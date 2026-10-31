@@ -9,6 +9,7 @@ import { CatalogPurchaseWidgetView } from '../widgets/CatalogPurchaseWidgetView'
 import { CatalogViewProductWidgetView } from '../widgets/CatalogViewProductWidgetView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 import { blockColorOf, groupBlockFamilies, NO_BLOCK_COLORS, pickBlockColor, pickVariant, swatchColor } from './buildersBlocks.helpers';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 /**
  * Builders Club colour grouping page for the old colour variants (bc_x*N): the preview on top, one
@@ -59,64 +60,66 @@ export const CatalogLayoutBuildersBlocksView: FC<CatalogLayoutProps> = (props) =
     }, [families, currentFamily, setCurrentOffer]);
 
     return (
-        <Column className="octane-catalog-builders-blocks" gap={1} overflow="hidden">
-            <div className="octane-catalog-builders-blocks-preview relative flex items-center justify-center overflow-hidden">
-                {currentOffer && (
-                    <>
-                        <CatalogPreviewControls productType={currentOffer.product.productType} roomPreviewer={roomPreviewer} />
-                        <CatalogViewProductWidgetView height={190} />
-                        <Text bold className="octane-catalog-builders-blocks-name" truncate>
-                            {currentOffer.localizationName}
-                        </Text>
-                    </>
-                )}
-            </div>
-            <div className="octane-catalog-builders-blocks-shapes">
-                <AutoGrid columnCount={7} columnMinHeight={50} columnMinWidth={45}>
-                    {families.map((family) =>
-                    {
-                        const offer = pickVariant(family, blockColorOf(colors, family.className));
-
-                        return (
-                            <CatalogGridOfferView
-                                key={family.className}
-                                itemActive={family.className === currentClassName}
-                                offer={offer}
-                                selectOffer={() => selectOffer(offer)}
-                                inventoryVisible={inventoryVisible}
-                            />
-                        );
-                    })}
-                </AutoGrid>
-            </div>
-            {currentFamily && currentFamily.colorIndexes.length > 1 && (
-                <div className="octane-catalog-recolorable-palette">
-                    <Text bold small>
-                        {localizeWithFallback('catalog.recolorable.palette', 'Palette')}
-                    </Text>
-                    <div className="octane-color-swatch-grid">
-                        {currentFamily.colorIndexes.map((index) =>
+        <NativeTextTree>
+            <Column className="octane-catalog-builders-blocks" gap={1} overflow="hidden">
+                <div className="octane-catalog-builders-blocks-preview relative flex items-center justify-center overflow-hidden">
+                    {currentOffer && (
+                        <>
+                            <CatalogPreviewControls productType={currentOffer.product.productType} roomPreviewer={roomPreviewer} />
+                            <CatalogViewProductWidgetView height={190} />
+                            <Text bold className="octane-catalog-builders-blocks-name" truncate>
+                                {currentOffer.localizationName}
+                            </Text>
+                        </>
+                    )}
+                </div>
+                <div className="octane-catalog-builders-blocks-shapes">
+                    <AutoGrid columnCount={7} columnMinHeight={50} columnMinWidth={45}>
+                        {families.map((family) =>
                         {
-                            const offer = currentFamily.variants.get(index);
+                            const offer = pickVariant(family, blockColorOf(colors, family.className));
 
                             return (
-                                <LayoutColorSwatchView
-                                    key={index}
-                                    active={index === currentColor}
-                                    color={ColorConverter.int2rgb(swatchColor(offer))}
-                                    title={offer?.localizationName}
-                                    onClick={() => pickColor(offer)}
+                                <CatalogGridOfferView
+                                    key={family.className}
+                                    itemActive={family.className === currentClassName}
+                                    offer={offer}
+                                    selectOffer={() => selectOffer(offer)}
+                                    inventoryVisible={inventoryVisible}
                                 />
                             );
                         })}
+                    </AutoGrid>
+                </div>
+                {currentFamily && currentFamily.colorIndexes.length > 1 && (
+                    <div className="octane-catalog-recolorable-palette">
+                        <Text bold small>
+                            {localizeWithFallback('catalog.recolorable.palette', 'Palette')}
+                        </Text>
+                        <div className="octane-color-swatch-grid">
+                            {currentFamily.colorIndexes.map((index) =>
+                            {
+                                const offer = currentFamily.variants.get(index);
+
+                                return (
+                                    <LayoutColorSwatchView
+                                        key={index}
+                                        active={index === currentColor}
+                                        color={ColorConverter.int2rgb(swatchColor(offer))}
+                                        title={offer?.localizationName}
+                                        onClick={() => pickColor(offer)}
+                                    />
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
-            )}
-            {currentOffer && (
-                <div className="octane-catalog-builders-blocks-actions">
-                    <CatalogPurchaseWidgetView />
-                </div>
-            )}
-        </Column>
+                )}
+                {currentOffer && (
+                    <div className="octane-catalog-builders-blocks-actions">
+                        <CatalogPurchaseWidgetView />
+                    </div>
+                )}
+            </Column>
+        </NativeTextTree>
     );
 };

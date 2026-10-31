@@ -16,6 +16,7 @@ import { Radio } from '../../../../common/Radio';
 import { NumberInput } from '../../../../common/NumberInput';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const SOURCE_TRIGGER = 0;
 const SOURCE_PICKED = 100;
@@ -175,85 +176,87 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
     );
 
     return (
-        <WiredActionBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID } save={ save } validate={ validate } widthModifier={ 1.2 } allowScrolling>
-            <div className="flex flex-col gap-2">
-                <Text small>{ localizeWithFallback('wiredfurni.params.place_furni.usage_info', 'Places temporary copies of the picked furni, as they are when you save.') }</Text>
+        <NativeTextTree>
+            <WiredActionBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID } save={ save } validate={ validate } widthModifier={ 1.2 } allowScrolling>
+                <div className="flex flex-col gap-2">
+                    <Text small>{ localizeWithFallback('wiredfurni.params.place_furni.usage_info', 'Places temporary copies of the picked furni, as they are when you save.') }</Text>
 
-                <div className="flex flex-col gap-1">
-                    <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.target_location', 'Location') }</Text>
-                    { radio('placeLocation', 0, location, setLocation, localizeWithFallback('wiredfurni.params.place_furni.target_location.0', 'Where the furni stood'), localizeWithFallback('wiredfurni.params.place_furni.target_location.0.info', '')) }
-                    { radio('placeLocation', 1, location, setLocation, localizeWithFallback('wiredfurni.params.place_furni.target_location.1', 'At the custom target')) }
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.target_location', 'Location') }</Text>
+                        { radio('placeLocation', 0, location, setLocation, localizeWithFallback('wiredfurni.params.place_furni.target_location.0', 'Where the furni stood'), localizeWithFallback('wiredfurni.params.place_furni.target_location.0.info', '')) }
+                        { radio('placeLocation', 1, location, setLocation, localizeWithFallback('wiredfurni.params.place_furni.target_location.1', 'At the custom target')) }
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.target_altitude', 'Altitude') }</Text>
+                        { [ 0, 1, 2 ].map(value => radio('placeAltitude', value, altitude, setAltitude, localizeWithFallback(`wiredfurni.params.place_furni.target_altitude.${ value }`, [ 'On top of the location', 'The furni\'s own altitude', 'The custom target\'s altitude' ][value]))) }
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                        <BaseButton type="button" className="octane-wired__advanced-toggle" onClick={ () => setShowOffsets(value => !value) }>
+                            <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.offsets', 'Offsets') }</Text>
+                        </BaseButton>
+                        { showOffsets &&
+                            <div className="flex flex-wrap items-center gap-3">
+                                { offsetInput(localizeWithFallback('wiredfurni.params.place_furni.offsets.x', 'x:'), offsetX, MAX_OFFSET, setOffsetX) }
+                                { offsetInput(localizeWithFallback('wiredfurni.params.place_furni.offsets.y', 'y:'), offsetY, MAX_OFFSET, setOffsetY) }
+                                { offsetInput(localizeWithFallback('wiredfurni.params.place_furni.offsets.altitude', 'altitude:'), offsetAltitude, MAX_OFFSET_ALTITUDE, setOffsetAltitude) }
+                            </div> }
+                    </div>
+
+                    <hr className="m-0 bg-dark" />
+
+                    <div className="flex flex-col gap-1">
+                        <label className="flex items-center gap-1">
+                            <Checkbox checked={ spawnWithVariable } onCheckedChange={(nextChecked) => setSpawnWithVariable(nextChecked)} />
+                            <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.spawn_with_variable', 'Spawn with variable') }</Text>
+                        </label>
+                        { spawnWithVariable &&
+                            <>
+                                <WiredVariablePicker entries={ spawnEntries } recentScope="variable-effects" selectedToken={ spawnToken } onSelect={ entry => setSpawnToken(entry.token) } />
+                                { !furniVariableDefinitions.length && <Text small>No wf_var_furni variables found in this room.</Text> }
+                                { /* AIR ?_-9T?: createValueOrVariableSection(1, mergedSourceOptions(1), spawn_with_value, int min, int max)
+                                    next to the spawn variable; the claimed merged slot 1 is the value's holder in the popup. */ }
+                                <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.spawn_with_value', 'Spawn with value:') }</Text>
+                                <WiredValueOrVariableField
+                                    disabled={ valueDisabled }
+                                    holderSource={ {
+                                        furniSource: valueFurniSource,
+                                        userSource: valueUserSource,
+                                        onFurniSourceChange: setValueFurniSource,
+                                        onUserSourceChange: setValueUserSource
+                                    } }
+                                    isVariable={ valueIsVariable }
+                                    label={ localizeWithFallback('wiredfurni.params.place_furni.spawn_with_value', 'Spawn with value:') }
+                                    literal={ value }
+                                    target={ valueTarget }
+                                    token={ valueToken }
+                                    onIsVariableChange={ setValueIsVariable }
+                                    onLiteralChange={ setValue }
+                                    onTargetChange={ setValueTarget }
+                                    onTokenChange={ setValueToken }
+                                    onValidityChange={ setValueValid } />
+                            </> }
+                    </div>
+
+                    <hr className="m-0 bg-dark" />
+
+                    <div className={ customTargetUsed ? '' : 'opacity-50 pointer-events-none' }>
+                        <WiredFurniSelectionSourceRow
+                            title="wiredfurni.params.sources.merged.title.custom_target"
+                            options={ targetIsUser ? availableUserSources : TARGET_FURNI_SOURCES }
+                            value={ targetIsUser ? targetUserSource : targetFurniSource }
+                            selectionKind={ targetIsUser ? 'primary' : 'secondary' }
+                            selectionActive={ false }
+                            selectionCount={ 0 }
+                            selectionLimit={ 0 }
+                            selectionEnabledValues={ [] }
+                            showSelectionToggle={ false }
+                            headerContent={ sourceButtons(targetIsUser, setTargetIsUser) }
+                            onChange={ value => (targetIsUser ? setTargetUserSource(value) : setTargetFurniSource(value)) } />
+                    </div>
                 </div>
-
-                <div className="flex flex-col gap-1">
-                    <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.target_altitude', 'Altitude') }</Text>
-                    { [ 0, 1, 2 ].map(value => radio('placeAltitude', value, altitude, setAltitude, localizeWithFallback(`wiredfurni.params.place_furni.target_altitude.${ value }`, [ 'On top of the location', 'The furni\'s own altitude', 'The custom target\'s altitude' ][value]))) }
-                </div>
-
-                <div className="flex flex-col gap-1">
-                    <BaseButton type="button" className="btn btn-link p-0 align-self-start" onClick={ () => setShowOffsets(value => !value) }>
-                        <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.offsets', 'Offsets') }</Text>
-                    </BaseButton>
-                    { showOffsets &&
-                        <div className="flex flex-wrap items-center gap-3">
-                            { offsetInput(localizeWithFallback('wiredfurni.params.place_furni.offsets.x', 'x:'), offsetX, MAX_OFFSET, setOffsetX) }
-                            { offsetInput(localizeWithFallback('wiredfurni.params.place_furni.offsets.y', 'y:'), offsetY, MAX_OFFSET, setOffsetY) }
-                            { offsetInput(localizeWithFallback('wiredfurni.params.place_furni.offsets.altitude', 'altitude:'), offsetAltitude, MAX_OFFSET_ALTITUDE, setOffsetAltitude) }
-                        </div> }
-                </div>
-
-                <hr className="m-0 bg-dark" />
-
-                <div className="flex flex-col gap-1">
-                    <label className="flex items-center gap-1">
-                        <Checkbox checked={ spawnWithVariable } onCheckedChange={(nextChecked) => setSpawnWithVariable(nextChecked)} />
-                        <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.spawn_with_variable', 'Spawn with variable') }</Text>
-                    </label>
-                    { spawnWithVariable &&
-                        <>
-                            <WiredVariablePicker entries={ spawnEntries } recentScope="variable-effects" selectedToken={ spawnToken } onSelect={ entry => setSpawnToken(entry.token) } />
-                            { !furniVariableDefinitions.length && <Text small>No wf_var_furni variables found in this room.</Text> }
-                            { /* AIR ?_-9T?: createValueOrVariableSection(1, mergedSourceOptions(1), spawn_with_value, int min, int max)
-                                next to the spawn variable; the claimed merged slot 1 is the value's holder in the popup. */ }
-                            <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.spawn_with_value', 'Spawn with value:') }</Text>
-                            <WiredValueOrVariableField
-                                disabled={ valueDisabled }
-                                holderSource={ {
-                                    furniSource: valueFurniSource,
-                                    userSource: valueUserSource,
-                                    onFurniSourceChange: setValueFurniSource,
-                                    onUserSourceChange: setValueUserSource
-                                } }
-                                isVariable={ valueIsVariable }
-                                label={ localizeWithFallback('wiredfurni.params.place_furni.spawn_with_value', 'Spawn with value:') }
-                                literal={ value }
-                                target={ valueTarget }
-                                token={ valueToken }
-                                onIsVariableChange={ setValueIsVariable }
-                                onLiteralChange={ setValue }
-                                onTargetChange={ setValueTarget }
-                                onTokenChange={ setValueToken }
-                                onValidityChange={ setValueValid } />
-                        </> }
-                </div>
-
-                <hr className="m-0 bg-dark" />
-
-                <div className={ customTargetUsed ? '' : 'opacity-50 pointer-events-none' }>
-                    <WiredFurniSelectionSourceRow
-                        title="wiredfurni.params.sources.merged.title.custom_target"
-                        options={ targetIsUser ? availableUserSources : TARGET_FURNI_SOURCES }
-                        value={ targetIsUser ? targetUserSource : targetFurniSource }
-                        selectionKind={ targetIsUser ? 'primary' : 'secondary' }
-                        selectionActive={ false }
-                        selectionCount={ 0 }
-                        selectionLimit={ 0 }
-                        selectionEnabledValues={ [] }
-                        showSelectionToggle={ false }
-                        headerContent={ sourceButtons(targetIsUser, setTargetIsUser) }
-                        onChange={ value => (targetIsUser ? setTargetUserSource(value) : setTargetFurniSource(value)) } />
-                </div>
-            </div>
-        </WiredActionBaseView>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

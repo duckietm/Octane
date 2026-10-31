@@ -21,6 +21,7 @@ import { clearAnsweredFriendRequestRows, FriendRequestRow, markFriendRequestRows
 import { FriendsListRequestView } from './friends-list-request/FriendsListRequestView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /** AIR HabboFriendList: a room invite can be sent once a minute. */
 const ROOM_INVITE_INTERVAL_MS = 60000;
@@ -249,168 +250,170 @@ export const FriendsListView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <>
-            <DraggableWindow
-                uniqueKey="octane-friends"
-                handleSelector=".hfl-titlebar"
-                windowPosition={DraggableWindowPosition.TOP_LEFT}
-                offsetLeft={110}
-                offsetTop={50}
-            >
-                <div
-                    className={`habbo-friend-list${requests.length || activePanel === 'requests' ? ' has-requests' : ''}${activePanel === 'search' ? ' search-mode' : ''}${activePanel === 'requests' ? ' requests-mode' : ''}${activePanel === null ? ' collapsed-mode' : ''}`}
+        <NativeTextTree>
+            <>
+                <DraggableWindow
+                    uniqueKey="octane-friends"
+                    handleSelector=".hfl-titlebar"
+                    windowPosition={DraggableWindowPosition.TOP_LEFT}
+                    offsetLeft={110}
+                    offsetTop={50}
                 >
-                    <div className="hfl-titlebar drag-handler">
-                        <span className="hfl-titlebar-grip" />
-                        <span className="hfl-title">{LocalizeText('friendlist.friends')}</span>
-                        <BaseButton type="button" className="hfl-close" onClick={() => setIsVisible(false)} />
-                    </div>
-                    <div className="hfl-category">
-                        <BaseButton
-                            type="button"
-                            className="hfl-category-current"
-                            aria-expanded={activePanel === 'friends'}
-                            onClick={() => setActivePanel((value) => (value === 'friends' ? null : 'friends'))}
-                        >
-                            {`${LocalizeText('friendlist.friends')} (${onlineFriends.length})`}
-                        </BaseButton>
-                    </div>
-                    {activePanel !== null && (
-                        <div className="hfl-content">
-                            {activePanel === 'search' && <FriendsSearchView friendResults={searchFriendResults} otherResults={searchOtherResults} />}
-                            {activePanel === 'requests' && (
-                                <>
-                                    <FriendsListRequestView rows={requestRows} onAccept={acceptRequest} onDecline={declineRequest} />
-                                    <div className="hfl-request-footer" data-testid="requests-footer">
-                                        <BaseButton type="button" data-action="accept-all" disabled={!requests.length} onClick={() => respondToAllRequests(true)}>
-                                            <span className="hfl-request-footer-icon accept" />
-                                            {LocalizeText('friendlist.requests.acceptall')}
-                                        </BaseButton>
-                                        <BaseButton type="button" data-action="dismiss-all" disabled={!requests.length} onClick={() => respondToAllRequests(false)}>
-                                            <span className="hfl-request-footer-icon decline" />
-                                            {LocalizeText('friendlist.requests.dismissall')}
-                                        </BaseButton>
-                                    </div>
-                                </>
-                            )}
-                            {activePanel === 'friends' && (
-                                <>
-                                    <Collapsible.Root render={<section />} className="hfl-section" open={isOnlineExpanded} onOpenChange={setIsOnlineExpanded}>
-                                        <Collapsible.Trigger className={`hfl-section-header${isOnlineExpanded ? '' : ' collapsed'}`}>
-                                            <span>{LocalizeText('friendlist.friends') + ` (${filteredOnlineFriends.length})`}</span>
-                                            {showSelectAll && (
-                                                <span
-                                                    className="hfl-select-all"
-                                                    onClick={(event) => {
-                                                        event.stopPropagation();
-                                                        toggleSelectFriends(filteredOnlineFriends.map((friend) => friend.id));
-                                                    }}
-                                                >
-                                                    {filteredOnlineFriends.every((friend) => selectedFriendsIds.indexOf(friend.id) >= 0)
-                                                        ? LocalizeText('friendlist.unselect_all')
-                                                        : LocalizeText('friendlist.select_all')}
-                                                </span>
-                                            )}
-                                        </Collapsible.Trigger>
-                                        <Collapsible.Panel className="hfl-list">
-                                            <FriendsListGroupView
-                                                list={filteredOnlineFriends}
-                                                selectedFriendsIds={selectedFriendsIds}
-                                                selectFriend={selectFriend}
-                                                firstRowIndex={1}
-                                            />
-                                        </Collapsible.Panel>
-                                    </Collapsible.Root>
-                                    <Collapsible.Root render={<section />} className="hfl-section" open={isOfflineExpanded} onOpenChange={setIsOfflineExpanded}>
-                                        <Collapsible.Trigger
-                                            className={`hfl-section-header${offlineHeaderRow % 2 === 1 ? ' hfl-row-odd' : ''}${isOfflineExpanded ? '' : ' collapsed'}`}
-                                        >
-                                            <span>{LocalizeText('friendlist.friends.offlinecaption') + ` (${filteredOfflineFriends.length})`}</span>
-                                        </Collapsible.Trigger>
-                                        <Collapsible.Panel className="hfl-list">
-                                            <FriendsListGroupView
-                                                list={filteredOfflineFriends}
-                                                selectedFriendsIds={selectedFriendsIds}
-                                                selectFriend={selectFriend}
-                                                firstRowIndex={offlineHeaderRow + 1}
-                                            />
-                                        </Collapsible.Panel>
-                                    </Collapsible.Root>
-                                </>
-                            )}
+                    <div
+                        className={`habbo-friend-list${requests.length || activePanel === 'requests' ? ' has-requests' : ''}${activePanel === 'search' ? ' search-mode' : ''}${activePanel === 'requests' ? ' requests-mode' : ''}${activePanel === null ? ' collapsed-mode' : ''}`}
+                    >
+                        <div className="hfl-titlebar drag-handler">
+                            <span className="hfl-titlebar-grip" />
+                            <span className="hfl-title">{LocalizeText('friendlist.friends')}</span>
+                            <BaseButton type="button" className="hfl-close" onClick={() => setIsVisible(false)} />
                         </div>
-                    )}
-                    {activePanel === 'friends' && (
-                        <div className="hfl-footer" data-testid="friends-footer">
-                            <div className="hfl-footer-border">
-                                <Hint content={LocalizeText('friendlist.tip.invite')}>
-                                    <BaseButton aria-label={LocalizeText('friendlist.tip.invite')}
-                                        type="button"
-                                        className="hfl-footer-button invite"
-                                        disabled={!selectedFriendsIds.length}
-                                        onClick={openRoomInvite}
-                                    />
-                                </Hint>
-                                <Hint content={LocalizeText('friendlist.tip.home')}>
-                                    <BaseButton aria-label={LocalizeText('friendlist.tip.home')}
-                                        type="button"
-                                        className="hfl-footer-button home"
-                                        disabled={selectedFriendsIds.length !== 1}
-                                        onClick={openSelectedFriendHome}
-                                    />
-                                </Hint>
-                                {isFriendSearchOpen ? (
-                                    <div className="hfl-footer-search">
-                                        <input
-                                            autoFocus
-                                            value={friendSearchValue}
-                                            onChange={(event) => setFriendSearchValue(event.target.value)}
-                                            onKeyDown={(event) => event.key === 'Escape' && closeFriendSearch()}
-                                        />
-                                        <Hint content={LocalizeText('generic.clear')}>
-                                            <BaseButton aria-label={LocalizeText('generic.clear')} type="button" onClick={closeFriendSearch} />
-                                        </Hint>
-                                    </div>
-                                ) : (
-                                    <Hint content={LocalizeText('friendlist.tip.search')}>
-                                        <BaseButton aria-label={LocalizeText('friendlist.tip.search')}
+                        <div className="hfl-category">
+                            <BaseButton
+                                type="button"
+                                className="hfl-category-current"
+                                aria-expanded={activePanel === 'friends'}
+                                onClick={() => setActivePanel((value) => (value === 'friends' ? null : 'friends'))}
+                            >
+                                {`${LocalizeText('friendlist.friends')} (${onlineFriends.length})`}
+                            </BaseButton>
+                        </div>
+                        {activePanel !== null && (
+                            <div className="hfl-content">
+                                {activePanel === 'search' && <FriendsSearchView friendResults={searchFriendResults} otherResults={searchOtherResults} />}
+                                {activePanel === 'requests' && (
+                                    <>
+                                        <FriendsListRequestView rows={requestRows} onAccept={acceptRequest} onDecline={declineRequest} />
+                                        <div className="hfl-request-footer" data-testid="requests-footer">
+                                            <BaseButton type="button" data-action="accept-all" disabled={!requests.length} onClick={() => respondToAllRequests(true)}>
+                                                <span className="hfl-request-footer-icon accept" />
+                                                {LocalizeText('friendlist.requests.acceptall')}
+                                            </BaseButton>
+                                            <BaseButton type="button" data-action="dismiss-all" disabled={!requests.length} onClick={() => respondToAllRequests(false)}>
+                                                <span className="hfl-request-footer-icon decline" />
+                                                {LocalizeText('friendlist.requests.dismissall')}
+                                            </BaseButton>
+                                        </div>
+                                    </>
+                                )}
+                                {activePanel === 'friends' && (
+                                    <>
+                                        <Collapsible.Root render={<section />} className="hfl-section" open={isOnlineExpanded} onOpenChange={setIsOnlineExpanded}>
+                                            <Collapsible.Trigger className={`hfl-section-header${isOnlineExpanded ? '' : ' collapsed'}`}>
+                                                <span>{LocalizeText('friendlist.friends') + ` (${filteredOnlineFriends.length})`}</span>
+                                                {showSelectAll && (
+                                                    <span
+                                                        className="hfl-select-all"
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+                                                            toggleSelectFriends(filteredOnlineFriends.map((friend) => friend.id));
+                                                        }}
+                                                    >
+                                                        {filteredOnlineFriends.every((friend) => selectedFriendsIds.indexOf(friend.id) >= 0)
+                                                            ? LocalizeText('friendlist.unselect_all')
+                                                            : LocalizeText('friendlist.select_all')}
+                                                    </span>
+                                                )}
+                                            </Collapsible.Trigger>
+                                            <Collapsible.Panel className="hfl-list">
+                                                <FriendsListGroupView
+                                                    list={filteredOnlineFriends}
+                                                    selectedFriendsIds={selectedFriendsIds}
+                                                    selectFriend={selectFriend}
+                                                    firstRowIndex={1}
+                                                />
+                                            </Collapsible.Panel>
+                                        </Collapsible.Root>
+                                        <Collapsible.Root render={<section />} className="hfl-section" open={isOfflineExpanded} onOpenChange={setIsOfflineExpanded}>
+                                            <Collapsible.Trigger
+                                                className={`hfl-section-header${offlineHeaderRow % 2 === 1 ? ' hfl-row-odd' : ''}${isOfflineExpanded ? '' : ' collapsed'}`}
+                                            >
+                                                <span>{LocalizeText('friendlist.friends.offlinecaption') + ` (${filteredOfflineFriends.length})`}</span>
+                                            </Collapsible.Trigger>
+                                            <Collapsible.Panel className="hfl-list">
+                                                <FriendsListGroupView
+                                                    list={filteredOfflineFriends}
+                                                    selectedFriendsIds={selectedFriendsIds}
+                                                    selectFriend={selectFriend}
+                                                    firstRowIndex={offlineHeaderRow + 1}
+                                                />
+                                            </Collapsible.Panel>
+                                        </Collapsible.Root>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                        {activePanel === 'friends' && (
+                            <div className="hfl-footer" data-testid="friends-footer">
+                                <div className="hfl-footer-border">
+                                    <Hint content={LocalizeText('friendlist.tip.invite')}>
+                                        <BaseButton aria-label={LocalizeText('friendlist.tip.invite')}
                                             type="button"
-                                            className="hfl-footer-button search"
-                                            onClick={() => setIsFriendSearchOpen(true)}
+                                            className="hfl-footer-button invite"
+                                            disabled={!selectedFriendsIds.length}
+                                            onClick={openRoomInvite}
                                         />
                                     </Hint>
-                                )}
-                                <Hint content={LocalizeText('friendlist.tip.remove')}><BaseButton aria-label={LocalizeText('friendlist.tip.remove')}
-                                    type="button"
-                                    className="hfl-footer-button delete"
-                                    disabled={!selectedFriendsIds.length}
-                                    onClick={() => selectedFriendsIds.length && setShowRemoveFriendsConfirmation(true)}
-                                /></Hint>
+                                    <Hint content={LocalizeText('friendlist.tip.home')}>
+                                        <BaseButton aria-label={LocalizeText('friendlist.tip.home')}
+                                            type="button"
+                                            className="hfl-footer-button home"
+                                            disabled={selectedFriendsIds.length !== 1}
+                                            onClick={openSelectedFriendHome}
+                                        />
+                                    </Hint>
+                                    {isFriendSearchOpen ? (
+                                        <div className="hfl-footer-search">
+                                            <input
+                                                autoFocus
+                                                value={friendSearchValue}
+                                                onChange={(event) => setFriendSearchValue(event.target.value)}
+                                                onKeyDown={(event) => event.key === 'Escape' && closeFriendSearch()}
+                                            />
+                                            <Hint content={LocalizeText('generic.clear')}>
+                                                <BaseButton aria-label={LocalizeText('generic.clear')} type="button" onClick={closeFriendSearch} />
+                                            </Hint>
+                                        </div>
+                                    ) : (
+                                        <Hint content={LocalizeText('friendlist.tip.search')}>
+                                            <BaseButton aria-label={LocalizeText('friendlist.tip.search')}
+                                                type="button"
+                                                className="hfl-footer-button search"
+                                                onClick={() => setIsFriendSearchOpen(true)}
+                                            />
+                                        </Hint>
+                                    )}
+                                    <Hint content={LocalizeText('friendlist.tip.remove')}><BaseButton aria-label={LocalizeText('friendlist.tip.remove')}
+                                        type="button"
+                                        className="hfl-footer-button delete"
+                                        disabled={!selectedFriendsIds.length}
+                                        onClick={() => selectedFriendsIds.length && setShowRemoveFriendsConfirmation(true)}
+                                    /></Hint>
+                                </div>
                             </div>
-                        </div>
-                    )}
-                    {(!!requests.length || activePanel === 'requests') && (
-                        <BaseButton type="button" className="hfl-request-strip" onClick={toggleRequestsPanel}>
-                            {`${LocalizeText('friendlist.tab.friendrequests')} (${requests.length})`}
+                        )}
+                        {(!!requests.length || activePanel === 'requests') && (
+                            <BaseButton type="button" className="hfl-request-strip" onClick={toggleRequestsPanel}>
+                                {`${LocalizeText('friendlist.tab.friendrequests')} (${requests.length})`}
+                            </BaseButton>
+                        )}
+                        <BaseButton type="button" className="hfl-search-strip" onClick={() => setActivePanel((value) => (value === 'search' ? null : 'search'))}>
+                            {`${LocalizeText('generic.search')} (${searchResultCount})`}
                         </BaseButton>
-                    )}
-                    <BaseButton type="button" className="hfl-search-strip" onClick={() => setActivePanel((value) => (value === 'search' ? null : 'search'))}>
-                        {`${LocalizeText('generic.search')} (${searchResultCount})`}
-                    </BaseButton>
-                    <div className="hfl-bottom" />
-                </div>
-            </DraggableWindow>
-            {showRoomInvite && (
-                <FriendsRoomInviteView selectedFriendsIds={selectedFriendsIds} sendRoomInvite={sendRoomInvite} onCloseClick={() => setShowRoomInvite(false)} />
-            )}
-            {showRemoveFriendsConfirmation && (
-                <FriendsRemoveConfirmationView
-                    removeFriendsText={removeFriendsText}
-                    removeSelectedFriends={removeSelectedFriends}
-                    selectedFriendsIds={selectedFriendsIds}
-                    onCloseClick={() => setShowRemoveFriendsConfirmation(false)}
-                />
-            )}
-        </>
+                        <div className="hfl-bottom" />
+                    </div>
+                </DraggableWindow>
+                {showRoomInvite && (
+                    <FriendsRoomInviteView selectedFriendsIds={selectedFriendsIds} sendRoomInvite={sendRoomInvite} onCloseClick={() => setShowRoomInvite(false)} />
+                )}
+                {showRemoveFriendsConfirmation && (
+                    <FriendsRemoveConfirmationView
+                        removeFriendsText={removeFriendsText}
+                        removeSelectedFriends={removeSelectedFriends}
+                        selectedFriendsIds={selectedFriendsIds}
+                        onCloseClick={() => setShowRemoveFriendsConfirmation(false)}
+                    />
+                )}
+            </>
+        </NativeTextTree>
     );
 };

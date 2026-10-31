@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import frankImage from '@/assets/images/notifications/frank.gif';
 import { LocalizeText, PlaySound, SoundNames } from '../../../api';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useHotelAlertToastStore } from '../../../hooks/notification/hotelAlertToastStore';
 
 const ENTER_MS = 350;
@@ -47,16 +48,18 @@ export const HotelAlertToastView: FC<{}> = () => {
     };
 
     return (
-        <div className={`hotel-alert-toast phase-${phase}${toast.variant === 'staff' ? ' is-staff' : ''}`} role="status" onClick={dismissEarly}>
-            <div className="hotel-alert-toast-circle">
-                <img alt="" draggable={false} src={frankImage} />
-            </div>
-            <div className="hotel-alert-toast-pill">
-                <div className="hotel-alert-toast-body">
-                    <span className="hotel-alert-toast-title">{toast.title || LocalizeText('notifications.broadcast.title')}</span>
-                    <span className="hotel-alert-toast-message">{toast.message}</span>
+        <NativeTextTree>
+            <div className={`hotel-alert-toast phase-${phase}${toast.variant === 'staff' ? ' is-staff' : ''}`} role="status" onClick={dismissEarly}>
+                <div className="hotel-alert-toast-circle">
+                    <img alt="" draggable={false} src={frankImage} />
+                </div>
+                <div className="hotel-alert-toast-pill">
+                    <div className="hotel-alert-toast-body">
+                        <span className="hotel-alert-toast-title">{toast.title || LocalizeText('notifications.broadcast.title')}</span>
+                        <span className="hotel-alert-toast-message">{toast.message}</span>
+                    </div>
                 </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

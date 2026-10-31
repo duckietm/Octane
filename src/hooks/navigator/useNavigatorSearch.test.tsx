@@ -5,10 +5,10 @@ import { mockEventDispatcher } from '../../octane-renderer.mock';
 import { useNavigatorUiStore } from './navigatorUiStore';
 import { useNavigatorSearch } from './useNavigatorSearch';
 
-const makeSearchEvent = (code: string) => {
+const makeSearchEvent = (code: string, data = '') => {
     const result = new (NavigatorSearchResultSet as any)() as any;
     result.code = code;
-    result.data = '';
+    result.data = data;
     result.results = [];
 
     const ev = new (NavigatorSearchEvent as any)() as any;
@@ -83,12 +83,19 @@ describe('useNavigatorSearch', () => {
 
         await waitFor(() => expect(result.current.isFetching).toBe(true));
 
+        // A late reply for the filter before is not shown for this one.
         act(() => {
-            mockEventDispatcher.dispatchEvent(makeSearchEvent('public') as any);
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('public', '') as any);
+        });
+        expect(result.current.isFetching).toBe(true);
+
+        act(() => {
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('public', 'cocco') as any);
         });
 
         await waitFor(() => expect(result.current.isFetching).toBe(false));
         expect((result.current.searchResult as any).code).toBe('public');
+        expect((result.current.searchResult as any).data).toBe('cocco');
         expect(useNavigatorUiStore.getState().currentFilter).toBe('cocco');
     });
 
@@ -102,7 +109,7 @@ describe('useNavigatorSearch', () => {
 
         await waitFor(() => expect(result.current.isFetching).toBe(true));
         act(() => {
-            mockEventDispatcher.dispatchEvent(makeSearchEvent('public') as any);
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('public', 'some-filter') as any);
         });
         await waitFor(() => expect(result.current.isFetching).toBe(false));
 
@@ -220,5 +227,16 @@ describe('useNavigatorSearch', () => {
             mockEventDispatcher.dispatchEvent(new (RoomSettingsSavedEvent as any)() as any);
         });
         await waitFor(() => expect(result.current.isFetching).toBe(true));
+    });
+});
+
+describe('isReplyForSearch', () => {
+    it('matches the tab and the filter, with the filter cut where the server cuts it', async () => {
+        const { isReplyForSearch } = await import('./useNavigatorSearch');
+
+        expect(isReplyForSearch('public', 'cocco', 'public', 'cocco')).toBe(true);
+        expect(isReplyForSearch('public', 'cocc', 'public', 'cocco')).toBe(false);
+        expect(isReplyForSearch('events', 'cocco', 'public', 'cocco')).toBe(false);
+        expect(isReplyForSearch('public', 'x'.repeat(64), 'public', 'x'.repeat(80))).toBe(true);
     });
 });

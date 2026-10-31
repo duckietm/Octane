@@ -1,5 +1,6 @@
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { WiredFurniType, WiredSelectionVisualizer } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { FURNI_SOURCES, sortWiredSourceOptions, WiredSourceOption } from '../WiredSourcesSelector';
@@ -156,38 +157,40 @@ export const WiredActionFurniToFurniView: FC<{}> = () => {
     const selectionLimit = trigger?.maximumItemSelectionCount ?? 0;
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
-            save={save}
-            selectionPreview={
-                <div className="flex flex-col gap-2">
-                    <WiredFurniSelectionSourceRow
-                        title="wiredfurni.params.sources.furni.title.mv.0"
-                        options={FURNI_SOURCES}
-                        value={moveSource}
-                        selectionKind="primary"
-                        selectionActive={selectionMode === 'move'}
-                        selectionCount={moveFurniIds.length}
-                        selectionLimit={selectionLimit}
-                        selectionEnabledValues={[SOURCE_SELECTED]}
-                        onChange={setMoveSource}
-                        onSelectionActivate={() => switchSelection('move')}
-                    />
-                    <WiredFurniSelectionSourceRow
-                        title="wiredfurni.params.sources.furni.title.mv.1"
-                        options={TARGET_FURNI_SOURCES}
-                        value={targetSource}
-                        selectionKind="secondary"
-                        selectionActive={selectionMode === 'target'}
-                        selectionCount={targetFurniIds.length}
-                        selectionLimit={selectionLimit}
-                        selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
-                        onChange={(value) => setTargetSource(value === SOURCE_SELECTED ? SOURCE_SECONDARY_SELECTED : value)}
-                        onSelectionActivate={() => switchSelection('target')}
-                    />
-                </div>
-            }
-        />
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
+                save={save}
+                selectionPreview={
+                    <div className="flex flex-col gap-2">
+                        <WiredFurniSelectionSourceRow
+                            title="wiredfurni.params.sources.furni.title.mv.0"
+                            options={FURNI_SOURCES}
+                            value={moveSource}
+                            selectionKind="primary"
+                            selectionActive={selectionMode === 'move'}
+                            selectionCount={moveFurniIds.length}
+                            selectionLimit={selectionLimit}
+                            selectionEnabledValues={[SOURCE_SELECTED]}
+                            onChange={setMoveSource}
+                            onSelectionActivate={() => switchSelection('move')}
+                        />
+                        <WiredFurniSelectionSourceRow
+                            title="wiredfurni.params.sources.furni.title.mv.1"
+                            options={TARGET_FURNI_SOURCES}
+                            value={targetSource}
+                            selectionKind="secondary"
+                            selectionActive={selectionMode === 'target'}
+                            selectionCount={targetFurniIds.length}
+                            selectionLimit={selectionLimit}
+                            selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
+                            onChange={(value) => setTargetSource(value === SOURCE_SELECTED ? SOURCE_SECONDARY_SELECTED : value)}
+                            onSelectionActivate={() => switchSelection('target')}
+                        />
+                    </div>
+                }
+            />
+        </NativeTextTree>
     );
 };

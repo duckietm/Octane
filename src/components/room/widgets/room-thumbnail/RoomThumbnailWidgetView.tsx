@@ -2,6 +2,7 @@ import { GetGuestRoomMessageComposer, GetRoomEngine, OctaneRectangle, OctaneRend
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CaptureCameraRenderMessage, GetCameraRenderMode, LocalizeText, RefreshRoomThumbnail, SendMessageComposer } from '../../../../api';
 import { LayoutMiniCameraView } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { RoomWidgetThumbnailEvent } from '../../../../events';
 import { useMessageEvent, useNotification, useRoom, useUiEvent } from '../../../../hooks';
 
@@ -102,11 +103,13 @@ export const RoomThumbnailWidgetView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <LayoutMiniCameraView
-            roomId={roomSession.roomId}
-            textureReceiver={receiveTexture}
-            isSaving={isSaving}
-            onClose={() => !isSaving && setIsVisible(false)}
-        />
+        <NativeTextTree>
+            <LayoutMiniCameraView
+                roomId={roomSession.roomId}
+                textureReceiver={receiveTexture}
+                isSaving={isSaving}
+                onClose={() => !isSaving && setIsVisible(false)}
+            />
+        </NativeTextTree>
     );
 };

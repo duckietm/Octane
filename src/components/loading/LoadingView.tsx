@@ -3,6 +3,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { AIR_SPLASH_BG, AIR_SPLASH_TOP, AIR_USER_PHOTOS } from '@/assets/images/loading/air';
 import octaneLogo from '@/assets/images/loading/octane-logo.png';
 import '@/css/loading/LoadingView.css';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface LoadingViewProps {
     isError?: boolean;
@@ -72,44 +73,46 @@ export const LoadingView: FC<LoadingViewProps> = (props) => {
     const headline = isError ? configString('client.loading.failed', 'Loading failed') : (messages[messageIndex] ?? message);
 
     return (
-        <div className="octane-loading" style={customBackground ? { background: customBackground } : undefined}>
-            <img src={logoUrl} alt="Octane" draggable={false} className="octane-loading__logo" />
-            <div className="octane-loading__stack">
-                <div className="octane-loading__splash" aria-hidden="true">
-                    <img src={AIR_SPLASH_BG} alt="" draggable={false} />
-                    {photo && <img src={photo} alt="" draggable={false} className="octane-loading__photo" />}
-                    <img src={AIR_SPLASH_TOP} alt="" draggable={false} />
-                </div>
-                <div className="octane-loading__text" role="status">
-                    {headline}
-                </div>
-                {isError ? (
-                    <div className="octane-loading__error">
-                        {message && <div>{message}</div>}
-                        {homeUrl && (
-                            <a href={homeUrl} className="octane-loading__home">
-                                Back to Hotel
-                            </a>
-                        )}
+        <NativeTextTree>
+            <div className="octane-loading" style={customBackground ? { background: customBackground } : undefined}>
+                <img src={logoUrl} alt="Octane" draggable={false} className="octane-loading__logo" />
+                <div className="octane-loading__stack">
+                    <div className="octane-loading__splash" aria-hidden="true">
+                        <img src={AIR_SPLASH_BG} alt="" draggable={false} />
+                        {photo && <img src={photo} alt="" draggable={false} className="octane-loading__photo" />}
+                        <img src={AIR_SPLASH_TOP} alt="" draggable={false} />
                     </div>
-                ) : (
-                    <>
-                        <div
-                            className="octane-loading__bar"
-                            role="progressbar"
-                            aria-valuemin={0}
-                            aria-valuemax={100}
-                            aria-valuenow={clampedProgress ?? undefined}
-                        >
-                            <div className="octane-loading__track">
-                                <div className="octane-loading__fill" style={{ width: `${clampedProgress ?? 0}%` }} />
-                            </div>
+                    <div className="octane-loading__text" role="status">
+                        {headline}
+                    </div>
+                    {isError ? (
+                        <div className="octane-loading__error">
+                            {message && <div>{message}</div>}
+                            {homeUrl && (
+                                <a href={homeUrl} className="octane-loading__home">
+                                    Back to Hotel
+                                </a>
+                            )}
                         </div>
-                        <div className="octane-loading__percent">{clampedProgress !== null ? `${clampedProgress}%` : ''}</div>
-                        {currentTask && <div className="octane-loading__task">{currentTask}</div>}
-                    </>
-                )}
+                    ) : (
+                        <>
+                            <div
+                                className="octane-loading__bar"
+                                role="progressbar"
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                                aria-valuenow={clampedProgress ?? undefined}
+                            >
+                                <div className="octane-loading__track">
+                                    <div className="octane-loading__fill" style={{ width: `${clampedProgress ?? 0}%` }} />
+                                </div>
+                            </div>
+                            <div className="octane-loading__percent">{clampedProgress !== null ? `${clampedProgress}%` : ''}</div>
+                            {currentTask && <div className="octane-loading__task">{currentTask}</div>}
+                        </>
+                    )}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

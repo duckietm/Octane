@@ -8,6 +8,7 @@ import { SnowWarSkillStars } from './SnowWarSkillStars';
 import { SnowWarStrokeText } from './SnowWarStrokeText';
 import { BaseButton } from '../../../../common/BaseButton';
 import { ToggleButton } from '../../../../common/ToggleButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 // Red = team 0, Blue = team 1 (matches the arena's TEAM_COLORS ordering).
 const TEAMS = [
@@ -81,93 +82,95 @@ export const SnowWarTeamsView: FC = () =>
                 : localizeWithFallback('snowwar.lobby_waiting_for_more_players', 'Waiting for more players...');
 
     return (
-        <div className="snowwar-teams snowwar-air-backdrop">
-            {queueInfo?.canEdit && (
-                <div className="snowwar-teams__topbar">
-                    <BaseButton type="button" className="snowwar-button snowwar-button--edit" onClick={() => startEditing()}>
-                        {localizeWithFallback('snowwar.editor.build_custom', 'Build Custom Arena')}
-                    </BaseButton>
-                </div>
-            )}
-            <img className="snowwar-lobby__logo" src={snowStormLogo} alt="SnowStorm" />
-            <div className="snowwar-teams__title">
-                {localizeWithFallback('snowwar.teams.assembling', 'Assembling teams...')}
-            </div>
-            {/* AIR wait_text over wait_text_stroke (UbuntuThick, 0x1077ac). */}
-            <div className="snowwar-teams__countdown"><SnowWarStrokeText text={status} /></div>
-
-            {!!lobbyTeams?.arenas.length && (
-                <div className="snowwar-teams__arenas">
-                    <div className="snowwar-teams__arena-heading">
-                        {isLeader
-                            ? localizeWithFallback('snowwar.arena.choose', 'Choose the arena')
-                            : localizeWithFallback('snowwar.arena.leader', 'The lobby leader chooses the arena')}
+        <NativeTextTree>
+            <div className="snowwar-teams snowwar-air-backdrop">
+                {queueInfo?.canEdit && (
+                    <div className="snowwar-teams__topbar">
+                        <BaseButton type="button" className="snowwar-button snowwar-button--edit" onClick={() => startEditing()}>
+                            {localizeWithFallback('snowwar.editor.build_custom', 'Build Custom Arena')}
+                        </BaseButton>
                     </div>
-                    <div className="snowwar-teams__arena-list">
-                        {lobbyTeams.arenas.map(arena =>
-                        {
-                            const selected = lobbyTeams.selectedArenaId === arena.id;
-                            const name = arena.official
-                                ? localizeWithFallback(`snowwar.field.name.${arena.id}`, localizeWithFallback(`gamecenter.snowwar.map.name.${arena.id}`, arena.name))
-                                : arena.name;
-                            return (
-                                <ToggleButton
-                                    key={arena.id}
-                                    type="button"
-                                    className={`snowwar-teams__arena${selected ? ' snowwar-teams__arena--selected' : ''}`}
-                                    disabled={!isLeader} pressed={selected}
-                                    onClick={() => selectArena(arena.id)}>
-                                    <img src={getArenaPreviewUrl(arena.id, arena.official)} alt="" />
-                                    {!arena.official && <small>{localizeWithFallback('snowwar.arena.custom', 'Custom')}</small>}
-                                    <span>{name}</span>
-                                </ToggleButton>
-                            );
-                        })}
-                    </div>
+                )}
+                <img className="snowwar-lobby__logo" src={snowStormLogo} alt="SnowStorm" />
+                <div className="snowwar-teams__title">
+                    {localizeWithFallback('snowwar.teams.assembling', 'Assembling teams...')}
                 </div>
-            )}
+                {/* AIR wait_text over wait_text_stroke (UbuntuThick, 0x1077ac). */}
+                <div className="snowwar-teams__countdown"><SnowWarStrokeText text={status} /></div>
 
-            <div className="snowwar-teams__board">
-                {TEAMS.map(team =>
-                {
-                    const roster = players.filter(player => (player.teamId % TEAMS.length) === team.id);
-                    return (
-                        <div key={team.id} className="snowwar-teams__panel" style={{ borderColor: team.color, boxShadow: `0 4px 18px ${team.glow}` }}>
-                            <div className="snowwar-teams__panel-header" style={{ background: team.color }}>
-                                <span>{localizeWithFallback(team.nameKey, team.nameFallback)}</span>
-                                <span className="snowwar-teams__count">{roster.length}</span>
-                            </div>
-                            <div className="snowwar-teams__roster">
-                                {roster.length === 0 && (
-                                    <div className="snowwar-teams__empty">
-                                        {spinner && <img alt="" src={spinner} />}
-                                        <span>{localizeWithFallback('snowwar.waiting_players', 'Waiting for players')}</span>
-                                    </div>
-                                )}
-                                {roster.map(player => (
-                                    <div key={player.userId} className={`snowwar-teams__player${(player.userId === ownUserId) ? ' snowwar-teams__player--own' : ''}`}>
-                                        <div className="snowwar-teams__avatar">
-                                            <LayoutAvatarImageView figure={player.figure} gender={player.gender} direction={team.dir} scale={0.5} />
-                                        </div>
-                                        <div className="snowwar-teams__player-data">
-                                            <div className="snowwar-teams__name">{player.name}</div>
-                                            {(player.skillLevel !== undefined) && <SnowWarSkillStars skillLevel={player.skillLevel} teamReference={getOfficialTeamReference(team.id)} />}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                {!!lobbyTeams?.arenas.length && (
+                    <div className="snowwar-teams__arenas">
+                        <div className="snowwar-teams__arena-heading">
+                            {isLeader
+                                ? localizeWithFallback('snowwar.arena.choose', 'Choose the arena')
+                                : localizeWithFallback('snowwar.arena.leader', 'The lobby leader chooses the arena')}
                         </div>
-                    );
-                })}
+                        <div className="snowwar-teams__arena-list">
+                            {lobbyTeams.arenas.map(arena =>
+                            {
+                                const selected = lobbyTeams.selectedArenaId === arena.id;
+                                const name = arena.official
+                                    ? localizeWithFallback(`snowwar.field.name.${arena.id}`, localizeWithFallback(`gamecenter.snowwar.map.name.${arena.id}`, arena.name))
+                                    : arena.name;
+                                return (
+                                    <ToggleButton
+                                        key={arena.id}
+                                        type="button"
+                                        className={`snowwar-teams__arena${selected ? ' snowwar-teams__arena--selected' : ''}`}
+                                        disabled={!isLeader} pressed={selected}
+                                        onClick={() => selectArena(arena.id)}>
+                                        <img src={getArenaPreviewUrl(arena.id, arena.official)} alt="" />
+                                        {!arena.official && <small>{localizeWithFallback('snowwar.arena.custom', 'Custom')}</small>}
+                                        <span>{name}</span>
+                                    </ToggleButton>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                <div className="snowwar-teams__board">
+                    {TEAMS.map(team =>
+                    {
+                        const roster = players.filter(player => (player.teamId % TEAMS.length) === team.id);
+                        return (
+                            <div key={team.id} className="snowwar-teams__panel" style={{ borderColor: team.color, boxShadow: `0 4px 18px ${team.glow}` }}>
+                                <div className="snowwar-teams__panel-header" style={{ background: team.color }}>
+                                    <span>{localizeWithFallback(team.nameKey, team.nameFallback)}</span>
+                                    <span className="snowwar-teams__count">{roster.length}</span>
+                                </div>
+                                <div className="snowwar-teams__roster">
+                                    {roster.length === 0 && (
+                                        <div className="snowwar-teams__empty">
+                                            {spinner && <img alt="" src={spinner} />}
+                                            <span>{localizeWithFallback('snowwar.waiting_players', 'Waiting for players')}</span>
+                                        </div>
+                                    )}
+                                    {roster.map(player => (
+                                        <div key={player.userId} className={`snowwar-teams__player${(player.userId === ownUserId) ? ' snowwar-teams__player--own' : ''}`}>
+                                            <div className="snowwar-teams__avatar">
+                                                <LayoutAvatarImageView figure={player.figure} gender={player.gender} direction={team.dir} scale={0.5} />
+                                            </div>
+                                            <div className="snowwar-teams__player-data">
+                                                <div className="snowwar-teams__name">{player.name}</div>
+                                                {(player.skillLevel !== undefined) && <SnowWarSkillStars skillLevel={player.skillLevel} teamReference={getOfficialTeamReference(team.id)} />}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {spinner && <img alt="" className="snowwar-teams__spinner" src={spinner} />}
+
+                {((phase === 'queued') || (phase === 'lobby')) && (
+                    <BaseButton type="button" className="snowwar-teams__cancel" onClick={() => leaveQueue()}>
+                        {localizeWithFallback('generic.cancel', 'Cancel')}
+                    </BaseButton>
+                )}
             </div>
-
-            {spinner && <img alt="" className="snowwar-teams__spinner" src={spinner} />}
-
-            {((phase === 'queued') || (phase === 'lobby')) && (
-                <BaseButton type="button" className="snowwar-teams__cancel" onClick={() => leaveQueue()}>
-                    {localizeWithFallback('generic.cancel', 'Cancel')}
-                </BaseButton>
-            )}
-        </div>
+        </NativeTextTree>
     );
 };

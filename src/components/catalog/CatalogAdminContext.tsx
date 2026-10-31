@@ -17,6 +17,7 @@ import {
 } from '@octane/renderer';
 import { createContext, FC, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { ICatalogNode, IPurchasableOffer, NotificationAlertType, SendMessageComposer } from '../../api';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useCatalogActions, useCatalogUiState, useMessageEvent, useNotification } from '../../hooks';
 import { nextCatalogStudioOperationId } from './admin/studio/CatalogStudioOperationId';
 import { CatalogStudioHistoryGroup, CatalogStudioOfferSnapshot, CatalogStudioPageSnapshot } from './admin/studio/CatalogStudioTypes';
@@ -807,40 +808,42 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
 
 
     return (
-        <CatalogAdminContext
-            value={{
-                adminMode,
-                setAdminMode,
-                editingOffer,
-                setEditingOffer,
-                editingOfferDetails,
-                editingPageDetails,
-                requestPageDetails,
-                editingPageData,
-                setEditingPageData,
-                editingRootPage,
-                setEditingRootPage,
-                editingPageNode,
-                setEditingPageNode,
-                creatingPage,
-                setCreatingPage,
-                loading,
-                lastError: lastError || studio.lastError,
-                lastMutationResult,
-                studioSessionReady: !!studio.session,
-                savePage,
-                createPage,
-                deletePage,
-                saveOffer,
-                createOffer,
-                deleteOffer,
-                reorderOffers,
-                reorderPage,
-                togglePageEnabled,
-                togglePageVisible,
-            }}
-        >
-            {children}
-        </CatalogAdminContext>
+        <NativeTextTree>
+            <CatalogAdminContext
+                value={{
+                    adminMode,
+                    setAdminMode,
+                    editingOffer,
+                    setEditingOffer,
+                    editingOfferDetails,
+                    editingPageDetails,
+                    requestPageDetails,
+                    editingPageData,
+                    setEditingPageData,
+                    editingRootPage,
+                    setEditingRootPage,
+                    editingPageNode,
+                    setEditingPageNode,
+                    creatingPage,
+                    setCreatingPage,
+                    loading,
+                    lastError: lastError || studio.lastError,
+                    lastMutationResult,
+                    studioSessionReady: !!studio.session,
+                    savePage,
+                    createPage,
+                    deletePage,
+                    saveOffer,
+                    createOffer,
+                    deleteOffer,
+                    reorderOffers,
+                    reorderPage,
+                    togglePageEnabled,
+                    togglePageVisible,
+                }}
+            >
+                {children}
+            </CatalogAdminContext>
+        </NativeTextTree>
     );
 };

@@ -1,5 +1,6 @@
 import { CSSProperties, FC, PropsWithChildren, ReactNode } from 'react';
 import { WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { WiredBaseView } from '../WiredBaseView';
 import { WiredSelectorOptionsSection } from './WiredSelectorOptionsSection';
 
@@ -29,19 +30,21 @@ export const WiredSelectorBaseView: FC<PropsWithChildren<WiredSelectorBaseViewPr
     } = props;
 
     return (
-        <WiredBaseView
-            hasSpecialInput={hasSpecialInput}
-            requiresFurni={requiresFurni}
-            save={save}
-            validate={validate}
-            wiredType="selector"
-            cardStyle={cardStyle}
-            footer={footer}
-            footerCollapsible={footerCollapsible}
-            selectionPreview={selectionPreview}
-            selectorOptions={<WiredSelectorOptionsSection />}
-        >
-            {children}
-        </WiredBaseView>
+        <NativeTextTree>
+            <WiredBaseView
+                hasSpecialInput={hasSpecialInput}
+                requiresFurni={requiresFurni}
+                save={save}
+                validate={validate}
+                wiredType="selector"
+                cardStyle={cardStyle}
+                footer={footer}
+                footerCollapsible={footerCollapsible}
+                selectionPreview={selectionPreview}
+                selectorOptions={<WiredSelectorOptionsSection />}
+            >
+                {children}
+            </WiredBaseView>
+        </NativeTextTree>
     );
 };

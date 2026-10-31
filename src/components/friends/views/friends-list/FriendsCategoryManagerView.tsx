@@ -3,6 +3,7 @@ import { FC, MouseEvent, useEffect, useState } from 'react';
 import { LocalizeText } from '../../../../api';
 import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Hint } from '../../../../common/Tooltip';
 import { useFriendsActions } from '../../../../hooks';
 
@@ -40,76 +41,78 @@ export const FriendsCategoryManagerView: FC<FriendsCategoryManagerViewProps> = (
     };
 
     return (
-        <OctaneCardView
-            className="octane-friends-category-manager min-w-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
-            theme="primary-slim"
-            uniqueKey="octane-friends-category-manager"
-            isResizable={false}
-        >
-            <OctaneCardHeaderView headerText={LocalizeText('friendlist.friends')} onCloseClick={onCloseClick} />
-            <OctaneCardContentView className="text-black" gap={1}>
-                <Flex gap={1} alignItems="center">
-                    <input
-                        className="form-control form-control-sm w-full"
-                        maxLength={25}
-                        type="text"
-                        value={newName}
-                        onChange={(event) => setNewName(event.target.value)}
-                        onKeyDown={(event) => event.key === 'Enter' && submitAdd()}
-                    />
-                    <Button disabled={!newName.trim().length || categories.length >= 20} onClick={submitAdd}>
-                        {LocalizeText('catalog.admin.create')}
-                    </Button>
-                </Flex>
-                <Column gap={1}>
-                    {categories.map((category) => (
-                        <Flex key={category.id} alignItems="center" gap={1}>
-                            {editingId === category.id ? (
-                                <>
-                                    <input
-                                        autoFocus
-                                        className="form-control form-control-sm w-full"
-                                        maxLength={25}
-                                        type="text"
-                                        value={editingName}
-                                        onChange={(event) => setEditingName(event.target.value)}
-                                        onKeyDown={(event) => event.key === 'Enter' && submitRename()}
-                                    />
-                                    <Button onClick={submitRename}>{LocalizeText('catalog.admin.save')}</Button>
-                                </>
-                            ) : (
-                                <>
-                                    <span className="grow text-sm">{category.name}</span>
-                                    <Hint content={LocalizeText('generic.edit')}>
-                                        <BaseButton
-                                            aria-label={LocalizeText('generic.edit')}
-                                            className="cursor-pointer border-0 bg-transparent p-0 text-base leading-none select-none"
-                                            type="button"
-                                            onClick={() => {
-                                                setEditingId(category.id);
-                                                setEditingName(category.name);
-                                            }}
-                                        >
-                                            {'✎'}
-                                        </BaseButton>
-                                    </Hint>
-                                    <Hint content={LocalizeText('generic.delete')}>
-                                        <BaseButton
-                                            aria-label={LocalizeText('generic.delete')}
-                                            className="cursor-pointer border-0 bg-transparent p-0 text-base leading-none select-none"
-                                            type="button"
-                                            onClick={() => removeCategory(category.id)}
-                                        >
-                                            {'✕'}
-                                        </BaseButton>
-                                    </Hint>
-                                </>
-                            )}
-                        </Flex>
-                    ))}
-                    {!categories.length && <span className="text-muted text-center py-2 text-sm">{LocalizeText('friendlist.search.nofriendsfound')}</span>}
-                </Column>
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <NativeTextTree>
+            <OctaneCardView
+                className="octane-friends-category-manager min-w-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+                theme="primary-slim"
+                uniqueKey="octane-friends-category-manager"
+                isResizable={false}
+            >
+                <OctaneCardHeaderView headerText={LocalizeText('friendlist.friends')} onCloseClick={onCloseClick} />
+                <OctaneCardContentView className="text-black" gap={1}>
+                    <Flex gap={1} alignItems="center">
+                        <input
+                            className="form-control form-control-sm w-full"
+                            maxLength={25}
+                            type="text"
+                            value={newName}
+                            onChange={(event) => setNewName(event.target.value)}
+                            onKeyDown={(event) => event.key === 'Enter' && submitAdd()}
+                        />
+                        <Button disabled={!newName.trim().length || categories.length >= 20} onClick={submitAdd}>
+                            {LocalizeText('catalog.admin.create')}
+                        </Button>
+                    </Flex>
+                    <Column gap={1}>
+                        {categories.map((category) => (
+                            <Flex key={category.id} alignItems="center" gap={1}>
+                                {editingId === category.id ? (
+                                    <>
+                                        <input
+                                            autoFocus
+                                            className="form-control form-control-sm w-full"
+                                            maxLength={25}
+                                            type="text"
+                                            value={editingName}
+                                            onChange={(event) => setEditingName(event.target.value)}
+                                            onKeyDown={(event) => event.key === 'Enter' && submitRename()}
+                                        />
+                                        <Button onClick={submitRename}>{LocalizeText('catalog.admin.save')}</Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="grow text-sm">{category.name}</span>
+                                        <Hint content={LocalizeText('generic.edit')}>
+                                            <BaseButton
+                                                aria-label={LocalizeText('generic.edit')}
+                                                className="cursor-pointer border-0 bg-transparent p-0 text-base leading-none select-none"
+                                                type="button"
+                                                onClick={() => {
+                                                    setEditingId(category.id);
+                                                    setEditingName(category.name);
+                                                }}
+                                            >
+                                                {'✎'}
+                                            </BaseButton>
+                                        </Hint>
+                                        <Hint content={LocalizeText('generic.delete')}>
+                                            <BaseButton
+                                                aria-label={LocalizeText('generic.delete')}
+                                                className="cursor-pointer border-0 bg-transparent p-0 text-base leading-none select-none"
+                                                type="button"
+                                                onClick={() => removeCategory(category.id)}
+                                            >
+                                                {'✕'}
+                                            </BaseButton>
+                                        </Hint>
+                                    </>
+                                )}
+                            </Flex>
+                        ))}
+                        {!categories.length && <span className="text-muted text-center py-2 text-sm">{LocalizeText('friendlist.search.nofriendsfound')}</span>}
+                    </Column>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

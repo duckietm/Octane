@@ -6,6 +6,7 @@ import { normalizeWiredComparison, WIRED_CMP_GREATER_EQUAL, WiredComparisonOpera
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MIN_RANK = 1;
 const MAX_RANK = 1000;
@@ -35,19 +36,21 @@ export const WiredConditionUserRankView: FC<{}> = () => {
     };
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text bold>{localizeWithFallback('wiredfurni.params.rank', 'Rank')}</Text>
-                    <NumberInput min={MIN_RANK} max={MAX_RANK} className="form-control form-control-sm" style={{ maxWidth: 140 }} value={rank} onChange={(event) => setRank(clampRank(parseInt(event.target.value, 10)))} />
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{localizeWithFallback('wiredfurni.params.rank', 'Rank')}</Text>
+                        <NumberInput min={MIN_RANK} max={MAX_RANK} className="form-control form-control-sm" style={{ maxWidth: 140 }} value={rank} onChange={(event) => setRank(clampRank(parseInt(event.target.value, 10)))} />
+                    </div>
+                    <WiredComparisonOperator name="wiredUserRankComparison" value={comparison} onChange={setComparison} />
                 </div>
-                <WiredComparisonOperator name="wiredUserRankComparison" value={comparison} onChange={setComparison} />
-            </div>
-        </WiredConditionBaseView>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

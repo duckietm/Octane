@@ -10,6 +10,7 @@ import { GetTraxSampleId, GetTraxSoundSetForSample, TraxSoundSets } from './Trax
 import { BaseButton } from '../../common/BaseButton';
 import { ToggleButton } from '../../common/ToggleButton';
 import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const CELL_WIDTH = 22;
 const CARTRIDGES_PER_PAGE = 8;
@@ -36,25 +37,27 @@ interface MachineButtonProps {
 }
 
 const MachineButton: FC<MachineButtonProps> = ({ title = undefined, disabled = false, accent = undefined, onClick, children = null }) => (
-    <Hint content={title}><BaseButton
-        disabled={disabled}
-        onClick={onClick}
-        className="flex h-9 w-10 shrink-0 items-center justify-center rounded-[5px] border font-bold"
-        style={{
-            cursor: disabled ? 'default' : 'pointer',
-            opacity: disabled ? 0.35 : 1,
-            color: '#ffffff',
-            fontSize: 15,
-            borderColor: 'rgba(0, 0, 0, 0.55)',
-            background: accent
-                ? `linear-gradient(rgba(255, 255, 255, 0.22), rgba(0, 0, 0, 0.25)), ${accent}`
-                : 'linear-gradient(#66798a, #46545e)',
-            boxShadow: 'inset 0 1px rgba(255, 255, 255, 0.35), 0 1px 2px rgba(0, 0, 0, 0.45)',
-            textShadow: '0 1px 2px rgba(0, 0, 0, 0.7)'
-        }}
-    >
-        {children}
-    </BaseButton></Hint>
+    <NativeTextTree>
+        <Hint content={title}><BaseButton
+            disabled={disabled}
+            onClick={onClick}
+            className="flex h-9 w-10 shrink-0 items-center justify-center rounded-[5px] border font-bold"
+            style={{
+                cursor: disabled ? 'default' : 'pointer',
+                opacity: disabled ? 0.35 : 1,
+                color: '#ffffff',
+                fontSize: 15,
+                borderColor: 'rgba(0, 0, 0, 0.55)',
+                background: accent
+                    ? `linear-gradient(rgba(255, 255, 255, 0.22), rgba(0, 0, 0, 0.25)), ${accent}`
+                    : 'linear-gradient(#66798a, #46545e)',
+                boxShadow: 'inset 0 1px rgba(255, 255, 255, 0.35), 0 1px 2px rgba(0, 0, 0, 0.45)',
+                textShadow: '0 1px 2px rgba(0, 0, 0, 0.7)'
+            }}
+        >
+            {children}
+        </BaseButton></Hint>
+    </NativeTextTree>
 );
 
 export const TraxEditorView: FC<{}> = () =>
@@ -468,392 +471,394 @@ export const TraxEditorView: FC<{}> = () =>
     const emptySlots = Math.max(0, maxSongs - songs.length);
     const rackCartridges = TraxSoundSets.slice(rackPage * CARTRIDGES_PER_PAGE, (rackPage + 1) * CARTRIDGES_PER_PAGE);
     return (
-        <OctaneCard className="w-[920px] max-w-[98vw]" uniqueKey="trax-editor">
-            <OctaneCard.Header
-                headerText={localizeWithFallback('trax.editor.title', 'Trax Machine')}
-                onCloseClick={hideEditor}
-            />
-            <OctaneCard.Content>
-                <div className="relative">
-                    <Column gap={2} className="absolute inset-y-0 left-0 w-[200px] overflow-y-auto">
-                        <Text bold>{localizeWithFallback('trax.editor.my.songs', 'My songs')}</Text>
-                        {loaded &&
-                            songs.map((song) =>
-                            {
-                                const isOpen = editingSongId === song.id;
-                                const diskColor = GetDiskColor(song.data);
+        <NativeTextTree>
+            <OctaneCard className="w-[920px] max-w-[98vw]" uniqueKey="trax-editor">
+                <OctaneCard.Header
+                    headerText={localizeWithFallback('trax.editor.title', 'Trax Machine')}
+                    onCloseClick={hideEditor}
+                />
+                <OctaneCard.Content>
+                    <div className="relative">
+                        <Column gap={2} className="absolute inset-y-0 left-0 w-[200px] overflow-y-auto">
+                            <Text bold>{localizeWithFallback('trax.editor.my.songs', 'My songs')}</Text>
+                            {loaded &&
+                                songs.map((song) =>
+                                {
+                                    const isOpen = editingSongId === song.id;
+                                    const diskColor = GetDiskColor(song.data);
 
-                                return (
-                                    <ToggleButton type="button" pressed={isOpen}
-                                        key={song.id}
-                                        onClick={() => openSong(song)}
-                                        className="flex w-full cursor-pointer items-center gap-2 rounded-lg border p-2 text-left"
-                                        style={{
-                                            borderColor: isOpen ? '#2e6f8a' : 'rgba(0, 0, 0, 0.2)',
-                                            background: isOpen ? 'linear-gradient(#eaf7fe, #d2ecf9)' : 'linear-gradient(#ffffff, #ececec)',
-                                            boxShadow: isOpen ? '0 0 5px rgba(46, 111, 138, 0.55)' : '0 1px 2px rgba(0, 0, 0, 0.15)'
-                                        }}
-                                    >
-                                        <div
-                                            className="h-9 w-9 shrink-0 rounded-full border"
+                                    return (
+                                        <ToggleButton type="button" pressed={isOpen}
+                                            key={song.id}
+                                            onClick={() => openSong(song)}
+                                            className="flex w-full cursor-pointer items-center gap-2 rounded-lg border p-2 text-left"
                                             style={{
-                                                borderColor: 'rgba(0, 0, 0, 0.35)',
-                                                background: `radial-gradient(circle at center, #20262b 0 5px, rgba(255, 255, 255, 0.55) 5px 6px, ${diskColor} 6px 100%)`,
-                                                boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3)'
-                                            }}
-                                        />
-                                        <div className="min-w-0 flex-1">
-                                            <span className="block truncate text-[12px] font-bold" style={{ color: '#222222' }}>{song.name}</span>
-                                            <span className="block text-[10px]" style={{ color: 'rgba(0, 0, 0, 0.5)' }}>♪ {formatStamp(song.length)}</span>
-                                        </div>
-                                        {isOpen && <span className="shrink-0 text-[12px]" style={{ color: '#2e6f8a' }}>▶</span>}
-                                    </ToggleButton>
-                                );
-                            })}
-                        {loaded &&
-                            Array.from({ length: emptySlots }, (_, index) => (
-                                <div
-                                    key={`empty-${index}`}
-                                    className="flex items-center gap-2 rounded-lg border border-dashed p-2"
-                                    style={{ borderColor: 'rgba(0, 0, 0, 0.25)', background: 'rgba(0, 0, 0, 0.03)' }}
-                                >
-                                    {index === 0 ? (
-                                        <Button fullWidth disabled={!canAfford} variant="success" onClick={buyNewSong}>
-                                            <Flex alignItems="center" gap={1} justifyContent="center">
-                                                <span>{localizeWithFallback('trax.editor.buy.song', 'New song')}</span>
-                                                {costAmount > 0 && (
-                                                    <>
-                                                        <span>{costAmount}</span>
-                                                        <LayoutCurrencyIcon type={costCurrency} />
-                                                    </>
-                                                )}
-                                            </Flex>
-                                        </Button>
-                                    ) : (
-                                        <>
-                                            <div
-                                                className="h-9 w-9 shrink-0 rounded-full border border-dashed"
-                                                style={{ borderColor: 'rgba(0, 0, 0, 0.25)' }}
-                                            />
-                                            <span className="text-[11px]" style={{ color: 'rgba(0, 0, 0, 0.4)' }}>
-                                                {localizeWithFallback('trax.editor.empty.slot', 'Empty slot')}
-                                            </span>
-                                        </>
-                                    )}
-                                </div>
-                            ))}
-                        {!!lastError && (
-                            <Text small className="text-[#a81a12]">
-                                {localizeWithFallback(...(ERROR_TEXTS[lastError] ?? ERROR_TEXTS[4]))}
-                            </Text>
-                        )}
-                    </Column>
-                    <Column gap={2} className="ml-[208px] min-h-[320px] min-w-0 rounded-lg p-2" style={{ background: 'linear-gradient(#55656f, #37444d)', boxShadow: 'inset 0 1px rgba(255,255,255,0.2)' }}>
-                        {editingSongId < 0 && (
-                            <Flex center className="flex-1">
-                                <Text style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                                    {localizeWithFallback('trax.editor.select.song', 'Select or buy a song on the left to start composing.')}
-                                </Text>
-                            </Flex>
-                        )}
-                        {editingSongId >= 0 && (
-                            <>
-                                <Flex alignItems="center" gap={2}>
-                                    <MachineButton
-                                        disabled={rackPage <= 0}
-                                        onClick={() => setRackPage((prev) => Math.max(0, prev - 1))}
-                                    >
-                                        ◀
-                                    </MachineButton>
-                                    <div className="grid min-w-0 flex-1 grid-cols-4 gap-1">
-                                        {rackCartridges.map((set) => (
-                                            <Hint key={set.cd} content={`${set.title} — ${set.artist}`}><BaseButton
-                                                onClick={() => loadCartridge(set.cd)}
-                                                className={`flex h-8 cursor-pointer items-center gap-1 rounded-[3px] border px-1 ${slotSets[activeSlot] === set.cd ? 'border-white' : 'border-black/50'}`}
-                                                style={{
-                                                    background: 'linear-gradient(#ececec, #b5b5b5)',
-                                                    boxShadow: slotSets[activeSlot] === set.cd ? '0 0 4px rgba(255,255,255,0.8)' : 'inset 0 1px rgba(255,255,255,0.6), 0 1px rgba(0,0,0,0.35)'
-                                                }}
-                                            >
-                                                {GetTraxCartridgeUrl(set.cd) ? (
-                                                    <img alt="" className="h-[26px] w-[26px] shrink-0 image-rendering-pixelated" src={GetTraxCartridgeUrl(set.cd)} />
-                                                ) : (
-                                                    <span className="h-5 w-4 shrink-0 rounded-[2px] border border-black/30" style={{ backgroundColor: set.color }} />
-                                                )}
-                                                <span className="truncate text-left text-[10px] font-bold leading-tight text-black/75">{set.title}</span>
-                                            </BaseButton></Hint>
-                                        ))}
-                                    </div>
-                                    <MachineButton
-                                        disabled={rackPage >= RACK_PAGES - 1}
-                                        onClick={() => setRackPage((prev) => Math.min(RACK_PAGES - 1, prev + 1))}
-                                    >
-                                        ▶
-                                    </MachineButton>
-                                    <span className="w-10 shrink-0 text-center text-[11px] font-bold" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>{rackPage + 1}/{RACK_PAGES}</span>
-                                </Flex>
-                                <div className="grid grid-cols-4 gap-1">
-                                    {Array.from({ length: TRAX_CHANNEL_COUNT }, (_, slot) =>
-                                    {
-                                        const set = TraxSoundSets[slotSets[slot] - 1];
-
-                                        return (
-                                            <div
-                                                key={slot}
-                                                onClick={() => setActiveSlot(slot)}
-                                                className={`cursor-pointer rounded-[4px] border p-1 ${activeSlot === slot ? 'border-white' : 'border-black/50 opacity-80'}`}
-                                                style={{
-                                                    borderTopWidth: 4,
-                                                    borderTopColor: CHANNEL_COLORS[slot],
-                                                    background: activeSlot === slot ? 'linear-gradient(#5e7280, #46545e)' : 'linear-gradient(#46545e, #313d45)',
-                                                    boxShadow: activeSlot === slot ? `0 0 7px ${CHANNEL_COLORS[slot]}, inset 0 1px rgba(255,255,255,0.3)` : 'none'
-                                                }}
-                                            >
-                                                <Flex alignItems="center" gap={1} className="mb-1 min-w-0">
-                                                    <span
-                                                        className="flex h-4 w-4 shrink-0 items-center justify-center rounded-[2px] text-[10px] font-bold text-white"
-                                                        style={{ backgroundColor: CHANNEL_COLORS[slot], textShadow: '0 1px 1px rgba(0, 0, 0, 0.6)' }}
-                                                    >
-                                                        {slot + 1}
-                                                    </span>
-                                                    {(set && GetTraxCartridgeUrl(set.cd)) ? (
-                                                        <img alt="" className="h-[18px] w-[18px] shrink-0 image-rendering-pixelated" src={GetTraxCartridgeUrl(set.cd)} />
-                                                    ) : (
-                                                        <span className="h-3 w-3 shrink-0 rounded-[2px] border border-black/40" style={{ backgroundColor: set?.color ?? '#CACACA' }} />
-                                                    )}
-                                                    <span className="truncate text-[10px] font-bold" style={{ color: 'rgba(255, 255, 255, 0.9)' }} title={`${set?.title ?? ''} — ${set?.artist ?? ''}`}>{set?.title ?? ''}</span>
-                                                </Flex>
-                                                <div className="grid grid-cols-9 gap-0.5">
-                                                    {(set?.sampleLengths ?? []).map((length, index) => (
-                                                        <Hint key={index} content={`#${index + 1} — ${length * 2}s`}><BaseButton
-                                                            onClick={(event) =>
-                                                            {
-                                                                event.stopPropagation();
-                                                                selectSample(slot, index);
-                                                            }}
-                                                            className={`h-6 cursor-pointer rounded-[2px] border text-[9px] font-bold text-white ${(slotSamples[slot] === index) ? 'border-white' : 'border-black/40'}`}
-                                                            style={{
-                                                                backgroundColor: CHANNEL_COLORS[slot],
-                                                                textShadow: '0 1px 2px rgba(0, 0, 0, 0.9)',
-                                                                boxShadow: (slotSamples[slot] === index) ? '0 0 4px rgba(255,255,255,0.9)' : 'inset 0 1px rgba(255,255,255,0.4)'
-                                                            }}
-                                                        >
-                                                            {index + 1}
-                                                        </BaseButton></Hint>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                                <Flex alignItems="center" gap={1}>
-                                    <MachineButton accent={isPlaying ? '#c2913f' : '#3f9e4a'} title={isPlaying ? localizeWithFallback('trax.editor.stop', 'Stop') : localizeWithFallback('trax.editor.play', 'Play')} onClick={togglePreview}>
-                                        {isPlaying ? '❚❚' : '▶'}
-                                    </MachineButton>
-                                    <MachineButton accent="#c2493f" title={localizeWithFallback('trax.editor.stop', 'Stop')} disabled={!isPlaying} onClick={stopPreview}>
-                                        ■
-                                    </MachineButton>
-                                    <MachineButton title={localizeWithFallback('trax.editor.rewind', 'Back to start')} disabled={!isPlaying && playheadUnit === 0} onClick={rewindPlayhead}>
-                                        ⏮
-                                    </MachineButton>
-                                    <MachineButton accent="#3f7fc2" title={localizeWithFallback('trax.editor.save', 'Save')} disabled={!isDirty} onClick={saveCurrentSong}>
-                                        💾
-                                    </MachineButton>
-                                    <MachineButton accent="#c2913f" title={localizeWithFallback('trax.editor.clear', 'Clear')} onClick={clearSong}>
-                                        🧹
-                                    </MachineButton>
-                                    <MachineButton title={localizeWithFallback('trax.editor.shift.left', 'Move left')} onClick={() => shiftSong(-1)}>
-                                        ⇤
-                                    </MachineButton>
-                                    <MachineButton title={localizeWithFallback('trax.editor.shift.right', 'Move right')} onClick={() => shiftSong(1)}>
-                                        ⇥
-                                    </MachineButton>
-                                    <div className="min-w-0 flex-1">
-                                        <OctaneInput
-                                            value={songName}
-                                            maxLength={64}
-                                            style={{
-                                                color: '#ffffff',
-                                                background: 'linear-gradient(#242f36, #2e3b43)',
-                                                border: '1px solid rgba(0, 0, 0, 0.55)',
-                                                boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.45)',
-                                                textShadow: '0 1px 1px rgba(0, 0, 0, 0.6)'
-                                            }}
-                                            onChange={(event) =>
-                                            {
-                                                setSongName(event.target.value);
-                                                setIsDirty(true);
-                                            }}
-                                        />
-                                    </div>
-                                    <MachineButton accent="#c2493f" title={localizeWithFallback('trax.editor.delete', 'Delete')} onClick={deleteCurrentSong}>
-                                        🗑
-                                    </MachineButton>
-                                </Flex>
-                                {/* Timeline */}
-                                <div className="overflow-x-auto rounded border border-black/40 p-2" style={{ background: 'linear-gradient(#222f36, #1a252b)', boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.5)' }}>
-                                    <div className="relative" style={{ width: songLength * CELL_WIDTH }}>
-                                        <div
-                                            ref={playheadRef}
-                                            className="pointer-events-none absolute"
-                                            style={{
-                                                left: playheadUnit * CELL_WIDTH,
-                                                top: 0,
-                                                bottom: 18,
-                                                width: 3,
-                                                backgroundColor: '#ffffff',
-                                                boxShadow: '0 0 6px rgba(255, 255, 255, 0.9)',
-                                                borderRadius: 2,
-                                                zIndex: 30
+                                                borderColor: isOpen ? '#2e6f8a' : 'rgba(0, 0, 0, 0.2)',
+                                                background: isOpen ? 'linear-gradient(#eaf7fe, #d2ecf9)' : 'linear-gradient(#ffffff, #ececec)',
+                                                boxShadow: isOpen ? '0 0 5px rgba(46, 111, 138, 0.55)' : '0 1px 2px rgba(0, 0, 0, 0.15)'
                                             }}
                                         >
                                             <div
-                                                className="absolute"
+                                                className="h-9 w-9 shrink-0 rounded-full border"
                                                 style={{
-                                                    top: 0,
-                                                    left: -4.5,
-                                                    width: 0,
-                                                    height: 0,
-                                                    borderLeft: '6px solid transparent',
-                                                    borderRight: '6px solid transparent',
-                                                    borderTop: '10px solid #ffffff',
-                                                    filter: 'drop-shadow(0 0 3px rgba(255, 255, 255, 0.8))'
+                                                    borderColor: 'rgba(0, 0, 0, 0.35)',
+                                                    background: `radial-gradient(circle at center, #20262b 0 5px, rgba(255, 255, 255, 0.55) 5px 6px, ${diskColor} 6px 100%)`,
+                                                    boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3)'
                                                 }}
                                             />
-                                        </div>
-                                        <div
-                                            className="relative mb-1 rounded"
-                                            style={{
-                                                height: 14,
-                                                cursor: 'col-resize',
-                                                touchAction: 'none',
-                                                background: 'rgba(255, 255, 255, 0.1)',
-                                                backgroundImage: `repeating-linear-gradient(to right, transparent, transparent ${(CELL_WIDTH * 5) - 1}px, rgba(255, 255, 255, 0.35) ${(CELL_WIDTH * 5) - 1}px, rgba(255, 255, 255, 0.35) ${CELL_WIDTH * 5}px)`,
-                                                boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.5)'
-                                            }}
-                                            title={localizeWithFallback('trax.editor.scrub.hint', 'Click or drag to set the play position')}
-                                            onPointerDown={scrubPointerDown}
-                                            onPointerMove={scrubPointerMove}
-                                            onPointerUp={scrubPointerUp}
-                                            onPointerCancel={scrubPointerUp}
-                                        />
-                                        <Column gap={1}>
-                                            {Array.from({ length: TRAX_CHANNEL_COUNT }, (_, channel) => (
+                                            <div className="min-w-0 flex-1">
+                                                <span className="block truncate text-[12px] font-bold" style={{ color: '#222222' }}>{song.name}</span>
+                                                <span className="block text-[10px]" style={{ color: 'rgba(0, 0, 0, 0.5)' }}>♪ {formatStamp(song.length)}</span>
+                                            </div>
+                                            {isOpen && <span className="shrink-0 text-[12px]" style={{ color: '#2e6f8a' }}>▶</span>}
+                                        </ToggleButton>
+                                    );
+                                })}
+                            {loaded &&
+                                Array.from({ length: emptySlots }, (_, index) => (
+                                    <div
+                                        key={`empty-${index}`}
+                                        className="flex items-center gap-2 rounded-lg border border-dashed p-2"
+                                        style={{ borderColor: 'rgba(0, 0, 0, 0.25)', background: 'rgba(0, 0, 0, 0.03)' }}
+                                    >
+                                        {index === 0 ? (
+                                            <Button fullWidth disabled={!canAfford} variant="success" onClick={buyNewSong}>
+                                                <Flex alignItems="center" gap={1} justifyContent="center">
+                                                    <span>{localizeWithFallback('trax.editor.buy.song', 'New song')}</span>
+                                                    {costAmount > 0 && (
+                                                        <>
+                                                            <span>{costAmount}</span>
+                                                            <LayoutCurrencyIcon type={costCurrency} />
+                                                        </>
+                                                    )}
+                                                </Flex>
+                                            </Button>
+                                        ) : (
+                                            <>
                                                 <div
-                                                    key={channel}
-                                                    onClick={(event) => onChannelClick(event, channel)}
-                                                    onMouseMove={(event) => onChannelMouseMove(event, channel)}
-                                                    onMouseLeave={() => setHoverCell(null)}
-                                                    className="relative h-10 shrink-0 cursor-crosshair rounded bg-[#2b3f4a]"
+                                                    className="h-9 w-9 shrink-0 rounded-full border border-dashed"
+                                                    style={{ borderColor: 'rgba(0, 0, 0, 0.25)' }}
+                                                />
+                                                <span className="text-[11px]" style={{ color: 'rgba(0, 0, 0, 0.4)' }}>
+                                                    {localizeWithFallback('trax.editor.empty.slot', 'Empty slot')}
+                                                </span>
+                                            </>
+                                        )}
+                                    </div>
+                                ))}
+                            {!!lastError && (
+                                <Text small className="text-[#a81a12]">
+                                    {localizeWithFallback(...(ERROR_TEXTS[lastError] ?? ERROR_TEXTS[4]))}
+                                </Text>
+                            )}
+                        </Column>
+                        <Column gap={2} className="ml-[208px] min-h-[320px] min-w-0 rounded-lg p-2" style={{ background: 'linear-gradient(#55656f, #37444d)', boxShadow: 'inset 0 1px rgba(255,255,255,0.2)' }}>
+                            {editingSongId < 0 && (
+                                <Flex center className="flex-1">
+                                    <Text style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                        {localizeWithFallback('trax.editor.select.song', 'Select or buy a song on the left to start composing.')}
+                                    </Text>
+                                </Flex>
+                            )}
+                            {editingSongId >= 0 && (
+                                <>
+                                    <Flex alignItems="center" gap={2}>
+                                        <MachineButton
+                                            disabled={rackPage <= 0}
+                                            onClick={() => setRackPage((prev) => Math.max(0, prev - 1))}
+                                        >
+                                            ◀
+                                        </MachineButton>
+                                        <div className="grid min-w-0 flex-1 grid-cols-4 gap-1">
+                                            {rackCartridges.map((set) => (
+                                                <Hint key={set.cd} content={`${set.title} — ${set.artist}`}><BaseButton
+                                                    onClick={() => loadCartridge(set.cd)}
+                                                    className={`flex h-8 cursor-pointer items-center gap-1 rounded-[3px] border px-1 ${slotSets[activeSlot] === set.cd ? 'border-white' : 'border-black/50'}`}
                                                     style={{
-                                                        width: songLength * CELL_WIDTH,
-                                                        boxShadow: `inset 3px 0 0 ${CHANNEL_COLORS[channel]}`,
-                                                        backgroundImage: 'repeating-linear-gradient(to right, transparent, transparent ' + (CELL_WIDTH - 1) + 'px, rgba(255,255,255,0.08) ' + (CELL_WIDTH - 1) + 'px, rgba(255,255,255,0.08) ' + CELL_WIDTH + 'px)'
+                                                        background: 'linear-gradient(#ececec, #b5b5b5)',
+                                                        boxShadow: slotSets[activeSlot] === set.cd ? '0 0 4px rgba(255,255,255,0.8)' : 'inset 0 1px rgba(255,255,255,0.6), 0 1px rgba(0,0,0,0.35)'
                                                     }}
                                                 >
-                                                    {hoverCell && hoverCell.channel === channel && (() =>
-                                                    {
-                                                        const hoverSet = TraxSoundSets[slotSets[channel] - 1];
-                                                        const hoverSample = slotSamples[channel];
-                                                        const ghostLength = Math.max(1, hoverSet?.sampleLengths[hoverSample] ?? 1);
-                                                        const fits = (hoverCell.unit + ghostLength) <= TRAX_MAX_UNITS;
-
-                                                        return (
-                                                            <div
-                                                                className={`pointer-events-none absolute top-0 z-10 flex h-full items-center justify-center rounded border-2 border-dashed text-[11px] font-bold ${fits ? 'border-white/80 text-black/60' : 'border-[#a81a12] text-[#a81a12]'}`}
-                                                                style={{
-                                                                    left: hoverCell.unit * CELL_WIDTH,
-                                                                    width: ghostLength * CELL_WIDTH,
-                                                                    backgroundColor: fits ? `${CHANNEL_COLORS[channel]}99` : 'rgba(168,26,18,0.25)'
-                                                                }}
-                                                            >
-                                                                {fits ? `#${hoverSample + 1}` : '✕'}
-                                                            </div>
-                                                        );
-                                                    })()}
-                                                    {channels[channel].map((placement) =>
-                                                    {
-                                                        const cd = GetTraxSoundSetForSample(placement.sampleId);
-                                                        const sampleNumber = placement.sampleId - (cd - 1) * 9;
-
-                                                        return (
-                                                            <div
-                                                                key={`${placement.position}-${placement.sampleId}`}
-                                                                title={`${TraxSoundSets[cd - 1]?.title ?? ''} #${sampleNumber} — ${localizeWithFallback('trax.editor.remove.hint', 'right-click to remove')}`}
-                                                                onClick={(event) => event.stopPropagation()}
-                                                                onContextMenu={(event) =>
-                                                                {
-                                                                    event.preventDefault();
-                                                                    event.stopPropagation();
-                                                                    removePlacement(channel, placement);
-                                                                }}
-                                                                className="absolute top-0 flex h-full items-center justify-center overflow-hidden rounded border border-black/40 text-[11px] font-bold text-black/70"
-                                                                style={{
-                                                                    left: placement.position * CELL_WIDTH,
-                                                                    width: placement.length * CELL_WIDTH,
-                                                                    backgroundColor: CHANNEL_COLORS[channel]
-                                                                }}
-                                                            >
-                                                                {sampleNumber}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            ))}
-                                        </Column>
-                                        <div
-                                            className="relative cursor-pointer"
-                                            style={{ height: 18, touchAction: 'none' }}
-                                            title={localizeWithFallback('trax.editor.scrub.hint', 'Click or drag to set the play position')}
-                                            onPointerDown={scrubPointerDown}
-                                            onPointerMove={scrubPointerMove}
-                                            onPointerUp={scrubPointerUp}
-                                            onPointerCancel={scrubPointerUp}
-                                        >
-                                            {Array.from({ length: Math.floor(songLength / 5) }, (_, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="absolute top-1 text-[9px] font-bold"
-                                                    style={{ left: ((index + 1) * 5 * CELL_WIDTH) - 12, color: 'rgba(255, 255, 255, 0.5)' }}
-                                                >
-                                                    {formatStamp((index + 1) * 10)}
-                                                </div>
+                                                    {GetTraxCartridgeUrl(set.cd) ? (
+                                                        <img alt="" className="h-[26px] w-[26px] shrink-0 image-rendering-pixelated" src={GetTraxCartridgeUrl(set.cd)} />
+                                                    ) : (
+                                                        <span className="h-5 w-4 shrink-0 rounded-[2px] border border-black/30" style={{ backgroundColor: set.color }} />
+                                                    )}
+                                                    <span className="truncate text-left text-[10px] font-bold leading-tight text-black/75">{set.title}</span>
+                                                </BaseButton></Hint>
                                             ))}
                                         </div>
-                                    </div>
-                                </div>
-                                <Flex alignItems="center" gap={2}>
-                                    <Text small style={{ color: 'rgba(255, 255, 255, 0.8)' }}>{localizeWithFallback('trax.editor.length', 'Length')}: {formatStamp(songLength * 2)}</Text>
-                                    <MachineButton
-                                        disabled={songLength <= TRAX_MIN_UNITS}
-                                        onClick={() =>
+                                        <MachineButton
+                                            disabled={rackPage >= RACK_PAGES - 1}
+                                            onClick={() => setRackPage((prev) => Math.min(RACK_PAGES - 1, prev + 1))}
+                                        >
+                                            ▶
+                                        </MachineButton>
+                                        <span className="w-10 shrink-0 text-center text-[11px] font-bold" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>{rackPage + 1}/{RACK_PAGES}</span>
+                                    </Flex>
+                                    <div className="grid grid-cols-4 gap-1">
+                                        {Array.from({ length: TRAX_CHANNEL_COUNT }, (_, slot) =>
                                         {
-                                            const nextLength = Math.max(TRAX_MIN_UNITS, songLength - 4);
+                                            const set = TraxSoundSets[slotSets[slot] - 1];
 
-                                            setSongLength(nextLength);
-                                            setChannels((prev) => prev.map((placements) => placements.filter((p) => p.position + p.length <= nextLength)));
-                                            if (playheadUnitRef.current >= nextLength) movePlayhead(nextLength - 1);
-                                            setIsDirty(true);
-                                        }}
-                                    >
-                                        −
-                                    </MachineButton>
-                                    <MachineButton
-                                        disabled={songLength >= TRAX_MAX_UNITS}
-                                        onClick={() =>
-                                        {
-                                            setSongLength((prev) => Math.min(TRAX_MAX_UNITS, prev + 4));
-                                            setIsDirty(true);
-                                        }}
-                                    >
-                                        +
-                                    </MachineButton>
-                                </Flex>
-                            </>
-                        )}
-                    </Column>
-                </div>
-            </OctaneCard.Content>
-        </OctaneCard>
+                                            return (
+                                                <div
+                                                    key={slot}
+                                                    onClick={() => setActiveSlot(slot)}
+                                                    className={`cursor-pointer rounded-[4px] border p-1 ${activeSlot === slot ? 'border-white' : 'border-black/50 opacity-80'}`}
+                                                    style={{
+                                                        borderTopWidth: 4,
+                                                        borderTopColor: CHANNEL_COLORS[slot],
+                                                        background: activeSlot === slot ? 'linear-gradient(#5e7280, #46545e)' : 'linear-gradient(#46545e, #313d45)',
+                                                        boxShadow: activeSlot === slot ? `0 0 7px ${CHANNEL_COLORS[slot]}, inset 0 1px rgba(255,255,255,0.3)` : 'none'
+                                                    }}
+                                                >
+                                                    <Flex alignItems="center" gap={1} className="mb-1 min-w-0">
+                                                        <span
+                                                            className="flex h-4 w-4 shrink-0 items-center justify-center rounded-[2px] text-[10px] font-bold text-white"
+                                                            style={{ backgroundColor: CHANNEL_COLORS[slot], textShadow: '0 1px 1px rgba(0, 0, 0, 0.6)' }}
+                                                        >
+                                                            {slot + 1}
+                                                        </span>
+                                                        {(set && GetTraxCartridgeUrl(set.cd)) ? (
+                                                            <img alt="" className="h-[18px] w-[18px] shrink-0 image-rendering-pixelated" src={GetTraxCartridgeUrl(set.cd)} />
+                                                        ) : (
+                                                            <span className="h-3 w-3 shrink-0 rounded-[2px] border border-black/40" style={{ backgroundColor: set?.color ?? '#CACACA' }} />
+                                                        )}
+                                                        <span className="truncate text-[10px] font-bold" style={{ color: 'rgba(255, 255, 255, 0.9)' }} title={`${set?.title ?? ''} — ${set?.artist ?? ''}`}>{set?.title ?? ''}</span>
+                                                    </Flex>
+                                                    <div className="grid grid-cols-9 gap-0.5">
+                                                        {(set?.sampleLengths ?? []).map((length, index) => (
+                                                            <Hint key={index} content={`#${index + 1} — ${length * 2}s`}><BaseButton
+                                                                onClick={(event) =>
+                                                                {
+                                                                    event.stopPropagation();
+                                                                    selectSample(slot, index);
+                                                                }}
+                                                                className={`h-6 cursor-pointer rounded-[2px] border text-[9px] font-bold text-white ${(slotSamples[slot] === index) ? 'border-white' : 'border-black/40'}`}
+                                                                style={{
+                                                                    backgroundColor: CHANNEL_COLORS[slot],
+                                                                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.9)',
+                                                                    boxShadow: (slotSamples[slot] === index) ? '0 0 4px rgba(255,255,255,0.9)' : 'inset 0 1px rgba(255,255,255,0.4)'
+                                                                }}
+                                                            >
+                                                                {index + 1}
+                                                            </BaseButton></Hint>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                    <Flex alignItems="center" gap={1}>
+                                        <MachineButton accent={isPlaying ? '#c2913f' : '#3f9e4a'} title={isPlaying ? localizeWithFallback('trax.editor.stop', 'Stop') : localizeWithFallback('trax.editor.play', 'Play')} onClick={togglePreview}>
+                                            {isPlaying ? '❚❚' : '▶'}
+                                        </MachineButton>
+                                        <MachineButton accent="#c2493f" title={localizeWithFallback('trax.editor.stop', 'Stop')} disabled={!isPlaying} onClick={stopPreview}>
+                                            ■
+                                        </MachineButton>
+                                        <MachineButton title={localizeWithFallback('trax.editor.rewind', 'Back to start')} disabled={!isPlaying && playheadUnit === 0} onClick={rewindPlayhead}>
+                                            ⏮
+                                        </MachineButton>
+                                        <MachineButton accent="#3f7fc2" title={localizeWithFallback('trax.editor.save', 'Save')} disabled={!isDirty} onClick={saveCurrentSong}>
+                                            💾
+                                        </MachineButton>
+                                        <MachineButton accent="#c2913f" title={localizeWithFallback('trax.editor.clear', 'Clear')} onClick={clearSong}>
+                                            🧹
+                                        </MachineButton>
+                                        <MachineButton title={localizeWithFallback('trax.editor.shift.left', 'Move left')} onClick={() => shiftSong(-1)}>
+                                            ⇤
+                                        </MachineButton>
+                                        <MachineButton title={localizeWithFallback('trax.editor.shift.right', 'Move right')} onClick={() => shiftSong(1)}>
+                                            ⇥
+                                        </MachineButton>
+                                        <div className="min-w-0 flex-1">
+                                            <OctaneInput
+                                                value={songName}
+                                                maxLength={64}
+                                                style={{
+                                                    color: '#ffffff',
+                                                    background: 'linear-gradient(#242f36, #2e3b43)',
+                                                    border: '1px solid rgba(0, 0, 0, 0.55)',
+                                                    boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.45)',
+                                                    textShadow: '0 1px 1px rgba(0, 0, 0, 0.6)'
+                                                }}
+                                                onChange={(event) =>
+                                                {
+                                                    setSongName(event.target.value);
+                                                    setIsDirty(true);
+                                                }}
+                                            />
+                                        </div>
+                                        <MachineButton accent="#c2493f" title={localizeWithFallback('trax.editor.delete', 'Delete')} onClick={deleteCurrentSong}>
+                                            🗑
+                                        </MachineButton>
+                                    </Flex>
+                                    {/* Timeline */}
+                                    <div className="overflow-x-auto rounded border border-black/40 p-2" style={{ background: 'linear-gradient(#222f36, #1a252b)', boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.5)' }}>
+                                        <div className="relative" style={{ width: songLength * CELL_WIDTH }}>
+                                            <div
+                                                ref={playheadRef}
+                                                className="pointer-events-none absolute"
+                                                style={{
+                                                    left: playheadUnit * CELL_WIDTH,
+                                                    top: 0,
+                                                    bottom: 18,
+                                                    width: 3,
+                                                    backgroundColor: '#ffffff',
+                                                    boxShadow: '0 0 6px rgba(255, 255, 255, 0.9)',
+                                                    borderRadius: 2,
+                                                    zIndex: 30
+                                                }}
+                                            >
+                                                <div
+                                                    className="absolute"
+                                                    style={{
+                                                        top: 0,
+                                                        left: -4.5,
+                                                        width: 0,
+                                                        height: 0,
+                                                        borderLeft: '6px solid transparent',
+                                                        borderRight: '6px solid transparent',
+                                                        borderTop: '10px solid #ffffff',
+                                                        filter: 'drop-shadow(0 0 3px rgba(255, 255, 255, 0.8))'
+                                                    }}
+                                                />
+                                            </div>
+                                            <div
+                                                className="relative mb-1 rounded"
+                                                style={{
+                                                    height: 14,
+                                                    cursor: 'col-resize',
+                                                    touchAction: 'none',
+                                                    background: 'rgba(255, 255, 255, 0.1)',
+                                                    backgroundImage: `repeating-linear-gradient(to right, transparent, transparent ${(CELL_WIDTH * 5) - 1}px, rgba(255, 255, 255, 0.35) ${(CELL_WIDTH * 5) - 1}px, rgba(255, 255, 255, 0.35) ${CELL_WIDTH * 5}px)`,
+                                                    boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.5)'
+                                                }}
+                                                title={localizeWithFallback('trax.editor.scrub.hint', 'Click or drag to set the play position')}
+                                                onPointerDown={scrubPointerDown}
+                                                onPointerMove={scrubPointerMove}
+                                                onPointerUp={scrubPointerUp}
+                                                onPointerCancel={scrubPointerUp}
+                                            />
+                                            <Column gap={1}>
+                                                {Array.from({ length: TRAX_CHANNEL_COUNT }, (_, channel) => (
+                                                    <div
+                                                        key={channel}
+                                                        onClick={(event) => onChannelClick(event, channel)}
+                                                        onMouseMove={(event) => onChannelMouseMove(event, channel)}
+                                                        onMouseLeave={() => setHoverCell(null)}
+                                                        className="relative h-10 shrink-0 cursor-crosshair rounded bg-[#2b3f4a]"
+                                                        style={{
+                                                            width: songLength * CELL_WIDTH,
+                                                            boxShadow: `inset 3px 0 0 ${CHANNEL_COLORS[channel]}`,
+                                                            backgroundImage: 'repeating-linear-gradient(to right, transparent, transparent ' + (CELL_WIDTH - 1) + 'px, rgba(255,255,255,0.08) ' + (CELL_WIDTH - 1) + 'px, rgba(255,255,255,0.08) ' + CELL_WIDTH + 'px)'
+                                                        }}
+                                                    >
+                                                        {hoverCell && hoverCell.channel === channel && (() =>
+                                                        {
+                                                            const hoverSet = TraxSoundSets[slotSets[channel] - 1];
+                                                            const hoverSample = slotSamples[channel];
+                                                            const ghostLength = Math.max(1, hoverSet?.sampleLengths[hoverSample] ?? 1);
+                                                            const fits = (hoverCell.unit + ghostLength) <= TRAX_MAX_UNITS;
+
+                                                            return (
+                                                                <div
+                                                                    className={`pointer-events-none absolute top-0 z-10 flex h-full items-center justify-center rounded border-2 border-dashed text-[11px] font-bold ${fits ? 'border-white/80 text-black/60' : 'border-[#a81a12] text-[#a81a12]'}`}
+                                                                    style={{
+                                                                        left: hoverCell.unit * CELL_WIDTH,
+                                                                        width: ghostLength * CELL_WIDTH,
+                                                                        backgroundColor: fits ? `${CHANNEL_COLORS[channel]}99` : 'rgba(168,26,18,0.25)'
+                                                                    }}
+                                                                >
+                                                                    {fits ? `#${hoverSample + 1}` : '✕'}
+                                                                </div>
+                                                            );
+                                                        })()}
+                                                        {channels[channel].map((placement) =>
+                                                        {
+                                                            const cd = GetTraxSoundSetForSample(placement.sampleId);
+                                                            const sampleNumber = placement.sampleId - (cd - 1) * 9;
+
+                                                            return (
+                                                                <div
+                                                                    key={`${placement.position}-${placement.sampleId}`}
+                                                                    title={`${TraxSoundSets[cd - 1]?.title ?? ''} #${sampleNumber} — ${localizeWithFallback('trax.editor.remove.hint', 'right-click to remove')}`}
+                                                                    onClick={(event) => event.stopPropagation()}
+                                                                    onContextMenu={(event) =>
+                                                                    {
+                                                                        event.preventDefault();
+                                                                        event.stopPropagation();
+                                                                        removePlacement(channel, placement);
+                                                                    }}
+                                                                    className="absolute top-0 flex h-full items-center justify-center overflow-hidden rounded border border-black/40 text-[11px] font-bold text-black/70"
+                                                                    style={{
+                                                                        left: placement.position * CELL_WIDTH,
+                                                                        width: placement.length * CELL_WIDTH,
+                                                                        backgroundColor: CHANNEL_COLORS[channel]
+                                                                    }}
+                                                                >
+                                                                    {sampleNumber}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                ))}
+                                            </Column>
+                                            <div
+                                                className="relative cursor-pointer"
+                                                style={{ height: 18, touchAction: 'none' }}
+                                                title={localizeWithFallback('trax.editor.scrub.hint', 'Click or drag to set the play position')}
+                                                onPointerDown={scrubPointerDown}
+                                                onPointerMove={scrubPointerMove}
+                                                onPointerUp={scrubPointerUp}
+                                                onPointerCancel={scrubPointerUp}
+                                            >
+                                                {Array.from({ length: Math.floor(songLength / 5) }, (_, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="absolute top-1 text-[9px] font-bold"
+                                                        style={{ left: ((index + 1) * 5 * CELL_WIDTH) - 12, color: 'rgba(255, 255, 255, 0.5)' }}
+                                                    >
+                                                        {formatStamp((index + 1) * 10)}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Flex alignItems="center" gap={2}>
+                                        <Text small style={{ color: 'rgba(255, 255, 255, 0.8)' }}>{localizeWithFallback('trax.editor.length', 'Length')}: {formatStamp(songLength * 2)}</Text>
+                                        <MachineButton
+                                            disabled={songLength <= TRAX_MIN_UNITS}
+                                            onClick={() =>
+                                            {
+                                                const nextLength = Math.max(TRAX_MIN_UNITS, songLength - 4);
+
+                                                setSongLength(nextLength);
+                                                setChannels((prev) => prev.map((placements) => placements.filter((p) => p.position + p.length <= nextLength)));
+                                                if (playheadUnitRef.current >= nextLength) movePlayhead(nextLength - 1);
+                                                setIsDirty(true);
+                                            }}
+                                        >
+                                            −
+                                        </MachineButton>
+                                        <MachineButton
+                                            disabled={songLength >= TRAX_MAX_UNITS}
+                                            onClick={() =>
+                                            {
+                                                setSongLength((prev) => Math.min(TRAX_MAX_UNITS, prev + 4));
+                                                setIsDirty(true);
+                                            }}
+                                        >
+                                            +
+                                        </MachineButton>
+                                    </Flex>
+                                </>
+                            )}
+                        </Column>
+                    </div>
+                </OctaneCard.Content>
+            </OctaneCard>
+        </NativeTextTree>
     );
 };

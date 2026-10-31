@@ -27,6 +27,7 @@ import {
 } from '../arrays/WiredArrayValueField';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const OPERATION_FALLBACKS: Record<number, string> = {
     0: 'Add to the end',
@@ -98,93 +99,95 @@ export const WiredActionModifyArrayView: FC<{}> = () => {
     };
 
     return (
-        <WiredActionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} validate={validate} cardStyle={{ width: 260 }}>
-            <div className="flex flex-col gap-2">
-                <WiredArrayDefinitionSelect
-                    definitions={payload.variableDefinitions}
-                    itemId={payload.variableItemId}
-                    requiresWritable={true}
-                    variableType={payload.variableType}
-                    onChange={(variableType, itemId) => setPayload({ ...payload, variableItemId: itemId, variableType })}
-                />
+        <NativeTextTree>
+            <WiredActionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} validate={validate} cardStyle={{ width: 260 }}>
+                <div className="flex flex-col gap-2">
+                    <WiredArrayDefinitionSelect
+                        definitions={payload.variableDefinitions}
+                        itemId={payload.variableItemId}
+                        requiresWritable={true}
+                        variableType={payload.variableType}
+                        onChange={(variableType, itemId) => setPayload({ ...payload, variableItemId: itemId, variableType })}
+                    />
 
-                <div className="flex flex-col gap-1">
-                    <Text bold>{localizeWithFallback('wiredfurni.params.arrays.operation', 'What to do')}</Text>
-                    <Select
-                        className="form-select form-select-sm"
-                        value={payload.operation}
-                        onChange={(event) => setPayload({ ...payload, operation: parseInt(event.target.value, 10) })}
-                    >
-                        {operations.map((operation) => (
-                            <option key={operation.code} value={operation.code}>
-                                {localizeWithFallback(`wiredfurni.params.arrays.operation.${operation.code}`, OPERATION_FALLBACKS[operation.code])}
-                            </option>
-                        ))}
-                    </Select>
-                    {definition && !operations.some((operation) => operation.code === payload.operation) && (
-                        <Text small className="text-black/60">
-                            {localizeWithFallback(
-                                'wiredfurni.params.arrays.operation.unsupported',
-                                'That operation does not work on this kind of array. Pick another one before saving.'
-                            )}
-                        </Text>
-                    )}
-                </div>
-
-                {ownerSources.length > 0 && (
                     <div className="flex flex-col gap-1">
-                        <Text bold>{localizeWithFallback('wiredfurni.params.arrays.owner', 'Whose array')}</Text>
+                        <Text bold>{localizeWithFallback('wiredfurni.params.arrays.operation', 'What to do')}</Text>
                         <Select
                             className="form-select form-select-sm"
-                            value={payload.ownerSource}
-                            onChange={(event) => setPayload({ ...payload, ownerSource: parseInt(event.target.value, 10) })}
+                            value={payload.operation}
+                            onChange={(event) => setPayload({ ...payload, operation: parseInt(event.target.value, 10) })}
                         >
-                            {ownerSources.map((source) => (
-                                <option key={source.value} value={source.value}>
-                                    {localizeWithFallback(source.label, WIRED_ARRAY_OWNER_SOURCE_FALLBACKS[source.value])}
+                            {operations.map((operation) => (
+                                <option key={operation.code} value={operation.code}>
+                                    {localizeWithFallback(`wiredfurni.params.arrays.operation.${operation.code}`, OPERATION_FALLBACKS[operation.code])}
                                 </option>
                             ))}
                         </Select>
+                        {definition && !operations.some((operation) => operation.code === payload.operation) && (
+                            <Text small className="text-black/60">
+                                {localizeWithFallback(
+                                    'wiredfurni.params.arrays.operation.unsupported',
+                                    'That operation does not work on this kind of array. Pick another one before saving.'
+                                )}
+                            </Text>
+                        )}
                     </div>
-                )}
 
-                {rule?.firstIndex && (
-                    <WiredArrayValueField
-                        constantMin={0}
-                        label={localizeWithFallback('wiredfurni.params.arrays.index', 'Index')}
-                        recentScope="array-modify-first"
-                        value={wiredArrayAddressAsValue(payload.firstIndex)}
-                        onChange={(value) => setPayload({ ...payload, firstIndex: wiredArrayValueAsAddress(value, payload.firstIndex) })}
-                    />
-                )}
+                    {ownerSources.length > 0 && (
+                        <div className="flex flex-col gap-1">
+                            <Text bold>{localizeWithFallback('wiredfurni.params.arrays.owner', 'Whose array')}</Text>
+                            <Select
+                                className="form-select form-select-sm"
+                                value={payload.ownerSource}
+                                onChange={(event) => setPayload({ ...payload, ownerSource: parseInt(event.target.value, 10) })}
+                            >
+                                {ownerSources.map((source) => (
+                                    <option key={source.value} value={source.value}>
+                                        {localizeWithFallback(source.label, WIRED_ARRAY_OWNER_SOURCE_FALLBACKS[source.value])}
+                                    </option>
+                                ))}
+                            </Select>
+                        </div>
+                    )}
 
-                {rule?.secondIndex && (
-                    <WiredArrayValueField
-                        constantMin={0}
-                        label={localizeWithFallback('wiredfurni.params.arrays.index.second', 'Second index')}
-                        recentScope="array-modify-second"
-                        value={wiredArrayAddressAsValue(payload.secondIndex)}
-                        onChange={(value) => setPayload({ ...payload, secondIndex: wiredArrayValueAsAddress(value, payload.secondIndex) })}
-                    />
-                )}
-
-                {rule?.entryValues &&
-                    fields.map((field) => (
+                    {rule?.firstIndex && (
                         <WiredArrayValueField
-                            key={field.id}
-                            label={field.name || localizeWithFallback('wiredfurni.params.arrays.criteria.value', 'Value')}
-                            recentScope={`array-modify-field-${field.id}`}
-                            value={fieldInput(field.id)}
-                            onChange={(value) => setFieldInput(field.id, value)}
+                            constantMin={0}
+                            label={localizeWithFallback('wiredfurni.params.arrays.index', 'Index')}
+                            recentScope="array-modify-first"
+                            value={wiredArrayAddressAsValue(payload.firstIndex)}
+                            onChange={(value) => setPayload({ ...payload, firstIndex: wiredArrayValueAsAddress(value, payload.firstIndex) })}
                         />
-                    ))}
+                    )}
 
-                {definition?.permanent && payload.variableType !== WIRED_ARRAY_TYPE_ROOM && payload.variableType !== WIRED_ARRAY_TYPE_CONTEXT && (
-                    <Text small className="text-black/60">
-                        {localizeWithFallback('wiredfurni.params.arrays.permanent', 'This array is saved, so the change outlives the room being emptied.')}
-                    </Text>
-                )}
-            </div>
-        </WiredActionBaseView>
+                    {rule?.secondIndex && (
+                        <WiredArrayValueField
+                            constantMin={0}
+                            label={localizeWithFallback('wiredfurni.params.arrays.index.second', 'Second index')}
+                            recentScope="array-modify-second"
+                            value={wiredArrayAddressAsValue(payload.secondIndex)}
+                            onChange={(value) => setPayload({ ...payload, secondIndex: wiredArrayValueAsAddress(value, payload.secondIndex) })}
+                        />
+                    )}
+
+                    {rule?.entryValues &&
+                        fields.map((field) => (
+                            <WiredArrayValueField
+                                key={field.id}
+                                label={field.name || localizeWithFallback('wiredfurni.params.arrays.criteria.value', 'Value')}
+                                recentScope={`array-modify-field-${field.id}`}
+                                value={fieldInput(field.id)}
+                                onChange={(value) => setFieldInput(field.id, value)}
+                            />
+                        ))}
+
+                    {definition?.permanent && payload.variableType !== WIRED_ARRAY_TYPE_ROOM && payload.variableType !== WIRED_ARRAY_TYPE_CONTEXT && (
+                        <Text small className="text-black/60">
+                            {localizeWithFallback('wiredfurni.params.arrays.permanent', 'This array is saved, so the change outlives the room being emptied.')}
+                        </Text>
+                    )}
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

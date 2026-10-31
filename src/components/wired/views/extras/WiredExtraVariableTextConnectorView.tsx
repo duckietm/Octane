@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { formatWiredTextCounter, WiredTextFormattingHelp } from '../common/WiredTextFormattingHelp';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
@@ -56,19 +57,21 @@ export const WiredExtraVariableTextConnectorView: FC<{}> = () => {
     const characterCount = mappingsText.length;
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 400 }}>
-            <div className="flex flex-col gap-2">
-                <Text bold>{LocalizeText('wiredfurni.params.variables.connect_text.title')}</Text>
-                <textarea
-                    className="form-control form-control-sm octane-wired__resizable-textarea"
-                    maxLength={MAX_CONNECTOR_CHARACTERS}
-                    placeholder={placeholderText}
-                    value={mappingsText}
-                    onChange={(event) => handleTextChange(event.target.value)}
-                />
-                <Text small>{formatWiredTextCounter(lineCount, characterCount, MAX_CONNECTOR_CHARACTERS, MAX_CONNECTOR_LINES)}</Text>
-                <WiredTextFormattingHelp />
-            </div>
-        </WiredExtraBaseView>
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 400 }}>
+                <div className="flex flex-col gap-2">
+                    <Text bold>{LocalizeText('wiredfurni.params.variables.connect_text.title')}</Text>
+                    <textarea
+                        className="form-control form-control-sm octane-wired__resizable-textarea"
+                        maxLength={MAX_CONNECTOR_CHARACTERS}
+                        placeholder={placeholderText}
+                        value={mappingsText}
+                        onChange={(event) => handleTextChange(event.target.value)}
+                    />
+                    <Text small>{formatWiredTextCounter(lineCount, characterCount, MAX_CONNECTOR_CHARACTERS, MAX_CONNECTOR_LINES)}</Text>
+                    <WiredTextFormattingHelp />
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

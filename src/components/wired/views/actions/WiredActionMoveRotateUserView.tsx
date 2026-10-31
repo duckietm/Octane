@@ -14,6 +14,7 @@ import {
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 // The official turn values (ours on the server are 8 and 9; the server converts).
 const ROTATION_CLOCKWISE = 9;
@@ -66,32 +67,39 @@ export const WiredActionMoveRotateUserView: FC<{}> = (props) => {
     }, [trigger]);
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.moveuser')}</Text>
-                <WiredIconRadioGroup name="wired-move-user-direction" options={movementOptions} value={movementDirection} onChange={setMovementDirection} />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.rotateuser')}</Text>
-                <WiredIconRadioGroup name="wired-rotate-user-direction" options={rotationOptions} value={rotationDirection} onChange={setRotationDirection} />
-            </div>
-            {hasTileCount && (
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
                 <div className="flex flex-col gap-1">
-                    <Text bold>{localizeWithFallback('wiredfurni.params.tilecount', 'Tiles to move')}</Text>
-                    <OctaneInput
-                        max={MAX_TILE_COUNT}
-                        min={MIN_TILE_COUNT}
-                        type="number"
-                        value={tileCount}
-                        onChange={(event) => setTileCount(clampTileCount(parseInt(event.target.value)))}
+                    <Text bold>{LocalizeText('wiredfurni.params.moveuser')}</Text>
+                    <WiredIconRadioGroup name="wired-move-user-direction" options={movementOptions} value={movementDirection} onChange={setMovementDirection} />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.rotateuser')}</Text>
+                    <WiredIconRadioGroup
+                        name="wired-rotate-user-direction"
+                        options={rotationOptions}
+                        value={rotationDirection}
+                        onChange={setRotationDirection}
                     />
                 </div>
-            )}
-        </WiredActionBaseView>
+                {hasTileCount && (
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{localizeWithFallback('wiredfurni.params.tilecount', 'Tiles to move')}</Text>
+                        <OctaneInput
+                            max={MAX_TILE_COUNT}
+                            min={MIN_TILE_COUNT}
+                            type="number"
+                            value={tileCount}
+                            onChange={(event) => setTileCount(clampTileCount(parseInt(event.target.value)))}
+                        />
+                    </div>
+                )}
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

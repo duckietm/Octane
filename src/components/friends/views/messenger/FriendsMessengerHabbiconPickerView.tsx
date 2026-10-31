@@ -4,6 +4,7 @@ import { LayoutHabbiconImageView, LayoutItemCountView } from '../../../../common
 import { InlineDialog } from '../../../../common/InlineDialog';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type PickerSection = {
     id: string;
@@ -112,43 +113,45 @@ export const FriendsMessengerHabbiconPickerView: FC<{
     };
 
     return (
-        <InlineDialog ref={pickerRef} aria-label="Habbicons" className="messenger-habbicon-picker" closeOnEscape={false} style={{ height: windowHeight }}>
-            <div className="messenger-habbicon-controls">
-                <div className="messenger-habbicon-search">
-                    <input autoFocus maxLength={24} value={search} onChange={(event) => setSearch(event.target.value)} />
-                    {!search && <span>{localizeWithFallback('generic.search', 'Search')}</span>}
-                    {search && <BaseButton aria-label="Clear" type="button" onClick={() => setSearch('')} />}
+        <NativeTextTree>
+            <InlineDialog ref={pickerRef} aria-label="Habbicons" className="messenger-habbicon-picker" closeOnEscape={false} style={{ height: windowHeight }}>
+                <div className="messenger-habbicon-controls">
+                    <div className="messenger-habbicon-search">
+                        <input autoFocus maxLength={24} value={search} onChange={(event) => setSearch(event.target.value)} />
+                        {!search && <span>{localizeWithFallback('generic.search', 'Search')}</span>}
+                        {search && <BaseButton aria-label="Clear" type="button" onClick={() => setSearch('')} />}
+                    </div>
+                    <BaseButton className="messenger-btn messenger-habbicon-get-more" type="button" onClick={onOpenHub}>
+                        {localizeWithFallback('habbicons.hud.get_more', 'Get more')}
+                    </BaseButton>
                 </div>
-                <BaseButton className="messenger-btn messenger-habbicon-get-more" type="button" onClick={onOpenHub}>
-                    {localizeWithFallback('habbicons.hud.get_more', 'Get more')}
-                </BaseButton>
-            </div>
-            {sections.length > 0 ? (
-                <div className="messenger-habbicon-scroll has-classic-scrollbar" style={{ height: listHeight }}>
-                    {sections.map((section) => (
-                        <section key={section.id}>
-                            <strong>{section.title}</strong>
-                            <div className="messenger-habbicon-grid">
-                                {padHabbiconRow(section.entries).map((entry, index) =>
-                                    entry ? (
-                                        <Hint key={entry.id} content={localizeHabbiconName(entry)}><BaseButton
-                                            type="button"
-                                            onClick={(event) => choose(entry.id, event.shiftKey)}
-                                        >
-                                            <LayoutHabbiconImageView id={entry.id} size={40} />
-                                            {catalog.isUnseen(entry.id) && <LayoutItemCountView count={1} style={{ top: -3, right: -3 }} />}
-                                        </BaseButton></Hint>
-                                    ) : (
-                                        <div className="empty" key={`empty-${section.id}-${index}`} />
-                                    )
-                                )}
-                            </div>
-                        </section>
-                    ))}
-                </div>
-            ) : (
-                <div className="messenger-habbicon-empty">{localizeWithFallback('habbicons.no_habbicons', 'No Habicons')}</div>
-            )}
-        </InlineDialog>
+                {sections.length > 0 ? (
+                    <div className="messenger-habbicon-scroll has-classic-scrollbar" style={{ height: listHeight }}>
+                        {sections.map((section) => (
+                            <section key={section.id}>
+                                <strong>{section.title}</strong>
+                                <div className="messenger-habbicon-grid">
+                                    {padHabbiconRow(section.entries).map((entry, index) =>
+                                        entry ? (
+                                            <Hint key={entry.id} content={localizeHabbiconName(entry)}><BaseButton
+                                                type="button"
+                                                onClick={(event) => choose(entry.id, event.shiftKey)}
+                                            >
+                                                <LayoutHabbiconImageView id={entry.id} size={40} />
+                                                {catalog.isUnseen(entry.id) && <LayoutItemCountView count={1} style={{ top: -3, right: -3 }} />}
+                                            </BaseButton></Hint>
+                                        ) : (
+                                            <div className="empty" key={`empty-${section.id}-${index}`} />
+                                        )
+                                    )}
+                                </div>
+                            </section>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="messenger-habbicon-empty">{localizeWithFallback('habbicons.no_habbicons', 'No Habicons')}</div>
+                )}
+            </InlineDialog>
+        </NativeTextTree>
     );
 };

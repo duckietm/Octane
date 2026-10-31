@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredHandItemField } from '../WiredHandItemField';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -22,13 +23,15 @@ export const WiredConditionActorHasHandItemView: FC = () => {
     }, [trigger]);
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            <WiredHandItemField handItemId={handItemId} onChange={setHandItemId} showCopyButton={true} />
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                <WiredHandItemField handItemId={handItemId} onChange={setHandItemId} showCopyButton={true} />
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

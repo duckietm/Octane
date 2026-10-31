@@ -1,6 +1,7 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import { LocalizeText } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredIconRadioGroup } from '../WiredMoveIconRadios';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
@@ -25,23 +26,25 @@ export const WiredSelectorUsersTeamView: FC<{}> = () => {
     }, [teamType, setIntParams]);
 
     return (
-        <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
-                    <WiredIconRadioGroup
-                        columns={2}
-                        name="usersTeamSelector"
-                        options={[
-                            { value: 0, label: LocalizeText('wiredfurni.params.team.any'), newLine: true },
-                            ...TEAM_TYPES.map((value) => ({ value, label: LocalizeText(`wiredfurni.params.team.${value}`) }))
-                        ]}
-                        value={teamType}
-                        onChange={setTeamType}
-                    />
-                </div>
+        <NativeTextTree>
+            <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
+                        <WiredIconRadioGroup
+                            columns={2}
+                            name="usersTeamSelector"
+                            options={[
+                                { value: 0, label: LocalizeText('wiredfurni.params.team.any'), newLine: true },
+                                ...TEAM_TYPES.map((value) => ({ value, label: LocalizeText(`wiredfurni.params.team.${value}`) }))
+                            ]}
+                            value={teamType}
+                            onChange={setTeamType}
+                        />
+                    </div>
 
-            </div>
-        </WiredSelectorBaseView>
+                </div>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { normalizeWiredComparison, WIRED_CMP_DEFAULT, WiredComparisonOperator } from '../WiredComparisonOperator';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -56,28 +57,30 @@ interface ChestAmountSectionsProps {
 
 /** AIR ChestHasAmount: the comparison section, then the value-or-variable amount (0..1000000). */
 export const WiredConditionChestAmountSections: FC<ChestAmountSectionsProps> = ({ state, onChange, onValidityChange }) => (
-    <div className="flex flex-col gap-3">
-        <WiredComparisonOperator
-            name="chestAmountComparison"
-            title={LocalizeText('wiredfurni.params.comparison_selection')}
-            value={state.comparison}
-            onChange={(comparison) => onChange({ ...state, comparison })}
-        />
-        <WiredValueOrVariableField
-            isVariable={state.fromVariable}
-            label={LocalizeText('wiredfurni.params.chest_compare_amount')}
-            literal={state.amount}
-            max={CHEST_AMOUNT_MAX}
-            min={CHEST_AMOUNT_MIN}
-            target={state.target}
-            token={state.token}
-            onIsVariableChange={(fromVariable) => onChange({ ...state, fromVariable })}
-            onLiteralChange={(amount) => onChange({ ...state, amount })}
-            onTargetChange={(target) => onChange({ ...state, target })}
-            onTokenChange={(token) => onChange({ ...state, token })}
-            onValidityChange={onValidityChange}
-        />
-    </div>
+    <NativeTextTree>
+        <div className="flex flex-col gap-3">
+            <WiredComparisonOperator
+                name="chestAmountComparison"
+                title={LocalizeText('wiredfurni.params.comparison_selection')}
+                value={state.comparison}
+                onChange={(comparison) => onChange({ ...state, comparison })}
+            />
+            <WiredValueOrVariableField
+                isVariable={state.fromVariable}
+                label={LocalizeText('wiredfurni.params.chest_compare_amount')}
+                literal={state.amount}
+                max={CHEST_AMOUNT_MAX}
+                min={CHEST_AMOUNT_MIN}
+                target={state.target}
+                token={state.token}
+                onIsVariableChange={(fromVariable) => onChange({ ...state, fromVariable })}
+                onLiteralChange={(amount) => onChange({ ...state, amount })}
+                onTargetChange={(target) => onChange({ ...state, target })}
+                onTokenChange={(token) => onChange({ ...state, token })}
+                onValidityChange={onValidityChange}
+            />
+        </div>
+    </NativeTextTree>
 );
 
 export const isChestAmountValid = (state: IChestAmountState, literalValid: boolean) =>
@@ -115,21 +118,23 @@ export const WiredConditionChestHasItemsView: FC<{}> = () => {
     };
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={requiresFurni}
-            save={save}
-            validate={() => isChestAmountValid(state, literalValid)}
-            footer={
-                <WiredSourcesSelector
-                    showFurni={true}
-                    furniTitle="wiredfurni.params.sources.furni.title.chests"
-                    furniSource={furniSource}
-                    onChangeFurni={setFurniSource}
-                />
-            }
-        >
-            <WiredConditionChestAmountSections state={state} onChange={setState} onValidityChange={setLiteralValid} />
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={requiresFurni}
+                save={save}
+                validate={() => isChestAmountValid(state, literalValid)}
+                footer={
+                    <WiredSourcesSelector
+                        showFurni={true}
+                        furniTitle="wiredfurni.params.sources.furni.title.chests"
+                        furniSource={furniSource}
+                        onChangeFurni={setFurniSource}
+                    />
+                }
+            >
+                <WiredConditionChestAmountSections state={state} onChange={setState} onValidityChange={setLiteralValid} />
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

@@ -3,6 +3,7 @@ import { Dispatch, FC, SetStateAction, useEffect, useRef } from 'react';
 import { GetConfigurationValue, localizeWithFallback } from '../../api';
 import { Flex, LayoutItemCountView } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 /** One entry of the official prog_menu_view: an icon with its caption underneath. */
 const ProgressionItem: FC<{ name: string; iconClassName: string; label: string; count?: number; onClick: () => void }> = ({
@@ -55,49 +56,51 @@ export const ToolbarProgressionView: FC<{
     };
 
     return (
-        <Flex
-            alignItems="center"
-            className="octane-toolbar-progression bg-[rgba(85,85,85,0.95)] border border-[solid] border-[#3d3d3d] [box-shadow:inset_2px_2px_rgba(255,255,255,.1),inset_-2px_-2px_rgba(0,0,0,.15)] rounded-[6px] p-2"
-            gap={2}
-            innerRef={elementRef}
-        >
-            {showDailyTasks && (
+        <NativeTextTree>
+            <Flex
+                alignItems="center"
+                className="octane-toolbar-progression bg-[rgba(85,85,85,0.95)] border border-[solid] border-[#3d3d3d] [box-shadow:inset_2px_2px_rgba(255,255,255,.1),inset_-2px_-2px_rgba(0,0,0,.15)] rounded-[6px] p-2"
+                gap={2}
+                innerRef={elementRef}
+            >
+                {showDailyTasks && (
+                    <ProgressionItem
+                        name="dailytasks"
+                        iconClassName="icon-me-dailytasks"
+                        label={localizeWithFallback('widget.progmenu.dailytasks', 'Daily tasks')}
+                        count={unseenDailyTaskCount}
+                        onClick={() => open('dailytasks/open')}
+                    />
+                )}
+                {showQuests && (
+                    <ProgressionItem
+                        name="quests"
+                        iconClassName="icon-me-quests"
+                        label={localizeWithFallback('widget.progmenu.quests', 'Quests')}
+                        onClick={() => open('quests/toggle')}
+                    />
+                )}
                 <ProgressionItem
-                    name="dailytasks"
-                    iconClassName="icon-me-dailytasks"
-                    label={localizeWithFallback('widget.progmenu.dailytasks', 'Daily tasks')}
-                    count={unseenDailyTaskCount}
-                    onClick={() => open('dailytasks/open')}
+                    name="achievements"
+                    iconClassName="octane-icon icon-me-achievements"
+                    label={localizeWithFallback('widget.progmenu.achievements', 'Achievements')}
+                    count={unseenAchievementCount}
+                    onClick={() => open('achievements/toggle')}
                 />
-            )}
-            {showQuests && (
                 <ProgressionItem
-                    name="quests"
-                    iconClassName="icon-me-quests"
-                    label={localizeWithFallback('widget.progmenu.quests', 'Quests')}
-                    onClick={() => open('quests/toggle')}
+                    name="leaderboards"
+                    iconClassName="icon-progmenu-leaderboards"
+                    label={localizeWithFallback('widget.progmenu.leaderboards', 'Leaderboards')}
+                    onClick={() => open('badge-leaderboard/show')}
                 />
-            )}
-            <ProgressionItem
-                name="achievements"
-                iconClassName="octane-icon icon-me-achievements"
-                label={localizeWithFallback('widget.progmenu.achievements', 'Achievements')}
-                count={unseenAchievementCount}
-                onClick={() => open('achievements/toggle')}
-            />
-            <ProgressionItem
-                name="leaderboards"
-                iconClassName="icon-progmenu-leaderboards"
-                label={localizeWithFallback('widget.progmenu.leaderboards', 'Leaderboards')}
-                onClick={() => open('badge-leaderboard/show')}
-            />
-            <ProgressionItem
-                name="introduction"
-                iconClassName="icon-me-rewardtrack"
-                label={localizeWithFallback('widget.progmenu.introduction', 'Introduction')}
-                count={unseenRewardTrackCount}
-                onClick={() => open('reward_track/open/introduction')}
-            />
-        </Flex>
+                <ProgressionItem
+                    name="introduction"
+                    iconClassName="icon-me-rewardtrack"
+                    label={localizeWithFallback('widget.progmenu.introduction', 'Introduction')}
+                    count={unseenRewardTrackCount}
+                    onClick={() => open('reward_track/open/introduction')}
+                />
+            </Flex>
+        </NativeTextTree>
     );
 };

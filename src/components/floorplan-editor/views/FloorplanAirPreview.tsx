@@ -18,6 +18,7 @@ import tileF from '../../../assets/images/floorplaneditor/preview/tile_preview_f
 import tileEntry from '../../../assets/images/floorplaneditor/preview/tile_preview_entry.png';
 import { layoutAirPreview } from '../state/airPreview';
 import { FloorplanState } from '../state/types';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 /** AIR's preview tiles in picture order: the 16 neighbour masks, then the door. */
 const TILE_SOURCES = [tile0, tile1, tile2, tile3, tile4, tile5, tile6, tile7, tile8, tile9, tileA, tileB, tileC, tileD, tileE, tileF, tileEntry];
@@ -83,8 +84,10 @@ export const FloorplanAirPreview: FC<{ state: FloorplanState }> = ({ state }) =>
     }, [images, layout]);
 
     return (
-        <div className="fp-air-preview" data-testid="floorplan-preview-2d">
-            <canvas ref={canvasRef} className="fp-air-preview-canvas" data-tiles={layout.tiles.length} />
-        </div>
+        <NativeTextTree>
+            <div className="fp-air-preview" data-testid="floorplan-preview-2d">
+                <canvas ref={canvasRef} className="fp-air-preview-canvas" data-tiles={layout.tiles.length} />
+            </div>
+        </NativeTextTree>
     );
 };

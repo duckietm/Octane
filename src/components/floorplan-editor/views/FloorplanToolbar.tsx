@@ -4,6 +4,7 @@ import { LocalizeText } from '../../../api';
 import { Base } from '../../../common';
 import { FloorActionMode, FloorplanAction, FloorplanState } from '../state/types';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 type Props = {
     state: FloorplanState;
@@ -33,96 +34,98 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
     const buttons = BRUSH_BUTTONS.filter((button) => includeDoor || button.mode !== 'DOOR');
 
     return (
-        <div className="fp-control-group" data-testid="floorplan-toolbar">
-            <div className="fp-group-label">{LocalizeText('floor.plan.editor.draw.mode')}</div>
-            <div className="fp-tools">
-                {buttons.map((b, index) => {
-                    const active = state.brush.action === b.mode && !panMode;
+        <NativeTextTree>
+            <div className="fp-control-group" data-testid="floorplan-toolbar">
+                <div className="fp-group-label">{LocalizeText('floor.plan.editor.draw.mode')}</div>
+                <div className="fp-tools">
+                    {buttons.map((b, index) => {
+                        const active = state.brush.action === b.mode && !panMode;
 
-                    return (
-                        <Base component={BaseButton} type="button"
-                            key={b.id}
-                            pointer
-                            data-testid={b.id}
-                            data-active={active ? 'true' : 'false'}
-                            className={`fp-tool ${active ? 'is-active' : ''} ${b.gap && index > 0 ? 'is-gap' : ''}`}
-                            onClick={() => {
-                                exitPan();
-                                dispatch({ type: 'BRUSH_SET', action: b.mode });
-                            }}
-                        >
-                            <span className={`octane-icon ${b.iconClass}`} />
-                        </Base>
-                    );
-                })}
-            </div>
-            {/* Octane's extra tools, in a row of their own under AIR's five. */}
-            <div className="fp-tools is-extra">
-                <Base component={BaseButton} type="button"
-                    pointer
-                    data-testid="tool-select-all"
-                    className="fp-tool is-extra"
-                    title={state.brush.action === 'UNSET' ? 'Erase all tiles' : 'Apply brush to all tiles'}
-                    onClick={() => {
-                        exitPan();
-                        dispatch({ type: 'SELECT_ALL' });
-                        dispatch({ type: 'APPLY_BRUSH_TO_SELECTION', source: 'local' });
-                    }}
-                >
-                    <span className={`octane-icon ${state.brush.action === 'UNSET' ? 'icon-set-deselect' : 'icon-set-select'}`} />
-                </Base>
-                <Base component={BaseButton} type="button"
-                    pointer
-                    data-testid="tool-square-select"
-                    data-active={state.squareSelect && !panMode ? 'true' : 'false'}
-                    title={
-                        state.squareSelect && !panMode
-                            ? 'Rectangular selection mode active — drag on the canvas to apply the brush'
-                            : 'Rectangular selection — apply the brush to all tiles in an area'
-                    }
-                    className={`fp-tool is-extra ${state.squareSelect && !panMode ? 'is-active' : ''}`}
-                    onClick={() => {
-                        exitPan();
-                        dispatch({ type: 'SQUARE_SELECT_TOGGLE' });
-                    }}
-                >
-                    <span className="octane-icon icon-set-squaresselect" />
-                </Base>
-                {setPanMode && (
+                        return (
+                            <Base component={BaseButton} type="button"
+                                key={b.id}
+                                pointer
+                                data-testid={b.id}
+                                data-active={active ? 'true' : 'false'}
+                                className={`fp-tool ${active ? 'is-active' : ''} ${b.gap && index > 0 ? 'is-gap' : ''}`}
+                                onClick={() => {
+                                    exitPan();
+                                    dispatch({ type: 'BRUSH_SET', action: b.mode });
+                                }}
+                            >
+                                <span className={`octane-icon ${b.iconClass}`} />
+                            </Base>
+                        );
+                    })}
+                </div>
+                {/* Octane's extra tools, in a row of their own under AIR's five. */}
+                <div className="fp-tools is-extra">
                     <Base component={BaseButton} type="button"
                         pointer
-                        data-testid="tool-pan"
-                        data-active={panMode ? 'true' : 'false'}
-                        title={panMode ? 'Hand mode active — drag to pan the view' : 'Hand mode — drag to pan the view'}
-                        className={`fp-tool is-extra is-gap ${panMode ? 'is-active' : ''}`}
-                        onClick={() => setPanMode(!panMode)}
+                        data-testid="tool-select-all"
+                        className="fp-tool is-extra"
+                        title={state.brush.action === 'UNSET' ? 'Erase all tiles' : 'Apply brush to all tiles'}
+                        onClick={() => {
+                            exitPan();
+                            dispatch({ type: 'SELECT_ALL' });
+                            dispatch({ type: 'APPLY_BRUSH_TO_SELECTION', source: 'local' });
+                        }}
                     >
-                        <span className="octane-icon icon-hand-mode" />
+                        <span className={`octane-icon ${state.brush.action === 'UNSET' ? 'icon-set-deselect' : 'icon-set-select'}`} />
                     </Base>
-                )}
-                {(onUndo || onRedo) && (
-                    <>
+                    <Base component={BaseButton} type="button"
+                        pointer
+                        data-testid="tool-square-select"
+                        data-active={state.squareSelect && !panMode ? 'true' : 'false'}
+                        title={
+                            state.squareSelect && !panMode
+                                ? 'Rectangular selection mode active — drag on the canvas to apply the brush'
+                                : 'Rectangular selection — apply the brush to all tiles in an area'
+                        }
+                        className={`fp-tool is-extra ${state.squareSelect && !panMode ? 'is-active' : ''}`}
+                        onClick={() => {
+                            exitPan();
+                            dispatch({ type: 'SQUARE_SELECT_TOGGLE' });
+                        }}
+                    >
+                        <span className="octane-icon icon-set-squaresselect" />
+                    </Base>
+                    {setPanMode && (
                         <Base component={BaseButton} type="button"
-                            pointer={Boolean(canUndo)}
-                            data-testid="tool-undo"
-                            title="Undo (Ctrl+Z)"
-                            className={`fp-tool is-extra is-gap ${canUndo ? '' : 'is-disabled'}`}
-                            onClick={canUndo && onUndo ? onUndo : undefined}
+                            pointer
+                            data-testid="tool-pan"
+                            data-active={panMode ? 'true' : 'false'}
+                            title={panMode ? 'Hand mode active — drag to pan the view' : 'Hand mode — drag to pan the view'}
+                            className={`fp-tool is-extra is-gap ${panMode ? 'is-active' : ''}`}
+                            onClick={() => setPanMode(!panMode)}
                         >
-                            <FaUndo size={16} />
+                            <span className="octane-icon icon-hand-mode" />
                         </Base>
-                        <Base component={BaseButton} type="button"
-                            pointer={Boolean(canRedo)}
-                            data-testid="tool-redo"
-                            title="Redo (Ctrl+Shift+Z)"
-                            className={`fp-tool is-extra ${canRedo ? '' : 'is-disabled'}`}
-                            onClick={canRedo && onRedo ? onRedo : undefined}
-                        >
-                            <FaRedo size={16} />
-                        </Base>
-                    </>
-                )}
+                    )}
+                    {(onUndo || onRedo) && (
+                        <>
+                            <Base component={BaseButton} type="button"
+                                pointer={Boolean(canUndo)}
+                                data-testid="tool-undo"
+                                title="Undo (Ctrl+Z)"
+                                className={`fp-tool is-extra is-gap ${canUndo ? '' : 'is-disabled'}`}
+                                onClick={canUndo && onUndo ? onUndo : undefined}
+                            >
+                                <FaUndo size={16} />
+                            </Base>
+                            <Base component={BaseButton} type="button"
+                                pointer={Boolean(canRedo)}
+                                data-testid="tool-redo"
+                                title="Redo (Ctrl+Shift+Z)"
+                                className={`fp-tool is-extra ${canRedo ? '' : 'is-disabled'}`}
+                                onClick={canRedo && onRedo ? onRedo : undefined}
+                            >
+                                <FaRedo size={16} />
+                            </Base>
+                        </>
+                    )}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

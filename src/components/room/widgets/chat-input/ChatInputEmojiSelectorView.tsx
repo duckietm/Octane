@@ -2,6 +2,7 @@ import { FC, useCallback, useMemo, useState } from 'react';
 import { GetConfigurationValue, localizeWithFallback } from '../../../../api';
 import { Popover, PopoverContent, PopoverTrigger } from '../../../../common/FloatingPopover';
 import { LazyEmojiPicker } from '../../../../common/LazyEmojiPicker';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface ChatInputEmojiSelectorViewProps {
     addChatEmoji: (emoji: string) => void;
@@ -24,18 +25,20 @@ export const ChatInputEmojiSelectorView: FC<ChatInputEmojiSelectorViewProps> = (
     if (!enabled) return null;
 
     return (
-        <Popover open={selectorVisible} onOpenChange={(open) => setSelectorVisible(open)}>
-            <PopoverTrigger
-                aria-label={localizeWithFallback('widgets.chatinput.emoji', 'Emoji')}
-                className="swf-chat-emoji-trigger cursor-pointer select-none"
-                title={localizeWithFallback('widgets.chatinput.emoji', 'Emoji')}
-                type="button"
-            >
-                <span aria-hidden="true">🙂</span>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="swf-chat-emoji-popover" positionerClassName="z-[1070]" side="top" sideOffset={8}>
-                <LazyEmojiPicker onEmojiSelect={handleEmojiSelect} previewPosition="none" skinTonePosition="search" theme="dark" />
-            </PopoverContent>
-        </Popover>
+        <NativeTextTree>
+            <Popover open={selectorVisible} onOpenChange={(open) => setSelectorVisible(open)}>
+                <PopoverTrigger
+                    aria-label={localizeWithFallback('widgets.chatinput.emoji', 'Emoji')}
+                    className="swf-chat-emoji-trigger cursor-pointer select-none"
+                    title={localizeWithFallback('widgets.chatinput.emoji', 'Emoji')}
+                    type="button"
+                >
+                    <span aria-hidden="true">🙂</span>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="swf-chat-emoji-popover" positionerClassName="z-[1070]" side="top" sideOffset={8}>
+                    <LazyEmojiPicker onEmojiSelect={handleEmojiSelect} previewPosition="none" skinTonePosition="search" theme="dark" />
+                </PopoverContent>
+            </Popover>
+        </NativeTextTree>
     );
 };

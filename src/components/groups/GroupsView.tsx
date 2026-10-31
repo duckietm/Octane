@@ -15,6 +15,7 @@ import {
     getGroupFailureTitleKey,
     GetRoomSession,
     localizeWithFallback,
+    parsePositiveId,
     SendMessageComposer,
     TryVisitRoom
 } from '../../api';
@@ -26,6 +27,7 @@ import { GroupInformationStandaloneView } from './views/GroupInformationStandalo
 import { GroupManagerView } from './views/GroupManagerView';
 import { GroupMembersView } from './views/GroupMembersView';
 import { GroupAlert, GroupNativeAlertView } from './views/GroupNativeAlertView';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 // HabboGroupsManager.onJoinFailed: reason 4 is "Habbo Club needed for more groups", which opens the HC required window.
 const JOIN_FAIL_HC_REQUIRED = 4;
@@ -83,12 +85,15 @@ export const GroupsView: FC<{}> = (props) => {
                     case 'create':
                         setCreatorVisible(true);
                         return;
-                    case 'manage':
-                        if (!parts[2]) return;
+                    case 'manage': {
+                        const groupId = parsePositiveId(parts[2]);
+
+                        if (groupId === null) return;
 
                         setCreatorVisible(false);
-                        SendMessageComposer(new GroupSettingsComposer(Number(parts[2])));
+                        SendMessageComposer(new GroupSettingsComposer(groupId));
                         return;
+                    }
                 }
             },
             eventUrlPrefix: 'groups/'
@@ -114,14 +119,16 @@ export const GroupsView: FC<{}> = (props) => {
     }, []);
 
     return (
-        <>
-            {isCreatorVisible && <GroupCreatorView onClose={() => setCreatorVisible(false)} />}
-            {createdGroupId !== 0 && <GroupCreatedView onClose={closeCreated} />}
-            {!isCreatorVisible && <GroupManagerView />}
-            <GroupMembersView />
-            <GroupInformationStandaloneView />
-            {joinFailure && <GroupNativeAlertView alert={joinFailure} onClose={() => setJoinFailure(null)} />}
-            {isHcRequiredVisible && <GroupHcRequiredView onClose={() => setHcRequiredVisible(false)} />}
-        </>
+        <NativeTextTree>
+            <>
+                {isCreatorVisible && <GroupCreatorView onClose={() => setCreatorVisible(false)} />}
+                {createdGroupId !== 0 && <GroupCreatedView onClose={closeCreated} />}
+                {!isCreatorVisible && <GroupManagerView />}
+                <GroupMembersView />
+                <GroupInformationStandaloneView />
+                {joinFailure && <GroupNativeAlertView alert={joinFailure} onClose={() => setJoinFailure(null)} />}
+                {isHcRequiredVisible && <GroupHcRequiredView onClose={() => setHcRequiredVisible(false)} />}
+            </>
+        </NativeTextTree>
     );
 };

@@ -2,6 +2,7 @@ import { FC, PropsWithChildren, ReactNode } from 'react';
 import { NumberInput } from '../../../../common/NumberInput';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * Small building blocks shared by the housekeeping tabs, so every tab uses the
@@ -69,20 +70,24 @@ export const HousekeepingSection: FC<PropsWithChildren<{ title?: string; icon?: 
 
 /** A label over a value, for the fact grids of the user and room cards. */
 export const HousekeepingFact: FC<{ label: string; value: ReactNode; icon?: ReactNode; title?: string }> = ({ label, value, icon, title }) => (
-    <div className="flex min-w-0 flex-col rounded border border-zinc-200 bg-white/80 px-1.5 py-1" title={title}>
-        <span className="flex items-center gap-1 text-[11px] text-[#666666]">
-            {icon}
-            {label}
-        </span>
-        <span className="truncate text-xs font-bold tabular-nums text-black">{value}</span>
-    </div>
+    <NativeTextTree>
+        <div className="flex min-w-0 flex-col rounded border border-zinc-200 bg-white/80 px-1.5 py-1" title={title}>
+            <span className="flex items-center gap-1 text-[11px] text-[#666666]">
+                {icon}
+                {label}
+            </span>
+            <span className="truncate text-xs font-bold tabular-nums text-black">{value}</span>
+        </div>
+    </NativeTextTree>
 );
 
 export const HousekeepingEmptyState: FC<PropsWithChildren<{ icon?: ReactNode }>> = ({ icon, children }) => (
-    <div className="flex items-center gap-2 rounded-lg border border-dashed border-zinc-300 bg-zinc-50/60 p-3 text-xs italic text-[#666666]">
-        {icon}
-        {children}
-    </div>
+    <NativeTextTree>
+        <div className="flex items-center gap-2 rounded-lg border border-dashed border-zinc-300 bg-zinc-50/60 p-3 text-xs italic text-[#666666]">
+            {icon}
+            {children}
+        </div>
+    </NativeTextTree>
 );
 
 /** Numeric field with its unit, used next to the timed sanction buttons. */
@@ -106,13 +111,15 @@ export const HOUSEKEEPING_INPUT_CLASS =
     'w-full rounded border border-zinc-300 bg-white px-2 py-1 text-xs text-black placeholder:italic placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-sky-400';
 
 export const HousekeepingField: FC<PropsWithChildren<{ label: string; hint?: string; className?: string }>> = ({ label, hint, className = '', children }) => (
-    <label className={`flex min-w-0 flex-col gap-0.5 ${className}`}>
-        <span className="flex items-baseline gap-1 text-[11px] font-bold text-black">
-            {label}
-            {hint && <span className="ml-auto font-normal normal-case tracking-normal text-zinc-400">{hint}</span>}
-        </span>
-        {children}
-    </label>
+    <NativeTextTree>
+        <label className={`flex min-w-0 flex-col gap-0.5 ${className}`}>
+            <span className="flex items-baseline gap-1 text-[11px] font-bold text-black">
+                {label}
+                {hint && <span className="ml-auto font-normal normal-case tracking-normal text-zinc-400">{hint}</span>}
+            </span>
+            {children}
+        </label>
+    </NativeTextTree>
 );
 
 export type HousekeepingButtonVariant = 'primary' | 'success' | 'warning' | 'danger' | 'secondary' | 'neutral';

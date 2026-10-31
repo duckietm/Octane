@@ -3,24 +3,27 @@ import { FC } from 'react';
 import { LocalizeText } from '../../../../api';
 import { NameChangeLayoutViewProps } from './NameChangeView.types';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const NameChangeInitView: FC<NameChangeLayoutViewProps> = (props) => {
     const { onAction = null } = props;
 
     return (
-        <div className="flex flex-col gap-4 h-full">
-            <div className="octane-card-panel p-2 text-center">{LocalizeText('tutorial.name_change.info.main')}</div>
-            <div className="font-bold	 flex items-center justify-center size-full">
-                {LocalizeText('tutorial.name_change.current', ['name'], [GetSessionDataManager().userName])}
+        <NativeTextTree>
+            <div className="flex flex-col gap-4 h-full">
+                <div className="octane-card-panel p-2 text-center">{LocalizeText('tutorial.name_change.info.main')}</div>
+                <div className="font-bold	 flex items-center justify-center size-full">
+                    {LocalizeText('tutorial.name_change.current', ['name'], [GetSessionDataManager().userName])}
+                </div>
+                <div className="flex gap-2">
+                    <BaseButton className="habbo-btn-secondary w-full" onClick={() => onAction('start')}>
+                        {LocalizeText('tutorial.name_change.change')}
+                    </BaseButton>
+                    <BaseButton className="habbo-btn-secondary w-full" onClick={() => onAction('confirmation', GetSessionDataManager().userName)}>
+                        {LocalizeText('tutorial.name_change.keep')}
+                    </BaseButton>
+                </div>
             </div>
-            <div className="flex gap-2">
-                <BaseButton className="habbo-btn-secondary w-full" onClick={() => onAction('start')}>
-                    {LocalizeText('tutorial.name_change.change')}
-                </BaseButton>
-                <BaseButton className="habbo-btn-secondary w-full" onClick={() => onAction('confirmation', GetSessionDataManager().userName)}>
-                    {LocalizeText('tutorial.name_change.keep')}
-                </BaseButton>
-            </div>
-        </div>
+        </NativeTextTree>
     );
 };

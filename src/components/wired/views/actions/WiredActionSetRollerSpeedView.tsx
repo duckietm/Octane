@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const WiredActionSetRollerSpeedView: FC<{}> = (props) => {
     const { trigger = null, setIntParams = null } = useWired();
@@ -18,12 +19,14 @@ export const WiredActionSetRollerSpeedView: FC<{}> = (props) => {
     const save = () => setIntParams([speed]);
 
     return (
-        <WiredActionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.roller_speed', 'Roller speed')}</Text>
-                <Text small>{localizeWithFallback('wiredfurni.params.roller_speed.info', '-1 = rollers off, 0 = fastest, higher = slower (max 10)')}</Text>
-                <NumberInput className="form-control form-control-sm" min={-1} max={10} value={speed} onChange={(event) => setSpeed(parseInt(event.target.value, 10) || 0)} />
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.roller_speed', 'Roller speed')}</Text>
+                    <Text small>{localizeWithFallback('wiredfurni.params.roller_speed.info', '-1 = rollers off, 0 = fastest, higher = slower (max 10)')}</Text>
+                    <NumberInput className="form-control form-control-sm" min={-1} max={10} value={speed} onChange={(event) => setSpeed(parseInt(event.target.value, 10) || 0)} />
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

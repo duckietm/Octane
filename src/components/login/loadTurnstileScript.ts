@@ -31,26 +31,30 @@ export const loadTurnstileScript = (timeoutMs: number = TURNSTILE_LOAD_TIMEOUT_M
             settled = true;
             window.clearTimeout(timer);
 
-            // A failed load may be retried later; a successful one is kept.
-            if (!loaded) pending = null;
+            // A failed load may be retried later; a successful one is kept. The failed element goes too: it never
+            // fires again, so a retry that found it in the page waited the whole timeout and failed every time.
+            if (!loaded) {
+                pending = null;
+                script.remove();
+            }
 
             resolve(loaded);
         };
 
         const timer = window.setTimeout(() => settle(false), timeoutMs);
 
-        const existing = document.querySelector<HTMLScriptElement>(`script[src="${TURNSTILE_SCRIPT_URL}"]`);
-        const script = existing ?? document.createElement('script');
+        // An element already in the page without window.turnstile is one whose load is over or lost: start afresh.
+        document.querySelector<HTMLScriptElement>(`script[src="${TURNSTILE_SCRIPT_URL}"]`)?.remove();
+
+        const script = document.createElement('script');
 
         script.addEventListener('load', () => settle(!!window.turnstile));
         script.addEventListener('error', () => settle(false));
 
-        if (!existing) {
-            script.src = TURNSTILE_SCRIPT_URL;
-            script.async = true;
-            script.defer = true;
-            document.head.appendChild(script);
-        }
+        script.src = TURNSTILE_SCRIPT_URL;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
     });
 
     return pending;

@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { FURNI_SOURCES, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
@@ -34,13 +35,15 @@ export const WiredActionRemoveTemporaryFurniView: FC<{}> = () =>
     };
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={ true }
-            requiresFurni={ furniSource === SOURCE_SELECTED ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID : WiredFurniType.STUFF_SELECTION_OPTION_NONE }
-            save={ save }
-            footerCollapsible={false}
-            footer={ <WiredSourcesSelector showFurni={ true } furniSource={ furniSource } onChangeFurni={ setFurniSource } /> }>
-            <Text small>{ localizeWithFallback('wiredfurni.params.remove_furni.usage_info', 'Removes temporary furni placed by "place furni". Furni somebody owns is not removed.') }</Text>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={ true }
+                requiresFurni={ furniSource === SOURCE_SELECTED ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID : WiredFurniType.STUFF_SELECTION_OPTION_NONE }
+                save={ save }
+                footerCollapsible={false}
+                footer={ <WiredSourcesSelector showFurni={ true } furniSource={ furniSource } onChangeFurni={ setFurniSource } /> }>
+                <Text small>{ localizeWithFallback('wiredfurni.params.remove_furni.usage_info', 'Removes temporary furni placed by "place furni". Furni somebody owns is not removed.') }</Text>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

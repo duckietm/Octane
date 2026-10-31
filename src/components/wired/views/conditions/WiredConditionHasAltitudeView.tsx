@@ -7,6 +7,7 @@ import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { WiredConditionQuantifierSection } from './WiredConditionQuantifierSection';
 import { Radio } from '../../../../common/Radio';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 
 const MIN_ALTITUDE = 0;
@@ -165,66 +166,68 @@ export const WiredConditionHasAltitudeView: FC<WiredConditionHasAltitudeViewProp
     };
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            footerCollapsible={false}
-            showQuantifier={false}
-            footer={
-                <div className="flex flex-col gap-2">
-                    <BaseButton className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
-                        {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
-                    </BaseButton>
-                    {showAdvanced && (
-                        <>
-                            <WiredConditionQuantifierSection />
-                            {spec.users ? (
-                                <WiredSourcesSelector showUsers={true} userSource={furniSource} onChangeUsers={setFurniSource} />
-                            ) : (
-                                <WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />
-                            )}
-                        </>
-                    )}
-                </div>
-            }
-        >
-            {spec.comparison && (
-                <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
-                    {[0, 1, 2].map((value) => {
-                        return (
-                            <div key={value} className="flex items-center gap-1">
-                                <Radio checked={comparison === value} id={`altitudeComparison${value}`} name="altitudeComparison" onCheckedChange={() => setComparison(value)} />
-                                <Text>
-                                    {spec.value === 'radius'
-                                        ? localizeWithFallback(RANGE_COMPARISON_LABELS[value].key, RANGE_COMPARISON_LABELS[value].fallback)
-                                        : LocalizeText(`wiredfurni.params.comparison.${value}`)}
-                                </Text>
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
-            {spec.value && (
-                <>
-                    <div className="flex flex-col gap-1">
-                        <Text bold>{localizeWithFallback(VALUE_LABELS[spec.value].key, VALUE_LABELS[spec.value].fallback)}</Text>
-                        <input
-                            className="form-control form-control-sm"
-                            inputMode="decimal"
-                            type="text"
-                            value={altitudeInput}
-                            onBlur={() => setAltitudeInput(formatAltitude(altitude))}
-                            onChange={(event) => updateAltitudeInput(event.target.value)}
-                        />
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                footerCollapsible={false}
+                showQuantifier={false}
+                footer={
+                    <div className="flex flex-col gap-2">
+                        <BaseButton className="octane-wired__advanced-toggle" type="button" onClick={() => setShowAdvanced((value) => !value)}>
+                            {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
+                        </BaseButton>
+                        {showAdvanced && (
+                            <>
+                                <WiredConditionQuantifierSection />
+                                {spec.users ? (
+                                    <WiredSourcesSelector showUsers={true} userSource={furniSource} onChangeUsers={setFurniSource} />
+                                ) : (
+                                    <WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />
+                                )}
+                            </>
+                        )}
                     </div>
+                }
+            >
+                {spec.comparison && (
                     <div className="flex flex-col gap-1">
-                        <Slider max={MAX_ALTITUDE} min={MIN_ALTITUDE} step={ALTITUDE_STEP} value={altitude} onChange={(event) => updateAltitude(event as number)} />
-                        <Text small>{formatAltitude(altitude)}</Text>
+                        <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
+                        {[0, 1, 2].map((value) => {
+                            return (
+                                <div key={value} className="flex items-center gap-1">
+                                    <Radio checked={comparison === value} id={`altitudeComparison${value}`} name="altitudeComparison" onCheckedChange={() => setComparison(value)} />
+                                    <Text>
+                                        {spec.value === 'radius'
+                                            ? localizeWithFallback(RANGE_COMPARISON_LABELS[value].key, RANGE_COMPARISON_LABELS[value].fallback)
+                                            : LocalizeText(`wiredfurni.params.comparison.${value}`)}
+                                    </Text>
+                                </div>
+                            );
+                        })}
                     </div>
-                </>
-            )}
-        </WiredConditionBaseView>
+                )}
+                {spec.value && (
+                    <>
+                        <div className="flex flex-col gap-1">
+                            <Text bold>{localizeWithFallback(VALUE_LABELS[spec.value].key, VALUE_LABELS[spec.value].fallback)}</Text>
+                            <input
+                                className="form-control form-control-sm"
+                                inputMode="decimal"
+                                type="text"
+                                value={altitudeInput}
+                                onBlur={() => setAltitudeInput(formatAltitude(altitude))}
+                                onChange={(event) => updateAltitudeInput(event.target.value)}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <Slider max={MAX_ALTITUDE} min={MIN_ALTITUDE} step={ALTITUDE_STEP} value={altitude} onChange={(event) => updateAltitude(event as number)} />
+                            <Text small>{formatAltitude(altitude)}</Text>
+                        </div>
+                    </>
+                )}
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

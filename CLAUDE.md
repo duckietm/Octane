@@ -514,6 +514,22 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
   `saveWiredAndKeepOpen`) and the pure helpers in `src/api/wired/WiredClipboard.ts`. Paste and reset work by
   handing the views a cloned definition object (prototype kept, data fields replaced), so every view re-reads
   it through its `[trigger]` effect; the clipboard is one entry per holder+code for the session.
+- AIR text (pixel-exact labels): `src/common/native-text/` holds the port of AIR's glyph rasteriser (`NativeText`).
+  `NativeLabel` draws a text in the font its computed CSS asks for (`resolveCssNativeFont`: every Ubuntu face becomes AIR's
+  Ubuntu, Volter stays Volter, unsupported faces / letter spacing stay browser text), keeping the CSS line height and wrap width;
+  `nativeTextChildren` turns text-only children into one label and is wired into `Text`, `BaseButton` (so `Button` too), window
+  titles (`OctaneCardHeaderView`) and tabs (`OctaneCardTabsItemView`). `CssNativeText` is the fixed-style variant used by the
+  catalogue. Config `ui.native.text.enabled` (default true) turns it off; jsdom never draws it (tests see plain text, enable it with
+  `forceNativeTextEnabled`). `NativeTextTree` wraps a view's returned JSX and labels every text-only element in it (inputs, selects,
+  code, running text with inline markup and component-owned text excluded); the login views, navigator, inventory,
+  every other view under `src/components` use it, except the room chat bubbles and the windows that already draw NativeText (`GroupNativeLayout`, mod-tools native
+  layouts, the catalogue's CssNativeText). The SKIP list keeps form fields, code and SVG text out; text beside elements without text of their own (a checkbox, radio,
+  icon) gets labels too. `Select` / `ListSelect` draw the value, options (keyed by highlighted / selected state) and group labels
+  natively; the select sizer measures in the regular Ubuntu cut (`.octane-select-sizer.is-native`). Chat bubbles use `ChatNativeContent`
+  (`room/widgets/chat`): the name and message laid out together by `layoutNativeRuns` (one AIR TextField, wrapped at the bubble's
+  max-width), styles read from the bubble CSS; markup (links, mentions, colour tags), emoji, name prefixes/icons and translations
+  stay browser text. `NativeTextRasterCache` reuses finished rasters (16 MB LRU). Ubuntu rasters are drawn at the device pixel ratio itself (`getNativeTextRasterScale`; on a fractional ratio such as Windows 125 % at the nearest whole font size, halves down) and shown `pixelated`, so they are never resampled; Volter and the letter-spaced canvas path keep the next whole scale. A one-line label in a `text-overflow: ellipsis` box that its drawn raster overflows is shortened with "..." (`fitNativeText`); boxes sized to their text are left alone. Never wrap a `.map` callback's keyed element (the key
+  must stay on the returned element): the outer view's tree already covers it.
 - Renderer-SDK mock for Vitest: `src/octane-renderer.mock.ts`
   (aliased over `@octane/renderer` via `vitest.config.mts`).
   Hosts the explicit `OctaneLogger` mock, the `mockEventDispatcher` /

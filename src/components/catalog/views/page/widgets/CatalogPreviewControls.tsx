@@ -4,6 +4,7 @@ import { ProductTypeEnum } from '../../../../../api';
 import previewArrowLeft from '../../../../../assets/images/catalog/air/preview-arrow-left.png';
 import previewArrowRight from '../../../../../assets/images/catalog/air/preview-arrow-right.png';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { ToggleButton } from '../../../../../common/ToggleButton';
 
 interface CatalogPreviewControlsProps {
@@ -28,13 +29,15 @@ interface PreviewCapabilities {
 }
 
 const CatalogPreviewArrowIcon: FC<{ direction: 'left' | 'right' }> = ({ direction }) => (
-    <img
-        alt=""
-        aria-hidden="true"
-        className="octane-catalog-preview-arrow"
-        draggable={false}
-        src={direction === 'left' ? previewArrowLeft : previewArrowRight}
-    />
+    <NativeTextTree>
+        <img
+            alt=""
+            aria-hidden="true"
+            className="octane-catalog-preview-arrow"
+            draggable={false}
+            src={direction === 'left' ? previewArrowLeft : previewArrowRight}
+        />
+    </NativeTextTree>
 );
 
 const getFallbackCapabilities = (productType: string): PreviewCapabilities => {
@@ -112,51 +115,53 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
     };
 
     return (
-        <div className={`octane-catalog-preview-controls is-${capabilities.mode}`} role="toolbar" aria-label="Product preview">
-            {showRotationControls && (
-                <>
-                    <BaseButton
-                        aria-label="Rotate left"
-                        className="octane-catalog-preview-btn is-left"
-                        disabled={!capabilities.canRotate}
+        <NativeTextTree>
+            <div className={`octane-catalog-preview-controls is-${capabilities.mode}`} role="toolbar" aria-label="Product preview">
+                {showRotationControls && (
+                    <>
+                        <BaseButton
+                            aria-label="Rotate left"
+                            className="octane-catalog-preview-btn is-left"
+                            disabled={!capabilities.canRotate}
+                            type="button"
+                            onClick={(event) => runPreviewAction(event, () => directionalPreviewer.changeRoomObjectDirection(true))}
+                        >
+                            <CatalogPreviewArrowIcon direction="left" />
+                        </BaseButton>
+                        <BaseButton
+                            aria-label="Rotate right"
+                            className="octane-catalog-preview-btn is-right"
+                            disabled={!capabilities.canRotate}
+                            type="button"
+                            onClick={(event) => runPreviewAction(event, () => directionalPreviewer.changeRoomObjectDirection(false))}
+                        >
+                            <CatalogPreviewArrowIcon direction="right" />
+                        </BaseButton>
+                    </>
+                )}
+                {canToggleZoom && (
+                    <ToggleButton
+                        aria-label="Toggle zoom" pressed={avatarZoomed}
+                        className="octane-catalog-preview-region octane-catalog-preview-zoom-btn"
                         type="button"
-                        onClick={(event) => runPreviewAction(event, () => directionalPreviewer.changeRoomObjectDirection(true))}
+                        onClick={(event) => runPreviewAction(event, () => setAvatarZoomed((value) => !value))}
                     >
-                        <CatalogPreviewArrowIcon direction="left" />
-                    </BaseButton>
+                        <i aria-hidden="true" className="octane-icon icon-zoom-more" />
+                    </ToggleButton>
+                )}
+                {isAvatarPreview && (
                     <BaseButton
-                        aria-label="Rotate right"
-                        className="octane-catalog-preview-btn is-right"
-                        disabled={!capabilities.canRotate}
+                        aria-label="Change avatar action"
+                        className="octane-catalog-preview-region octane-catalog-preview-action-btn"
+                        disabled={!canChangeAvatarAction}
                         type="button"
-                        onClick={(event) => runPreviewAction(event, () => directionalPreviewer.changeRoomObjectDirection(false))}
+                        onClick={(event) => runPreviewAction(event, () => directionalPreviewer.cycleAvatarAction?.())}
                     >
-                        <CatalogPreviewArrowIcon direction="right" />
+                        <span aria-hidden="true" className="octane-catalog-preview-action-icon" />
                     </BaseButton>
-                </>
-            )}
-            {canToggleZoom && (
-                <ToggleButton
-                    aria-label="Toggle zoom" pressed={avatarZoomed}
-                    className="octane-catalog-preview-region octane-catalog-preview-zoom-btn"
-                    type="button"
-                    onClick={(event) => runPreviewAction(event, () => setAvatarZoomed((value) => !value))}
-                >
-                    <i aria-hidden="true" className="octane-icon icon-zoom-more" />
-                </ToggleButton>
-            )}
-            {isAvatarPreview && (
-                <BaseButton
-                    aria-label="Change avatar action"
-                    className="octane-catalog-preview-region octane-catalog-preview-action-btn"
-                    disabled={!canChangeAvatarAction}
-                    type="button"
-                    onClick={(event) => runPreviewAction(event, () => directionalPreviewer.cycleAvatarAction?.())}
-                >
-                    <span aria-hidden="true" className="octane-catalog-preview-action-icon" />
-                </BaseButton>
-            )}
-        </div>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };
 

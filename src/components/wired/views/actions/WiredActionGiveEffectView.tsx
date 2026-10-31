@@ -7,6 +7,7 @@ import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Radio } from '../../../../common/Radio';
 import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const GIVE_EFFECT_MAX_ID = 10000;
 const DEFAULT_EFFECT_ID = 13;
@@ -52,25 +53,27 @@ export const WiredActionGiveEffectView: FC<{}> = () => {
     );
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            {numberSection('wiredfurni.params.give_effect.id', 'Effect id', effectId, GIVE_EFFECT_MAX_ID, setEffectId)}
-            {numberSection('wiredfurni.params.give_effect.priority', 'Priority', priority, 2, setPriority)}
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.give_effect.type', 'Type')}</Text>
-                <div className="grid grid-cols-2 gap-1">
-                    {[0, 1].map((value) => (
-                        <label key={value} className="flex items-center gap-1">
-                            <Radio name="giveEffectType" checked={effectType === value} onCheckedChange={() => setEffectType(value)} />
-                            <Text>{localizeWithFallback(`wiredfurni.params.give_effect.type.${value}`, `Type ${value + 1}`)}</Text>
-                        </label>
-                    ))}
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                {numberSection('wiredfurni.params.give_effect.id', 'Effect id', effectId, GIVE_EFFECT_MAX_ID, setEffectId)}
+                {numberSection('wiredfurni.params.give_effect.priority', 'Priority', priority, 2, setPriority)}
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.give_effect.type', 'Type')}</Text>
+                    <div className="grid grid-cols-2 gap-1">
+                        {[0, 1].map((value) => (
+                            <label key={value} className="flex items-center gap-1">
+                                <Radio name="giveEffectType" checked={effectType === value} onCheckedChange={() => setEffectType(value)} />
+                                <Text>{localizeWithFallback(`wiredfurni.params.give_effect.type.${value}`, `Type ${value + 1}`)}</Text>
+                            </label>
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </WiredActionBaseView>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

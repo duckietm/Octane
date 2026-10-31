@@ -147,3 +147,15 @@ describe('SanitizePageHtml', () => {
         expect(html).not.toContain('<form');
     });
 });
+
+describe('SanitizePageHtml — no overlay out of the page window', () => {
+    it('drops fixed and sticky positioning and keeps the rest of the layout', () => {
+        const div = document.createElement('div');
+        div.innerHTML = SanitizePageHtml('<div style="position:fixed;inset:0;width:200px">a</div><div style="position: sticky; top:0">b</div><div style="position:relative;left:4px">c</div>');
+        const [fixed, sticky, relative] = Array.from(div.children) as HTMLElement[];
+
+        expect(fixed.getAttribute('style')).toBe('inset:0; width:200px');
+        expect(sticky.getAttribute('style')).toBe('top:0');
+        expect(relative.getAttribute('style')).toBe('position:relative; left:4px');
+    });
+});

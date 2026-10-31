@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 // Config-based v1: the chest stocks a single furni base-type (base item id) x quantity.
 export const WiredChestFurniView: FC<{}> = () => {
@@ -24,13 +25,15 @@ export const WiredChestFurniView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
-            <div className="flex flex-col gap-2">
-                <Text bold>Furni base item id to store</Text>
-                <NumberInput min={0} className="form-control form-control-sm" value={baseItemId} onChange={(event) => setBaseItemId(Math.max(0, parseInt(event.target.value, 10) || 0))} />
-                <Text bold>Quantity stored</Text>
-                <NumberInput min={0} className="form-control form-control-sm" value={quantity} onChange={(event) => setQuantity(Math.max(0, parseInt(event.target.value, 10) || 0))} />
-            </div>
-        </WiredExtraBaseView>
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
+                <div className="flex flex-col gap-2">
+                    <Text bold>Furni base item id to store</Text>
+                    <NumberInput min={0} className="form-control form-control-sm" value={baseItemId} onChange={(event) => setBaseItemId(Math.max(0, parseInt(event.target.value, 10) || 0))} />
+                    <Text bold>Quantity stored</Text>
+                    <NumberInput min={0} className="form-control form-control-sm" value={quantity} onChange={(event) => setQuantity(Math.max(0, parseInt(event.target.value, 10) || 0))} />
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

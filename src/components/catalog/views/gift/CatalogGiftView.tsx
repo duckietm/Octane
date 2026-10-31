@@ -47,6 +47,7 @@ import {
 } from './CatalogGiftView.helpers';
 import { Checkbox } from '../../../../common/Checkbox';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface GiftPaletteColor {
     id: number;
@@ -454,11 +455,13 @@ export const CatalogGiftView: FC = () => {
             const matchEnd = Math.min(matchIndex + receiverName.length, name.length);
 
             return (
-                <>
-                    {name.slice(0, matchIndex)}
-                    <strong>{name.slice(matchIndex, matchEnd)}</strong>
-                    {name.slice(matchEnd)}
-                </>
+                <NativeTextTree>
+                    <>
+                        {name.slice(0, matchIndex)}
+                        <strong>{name.slice(matchIndex, matchEnd)}</strong>
+                        {name.slice(matchEnd)}
+                    </>
+                </NativeTextTree>
             );
         },
         [receiverName]
@@ -470,184 +473,186 @@ export const CatalogGiftView: FC = () => {
     if (!isVisible || !giftConfiguration || !boxTypes.length) return null;
 
     return (
-        <OctaneCardView classNames={['octane-catalog-gift']} frameStyle={3} isResizable={false} theme="primary-slim">
-            <OctaneCardHeaderView headerText={LocalizeText('catalog.gift_wrapping.title')} onCloseClick={onClose} />
-            <OctaneCardContentView classNames={['octane-catalog-gift-content']} overflow="hidden">
-                <div ref={suggestionsHostRef} className="octane-catalog-gift-suggestions-host" />
-                <Autocomplete.Root
-                    filter={null}
-                    items={suggestions.map((friend) => friend.name)}
-                    mode="list"
-                    open={isAutocompleteVisible && suggestions.length > 0}
-                    value={receiverName}
-                    onItemHighlighted={(item) => {
-                        highlightedSuggestionRef.current = item;
-                    }}
-                    onOpenChange={(open) => {
-                        if (!open) setIsAutocompleteVisible(false);
-                    }}
-                    onValueChange={(next, details) => {
-                        if (details.reason === 'item-press') selectReceiverName(next);
-                        else onReceiverChanged(next);
-                    }}
-                >
-                    <div className="octane-catalog-gift-name-border">
-                        <Autocomplete.Input
-                            aria-label={LocalizeText('catalog.gift_wrapping_new.name_hint')}
-                            className="octane-catalog-gift-name-input"
-                            maxLength={32}
-                            placeholder={LocalizeText('catalog.gift_wrapping_new.name_hint')}
-                            ref={recipientInputRef}
-                            onKeyDown={onReceiverKeyDown}
-                            onMouseDown={() => setIsAutocompleteVisible(false)}
-                        />
+        <NativeTextTree>
+            <OctaneCardView classNames={['octane-catalog-gift']} frameStyle={3} isResizable={false} theme="primary-slim">
+                <OctaneCardHeaderView headerText={LocalizeText('catalog.gift_wrapping.title')} onCloseClick={onClose} />
+                <OctaneCardContentView classNames={['octane-catalog-gift-content']} overflow="hidden">
+                    <div ref={suggestionsHostRef} className="octane-catalog-gift-suggestions-host" />
+                    <Autocomplete.Root
+                        filter={null}
+                        items={suggestions.map((friend) => friend.name)}
+                        mode="list"
+                        open={isAutocompleteVisible && suggestions.length > 0}
+                        value={receiverName}
+                        onItemHighlighted={(item) => {
+                            highlightedSuggestionRef.current = item;
+                        }}
+                        onOpenChange={(open) => {
+                            if (!open) setIsAutocompleteVisible(false);
+                        }}
+                        onValueChange={(next, details) => {
+                            if (details.reason === 'item-press') selectReceiverName(next);
+                            else onReceiverChanged(next);
+                        }}
+                    >
+                        <div className="octane-catalog-gift-name-border">
+                            <Autocomplete.Input
+                                aria-label={LocalizeText('catalog.gift_wrapping_new.name_hint')}
+                                className="octane-catalog-gift-name-input"
+                                maxLength={32}
+                                placeholder={LocalizeText('catalog.gift_wrapping_new.name_hint')}
+                                ref={recipientInputRef}
+                                onKeyDown={onReceiverKeyDown}
+                                onMouseDown={() => setIsAutocompleteVisible(false)}
+                            />
+                        </div>
+                        <img alt="" className="octane-catalog-gift-pen" draggable={false} src={giftSmallPenImage} />
+
+                        <Autocomplete.Portal container={suggestionsHostRef}>
+                            <Autocomplete.Positioner className="octane-catalog-gift-suggestions-positioner">
+                                <Autocomplete.Popup>
+                                    <Autocomplete.List className="octane-catalog-gift-suggestions">
+                                        {(name: string) => (
+                                            <Autocomplete.Item key={name} value={name}>
+                                                {renderSuggestionName(name)}
+                                            </Autocomplete.Item>
+                                        )}
+                                    </Autocomplete.List>
+                                </Autocomplete.Popup>
+                            </Autocomplete.Positioner>
+                        </Autocomplete.Portal>
+                    </Autocomplete.Root>
+
+                    <img alt="" className="octane-catalog-gift-card" draggable={false} src={giftCardImage} />
+                    <div className="octane-catalog-gift-avatar">
+                        {showPurchaserIdentity ? (
+                            <LayoutAvatarImageView
+                                headOnly
+                                classNames={['octane-catalog-gift-avatar-image']}
+                                direction={2}
+                                figure={sessionDataManager.figure}
+                                nativeCroppedHead
+                            />
+                        ) : (
+                            <img alt="" className="octane-catalog-gift-incognito" draggable={false} src={giftIncognitoImage} />
+                        )}
                     </div>
-                    <img alt="" className="octane-catalog-gift-pen" draggable={false} src={giftSmallPenImage} />
-
-                    <Autocomplete.Portal container={suggestionsHostRef}>
-                        <Autocomplete.Positioner className="octane-catalog-gift-suggestions-positioner">
-                            <Autocomplete.Popup>
-                                <Autocomplete.List className="octane-catalog-gift-suggestions">
-                                    {(name: string) => (
-                                        <Autocomplete.Item key={name} value={name}>
-                                            {renderSuggestionName(name)}
-                                        </Autocomplete.Item>
-                                    )}
-                                </Autocomplete.List>
-                            </Autocomplete.Popup>
-                        </Autocomplete.Positioner>
-                    </Autocomplete.Portal>
-                </Autocomplete.Root>
-
-                <img alt="" className="octane-catalog-gift-card" draggable={false} src={giftCardImage} />
-                <div className="octane-catalog-gift-avatar">
-                    {showPurchaserIdentity ? (
-                        <LayoutAvatarImageView
-                            headOnly
-                            classNames={['octane-catalog-gift-avatar-image']}
-                            direction={2}
-                            figure={sessionDataManager.figure}
-                            nativeCroppedHead
-                        />
-                    ) : (
-                        <img alt="" className="octane-catalog-gift-incognito" draggable={false} src={giftIncognitoImage} />
+                    <textarea
+                        aria-label={LocalizeText('catalog.gift_wrapping_new.message_hint')}
+                        className={`octane-catalog-gift-message${isAutocompleteVisible && suggestions.length >= 2 ? ' is-concealed' : ''}`}
+                        maxLength={140}
+                        placeholder={LocalizeText('catalog.gift_wrapping_new.message_hint')}
+                        ref={messageInputRef}
+                        value={message}
+                        onChange={(event) => setMessage(limitGiftMessageToTextarea(event.target.value, event.target))}
+                        onFocus={() => setIsAutocompleteVisible(false)}
+                    />
+                    {showPurchaserIdentity && (
+                        <div className="octane-catalog-gift-signature">
+                            {LocalizeText('catalog.gift_wrapping_new.message_from', ['name'], [sessionDataManager.userName])}
+                        </div>
                     )}
-                </div>
-                <textarea
-                    aria-label={LocalizeText('catalog.gift_wrapping_new.message_hint')}
-                    className={`octane-catalog-gift-message${isAutocompleteVisible && suggestions.length >= 2 ? ' is-concealed' : ''}`}
-                    maxLength={140}
-                    placeholder={LocalizeText('catalog.gift_wrapping_new.message_hint')}
-                    ref={messageInputRef}
-                    value={message}
-                    onChange={(event) => setMessage(limitGiftMessageToTextarea(event.target.value, event.target))}
-                    onFocus={() => setIsAutocompleteVisible(false)}
-                />
-                {showPurchaserIdentity && (
-                    <div className="octane-catalog-gift-signature">
-                        {LocalizeText('catalog.gift_wrapping_new.message_from', ['name'], [sessionDataManager.userName])}
+
+                    {isModerator && (
+                        <>
+                            <Checkbox aria-label={LocalizeText('catalog.gift_wrapping.show_face.title')} checked={showMyFace} className="octane-catalog-gift-show-face" id="octane-catalog-gift-show-face" onCheckedChange={(nextChecked) => setShowMyFace(nextChecked)} />
+                            <label className="octane-catalog-gift-show-face-label" htmlFor="octane-catalog-gift-show-face">
+                                {LocalizeText('catalog.gift_wrapping.show_face.title')}
+                            </label>
+                        </>
+                    )}
+
+                    <div className="octane-catalog-gift-box-picker">
+                        <div className="octane-catalog-gift-product-border">
+                            <div className="octane-catalog-gift-product-image">
+                                {giftSelection.wrapperId > 0 && (
+                                    <LayoutFurniImageView
+                                        direction={180}
+                                        extraData={giftSelection.previewExtraData}
+                                        productClassId={giftSelection.wrapperId}
+                                        productType={ProductTypeEnum.FLOOR}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                        <BaseButton
+                            aria-label={LocalizeText('catalog.gift_wrapping.pick_box')}
+                            className="octane-catalog-gift-arrow octane-catalog-gift-box-prev"
+                            type="button"
+                            onClick={() => selectRelativeBox(-1)}
+                        >
+                            <img alt="" draggable={false} src={giftArrowLeftImage} />
+                        </BaseButton>
+                        <BaseButton
+                            aria-label={LocalizeText('catalog.gift_wrapping.pick_box')}
+                            className="octane-catalog-gift-arrow octane-catalog-gift-box-next"
+                            type="button"
+                            onClick={() => selectRelativeBox(1)}
+                        >
+                            <img alt="" draggable={false} src={giftArrowRightImage} />
+                        </BaseButton>
+                        <div className="octane-catalog-gift-box-name">{LocalizeText(boxName)}</div>
+                        <div className="octane-catalog-gift-price">
+                            <span>{LocalizeText(priceText, ['price'], [giftConfiguration.price.toString()])}</span>
+                            {!isDefaultBox && <img alt="" draggable={false} src={giftSmallCoinImage} />}
+                        </div>
+                        <BaseButton
+                            aria-label={LocalizeText('catalog.gift_wrapping.pick_ribbon')}
+                            className={`octane-catalog-gift-arrow octane-catalog-gift-ribbon-prev${isRibbonEnabled ? '' : ' is-disabled'}`}
+                            disabled={!isRibbonEnabled}
+                            type="button"
+                            onClick={() => selectRelativeRibbon(-1)}
+                        >
+                            <img alt="" draggable={false} src={giftArrowLeftImage} />
+                        </BaseButton>
+                        <BaseButton
+                            aria-label={LocalizeText('catalog.gift_wrapping.pick_ribbon')}
+                            className={`octane-catalog-gift-arrow octane-catalog-gift-ribbon-next${isRibbonEnabled ? '' : ' is-disabled'}`}
+                            disabled={!isRibbonEnabled}
+                            type="button"
+                            onClick={() => selectRelativeRibbon(1)}
+                        >
+                            <img alt="" draggable={false} src={giftArrowRightImage} />
+                        </BaseButton>
+                        <div className={`octane-catalog-gift-ribbon-name${isRibbonEnabled ? '' : ' is-disabled'}`}>{LocalizeText(ribbonName)}</div>
                     </div>
-                )}
 
-                {isModerator && (
-                    <>
-                        <Checkbox aria-label={LocalizeText('catalog.gift_wrapping.show_face.title')} checked={showMyFace} className="octane-catalog-gift-show-face" id="octane-catalog-gift-show-face" onCheckedChange={(nextChecked) => setShowMyFace(nextChecked)} />
-                        <label className="octane-catalog-gift-show-face-label" htmlFor="octane-catalog-gift-show-face">
-                            {LocalizeText('catalog.gift_wrapping.show_face.title')}
-                        </label>
-                    </>
-                )}
-
-                <div className="octane-catalog-gift-box-picker">
-                    <div className="octane-catalog-gift-product-border">
-                        <div className="octane-catalog-gift-product-image">
-                            {giftSelection.wrapperId > 0 && (
-                                <LayoutFurniImageView
-                                    direction={180}
-                                    extraData={giftSelection.previewExtraData}
-                                    productClassId={giftSelection.wrapperId}
-                                    productType={ProductTypeEnum.FLOOR}
-                                />
-                            )}
+                    <div className={`octane-catalog-gift-color-title${isColorEnabled ? '' : ' is-disabled'}`}>
+                        {LocalizeText('catalog.gift_wrapping.pick_color')}
+                    </div>
+                    <div className={`octane-catalog-gift-palette${isColorEnabled ? '' : ' is-disabled'}`}>
+                        <div className="octane-catalog-gift-palette-grid">
+                            {colors.map((color) => (
+                                <BaseButton
+                                    aria-label={color.color}
+                                    className="octane-catalog-gift-palette-item"
+                                    disabled={!isColorEnabled}
+                                    key={color.id}
+                                    style={{ '--octane-gift-palette-color': color.color } as CSSProperties}
+                                    type="button"
+                                    onClick={() => {
+                                        setIsAutocompleteVisible(false);
+                                        setSelectedColorId(color.id);
+                                    }}
+                                >
+                                    <span className="octane-catalog-gift-palette-color" />
+                                    <img alt="" className="octane-catalog-gift-palette-border" draggable={false} src={giftPaletteBorderImage} />
+                                    {color.id === selectedColorId && (
+                                        <img alt="" className="octane-catalog-gift-palette-selection" draggable={false} src={giftPaletteSelectionImage} />
+                                    )}
+                                </BaseButton>
+                            ))}
                         </div>
                     </div>
-                    <BaseButton
-                        aria-label={LocalizeText('catalog.gift_wrapping.pick_box')}
-                        className="octane-catalog-gift-arrow octane-catalog-gift-box-prev"
-                        type="button"
-                        onClick={() => selectRelativeBox(-1)}
-                    >
-                        <img alt="" draggable={false} src={giftArrowLeftImage} />
-                    </BaseButton>
-                    <BaseButton
-                        aria-label={LocalizeText('catalog.gift_wrapping.pick_box')}
-                        className="octane-catalog-gift-arrow octane-catalog-gift-box-next"
-                        type="button"
-                        onClick={() => selectRelativeBox(1)}
-                    >
-                        <img alt="" draggable={false} src={giftArrowRightImage} />
-                    </BaseButton>
-                    <div className="octane-catalog-gift-box-name">{LocalizeText(boxName)}</div>
-                    <div className="octane-catalog-gift-price">
-                        <span>{LocalizeText(priceText, ['price'], [giftConfiguration.price.toString()])}</span>
-                        {!isDefaultBox && <img alt="" draggable={false} src={giftSmallCoinImage} />}
-                    </div>
-                    <BaseButton
-                        aria-label={LocalizeText('catalog.gift_wrapping.pick_ribbon')}
-                        className={`octane-catalog-gift-arrow octane-catalog-gift-ribbon-prev${isRibbonEnabled ? '' : ' is-disabled'}`}
-                        disabled={!isRibbonEnabled}
-                        type="button"
-                        onClick={() => selectRelativeRibbon(-1)}
-                    >
-                        <img alt="" draggable={false} src={giftArrowLeftImage} />
-                    </BaseButton>
-                    <BaseButton
-                        aria-label={LocalizeText('catalog.gift_wrapping.pick_ribbon')}
-                        className={`octane-catalog-gift-arrow octane-catalog-gift-ribbon-next${isRibbonEnabled ? '' : ' is-disabled'}`}
-                        disabled={!isRibbonEnabled}
-                        type="button"
-                        onClick={() => selectRelativeRibbon(1)}
-                    >
-                        <img alt="" draggable={false} src={giftArrowRightImage} />
-                    </BaseButton>
-                    <div className={`octane-catalog-gift-ribbon-name${isRibbonEnabled ? '' : ' is-disabled'}`}>{LocalizeText(ribbonName)}</div>
-                </div>
 
-                <div className={`octane-catalog-gift-color-title${isColorEnabled ? '' : ' is-disabled'}`}>
-                    {LocalizeText('catalog.gift_wrapping.pick_color')}
-                </div>
-                <div className={`octane-catalog-gift-palette${isColorEnabled ? '' : ' is-disabled'}`}>
-                    <div className="octane-catalog-gift-palette-grid">
-                        {colors.map((color) => (
-                            <BaseButton
-                                aria-label={color.color}
-                                className="octane-catalog-gift-palette-item"
-                                disabled={!isColorEnabled}
-                                key={color.id}
-                                style={{ '--octane-gift-palette-color': color.color } as CSSProperties}
-                                type="button"
-                                onClick={() => {
-                                    setIsAutocompleteVisible(false);
-                                    setSelectedColorId(color.id);
-                                }}
-                            >
-                                <span className="octane-catalog-gift-palette-color" />
-                                <img alt="" className="octane-catalog-gift-palette-border" draggable={false} src={giftPaletteBorderImage} />
-                                {color.id === selectedColorId && (
-                                    <img alt="" className="octane-catalog-gift-palette-selection" draggable={false} src={giftPaletteSelectionImage} />
-                                )}
-                            </BaseButton>
-                        ))}
-                    </div>
-                </div>
-
-                <BaseButton className="octane-catalog-gift-cancel" type="button" onClick={onClose}>
-                    {LocalizeText('catalog.gift_wrapping.cancel')}
-                </BaseButton>
-                <BaseButton className="octane-catalog-gift-submit" disabled={isBuyingGift} type="button" onClick={onBuyGift}>
-                    {LocalizeText('catalog.gift_wrapping.give_gift')}
-                </BaseButton>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    <BaseButton className="octane-catalog-gift-cancel" type="button" onClick={onClose}>
+                        {LocalizeText('catalog.gift_wrapping.cancel')}
+                    </BaseButton>
+                    <BaseButton className="octane-catalog-gift-submit" disabled={isBuyingGift} type="button" onClick={onBuyGift}>
+                        {LocalizeText('catalog.gift_wrapping.give_gift')}
+                    </BaseButton>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

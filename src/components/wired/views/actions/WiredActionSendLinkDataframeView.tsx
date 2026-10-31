@@ -28,6 +28,7 @@ import { WiredActionBaseView } from './WiredActionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { NumberInput } from '../../../../common/NumberInput';
 import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const LINK_SOURCES = [
     { value: 100, label: 'wiredfurni.params.sources.furni.100' },
@@ -216,109 +217,111 @@ export const WiredActionSendLinkDataframeView: FC<{}> = () =>
     const modeChoice = (row: IRowState) => ((row.mode === LINK_SEND_VARIABLE_VALUE) ? LINK_SEND_NUMBER : row.mode);
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={ true }
-            requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID }
-            save={ save }
-            validate={ validate }
-            widthModifier={ 1.4 }
-            allowScrolling
-            selectionPreview={
-                <div className="flex flex-col gap-2">
-                    <WiredFurniSelectionSourceRow
-                        title={ localizeWithFallback('wiredfurni.params.link.endpoints', 'WIRED Links') }
-                        titleIsLiteral={ true }
-                        options={ [ { value: 100, label: 'wiredfurni.params.sources.furni.100' } ] }
-                        value={ 100 }
-                        selectionKind="primary"
-                        selectionActive={ pickList === 'endpoints' }
-                        selectionCount={ endpointIds.length }
-                        selectionLimit={ selectionLimit }
-                        selectionEnabledValues={ [ 100 ] }
-                        showSelectionToggle={ usesOtherPicks }
-                        onChange={ () =>
-                        {} }
-                        onSelectionActivate={ () => switchPickList('endpoints') } />
-                    { usesOtherPicks && (
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={ true }
+                requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID }
+                save={ save }
+                validate={ validate }
+                widthModifier={ 1.4 }
+                allowScrolling
+                selectionPreview={
+                    <div className="flex flex-col gap-2">
                         <WiredFurniSelectionSourceRow
-                            title={ localizeWithFallback('wiredfurni.params.link.source_furni', 'Variable source furni') }
+                            title={ localizeWithFallback('wiredfurni.params.link.endpoints', 'WIRED Links') }
                             titleIsLiteral={ true }
-                            options={ [ { value: SOURCE_OTHER_PICKS, label: 'wiredfurni.params.sources.furni.101' } ] }
-                            value={ SOURCE_OTHER_PICKS }
-                            selectionKind="secondary"
-                            selectionActive={ pickList === 'other' }
-                            selectionCount={ otherIds.length }
+                            options={ [ { value: 100, label: 'wiredfurni.params.sources.furni.100' } ] }
+                            value={ 100 }
+                            selectionKind="primary"
+                            selectionActive={ pickList === 'endpoints' }
+                            selectionCount={ endpointIds.length }
                             selectionLimit={ selectionLimit }
-                            selectionEnabledValues={ [ SOURCE_OTHER_PICKS ] }
+                            selectionEnabledValues={ [ 100 ] }
+                            showSelectionToggle={ usesOtherPicks }
                             onChange={ () =>
                             {} }
-                            onSelectionActivate={ () => switchPickList('other') } />
-                    ) }
+                            onSelectionActivate={ () => switchPickList('endpoints') } />
+                        { usesOtherPicks && (
+                            <WiredFurniSelectionSourceRow
+                                title={ localizeWithFallback('wiredfurni.params.link.source_furni', 'Variable source furni') }
+                                titleIsLiteral={ true }
+                                options={ [ { value: SOURCE_OTHER_PICKS, label: 'wiredfurni.params.sources.furni.101' } ] }
+                                value={ SOURCE_OTHER_PICKS }
+                                selectionKind="secondary"
+                                selectionActive={ pickList === 'other' }
+                                selectionCount={ otherIds.length }
+                                selectionLimit={ selectionLimit }
+                                selectionEnabledValues={ [ SOURCE_OTHER_PICKS ] }
+                                onChange={ () =>
+                                {} }
+                                onSelectionActivate={ () => switchPickList('other') } />
+                        ) }
+                    </div>
+                }
+                footer={ <WiredSourcesSelector showFurni={ true } furniSource={ endpointSource } furniSources={ LINK_SOURCES } furniTitle={ localizeWithFallback('wiredfurni.params.link.endpoints', 'WIRED Links') } onChangeFurni={ setEndpointSource } /> }
+            >
+                { invalid && <Text small className="text-[#ad3434]">{ localizeWithFallback('wiredfurni.error.link.invalid_dataframe', 'The dataframe configuration is invalid.') }</Text> }
+                <div className="flex items-center justify-between gap-2">
+                    <Text bold>{ localizeWithFallback('wiredfurni.params.link.row_count', 'Row count') }</Text>
+                    <Select className="form-select form-select-sm w-[70px]" value={ rows.length } onChange={ event => setCount(parseInt(event.target.value, 10)) }>
+                        { Array.from({ length: LINK_DATAFRAME_MAX_ROWS + 1 }, (_, count) => <option key={ count } value={ count }>{ count }</option>) }
+                    </Select>
                 </div>
-            }
-            footer={ <WiredSourcesSelector showFurni={ true } furniSource={ endpointSource } furniSources={ LINK_SOURCES } furniTitle={ localizeWithFallback('wiredfurni.params.link.endpoints', 'WIRED Links') } onChangeFurni={ setEndpointSource } /> }
-        >
-            { invalid && <Text small className="text-[#ad3434]">{ localizeWithFallback('wiredfurni.error.link.invalid_dataframe', 'The dataframe configuration is invalid.') }</Text> }
-            <div className="flex items-center justify-between gap-2">
-                <Text bold>{ localizeWithFallback('wiredfurni.params.link.row_count', 'Row count') }</Text>
-                <Select className="form-select form-select-sm w-[70px]" value={ rows.length } onChange={ event => setCount(parseInt(event.target.value, 10)) }>
-                    { Array.from({ length: LINK_DATAFRAME_MAX_ROWS + 1 }, (_, count) => <option key={ count } value={ count }>{ count }</option>) }
-                </Select>
-            </div>
-            <div className="flex max-h-[55vh] flex-col gap-2 overflow-y-auto">
-                { rows.map((row, index) =>
-                {
-                    const target = TARGETS.find(entry => (entry.value === row.target)) ?? TARGETS[0];
-                    const usesVariable = (row.mode === LINK_SEND_VARIABLE_VALUE) || (row.mode === LINK_SEND_VARIABLE_TEXT);
+                <div className="flex max-h-[55vh] flex-col gap-2 overflow-y-auto">
+                    { rows.map((row, index) =>
+                    {
+                        const target = TARGETS.find(entry => (entry.value === row.target)) ?? TARGETS[0];
+                        const usesVariable = (row.mode === LINK_SEND_VARIABLE_VALUE) || (row.mode === LINK_SEND_VARIABLE_TEXT);
 
-                    return (
-                        <div key={ index } className="flex flex-col gap-1 rounded border border-[#d6d1c4] p-1">
-                            <Text bold small>{ localizeWithFallback('wiredfurni.params.link.row', `Row ${ index + 1 }`, [ 'number' ], [ String(index + 1) ]) }</Text>
-                            <div className="flex items-center gap-1">
-                                <Text small>{ localizeWithFallback('wiredfurni.params.link.key', 'Key') }</Text>
-                                <input className="form-control form-control-sm grow" maxLength={ LINK_DATAFRAME_MAX_KEY_LENGTH } type="text" value={ row.key } onChange={ event => updateRow(index, { key: event.target.value }) } />
-                                <Select className="form-select form-select-sm w-[120px]" value={ modeChoice(row) } onChange={ event => updateRow(index, { mode: parseInt(event.target.value, 10) }) }>
-                                    <option value={ LINK_SEND_NUMBER }>{ localizeWithFallback('wiredfurni.params.link.source.number', 'Number') }</option>
-                                    <option value={ LINK_SEND_VARIABLE_TEXT }>{ localizeWithFallback('wiredfurni.params.link.source.variable_text', 'Variable text') }</option>
-                                    <option value={ LINK_SEND_MESSAGE }>{ localizeWithFallback('wiredfurni.params.link.source.message', 'Custom message') }</option>
-                                </Select>
-                            </div>
-                            { (row.mode === LINK_SEND_MESSAGE) && (
+                        return (
+                            <div key={ index } className="flex flex-col gap-1 rounded border border-[#d6d1c4] p-1">
+                                <Text bold small>{ localizeWithFallback('wiredfurni.params.link.row', `Row ${ index + 1 }`, [ 'number' ], [ String(index + 1) ]) }</Text>
                                 <div className="flex items-center gap-1">
-                                    <Text small>{ localizeWithFallback('wiredfurni.params.link.message', 'Message:') }</Text>
-                                    <input className="form-control form-control-sm grow" maxLength={ LINK_DATAFRAME_MAX_MESSAGE_BYTES } type="text" value={ row.text } onChange={ event => updateRow(index, { text: event.target.value }) } />
+                                    <Text small>{ localizeWithFallback('wiredfurni.params.link.key', 'Key') }</Text>
+                                    <input className="form-control form-control-sm grow" maxLength={ LINK_DATAFRAME_MAX_KEY_LENGTH } type="text" value={ row.key } onChange={ event => updateRow(index, { key: event.target.value }) } />
+                                    <Select className="form-select form-select-sm w-[120px]" value={ modeChoice(row) } onChange={ event => updateRow(index, { mode: parseInt(event.target.value, 10) }) }>
+                                        <option value={ LINK_SEND_NUMBER }>{ localizeWithFallback('wiredfurni.params.link.source.number', 'Number') }</option>
+                                        <option value={ LINK_SEND_VARIABLE_TEXT }>{ localizeWithFallback('wiredfurni.params.link.source.variable_text', 'Variable text') }</option>
+                                        <option value={ LINK_SEND_MESSAGE }>{ localizeWithFallback('wiredfurni.params.link.source.message', 'Custom message') }</option>
+                                    </Select>
                                 </div>
-                            ) }
-                            { (row.mode !== LINK_SEND_MESSAGE) && (
-                                <div className="flex flex-col gap-1">
-                                    { (row.mode !== LINK_SEND_VARIABLE_TEXT) && (
-                                        <label className="flex cursor-pointer items-center gap-1">
-                                            <Checkbox checked={ row.mode === LINK_SEND_VARIABLE_VALUE } onCheckedChange={ nextChecked => updateRow(index, { mode: nextChecked ? LINK_SEND_VARIABLE_VALUE : LINK_SEND_NUMBER }) } />
-                                            <Text small>{ localizeWithFallback('wiredfurni.params.link.source.variable_value', 'Variable value') }</Text>
-                                        </label>
-                                    ) }
-                                    { !usesVariable && (
-                                        <div className="flex items-center gap-1">
-                                            <Text small>{ localizeWithFallback('wiredfurni.params.link.value', 'Value') }</Text>
-                                            <NumberInput className="form-control form-control-sm grow" value={ row.literal } onChange={ event => updateRow(index, { literal: Math.max(-2147483648, Math.min(2147483647, parseInt(event.target.value || '0', 10) || 0)) }) } />
-                                        </div>
-                                    ) }
-                                    { usesVariable && (
-                                        <>
-                                            <Select className="form-select form-select-sm" value={ row.target } onChange={ event => updateRow(index, { target: parseInt(event.target.value, 10), variableId: '' }) }>
-                                                { TARGETS.map(entry => <option key={ entry.value } value={ entry.value }>{ localizeWithFallback(entry.key, entry.picker) }</option>) }
-                                            </Select>
-                                            <WiredVariablePicker entries={ entriesByTarget[target.picker] as IWiredVariablePickerEntry[] } recentScope="link-dataframe-send" selectedToken={ row.variableId } onSelect={ entry => updateRow(index, { variableId: entry.token }) } onClear={ () => updateRow(index, { variableId: '' }) } />
-                                            { (row.target === LINK_TARGET_FURNI) && <WiredSourcesSelector showFurni={ true } furniSource={ row.furniSource } furniSources={ ROW_FURNI_SOURCES } furniTitle={ localizeWithFallback('wiredfurni.params.link.source_furni', 'Variable source furni') } onChangeFurni={ value => updateRow(index, { furniSource: value }) } /> }
-                                            { (row.target === LINK_TARGET_USER) && <WiredSourcesSelector showUsers={ true } userSource={ row.userSource } userSources={ ROW_USER_SOURCES } usersTitle={ localizeWithFallback('wiredfurni.params.link.source_users', 'Variable source users') } onChangeUsers={ value => updateRow(index, { userSource: value }) } /> }
-                                        </>
-                                    ) }
-                                </div>
-                            ) }
-                        </div>
-                    );
-                }) }
-            </div>
-        </WiredActionBaseView>
+                                { (row.mode === LINK_SEND_MESSAGE) && (
+                                    <div className="flex items-center gap-1">
+                                        <Text small>{ localizeWithFallback('wiredfurni.params.link.message', 'Message:') }</Text>
+                                        <input className="form-control form-control-sm grow" maxLength={ LINK_DATAFRAME_MAX_MESSAGE_BYTES } type="text" value={ row.text } onChange={ event => updateRow(index, { text: event.target.value }) } />
+                                    </div>
+                                ) }
+                                { (row.mode !== LINK_SEND_MESSAGE) && (
+                                    <div className="flex flex-col gap-1">
+                                        { (row.mode !== LINK_SEND_VARIABLE_TEXT) && (
+                                            <label className="flex cursor-pointer items-center gap-1">
+                                                <Checkbox checked={ row.mode === LINK_SEND_VARIABLE_VALUE } onCheckedChange={ nextChecked => updateRow(index, { mode: nextChecked ? LINK_SEND_VARIABLE_VALUE : LINK_SEND_NUMBER }) } />
+                                                <Text small>{ localizeWithFallback('wiredfurni.params.link.source.variable_value', 'Variable value') }</Text>
+                                            </label>
+                                        ) }
+                                        { !usesVariable && (
+                                            <div className="flex items-center gap-1">
+                                                <Text small>{ localizeWithFallback('wiredfurni.params.link.value', 'Value') }</Text>
+                                                <NumberInput className="form-control form-control-sm grow" value={ row.literal } onChange={ event => updateRow(index, { literal: Math.max(-2147483648, Math.min(2147483647, parseInt(event.target.value || '0', 10) || 0)) }) } />
+                                            </div>
+                                        ) }
+                                        { usesVariable && (
+                                            <>
+                                                <Select className="form-select form-select-sm" value={ row.target } onChange={ event => updateRow(index, { target: parseInt(event.target.value, 10), variableId: '' }) }>
+                                                    { TARGETS.map(entry => <option key={ entry.value } value={ entry.value }>{ localizeWithFallback(entry.key, entry.picker) }</option>) }
+                                                </Select>
+                                                <WiredVariablePicker entries={ entriesByTarget[target.picker] as IWiredVariablePickerEntry[] } recentScope="link-dataframe-send" selectedToken={ row.variableId } onSelect={ entry => updateRow(index, { variableId: entry.token }) } onClear={ () => updateRow(index, { variableId: '' }) } />
+                                                { (row.target === LINK_TARGET_FURNI) && <WiredSourcesSelector showFurni={ true } furniSource={ row.furniSource } furniSources={ ROW_FURNI_SOURCES } furniTitle={ localizeWithFallback('wiredfurni.params.link.source_furni', 'Variable source furni') } onChangeFurni={ value => updateRow(index, { furniSource: value }) } /> }
+                                                { (row.target === LINK_TARGET_USER) && <WiredSourcesSelector showUsers={ true } userSource={ row.userSource } userSources={ ROW_USER_SOURCES } usersTitle={ localizeWithFallback('wiredfurni.params.link.source_users', 'Variable source users') } onChangeUsers={ value => updateRow(index, { userSource: value }) } /> }
+                                            </>
+                                        ) }
+                                    </div>
+                                ) }
+                            </div>
+                        );
+                    }) }
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

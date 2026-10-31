@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { GetConfigurationValue, GetProductIconUrl, handleInternalLinkClick, SanitizeHtmlWithInternalLinks } from '../../../../../api';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogData } from '../../../../../hooks';
 import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';
 import { CatalogAddOnChatStyleWidgetView } from '../widgets/CatalogAddOnChatStyleWidgetView';
@@ -31,33 +32,35 @@ export const CatalogLayoutSingleBundleView: FC<CatalogLayoutProps> = (props) => 
     const footerText = localization?.getText(3) ?? '';
 
     return (
-        <div className="octane-catalog-air-bundle">
-            <CatalogFirstProductSelectorWidgetView />
-            <PageHtml className="octane-catalog-air-bundle__description" html={localization?.getText(1) ?? ''} />
-            <PageHtml className="octane-catalog-air-bundle__special" html={localization?.getText(2) ?? ''} />
-            {!!teaser && <img alt="" draggable={false} className="octane-catalog-air-bundle__teaser" src={teaser} />}
-            <div className="octane-catalog-air-bundle__addon">
-                <CatalogAddOnBadgeWidgetView />
-                <CatalogAddOnChatStyleWidgetView />
-            </div>
-            {!!currentOffer && (
-                <div className="octane-catalog-air-bundle__price">
-                    {mainIconUrl && <img alt="" draggable={false} src={mainIconUrl} />}
-                    <CatalogSimplePriceWidgetView />
+        <NativeTextTree>
+            <div className="octane-catalog-air-bundle">
+                <CatalogFirstProductSelectorWidgetView />
+                <PageHtml className="octane-catalog-air-bundle__description" html={localization?.getText(1) ?? ''} />
+                <PageHtml className="octane-catalog-air-bundle__special" html={localization?.getText(2) ?? ''} />
+                {!!teaser && <img alt="" draggable={false} className="octane-catalog-air-bundle__teaser" src={teaser} />}
+                <div className="octane-catalog-air-bundle__addon">
+                    <CatalogAddOnBadgeWidgetView />
+                    <CatalogAddOnChatStyleWidgetView />
                 </div>
-            )}
-            <div className="octane-catalog-air-bundle__grid">
-                <CatalogBundleGridWidgetView hideBadges fullWidth className="octane-catalog-air-bundle__items" columnCount={4} />
-            </div>
-            {(!!specialImage || !!footerText) && (
-                <div className="octane-catalog-air-bundle__footer">
-                    {!!specialImage && <img alt="" draggable={false} src={specialImage} />}
-                    <PageHtml className="octane-catalog-air-bundle__footer-text" html={footerText} />
+                {!!currentOffer && (
+                    <div className="octane-catalog-air-bundle__price">
+                        {mainIconUrl && <img alt="" draggable={false} src={mainIconUrl} />}
+                        <CatalogSimplePriceWidgetView />
+                    </div>
+                )}
+                <div className="octane-catalog-air-bundle__grid">
+                    <CatalogBundleGridWidgetView hideBadges fullWidth className="octane-catalog-air-bundle__items" columnCount={4} />
                 </div>
-            )}
-            <div className="octane-catalog-air-bundle__purchase">
-                <CatalogPurchaseWidgetView />
+                {(!!specialImage || !!footerText) && (
+                    <div className="octane-catalog-air-bundle__footer">
+                        {!!specialImage && <img alt="" draggable={false} src={specialImage} />}
+                        <PageHtml className="octane-catalog-air-bundle__footer-text" html={footerText} />
+                    </div>
+                )}
+                <div className="octane-catalog-air-bundle__purchase">
+                    <CatalogPurchaseWidgetView />
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

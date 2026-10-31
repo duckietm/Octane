@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { SanitizeHtml } from '../../../../../api';
 import { Column, Flex, Grid, Text } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';
 import { CatalogAddOnChatStyleWidgetView } from '../widgets/CatalogAddOnChatStyleWidgetView';
 import { CatalogBundleGridWidgetView } from '../widgets/CatalogBundleGridWidgetView';
@@ -14,57 +15,59 @@ export const CatalogLayoutRoomBundleView: FC<CatalogLayoutProps> = (props) => {
     const hasDetails = !!page.localization.getText(1);
 
     return (
-        <>
-            <CatalogFirstProductSelectorWidgetView />
-            <Grid style={{ gridTemplateRows: hasDetails ? 'auto minmax(0, 1fr) auto' : 'minmax(0, 1fr) auto' }}>
-                {hasDetails && (
-                    <div className="col-span-12 octane-catalog-bundle-details">
-                        <Text small>{page.localization.getText(1)}</Text>
-                    </div>
-                )}
-                <Column gap={1} overflow="hidden" size={5}>
-                    {!!page.localization.getText(2) && (
-                        <>
-                            <Text
-                                aria-hidden
-                                className="octane-catalog-bundle-header-spacer"
-                                dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(2)) }}
-                            />
-                            <Text
-                                aria-hidden
-                                className="octane-catalog-bundle-header-spacer"
-                                dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(2)) }}
-                            />
-                        </>
-                    )}
-                    <Flex alignItems="center" gap={2}>
-                        <div className="octane-catalog-bundle-price octane-catalog-bundle-price--room">
-                            <CatalogSimplePriceWidgetView />
+        <NativeTextTree>
+            <>
+                <CatalogFirstProductSelectorWidgetView />
+                <Grid style={{ gridTemplateRows: hasDetails ? 'auto minmax(0, 1fr) auto' : 'minmax(0, 1fr) auto' }}>
+                    {hasDetails && (
+                        <div className="col-span-12 octane-catalog-bundle-details">
+                            <Text small>{page.localization.getText(1)}</Text>
                         </div>
-                    </Flex>
-                    <Column grow gap={0} overflow="hidden" position="relative">
-                        {!!page.localization.getImage(1) && <img alt="" className="w-full h-full object-contain object-top" src={page.localization.getImage(1)} />}
-                        <CatalogAddOnBadgeWidgetView className="bg-muted rounded bottom-0 inset-s-0" position="absolute" />
-                        <CatalogAddOnChatStyleWidgetView className="absolute bottom-0 inset-s-0" />
-                    </Column>
-                </Column>
-                <Column gap={1} overflow="hidden" size={7}>
-                    {!!page.localization.getText(2) && (
-                        <Text
-                            aria-hidden
-                            className="octane-catalog-bundle-header-spacer"
-                            dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(2)) }}
-                        />
                     )}
-                    {!!page.localization.getText(2) && <Text dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(2)) }} />}
-                    <Column className="octane-catalog-bundle-frame has-classic-scrollbar" overflow="hidden">
-                        <CatalogBundleGridWidgetView fullWidth className="octane-catalog-layout-bundle-grid" columnCount={4} />
+                    <Column gap={1} overflow="hidden" size={5}>
+                        {!!page.localization.getText(2) && (
+                            <>
+                                <Text
+                                    aria-hidden
+                                    className="octane-catalog-bundle-header-spacer"
+                                    dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(2)) }}
+                                />
+                                <Text
+                                    aria-hidden
+                                    className="octane-catalog-bundle-header-spacer"
+                                    dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(2)) }}
+                                />
+                            </>
+                        )}
+                        <Flex alignItems="center" gap={2}>
+                            <div className="octane-catalog-bundle-price octane-catalog-bundle-price--room">
+                                <CatalogSimplePriceWidgetView />
+                            </div>
+                        </Flex>
+                        <Column grow gap={0} overflow="hidden" position="relative">
+                            {!!page.localization.getImage(1) && <img alt="" className="w-full h-full object-contain object-top" src={page.localization.getImage(1)} />}
+                            <CatalogAddOnBadgeWidgetView className="bg-muted rounded bottom-0 inset-s-0" position="absolute" />
+                            <CatalogAddOnChatStyleWidgetView className="absolute bottom-0 inset-s-0" />
+                        </Column>
                     </Column>
-                </Column>
-                <div className="col-span-12 octane-catalog-bundle-actions">
-                    <CatalogPurchaseWidgetView />
-                </div>
-            </Grid>
-        </>
+                    <Column gap={1} overflow="hidden" size={7}>
+                        {!!page.localization.getText(2) && (
+                            <Text
+                                aria-hidden
+                                className="octane-catalog-bundle-header-spacer"
+                                dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(2)) }}
+                            />
+                        )}
+                        {!!page.localization.getText(2) && <Text dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(2)) }} />}
+                        <Column className="octane-catalog-bundle-frame has-classic-scrollbar" overflow="hidden">
+                            <CatalogBundleGridWidgetView fullWidth className="octane-catalog-layout-bundle-grid" columnCount={4} />
+                        </Column>
+                    </Column>
+                    <div className="col-span-12 octane-catalog-bundle-actions">
+                        <CatalogPurchaseWidgetView />
+                    </div>
+                </Grid>
+            </>
+        </NativeTextTree>
     );
 };

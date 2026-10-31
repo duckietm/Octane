@@ -1,4 +1,5 @@
 import { CSSProperties, forwardRef, lazy, Suspense, SyntheticEvent, useCallback, useEffect, useRef } from 'react';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const YoutubeElement = lazy(() => import('youtube-video-element/react'));
 
@@ -62,20 +63,22 @@ const YoutubeReactPlayer = forwardRef<HTMLVideoElement, YoutubeReactPlayerProps>
     const style: CSSProperties = { display: 'block', width, height };
 
     return (
-        <Suspense fallback={null}>
-            <YoutubeElement
-                ref={setElement as never}
-                config={config?.youtube}
-                controls={controls}
-                loop={loop}
-                muted={muted}
-                src={src}
-                style={style}
-                onLoadStart={() => onReady?.()}
-                onPause={onPause}
-                onPlay={onPlay}
-            />
-        </Suspense>
+        <NativeTextTree>
+            <Suspense fallback={null}>
+                <YoutubeElement
+                    ref={setElement as never}
+                    config={config?.youtube}
+                    controls={controls}
+                    loop={loop}
+                    muted={muted}
+                    src={src}
+                    style={style}
+                    onLoadStart={() => onReady?.()}
+                    onPause={onPause}
+                    onPlay={onPlay}
+                />
+            </Suspense>
+        </NativeTextTree>
     );
 });
 

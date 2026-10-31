@@ -1,6 +1,7 @@
 import { FC, ReactNode, useState } from 'react';
 import { FaBook, FaCheck, FaCog, FaCompass, FaCube, FaFilter, FaLanguage, FaSync, FaTimes, FaUserShield } from 'react-icons/fa';
 import { formatHousekeepingDateTime, HOUSEKEEPING_RELOAD_TARGETS, HousekeepingReloadTarget, LocalizeText } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useHousekeeping, useHousekeepingConfirm } from '../../../../hooks';
 import { HousekeepingButton, HousekeepingSection } from '../common/HousekeepingParts';
 
@@ -64,63 +65,77 @@ export const HousekeepingReloadView: FC = () => {
     const failed = finished.filter((target) => !outcomes[target]?.ok);
 
     return (
-        <HousekeepingSection
-            aside={
-                <HousekeepingButton disabled={isActionPending || isReloadingAll} gap={1} size="sm" variant="primary" onClick={reloadAll}>
-                    <FaSync className={isReloadingAll ? 'animate-spin' : ''} size={9} />
-                    <span>{LocalizeText('housekeeping.hotel.reload.all')}</span>
-                </HousekeepingButton>
-            }
-            icon={<FaSync className="text-sky-600" size={9} />}
-            title={LocalizeText('housekeeping.hotel.reload.label')}
-            tone="accent"
-        >
-            <div className="text-[10px] text-zinc-500">{LocalizeText('housekeeping.hotel.reload.hint')}</div>
-            {finished.length === HOUSEKEEPING_RELOAD_TARGETS.length && !isReloadingAll && (
-                <div
-                    className={`rounded border px-2 py-1 text-[11px] ${failed.length ? 'border-rose-300 bg-rose-50 text-rose-800' : 'border-emerald-300 bg-emerald-50 text-emerald-800'}`}
-                >
-                    {failed.length
-                        ? LocalizeText(
-                              'housekeeping.hotel.reload.all.partial',
-                              ['failed'],
-                              [failed.map((target) => LocalizeText(`housekeeping.hotel.reload.${target}`)).join(', ')]
-                          )
-                        : LocalizeText('housekeeping.hotel.reload.all.done')}
-                </div>
-            )}
-            <div className="grid grid-cols-2 gap-1.5">
-                {HOUSEKEEPING_RELOAD_TARGETS.map((target) => {
-                    const outcome = outcomes[target];
+        <NativeTextTree>
+            <HousekeepingSection
+                aside={
+                    <HousekeepingButton disabled={isActionPending || isReloadingAll} gap={1} size="sm" variant="primary" onClick={reloadAll}>
+                        <FaSync className={isReloadingAll ? 'animate-spin' : ''} size={9} />
+                        <span>{LocalizeText('housekeeping.hotel.reload.all')}</span>
+                    </HousekeepingButton>
+                }
+                icon={<FaSync className="text-sky-600" size={9} />}
+                title={LocalizeText('housekeeping.hotel.reload.label')}
+                tone="accent"
+            >
+                <div className="text-[10px] text-zinc-500">{LocalizeText('housekeeping.hotel.reload.hint')}</div>
+                {finished.length === HOUSEKEEPING_RELOAD_TARGETS.length && !isReloadingAll && (
+                    <div
+                        className={`rounded border px-2 py-1 text-[11px] ${failed.length ? 'border-rose-300 bg-rose-50 text-rose-800' : 'border-emerald-300 bg-emerald-50 text-emerald-800'}`}
+                    >
+                        {failed.length
+                            ? LocalizeText(
+                                  'housekeeping.hotel.reload.all.partial',
+                                  ['failed'],
+                                  [failed.map((target) => LocalizeText(`housekeeping.hotel.reload.${target}`)).join(', ')]
+                              )
+                            : LocalizeText('housekeeping.hotel.reload.all.done')}
+                    </div>
+                )}
+                <div className="grid grid-cols-2 gap-1.5">
+                    {HOUSEKEEPING_RELOAD_TARGETS.map((target) => {
+                        const outcome = outcomes[target];
 
-                    return (
-                        <div key={target} className="flex min-w-0 items-center gap-1.5 rounded border border-zinc-200 bg-white px-1.5 py-1">
-                            <span className="shrink-0">{RELOAD_ICONS[target]}</span>
-                            <div className="flex min-w-0 grow flex-col">
-                                <span className="truncate text-[11px] font-semibold text-zinc-800">{LocalizeText(`housekeeping.hotel.reload.${target}`)}</span>
-                                <span
-                                    className={`flex items-center gap-1 truncate text-[9px] ${outcome && !outcome.ok ? 'text-rose-600' : 'text-zinc-500'}`}
-                                    title={LocalizeText(`housekeeping.hotel.reload.${target}.hint`)}
+                        return (
+                            <div key={target} className="flex min-w-0 items-center gap-1.5 rounded border border-zinc-200 bg-white px-1.5 py-1">
+                                <span className="shrink-0">{RELOAD_ICONS[target]}</span>
+                                <div className="flex min-w-0 grow flex-col">
+                                    <span className="truncate text-[11px] font-semibold text-zinc-800">
+                                        {LocalizeText(`housekeeping.hotel.reload.${target}`)}
+                                    </span>
+                                    <span
+                                        className={`flex items-center gap-1 truncate text-[9px] ${outcome && !outcome.ok ? 'text-rose-600' : 'text-zinc-500'}`}
+                                        title={LocalizeText(`housekeeping.hotel.reload.${target}.hint`)}
+                                    >
+                                        {outcome &&
+                                            (outcome.ok ? (
+                                                <FaCheck className="shrink-0 text-emerald-600" size={8} />
+                                            ) : (
+                                                <FaTimes className="shrink-0" size={8} />
+                                            ))}
+                                        {outcome
+                                            ? LocalizeText(
+                                                  outcome.ok ? 'housekeeping.hotel.reload.done_at' : 'housekeeping.hotel.reload.failed_at',
+                                                  ['time'],
+                                                  [formatHousekeepingDateTime(outcome.at)]
+                                              )
+                                            : LocalizeText(`housekeeping.hotel.reload.${target}.hint`)}
+                                    </span>
+                                </div>
+                                <HousekeepingButton
+                                    disabled={isActionPending || isReloadingAll}
+                                    gap={1}
+                                    size="sm"
+                                    variant="primary"
+                                    onClick={() => reload(target)}
                                 >
-                                    {outcome &&
-                                        (outcome.ok ? <FaCheck className="shrink-0 text-emerald-600" size={8} /> : <FaTimes className="shrink-0" size={8} />)}
-                                    {outcome
-                                        ? LocalizeText(
-                                              outcome.ok ? 'housekeeping.hotel.reload.done_at' : 'housekeeping.hotel.reload.failed_at',
-                                              ['time'],
-                                              [formatHousekeepingDateTime(outcome.at)]
-                                          )
-                                        : LocalizeText(`housekeeping.hotel.reload.${target}.hint`)}
-                                </span>
+                                    <FaSync size={9} />
+                                    <span>{LocalizeText('housekeeping.hotel.reload.run')}</span>
+                                </HousekeepingButton>
                             </div>
-                            <HousekeepingButton disabled={isActionPending || isReloadingAll} gap={1} size="sm" variant="primary" onClick={() => reload(target)}>
-                                <FaSync size={9} />
-                                <span>{LocalizeText('housekeeping.hotel.reload.run')}</span>
-                            </HousekeepingButton>
-                        </div>
-                    );
-                })}
-            </div>
-        </HousekeepingSection>
+                        );
+                    })}
+                </div>
+            </HousekeepingSection>
+        </NativeTextTree>
     );
 };

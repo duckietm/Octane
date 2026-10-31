@@ -14,6 +14,7 @@ import iconRotateCcw from '../../../assets/images/wired/move/rotate_ccw.png';
 import iconRotateCw from '../../../assets/images/wired/move/rotate_cw.png';
 import { Text } from '../../../common';
 import { Checkbox } from '../../../common/Checkbox';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { Radio } from '../../../common/Radio';
 
 /** The official wired setup assets `move_0` .. `move_7` (one per room direction). */
@@ -44,10 +45,12 @@ interface WiredIconRadioGroupProps {
 }
 
 const OptionContent: FC<{ option: WiredIconRadioOption }> = ({ option }) => (
-    <>
-        {option.icon && <img alt="" className="h-auto w-auto object-contain" draggable={false} src={option.icon} />}
-        {option.label !== undefined && option.label !== null && <Text>{option.label}</Text>}
-    </>
+    <NativeTextTree>
+        <>
+            {option.icon && <img alt="" className="h-auto w-auto object-contain" draggable={false} src={option.icon} />}
+            {option.label !== undefined && option.label !== null && <Text>{option.label}</Text>}
+        </>
+    </NativeTextTree>
 );
 
 /** An official `createRadioGroup(options, null, columns)`: the options fill the columns row by row. */

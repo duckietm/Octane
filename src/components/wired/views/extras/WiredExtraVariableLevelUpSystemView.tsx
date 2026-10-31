@@ -7,6 +7,7 @@ import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MODE_LINEAR = 1;
 const MODE_EXPONENTIAL = 2;
@@ -341,153 +342,155 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
     ];
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 260 }}>
-            <div className="octane-wired__levelup">
-                <div className="octane-wired__levelup-section">
-                    <BaseButton type="button" className="octane-wired__levelup-section-header" onClick={() => setIsModeSectionOpen((value) => !value)}>
-                        <Text bold>{LocalizeText('wiredfurni.params.levelup.mode')}</Text>
-                        <span className={`octane-wired__levelup-chevron ${isModeSectionOpen ? 'is-open' : ''}`}>^</span>
-                    </BaseButton>
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 260 }}>
+                <div className="octane-wired__levelup">
+                    <div className="octane-wired__levelup-section">
+                        <BaseButton type="button" className="octane-wired__levelup-section-header" onClick={() => setIsModeSectionOpen((value) => !value)}>
+                            <Text bold>{LocalizeText('wiredfurni.params.levelup.mode')}</Text>
+                            <span className={`octane-wired__levelup-chevron ${isModeSectionOpen ? 'is-open' : ''}`}>^</span>
+                        </BaseButton>
 
-                    {isModeSectionOpen && (
-                        <div className="octane-wired__levelup-section-body">
-                            <div className={`octane-wired__levelup-mode-block ${mode === MODE_LINEAR ? 'is-active' : 'is-inactive'}`}>
-                                <label className="octane-wired__levelup-mode-label">
-                                    <Radio checked={mode === MODE_LINEAR} name="wiredVariableLevelUpMode" onCheckedChange={() => setMode(MODE_LINEAR)} />
-                                    <Text>{localizeOrFallback('wiredfurni.params.levelup.mode.1', 'Lineare')}</Text>
-                                </label>
-                                <div className="octane-wired__levelup-fields">
-                                    <div className="octane-wired__levelup-field-row">
-                                        <Text>{LocalizeText('wiredfurni.params.levelup.step_size')}</Text>
-                                        <OctaneInput
-                                            className="octane-wired__levelup-number"
-                                            disabled={mode !== MODE_LINEAR}
-                                            type="number"
-                                            value={stepSizeInput}
-                                            onChange={(event) => setStepSizeInput(event.target.value)}
-                                        />
-                                    </div>
-                                    <div className="octane-wired__levelup-field-row">
-                                        <Text>{LocalizeText('wiredfurni.params.levelup.max_level')}</Text>
-                                        <OctaneInput
-                                            className="octane-wired__levelup-number"
-                                            disabled={mode !== MODE_LINEAR}
-                                            type="number"
-                                            value={maxLevelInput}
-                                            onChange={(event) => setMaxLevelInput(event.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className={`octane-wired__levelup-mode-block ${mode === MODE_EXPONENTIAL ? 'is-active' : 'is-inactive'}`}>
-                                <label className="octane-wired__levelup-mode-label">
-                                    <Radio checked={mode === MODE_EXPONENTIAL} name="wiredVariableLevelUpMode" onCheckedChange={() => setMode(MODE_EXPONENTIAL)} />
-                                    <Text>{localizeOrFallback('wiredfurni.params.levelup.mode.2', 'Esponenziale')}</Text>
-                                </label>
-                                <div className="octane-wired__levelup-fields">
-                                    <div className="octane-wired__levelup-field-row">
-                                        <Text>{LocalizeText('wiredfurni.params.levelup.first_level_xp')}</Text>
-                                        <OctaneInput
-                                            className="octane-wired__levelup-number"
-                                            disabled={mode !== MODE_EXPONENTIAL}
-                                            type="number"
-                                            value={firstLevelXpInput}
-                                            onChange={(event) => setFirstLevelXpInput(event.target.value)}
-                                        />
-                                    </div>
-                                    <div className="octane-wired__levelup-field-row">
-                                        <Text>{LocalizeText('wiredfurni.params.levelup.increase_factor')}</Text>
-                                        <OctaneInput
-                                            className="octane-wired__levelup-number"
-                                            disabled={mode !== MODE_EXPONENTIAL}
-                                            type="number"
-                                            value={increaseFactorInput}
-                                            onChange={(event) => setIncreaseFactorInput(event.target.value)}
-                                        />
-                                    </div>
-                                    <div className="octane-wired__levelup-field-row">
-                                        <Text>{LocalizeText('wiredfurni.params.levelup.max_level')}</Text>
-                                        <OctaneInput
-                                            className="octane-wired__levelup-number"
-                                            disabled={mode !== MODE_EXPONENTIAL}
-                                            type="number"
-                                            value={maxLevelInput}
-                                            onChange={(event) => setMaxLevelInput(event.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className={`octane-wired__levelup-mode-block ${mode === MODE_MANUAL ? 'is-active' : 'is-inactive'}`}>
-                                <label className="octane-wired__levelup-mode-label">
-                                    <Radio checked={mode === MODE_MANUAL} name="wiredVariableLevelUpMode" onCheckedChange={() => setMode(MODE_MANUAL)} />
-                                    <Text>
-                                        {localizeWithFallback(
-                                            'wiredfurni.params.levelup.mode.0',
-                                            localizeOrFallback('wiredfurni.params.levelup.mode.3', 'Inserimento manuale')
-                                        )}
-                                    </Text>
-                                </label>
-                                <textarea
-                                    className="form-control form-control-sm octane-wired__levelup-textarea"
-                                    disabled={mode !== MODE_MANUAL}
-                                    placeholder={interpolationPlaceholder}
-                                    value={interpolationText}
-                                    onChange={(event) => setInterpolationText(event.target.value)}
-                                />
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                <div className="octane-wired__divider" />
-
-                <div className="octane-wired__levelup-section">
-                    <BaseButton type="button" className="octane-wired__levelup-section-header" onClick={() => setIsPreviewSectionOpen((value) => !value)}>
-                        <Text bold>{LocalizeText('wiredfurni.params.levelup.preview')}</Text>
-                        <span className={`octane-wired__levelup-chevron ${isPreviewSectionOpen ? 'is-open' : ''}`}>^</span>
-                    </BaseButton>
-
-                    {isPreviewSectionOpen && (
-                        <div className="octane-wired__levelup-preview">
-                            {previewEntries.map((entry) => (
-                                <div key={entry.level} className="octane-wired__levelup-preview-entry">
-                                    {localizeOrFallback(
-                                        'wiredfurni.params.levelup.preview.entry',
-                                        `Livello: ${entry.level} - XP: ${entry.requiredXp}`,
-                                        ['lvl', 'xp'],
-                                        [entry.level.toString(), entry.requiredXp.toString()]
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                <div className="octane-wired__divider" />
-
-                <div className="octane-wired__levelup-section">
-                    <BaseButton type="button" className="octane-wired__levelup-section-header" onClick={() => setIsSubvariablesSectionOpen((value) => !value)}>
-                        <Text bold>{LocalizeText('wiredfurni.params.create_subvariables')}</Text>
-                        <span className={`octane-wired__levelup-chevron ${isSubvariablesSectionOpen ? 'is-open' : ''}`}>^</span>
-                    </BaseButton>
-
-                    {isSubvariablesSectionOpen && (
-                        <div className="octane-wired__levelup-subvariables">
-                            {subvariableOptions.map((subvariable) => (
-                                <div key={subvariable.key} className="octane-wired__levelup-subvariable-row">
-                                    <label className="octane-wired__levelup-subvariable-label">
-                                        <Checkbox checked={selectedSubvariables.includes(subvariable.key)} onCheckedChange={() => toggleSubvariable(subvariable.key)} />
-                                        <Text>{LocalizeText(`wiredfurni.params.levelup.subvariable.${subvariable.key}`)}</Text>
+                        {isModeSectionOpen && (
+                            <div className="octane-wired__levelup-section-body">
+                                <div className={`octane-wired__levelup-mode-block ${mode === MODE_LINEAR ? 'is-active' : 'is-inactive'}`}>
+                                    <label className="octane-wired__levelup-mode-label">
+                                        <Radio checked={mode === MODE_LINEAR} name="wiredVariableLevelUpMode" onCheckedChange={() => setMode(MODE_LINEAR)} />
+                                        <Text>{localizeOrFallback('wiredfurni.params.levelup.mode.1', 'Lineare')}</Text>
                                     </label>
-                                    <input className="octane-wired__levelup-subvariable-token" readOnly tabIndex={-1} type="text" value={subvariable.suffix} />
+                                    <div className="octane-wired__levelup-fields">
+                                        <div className="octane-wired__levelup-field-row">
+                                            <Text>{LocalizeText('wiredfurni.params.levelup.step_size')}</Text>
+                                            <OctaneInput
+                                                className="octane-wired__levelup-number"
+                                                disabled={mode !== MODE_LINEAR}
+                                                type="number"
+                                                value={stepSizeInput}
+                                                onChange={(event) => setStepSizeInput(event.target.value)}
+                                            />
+                                        </div>
+                                        <div className="octane-wired__levelup-field-row">
+                                            <Text>{LocalizeText('wiredfurni.params.levelup.max_level')}</Text>
+                                            <OctaneInput
+                                                className="octane-wired__levelup-number"
+                                                disabled={mode !== MODE_LINEAR}
+                                                type="number"
+                                                value={maxLevelInput}
+                                                onChange={(event) => setMaxLevelInput(event.target.value)}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
+
+                                <div className={`octane-wired__levelup-mode-block ${mode === MODE_EXPONENTIAL ? 'is-active' : 'is-inactive'}`}>
+                                    <label className="octane-wired__levelup-mode-label">
+                                        <Radio checked={mode === MODE_EXPONENTIAL} name="wiredVariableLevelUpMode" onCheckedChange={() => setMode(MODE_EXPONENTIAL)} />
+                                        <Text>{localizeOrFallback('wiredfurni.params.levelup.mode.2', 'Esponenziale')}</Text>
+                                    </label>
+                                    <div className="octane-wired__levelup-fields">
+                                        <div className="octane-wired__levelup-field-row">
+                                            <Text>{LocalizeText('wiredfurni.params.levelup.first_level_xp')}</Text>
+                                            <OctaneInput
+                                                className="octane-wired__levelup-number"
+                                                disabled={mode !== MODE_EXPONENTIAL}
+                                                type="number"
+                                                value={firstLevelXpInput}
+                                                onChange={(event) => setFirstLevelXpInput(event.target.value)}
+                                            />
+                                        </div>
+                                        <div className="octane-wired__levelup-field-row">
+                                            <Text>{LocalizeText('wiredfurni.params.levelup.increase_factor')}</Text>
+                                            <OctaneInput
+                                                className="octane-wired__levelup-number"
+                                                disabled={mode !== MODE_EXPONENTIAL}
+                                                type="number"
+                                                value={increaseFactorInput}
+                                                onChange={(event) => setIncreaseFactorInput(event.target.value)}
+                                            />
+                                        </div>
+                                        <div className="octane-wired__levelup-field-row">
+                                            <Text>{LocalizeText('wiredfurni.params.levelup.max_level')}</Text>
+                                            <OctaneInput
+                                                className="octane-wired__levelup-number"
+                                                disabled={mode !== MODE_EXPONENTIAL}
+                                                type="number"
+                                                value={maxLevelInput}
+                                                onChange={(event) => setMaxLevelInput(event.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className={`octane-wired__levelup-mode-block ${mode === MODE_MANUAL ? 'is-active' : 'is-inactive'}`}>
+                                    <label className="octane-wired__levelup-mode-label">
+                                        <Radio checked={mode === MODE_MANUAL} name="wiredVariableLevelUpMode" onCheckedChange={() => setMode(MODE_MANUAL)} />
+                                        <Text>
+                                            {localizeWithFallback(
+                                                'wiredfurni.params.levelup.mode.0',
+                                                localizeOrFallback('wiredfurni.params.levelup.mode.3', 'Inserimento manuale')
+                                            )}
+                                        </Text>
+                                    </label>
+                                    <textarea
+                                        className="form-control form-control-sm octane-wired__levelup-textarea"
+                                        disabled={mode !== MODE_MANUAL}
+                                        placeholder={interpolationPlaceholder}
+                                        value={interpolationText}
+                                        onChange={(event) => setInterpolationText(event.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="octane-wired__divider" />
+
+                    <div className="octane-wired__levelup-section">
+                        <BaseButton type="button" className="octane-wired__levelup-section-header" onClick={() => setIsPreviewSectionOpen((value) => !value)}>
+                            <Text bold>{LocalizeText('wiredfurni.params.levelup.preview')}</Text>
+                            <span className={`octane-wired__levelup-chevron ${isPreviewSectionOpen ? 'is-open' : ''}`}>^</span>
+                        </BaseButton>
+
+                        {isPreviewSectionOpen && (
+                            <div className="octane-wired__levelup-preview">
+                                {previewEntries.map((entry) => (
+                                    <div key={entry.level} className="octane-wired__levelup-preview-entry">
+                                        {localizeOrFallback(
+                                            'wiredfurni.params.levelup.preview.entry',
+                                            `Livello: ${entry.level} - XP: ${entry.requiredXp}`,
+                                            ['lvl', 'xp'],
+                                            [entry.level.toString(), entry.requiredXp.toString()]
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="octane-wired__divider" />
+
+                    <div className="octane-wired__levelup-section">
+                        <BaseButton type="button" className="octane-wired__levelup-section-header" onClick={() => setIsSubvariablesSectionOpen((value) => !value)}>
+                            <Text bold>{LocalizeText('wiredfurni.params.create_subvariables')}</Text>
+                            <span className={`octane-wired__levelup-chevron ${isSubvariablesSectionOpen ? 'is-open' : ''}`}>^</span>
+                        </BaseButton>
+
+                        {isSubvariablesSectionOpen && (
+                            <div className="octane-wired__levelup-subvariables">
+                                {subvariableOptions.map((subvariable) => (
+                                    <div key={subvariable.key} className="octane-wired__levelup-subvariable-row">
+                                        <label className="octane-wired__levelup-subvariable-label">
+                                            <Checkbox checked={selectedSubvariables.includes(subvariable.key)} onCheckedChange={() => toggleSubvariable(subvariable.key)} />
+                                            <Text>{LocalizeText(`wiredfurni.params.levelup.subvariable.${subvariable.key}`)}</Text>
+                                        </label>
+                                        <input className="octane-wired__levelup-subvariable-token" readOnly tabIndex={-1} type="text" value={subvariable.suffix} />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

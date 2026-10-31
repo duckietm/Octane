@@ -18,6 +18,7 @@ import recyclerPointerArrow from '../../../../../../assets/images/catalog/air/re
 import recyclerPointerBase from '../../../../../../assets/images/catalog/air/recycler/pointer-base.png';
 import recyclerTitle from '../../../../../../assets/images/catalog/air/recycler/title.png';
 import { BaseButton } from '../../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
 import { useInventoryFurni, useMessageEvent } from '../../../../../../hooks';
 import { useRecyclerEngineAnimation } from '../../../../../../hooks/catalog/useRecyclerEngineAnimation';
 import { CatalogLayoutProps } from '../CatalogLayout.types';
@@ -184,102 +185,104 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = () => {
     // top (shaking while it runs), and at the bottom the status, the recycle button, the slots in the Furnimatic frame
     // and the dial; when the recycler is closed, Frank says so instead.
     return (
-        <div className="octane-catalog-air-recycler">
-            <img alt="" draggable={false} className="octane-catalog-air-recycler__title" src={recyclerTitle} />
-            <img
-                alt=""
-                draggable={false}
-                className="octane-catalog-air-recycler__machine"
-                src={recyclerMachine}
-                style={{ transform: `translate(${engine.shakeX}px, ${engine.shakeY}px)` }}
-            />
-            <div className="octane-catalog-air-recycler__widget">
-                {enabled ? (
-                    <>
-                        <div className="octane-catalog-air-recycler__status" role="status">
-                            {statusText}
-                        </div>
-                        <BaseButton
-                            className="octane-catalog-standard-button octane-catalog-air-recycler__recycle"
-                            disabled={processing || secondsLeft > 0 || slots.length !== slotCount}
-                            type="button"
-                            onClick={recycle}
-                        >
-                            {secondsLeft > 0
-                                ? LocalizeText('catalog.recycler.button.wait', ['s'], [secondsLeft.toString()])
-                                : LocalizeText('catalog.recycler.button.recycle')}
-                        </BaseButton>
-                        <div className="octane-catalog-air-recycler__frame is-slots">
-                            <div aria-label={LocalizeText('catalog.recycler.button.recycle')} className="octane-catalog-air-recycler__slots" role="list">
-                                {Array.from({ length: slotCount }, (_, index) => {
-                                    const slot = slots[index];
+        <NativeTextTree>
+            <div className="octane-catalog-air-recycler">
+                <img alt="" draggable={false} className="octane-catalog-air-recycler__title" src={recyclerTitle} />
+                <img
+                    alt=""
+                    draggable={false}
+                    className="octane-catalog-air-recycler__machine"
+                    src={recyclerMachine}
+                    style={{ transform: `translate(${engine.shakeX}px, ${engine.shakeY}px)` }}
+                />
+                <div className="octane-catalog-air-recycler__widget">
+                    {enabled ? (
+                        <>
+                            <div className="octane-catalog-air-recycler__status" role="status">
+                                {statusText}
+                            </div>
+                            <BaseButton
+                                className="octane-catalog-standard-button octane-catalog-air-recycler__recycle"
+                                disabled={processing || secondsLeft > 0 || slots.length !== slotCount}
+                                type="button"
+                                onClick={recycle}
+                            >
+                                {secondsLeft > 0
+                                    ? LocalizeText('catalog.recycler.button.wait', ['s'], [secondsLeft.toString()])
+                                    : LocalizeText('catalog.recycler.button.recycle')}
+                            </BaseButton>
+                            <div className="octane-catalog-air-recycler__frame is-slots">
+                                <div aria-label={LocalizeText('catalog.recycler.button.recycle')} className="octane-catalog-air-recycler__slots" role="list">
+                                    {Array.from({ length: slotCount }, (_, index) => {
+                                        const slot = slots[index];
 
-                                    return (
-                                        <BaseButton
-                                            key={index}
-                                            aria-label={slot?.name ?? `${index + 1}`}
-                                            className={`octane-catalog-air-recycler__slot${slot ? ' is-filled' : ''}`}
-                                            disabled={slotsLocked}
-                                            role="listitem"
-                                            style={{ left: (index % 4) * 37, top: SLOT_ROWS[Math.floor(index / 4)] ?? 0 }}
-                                            type="button"
-                                            onClick={() => onSlot(index)}
-                                        >
-                                            {slot?.iconUrl && <img alt="" draggable={false} src={slot.iconUrl} />}
-                                        </BaseButton>
-                                    );
-                                })}
+                                        return (
+                                            <BaseButton
+                                                key={index}
+                                                aria-label={slot?.name ?? `${index + 1}`}
+                                                className={`octane-catalog-air-recycler__slot${slot ? ' is-filled' : ''}`}
+                                                disabled={slotsLocked}
+                                                role="listitem"
+                                                style={{ left: (index % 4) * 37, top: SLOT_ROWS[Math.floor(index / 4)] ?? 0 }}
+                                                type="button"
+                                                onClick={() => onSlot(index)}
+                                            >
+                                                {slot?.iconUrl && <img alt="" draggable={false} src={slot.iconUrl} />}
+                                            </BaseButton>
+                                        );
+                                    })}
+                                </div>
                             </div>
-                        </div>
-                        <div className="octane-catalog-air-recycler__frame is-indicator">
-                            <img alt="" draggable={false} className="octane-catalog-air-recycler__dial" src={recyclerIndicator} />
-                            <div className="octane-catalog-air-recycler__pointer">
-                                <img alt="" draggable={false} src={recyclerPointerArrow} style={{ transform: `rotate(${engine.angle}deg)` }} />
-                                <img alt="" draggable={false} src={recyclerPointerBase} />
+                            <div className="octane-catalog-air-recycler__frame is-indicator">
+                                <img alt="" draggable={false} className="octane-catalog-air-recycler__dial" src={recyclerIndicator} />
+                                <div className="octane-catalog-air-recycler__pointer">
+                                    <img alt="" draggable={false} src={recyclerPointerArrow} style={{ transform: `rotate(${engine.angle}deg)` }} />
+                                    <img alt="" draggable={false} src={recyclerPointerBase} />
+                                </div>
                             </div>
+                        </>
+                    ) : (
+                        <div className="octane-catalog-air-recycler__closed">
+                            <div className="octane-catalog-air-recycler__bubble" role="status">
+                                {localizeWithFallback('recycler.broken', statusText)}
+                            </div>
+                            <img alt="" draggable={false} className="octane-catalog-air-recycler__frank" src={frankDontKnow} />
                         </div>
-                    </>
-                ) : (
-                    <div className="octane-catalog-air-recycler__closed">
-                        <div className="octane-catalog-air-recycler__bubble" role="status">
-                            {localizeWithFallback('recycler.broken', statusText)}
+                    )}
+                </div>
+                {chooserOpen && enabled && (
+                    <div className="octane-catalog-air-recycler__chooser" role="dialog" aria-label={LocalizeText('catalog.recycler.button.recycle')}>
+                        <div className="octane-catalog-air-recycler__chooser-head">
+                            <span>{LocalizeText('inventory.furni.tab.furni')}</span>
+                            <BaseButton
+                                aria-label={LocalizeText('generic.close')}
+                                className="octane-catalog-air-recycler__chooser-close"
+                                onClick={() => setChooserOpen(false)}
+                            >
+                                ×
+                            </BaseButton>
                         </div>
-                        <img alt="" draggable={false} className="octane-catalog-air-recycler__frank" src={frankDontKnow} />
+                        {choices.length ? (
+                            <div className="octane-catalog-air-recycler__choices">
+                                {choices.map((choice) => (
+                                    <BaseButton
+                                        key={choice.itemId}
+                                        aria-label={choice.name}
+                                        className="octane-catalog-air-recycler__choice"
+                                        disabled={processing || slots.length >= slotCount}
+                                        type="button"
+                                        onClick={() => choose(choice)}
+                                    >
+                                        {choice.iconUrl && <img alt="" draggable={false} src={choice.iconUrl} />}
+                                    </BaseButton>
+                                ))}
+                            </div>
+                        ) : (
+                            <span className="octane-catalog-specialized-empty">{LocalizeText('inventory.furni.preview.not_recyclable')}</span>
+                        )}
                     </div>
                 )}
             </div>
-            {chooserOpen && enabled && (
-                <div className="octane-catalog-air-recycler__chooser" role="dialog" aria-label={LocalizeText('catalog.recycler.button.recycle')}>
-                    <div className="octane-catalog-air-recycler__chooser-head">
-                        <span>{LocalizeText('inventory.furni.tab.furni')}</span>
-                        <BaseButton
-                            aria-label={LocalizeText('generic.close')}
-                            className="octane-catalog-air-recycler__chooser-close"
-                            onClick={() => setChooserOpen(false)}
-                        >
-                            ×
-                        </BaseButton>
-                    </div>
-                    {choices.length ? (
-                        <div className="octane-catalog-air-recycler__choices">
-                            {choices.map((choice) => (
-                                <BaseButton
-                                    key={choice.itemId}
-                                    aria-label={choice.name}
-                                    className="octane-catalog-air-recycler__choice"
-                                    disabled={processing || slots.length >= slotCount}
-                                    type="button"
-                                    onClick={() => choose(choice)}
-                                >
-                                    {choice.iconUrl && <img alt="" draggable={false} src={choice.iconUrl} />}
-                                </BaseButton>
-                            ))}
-                        </div>
-                    ) : (
-                        <span className="octane-catalog-specialized-empty">{LocalizeText('inventory.furni.preview.not_recyclable')}</span>
-                    )}
-                </div>
-            )}
-        </div>
+        </NativeTextTree>
     );
 };

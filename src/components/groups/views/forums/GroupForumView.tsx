@@ -30,6 +30,7 @@ import { GroupForumListView, GroupForumsListData } from './GroupForumListView';
 import { GroupForumSettingsView } from './GroupForumSettingsView';
 import { GroupForumThreadListView } from './GroupForumThreadListView';
 import { GroupForumThreadView } from './GroupForumThreadView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type ForumMode = 'threads' | 'thread' | 'list';
 type ForumCompose = { kind: 'thread' } | { kind: 'reply'; threadId: number; subject: string; quote?: string; quoteSeq: number };
@@ -428,86 +429,88 @@ export const GroupForumView: FC<{}> = () =>
     const effectiveGroupId = groupId;
 
     return (
-        <>
-            <ForumFrame
-                className="octane-group-forum"
-                height={WINDOW_HEIGHT}
-                initialPosition={initialPosition}
-                isResizable={true}
-                minHeight={525}
-                minWidth={400}
-                title={LocalizeText('groupforum.view.window_title')}
-                uniqueKey="group-forum"
-                width={WINDOW_WIDTH}
-                onClose={closeForum}
-                onHelp={() => CreateLinkEvent('habbopages/forums')}
-            >
-                {isList ? (
-                    <ForumHeader
-                        description={LocalizeText(`groupforum.view.forums_description.${forumsList.listCode}`)}
-                        icon={LIST_ICONS[forumsList.listCode]}
-                        title={LocalizeText(`groupforum.view.forums_header.${forumsList.listCode}`)}
-                    />
-                ) : (
-                    <ForumHeader
-                        badge={forumData?.icon ?? ''}
-                        canChangeSettings={!!forumData?.canChangeSettings}
-                        description={forumData?.description ?? ''}
-                        title={forumData?.name ?? ''}
-                        onClick={() => effectiveGroupId > 0 && GetGroupInformation(effectiveGroupId)}
-                        onSettings={() => setIsSettingsOpen(true)}
-                    />
-                )}
-                <ForumShortcuts unreadCount={unreadForumsCount} onOpenList={(listMode) => openForumsList(LIST_CODES[listMode] ?? MY_FORUMS)} />
-                {isList && (
-                    <GroupForumListView
-                        list={forumsList}
-                        onMarkAsRead={markForumsAsRead}
-                        onOpenForum={(id) => openForum(id, true)}
-                        onPage={(pageIndex) => openForumsList(forumsList.listCode, pageIndex * FORUM_PAGE_SIZE)}
-                    />
-                )}
-                {mode === 'threads' && forumData && (
-                    <GroupForumThreadListView
+        <NativeTextTree>
+            <>
+                <ForumFrame
+                    className="octane-group-forum"
+                    height={WINDOW_HEIGHT}
+                    initialPosition={initialPosition}
+                    isResizable={true}
+                    minHeight={525}
+                    minWidth={400}
+                    title={LocalizeText('groupforum.view.window_title')}
+                    uniqueKey="group-forum"
+                    width={WINDOW_WIDTH}
+                    onClose={closeForum}
+                    onHelp={() => CreateLinkEvent('habbopages/forums')}
+                >
+                    {isList ? (
+                        <ForumHeader
+                            description={LocalizeText(`groupforum.view.forums_description.${forumsList.listCode}`)}
+                            icon={LIST_ICONS[forumsList.listCode]}
+                            title={LocalizeText(`groupforum.view.forums_header.${forumsList.listCode}`)}
+                        />
+                    ) : (
+                        <ForumHeader
+                            badge={forumData?.icon ?? ''}
+                            canChangeSettings={!!forumData?.canChangeSettings}
+                            description={forumData?.description ?? ''}
+                            title={forumData?.name ?? ''}
+                            onClick={() => effectiveGroupId > 0 && GetGroupInformation(effectiveGroupId)}
+                            onSettings={() => setIsSettingsOpen(true)}
+                        />
+                    )}
+                    <ForumShortcuts unreadCount={unreadForumsCount} onOpenList={(listMode) => openForumsList(LIST_CODES[listMode] ?? MY_FORUMS)} />
+                    {isList && (
+                        <GroupForumListView
+                            list={forumsList}
+                            onMarkAsRead={markForumsAsRead}
+                            onOpenForum={(id) => openForum(id, true)}
+                            onPage={(pageIndex) => openForumsList(forumsList.listCode, pageIndex * FORUM_PAGE_SIZE)}
+                        />
+                    )}
+                    {mode === 'threads' && forumData && (
+                        <GroupForumThreadListView
+                            forumData={forumData}
+                            getLastReadMessageIndex={getThreadLastReadMessageIndex}
+                            groupId={effectiveGroupId}
+                            pageIndex={threadsPage}
+                            reloadKey={threadsReload}
+                            onLeave={leaveThreads}
+                            onNewThread={() => setCompose({ kind: 'thread' })}
+                            onOpenThread={openThreadAtFirstUnread}
+                            onPageChange={setThreadsPage}
+                        />
+                    )}
+                    {mode === 'thread' && (
+                        <GroupForumThreadView
+                            forumData={forumData}
+                            groupId={effectiveGroupId}
+                            initialPageIndex={threadStart.pageIndex}
+                            initialThread={currentThread}
+                            scrollIndex={threadStart.scrollIndex}
+                            threadId={threadId}
+                            onBack={backToThreads}
+                            onMessagesSeen={onMessagesSeen}
+                            onReply={(subject, quote) => setCompose((previous) => ({ kind: 'reply', threadId, subject, quote, quoteSeq: previous && previous.kind === 'reply' && previous.threadId === threadId ? previous.quoteSeq + 1 : 0 }))}
+                        />
+                    )}
+                </ForumFrame>
+                {compose && forumData && (
+                    <GroupForumComposeView
+                        compose={compose}
                         forumData={forumData}
-                        getLastReadMessageIndex={getThreadLastReadMessageIndex}
                         groupId={effectiveGroupId}
-                        pageIndex={threadsPage}
-                        reloadKey={threadsReload}
-                        onLeave={leaveThreads}
-                        onNewThread={() => setCompose({ kind: 'thread' })}
-                        onOpenThread={openThreadAtFirstUnread}
-                        onPageChange={setThreadsPage}
+                        initialPosition={dialogPosition(455)}
+                        readForumData={() => forumRef.current}
+                        onClose={() => setCompose(null)}
+                        onThreadCreated={onThreadCreated}
                     />
                 )}
-                {mode === 'thread' && (
-                    <GroupForumThreadView
-                        forumData={forumData}
-                        groupId={effectiveGroupId}
-                        initialPageIndex={threadStart.pageIndex}
-                        initialThread={currentThread}
-                        scrollIndex={threadStart.scrollIndex}
-                        threadId={threadId}
-                        onBack={backToThreads}
-                        onMessagesSeen={onMessagesSeen}
-                        onReply={(subject, quote) => setCompose((previous) => ({ kind: 'reply', threadId, subject, quote, quoteSeq: previous && previous.kind === 'reply' && previous.threadId === threadId ? previous.quoteSeq + 1 : 0 }))}
-                    />
+                {isSettingsOpen && forumData && (
+                    <GroupForumSettingsView forumData={forumData} groupId={effectiveGroupId} initialPosition={dialogPosition(350)} readForumData={() => forumRef.current} onClose={() => setIsSettingsOpen(false)} />
                 )}
-            </ForumFrame>
-            {compose && forumData && (
-                <GroupForumComposeView
-                    compose={compose}
-                    forumData={forumData}
-                    groupId={effectiveGroupId}
-                    initialPosition={dialogPosition(455)}
-                    readForumData={() => forumRef.current}
-                    onClose={() => setCompose(null)}
-                    onThreadCreated={onThreadCreated}
-                />
-            )}
-            {isSettingsOpen && forumData && (
-                <GroupForumSettingsView forumData={forumData} groupId={effectiveGroupId} initialPosition={dialogPosition(350)} readForumData={() => forumRef.current} onClose={() => setIsSettingsOpen(false)} />
-            )}
-        </>
+            </>
+        </NativeTextTree>
     );
 };

@@ -8,6 +8,7 @@ import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { TabBar, TabBarTab } from '../../../../common/TabBar';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type InventoryIdentityTab = 'prefixes' | 'icons';
 
@@ -25,20 +26,22 @@ const PrefixPreview: FC<{ text: string; color: string; icon: string; effect?: st
     const fontStyle = getPrefixFontStyle(font);
 
     return (
-        <span className={`octane-inventory-prefix-text ${className}`} style={{ ...fontStyle, ...fxStyle }}>
-            {icon && <span className="octane-inventory-prefix-icon">{icon}</span>}
-            <span style={hasMultiColor ? { ...fontStyle, ...fxStyle } : { ...fontStyle, ...fxStyle, color: colors[0] || '#FFFFFF' }}>
-                {'{'}
-                {hasMultiColor
-                    ? [...text].map((char, i) => (
-                          <span key={i} style={{ ...fontStyle, color: colors[i] || colors[colors.length - 1], ...getPrefixEffectStyle(effect, colors[i]) }}>
-                              {char}
-                          </span>
-                      ))
-                    : text}
-                {'}'}
+        <NativeTextTree>
+            <span className={`octane-inventory-prefix-text ${className}`} style={{ ...fontStyle, ...fxStyle }}>
+                {icon && <span className="octane-inventory-prefix-icon">{icon}</span>}
+                <span style={hasMultiColor ? { ...fontStyle, ...fxStyle } : { ...fontStyle, ...fxStyle, color: colors[0] || '#FFFFFF' }}>
+                    {'{'}
+                    {hasMultiColor
+                        ? [...text].map((char, i) => (
+                              <span key={i} style={{ ...fontStyle, color: colors[i] || colors[colors.length - 1], ...getPrefixEffectStyle(effect, colors[i]) }}>
+                                  {char}
+                              </span>
+                          ))
+                        : text}
+                    {'}'}
+                </span>
             </span>
-        </span>
+        </NativeTextTree>
     );
 };
 
@@ -114,129 +117,131 @@ export const InventoryPrefixView: FC<{}> = () => {
     const deleteLabel = localizeWithFallback('inventory.prefixes.delete', 'Delete');
 
     return (
-        <div className="octane-inventory-identity">
-            <TabBar className="octane-inventory-identity-tabs" value={activeTab}>
-                {tabs.map((tab) => (
-                    <TabBarTab
-                        key={tab.id}
-                        className={`octane-inventory-identity-tab${activeTab === tab.id ? ' is-active' : ''}`}
-                        value={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                    >
-                        {tab.label}
-                    </TabBarTab>
-                ))}
-            </TabBar>
+        <NativeTextTree>
+            <div className="octane-inventory-identity">
+                <TabBar className="octane-inventory-identity-tabs" value={activeTab}>
+                    {tabs.map((tab) => (
+                        <TabBarTab
+                            key={tab.id}
+                            className={`octane-inventory-identity-tab${activeTab === tab.id ? ' is-active' : ''}`}
+                            value={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                        >
+                            {tab.label}
+                        </TabBarTab>
+                    ))}
+                </TabBar>
 
-            {activeTab === 'prefixes' &&
-                (prefixes.length === 0 ? (
-                    <InventoryCategoryEmptyView
-                        desc={localizeWithFallback('inventory.empty.prefixes.desc', 'Prefixes you buy show up here.')}
-                        title={localizeWithFallback('inventory.empty.prefixes.title', 'You have no prefixes')}
-                    />
-                ) : (
-                    <div className="octane-inventory-animals is-prefixes">
-                        <div className="octane-inventory-animal-grid">
-                            <ClassicScrollAreaView className="size-full">
-                                <div className="octane-inventory-animal-cells">
-                                    {prefixes.map((prefix: IPrefixItem) => (
-                                        <BaseButton
-                                            key={prefix.id}
-                                            className={cellClass(selectedPrefix?.id === prefix.id, !!prefix.active)}
-                                            type="button"
-                                            onClick={() => setSelectedPrefix(prefix)}
-                                        >
-                                            <PrefixPreview color={prefix.color} effect={prefix.effect} font={prefix.font} icon={prefix.icon} text={prefix.text} />
-                                        </BaseButton>
-                                    ))}
+                {activeTab === 'prefixes' &&
+                    (prefixes.length === 0 ? (
+                        <InventoryCategoryEmptyView
+                            desc={localizeWithFallback('inventory.empty.prefixes.desc', 'Prefixes you buy show up here.')}
+                            title={localizeWithFallback('inventory.empty.prefixes.title', 'You have no prefixes')}
+                        />
+                    ) : (
+                        <div className="octane-inventory-animals is-prefixes">
+                            <div className="octane-inventory-animal-grid">
+                                <ClassicScrollAreaView className="size-full">
+                                    <div className="octane-inventory-animal-cells">
+                                        {prefixes.map((prefix: IPrefixItem) => (
+                                            <BaseButton
+                                                key={prefix.id}
+                                                className={cellClass(selectedPrefix?.id === prefix.id, !!prefix.active)}
+                                                type="button"
+                                                onClick={() => setSelectedPrefix(prefix)}
+                                            >
+                                                <PrefixPreview color={prefix.color} effect={prefix.effect} font={prefix.font} icon={prefix.icon} text={prefix.text} />
+                                            </BaseButton>
+                                        ))}
+                                    </div>
+                                </ClassicScrollAreaView>
+                            </div>
+                            <div className="octane-inventory-animal-preview">
+                                <div className="octane-inventory-animal-name">{selectedPrefix?.active ? activeLabel : ''}</div>
+                                <div className="octane-inventory-animal-image">
+                                    {selectedPrefix && (
+                                        <PrefixPreview
+                                            className="is-large"
+                                            color={selectedPrefix.color}
+                                            effect={selectedPrefix.effect}
+                                            font={selectedPrefix.font}
+                                            icon={selectedPrefix.icon}
+                                            text={selectedPrefix.text}
+                                        />
+                                    )}
                                 </div>
-                            </ClassicScrollAreaView>
-                        </div>
-                        <div className="octane-inventory-animal-preview">
-                            <div className="octane-inventory-animal-name">{selectedPrefix?.active ? activeLabel : ''}</div>
-                            <div className="octane-inventory-animal-image">
-                                {selectedPrefix && (
-                                    <PrefixPreview
-                                        className="is-large"
-                                        color={selectedPrefix.color}
-                                        effect={selectedPrefix.effect}
-                                        font={selectedPrefix.font}
-                                        icon={selectedPrefix.icon}
-                                        text={selectedPrefix.text}
-                                    />
-                                )}
-                            </div>
-                            <div className="octane-inventory-animal-description">
-                                {!selectedPrefix && activePrefix && (
-                                    <>
-                                        {activeLabel}: <PrefixPreview color={activePrefix.color} effect={activePrefix.effect} font={activePrefix.font} icon={activePrefix.icon} text={activePrefix.text} />
-                                    </>
-                                )}
-                            </div>
-                            <div className="octane-inventory-animal-actions">
-                                <OctaneButton
-                                    className="octane-inventory-animal-place"
-                                    disabled={!selectedPrefix}
-                                    onClick={() => (selectedPrefix.active ? deactivatePrefix() : activatePrefix(selectedPrefix.id))}
-                                >
-                                    {selectedPrefix?.active ? deactivateLabel : activateLabel}
-                                </OctaneButton>
-                                <OctaneButton className="octane-inventory-animal-place" disabled={!selectedPrefix || selectedPrefix.active} onClick={attemptDeletePrefix}>
-                                    {deleteLabel}
-                                </OctaneButton>
+                                <div className="octane-inventory-animal-description">
+                                    {!selectedPrefix && activePrefix && (
+                                        <>
+                                            {activeLabel}: <PrefixPreview color={activePrefix.color} effect={activePrefix.effect} font={activePrefix.font} icon={activePrefix.icon} text={activePrefix.text} />
+                                        </>
+                                    )}
+                                </div>
+                                <div className="octane-inventory-animal-actions">
+                                    <OctaneButton
+                                        className="octane-inventory-animal-place"
+                                        disabled={!selectedPrefix}
+                                        onClick={() => (selectedPrefix.active ? deactivatePrefix() : activatePrefix(selectedPrefix.id))}
+                                    >
+                                        {selectedPrefix?.active ? deactivateLabel : activateLabel}
+                                    </OctaneButton>
+                                    <OctaneButton className="octane-inventory-animal-place" disabled={!selectedPrefix || selectedPrefix.active} onClick={attemptDeletePrefix}>
+                                        {deleteLabel}
+                                    </OctaneButton>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
 
-            {activeTab === 'icons' &&
-                (nickIcons.length === 0 ? (
-                    <InventoryCategoryEmptyView
-                        actionLabel={localizeWithFallback('inventory.empty.nickicons.action', 'Customize identity')}
-                        desc={localizeWithFallback('inventory.empty.nickicons.desc', 'Icons are bought in the identity customizer.')}
-                        onAction={() => CreateLinkEvent('customize/show')}
-                        title={localizeWithFallback('inventory.empty.nickicons.title', 'You have no icons')}
-                    />
-                ) : (
-                    <div className="octane-inventory-animals is-prefixes">
-                        <div className="octane-inventory-animal-grid">
-                            <ClassicScrollAreaView className="size-full">
-                                <div className="octane-inventory-animal-cells">
-                                    {nickIcons.map((icon) => (
-                                        <BaseButton
-                                            key={icon.id}
-                                            className={cellClass(selectedNickIcon?.id === icon.id, !!icon.active)}
-                                            type="button"
-                                            onClick={() => setSelectedNickIcon(icon)}
-                                        >
-                                            {GetNickIconUrl(icon.iconKey) && <img alt={icon.displayName || icon.iconKey} className="octane-inventory-identity-icon" src={GetNickIconUrl(icon.iconKey)} />}
-                                        </BaseButton>
-                                    ))}
+                {activeTab === 'icons' &&
+                    (nickIcons.length === 0 ? (
+                        <InventoryCategoryEmptyView
+                            actionLabel={localizeWithFallback('inventory.empty.nickicons.action', 'Customize identity')}
+                            desc={localizeWithFallback('inventory.empty.nickicons.desc', 'Icons are bought in the identity customizer.')}
+                            onAction={() => CreateLinkEvent('customize/show')}
+                            title={localizeWithFallback('inventory.empty.nickicons.title', 'You have no icons')}
+                        />
+                    ) : (
+                        <div className="octane-inventory-animals is-prefixes">
+                            <div className="octane-inventory-animal-grid">
+                                <ClassicScrollAreaView className="size-full">
+                                    <div className="octane-inventory-animal-cells">
+                                        {nickIcons.map((icon) => (
+                                            <BaseButton
+                                                key={icon.id}
+                                                className={cellClass(selectedNickIcon?.id === icon.id, !!icon.active)}
+                                                type="button"
+                                                onClick={() => setSelectedNickIcon(icon)}
+                                            >
+                                                {GetNickIconUrl(icon.iconKey) && <img alt={icon.displayName || icon.iconKey} className="octane-inventory-identity-icon" src={GetNickIconUrl(icon.iconKey)} />}
+                                            </BaseButton>
+                                        ))}
+                                    </div>
+                                </ClassicScrollAreaView>
+                            </div>
+                            <div className="octane-inventory-animal-preview">
+                                <div className="octane-inventory-animal-name">{selectedNickIcon ? selectedNickIcon.displayName || selectedNickIcon.iconKey : ''}</div>
+                                <div className="octane-inventory-animal-image">
+                                    {selectedNickIcon && selectedIconUrl && (
+                                        <img alt={selectedNickIcon.displayName || selectedNickIcon.iconKey} className="octane-inventory-identity-icon is-large" src={selectedIconUrl} />
+                                    )}
                                 </div>
-                            </ClassicScrollAreaView>
-                        </div>
-                        <div className="octane-inventory-animal-preview">
-                            <div className="octane-inventory-animal-name">{selectedNickIcon ? selectedNickIcon.displayName || selectedNickIcon.iconKey : ''}</div>
-                            <div className="octane-inventory-animal-image">
-                                {selectedNickIcon && selectedIconUrl && (
-                                    <img alt={selectedNickIcon.displayName || selectedNickIcon.iconKey} className="octane-inventory-identity-icon is-large" src={selectedIconUrl} />
-                                )}
-                            </div>
-                            <div className="octane-inventory-animal-description">
-                                {!selectedNickIcon && activeNickIcon && `${activeLabel}: ${activeNickIcon.displayName || activeNickIcon.iconKey}`}
-                            </div>
-                            <div className="octane-inventory-animal-actions">
-                                <OctaneButton
-                                    className="octane-inventory-animal-place"
-                                    disabled={!selectedNickIcon}
-                                    onClick={() => (selectedNickIcon.active ? deactivateNickIcon() : activateNickIcon(selectedNickIcon.id))}
-                                >
-                                    {selectedNickIcon?.active ? deactivateLabel : activateLabel}
-                                </OctaneButton>
+                                <div className="octane-inventory-animal-description">
+                                    {!selectedNickIcon && activeNickIcon && `${activeLabel}: ${activeNickIcon.displayName || activeNickIcon.iconKey}`}
+                                </div>
+                                <div className="octane-inventory-animal-actions">
+                                    <OctaneButton
+                                        className="octane-inventory-animal-place"
+                                        disabled={!selectedNickIcon}
+                                        onClick={() => (selectedNickIcon.active ? deactivateNickIcon() : activateNickIcon(selectedNickIcon.id))}
+                                    >
+                                        {selectedNickIcon?.active ? deactivateLabel : activateLabel}
+                                    </OctaneButton>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
-        </div>
+                    ))}
+            </div>
+        </NativeTextTree>
     );
 };

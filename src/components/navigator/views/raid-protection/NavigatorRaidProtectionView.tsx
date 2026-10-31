@@ -16,6 +16,7 @@ import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../
 import { BaseButton } from '../../../../common/BaseButton';
 import { Checkbox } from '../../../../common/Checkbox';
 import { UbuntuDropmenuView } from '../../../../common/dropmenu/UbuntuDropmenuView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import {
     isCurrentRaidProtectionRoom,
     sendRaidProtectionSave,
@@ -152,74 +153,76 @@ export const NavigatorRaidProtectionView: FC<{}> = () =>
         : text('status.inactive', 'There is no raid going on');
 
     return (
-        <OctaneCardView className="octane-raid-protection" frameStyle={ 3 } isResizable={ false } theme="primary-slim" uniqueKey="raid-protection-settings">
-            <OctaneCardHeaderView headerText={ text('title', 'Raid protection') } onCloseClick={ close } />
-            <OctaneCardContentView className="octane-raid-protection__content" overflow="hidden">
-                <div className="octane-raid-protection__advice">
-                    { text('warning', 'Switch this on when you expect an unwanted raid. Start busy games or events with a lower sensitivity.') }
-                </div>
-                <div className="octane-raid-protection__card is-protection">
-                    <label className="octane-raid-protection__toggle">
-                        <Checkbox aria-label={ text('enabled', 'Turn on raid protection') } checked={ form.enabled } onCheckedChange={ checked => update({ enabled: checked }) } />
-                        <span>{ text('enabled', 'Turn on raid protection') }</span>
-                    </label>
-                    <div className="octane-raid-protection__separator" />
-                    <div className="octane-raid-protection__controls" data-disabled={ protectionDisabled || undefined }>
-                        <div className="octane-raid-protection__row">
-                            <span>{ text('detection.label', 'Sensitivity') }</span>
-                            <UbuntuDropmenuView disabled={ protectionDisabled } label={ text('detection.label', 'Sensitivity') } options={ sensitivityOptions() } value={ form.sensitivity } onSelect={ value => update({ sensitivity: Number(value) }) } />
-                        </div>
-                        <div className="octane-raid-protection__row">
-                            <span>{ text('action.label', 'When a raid is detected') }</span>
-                            <UbuntuDropmenuView
-                                disabled={ protectionDisabled }
-                                label={ text('action.label', 'When a raid is detected') }
-                                options={ [
-                                    { value: 0, label: text('action.kick', 'Kick the player out of the room') },
-                                    { value: 1, label: text('action.temporary_ban', 'Temporary ban') }
-                                ] }
-                                value={ form.actionType }
-                                onSelect={ value => update({ actionType: Number(value) }) } />
-                        </div>
-                        <div className="octane-raid-protection__row" data-disabled={ banDisabled || undefined }>
-                            <span>{ text('ban_duration', 'Ban length') }</span>
-                            <UbuntuDropmenuView disabled={ banDisabled } label={ text('ban_duration', 'Ban length') } options={ durationOptions(RAID_PROTECTION_BAN_DURATIONS) } value={ form.banDurationSeconds } onSelect={ value => update({ banDurationSeconds: Number(value) }) } />
+        <NativeTextTree>
+            <OctaneCardView className="octane-raid-protection" frameStyle={ 3 } isResizable={ false } theme="primary-slim" uniqueKey="raid-protection-settings">
+                <OctaneCardHeaderView headerText={ text('title', 'Raid protection') } onCloseClick={ close } />
+                <OctaneCardContentView className="octane-raid-protection__content" overflow="hidden">
+                    <div className="octane-raid-protection__advice">
+                        { text('warning', 'Switch this on when you expect an unwanted raid. Start busy games or events with a lower sensitivity.') }
+                    </div>
+                    <div className="octane-raid-protection__card is-protection">
+                        <label className="octane-raid-protection__toggle">
+                            <Checkbox aria-label={ text('enabled', 'Turn on raid protection') } checked={ form.enabled } onCheckedChange={ checked => update({ enabled: checked }) } />
+                            <span>{ text('enabled', 'Turn on raid protection') }</span>
+                        </label>
+                        <div className="octane-raid-protection__separator" />
+                        <div className="octane-raid-protection__controls" data-disabled={ protectionDisabled || undefined }>
+                            <div className="octane-raid-protection__row">
+                                <span>{ text('detection.label', 'Sensitivity') }</span>
+                                <UbuntuDropmenuView disabled={ protectionDisabled } label={ text('detection.label', 'Sensitivity') } options={ sensitivityOptions() } value={ form.sensitivity } onSelect={ value => update({ sensitivity: Number(value) }) } />
+                            </div>
+                            <div className="octane-raid-protection__row">
+                                <span>{ text('action.label', 'When a raid is detected') }</span>
+                                <UbuntuDropmenuView
+                                    disabled={ protectionDisabled }
+                                    label={ text('action.label', 'When a raid is detected') }
+                                    options={ [
+                                        { value: 0, label: text('action.kick', 'Kick the player out of the room') },
+                                        { value: 1, label: text('action.temporary_ban', 'Temporary ban') }
+                                    ] }
+                                    value={ form.actionType }
+                                    onSelect={ value => update({ actionType: Number(value) }) } />
+                            </div>
+                            <div className="octane-raid-protection__row" data-disabled={ banDisabled || undefined }>
+                                <span>{ text('ban_duration', 'Ban length') }</span>
+                                <UbuntuDropmenuView disabled={ banDisabled } label={ text('ban_duration', 'Ban length') } options={ durationOptions(RAID_PROTECTION_BAN_DURATIONS) } value={ form.banDurationSeconds } onSelect={ value => update({ banDurationSeconds: Number(value) }) } />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className="octane-raid-protection__card is-guard">
-                    <label className="octane-raid-protection__toggle">
-                        <Checkbox aria-label={ text('guard.enabled', 'Keep suspicious players out during a raid') } checked={ form.guardEnabled } onCheckedChange={ checked => update({ guardEnabled: checked }) } />
-                        <span>{ text('guard.enabled', 'Keep suspicious players out during a raid') }</span>
-                    </label>
-                    <div className="octane-raid-protection__description">
-                        { text('guard.description', 'During a raid suspicious players can be kept out of the room as well') }
-                    </div>
-                    <div className="octane-raid-protection__controls" data-disabled={ guardDisabled || undefined }>
-                        <div className="octane-raid-protection__row">
-                            <span>{ text('guard.duration', 'Keep players out for') }</span>
-                            <UbuntuDropmenuView disabled={ guardDisabled } label={ text('guard.duration', 'Keep players out for') } options={ durationOptions(RAID_PROTECTION_GUARD_DURATIONS) } value={ form.guardDurationSeconds } onSelect={ value => update({ guardDurationSeconds: Number(value) }) } />
+                    <div className="octane-raid-protection__card is-guard">
+                        <label className="octane-raid-protection__toggle">
+                            <Checkbox aria-label={ text('guard.enabled', 'Keep suspicious players out during a raid') } checked={ form.guardEnabled } onCheckedChange={ checked => update({ guardEnabled: checked }) } />
+                            <span>{ text('guard.enabled', 'Keep suspicious players out during a raid') }</span>
+                        </label>
+                        <div className="octane-raid-protection__description">
+                            { text('guard.description', 'During a raid suspicious players can be kept out of the room as well') }
                         </div>
-                        <div className="octane-raid-protection__row">
-                            <span>{ text('guard.sensitivity', 'How strict should this be?') }</span>
-                            <UbuntuDropmenuView disabled={ guardDisabled } label={ text('guard.sensitivity', 'How strict should this be?') } options={ sensitivityOptions() } value={ form.guardSensitivity } onSelect={ value => update({ guardSensitivity: Number(value) }) } />
+                        <div className="octane-raid-protection__controls" data-disabled={ guardDisabled || undefined }>
+                            <div className="octane-raid-protection__row">
+                                <span>{ text('guard.duration', 'Keep players out for') }</span>
+                                <UbuntuDropmenuView disabled={ guardDisabled } label={ text('guard.duration', 'Keep players out for') } options={ durationOptions(RAID_PROTECTION_GUARD_DURATIONS) } value={ form.guardDurationSeconds } onSelect={ value => update({ guardDurationSeconds: Number(value) }) } />
+                            </div>
+                            <div className="octane-raid-protection__row">
+                                <span>{ text('guard.sensitivity', 'How strict should this be?') }</span>
+                                <UbuntuDropmenuView disabled={ guardDisabled } label={ text('guard.sensitivity', 'How strict should this be?') } options={ sensitivityOptions() } value={ form.guardSensitivity } onSelect={ value => update({ guardSensitivity: Number(value) }) } />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className="octane-raid-protection__status" role="status">
-                    { settings.incidentActive
-                        ? <strong className="is-active">{ text('status.active', 'A raid is going on right now') }</strong>
-                        : <span>{ inactiveText }</span> }
-                </div>
-                <div className="octane-raid-protection__actions">
-                    <BaseButton className="octane-raid-protection__button is-cancel" type="button" onClick={ close }>
-                        { text('cancel', 'Cancel') }
-                    </BaseButton>
-                    <BaseButton className="octane-raid-protection__button is-save" disabled={ busy } type="button" onClick={ save }>
-                        { text('save', 'Save') }
-                    </BaseButton>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    <div className="octane-raid-protection__status" role="status">
+                        { settings.incidentActive
+                            ? <strong className="is-active">{ text('status.active', 'A raid is going on right now') }</strong>
+                            : <span>{ inactiveText }</span> }
+                    </div>
+                    <div className="octane-raid-protection__actions">
+                        <BaseButton className="octane-raid-protection__button is-cancel" type="button" onClick={ close }>
+                            { text('cancel', 'Cancel') }
+                        </BaseButton>
+                        <BaseButton className="octane-raid-protection__button is-save" disabled={ busy } type="button" onClick={ save }>
+                            { text('save', 'Save') }
+                        </BaseButton>
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

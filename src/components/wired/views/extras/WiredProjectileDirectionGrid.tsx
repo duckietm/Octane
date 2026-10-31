@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { isFourWayProjectileSystem, resolveProjectileDirection } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const RADIUS = 5;
 const SIZE = RADIUS * 2 + 1;
@@ -42,17 +43,19 @@ export const WiredProjectileDirectionGrid: FC<{ system: number; disabled?: boole
     }
 
     return (
-        <div className="octane-wired__projectile-grid" style={{ opacity: disabled ? 0.4 : 1 }}>
-            <svg aria-hidden="true" height={height + 4} viewBox={`-2 -2 ${width + 4} ${height + 4}`} width={width + 4}>
-                {tiles}
-                <polygon
-                    fill="none"
-                    points={`${width / 2},0 ${width},${height / 2} ${width / 2},${height} 0,${height / 2}`}
-                    stroke={STROKE}
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                />
-            </svg>
-        </div>
+        <NativeTextTree>
+            <div className="octane-wired__projectile-grid" style={{ opacity: disabled ? 0.4 : 1 }}>
+                <svg aria-hidden="true" height={height + 4} viewBox={`-2 -2 ${width + 4} ${height + 4}`} width={width + 4}>
+                    {tiles}
+                    <polygon
+                        fill="none"
+                        points={`${width / 2},0 ${width},${height / 2} ${width / 2},${height} 0,${height / 2}`}
+                        stroke={STROKE}
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                    />
+                </svg>
+            </div>
+        </NativeTextTree>
     );
 };

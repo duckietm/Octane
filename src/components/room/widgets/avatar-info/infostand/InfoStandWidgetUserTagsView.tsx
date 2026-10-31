@@ -1,16 +1,15 @@
-import { CreateLinkEvent, NavigatorSearchComposer } from '@octane/renderer';
+import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
-import { SendMessageComposer } from '../../../../../api';
 import { Flex, Text } from '../../../../../common';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 interface InfoStandWidgetUserTagsViewProps {
     tags: string[];
 }
 
 const processAction = (tag: string) => {
-    CreateLinkEvent(`navigator/search/${tag}`);
-    SendMessageComposer(new NavigatorSearchComposer('hotel_view', `tag:${tag}`));
+    CreateLinkEvent(`navigator/tag/${tag}`);
 };
 
 export const InfoStandWidgetUserTagsView: FC<InfoStandWidgetUserTagsViewProps> = (props) => {
@@ -19,17 +18,26 @@ export const InfoStandWidgetUserTagsView: FC<InfoStandWidgetUserTagsViewProps> =
     if (!tags || !tags.length) return null;
 
     return (
-        <>
-            <hr className="m-0" />
-            <Flex className="flex-tags">
-                {tags &&
-                    tags.length > 0 &&
-                    tags.map((tag, index) => (
-                        <Text component={BaseButton} type="button" key={index} className="text-tags" variant="white" onClick={(event) => processAction(tag)}>
-                            {tag}
-                        </Text>
-                    ))}
-            </Flex>
-        </>
+        <NativeTextTree>
+            <>
+                <hr className="m-0" />
+                <Flex className="flex-tags">
+                    {tags &&
+                        tags.length > 0 &&
+                        tags.map((tag, index) => (
+                            <Text
+                                component={BaseButton}
+                                type="button"
+                                key={index}
+                                className="text-tags"
+                                variant="white"
+                                onClick={(event) => processAction(tag)}
+                            >
+                                {tag}
+                            </Text>
+                        ))}
+                </Flex>
+            </>
+        </NativeTextTree>
     );
 };

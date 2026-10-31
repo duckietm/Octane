@@ -6,6 +6,7 @@ import roomVisitsXml from '../../../assets/mod-tools/xml/roomvisits_frame.xml?ra
 import { NativeWindowShell } from '../native/NativeWindowShell';
 import { findNativeNode, nativeCaption, nativeNumber, nativeScaledRect, NativeNode, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Frame, Native0Rows, Native0Scrollbar, Native0Text } from '../native/NativeWindow0';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SHADE = 0xa2d6ea;
@@ -67,22 +68,24 @@ export const RoomVisitsView: FC<RoomVisitsProps> = ({ userId, x, y, width, heigh
     const clamped = Math.max(0, Math.min(Math.max(0, contentHeight - viewHeight), offset));
 
     return (
-        <NativeWindowShell type="roomVisits" windowKey={`${userId}`} x={x} y={y}>
-            <Native0Frame caption={`Room visits: ${data.userName} (${data.rooms.length})`} height={height} width={width} onClose={onClose} onResize={onResize}>
-                <div className="native0-list" style={{ left: 0, top: 0, width: listWidth, height: viewHeight }} onWheel={(event) => setOffset(Math.max(0, Math.min(Math.max(0, contentHeight - viewHeight), clamped + event.deltaY * 0.75)))}>
-                    <div style={{ position: 'absolute', left: 0, top: -clamped, width: listWidth, height: contentHeight }}>
-                        <Native0Rows colors={rowColors} height={contentHeight} rowHeight={row.height} width={listWidth} />
-                        {data.rooms.map((room, index) => (
-                            <div key={index} style={{ position: 'absolute', left: 0, top: index * row.height, width: listWidth, height: row.height }}>
-                                <Native0Text bold clip height={row.height} text={room.roomName} underline width={name.width} x={name.x} y={0} onClick={() => onOpenRoomTool(room.roomId)} />
-                                <Native0Text height={row.height} text={`${pad(room.enterHour)}:${pad(room.enterMinute)}`} width={time.width} x={time.x} y={0} />
-                                <Native0Text bold height={row.height} text={enterCaption} underline width={enter.width} x={enter.x} y={0} onClick={() => onEnterRoom(room.roomId)} />
-                            </div>
-                        ))}
+        <NativeTextTree>
+            <NativeWindowShell type="roomVisits" windowKey={`${userId}`} x={x} y={y}>
+                <Native0Frame caption={`Room visits: ${data.userName} (${data.rooms.length})`} height={height} width={width} onClose={onClose} onResize={onResize}>
+                    <div className="native0-list" style={{ left: 0, top: 0, width: listWidth, height: viewHeight }} onWheel={(event) => setOffset(Math.max(0, Math.min(Math.max(0, contentHeight - viewHeight), clamped + event.deltaY * 0.75)))}>
+                        <div style={{ position: 'absolute', left: 0, top: -clamped, width: listWidth, height: contentHeight }}>
+                            <Native0Rows colors={rowColors} height={contentHeight} rowHeight={row.height} width={listWidth} />
+                            {data.rooms.map((room, index) => (
+                                <div key={index} style={{ position: 'absolute', left: 0, top: index * row.height, width: listWidth, height: row.height }}>
+                                    <Native0Text bold clip height={row.height} text={room.roomName} underline width={name.width} x={name.x} y={0} onClick={() => onOpenRoomTool(room.roomId)} />
+                                    <Native0Text height={row.height} text={`${pad(room.enterHour)}:${pad(room.enterMinute)}`} width={time.width} x={time.x} y={0} />
+                                    <Native0Text bold height={row.height} text={enterCaption} underline width={enter.width} x={enter.x} y={0} onClick={() => onEnterRoom(room.roomId)} />
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
-                {overflow && <Native0Scrollbar contentHeight={contentHeight} height={viewHeight} offset={clamped} viewHeight={viewHeight} x={clientWidth - 17} y={0} onOffset={setOffset} />}
-            </Native0Frame>
-        </NativeWindowShell>
+                    {overflow && <Native0Scrollbar contentHeight={contentHeight} height={viewHeight} offset={clamped} viewHeight={viewHeight} x={clientWidth - 17} y={0} onOffset={setOffset} />}
+                </Native0Frame>
+            </NativeWindowShell>
+        </NativeTextTree>
     );
 };

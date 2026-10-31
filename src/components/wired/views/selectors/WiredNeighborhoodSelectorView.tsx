@@ -22,6 +22,7 @@ import { sortWiredSourceOptions, useAvailableUserSources } from '../WiredSources
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { NumberInput } from '../../../../common/NumberInput';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 // Official source values (InputSourcesConf): 0 trigger, 11 clicked user, 100 picks, 201 signal.
 const SOURCE_TRIGGER = 0;
@@ -192,14 +193,16 @@ export const NeighborhoodFloor: FC<NeighborhoodFloorProps> = ({ radius, tiles, r
     }
 
     return (
-        <div
-            data-testid="neighborhood-floor"
-            style={ { position: 'relative', width, height, flexShrink: 0, cursor: 'pointer' } }
-            onContextMenu={ event => event.preventDefault() }
-            onMouseDown={ onMouseDown }
-            onMouseMove={ onMouseMove }>
-            { cells }
-        </div>
+        <NativeTextTree>
+            <div
+                data-testid="neighborhood-floor"
+                style={ { position: 'relative', width, height, flexShrink: 0, cursor: 'pointer' } }
+                onContextMenu={ event => event.preventDefault() }
+                onMouseDown={ onMouseDown }
+                onMouseMove={ onMouseMove }>
+                { cells }
+            </div>
+        </NativeTextTree>
     );
 };
 
@@ -298,68 +301,70 @@ export const WiredNeighborhoodSelectorView: FC<{}> = () =>
     const picking = !isUser && source === SOURCE_PICKED;
 
     return (
-        <WiredSelectorBaseView
-            hasSpecialInput={ true }
-            requiresFurni={ picking ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID : WiredFurniType.STUFF_SELECTION_OPTION_NONE }
-            save={ save }
-            hideDelay={ true }
-            cardStyle={ { width: bigMode ? '420px' : '360px' } }>
-            <div className="flex flex-col gap-2">
-                <Text bold>{ LocalizeText('wiredfurni.params.neighborhood_selection') }</Text>
+        <NativeTextTree>
+            <WiredSelectorBaseView
+                hasSpecialInput={ true }
+                requiresFurni={ picking ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID : WiredFurniType.STUFF_SELECTION_OPTION_NONE }
+                save={ save }
+                hideDelay={ true }
+                cardStyle={ { width: bigMode ? '420px' : '360px' } }>
+                <div className="flex flex-col gap-2">
+                    <Text bold>{ LocalizeText('wiredfurni.params.neighborhood_selection') }</Text>
 
-                <div className="flex items-center gap-1">
-                    { modeButton('add_tile', <FaPlus />, 'wiredfurni.params.neighborhood.add', 'Add tiles') }
-                    { modeButton('remove_tile', <FaMinus />, 'wiredfurni.params.neighborhood.remove', 'Remove tiles') }
-                    { modeButton('set_root_tile', <FaCrosshairs />, 'wiredfurni.params.neighborhood.reference', 'Set the root tile') }
-                    <Button
-                        className="ms-auto px-2 py-1"
-                        variant="secondary"
-                        disabled={ !fitsSmall }
-                        aria-label={ localizeWithFallback(bigMode ? 'wiredfurni.params.neighborhood.reduce' : 'wiredfurni.params.neighborhood.enlarge', bigMode ? 'Smaller view' : 'Bigger view') }
-                        onClick={ () => setBigMode(value => !value) }>
-                        { bigMode ? <FaCompress /> : <FaExpand /> }
-                    </Button>
+                    <div className="flex items-center gap-1">
+                        { modeButton('add_tile', <FaPlus />, 'wiredfurni.params.neighborhood.add', 'Add tiles') }
+                        { modeButton('remove_tile', <FaMinus />, 'wiredfurni.params.neighborhood.remove', 'Remove tiles') }
+                        { modeButton('set_root_tile', <FaCrosshairs />, 'wiredfurni.params.neighborhood.reference', 'Set the root tile') }
+                        <Button
+                            className="ms-auto px-2 py-1"
+                            variant="secondary"
+                            disabled={ !fitsSmall }
+                            aria-label={ localizeWithFallback(bigMode ? 'wiredfurni.params.neighborhood.reduce' : 'wiredfurni.params.neighborhood.enlarge', bigMode ? 'Smaller view' : 'Bigger view') }
+                            onClick={ () => setBigMode(value => !value) }>
+                            { bigMode ? <FaCompress /> : <FaExpand /> }
+                        </Button>
+                    </div>
+
+                    <div className="flex justify-center">
+                        <NeighborhoodFloor radius={ radius } tiles={ tiles } root={ root } onDraw={ draw } />
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2">
+                        <Text small>x:</Text>
+                        <NumberInput className="form-control form-control-sm" style={ { width: 56 } } min={ -NEIGHBORHOOD_MAX_ROOT } max={ NEIGHBORHOOD_MAX_ROOT } value={ root.x } onChange={ event => setRoot({ x: clampRoot(parseInt(event.target.value)), y: root.y }) } />
+                        <Text small>y:</Text>
+                        <NumberInput className="form-control form-control-sm" style={ { width: 56 } } min={ -NEIGHBORHOOD_MAX_ROOT } max={ NEIGHBORHOOD_MAX_ROOT } value={ root.y } onChange={ event => setRoot({ x: root.x, y: clampRoot(parseInt(event.target.value)) }) } />
+                    </div>
+
+
+                    <hr className="m-0 bg-dark" />
+
+                    <WiredFurniSelectionSourceRow
+                        title="wiredfurni.params.sources.merged.title.neighborhood"
+                        options={ options }
+                        value={ source }
+                        selectionKind={ isUser ? 'primary' : 'secondary' }
+                        selectionActive={ picking }
+                        selectionCount={ furniIds.length }
+                        selectionLimit={ trigger?.maximumItemSelectionCount ?? 20 }
+                        selectionEnabledValues={ [ SOURCE_PICKED ] }
+                        showSelectionToggle={ false }
+                        headerContent={
+                            <div className="octane-wired__give-var-targets">
+                                { SOURCE_GROUP_BUTTONS.map(button => (
+                                    <BaseButton
+                                        key={ button.key }
+                                        type="button"
+                                        className={ `octane-wired__give-var-target octane-wired__give-var-target--${ button.key } ${ isUser === button.isUser ? 'is-active' : '' }` }
+                                        onClick={ () => setIsUser(button.isUser) }>
+                                        <img src={ button.icon } alt={ button.key } />
+                                    </BaseButton>
+                                )) }
+                            </div>
+                        }
+                        onChange={ value => setSource(value) } />
                 </div>
-
-                <div className="flex justify-center">
-                    <NeighborhoodFloor radius={ radius } tiles={ tiles } root={ root } onDraw={ draw } />
-                </div>
-
-                <div className="flex items-center justify-end gap-2">
-                    <Text small>x:</Text>
-                    <NumberInput className="form-control form-control-sm" style={ { width: 56 } } min={ -NEIGHBORHOOD_MAX_ROOT } max={ NEIGHBORHOOD_MAX_ROOT } value={ root.x } onChange={ event => setRoot({ x: clampRoot(parseInt(event.target.value)), y: root.y }) } />
-                    <Text small>y:</Text>
-                    <NumberInput className="form-control form-control-sm" style={ { width: 56 } } min={ -NEIGHBORHOOD_MAX_ROOT } max={ NEIGHBORHOOD_MAX_ROOT } value={ root.y } onChange={ event => setRoot({ x: root.x, y: clampRoot(parseInt(event.target.value)) }) } />
-                </div>
-
-
-                <hr className="m-0 bg-dark" />
-
-                <WiredFurniSelectionSourceRow
-                    title="wiredfurni.params.sources.merged.title.neighborhood"
-                    options={ options }
-                    value={ source }
-                    selectionKind={ isUser ? 'primary' : 'secondary' }
-                    selectionActive={ picking }
-                    selectionCount={ furniIds.length }
-                    selectionLimit={ trigger?.maximumItemSelectionCount ?? 20 }
-                    selectionEnabledValues={ [ SOURCE_PICKED ] }
-                    showSelectionToggle={ false }
-                    headerContent={
-                        <div className="octane-wired__give-var-targets">
-                            { SOURCE_GROUP_BUTTONS.map(button => (
-                                <BaseButton
-                                    key={ button.key }
-                                    type="button"
-                                    className={ `octane-wired__give-var-target octane-wired__give-var-target--${ button.key } ${ isUser === button.isUser ? 'is-active' : '' }` }
-                                    onClick={ () => setIsUser(button.isUser) }>
-                                    <img src={ button.icon } alt={ button.key } />
-                                </BaseButton>
-                            )) }
-                        </div>
-                    }
-                    onChange={ value => setSource(value) } />
-            </div>
-        </WiredSelectorBaseView>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

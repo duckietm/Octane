@@ -11,6 +11,7 @@ import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { GetRoomSession, LocalizeText } from '../../../api';
 import { Button, Text } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useMessageEvent, useOctaneEvent, useWired } from '../../../hooks';
 
 export const FURNI_SOURCES = [
@@ -329,48 +330,50 @@ export const WiredSourcesSelector: FC<WiredSourcesSelectorProps> = (props) => {
     if (!showFurni && !showUsers) return null;
 
     return (
-        <div className="flex flex-col gap-2">
-            {showFurni && (
-                <>
-                    <Text bold>{LocalizeText(furniTitle)}</Text>
-                    <div className="flex items-center gap-1">
-                        <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={prevFurni}>
-                            <FaChevronLeft />
-                        </Button>
-                        <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
-                            <Text small className="text-center">
-                                {LocalizeText(orderedFurniSources[furniIndex].label)}
-                            </Text>
+        <NativeTextTree>
+            <div className="flex flex-col gap-2">
+                {showFurni && (
+                    <>
+                        <Text bold>{LocalizeText(furniTitle)}</Text>
+                        <div className="flex items-center gap-1">
+                            <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={prevFurni}>
+                                <FaChevronLeft />
+                            </Button>
+                            <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
+                                <Text small className="text-center">
+                                    {LocalizeText(orderedFurniSources[furniIndex].label)}
+                                </Text>
+                            </div>
+                            <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={nextFurni}>
+                                <FaChevronRight />
+                            </Button>
                         </div>
-                        <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={nextFurni}>
-                            <FaChevronRight />
-                        </Button>
-                    </div>
-                    {furniDetail && <div className="octane-wired__source-detail">{furniDetail}</div>}
-                </>
-            )}
+                        {furniDetail && <div className="octane-wired__source-detail">{furniDetail}</div>}
+                    </>
+                )}
 
-            {showFurni && showUsers && <hr className="m-0 bg-dark" />}
+                {showFurni && showUsers && <hr className="m-0 bg-dark" />}
 
-            {showUsers && (
-                <>
-                    <Text bold>{LocalizeText(usersTitle)}</Text>
-                    <div className="flex items-center gap-1">
-                        <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={prevUsers}>
-                            <FaChevronLeft />
-                        </Button>
-                        <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
-                            <Text small className="text-center">
-                                {LocalizeText(orderedUserSources[userIndex].label)}
-                            </Text>
+                {showUsers && (
+                    <>
+                        <Text bold>{LocalizeText(usersTitle)}</Text>
+                        <div className="flex items-center gap-1">
+                            <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={prevUsers}>
+                                <FaChevronLeft />
+                            </Button>
+                            <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
+                                <Text small className="text-center">
+                                    {LocalizeText(orderedUserSources[userIndex].label)}
+                                </Text>
+                            </div>
+                            <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={nextUsers}>
+                                <FaChevronRight />
+                            </Button>
                         </div>
-                        <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={nextUsers}>
-                            <FaChevronRight />
-                        </Button>
-                    </div>
-                    {userDetail && <div className="octane-wired__source-detail">{userDetail}</div>}
-                </>
-            )}
-        </div>
+                        {userDetail && <div className="octane-wired__source-detail">{userDetail}</div>}
+                    </>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

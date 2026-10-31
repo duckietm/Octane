@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
@@ -31,17 +32,19 @@ export const WiredExtraAnimationTimeView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
-            {/* Official: the setanimationtime2 slider section, with the header number input. */}
-            <WiredSliderSection
-                max={MAX_DURATION}
-                min={MIN_DURATION}
-                step={STEP_DURATION}
-                displayStep={STEP_DURATION}
-                title={localizeWithFallback('wiredfurni.params.setanimationtime2', 'Animation time (ms):')}
-                value={duration}
-                onChange={(value) => setDuration(normalizeDuration(value))}
-            />
-        </WiredExtraBaseView>
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
+                {/* Official: the setanimationtime2 slider section, with the header number input. */}
+                <WiredSliderSection
+                    max={MAX_DURATION}
+                    min={MIN_DURATION}
+                    step={STEP_DURATION}
+                    displayStep={STEP_DURATION}
+                    title={localizeWithFallback('wiredfurni.params.setanimationtime2', 'Animation time (ms):')}
+                    value={duration}
+                    onChange={(value) => setDuration(normalizeDuration(value))}
+                />
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

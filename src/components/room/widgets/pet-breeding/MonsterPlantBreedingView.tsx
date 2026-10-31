@@ -31,6 +31,7 @@ import { ContextMenuHeaderView } from "../context-menu/ContextMenuHeaderView";
 import { ContextMenuListItemView } from "../context-menu/ContextMenuListItemView";
 import { ContextMenuView } from "../context-menu/ContextMenuView";
 import '../../../../css/room/RoomWidgetsSweepAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 // Official RoomWidgetPetBreedingEvent states.
 const STATE_OPEN = 0;
@@ -216,275 +217,277 @@ export const MonsterPlantBreedingView: FC = () => {
     const ownUserId = GetSessionDataManager().userId;
 
     return (
-        <>
-            {bubbles &&
-                bubbles.targets.map((target) => (
-                    <ContextMenuView
-                        key={target.roomIndex}
-                        category={RoomObjectCategory.UNIT}
-                        collapsable={true}
-                        objectId={target.roomIndex}
-                        userType={RoomObjectType.PET}
-                        onClose={() => setBubbles(null)}
+        <NativeTextTree>
+            <>
+                {bubbles &&
+                    bubbles.targets.map((target) => (
+                        <ContextMenuView
+                            key={target.roomIndex}
+                            category={RoomObjectCategory.UNIT}
+                            collapsable={true}
+                            objectId={target.roomIndex}
+                            userType={RoomObjectType.PET}
+                            onClose={() => setBubbles(null)}
+                        >
+                            <ContextMenuHeaderView>
+                                {target.name}
+                            </ContextMenuHeaderView>
+                            <ContextMenuListItemView
+                                onClick={() => {
+                                    setConfirm({
+                                        requestIndex: bubbles.requestIndex,
+                                        targetIndex: target.roomIndex,
+                                        requested: false,
+                                    });
+                                    setBubbles(null);
+                                }}
+                            >
+                                {LocalizeText("infostand.button.breed")}
+                            </ContextMenuListItemView>
+                        </ContextMenuView>
+                    ))}
+
+                {confirm && confirmFirst && confirmSecond && (
+                    <OctaneCardView
+                        className="octane-monsterplant-breeding"
+                        theme="primary-slim"
                     >
-                        <ContextMenuHeaderView>
-                            {target.name}
-                        </ContextMenuHeaderView>
-                        <ContextMenuListItemView
-                            onClick={() => {
-                                setConfirm({
-                                    requestIndex: bubbles.requestIndex,
-                                    targetIndex: target.roomIndex,
-                                    requested: false,
-                                });
-                                setBubbles(null);
-                            }}
-                        >
-                            {LocalizeText("infostand.button.breed")}
-                        </ContextMenuListItemView>
-                    </ContextMenuView>
-                ))}
-
-            {confirm && confirmFirst && confirmSecond && (
-                <OctaneCardView
-                    className="octane-monsterplant-breeding"
-                    theme="primary-slim"
-                >
-                    <OctaneCardHeaderView
-                        headerText={LocalizeText(
-                            "breedpets.widget.title",
-                            ["name"],
-                            [confirmFirst.name],
-                        )}
-                        onCloseClick={cancelConfirm}
-                    />
-                    <OctaneCardContentView gap={2}>
-                        <Text small>
-                            {confirm.requested
-                                ? LocalizeText(
-                                      "breedpets.widget.request",
-                                      ["name"],
-                                      [confirmSecond.ownerName],
-                                  )
-                                : LocalizeText("breedpets.widget.text")}
-                        </Text>
-                        <div className="flex gap-2">
-                            {[confirmFirst, confirmSecond].map(
-                                (plant, index) => (
-                                    <div
-                                        key={plant.roomIndex}
-                                        className="octane-monsterplant-breeding__plant"
-                                    >
-                                        <div className="octane-monsterplant-breeding__preview">
-                                            <LayoutPetImageView
-                                                direction={2}
-                                                figure={plant.figure}
-                                            />
-                                        </div>
-                                        <Text bold truncate>
-                                            {LocalizeText(
-                                                `breedpets.widget.plant${index + 1}.name`,
-                                                ["name"],
-                                                [plant.name],
-                                            )}
-                                        </Text>
-                                        <Text small>
-                                            {LocalizeText(
-                                                `breedpets.widget.plant${index + 1}.raritylevel`,
-                                                ["level"],
-                                                [String(plant.rarityLevel)],
-                                            )}
-                                        </Text>
-                                        <Text small truncate variant="muted">
-                                            {LocalizeText(
-                                                `breedpets.widget.plant${index + 1}.description`,
-                                                ["name"],
-                                                [plant.ownerName],
-                                            )}
-                                        </Text>
-                                    </div>
-                                ),
+                        <OctaneCardHeaderView
+                            headerText={LocalizeText(
+                                "breedpets.widget.title",
+                                ["name"],
+                                [confirmFirst.name],
                             )}
-                        </div>
-                        <Text small className="octane-monsterplant-breeding__info">
-                            {LocalizeText("breedpets.widget.info")}
-                        </Text>
-                        <div className="flex justify-end gap-2">
-                            <Button variant="secondary" onClick={cancelConfirm}>
-                                {LocalizeText("breedpets.widget.cancel")}
-                            </Button>
-                            {confirm.requested ? (
-                                <Button
-                                    variant="success"
-                                    onClick={acceptConfirm}
-                                >
-                                    {LocalizeText("breedpets.widget.accept")}
-                                </Button>
-                            ) : (
-                                <Button variant="success" onClick={useConfirm}>
-                                    {LocalizeText("breedpets.widget.use")}
-                                </Button>
-                            )}
-                        </div>
-                    </OctaneCardContentView>
-                </OctaneCardView>
-            )}
-
-            {waiting && (
-                <OctaneCardView
-                    className="octane-monsterplant-breeding"
-                    theme="primary-slim"
-                >
-                    <OctaneCardHeaderView
-                        headerText={LocalizeText(
-                            "breedpets.confirmation.notification.title",
-                        )}
-                        onCloseClick={() => setWaiting(null)}
-                    />
-                    <OctaneCardContentView center gap={2}>
-                        <Text center>
-                            {LocalizeText(
-                                "breedpets.confirmation.notification.text",
-                            )}
-                        </Text>
-                        <Button
-                            variant="secondary"
-                            onClick={() => {
-                                send(
-                                    BreedPetsMessageComposer.STATE_CANCEL,
-                                    waiting,
-                                );
-                                setWaiting(null);
-                            }}
-                        >
-                            {LocalizeText("breedpets.widget.cancel")}
-                        </Button>
-                    </OctaneCardContentView>
-                </OctaneCardView>
-            )}
-
-            {cancelled && (
-                <OctaneCardView
-                    className="octane-monsterplant-breeding"
-                    theme="primary-slim"
-                >
-                    <OctaneCardHeaderView
-                        headerText={LocalizeText(
-                            "breedpets.cancel.notification.title",
-                        )}
-                        onCloseClick={() => setCancelled(false)}
-                    />
-                    <OctaneCardContentView center gap={2}>
-                        <Text center>
-                            {LocalizeText("breedpets.cancel.notification.text")}
-                        </Text>
-                        <Button variant="secondary" onClick={() => setCancelled(false)}>
-                            {localizeWithFallback("generic.ok", "OK")}
-                        </Button>
-                    </OctaneCardContentView>
-                </OctaneCardView>
-            )}
-
-            {result && (
-                <OctaneCardView
-                    className="octane-monsterplant-breeding"
-                    theme="primary-slim"
-                >
-                    <OctaneCardHeaderView
-                        headerText={LocalizeText(
-                            "breedpetsresult.widget.title",
-                        )}
-                        onCloseClick={() => setResult(null)}
-                    />
-                    <OctaneCardContentView gap={2}>
-                        {result.first.userId === ownUserId ||
-                        result.second.userId === ownUserId ? (
+                            onCloseClick={cancelConfirm}
+                        />
+                        <OctaneCardContentView gap={2}>
                             <Text small>
-                                {LocalizeText("breedpetsresult.widget.text")}
+                                {confirm.requested
+                                    ? LocalizeText(
+                                          "breedpets.widget.request",
+                                          ["name"],
+                                          [confirmSecond.ownerName],
+                                      )
+                                    : LocalizeText("breedpets.widget.text")}
                             </Text>
-                        ) : (
-                            <Text small>
-                                {LocalizeText(
-                                    "breedpetsresult.widget.text.sorry",
-                                    ["name"],
-                                    [
-                                        result.first.userName ||
-                                            result.second.userName ||
-                                            "",
-                                    ],
-                                )}
-                            </Text>
-                        )}
-                        <div className="flex gap-2">
-                            {[result.first, result.second].map(
-                                (seed, index) => {
-                                    // An empty slot: no seed for that side (-1 officially, 0 from the emulator).
-                                    if (!seed || seed.stuffId <= 0) return null;
-
-                                    const furni =
-                                        GetSessionDataManager().getFloorItemData(
-                                            seed.classId,
-                                        );
-
-                                    return (
+                            <div className="flex gap-2">
+                                {[confirmFirst, confirmSecond].map(
+                                    (plant, index) => (
                                         <div
-                                            key={index}
+                                            key={plant.roomIndex}
                                             className="octane-monsterplant-breeding__plant"
                                         >
                                             <div className="octane-monsterplant-breeding__preview">
-                                                <LayoutFurniImageView
+                                                <LayoutPetImageView
                                                     direction={2}
-                                                    productClassId={
-                                                        seed.classId
-                                                    }
-                                                    productType="s"
+                                                    figure={plant.figure}
                                                 />
                                             </div>
                                             <Text bold truncate>
                                                 {LocalizeText(
-                                                    `breedpetsresult.widget.seed${index + 1}.name`,
+                                                    `breedpets.widget.plant${index + 1}.name`,
                                                     ["name"],
-                                                    [furni?.name ?? ""],
+                                                    [plant.name],
                                                 )}
                                             </Text>
                                             <Text small>
                                                 {LocalizeText(
-                                                    `breedpetsresult.widget.seed${index + 1}.raritylevel`,
+                                                    `breedpets.widget.plant${index + 1}.raritylevel`,
                                                     ["level"],
-                                                    [String(seed.rarityLevel)],
+                                                    [String(plant.rarityLevel)],
                                                 )}
                                             </Text>
-                                            <Text
-                                                small
-                                                truncate
-                                                variant="muted"
-                                            >
+                                            <Text small truncate variant="muted">
                                                 {LocalizeText(
-                                                    `breedpetsresult.widget.seed${index + 1}.description`,
+                                                    `breedpets.widget.plant${index + 1}.description`,
                                                     ["name"],
-                                                    [seed.userName],
+                                                    [plant.ownerName],
                                                 )}
                                             </Text>
-                                            {seed.hasMutation && (
-                                                <Text small className="octane-monsterplant-breeding__info">
+                                        </div>
+                                    ),
+                                )}
+                            </div>
+                            <Text small className="octane-monsterplant-breeding__info">
+                                {LocalizeText("breedpets.widget.info")}
+                            </Text>
+                            <div className="flex justify-end gap-2">
+                                <Button variant="secondary" onClick={cancelConfirm}>
+                                    {LocalizeText("breedpets.widget.cancel")}
+                                </Button>
+                                {confirm.requested ? (
+                                    <Button
+                                        variant="success"
+                                        onClick={acceptConfirm}
+                                    >
+                                        {LocalizeText("breedpets.widget.accept")}
+                                    </Button>
+                                ) : (
+                                    <Button variant="success" onClick={useConfirm}>
+                                        {LocalizeText("breedpets.widget.use")}
+                                    </Button>
+                                )}
+                            </div>
+                        </OctaneCardContentView>
+                    </OctaneCardView>
+                )}
+
+                {waiting && (
+                    <OctaneCardView
+                        className="octane-monsterplant-breeding"
+                        theme="primary-slim"
+                    >
+                        <OctaneCardHeaderView
+                            headerText={LocalizeText(
+                                "breedpets.confirmation.notification.title",
+                            )}
+                            onCloseClick={() => setWaiting(null)}
+                        />
+                        <OctaneCardContentView center gap={2}>
+                            <Text center>
+                                {LocalizeText(
+                                    "breedpets.confirmation.notification.text",
+                                )}
+                            </Text>
+                            <Button
+                                variant="secondary"
+                                onClick={() => {
+                                    send(
+                                        BreedPetsMessageComposer.STATE_CANCEL,
+                                        waiting,
+                                    );
+                                    setWaiting(null);
+                                }}
+                            >
+                                {LocalizeText("breedpets.widget.cancel")}
+                            </Button>
+                        </OctaneCardContentView>
+                    </OctaneCardView>
+                )}
+
+                {cancelled && (
+                    <OctaneCardView
+                        className="octane-monsterplant-breeding"
+                        theme="primary-slim"
+                    >
+                        <OctaneCardHeaderView
+                            headerText={LocalizeText(
+                                "breedpets.cancel.notification.title",
+                            )}
+                            onCloseClick={() => setCancelled(false)}
+                        />
+                        <OctaneCardContentView center gap={2}>
+                            <Text center>
+                                {LocalizeText("breedpets.cancel.notification.text")}
+                            </Text>
+                            <Button variant="secondary" onClick={() => setCancelled(false)}>
+                                {localizeWithFallback("generic.ok", "OK")}
+                            </Button>
+                        </OctaneCardContentView>
+                    </OctaneCardView>
+                )}
+
+                {result && (
+                    <OctaneCardView
+                        className="octane-monsterplant-breeding"
+                        theme="primary-slim"
+                    >
+                        <OctaneCardHeaderView
+                            headerText={LocalizeText(
+                                "breedpetsresult.widget.title",
+                            )}
+                            onCloseClick={() => setResult(null)}
+                        />
+                        <OctaneCardContentView gap={2}>
+                            {result.first.userId === ownUserId ||
+                            result.second.userId === ownUserId ? (
+                                <Text small>
+                                    {LocalizeText("breedpetsresult.widget.text")}
+                                </Text>
+                            ) : (
+                                <Text small>
+                                    {LocalizeText(
+                                        "breedpetsresult.widget.text.sorry",
+                                        ["name"],
+                                        [
+                                            result.first.userName ||
+                                                result.second.userName ||
+                                                "",
+                                        ],
+                                    )}
+                                </Text>
+                            )}
+                            <div className="flex gap-2">
+                                {[result.first, result.second].map(
+                                    (seed, index) => {
+                                        // An empty slot: no seed for that side (-1 officially, 0 from the emulator).
+                                        if (!seed || seed.stuffId <= 0) return null;
+
+                                        const furni =
+                                            GetSessionDataManager().getFloorItemData(
+                                                seed.classId,
+                                            );
+
+                                        return (
+                                            <div
+                                                key={index}
+                                                className="octane-monsterplant-breeding__plant"
+                                            >
+                                                <div className="octane-monsterplant-breeding__preview">
+                                                    <LayoutFurniImageView
+                                                        direction={2}
+                                                        productClassId={
+                                                            seed.classId
+                                                        }
+                                                        productType="s"
+                                                    />
+                                                </div>
+                                                <Text bold truncate>
                                                     {LocalizeText(
-                                                        "breedpetsresult.widget.info.mutation",
+                                                        `breedpetsresult.widget.seed${index + 1}.name`,
+                                                        ["name"],
+                                                        [furni?.name ?? ""],
                                                     )}
                                                 </Text>
-                                            )}
-                                        </div>
-                                    );
-                                },
-                            )}
-                        </div>
-                        <div className="flex justify-end">
-                            <Button variant="secondary" onClick={() => setResult(null)}>
-                                {LocalizeText("breedpetsresult.widget.close")}
-                            </Button>
-                        </div>
-                    </OctaneCardContentView>
-                </OctaneCardView>
-            )}
-        </>
+                                                <Text small>
+                                                    {LocalizeText(
+                                                        `breedpetsresult.widget.seed${index + 1}.raritylevel`,
+                                                        ["level"],
+                                                        [String(seed.rarityLevel)],
+                                                    )}
+                                                </Text>
+                                                <Text
+                                                    small
+                                                    truncate
+                                                    variant="muted"
+                                                >
+                                                    {LocalizeText(
+                                                        `breedpetsresult.widget.seed${index + 1}.description`,
+                                                        ["name"],
+                                                        [seed.userName],
+                                                    )}
+                                                </Text>
+                                                {seed.hasMutation && (
+                                                    <Text small className="octane-monsterplant-breeding__info">
+                                                        {LocalizeText(
+                                                            "breedpetsresult.widget.info.mutation",
+                                                        )}
+                                                    </Text>
+                                                )}
+                                            </div>
+                                        );
+                                    },
+                                )}
+                            </div>
+                            <div className="flex justify-end">
+                                <Button variant="secondary" onClick={() => setResult(null)}>
+                                    {LocalizeText("breedpetsresult.widget.close")}
+                                </Button>
+                            </div>
+                        </OctaneCardContentView>
+                    </OctaneCardView>
+                )}
+            </>
+        </NativeTextTree>
     );
 };

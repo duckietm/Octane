@@ -5,6 +5,7 @@ import { ColorUtils, LocalizeText } from '../../../../api';
 import { Flex, LayoutGridItem, Text } from '../../../../common';
 import { useOctaneEvent } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const colorMap = {
     purple: 9452386,
@@ -36,31 +37,33 @@ export const MysteryBoxExtensionView: FC<{}> = (props) => {
     if (keyColor === '' && boxColor === '') return null;
 
     return (
-        <div className="px-[5px] py-[6px] [box-shadow:inset_0_5px_#22222799,inset_0_-4px_#12121599]  text-sm bg-[#1c1c20f2] rounded mysterybox-extension">
-            <div className="flex flex-col">
-                <Flex component={BaseButton} type="button" pointer alignItems="center" justifyContent="between" onClick={(event) => setIsOpen((value) => !value)}>
-                    <Text variant="white">{LocalizeText('mysterybox.tracker.title')}</Text>
-                    {isOpen && <FaChevronUp className="fa-icon" />}
-                    {!isOpen && <FaChevronDown className="fa-icon" />}
-                </Flex>
-                {isOpen && (
-                    <>
-                        <Text variant="white">{LocalizeText('mysterybox.tracker.description')}</Text>
-                        <div className="flex items-center gap-2 justify-center">
-                            <LayoutGridItem className="mysterybox-container">
-                                <div className="box-image shrink-0" style={{ backgroundColor: getRgbColor(boxColor) }}>
-                                    <div className="chain-overlay-image" />
-                                </div>
-                            </LayoutGridItem>
-                            <LayoutGridItem className="mysterybox-container">
-                                <div className="key-image shrink-0" style={{ backgroundColor: getRgbColor(keyColor) }}>
-                                    <div className="key-overlay-image" />
-                                </div>
-                            </LayoutGridItem>
-                        </div>
-                    </>
-                )}
+        <NativeTextTree>
+            <div className="px-[5px] py-[6px] [box-shadow:inset_0_5px_#22222799,inset_0_-4px_#12121599]  text-sm bg-[#1c1c20f2] rounded mysterybox-extension">
+                <div className="flex flex-col">
+                    <Flex component={BaseButton} type="button" pointer alignItems="center" justifyContent="between" onClick={(event) => setIsOpen((value) => !value)}>
+                        <Text variant="white">{LocalizeText('mysterybox.tracker.title')}</Text>
+                        {isOpen && <FaChevronUp className="fa-icon" />}
+                        {!isOpen && <FaChevronDown className="fa-icon" />}
+                    </Flex>
+                    {isOpen && (
+                        <>
+                            <Text variant="white">{LocalizeText('mysterybox.tracker.description')}</Text>
+                            <div className="flex items-center gap-2 justify-center">
+                                <LayoutGridItem className="mysterybox-container">
+                                    <div className="box-image shrink-0" style={{ backgroundColor: getRgbColor(boxColor) }}>
+                                        <div className="chain-overlay-image" />
+                                    </div>
+                                </LayoutGridItem>
+                                <LayoutGridItem className="mysterybox-container">
+                                    <div className="key-image shrink-0" style={{ backgroundColor: getRgbColor(keyColor) }}>
+                                        <div className="key-overlay-image" />
+                                    </div>
+                                </LayoutGridItem>
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

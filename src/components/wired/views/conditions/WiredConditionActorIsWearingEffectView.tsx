@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -38,25 +39,27 @@ export const WiredConditionActorIsWearingEffectView: FC<WiredConditionActorIsWea
     }, [trigger]);
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            {showEffect && (
-                <div className="flex flex-col gap-1">
-                    <Text bold>{localizeWithFallback('wiredfurni.params.effectid', LocalizeText('wiredfurni.tooltip.effectid'))}</Text>
-                    <OctaneInput
-                        max={INT32_MAX}
-                        min={INT32_MIN}
-                        title={LocalizeText('wiredfurni.tooltip.effectid')}
-                        type="number"
-                        value={effect}
-                        onChange={(event) => setEffect(clampEffectId(parseInt(event.target.value)))}
-                    />
-                </div>
-            )}
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                {showEffect && (
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{localizeWithFallback('wiredfurni.params.effectid', LocalizeText('wiredfurni.tooltip.effectid'))}</Text>
+                        <OctaneInput
+                            max={INT32_MAX}
+                            min={INT32_MIN}
+                            title={LocalizeText('wiredfurni.tooltip.effectid')}
+                            type="number"
+                            value={effect}
+                            onChange={(event) => setEffect(clampEffectId(parseInt(event.target.value)))}
+                        />
+                    </div>
+                )}
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

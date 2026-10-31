@@ -1266,7 +1266,12 @@ body {
         border: 1px solid #9a9a9a;
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
 
+        /* the filled part lies inside the track: it fills it without a border of its own (no double line) */
         &.track-0 {
+            height: 100%;
+            border: 0;
+            border-radius: inherit;
+            box-shadow: none;
             background: linear-gradient(180deg, #7f9fb1 0%, #64889e 100%);
         }
 
@@ -1275,10 +1280,10 @@ body {
         }
     }
 
+    /* Base UI centres the thumb on the track itself: no margin, or it sits below the line. */
     .octane-slider .thumb {
         width: 12px;
         height: 12px;
-        margin-top: 3px;
         border-radius: 50%;
         border: 1px solid #7f7f7f;
         background: linear-gradient(180deg, #fefefe 0%, #dadada 100%);
@@ -2317,5 +2322,36 @@ body {
 /* NativeLabel: a drawn raster folds its 2 px TextField gutter away so the text sits where the CSS put it; the browser-text
    fallback (glyphs the native fonts lack) keeps its box. */
 .octane-native-label > [data-native-text]:not([data-native-text="fallback"]) {
-    margin: -2px;
+    margin: -2px !important;
+}
+
+/* A window's descendant rules (`.window-button span { position: absolute; top: 22px; left: 60px; overflow: hidden }`) also reach
+   the raster's own wrapper inside a NativeLabel and push the canvas out of view. Its geometry is the label's, never the window's. */
+.octane-native-label > [data-native-text] {
+    position: relative !important;
+    inset: auto !important;
+    float: none !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    overflow: visible !important;
+    transform: none !important;
+    z-index: auto !important;
+    opacity: 1 !important;
+    line-height: normal !important;
+    text-indent: 0 !important;
+}
+
+.octane-native-label > [data-native-text] > canvas {
+    position: static !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    transform: none !important;
 }

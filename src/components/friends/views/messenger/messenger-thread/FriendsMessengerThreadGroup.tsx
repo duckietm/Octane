@@ -13,6 +13,7 @@ import {
 import MessengerCautionIcon from '../../../../../assets/images/friends/messenger_caution.png';
 import MessengerNotificationIcon from '../../../../../assets/images/friends/messenger_notification_icon.png';
 import { LayoutAvatarImageView, LayoutHabbiconImageView } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useFriends } from '../../../../../hooks';
 import { resolveAvatarFigure } from '../../friends-list/resolveAvatarFigure';
 import { MessengerMessageStatusView } from '../MessengerMessageStatusView';
@@ -42,28 +43,30 @@ export const FriendsMessengerThreadGroup: FC<{ thread: MessengerThread; group: M
 
     if (!group.userId)
         return (
-            <>
-                {group.chats.map((chat, index) =>
-                    chat.type === MessengerThreadChat.ROOM_INVITE ? (
-                        <div key={index} className="messenger-notification">
-                            <img src={MessengerNotificationIcon} alt="" />
-                            <span>
-                                {LocalizeText('messenger.invitation')} {chat.message}
-                            </span>
-                        </div>
-                    ) : chat.type === MessengerThreadChat.SECURITY_NOTIFICATION ? (
-                        // AIR msg_notification: warnings (moderation, refused messages, stored messages) with the caution icon.
-                        <div key={index} className="messenger-notification is-warning">
-                            <img src={MessengerCautionIcon} alt="" />
-                            <span>{chat.message}</span>
-                        </div>
-                    ) : chat.type === MessengerThreadChat.STATUS_NOTIFICATION ? (
-                        <div key={index} className="messenger-status-notification">
-                            {chat.message}
-                        </div>
-                    ) : null
-                )}
-            </>
+            <NativeTextTree>
+                <>
+                    {group.chats.map((chat, index) =>
+                        chat.type === MessengerThreadChat.ROOM_INVITE ? (
+                            <div key={index} className="messenger-notification">
+                                <img src={MessengerNotificationIcon} alt="" />
+                                <span>
+                                    {LocalizeText('messenger.invitation')} {chat.message}
+                                </span>
+                            </div>
+                        ) : chat.type === MessengerThreadChat.SECURITY_NOTIFICATION ? (
+                            // AIR msg_notification: warnings (moderation, refused messages, stored messages) with the caution icon.
+                            <div key={index} className="messenger-notification is-warning">
+                                <img src={MessengerCautionIcon} alt="" />
+                                <span>{chat.message}</span>
+                            </div>
+                        ) : chat.type === MessengerThreadChat.STATUS_NOTIFICATION ? (
+                            <div key={index} className="messenger-status-notification">
+                                {chat.message}
+                            </div>
+                        ) : null
+                    )}
+                </>
+            </NativeTextTree>
         );
 
     const friend = getFriend?.(thread.participant.id);
@@ -81,46 +84,48 @@ export const FriendsMessengerThreadGroup: FC<{ thread: MessengerThread; group: M
     };
 
     return (
-        <div className={`messenger-message-row${own ? ' own' : ''}`}>
-            {own && (
-                <div className="message-avatar">
-                    <LayoutAvatarImageView direction={2} figure={figure} />
-                </div>
-            )}
-            <div className="messenger-message-body">
-                <div className="messenger-message-name">{name}:</div>
-                <div className="messenger-message-bubble">
-                    {group.chats.map((chat, index) =>
-                        chat.failed ? (
-                            // Refused by the server: never reached the friend.
-                            <div key={index} className="messenger-message-failed" title={chat.failureText}>
-                                <span className="messenger-message-failed-mark" aria-hidden="true">
-                                    !
-                                </span>
-                                {renderMessage(chat)}
-                            </div>
-                        ) : !chat.showTranslation ? (
-                            <div key={index}>{renderMessage(chat)}</div>
-                        ) : (
-                            <div key={index} className="messenger-translation-block">
-                                <div>
-                                    <b>original:</b> {chat.originalMessage || chat.message}
+        <NativeTextTree>
+            <div className={`messenger-message-row${own ? ' own' : ''}`}>
+                {own && (
+                    <div className="message-avatar">
+                        <LayoutAvatarImageView direction={2} figure={figure} />
+                    </div>
+                )}
+                <div className="messenger-message-body">
+                    <div className="messenger-message-name">{name}:</div>
+                    <div className="messenger-message-bubble">
+                        {group.chats.map((chat, index) =>
+                            chat.failed ? (
+                                // Refused by the server: never reached the friend.
+                                <div key={index} className="messenger-message-failed" title={chat.failureText}>
+                                    <span className="messenger-message-failed-mark" aria-hidden="true">
+                                        !
+                                    </span>
+                                    {renderMessage(chat)}
                                 </div>
-                                <div>
-                                    <b>translate:</b> {chat.translatedMessage || chat.message}
+                            ) : !chat.showTranslation ? (
+                                <div key={index}>{renderMessage(chat)}</div>
+                            ) : (
+                                <div key={index} className="messenger-translation-block">
+                                    <div>
+                                        <b>original:</b> {chat.originalMessage || chat.message}
+                                    </div>
+                                    <div>
+                                        <b>translate:</b> {chat.translatedMessage || chat.message}
+                                    </div>
                                 </div>
-                            </div>
-                        )
-                    )}
+                            )
+                        )}
+                    </div>
+                    {/* AIR MainView: a combined block shows the time of its newest message. */}
+                    <MessengerMessageTime date={group.chats[group.chats.length - 1].date} />
                 </div>
-                {/* AIR MainView: a combined block shows the time of its newest message. */}
-                <MessengerMessageTime date={group.chats[group.chats.length - 1].date} />
+                {!own && (
+                    <div className="message-avatar">
+                        <LayoutAvatarImageView direction={4} figure={figure} />
+                    </div>
+                )}
             </div>
-            {!own && (
-                <div className="message-avatar">
-                    <LayoutAvatarImageView direction={4} figure={figure} />
-                </div>
-            )}
-        </div>
+        </NativeTextTree>
     );
 };

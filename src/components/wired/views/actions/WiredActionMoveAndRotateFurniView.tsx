@@ -8,6 +8,7 @@ import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const rotationOptions: number[] = [0, 1, 2, 3, 4, 5, 6];
 
@@ -46,34 +47,36 @@ export const WiredActionMoveAndRotateFurniView: FC<{}> = (props) => {
     const requiresFurni = WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT;
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={requiresFurni}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.startdir')}</Text>
-                <WiredIconRadioGroup name="movement" options={START_DIRECTION_OPTIONS} value={movement} onChange={setMovement} />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.turn')}</Text>
-                {rotationOptions.map((option) => {
-                    return (
-                        <div key={option} className="flex items-center gap-1">
-                            <Radio checked={rotation === option} id={`rotation${option}`} name="rotation" onCheckedChange={() => setRotation(option)} />
-                            <Text>{LocalizeText(`wiredfurni.params.turn.${option}`)}</Text>
-                        </div>
-                    );
-                })}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.user_collide')}</Text>
-                <label className="flex items-center gap-1 cursor-pointer">
-                    <Checkbox checked={blockOnUserCollision} onCheckedChange={(nextChecked) => setBlockOnUserCollision(nextChecked)} />
-                    <Text>{LocalizeText('wiredfurni.params.user_collide.0')}</Text>
-                </label>
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={requiresFurni}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.startdir')}</Text>
+                    <WiredIconRadioGroup name="movement" options={START_DIRECTION_OPTIONS} value={movement} onChange={setMovement} />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.turn')}</Text>
+                    {rotationOptions.map((option) => {
+                        return (
+                            <div key={option} className="flex items-center gap-1">
+                                <Radio checked={rotation === option} id={`rotation${option}`} name="rotation" onCheckedChange={() => setRotation(option)} />
+                                <Text>{LocalizeText(`wiredfurni.params.turn.${option}`)}</Text>
+                            </div>
+                        );
+                    })}
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.user_collide')}</Text>
+                    <label className="flex items-center gap-1 cursor-pointer">
+                        <Checkbox checked={blockOnUserCollision} onCheckedChange={(nextChecked) => setBlockOnUserCollision(nextChecked)} />
+                        <Text>{LocalizeText('wiredfurni.params.user_collide.0')}</Text>
+                    </label>
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

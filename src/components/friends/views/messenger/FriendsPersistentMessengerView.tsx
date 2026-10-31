@@ -12,6 +12,7 @@ import { canFollowMessengerConversation, filterMessengerConversations, resolveCo
 import { BaseButton } from '../../../../common/BaseButton';
 import { TabBar, TabBarTab } from '../../../../common/TabBar';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface PersistentMessengerApi
 {
@@ -109,62 +110,64 @@ export const FriendsPersistentMessengerView: FC<FriendsPersistentMessengerViewPr
     };
 
     return (
-        <OctaneCardView className="messenger-card messenger-persistent" theme="primary-slim" uniqueKey="persistent-messenger" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={8} isResizable={false}>
-            <OctaneCardHeaderView headerText={LocalizeText('messenger.window.title', [ 'OPEN_CHAT_COUNT' ], [ (conversations.length + (legacyStaffThread ? 1 : 0)).toString() ])} onCloseClick={onClose} />
-            <OctaneCardContentView className="p-0" gap={0} overflow="hidden">
-                <div className="messenger-card-body">
-                    <TabBar className="messenger-avatar-bar" value={staffActive ? 'staff' : active ? `conversation-${ active.id }` : null}>
-                        {legacyStaffThread && <TabBarTab value="staff" className={`messenger-avatar-tab ${ staffActive ? 'active' : '' } ${ legacyStaffThread.unread ? 'unread' : '' }`} onClick={() => { setStaffActive(true); setMode('conversation'); }} aria-label={legacyStaffThread.participant.name}><LayoutAvatarImageView figure={STAFF_CHAT_FIGURE} headOnly compactHead compactHeadSize={36} compactHeadPadding={0} direction={3} /></TabBarTab>}
-                        {visibleConversations.slice(0, 7).map(conversation => (
-                            <TabBarTab key={conversation.id} value={`conversation-${ conversation.id }`} className={`messenger-avatar-tab ${ active?.id === conversation.id ? 'active' : '' } ${ conversation.unreadCount ? 'unread' : '' }`} onClick={() => selectConversation(conversation)} aria-label={conversation.name}>
-                                {avatar(conversation, 36, 0)}
-                                {conversation.unreadCount > 0 && <span className="messenger-unread-badge">{conversation.unreadCount}</span>}
-                            </TabBarTab>
-                        ))}
-                        <BaseButton className="messenger-all-button" onClick={() => { setStaffActive(false); setMode('inbox'); }}>{LocalizeText('generic.all')} {conversations.length + (legacyStaffThread ? 1 : 0)}</BaseButton>
-                    </TabBar>
+        <NativeTextTree>
+            <OctaneCardView className="messenger-card messenger-persistent" theme="primary-slim" uniqueKey="persistent-messenger" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={8} isResizable={false}>
+                <OctaneCardHeaderView headerText={LocalizeText('messenger.window.title', [ 'OPEN_CHAT_COUNT' ], [ (conversations.length + (legacyStaffThread ? 1 : 0)).toString() ])} onCloseClick={onClose} />
+                <OctaneCardContentView className="p-0" gap={0} overflow="hidden">
+                    <div className="messenger-card-body">
+                        <TabBar className="messenger-avatar-bar" value={staffActive ? 'staff' : active ? `conversation-${ active.id }` : null}>
+                            {legacyStaffThread && <TabBarTab value="staff" className={`messenger-avatar-tab ${ staffActive ? 'active' : '' } ${ legacyStaffThread.unread ? 'unread' : '' }`} onClick={() => { setStaffActive(true); setMode('conversation'); }} aria-label={legacyStaffThread.participant.name}><LayoutAvatarImageView figure={STAFF_CHAT_FIGURE} headOnly compactHead compactHeadSize={36} compactHeadPadding={0} direction={3} /></TabBarTab>}
+                            {visibleConversations.slice(0, 7).map(conversation => (
+                                <TabBarTab key={conversation.id} value={`conversation-${ conversation.id }`} className={`messenger-avatar-tab ${ active?.id === conversation.id ? 'active' : '' } ${ conversation.unreadCount ? 'unread' : '' }`} onClick={() => selectConversation(conversation)} aria-label={conversation.name}>
+                                    {avatar(conversation, 36, 0)}
+                                    {conversation.unreadCount > 0 && <span className="messenger-unread-badge">{conversation.unreadCount}</span>}
+                                </TabBarTab>
+                            ))}
+                            <BaseButton className="messenger-all-button" onClick={() => { setStaffActive(false); setMode('inbox'); }}>{LocalizeText('generic.all')} {conversations.length + (legacyStaffThread ? 1 : 0)}</BaseButton>
+                        </TabBar>
 
-                    {mode === 'inbox' && (
-                        <div className="messenger-inbox" data-testid="messenger-inbox">
-                            <label className="messenger-search"><FaSearch /><input value={query} onChange={event => setQuery(event.target.value)} placeholder={LocalizeText('generic.search')} /></label>
-                            <div className="messenger-inbox-list">
-                                {filtered.map(conversation => <BaseButton key={conversation.id} className="messenger-inbox-row" onClick={() => selectConversation(conversation)}><span className="messenger-inbox-avatar">{avatar(conversation, 24) || <FaUsers />}</span><span><b>{conversation.name}</b><small>{conversation.unreadCount ? `${ conversation.unreadCount } ${ LocalizeText('notifications.messages') }` : LocalizeText('messenger.window.input.default', [ 'FRIEND_NAME' ], [ conversation.name ])}</small></span></BaseButton>)}
-                            </div>
-                        </div>
-                    )}
-
-                    {mode === 'conversation' && staffActive && legacyStaffThread && (
-                        <div className="messenger-conversation" data-testid="messenger-staff-conversation">
-                            <div className="messenger-thread-header"><span className="messenger-thread-name">{legacyStaffThread.participant.name}</span><div className="messenger-actions"><Hint content={LocalizeText('generic.close')}><BaseButton className="messenger-btn close-conversation" onClick={onCloseStaff} aria-label={LocalizeText('generic.close')}><FaTimes /></BaseButton></Hint></div></div>
-                            <div className="chat-messages"><FriendsMessengerThreadView thread={legacyStaffThread} /></div>
-                            <div className="messenger-input-row"><input maxLength={255} value={text} onChange={event => setText(event.target.value)} onKeyDown={keyDown} placeholder={LocalizeText('messenger.window.input.default', [ 'FRIEND_NAME' ], [ legacyStaffThread.participant.name ])} /><BaseButton className="messenger-btn send" onClick={send}>{LocalizeText('widgets.chatinput.say')}</BaseButton></div>
-                        </div>
-                    )}
-
-                    {mode === 'conversation' && !staffActive && active && (
-                        <div className="messenger-conversation" data-testid="messenger-conversation">
-                            <div className="messenger-thread-header">
-                                <BaseButton className="messenger-mobile-back" onClick={() => setMode('inbox')}><FaArrowLeft /></BaseButton>
-                                <span className="messenger-thread-name">{active.name}</span>
-                                <div className="messenger-actions">
-                                    {canFollowMessengerConversation(active) && <BaseButton className="messenger-btn" onClick={() => SendMessageComposer(new FollowFriendMessageComposer(active.participantId))}>{LocalizeText('friendlist.follow')}</BaseButton>}
-                                    {active.participantId > 0 && <BaseButton className="messenger-btn" onClick={() => GetUserProfile(active.participantId)}>{LocalizeText('extendedprofile.caption')}</BaseButton>}
-                                    {active.participantId > 0 && <BaseButton className="messenger-btn danger" onClick={() => report(ReportType.IM, { reportedUserId: active.participantId })}><FaExclamationTriangle /></BaseButton>}
-                                    <Hint content={LocalizeText('generic.close')}><BaseButton className="messenger-btn close-conversation" onClick={closeConversation} aria-label={LocalizeText('generic.close')}><FaTimes /></BaseButton></Hint>
+                        {mode === 'inbox' && (
+                            <div className="messenger-inbox" data-testid="messenger-inbox">
+                                <label className="messenger-search"><FaSearch /><input value={query} onChange={event => setQuery(event.target.value)} placeholder={LocalizeText('generic.search')} /></label>
+                                <div className="messenger-inbox-list">
+                                    {filtered.map(conversation => <BaseButton key={conversation.id} className="messenger-inbox-row" onClick={() => selectConversation(conversation)}><span className="messenger-inbox-avatar">{avatar(conversation, 24) || <FaUsers />}</span><span><b>{conversation.name}</b><small>{conversation.unreadCount ? `${ conversation.unreadCount } ${ LocalizeText('notifications.messages') }` : LocalizeText('messenger.window.input.default', [ 'FRIEND_NAME' ], [ conversation.name ])}</small></span></BaseButton>)}
                                 </div>
                             </div>
-                            <div className="chat-messages persistent-message-list" onScroll={scroll}>
-                                {messenger.state.historyByConversation[active.id]?.loading && <div className="messenger-history-state">{LocalizeText('generic.loading')}</div>}
-                                {messages.map((message: MessengerMessage) => {
-                                    const own = message.senderId === GetSessionDataManager().userId;
-                                    return <div key={message.id || message.clientId} className={`persistent-message ${ own ? 'own' : 'incoming' }`}><div className="persistent-message-bubble"><span>{message.message}</span><Hint content="Copy"><BaseButton aria-label="Copy" onClick={() => void CopyToClipboard(message.message)}><FaCopy /></BaseButton></Hint></div><small className="persistent-message-meta"><span>{new Date(message.createdAt * 1000).toLocaleTimeString()}</span>{own && message.status !== 'failed' && message.status !== 'sending' && <MessengerMessageStatusView isRead={message.status === 'read'} />}{own && message.status === 'failed' && <span className="messenger-message-failed">!</span>}{own && message.status === 'sending' && <span className="messenger-message-sending">…</span>}</small>{message.status === 'failed' && message.clientId && <BaseButton className="messenger-retry" onClick={() => messenger.actions.retryMessage(message.clientId)}>Retry</BaseButton>}</div>;
-                                })}
+                        )}
+
+                        {mode === 'conversation' && staffActive && legacyStaffThread && (
+                            <div className="messenger-conversation" data-testid="messenger-staff-conversation">
+                                <div className="messenger-thread-header"><span className="messenger-thread-name">{legacyStaffThread.participant.name}</span><div className="messenger-actions"><Hint content={LocalizeText('generic.close')}><BaseButton className="messenger-btn close-conversation" onClick={onCloseStaff} aria-label={LocalizeText('generic.close')}><FaTimes /></BaseButton></Hint></div></div>
+                                <div className="chat-messages"><FriendsMessengerThreadView thread={legacyStaffThread} /></div>
+                                <div className="messenger-input-row"><input maxLength={255} value={text} onChange={event => setText(event.target.value)} onKeyDown={keyDown} placeholder={LocalizeText('messenger.window.input.default', [ 'FRIEND_NAME' ], [ legacyStaffThread.participant.name ])} /><BaseButton className="messenger-btn send" onClick={send}>{LocalizeText('widgets.chatinput.say')}</BaseButton></div>
                             </div>
-                            <div className="messenger-input-row"><input maxLength={255} value={text} onChange={event => setText(event.target.value)} onKeyDown={keyDown} placeholder={LocalizeText('messenger.window.input.default', [ 'FRIEND_NAME' ], [ active.name ])} /><BaseButton className="messenger-btn send" onClick={send}>{LocalizeText('widgets.chatinput.say')}</BaseButton></div>
-                        </div>
-                    )}
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                        )}
+
+                        {mode === 'conversation' && !staffActive && active && (
+                            <div className="messenger-conversation" data-testid="messenger-conversation">
+                                <div className="messenger-thread-header">
+                                    <BaseButton className="messenger-mobile-back" onClick={() => setMode('inbox')}><FaArrowLeft /></BaseButton>
+                                    <span className="messenger-thread-name">{active.name}</span>
+                                    <div className="messenger-actions">
+                                        {canFollowMessengerConversation(active) && <BaseButton className="messenger-btn" onClick={() => SendMessageComposer(new FollowFriendMessageComposer(active.participantId))}>{LocalizeText('friendlist.follow')}</BaseButton>}
+                                        {active.participantId > 0 && <BaseButton className="messenger-btn" onClick={() => GetUserProfile(active.participantId)}>{LocalizeText('extendedprofile.caption')}</BaseButton>}
+                                        {active.participantId > 0 && <BaseButton className="messenger-btn danger" onClick={() => report(ReportType.IM, { reportedUserId: active.participantId })}><FaExclamationTriangle /></BaseButton>}
+                                        <Hint content={LocalizeText('generic.close')}><BaseButton className="messenger-btn close-conversation" onClick={closeConversation} aria-label={LocalizeText('generic.close')}><FaTimes /></BaseButton></Hint>
+                                    </div>
+                                </div>
+                                <div className="chat-messages persistent-message-list" onScroll={scroll}>
+                                    {messenger.state.historyByConversation[active.id]?.loading && <div className="messenger-history-state">{LocalizeText('generic.loading')}</div>}
+                                    {messages.map((message: MessengerMessage) => {
+                                        const own = message.senderId === GetSessionDataManager().userId;
+                                        return <div key={message.id || message.clientId} className={`persistent-message ${ own ? 'own' : 'incoming' }`}><div className="persistent-message-bubble"><span>{message.message}</span><Hint content="Copy"><BaseButton aria-label="Copy" onClick={() => void CopyToClipboard(message.message)}><FaCopy /></BaseButton></Hint></div><small className="persistent-message-meta"><span>{new Date(message.createdAt * 1000).toLocaleTimeString()}</span>{own && message.status !== 'failed' && message.status !== 'sending' && <MessengerMessageStatusView isRead={message.status === 'read'} />}{own && message.status === 'failed' && <span className="messenger-message-failed">!</span>}{own && message.status === 'sending' && <span className="messenger-message-sending">…</span>}</small>{message.status === 'failed' && message.clientId && <BaseButton className="messenger-retry" onClick={() => messenger.actions.retryMessage(message.clientId)}>Retry</BaseButton>}</div>;
+                                    })}
+                                </div>
+                                <div className="messenger-input-row"><input maxLength={255} value={text} onChange={event => setText(event.target.value)} onKeyDown={keyDown} placeholder={LocalizeText('messenger.window.input.default', [ 'FRIEND_NAME' ], [ active.name ])} /><BaseButton className="messenger-btn send" onClick={send}>{LocalizeText('widgets.chatinput.say')}</BaseButton></div>
+                            </div>
+                        )}
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

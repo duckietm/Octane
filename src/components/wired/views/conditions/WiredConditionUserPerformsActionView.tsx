@@ -6,6 +6,7 @@ import { WiredUserActionSection } from '../WiredUserActionSection';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { WiredConditionQuantifierSection } from './WiredConditionQuantifierSection';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 
 const USER_ACTION_SOURCES: WiredSourceOption[] = [
@@ -35,27 +36,29 @@ export const WiredConditionUserPerformsActionView: FC = () => {
     }, [trigger]);
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footerCollapsible={false}
-            showQuantifier={false}
-            footer={
-                <div className="flex flex-col gap-2">
-                    <BaseButton className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
-                        {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
-                    </BaseButton>
-                    {showAdvanced && (
-                        <>
-                            <WiredConditionQuantifierSection />
-                            <WiredSourcesSelector showUsers={true} userSource={userSource} userSources={USER_ACTION_SOURCES} onChangeUsers={setUserSource} />
-                        </>
-                    )}
-                </div>
-            }
-        >
-            <WiredUserActionSection choice={choice} onChange={setChoice} />
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footerCollapsible={false}
+                showQuantifier={false}
+                footer={
+                    <div className="flex flex-col gap-2">
+                        <BaseButton className="octane-wired__advanced-toggle" type="button" onClick={() => setShowAdvanced((value) => !value)}>
+                            {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
+                        </BaseButton>
+                        {showAdvanced && (
+                            <>
+                                <WiredConditionQuantifierSection />
+                                <WiredSourcesSelector showUsers={true} userSource={userSource} userSources={USER_ACTION_SOURCES} onChangeUsers={setUserSource} />
+                            </>
+                        )}
+                    </div>
+                }
+            >
+                <WiredUserActionSection choice={choice} onChange={setChoice} />
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

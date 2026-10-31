@@ -13,6 +13,7 @@ import {
 import vipIconMedium from '../../../../../assets/images/catalog/air/vip-icon-medium.png';
 import { Button, LayoutCurrencyIcon, LayoutLoadingSpinnerView } from '../../../../../common';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { CatalogEvent, CatalogInitGiftEvent, CatalogPurchasedEvent, CatalogPurchaseFailureEvent } from '../../../../../events';
 import {
     useCatalogActions,
@@ -259,32 +260,36 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
     const renderPrice = (offer: ClubOfferData) => {
         if (!isVipPage) {
             return (
-                <span className="octane-club-offer-prices is-compact-text">
-                    {offer.priceCredits > 0 && LocalizeText('catalog.club.price', ['price'], [offer.priceCredits.toString()])}
-                    {offer.priceCredits > 0 && offer.priceActivityPoints > 0 && ' + '}
-                    {offer.priceActivityPoints > 0 && `${offer.priceActivityPoints} ${getActivityPointName(offer.priceActivityPointsType)}`}
-                </span>
+                <NativeTextTree>
+                    <span className="octane-club-offer-prices is-compact-text">
+                        {offer.priceCredits > 0 && LocalizeText('catalog.club.price', ['price'], [offer.priceCredits.toString()])}
+                        {offer.priceCredits > 0 && offer.priceActivityPoints > 0 && ' + '}
+                        {offer.priceActivityPoints > 0 && `${offer.priceActivityPoints} ${getActivityPointName(offer.priceActivityPointsType)}`}
+                    </span>
+                </NativeTextTree>
             );
         }
 
         return (
-            <span className="octane-club-offer-prices">
-                {offer.priceCredits > 0 && (
-                    <span className="octane-club-offer-price" data-currency-type="-1">
-                        <span>{offer.priceCredits}</span>
-                        <LayoutCurrencyIcon type={-1} />
-                    </span>
-                )}
-                {offer.priceActivityPoints > 0 && (
-                    <>
-                        {offer.priceCredits > 0 && <span className="octane-club-price-separator">+</span>}
-                        <span className="octane-club-offer-price" data-currency-type={offer.priceActivityPointsType}>
-                            <span>{offer.priceActivityPoints}</span>
-                            <LayoutCurrencyIcon type={offer.priceActivityPointsType} />
+            <NativeTextTree>
+                <span className="octane-club-offer-prices">
+                    {offer.priceCredits > 0 && (
+                        <span className="octane-club-offer-price" data-currency-type="-1">
+                            <span>{offer.priceCredits}</span>
+                            <LayoutCurrencyIcon type={-1} />
                         </span>
-                    </>
-                )}
-            </span>
+                    )}
+                    {offer.priceActivityPoints > 0 && (
+                        <>
+                            {offer.priceCredits > 0 && <span className="octane-club-price-separator">+</span>}
+                            <span className="octane-club-offer-price" data-currency-type={offer.priceActivityPointsType}>
+                                <span>{offer.priceActivityPoints}</span>
+                                <LayoutCurrencyIcon type={offer.priceActivityPointsType} />
+                            </span>
+                        </>
+                    )}
+                </span>
+            </NativeTextTree>
         );
     };
 
@@ -343,84 +348,86 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
         membership.tier === 'vip' ? LocalizeText('catalog.vip.extend.info', ['days'], [membership.totalDays.toString()]) : LocalizeText('catalog.vip.buy.info');
 
     return (
-        <div className={`octane-club-purchase-layout ${isVipPage ? 'is-vip-page' : 'is-club-page'}`}>
-            {isVipPage ? (
-                <>
-                    <div className="octane-club-vip-intro">
-                        {teaserImage ? <img alt="" className="octane-club-teaser" src={teaserImage} /> : <span className="octane-club-teaser" />}
-                        <div className="octane-club-vip-copy">
-                            <strong>{LocalizeText(vipTitleKey)}</strong>
-                            <span>{vipInfo}</span>
+        <NativeTextTree>
+            <div className={`octane-club-purchase-layout ${isVipPage ? 'is-vip-page' : 'is-club-page'}`}>
+                {isVipPage ? (
+                    <>
+                        <div className="octane-club-vip-intro">
+                            {teaserImage ? <img alt="" className="octane-club-teaser" src={teaserImage} /> : <span className="octane-club-teaser" />}
+                            <div className="octane-club-vip-copy">
+                                <strong>{LocalizeText(vipTitleKey)}</strong>
+                                <span>{vipInfo}</span>
+                            </div>
                         </div>
-                    </div>
-                    <div className="octane-club-vip-offers">{offerGroups.vip.map(renderOffer)}</div>
-                    {/* AIR layout_loyalty_vip_buy has vip_link (VipBuyCatalogWidget.initLinks -> showVipBenefits) where layout_vip_buy has the HC Center link. */}
-                    {layoutCode === 'loyalty_vip_buy' ? (
-                        <BaseButton className="octane-club-vip-benefits-link" onClick={() => ShowVipBenefits()}>
-                            {LocalizeText('catalog.vip.buy.link')}
+                        <div className="octane-club-vip-offers">{offerGroups.vip.map(renderOffer)}</div>
+                        {/* AIR layout_loyalty_vip_buy has vip_link (VipBuyCatalogWidget.initLinks -> showVipBenefits) where layout_vip_buy has the HC Center link. */}
+                        {layoutCode === 'loyalty_vip_buy' ? (
+                            <BaseButton className="octane-club-vip-benefits-link" onClick={() => ShowVipBenefits()}>
+                                {LocalizeText('catalog.vip.buy.link')}
+                            </BaseButton>
+                        ) : (
+                            <div
+                                className="octane-club-center-link"
+                                dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('catalog.vip.buy.hccenter')) }}
+                                role="link"
+                                tabIndex={0}
+                                onClick={(event) => {
+                                    event.preventDefault();
+                                    CreateLinkEvent('habboUI/open/hccenter');
+                                }}
+                                onKeyDown={(event) => {
+                                    if (event.key !== 'Enter' && event.key !== ' ') return;
+
+                                    event.preventDefault();
+                                    CreateLinkEvent('habboUI/open/hccenter');
+                                }}
+                            />
+                        )}
+                    </>
+                ) : (
+                    <>
+                        <header className="octane-club-membership-header">
+                            <strong>{LocalizeText(membershipHeaderKey)}</strong>
+                        </header>
+                        <p className="octane-club-membership-info">{LocalizeText(membershipInfoKey)}</p>
+                        <div className="octane-club-emblem" aria-hidden="true">
+                            <span className="octane-club-vip-emblem" />
+                        </div>
+                        <div className="octane-club-columns">
+                            <section className="octane-club-hc-column">
+                                {offerGroups.hc.map(renderOffer)}
+                                {membership.tier === 'vip' && (
+                                    <div className="octane-club-info-card">
+                                        <strong>{LocalizeText('catalog.club.info.header')}</strong>
+                                        <span>{LocalizeText('catalog.club.info.content')}</span>
+                                    </div>
+                                )}
+                            </section>
+                            <section className="octane-club-vip-column">{offerGroups.vip.map(renderOffer)}</section>
+                        </div>
+                        {membership.active && (
+                            <div className="octane-club-remaining">{LocalizeText(remainingKey, ['days'], [membership.totalDays.toString()])}</div>
+                        )}
+                        <BaseButton className="octane-club-center-link" type="button" onClick={() => CreateLinkEvent('habboUI/open/hccenter')}>
+                            {LocalizeText('catalog.club.buy.link')}
                         </BaseButton>
-                    ) : (
-                        <div
-                            className="octane-club-center-link"
-                            dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('catalog.vip.buy.hccenter')) }}
-                            role="link"
-                            tabIndex={0}
-                            onClick={(event) => {
-                                event.preventDefault();
-                                CreateLinkEvent('habboUI/open/hccenter');
-                            }}
-                            onKeyDown={(event) => {
-                                if (event.key !== 'Enter' && event.key !== ' ') return;
+                    </>
+                )}
 
-                                event.preventDefault();
-                                CreateLinkEvent('habboUI/open/hccenter');
-                            }}
-                        />
-                    )}
-                </>
-            ) : (
-                <>
-                    <header className="octane-club-membership-header">
-                        <strong>{LocalizeText(membershipHeaderKey)}</strong>
-                    </header>
-                    <p className="octane-club-membership-info">{LocalizeText(membershipInfoKey)}</p>
-                    <div className="octane-club-emblem" aria-hidden="true">
-                        <span className="octane-club-vip-emblem" />
-                    </div>
-                    <div className="octane-club-columns">
-                        <section className="octane-club-hc-column">
-                            {offerGroups.hc.map(renderOffer)}
-                            {membership.tier === 'vip' && (
-                                <div className="octane-club-info-card">
-                                    <strong>{LocalizeText('catalog.club.info.header')}</strong>
-                                    <span>{LocalizeText('catalog.club.info.content')}</span>
-                                </div>
-                            )}
-                        </section>
-                        <section className="octane-club-vip-column">{offerGroups.vip.map(renderOffer)}</section>
-                    </div>
-                    {membership.active && (
-                        <div className="octane-club-remaining">{LocalizeText(remainingKey, ['days'], [membership.totalDays.toString()])}</div>
-                    )}
-                    <BaseButton className="octane-club-center-link" type="button" onClick={() => CreateLinkEvent('habboUI/open/hccenter')}>
-                        {LocalizeText('catalog.club.buy.link')}
-                    </BaseButton>
-                </>
-            )}
-
-            {pendingOffer && purchaseState !== CatalogPurchaseState.NONE && purchaseState !== CatalogPurchaseState.PURCHASE && (
-                <CatalogClubPurchaseConfirmView
-                    offer={pendingOffer}
-                    productText={getPurchaseHeader(pendingOffer)}
-                    validUntilText={getPurchaseValidUntil(pendingOffer)}
-                    onCancel={() => {
-                        setPurchaseWillBeGift(false);
-                        setPendingOffer(null);
-                        setPurchaseState(CatalogPurchaseState.NONE);
-                    }}
-                    onConfirm={confirmPendingOffer}
-                />
-            )}
-        </div>
+                {pendingOffer && purchaseState !== CatalogPurchaseState.NONE && purchaseState !== CatalogPurchaseState.PURCHASE && (
+                    <CatalogClubPurchaseConfirmView
+                        offer={pendingOffer}
+                        productText={getPurchaseHeader(pendingOffer)}
+                        validUntilText={getPurchaseValidUntil(pendingOffer)}
+                        onCancel={() => {
+                            setPurchaseWillBeGift(false);
+                            setPendingOffer(null);
+                            setPurchaseState(CatalogPurchaseState.NONE);
+                        }}
+                        onConfirm={confirmPendingOffer}
+                    />
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

@@ -40,7 +40,7 @@ const firstFamily = (value: string) =>
 
 /**
  * The AIR text style for a label's computed CSS, or null when the label has to stay browser text: a face we have no glyphs for,
- * a transparent colour, letter spacing, an odd size, or italic Volter (there are no glyphs for it).
+ * a transparent colour, letter spacing, an odd size, or italic or underlined Volter.
  */
 export const resolveCssNativeFont = (css: CssFontSource): CssNativeFont | null => {
     if (!css) return null;
@@ -54,7 +54,8 @@ export const resolveCssNativeFont = (css: CssFontSource): CssNativeFont | null =
     const spacing = css.letterSpacing === 'normal' ? 0 : parseFloat(css.letterSpacing) || 0;
 
     if (!family || color === null || spacing !== 0 || !Number.isFinite(size) || size < 7 || size > 40) return null;
-    if (family === 'Volter' && italic) return null;
+    // The renderer has no italic Volter glyphs and draws underlines (Habbo skin effects) for ADVANCED (Ubuntu) text only.
+    if (family === 'Volter' && (italic || css.textDecorationLine?.includes('underline'))) return null;
 
     const style: NativeFontStyle =
         family === 'Volter'

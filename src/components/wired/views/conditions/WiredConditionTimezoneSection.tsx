@@ -1,6 +1,7 @@
 import { FC, useMemo } from 'react';
 import { buildTimezoneOptions, GetConfigurationValue, LocalizeText, localizeWithFallback } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Select } from '../../../../common/Select';
 import { useRoom, useWiredTools } from '../../../../hooks';
 
@@ -34,20 +35,22 @@ export const WiredConditionTimezoneSection: FC<WiredConditionTimezoneSectionProp
     if (options.length <= 1) return null;
 
     return (
-        <div className="flex flex-col gap-1">
-            <Text bold>{LocalizeText('wiredfurni.params.time.timezone_selection')}</Text>
-            <Select
-                aria-label={localizeWithFallback('wiredfurni.tooltip.timezone', 'Timezone')}
-                className="form-select form-select-sm"
-                value={selected}
-                onChange={(event) => onChange(event.target.value)}
-            >
-                {options.map((zone) => (
-                    <option key={zone} value={zone}>
-                        {zone}
-                    </option>
-                ))}
-            </Select>
-        </div>
+        <NativeTextTree>
+            <div className="flex flex-col gap-1">
+                <Text bold>{LocalizeText('wiredfurni.params.time.timezone_selection')}</Text>
+                <Select
+                    aria-label={localizeWithFallback('wiredfurni.tooltip.timezone', 'Timezone')}
+                    className="form-select form-select-sm"
+                    value={selected}
+                    onChange={(event) => onChange(event.target.value)}
+                >
+                    {options.map((zone) => (
+                        <option key={zone} value={zone}>
+                            {zone}
+                        </option>
+                    ))}
+                </Select>
+            </div>
+        </NativeTextTree>
     );
 };

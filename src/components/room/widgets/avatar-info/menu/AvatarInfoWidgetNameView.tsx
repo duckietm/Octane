@@ -1,6 +1,7 @@
 import { GetSessionDataManager } from '@octane/renderer';
 import { FC, useMemo } from 'react';
 import { AvatarInfoName, MessengerFriend } from '../../../../../api';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
 
 interface AvatarInfoWidgetNameViewProps {
@@ -33,18 +34,20 @@ export const AvatarInfoWidgetNameView: FC<AvatarInfoWidgetNameViewProps> = (prop
     }, [nameInfo]);
 
     return (
-        <ContextMenuView
-            category={nameInfo.category}
-            classNames={getClassNames}
-            fades={nameInfo.id !== GetSessionDataManager().userId}
-            objectId={nameInfo.roomIndex}
-            userType={nameInfo.userType}
-            onClose={onClose}
-        >
-            <div className="flex items-center justify-center gap-1">
-                {relationIconClass && <div className={`octane-friends-spritesheet ${relationIconClass}`} />}
-                <div className="text-shadow">{nameInfo.name}</div>
-            </div>
-        </ContextMenuView>
+        <NativeTextTree>
+            <ContextMenuView
+                category={nameInfo.category}
+                classNames={getClassNames}
+                fades={nameInfo.id !== GetSessionDataManager().userId}
+                objectId={nameInfo.roomIndex}
+                userType={nameInfo.userType}
+                onClose={onClose}
+            >
+                <div className="flex items-center justify-center gap-1">
+                    {relationIconClass && <div className={`octane-friends-spritesheet ${relationIconClass}`} />}
+                    <div className="text-shadow">{nameInfo.name}</div>
+                </div>
+            </ContextMenuView>
+        </NativeTextTree>
     );
 };

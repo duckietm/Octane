@@ -1,8 +1,9 @@
-import { CSSProperties, FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { CSSProperties, FC, useLayoutEffect, useRef, useState } from 'react';
 import { compositeRetainedToOpaque, resolveLineMetrics } from './NativeTextRenderer';
 import { renderCanvasSpacedText, supportsCanvasSpacedText } from './CanvasSpacedText';
-import { loadNativeFont, measureNativeText, NativeFontStyle, supportsNativeText, unpremultiplyPixels } from './NativeFont';
-import { useNativeTextSampling, useNativeTextScale } from './NativeTextScale';
+import { loadNativeFont, measureNativeText, NativeFontStyle, peekNativeFont, supportsNativeText, unpremultiplyPixels } from './NativeFont';
+import { useNativeTextRasterScale, useNativeTextSampling, useNativeTextScale } from './NativeTextScale';
+import { nativeTextRasterCache } from './NativeTextRasterCache';
 import { NativeTextStyleName, nativeTextStyles } from './NativeTextStyles';
 
 /** A drawn raster handed to `onRaster`: the 1x or display-scale canvas, the text it shows and the surface colour it was composited against (null: transparent). */
@@ -93,24 +94,27 @@ export const NativeText: FC<NativeTextProps> = ({
     style,
     nativeResolution = false,
     onRaster
-}) =>
-{
+}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [size, setSize] = useState<{ width: number; height: number }>(null);
     const fontStyle = { ...nativeTextStyles[textStyle], ...overrides, background: background ?? undefined };
     const styleKey = JSON.stringify(fontStyle);
     const displayScale = useNativeTextScale();
+    const rasterScale = useNativeTextRasterScale();
     const sampling = useNativeTextSampling(nativeResolution);
-    const scale = nativeResolution ? 1 : displayScale;
+    // Smooth (ADVANCED) text is drawn at the device pixel ratio itself, so it is never resampled; the renderer takes whole sizes only, so
+    // on a fractional ratio it is drawn at the nearest whole size (13 px at 125 % as 16 px). Volter is a pixel font that an in-between size
+    // would distort: it, and the letter-spaced canvas path, keep the next whole scale.
+    const scale = nativeResolution ? 1 : fontStyle.antiAliasType === 'normal' ? displayScale : rasterScale;
+    const spacedScale = nativeResolution ? 1 : displayScale;
     const onRasterRef = useRef(onRaster);
 
-    // Refreshed before the render effect below runs, like the other callback refs of the code base (never written during render).
-    useLayoutEffect(() =>
-    {
+    // Refreshed before the render effect below runs (declared first, so it runs first), like the other callback refs of the code base.
+    useLayoutEffect(() => {
         onRasterRef.current = onRaster;
     });
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         let disposed = false;
         setSize(null);
         onRasterRef.current?.(null);
@@ -140,7 +144,7 @@ export const NativeText: FC<NativeTextProps> = ({
                     etched: fontStyle.etchingColor !== undefined || fontStyle.etchingPosition !== undefined
                 })
             ) {
-                const spaced = await renderCanvasSpacedText(text, spacedStyle, scale).catch(() => null);
+                const spaced = await renderCanvasSpacedText(text, spacedStyle, spacedScale).catch(() => null);
 
                 if (disposed || !canvasRef.current) return;
 
@@ -157,7 +161,26 @@ export const NativeText: FC<NativeTextProps> = ({
                 }
             }
 
-            const loaded = await loadNativeFont(fontStyle);
+            // The same label drawn before (every "0" of a list, a window opened again) is copied, not rasterised again.
+            const cacheKey = `${styleKey}|${background}|${maxWidth}|${leading}|${cssLineHeight}|${align}|${scale}|${text}`;
+            const cached = nativeTextRasterCache.get(cacheKey);
+
+            if (cached) {
+                const canvas = canvasRef.current;
+
+                if (!canvas) return;
+
+                canvas.width = cached.image.width;
+                canvas.height = cached.image.height;
+                canvas.getContext('2d').putImageData(cached.image, 0, 0);
+                setSize({ width: cached.width, height: cached.height });
+                onRasterRef.current?.({ canvas, text, background });
+
+                return;
+            }
+
+            // An already loaded font draws without awaiting, inside this layout effect, so a remounted label never shows a frame of browser text.
+            const loaded = peekNativeFont(fontStyle) ?? (await loadNativeFont(fontStyle));
             if (disposed || !supportsNativeText(loaded.font, text.replace(/[\r\n]/g, ''))) return;
             const measure = (value: string) => measureNativeText(loaded.font, value, fontStyle);
             const width = maxWidth === undefined ? Infinity : Math.max(1, maxWidth - 4);
@@ -173,13 +196,18 @@ export const NativeText: FC<NativeTextProps> = ({
             if (fieldWidth * fieldHeight > 2 * 1024 * 1024) return;
             // Layout stays in CSS pixels; the raster is drawn at the display scale (see NativeTextScale),
             // as wide as the lines measure at that size.
-            const scaledStyle = { ...fontStyle, size: fontStyle.size * scale };
-            const pixelWidth = Math.max(fieldWidth * scale, ...lines.map((line) => Math.ceil(measureNativeText(loaded.font, line, scaledStyle)) + 4 * scale));
-            const pixelHeight = fieldHeight * scale;
+            // Nearest whole size, halves down: the raster stays within a pixel or two of the laid-out width.
+            const scaledStyle = { ...fontStyle, size: Math.max(1, Math.ceil(fontStyle.size * scale - 0.5)) };
+            const pixelWidth = Math.ceil(
+                Math.max(fieldWidth * scale, ...lines.map((line) => Math.ceil(measureNativeText(loaded.font, line, scaledStyle)) + 4 * scale))
+            );
+            const pixelHeight = Math.ceil(fieldHeight * scale);
+            // Line tops in raster rows: whole rows on a fractional scale too.
+            const lineTop = (index: number) => Math.round((Math.round(index * lineHeight) + lineOffset) * scale);
             const pixels = new Uint8ClampedArray(pixelWidth * pixelHeight * 4);
             lines.forEach((line, index) =>
                 loaded.renderer.render(line, {
-                    size: fontStyle.size * scale,
+                    size: scaledStyle.size,
                     color: fontStyle.color ?? 0,
                     antiAliasType: fontStyle.antiAliasType ?? 'advanced',
                     gridFitType: 'pixel',
@@ -189,21 +217,22 @@ export const NativeText: FC<NativeTextProps> = ({
                     fontStyle: fontStyle.italic ? 'italic' : 'normal',
                     stageQuality: 'high',
                     renderingPipeline: 'habbo-retained',
+                    rasterCache: loaded.rasterCache,
                     etchingColor: fontStyle.etchingColor,
                     etchingPosition: fontStyle.etchingPosition,
                     textDecoration: fontStyle.underline ? 'underline' : null,
                     // Each line gets a local surface view: the native renderer's
                     // etching pass is relative to that surface, not target.offsetY.
                     target: {
-                        pixels: pixels.subarray((Math.round(index * lineHeight) + lineOffset) * scale * pixelWidth * 4),
+                        pixels: pixels.subarray(lineTop(index) * pixelWidth * 4),
                         width: pixelWidth,
-                        height: pixelHeight - (Math.round(index * lineHeight) + lineOffset) * scale,
+                        height: pixelHeight - lineTop(index),
                         offsetX:
                             align === 'center'
                                 ? Math.round((pixelWidth - 4 * scale - measureNativeText(loaded.font, line, scaledStyle)) / 2)
                                 : align === 'right'
-                                    ? Math.round(pixelWidth - 4 * scale - measureNativeText(loaded.font, line, scaledStyle))
-                                    : 0
+                                  ? Math.round(pixelWidth - 4 * scale - measureNativeText(loaded.font, line, scaledStyle))
+                                  : 0
                     }
                 })
             );
@@ -215,8 +244,10 @@ export const NativeText: FC<NativeTextProps> = ({
                 background === null
                     ? unpremultiplyPixels(pixels)
                     : compositeRetainedToOpaque(pixels, [(background >>> 16) & 255, (background >>> 8) & 255, background & 255, 255]);
-            canvas.getContext('2d').putImageData(new ImageData(composited, pixelWidth, pixelHeight), 0, 0);
-            setSize({ width: pixelWidth / scale, height: fieldHeight });
+            const image = new ImageData(composited, pixelWidth, pixelHeight);
+            canvas.getContext('2d').putImageData(image, 0, 0);
+            nativeTextRasterCache.set(cacheKey, { image, width: pixelWidth / scale, height: pixelHeight / scale });
+            setSize({ width: pixelWidth / scale, height: pixelHeight / scale });
             onRasterRef.current?.({ canvas, text, background });
         };
         render().catch((error) => {
@@ -225,7 +256,7 @@ export const NativeText: FC<NativeTextProps> = ({
         return () => {
             disposed = true;
         };
-    }, [text, textStyle, styleKey, maxWidth, leading, cssLineHeight, align, scale]);
+    }, [text, textStyle, styleKey, maxWidth, leading, cssLineHeight, align, scale, spacedScale]);
 
     return (
         <span
@@ -236,13 +267,18 @@ export const NativeText: FC<NativeTextProps> = ({
             <canvas
                 ref={canvasRef}
                 aria-hidden="true"
-                style={{ display: size ? 'block' : 'none', width: size?.width, height: size?.height, imageRendering: nativeResolution ? sampling : scale > 1 ? 'auto' : 'pixelated' }}
+                style={{
+                    display: size ? 'block' : 'none',
+                    width: size?.width,
+                    height: size?.height,
+                    imageRendering: nativeResolution ? sampling : scale === rasterScale ? 'pixelated' : 'auto'
+                }}
             />
             <span
                 style={
                     size
                         ? { position: 'absolute', width: 1, height: 1, overflow: 'hidden', clipPath: 'inset(50%)', whiteSpace: 'pre' }
-                        : { lineHeight: 'normal', whiteSpace: 'pre-wrap' }
+                        : { font: 'inherit', color: 'inherit', lineHeight: 'normal', whiteSpace: 'pre-wrap' }
                 }
             >
                 {text}

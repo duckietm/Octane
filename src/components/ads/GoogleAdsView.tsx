@@ -4,6 +4,7 @@ import { resolveAdsFrame } from '../../api/utils/resolveAdsFrame';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { configFileUrl } from '../../secure-assets';
 import '../../css/ads/GoogleAdsAirText.css';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface AdsenseConfig {
     slot: string;
@@ -132,44 +133,46 @@ export const GoogleAdsView: FC<{}> = () => {
     const framed = !!adsFrameUrl;
 
     return (
-        <OctaneCardView className="octane-google-ads" uniqueKey="google-ads" theme="primary">
-            {publisherId && !framed && (
-                <script async crossOrigin="anonymous" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-${publisherId}`} />
-            )}
-            <OctaneCardHeaderView headerText="Sponsored" onCloseClick={() => setIsOpen(false)} />
-            <OctaneCardContentView>
-                <div className="flex items-center justify-center w-[300px] h-[250px] bg-white">
-                    {loadError && <div className="text-xs text-red-600 text-center px-2">Ads unavailable: {loadError}</div>}
-                    {!loadError && (!publisherId || !config) && <div className="octane-google-ads__hint">Loading…</div>}
-                    {!loadError && framed && adsFrame && (
-                        <iframe
-                            className="w-full h-full border-0"
-                            referrerPolicy="strict-origin"
-                            sandbox={adsFrame.sandbox}
-                            src={adsFrame.src}
-                            title="Sponsored"
-                        />
-                    )}
-                    {!loadError && framed && publisherId && config?.slot && !adsFrame && (
-                        <div className="text-xs text-red-600 text-center px-2">Ads unavailable: ads.frame.url is not a web URL</div>
-                    )}
-                    {!loadError && !framed && publisherId && config?.slot && (
-                        <ins
-                            ref={insRef}
-                            key={`${publisherId}-${config.slot}`}
-                            className="adsbygoogle"
-                            style={{ display: 'block', width: '100%', height: '100%' }}
-                            data-ad-client={`ca-${publisherId}`}
-                            data-ad-slot={config.slot}
-                            data-ad-format={config.format ?? 'auto'}
-                            data-full-width-responsive={(config.fullWidthResponsive ?? true) ? 'true' : 'false'}
-                        />
-                    )}
-                    {!loadError && publisherId && config && !config.slot && (
-                        <div className="octane-google-ads__hint text-center px-2">Ad slot not configured in configuration/adsense.json</div>
-                    )}
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <NativeTextTree>
+            <OctaneCardView className="octane-google-ads" uniqueKey="google-ads" theme="primary">
+                {publisherId && !framed && (
+                    <script async crossOrigin="anonymous" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-${publisherId}`} />
+                )}
+                <OctaneCardHeaderView headerText="Sponsored" onCloseClick={() => setIsOpen(false)} />
+                <OctaneCardContentView>
+                    <div className="flex items-center justify-center w-[300px] h-[250px] bg-white">
+                        {loadError && <div className="text-xs text-red-600 text-center px-2">Ads unavailable: {loadError}</div>}
+                        {!loadError && (!publisherId || !config) && <div className="octane-google-ads__hint">Loading…</div>}
+                        {!loadError && framed && adsFrame && (
+                            <iframe
+                                className="w-full h-full border-0"
+                                referrerPolicy="strict-origin"
+                                sandbox={adsFrame.sandbox}
+                                src={adsFrame.src}
+                                title="Sponsored"
+                            />
+                        )}
+                        {!loadError && framed && publisherId && config?.slot && !adsFrame && (
+                            <div className="text-xs text-red-600 text-center px-2">Ads unavailable: ads.frame.url is not a web URL</div>
+                        )}
+                        {!loadError && !framed && publisherId && config?.slot && (
+                            <ins
+                                ref={insRef}
+                                key={`${publisherId}-${config.slot}`}
+                                className="adsbygoogle"
+                                style={{ display: 'block', width: '100%', height: '100%' }}
+                                data-ad-client={`ca-${publisherId}`}
+                                data-ad-slot={config.slot}
+                                data-ad-format={config.format ?? 'auto'}
+                                data-full-width-responsive={(config.fullWidthResponsive ?? true) ? 'true' : 'false'}
+                            />
+                        )}
+                        {!loadError && publisherId && config && !config.slot && (
+                            <div className="octane-google-ads__hint text-center px-2">Ad slot not configured in configuration/adsense.json</div>
+                        )}
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

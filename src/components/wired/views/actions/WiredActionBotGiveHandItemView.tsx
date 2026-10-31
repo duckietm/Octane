@@ -8,6 +8,7 @@ import { CLICKED_USER_SOURCE_VALUE, REACHED_USER_SOURCE_VALUE, WiredSourceOption
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const USER_SOURCE_OPTIONS: WiredSourceOption[] = [
     { value: 0, label: 'wiredfurni.params.sources.users.0' },
@@ -56,60 +57,62 @@ export const WiredActionBotGiveHandItemView: FC<{}> = (props) => {
     }, [trigger]);
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={
-                <div className="flex flex-col gap-2">
-                    <WiredSourcesSelector showUsers={true} userSlot={1} userSource={userSource} userSources={USER_SOURCE_OPTIONS} onChangeUsers={setUserSource} />
-                    <hr className="m-0 bg-dark" />
-                    <WiredSourcesSelector
-                        showUsers={true}
-                        userSource={botSource}
-                        userSources={BOT_SOURCE_OPTIONS}
-                        usersTitle="wiredfurni.params.sources.users.title.bots"
-                        allowClickedUserSource={false}
-                        onChangeUsers={(value) => setBotSource(normalizeBotSource(value, botName.length > 0))}
-                    />
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={
+                    <div className="flex flex-col gap-2">
+                        <WiredSourcesSelector showUsers={true} userSlot={1} userSource={userSource} userSources={USER_SOURCE_OPTIONS} onChangeUsers={setUserSource} />
+                        <hr className="m-0 bg-dark" />
+                        <WiredSourcesSelector
+                            showUsers={true}
+                            userSource={botSource}
+                            userSources={BOT_SOURCE_OPTIONS}
+                            usersTitle="wiredfurni.params.sources.users.title.bots"
+                            allowClickedUserSource={false}
+                            onChangeUsers={(value) => setBotSource(normalizeBotSource(value, botName.length > 0))}
+                        />
+                    </div>
+                }
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.bot.name')}</Text>
+                    <label className="flex items-center gap-1 cursor-pointer">
+                        <Checkbox
+                            checked={useBotName}
+                            id="botGiveHandItemUseNamedBot"
+                            onCheckedChange={(nextChecked) => {
+                                setUseBotName(nextChecked);
+                                // Ours: the named bot is bot source 100.
+                                if (nextChecked) setBotSource(100);
+                                else if (botSource === 100) setBotSource(0);
+                            }}
+                        />
+                        <Text>{LocalizeText('wiredfurni.params.bot.usage')}</Text>
+                    </label>
+                    {useBotName && (
+                        <OctaneInput
+                            aria-label={LocalizeText('wiredfurni.params.bot.name')}
+                            maxLength={32}
+                            title={LocalizeText('wiredfurni.tooltip.bot.name')}
+                            type="text"
+                            value={botName}
+                            onChange={(event) => setBotName(event.target.value)}
+                        />
+                    )}
                 </div>
-            }
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.bot.name')}</Text>
-                <label className="flex items-center gap-1 cursor-pointer">
-                    <Checkbox
-                        checked={useBotName}
-                        id="botGiveHandItemUseNamedBot"
-                        onCheckedChange={(nextChecked) => {
-                            setUseBotName(nextChecked);
-                            // Ours: the named bot is bot source 100.
-                            if (nextChecked) setBotSource(100);
-                            else if (botSource === 100) setBotSource(0);
-                        }}
-                    />
-                    <Text>{LocalizeText('wiredfurni.params.bot.usage')}</Text>
-                </label>
-                {useBotName && (
-                    <OctaneInput
-                        aria-label={LocalizeText('wiredfurni.params.bot.name')}
-                        maxLength={32}
-                        title={LocalizeText('wiredfurni.tooltip.bot.name')}
-                        type="text"
-                        value={botName}
-                        onChange={(event) => setBotName(event.target.value)}
-                    />
-                )}
-            </div>
-            {/* Official BOT_GIVE_HAND_ITEM code list includes 1126/1127/1128 (§_-32b§.as DEFAULT_CODES);
-                the condition/selector variants intentionally do NOT, so pass them per-view. */}
-            <WiredHandItemField
-                handItemId={handItemId}
-                extraItemIds={BOT_EXTRA_HAND_ITEM_IDS}
-                tooltipKey="wiredfurni.tooltip.bot.handitem"
-                onChange={setHandItemId}
-                showCopyButton={true}
-            />
-        </WiredActionBaseView>
+                {/* Official BOT_GIVE_HAND_ITEM code list includes 1126/1127/1128 (§_-32b§.as DEFAULT_CODES);
+                    the condition/selector variants intentionally do NOT, so pass them per-view. */}
+                <WiredHandItemField
+                    handItemId={handItemId}
+                    extraItemIds={BOT_EXTRA_HAND_ITEM_IDS}
+                    tooltipKey="wiredfurni.tooltip.bot.handitem"
+                    onChange={setHandItemId}
+                    showCopyButton={true}
+                />
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

@@ -7,6 +7,7 @@ import searchPenIcon from '../../../../assets/images/navigator/air/search-pen.pn
 import { useNavigatorData, useNavigatorUiStore } from '../../../../hooks';
 import { NavigatorFilterChipsView } from './NavigatorFilterChipsView';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface NavigatorSearchViewProps {
     searchResult: NavigatorSearchResultSet | null;
@@ -63,7 +64,16 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = (props) => {
 
     const refreshSearch = () => {
         if (!tabCode) return;
-        SendMessageComposer(new NavigatorSearchComposer(tabCode, currentFilter || buildQuery(searchFilterIndex, inputText)));
+
+        const query = currentFilter || buildQuery(searchFilterIndex, inputText);
+
+        // A typed search that was never submitted goes through the store, so its reply matches the filter on screen.
+        if (query !== currentFilter) {
+            useNavigatorUiStore.getState().setFilter(query);
+            return;
+        }
+
+        SendMessageComposer(new NavigatorSearchComposer(tabCode, query));
     };
 
     const clearSearch = () => {
@@ -71,31 +81,38 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = (props) => {
     };
 
     return (
-        <form onSubmit={onSubmit} className="octane-navigator-air__search">
-            <NavigatorFilterChipsView value={searchFilterIndex} onChange={setSearchFilterIndex} />
-            <div className={`octane-navigator-air__search-field${hasQuery ? '' : ' is-placeholder'}`}>
-                <input
-                    className="octane-navigator-air__search-input"
-                    name="q"
-                    placeholder={placeholder}
-                    type="text"
-                    value={inputText}
-                    onChange={(event) => setInputText(event.target.value)}
-                />
-                <BaseButton
-                    type={hasQuery ? 'button' : 'submit'}
-                    className="octane-navigator-air__search-clear"
-                    aria-label={hasQuery ? LocalizeText('generic.clear') : placeholder}
-                    onClick={hasQuery ? clearSearch : undefined}
-                >
-                    <img src={hasQuery ? searchCloseIcon : searchPenIcon} alt="" />
-                </BaseButton>
-            </div>
-            {hasQuery && (
-                <BaseButton type="button" className="octane-navigator-air__search-refresh" aria-label={LocalizeText('generic.refresh')} onClick={refreshSearch}>
-                    <img src={refreshIcon} alt="" />
-                </BaseButton>
-            )}
-        </form>
+        <NativeTextTree>
+            <form onSubmit={onSubmit} className="octane-navigator-air__search">
+                <NavigatorFilterChipsView value={searchFilterIndex} onChange={setSearchFilterIndex} />
+                <div className={`octane-navigator-air__search-field${hasQuery ? '' : ' is-placeholder'}`}>
+                    <input
+                        className="octane-navigator-air__search-input"
+                        name="q"
+                        placeholder={placeholder}
+                        type="text"
+                        value={inputText}
+                        onChange={(event) => setInputText(event.target.value)}
+                    />
+                    <BaseButton
+                        type={hasQuery ? 'button' : 'submit'}
+                        className="octane-navigator-air__search-clear"
+                        aria-label={hasQuery ? LocalizeText('generic.clear') : placeholder}
+                        onClick={hasQuery ? clearSearch : undefined}
+                    >
+                        <img src={hasQuery ? searchCloseIcon : searchPenIcon} alt="" />
+                    </BaseButton>
+                </div>
+                {hasQuery && (
+                    <BaseButton
+                        type="button"
+                        className="octane-navigator-air__search-refresh"
+                        aria-label={LocalizeText('generic.refresh')}
+                        onClick={refreshSearch}
+                    >
+                        <img src={refreshIcon} alt="" />
+                    </BaseButton>
+                )}
+            </form>
+        </NativeTextTree>
     );
 };

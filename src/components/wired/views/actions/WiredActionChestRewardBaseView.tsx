@@ -11,6 +11,7 @@ import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
 import { CollapsibleSection } from '../../../../common/CollapsibleSection';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const CHEST_REWARD_MODE_AMOUNT = 0;
 export const CHEST_REWARD_MODE_EVERYTHING = 1;
@@ -84,87 +85,89 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
     const extraDisabled = extra.disabledWhenEverything && mode === CHEST_REWARD_MODE_EVERYTHING;
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
-            save={save}
-            validate={validate}
-            footerCollapsible={false}
-            footer={
-                <WiredSourcesSelector
-                    showUsers={true}
-                    userSource={userSource}
-                    usersTitle="wiredfurni.params.sources.users.title.reward_user"
-                    onChangeUsers={setUserSource}
-                />
-            }
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.rewarding_mode', 'Rewarding mode')}</Text>
-                {[CHEST_REWARD_MODE_AMOUNT, CHEST_REWARD_MODE_EVERYTHING].map((value) => (
-                    <label key={value} className="flex items-center gap-1">
-                        <Radio name="chestRewardMode" checked={mode === value} onCheckedChange={() => setMode(value)} />
-                        <Text>{localizeWithFallback(`wiredfurni.params.rewarding_mode.${value}`, value === 0 ? 'Give a specific amount' : 'Give everything')}</Text>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
+                save={save}
+                validate={validate}
+                footerCollapsible={false}
+                footer={
+                    <WiredSourcesSelector
+                        showUsers={true}
+                        userSource={userSource}
+                        usersTitle="wiredfurni.params.sources.users.title.reward_user"
+                        onChangeUsers={setUserSource}
+                    />
+                }
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.rewarding_mode', 'Rewarding mode')}</Text>
+                    {[CHEST_REWARD_MODE_AMOUNT, CHEST_REWARD_MODE_EVERYTHING].map((value) => (
+                        <label key={value} className="flex items-center gap-1">
+                            <Radio name="chestRewardMode" checked={mode === value} onCheckedChange={() => setMode(value)} />
+                            <Text>{localizeWithFallback(`wiredfurni.params.rewarding_mode.${value}`, value === 0 ? 'Give a specific amount' : 'Give everything')}</Text>
+                        </label>
+                    ))}
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.amount_to_give', 'Amount to give:')}</Text>
+                    {/* AIR ?_-b1s?: createValueOrVariableSection(0, mergedSourceOptions(0), amount_to_give, 1, int max), disabled
+                        when the box gives everything (onModeChange). The server reads the variable on a room or context holder. */}
+                    <WiredValueOrVariableField
+                        disabled={mode === CHEST_REWARD_MODE_EVERYTHING}
+                        holderSource={WIRED_FIXED_HOLDER_SOURCE}
+                        isVariable={isVariable}
+                        label={localizeWithFallback('wiredfurni.params.amount_to_give', 'Amount to give:')}
+                        literal={amount}
+                        min={1}
+                        target={target}
+                        targets={[GLOBAL_TARGET, CONTEXT_TARGET]}
+                        token={token}
+                        onIsVariableChange={setIsVariable}
+                        onLiteralChange={setAmount}
+                        onTargetChange={setTarget}
+                        onTokenChange={setToken}
+                        onValidityChange={setAmountValid}
+                    />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.reward_contract.reward_popup', 'Reward popup')}</Text>
+                    <textarea
+                        aria-label="reward popup"
+                        className="form-control form-control-sm"
+                        maxLength={CHEST_POPUP_MAX_LENGTH}
+                        rows={CHEST_POPUP_MAX_LINES}
+                        title={localizeWithFallback('wiredfurni.reward_contract.reward_popup.text.tooltip', 'The text shown to the rewarded user')}
+                        value={popupText}
+                        onChange={(event) => setPopupText(normalizeChestPopup(event.target.value))}
+                    />
+                    <label className="flex items-center gap-1">
+                        <Checkbox checked={showByDefault} onCheckedChange={(nextChecked) => setShowByDefault(nextChecked)} />
+                        <Text>{localizeWithFallback('wiredfurni.reward_contract.reward_popup.show_by_default', 'Show the popup by default')}</Text>
                     </label>
-                ))}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.amount_to_give', 'Amount to give:')}</Text>
-                {/* AIR ?_-b1s?: createValueOrVariableSection(0, mergedSourceOptions(0), amount_to_give, 1, int max), disabled
-                    when the box gives everything (onModeChange). The server reads the variable on a room or context holder. */}
-                <WiredValueOrVariableField
-                    disabled={mode === CHEST_REWARD_MODE_EVERYTHING}
-                    holderSource={WIRED_FIXED_HOLDER_SOURCE}
-                    isVariable={isVariable}
-                    label={localizeWithFallback('wiredfurni.params.amount_to_give', 'Amount to give:')}
-                    literal={amount}
-                    min={1}
-                    target={target}
-                    targets={[GLOBAL_TARGET, CONTEXT_TARGET]}
-                    token={token}
-                    onIsVariableChange={setIsVariable}
-                    onLiteralChange={setAmount}
-                    onTargetChange={setTarget}
-                    onTokenChange={setToken}
-                    onValidityChange={setAmountValid}
-                />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.reward_contract.reward_popup', 'Reward popup')}</Text>
-                <textarea
-                    aria-label="reward popup"
-                    className="form-control form-control-sm"
-                    maxLength={CHEST_POPUP_MAX_LENGTH}
-                    rows={CHEST_POPUP_MAX_LINES}
-                    title={localizeWithFallback('wiredfurni.reward_contract.reward_popup.text.tooltip', 'The text shown to the rewarded user')}
-                    value={popupText}
-                    onChange={(event) => setPopupText(normalizeChestPopup(event.target.value))}
-                />
-                <label className="flex items-center gap-1">
-                    <Checkbox checked={showByDefault} onCheckedChange={(nextChecked) => setShowByDefault(nextChecked)} />
-                    <Text>{localizeWithFallback('wiredfurni.reward_contract.reward_popup.show_by_default', 'Show the popup by default')}</Text>
-                </label>
-            </div>
-            <CollapsibleSection title={<Text bold>{localizeWithFallback(extra.titleKey, extra.title)}</Text>}>
-                <fieldset className="flex flex-col gap-1 pt-1" disabled={extraDisabled}>
-                    {extra.dropdown ? (
-                        <Select aria-label="chest extra" className="form-select form-select-sm" value={extraValue} onChange={(event) => setExtraValue(Number(event.target.value))}>
-                            {extra.options.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                    {localizeWithFallback(option.key, option.label)}
-                                </option>
-                            ))}
-                        </Select>
-                    ) : (
-                        extra.options.map((option) => (
-                            <label key={option.value} className="flex items-center gap-1">
-                                <Radio name="chestRewardExtra" checked={extraValue === option.value} onCheckedChange={() => setExtraValue(option.value)} />
-                                <Text>{localizeWithFallback(option.key, option.label)}</Text>
-                            </label>
-                        ))
-                    )}
-                </fieldset>
-            </CollapsibleSection>
-        </WiredActionBaseView>
+                </div>
+                <CollapsibleSection title={<Text bold>{localizeWithFallback(extra.titleKey, extra.title)}</Text>}>
+                    <fieldset className="flex flex-col gap-1 pt-1" disabled={extraDisabled}>
+                        {extra.dropdown ? (
+                            <Select aria-label="chest extra" className="form-select form-select-sm" value={extraValue} onChange={(event) => setExtraValue(Number(event.target.value))}>
+                                {extra.options.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {localizeWithFallback(option.key, option.label)}
+                                    </option>
+                                ))}
+                            </Select>
+                        ) : (
+                            extra.options.map((option) => (
+                                <label key={option.value} className="flex items-center gap-1">
+                                    <Radio name="chestRewardExtra" checked={extraValue === option.value} onCheckedChange={() => setExtraValue(option.value)} />
+                                    <Text>{localizeWithFallback(option.key, option.label)}</Text>
+                                </label>
+                            ))
+                        )}
+                    </fieldset>
+                </CollapsibleSection>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

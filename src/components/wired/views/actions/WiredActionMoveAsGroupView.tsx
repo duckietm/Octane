@@ -10,6 +10,7 @@ import { WiredActionBaseView } from './WiredActionBaseView';
 import { NumberInput } from '../../../../common/NumberInput';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 // Official source values: 0 trigger, 11 clicked user, 100 picks, 200 selector, 201 signal.
 const SOURCE_TRIGGER = 0;
@@ -84,51 +85,53 @@ export const WiredActionMoveAsGroupView: FC<{}> = () =>
     );
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={ true }
-            requiresFurni={ groupSource === SOURCE_PICKED ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID : WiredFurniType.STUFF_SELECTION_OPTION_NONE }
-            save={ save }
-            footerCollapsible={false}
-            footer={ <WiredSourcesSelector showFurni={ true } furniSource={ groupSource } onChangeFurni={ setGroupSource } /> }>
-            <div className="flex flex-col gap-2">
-                <Text small>{ localizeWithFallback('wiredfurni.params.move_as_group.usage_info', 'The distance between the moving furniture will stay consistent.') }</Text>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={ true }
+                requiresFurni={ groupSource === SOURCE_PICKED ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID : WiredFurniType.STUFF_SELECTION_OPTION_NONE }
+                save={ save }
+                footerCollapsible={false}
+                footer={ <WiredSourcesSelector showFurni={ true } furniSource={ groupSource } onChangeFurni={ setGroupSource } /> }>
+                <div className="flex flex-col gap-2">
+                    <Text small>{ localizeWithFallback('wiredfurni.params.move_as_group.usage_info', 'The distance between the moving furniture will stay consistent.') }</Text>
 
-                <div className="flex flex-col gap-1">
-                    <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.offsets', 'Offsets') }</Text>
-                    <div className="flex items-center gap-3">
-                        { offsetInput(localizeWithFallback('wiredfurni.params.place_furni.offsets.x', 'x:'), offsetX, setOffsetX) }
-                        { offsetInput(localizeWithFallback('wiredfurni.params.place_furni.offsets.y', 'y:'), offsetY, setOffsetY) }
-                    </div>
-                </div>
-
-                <hr className="m-0 bg-dark" />
-
-                <WiredFurniSelectionSourceRow
-                    title="wiredfurni.params.sources.merged.title.target_location"
-                    options={ targetOptions }
-                    value={ targetValue }
-                    selectionKind={ targetIsUser ? 'primary' : 'secondary' }
-                    selectionActive={ false }
-                    selectionCount={ 0 }
-                    selectionLimit={ 0 }
-                    selectionEnabledValues={ [] }
-                    showSelectionToggle={ false }
-                    headerContent={
-                        <div className="octane-wired__give-var-targets">
-                            { [ { key: 'furni', icon: sourceFurniIcon, isUser: false }, { key: 'user', icon: sourceUserIcon, isUser: true } ].map(button => (
-                                <Hint key={ button.key } content={ LocalizeText(`wiredfurni.params.sources.${ button.isUser ? 'users' : 'furni' }.title`) }>
-                                    <BaseButton aria-label={ LocalizeText(`wiredfurni.params.sources.${ button.isUser ? 'users' : 'furni' }.title`) }
-                                        type="button"
-                                        className={ `octane-wired__give-var-target octane-wired__give-var-target--${ button.key } ${ targetIsUser === button.isUser ? 'is-active' : '' }` }
-                                        onClick={ () => setTargetIsUser(button.isUser) }>
-                                        <img src={ button.icon } alt={ button.key } />
-                                    </BaseButton>
-                                </Hint>
-                            )) }
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.offsets', 'Offsets') }</Text>
+                        <div className="flex items-center gap-3">
+                            { offsetInput(localizeWithFallback('wiredfurni.params.place_furni.offsets.x', 'x:'), offsetX, setOffsetX) }
+                            { offsetInput(localizeWithFallback('wiredfurni.params.place_furni.offsets.y', 'y:'), offsetY, setOffsetY) }
                         </div>
-                    }
-                    onChange={ value => (targetIsUser ? setUserSource(value) : setTargetFurniSource(value)) } />
-            </div>
-        </WiredActionBaseView>
+                    </div>
+
+                    <hr className="m-0 bg-dark" />
+
+                    <WiredFurniSelectionSourceRow
+                        title="wiredfurni.params.sources.merged.title.target_location"
+                        options={ targetOptions }
+                        value={ targetValue }
+                        selectionKind={ targetIsUser ? 'primary' : 'secondary' }
+                        selectionActive={ false }
+                        selectionCount={ 0 }
+                        selectionLimit={ 0 }
+                        selectionEnabledValues={ [] }
+                        showSelectionToggle={ false }
+                        headerContent={
+                            <div className="octane-wired__give-var-targets">
+                                { [ { key: 'furni', icon: sourceFurniIcon, isUser: false }, { key: 'user', icon: sourceUserIcon, isUser: true } ].map(button => (
+                                    <Hint key={ button.key } content={ LocalizeText(`wiredfurni.params.sources.${ button.isUser ? 'users' : 'furni' }.title`) }>
+                                        <BaseButton aria-label={ LocalizeText(`wiredfurni.params.sources.${ button.isUser ? 'users' : 'furni' }.title`) }
+                                            type="button"
+                                            className={ `octane-wired__give-var-target octane-wired__give-var-target--${ button.key } ${ targetIsUser === button.isUser ? 'is-active' : '' }` }
+                                            onClick={ () => setTargetIsUser(button.isUser) }>
+                                            <img src={ button.icon } alt={ button.key } />
+                                        </BaseButton>
+                                    </Hint>
+                                )) }
+                            </div>
+                        }
+                        onChange={ value => (targetIsUser ? setUserSource(value) : setTargetFurniSource(value)) } />
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

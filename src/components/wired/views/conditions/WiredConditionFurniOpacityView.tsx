@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { normalizeWiredComparison, WIRED_CMP_EQUAL, WiredComparisonOperator } from '../WiredComparisonOperator';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -35,21 +36,23 @@ export const WiredConditionFurniOpacityView: FC<{}> = () => {
     };
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
-        >
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text bold>
-                        {localizeWithFallback('wiredfurni.params.opacity', 'Opacity')}: {opacity}%
-                    </Text>
-                    <Slider max={MAX_OPACITY} min={MIN_OPACITY} value={opacity} onChange={(value) => setOpacity(value)} />
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
+            >
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        <Text bold>
+                            {localizeWithFallback('wiredfurni.params.opacity', 'Opacity')}: {opacity}%
+                        </Text>
+                        <Slider max={MAX_OPACITY} min={MIN_OPACITY} value={opacity} onChange={(value) => setOpacity(value)} />
+                    </div>
+                    <WiredComparisonOperator name="wiredFurniOpacityComparison" value={comparison} onChange={setComparison} />
                 </div>
-                <WiredComparisonOperator name="wiredFurniOpacityComparison" value={comparison} onChange={setComparison} />
-            </div>
-        </WiredConditionBaseView>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

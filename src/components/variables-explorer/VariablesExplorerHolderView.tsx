@@ -7,6 +7,7 @@ import { useVariablesExplorerProfile } from '../../hooks/variables-explorer/useV
 import { WiredVariableHolderPanelView } from '../wired-tools/WiredVariableHolderPanelView';
 import { EXPLORER_VARIABLE_ELEMENTS, ExplorerHolderTarget, holderInfoLines, holderPanelTitle, resolvedEntityId } from './VariablesExplorer.helpers';
 import { NumberInput } from '../../common/NumberInput';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export interface VariablesExplorerHolderViewProps {
     client: VariablesWebApiClient;
@@ -170,76 +171,78 @@ export const VariablesExplorerHolderView: FC<VariablesExplorerHolderViewProps> =
     const local = describeLocalHolder(target, entityId, roomId);
 
     return (
-        <WiredVariableHolderPanelView
-            title={holderPanelTitle(target)}
-            warningText={WARNING_TEXT[target.scope]}
-            onRefresh={() => void reload()}
-            onClose={onClose}
-            preview={
-                local?.preview ?? (
-                    <img
-                        alt=""
-                        className={
-                            target.scope === 'global' ? 'max-w-full max-h-full object-contain p-3' : 'w-auto h-auto max-w-[48px] max-h-[48px] object-contain'
-                        }
-                        src={target.scope === 'global' ? wiredGlobalPlaceholderImage : icon}
-                    />
-                )
-            }
-            infoLines={holderInfoLines(target, profile, roomId, local?.name, local?.owner)}
-            variablesTitle={target.scope === 'global' ? 'Room variables:' : 'Assigned variables:'}
-            entries={entries.map((entry) => ({
-                id: entry.name,
-                name: entry.name,
-                availability: 'Permanent',
-                hasValue: entry.hasValue,
-                value: entry.value
-            }))}
-            selectedId={selectedEntry?.name ?? null}
-            onSelect={setSelectedName}
-            canEdit={canWrite && holderReady && !busy}
-            editingId={editingName}
-            editingValue={editingValue}
-            onBeginEdit={(entry) => {
-                setSelectedName(entry.id);
-                setEditingName(entry.id);
-                setEditingValue(String(entry.value ?? 0));
-            }}
-            onEditingValueChange={setEditingValue}
-            onEditBlur={() => setEditingName(null)}
-            onEditKeyDown={onEditKeyDown}
-            isGiveOpen={isGiveOpen}
-            onToggleGive={() => setIsGiveOpen((value) => !value)}
-            giveOptions={giveOptions.map((option) => ({ id: option.name, name: option.name, hasValue: option.hasValue }))}
-            giveSelectedId={selectedGive?.name ?? ''}
-            onGiveSelect={setGiveName}
-            giveValue={giveValue}
-            onGiveValueChange={setGiveValue}
-            canGive={canWrite && holderReady && !busy && target.scope !== 'global' && !!giveOptions.length}
-            onGive={give}
-            canRemove={canWrite && holderReady && !busy && target.scope !== 'global' && !!selectedEntry}
-            onRemove={() => selectedEntry && void setValues({ [selectedEntry.name]: null })}
-            status={
-                status ? (
-                    <div className="rounded border border-[#d9a3a3] bg-[#fbeaea] px-2 py-1 text-[12px] text-[#8c2424]" role="alert">
-                        {status}
-                    </div>
-                ) : null
-            }
-            extraActions={
-                canWrite && selectedEntry?.hasValue ? (
-                    <div className="flex items-center justify-end gap-2 text-[12px]">
-                        <span>Add to {selectedEntry.name}:</span>
-                        <NumberInput aria-label="Amount to add" className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={addValue} onChange={(event) => setAddValue(event.target.value)} />
-                        <Button disabled={busy || !holderReady} variant="secondary" onClick={addToSelected}>
-                            Add
-                        </Button>
-                    </div>
-                ) : null
-            }
-            uniqueKey="variables-explorer-holder"
-            offsetLeft={760}
-            offsetTop={120}
-        />
+        <NativeTextTree>
+            <WiredVariableHolderPanelView
+                title={holderPanelTitle(target)}
+                warningText={WARNING_TEXT[target.scope]}
+                onRefresh={() => void reload()}
+                onClose={onClose}
+                preview={
+                    local?.preview ?? (
+                        <img
+                            alt=""
+                            className={
+                                target.scope === 'global' ? 'max-w-full max-h-full object-contain p-3' : 'w-auto h-auto max-w-[48px] max-h-[48px] object-contain'
+                            }
+                            src={target.scope === 'global' ? wiredGlobalPlaceholderImage : icon}
+                        />
+                    )
+                }
+                infoLines={holderInfoLines(target, profile, roomId, local?.name, local?.owner)}
+                variablesTitle={target.scope === 'global' ? 'Room variables:' : 'Assigned variables:'}
+                entries={entries.map((entry) => ({
+                    id: entry.name,
+                    name: entry.name,
+                    availability: 'Permanent',
+                    hasValue: entry.hasValue,
+                    value: entry.value
+                }))}
+                selectedId={selectedEntry?.name ?? null}
+                onSelect={setSelectedName}
+                canEdit={canWrite && holderReady && !busy}
+                editingId={editingName}
+                editingValue={editingValue}
+                onBeginEdit={(entry) => {
+                    setSelectedName(entry.id);
+                    setEditingName(entry.id);
+                    setEditingValue(String(entry.value ?? 0));
+                }}
+                onEditingValueChange={setEditingValue}
+                onEditBlur={() => setEditingName(null)}
+                onEditKeyDown={onEditKeyDown}
+                isGiveOpen={isGiveOpen}
+                onToggleGive={() => setIsGiveOpen((value) => !value)}
+                giveOptions={giveOptions.map((option) => ({ id: option.name, name: option.name, hasValue: option.hasValue }))}
+                giveSelectedId={selectedGive?.name ?? ''}
+                onGiveSelect={setGiveName}
+                giveValue={giveValue}
+                onGiveValueChange={setGiveValue}
+                canGive={canWrite && holderReady && !busy && target.scope !== 'global' && !!giveOptions.length}
+                onGive={give}
+                canRemove={canWrite && holderReady && !busy && target.scope !== 'global' && !!selectedEntry}
+                onRemove={() => selectedEntry && void setValues({ [selectedEntry.name]: null })}
+                status={
+                    status ? (
+                        <div className="rounded border border-[#d9a3a3] bg-[#fbeaea] px-2 py-1 text-[12px] text-[#8c2424]" role="alert">
+                            {status}
+                        </div>
+                    ) : null
+                }
+                extraActions={
+                    canWrite && selectedEntry?.hasValue ? (
+                        <div className="flex items-center justify-end gap-2 text-[12px]">
+                            <span>Add to {selectedEntry.name}:</span>
+                            <NumberInput aria-label="Amount to add" className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={addValue} onChange={(event) => setAddValue(event.target.value)} />
+                            <Button disabled={busy || !holderReady} variant="secondary" onClick={addToSelected}>
+                                Add
+                            </Button>
+                        </div>
+                    ) : null
+                }
+                uniqueKey="variables-explorer-holder"
+                offsetLeft={760}
+                offsetTop={120}
+            />
+        </NativeTextTree>
     );
 };

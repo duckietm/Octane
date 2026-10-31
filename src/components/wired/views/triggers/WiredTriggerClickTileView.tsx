@@ -4,6 +4,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
 import { clickTriggerFurniSources, normalizeClickTriggerFurniSource } from './clickTriggerSources';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const WiredTriggerClickTileView: FC<{}> = () => {
     const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
@@ -25,11 +26,13 @@ export const WiredTriggerClickTileView: FC<{}> = () => {
     }, [trigger]);
 
     return (
-        <WiredTriggerBaseView
-            hasSpecialInput={false}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} furniSources={furniSources} onChangeFurni={setFurniSource} />}
-        />
+        <NativeTextTree>
+            <WiredTriggerBaseView
+                hasSpecialInput={false}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} furniSources={furniSources} onChangeFurni={setFurniSource} />}
+            />
+        </NativeTextTree>
     );
 };

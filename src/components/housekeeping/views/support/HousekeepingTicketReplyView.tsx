@@ -5,6 +5,7 @@ import { getHousekeepingTicketReplies, LocalizeText, localizeTicketReply, SendMe
 import { HOUSEKEEPING_INPUT_CLASS, HousekeepingButton } from '../common/HousekeepingParts';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const REPLY_MAX = 500;
 
@@ -29,50 +30,52 @@ export const HousekeepingTicketReplyView: FC<{ ticket: IssueMessageData }> = ({ 
     };
 
     return (
-        <div className="flex flex-col gap-1 rounded border border-sky-200 bg-sky-50/40 p-1.5">
-            <div className="flex items-center gap-1.5">
-                <FaReply className="shrink-0 text-sky-600" size={9} />
-                <span className="text-[10px] font-semibold uppercase tracking-wide text-zinc-600">
-                    {LocalizeText('housekeeping.support.reply.label', ['user'], [ticket.reporterUserName])}
-                </span>
-                <Select
-                    className="ml-auto rounded border border-zinc-300 bg-white px-1 py-0.5 text-[11px]"
-                    value=""
-                    onChange={(event) => {
-                        const reply = replies.find((entry) => entry.id === event.target.value);
+        <NativeTextTree>
+            <div className="flex flex-col gap-1 rounded border border-sky-200 bg-sky-50/40 p-1.5">
+                <div className="flex items-center gap-1.5">
+                    <FaReply className="shrink-0 text-sky-600" size={9} />
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-zinc-600">
+                        {LocalizeText('housekeeping.support.reply.label', ['user'], [ticket.reporterUserName])}
+                    </span>
+                    <Select
+                        className="ml-auto rounded border border-zinc-300 bg-white px-1 py-0.5 text-[11px]"
+                        value=""
+                        onChange={(event) => {
+                            const reply = replies.find((entry) => entry.id === event.target.value);
 
-                        if (reply) setText(localizeTicketReply(reply));
+                            if (reply) setText(localizeTicketReply(reply));
+                        }}
+                    >
+                        <option value="">{LocalizeText('housekeeping.support.reply.canned')}</option>
+                        {replies.map((reply) => (
+                            <option key={reply.id} value={reply.id}>
+                                {localizeTicketReply(reply)}
+                            </option>
+                        ))}
+                    </Select>
+                </div>
+                <textarea
+                    className={`${HOUSEKEEPING_INPUT_CLASS} min-h-[48px] resize-y`}
+                    maxLength={REPLY_MAX}
+                    placeholder={LocalizeText('housekeeping.support.reply.placeholder')}
+                    value={text}
+                    onChange={(event) => {
+                        setText(event.target.value);
+                        setSent(false);
                     }}
-                >
-                    <option value="">{LocalizeText('housekeeping.support.reply.canned')}</option>
-                    {replies.map((reply) => (
-                        <option key={reply.id} value={reply.id}>
-                            {localizeTicketReply(reply)}
-                        </option>
-                    ))}
-                </Select>
+                />
+                <div className="flex items-center gap-1.5">
+                    <label className="flex items-center gap-1 text-[10px] text-zinc-600">
+                        <Checkbox checked={closeAfter} onCheckedChange={(nextChecked) => setCloseAfter(nextChecked)} />
+                        {LocalizeText('housekeeping.support.reply.close_after')}
+                    </label>
+                    {sent && <span className="text-[10px] text-emerald-700">{LocalizeText('housekeeping.support.reply.sent')}</span>}
+                    <HousekeepingButton classNames={['ml-auto']} disabled={!trimmed} gap={1} size="sm" variant="primary" onClick={send}>
+                        <FaReply size={9} />
+                        <span>{LocalizeText('housekeeping.support.reply.send')}</span>
+                    </HousekeepingButton>
+                </div>
             </div>
-            <textarea
-                className={`${HOUSEKEEPING_INPUT_CLASS} min-h-[48px] resize-y`}
-                maxLength={REPLY_MAX}
-                placeholder={LocalizeText('housekeeping.support.reply.placeholder')}
-                value={text}
-                onChange={(event) => {
-                    setText(event.target.value);
-                    setSent(false);
-                }}
-            />
-            <div className="flex items-center gap-1.5">
-                <label className="flex items-center gap-1 text-[10px] text-zinc-600">
-                    <Checkbox checked={closeAfter} onCheckedChange={(nextChecked) => setCloseAfter(nextChecked)} />
-                    {LocalizeText('housekeeping.support.reply.close_after')}
-                </label>
-                {sent && <span className="text-[10px] text-emerald-700">{LocalizeText('housekeeping.support.reply.sent')}</span>}
-                <HousekeepingButton classNames={['ml-auto']} disabled={!trimmed} gap={1} size="sm" variant="primary" onClick={send}>
-                    <FaReply size={9} />
-                    <span>{LocalizeText('housekeeping.support.reply.send')}</span>
-                </HousekeepingButton>
-            </div>
-        </div>
+        </NativeTextTree>
     );
 };

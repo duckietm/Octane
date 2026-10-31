@@ -1,6 +1,7 @@
 import { FC, useMemo } from 'react';
 import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
 import { Flex, FlexProps } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface CaretViewProps extends FlexProps {
     collapsed?: boolean;
@@ -18,9 +19,11 @@ export const ContextMenuCaretView: FC<CaretViewProps> = (props) => {
     }, [classNames]);
 
     return (
-        <Flex alignItems={alignItems} classNames={getClassNames} justifyContent={justifyContent} {...rest}>
-            {showIcon && !collapsed && <FaCaretDown className="fa-icon align-self-center" />}
-            {showIcon && collapsed && <FaCaretUp className="fa-icon align-self-center" />}
-        </Flex>
+        <NativeTextTree>
+            <Flex alignItems={alignItems} classNames={getClassNames} justifyContent={justifyContent} {...rest}>
+                {showIcon && !collapsed && <FaCaretDown className="fa-icon align-self-center" />}
+                {showIcon && collapsed && <FaCaretUp className="fa-icon align-self-center" />}
+            </Flex>
+        </NativeTextTree>
     );
 };

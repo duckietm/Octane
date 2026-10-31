@@ -36,6 +36,7 @@ import chIcon from '../../assets/images/avatareditor/air/top-shirt-off.png';
 import sellableIcon from '../../assets/images/avatareditor/air/wearable.png';
 import arrowLeftIcon from '../../assets/images/avatareditor/arrow-left-icon.png';
 import arrowRightIcon from '../../assets/images/avatareditor/arrow-right-icon.png';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { classNames } from '../../layout';
 
 const ICON_MAP: Record<string, { normal: string; selected?: string }> = {
@@ -77,9 +78,11 @@ export const AvatarEditorIcon = ({ ref, icon = null, selected = false, className
     const src = selected && iconEntry.selected ? iconEntry.selected : iconEntry.normal;
 
     return (
-        <div ref={ref} className={classNames('avatar-editor-icon flex items-center justify-center cursor-pointer', className)} {...rest}>
-            <img src={src} alt="" className="pointer-events-none" draggable={false} />
-            {children}
-        </div>
+        <NativeTextTree>
+            <div ref={ref} className={classNames('avatar-editor-icon flex items-center justify-center cursor-pointer', className)} {...rest}>
+                <img src={src} alt="" className="pointer-events-none" draggable={false} />
+                {children}
+            </div>
+        </NativeTextTree>
     );
 };

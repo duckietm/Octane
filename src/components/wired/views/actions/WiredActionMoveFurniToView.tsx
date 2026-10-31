@@ -7,6 +7,7 @@ import { WiredSliderSection } from '../WiredSliderSection';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const directionOptions: { value: number; icon: string }[] = [
     {
@@ -51,31 +52,33 @@ export const WiredActionMoveFurniToView: FC<{}> = (props) => {
     const requiresFurni = WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_OR_BY_TYPE;
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={requiresFurni}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.movefurni', LocalizeText('wiredfurni.params.startdir'))}</Text>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={requiresFurni}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
+            >
                 <div className="flex flex-col gap-1">
-                    {directionOptions.map((value) => (
-                        <label key={value.value} className="flex items-center gap-1">
-                            <Radio checked={movement === value.value} name="movement" onCheckedChange={() => setMovement(value.value)} />
-                            <i className={`icon icon-${value.icon}`} />
-                            <Text>{localizeWithFallback(`wiredfurni.params.movefurni.${value.value}`, value.icon.toUpperCase())}</Text>
-                        </label>
-                    ))}
+                    <Text bold>{localizeWithFallback('wiredfurni.params.movefurni', LocalizeText('wiredfurni.params.startdir'))}</Text>
+                    <div className="flex flex-col gap-1">
+                        {directionOptions.map((value) => (
+                            <label key={value.value} className="flex items-center gap-1">
+                                <Radio checked={movement === value.value} name="movement" onCheckedChange={() => setMovement(value.value)} />
+                                <i className={`icon icon-${value.icon}`} />
+                                <Text>{localizeWithFallback(`wiredfurni.params.movefurni.${value.value}`, value.icon.toUpperCase())}</Text>
+                            </label>
+                        ))}
+                    </div>
                 </div>
-            </div>
-            <WiredSliderSection
-                max={5}
-                min={1}
-                title={LocalizeText('wiredfurni.params.emptytiles', ['tiles'], [spacing.toString()])}
-                value={spacing}
-                onChange={setSpacing}
-            />
-        </WiredActionBaseView>
+                <WiredSliderSection
+                    max={5}
+                    min={1}
+                    title={LocalizeText('wiredfurni.params.emptytiles', ['tiles'], [spacing.toString()])}
+                    value={spacing}
+                    onChange={setSpacing}
+                />
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

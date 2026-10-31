@@ -4,6 +4,7 @@ import { LayoutAvatarImageView } from '../../common';
 import { MentionMessageView } from './MentionMessageView';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface MentionRowViewProps {
     mention: IMentionEntry;
@@ -24,42 +25,49 @@ export const MentionRowView: FC<MentionRowViewProps> = (props) => {
     const removeLabel = LocalizeText('mentions.action.remove');
 
     return (
-        <div className={`mention-row ${mention.read ? '' : 'is-unread'}`} role="listitem">
-            {!mention.read && <span className="mention-row-unread-dot" aria-hidden />}
-            <BaseButton type="button" className="mention-row-main" aria-label={`${mention.senderUsername}: ${mention.message}`} onClick={() => onOpen(mention)}>
-                <span className="mention-row-avatar">
-                    <LayoutAvatarImageView headOnly compactHead compactHeadSize={40} compactHeadPadding={0} direction={2} figure={mention.senderFigure} />
-                </span>
-                <span className="mention-row-body">
-                    <span className="mention-row-head">
-                        <span className="mention-row-name">{mention.senderUsername}</span>
-                        <Hint content={typeTitle}>
-                            <span className={`mention-row-chip ${isRoom ? 'is-room' : 'is-direct'}`}>{typeChip}</span>
-                        </Hint>
-                        {mention.roomName && mention.roomName.length > 0 && <span className="mention-row-room">· {mention.roomName}</span>}
+        <NativeTextTree>
+            <div className={`mention-row ${mention.read ? '' : 'is-unread'}`} role="listitem">
+                {!mention.read && <span className="mention-row-unread-dot" aria-hidden />}
+                <BaseButton
+                    type="button"
+                    className="mention-row-main"
+                    aria-label={`${mention.senderUsername}: ${mention.message}`}
+                    onClick={() => onOpen(mention)}
+                >
+                    <span className="mention-row-avatar">
+                        <LayoutAvatarImageView headOnly compactHead compactHeadSize={40} compactHeadPadding={0} direction={2} figure={mention.senderFigure} />
                     </span>
-                    <MentionMessageView className="mention-row-msg" ownUsername={ownUsername} text={mention.message} />
-                </span>
-            </BaseButton>
-            <div className="mention-row-meta">
-                {time.length > 0 && <span className="mention-row-time">{time}</span>}
-                <div className="mention-row-actions">
-                    {onGoto && mention.roomId > 0 && (
-                        <Hint content={gotoLabel}>
-                            <BaseButton type="button" className="mention-row-action" aria-label={gotoLabel} onClick={() => onGoto(mention)}>
-                                ›
-                            </BaseButton>
-                        </Hint>
-                    )}
-                    {onRemove && (
-                        <Hint content={removeLabel}>
-                            <BaseButton type="button" className="mention-row-action is-remove" aria-label={removeLabel} onClick={() => onRemove(mention)}>
-                                ×
-                            </BaseButton>
-                        </Hint>
-                    )}
+                    <span className="mention-row-body">
+                        <span className="mention-row-head">
+                            <span className="mention-row-name">{mention.senderUsername}</span>
+                            <Hint content={typeTitle}>
+                                <span className={`mention-row-chip ${isRoom ? 'is-room' : 'is-direct'}`}>{typeChip}</span>
+                            </Hint>
+                            {mention.roomName && mention.roomName.length > 0 && <span className="mention-row-room">· {mention.roomName}</span>}
+                        </span>
+                        <MentionMessageView className="mention-row-msg" ownUsername={ownUsername} text={mention.message} />
+                    </span>
+                </BaseButton>
+                <div className="mention-row-meta">
+                    {time.length > 0 && <span className="mention-row-time">{time}</span>}
+                    <div className="mention-row-actions">
+                        {onGoto && mention.roomId > 0 && (
+                            <Hint content={gotoLabel}>
+                                <BaseButton type="button" className="mention-row-action" aria-label={gotoLabel} onClick={() => onGoto(mention)}>
+                                    ›
+                                </BaseButton>
+                            </Hint>
+                        )}
+                        {onRemove && (
+                            <Hint content={removeLabel}>
+                                <BaseButton type="button" className="mention-row-action is-remove" aria-label={removeLabel} onClick={() => onRemove(mention)}>
+                                    ×
+                                </BaseButton>
+                            </Hint>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

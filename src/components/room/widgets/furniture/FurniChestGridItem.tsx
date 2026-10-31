@@ -5,6 +5,7 @@ import { LayoutLimitedEditionStyledNumberView, LayoutRarityLevelView, PIXEL_ART_
 import { ChestFurniGroup } from './chestFurniGrouping';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const BORDER_IDLE = '#cbcbcb';
 const BORDER_HOVER = '#d69586';
@@ -22,51 +23,53 @@ export const FurniChestGridItem: FC<{
     const isRarity = group.specialType === 19;
 
     return (
-        <Hint content={title}><BaseButton type="button"
-            className="octane-chest__grid-cell"
-            onClick={onSelect}
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-        >
-            {selected && <div className="octane-chest__grid-cell-focus" aria-hidden />}
-            <div
-                className={`octane-chest__grid-cell-inner${isLtd ? ' unique-item' : ''}`}
-                style={{ borderColor: hovered && !selected ? BORDER_HOVER : BORDER_IDLE, position: 'relative' }}
+        <NativeTextTree>
+            <Hint content={title}><BaseButton type="button"
+                className="octane-chest__grid-cell"
+                onClick={onSelect}
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
             >
-                {isLtd && (
-                    <>
-                        <div className="unique-bg-override octane-chest__grid-ltd-bg" />
-                        <div className="absolute bottom-0 unique-item-counter octane-chest__grid-ltd-counter">
-                            <LayoutLimitedEditionStyledNumberView value={stuff?.uniqueNumber ?? 0} />
-                        </div>
-                    </>
-                )}
-                {/* Same gamedata icon (and sizing) as the deposit panel, so both grids look identical. */}
-                <div className="octane-chest__grid-icon">
-                    <img
-                        src={ProductImageUtility.getProductImageUrl(
-                            group.wallItem ? FurnitureType.WALL : FurnitureType.FLOOR,
-                            group.baseItemId,
-                            group.legacyPosterId,
-                        )}
-                        alt=""
-                        draggable={false}
-                        style={{ maxWidth: 38, maxHeight: 38, objectFit: 'contain', imageRendering: PIXEL_ART_RENDERING }}
-                    />
-                </div>
-                {isRarity && (
-                    <LayoutRarityLevelView
-                        className="octane-chest__grid-rarity"
-                        level={stuff?.rarityLevel ?? 0}
-                        position="absolute"
-                    />
-                )}
-                {group.quantity > 1 && (
-                    <div className="octane-chest__qty-badge">
-                        <span>{group.quantity}</span>
+                {selected && <div className="octane-chest__grid-cell-focus" aria-hidden />}
+                <div
+                    className={`octane-chest__grid-cell-inner${isLtd ? ' unique-item' : ''}`}
+                    style={{ borderColor: hovered && !selected ? BORDER_HOVER : BORDER_IDLE, position: 'relative' }}
+                >
+                    {isLtd && (
+                        <>
+                            <div className="unique-bg-override octane-chest__grid-ltd-bg" />
+                            <div className="absolute bottom-0 unique-item-counter octane-chest__grid-ltd-counter">
+                                <LayoutLimitedEditionStyledNumberView value={stuff?.uniqueNumber ?? 0} />
+                            </div>
+                        </>
+                    )}
+                    {/* Same gamedata icon (and sizing) as the deposit panel, so both grids look identical. */}
+                    <div className="octane-chest__grid-icon">
+                        <img
+                            src={ProductImageUtility.getProductImageUrl(
+                                group.wallItem ? FurnitureType.WALL : FurnitureType.FLOOR,
+                                group.baseItemId,
+                                group.legacyPosterId,
+                            )}
+                            alt=""
+                            draggable={false}
+                            style={{ maxWidth: 38, maxHeight: 38, objectFit: 'contain', imageRendering: PIXEL_ART_RENDERING }}
+                        />
                     </div>
-                )}
-            </div>
-        </BaseButton></Hint>
+                    {isRarity && (
+                        <LayoutRarityLevelView
+                            className="octane-chest__grid-rarity"
+                            level={stuff?.rarityLevel ?? 0}
+                            position="absolute"
+                        />
+                    )}
+                    {group.quantity > 1 && (
+                        <div className="octane-chest__qty-badge">
+                            <span>{group.quantity}</span>
+                        </div>
+                    )}
+                </div>
+            </BaseButton></Hint>
+        </NativeTextTree>
     );
 };

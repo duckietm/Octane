@@ -2,6 +2,7 @@ import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
 import { GetConfigurationValue, localizeWithFallback, OpenUrl } from '../../../../../api';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { isCollectiblesEnabled } from '../../../../../hooks/collectibles/useCollectibles';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 import { CatalogLayoutInformationView } from './CatalogLayoutInformationView';
@@ -15,17 +16,19 @@ export const CatalogLayoutCollectiblesView: FC<CatalogLayoutProps> = (props) => 
     const externalLink = GetConfigurationValue<string>('link.format.collectibles', '');
 
     return (
-        <div className="octane-catalog-collectibles-layout">
-            <CatalogLayoutInformationView {...props} />
-            {(enabled || !!externalLink) && (
-                <BaseButton
-                    className="octane-collectibles-button is-green octane-catalog-collectibles-link"
-                    data-testid="catalog-collectibles-link"
-                    onClick={() => (enabled ? CreateLinkEvent('collectibles/open/shop') : OpenUrl(externalLink))}
-                >
-                    {localizeWithFallback('catalog.collectibles.link', localizeWithFallback('collectibles.title', 'Collectibles'))}
-                </BaseButton>
-            )}
-        </div>
+        <NativeTextTree>
+            <div className="octane-catalog-collectibles-layout">
+                <CatalogLayoutInformationView {...props} />
+                {(enabled || !!externalLink) && (
+                    <BaseButton
+                        className="octane-collectibles-button is-green octane-catalog-collectibles-link"
+                        data-testid="catalog-collectibles-link"
+                        onClick={() => (enabled ? CreateLinkEvent('collectibles/open/shop') : OpenUrl(externalLink))}
+                    >
+                        {localizeWithFallback('catalog.collectibles.link', localizeWithFallback('collectibles.title', 'Collectibles'))}
+                    </BaseButton>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

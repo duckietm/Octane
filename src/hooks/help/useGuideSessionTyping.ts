@@ -50,7 +50,12 @@ export const useGuideSessionTyping = (messageLength: number, active = true) => {
 
         start();
 
-        return stop;
+        return () => {
+            stop();
+            // The next session starts as not typing: a session that ended while typing kept the flag, and the next
+            // session's first "typing" was never sent.
+            isTypingRef.current = false;
+        };
     }, [active, start, stop]);
 
     return { restart: start };

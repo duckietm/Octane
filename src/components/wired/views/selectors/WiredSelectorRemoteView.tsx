@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Radio } from '../../../../common/Radio';
 import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MAX_PICK_COUNT = 20;
 
@@ -31,24 +32,26 @@ export const WiredSelectorRemoteView: FC<{}> = () => {
     }, [intersect, pickCount, setIntParams]);
 
     return (
-        <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
-            <div className="flex flex-col gap-2">
-                <Text small>{localizeWithFallback('wiredfurni.params.remote_selection.info', 'Pick selector boxes of other stacks; their selections are used here.')}</Text>
+        <NativeTextTree>
+            <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
+                <div className="flex flex-col gap-2">
+                    <Text small>{localizeWithFallback('wiredfurni.params.remote_selection.info', 'Pick selector boxes of other stacks; their selections are used here.')}</Text>
 
-                <Text bold>{localizeWithFallback('wiredfurni.params.remote_selection.type', 'Selection type')}</Text>
-                {[false, true].map((value) => (
-                    <label key={String(value)} className="flex items-center gap-1">
-                        <Radio name="remoteSelectionType" checked={intersect === value} onCheckedChange={() => setIntersect(value)} />
-                        <Text>{localizeWithFallback(`wiredfurni.params.remote_selection.type.${value ? 1 : 0}`, value ? 'Intersection' : 'Union')}</Text>
+                    <Text bold>{localizeWithFallback('wiredfurni.params.remote_selection.type', 'Selection type')}</Text>
+                    {[false, true].map((value) => (
+                        <label key={String(value)} className="flex items-center gap-1">
+                            <Radio name="remoteSelectionType" checked={intersect === value} onCheckedChange={() => setIntersect(value)} />
+                            <Text>{localizeWithFallback(`wiredfurni.params.remote_selection.type.${value ? 1 : 0}`, value ? 'Intersection' : 'Union')}</Text>
+                        </label>
+                    ))}
+
+                    <label className="flex items-center gap-2">
+                        <Text>{localizeWithFallback('wiredfurni.params.remote_selection.filter', 'Use this many of the picked, at random (0 = all)')}</Text>
+                        <NumberInput className="form-control form-control-sm" style={{ width: 64 }} min={0} max={MAX_PICK_COUNT} value={pickCount} onChange={(event) => setPickCount(Math.max(0, Math.min(MAX_PICK_COUNT, parseInt(event.target.value, 10) || 0)))} />
                     </label>
-                ))}
 
-                <label className="flex items-center gap-2">
-                    <Text>{localizeWithFallback('wiredfurni.params.remote_selection.filter', 'Use this many of the picked, at random (0 = all)')}</Text>
-                    <NumberInput className="form-control form-control-sm" style={{ width: 64 }} min={0} max={MAX_PICK_COUNT} value={pickCount} onChange={(event) => setPickCount(Math.max(0, Math.min(MAX_PICK_COUNT, parseInt(event.target.value, 10) || 0)))} />
-                </label>
-
-            </div>
-        </WiredSelectorBaseView>
+                </div>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

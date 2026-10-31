@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { localizeWithFallback } from '../../../api';
 import { Text } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { Radio } from '../../../common/Radio';
 
 // Comparison operators for wired chest conditions.
@@ -45,15 +46,17 @@ interface WiredComparisonOperatorProps {
 }
 
 export const WiredComparisonOperator: FC<WiredComparisonOperatorProps> = ({ name, value, onChange, title }) => (
-    <div className="flex flex-col gap-1">
-        <Text bold>{title ?? localizeWithFallback('wiredfurni.chest.comparison', 'Comparison')}</Text>
-        <div className="flex flex-wrap gap-2">
-            {OPTIONS.map((option) => (
-                <label key={option.value} className="flex items-center gap-1">
-                    <Radio name={name} checked={value === option.value} onCheckedChange={() => onChange(option.value)} />
-                    <Text>{option.symbol}</Text>
-                </label>
-            ))}
+    <NativeTextTree>
+        <div className="flex flex-col gap-1">
+            <Text bold>{title ?? localizeWithFallback('wiredfurni.chest.comparison', 'Comparison')}</Text>
+            <div className="flex flex-wrap gap-2">
+                {OPTIONS.map((option) => (
+                    <label key={option.value} className="flex items-center gap-1">
+                        <Radio name={name} checked={value === option.value} onCheckedChange={() => onChange(option.value)} />
+                        <Text>{option.symbol}</Text>
+                    </label>
+                ))}
+            </div>
         </div>
-    </div>
+    </NativeTextTree>
 );

@@ -14,6 +14,7 @@ import { useHousekeeping, useHousekeepingConfirm } from '../../../../hooks';
 import { HOUSEKEEPING_INPUT_CLASS, HousekeepingButton, HousekeepingEmptyState, HousekeepingPill, HousekeepingSection } from '../common/HousekeepingParts';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * Every permission against every rank. A cell saves on change and the server reloads the
@@ -86,102 +87,104 @@ export const HousekeepingPermissionsTab: FC = () => {
     };
 
     return (
-        <HousekeepingSection
-            aside={
-                <HousekeepingButton disabled={isLoading} gap={1} size="sm" variant="secondary" onClick={() => setReload((value) => value + 1)}>
-                    <FaSync className={isLoading ? 'animate-spin' : ''} size={9} />
-                    <span>{LocalizeText('housekeeping.history.refresh')}</span>
-                </HousekeepingButton>
-            }
-            icon={<FaKey className="text-amber-600" size={9} />}
-            title={LocalizeText('housekeeping.permissions.label')}
-            tone="warning"
-        >
-            <div className="text-[10px] text-zinc-500">{LocalizeText('housekeeping.permissions.hint')}</div>
-            <div className="flex items-center gap-1.5">
-                <FaSearch className="shrink-0 text-zinc-400" size={10} />
-                <input
-                    className={HOUSEKEEPING_INPUT_CLASS}
-                    placeholder={LocalizeText('housekeeping.permissions.search')}
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                />
-                <label className="flex shrink-0 items-center gap-1 text-[10px] text-zinc-600">
-                    <Checkbox checked={onlyMixed} onCheckedChange={(nextChecked) => setOnlyMixed(nextChecked)} />
-                    {LocalizeText('housekeeping.permissions.only_mixed')}
-                </label>
-                {matrix && <HousekeepingPill>{rows.length}</HousekeepingPill>}
-            </div>
-
-            {error && <HousekeepingEmptyState>{LocalizeText(error)}</HousekeepingEmptyState>}
-            {!error && !matrix && isLoading && <HousekeepingEmptyState>{LocalizeText('generic.loading')}</HousekeepingEmptyState>}
-            {!error && matrix && rows.length === 0 && <HousekeepingEmptyState>{LocalizeText('housekeeping.permissions.empty')}</HousekeepingEmptyState>}
-
-            {!error && matrix && rows.length > 0 && (
-                <div className="max-h-[420px] overflow-auto rounded border border-zinc-200 bg-white">
-                    <table className="w-full border-collapse text-[11px]">
-                        <thead className="sticky top-0 z-[1] bg-zinc-100">
-                            <tr>
-                                <th className="px-1.5 py-1 text-left text-[10px] font-semibold uppercase tracking-wide text-zinc-600">
-                                    {LocalizeText('housekeeping.permissions.column.permission')}
-                                </th>
-                                {matrix.ranks.map((rank) => (
-                                    <th
-                                        key={rank.id}
-                                        className={`px-1 py-1 text-center text-[10px] font-semibold ${rank.own ? 'text-amber-700' : 'text-zinc-600'}`}
-                                        title={rank.editable ? rank.name : LocalizeText('housekeeping.permissions.locked', ['rank'], [rank.name])}
-                                    >
-                                        <div className="flex flex-col items-center gap-0.5">
-                                            <span className="max-w-[72px] truncate">{rank.name || `#${rank.id}`}</span>
-                                            <span className="flex items-center gap-0.5 text-[9px] font-normal text-zinc-500">
-                                                {!rank.editable && <FaLock size={7} />}
-                                                {rank.own && <FaExclamationTriangle className="text-amber-600" size={7} />}#{rank.id}
-                                            </span>
-                                        </div>
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {rows.map((row) => (
-                                <tr key={row.key} className="border-t border-zinc-100 hover:bg-sky-50/50">
-                                    <td className="px-1.5 py-0.5" title={row.comment}>
-                                        <div className="font-semibold text-zinc-800">{row.key}</div>
-                                        {row.comment && <div className="max-w-[240px] truncate text-[10px] text-zinc-500">{row.comment}</div>}
-                                    </td>
-                                    {matrix.ranks.map((rank, rankIndex) => {
-                                        const value = row.values[rankIndex] ?? 0;
-                                        const disabled = !rank.editable || isActionPending;
-                                        const label = `${row.key} · ${rank.name || `#${rank.id}`}`;
-
-                                        return (
-                                            <td key={rank.id} className={`px-1 py-0.5 text-center ${rank.own ? 'bg-amber-50/60' : ''}`}>
-                                                {row.max <= 1 ? (
-                                                    <Checkbox aria-label={label} checked={value > 0} disabled={disabled} onCheckedChange={(nextChecked) => change(row.key, rank, rankIndex, value, nextChecked ? 1 : 0)} />
-                                                ) : (
-                                                    <Select
-                                                        aria-label={label}
-                                                        className="rounded border border-zinc-300 bg-white px-0.5 text-[11px] disabled:opacity-50"
-                                                        disabled={disabled}
-                                                        value={value}
-                                                        onChange={(event) => change(row.key, rank, rankIndex, value, Number(event.target.value))}
-                                                    >
-                                                        {Array.from({ length: row.max + 1 }, (_, option) => (
-                                                            <option key={option} value={option}>
-                                                                {option}
-                                                            </option>
-                                                        ))}
-                                                    </Select>
-                                                )}
-                                            </td>
-                                        );
-                                    })}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+        <NativeTextTree>
+            <HousekeepingSection
+                aside={
+                    <HousekeepingButton disabled={isLoading} gap={1} size="sm" variant="secondary" onClick={() => setReload((value) => value + 1)}>
+                        <FaSync className={isLoading ? 'animate-spin' : ''} size={9} />
+                        <span>{LocalizeText('housekeeping.history.refresh')}</span>
+                    </HousekeepingButton>
+                }
+                icon={<FaKey className="text-amber-600" size={9} />}
+                title={LocalizeText('housekeeping.permissions.label')}
+                tone="warning"
+            >
+                <div className="text-[10px] text-zinc-500">{LocalizeText('housekeeping.permissions.hint')}</div>
+                <div className="flex items-center gap-1.5">
+                    <FaSearch className="shrink-0 text-zinc-400" size={10} />
+                    <input
+                        className={HOUSEKEEPING_INPUT_CLASS}
+                        placeholder={LocalizeText('housekeeping.permissions.search')}
+                        value={search}
+                        onChange={(event) => setSearch(event.target.value)}
+                    />
+                    <label className="flex shrink-0 items-center gap-1 text-[10px] text-zinc-600">
+                        <Checkbox checked={onlyMixed} onCheckedChange={(nextChecked) => setOnlyMixed(nextChecked)} />
+                        {LocalizeText('housekeeping.permissions.only_mixed')}
+                    </label>
+                    {matrix && <HousekeepingPill>{rows.length}</HousekeepingPill>}
                 </div>
-            )}
-        </HousekeepingSection>
+
+                {error && <HousekeepingEmptyState>{LocalizeText(error)}</HousekeepingEmptyState>}
+                {!error && !matrix && isLoading && <HousekeepingEmptyState>{LocalizeText('generic.loading')}</HousekeepingEmptyState>}
+                {!error && matrix && rows.length === 0 && <HousekeepingEmptyState>{LocalizeText('housekeeping.permissions.empty')}</HousekeepingEmptyState>}
+
+                {!error && matrix && rows.length > 0 && (
+                    <div className="max-h-[420px] overflow-auto rounded border border-zinc-200 bg-white">
+                        <table className="w-full border-collapse text-[11px]">
+                            <thead className="sticky top-0 z-[1] bg-zinc-100">
+                                <tr>
+                                    <th className="px-1.5 py-1 text-left text-[10px] font-semibold uppercase tracking-wide text-zinc-600">
+                                        {LocalizeText('housekeeping.permissions.column.permission')}
+                                    </th>
+                                    {matrix.ranks.map((rank) => (
+                                        <th
+                                            key={rank.id}
+                                            className={`px-1 py-1 text-center text-[10px] font-semibold ${rank.own ? 'text-amber-700' : 'text-zinc-600'}`}
+                                            title={rank.editable ? rank.name : LocalizeText('housekeeping.permissions.locked', ['rank'], [rank.name])}
+                                        >
+                                            <div className="flex flex-col items-center gap-0.5">
+                                                <span className="max-w-[72px] truncate">{rank.name || `#${rank.id}`}</span>
+                                                <span className="flex items-center gap-0.5 text-[9px] font-normal text-zinc-500">
+                                                    {!rank.editable && <FaLock size={7} />}
+                                                    {rank.own && <FaExclamationTriangle className="text-amber-600" size={7} />}#{rank.id}
+                                                </span>
+                                            </div>
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {rows.map((row) => (
+                                    <tr key={row.key} className="border-t border-zinc-100 hover:bg-sky-50/50">
+                                        <td className="px-1.5 py-0.5" title={row.comment}>
+                                            <div className="font-semibold text-zinc-800">{row.key}</div>
+                                            {row.comment && <div className="max-w-[240px] truncate text-[10px] text-zinc-500">{row.comment}</div>}
+                                        </td>
+                                        {matrix.ranks.map((rank, rankIndex) => {
+                                            const value = row.values[rankIndex] ?? 0;
+                                            const disabled = !rank.editable || isActionPending;
+                                            const label = `${row.key} · ${rank.name || `#${rank.id}`}`;
+
+                                            return (
+                                                <td key={rank.id} className={`px-1 py-0.5 text-center ${rank.own ? 'bg-amber-50/60' : ''}`}>
+                                                    {row.max <= 1 ? (
+                                                        <Checkbox aria-label={label} checked={value > 0} disabled={disabled} onCheckedChange={(nextChecked) => change(row.key, rank, rankIndex, value, nextChecked ? 1 : 0)} />
+                                                    ) : (
+                                                        <Select
+                                                            aria-label={label}
+                                                            className="rounded border border-zinc-300 bg-white px-0.5 text-[11px] disabled:opacity-50"
+                                                            disabled={disabled}
+                                                            value={value}
+                                                            onChange={(event) => change(row.key, rank, rankIndex, value, Number(event.target.value))}
+                                                        >
+                                                            {Array.from({ length: row.max + 1 }, (_, option) => (
+                                                                <option key={option} value={option}>
+                                                                    {option}
+                                                                </option>
+                                                            ))}
+                                                        </Select>
+                                                    )}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </HousekeepingSection>
+        </NativeTextTree>
     );
 };

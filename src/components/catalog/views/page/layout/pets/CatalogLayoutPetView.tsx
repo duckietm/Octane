@@ -30,6 +30,7 @@ import { Select } from '../../../../../../common/Select';
 import { BaseButton } from '../../../../../../common/BaseButton';
 import { ToggleButton } from '../../../../../../common/ToggleButton';
 import { Hint } from '../../../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
 
 interface PendingPetPurchase {
     extraData: string;
@@ -242,30 +243,75 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
     const colorLabel = LocalizeText('catalog.pets.choose.color');
 
     return (
-        <div
-            className={`octane-catalog-pet-layout ${legacyPet ? 'octane-catalog-pet-layout--legacy' : 'octane-catalog-pet-layout--new'}`}
-        >
-            <div className="octane-catalog-pet-preview relative h-[240px] min-h-[240px] overflow-hidden">
-                {selectedPalette && (
-                    <div className="octane-catalog-pet-preview-image">
-                        <LayoutPetImageView
-                            direction={legacyPet || petIndex === 15 ? 2 : 3}
-                            paletteId={selectedPalette.paletteId}
-                            petColor={legacyPet ? selectedColor : 0xffffff}
-                            scale={petIndex === 15 ? 1 : 2}
-                            typeId={petIndex}
-                        />
+        <NativeTextTree>
+            <div
+                className={`octane-catalog-pet-layout ${legacyPet ? 'octane-catalog-pet-layout--legacy' : 'octane-catalog-pet-layout--new'}`}
+            >
+                <div className="octane-catalog-pet-preview relative h-[240px] min-h-[240px] overflow-hidden">
+                    {selectedPalette && (
+                        <div className="octane-catalog-pet-preview-image">
+                            <LayoutPetImageView
+                                direction={legacyPet || petIndex === 15 ? 2 : 3}
+                                paletteId={selectedPalette.paletteId}
+                                petColor={legacyPet ? selectedColor : 0xffffff}
+                                scale={petIndex === 15 ? 1 : 2}
+                                typeId={petIndex}
+                            />
+                        </div>
+                    )}
+                    <CatalogAddOnBadgeWidgetView className="octane-catalog-pet-preview-badge" />
+                    <div className="octane-catalog-pet-preview-price">
+                        <CatalogTotalPriceWidget />
                     </div>
-                )}
-                <CatalogAddOnBadgeWidgetView className="octane-catalog-pet-preview-badge" />
-                <div className="octane-catalog-pet-preview-price">
-                    <CatalogTotalPriceWidget />
                 </div>
-            </div>
 
-            <div className="octane-catalog-pet-editor">
-                {legacyPet ? (
-                    <>
+                <div className="octane-catalog-pet-editor">
+                    {legacyPet ? (
+                        <>
+                            <div className="octane-catalog-pet-field">
+                                <span>{colorLabel}</span>
+                                <CatalogScrollAreaView
+                                    className="octane-catalog-pet-color-grid"
+                                    contentClassName="octane-catalog-pet-color-grid-content"
+                                    aria-label={colorLabel}
+                                    role="group"
+                                >
+                                    {legacyColors.map((colors, index) => (
+                                        <ToggleButton
+                                            key={`${colors[0]}-${index}`}
+                                            aria-label={`${colorLabel} ${index + 1}`} pressed={selectedColorIndex === index}
+                                            className="octane-catalog-pet-color-swatch"
+                                            disabled={controlsDisabled}
+                                            style={{ backgroundColor: ColorConverter.int2rgb(colors[0]) }}
+                                            type="button"
+                                            onClick={() => setSelectedColorIndex(index)}
+                                        />
+                                    ))}
+                                </CatalogScrollAreaView>
+                            </div>
+                            {selectablePalettes.length > 1 && (
+                                <label className="octane-catalog-pet-breed-selector">
+                                    <span>{LocalizeText('catalog.pets.choose.breed')}</span>
+                                    <Select
+                                        value={selectedPaletteIndex}
+                                        disabled={controlsDisabled}
+                                        onChange={(event) => setSelectedPaletteIndex(Number(event.target.value))}
+                                    >
+                                        {selectablePalettes.map((palette, index) => {
+                                            const locked = isBreedLocked(palette);
+
+                                            return (
+                                                <option key={palette.paletteId} disabled={locked} value={index}>
+                                                    {LocalizeText(`pet.breed.${petIndex}.${palette.breedId}`)}
+                                                    {locked ? ` (${hcOnlyLabel})` : ''}
+                                                </option>
+                                            );
+                                        })}
+                                    </Select>
+                                </label>
+                            )}
+                        </>
+                    ) : (
                         <div className="octane-catalog-pet-field">
                             <span>{colorLabel}</span>
                             <CatalogScrollAreaView
@@ -274,110 +320,67 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                 aria-label={colorLabel}
                                 role="group"
                             >
-                                {legacyColors.map((colors, index) => (
-                                    <ToggleButton
-                                        key={`${colors[0]}-${index}`}
-                                        aria-label={`${colorLabel} ${index + 1}`} pressed={selectedColorIndex === index}
-                                        className="octane-catalog-pet-color-swatch"
-                                        disabled={controlsDisabled}
-                                        style={{ backgroundColor: ColorConverter.int2rgb(colors[0]) }}
-                                        type="button"
-                                        onClick={() => setSelectedColorIndex(index)}
-                                    />
-                                ))}
+                                {newPetChoices.map((choice, index) => {
+                                    const colors = choice.colors.map((color) => ColorConverter.int2rgb(color));
+                                    const style = {
+                                        background:
+                                            colors.length > 1
+                                                ? `linear-gradient(135deg, ${colors[0]} 0 50%, ${colors[1]} 50% 100%)`
+                                                : colors[0]
+                                    };
+                                    const locked = isBreedLocked(choice.palette);
+
+                                    return (
+                                        <Hint key={choice.palette.paletteId} content={locked ? hcOnlyLabel : undefined}><ToggleButton
+                                            aria-label={locked ? `${colorLabel} ${index + 1} — ${hcOnlyLabel}` : `${colorLabel} ${index + 1}`} pressed={selectedPaletteIndex === index}
+                                            className={`octane-catalog-pet-color-swatch${locked ? ' octane-catalog-pet-color-swatch--locked' : ''}`}
+                                            disabled={controlsDisabled || locked}
+                                            style={style}
+                                            type="button"
+                                            onClick={() => setSelectedPaletteIndex(index)}
+                                        >
+                                            {locked && <FaLock className="octane-catalog-pet-swatch-lock" />}
+                                        </ToggleButton></Hint>
+                                    );
+                                })}
                             </CatalogScrollAreaView>
                         </div>
-                        {selectablePalettes.length > 1 && (
-                            <label className="octane-catalog-pet-breed-selector">
-                                <span>{LocalizeText('catalog.pets.choose.breed')}</span>
-                                <Select
-                                    value={selectedPaletteIndex}
-                                    disabled={controlsDisabled}
-                                    onChange={(event) => setSelectedPaletteIndex(Number(event.target.value))}
-                                >
-                                    {selectablePalettes.map((palette, index) => {
-                                        const locked = isBreedLocked(palette);
-
-                                        return (
-                                            <option key={palette.paletteId} disabled={locked} value={index}>
-                                                {LocalizeText(`pet.breed.${petIndex}.${palette.breedId}`)}
-                                                {locked ? ` (${hcOnlyLabel})` : ''}
-                                            </option>
-                                        );
-                                    })}
-                                </Select>
-                            </label>
-                        )}
-                    </>
-                ) : (
-                    <div className="octane-catalog-pet-field">
-                        <span>{colorLabel}</span>
-                        <CatalogScrollAreaView
-                            className="octane-catalog-pet-color-grid"
-                            contentClassName="octane-catalog-pet-color-grid-content"
-                            aria-label={colorLabel}
-                            role="group"
-                        >
-                            {newPetChoices.map((choice, index) => {
-                                const colors = choice.colors.map((color) => ColorConverter.int2rgb(color));
-                                const style = {
-                                    background:
-                                        colors.length > 1
-                                            ? `linear-gradient(135deg, ${colors[0]} 0 50%, ${colors[1]} 50% 100%)`
-                                            : colors[0]
-                                };
-                                const locked = isBreedLocked(choice.palette);
-
-                                return (
-                                    <Hint key={choice.palette.paletteId} content={locked ? hcOnlyLabel : undefined}><ToggleButton
-                                        aria-label={locked ? `${colorLabel} ${index + 1} — ${hcOnlyLabel}` : `${colorLabel} ${index + 1}`} pressed={selectedPaletteIndex === index}
-                                        className={`octane-catalog-pet-color-swatch${locked ? ' octane-catalog-pet-color-swatch--locked' : ''}`}
-                                        disabled={controlsDisabled || locked}
-                                        style={style}
-                                        type="button"
-                                        onClick={() => setSelectedPaletteIndex(index)}
-                                    >
-                                        {locked && <FaLock className="octane-catalog-pet-swatch-lock" />}
-                                    </ToggleButton></Hint>
-                                );
-                            })}
-                        </CatalogScrollAreaView>
-                    </div>
-                )}
-
-                <div className="octane-catalog-pet-purchase mt-auto">
-                    <label className="octane-catalog-pet-name-field">
-                        <span>{LocalizeText('widgets.petpackage.name.title')}</span>
-                        <span className="relative flex-1">
-                            <input
-                                disabled={controlsDisabled}
-                                maxLength={getPetNameMaxLength(petIndex)}
-                                placeholder={LocalizeText('widgets.petpackage.name.title')}
-                                type="text"
-                                value={petName}
-                                onChange={(event) => setPetName(event.target.value)}
-                            />
-                            {approvalResult === 0 && <FaCheck className="octane-catalog-pet-name-status text-success" />}
-                            {approvalResult > 0 && <FaTimes className="octane-catalog-pet-name-status text-danger" />}
-                        </span>
-                    </label>
-                    {approvalResult > 0 && <span className="octane-catalog-pet-name-error">{validationErrorMessage}</span>}
-                    {isBreedLocked(selectedPalette) && (
-                        <span className="octane-catalog-pet-hc-note">
-                            <FaLock /> {hcOnlyLabel}
-                        </span>
                     )}
-                    <div className="octane-catalog-pet-purchase-row">
-                        <BaseButton
-                            className="octane-catalog-standard-button octane-catalog-standard-buy-button"
-                            disabled={controlsDisabled || !purchaseExtraData}
-                            onClick={requestPurchase}
-                        >
-                            {LocalizeText('catalog.purchase_confirmation.buy')}
-                        </BaseButton>
+
+                    <div className="octane-catalog-pet-purchase mt-auto">
+                        <label className="octane-catalog-pet-name-field">
+                            <span>{LocalizeText('widgets.petpackage.name.title')}</span>
+                            <span className="relative flex-1">
+                                <input
+                                    disabled={controlsDisabled}
+                                    maxLength={getPetNameMaxLength(petIndex)}
+                                    placeholder={LocalizeText('widgets.petpackage.name.title')}
+                                    type="text"
+                                    value={petName}
+                                    onChange={(event) => setPetName(event.target.value)}
+                                />
+                                {approvalResult === 0 && <FaCheck className="octane-catalog-pet-name-status text-success" />}
+                                {approvalResult > 0 && <FaTimes className="octane-catalog-pet-name-status text-danger" />}
+                            </span>
+                        </label>
+                        {approvalResult > 0 && <span className="octane-catalog-pet-name-error">{validationErrorMessage}</span>}
+                        {isBreedLocked(selectedPalette) && (
+                            <span className="octane-catalog-pet-hc-note">
+                                <FaLock /> {hcOnlyLabel}
+                            </span>
+                        )}
+                        <div className="octane-catalog-pet-purchase-row">
+                            <BaseButton
+                                className="octane-catalog-standard-button octane-catalog-standard-buy-button"
+                                disabled={controlsDisabled || !purchaseExtraData}
+                                onClick={requestPurchase}
+                            >
+                                {LocalizeText('catalog.purchase_confirmation.buy')}
+                            </BaseButton>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

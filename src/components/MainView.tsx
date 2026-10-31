@@ -68,6 +68,7 @@ import { VariablesExplorerView } from './variables-explorer/VariablesExplorerVie
 import { VaultView } from './vault/VaultView';
 import { WiredView } from './wired/WiredView';
 import { WiredCreatorToolsView } from './wired-tools/WiredCreatorToolsView';
+import { NativeTextTree } from '../common/native-text/NativeTextTree';
 
 export const MainView: FC<{}> = (props) =>
 {
@@ -181,94 +182,96 @@ export const MainView: FC<{}> = (props) =>
     }, []);
 
     return (
-        <>
-            <div className="hidden" data-localization-version={localizationVersion} />
-            <AnimatePresence>
-                {landingViewVisible && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                        <WidgetErrorBoundary name="HotelView">
-                            <HotelView />
-                        </WidgetErrorBoundary>
-                    </motion.div>
+        <NativeTextTree>
+            <>
+                <div className="hidden" data-localization-version={localizationVersion} />
+                <AnimatePresence>
+                    {landingViewVisible && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                            <WidgetErrorBoundary name="HotelView">
+                                <HotelView />
+                            </WidgetErrorBoundary>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+                <WidgetErrorBoundary name="ToolbarView"><ToolbarView isInRoom={!landingViewVisible} /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="TranslationBootstrap">
+                    <TranslationBootstrap />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="GoogleAdsView"><GoogleAdsView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="ModToolsView"><ModToolsView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="HousekeepingView"><HousekeepingView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="WiredCreatorToolsView"><WiredCreatorToolsView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="VariablesExplorerView"><VariablesExplorerView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="RoomView"><RoomView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="RoomQueueWidgetView"><RoomQueueWidgetView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="ChatHistoryView"><ChatHistoryView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="CustomizeNickIconView"><CustomizeNickIconView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="WiredView"><WiredView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="AvatarEditorView"><AvatarEditorView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="BadgeCreatorView"><BadgeCreatorView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="BadgeLeaderboardView"><BadgeLeaderboardView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="EmuStatsView"><EmuStatsView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="AchievementsView"><AchievementsView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="HabbiconHubView"><HabbiconHubView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="NavigatorView"><NavigatorView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="OctanebubbleHiddenView"><OctanebubbleHiddenView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="InventoryView"><InventoryView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="CatalogView"><CatalogView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="SpecialItemsDisplayView"><SpecialItemsDisplayView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="CollectiblesHubView"><CollectiblesHubView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="CollectiblesRewardBoxView"><CollectiblesRewardBoxView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="FriendsView"><FriendsView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="RightSideView"><RightSideView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="UserSettingsView"><UserSettingsView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="UserAccountSettingsView"><UserAccountSettingsView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="DiscordSettingsView"><DiscordSettingsView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="VaultView"><VaultView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="QuestsView"><QuestsView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="SeasonalCalendarView"><SeasonalCalendarView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="QuestTrackerView"><QuestTrackerView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="NextQuestTimerView"><NextQuestTimerView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="QuestCompletedView"><QuestCompletedView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="DailyTasksView"><DailyTasksView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="RewardTrackView"><RewardTrackView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="TranslationSettingsView"><TranslationSettingsView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="UserProfileView"><UserProfileView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="GroupsView"><GroupsView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="GroupForumView"><GroupForumView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="CameraWidgetView"><CameraWidgetView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="HelpView"><HelpView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="TalentView"><TalentView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="NuxView"><NuxView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="OctanepediaView"><OctanepediaView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="GuideToolView"><GuideToolView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="HcCenterView"><HcCenterView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="CampaignView"><CampaignView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="GameCenterView"><GameCenterView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="SnowWarView"><SnowWarView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="FloorplanEditorView"><FloorplanEditorView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="FurniEditorView"><FurniEditorView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="RareValuesView"><RareValuesView /></WidgetErrorBoundary>
+                {GetConfigurationValue<boolean>('toolbar.fortunewheel.enabled', true) && (
+                    <WidgetErrorBoundary name="FortuneWheelView">
+                        <FortuneWheelView />
+                    </WidgetErrorBoundary>
                 )}
-            </AnimatePresence>
-            <WidgetErrorBoundary name="ToolbarView"><ToolbarView isInRoom={!landingViewVisible} /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="TranslationBootstrap">
-                <TranslationBootstrap />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="GoogleAdsView"><GoogleAdsView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="ModToolsView"><ModToolsView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="HousekeepingView"><HousekeepingView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="WiredCreatorToolsView"><WiredCreatorToolsView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="VariablesExplorerView"><VariablesExplorerView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="RoomView"><RoomView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="RoomQueueWidgetView"><RoomQueueWidgetView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="ChatHistoryView"><ChatHistoryView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="CustomizeNickIconView"><CustomizeNickIconView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="WiredView"><WiredView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="AvatarEditorView"><AvatarEditorView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="BadgeCreatorView"><BadgeCreatorView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="BadgeLeaderboardView"><BadgeLeaderboardView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="EmuStatsView"><EmuStatsView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="AchievementsView"><AchievementsView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="HabbiconHubView"><HabbiconHubView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="NavigatorView"><NavigatorView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="OctanebubbleHiddenView"><OctanebubbleHiddenView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="InventoryView"><InventoryView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="CatalogView"><CatalogView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="SpecialItemsDisplayView"><SpecialItemsDisplayView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="CollectiblesHubView"><CollectiblesHubView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="CollectiblesRewardBoxView"><CollectiblesRewardBoxView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="FriendsView"><FriendsView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="RightSideView"><RightSideView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="UserSettingsView"><UserSettingsView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="UserAccountSettingsView"><UserAccountSettingsView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="DiscordSettingsView"><DiscordSettingsView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="VaultView"><VaultView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="QuestsView"><QuestsView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="SeasonalCalendarView"><SeasonalCalendarView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="QuestTrackerView"><QuestTrackerView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="NextQuestTimerView"><NextQuestTimerView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="QuestCompletedView"><QuestCompletedView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="DailyTasksView"><DailyTasksView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="RewardTrackView"><RewardTrackView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="TranslationSettingsView"><TranslationSettingsView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="UserProfileView"><UserProfileView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="GroupsView"><GroupsView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="GroupForumView"><GroupForumView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="CameraWidgetView"><CameraWidgetView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="HelpView"><HelpView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="TalentView"><TalentView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="NuxView"><NuxView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="OctanepediaView"><OctanepediaView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="GuideToolView"><GuideToolView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="HcCenterView"><HcCenterView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="CampaignView"><CampaignView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="GameCenterView"><GameCenterView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="SnowWarView"><SnowWarView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="FloorplanEditorView"><FloorplanEditorView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="FurniEditorView"><FurniEditorView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="RareValuesView"><RareValuesView /></WidgetErrorBoundary>
-            {GetConfigurationValue<boolean>('toolbar.fortunewheel.enabled', true) && (
-                <WidgetErrorBoundary name="FortuneWheelView">
-                    <FortuneWheelView />
+                <WidgetErrorBoundary name="SoundboardView"><SoundboardView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="TraxEditorView"><TraxEditorView /></WidgetErrorBoundary>
+                {GetConfigurationValue<boolean>('radio_ui.enabled', false) && !IsTouchDevice() && (
+                    <WidgetErrorBoundary name="RadioView">
+                        <RadioView />
+                    </WidgetErrorBoundary>
+                )}
+                {GetConfigurationValue<boolean>('mentions_ui.enabled', true) && mentionsVisible && (
+                    <WidgetErrorBoundary name="MentionsView">
+                        <MentionsView onClose={() => setMentionsVisible(false)} />
+                    </WidgetErrorBoundary>
+                )}
+                <WidgetErrorBoundary name="ExternalPluginLoader">
+                    <ExternalPluginLoader />
                 </WidgetErrorBoundary>
-            )}
-            <WidgetErrorBoundary name="SoundboardView"><SoundboardView /></WidgetErrorBoundary>
-            <WidgetErrorBoundary name="TraxEditorView"><TraxEditorView /></WidgetErrorBoundary>
-            {GetConfigurationValue<boolean>('radio_ui.enabled', false) && !IsTouchDevice() && (
-                <WidgetErrorBoundary name="RadioView">
-                    <RadioView />
-                </WidgetErrorBoundary>
-            )}
-            {GetConfigurationValue<boolean>('mentions_ui.enabled', true) && mentionsVisible && (
-                <WidgetErrorBoundary name="MentionsView">
-                    <MentionsView onClose={() => setMentionsVisible(false)} />
-                </WidgetErrorBoundary>
-            )}
-            <WidgetErrorBoundary name="ExternalPluginLoader">
-                <ExternalPluginLoader />
-            </WidgetErrorBoundary>
-        </>
+            </>
+        </NativeTextTree>
     );
 };

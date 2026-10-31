@@ -5,6 +5,7 @@ import { LocalStorageKeys, SendMessageComposer } from '../../api';
 import { parseJsonDocument } from '../../json/JsonDocumentParser';
 import { useMessageEvent } from '../events';
 import { useLocalStorage } from '../useLocalStorage';
+import { TranslationCache } from './translationCache';
 
 const REQUEST_TIMEOUT_MS = 8000;
 const OUTGOING_QUEUE_TTL_MS = 30000;
@@ -290,7 +291,7 @@ const useTranslationStore = () =>
     const requestIdRef = useRef(0);
     const languagesTimeoutRef = useRef(0);
     const pendingRequestsRef = useRef(new Map<number, IPendingTranslationRequest>());
-    const translationCacheRef = useRef(new Map<string, IResolvedTranslation>());
+    const translationCacheRef = useRef(new TranslationCache<IResolvedTranslation>());
     const outgoingQueueRef = useRef(new Map<string, IQueuedOutgoingTranslation[]>());
     const localizationRequestRef = useRef(0);
 

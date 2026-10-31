@@ -4,6 +4,7 @@ import { WiredPageRequests } from '../../hooks/wired-tools/useWiredPageRequests'
 import { clampInputPage, DEFAULT_PAGING_TEXT, NO_PAGE, parseInputPage, restrictPageInput, splitPagingText } from './WiredPaging.helpers';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export interface WiredTableColumn {
     id: string;
@@ -74,91 +75,93 @@ export const WiredPagedTable = <T,>(props: WiredPagedTableProps<T>) => {
     };
 
     return (
-        <div className="flex flex-col gap-2 min-h-0 grow">
-            <div ref={setBodyElement} className={`overflow-y-auto border border-[#d1ccbf] rounded bg-white ${bodyClassName}`} data-testid="wired-paged-table-body">
-                <table className="w-full text-[12px] table-fixed">
-                    <thead className="bg-[#efede5] sticky top-0">
-                        <tr>
-                            {columns.map((column) => (
-                                <th key={column.id} className={`px-2 py-1 ${column.align === 'right' ? 'text-right' : 'text-left'} ${column.className ?? ''}`}>
-                                    {column.title}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {!rows.length && (
+        <NativeTextTree>
+            <div className="flex flex-col gap-2 min-h-0 grow">
+                <div ref={setBodyElement} className={`overflow-y-auto border border-[#d1ccbf] rounded bg-white ${bodyClassName}`} data-testid="wired-paged-table-body">
+                    <table className="w-full text-[12px] table-fixed">
+                        <thead className="bg-[#efede5] sticky top-0">
                             <tr>
-                                <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={columns.length}>
-                                    {emptyText}
-                                </td>
+                                {columns.map((column) => (
+                                    <th key={column.id} className={`px-2 py-1 ${column.align === 'right' ? 'text-right' : 'text-left'} ${column.className ?? ''}`}>
+                                        {column.title}
+                                    </th>
+                                ))}
                             </tr>
-                        )}
-                        {rows.map((row, index) => (
-                            <tr key={getRowId(row)} className={index % 2 === 0 ? 'bg-white' : 'bg-[#f8f6f0]'}>
-                                {columns.map((column) => {
-                                    const cell = getCell(row, column.id);
+                        </thead>
+                        <tbody>
+                            {!rows.length && (
+                                <tr>
+                                    <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={columns.length}>
+                                        {emptyText}
+                                    </td>
+                                </tr>
+                            )}
+                            {rows.map((row, index) => (
+                                <tr key={getRowId(row)} className={index % 2 === 0 ? 'bg-white' : 'bg-[#f8f6f0]'}>
+                                    {columns.map((column) => {
+                                        const cell = getCell(row, column.id);
 
-                                    return (
-                                        <td
-                                            key={column.id}
-                                            className={`px-2 py-1 truncate ${column.align === 'right' ? 'text-right' : ''} ${cell.className ?? ''}`}
-                                            title={cell.title}
-                                        >
-                                            {cell.content}
-                                        </td>
-                                    );
-                                })}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            <div className="flex items-center justify-between gap-3">
-                <div className="flex gap-2">
-                    <Hint content="First page">
-                        <BaseButton aria-label="First page" className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" onClick={() => requests.requestFirstPage()}>
-                            &laquo;
-                        </BaseButton>
-                    </Hint>
-                    <Hint content="Previous page">
-                        <BaseButton aria-label="Previous page" className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" onClick={() => requests.requestPreviousPage()}>
-                            &lsaquo;
-                        </BaseButton>
-                    </Hint>
+                                        return (
+                                            <td
+                                                key={column.id}
+                                                className={`px-2 py-1 truncate ${column.align === 'right' ? 'text-right' : ''} ${cell.className ?? ''}`}
+                                                title={cell.title}
+                                            >
+                                                {cell.content}
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
-                <div className="flex items-center gap-2 text-[12px] text-[#555]">
-                    {pagingText && <span>{pagingText.start}</span>}
-                    <input
-                        aria-label="Page"
-                        className="w-[42px] rounded border border-[#b8b2a4] bg-white px-1 py-[2px] text-center text-[12px]"
-                        type="text"
-                        inputMode="numeric"
-                        value={pageInput}
-                        onChange={(event) => setPageInput(restrictPageInput(event.target.value))}
-                        onBlur={navigateToInputPage}
-                        onKeyDown={(event) => {
-                            if (event.key !== 'Enter') return;
+                <div className="flex items-center justify-between gap-3">
+                    <div className="flex gap-2">
+                        <Hint content="First page">
+                            <BaseButton aria-label="First page" className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" onClick={() => requests.requestFirstPage()}>
+                                &laquo;
+                            </BaseButton>
+                        </Hint>
+                        <Hint content="Previous page">
+                            <BaseButton aria-label="Previous page" className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" onClick={() => requests.requestPreviousPage()}>
+                                &lsaquo;
+                            </BaseButton>
+                        </Hint>
+                    </div>
+                    <div className="flex items-center gap-2 text-[12px] text-[#555]">
+                        {pagingText && <span>{pagingText.start}</span>}
+                        <input
+                            aria-label="Page"
+                            className="w-[42px] rounded border border-[#b8b2a4] bg-white px-1 py-[2px] text-center text-[12px]"
+                            type="text"
+                            inputMode="numeric"
+                            value={pageInput}
+                            onChange={(event) => setPageInput(restrictPageInput(event.target.value))}
+                            onBlur={navigateToInputPage}
+                            onKeyDown={(event) => {
+                                if (event.key !== 'Enter') return;
 
-                            event.preventDefault();
-                            navigateToInputPage();
-                        }}
-                    />
-                    {pagingText && <span>{pagingText.end}</span>}
-                </div>
-                <div className="flex gap-2">
-                    <Hint content="Next page">
-                        <BaseButton aria-label="Next page" className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" onClick={() => requests.requestNextPage()}>
-                            &rsaquo;
-                        </BaseButton>
-                    </Hint>
-                    <Hint content="Last page">
-                        <BaseButton aria-label="Last page" className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" onClick={() => requests.requestLastPage()}>
-                            &raquo;
-                        </BaseButton>
-                    </Hint>
+                                event.preventDefault();
+                                navigateToInputPage();
+                            }}
+                        />
+                        {pagingText && <span>{pagingText.end}</span>}
+                    </div>
+                    <div className="flex gap-2">
+                        <Hint content="Next page">
+                            <BaseButton aria-label="Next page" className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" onClick={() => requests.requestNextPage()}>
+                                &rsaquo;
+                            </BaseButton>
+                        </Hint>
+                        <Hint content="Last page">
+                            <BaseButton aria-label="Last page" className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" onClick={() => requests.requestLastPage()}>
+                                &raquo;
+                            </BaseButton>
+                        </Hint>
+                    </div>
                 </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

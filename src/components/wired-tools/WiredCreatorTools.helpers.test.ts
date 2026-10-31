@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+    clampWiredVariableValue,
+    parseWiredVariableValue,
     buildMonitorLogs,
     exceedsVariableHighlightLimit,
     wiredSourceTypeLabelKey,
@@ -245,5 +247,20 @@ describe('variable overview helpers', () => {
     it('titles the type buttons with the official source type keys', () => {
         expect(wiredSourceTypeLabelKey('user')).toBe('wiredfurni.params.sourcetype.users');
         expect(wiredSourceTypeLabelKey('furni')).toBe('wiredfurni.params.sourcetype.furni');
+    });
+});
+
+describe('wired variable values', () => {
+    it('holds a value inside the int32 range the server stores', () => {
+        expect(clampWiredVariableValue(99999999999)).toBe(2147483647);
+        expect(clampWiredVariableValue(-99999999999)).toBe(-2147483648);
+        expect(clampWiredVariableValue(12.7)).toBe(12);
+        expect(clampWiredVariableValue(Number.NaN)).toBe(0);
+    });
+
+    it('parses typed text, NaN when there is no number', () => {
+        expect(parseWiredVariableValue(' 42 ')).toBe(42);
+        expect(parseWiredVariableValue('3000000000')).toBe(2147483647);
+        expect(parseWiredVariableValue('abc')).toBeNaN();
     });
 });

@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const WiredTriggerClickUserView: FC<{}> = () => {
     const [blockMenuOpen, setBlockMenuOpen] = useState(false);
@@ -18,18 +19,20 @@ export const WiredTriggerClickUserView: FC<{}> = () => {
     }, [trigger]);
 
     return (
-        <WiredTriggerBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.click_user.settings')}</Text>
-                <div className="flex items-center gap-1">
-                    <Checkbox checked={blockMenuOpen} id="clickUserBlockMenuOpen" onCheckedChange={(nextChecked) => setBlockMenuOpen(nextChecked)} />
-                    <Text>{LocalizeText('wiredfurni.params.click_user.block_menu_open')}</Text>
+        <NativeTextTree>
+            <WiredTriggerBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.click_user.settings')}</Text>
+                    <div className="flex items-center gap-1">
+                        <Checkbox checked={blockMenuOpen} id="clickUserBlockMenuOpen" onCheckedChange={(nextChecked) => setBlockMenuOpen(nextChecked)} />
+                        <Text>{LocalizeText('wiredfurni.params.click_user.block_menu_open')}</Text>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Checkbox checked={doNotRotate} id="clickUserDoNotRotate" onCheckedChange={(nextChecked) => setDoNotRotate(nextChecked)} />
+                        <Text>{LocalizeText('wiredfurni.params.click_user.do_not_rotate')}</Text>
+                    </div>
                 </div>
-                <div className="flex items-center gap-1">
-                    <Checkbox checked={doNotRotate} id="clickUserDoNotRotate" onCheckedChange={(nextChecked) => setDoNotRotate(nextChecked)} />
-                    <Text>{LocalizeText('wiredfurni.params.click_user.do_not_rotate')}</Text>
-                </div>
-            </div>
-        </WiredTriggerBaseView>
+            </WiredTriggerBaseView>
+        </NativeTextTree>
     );
 };

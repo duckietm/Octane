@@ -1,6 +1,7 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import { LocalizeText } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 
@@ -31,19 +32,21 @@ export const WiredSelectorUsersByNameView: FC<{}> = () => {
     }, [namesText, setStringParam, setIntParams]);
 
     return (
-        <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.enter_names')}</Text>
-                    <textarea
-                        className="form-control form-control-sm octane-wired__resizable-textarea"
-                        maxLength={MAX_NAMES_LENGTH}
-                        value={namesText}
-                        onChange={(event) => setNamesText(limitNamesText(event.target.value))}
-                    />
-                </div>
+        <NativeTextTree>
+            <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{LocalizeText('wiredfurni.params.enter_names')}</Text>
+                        <textarea
+                            className="form-control form-control-sm octane-wired__resizable-textarea"
+                            maxLength={MAX_NAMES_LENGTH}
+                            value={namesText}
+                            onChange={(event) => setNamesText(limitNamesText(event.target.value))}
+                        />
+                    </div>
 
-            </div>
-        </WiredSelectorBaseView>
+                </div>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

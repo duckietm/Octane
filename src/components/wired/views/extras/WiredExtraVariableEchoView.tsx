@@ -20,6 +20,7 @@ import {
 import { fromWiredVariableId, toWiredVariableId, wiredVariableIdTarget } from '../WiredVariableIds';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MAX_NAME_LENGTH = 40;
 
@@ -192,51 +193,53 @@ export const WiredExtraVariableEchoView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            validate={validate}
-            cardStyle={{ width: 244 }}
-        >
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
-                    <OctaneInput
-                        maxLength={MAX_NAME_LENGTH}
-                        type="text"
-                        value={variableName}
-                        onChange={(event) => setVariableName(normalizeVariableName(event.target.value))}
-                        onKeyDown={(event) => handleVariableNameKeyDown(event, setVariableName)}
+        <NativeTextTree>
+            <WiredExtraBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                validate={validate}
+                cardStyle={{ width: 244 }}
+            >
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
+                        <OctaneInput
+                            maxLength={MAX_NAME_LENGTH}
+                            type="text"
+                            value={variableName}
+                            onChange={(event) => setVariableName(normalizeVariableName(event.target.value))}
+                            onKeyDown={(event) => handleVariableNameKeyDown(event, setVariableName)}
+                        />
+                    </div>
+
+                    <div className="octane-wired__give-var-heading">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
+                        <div className="octane-wired__give-var-targets" role="radiogroup">
+                            {TARGET_BUTTONS.map((button) => (
+                                <BaseButton
+                                    key={button.key}
+                                    type="button"
+                                    aria-checked={sourceTargetType === button.key}
+                                    aria-label={button.key}
+                                    role="radio"
+                                    className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${sourceTargetType === button.key ? 'is-active' : ''}`}
+                                    onClick={() => handleTargetTypeChange(button.key)}
+                                >
+                                    <img src={button.icon} alt={button.key} />
+                                </BaseButton>
+                            ))}
+                        </div>
+                    </div>
+
+                    <WiredVariablePicker
+                        entries={resolvedVariableEntries as IWiredVariablePickerEntry[]}
+                        recentScope="variable-echo"
+                        selectedToken={sourceVariableToken}
+                        onSelect={selectSource}
                     />
                 </div>
-
-                <div className="octane-wired__give-var-heading">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <div className="octane-wired__give-var-targets" role="radiogroup">
-                        {TARGET_BUTTONS.map((button) => (
-                            <BaseButton
-                                key={button.key}
-                                type="button"
-                                aria-checked={sourceTargetType === button.key}
-                                aria-label={button.key}
-                                role="radio"
-                                className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${sourceTargetType === button.key ? 'is-active' : ''}`}
-                                onClick={() => handleTargetTypeChange(button.key)}
-                            >
-                                <img src={button.icon} alt={button.key} />
-                            </BaseButton>
-                        ))}
-                    </div>
-                </div>
-
-                <WiredVariablePicker
-                    entries={resolvedVariableEntries as IWiredVariablePickerEntry[]}
-                    recentScope="variable-echo"
-                    selectedToken={sourceVariableToken}
-                    onSelect={selectSource}
-                />
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

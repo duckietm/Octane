@@ -12,6 +12,7 @@ import {
     productTypeKey
 } from '../../../../hooks/collectibles/collectibles.helpers';
 import { getCollectibleProductName, useCollectibles } from '../../../../hooks/collectibles/useCollectibles';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const nameOf = (group: CollectibleGroup) => getCollectibleProductName(group.product);
 
@@ -41,72 +42,78 @@ export const InventoryCollectiblesView: FC = () => {
 
     if (inventory === null) {
         return (
-            <div className="octane-inventory-collectibles-state" role="status">
-                {localizeWithFallback('generic.loading', 'Loading...')}
-            </div>
+            <NativeTextTree>
+                <div className="octane-inventory-collectibles-state" role="status">
+                    {localizeWithFallback('generic.loading', 'Loading...')}
+                </div>
+            </NativeTextTree>
         );
     }
 
     if (!groups.length) {
         return (
-            <div className="octane-inventory-collectibles-state" data-testid="inventory-collectibles-empty">
-                {localizeWithFallback('inventory.empty.collectibles.title', 'You have no collectibles yet.')}
-            </div>
+            <NativeTextTree>
+                <div className="octane-inventory-collectibles-state" data-testid="inventory-collectibles-empty">
+                    {localizeWithFallback('inventory.empty.collectibles.title', 'You have no collectibles yet.')}
+                </div>
+            </NativeTextTree>
         );
     }
 
     return (
-        <div className="octane-inventory-collectibles" data-testid="inventory-collectibles">
-            <div className="octane-inventory-collectibles-options">
-                <input
-                    aria-label={localizeWithFallback('generic.search', 'Search')}
-                    className="octane-inventory-filter-input"
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                />
-                <Select
-                    aria-label={localizeWithFallback('inventory.filter.option.everything', 'Everything')}
-                    className="octane-inventory-collectibles-filter"
-                    value={String(filterIndex)}
-                    onChange={(event) => setFilterIndex(Number(event.target.value))}
-                >
-                    <option value="0">{localizeWithFallback('inventory.filter.option.everything', 'Everything')}</option>
-                    {INVENTORY_FILTER_TYPES.map((type, index) => (
-                        <option key={type} value={String(index + 1)}>
-                            {typeLabel(type)}
-                        </option>
-                    ))}
-                </Select>
-            </div>
-            <div className="octane-inventory-collectibles-body">
-                <div className="octane-inventory-collectibles-grid">
-                    {shown.map((group) => (
-                        <ToggleButton
-                            key={group.productCode}
-                            aria-label={nameOf(group)}
-                            className={`octane-collectibles-item${selected?.productCode === group.productCode ? ' is-selected' : ''}`}
-                            pressed={selected?.productCode === group.productCode}
-                            onClick={() => setSelectedCode(group.productCode)}
-                        >
-                            <CollectibleProductImageView icon product={group.product} />
-                            {group.assetIds.length > 1 && <span className="octane-collectibles-item-amount">{group.assetIds.length}</span>}
-                        </ToggleButton>
-                    ))}
+        <NativeTextTree>
+            <div className="octane-inventory-collectibles" data-testid="inventory-collectibles">
+                <div className="octane-inventory-collectibles-options">
+                    <input
+                        aria-label={localizeWithFallback('generic.search', 'Search')}
+                        className="octane-inventory-filter-input"
+                        value={search}
+                        onChange={(event) => setSearch(event.target.value)}
+                    />
+                    <Select
+                        aria-label={localizeWithFallback('inventory.filter.option.everything', 'Everything')}
+                        className="octane-inventory-collectibles-filter"
+                        value={String(filterIndex)}
+                        onChange={(event) => setFilterIndex(Number(event.target.value))}
+                    >
+                        <option value="0">{localizeWithFallback('inventory.filter.option.everything', 'Everything')}</option>
+                        {INVENTORY_FILTER_TYPES.map((type, index) => (
+                            <option key={type} value={String(index + 1)}>
+                                {typeLabel(type)}
+                            </option>
+                        ))}
+                    </Select>
                 </div>
-                {selected && (
-                    <div className="octane-inventory-collectibles-preview">
-                        <div className="octane-inventory-collectibles-image">
-                            <CollectibleProductImageView product={selected.product} />
-                        </div>
-                        <div className="octane-inventory-collectibles-name" data-testid="inventory-collectibles-name">
-                            {nameOf(selected)}
-                        </div>
-                        <div className="octane-inventory-collectibles-type">
-                            {`${localizeWithFallback('collectibles.item.type', 'Type')}: ${typeLabel(selected.product.productTypeId)}`}
-                        </div>
+                <div className="octane-inventory-collectibles-body">
+                    <div className="octane-inventory-collectibles-grid">
+                        {shown.map((group) => (
+                            <ToggleButton
+                                key={group.productCode}
+                                aria-label={nameOf(group)}
+                                className={`octane-collectibles-item${selected?.productCode === group.productCode ? ' is-selected' : ''}`}
+                                pressed={selected?.productCode === group.productCode}
+                                onClick={() => setSelectedCode(group.productCode)}
+                            >
+                                <CollectibleProductImageView icon product={group.product} />
+                                {group.assetIds.length > 1 && <span className="octane-collectibles-item-amount">{group.assetIds.length}</span>}
+                            </ToggleButton>
+                        ))}
                     </div>
-                )}
+                    {selected && (
+                        <div className="octane-inventory-collectibles-preview">
+                            <div className="octane-inventory-collectibles-image">
+                                <CollectibleProductImageView product={selected.product} />
+                            </div>
+                            <div className="octane-inventory-collectibles-name" data-testid="inventory-collectibles-name">
+                                {nameOf(selected)}
+                            </div>
+                            <div className="octane-inventory-collectibles-type">
+                                {`${localizeWithFallback('collectibles.item.type', 'Type')}: ${typeLabel(selected.product.productTypeId)}`}
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

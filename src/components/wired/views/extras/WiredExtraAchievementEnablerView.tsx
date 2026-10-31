@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
@@ -28,24 +29,26 @@ export const WiredExtraAchievementEnablerView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.achievement_enabler', 'Achievements')}</Text>
-                <textarea
-                    className="form-control form-control-sm"
-                    maxLength={ACHIEVEMENT_ENABLER_MAX_LENGTH}
-                    placeholder={localizeWithFallback('wiredfurni.params.achievement_enabler.placeholder', 'ACH_MyGame1, ACH_MyGame2')}
-                    rows={3}
-                    value={text}
-                    onChange={(event) => setText(event.target.value)}
-                />
-                <Text small>
-                    {localizeWithFallback(
-                        'wiredfurni.params.achievement_enabler.hint',
-                        'The achievements this room may progress. Only the ones the hotel allows for wired work.'
-                    )}
-                </Text>
-            </div>
-        </WiredExtraBaseView>
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.achievement_enabler', 'Achievements')}</Text>
+                    <textarea
+                        className="form-control form-control-sm"
+                        maxLength={ACHIEVEMENT_ENABLER_MAX_LENGTH}
+                        placeholder={localizeWithFallback('wiredfurni.params.achievement_enabler.placeholder', 'ACH_MyGame1, ACH_MyGame2')}
+                        rows={3}
+                        value={text}
+                        onChange={(event) => setText(event.target.value)}
+                    />
+                    <Text small>
+                        {localizeWithFallback(
+                            'wiredfurni.params.achievement_enabler.hint',
+                            'The achievements this room may progress. Only the ones the hotel allows for wired work.'
+                        )}
+                    </Text>
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

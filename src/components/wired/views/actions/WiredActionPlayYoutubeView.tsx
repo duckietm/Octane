@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const PLAYBACK_OPTIONS = [
     { value: 1, key: 'wiredfurni.params.youtube.play', label: 'Play video' },
@@ -29,26 +30,28 @@ export const WiredActionPlayYoutubeView: FC<{}> = (props) => {
     };
 
     return (
-        <WiredActionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <div className="flex flex-col gap-1">
-                <Text bold>YouTube video id / url</Text>
-                <Text small>The room must have YouTube enabled. Empty value (or "Stop") clears the video.</Text>
-                <OctaneInput maxLength={100} type="text" value={videoId} onChange={(event) => setVideoId(event.target.value)} />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>Action</Text>
-                <Select
-                    className="form-select form-select-sm"
-                    value={autoStart}
-                    onChange={(event) => setAutoStart(parseInt(event.target.value, 10) === 0 ? 0 : 1)}
-                >
-                    {PLAYBACK_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {localizeWithFallback(option.key, option.label)}
-                        </option>
-                    ))}
-                </Select>
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
+                <div className="flex flex-col gap-1">
+                    <Text bold>YouTube video id / url</Text>
+                    <Text small>The room must have YouTube enabled. Empty value (or "Stop") clears the video.</Text>
+                    <OctaneInput maxLength={100} type="text" value={videoId} onChange={(event) => setVideoId(event.target.value)} />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>Action</Text>
+                    <Select
+                        className="form-select form-select-sm"
+                        value={autoStart}
+                        onChange={(event) => setAutoStart(parseInt(event.target.value, 10) === 0 ? 0 : 1)}
+                    >
+                        {PLAYBACK_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {localizeWithFallback(option.key, option.label)}
+                            </option>
+                        ))}
+                    </Select>
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

@@ -29,6 +29,7 @@ import { WiredActionDelaySection } from './WiredActionDelaySection';
 import { localizeWiredVariableOperation, WIRED_VARIABLE_ADVANCED_OPERATIONS, WIRED_VARIABLE_BASIC_OPERATIONS, WIRED_VARIABLE_UNARY_OPERATIONS } from './WiredVariableOperations';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type ReferenceMode = 'constant' | 'variable';
@@ -428,145 +429,147 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
     };
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            validate={validate}
-            cardStyle={{ width: 244 }}
-            hideDelay={true}
-        >
-            <div className="octane-wired__give-var">
-                <div className="octane-wired__give-var-heading">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <div className="octane-wired__give-var-targets">
-                        {TARGET_BUTTONS.map((button) => (
-                            <BaseButton
-                                key={button.key}
-                                type="button"
-                                disabled={button.disabled}
-                                className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${destinationTargetType === button.key ? 'is-active' : ''}`}
-                                onClick={() => handleDestinationTargetChange(button.key)}
-                            >
-                                <img src={button.icon} alt={button.key} />
-                            </BaseButton>
-                        ))}
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                validate={validate}
+                cardStyle={{ width: 244 }}
+                hideDelay={true}
+            >
+                <div className="octane-wired__give-var">
+                    <div className="octane-wired__give-var-heading">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
+                        <div className="octane-wired__give-var-targets">
+                            {TARGET_BUTTONS.map((button) => (
+                                <BaseButton
+                                    key={button.key}
+                                    type="button"
+                                    disabled={button.disabled}
+                                    className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${destinationTargetType === button.key ? 'is-active' : ''}`}
+                                    onClick={() => handleDestinationTargetChange(button.key)}
+                                >
+                                    <img src={button.icon} alt={button.key} />
+                                </BaseButton>
+                            ))}
+                        </div>
                     </div>
-                </div>
 
-                <WiredVariablePicker
-                    entries={resolvedDestinationVariableEntries}
-                    recentScope="variable-effects"
-                    selectedToken={destinationVariableToken}
-                    onSelect={(entry) => setDestinationVariableToken(entry.token)}
-                />
+                    <WiredVariablePicker
+                        entries={resolvedDestinationVariableEntries}
+                        recentScope="variable-effects"
+                        selectedToken={destinationVariableToken}
+                        onSelect={(entry) => setDestinationVariableToken(entry.token)}
+                    />
 
-                <div className="octane-wired__divider" />
+                    <div className="octane-wired__divider" />
 
-                <div className="octane-wired__give-var-section">
-                    <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.operation')}</div>
-                    <Select
-                        className="form-select form-select-sm octane-wired__give-var-select"
-                        title={localizeWithFallback('wiredfurni.params.variables.operation.tooltip', '')}
-                        value={operation}
-                        onChange={(event) => setOperation(parseInt(event.target.value, 10))}
-                    >
-                        {WIRED_VARIABLE_BASIC_OPERATIONS.map((value) => (
-                            <option key={value} value={value}>
-                                {localizeWiredVariableOperation(value)}
-                            </option>
-                        ))}
-                        <optgroup label={localizeWithFallback('wiredfurni.params.variables.operation.advanced', 'Advanced')}>
-                            {WIRED_VARIABLE_ADVANCED_OPERATIONS.map((value) => (
+                    <div className="octane-wired__give-var-section">
+                        <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.operation')}</div>
+                        <Select
+                            className="form-select form-select-sm octane-wired__give-var-select"
+                            title={localizeWithFallback('wiredfurni.params.variables.operation.tooltip', '')}
+                            value={operation}
+                            onChange={(event) => setOperation(parseInt(event.target.value, 10))}
+                        >
+                            {WIRED_VARIABLE_BASIC_OPERATIONS.map((value) => (
                                 <option key={value} value={value}>
                                     {localizeWiredVariableOperation(value)}
                                 </option>
                             ))}
-                        </optgroup>
-                    </Select>
+                            <optgroup label={localizeWithFallback('wiredfurni.params.variables.operation.advanced', 'Advanced')}>
+                                {WIRED_VARIABLE_ADVANCED_OPERATIONS.map((value) => (
+                                    <option key={value} value={value}>
+                                        {localizeWiredVariableOperation(value)}
+                                    </option>
+                                ))}
+                            </optgroup>
+                        </Select>
+                    </div>
+
+                    <div className="octane-wired__divider" />
+
+                    <div className="octane-wired__give-var-section">
+                        <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
+                        <WiredValueOrVariableInput
+                            disabled={isUnaryOperation}
+                            entries={resolvedReferenceVariableEntries}
+                            isVariable={referenceMode === 'variable'}
+                            label={LocalizeText('wiredfurni.params.variables.reference_value')}
+                            literal={referenceConstantValueInput}
+                            primaryTarget={destinationTargetType}
+                            sameHolder={referenceSameHolder}
+                            target={referenceTargetType}
+                            targets={REFERENCE_TARGETS}
+                            token={referenceVariableToken}
+                            renderSource={({ typeSelector, locked }) => (
+                                // AIR ChangeVariable: the reference value section claims merged slot 1, so its holder is the popup's
+                                // first section; the same holder or an operation without operand disables it (isInputSourceDisabled).
+                                <fieldset className="octane-wired__value-popup-locked" disabled={locked || isUnaryOperation}>
+                                    <WiredFurniSelectionSourceRow
+                                        headerContent={typeSelector}
+                                        options={referenceSourceOptions}
+                                        selectionActive={selectionMode === 'reference'}
+                                        selectionCount={referenceFurniIds.length}
+                                        selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
+                                        selectionKind="secondary"
+                                        selectionLimit={selectionLimit}
+                                        showSelectionToggle={isFurniTarget(referenceTargetType)}
+                                        title="wiredfurni.params.sources.merged.title.variables"
+                                        value={referenceSelectedSourceValue}
+                                        onChange={(value) => {
+                                            if (isFurniTarget(referenceTargetType)) {
+                                                setReferenceFurniSource(value);
+                                                return;
+                                            }
+
+                                            if (!isGlobalTarget(referenceTargetType) && !isContextTarget(referenceTargetType)) setReferenceUserSource(value);
+                                        }}
+                                        onSelectionActivate={() => switchSelection('reference')}
+                                    />
+                                </fieldset>
+                            )}
+                            onIsVariableChange={(isVariable) => setReferenceMode(isVariable ? 'variable' : 'constant')}
+                            onLiteralChange={setReferenceConstantValueInput}
+                            onSameHolderChange={setReferenceSameHolder}
+                            onTargetChange={handleReferenceTargetChange}
+                            onTokenChange={setReferenceVariableToken}
+                            onValidityChange={setReferenceValid}
+                        />
+                    </div>
+
+                    <div className="octane-wired__divider" />
+
+                    <WiredActionDelaySection value={actionDelay} onChange={setActionDelay} />
+
+                    <div className="octane-wired__divider" />
+
+                    <div className="octane-wired__give-var-section">
+                        <WiredFurniSelectionSourceRow
+                            title="wiredfurni.params.sources.merged.title.variables_destination"
+                            options={destinationSourceOptions}
+                            value={destinationSelectedSourceValue}
+                            selectionKind="primary"
+                            selectionActive={selectionMode === 'destination'}
+                            selectionCount={destinationFurniIds.length}
+                            selectionLimit={selectionLimit}
+                            selectionEnabledValues={[SOURCE_SELECTED]}
+                            showSelectionToggle={isFurniTarget(destinationTargetType)}
+                            onChange={(value) => {
+                                if (isFurniTarget(destinationTargetType)) {
+                                    setDestinationFurniSource(value);
+                                    return;
+                                }
+
+                                if (!isGlobalTarget(destinationTargetType) && !isContextTarget(destinationTargetType)) setDestinationUserSource(value);
+                            }}
+                            onSelectionActivate={() => switchSelection('destination')}
+                        />
+                    </div>
+
                 </div>
-
-                <div className="octane-wired__divider" />
-
-                <div className="octane-wired__give-var-section">
-                    <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
-                    <WiredValueOrVariableInput
-                        disabled={isUnaryOperation}
-                        entries={resolvedReferenceVariableEntries}
-                        isVariable={referenceMode === 'variable'}
-                        label={LocalizeText('wiredfurni.params.variables.reference_value')}
-                        literal={referenceConstantValueInput}
-                        primaryTarget={destinationTargetType}
-                        sameHolder={referenceSameHolder}
-                        target={referenceTargetType}
-                        targets={REFERENCE_TARGETS}
-                        token={referenceVariableToken}
-                        renderSource={({ typeSelector, locked }) => (
-                            // AIR ChangeVariable: the reference value section claims merged slot 1, so its holder is the popup's
-                            // first section; the same holder or an operation without operand disables it (isInputSourceDisabled).
-                            <fieldset className="octane-wired__value-popup-locked" disabled={locked || isUnaryOperation}>
-                                <WiredFurniSelectionSourceRow
-                                    headerContent={typeSelector}
-                                    options={referenceSourceOptions}
-                                    selectionActive={selectionMode === 'reference'}
-                                    selectionCount={referenceFurniIds.length}
-                                    selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
-                                    selectionKind="secondary"
-                                    selectionLimit={selectionLimit}
-                                    showSelectionToggle={isFurniTarget(referenceTargetType)}
-                                    title="wiredfurni.params.sources.merged.title.variables"
-                                    value={referenceSelectedSourceValue}
-                                    onChange={(value) => {
-                                        if (isFurniTarget(referenceTargetType)) {
-                                            setReferenceFurniSource(value);
-                                            return;
-                                        }
-
-                                        if (!isGlobalTarget(referenceTargetType) && !isContextTarget(referenceTargetType)) setReferenceUserSource(value);
-                                    }}
-                                    onSelectionActivate={() => switchSelection('reference')}
-                                />
-                            </fieldset>
-                        )}
-                        onIsVariableChange={(isVariable) => setReferenceMode(isVariable ? 'variable' : 'constant')}
-                        onLiteralChange={setReferenceConstantValueInput}
-                        onSameHolderChange={setReferenceSameHolder}
-                        onTargetChange={handleReferenceTargetChange}
-                        onTokenChange={setReferenceVariableToken}
-                        onValidityChange={setReferenceValid}
-                    />
-                </div>
-
-                <div className="octane-wired__divider" />
-
-                <WiredActionDelaySection value={actionDelay} onChange={setActionDelay} />
-
-                <div className="octane-wired__divider" />
-
-                <div className="octane-wired__give-var-section">
-                    <WiredFurniSelectionSourceRow
-                        title="wiredfurni.params.sources.merged.title.variables_destination"
-                        options={destinationSourceOptions}
-                        value={destinationSelectedSourceValue}
-                        selectionKind="primary"
-                        selectionActive={selectionMode === 'destination'}
-                        selectionCount={destinationFurniIds.length}
-                        selectionLimit={selectionLimit}
-                        selectionEnabledValues={[SOURCE_SELECTED]}
-                        showSelectionToggle={isFurniTarget(destinationTargetType)}
-                        onChange={(value) => {
-                            if (isFurniTarget(destinationTargetType)) {
-                                setDestinationFurniSource(value);
-                                return;
-                            }
-
-                            if (!isGlobalTarget(destinationTargetType) && !isContextTarget(destinationTargetType)) setDestinationUserSource(value);
-                        }}
-                        onSelectionActivate={() => switchSelection('destination')}
-                    />
-                </div>
-
-            </div>
-        </WiredActionBaseView>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -46,24 +47,26 @@ export const WiredConditionActorIsWearingBadgeView: FC<WiredConditionActorIsWear
     }, [trigger]);
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            {text && (
-                <div className="flex flex-col gap-1">
-                    <Text bold>{localizeWithFallback(text.key, text.fallback)}</Text>
-                    <OctaneInput
-                        maxLength={text.maxLength}
-                        title={text.tooltipKey ? LocalizeText(text.tooltipKey) : undefined}
-                        type="text"
-                        value={badge}
-                        onChange={(event) => setBadge(event.target.value)}
-                    />
-                </div>
-            )}
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                {text && (
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{localizeWithFallback(text.key, text.fallback)}</Text>
+                        <OctaneInput
+                            maxLength={text.maxLength}
+                            title={text.tooltipKey ? LocalizeText(text.tooltipKey) : undefined}
+                            type="text"
+                            value={badge}
+                            onChange={(event) => setBadge(event.target.value)}
+                        />
+                    </div>
+                )}
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

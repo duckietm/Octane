@@ -7,6 +7,7 @@ import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { WiredConditionQuantifierSection } from './WiredConditionQuantifierSection';
 import { Radio } from '../../../../common/Radio';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const TEAM_OPTIONS = [0, 1, 2, 3, 4];
 const PLACEMENT_OPTIONS = [1, 2, 3, 4];
@@ -38,50 +39,52 @@ export const WiredConditionTeamHasRankView: FC<{}> = () => {
     };
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footerCollapsible={false}
-            showQuantifier={false}
-            footer={
-                <div className="flex flex-col gap-2">
-                    <BaseButton className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
-                        {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
-                    </BaseButton>
-                    {showAdvanced && (
-                        <>
-                            <WiredConditionQuantifierSection />
-                            <WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />
-                        </>
-                    )}
-                </div>
-            }
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
-                {TEAM_OPTIONS.map((value) => {
-                    const labelKey = value === 0 ? 'wiredfurni.params.team.triggerer' : `wiredfurni.params.team.${value}`;
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footerCollapsible={false}
+                showQuantifier={false}
+                footer={
+                    <div className="flex flex-col gap-2">
+                        <BaseButton className="octane-wired__advanced-toggle" type="button" onClick={() => setShowAdvanced((value) => !value)}>
+                            {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
+                        </BaseButton>
+                        {showAdvanced && (
+                            <>
+                                <WiredConditionQuantifierSection />
+                                <WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />
+                            </>
+                        )}
+                    </div>
+                }
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
+                    {TEAM_OPTIONS.map((value) => {
+                        const labelKey = value === 0 ? 'wiredfurni.params.team.triggerer' : `wiredfurni.params.team.${value}`;
 
-                    return (
-                        <div key={value} className="flex items-center gap-1">
-                            <Radio checked={team === value} id={`teamHasRank${value}`} name="teamHasRank" onCheckedChange={() => setTeam(value)} />
-                            <Text>{LocalizeText(labelKey)}</Text>
-                        </div>
-                    );
-                })}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.placement_selection')}</Text>
-                {PLACEMENT_OPTIONS.map((value) => {
-                    return (
-                        <div key={value} className="flex items-center gap-1">
-                            <Radio checked={placement === value} id={`teamRankPlacement${value}`} name="teamRankPlacement" onCheckedChange={() => setPlacement(value)} />
-                            <Text>{LocalizeText(`wiredfurni.params.placement.${value}`)}</Text>
-                        </div>
-                    );
-                })}
-            </div>
-        </WiredConditionBaseView>
+                        return (
+                            <div key={value} className="flex items-center gap-1">
+                                <Radio checked={team === value} id={`teamHasRank${value}`} name="teamHasRank" onCheckedChange={() => setTeam(value)} />
+                                <Text>{LocalizeText(labelKey)}</Text>
+                            </div>
+                        );
+                    })}
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.placement_selection')}</Text>
+                    {PLACEMENT_OPTIONS.map((value) => {
+                        return (
+                            <div key={value} className="flex items-center gap-1">
+                                <Radio checked={placement === value} id={`teamRankPlacement${value}`} name="teamRankPlacement" onCheckedChange={() => setPlacement(value)} />
+                                <Text>{LocalizeText(`wiredfurni.params.placement.${value}`)}</Text>
+                            </div>
+                        );
+                    })}
+                </div>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

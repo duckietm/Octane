@@ -1,4 +1,5 @@
 import { FC, useEffect } from 'react';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useGameCenter, useSnowWar } from '../../../../hooks';
 import { SnowWarArenaView } from './SnowWarArenaView';
 import { localizeWithFallback, SNOWWAR_ERROR_IDLE_WARNING, snowWarErrorText } from './SnowWarErrorTexts';
@@ -29,9 +30,11 @@ export const SnowWarView: FC = () =>
     if (queueExpired)
     {
         return (
-            <div className="snowwar-toast snowwar-toast--error">
-                {localizeWithFallback('snowwar.queue.timeout', 'Sorry, the waiting time has passed.')}
-            </div>
+            <NativeTextTree>
+                <div className="snowwar-toast snowwar-toast--error">
+                    {localizeWithFallback('snowwar.queue.timeout', 'Sorry, the waiting time has passed.')}
+                </div>
+            </NativeTextTree>
         );
     }
 
@@ -48,9 +51,11 @@ export const SnowWarView: FC = () =>
     if (phase === 'queued' || phase === 'lobby')
     {
         return (
-            <div className="snowwar-overlay">
-                <SnowWarTeamsView />
-            </div>
+            <NativeTextTree>
+                <div className="snowwar-overlay">
+                    <SnowWarTeamsView />
+                </div>
+            </NativeTextTree>
         );
     }
 
@@ -60,18 +65,22 @@ export const SnowWarView: FC = () =>
     if (phase === 'loading')
     {
         return (
-            <div className="snowwar-overlay">
-                <SnowWarLobbyView />
-            </div>
+            <NativeTextTree>
+                <div className="snowwar-overlay">
+                    <SnowWarLobbyView />
+                </div>
+            </NativeTextTree>
         );
     }
 
     return (
-        <div className="snowwar-overlay">
-            <SnowWarArenaView />
-            {(phase === 'playing') && (errorCode === SNOWWAR_ERROR_IDLE_WARNING) &&
-                <div className="snowwar-toast snowwar-toast--error" role="alert">{snowWarErrorText(errorCode)}</div>}
-            {phase === 'results' && <SnowWarResultsView />}
-        </div>
+        <NativeTextTree>
+            <div className="snowwar-overlay">
+                <SnowWarArenaView />
+                {(phase === 'playing') && (errorCode === SNOWWAR_ERROR_IDLE_WARNING) &&
+                    <div className="snowwar-toast snowwar-toast--error" role="alert">{snowWarErrorText(errorCode)}</div>}
+                {phase === 'results' && <SnowWarResultsView />}
+            </div>
+        </NativeTextTree>
     );
 };

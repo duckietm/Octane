@@ -1,14 +1,17 @@
 import { FC, PropsWithChildren } from 'react';
 import { LocalizeText } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Select } from '../../../../common/Select';
 
 /** A titled group of the chest settings window (a bordered box with its caption in the border). */
 export const ChestSettingsSection: FC<PropsWithChildren<{ title: string }>> = ({ title, children }) => (
-    <fieldset className="octane-chest-settings__section">
-        <legend>{title}</legend>
-        {children}
-    </fieldset>
+    <NativeTextTree>
+        <fieldset className="octane-chest-settings__section">
+            <legend>{title}</legend>
+            {children}
+        </fieldset>
+    </NativeTextTree>
 );
 
 export interface ChestSelectOption<T extends number> {
@@ -29,19 +32,21 @@ export function ChestSelect<T extends number>(props: ChestSelectProps<T>) {
     const { label, value, options, onSelect, disabled = false } = props;
 
     return (
-        <Select
-            aria-label={label}
-            className="form-select form-select-sm"
-            disabled={disabled}
-            value={value}
-            onChange={(event) => onSelect(Number(event.target.value) as T)}
-        >
-            {options.map(({ value: optionValue, label: optionLabel }) => (
-                <option key={optionValue} value={optionValue}>
-                    {optionLabel}
-                </option>
-            ))}
-        </Select>
+        <NativeTextTree>
+            <Select
+                aria-label={label}
+                className="form-select form-select-sm"
+                disabled={disabled}
+                value={value}
+                onChange={(event) => onSelect(Number(event.target.value) as T)}
+            >
+                {options.map(({ value: optionValue, label: optionLabel }) => (
+                    <option key={optionValue} value={optionValue}>
+                        {optionLabel}
+                    </option>
+                ))}
+            </Select>
+        </NativeTextTree>
     );
 }
 
@@ -85,31 +90,33 @@ export const ChestAppearanceFields: FC<ChestAppearanceFieldsProps> = (props) => 
     const previewOff = previewMode === PREVIEW_OFF;
 
     return (
-        <>
-            <Text bold>{stateLabel}</Text>
-            <ChestSelect label={stateLabel} value={state} options={numberedOptions(`${APPEARANCE_KEY}.state`, STATE_COUNT)} onSelect={onStateChange} />
-            {isFurni && (
-                <>
-                    <Text bold>{previewLabel}</Text>
-                    <ChestSelect
-                        label={previewLabel}
-                        value={previewMode}
-                        options={numberedOptions(`${APPEARANCE_KEY}.preview`, PREVIEW_MODE_COUNT)}
-                        onSelect={onPreviewModeChange}
-                    />
-                    <span className="octane-chest-settings__note">{LocalizeText(`${APPEARANCE_KEY}.preview.note`)}</span>
-                    <div className={`octane-chest-settings__amount${previewOff ? ' is-off' : ''}`} aria-disabled={previewOff}>
-                        <Text bold>{amountLabel}</Text>
+        <NativeTextTree>
+            <>
+                <Text bold>{stateLabel}</Text>
+                <ChestSelect label={stateLabel} value={state} options={numberedOptions(`${APPEARANCE_KEY}.state`, STATE_COUNT)} onSelect={onStateChange} />
+                {isFurni && (
+                    <>
+                        <Text bold>{previewLabel}</Text>
                         <ChestSelect
-                            label={amountLabel}
-                            value={previewAmount}
-                            disabled={previewOff}
-                            options={PREVIEW_AMOUNTS.map((amount) => ({ value: amount, label: String(amount) }))}
-                            onSelect={onPreviewAmountChange}
+                            label={previewLabel}
+                            value={previewMode}
+                            options={numberedOptions(`${APPEARANCE_KEY}.preview`, PREVIEW_MODE_COUNT)}
+                            onSelect={onPreviewModeChange}
                         />
-                    </div>
-                </>
-            )}
-        </>
+                        <span className="octane-chest-settings__note">{LocalizeText(`${APPEARANCE_KEY}.preview.note`)}</span>
+                        <div className={`octane-chest-settings__amount${previewOff ? ' is-off' : ''}`} aria-disabled={previewOff}>
+                            <Text bold>{amountLabel}</Text>
+                            <ChestSelect
+                                label={amountLabel}
+                                value={previewAmount}
+                                disabled={previewOff}
+                                options={PREVIEW_AMOUNTS.map((amount) => ({ value: amount, label: String(amount) }))}
+                                onSelect={onPreviewAmountChange}
+                            />
+                        </div>
+                    </>
+                )}
+            </>
+        </NativeTextTree>
     );
 };

@@ -6,6 +6,7 @@ import { HousekeepingButton, HousekeepingEmptyState } from './HousekeepingParts'
 import { HousekeepingSubTabs } from './HousekeepingSubTabs';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export interface HousekeepingListChoice {
     key: string;
@@ -79,98 +80,100 @@ export const HousekeepingListView: FC<{ lists: HousekeepingListChoice[]; targetI
     };
 
     return (
-        <div className="flex flex-col gap-1.5">
-            <div className="flex flex-wrap items-center gap-1">
-                <HousekeepingSubTabs
-                    compact
-                    active={listKey}
-                    tabs={lists.map((choice) => ({ id: choice.key, label: LocalizeText(choice.labelKey) }))}
-                    onChange={(key) => {
-                        setListKey(key);
-                        setReveal(false);
-                    }}
-                />
-                {canReveal && shown?.columns.includes('ip') && (
+        <NativeTextTree>
+            <div className="flex flex-col gap-1.5">
+                <div className="flex flex-wrap items-center gap-1">
+                    <HousekeepingSubTabs
+                        compact
+                        active={listKey}
+                        tabs={lists.map((choice) => ({ id: choice.key, label: LocalizeText(choice.labelKey) }))}
+                        onChange={(key) => {
+                            setListKey(key);
+                            setReveal(false);
+                        }}
+                    />
+                    {canReveal && shown?.columns.includes('ip') && (
+                        <HousekeepingButton
+                            classNames={['ml-auto']}
+                            disabled={isLoading}
+                            gap={1}
+                            size="sm"
+                            title={LocalizeText('housekeeping.user.private.reveal_hint')}
+                            variant={reveal ? 'warning' : 'secondary'}
+                            onClick={() => setReveal((value) => !value)}
+                        >
+                            {reveal ? <FaEyeSlash size={9} /> : <FaEye size={9} />}
+                            <span>{LocalizeText(reveal ? 'housekeeping.user.private.hide' : 'housekeeping.user.private.show')}</span>
+                        </HousekeepingButton>
+                    )}
                     <HousekeepingButton
-                        classNames={['ml-auto']}
+                        classNames={canReveal && shown?.columns.includes('ip') ? [] : ['ml-auto']}
                         disabled={isLoading}
                         gap={1}
                         size="sm"
-                        title={LocalizeText('housekeeping.user.private.reveal_hint')}
-                        variant={reveal ? 'warning' : 'secondary'}
-                        onClick={() => setReveal((value) => !value)}
+                        variant="secondary"
+                        onClick={() => setReload((value) => value + 1)}
                     >
-                        {reveal ? <FaEyeSlash size={9} /> : <FaEye size={9} />}
-                        <span>{LocalizeText(reveal ? 'housekeeping.user.private.hide' : 'housekeeping.user.private.show')}</span>
+                        <FaSync className={isLoading ? 'animate-spin' : ''} size={9} />
+                        <span>{LocalizeText('housekeeping.history.refresh')}</span>
                     </HousekeepingButton>
-                )}
-                <HousekeepingButton
-                    classNames={canReveal && shown?.columns.includes('ip') ? [] : ['ml-auto']}
-                    disabled={isLoading}
-                    gap={1}
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => setReload((value) => value + 1)}
-                >
-                    <FaSync className={isLoading ? 'animate-spin' : ''} size={9} />
-                    <span>{LocalizeText('housekeeping.history.refresh')}</span>
-                </HousekeepingButton>
-            </div>
-
-            {error && <HousekeepingEmptyState>{LocalizeText(error)}</HousekeepingEmptyState>}
-            {!error && isLoading && !shown && <HousekeepingEmptyState>{LocalizeText('generic.loading')}</HousekeepingEmptyState>}
-            {!error && shown && shown.rows.length === 0 && <HousekeepingEmptyState>{LocalizeText('housekeeping.list.empty')}</HousekeepingEmptyState>}
-
-            {!error && shown && shown.rows.length > 0 && (
-                <div className="max-h-[300px] overflow-auto rounded border border-zinc-200 bg-white">
-                    <table className="w-full border-collapse text-[11px]">
-                        <thead className="sticky top-0 bg-zinc-100">
-                            <tr>
-                                {shown.columns.map((column) => (
-                                    <th
-                                        key={column}
-                                        className="whitespace-nowrap px-1.5 py-1 text-left text-[10px] font-semibold uppercase tracking-wide text-zinc-600"
-                                    >
-                                        {LocalizeText(`housekeeping.list.column.${column}`)}
-                                    </th>
-                                ))}
-                                {(userColumn >= 0 || roomColumn >= 0) && <th className="w-6" />}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {shown.rows.map((row, index) => (
-                                <tr key={index} className="border-t border-zinc-100 align-top hover:bg-sky-50/50">
-                                    {shown.columns.map((column, columnIndex) => (
-                                        <td
-                                            key={column}
-                                            className={`px-1.5 py-0.5 ${column === 'message' || column === 'reason' ? 'break-words' : 'whitespace-nowrap'} text-zinc-800`}
-                                        >
-                                            {formatHousekeepingListCell(column, row[columnIndex])}
-                                        </td>
-                                    ))}
-                                    {(userColumn >= 0 || roomColumn >= 0) && (
-                                        <td className="px-1 py-0.5">
-                                            <Hint content={LocalizeText(
-                                                    userColumn >= 0 ? 'housekeeping.audit.detail.open_user' : 'housekeeping.audit.detail.open_room'
-                                                )}>
-                                                <BaseButton aria-label={LocalizeText(
-                                                                                                    userColumn >= 0 ? 'housekeeping.audit.detail.open_user' : 'housekeeping.audit.detail.open_room'
-                                                                                                )}
-                                                                                                className="text-zinc-400 hover:text-sky-600"
-                                                                                                type="button"
-                                                                                                onClick={() => openRow(row)}
-                                                                                            >
-                                                                                                <FaExternalLinkAlt size={9} />
-                                                                                            </BaseButton>
-                                            </Hint>
-                                        </td>
-                                    )}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
                 </div>
-            )}
-        </div>
+
+                {error && <HousekeepingEmptyState>{LocalizeText(error)}</HousekeepingEmptyState>}
+                {!error && isLoading && !shown && <HousekeepingEmptyState>{LocalizeText('generic.loading')}</HousekeepingEmptyState>}
+                {!error && shown && shown.rows.length === 0 && <HousekeepingEmptyState>{LocalizeText('housekeeping.list.empty')}</HousekeepingEmptyState>}
+
+                {!error && shown && shown.rows.length > 0 && (
+                    <div className="max-h-[300px] overflow-auto rounded border border-zinc-200 bg-white">
+                        <table className="w-full border-collapse text-[11px]">
+                            <thead className="sticky top-0 bg-zinc-100">
+                                <tr>
+                                    {shown.columns.map((column) => (
+                                        <th
+                                            key={column}
+                                            className="whitespace-nowrap px-1.5 py-1 text-left text-[10px] font-semibold uppercase tracking-wide text-zinc-600"
+                                        >
+                                            {LocalizeText(`housekeeping.list.column.${column}`)}
+                                        </th>
+                                    ))}
+                                    {(userColumn >= 0 || roomColumn >= 0) && <th className="w-6" />}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {shown.rows.map((row, index) => (
+                                    <tr key={index} className="border-t border-zinc-100 align-top hover:bg-sky-50/50">
+                                        {shown.columns.map((column, columnIndex) => (
+                                            <td
+                                                key={column}
+                                                className={`px-1.5 py-0.5 ${column === 'message' || column === 'reason' ? 'break-words' : 'whitespace-nowrap'} text-zinc-800`}
+                                            >
+                                                {formatHousekeepingListCell(column, row[columnIndex])}
+                                            </td>
+                                        ))}
+                                        {(userColumn >= 0 || roomColumn >= 0) && (
+                                            <td className="px-1 py-0.5">
+                                                <Hint content={LocalizeText(
+                                                        userColumn >= 0 ? 'housekeeping.audit.detail.open_user' : 'housekeeping.audit.detail.open_room'
+                                                    )}>
+                                                    <BaseButton aria-label={LocalizeText(
+                                                                                                        userColumn >= 0 ? 'housekeeping.audit.detail.open_user' : 'housekeeping.audit.detail.open_room'
+                                                                                                    )}
+                                                                                                    className="text-zinc-400 hover:text-sky-600"
+                                                                                                    type="button"
+                                                                                                    onClick={() => openRow(row)}
+                                                                                                >
+                                                                                                    <FaExternalLinkAlt size={9} />
+                                                                                                </BaseButton>
+                                                </Hint>
+                                            </td>
+                                        )}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

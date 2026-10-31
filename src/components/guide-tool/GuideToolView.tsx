@@ -17,8 +17,8 @@ import {
     PerkEnum,
     RemoveLinkEventTracker
 } from '@octane/renderer';
-import { FC, useCallback, useEffect, useState } from 'react';
-import { GetConfigurationValue, guardianText, GuideSessionState, GuideToolMessage, GuideToolMessageGroup, LocalizeText, SendMessageComposer } from '../../api';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { GetConfigurationValue, guardianText, GuideSessionState, GuideToolMessage, GuideToolMessageGroup, isSafeExternalUrl, LocalizeText, SendMessageComposer } from '../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { GuideToolEvent } from '../../events';
 import { useGuardianChatReview, useMessageEvent, useNotification, useUiEvent } from '../../hooks';
@@ -35,6 +35,7 @@ import { GuideToolUserNoHelpersView } from './views/GuideToolUserNoHelpersView';
 import { GuideToolUserPendingView } from './views/GuideToolUserPendingView';
 import { GuideToolUserSomethingWrogView } from './views/GuideToolUserSomethingWrogView';
 import { GuideToolUserThanksView } from './views/GuideToolUserThanksView';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export const GuideToolView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -43,6 +44,8 @@ export const GuideToolView: FC<{}> = (props) => {
     const [sessionState, setSessionState] = useState<string>(GuideSessionState.GUIDE_TOOL_MENU);
 
     const [isOnDuty, setIsOnDuty] = useState<boolean>(false);
+    const isOnDutyRef = useRef(false);
+    isOnDutyRef.current = isOnDuty;
     const [isHandlingBullyReports, setIsHandlingBullyReports] = useState<boolean>(false);
     const [isHandlingGuideRequests, setIsHandlingGuideRequests] = useState<boolean>(false);
     const [isHandlingHelpRequests, setIsHandlingHelpRequests] = useState<boolean>(false);
@@ -333,17 +336,18 @@ export const GuideToolView: FC<{}> = (props) => {
                         return;
                     }
 
-                    setIsOnDuty((v) => {
-                        SendMessageComposer(
-                            new GuideSessionOnDutyUpdateMessageComposer(
-                                !v,
-                                v ? false : isHandlingGuideRequests,
-                                v ? false : isHandlingHelpRequests,
-                                v ? false : isHandlingBullyReports
-                            )
-                        );
-                        return !v;
-                    });
+                    // Toggled from a ref, not inside a state updater: an updater may run twice (StrictMode).
+                    const wasOnDuty = isOnDutyRef.current;
+                    isOnDutyRef.current = !wasOnDuty;
+                    setIsOnDuty(!wasOnDuty);
+                    SendMessageComposer(
+                        new GuideSessionOnDutyUpdateMessageComposer(
+                            !wasOnDuty,
+                            wasOnDuty ? false : isHandlingGuideRequests,
+                            wasOnDuty ? false : isHandlingHelpRequests,
+                            wasOnDuty ? false : isHandlingBullyReports
+                        )
+                    );
 
                     return;
                 case 'forum_link':
@@ -351,7 +355,8 @@ export const GuideToolView: FC<{}> = (props) => {
                         '%groupid%',
                         GetConfigurationValue<string>('guide.help.alpha.groupid', '0')
                     );
-                    window.open(url, '_blank', 'noopener,noreferrer');
+                    // A hotel without a group homepage set opened an empty tab; only a web URL is opened.
+                    if (isSafeExternalUrl(url)) window.open(url, '_blank', 'noopener,noreferrer');
                     return;
             }
         },
@@ -373,38 +378,40 @@ export const GuideToolView: FC<{}> = (props) => {
             review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_RESULTS || review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_RESULTS;
 
         return (
-            <OctaneCardView className="octane-guide-tool octane-guardian-review" theme="primary-slim">
-                <OctaneCardHeaderView headerText={guardianText(reviewHeader[review.state])} noCloseButton={!reviewClosable} onCloseClick={closeReview} />
-                <OctaneCardContentView className="text-black">
-                    {review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_ACCEPT && (
-                        <GuardianChatReviewAcceptView
-                            countdownId={review.countdownId}
-                            countdownSeconds={review.countdownSeconds}
-                            onAccept={acceptReview}
-                            onSkip={skipReview}
-                        />
-                    )}
-                    {(review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_VOTERS || review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_VOTE) && (
-                        <GuardianChatReviewVoteView
-                            countdownId={review.countdownId}
-                            countdownSeconds={review.countdownSeconds}
-                            record={review.record}
-                            waiting={review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_VOTERS}
-                            onClose={closeReview}
-                            onVote={voteReview}
-                        />
-                    )}
-                    {(review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_RESULTS || review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_RESULTS) && (
-                        <GuardianChatReviewResultsView
-                            final={review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_RESULTS}
-                            ownVote={review.ownVote}
-                            statuses={review.statuses}
-                            winningVote={review.winningVote}
-                            onClose={closeReview}
-                        />
-                    )}
-                </OctaneCardContentView>
-            </OctaneCardView>
+            <NativeTextTree>
+                <OctaneCardView className="octane-guide-tool octane-guardian-review" theme="primary-slim">
+                    <OctaneCardHeaderView headerText={guardianText(reviewHeader[review.state])} noCloseButton={!reviewClosable} onCloseClick={closeReview} />
+                    <OctaneCardContentView className="text-black">
+                        {review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_ACCEPT && (
+                            <GuardianChatReviewAcceptView
+                                countdownId={review.countdownId}
+                                countdownSeconds={review.countdownSeconds}
+                                onAccept={acceptReview}
+                                onSkip={skipReview}
+                            />
+                        )}
+                        {(review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_VOTERS || review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_VOTE) && (
+                            <GuardianChatReviewVoteView
+                                countdownId={review.countdownId}
+                                countdownSeconds={review.countdownSeconds}
+                                record={review.record}
+                                waiting={review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_VOTERS}
+                                onClose={closeReview}
+                                onVote={voteReview}
+                            />
+                        )}
+                        {(review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_RESULTS || review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_RESULTS) && (
+                            <GuardianChatReviewResultsView
+                                final={review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_RESULTS}
+                                ownVote={review.ownVote}
+                                statuses={review.statuses}
+                                winningVote={review.winningVote}
+                                onClose={closeReview}
+                            />
+                        )}
+                    </OctaneCardContentView>
+                </OctaneCardView>
+            </NativeTextTree>
         );
     }
 
@@ -412,55 +419,57 @@ export const GuideToolView: FC<{}> = (props) => {
     const canReport = [GuideSessionState.GUIDE_ONGOING, GuideSessionState.USER_ONGOING, GuideSessionState.USER_FEEDBACK].includes(sessionState);
 
     return (
-        <>
-            {isReporting && canReport && <GuideToolReportView onClose={() => setIsReporting(false)} />}
-            <OctaneCardView className="octane-guide-tool" theme="primary-slim">
-                <OctaneCardHeaderView headerText={headerText} noCloseButton={noCloseButton} onCloseClick={(event) => processAction('close')} />
-                <OctaneCardContentView className="text-black">
-                    {sessionState === GuideSessionState.GUIDE_TOOL_MENU && (
-                        <GuideToolMenuView
-                            canJudgeChatReviews={canJudgeChatReviews}
-                            guardiansOnDuty={guardiansOnDuty}
-                            guidesOnDuty={guidesOnDuty}
-                            helpersOnDuty={helpersOnDuty}
-                            isHandlingBullyReports={isHandlingBullyReports}
-                            isHandlingGuideRequests={isHandlingGuideRequests}
-                            isHandlingHelpRequests={isHandlingHelpRequests}
-                            isOnDuty={isOnDuty}
-                            processAction={processAction}
-                            setIsHandlingBullyReports={setIsHandlingBullyReports}
-                            setIsHandlingGuideRequests={setIsHandlingGuideRequests}
-                            setIsHandlingHelpRequests={setIsHandlingHelpRequests}
-                        />
-                    )}
-                    {sessionState === GuideSessionState.GUIDE_ACCEPT && (
-                        <GuideToolAcceptView helpRequestAverageTime={helpRequestAverageTime} helpRequestDescription={helpRequestDescription} />
-                    )}
-                    {[GuideSessionState.GUIDE_ONGOING, GuideSessionState.USER_ONGOING].includes(sessionState) && (
-                        <GuideToolOngoingView
-                            isGuide={isOnDuty}
-                            isTyping={ongoingIsTyping}
-                            messageGroups={ongoingMessageGroups}
-                            userFigure={ongoingFigure}
-                            userId={ongoingUserId}
-                            userName={ongoingUsername}
-                            onReport={() => setIsReporting(true)}
-                        />
-                    )}
-                    {sessionState === GuideSessionState.USER_CREATE && (
-                        <GuideToolUserCreateRequestView setUserRequest={setUserRequest} userRequest={userRequest} />
-                    )}
-                    {sessionState === GuideSessionState.USER_PENDING && (
-                        <GuideToolUserPendingView helpRequestAverageTime={helpRequestAverageTime} helpRequestDescription={helpRequestDescription} />
-                    )}
-                    {sessionState === GuideSessionState.USER_FEEDBACK && (
-                        <GuideToolUserFeedbackView userName={ongoingUsername} onReport={() => setIsReporting(true)} />
-                    )}
-                    {sessionState === GuideSessionState.USER_THANKS && <GuideToolUserThanksView />}
-                    {sessionState === GuideSessionState.USER_NO_HELPERS && <GuideToolUserNoHelpersView />}
-                    {sessionState === GuideSessionState.USER_SOMETHING_WRONG && <GuideToolUserSomethingWrogView />}
-                </OctaneCardContentView>
-            </OctaneCardView>
-        </>
+        <NativeTextTree>
+            <>
+                {isReporting && canReport && <GuideToolReportView onClose={() => setIsReporting(false)} />}
+                <OctaneCardView className="octane-guide-tool" theme="primary-slim">
+                    <OctaneCardHeaderView headerText={headerText} noCloseButton={noCloseButton} onCloseClick={(event) => processAction('close')} />
+                    <OctaneCardContentView className="text-black">
+                        {sessionState === GuideSessionState.GUIDE_TOOL_MENU && (
+                            <GuideToolMenuView
+                                canJudgeChatReviews={canJudgeChatReviews}
+                                guardiansOnDuty={guardiansOnDuty}
+                                guidesOnDuty={guidesOnDuty}
+                                helpersOnDuty={helpersOnDuty}
+                                isHandlingBullyReports={isHandlingBullyReports}
+                                isHandlingGuideRequests={isHandlingGuideRequests}
+                                isHandlingHelpRequests={isHandlingHelpRequests}
+                                isOnDuty={isOnDuty}
+                                processAction={processAction}
+                                setIsHandlingBullyReports={setIsHandlingBullyReports}
+                                setIsHandlingGuideRequests={setIsHandlingGuideRequests}
+                                setIsHandlingHelpRequests={setIsHandlingHelpRequests}
+                            />
+                        )}
+                        {sessionState === GuideSessionState.GUIDE_ACCEPT && (
+                            <GuideToolAcceptView helpRequestAverageTime={helpRequestAverageTime} helpRequestDescription={helpRequestDescription} />
+                        )}
+                        {[GuideSessionState.GUIDE_ONGOING, GuideSessionState.USER_ONGOING].includes(sessionState) && (
+                            <GuideToolOngoingView
+                                isGuide={isOnDuty}
+                                isTyping={ongoingIsTyping}
+                                messageGroups={ongoingMessageGroups}
+                                userFigure={ongoingFigure}
+                                userId={ongoingUserId}
+                                userName={ongoingUsername}
+                                onReport={() => setIsReporting(true)}
+                            />
+                        )}
+                        {sessionState === GuideSessionState.USER_CREATE && (
+                            <GuideToolUserCreateRequestView setUserRequest={setUserRequest} userRequest={userRequest} />
+                        )}
+                        {sessionState === GuideSessionState.USER_PENDING && (
+                            <GuideToolUserPendingView helpRequestAverageTime={helpRequestAverageTime} helpRequestDescription={helpRequestDescription} />
+                        )}
+                        {sessionState === GuideSessionState.USER_FEEDBACK && (
+                            <GuideToolUserFeedbackView userName={ongoingUsername} onReport={() => setIsReporting(true)} />
+                        )}
+                        {sessionState === GuideSessionState.USER_THANKS && <GuideToolUserThanksView />}
+                        {sessionState === GuideSessionState.USER_NO_HELPERS && <GuideToolUserNoHelpersView />}
+                        {sessionState === GuideSessionState.USER_SOMETHING_WRONG && <GuideToolUserSomethingWrogView />}
+                    </OctaneCardContentView>
+                </OctaneCardView>
+            </>
+        </NativeTextTree>
     );
 };

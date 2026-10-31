@@ -22,6 +22,7 @@ import { getCustomVariableItemId } from '../WiredVariablePickerData';
 import { variableTokenFromId, WIRED_FIXED_HOLDER_SOURCE, WiredValueOrVariableField } from '../WiredValueOrVariableField';
 import { toWiredVariableIdOnTarget, wiredVariableIdList } from '../WiredVariableIds';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const SOURCE_SELECTED = 100;
 const SOURCE_SECONDARY_SELECTED = 101;
@@ -55,54 +56,56 @@ const ElementSection: FC<ElementSectionProps> = ({ half, element, onChange, onVa
     const amountLabel = localizeWithFallback('wiredfurni.params.custom_contract.amount_selection', 'Select amount:');
 
     return (
-        <details>
-            <summary>
-                <Text bold>{title}</Text>
-            </summary>
-            <div className="flex flex-col gap-1 pt-1">
-                <label className="flex items-center gap-1">
-                    <Checkbox
-                        aria-label={enableLabel}
-                        checked={element.enabled}
-                        onCheckedChange={(nextChecked) => onChange({ ...element, enabled: nextChecked })}
-                    />
-                    <Text>{enableLabel}</Text>
-                </label>
-                <fieldset className="flex flex-col gap-1 ps-3" disabled={!element.enabled}>
-                    <Text bold>{localizeWithFallback('wiredfurni.params.custom_contract.element_type_selection', 'Element type:')}</Text>
-                    <div className="flex items-center gap-3">
-                        {ELEMENT_TYPES.map((type) => (
-                            <label key={type} className="flex items-center gap-1">
-                                <Radio
-                                    name={`customContract-${half}-type`}
-                                    checked={element.type === type}
-                                    onCheckedChange={() => onChange({ ...element, type })}
-                                />
-                                <Text>{localizeWithFallback(`wiredfurni.params.custom_contract.element_type_selection.${type}`, ELEMENT_TYPE_LABELS[type])}</Text>
-                            </label>
-                        ))}
-                    </div>
-                    <Text bold>{amountLabel}</Text>
-                    <WiredValueOrVariableField
-                        disabled={!element.enabled}
-                        holderSource={WIRED_FIXED_HOLDER_SOURCE}
-                        isVariable={element.fromVariable}
-                        label={`${title}: ${amountLabel}`}
-                        literal={element.literal}
-                        max={CUSTOM_CONTRACT_MAX_AMOUNT}
-                        min={CUSTOM_CONTRACT_MIN_AMOUNT}
-                        target={element.target}
-                        targets={[CUSTOM_CONTRACT_GLOBAL_TARGET, CUSTOM_CONTRACT_CONTEXT_TARGET]}
-                        token={element.token}
-                        onIsVariableChange={(fromVariable) => onChange({ ...element, fromVariable })}
-                        onLiteralChange={(literal) => onChange({ ...element, literal })}
-                        onTargetChange={(target) => onChange({ ...element, target })}
-                        onTokenChange={(token) => onChange({ ...element, token })}
-                        onValidityChange={onValidityChange}
-                    />
-                </fieldset>
-            </div>
-        </details>
+        <NativeTextTree>
+            <details>
+                <summary>
+                    <Text bold>{title}</Text>
+                </summary>
+                <div className="flex flex-col gap-1 pt-1">
+                    <label className="flex items-center gap-1">
+                        <Checkbox
+                            aria-label={enableLabel}
+                            checked={element.enabled}
+                            onCheckedChange={(nextChecked) => onChange({ ...element, enabled: nextChecked })}
+                        />
+                        <Text>{enableLabel}</Text>
+                    </label>
+                    <fieldset className="flex flex-col gap-1 ps-3" disabled={!element.enabled}>
+                        <Text bold>{localizeWithFallback('wiredfurni.params.custom_contract.element_type_selection', 'Element type:')}</Text>
+                        <div className="flex items-center gap-3">
+                            {ELEMENT_TYPES.map((type) => (
+                                <label key={type} className="flex items-center gap-1">
+                                    <Radio
+                                        name={`customContract-${half}-type`}
+                                        checked={element.type === type}
+                                        onCheckedChange={() => onChange({ ...element, type })}
+                                    />
+                                    <Text>{localizeWithFallback(`wiredfurni.params.custom_contract.element_type_selection.${type}`, ELEMENT_TYPE_LABELS[type])}</Text>
+                                </label>
+                            ))}
+                        </div>
+                        <Text bold>{amountLabel}</Text>
+                        <WiredValueOrVariableField
+                            disabled={!element.enabled}
+                            holderSource={WIRED_FIXED_HOLDER_SOURCE}
+                            isVariable={element.fromVariable}
+                            label={`${title}: ${amountLabel}`}
+                            literal={element.literal}
+                            max={CUSTOM_CONTRACT_MAX_AMOUNT}
+                            min={CUSTOM_CONTRACT_MIN_AMOUNT}
+                            target={element.target}
+                            targets={[CUSTOM_CONTRACT_GLOBAL_TARGET, CUSTOM_CONTRACT_CONTEXT_TARGET]}
+                            token={element.token}
+                            onIsVariableChange={(fromVariable) => onChange({ ...element, fromVariable })}
+                            onLiteralChange={(literal) => onChange({ ...element, literal })}
+                            onTargetChange={(target) => onChange({ ...element, target })}
+                            onTokenChange={(token) => onChange({ ...element, token })}
+                            onValidityChange={onValidityChange}
+                        />
+                    </fieldset>
+                </div>
+            </details>
+        </NativeTextTree>
     );
 };
 
@@ -248,53 +251,55 @@ export const WiredCustomContractOfficialView: FC<{}> = () => {
 
     // AIR forceHidePickFurniInstructions, widthModifier 1.2: the two source rows are the whole selection.
     return (
-        <WiredExtraBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
-            save={save}
-            validate={validate}
-            widthModifier={1.2}
-            allowScrolling
-            showSelection={false}
-            footerCollapsible={false}
-            footer={
+        <NativeTextTree>
+            <WiredExtraBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
+                save={save}
+                validate={validate}
+                widthModifier={1.2}
+                allowScrolling
+                showSelection={false}
+                footerCollapsible={false}
+                footer={
+                    <div className="flex flex-col gap-2">
+                        <fieldset disabled={!paymentPicksFurni} className={paymentPicksFurni ? undefined : 'opacity-50'}>
+                            <WiredFurniSelectionSourceRow
+                                title="wiredfurni.params.sources.furni.title.payment"
+                                options={FURNI_SOURCES}
+                                value={paymentSource}
+                                selectionKind="primary"
+                                selectionActive={selectionMode === 'payment'}
+                                selectionCount={paymentIds.length}
+                                selectionLimit={selectionLimit}
+                                selectionEnabledValues={[SOURCE_SELECTED]}
+                                onChange={setPaymentSource}
+                                onSelectionActivate={() => switchSelection('payment')}
+                            />
+                        </fieldset>
+                        <fieldset disabled={!rewardPicksFurni} className={rewardPicksFurni ? undefined : 'opacity-50'}>
+                            <WiredFurniSelectionSourceRow
+                                title="wiredfurni.params.sources.furni.title.reward"
+                                options={REWARD_SOURCES}
+                                value={rewardSource}
+                                selectionKind="secondary"
+                                selectionActive={selectionMode === 'reward'}
+                                selectionCount={rewardIds.length}
+                                selectionLimit={selectionLimit}
+                                selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
+                                onChange={(value) => setRewardSource(value === SOURCE_SELECTED ? SOURCE_SECONDARY_SELECTED : value)}
+                                onSelectionActivate={() => switchSelection('reward')}
+                            />
+                        </fieldset>
+                    </div>
+                }
+            >
                 <div className="flex flex-col gap-2">
-                    <fieldset disabled={!paymentPicksFurni} className={paymentPicksFurni ? undefined : 'opacity-50'}>
-                        <WiredFurniSelectionSourceRow
-                            title="wiredfurni.params.sources.furni.title.payment"
-                            options={FURNI_SOURCES}
-                            value={paymentSource}
-                            selectionKind="primary"
-                            selectionActive={selectionMode === 'payment'}
-                            selectionCount={paymentIds.length}
-                            selectionLimit={selectionLimit}
-                            selectionEnabledValues={[SOURCE_SELECTED]}
-                            onChange={setPaymentSource}
-                            onSelectionActivate={() => switchSelection('payment')}
-                        />
-                    </fieldset>
-                    <fieldset disabled={!rewardPicksFurni} className={rewardPicksFurni ? undefined : 'opacity-50'}>
-                        <WiredFurniSelectionSourceRow
-                            title="wiredfurni.params.sources.furni.title.reward"
-                            options={REWARD_SOURCES}
-                            value={rewardSource}
-                            selectionKind="secondary"
-                            selectionActive={selectionMode === 'reward'}
-                            selectionCount={rewardIds.length}
-                            selectionLimit={selectionLimit}
-                            selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
-                            onChange={(value) => setRewardSource(value === SOURCE_SELECTED ? SOURCE_SECONDARY_SELECTED : value)}
-                            onSelectionActivate={() => switchSelection('reward')}
-                        />
-                    </fieldset>
+                    <Text small className="whitespace-pre-line">{LocalizeText('wiredfurni.params.custom_contract.usage_warning').replace(/\\n/g, '\n')}</Text>
+                    <ElementSection half="payment" element={payment} onChange={setPayment} onValidityChange={setPaymentValid} />
+                    <ElementSection half="reward" element={reward} onChange={setReward} onValidityChange={setRewardValid} />
                 </div>
-            }
-        >
-            <div className="flex flex-col gap-2">
-                <Text small className="whitespace-pre-line">{LocalizeText('wiredfurni.params.custom_contract.usage_warning').replace(/\\n/g, '\n')}</Text>
-                <ElementSection half="payment" element={payment} onChange={setPayment} onValidityChange={setPaymentValid} />
-                <ElementSection half="reward" element={reward} onChange={setReward} onValidityChange={setRewardValid} />
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

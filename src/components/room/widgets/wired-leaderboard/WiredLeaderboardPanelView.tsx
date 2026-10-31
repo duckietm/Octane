@@ -15,6 +15,7 @@ import {
 } from '../../../../api/wired/WiredLeaderboard';
 import { LayoutAvatarImageView } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Hint } from '../../../../common/Tooltip';
 
 /** Where a panel stands: a tile, a horizontal offset and an altitude, both in pixels at scale 1. */
@@ -189,71 +190,73 @@ export const WiredLeaderboardPanelView: FC<WiredLeaderboardPanelViewProps> = (pr
     const width = leaderboardPanelWidth(columns);
 
     return (
-        <div ref={elementRef} className={`octane-wired-leaderboard${ dimmed ? ' octane-wired-leaderboard--dimmed' : '' }${ onRelocate ? ' octane-wired-leaderboard--editing' : '' }`} style={{ visibility: 'hidden', width }} data-testid="leaderboard-panel">
-            <div className="octane-wired-leaderboard__head" onMouseDown={startDrag}>
-                <div className="octane-wired-leaderboard__heading">
-                    <div className={`octane-wired-leaderboard__title${ shownTitle.trim().length ? '' : ' is-placeholder' }`}>
-                        {shownTitle.trim().length ? shownTitle : localizeWithFallback('wiredfurni.variable_leaderboard.untitled', 'Leaderboard')}
+        <NativeTextTree>
+            <div ref={elementRef} className={`octane-wired-leaderboard${ dimmed ? ' octane-wired-leaderboard--dimmed' : '' }${ onRelocate ? ' octane-wired-leaderboard--editing' : '' }`} style={{ visibility: 'hidden', width }} data-testid="leaderboard-panel">
+                <div className="octane-wired-leaderboard__head" onMouseDown={startDrag}>
+                    <div className="octane-wired-leaderboard__heading">
+                        <div className={`octane-wired-leaderboard__title${ shownTitle.trim().length ? '' : ' is-placeholder' }`}>
+                            {shownTitle.trim().length ? shownTitle : localizeWithFallback('wiredfurni.variable_leaderboard.untitled', 'Leaderboard')}
+                        </div>
+                        {description.length > 0 && <div className="octane-wired-leaderboard__description">{description}</div>}
                     </div>
-                    {description.length > 0 && <div className="octane-wired-leaderboard__description">{description}</div>}
+                    {onRelocate && (
+                        <Hint content={localizeWithFallback('wiredfurni.params.variable_leaderboard.location.drag_status', 'Drag to move')}>
+                            <span aria-label={localizeWithFallback('wiredfurni.params.variable_leaderboard.location.drag_status', 'Drag to move')} className="octane-wired-leaderboard__drag" role="img">✥</span>
+                        </Hint>
+                    )}
+                    {choices.length > 1 && (
+                        <BaseButton type="button" className="octane-wired-leaderboard__choice-toggle" onMouseDown={(event) => event.stopPropagation()} onClick={() => setChoicesOpen((open) => !open)}>▾</BaseButton>
+                    )}
                 </div>
-                {onRelocate && (
-                    <Hint content={localizeWithFallback('wiredfurni.params.variable_leaderboard.location.drag_status', 'Drag to move')}>
-                        <span aria-label={localizeWithFallback('wiredfurni.params.variable_leaderboard.location.drag_status', 'Drag to move')} className="octane-wired-leaderboard__drag" role="img">✥</span>
-                    </Hint>
+                {choicesOpen && choices.length > 1 && (
+                    <div className="octane-wired-leaderboard__choices">
+                        {choices.map((choice) => (
+                            <BaseButton type="button" key={choice.variableId} className={`octane-wired-leaderboard__choice${ choice.variableId === variableId ? ' is-selected' : '' }`} onClick={() => {
+                                setChoicesOpen(false);
+                                onSelectVariable?.(choice.variableId);
+                            }}>
+                                {choice.displayName}
+                            </BaseButton>
+                        ))}
+                    </div>
                 )}
-                {choices.length > 1 && (
-                    <BaseButton type="button" className="octane-wired-leaderboard__choice-toggle" onMouseDown={(event) => event.stopPropagation()} onClick={() => setChoicesOpen((open) => !open)}>▾</BaseButton>
-                )}
-            </div>
-            {choicesOpen && choices.length > 1 && (
-                <div className="octane-wired-leaderboard__choices">
-                    {choices.map((choice) => (
-                        <BaseButton type="button" key={choice.variableId} className={`octane-wired-leaderboard__choice${ choice.variableId === variableId ? ' is-selected' : '' }`} onClick={() => {
-                            setChoicesOpen(false);
-                            onSelectVariable?.(choice.variableId);
-                        }}>
-                            {choice.displayName}
-                        </BaseButton>
+                <div className="octane-wired-leaderboard__headers">
+                    <div style={{ width: LEADERBOARD_RANK_GUTTER }}>#</div>
+                    {columns.map((column, index) => (
+                        <div key={index} className={columnAlign(column.type)} style={{ width: LEADERBOARD_COLUMN_PIXELS[column.width] }}>{column.label}</div>
                     ))}
                 </div>
-            )}
-            <div className="octane-wired-leaderboard__headers">
-                <div style={{ width: LEADERBOARD_RANK_GUTTER }}>#</div>
-                {columns.map((column, index) => (
-                    <div key={index} className={columnAlign(column.type)} style={{ width: LEADERBOARD_COLUMN_PIXELS[column.width] }}>{column.label}</div>
-                ))}
+                <div className="octane-wired-leaderboard__rows" style={{ height: entriesPerPage * ROW_HEIGHT }}>
+                    {(empty || loading) && (
+                        <div className="octane-wired-leaderboard__state">
+                            {loading && !empty
+                                ? localizeWithFallback('wiredfurni.variable_leaderboard.loading', 'Loading...')
+                                : localizeWithFallback('wiredfurni.variable_leaderboard.no_entries', 'No entries yet')}
+                        </div>
+                    )}
+                    {rows.map((row, position) => (
+                        <div key={`${ row.rank }-${ row.userId }`} className={`octane-wired-leaderboard__row${ position % 2 ? ' is-odd' : '' }`}>
+                            <div className="octane-wired-leaderboard__rank" style={{ width: LEADERBOARD_RANK_GUTTER }}>{row.rank}</div>
+                            {columns.map((column, index) => (column.type === LeaderboardColumnType.USERNAME)
+                                ? (
+                                    <BaseButton type="button" key={index} className="octane-wired-leaderboard__user" style={{ width: LEADERBOARD_COLUMN_PIXELS[column.width] }} onClick={() => GetUserProfile(row.userId)}>
+                                        <div className="octane-wired-leaderboard__face">{row.figure && <LayoutAvatarImageView figure={row.figure} headOnly compactHead compactHeadSize={18} direction={2} />}</div>
+                                        <span>{row.username}</span>
+                                    </BaseButton>
+                                )
+                                : <div key={index} className={`octane-wired-leaderboard__cell ${ columnAlign(column.type) }`} style={{ width: LEADERBOARD_COLUMN_PIXELS[column.width] }}>{cellText(row, column.type, now)}</div>)}
+                        </div>
+                    ))}
+                    {Array.from({ length: Math.max(0, entriesPerPage - rows.length) }, (_, i) => (
+                        <div key={`empty-${ i }`} className={`octane-wired-leaderboard__row is-empty${ (rows.length + i) % 2 ? ' is-odd' : '' }`} />
+                    ))}
+                </div>
+                <div className="octane-wired-leaderboard__pager">
+                    <BaseButton type="button" disabled={page <= 0} onClick={() => onMovePage?.(-1)}>‹</BaseButton>
+                    <span>{localizeWithFallback('wiredfurni.variable_leaderboard.page', `Page ${ page + 1 } / ${ pages }`, [ 'page', 'pages' ], [ String(page + 1), String(pages) ])}</span>
+                    <BaseButton type="button" disabled={page + 1 >= pages} onClick={() => onMovePage?.(1)}>›</BaseButton>
+                </div>
             </div>
-            <div className="octane-wired-leaderboard__rows" style={{ height: entriesPerPage * ROW_HEIGHT }}>
-                {(empty || loading) && (
-                    <div className="octane-wired-leaderboard__state">
-                        {loading && !empty
-                            ? localizeWithFallback('wiredfurni.variable_leaderboard.loading', 'Loading...')
-                            : localizeWithFallback('wiredfurni.variable_leaderboard.no_entries', 'No entries yet')}
-                    </div>
-                )}
-                {rows.map((row, position) => (
-                    <div key={`${ row.rank }-${ row.userId }`} className={`octane-wired-leaderboard__row${ position % 2 ? ' is-odd' : '' }`}>
-                        <div className="octane-wired-leaderboard__rank" style={{ width: LEADERBOARD_RANK_GUTTER }}>{row.rank}</div>
-                        {columns.map((column, index) => (column.type === LeaderboardColumnType.USERNAME)
-                            ? (
-                                <BaseButton type="button" key={index} className="octane-wired-leaderboard__user" style={{ width: LEADERBOARD_COLUMN_PIXELS[column.width] }} onClick={() => GetUserProfile(row.userId)}>
-                                    <div className="octane-wired-leaderboard__face">{row.figure && <LayoutAvatarImageView figure={row.figure} headOnly compactHead compactHeadSize={18} direction={2} />}</div>
-                                    <span>{row.username}</span>
-                                </BaseButton>
-                            )
-                            : <div key={index} className={`octane-wired-leaderboard__cell ${ columnAlign(column.type) }`} style={{ width: LEADERBOARD_COLUMN_PIXELS[column.width] }}>{cellText(row, column.type, now)}</div>)}
-                    </div>
-                ))}
-                {Array.from({ length: Math.max(0, entriesPerPage - rows.length) }, (_, i) => (
-                    <div key={`empty-${ i }`} className={`octane-wired-leaderboard__row is-empty${ (rows.length + i) % 2 ? ' is-odd' : '' }`} />
-                ))}
-            </div>
-            <div className="octane-wired-leaderboard__pager">
-                <BaseButton type="button" disabled={page <= 0} onClick={() => onMovePage?.(-1)}>‹</BaseButton>
-                <span>{localizeWithFallback('wiredfurni.variable_leaderboard.page', `Page ${ page + 1 } / ${ pages }`, [ 'page', 'pages' ], [ String(page + 1), String(pages) ])}</span>
-                <BaseButton type="button" disabled={page + 1 >= pages} onClick={() => onMovePage?.(1)}>›</BaseButton>
-            </div>
-        </div>
+        </NativeTextTree>
     );
 };

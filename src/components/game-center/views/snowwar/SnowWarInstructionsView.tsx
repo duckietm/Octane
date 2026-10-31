@@ -10,6 +10,7 @@ import {
 import { SNOWWAR_AIR_ASSETS } from '../../../../assets/images/snowstorm/air';
 import { useGameCenter } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const localizeWithFallback = (key: string, fallback: string) =>
 {
@@ -64,36 +65,38 @@ export const SnowWarInstructionsView: FC = () =>
     const image = SNOWWAR_AIR_ASSETS[`${ current.asset }${ frame + 1 }`];
 
     return (
-        <div className="snowwar-instructions">
-            <BaseButton aria-label="previous" className="snowwar-instructions__arrow snowwar-instructions__arrow--prev" type="button" onClick={ () => goTo(-1) }>
-                <img alt="" src={ SNOWWAR_AIR_ASSETS.scroll_left } />
-            </BaseButton>
-            <div className="snowwar-instructions__image">
-                { image && <img alt="" src={ image } /> }
+        <NativeTextTree>
+            <div className="snowwar-instructions">
+                <BaseButton aria-label="previous" className="snowwar-instructions__arrow snowwar-instructions__arrow--prev" type="button" onClick={ () => goTo(-1) }>
+                    <img alt="" src={ SNOWWAR_AIR_ASSETS.scroll_left } />
+                </BaseButton>
+                <div className="snowwar-instructions__image">
+                    { image && <img alt="" src={ image } /> }
+                </div>
+                <BaseButton aria-label="next" className="snowwar-instructions__arrow snowwar-instructions__arrow--next" type="button" onClick={ () => goTo(1) }>
+                    <img alt="" src={ SNOWWAR_AIR_ASSETS.scroll_right } />
+                </BaseButton>
+                <div className="snowwar-instructions__pages">
+                    { SNOWWAR_INSTRUCTION_PAGES.map((_, index) => (
+                        <BaseButton
+                            key={ index }
+                            aria-label={ `page ${ index + 1 }` }
+                            className="snowwar-instructions__ball"
+                            type="button"
+                            onClick={ () =>
+                            {
+                                setFrame(0);
+                                setPage(index);
+                            } }>
+                            <img alt="" src={ isInstructionPageHighlighted(index, page) ? SNOWWAR_AIR_ASSETS.pagination_ball_hilite : SNOWWAR_AIR_ASSETS.pagination_ball } />
+                        </BaseButton>
+                    )) }
+                </div>
+                <div className="snowwar-instructions__text">{ localizeWithFallback(current.textKey, INSTRUCTION_FALLBACKS[page]) }</div>
+                <BaseButton className="snowwar-instructions__back" type="button" onClick={ () => setInstructionsOpen(false) }>
+                    { localizeWithFallback('snowwar.instructions.back', 'Back') }
+                </BaseButton>
             </div>
-            <BaseButton aria-label="next" className="snowwar-instructions__arrow snowwar-instructions__arrow--next" type="button" onClick={ () => goTo(1) }>
-                <img alt="" src={ SNOWWAR_AIR_ASSETS.scroll_right } />
-            </BaseButton>
-            <div className="snowwar-instructions__pages">
-                { SNOWWAR_INSTRUCTION_PAGES.map((_, index) => (
-                    <BaseButton
-                        key={ index }
-                        aria-label={ `page ${ index + 1 }` }
-                        className="snowwar-instructions__ball"
-                        type="button"
-                        onClick={ () =>
-                        {
-                            setFrame(0);
-                            setPage(index);
-                        } }>
-                        <img alt="" src={ isInstructionPageHighlighted(index, page) ? SNOWWAR_AIR_ASSETS.pagination_ball_hilite : SNOWWAR_AIR_ASSETS.pagination_ball } />
-                    </BaseButton>
-                )) }
-            </div>
-            <div className="snowwar-instructions__text">{ localizeWithFallback(current.textKey, INSTRUCTION_FALLBACKS[page]) }</div>
-            <BaseButton className="snowwar-instructions__back" type="button" onClick={ () => setInstructionsOpen(false) }>
-                { localizeWithFallback('snowwar.instructions.back', 'Back') }
-            </BaseButton>
-        </div>
+        </NativeTextTree>
     );
 };

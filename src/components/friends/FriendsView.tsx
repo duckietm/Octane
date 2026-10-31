@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useFriends } from '../../hooks';
 import { useFriendBarNotificationEvents } from '../../hooks/friends/useFriendBarNotificationEvents';
 import { EpicPopupView } from './views/epic-popup/EpicPopupView';
@@ -43,11 +44,13 @@ export const FriendsView: FC<{}> = (props) => {
     if (!settings) return <EpicPopupView />;
 
     return (
-        <>
-            <EpicPopupView />
-            {portalTarget && createPortal(<FriendBarView onlineFriends={onlineFriends} requestsCount={requests.length} />, portalTarget)}
-            <FriendsListView />
-            <FriendsMessengerView />
-        </>
+        <NativeTextTree>
+            <>
+                <EpicPopupView />
+                {portalTarget && createPortal(<FriendBarView onlineFriends={onlineFriends} requestsCount={requests.length} />, portalTarget)}
+                <FriendsListView />
+                <FriendsMessengerView />
+            </>
+        </NativeTextTree>
     );
 };

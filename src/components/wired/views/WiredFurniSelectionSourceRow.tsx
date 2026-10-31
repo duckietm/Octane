@@ -4,6 +4,7 @@ import { LocalizeText } from '../../../api';
 import { Button, Text } from '../../../common';
 import { WiredSourceOption } from './WiredSourcesSelector';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 /**
  * AIR WiredInputSourcePicker.refreshContainer + InputSourceControlPreset.updateUI: a room or context holder
@@ -66,34 +67,36 @@ export const WiredFurniSelectionSourceRow: FC<WiredFurniSelectionSourceRowProps>
     };
 
     return (
-        <div className="octane-wired__source-row">
-            <div className="flex items-center justify-between gap-2">
-                <Text>{resolvedTitle}</Text>
-                {headerContent}
-                {showSelectionToggle && (
-                    <BaseButton
-                        type="button"
-                        className={`octane-wired__selection-toggle octane-wired__selection-toggle--${selectionKind} ${selectionActive ? 'is-active' : ''}`}
-                        disabled={!canActivateSelection}
-                        onClick={() => onSelectionActivate && onSelectionActivate()}
-                    >
-                        <FaMousePointer />
-                    </BaseButton>
-                )}
-            </div>
-            <div className="flex items-center gap-1">
-                <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" disabled={holderRow} onClick={() => cycleValue(-1)}>
-                    <FaChevronLeft />
-                </Button>
-                <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
-                    <Text small className="text-center">
-                        {displayText}
-                    </Text>
+        <NativeTextTree>
+            <div className="octane-wired__source-row">
+                <div className="flex items-center justify-between gap-2">
+                    <Text>{resolvedTitle}</Text>
+                    {headerContent}
+                    {showSelectionToggle && (
+                        <BaseButton
+                            type="button"
+                            className={`octane-wired__selection-toggle octane-wired__selection-toggle--${selectionKind} ${selectionActive ? 'is-active' : ''}`}
+                            disabled={!canActivateSelection}
+                            onClick={() => onSelectionActivate && onSelectionActivate()}
+                        >
+                            <FaMousePointer />
+                        </BaseButton>
+                    )}
                 </div>
-                <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" disabled={holderRow} onClick={() => cycleValue(1)}>
-                    <FaChevronRight />
-                </Button>
+                <div className="flex items-center gap-1">
+                    <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" disabled={holderRow} onClick={() => cycleValue(-1)}>
+                        <FaChevronLeft />
+                    </Button>
+                    <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
+                        <Text small className="text-center">
+                            {displayText}
+                        </Text>
+                    </div>
+                    <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" disabled={holderRow} onClick={() => cycleValue(1)}>
+                        <FaChevronRight />
+                    </Button>
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

@@ -7,6 +7,7 @@ import { useUserDataSnapshot } from '../../../hooks/session/useSessionSnapshots'
 import { EntryDir, FloorplanAction, FloorplanState, ThicknessLevel } from '../state/types';
 import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 type Props = {
     state: FloorplanState;
@@ -30,37 +31,39 @@ export const FloorplanOptionsPanel: FC<Props> = ({ state, dispatch }) => {
     const setFloor = (t: ThicknessLevel) => dispatch({ type: 'SET_THICKNESS', floor: t, source: 'local' });
 
     return (
-        <>
-            <div className="fp-control-group is-centered" data-testid="floorplan-orientation">
-                <div className="fp-group-label">{LocalizeText('floor.plan.editor.enter.direction')}</div>
-                {/* AIR enterdirection_container: left turns the ghost avatar one step up (entryPointDir++), right one
-                    step back; the avatar in the middle faces the door direction. */}
-                <div className="fp-orientation">
-                    <Base component={BaseButton} type="button" data-testid="entry-dir-prev" pointer title="Rotate left" className="fp-orientation-step" onClick={() => setDir(rotateDir(state.door.dir, 1))}>
-                        <FaChevronLeft size={11} />
-                    </Base>
-                    <Base component={BaseButton} type="button"
-                        data-testid="entry-dir"
-                        data-dir={state.door.dir}
-                        pointer
-                        title={`Direction ${state.door.dir}/7 (click to rotate)`}
-                        className="fp-orientation-avatar"
-                        onClick={() => setDir(rotateDir(state.door.dir, 1))}
-                    >
-                        <LayoutAvatarImageView figure={figure || GHOST_FIGURE} gender={gender || 'M'} direction={state.door.dir} fit small />
-                    </Base>
-                    <Base component={BaseButton} type="button" data-testid="entry-dir-next" pointer title="Rotate right" className="fp-orientation-step" onClick={() => setDir(rotateDir(state.door.dir, -1))}>
-                        <FaChevronRight size={11} />
-                    </Base>
+        <NativeTextTree>
+            <>
+                <div className="fp-control-group is-centered" data-testid="floorplan-orientation">
+                    <div className="fp-group-label">{LocalizeText('floor.plan.editor.enter.direction')}</div>
+                    {/* AIR enterdirection_container: left turns the ghost avatar one step up (entryPointDir++), right one
+                        step back; the avatar in the middle faces the door direction. */}
+                    <div className="fp-orientation">
+                        <Base component={BaseButton} type="button" data-testid="entry-dir-prev" pointer title="Rotate left" className="fp-orientation-step" onClick={() => setDir(rotateDir(state.door.dir, 1))}>
+                            <FaChevronLeft size={11} />
+                        </Base>
+                        <Base component={BaseButton} type="button"
+                            data-testid="entry-dir"
+                            data-dir={state.door.dir}
+                            pointer
+                            title={`Direction ${state.door.dir}/7 (click to rotate)`}
+                            className="fp-orientation-avatar"
+                            onClick={() => setDir(rotateDir(state.door.dir, 1))}
+                        >
+                            <LayoutAvatarImageView figure={figure || GHOST_FIGURE} gender={gender || 'M'} direction={state.door.dir} fit small />
+                        </Base>
+                        <Base component={BaseButton} type="button" data-testid="entry-dir-next" pointer title="Rotate right" className="fp-orientation-step" onClick={() => setDir(rotateDir(state.door.dir, -1))}>
+                            <FaChevronRight size={11} />
+                        </Base>
+                    </div>
                 </div>
-            </div>
 
-            <div className="fp-control-group is-centered is-right" data-testid="floorplan-appearance">
-                <div className="fp-group-label">{localizeOr('floor.plan.editor.room.options', localizeOr('floor.plan.editor.appearance', 'Appearance'))}</div>
-                <ThicknessStepper value={state.thickness.wall} onChange={setWall} testIdPrefix="wall-thickness" labelKeyPrefix="navigator.roomsettings.wall_thickness" />
-                <ThicknessStepper value={state.thickness.floor} onChange={setFloor} testIdPrefix="floor-thickness" labelKeyPrefix="navigator.roomsettings.floor_thickness" />
-            </div>
-        </>
+                <div className="fp-control-group is-centered is-right" data-testid="floorplan-appearance">
+                    <div className="fp-group-label">{localizeOr('floor.plan.editor.room.options', localizeOr('floor.plan.editor.appearance', 'Appearance'))}</div>
+                    <ThicknessStepper value={state.thickness.wall} onChange={setWall} testIdPrefix="wall-thickness" labelKeyPrefix="navigator.roomsettings.wall_thickness" />
+                    <ThicknessStepper value={state.thickness.floor} onChange={setFloor} testIdPrefix="floor-thickness" labelKeyPrefix="navigator.roomsettings.floor_thickness" />
+                </div>
+            </>
+        </NativeTextTree>
     );
 };
 
@@ -79,28 +82,30 @@ const ThicknessStepper: FC<StepperProps> = ({ value, onChange, testIdPrefix, lab
     const label = LocalizeText(`${labelKeyPrefix}.${THICKNESS_NAMES[value]}`);
 
     return (
-        <div className="fp-select" data-testid={testIdPrefix} data-value={value} title={label}>
-            <BaseButton className="cursor-pointer" data-testid={`${testIdPrefix}-label`} type="button" onClick={() => onChange(thicker ?? THICKNESS_LEVELS[0])}>
-                {label}
-            </BaseButton>
-            <div className="fp-select-arrows">
-                <Hint content="Thicker"><BaseButton
-                    aria-disabled={thicker === null}
-                    aria-label="Thicker"
-                    data-testid={`${testIdPrefix}-up`}
-                    className={`fp-select-arrow is-up ${thicker === null ? 'is-disabled' : ''}`}
-                    type="button"
-                    onClick={() => thicker !== null && onChange(thicker)}
-                /></Hint>
-                <Hint content="Thinner"><BaseButton
-                    aria-disabled={thinner === null}
-                    aria-label="Thinner"
-                    data-testid={`${testIdPrefix}-down`}
-                    className={`fp-select-arrow is-down ${thinner === null ? 'is-disabled' : ''}`}
-                    type="button"
-                    onClick={() => thinner !== null && onChange(thinner)}
-                /></Hint>
+        <NativeTextTree>
+            <div className="fp-select" data-testid={testIdPrefix} data-value={value} title={label}>
+                <BaseButton className="cursor-pointer" data-testid={`${testIdPrefix}-label`} type="button" onClick={() => onChange(thicker ?? THICKNESS_LEVELS[0])}>
+                    {label}
+                </BaseButton>
+                <div className="fp-select-arrows">
+                    <Hint content="Thicker"><BaseButton
+                        aria-disabled={thicker === null}
+                        aria-label="Thicker"
+                        data-testid={`${testIdPrefix}-up`}
+                        className={`fp-select-arrow is-up ${thicker === null ? 'is-disabled' : ''}`}
+                        type="button"
+                        onClick={() => thicker !== null && onChange(thicker)}
+                    /></Hint>
+                    <Hint content="Thinner"><BaseButton
+                        aria-disabled={thinner === null}
+                        aria-label="Thinner"
+                        data-testid={`${testIdPrefix}-down`}
+                        className={`fp-select-arrow is-down ${thinner === null ? 'is-disabled' : ''}`}
+                        type="button"
+                        onClick={() => thinner !== null && onChange(thinner)}
+                    /></Hint>
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

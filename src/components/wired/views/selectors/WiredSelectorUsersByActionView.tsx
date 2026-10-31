@@ -3,6 +3,7 @@ import { readWiredUserAction, wiredUserActionExtra, WiredUserActionChoice } from
 import { useWired } from '../../../../hooks';
 import { WiredUserActionSection } from '../WiredUserActionSection';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 
 export const WiredSelectorUsersByActionView: FC<{}> = () => {
@@ -22,10 +23,12 @@ export const WiredSelectorUsersByActionView: FC<{}> = () => {
     }, [choice, setIntParams, setStringParam]);
 
     return (
-        <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
-            <div className="flex flex-col gap-2">
-                <WiredUserActionSection choice={choice} onChange={setChoice} />
-            </div>
-        </WiredSelectorBaseView>
+        <NativeTextTree>
+            <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
+                <div className="flex flex-col gap-2">
+                    <WiredUserActionSection choice={choice} onChange={setChoice} />
+                </div>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

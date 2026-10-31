@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { GetFurnitureData, GetImageIconUrlForProduct, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../../api';
 import { LayoutFurniImageView } from '../../../../../../common';
 import { BaseButton } from '../../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
 import { useMessageEvent } from '../../../../../../hooks';
 import { CatalogLayoutProps } from '../CatalogLayout.types';
 
@@ -44,69 +45,78 @@ export const CatalogLayoutRecyclerPrizesView: FC<CatalogLayoutProps> = ({ page }
 
     if (!levels) {
         return (
-            <div className="octane-catalog-specialized-state" role="status">
-                {LocalizeText('generic.loading')}
-            </div>
+            <NativeTextTree>
+                <div className="octane-catalog-specialized-state" role="status">
+                    {LocalizeText('generic.loading')}
+                </div>
+            </NativeTextTree>
         );
     }
 
     if (!levels.length) {
         return (
-            <div className="octane-catalog-specialized-state" role="status">
-                {LocalizeText('recycler.info.closed')}
-            </div>
+            <NativeTextTree>
+                <div className="octane-catalog-specialized-state" role="status">
+                    {LocalizeText('recycler.info.closed')}
+                </div>
+            </NativeTextTree>
         );
     }
 
     const teaser = page?.localization?.getImage(1);
 
     return (
-        <div className="octane-catalog-air-prizes">
-            <div className="octane-catalog-air-prizes__view">
-                {selected ? (
-                    <>
-                        <div className="octane-catalog-air-prizes__preview">
-                            <LayoutFurniImageView direction={2} productClassId={selected.productClassId} productType={selected.productType} scale={2} />
-                        </div>
-                        <div className="octane-catalog-air-prizes__name">{prizeName(selected)}</div>
-                    </>
-                ) : (
-                    !!teaser && <img alt="" draggable={false} className="octane-catalog-air-prizes__teaser" src={teaser} />
-                )}
-            </div>
-            <div className="octane-catalog-air-prizes__list">
-                {levels.map((level) => (
-                    <section key={level.levelId} className="octane-catalog-air-prizes__level">
-                        <header className="octane-catalog-air-prizes__level-head">
-                            <span
-                                aria-hidden="true"
-                                className="octane-catalog-air-prizes__star"
-                                style={{ color: STAR_COLOURS[level.levelId - 1] ?? STAR_COLOURS[7] }}
-                            >
-                                ★
-                            </span>
-                            <strong>
-                                {localizeWithFallback(`recycler.prizes.category.${level.levelId}`, CATEGORY_FALLBACK[level.levelId - 1] ?? `${level.levelId}`)}
-                            </strong>
-                            {level.levelId > 1 && <span> - {LocalizeText('recycler.prizes.odds', ['odds'], [`1:${level.chance}`])}</span>}
-                        </header>
-                        <div className="octane-catalog-air-prizes__items">
-                            {level.products.map((prize, index) => (
-                                <BaseButton
-                                    key={`${prize.name}-${prize.productClassId}-${index}`}
-                                    aria-label={prizeName(prize)}
-                                    aria-pressed={selected === prize}
-                                    className={`octane-catalog-air-prizes__item${selected === prize ? ' is-selected' : ''}`}
-                                    onClick={() => setSelected(prize)}
+        <NativeTextTree>
+            <div className="octane-catalog-air-prizes">
+                <div className="octane-catalog-air-prizes__view">
+                    {selected ? (
+                        <>
+                            <div className="octane-catalog-air-prizes__preview">
+                                <LayoutFurniImageView direction={2} productClassId={selected.productClassId} productType={selected.productType} scale={2} />
+                            </div>
+                            <div className="octane-catalog-air-prizes__name">{prizeName(selected)}</div>
+                        </>
+                    ) : (
+                        !!teaser && <img alt="" draggable={false} className="octane-catalog-air-prizes__teaser" src={teaser} />
+                    )}
+                </div>
+                <div className="octane-catalog-air-prizes__list">
+                    {levels.map((level) => (
+                        <section key={level.levelId} className="octane-catalog-air-prizes__level">
+                            <header className="octane-catalog-air-prizes__level-head">
+                                <span
+                                    aria-hidden="true"
+                                    className="octane-catalog-air-prizes__star"
+                                    style={{ color: STAR_COLOURS[level.levelId - 1] ?? STAR_COLOURS[7] }}
                                 >
-                                    <PrizeIcon prize={prize} />
-                                    {prize.count > 1 && <small>x{prize.count}</small>}
-                                </BaseButton>
-                            ))}
-                        </div>
-                    </section>
-                ))}
+                                    ★
+                                </span>
+                                <strong>
+                                    {localizeWithFallback(
+                                        `recycler.prizes.category.${level.levelId}`,
+                                        CATEGORY_FALLBACK[level.levelId - 1] ?? `${level.levelId}`
+                                    )}
+                                </strong>
+                                {level.levelId > 1 && <span> - {LocalizeText('recycler.prizes.odds', ['odds'], [`1:${level.chance}`])}</span>}
+                            </header>
+                            <div className="octane-catalog-air-prizes__items">
+                                {level.products.map((prize, index) => (
+                                    <BaseButton
+                                        key={`${prize.name}-${prize.productClassId}-${index}`}
+                                        aria-label={prizeName(prize)}
+                                        aria-pressed={selected === prize}
+                                        className={`octane-catalog-air-prizes__item${selected === prize ? ' is-selected' : ''}`}
+                                        onClick={() => setSelected(prize)}
+                                    >
+                                        <PrizeIcon prize={prize} />
+                                        {prize.count > 1 && <small>x{prize.count}</small>}
+                                    </BaseButton>
+                                ))}
+                            </div>
+                        </section>
+                    ))}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

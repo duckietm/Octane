@@ -14,6 +14,7 @@ import { LocalizeText, localizeWithFallback, NotificationAlertType, SendMessageC
 import { Button, Column, LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useMessageEvent, useNotification, usePurse, useRoom } from '../../../../hooks';
 import '../../../../css/room/FurniWindowsBAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface RentRequest {
     objectId: number;
@@ -103,34 +104,36 @@ export const FurniRentConfirmView: FC = () => {
         : localizeWithFallback('rent.confirmation.title.extend', 'Confirm Rentable extension');
 
     return (
-        <OctaneCardView className="octane-widget-rent-confirm octane-furni-rent-confirm" theme="primary-slim">
-            <OctaneCardHeaderView headerText={title} onCloseClick={() => setOffer(null)} />
-            <OctaneCardContentView gap={2}>
-                <Text bold className="octane-furni-rent-confirm__name">{offer.name}</Text>
-                {!offer.buyout && <Text className="octane-furni-rent-confirm__description">{localizeWithFallback('rent.confirmation.rental.description', 'You are about to rent the selected piece of furni for 7 more days:')}</Text>}
-                <Column gap={1}>
-                    {offer.credits > 0 && (
-                        <div className="flex items-center gap-1">
-                            <Text className="octane-furni-rent-confirm__price">{offer.credits}</Text>
-                            <LayoutCurrencyIcon type={-1} />
-                        </div>
-                    )}
-                    {offer.points > 0 && (
-                        <div className="flex items-center gap-1">
-                            <Text className="octane-furni-rent-confirm__price">{offer.points}</Text>
-                            <LayoutCurrencyIcon type={offer.pointsType} />
-                        </div>
-                    )}
-                </Column>
-                <div className="flex gap-1 justify-end mt-auto">
-                    <Button className="octane-furni-rent-confirm__cancel" variant="secondary" onClick={() => setOffer(null)}>
-                        {localizeWithFallback('generic.cancel', 'Cancel')}
-                    </Button>
-                    <Button className="octane-furni-rent-confirm__ok" variant="success" onClick={confirm}>
-                        {offer.buyout ? localizeWithFallback('infostand.button.buyout', 'Buy-out') : localizeWithFallback('infostand.button.extend', 'Extend')}
-                    </Button>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <NativeTextTree>
+            <OctaneCardView className="octane-widget-rent-confirm octane-furni-rent-confirm" theme="primary-slim">
+                <OctaneCardHeaderView headerText={title} onCloseClick={() => setOffer(null)} />
+                <OctaneCardContentView gap={2}>
+                    <Text bold className="octane-furni-rent-confirm__name">{offer.name}</Text>
+                    {!offer.buyout && <Text className="octane-furni-rent-confirm__description">{localizeWithFallback('rent.confirmation.rental.description', 'You are about to rent the selected piece of furni for 7 more days:')}</Text>}
+                    <Column gap={1}>
+                        {offer.credits > 0 && (
+                            <div className="flex items-center gap-1">
+                                <Text className="octane-furni-rent-confirm__price">{offer.credits}</Text>
+                                <LayoutCurrencyIcon type={-1} />
+                            </div>
+                        )}
+                        {offer.points > 0 && (
+                            <div className="flex items-center gap-1">
+                                <Text className="octane-furni-rent-confirm__price">{offer.points}</Text>
+                                <LayoutCurrencyIcon type={offer.pointsType} />
+                            </div>
+                        )}
+                    </Column>
+                    <div className="flex gap-1 justify-end mt-auto">
+                        <Button className="octane-furni-rent-confirm__cancel" variant="secondary" onClick={() => setOffer(null)}>
+                            {localizeWithFallback('generic.cancel', 'Cancel')}
+                        </Button>
+                        <Button className="octane-furni-rent-confirm__ok" variant="success" onClick={confirm}>
+                            {offer.buyout ? localizeWithFallback('infostand.button.buyout', 'Buy-out') : localizeWithFallback('infostand.button.extend', 'Extend')}
+                        </Button>
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

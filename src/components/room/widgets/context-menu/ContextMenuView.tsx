@@ -2,6 +2,7 @@ import { GetStage, OctaneRectangle, RoomObjectType } from '@octane/renderer';
 import { CSSProperties, FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AddAnimationTickerCallback, FixedSizeStack, GetRoomObjectBounds, GetRoomObjectScreenLocation, GetRoomSession } from '../../../../api';
 import { BaseProps } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { ContextMenuCaretView } from './ContextMenuCaretView';
 
 interface ContextMenuViewProps extends BaseProps<HTMLDivElement> {
@@ -184,36 +185,38 @@ export const ContextMenuView: FC<ContextMenuViewProps> = ({
     }, [repositionKey]);
 
     return (
-        <div
-            ref={elementRef}
-            className={getClassNames.join(' ')}
-            style={getStyle}
-            onMouseEnter={(event) =>
-            {
-                isPointerOverRef.current = true;
-                onMouseEnter?.(event);
-            }}
-            onMouseLeave={(event) =>
-            {
-                isPointerOverRef.current = false;
-                onMouseLeave?.(event);
-            }}
-            {...rest}
-        >
-            {!(collapsable && isCollapsed) && children}
-            {collapsable && (
-                <ContextMenuCaretView
-                    collapsed={isCollapsed}
-                    showIcon={showCaretIcon}
-                    onClick={() =>
-                    {
-                        // AIR swaps to a separate 45x35 minimized bubble and explicitly
-                        // forces a position update even while the pointer is hovering it.
-                        forcePositionUpdateRef.current = true;
-                        setIsCollapsed((prev) => !prev);
-                    }}
-                />
-            )}
-        </div>
+        <NativeTextTree>
+            <div
+                ref={elementRef}
+                className={getClassNames.join(' ')}
+                style={getStyle}
+                onMouseEnter={(event) =>
+                {
+                    isPointerOverRef.current = true;
+                    onMouseEnter?.(event);
+                }}
+                onMouseLeave={(event) =>
+                {
+                    isPointerOverRef.current = false;
+                    onMouseLeave?.(event);
+                }}
+                {...rest}
+            >
+                {!(collapsable && isCollapsed) && children}
+                {collapsable && (
+                    <ContextMenuCaretView
+                        collapsed={isCollapsed}
+                        showIcon={showCaretIcon}
+                        onClick={() =>
+                        {
+                            // AIR swaps to a separate 45x35 minimized bubble and explicitly
+                            // forces a position update even while the pointer is hovering it.
+                            forcePositionUpdateRef.current = true;
+                            setIsCollapsed((prev) => !prev);
+                        }}
+                    />
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

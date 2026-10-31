@@ -16,6 +16,7 @@ import { getCameraAchievementLevel } from './CameraAirUtilities';
 import { CameraWidgetCaptureView } from './views/CameraWidgetCaptureView';
 import { CameraWidgetCheckoutView } from './views/CameraWidgetCheckoutView';
 import { CameraWidgetEditorView } from './views/editor/CameraWidgetEditorView';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const MODE_NONE: number = 0;
 const MODE_CAPTURE: number = 1;
@@ -166,32 +167,38 @@ export const CameraWidgetView: FC<{}> = (props) => {
     if (mode === MODE_NONE) return null;
 
     return (
-        <>
-            {mode === MODE_CAPTURE && (
-                <CameraWidgetCaptureView onClose={() => processAction('close')} onDelete={() => processAction('delete')} onEdit={() => processAction('edit')} />
-            )}
-            {mode === MODE_EDITOR && cameraRoll[selectedPictureIndex] && (
-                <CameraWidgetEditorView
-                    availableEffects={availableEffects}
-                    myLevel={myLevel}
-                    picture={cameraRoll[selectedPictureIndex]}
-                    onCancel={() => processAction('editor_cancel')}
-                    onCheckout={checkoutPictureUrl}
-                    onClose={() => processAction('close')}
-                />
-            )}
-            {mode === MODE_CHECKOUT && (
-                <CameraWidgetCheckoutView
-                    availableEffects={availableEffects}
-                    base64Url={base64Url}
-                    effects={checkout?.effects}
-                    picture={checkout?.picture}
-                    zoom={checkout?.zoom}
-                    price={price}
-                    onCancelClick={() => processAction('editor_cancel')}
-                    onCloseClick={() => processAction('editor_cancel')}
-                ></CameraWidgetCheckoutView>
-            )}
-        </>
+        <NativeTextTree>
+            <>
+                {mode === MODE_CAPTURE && (
+                    <CameraWidgetCaptureView
+                        onClose={() => processAction('close')}
+                        onDelete={() => processAction('delete')}
+                        onEdit={() => processAction('edit')}
+                    />
+                )}
+                {mode === MODE_EDITOR && cameraRoll[selectedPictureIndex] && (
+                    <CameraWidgetEditorView
+                        availableEffects={availableEffects}
+                        myLevel={myLevel}
+                        picture={cameraRoll[selectedPictureIndex]}
+                        onCancel={() => processAction('editor_cancel')}
+                        onCheckout={checkoutPictureUrl}
+                        onClose={() => processAction('close')}
+                    />
+                )}
+                {mode === MODE_CHECKOUT && (
+                    <CameraWidgetCheckoutView
+                        availableEffects={availableEffects}
+                        base64Url={base64Url}
+                        effects={checkout?.effects}
+                        picture={checkout?.picture}
+                        zoom={checkout?.zoom}
+                        price={price}
+                        onCancelClick={() => processAction('editor_cancel')}
+                        onCloseClick={() => processAction('editor_cancel')}
+                    ></CameraWidgetCheckoutView>
+                )}
+            </>
+        </NativeTextTree>
     );
 };

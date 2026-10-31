@@ -2,6 +2,7 @@ import { ModeratorInitData } from '@octane/renderer';
 import { FC, useMemo } from 'react';
 import userInfoXml from '../../../assets/mod-tools/xml/user_info.xml?raw';
 import userInfoFrameXml from '../../../assets/mod-tools/xml/user_info_frame.xml?raw';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { nativeNumber, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Frame } from '../native/NativeWindow0';
 import { NativeWindowShell } from '../native/NativeWindowShell';
@@ -31,10 +32,12 @@ export const UserInfoView: FC<UserInfoProps> = ({ userId, settings, x, y, onClos
     const height = Math.max(nativeNumber(root, 'height'), CLIENT_TOP + panelHeight + CLIENT_BOTTOM);
 
     return (
-        <NativeWindowShell type="userInfo" windowKey={`${userId}`} x={x} y={y}>
-            <Native0Frame caption="User Info" height={height} width={nativeNumber(root, 'width')} onClose={onClose}>
-                <UserInfoPanel settings={settings} userId={userId} onOpenChatlog={onOpenChatlog} onOpenModAction={onOpenModAction} onOpenRoomVisits={onOpenRoomVisits} onOpenSendMessage={onOpenSendMessage} />
-            </Native0Frame>
-        </NativeWindowShell>
+        <NativeTextTree>
+            <NativeWindowShell type="userInfo" windowKey={`${userId}`} x={x} y={y}>
+                <Native0Frame caption="User Info" height={height} width={nativeNumber(root, 'width')} onClose={onClose}>
+                    <UserInfoPanel settings={settings} userId={userId} onOpenChatlog={onOpenChatlog} onOpenModAction={onOpenModAction} onOpenRoomVisits={onOpenRoomVisits} onOpenSendMessage={onOpenSendMessage} />
+                </Native0Frame>
+            </NativeWindowShell>
+        </NativeTextTree>
     );
 };

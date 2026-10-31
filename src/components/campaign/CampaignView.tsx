@@ -10,6 +10,7 @@ import {
 } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { CalendarItem, SendMessageComposer } from '../../api';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useMessageEvent } from '../../hooks';
 import { CalendarView } from './CalendarView';
 
@@ -97,20 +98,22 @@ export const CampaignView: FC<{}> = (props) => {
     }, []);
 
     return (
-        <>
-            {calendarData && isCalendarOpen && (
-                <CalendarView
-                    campaignName={calendarData.campaignName}
-                    currentDay={calendarData.currentDay}
-                    missedDays={calendarData.missedDays}
-                    numDays={calendarData.campaignDays}
-                    openedDays={calendarData.openedDays}
-                    openedRewards={calendarData.openedRewards}
-                    openPackage={openPackage}
-                    receivedProducts={receivedProducts}
-                    onClose={() => setCalendarOpen(false)}
-                />
-            )}
-        </>
+        <NativeTextTree>
+            <>
+                {calendarData && isCalendarOpen && (
+                    <CalendarView
+                        campaignName={calendarData.campaignName}
+                        currentDay={calendarData.currentDay}
+                        missedDays={calendarData.missedDays}
+                        numDays={calendarData.campaignDays}
+                        openedDays={calendarData.openedDays}
+                        openedRewards={calendarData.openedRewards}
+                        openPackage={openPackage}
+                        receivedProducts={receivedProducts}
+                        onClose={() => setCalendarOpen(false)}
+                    />
+                )}
+            </>
+        </NativeTextTree>
     );
 };

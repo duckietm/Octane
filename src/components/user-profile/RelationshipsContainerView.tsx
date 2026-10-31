@@ -4,6 +4,7 @@ import { GetUserProfile, LocalizeText, localizeWithFallback, SendMessageComposer
 import { Flex, LayoutAvatarImageView } from '../../common';
 import { useNotification } from '../../hooks';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface RelationshipsContainerViewProps {
     relationships: RelationshipStatusInfoMessageParser;
@@ -42,47 +43,51 @@ export const RelationshipsContainerView: FC<RelationshipsContainerViewProps> = (
         const relationshipName = RelationshipStatusEnum.RELATIONSHIP_NAMES[type].toLocaleLowerCase();
 
         return (
-            <div className="octane-extended-profile__relationship">
-                <Flex center className="octane-extended-profile__relationship-icon">
-                    <i className={`octane-friends-spritesheet icon-${relationshipName}`} />
-                </Flex>
-                <div className="octane-extended-profile__relationship-copy">
-                    <div className="octane-extended-profile__relationship-box">
-                        <BaseButton
-                            className="octane-extended-profile__relationship-name"
-                            onClick={(event) =>
-                                relationshipInfo && relationshipInfo.randomFriendId >= 1
-                                    ? GetUserProfile(relationshipInfo.randomFriendId)
-                                    : findFriends()
-                            }
-                        >
-                            {(!relationshipInfo || relationshipInfo.friendCount === 0) && LocalizeText('extendedprofile.add.friends')}
-                            {relationshipInfo && relationshipInfo.friendCount >= 1 && relationshipInfo.randomFriendName}
-                        </BaseButton>
-                        {relationshipInfo && relationshipInfo.friendCount >= 1 && (
-                            <div className="octane-extended-profile__relationship-head">
-                                {/* Official avatar_image:direction "southwest", which the AIR widget maps to 4. */}
-                                <LayoutAvatarImageView direction={4} figure={relationshipInfo.randomFriendFigure} headOnly={true} />
-                            </div>
-                        )}
+            <NativeTextTree>
+                <div className="octane-extended-profile__relationship">
+                    <Flex center className="octane-extended-profile__relationship-icon">
+                        <i className={`octane-friends-spritesheet icon-${relationshipName}`} />
+                    </Flex>
+                    <div className="octane-extended-profile__relationship-copy">
+                        <div className="octane-extended-profile__relationship-box">
+                            <BaseButton
+                                className="octane-extended-profile__relationship-name"
+                                onClick={(event) =>
+                                    relationshipInfo && relationshipInfo.randomFriendId >= 1
+                                        ? GetUserProfile(relationshipInfo.randomFriendId)
+                                        : findFriends()
+                                }
+                            >
+                                {(!relationshipInfo || relationshipInfo.friendCount === 0) && LocalizeText('extendedprofile.add.friends')}
+                                {relationshipInfo && relationshipInfo.friendCount >= 1 && relationshipInfo.randomFriendName}
+                            </BaseButton>
+                            {relationshipInfo && relationshipInfo.friendCount >= 1 && (
+                                <div className="octane-extended-profile__relationship-head">
+                                    {/* Official avatar_image:direction "southwest", which the AIR widget maps to 4. */}
+                                    <LayoutAvatarImageView direction={4} figure={relationshipInfo.randomFriendFigure} headOnly={true} />
+                                </div>
+                            )}
+                        </div>
+                        <p className="octane-extended-profile__relationship-subcopy">
+                            {(!relationshipInfo || relationshipInfo.friendCount === 0) && LocalizeText('extendedprofile.no.friends.in.this.category')}
+                            {relationshipInfo &&
+                                relationshipInfo.friendCount > 1 &&
+                                LocalizeText(`extendedprofile.relstatus.others.${relationshipName}`, ['count'], [(relationshipInfo.friendCount - 1).toString()])}
+                            &nbsp;
+                        </p>
                     </div>
-                    <p className="octane-extended-profile__relationship-subcopy">
-                        {(!relationshipInfo || relationshipInfo.friendCount === 0) && LocalizeText('extendedprofile.no.friends.in.this.category')}
-                        {relationshipInfo &&
-                            relationshipInfo.friendCount > 1 &&
-                            LocalizeText(`extendedprofile.relstatus.others.${relationshipName}`, ['count'], [(relationshipInfo.friendCount - 1).toString()])}
-                        &nbsp;
-                    </p>
                 </div>
-            </div>
+            </NativeTextTree>
         );
     };
 
     return (
-        <>
-            <RelationshipComponent type={RelationshipStatusEnum.HEART} />
-            <RelationshipComponent type={RelationshipStatusEnum.SMILE} />
-            <RelationshipComponent type={RelationshipStatusEnum.BOBBA} />
-        </>
+        <NativeTextTree>
+            <>
+                <RelationshipComponent type={RelationshipStatusEnum.HEART} />
+                <RelationshipComponent type={RelationshipStatusEnum.SMILE} />
+                <RelationshipComponent type={RelationshipStatusEnum.BOBBA} />
+            </>
+        </NativeTextTree>
     );
 };

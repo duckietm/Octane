@@ -16,6 +16,7 @@ import { useNotification } from '../../hooks';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
 import '../../css/badge-creator/BadgeCreatorView.css';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const t = (key: string, fallback: string, params?: string[], replacements?: string[]): string => {
     try {
@@ -462,258 +463,260 @@ export const BadgeCreatorView: FC<{}> = () => {
     if (!isVisible) return null;
 
     return (
-        <OctaneCardView className="octane-badge-creator w-[760px] h-[680px]" isResizable={false} theme="primary-slim" uniqueKey="badge-creator">
-            <OctaneCardHeaderView headerText={t('badgecreator.title', 'Badge Creator')} onCloseClick={() => setIsVisible(false)} />
-            <OctaneCardContentView className="octane-badge-creator__content text-black">
-                <Flex gap={2} className="badge-creator-main">
-                    <Column gap={2}>
-                        <div
-                            className="badge-creator-canvas"
-                            style={{
-                                width: GRID_WIDTH * PIXEL_DISPLAY_SIZE,
-                                height: GRID_HEIGHT * PIXEL_DISPLAY_SIZE,
-                                backgroundColor: '#ffffff',
-                                backgroundImage: showGrid
-                                    ? 'linear-gradient(to right, rgba(0,0,0,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.18) 1px, transparent 1px)'
-                                    : 'none',
-                                backgroundSize: `${PIXEL_DISPLAY_SIZE}px ${PIXEL_DISPLAY_SIZE}px`,
-                                backgroundPosition: '0 0',
-                                border: '1px solid #888',
-                                boxSizing: 'content-box',
-                                imageRendering: 'pixelated',
-                                cursor: tool === 'picker' ? 'crosshair' : tool === 'erase' ? 'cell' : 'crosshair',
-                                position: 'relative',
-                                userSelect: 'none'
-                            }}
-                            onMouseDown={handleMouseDown}
-                            onMouseMove={handleMouseMove}
-                        >
-                            <canvas
-                                ref={mainCanvasRef}
-                                width={GRID_WIDTH}
-                                height={GRID_HEIGHT}
+        <NativeTextTree>
+            <OctaneCardView className="octane-badge-creator w-[760px] h-[680px]" isResizable={false} theme="primary-slim" uniqueKey="badge-creator">
+                <OctaneCardHeaderView headerText={t('badgecreator.title', 'Badge Creator')} onCloseClick={() => setIsVisible(false)} />
+                <OctaneCardContentView className="octane-badge-creator__content text-black">
+                    <Flex gap={2} className="badge-creator-main">
+                        <Column gap={2}>
+                            <div
+                                className="badge-creator-canvas"
                                 style={{
-                                    display: 'block',
                                     width: GRID_WIDTH * PIXEL_DISPLAY_SIZE,
                                     height: GRID_HEIGHT * PIXEL_DISPLAY_SIZE,
-                                    imageRendering: 'pixelated',
-                                    pointerEvents: 'none'
-                                }}
-                            />
-                        </div>
-                        <Flex gap={1} className="badge-creator-tools">
-                            <Button onClick={() => setTool('paint')} variant="secondary" active={tool === 'paint'}>
-                                {t('badgecreator.tool.paint', 'Paint')}
-                            </Button>
-                            <Button onClick={() => setTool('fill')} variant="secondary" active={tool === 'fill'}>
-                                {t('badgecreator.tool.fill', 'Fill')}
-                            </Button>
-                            <Button onClick={() => setTool('erase')} variant="secondary" active={tool === 'erase'}>
-                                {t('badgecreator.tool.erase', 'Erase')}
-                            </Button>
-                            <Button onClick={copyColor} variant="secondary" active={tool === 'picker'}>
-                                {t('badgecreator.tool.picker', 'Pick')}
-                            </Button>
-                            <Button onClick={clearCanvas} variant="danger">
-                                {t('badgecreator.tool.clear', 'Clear')}
-                            </Button>
-                            <Button onClick={() => setShowGrid((g) => !g)} variant="secondary">
-                                {showGrid ? t('badgecreator.tool.gridoff', 'Grid off') : t('badgecreator.tool.gridon', 'Grid on')}
-                            </Button>
-                        </Flex>
-                    </Column>
-                    <Column gap={2} className="badge-creator-side" style={{ minWidth: 220 }}>
-                        <div>
-                            <Text bold variant="black">
-                                {t('badgecreator.palette', 'Palette')}
-                            </Text>
-                            <div className="badge-creator-palette" style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 22px)', gap: 4, marginTop: 4 }}>
-                                {PALETTE.map((color, idx) => {
-                                    const isTransparent = color === TRANSPARENT;
-                                    const isSelected = color === selectedColor;
-                                    return (
-                                        <Hint key={idx} content={isTransparent ? 'Transparent' : argbToCss(color)}>
-                                            <BaseButton aria-label={isTransparent ? 'Transparent' : argbToCss(color)}
-                                                type="button"
-                                                onClick={() => {
-                                                    setSelectedColor(color);
-                                                    setTool('paint');
-                                                }}
-                                                style={{
-                                                    width: 22,
-                                                    height: 22,
-                                                    border: isSelected ? '2px solid #000' : '1px solid #888',
-                                                    background: isTransparent
-                                                        ? 'repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 50% / 8px 8px'
-                                                        : argbToCss(color),
-                                                    cursor: 'pointer',
-                                                    padding: 0
-                                                }}
-                                            />
-                                        </Hint>
-                                    );
-                                })}
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
-                                <Hint content={t('badgecreator.color.custom', 'Pick a custom colour')}>
-                                    <BaseButton aria-label={t('badgecreator.color.custom', 'Pick a custom colour')}
-                                        type="button"
-                                        onClick={openColorPicker}
-                                        style={{
-                                            width: 28,
-                                            height: 26,
-                                            padding: 2,
-                                            border: '1px solid #888',
-                                            background: '#f3f3f3',
-                                            cursor: 'pointer',
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}
-                                    >
-                                        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path
-                                                d="M4.5 14.5 12 7l5 5-7.5 7.5a2 2 0 0 1-2.83 0l-2.17-2.17a2 2 0 0 1 0-2.83Z"
-                                                fill="#d3d3d3"
-                                                stroke="#222"
-                                                strokeWidth="1.4"
-                                                strokeLinejoin="round"
-                                            />
-                                            <path d="m12 7-2-2 2-2 2 2" stroke="#222" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                                            <path
-                                                d="M18 14c0 1.5 1.4 2.5 1.4 4a1.4 1.4 0 1 1-2.8 0c0-1.5 1.4-2.5 1.4-4Z"
-                                                fill="#ffb74d"
-                                                stroke="#222"
-                                                strokeWidth="1.2"
-                                            />
-                                        </svg>
-                                    </BaseButton>
-                                </Hint>
-                                <Hint content={argbToHex(selectedColor)}><BaseButton aria-label={argbToHex(selectedColor)}
-                                    onClick={openColorPicker}
-                                    style={{
-                                        width: 26,
-                                        height: 26,
-                                        border: '1px solid #888',
-                                        background:
-                                            selectedColor === TRANSPARENT
-                                                ? 'repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 50% / 8px 8px'
-                                                : argbToCss(selectedColor),
-                                        cursor: 'pointer'
-                                    }}
-                                /></Hint>
-                                <Text small variant="muted">
-                                    {argbToHex(selectedColor).toUpperCase()}
-                                </Text>
-                                <input
-                                    ref={colorInputRef}
-                                    type="color"
-                                    onChange={handleColorPicked}
-                                    style={{ position: 'absolute', width: 0, height: 0, opacity: 0, pointerEvents: 'none' }}
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <Text bold variant="black">
-                                {t('badgecreator.preview', 'Preview')}
-                            </Text>
-                            <div
-                                style={{
-                                    width: GRID_WIDTH,
-                                    height: GRID_HEIGHT,
-                                    marginTop: 4,
+                                    backgroundColor: '#ffffff',
+                                    backgroundImage: showGrid
+                                        ? 'linear-gradient(to right, rgba(0,0,0,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.18) 1px, transparent 1px)'
+                                        : 'none',
+                                    backgroundSize: `${PIXEL_DISPLAY_SIZE}px ${PIXEL_DISPLAY_SIZE}px`,
+                                    backgroundPosition: '0 0',
                                     border: '1px solid #888',
+                                    boxSizing: 'content-box',
                                     imageRendering: 'pixelated',
+                                    cursor: tool === 'picker' ? 'crosshair' : tool === 'erase' ? 'cell' : 'crosshair',
                                     position: 'relative',
-                                    overflow: 'hidden'
+                                    userSelect: 'none'
                                 }}
+                                onMouseDown={handleMouseDown}
+                                onMouseMove={handleMouseMove}
                             >
                                 <canvas
-                                    ref={previewCanvasRef}
+                                    ref={mainCanvasRef}
                                     width={GRID_WIDTH}
                                     height={GRID_HEIGHT}
-                                    style={{ display: 'block', width: GRID_WIDTH, height: GRID_HEIGHT, imageRendering: 'pixelated' }}
+                                    style={{
+                                        display: 'block',
+                                        width: GRID_WIDTH * PIXEL_DISPLAY_SIZE,
+                                        height: GRID_HEIGHT * PIXEL_DISPLAY_SIZE,
+                                        imageRendering: 'pixelated',
+                                        pointerEvents: 'none'
+                                    }}
                                 />
                             </div>
-                        </div>
-                        <div>
-                            <Text variant="black">{t('badgecreator.name', 'Name')}</Text>
-                            <input className="form-control form-control-sm" maxLength={64} value={name} onChange={(e) => setName(e.target.value)} />
-                        </div>
-                        <div>
-                            <Text variant="black">{t('badgecreator.description', 'Description')}</Text>
-                            <input
-                                className="form-control form-control-sm"
-                                maxLength={255}
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                            />
-                        </div>
-                        {error && <Text variant="danger">{error}</Text>}
-                        {!editingBadgeId && priceBadge > 0 && (
-                            <Text small variant="muted">
-                                {t('badgecreator.price', 'Cost: %price% %currency%', ['price', 'currency'], [String(priceBadge), currencyName(currencyType)])}
-                            </Text>
-                        )}
-                        <Flex gap={1}>
-                            <Button onClick={handleSave} disabled={submitting} variant="success">
-                                {submitting
-                                    ? t('badgecreator.saving', 'Saving…')
-                                    : editingBadgeId
-                                      ? t('badgecreator.save.edit', 'Save changes')
-                                      : priceBadge > 0
-                                        ? t(
-                                              'badgecreator.save.create.priced',
-                                              'Create badge (%price% %currency%)',
-                                              ['price', 'currency'],
-                                              [String(priceBadge), currencyName(currencyType)]
-                                          )
-                                        : t('badgecreator.save.create', 'Create badge')}
-                            </Button>
-                            {editingBadgeId && (
-                                <Button onClick={resetEditor} variant="secondary">
-                                    {t('generic.cancel', 'Cancel')}
+                            <Flex gap={1} className="badge-creator-tools">
+                                <Button onClick={() => setTool('paint')} variant="secondary" active={tool === 'paint'}>
+                                    {t('badgecreator.tool.paint', 'Paint')}
                                 </Button>
-                            )}
-                        </Flex>
-                    </Column>
-                </Flex>
-                <Column gap={1} className="badge-creator-list" style={{ marginTop: 8 }}>
-                    <Text bold variant="black">
-                        {t('badgecreator.list.title', 'Your custom badges (%count%/%max%)', ['count', 'max'], [String(badges?.length ?? 0), String(maxBadges)])}
-                    </Text>
-                    {badges === null && <Text variant="black">{t('badgecreator.list.loading', 'Loading…')}</Text>}
-                    {badges !== null && !badges.length && <Text variant="black">{t('badgecreator.list.empty', "You haven't made any badges yet.")}</Text>}
-                    {badges !== null &&
-                        badges.map((badge) => (
-                            <Flex key={badge.badgeId} alignItems="center" gap={2} style={{ padding: 4, borderTop: '1px solid #ccc' }}>
-                                <img
-                                    src={badge.url}
-                                    alt={badge.name || badge.badgeId}
-                                    width={GRID_WIDTH}
-                                    height={GRID_HEIGHT}
-                                    style={{ imageRendering: 'pixelated', border: '1px solid #888' }}
-                                />
-                                <Column gap={0} style={{ flex: 1, minWidth: 0 }}>
-                                    <Text bold variant="black" truncate>
-                                        {badge.name || badge.badgeId}
-                                    </Text>
-                                    {badge.description && (
-                                        <Text small variant="muted" truncate>
-                                            {badge.description}
-                                        </Text>
-                                    )}
-                                </Column>
-                                <Button onClick={() => startEdit(badge)} variant="secondary">
-                                    {t('generic.edit', 'Edit')}
+                                <Button onClick={() => setTool('fill')} variant="secondary" active={tool === 'fill'}>
+                                    {t('badgecreator.tool.fill', 'Fill')}
                                 </Button>
-                                <Button onClick={() => handleDelete(badge)} variant="danger">
-                                    {t('generic.delete', 'Delete')}
+                                <Button onClick={() => setTool('erase')} variant="secondary" active={tool === 'erase'}>
+                                    {t('badgecreator.tool.erase', 'Erase')}
+                                </Button>
+                                <Button onClick={copyColor} variant="secondary" active={tool === 'picker'}>
+                                    {t('badgecreator.tool.picker', 'Pick')}
+                                </Button>
+                                <Button onClick={clearCanvas} variant="danger">
+                                    {t('badgecreator.tool.clear', 'Clear')}
+                                </Button>
+                                <Button onClick={() => setShowGrid((g) => !g)} variant="secondary">
+                                    {showGrid ? t('badgecreator.tool.gridoff', 'Grid off') : t('badgecreator.tool.gridon', 'Grid on')}
                                 </Button>
                             </Flex>
-                        ))}
-                </Column>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                        </Column>
+                        <Column gap={2} className="badge-creator-side" style={{ minWidth: 220 }}>
+                            <div>
+                                <Text bold variant="black">
+                                    {t('badgecreator.palette', 'Palette')}
+                                </Text>
+                                <div className="badge-creator-palette" style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 22px)', gap: 4, marginTop: 4 }}>
+                                    {PALETTE.map((color, idx) => {
+                                        const isTransparent = color === TRANSPARENT;
+                                        const isSelected = color === selectedColor;
+                                        return (
+                                            <Hint key={idx} content={isTransparent ? 'Transparent' : argbToCss(color)}>
+                                                <BaseButton aria-label={isTransparent ? 'Transparent' : argbToCss(color)}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSelectedColor(color);
+                                                        setTool('paint');
+                                                    }}
+                                                    style={{
+                                                        width: 22,
+                                                        height: 22,
+                                                        border: isSelected ? '2px solid #000' : '1px solid #888',
+                                                        background: isTransparent
+                                                            ? 'repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 50% / 8px 8px'
+                                                            : argbToCss(color),
+                                                        cursor: 'pointer',
+                                                        padding: 0
+                                                    }}
+                                                />
+                                            </Hint>
+                                        );
+                                    })}
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
+                                    <Hint content={t('badgecreator.color.custom', 'Pick a custom colour')}>
+                                        <BaseButton aria-label={t('badgecreator.color.custom', 'Pick a custom colour')}
+                                            type="button"
+                                            onClick={openColorPicker}
+                                            style={{
+                                                width: 28,
+                                                height: 26,
+                                                padding: 2,
+                                                border: '1px solid #888',
+                                                background: '#f3f3f3',
+                                                cursor: 'pointer',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}
+                                        >
+                                            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                                                <path
+                                                    d="M4.5 14.5 12 7l5 5-7.5 7.5a2 2 0 0 1-2.83 0l-2.17-2.17a2 2 0 0 1 0-2.83Z"
+                                                    fill="#d3d3d3"
+                                                    stroke="#222"
+                                                    strokeWidth="1.4"
+                                                    strokeLinejoin="round"
+                                                />
+                                                <path d="m12 7-2-2 2-2 2 2" stroke="#222" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                                                <path
+                                                    d="M18 14c0 1.5 1.4 2.5 1.4 4a1.4 1.4 0 1 1-2.8 0c0-1.5 1.4-2.5 1.4-4Z"
+                                                    fill="#ffb74d"
+                                                    stroke="#222"
+                                                    strokeWidth="1.2"
+                                                />
+                                            </svg>
+                                        </BaseButton>
+                                    </Hint>
+                                    <Hint content={argbToHex(selectedColor)}><BaseButton aria-label={argbToHex(selectedColor)}
+                                        onClick={openColorPicker}
+                                        style={{
+                                            width: 26,
+                                            height: 26,
+                                            border: '1px solid #888',
+                                            background:
+                                                selectedColor === TRANSPARENT
+                                                    ? 'repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 50% / 8px 8px'
+                                                    : argbToCss(selectedColor),
+                                            cursor: 'pointer'
+                                        }}
+                                    /></Hint>
+                                    <Text small variant="muted">
+                                        {argbToHex(selectedColor).toUpperCase()}
+                                    </Text>
+                                    <input
+                                        ref={colorInputRef}
+                                        type="color"
+                                        onChange={handleColorPicked}
+                                        style={{ position: 'absolute', width: 0, height: 0, opacity: 0, pointerEvents: 'none' }}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <Text bold variant="black">
+                                    {t('badgecreator.preview', 'Preview')}
+                                </Text>
+                                <div
+                                    style={{
+                                        width: GRID_WIDTH,
+                                        height: GRID_HEIGHT,
+                                        marginTop: 4,
+                                        border: '1px solid #888',
+                                        imageRendering: 'pixelated',
+                                        position: 'relative',
+                                        overflow: 'hidden'
+                                    }}
+                                >
+                                    <canvas
+                                        ref={previewCanvasRef}
+                                        width={GRID_WIDTH}
+                                        height={GRID_HEIGHT}
+                                        style={{ display: 'block', width: GRID_WIDTH, height: GRID_HEIGHT, imageRendering: 'pixelated' }}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <Text variant="black">{t('badgecreator.name', 'Name')}</Text>
+                                <input className="form-control form-control-sm" maxLength={64} value={name} onChange={(e) => setName(e.target.value)} />
+                            </div>
+                            <div>
+                                <Text variant="black">{t('badgecreator.description', 'Description')}</Text>
+                                <input
+                                    className="form-control form-control-sm"
+                                    maxLength={255}
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                />
+                            </div>
+                            {error && <Text variant="danger">{error}</Text>}
+                            {!editingBadgeId && priceBadge > 0 && (
+                                <Text small variant="muted">
+                                    {t('badgecreator.price', 'Cost: %price% %currency%', ['price', 'currency'], [String(priceBadge), currencyName(currencyType)])}
+                                </Text>
+                            )}
+                            <Flex gap={1}>
+                                <Button onClick={handleSave} disabled={submitting} variant="success">
+                                    {submitting
+                                        ? t('badgecreator.saving', 'Saving…')
+                                        : editingBadgeId
+                                          ? t('badgecreator.save.edit', 'Save changes')
+                                          : priceBadge > 0
+                                            ? t(
+                                                  'badgecreator.save.create.priced',
+                                                  'Create badge (%price% %currency%)',
+                                                  ['price', 'currency'],
+                                                  [String(priceBadge), currencyName(currencyType)]
+                                              )
+                                            : t('badgecreator.save.create', 'Create badge')}
+                                </Button>
+                                {editingBadgeId && (
+                                    <Button onClick={resetEditor} variant="secondary">
+                                        {t('generic.cancel', 'Cancel')}
+                                    </Button>
+                                )}
+                            </Flex>
+                        </Column>
+                    </Flex>
+                    <Column gap={1} className="badge-creator-list" style={{ marginTop: 8 }}>
+                        <Text bold variant="black">
+                            {t('badgecreator.list.title', 'Your custom badges (%count%/%max%)', ['count', 'max'], [String(badges?.length ?? 0), String(maxBadges)])}
+                        </Text>
+                        {badges === null && <Text variant="black">{t('badgecreator.list.loading', 'Loading…')}</Text>}
+                        {badges !== null && !badges.length && <Text variant="black">{t('badgecreator.list.empty', "You haven't made any badges yet.")}</Text>}
+                        {badges !== null &&
+                            badges.map((badge) => (
+                                <Flex key={badge.badgeId} alignItems="center" gap={2} style={{ padding: 4, borderTop: '1px solid #ccc' }}>
+                                    <img
+                                        src={badge.url}
+                                        alt={badge.name || badge.badgeId}
+                                        width={GRID_WIDTH}
+                                        height={GRID_HEIGHT}
+                                        style={{ imageRendering: 'pixelated', border: '1px solid #888' }}
+                                    />
+                                    <Column gap={0} style={{ flex: 1, minWidth: 0 }}>
+                                        <Text bold variant="black" truncate>
+                                            {badge.name || badge.badgeId}
+                                        </Text>
+                                        {badge.description && (
+                                            <Text small variant="muted" truncate>
+                                                {badge.description}
+                                            </Text>
+                                        )}
+                                    </Column>
+                                    <Button onClick={() => startEdit(badge)} variant="secondary">
+                                        {t('generic.edit', 'Edit')}
+                                    </Button>
+                                    <Button onClick={() => handleDelete(badge)} variant="danger">
+                                        {t('generic.delete', 'Delete')}
+                                    </Button>
+                                </Flex>
+                            ))}
+                    </Column>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

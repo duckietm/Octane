@@ -40,6 +40,7 @@ import { AvatarInfoWidgetOwnPetView } from './menu/AvatarInfoWidgetOwnPetView';
 import { AvatarInfoWidgetPetView } from './menu/AvatarInfoWidgetPetView';
 import { AvatarInfoWidgetRentableBotView } from './menu/AvatarInfoWidgetRentableBotView';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const AvatarInfoWidgetView: FC<{}> = (props) => {
     const BLOCK_MENU_WINDOW_MS = 500;
@@ -186,12 +187,14 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
                         if (RoomEnterEffect.isRunning()) return <AvatarInfoNewUserHelpView avatarInfo={info} onClose={() => setAvatarInfo(null)} />;
 
                         return (
-                            <AvatarInfoWidgetOwnAvatarView
-                                avatarInfo={info}
-                                isDancing={isDancing}
-                                setIsDecorating={setIsDecorating}
-                                onClose={() => setAvatarInfo(null)}
-                            />
+                            <NativeTextTree>
+                                <AvatarInfoWidgetOwnAvatarView
+                                    avatarInfo={info}
+                                    isDancing={isDancing}
+                                    setIsDecorating={setIsDecorating}
+                                    onClose={() => setAvatarInfo(null)}
+                                />
+                            </NativeTextTree>
                         );
                     }
 
@@ -223,9 +226,11 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
 
                     if (!mobileFurniDetailsOpen) {
                         return (
-                            <BaseButton className="octane-mobile-furni-infostand-trigger" type="button" onClick={() => setMobileFurniDetailsOpen(true)}>
-                                <LayoutFurniIconImageView productType={info.productType} productClassId={info.spriteId} />
-                            </BaseButton>
+                            <NativeTextTree>
+                                <BaseButton className="octane-mobile-furni-infostand-trigger" type="button" onClick={() => setMobileFurniDetailsOpen(true)}>
+                                    <LayoutFurniIconImageView productType={info.productType} productClassId={info.spriteId} />
+                                </BaseButton>
+                            </NativeTextTree>
                         );
                     }
                 }
@@ -244,44 +249,46 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
     };
 
     return (
-        <>
-            {isDecorating && (
-                <AvatarInfoWidgetDecorateView
-                    roomIndex={roomSession.ownRoomIndex}
-                    setIsDecorating={setIsDecorating}
-                    userId={GetSessionDataManager().userId}
-                    userName={GetSessionDataManager().userName}
-                />
-            )}
-            {getMenuView()}
-            {avatarInfo && (
-                <Column alignItems="end" className="octane-infostand-area absolute right-[10px] bottom-[65px] pointer-events-none z-30 text-white">
-                    {getInfostandView()}
-                </Column>
-            )}
-            {nameBubbles.length > 0 &&
-                nameBubbles.map((name, index) => <AvatarInfoWidgetNameView key={index} nameInfo={name} onClose={() => removeNameBubble(index)} />)}
-            {productBubbles.length > 0 &&
-                productBubbles.map((item, index) => {
-                    return (
-                        <AvatarInfoUseProductView
-                            key={item.id}
-                            item={item}
-                            updateConfirmingProduct={updateConfirmingProduct}
-                            onClose={() => removeProductBubble(index)}
-                        />
-                    );
-                })}
-            {rentableBotChatEvent && <AvatarInfoRentableBotChatView chatEvent={rentableBotChatEvent} onClose={() => setRentableBotChatEvent(null)} />}
-            {rentableBotTextSkillEvent && (
-                <AvatarInfoRentableBotTextSkillView
-                    key={`${rentableBotTextSkillEvent.botId}:${rentableBotTextSkillEvent.skillType}:${rentableBotTextSkillEvent.text}`}
-                    skillEvent={rentableBotTextSkillEvent}
-                    onClose={() => setRentableBotTextSkillEvent(null)}
-                />
-            )}
-            {confirmingProduct && <AvatarInfoUseProductConfirmView item={confirmingProduct} onClose={() => updateConfirmingProduct(null)} />}
-            <AvatarInfoPetTrainingPanelView />
-        </>
+        <NativeTextTree>
+            <>
+                {isDecorating && (
+                    <AvatarInfoWidgetDecorateView
+                        roomIndex={roomSession.ownRoomIndex}
+                        setIsDecorating={setIsDecorating}
+                        userId={GetSessionDataManager().userId}
+                        userName={GetSessionDataManager().userName}
+                    />
+                )}
+                {getMenuView()}
+                {avatarInfo && (
+                    <Column alignItems="end" className="octane-infostand-area absolute right-[10px] bottom-[65px] pointer-events-none z-30 text-white">
+                        {getInfostandView()}
+                    </Column>
+                )}
+                {nameBubbles.length > 0 &&
+                    nameBubbles.map((name, index) => <AvatarInfoWidgetNameView key={index} nameInfo={name} onClose={() => removeNameBubble(index)} />)}
+                {productBubbles.length > 0 &&
+                    productBubbles.map((item, index) => {
+                        return (
+                            <AvatarInfoUseProductView
+                                key={item.id}
+                                item={item}
+                                updateConfirmingProduct={updateConfirmingProduct}
+                                onClose={() => removeProductBubble(index)}
+                            />
+                        );
+                    })}
+                {rentableBotChatEvent && <AvatarInfoRentableBotChatView chatEvent={rentableBotChatEvent} onClose={() => setRentableBotChatEvent(null)} />}
+                {rentableBotTextSkillEvent && (
+                    <AvatarInfoRentableBotTextSkillView
+                        key={`${rentableBotTextSkillEvent.botId}:${rentableBotTextSkillEvent.skillType}:${rentableBotTextSkillEvent.text}`}
+                        skillEvent={rentableBotTextSkillEvent}
+                        onClose={() => setRentableBotTextSkillEvent(null)}
+                    />
+                )}
+                {confirmingProduct && <AvatarInfoUseProductConfirmView item={confirmingProduct} onClose={() => updateConfirmingProduct(null)} />}
+                <AvatarInfoPetTrainingPanelView />
+            </>
+        </NativeTextTree>
     );
 };

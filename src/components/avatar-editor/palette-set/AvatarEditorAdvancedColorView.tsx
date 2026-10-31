@@ -1,6 +1,7 @@
 import { IPartColor } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef } from 'react';
 import { ColorUtils, GetClubMemberLevel, IAvatarEditorCategory } from '../../../api';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useAvatarEditor } from '../../../hooks';
 
 const DEBOUNCE_MS = 150;
@@ -72,23 +73,25 @@ export const AvatarEditorAdvancedColorView: FC<{
     );
 
     return (
-        <div className="flex h-full p-1.5">
-            <div
-                className="flex-1 rounded-lg cursor-pointer relative border-2 border-white/20 overflow-hidden"
-                style={{ backgroundColor: hexColor }}
-                onClick={() => inputRef.current?.click()}
-            >
-                <input
-                    ref={inputRef}
-                    type="color"
-                    value={hexColor}
-                    onChange={handleChange}
-                    className="absolute opacity-0 inset-0 w-full h-full cursor-pointer"
-                />
-                <div className="absolute bottom-0 left-0 right-0 py-1 text-center bg-black/40">
-                    <span className="text-xs font-mono font-bold text-white">{hexColor.toUpperCase()}</span>
+        <NativeTextTree>
+            <div className="flex h-full p-1.5">
+                <div
+                    className="flex-1 rounded-lg cursor-pointer relative border-2 border-white/20 overflow-hidden"
+                    style={{ backgroundColor: hexColor }}
+                    onClick={() => inputRef.current?.click()}
+                >
+                    <input
+                        ref={inputRef}
+                        type="color"
+                        value={hexColor}
+                        onChange={handleChange}
+                        className="absolute opacity-0 inset-0 w-full h-full cursor-pointer"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 py-1 text-center bg-black/40">
+                        <span className="text-xs font-mono font-bold text-white">{hexColor.toUpperCase()}</span>
+                    </div>
                 </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

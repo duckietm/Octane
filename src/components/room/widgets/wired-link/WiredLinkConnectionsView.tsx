@@ -9,6 +9,7 @@ import { useWiredLinkStore } from '../../../../hooks/rooms/widgets/useWiredLinkS
 import { WiredLinkAction, WiredLinkColumn, WiredLinkTable } from './WiredLinkTable';
 import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * AIR WiredLinkConnectionsView (wired_link_connections_view_xml): the Links of one network in every room (room
@@ -68,20 +69,22 @@ const WiredLinkConnectionsWindow: FC<{ networkId: string }> = ({ networkId }) =>
         : (errorCode ? localizeWithFallback(`wiredlink.error.${ errorCode }`, WIRED_LINK_FALLBACKS[`wiredlink.error.${ errorCode }`] ?? '') : '');
 
     return (
-        <OctaneCardView className="octane-wired-link-connections w-[660px]" theme="primary-slim" uniqueKey="wired-link-connections">
-            <OctaneCardHeaderView headerText={ localizeWithFallback('wiredlink.connections.title', `Connected rooms: ${ networkName }`, [ 'name' ], [ networkName ]) } onCloseClick={ closeConnections } />
-            <OctaneCardContentView gap={ 2 }>
-                <WiredLinkTable bodyClassName="h-[150px]" columns={ columns } emptyText={ loading ? '' : localizeWithFallback('wiredlink.empty.connections', '') } getCell={ getCell } getRowId={ connection => `${ connection.roomId }:${ connection.furniId }` } rows={ rows } />
-                <div className="text-[11px] text-[#777]">{ localizeWithFallback('wiredlink.connections.hint', '') }</div>
-                <div className="flex items-center gap-2">
-                    <span>{ localizeWithFallback('wiredlink.column.name', 'Network name') }</span>
-                    <input aria-label={ localizeWithFallback('wiredlink.column.name', 'Network name') } className="form-control form-control-sm grow" maxLength={ 255 } type="text" value={ nameInput } onChange={ event => setNameDraft({ seq: renameCount, text: event.target.value }) } onKeyDown={ event => { if(event.key === 'Enter') renameWiredLinkNetwork(networkId, nameInput); } } />
-                    <BaseButton className="btn btn-primary btn-sm octane-wired-link__button" type="button" onClick={ () => renameWiredLinkNetwork(networkId, nameInput) }>{ localizeWithFallback('wiredlink.rename', 'Rename') }</BaseButton>
-                    <WiredLinkAction danger text={ localizeWithFallback('wiredlink.delete', 'Delete network') } onClick={ requestDelete } />
-                </div>
-                { statusText && <div className="text-[12px]" role="status" style={ { color: errorCode ? '#ad3434' : '#555555' } }>{ statusText }</div> }
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <NativeTextTree>
+            <OctaneCardView className="octane-wired-link-connections w-[660px]" theme="primary-slim" uniqueKey="wired-link-connections">
+                <OctaneCardHeaderView headerText={ localizeWithFallback('wiredlink.connections.title', `Connected rooms: ${ networkName }`, [ 'name' ], [ networkName ]) } onCloseClick={ closeConnections } />
+                <OctaneCardContentView gap={ 2 }>
+                    <WiredLinkTable bodyClassName="h-[150px]" columns={ columns } emptyText={ loading ? '' : localizeWithFallback('wiredlink.empty.connections', '') } getCell={ getCell } getRowId={ connection => `${ connection.roomId }:${ connection.furniId }` } rows={ rows } />
+                    <div className="text-[11px] text-[#777]">{ localizeWithFallback('wiredlink.connections.hint', '') }</div>
+                    <div className="flex items-center gap-2">
+                        <span>{ localizeWithFallback('wiredlink.column.name', 'Network name') }</span>
+                        <input aria-label={ localizeWithFallback('wiredlink.column.name', 'Network name') } className="form-control form-control-sm grow" maxLength={ 255 } type="text" value={ nameInput } onChange={ event => setNameDraft({ seq: renameCount, text: event.target.value }) } onKeyDown={ event => { if(event.key === 'Enter') renameWiredLinkNetwork(networkId, nameInput); } } />
+                        <BaseButton className="btn btn-primary btn-sm octane-wired-link__button" type="button" onClick={ () => renameWiredLinkNetwork(networkId, nameInput) }>{ localizeWithFallback('wiredlink.rename', 'Rename') }</BaseButton>
+                        <WiredLinkAction danger text={ localizeWithFallback('wiredlink.delete', 'Delete network') } onClick={ requestDelete } />
+                    </div>
+                    { statusText && <div className="text-[12px]" role="status" style={ { color: errorCode ? '#ad3434' : '#555555' } }>{ statusText }</div> }
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };
 

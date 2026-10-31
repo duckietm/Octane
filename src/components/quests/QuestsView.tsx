@@ -13,6 +13,7 @@ import { useQuests, useSeasonalCalendar } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { QuestEntryView } from './QuestEntryView';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 /**
  * The official Quests window (512x448): one row per campaign with the current quest, plus the HC
@@ -122,50 +123,52 @@ export const QuestsView: FC<{}> = () => {
     );
 
     return (
-        <>
-            {isVisible && (
-                <OctaneCard className="octane-quests" uniqueKey="quests" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={-30}>
-                    <OctaneCard.Header headerText={localizeWithFallback('quests.list.caption', 'Quests')} onCloseClick={() => setIsVisible(false)} />
-                    <OctaneCard.Content className="octane-quests-content">
-                        <div className="octane-quests-list">
-                            {quests.map((quest) => (
-                                <QuestEntryView
-                                    key={`${quest.campaignCode}-${quest.id}`}
-                                    quest={quest}
-                                    onAccept={onAccept}
-                                    onReject={onReject}
-                                    onDetails={setDetailsQuest}
-                                />
-                            ))}
-                        </div>
-                        <div className="octane-quests-hc-info">
-                            <Text className="octane-quests-hc-text">
-                                {hasClub
-                                    ? localizeWithFallback('hc.has.double_duckets.info', 'You get double duckets as you are an HC member!')
-                                    : localizeWithFallback('hc.get.double_duckets.info', 'Get HC membership to gain double duckets!')}
-                            </Text>
-                            {!hasClub && (
-                                <Button variant="success" className="octane-quests-get-hc" onClick={() => CreateLinkEvent('catalog/open/hc_membership')}>
-                                    {localizeWithFallback('generic.get_hc', 'Get HC')}
-                                </Button>
+        <NativeTextTree>
+            <>
+                {isVisible && (
+                    <OctaneCard className="octane-quests" uniqueKey="quests" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={-30}>
+                        <OctaneCard.Header headerText={localizeWithFallback('quests.list.caption', 'Quests')} onCloseClick={() => setIsVisible(false)} />
+                        <OctaneCard.Content className="octane-quests-content">
+                            <div className="octane-quests-list">
+                                {quests.map((quest) => (
+                                    <QuestEntryView
+                                        key={`${quest.campaignCode}-${quest.id}`}
+                                        quest={quest}
+                                        onAccept={onAccept}
+                                        onReject={onReject}
+                                        onDetails={setDetailsQuest}
+                                    />
+                                ))}
+                            </div>
+                            <div className="octane-quests-hc-info">
+                                <Text className="octane-quests-hc-text">
+                                    {hasClub
+                                        ? localizeWithFallback('hc.has.double_duckets.info', 'You get double duckets as you are an HC member!')
+                                        : localizeWithFallback('hc.get.double_duckets.info', 'Get HC membership to gain double duckets!')}
+                                </Text>
+                                {!hasClub && (
+                                    <Button variant="success" className="octane-quests-get-hc" onClick={() => CreateLinkEvent('catalog/open/hc_membership')}>
+                                        {localizeWithFallback('generic.get_hc', 'Get HC')}
+                                    </Button>
+                                )}
+                            </div>
+                        </OctaneCard.Content>
+                    </OctaneCard>
+                )}
+                {detailsQuest && (
+                    <OctaneCard className="octane-quest-details" uniqueKey="quest-details" windowPosition={DraggableWindowPosition.CENTER}>
+                        <OctaneCard.Header headerText={localizeWithFallback('quests.details.caption', 'Quest details')} onCloseClick={() => setDetailsQuest(null)} />
+                        <OctaneCard.Content className="octane-quest-details-content">
+                            <QuestEntryView quest={detailsQuest} showHint onAccept={onAccept} onReject={onReject} />
+                            {detailsQuest.catalogPageName && detailsQuest.catalogPageName.length > 0 && (
+                                <BaseButton className="octane-quest-link" onClick={() => CreateLinkEvent(`catalog/open/${detailsQuest.catalogPageName}`)}>
+                                    {localizeWithFallback('quests.list.opencatalog', 'Open the catalogue')}
+                                </BaseButton>
                             )}
-                        </div>
-                    </OctaneCard.Content>
-                </OctaneCard>
-            )}
-            {detailsQuest && (
-                <OctaneCard className="octane-quest-details" uniqueKey="quest-details" windowPosition={DraggableWindowPosition.CENTER}>
-                    <OctaneCard.Header headerText={localizeWithFallback('quests.details.caption', 'Quest details')} onCloseClick={() => setDetailsQuest(null)} />
-                    <OctaneCard.Content className="octane-quest-details-content">
-                        <QuestEntryView quest={detailsQuest} showHint onAccept={onAccept} onReject={onReject} />
-                        {detailsQuest.catalogPageName && detailsQuest.catalogPageName.length > 0 && (
-                            <BaseButton className="octane-quest-link" onClick={() => CreateLinkEvent(`catalog/open/${detailsQuest.catalogPageName}`)}>
-                                {localizeWithFallback('quests.list.opencatalog', 'Open the catalogue')}
-                            </BaseButton>
-                        )}
-                    </OctaneCard.Content>
-                </OctaneCard>
-            )}
-        </>
+                        </OctaneCard.Content>
+                    </OctaneCard>
+                )}
+            </>
+        </NativeTextTree>
     );
 };

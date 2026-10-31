@@ -1,5 +1,6 @@
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { WiredFurniType, WiredSelectionVisualizer } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { FURNI_SOURCES, sortWiredSourceOptions, WiredSourceOption } from '../WiredSourcesSelector';
@@ -146,42 +147,44 @@ export const WiredConditionChestHasItemTypeView: FC<{}> = () => {
     const selectionLimit = trigger?.maximumItemSelectionCount ?? 0;
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
-            save={save}
-            validate={() => isChestAmountValid(state, literalValid)}
-            showSelection={false}
-            footer={
-                <div className="flex flex-col gap-2">
-                    <WiredFurniSelectionSourceRow
-                        title="wiredfurni.params.sources.furni.title.item_types"
-                        options={FURNI_SOURCES}
-                        value={typeSource}
-                        selectionKind="primary"
-                        selectionActive={selectionMode === 'types'}
-                        selectionCount={typeIds.length}
-                        selectionLimit={selectionLimit}
-                        selectionEnabledValues={[SOURCE_SELECTED]}
-                        onChange={setTypeSource}
-                        onSelectionActivate={() => switchSelection('types')}
-                    />
-                    <WiredFurniSelectionSourceRow
-                        title="wiredfurni.params.sources.furni.title.chests"
-                        options={CHEST_SOURCES}
-                        value={chestSource}
-                        selectionKind="secondary"
-                        selectionActive={selectionMode === 'chests'}
-                        selectionCount={chestIds.length}
-                        selectionLimit={selectionLimit}
-                        selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
-                        onChange={(value) => setChestSource(value === SOURCE_SELECTED ? SOURCE_SECONDARY_SELECTED : value)}
-                        onSelectionActivate={() => switchSelection('chests')}
-                    />
-                </div>
-            }
-        >
-            <WiredConditionChestAmountSections state={state} onChange={setState} onValidityChange={setLiteralValid} />
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
+                save={save}
+                validate={() => isChestAmountValid(state, literalValid)}
+                showSelection={false}
+                footer={
+                    <div className="flex flex-col gap-2">
+                        <WiredFurniSelectionSourceRow
+                            title="wiredfurni.params.sources.furni.title.item_types"
+                            options={FURNI_SOURCES}
+                            value={typeSource}
+                            selectionKind="primary"
+                            selectionActive={selectionMode === 'types'}
+                            selectionCount={typeIds.length}
+                            selectionLimit={selectionLimit}
+                            selectionEnabledValues={[SOURCE_SELECTED]}
+                            onChange={setTypeSource}
+                            onSelectionActivate={() => switchSelection('types')}
+                        />
+                        <WiredFurniSelectionSourceRow
+                            title="wiredfurni.params.sources.furni.title.chests"
+                            options={CHEST_SOURCES}
+                            value={chestSource}
+                            selectionKind="secondary"
+                            selectionActive={selectionMode === 'chests'}
+                            selectionCount={chestIds.length}
+                            selectionLimit={selectionLimit}
+                            selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
+                            onChange={(value) => setChestSource(value === SOURCE_SELECTED ? SOURCE_SECONDARY_SELECTED : value)}
+                            onSelectionActivate={() => switchSelection('chests')}
+                        />
+                    </div>
+                }
+            >
+                <WiredConditionChestAmountSections state={state} onChange={setState} onValidityChange={setLiteralValid} />
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

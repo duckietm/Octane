@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { FaLock, FaLockOpen, FaShieldAlt } from 'react-icons/fa';
 import { HousekeepingApi, housekeepingFailureKey, LocalizeText } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useHousekeeping, useHousekeepingDangerConfirm } from '../../../../hooks';
 import { HousekeepingButton, HousekeepingEmptyState, HousekeepingPill, HousekeepingSection } from '../common/HousekeepingParts';
 
@@ -65,37 +66,39 @@ export const HousekeepingSecurityView: FC = () => {
     };
 
     return (
-        <HousekeepingSection
-            aside={
-                state && (
-                    <HousekeepingPill tone={state.locked ? 'danger' : 'success'}>
-                        {LocalizeText(state.locked ? 'housekeeping.hotel.security.state.locked' : 'housekeeping.hotel.security.state.open')}
-                    </HousekeepingPill>
-                )
-            }
-            icon={<FaShieldAlt className="text-rose-600" size={9} />}
-            title={LocalizeText('housekeeping.hotel.security.label')}
-            tone="danger"
-        >
-            <div className="text-[10px] text-zinc-600">{LocalizeText('housekeeping.hotel.security.hint')}</div>
-            {error && <HousekeepingEmptyState>{LocalizeText(error)}</HousekeepingEmptyState>}
-            {!error && !state && <HousekeepingEmptyState>{LocalizeText('generic.loading')}</HousekeepingEmptyState>}
-            {state &&
-                (state.topRank ? (
-                    state.locked ? (
-                        <HousekeepingButton disabled={isActionPending} gap={1} variant="success" onClick={() => toggle(false)}>
-                            <FaLockOpen size={10} />
-                            <span>{LocalizeText('housekeeping.hotel.security.unlock')}</span>
-                        </HousekeepingButton>
-                    ) : (
-                        <HousekeepingButton disabled={isActionPending} gap={1} variant="danger" onClick={() => toggle(true)}>
-                            <FaLock size={10} />
-                            <span>{LocalizeText('housekeeping.hotel.security.lock')}</span>
-                        </HousekeepingButton>
+        <NativeTextTree>
+            <HousekeepingSection
+                aside={
+                    state && (
+                        <HousekeepingPill tone={state.locked ? 'danger' : 'success'}>
+                            {LocalizeText(state.locked ? 'housekeeping.hotel.security.state.locked' : 'housekeeping.hotel.security.state.open')}
+                        </HousekeepingPill>
                     )
-                ) : (
-                    <div className="text-[10px] italic text-zinc-500">{LocalizeText('housekeeping.hotel.security.top_only')}</div>
-                ))}
-        </HousekeepingSection>
+                }
+                icon={<FaShieldAlt className="text-rose-600" size={9} />}
+                title={LocalizeText('housekeeping.hotel.security.label')}
+                tone="danger"
+            >
+                <div className="text-[10px] text-zinc-600">{LocalizeText('housekeeping.hotel.security.hint')}</div>
+                {error && <HousekeepingEmptyState>{LocalizeText(error)}</HousekeepingEmptyState>}
+                {!error && !state && <HousekeepingEmptyState>{LocalizeText('generic.loading')}</HousekeepingEmptyState>}
+                {state &&
+                    (state.topRank ? (
+                        state.locked ? (
+                            <HousekeepingButton disabled={isActionPending} gap={1} variant="success" onClick={() => toggle(false)}>
+                                <FaLockOpen size={10} />
+                                <span>{LocalizeText('housekeeping.hotel.security.unlock')}</span>
+                            </HousekeepingButton>
+                        ) : (
+                            <HousekeepingButton disabled={isActionPending} gap={1} variant="danger" onClick={() => toggle(true)}>
+                                <FaLock size={10} />
+                                <span>{LocalizeText('housekeeping.hotel.security.lock')}</span>
+                            </HousekeepingButton>
+                        )
+                    ) : (
+                        <div className="text-[10px] italic text-zinc-500">{LocalizeText('housekeeping.hotel.security.top_only')}</div>
+                    ))}
+            </HousekeepingSection>
+        </NativeTextTree>
     );
 };

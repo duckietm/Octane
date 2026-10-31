@@ -2,6 +2,7 @@ import { GetSessionDataManager, RoomDataParser } from '@octane/renderer';
 import { FC, KeyboardEvent, MouseEvent } from 'react';
 import { CreateRoomSession, DoorStateType, TryVisitRoom } from '../../../../api';
 import { LayoutBadgeImageView, LayoutRoomThumbnailView } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useDoorState, useNavigatorRoomInfoPopupStore } from '../../../../hooks';
 import { NavigatorSearchResultItemInfoView } from './NavigatorSearchResultItemInfoView';
 import { NavigatorUserCountView } from './NavigatorUserCountView';
@@ -72,44 +73,48 @@ export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProp
 
     if (thumbnail)
         return (
+            <NativeTextTree>
+                <div
+                    role="button"
+                    tabIndex={0}
+                    aria-label={title}
+                    className={`octane-navigator-air__tile${stripe ? ' is-stripe' : ''}`}
+                    onClick={visitRoom}
+                    onKeyDown={handleKeyDown}
+                    onMouseEnter={retargetPopup}
+                >
+                    <LayoutRoomThumbnailView className="octane-navigator-air__tile-thumb" customUrl={roomData.officialRoomPicRef} roomId={roomData.roomId}>
+                        {roomData.habboGroupId > 0 && (
+                            <LayoutBadgeImageView badgeCode={roomData.groupBadgeCode} className="octane-navigator-air__tile-badge" isGroup={true} />
+                        )}
+                        <NavigatorUserCountView userCount={roomData.userCount} maxUserCount={roomData.maxUserCount} />
+                        {roomData.doorMode !== RoomDataParser.OPEN_STATE && <i className={`octane-navigator-air__tile-door ${doorClass()}`} />}
+                    </LayoutRoomThumbnailView>
+                    <div className="octane-navigator-air__tile-name">
+                        <span>{title}</span>
+                        <NavigatorSearchResultItemInfoView roomData={roomData} thumbnail={true} />
+                    </div>
+                </div>
+            </NativeTextTree>
+        );
+
+    return (
+        <NativeTextTree>
             <div
                 role="button"
                 tabIndex={0}
                 aria-label={title}
-                className={`octane-navigator-air__tile${stripe ? ' is-stripe' : ''}`}
+                className={`octane-navigator-air__row${stripe ? ' is-stripe' : ''}`}
                 onClick={visitRoom}
                 onKeyDown={handleKeyDown}
                 onMouseEnter={retargetPopup}
             >
-                <LayoutRoomThumbnailView className="octane-navigator-air__tile-thumb" customUrl={roomData.officialRoomPicRef} roomId={roomData.roomId}>
-                    {roomData.habboGroupId > 0 && (
-                        <LayoutBadgeImageView badgeCode={roomData.groupBadgeCode} className="octane-navigator-air__tile-badge" isGroup={true} />
-                    )}
-                    <NavigatorUserCountView userCount={roomData.userCount} maxUserCount={roomData.maxUserCount} />
-                    {roomData.doorMode !== RoomDataParser.OPEN_STATE && <i className={`octane-navigator-air__tile-door ${doorClass()}`} />}
-                </LayoutRoomThumbnailView>
-                <div className="octane-navigator-air__tile-name">
-                    <span>{title}</span>
-                    <NavigatorSearchResultItemInfoView roomData={roomData} thumbnail={true} />
-                </div>
+                <NavigatorUserCountView userCount={roomData.userCount} maxUserCount={roomData.maxUserCount} />
+                <span className="octane-navigator-air__row-name">{title}</span>
+                {roomData.doorMode !== RoomDataParser.OPEN_STATE && <i className={`octane-navigator-air__row-door ${doorClass()}`} />}
+                {roomData.habboGroupId > 0 && <i className="octane-navigator-air__row-group octane-navigator-air__group" />}
+                <NavigatorSearchResultItemInfoView roomData={roomData} />
             </div>
-        );
-
-    return (
-        <div
-            role="button"
-            tabIndex={0}
-            aria-label={title}
-            className={`octane-navigator-air__row${stripe ? ' is-stripe' : ''}`}
-            onClick={visitRoom}
-            onKeyDown={handleKeyDown}
-            onMouseEnter={retargetPopup}
-        >
-            <NavigatorUserCountView userCount={roomData.userCount} maxUserCount={roomData.maxUserCount} />
-            <span className="octane-navigator-air__row-name">{title}</span>
-            {roomData.doorMode !== RoomDataParser.OPEN_STATE && <i className={`octane-navigator-air__row-door ${doorClass()}`} />}
-            {roomData.habboGroupId > 0 && <i className="octane-navigator-air__row-group octane-navigator-air__group" />}
-            <NavigatorSearchResultItemInfoView roomData={roomData} />
-        </div>
+        </NativeTextTree>
     );
 };

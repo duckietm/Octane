@@ -4,6 +4,7 @@ import { LocalizeText, matchesDangerConfirmation } from '../../api';
 import { useHousekeepingStore } from '../../hooks';
 import { HousekeepingButton } from './views/common/HousekeepingParts';
 import { InlineDialog } from '../../common/InlineDialog';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 /**
  * Second step of a dangerous action, drawn over the panel: the operator has to
@@ -30,39 +31,41 @@ export const HousekeepingDangerConfirmView: FC = () => {
     };
 
     return (
-        <InlineDialog
-            aria-label={LocalizeText('housekeeping.danger.title')}
-            aria-modal="true"
-            className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-            onClose={close}
-        >
-            <div className="octane-hk-popover flex w-[360px] max-w-full flex-col gap-2 rounded-lg border border-rose-300 p-3 text-black">
-                <div className="flex items-center gap-2 text-sm font-bold text-rose-700">
-                    <FaExclamationTriangle size={14} />
-                    {LocalizeText('housekeeping.danger.title')}
+        <NativeTextTree>
+            <InlineDialog
+                aria-label={LocalizeText('housekeeping.danger.title')}
+                aria-modal="true"
+                className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+                onClose={close}
+            >
+                <div className="octane-hk-popover flex w-[360px] max-w-full flex-col gap-2 rounded-lg border border-rose-300 p-3 text-black">
+                    <div className="flex items-center gap-2 text-sm font-bold text-rose-700">
+                        <FaExclamationTriangle size={14} />
+                        {LocalizeText('housekeeping.danger.title')}
+                    </div>
+                    <p className="m-0 text-xs text-zinc-700">{dangerRequest.message}</p>
+                    <label className="flex flex-col gap-1 text-[11px] text-zinc-600">
+                        {LocalizeText('housekeeping.danger.type', ['target'], [dangerRequest.expected])}
+                        <input
+                            autoFocus
+                            className="rounded border border-zinc-300 bg-white px-2 py-1 text-sm text-zinc-900 focus:outline-none focus:ring-1 focus:ring-rose-400"
+                            value={typed}
+                            onChange={(event) => setTyped(event.target.value)}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter') confirm();
+                            }}
+                        />
+                    </label>
+                    <div className="flex justify-end gap-1.5">
+                        <HousekeepingButton variant="secondary" onClick={close}>
+                            {LocalizeText('housekeeping.confirm.cancel')}
+                        </HousekeepingButton>
+                        <HousekeepingButton disabled={!matches} variant="danger" onClick={confirm}>
+                            {dangerRequest.confirmLabel}
+                        </HousekeepingButton>
+                    </div>
                 </div>
-                <p className="m-0 text-xs text-zinc-700">{dangerRequest.message}</p>
-                <label className="flex flex-col gap-1 text-[11px] text-zinc-600">
-                    {LocalizeText('housekeeping.danger.type', ['target'], [dangerRequest.expected])}
-                    <input
-                        autoFocus
-                        className="rounded border border-zinc-300 bg-white px-2 py-1 text-sm text-zinc-900 focus:outline-none focus:ring-1 focus:ring-rose-400"
-                        value={typed}
-                        onChange={(event) => setTyped(event.target.value)}
-                        onKeyDown={(event) => {
-                            if (event.key === 'Enter') confirm();
-                        }}
-                    />
-                </label>
-                <div className="flex justify-end gap-1.5">
-                    <HousekeepingButton variant="secondary" onClick={close}>
-                        {LocalizeText('housekeeping.confirm.cancel')}
-                    </HousekeepingButton>
-                    <HousekeepingButton disabled={!matches} variant="danger" onClick={confirm}>
-                        {dangerRequest.confirmLabel}
-                    </HousekeepingButton>
-                </div>
-            </div>
-        </InlineDialog>
+            </InlineDialog>
+        </NativeTextTree>
     );
 };

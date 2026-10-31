@@ -94,6 +94,11 @@
     content: attr(data-label);
 }
 
+/* AIR text draws the value in the regular Ubuntu cut: reserve its width, not the condensed one's. */
+.octane-select-sizer.is-native {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
 .octane-select-positioner {
     z-index: 100000;
 }

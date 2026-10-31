@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
@@ -35,23 +36,25 @@ export const WiredConditionUserOnFurniWithStateView: FC<{}> = () =>
     const requiresFurni = WiredFurniType.STUFF_SELECTION_OPTION_BY_ID;
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={ true }
-            requiresFurni={ requiresFurni }
-            save={ save }
-            footer={ (
-                <WiredSourcesSelector
-                    showFurni={ true }
-                    showUsers={ true }
-                    furniSource={ furniSource }
-                    userSource={ userSource }
-                    onChangeFurni={ onChangeFurniSource }
-                    onChangeUsers={ setUserSource } />
-            ) }>
-            <div className="flex flex-col gap-1">
-                <Text bold>{ localizeWithFallback('wiredfurni.params.state', 'State') }</Text>
-                <input className="form-control form-control-sm" type="text" value={ requiredState } onChange={ event => setRequiredState(event.target.value) } />
-            </div>
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={ true }
+                requiresFurni={ requiresFurni }
+                save={ save }
+                footer={ (
+                    <WiredSourcesSelector
+                        showFurni={ true }
+                        showUsers={ true }
+                        furniSource={ furniSource }
+                        userSource={ userSource }
+                        onChangeFurni={ onChangeFurniSource }
+                        onChangeUsers={ setUserSource } />
+                ) }>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{ localizeWithFallback('wiredfurni.params.state', 'State') }</Text>
+                    <input className="form-control form-control-sm" type="text" value={ requiredState } onChange={ event => setRequiredState(event.target.value) } />
+                </div>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

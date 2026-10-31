@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { AchievementCategory } from '../../api';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useAchievements } from '../../hooks';
 import { AchievementDetailsView } from './AchievementDetailsView';
 import { AchievementListView } from './achievement-list';
@@ -15,9 +16,11 @@ export const AchievementCategoryView: FC<AchievementCategoryViewProps> = (props)
     if (!category) return null;
 
     return (
-        <div className="air-achievements-category-body">
-            <AchievementListView achievements={visibleAchievements} isScrollable={category.achievements.length > 24} />
-            {!!selectedAchievement && <AchievementDetailsView achievement={selectedAchievement} />}
-        </div>
+        <NativeTextTree>
+            <div className="air-achievements-category-body">
+                <AchievementListView achievements={visibleAchievements} isScrollable={category.achievements.length > 24} />
+                {!!selectedAchievement && <AchievementDetailsView achievement={selectedAchievement} />}
+            </div>
+        </NativeTextTree>
     );
 };

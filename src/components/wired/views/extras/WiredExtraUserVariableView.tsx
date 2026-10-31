@@ -6,6 +6,7 @@ import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const AVAILABILITY_ROOM = 0;
 const AVAILABILITY_PERMANENT = 10;
@@ -119,39 +120,41 @@ export const WiredExtraVariableView: FC<WiredExtraVariableViewProps> = props =>
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } save={ save } confirmSave={ confirmSave } cardStyle={ { width: 400 } }>
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text>{ LocalizeText('wiredfurni.params.variables.variable_name') }</Text>
-                    <OctaneInput maxLength={ MAX_NAME_LENGTH } type="text" value={ variableName } onChange={ event => setVariableName(normalizeVariableName(event.target.value)) } onKeyDown={ event => handleVariableNameKeyDown(event, setVariableName) } />
-                </div>
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } save={ save } confirmSave={ confirmSave } cardStyle={ { width: 400 } }>
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        <Text>{ LocalizeText('wiredfurni.params.variables.variable_name') }</Text>
+                        <OctaneInput maxLength={ MAX_NAME_LENGTH } type="text" value={ variableName } onChange={ event => setVariableName(normalizeVariableName(event.target.value)) } onKeyDown={ event => handleVariableNameKeyDown(event, setVariableName) } />
+                    </div>
 
-                <div className="flex flex-col gap-1">
-                    <Text>{ LocalizeText('wiredfurni.params.variables.settings') }</Text>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Checkbox checked={ hasValue } onCheckedChange={(nextChecked) => setHasValue(nextChecked)} />
-                        <Text>{ LocalizeText('wiredfurni.params.variables.settings.has_value') }</Text>
-                    </label>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                    <Text>{ LocalizeText('wiredfurni.params.variables.availability') }</Text>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Radio checked={ (availability === props.availabilityRoomValue) } name={ props.availabilityRadioName } onCheckedChange={() => setAvailability(props.availabilityRoomValue)} />
-                        <Text>{ roomAvailabilityText }</Text>
-                    </label>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Radio checked={ (availability === AVAILABILITY_PERMANENT) } name={ props.availabilityRadioName } onCheckedChange={() => setAvailability(AVAILABILITY_PERMANENT)} />
-                        <Text>{ LocalizeText('wiredfurni.params.variables.availability.10') }</Text>
-                    </label>
-                    { !!props.showSharedAvailability &&
+                    <div className="flex flex-col gap-1">
+                        <Text>{ LocalizeText('wiredfurni.params.variables.settings') }</Text>
                         <label className="flex items-center gap-1 cursor-pointer">
-                            <Radio checked={ (availability === AVAILABILITY_SHARED) } name={ props.availabilityRadioName } onCheckedChange={() => setAvailability(AVAILABILITY_SHARED)} />
-                            <Text>{ LocalizeText('wiredfurni.params.variables.availability.11') }</Text>
-                        </label> }
+                            <Checkbox checked={ hasValue } onCheckedChange={(nextChecked) => setHasValue(nextChecked)} />
+                            <Text>{ LocalizeText('wiredfurni.params.variables.settings.has_value') }</Text>
+                        </label>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                        <Text>{ LocalizeText('wiredfurni.params.variables.availability') }</Text>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Radio checked={ (availability === props.availabilityRoomValue) } name={ props.availabilityRadioName } onCheckedChange={() => setAvailability(props.availabilityRoomValue)} />
+                            <Text>{ roomAvailabilityText }</Text>
+                        </label>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Radio checked={ (availability === AVAILABILITY_PERMANENT) } name={ props.availabilityRadioName } onCheckedChange={() => setAvailability(AVAILABILITY_PERMANENT)} />
+                            <Text>{ LocalizeText('wiredfurni.params.variables.availability.10') }</Text>
+                        </label>
+                        { !!props.showSharedAvailability &&
+                            <label className="flex items-center gap-1 cursor-pointer">
+                                <Radio checked={ (availability === AVAILABILITY_SHARED) } name={ props.availabilityRadioName } onCheckedChange={() => setAvailability(AVAILABILITY_SHARED)} />
+                                <Text>{ LocalizeText('wiredfurni.params.variables.availability.11') }</Text>
+                            </label> }
+                    </div>
                 </div>
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };
 

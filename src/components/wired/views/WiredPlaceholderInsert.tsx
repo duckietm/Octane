@@ -1,6 +1,7 @@
 import { Triggerable } from '@octane/renderer';
 import { FC } from 'react';
 import { localizeWithFallback } from '../../../api';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { Select } from '../../../common/Select';
 
 /** The official text-placeholder context of a message box (wired context type 7). */
@@ -28,21 +29,23 @@ export const WiredPlaceholderInsert: FC<WiredPlaceholderInsertProps> = ({ trigge
     const names = getWiredPlaceholderNames(trigger);
 
     return (
-        <Select
-            aria-label="add placeholder"
-            className="form-select form-select-sm"
-            disabled={!names.length}
-            value=""
-            onChange={(event) => {
-                if (event.target.value) onInsert(`$(${event.target.value})`);
-            }}
-        >
-            <option value="">{localizeWithFallback('wiredfurni.params.message_editor.add_placeholder', 'Add placeholder')}</option>
-            {names.map((name) => (
-                <option key={name} value={name}>
-                    {name}
-                </option>
-            ))}
-        </Select>
+        <NativeTextTree>
+            <Select
+                aria-label="add placeholder"
+                className="form-select form-select-sm"
+                disabled={!names.length}
+                value=""
+                onChange={(event) => {
+                    if (event.target.value) onInsert(`$(${event.target.value})`);
+                }}
+            >
+                <option value="">{localizeWithFallback('wiredfurni.params.message_editor.add_placeholder', 'Add placeholder')}</option>
+                {names.map((name) => (
+                    <option key={name} value={name}>
+                        {name}
+                    </option>
+                ))}
+            </Select>
+        </NativeTextTree>
     );
 };

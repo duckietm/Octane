@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { CameraCenteredText } from './CameraNativeText';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 interface CameraSkinButtonProps {
     label: string;
@@ -18,17 +19,19 @@ export const CameraSkinButton: FC<CameraSkinButtonProps> = ({ label, variant, di
     const light = variant === 'green' || variant === 'thick-green';
 
     return (
-        <BaseButton className={`octane-camera-button is-${variant} ${className}`} disabled={disabled} type="button" onClick={onClick}>
-            <span className="octane-camera-button-label">
-                <CameraCenteredText
-                    background={light ? 0x000000 : 0xffffff}
-                    color={light ? 0xffffff : 0x000000}
-                    style={{ mixBlendMode: light ? 'screen' : 'multiply', opacity: disabled ? 0.5 : 1 }}
-                    text={label}
-                    textStyle={variant === 'thick-green' ? 'button_shiny_bold' : 'button_shiny_regular'}
-                    width={labelWidth}
-                />
-            </span>
-        </BaseButton>
+        <NativeTextTree>
+            <BaseButton className={`octane-camera-button is-${variant} ${className}`} disabled={disabled} type="button" onClick={onClick}>
+                <span className="octane-camera-button-label">
+                    <CameraCenteredText
+                        background={light ? 0x000000 : 0xffffff}
+                        color={light ? 0xffffff : 0x000000}
+                        style={{ mixBlendMode: light ? 'screen' : 'multiply', opacity: disabled ? 0.5 : 1 }}
+                        text={label}
+                        textStyle={variant === 'thick-green' ? 'button_shiny_bold' : 'button_shiny_regular'}
+                        width={labelWidth}
+                    />
+                </span>
+            </BaseButton>
+        </NativeTextTree>
     );
 };

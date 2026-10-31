@@ -11,6 +11,7 @@ import {
 } from '../../../../../api';
 import { AutoGrid, Column, Text } from '../../../../../common';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import {
     pickRecolorableColor,
     recolorableObjectData,
@@ -73,52 +74,54 @@ export const CatalogLayoutRecolorableFurnitureView: FC<CatalogLayoutProps> = (pr
     }, [currentOffer, color, setPurchaseOptions]);
 
     return (
-        <Column className="octane-catalog-builders-blocks octane-catalog-recolorable" gap={1} overflow="hidden">
-            <div className="octane-catalog-builders-blocks-preview relative flex items-center justify-center overflow-hidden">
-                {currentOffer && (
-                    <>
-                        <CatalogPreviewControls productType={currentOffer.product.productType} roomPreviewer={roomPreviewer} />
-                        <CatalogViewProductWidgetView height={150} />
-                        <Text bold className="octane-catalog-builders-blocks-name" truncate>
-                            {currentOffer.localizationName}
-                        </Text>
-                    </>
-                )}
-            </div>
-            <div className="octane-catalog-builders-blocks-shapes">
-                <AutoGrid columnCount={7} columnMinHeight={50} columnMinWidth={45}>
-                    {offers.map((offer) => (
-                        <CatalogGridOfferView
-                            key={offer.offerId}
-                            itemActive={offer === currentOffer}
-                            offer={offer}
-                            selectOffer={() => selectOffer(offer)}
-                            inventoryVisible={inventoryVisible}
-                        />
-                    ))}
-                </AutoGrid>
-            </div>
-            <div className="octane-catalog-recolorable-palette">
-                <span className="octane-catalog-recolorable-palette-caption">{localizeWithFallback('catalog.recolorable.palette', 'Palette')}</span>
-                <div
-                    aria-label={localizeWithFallback('catalog.recolorable.palette', 'Palette')}
-                    className="octane-catalog-recolorable-palette-box"
-                    role="radiogroup"
-                >
-                    {palette.map((swatch) => (
-                        <BaseButton
-                            key={swatch}
-                            aria-checked={swatch === color}
-                            aria-label={recolorHex(swatch)}
-                            className={`octane-catalog-recolorable-swatch${swatch === color ? ' is-chosen' : ''}`}
-                            role="radio"
-                            style={{ '--swatch-color': recolorHex(swatch) } as CSSProperties}
-                            onClick={() => pickColor(swatch)}
-                        />
-                    ))}
+        <NativeTextTree>
+            <Column className="octane-catalog-builders-blocks octane-catalog-recolorable" gap={1} overflow="hidden">
+                <div className="octane-catalog-builders-blocks-preview relative flex items-center justify-center overflow-hidden">
+                    {currentOffer && (
+                        <>
+                            <CatalogPreviewControls productType={currentOffer.product.productType} roomPreviewer={roomPreviewer} />
+                            <CatalogViewProductWidgetView height={150} />
+                            <Text bold className="octane-catalog-builders-blocks-name" truncate>
+                                {currentOffer.localizationName}
+                            </Text>
+                        </>
+                    )}
                 </div>
-            </div>
-            <div className="octane-catalog-builders-blocks-actions">{currentOffer && <CatalogPurchaseWidgetView />}</div>
-        </Column>
+                <div className="octane-catalog-builders-blocks-shapes">
+                    <AutoGrid columnCount={7} columnMinHeight={50} columnMinWidth={45}>
+                        {offers.map((offer) => (
+                            <CatalogGridOfferView
+                                key={offer.offerId}
+                                itemActive={offer === currentOffer}
+                                offer={offer}
+                                selectOffer={() => selectOffer(offer)}
+                                inventoryVisible={inventoryVisible}
+                            />
+                        ))}
+                    </AutoGrid>
+                </div>
+                <div className="octane-catalog-recolorable-palette">
+                    <span className="octane-catalog-recolorable-palette-caption">{localizeWithFallback('catalog.recolorable.palette', 'Palette')}</span>
+                    <div
+                        aria-label={localizeWithFallback('catalog.recolorable.palette', 'Palette')}
+                        className="octane-catalog-recolorable-palette-box"
+                        role="radiogroup"
+                    >
+                        {palette.map((swatch) => (
+                            <BaseButton
+                                key={swatch}
+                                aria-checked={swatch === color}
+                                aria-label={recolorHex(swatch)}
+                                className={`octane-catalog-recolorable-swatch${swatch === color ? ' is-chosen' : ''}`}
+                                role="radio"
+                                style={{ '--swatch-color': recolorHex(swatch) } as CSSProperties}
+                                onClick={() => pickColor(swatch)}
+                            />
+                        ))}
+                    </div>
+                </div>
+                <div className="octane-catalog-builders-blocks-actions">{currentOffer && <CatalogPurchaseWidgetView />}</div>
+            </Column>
+        </NativeTextTree>
     );
 };

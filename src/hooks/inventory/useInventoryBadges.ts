@@ -1,9 +1,10 @@
 import { BadgeReceivedEvent, BadgesEvent, RequestBadgesComposer, SetActivatedBadgesComposer } from '@octane/renderer';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { GetConfigurationValue, SendMessageComposer, UnseenItemCategory } from '../../api';
 import { rememberBadgeRarityFromPacket, rememberReceivedBadgeRarity } from '../../api/badges/badgeRarity';
 import { useMessageEvent } from '../events';
+import { createTrailingSender } from './badgeWearSender';
 import { useSharedVisibility } from '../useSharedVisibility';
 import { useInventoryUnseenTracker } from './useInventoryUnseenTracker';
 
@@ -12,6 +13,8 @@ const useInventoryBadgesState = () => {
     const [badgeCodes, setBadgeCodes] = useState<string[]>([]);
     const [badgeIds, setBadgeIds] = useState<Map<string, number>>(new Map<string, number>());
     const [activeBadgeCodes, setActiveBadgeCodes] = useState<(string | null)[]>([]);
+    const activeBadgeCodesRef = useRef<(string | null)[]>([]);
+    activeBadgeCodesRef.current = activeBadgeCodes;
     const [selectedBadgeCode, setSelectedBadgeCode] = useState<string>(null);
     const { isVisible = false, activate = null, deactivate = null } = useSharedVisibility();
     const { isUnseen = null, resetCategory = null } = useInventoryUnseenTracker();
@@ -36,23 +39,37 @@ const useInventoryBadgesState = () => {
         SendMessageComposer(composer);
     };
 
+    const sendActiveBadgesRef = useRef(sendActiveBadges);
+    sendActiveBadgesRef.current = sendActiveBadges;
+    const [wearSender] = useState(() => createTrailingSender<(string | null)[]>((slots) => sendActiveBadgesRef.current(slots)));
+
+    // A change still waiting is sent when the hook goes away, not dropped.
+    useEffect(() => () => wearSender.flush(), [wearSender]);
+
+    /**
+     * Keeps a new set of worn badges at once and sends the last of a quick run of changes. Every change is worked out
+     * from a ref, not inside a state updater: an updater may run twice (StrictMode) and sent the set twice.
+     */
+    const wearBadges = (slots: (string | null)[]) => {
+        activeBadgeCodesRef.current = slots;
+        setActiveBadgeCodes(slots);
+        wearSender.push(slots);
+    };
+
     const toggleBadge = (badgeCode: string) => {
-        setActiveBadgeCodes((prevValue) => {
-            const slots = toFixedSlots(prevValue);
-            const index = slots.indexOf(badgeCode);
+        const slots = toFixedSlots(activeBadgeCodesRef.current);
+        const index = slots.indexOf(badgeCode);
 
-            if (index === -1) {
-                const emptySlot = slots.indexOf(null);
-                if (emptySlot === -1) return prevValue;
+        if (index === -1) {
+            const emptySlot = slots.indexOf(null);
+            if (emptySlot === -1) return;
 
-                slots[emptySlot] = badgeCode;
-            } else {
-                slots[index] = null;
-            }
+            slots[emptySlot] = badgeCode;
+        } else {
+            slots[index] = null;
+        }
 
-            sendActiveBadges(slots);
-            return slots;
-        });
+        wearBadges(slots);
     };
 
     const getBadgeId = (badgeCode: string) => {
@@ -89,8 +106,8 @@ const useInventoryBadgesState = () => {
         // leaked (incremented on every edit, never decremented), which then
         // silently dropped legitimate later BadgesEvent updates. The server is
         // authoritative here (edits are already persisted), so always apply it.
-        const serverBadges = parser.getActiveBadgeCodes();
-        setActiveBadgeCodes(toFixedSlots(serverBadges));
+        // A set the user changed and is not sent yet wins over this older one.
+        if (!wearSender.isPending()) setActiveBadgeCodes(toFixedSlots(parser.getActiveBadgeCodes()));
 
         setBadgeCodes(allBadgeCodes);
     });
@@ -151,60 +168,48 @@ const useInventoryBadgesState = () => {
     }, [isVisible, needsUpdate]);
 
     const setBadgeAtSlot = (badgeCode: string, slotIndex: number) => {
-        setActiveBadgeCodes((prevValue) => {
-            const slots = toFixedSlots(prevValue);
+        const slots = toFixedSlots(activeBadgeCodesRef.current);
 
-            // Remove badge if already in another slot
-            const existingIndex = slots.indexOf(badgeCode);
-            if (existingIndex >= 0) slots[existingIndex] = null;
+        // Remove badge if already in another slot
+        const existingIndex = slots.indexOf(badgeCode);
+        if (existingIndex >= 0) slots[existingIndex] = null;
 
-            // Place badge at target slot
-            slots[slotIndex] = badgeCode;
+        // Place badge at target slot
+        slots[slotIndex] = badgeCode;
 
-            sendActiveBadges(slots);
-            return slots;
-        });
+        wearBadges(slots);
     };
 
     const removeBadge = (badgeCode: string) => {
-        setActiveBadgeCodes((prevValue) => {
-            const slots = toFixedSlots(prevValue);
-            const index = slots.indexOf(badgeCode);
-            if (index === -1) return prevValue;
+        const slots = toFixedSlots(activeBadgeCodesRef.current);
+        const index = slots.indexOf(badgeCode);
+        if (index === -1) return;
 
-            slots[index] = null;
+        slots[index] = null;
 
-            sendActiveBadges(slots);
-            return slots;
-        });
+        wearBadges(slots);
     };
 
     const reorderBadges = (fromIndex: number, toIndex: number) => {
-        setActiveBadgeCodes((prevValue) => {
-            if (fromIndex === toIndex) return prevValue;
+        if (fromIndex === toIndex) return;
 
-            const slots = toFixedSlots(prevValue);
-            const temp = slots[fromIndex];
-            slots[fromIndex] = slots[toIndex];
-            slots[toIndex] = temp;
+        const slots = toFixedSlots(activeBadgeCodesRef.current);
+        const temp = slots[fromIndex];
+        slots[fromIndex] = slots[toIndex];
+        slots[toIndex] = temp;
 
-            sendActiveBadges(slots);
-            return slots;
-        });
+        wearBadges(slots);
     };
 
     const swapBadges = (fromIndex: number, toIndex: number) => {
-        setActiveBadgeCodes((prevValue) => {
-            if (fromIndex === toIndex) return prevValue;
+        if (fromIndex === toIndex) return;
 
-            const slots = toFixedSlots(prevValue);
-            const temp = slots[fromIndex];
-            slots[fromIndex] = slots[toIndex];
-            slots[toIndex] = temp;
+        const slots = toFixedSlots(activeBadgeCodesRef.current);
+        const temp = slots[fromIndex];
+        slots[fromIndex] = slots[toIndex];
+        slots[toIndex] = temp;
 
-            sendActiveBadges(slots);
-            return slots;
-        });
+        wearBadges(slots);
     };
 
     const requestBadges = () => {

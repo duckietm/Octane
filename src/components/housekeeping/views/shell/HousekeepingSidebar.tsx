@@ -2,6 +2,7 @@ import { FC, ReactNode } from 'react';
 import { HousekeepingTabId, LocalizeText } from '../../../../api';
 import { HousekeepingGlobalSearch } from './HousekeepingGlobalSearch';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export interface HousekeepingNavItem {
     id: HousekeepingTabId;
@@ -22,9 +23,11 @@ export interface HousekeepingNavGroup {
  * the widest: the labels start at the same x and every row has the same height.
  */
 const HousekeepingNavIcon: FC<{ icon: string }> = ({ icon }) => (
-    <span className="flex h-[38px] w-[44px] shrink-0 items-center justify-center">
-        <span className={`octane-icon octane-icon-hk-tab ${icon} shrink-0`} />
-    </span>
+    <NativeTextTree>
+        <span className="flex h-[38px] w-[44px] shrink-0 items-center justify-center">
+            <span className={`octane-icon octane-icon-hk-tab ${icon} shrink-0`} />
+        </span>
+    </NativeTextTree>
 );
 
 /** Left column of the panel: the global search over grouped sections. */

@@ -3,6 +3,7 @@ import { FC, MouseEvent, useState } from 'react';
 import { attemptItemPlacement, getWiredChestOverlayColor, GroupItem } from '../../../../api';
 import { LayoutLimitedEditionStyledNumberView } from '../../../../common';
 import { classNames, InfiniteGrid } from '../../../../layout';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const InventoryFurnitureItemView: FC<{
     groupItem: GroupItem;
@@ -39,38 +40,40 @@ export const InventoryFurnitureItemView: FC<{
     const chestColor = rarityLevel >= 0 ? null : getWiredChestOverlayColor(groupItem.category, groupItem.stuffData);
 
     return (
-        <InfiniteGrid.Item
-            className={classNames('octane-inventory-thumb', isActive && 'is-selected', groupItem.hasUnseenItems && 'is-unseen', !count && 'opacity-50')}
-            itemActive={isActive}
-            itemCount={count}
-            itemImage={groupItem.stuffData.uniqueNumber > 0 ? groupItem.iconUrl : undefined}
-            itemUniqueNumber={groupItem.stuffData.uniqueNumber}
-            itemUnseen={groupItem.hasUnseenItems}
-            onDoubleClick={onMouseEvent}
-            onMouseDown={onMouseEvent}
-            onMouseOut={onMouseEvent}
-            onMouseUp={onMouseEvent}
-        >
-            {chestColor && <div aria-hidden className={`octane-inventory-thumb-chest-background is-${ chestColor }`} />}
-            {groupItem.stuffData.uniqueNumber <= 0 && (
-                <div className="octane-inventory-thumb-image">
-                    {groupItem.iconUrl && <img src={groupItem.iconUrl} alt="" draggable={false} />}
-                </div>
-            )}
-            {rarityLevel >= 0 && (
-                <div aria-hidden className="octane-inventory-thumb-rarity">
-                    <div className="octane-inventory-thumb-rarity-count">
-                        <LayoutLimitedEditionStyledNumberView value={rarityLevel} />
+        <NativeTextTree>
+            <InfiniteGrid.Item
+                className={classNames('octane-inventory-thumb', isActive && 'is-selected', groupItem.hasUnseenItems && 'is-unseen', !count && 'opacity-50')}
+                itemActive={isActive}
+                itemCount={count}
+                itemImage={groupItem.stuffData.uniqueNumber > 0 ? groupItem.iconUrl : undefined}
+                itemUniqueNumber={groupItem.stuffData.uniqueNumber}
+                itemUnseen={groupItem.hasUnseenItems}
+                onDoubleClick={onMouseEvent}
+                onMouseDown={onMouseEvent}
+                onMouseOut={onMouseEvent}
+                onMouseUp={onMouseEvent}
+            >
+                {chestColor && <div aria-hidden className={`octane-inventory-thumb-chest-background is-${ chestColor }`} />}
+                {groupItem.stuffData.uniqueNumber <= 0 && (
+                    <div className="octane-inventory-thumb-image">
+                        {groupItem.iconUrl && <img src={groupItem.iconUrl} alt="" draggable={false} />}
                     </div>
-                </div>
-            )}
-            {chestColor && (
-                <div aria-hidden className={`octane-inventory-thumb-chest is-${ chestColor }`}>
-                    <div className="octane-inventory-thumb-chest-count">
-                        <LayoutLimitedEditionStyledNumberView value={Math.max(0, groupItem.stuffData.contentsCount ?? 0)} />
+                )}
+                {rarityLevel >= 0 && (
+                    <div aria-hidden className="octane-inventory-thumb-rarity">
+                        <div className="octane-inventory-thumb-rarity-count">
+                            <LayoutLimitedEditionStyledNumberView value={rarityLevel} />
+                        </div>
                     </div>
-                </div>
-            )}
-        </InfiniteGrid.Item>
+                )}
+                {chestColor && (
+                    <div aria-hidden className={`octane-inventory-thumb-chest is-${ chestColor }`}>
+                        <div className="octane-inventory-thumb-chest-count">
+                            <LayoutLimitedEditionStyledNumberView value={Math.max(0, groupItem.stuffData.contentsCount ?? 0)} />
+                        </div>
+                    </div>
+                )}
+            </InfiniteGrid.Item>
+        </NativeTextTree>
     );
 };

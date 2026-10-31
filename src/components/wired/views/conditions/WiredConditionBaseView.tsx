@@ -1,5 +1,6 @@
 import { CSSProperties, FC, PropsWithChildren, ReactNode } from 'react';
 import { hasWiredQuantifier, WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredBaseView } from '../WiredBaseView';
 import { WiredConditionQuantifierSection } from './WiredConditionQuantifierSection';
@@ -52,19 +53,21 @@ export const WiredConditionBaseView: FC<PropsWithChildren<WiredConditionBaseView
     );
 
     return (
-        <WiredBaseView
-            hasSpecialInput={hasSpecialInput}
-            requiresFurni={requiresFurni}
-            save={onSave}
-            validate={validate}
-            cardStyle={cardStyle}
-            wiredType="condition"
-            footer={advanced}
-            footerCollapsible={footerCollapsible}
-            showSelection={showSelection}
-            selectionPreview={selectionPreview}
-        >
-            {children}
-        </WiredBaseView>
+        <NativeTextTree>
+            <WiredBaseView
+                hasSpecialInput={hasSpecialInput}
+                requiresFurni={requiresFurni}
+                save={onSave}
+                validate={validate}
+                cardStyle={cardStyle}
+                wiredType="condition"
+                footer={advanced}
+                footerCollapsible={footerCollapsible}
+                showSelection={showSelection}
+                selectionPreview={selectionPreview}
+            >
+                {children}
+            </WiredBaseView>
+        </NativeTextTree>
     );
 };

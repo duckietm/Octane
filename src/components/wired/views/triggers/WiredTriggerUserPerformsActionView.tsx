@@ -3,6 +3,7 @@ import { readWiredUserAction, WiredFurniType, wiredUserActionExtra, WiredUserAct
 import { useWired } from '../../../../hooks';
 import { WiredUserActionSection } from '../WiredUserActionSection';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /** Official "user performs action" trigger: int params [action], the sign / dance extra in the string. */
 export const WiredTriggerUserPerformsActionView: FC<{}> = () =>
@@ -22,8 +23,10 @@ export const WiredTriggerUserPerformsActionView: FC<{}> = () =>
     };
 
     return (
-        <WiredTriggerBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } save={ save }>
-            <WiredUserActionSection choice={ choice } onChange={ setChoice } />
-        </WiredTriggerBaseView>
+        <NativeTextTree>
+            <WiredTriggerBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } save={ save }>
+                <WiredUserActionSection choice={ choice } onChange={ setChoice } />
+            </WiredTriggerBaseView>
+        </NativeTextTree>
     );
 };

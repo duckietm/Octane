@@ -14,6 +14,7 @@ import { OctaneCard } from '../../layout';
 import { SoundboardPadView } from './SoundboardPadView';
 import { SoundboardShelfView } from './SoundboardShelfView';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const PAGE_SIZE = 10;
 const PLAYING_MS = 1_500;
@@ -126,106 +127,108 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
     }`;
 
     return (
-        <div className="flex flex-col gap-2">
-            <input
-                ref={searchRef}
-                type="search"
-                value={query}
-                aria-label={LocalizeText('soundboard.search')}
-                placeholder={`${LocalizeText('soundboard.search')}  ( / )`}
-                onChange={(event) => setQuery(event.target.value)}
-                onKeyDown={(event) => event.key === 'Escape' && event.currentTarget.blur()}
-                className="h-8 w-full rounded-md border border-[#8ca9b8] bg-white px-2.5 text-xs text-[#17384b] outline-none focus:border-[#3d8fba] focus:ring-1 focus:ring-[#3d8fba]"
-            />
-
-            {!query.trim() && !!shelfSounds.length && (
-                <SoundboardShelfView
-                    label={favoriteIds.length ? `★ ${LocalizeText('soundboard.category.favorites')}` : LocalizeText('soundboard.category.recent')}
-                    sounds={shelfSounds}
-                    disabled={isCoolingDown}
-                    playingSoundId={playingSoundId}
-                    onPlay={onPlay}
+        <NativeTextTree>
+            <div className="flex flex-col gap-2">
+                <input
+                    ref={searchRef}
+                    type="search"
+                    value={query}
+                    aria-label={LocalizeText('soundboard.search')}
+                    placeholder={`${LocalizeText('soundboard.search')}  ( / )`}
+                    onChange={(event) => setQuery(event.target.value)}
+                    onKeyDown={(event) => event.key === 'Escape' && event.currentTarget.blur()}
+                    className="h-8 w-full rounded-md border border-[#8ca9b8] bg-white px-2.5 text-xs text-[#17384b] outline-none focus:border-[#3d8fba] focus:ring-1 focus:ring-[#3d8fba]"
                 />
-            )}
 
-            <div className="flex gap-1.5 overflow-x-auto pb-0.5" aria-label={LocalizeText('soundboard.categories')}>
-                {!!favoriteIds.length && (
-                    <BaseButton type="button" onClick={() => selectCategory('favorites')} className={categoryClassName('favorites')}>
-                        ★ {LocalizeText('soundboard.category.favorites')}
-                    </BaseButton>
+                {!query.trim() && !!shelfSounds.length && (
+                    <SoundboardShelfView
+                        label={favoriteIds.length ? `★ ${LocalizeText('soundboard.category.favorites')}` : LocalizeText('soundboard.category.recent')}
+                        sounds={shelfSounds}
+                        disabled={isCoolingDown}
+                        playingSoundId={playingSoundId}
+                        onPlay={onPlay}
+                    />
                 )}
-                <BaseButton type="button" onClick={() => selectCategory('all')} className={categoryClassName('all')}>
-                    {LocalizeText('soundboard.category.all')}
-                </BaseButton>
-                {!!recentSoundIds.length && (
-                    <BaseButton type="button" onClick={() => selectCategory('recent')} className={categoryClassName('recent')}>
-                        {LocalizeText('soundboard.category.recent')}
+
+                <div className="flex gap-1.5 overflow-x-auto pb-0.5" aria-label={LocalizeText('soundboard.categories')}>
+                    {!!favoriteIds.length && (
+                        <BaseButton type="button" onClick={() => selectCategory('favorites')} className={categoryClassName('favorites')}>
+                            ★ {LocalizeText('soundboard.category.favorites')}
+                        </BaseButton>
+                    )}
+                    <BaseButton type="button" onClick={() => selectCategory('all')} className={categoryClassName('all')}>
+                        {LocalizeText('soundboard.category.all')}
                     </BaseButton>
+                    {!!recentSoundIds.length && (
+                        <BaseButton type="button" onClick={() => selectCategory('recent')} className={categoryClassName('recent')}>
+                            {LocalizeText('soundboard.category.recent')}
+                        </BaseButton>
+                    )}
+                    {categories.map((category) => (
+                        <BaseButton key={category.id} type="button" onClick={() => selectCategory(category.id)} className={categoryClassName(category.id)}>
+                            {category.label}
+                        </BaseButton>
+                    ))}
+                </div>
+
+                {!filteredSounds.length ? (
+                    <div className="py-4 text-center text-xs text-black/50">{LocalizeText('soundboard.empty')}</div>
+                ) : (
+                    <div
+                        className="soundboard-list"
+                        data-testid="soundboard-grid"
+                        onWheel={(event) => totalPages > 1 && event.deltaY !== 0 && changePage(event.deltaY > 0 ? 1 : -1)}
+                    >
+                        {pageSounds.map((sound, index) => (
+                            <SoundboardPadView
+                                key={sound.id}
+                                sound={sound}
+                                hotkey={String((index + 1) % 10)}
+                                favorite={favoriteSet.has(sound.id)}
+                                playing={sound.id === playingSoundId}
+                                disabled={isCoolingDown}
+                                onPlay={onPlay}
+                                onToggleFavorite={onToggleFavorite}
+                            />
+                        ))}
+                    </div>
                 )}
-                {categories.map((category) => (
-                    <BaseButton key={category.id} type="button" onClick={() => selectCategory(category.id)} className={categoryClassName(category.id)}>
-                        {category.label}
-                    </BaseButton>
-                ))}
+
+                <Progress.Root className="soundboard-cooldown" aria-label={LocalizeText('soundboard.cooldown')} max={100} min={0} value={cooldownPercent}>
+                    <Progress.Track className="soundboard-cooldown__track">
+                        <Progress.Indicator className="soundboard-cooldown__fill" />
+                    </Progress.Track>
+                </Progress.Root>
+
+                {totalPages > 1 && (
+                    <div className="flex select-none items-center justify-center gap-1.5">
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <BaseButton
+                                key={index}
+                                type="button"
+                                aria-label={LocalizeText('soundboard.pagination.page', ['page'], [String(index + 1)])}
+                                aria-current={index === page ? 'page' : undefined}
+                                onClick={() => setPage(index)}
+                                className={`h-2 w-2 cursor-pointer rounded-full transition-colors ${index === page ? 'bg-[#3d8fba]' : 'bg-[#9bb7c7] hover:bg-[#6f98b0]'}`}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {silencedCount > 0 && (
+                    <div className="soundboard-silenced text-black/60">
+                        <span>{LocalizeText('soundboard.silenced.count', ['count'], [String(silencedCount)])}</span>
+                        <BaseButton type="button" className="soundboard-silenced__restore" onClick={onRestoreSilenced}>
+                            {LocalizeText('soundboard.silenced.restore')}
+                        </BaseButton>
+                    </div>
+                )}
+
+                {rightsOnly && <div className="text-center text-[10px] text-black/60">{LocalizeText('soundboard.room.mode.rights')}</div>}
+
+                <div className="text-center text-[10px] text-black/45">{LocalizeText('soundboard.hint')}</div>
             </div>
-
-            {!filteredSounds.length ? (
-                <div className="py-4 text-center text-xs text-black/50">{LocalizeText('soundboard.empty')}</div>
-            ) : (
-                <div
-                    className="soundboard-list"
-                    data-testid="soundboard-grid"
-                    onWheel={(event) => totalPages > 1 && event.deltaY !== 0 && changePage(event.deltaY > 0 ? 1 : -1)}
-                >
-                    {pageSounds.map((sound, index) => (
-                        <SoundboardPadView
-                            key={sound.id}
-                            sound={sound}
-                            hotkey={String((index + 1) % 10)}
-                            favorite={favoriteSet.has(sound.id)}
-                            playing={sound.id === playingSoundId}
-                            disabled={isCoolingDown}
-                            onPlay={onPlay}
-                            onToggleFavorite={onToggleFavorite}
-                        />
-                    ))}
-                </div>
-            )}
-
-            <Progress.Root className="soundboard-cooldown" aria-label={LocalizeText('soundboard.cooldown')} max={100} min={0} value={cooldownPercent}>
-                <Progress.Track className="soundboard-cooldown__track">
-                    <Progress.Indicator className="soundboard-cooldown__fill" />
-                </Progress.Track>
-            </Progress.Root>
-
-            {totalPages > 1 && (
-                <div className="flex select-none items-center justify-center gap-1.5">
-                    {Array.from({ length: totalPages }, (_, index) => (
-                        <BaseButton
-                            key={index}
-                            type="button"
-                            aria-label={LocalizeText('soundboard.pagination.page', ['page'], [String(index + 1)])}
-                            aria-current={index === page ? 'page' : undefined}
-                            onClick={() => setPage(index)}
-                            className={`h-2 w-2 cursor-pointer rounded-full transition-colors ${index === page ? 'bg-[#3d8fba]' : 'bg-[#9bb7c7] hover:bg-[#6f98b0]'}`}
-                        />
-                    ))}
-                </div>
-            )}
-
-            {silencedCount > 0 && (
-                <div className="soundboard-silenced text-black/60">
-                    <span>{LocalizeText('soundboard.silenced.count', ['count'], [String(silencedCount)])}</span>
-                    <BaseButton type="button" className="soundboard-silenced__restore" onClick={onRestoreSilenced}>
-                        {LocalizeText('soundboard.silenced.restore')}
-                    </BaseButton>
-                </div>
-            )}
-
-            {rightsOnly && <div className="text-center text-[10px] text-black/60">{LocalizeText('soundboard.room.mode.rights')}</div>}
-
-            <div className="text-center text-[10px] text-black/45">{LocalizeText('soundboard.hint')}</div>
-        </div>
+        </NativeTextTree>
     );
 };
 
@@ -299,25 +302,27 @@ export const SoundboardView: FC<{}> = () => {
     if (!isVisible || !enabled) return null;
 
     return (
-        <OctaneCard className="w-[420px] max-w-[96vw]" uniqueKey="soundboard">
-            <OctaneCard.Header headerText={LocalizeText('soundboard.title')} onCloseClick={() => setIsVisible(false)} />
-            <OctaneCard.Content>
-                <SoundboardContentView
-                    sounds={sounds}
-                    categories={categories}
-                    recentSoundIds={recentSoundIds}
-                    favoriteIds={favoriteIds}
-                    isCoolingDown={isCoolingDown}
-                    cooldownRemainingSeconds={cooldownRemainingSeconds}
-                    cooldownTotalSeconds={cooldownTotalSeconds}
-                    playingSoundId={playingSoundId}
-                    silencedCount={silencedUserIds.length}
-                    rightsOnly={roomMode === 2}
-                    onPlay={play}
-                    onToggleFavorite={(sound) => toggleFavorite(sound.id)}
-                    onRestoreSilenced={restoreSilencedUsers}
-                />
-            </OctaneCard.Content>
-        </OctaneCard>
+        <NativeTextTree>
+            <OctaneCard className="w-[420px] max-w-[96vw]" uniqueKey="soundboard">
+                <OctaneCard.Header headerText={LocalizeText('soundboard.title')} onCloseClick={() => setIsVisible(false)} />
+                <OctaneCard.Content>
+                    <SoundboardContentView
+                        sounds={sounds}
+                        categories={categories}
+                        recentSoundIds={recentSoundIds}
+                        favoriteIds={favoriteIds}
+                        isCoolingDown={isCoolingDown}
+                        cooldownRemainingSeconds={cooldownRemainingSeconds}
+                        cooldownTotalSeconds={cooldownTotalSeconds}
+                        playingSoundId={playingSoundId}
+                        silencedCount={silencedUserIds.length}
+                        rightsOnly={roomMode === 2}
+                        onPlay={play}
+                        onToggleFavorite={(sound) => toggleFavorite(sound.id)}
+                        onRestoreSilenced={restoreSilencedUsers}
+                    />
+                </OctaneCard.Content>
+            </OctaneCard>
+        </NativeTextTree>
     );
 };

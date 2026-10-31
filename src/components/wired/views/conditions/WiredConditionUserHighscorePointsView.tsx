@@ -6,6 +6,7 @@ import { normalizeWiredComparison, WIRED_CMP_GREATER_EQUAL, WiredComparisonOpera
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MIN_POINTS = 0;
 const MAX_POINTS = 1_000_000_000;
@@ -38,23 +39,25 @@ export const WiredConditionUserHighscorePointsView: FC<{}> = () => {
     const validate = () => (trigger?.selectedItems?.length ?? 0) > 0;
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
-            save={save}
-            validate={validate}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            <div className="flex flex-col gap-2">
-                <Text small className="text-black/60">
-                    {localizeWithFallback('wiredfurni.params.highscore.title', "Pick the scoreboards above. The user's best score on them is compared.")}
-                </Text>
-                <div className="flex flex-col gap-1">
-                    <Text bold>{localizeWithFallback('wiredfurni.params.highscore_points', 'Points')}</Text>
-                    <NumberInput min={MIN_POINTS} max={MAX_POINTS} className="form-control form-control-sm" style={{ maxWidth: 160 }} value={points} onChange={(event) => setPoints(clampPoints(parseInt(event.target.value, 10)))} />
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
+                save={save}
+                validate={validate}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                <div className="flex flex-col gap-2">
+                    <Text small className="text-black/60">
+                        {localizeWithFallback('wiredfurni.params.highscore.title', "Pick the scoreboards above. The user's best score on them is compared.")}
+                    </Text>
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{localizeWithFallback('wiredfurni.params.highscore_points', 'Points')}</Text>
+                        <NumberInput min={MIN_POINTS} max={MAX_POINTS} className="form-control form-control-sm" style={{ maxWidth: 160 }} value={points} onChange={(event) => setPoints(clampPoints(parseInt(event.target.value, 10)))} />
+                    </div>
+                    <WiredComparisonOperator name="wiredHighscorePointsComparison" value={comparison} onChange={setComparison} />
                 </div>
-                <WiredComparisonOperator name="wiredHighscorePointsComparison" value={comparison} onChange={setComparison} />
-            </div>
-        </WiredConditionBaseView>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

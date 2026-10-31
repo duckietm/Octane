@@ -5,6 +5,7 @@ import { suggestInteractionType } from '../furniEditorSuggestions';
 import { BaseButton } from '../../../common/BaseButton';
 import { ToggleButton } from '../../../common/ToggleButton';
 import { Hint } from '../../../common/Tooltip';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 interface FurniEditorSearchViewProps {
     items: FurniItem[];
@@ -47,14 +48,16 @@ const SortArrow: FC<{ field: SortField; active: SortField; dir: SortDir }> = ({ 
 };
 
 const PagBtn: FC<{ disabled?: boolean; onClick: () => void; children: ReactNode; title?: string }> = ({ disabled, onClick, children, title }) => (
-    <Hint content={title}><BaseButton
-        type="button"
-        disabled={disabled}
-        onClick={onClick}
-        className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 bg-[#ffffff] text-slate-600 text-sm leading-none hover:bg-slate-50 hover:border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition"
-    >
-        {children}
-    </BaseButton></Hint>
+    <NativeTextTree>
+        <Hint content={title}><BaseButton
+            type="button"
+            disabled={disabled}
+            onClick={onClick}
+            className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 bg-[#ffffff] text-slate-600 text-sm leading-none hover:bg-slate-50 hover:border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition"
+        >
+            {children}
+        </BaseButton></Hint>
+    </NativeTextTree>
 );
 
 export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => {
@@ -137,191 +140,193 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
         'w-full pl-9 pr-8 py-2 text-sm leading-normal rounded-lg border border-slate-300 bg-[#ffffff] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 transition';
 
     return (
-        <Column gap={2} className="h-full">
-            {/* Search + filters */}
-            <Flex gap={2} alignItems="center">
-                <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                        <svg
-                            className="w-4 h-4"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        >
-                            <circle cx="8.5" cy="8.5" r="5.5" />
-                            <line x1="12.7" y1="12.7" x2="18" y2="18" />
-                        </svg>
-                    </span>
-                    <input
-                        type="text"
-                        className={inputClass}
-                        placeholder="Search by ID, name or sprite ID…"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                    />
-                    {query && (
-                        <BaseButton
-                            type="button"
-                            onClick={() => setQuery('')}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-[11px] text-slate-300 hover:text-slate-500 hover:bg-slate-100"
-                        >
-                            ✕
-                        </BaseButton>
-                    )}
-                </div>
-                <Flex gap={1}>
-                    {['', 's', 'i'].map((t) => {
-                        const on = typeFilter === t;
-
-                        return (
-                            <BaseButton
-                                key={t || 'all'}
-                                type="button"
-                                onClick={() => applyType(t)}
-                                className={`px-3 py-1.5 text-[12px] font-medium rounded-lg border transition ${on ? 'bg-[#418db0] border-[#418db0] text-[#ffffff] shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-500 hover:bg-slate-200 hover:text-slate-600'}`}
+        <NativeTextTree>
+            <Column gap={2} className="h-full">
+                {/* Search + filters */}
+                <Flex gap={2} alignItems="center">
+                    <div className="relative flex-1">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                            <svg
+                                className="w-4 h-4"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                             >
-                                {t === '' ? 'All' : t === 's' ? 'Floor' : 'Wall'}
-                            </BaseButton>
-                        );
-                    })}
-                </Flex>
-            </Flex>
-
-            {/* Result count + activity */}
-            <Flex alignItems="center" gap={2} className="px-0.5">
-                <Text className="text-[11px] text-slate-500">
-                    {total > 0 ? `Showing ${from}–${to} of ${total.toLocaleString()}` : loading ? 'Searching…' : 'No results'}
-                </Text>
-                {loading && <span className="w-3 h-3 rounded-full border-2 border-slate-300 border-t-primary animate-spin" />}
-                {flaggedCount > 0 && (
-                    <Hint content="Rows whose interaction type has no class or does not match the classname"><ToggleButton
-                        type="button"
-                        onClick={() => setOnlyFlagged((prev) => !prev)} pressed={onlyFlagged}
-                        className={`ml-auto inline-flex items-center gap-1.5 text-[10px] font-medium rounded-full border px-2 py-0.5 transition ${onlyFlagged ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-[#ffffff] border-slate-200 text-slate-500 hover:border-slate-300'}`}
-                    >
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />
-                        {flaggedCount} to check on this page
-                    </ToggleButton></Hint>
-                )}
-            </Flex>
-
-            {/* Table */}
-            <div className="flex-1 overflow-auto rounded-xl border border-slate-200 shadow-sm bg-[#ffffff]">
-                <table className="w-full text-xs border-collapse">
-                    <thead>
-                        <tr className="sticky top-0 z-10 bg-slate-50 border-b border-slate-200 select-none">
-                            <th className="px-2 py-2 w-[52px]"></th>
-                            {COLUMNS.map((c) => (
-                                <th
-                                    key={c.field}
-                                    onClick={() => applySort(c.field)}
-                                    className={`px-2 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500 cursor-pointer hover:text-slate-700 ${c.align === 'center' ? 'text-center' : 'text-left'}`}
-                                >
-                                    {c.label}
-                                    <SortArrow field={c.field} active={sortField} dir={sortDir} />
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {rows.map(({ item, note }) => (
-                            <tr
-                                key={item.id}
-                                onClick={() => onSelect(item.id)}
-                                title={note ?? undefined}
-                                className="group cursor-pointer border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors"
-                            >
-                                <td className="px-2 py-1.5">
-                                    <div className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 group-hover:border-slate-200 flex items-center justify-center overflow-hidden">
-                                        <LayoutFurniIconImageView productType={item.type} productClassId={item.spriteId} />
-                                    </div>
-                                </td>
-                                <td className="px-2 py-1.5 font-mono text-slate-500">{item.id}</td>
-                                <td className="px-2 py-1.5 font-mono text-slate-500">{item.spriteId}</td>
-                                <td className="px-2 py-1.5 text-slate-700 font-medium truncate max-w-[160px]" title={note ?? item.itemName}>
-                                    {note && <span aria-label={note} className="inline-block w-1.5 h-1.5 rounded-full bg-[#f59e0b] mr-1.5 align-middle" />}
-                                    {item.itemName}
-                                </td>
-                                <td className="px-2 py-1.5 text-slate-500 truncate max-w-[150px]" title={item.publicName}>
-                                    {item.publicName || '—'}
-                                </td>
-                                <td className="px-2 py-1.5 text-center">
-                                    <span
-                                        className={`inline-block px-2 py-0.5 rounded-md text-[#ffffff] text-[10px] font-semibold ${item.type === 's' ? 'bg-[#418db0]' : 'bg-[#64748b]'}`}
-                                    >
-                                        {item.type === 's' ? 'Floor' : 'Wall'}
-                                    </span>
-                                </td>
-                                <td className="px-2 py-1.5">
-                                    {item.interactionType ? (
-                                        <span className="inline-block px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px] font-mono">
-                                            {item.interactionType}
-                                        </span>
-                                    ) : (
-                                        <span className="text-slate-300">—</span>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                        {items.length === 0 &&
-                            loading &&
-                            Array.from({ length: 8 }).map((_, i) => (
-                                <tr key={`sk-${i}`} className="border-b border-slate-100">
-                                    <td className="px-2 py-1.5">
-                                        <div className="w-9 h-9 rounded-lg bg-slate-100 animate-pulse" />
-                                    </td>
-                                    {COLUMNS.map((c) => (
-                                        <td key={c.field} className="px-2 py-1.5">
-                                            <div className="h-3 rounded bg-slate-100 animate-pulse" />
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
-                        {items.length === 0 && !loading && (
-                            <tr>
-                                <td colSpan={7} className="px-2 py-10 text-center">
-                                    <div className="text-slate-400 text-sm">No furni found</div>
-                                    <div className="text-slate-300 text-[11px] mt-0.5">Try a different search or filter</div>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Pagination */}
-            <Flex justifyContent="between" alignItems="center" className="px-0.5">
-                <Text className="text-[11px] text-slate-400">{total.toLocaleString()} items</Text>
-                <Flex alignItems="center" gap={1}>
-                    <PagBtn title="First" disabled={page <= 1} onClick={() => goTo(1)}>
-                        «
-                    </PagBtn>
-                    <PagBtn title="Previous" disabled={page <= 1} onClick={() => goTo(page - 1)}>
-                        ‹
-                    </PagBtn>
-                    <Flex alignItems="center" gap={1} className="px-1 text-[11px] text-slate-500">
+                                <circle cx="8.5" cy="8.5" r="5.5" />
+                                <line x1="12.7" y1="12.7" x2="18" y2="18" />
+                            </svg>
+                        </span>
                         <input
                             type="text"
-                            value={pageInput}
-                            onChange={(e) => setPageInput(e.target.value.replace(/[^0-9]/g, ''))}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') goTo(Number(pageInput));
-                            }}
-                            className="w-12 px-1.5 py-1 text-center rounded-lg border border-slate-200 bg-[#ffffff] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+                            className={inputClass}
+                            placeholder="Search by ID, name or sprite ID…"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
                         />
-                        <span className="text-slate-400">/ {totalPages.toLocaleString()}</span>
+                        {query && (
+                            <BaseButton
+                                type="button"
+                                onClick={() => setQuery('')}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-[11px] text-slate-300 hover:text-slate-500 hover:bg-slate-100"
+                            >
+                                ✕
+                            </BaseButton>
+                        )}
+                    </div>
+                    <Flex gap={1}>
+                        {['', 's', 'i'].map((t) => {
+                            const on = typeFilter === t;
+
+                            return (
+                                <BaseButton
+                                    key={t || 'all'}
+                                    type="button"
+                                    onClick={() => applyType(t)}
+                                    className={`px-3 py-1.5 text-[12px] font-medium rounded-lg border transition ${on ? 'bg-[#418db0] border-[#418db0] text-[#ffffff] shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-500 hover:bg-slate-200 hover:text-slate-600'}`}
+                                >
+                                    {t === '' ? 'All' : t === 's' ? 'Floor' : 'Wall'}
+                                </BaseButton>
+                            );
+                        })}
                     </Flex>
-                    <PagBtn title="Next" disabled={page >= totalPages} onClick={() => goTo(page + 1)}>
-                        ›
-                    </PagBtn>
-                    <PagBtn title="Last" disabled={page >= totalPages} onClick={() => goTo(totalPages)}>
-                        »
-                    </PagBtn>
                 </Flex>
-            </Flex>
-        </Column>
+
+                {/* Result count + activity */}
+                <Flex alignItems="center" gap={2} className="px-0.5">
+                    <Text className="text-[11px] text-slate-500">
+                        {total > 0 ? `Showing ${from}–${to} of ${total.toLocaleString()}` : loading ? 'Searching…' : 'No results'}
+                    </Text>
+                    {loading && <span className="w-3 h-3 rounded-full border-2 border-slate-300 border-t-primary animate-spin" />}
+                    {flaggedCount > 0 && (
+                        <Hint content="Rows whose interaction type has no class or does not match the classname"><ToggleButton
+                            type="button"
+                            onClick={() => setOnlyFlagged((prev) => !prev)} pressed={onlyFlagged}
+                            className={`ml-auto inline-flex items-center gap-1.5 text-[10px] font-medium rounded-full border px-2 py-0.5 transition ${onlyFlagged ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-[#ffffff] border-slate-200 text-slate-500 hover:border-slate-300'}`}
+                        >
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />
+                            {flaggedCount} to check on this page
+                        </ToggleButton></Hint>
+                    )}
+                </Flex>
+
+                {/* Table */}
+                <div className="flex-1 overflow-auto rounded-xl border border-slate-200 shadow-sm bg-[#ffffff]">
+                    <table className="w-full text-xs border-collapse">
+                        <thead>
+                            <tr className="sticky top-0 z-10 bg-slate-50 border-b border-slate-200 select-none">
+                                <th className="px-2 py-2 w-[52px]"></th>
+                                {COLUMNS.map((c) => (
+                                    <th
+                                        key={c.field}
+                                        onClick={() => applySort(c.field)}
+                                        className={`px-2 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500 cursor-pointer hover:text-slate-700 ${c.align === 'center' ? 'text-center' : 'text-left'}`}
+                                    >
+                                        {c.label}
+                                        <SortArrow field={c.field} active={sortField} dir={sortDir} />
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rows.map(({ item, note }) => (
+                                <tr
+                                    key={item.id}
+                                    onClick={() => onSelect(item.id)}
+                                    title={note ?? undefined}
+                                    className="group cursor-pointer border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors"
+                                >
+                                    <td className="px-2 py-1.5">
+                                        <div className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 group-hover:border-slate-200 flex items-center justify-center overflow-hidden">
+                                            <LayoutFurniIconImageView productType={item.type} productClassId={item.spriteId} />
+                                        </div>
+                                    </td>
+                                    <td className="px-2 py-1.5 font-mono text-slate-500">{item.id}</td>
+                                    <td className="px-2 py-1.5 font-mono text-slate-500">{item.spriteId}</td>
+                                    <td className="px-2 py-1.5 text-slate-700 font-medium truncate max-w-[160px]" title={note ?? item.itemName}>
+                                        {note && <span aria-label={note} className="inline-block w-1.5 h-1.5 rounded-full bg-[#f59e0b] mr-1.5 align-middle" />}
+                                        {item.itemName}
+                                    </td>
+                                    <td className="px-2 py-1.5 text-slate-500 truncate max-w-[150px]" title={item.publicName}>
+                                        {item.publicName || '—'}
+                                    </td>
+                                    <td className="px-2 py-1.5 text-center">
+                                        <span
+                                            className={`inline-block px-2 py-0.5 rounded-md text-[#ffffff] text-[10px] font-semibold ${item.type === 's' ? 'bg-[#418db0]' : 'bg-[#64748b]'}`}
+                                        >
+                                            {item.type === 's' ? 'Floor' : 'Wall'}
+                                        </span>
+                                    </td>
+                                    <td className="px-2 py-1.5">
+                                        {item.interactionType ? (
+                                            <span className="inline-block px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px] font-mono">
+                                                {item.interactionType}
+                                            </span>
+                                        ) : (
+                                            <span className="text-slate-300">—</span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                            {items.length === 0 &&
+                                loading &&
+                                Array.from({ length: 8 }).map((_, i) => (
+                                    <tr key={`sk-${i}`} className="border-b border-slate-100">
+                                        <td className="px-2 py-1.5">
+                                            <div className="w-9 h-9 rounded-lg bg-slate-100 animate-pulse" />
+                                        </td>
+                                        {COLUMNS.map((c) => (
+                                            <td key={c.field} className="px-2 py-1.5">
+                                                <div className="h-3 rounded bg-slate-100 animate-pulse" />
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            {items.length === 0 && !loading && (
+                                <tr>
+                                    <td colSpan={7} className="px-2 py-10 text-center">
+                                        <div className="text-slate-400 text-sm">No furni found</div>
+                                        <div className="text-slate-300 text-[11px] mt-0.5">Try a different search or filter</div>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Pagination */}
+                <Flex justifyContent="between" alignItems="center" className="px-0.5">
+                    <Text className="text-[11px] text-slate-400">{total.toLocaleString()} items</Text>
+                    <Flex alignItems="center" gap={1}>
+                        <PagBtn title="First" disabled={page <= 1} onClick={() => goTo(1)}>
+                            «
+                        </PagBtn>
+                        <PagBtn title="Previous" disabled={page <= 1} onClick={() => goTo(page - 1)}>
+                            ‹
+                        </PagBtn>
+                        <Flex alignItems="center" gap={1} className="px-1 text-[11px] text-slate-500">
+                            <input
+                                type="text"
+                                value={pageInput}
+                                onChange={(e) => setPageInput(e.target.value.replace(/[^0-9]/g, ''))}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') goTo(Number(pageInput));
+                                }}
+                                className="w-12 px-1.5 py-1 text-center rounded-lg border border-slate-200 bg-[#ffffff] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+                            />
+                            <span className="text-slate-400">/ {totalPages.toLocaleString()}</span>
+                        </Flex>
+                        <PagBtn title="Next" disabled={page >= totalPages} onClick={() => goTo(page + 1)}>
+                            ›
+                        </PagBtn>
+                        <PagBtn title="Last" disabled={page >= totalPages} onClick={() => goTo(totalPages)}>
+                            »
+                        </PagBtn>
+                    </Flex>
+                </Flex>
+            </Column>
+        </NativeTextTree>
     );
 };

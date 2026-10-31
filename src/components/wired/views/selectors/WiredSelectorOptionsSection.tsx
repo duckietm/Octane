@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { LocalizeText } from '../../../../api';
 import { Text } from '../../../../common';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 
 /**
@@ -31,16 +32,18 @@ export const WiredSelectorOptionsSection: FC<{}> = () => {
     };
 
     return (
-        <div className="flex flex-col gap-1">
-            <Text bold>{LocalizeText('wiredfurni.params.selector_options_selector')}</Text>
-            <label className="flex items-center gap-2">
-                <Checkbox checked={filter} onCheckedChange={(checked) => update({ filter: checked, invert })} />
-                <Text small>{LocalizeText('wiredfurni.params.selector_option.0')}</Text>
-            </label>
-            <label className="flex items-center gap-2">
-                <Checkbox checked={invert} onCheckedChange={(checked) => update({ filter, invert: checked })} />
-                <Text small>{LocalizeText('wiredfurni.params.selector_option.1')}</Text>
-            </label>
-        </div>
+        <NativeTextTree>
+            <div className="flex flex-col gap-1">
+                <Text bold>{LocalizeText('wiredfurni.params.selector_options_selector')}</Text>
+                <label className="flex items-center gap-2">
+                    <Checkbox checked={filter} onCheckedChange={(checked) => update({ filter: checked, invert })} />
+                    <Text small>{LocalizeText('wiredfurni.params.selector_option.0')}</Text>
+                </label>
+                <label className="flex items-center gap-2">
+                    <Checkbox checked={invert} onCheckedChange={(checked) => update({ filter, invert: checked })} />
+                    <Text small>{LocalizeText('wiredfurni.params.selector_option.1')}</Text>
+                </label>
+            </div>
+        </NativeTextTree>
     );
 };

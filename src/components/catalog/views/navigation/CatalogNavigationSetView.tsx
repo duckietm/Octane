@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { getCatalogNodeKey, ICatalogNode } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { CatalogNavigationItemView } from './CatalogNavigationItemView';
 import { CatalogNavigationRuntime } from './CatalogNavigationRuntime';
 
@@ -13,14 +14,16 @@ export const CatalogNavigationSetView: FC<CatalogNavigationSetViewProps> = (prop
     const { node = null, runtime, child = false } = props;
 
     return (
-        <>
-            {node &&
-                node.children.length > 0 &&
-                node.children.map((n, index) => {
-                    if (!n.isVisible) return null;
+        <NativeTextTree>
+            <>
+                {node &&
+                    node.children.length > 0 &&
+                    node.children.map((n, index) => {
+                        if (!n.isVisible) return null;
 
-                    return <CatalogNavigationItemView key={getCatalogNodeKey(n, index)} child={child} node={n} runtime={runtime} />;
-                })}
-        </>
+                        return <CatalogNavigationItemView key={getCatalogNodeKey(n, index)} child={child} node={n} runtime={runtime} />;
+                    })}
+            </>
+        </NativeTextTree>
     );
 };

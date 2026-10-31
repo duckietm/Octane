@@ -7,6 +7,7 @@ import { FloorplanAction, FloorplanState } from '../state/types';
 import { FloorplanTile } from './FloorplanTile';
 import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 type Props = {
     state: FloorplanState;
@@ -75,16 +76,18 @@ const GridPattern: FC<{ id: string }> = ({ id }) => {
     const diamond = (cx: number, cy: number) => `${cx},${cy - h / 2} ${cx + w / 2},${cy} ${cx},${cy + h / 2} ${cx - w / 2},${cy}`;
 
     return (
-        <defs>
-            <pattern id={id} patternUnits="userSpaceOnUse" x={originX - w / 2} y={originY - h / 2} width={w} height={h}>
-                <rect width={w} height={h} fill={GRID_LINE} />
-                <polygon points={diamond(w / 2, h / 2)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
-                <polygon points={diamond(0, 0)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
-                <polygon points={diamond(w, 0)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
-                <polygon points={diamond(0, h)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
-                <polygon points={diamond(w, h)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
-            </pattern>
-        </defs>
+        <NativeTextTree>
+            <defs>
+                <pattern id={id} patternUnits="userSpaceOnUse" x={originX - w / 2} y={originY - h / 2} width={w} height={h}>
+                    <rect width={w} height={h} fill={GRID_LINE} />
+                    <polygon points={diamond(w / 2, h / 2)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
+                    <polygon points={diamond(0, 0)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
+                    <polygon points={diamond(w, 0)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
+                    <polygon points={diamond(0, h)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
+                    <polygon points={diamond(w, h)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
+                </pattern>
+            </defs>
+        </NativeTextTree>
     );
 };
 
@@ -215,70 +218,72 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
     const cursorClass = isPanning ? 'cursor-grabbing' : panMode ? 'cursor-grab' : '';
 
     return (
-        <div className="fp-stage" data-testid="floorplan-2d">
-            <svg
-                ref={svgRef}
-                viewBox={viewBox}
-                style={flipped ? { transform: 'scaleX(-1)' } : undefined}
-                className={`block w-full h-full select-none bg-black [shape-rendering:crispEdges] ${cursorClass}`}
-                onWheel={onWheel}
-                onPointerDown={(e) => {
-                    if (isPanGesture(e)) {
-                        e.preventDefault();
-                        panStartRef.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y };
-                        setIsPanning(true);
-                        return;
-                    }
-                    tool.onPointerDown(e);
-                }}
-                onPointerMove={(e) => {
-                    if (panStartRef.current) return;
-                    tool.onPointerMove(e);
-                }}
-                onPointerUp={(e) => {
-                    if (panStartRef.current) return;
-                    tool.onPointerUp(e);
-                }}
-            >
-                <GridPattern id="fp-grid" />
-                <rect data-testid="floorplan-grid" x={viewX} y={viewY} width={visW} height={visH} fill="url(#fp-grid)" />
-                {rows}
-                {outOfBoundsOverlay}
-            </svg>
-            <div className="fp-stage-buttons">
-                <Hint content="Fit room to view"><BaseButton aria-label="Fit room to view" type="button" data-testid="zoom-reset" className="fp-round-btn is-small" disabled={!roomBounds} onClick={resetView}>
-                    <FaExpand size={10} />
-                </BaseButton></Hint>
-                <Hint content="Recenter on room (keep zoom)"><BaseButton aria-label="Recenter on room (keep zoom)"
-                    type="button"
-                    data-testid="zoom-recenter"
-                    className="fp-round-btn is-small"
-                    disabled={!roomBounds}
-                    onClick={() => {
-                        const next = centerPanForRoom();
-                        if (next) setPan(next);
+        <NativeTextTree>
+            <div className="fp-stage" data-testid="floorplan-2d">
+                <svg
+                    ref={svgRef}
+                    viewBox={viewBox}
+                    style={flipped ? { transform: 'scaleX(-1)' } : undefined}
+                    className={`block w-full h-full select-none bg-black [shape-rendering:crispEdges] ${cursorClass}`}
+                    onWheel={onWheel}
+                    onPointerDown={(e) => {
+                        if (isPanGesture(e)) {
+                            e.preventDefault();
+                            panStartRef.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y };
+                            setIsPanning(true);
+                            return;
+                        }
+                        tool.onPointerDown(e);
+                    }}
+                    onPointerMove={(e) => {
+                        if (panStartRef.current) return;
+                        tool.onPointerMove(e);
+                    }}
+                    onPointerUp={(e) => {
+                        if (panStartRef.current) return;
+                        tool.onPointerUp(e);
                     }}
                 >
-                    <FaCrosshairs size={10} />
-                </BaseButton></Hint>
-                <Hint content={flipped ? 'Original view' : 'View from the other side'}>
-                    <BaseButton aria-label={flipped ? 'Original view' : 'View from the other side'}
+                    <GridPattern id="fp-grid" />
+                    <rect data-testid="floorplan-grid" x={viewX} y={viewY} width={visW} height={visH} fill="url(#fp-grid)" />
+                    {rows}
+                    {outOfBoundsOverlay}
+                </svg>
+                <div className="fp-stage-buttons">
+                    <Hint content="Fit room to view"><BaseButton aria-label="Fit room to view" type="button" data-testid="zoom-reset" className="fp-round-btn is-small" disabled={!roomBounds} onClick={resetView}>
+                        <FaExpand size={10} />
+                    </BaseButton></Hint>
+                    <Hint content="Recenter on room (keep zoom)"><BaseButton aria-label="Recenter on room (keep zoom)"
                         type="button"
-                        data-testid="zoom-flip"
-                        data-active={flipped ? 'true' : 'false'}
-                        className={`fp-round-btn is-small ${flipped ? 'is-on' : ''}`}
-                        onClick={() => setFlipped((v) => !v)}
+                        data-testid="zoom-recenter"
+                        className="fp-round-btn is-small"
+                        disabled={!roomBounds}
+                        onClick={() => {
+                            const next = centerPanForRoom();
+                            if (next) setPan(next);
+                        }}
                     >
-                        <FaSyncAlt size={10} />
-                    </BaseButton>
-                </Hint>
-                <Hint content={`Zoom in (Ctrl+wheel) · ${Math.round(zoom * 100)}%`}><BaseButton aria-label={`Zoom in (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} type="button" data-testid="zoom-in" className="fp-round-btn" disabled={zoom >= ZOOM_MAX - 1e-3} onClick={zoomIn}>
-                    <FaPlus size={13} />
-                </BaseButton></Hint>
-                <Hint content={`Zoom out (Ctrl+wheel) · ${Math.round(zoom * 100)}%`}><BaseButton aria-label={`Zoom out (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} type="button" data-testid="zoom-out" className="fp-round-btn" disabled={zoom <= ZOOM_MIN + 1e-3} onClick={zoomOut}>
-                    <FaMinus size={13} />
-                </BaseButton></Hint>
+                        <FaCrosshairs size={10} />
+                    </BaseButton></Hint>
+                    <Hint content={flipped ? 'Original view' : 'View from the other side'}>
+                        <BaseButton aria-label={flipped ? 'Original view' : 'View from the other side'}
+                            type="button"
+                            data-testid="zoom-flip"
+                            data-active={flipped ? 'true' : 'false'}
+                            className={`fp-round-btn is-small ${flipped ? 'is-on' : ''}`}
+                            onClick={() => setFlipped((v) => !v)}
+                        >
+                            <FaSyncAlt size={10} />
+                        </BaseButton>
+                    </Hint>
+                    <Hint content={`Zoom in (Ctrl+wheel) · ${Math.round(zoom * 100)}%`}><BaseButton aria-label={`Zoom in (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} type="button" data-testid="zoom-in" className="fp-round-btn" disabled={zoom >= ZOOM_MAX - 1e-3} onClick={zoomIn}>
+                        <FaPlus size={13} />
+                    </BaseButton></Hint>
+                    <Hint content={`Zoom out (Ctrl+wheel) · ${Math.round(zoom * 100)}%`}><BaseButton aria-label={`Zoom out (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} type="button" data-testid="zoom-out" className="fp-round-btn" disabled={zoom <= ZOOM_MIN + 1e-3} onClick={zoomOut}>
+                        <FaMinus size={13} />
+                    </BaseButton></Hint>
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

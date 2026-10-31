@@ -19,6 +19,7 @@ export * from './LocalizeShortNumber';
 export * from './LocalizeText';
 export * from './LocalStorageKeys';
 export * from './localizeWithFallback';
+export * from './parseCommandNumbers';
 export * from './PlaySound';
 export * from './PrefixUtils';
 export * from './ProductImageUtility';

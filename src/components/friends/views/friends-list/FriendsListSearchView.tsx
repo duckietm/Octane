@@ -3,6 +3,7 @@ import { FC, FormEvent, useState } from 'react';
 import { GetConfigurationValue, GetUserProfile, LocalizeText, OpenMessengerChat, SendMessageComposer } from '../../../../api';
 import { LayoutAvatarImageView, UserProfileIconView } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Hint } from '../../../../common/Tooltip';
 import { useFriends, useNotification } from '../../../../hooks';
 import { resolveAvatarFigure } from './resolveAvatarFigure';
@@ -106,30 +107,32 @@ export const FriendsSearchView: FC<FriendsSearchViewProps> = ({ className = '', 
     const rowClass = (row: number) => (row % 2 === 1 ? 'hfl-row-odd' : undefined);
 
     return (
-        <div className={`hfl-search-results ${className}`}>
-            <div className="hfl-search-results-scroll">
-                {friendResults && (
-                    <section className="hfl-search-section">
-                        <h4 className={rowClass(0)}>{caption(friendResults, 'friendlist.search.friendscaption', 'friendlist.search.nofriendsfound')}</h4>
-                        {friendResults.map((result, index) => renderResult(result, false, 1 + index))}
-                    </section>
-                )}
-                {otherResults && (
-                    <section className="hfl-search-section">
-                        <h4 className={rowClass(othersCaptionRow)}>
-                            {caption(otherResults, 'friendlist.search.otherscaption', 'friendlist.search.noothersfound')}
-                        </h4>
-                        {otherResults.map((result, index) => renderResult(result, true, othersCaptionRow + 1 + index))}
-                    </section>
-                )}
+        <NativeTextTree>
+            <div className={`hfl-search-results ${className}`}>
+                <div className="hfl-search-results-scroll">
+                    {friendResults && (
+                        <section className="hfl-search-section">
+                            <h4 className={rowClass(0)}>{caption(friendResults, 'friendlist.search.friendscaption', 'friendlist.search.nofriendsfound')}</h4>
+                            {friendResults.map((result, index) => renderResult(result, false, 1 + index))}
+                        </section>
+                    )}
+                    {otherResults && (
+                        <section className="hfl-search-section">
+                            <h4 className={rowClass(othersCaptionRow)}>
+                                {caption(otherResults, 'friendlist.search.otherscaption', 'friendlist.search.noothersfound')}
+                            </h4>
+                            {otherResults.map((result, index) => renderResult(result, true, othersCaptionRow + 1 + index))}
+                        </section>
+                    )}
+                </div>
+                <form className="hfl-search-form" onSubmit={submitSearch}>
+                    <input maxLength={50} value={searchValue} onChange={(event) => setSearchValue(event.target.value)} />
+                    <BaseButton type="submit">
+                        <span />
+                        {LocalizeText('generic.search')}
+                    </BaseButton>
+                </form>
             </div>
-            <form className="hfl-search-form" onSubmit={submitSearch}>
-                <input maxLength={50} value={searchValue} onChange={(event) => setSearchValue(event.target.value)} />
-                <BaseButton type="submit">
-                    <span />
-                    {LocalizeText('generic.search')}
-                </BaseButton>
-            </form>
-        </div>
+        </NativeTextTree>
     );
 };

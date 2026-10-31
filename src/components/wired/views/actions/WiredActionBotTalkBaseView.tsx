@@ -12,6 +12,7 @@ import { WiredPlaceholderInsert } from '../WiredPlaceholderInsert';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
 import { CollapsibleSection } from '../../../../common/CollapsibleSection';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MESSAGE_MAX_LENGTH = 400;
 
@@ -68,59 +69,61 @@ export const WiredActionBotTalkBaseView: FC<WiredActionBotTalkBaseViewProps> = (
           ];
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={
-                <div className="flex flex-col gap-2">
-                    <WiredSourcesSelector
-                        showUsers={true}
-                        userSource={botSource}
-                        userSources={BOT_SOURCES}
-                        usersTitle="wiredfurni.params.sources.users.title.bots"
-                        onChangeUsers={(value) => setBotSource(normalizeBotSource(value))}
-                    />
-                    {toAvatar && (
-                        <>
-                            <hr className="m-0 bg-dark" />
-                            <WiredSourcesSelector showUsers={true} userSlot={1} userSource={userSource} onChangeUsers={setUserSource} />
-                        </>
-                    )}
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={
+                    <div className="flex flex-col gap-2">
+                        <WiredSourcesSelector
+                            showUsers={true}
+                            userSource={botSource}
+                            userSources={BOT_SOURCES}
+                            usersTitle="wiredfurni.params.sources.users.title.bots"
+                            onChangeUsers={(value) => setBotSource(normalizeBotSource(value))}
+                        />
+                        {toAvatar && (
+                            <>
+                                <hr className="m-0 bg-dark" />
+                                <WiredSourcesSelector showUsers={true} userSlot={1} userSource={userSource} onChangeUsers={setUserSource} />
+                            </>
+                        )}
+                    </div>
+                }
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.bot.name')}</Text>
+                    <OctaneInput maxLength={32} title={LocalizeText('wiredfurni.tooltip.bot.name')} type="text" value={botName} onChange={(event) => setBotName(event.target.value)} />
                 </div>
-            }
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.bot.name')}</Text>
-                <OctaneInput maxLength={32} title={LocalizeText('wiredfurni.tooltip.bot.name')} type="text" value={botName} onChange={(event) => setBotName(event.target.value)} />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.message')}</Text>
-                <textarea
-                    className="form-control form-control-sm octane-wired__resizable-textarea"
-                    maxLength={MESSAGE_MAX_LENGTH}
-                    rows={4}
-                    title={LocalizeText('wiredfurni.tooltip.bot.chatmessage')}
-                    value={message}
-                    onChange={(event) => setMessage(event.target.value)}
-                />
-                <WiredTextCounter maxLength={MESSAGE_MAX_LENGTH} value={message} />
-                <WiredPlaceholderInsert trigger={trigger} onInsert={(token) => setMessage((current) => (current + token).slice(0, MESSAGE_MAX_LENGTH))} />
-                <WiredTextFormattingHelp />
-                {modes.map((mode) => (
-                    <label key={mode.value} className="flex items-center gap-1">
-                        <Radio checked={talkMode === mode.value} name="botTalkMode" onCheckedChange={() => setTalkMode(mode.value)} />
-                        <Text>{LocalizeText(mode.label)}</Text>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.message')}</Text>
+                    <textarea
+                        className="form-control form-control-sm octane-wired__resizable-textarea"
+                        maxLength={MESSAGE_MAX_LENGTH}
+                        rows={4}
+                        title={LocalizeText('wiredfurni.tooltip.bot.chatmessage')}
+                        value={message}
+                        onChange={(event) => setMessage(event.target.value)}
+                    />
+                    <WiredTextCounter maxLength={MESSAGE_MAX_LENGTH} value={message} />
+                    <WiredPlaceholderInsert trigger={trigger} onInsert={(token) => setMessage((current) => (current + token).slice(0, MESSAGE_MAX_LENGTH))} />
+                    <WiredTextFormattingHelp />
+                    {modes.map((mode) => (
+                        <label key={mode.value} className="flex items-center gap-1">
+                            <Radio checked={talkMode === mode.value} name="botTalkMode" onCheckedChange={() => setTalkMode(mode.value)} />
+                            <Text>{LocalizeText(mode.label)}</Text>
+                        </label>
+                    ))}
+                    <label className="flex items-center gap-1">
+                        <Checkbox checked={hideBotName} onCheckedChange={(nextChecked) => setHideBotName(nextChecked)} />
+                        <Text>{localizeWithFallback('wiredfurni.params.bot_talk.hide_bot_name', 'Hide the bot name')}</Text>
                     </label>
-                ))}
-                <label className="flex items-center gap-1">
-                    <Checkbox checked={hideBotName} onCheckedChange={(nextChecked) => setHideBotName(nextChecked)} />
-                    <Text>{localizeWithFallback('wiredfurni.params.bot_talk.hide_bot_name', 'Hide the bot name')}</Text>
-                </label>
-            </div>
-            <CollapsibleSection title={<Text bold>{localizeWithFallback('wiredfurni.params.show_message.bubble_width.title', 'Bubble width')}</Text>}>
-                <WiredBubbleWidthSelect value={bubbleWidth} onChange={setBubbleWidth} />
-            </CollapsibleSection>
-        </WiredActionBaseView>
+                </div>
+                <CollapsibleSection title={<Text bold>{localizeWithFallback('wiredfurni.params.show_message.bubble_width.title', 'Bubble width')}</Text>}>
+                    <WiredBubbleWidthSelect value={bubbleWidth} onChange={setBubbleWidth} />
+                </CollapsibleSection>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { GetConfigurationValue, handleInternalLinkClick, LocalizeText, OpenUrl, SanitizeHtmlWithInternalLinks } from '../../../../../api';
 import duckatIcon from '../../../../../assets/images/purse-swf/icons/2381_duckat_icon_0_png$7c0915a94ebd1a1746053f94976b8ba1-1879246012.png';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useNotificationActions } from '../../../../../hooks';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
@@ -20,7 +21,9 @@ const pageImage = (page: CatalogLayoutProps['page'], index: number, libraryPath:
 };
 
 const PageText: FC<{ html: string; className: string }> = ({ html, className }) => (
-    <div className={className} onClick={handleInternalLinkClick} dangerouslySetInnerHTML={{ __html: SanitizeHtmlWithInternalLinks(html ?? '') }} />
+    <NativeTextTree>
+        <div className={className} onClick={handleInternalLinkClick} dangerouslySetInnerHTML={{ __html: SanitizeHtmlWithInternalLinks(html ?? '') }} />
+    </NativeTextTree>
 );
 
 const RENTABLE_RULES = [1, 2, 3, 4, 5];
@@ -35,26 +38,28 @@ export const CatalogLayoutInfoRentablesView: FC<CatalogLayoutProps> = ({ page })
     const rules = RENTABLE_RULES.map((rule) => ({ rule, text: page?.localization?.getText(rule) ?? '' })).filter((rule) => !!rule.text);
 
     return (
-        <div className="octane-catalog-air-info is-rentables">
-            <div className="octane-catalog-air-info__border">
-                <div className="octane-catalog-air-info__rules">
-                    {rules.map(({ rule, text }) => (
-                        <div key={rule} className="octane-catalog-air-info__rule">
-                            <img alt="" draggable={false} className="octane-catalog-air-info__rule-icon" src={duckatIcon} />
-                            <PageText className="octane-catalog-air-info__rule-text" html={text} />
-                            {!!imageLibraryUrl && (
-                                <img
-                                    alt=""
-                                    draggable={false}
-                                    className="octane-catalog-air-info__rule-pic"
-                                    src={`${imageLibraryUrl}catalogue/rentables_rulepic${rule}.gif`}
-                                />
-                            )}
-                        </div>
-                    ))}
+        <NativeTextTree>
+            <div className="octane-catalog-air-info is-rentables">
+                <div className="octane-catalog-air-info__border">
+                    <div className="octane-catalog-air-info__rules">
+                        {rules.map(({ rule, text }) => (
+                            <div key={rule} className="octane-catalog-air-info__rule">
+                                <img alt="" draggable={false} className="octane-catalog-air-info__rule-icon" src={duckatIcon} />
+                                <PageText className="octane-catalog-air-info__rule-text" html={text} />
+                                {!!imageLibraryUrl && (
+                                    <img
+                                        alt=""
+                                        draggable={false}
+                                        className="octane-catalog-air-info__rule-pic"
+                                        src={`${imageLibraryUrl}catalogue/rentables_rulepic${rule}.gif`}
+                                    />
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };
 
@@ -67,13 +72,15 @@ export const CatalogLayoutRecyclerInfoView: FC<CatalogLayoutProps> = ({ page }) 
     const teaser = pageImage(page, 1, 'catalogue/ctlg_ecotron_box.gif');
 
     return (
-        <div className="octane-catalog-air-info is-recycler">
-            <div className="octane-catalog-air-info__border">
-                {!!teaser && <img alt="" draggable={false} className="octane-catalog-air-info__recycler-teaser" src={teaser} />}
-                <PageText className="octane-catalog-air-info__recycler-title" html={page?.localization?.getText(1)} />
-                <PageText className="octane-catalog-air-info__recycler-text" html={page?.localization?.getText(2)} />
+        <NativeTextTree>
+            <div className="octane-catalog-air-info is-recycler">
+                <div className="octane-catalog-air-info__border">
+                    {!!teaser && <img alt="" draggable={false} className="octane-catalog-air-info__recycler-teaser" src={teaser} />}
+                    <PageText className="octane-catalog-air-info__recycler-title" html={page?.localization?.getText(1)} />
+                    <PageText className="octane-catalog-air-info__recycler-text" html={page?.localization?.getText(2)} />
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };
 
@@ -97,17 +104,19 @@ export const CatalogLayoutMonkeyView: FC<CatalogLayoutProps> = ({ page }) => {
     };
 
     return (
-        <div className="octane-catalog-air-info is-monkey">
-            {!!teaser && (
-                <BaseButton className="octane-catalog-air-info__monkey-teaser" onClick={openStore}>
-                    <img alt="" draggable={false} src={teaser} />
-                </BaseButton>
-            )}
-            {!!special && (
-                <BaseButton className="octane-catalog-air-info__monkey-special" onClick={openStore}>
-                    <img alt="" draggable={false} src={special} />
-                </BaseButton>
-            )}
-        </div>
+        <NativeTextTree>
+            <div className="octane-catalog-air-info is-monkey">
+                {!!teaser && (
+                    <BaseButton className="octane-catalog-air-info__monkey-teaser" onClick={openStore}>
+                        <img alt="" draggable={false} src={teaser} />
+                    </BaseButton>
+                )}
+                {!!special && (
+                    <BaseButton className="octane-catalog-air-info__monkey-special" onClick={openStore}>
+                        <img alt="" draggable={false} src={special} />
+                    </BaseButton>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

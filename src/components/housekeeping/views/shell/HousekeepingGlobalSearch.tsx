@@ -2,6 +2,7 @@ import { Autocomplete } from '@base-ui/react/autocomplete';
 import { FC, useEffect, useRef, useState } from 'react';
 import { FaCircle, FaHome, FaSearch, FaUser } from 'react-icons/fa';
 import { HousekeepingTabId, LocalizeText, parseHousekeepingSearch } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useHousekeepingStore } from '../../../../hooks';
 
 interface SearchRow {
@@ -91,79 +92,81 @@ export const HousekeepingGlobalSearch: FC = () => {
     const rowByKey = new Map(rows.map((row) => [row.key, row]));
 
     return (
-        <div className="relative">
-            <div ref={listHostRef} />
-            <Autocomplete.Root
-                autoHighlight="always"
-                filter={null}
-                items={rows.map((row) => row.key)}
-                mode="list"
-                open={isOpen && (rows.length > 0 || parsed.kind === 'text')}
-                value={query}
-                onOpenChange={setIsOpen}
-                onValueChange={(next, details) => {
-                    // The rows are actions, not values: a picked row opens its user or room and the box is cleared.
-                    if (details.reason === 'item-press') {
-                        const row = rowByKey.get(next);
+        <NativeTextTree>
+            <div className="relative">
+                <div ref={listHostRef} />
+                <Autocomplete.Root
+                    autoHighlight="always"
+                    filter={null}
+                    items={rows.map((row) => row.key)}
+                    mode="list"
+                    open={isOpen && (rows.length > 0 || parsed.kind === 'text')}
+                    value={query}
+                    onOpenChange={setIsOpen}
+                    onValueChange={(next, details) => {
+                        // The rows are actions, not values: a picked row opens its user or room and the box is cleared.
+                        if (details.reason === 'item-press') {
+                            const row = rowByKey.get(next);
 
-                        if (row) open(row);
+                            if (row) open(row);
 
-                        return;
-                    }
+                            return;
+                        }
 
-                    setQuery(next);
-                    setIsOpen(true);
-                }}
-            >
-                <div
-                    ref={boxRef}
-                    className="flex items-center gap-1 rounded-md border border-zinc-300 bg-white px-1.5 py-1 focus-within:border-sky-400 focus-within:ring-1 focus-within:ring-sky-300"
+                        setQuery(next);
+                        setIsOpen(true);
+                    }}
                 >
-                    <FaSearch className="shrink-0 text-zinc-400" size={10} />
-                    <Autocomplete.Input
-                        aria-label={LocalizeText('housekeeping.search.placeholder')}
-                        className="w-full min-w-0 bg-transparent text-xs outline-none placeholder:italic placeholder:text-zinc-400"
-                        placeholder={LocalizeText('housekeeping.search.placeholder')}
-                        onFocus={() => setIsOpen(true)}
-                    />
-                </div>
-                <Autocomplete.Portal container={listHostRef}>
-                    <Autocomplete.Positioner align="start" anchor={boxRef} className="z-40" sideOffset={4}>
-                        <Autocomplete.Popup className="octane-hk-popover w-[260px] overflow-hidden rounded border border-zinc-200 bg-white shadow-lg">
-                            {parsed.kind === 'empty' && rows.length > 0 && (
-                                <div className="border-b border-zinc-100 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
-                                    {LocalizeText('housekeeping.user.recent')}
-                                </div>
-                            )}
-                            {rows.length === 0 && <div className="px-2 py-1.5 text-[11px] italic text-zinc-500">{LocalizeText('housekeeping.search.no_results')}</div>}
-                            <Autocomplete.List>
-                                {(key: string) => {
-                                    const row = rowByKey.get(key);
+                    <div
+                        ref={boxRef}
+                        className="flex items-center gap-1 rounded-md border border-zinc-300 bg-white px-1.5 py-1 focus-within:border-sky-400 focus-within:ring-1 focus-within:ring-sky-300"
+                    >
+                        <FaSearch className="shrink-0 text-zinc-400" size={10} />
+                        <Autocomplete.Input
+                            aria-label={LocalizeText('housekeeping.search.placeholder')}
+                            className="w-full min-w-0 bg-transparent text-xs outline-none placeholder:italic placeholder:text-zinc-400"
+                            placeholder={LocalizeText('housekeeping.search.placeholder')}
+                            onFocus={() => setIsOpen(true)}
+                        />
+                    </div>
+                    <Autocomplete.Portal container={listHostRef}>
+                        <Autocomplete.Positioner align="start" anchor={boxRef} className="z-40" sideOffset={4}>
+                            <Autocomplete.Popup className="octane-hk-popover w-[260px] overflow-hidden rounded border border-zinc-200 bg-white shadow-lg">
+                                {parsed.kind === 'empty' && rows.length > 0 && (
+                                    <div className="border-b border-zinc-100 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+                                        {LocalizeText('housekeeping.user.recent')}
+                                    </div>
+                                )}
+                                {rows.length === 0 && <div className="px-2 py-1.5 text-[11px] italic text-zinc-500">{LocalizeText('housekeeping.search.no_results')}</div>}
+                                <Autocomplete.List>
+                                    {(key: string) => {
+                                        const row = rowByKey.get(key);
 
-                                    if (!row) return null;
+                                        if (!row) return null;
 
-                                    return (
-                                        <Autocomplete.Item
-                                            key={key}
-                                            className="flex w-full cursor-pointer items-center gap-1.5 px-2 py-1 text-left text-xs data-[highlighted]:bg-sky-50"
-                                            value={key}
-                                        >
-                                            {row.kind === 'user' ? (
-                                                <FaUser className="shrink-0 text-sky-500" size={9} />
-                                            ) : (
-                                                <FaHome className="shrink-0 text-violet-500" size={10} />
-                                            )}
-                                            <span className="grow truncate font-medium">{row.label}</span>
-                                            {row.online !== undefined && <FaCircle className={row.online ? 'text-emerald-500' : 'text-zinc-300'} size={6} />}
-                                            {row.hint && <span className="max-w-[80px] shrink-0 truncate text-[10px] text-zinc-500">{row.hint}</span>}
-                                        </Autocomplete.Item>
-                                    );
-                                }}
-                            </Autocomplete.List>
-                        </Autocomplete.Popup>
-                    </Autocomplete.Positioner>
-                </Autocomplete.Portal>
-            </Autocomplete.Root>
-        </div>
+                                        return (
+                                            <Autocomplete.Item
+                                                key={key}
+                                                className="flex w-full cursor-pointer items-center gap-1.5 px-2 py-1 text-left text-xs data-[highlighted]:bg-sky-50"
+                                                value={key}
+                                            >
+                                                {row.kind === 'user' ? (
+                                                    <FaUser className="shrink-0 text-sky-500" size={9} />
+                                                ) : (
+                                                    <FaHome className="shrink-0 text-violet-500" size={10} />
+                                                )}
+                                                <span className="grow truncate font-medium">{row.label}</span>
+                                                {row.online !== undefined && <FaCircle className={row.online ? 'text-emerald-500' : 'text-zinc-300'} size={6} />}
+                                                {row.hint && <span className="max-w-[80px] shrink-0 truncate text-[10px] text-zinc-500">{row.hint}</span>}
+                                            </Autocomplete.Item>
+                                        );
+                                    }}
+                                </Autocomplete.List>
+                            </Autocomplete.Popup>
+                        </Autocomplete.Positioner>
+                    </Autocomplete.Portal>
+                </Autocomplete.Root>
+            </div>
+        </NativeTextTree>
     );
 };

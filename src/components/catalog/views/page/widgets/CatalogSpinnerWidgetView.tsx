@@ -3,6 +3,7 @@ import { CatalogType, GetConfigurationValue, LocalizeText } from '../../../../..
 import { getCatalogBundleDiscountFlatPriceSteps, getCatalogBundleDiscountItemCount } from '../../../../../api/catalog/CatalogBundleDiscount';
 import { useCatalogBundleDiscountRuleset, useCatalogData, useCatalogUiState } from '../../../../../hooks';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 const MIN_VALUE: number = 1;
 const MAX_VALUE: number = 100;
@@ -156,72 +157,74 @@ export const CatalogSpinnerWidgetView: FC<{}> = () => {
         return null;
 
     return (
-        <div className="octane-catalog-standard-spinner">
-            <label className="octane-catalog-standard-spinner-label" htmlFor={quantityInputId}>
-                {LocalizeText('catalog.bundlewidget.quantity')}
-            </label>
-            {freeItemCount > 0 && (
-                <div className="octane-catalog-standard-spinner-discount">
-                    <span className="octane-catalog-standard-spinner-discount-copy">
-                        {LocalizeText('shop.bonus.items.count', ['amount'], [freeItemCount.toString()])}
-                    </span>
-                    <span aria-hidden="true" className="octane-catalog-standard-spinner-discount-star" />
-                </div>
-            )}
-            <BaseButton
-                type="button"
-                className="octane-catalog-standard-spinner-button octane-catalog-standard-spinner-button-less"
-                aria-controls={quantityInputId}
-                aria-label={`${LocalizeText('catalog.bundlewidget.quantity')} −`}
-                disabled={quantity <= MIN_VALUE}
-                onBlur={stopStepping}
-                onClick={(event) => finishStepClick(-1, event.detail)}
-                onLostPointerCapture={stopStepping}
-                onPointerCancel={stopStepping}
-                onPointerDown={(event) => {
-                    if (event.button !== 0) return;
+        <NativeTextTree>
+            <div className="octane-catalog-standard-spinner">
+                <label className="octane-catalog-standard-spinner-label" htmlFor={quantityInputId}>
+                    {LocalizeText('catalog.bundlewidget.quantity')}
+                </label>
+                {freeItemCount > 0 && (
+                    <div className="octane-catalog-standard-spinner-discount">
+                        <span className="octane-catalog-standard-spinner-discount-copy">
+                            {LocalizeText('shop.bonus.items.count', ['amount'], [freeItemCount.toString()])}
+                        </span>
+                        <span aria-hidden="true" className="octane-catalog-standard-spinner-discount-star" />
+                    </div>
+                )}
+                <BaseButton
+                    type="button"
+                    className="octane-catalog-standard-spinner-button octane-catalog-standard-spinner-button-less"
+                    aria-controls={quantityInputId}
+                    aria-label={`${LocalizeText('catalog.bundlewidget.quantity')} −`}
+                    disabled={quantity <= MIN_VALUE}
+                    onBlur={stopStepping}
+                    onClick={(event) => finishStepClick(-1, event.detail)}
+                    onLostPointerCapture={stopStepping}
+                    onPointerCancel={stopStepping}
+                    onPointerDown={(event) => {
+                        if (event.button !== 0) return;
 
-                    event.currentTarget.setPointerCapture(event.pointerId);
-                    startStepping(-1);
-                }}
-                onPointerUp={stopStepping}
-            />
-            <div className="octane-catalog-standard-spinner-input-frame">
-                <input
-                    id={quantityInputId}
-                    className="octane-catalog-standard-spinner-value"
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={maxPurchaseSize.toString().length}
-                    value={quantityDraft}
-                    onChange={(event) => updateQuantityDraft(event.target.value)}
-                    onKeyDown={(event) => {
-                        if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
-
-                        event.preventDefault();
-                        stepQuantity(event.key === 'ArrowDown' ? -1 : 1);
+                        event.currentTarget.setPointerCapture(event.pointerId);
+                        startStepping(-1);
                     }}
+                    onPointerUp={stopStepping}
+                />
+                <div className="octane-catalog-standard-spinner-input-frame">
+                    <input
+                        id={quantityInputId}
+                        className="octane-catalog-standard-spinner-value"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={maxPurchaseSize.toString().length}
+                        value={quantityDraft}
+                        onChange={(event) => updateQuantityDraft(event.target.value)}
+                        onKeyDown={(event) => {
+                            if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+
+                            event.preventDefault();
+                            stepQuantity(event.key === 'ArrowDown' ? -1 : 1);
+                        }}
+                    />
+                </div>
+                <BaseButton
+                    type="button"
+                    className="octane-catalog-standard-spinner-button octane-catalog-standard-spinner-button-more"
+                    aria-controls={quantityInputId}
+                    aria-label={`${LocalizeText('catalog.bundlewidget.quantity')} +`}
+                    disabled={quantity >= maxPurchaseSize}
+                    onBlur={stopStepping}
+                    onClick={(event) => finishStepClick(1, event.detail)}
+                    onLostPointerCapture={stopStepping}
+                    onPointerCancel={stopStepping}
+                    onPointerDown={(event) => {
+                        if (event.button !== 0) return;
+
+                        event.currentTarget.setPointerCapture(event.pointerId);
+                        startStepping(1);
+                    }}
+                    onPointerUp={stopStepping}
                 />
             </div>
-            <BaseButton
-                type="button"
-                className="octane-catalog-standard-spinner-button octane-catalog-standard-spinner-button-more"
-                aria-controls={quantityInputId}
-                aria-label={`${LocalizeText('catalog.bundlewidget.quantity')} +`}
-                disabled={quantity >= maxPurchaseSize}
-                onBlur={stopStepping}
-                onClick={(event) => finishStepClick(1, event.detail)}
-                onLostPointerCapture={stopStepping}
-                onPointerCancel={stopStepping}
-                onPointerDown={(event) => {
-                    if (event.button !== 0) return;
-
-                    event.currentTarget.setPointerCapture(event.pointerId);
-                    startStepping(1);
-                }}
-                onPointerUp={stopStepping}
-            />
-        </div>
+        </NativeTextTree>
     );
 };

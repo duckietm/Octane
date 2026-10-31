@@ -1,5 +1,6 @@
 import { Select as BaseSelect } from '@base-ui/react/select';
 import { CSSProperties, FC, ReactNode, RefObject, useRef, useState } from 'react';
+import { nativeTextChildren } from './native-text/nativeTextChildren';
 
 export interface ListSelectOption {
     value: string;
@@ -92,7 +93,7 @@ export const ListSelect: FC<ListSelectProps> = (props) => {
             }}
         >
             <BaseSelect.Trigger ref={triggerRef} aria-label={ariaLabel} className={triggerClassName}>
-                {renderTrigger ? renderTrigger(selected) : selected?.label}
+                {renderTrigger ? renderTrigger(selected) : nativeTextChildren(selected?.label, `${triggerClassName}|${disabled}`)}
             </BaseSelect.Trigger>
             <BaseSelect.Portal container={container}>
                 <BaseSelect.Positioner align={align} alignItemWithTrigger={false} className={positionerClassName} side={side} sideOffset={sideOffset}>
@@ -105,10 +106,15 @@ export const ListSelect: FC<ListSelectProps> = (props) => {
                                     className={itemClassName}
                                     disabled={option.disabled}
                                     label={textOf(option.label)}
+                                    render={(itemProps, state) => (
+                                        <div {...itemProps}>
+                                            <BaseSelect.ItemText>
+                                                {nativeTextChildren(option.label, `${state.highlighted}|${state.selected}|${state.disabled}`)}
+                                            </BaseSelect.ItemText>
+                                        </div>
+                                    )}
                                     value={option.value}
-                                >
-                                    <BaseSelect.ItemText>{option.label}</BaseSelect.ItemText>
-                                </BaseSelect.Item>
+                                />
                             ))}
                         </BaseSelect.List>
                     </BaseSelect.Popup>

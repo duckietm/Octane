@@ -2,6 +2,7 @@ import { GuideSessionFeedbackMessageComposer } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../api';
 import { Button, Column, Flex, Text } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 interface GuideToolUserFeedbackViewProps {
     userName: string;
@@ -14,38 +15,40 @@ export const GuideToolUserFeedbackView: FC<GuideToolUserFeedbackViewProps> = (pr
     const giveFeedback = (recommend: boolean) => SendMessageComposer(new GuideSessionFeedbackMessageComposer(recommend));
 
     return (
-        <div className="flex flex-col">
-            <Flex className="octane-card-panel p-2" gap={1} justifyContent="between">
-                <Column gap={0}>
-                    <Text bold className="octane-guide-tool__heading-2">{userName}</Text>
-                    <Text>{LocalizeText('guide.help.request.user.feedback.guide.desc')}</Text>
-                </Column>
-                <Button disabled={!onReport} variant="danger" onClick={() => onReport?.()}>
-                    {LocalizeText('guide.help.common.report.link')}
-                </Button>
-            </Flex>
-            <div className="flex flex-col gap-1">
-                <Text bold className="octane-guide-tool__heading-2">{LocalizeText('guide.help.request.user.feedback.closed.title')}</Text>
-                <Text>{LocalizeText('guide.help.request.user.feedback.closed.desc')}</Text>
-            </div>
-            {userName && userName.length > 0 && (
-                <>
-                    <hr className="octane-card-divider m-0 mt-auto" />
-                    <div className="flex flex-col">
-                        <Text bold center className="octane-guide-tool__heading-2">
-                            {LocalizeText('guide.help.request.user.feedback.question')}
-                        </Text>
-                        <div className="flex gap-1">
-                            <Button fullWidth variant="success" onClick={(event) => giveFeedback(true)}>
-                                {LocalizeText('guide.help.request.user.feedback.positive.button')}
-                            </Button>
-                            <Button fullWidth variant="danger" onClick={(event) => giveFeedback(false)}>
-                                {LocalizeText('guide.help.request.user.feedback.negative.button')}
-                            </Button>
+        <NativeTextTree>
+            <div className="flex flex-col">
+                <Flex className="octane-card-panel p-2" gap={1} justifyContent="between">
+                    <Column gap={0}>
+                        <Text bold className="octane-guide-tool__heading-2">{userName}</Text>
+                        <Text>{LocalizeText('guide.help.request.user.feedback.guide.desc')}</Text>
+                    </Column>
+                    <Button disabled={!onReport} variant="danger" onClick={() => onReport?.()}>
+                        {LocalizeText('guide.help.common.report.link')}
+                    </Button>
+                </Flex>
+                <div className="flex flex-col gap-1">
+                    <Text bold className="octane-guide-tool__heading-2">{LocalizeText('guide.help.request.user.feedback.closed.title')}</Text>
+                    <Text>{LocalizeText('guide.help.request.user.feedback.closed.desc')}</Text>
+                </div>
+                {userName && userName.length > 0 && (
+                    <>
+                        <hr className="octane-card-divider m-0 mt-auto" />
+                        <div className="flex flex-col">
+                            <Text bold center className="octane-guide-tool__heading-2">
+                                {LocalizeText('guide.help.request.user.feedback.question')}
+                            </Text>
+                            <div className="flex gap-1">
+                                <Button fullWidth variant="success" onClick={(event) => giveFeedback(true)}>
+                                    {LocalizeText('guide.help.request.user.feedback.positive.button')}
+                                </Button>
+                                <Button fullWidth variant="danger" onClick={(event) => giveFeedback(false)}>
+                                    {LocalizeText('guide.help.request.user.feedback.negative.button')}
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                </>
-            )}
-        </div>
+                    </>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

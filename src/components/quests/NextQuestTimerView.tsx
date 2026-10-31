@@ -12,6 +12,7 @@ import {
     SanitizeHtml
 } from '../../api';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useQuests } from '../../hooks';
 
 /**
@@ -54,29 +55,31 @@ export const NextQuestTimerView: FC<{}> = () => {
     const background = getQuestingImageUrl(expanded ? 'quest_timer_expanded' : 'quest_timer_contracted');
 
     return (
-        <div className="octane-next-quest-timer" data-expanded={expanded} data-missing-art={missingArt}>
-            <img alt="" className="octane-next-quest-timer-bg" draggable={false} src={background} onError={() => setMissingArt(true)} />
-            <BaseButton
-                aria-expanded={expanded}
-                aria-label={getNextQuestTimerCaption(expanded, time)}
-                className="octane-next-quest-timer-toggle"
-                onClick={() => setExpanded((value) => !value)}
-            />
-            <div className="octane-next-quest-timer-header">{getNextQuestTimerCaption(expanded, time)}</div>
-            {expanded && (
-                <>
-                    <img alt="" className="octane-next-quest-timer-pic" draggable={false} src={getQuestingImageUrl(QUEST_TIMER_IMAGE)} />
-                    <div
-                        className="octane-next-quest-timer-desc"
-                        dangerouslySetInnerHTML={{ __html: SanitizeHtml(getNextQuestTimerMessage(trackedQuest, time)) }}
-                    />
-                    {isInRoom && (
-                        <BaseButton className="octane-next-quest-timer-moreinfo" onClick={() => CreateLinkEvent('quests/details')}>
-                            {localizeWithFallback('quests.tracker.moreinfo', 'More info')}
-                        </BaseButton>
-                    )}
-                </>
-            )}
-        </div>
+        <NativeTextTree>
+            <div className="octane-next-quest-timer" data-expanded={expanded} data-missing-art={missingArt}>
+                <img alt="" className="octane-next-quest-timer-bg" draggable={false} src={background} onError={() => setMissingArt(true)} />
+                <BaseButton
+                    aria-expanded={expanded}
+                    aria-label={getNextQuestTimerCaption(expanded, time)}
+                    className="octane-next-quest-timer-toggle"
+                    onClick={() => setExpanded((value) => !value)}
+                />
+                <div className="octane-next-quest-timer-header">{getNextQuestTimerCaption(expanded, time)}</div>
+                {expanded && (
+                    <>
+                        <img alt="" className="octane-next-quest-timer-pic" draggable={false} src={getQuestingImageUrl(QUEST_TIMER_IMAGE)} />
+                        <div
+                            className="octane-next-quest-timer-desc"
+                            dangerouslySetInnerHTML={{ __html: SanitizeHtml(getNextQuestTimerMessage(trackedQuest, time)) }}
+                        />
+                        {isInRoom && (
+                            <BaseButton className="octane-next-quest-timer-moreinfo" onClick={() => CreateLinkEvent('quests/details')}>
+                                {localizeWithFallback('quests.tracker.moreinfo', 'More info')}
+                            </BaseButton>
+                        )}
+                    </>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

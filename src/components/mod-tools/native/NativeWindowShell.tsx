@@ -1,5 +1,6 @@
 import { FC, ReactNode, useCallback } from 'react';
 import { DraggableWindow } from '../../../common/draggable-window';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { ModWindowType, useModWindowTrackerStore } from '../../../hooks';
 
 interface NativeWindowShellProps {
@@ -19,8 +20,10 @@ export const NativeWindowShell: FC<NativeWindowShellProps> = ({ type, windowKey,
     const onPositionChange = useCallback((position: { x: number; y: number }) => move(type, windowKey, position.x, position.y), [move, type, windowKey]);
 
     return (
-        <DraggableWindow handleSelector=".native0-header" initialPosition={{ x, y }} onPositionChange={onPositionChange}>
-            {children}
-        </DraggableWindow>
+        <NativeTextTree>
+            <DraggableWindow handleSelector=".native0-header" initialPosition={{ x, y }} onPositionChange={onPositionChange}>
+                {children}
+            </DraggableWindow>
+        </NativeTextTree>
     );
 };

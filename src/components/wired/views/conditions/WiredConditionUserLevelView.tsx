@@ -6,6 +6,7 @@ import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MIN_LEVEL = 1;
 const MAX_LEVEL = 30;
@@ -43,31 +44,33 @@ export const WiredConditionUserLevelView: FC<{}> = () => {
     };
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            <div className="flex flex-col gap-2">
-                <WiredSliderSection
-                    max={MAX_LEVEL}
-                    min={MIN_LEVEL}
-                    title={localizeWithFallback('wiredfurni.params.level_selection', `Level: ${level}`, ['level'], [String(level)])}
-                    value={level}
-                    onChange={setLevel}
-                />
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                <div className="flex flex-col gap-2">
+                    <WiredSliderSection
+                        max={MAX_LEVEL}
+                        min={MIN_LEVEL}
+                        title={localizeWithFallback('wiredfurni.params.level_selection', `Level: ${level}`, ['level'], [String(level)])}
+                        value={level}
+                        onChange={setLevel}
+                    />
 
-                <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
-                    {COMPARISONS.map((value) => (
-                        <label key={value} className="flex items-center gap-1">
-                            <Radio checked={comparison === value} name="wiredUserLevelComparison" onCheckedChange={() => setComparison(value)} />
-                            <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
-                        </label>
-                    ))}
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
+                        {COMPARISONS.map((value) => (
+                            <label key={value} className="flex items-center gap-1">
+                                <Radio checked={comparison === value} name="wiredUserLevelComparison" onCheckedChange={() => setComparison(value)} />
+                                <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
+                            </label>
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </WiredConditionBaseView>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

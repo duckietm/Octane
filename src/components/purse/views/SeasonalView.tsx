@@ -2,6 +2,7 @@ import { CreateLinkEvent } from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
 import { GetConfigurationValue, GetOptionalConfigurationValue, localizeWithFallback } from '../../../api';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 interface SeasonalViewProps {
     type: number;
@@ -68,21 +69,23 @@ export const SeasonalView: FC<SeasonalViewProps> = (props) => {
     const amountText = isZero ? localizeWithFallback('purse.snowflakes.zero.amount.text', 'Info') : String(shownAmount);
 
     return (
-        <BaseButton
-            className="octane-purse-seasonal-currency"
-            type="button"
-            onClick={() => {
-                if (catalogPage) CreateLinkEvent(`catalog/open/${catalogPage}`);
-            }}
-        >
-            <span className="seasonal-text">{currencyName(type)}</span>
-            <span className={`seasonal-amount${isZero ? ' is-zero' : ''}`}>{amountText}</span>
-            <span className="octane-seasonal-box">{iconUrl && <img src={iconUrl} alt="" className="seasonal-image" />}</span>
-            {change && (
-                <span key={change.key} className="seasonal-change" aria-hidden="true">
-                    {change.text}
-                </span>
-            )}
-        </BaseButton>
+        <NativeTextTree>
+            <BaseButton
+                className="octane-purse-seasonal-currency"
+                type="button"
+                onClick={() => {
+                    if (catalogPage) CreateLinkEvent(`catalog/open/${catalogPage}`);
+                }}
+            >
+                <span className="seasonal-text">{currencyName(type)}</span>
+                <span className={`seasonal-amount${isZero ? ' is-zero' : ''}`}>{amountText}</span>
+                <span className="octane-seasonal-box">{iconUrl && <img src={iconUrl} alt="" className="seasonal-image" />}</span>
+                {change && (
+                    <span key={change.key} className="seasonal-change" aria-hidden="true">
+                        {change.text}
+                    </span>
+                )}
+            </BaseButton>
+        </NativeTextTree>
     );
 };

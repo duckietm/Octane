@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { CalendarItemState, getCalendarRewardImageUrl, ICalendarItem } from '../../api';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface CalendarItemViewProps {
     itemId: number;
@@ -23,13 +24,15 @@ export const CalendarItemView: FC<CalendarItemViewProps> = (props) => {
     const iconUrl = getCalendarRewardImageUrl(product);
 
     return (
-        <div className={`octane-calendar-day${active ? ' is-active' : ''}`} data-state={state}>
-            <BaseButton aria-label={`day ${itemId + 1}`} className="octane-calendar-day__present" onClick={() => onClick(itemId)}>
-                <span className={`octane-calendar-day__bg${opened ? ' is-opened' : ''}${wiggle ? ' is-wiggling' : ''}`} />
-                {opened && <span className="octane-calendar-day__opened" />}
-                {opened && iconUrl && <img alt="" className="octane-calendar-day__icon" draggable={false} src={iconUrl} />}
-            </BaseButton>
-            {locked && <span className="octane-calendar-day__lock" />}
-        </div>
+        <NativeTextTree>
+            <div className={`octane-calendar-day${active ? ' is-active' : ''}`} data-state={state}>
+                <BaseButton aria-label={`day ${itemId + 1}`} className="octane-calendar-day__present" onClick={() => onClick(itemId)}>
+                    <span className={`octane-calendar-day__bg${opened ? ' is-opened' : ''}${wiggle ? ' is-wiggling' : ''}`} />
+                    {opened && <span className="octane-calendar-day__opened" />}
+                    {opened && iconUrl && <img alt="" className="octane-calendar-day__icon" draggable={false} src={iconUrl} />}
+                </BaseButton>
+                {locked && <span className="octane-calendar-day__lock" />}
+            </div>
+        </NativeTextTree>
     );
 };

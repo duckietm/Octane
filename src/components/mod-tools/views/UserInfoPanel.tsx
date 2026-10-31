@@ -5,6 +5,7 @@ import { useMessageEvent, useRoomUserListSnapshot } from '../../../hooks';
 import userInfoXml from '../../../assets/mod-tools/xml/user_info.xml?raw';
 import { findNativeNode, nativeCaption, nativeNumber, NativeNode, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Border, Native0Button, Native0Text } from '../native/NativeWindow0';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SHADE = 0xa2d6ea;
@@ -73,52 +74,54 @@ export const UserInfoPanel: FC<UserInfoPanelProps> = ({ userId, settings, onOpen
     );
 
     return (
-            <Native0Border {...box} x={0} y={0}>
-                {!data && <Native0Text background={0xffffff} bold text={nativeCaption(findNativeNode(frame, 'loading_txt'))} width={70} x={120} y={45} />}
-                {data && (
-                    <div style={{ position: 'absolute', left: fieldsAt.x, top: fieldsAt.y, width: fieldsAt.width, height: fieldsAt.height, overflow: 'hidden' }}>
-                        {[0, 26, 52, 78, 104, 130, 156, 182].map((top) => (
-                            <div key={top} style={{ position: 'absolute', left: 0, top, width: 187, height: 13, backgroundColor: `#${SHADE.toString(16)}` }} />
-                        ))}
-                        {fields.children
-                            .filter((node) => node.tag === 'text' && !node.attrs.name)
-                            .map((node, index) => (
-                                <Native0Text key={index} text={text(node)} width={rectOf(node).width} x={rectOf(node).x} y={rectOf(node).y} />
+        <NativeTextTree>
+                <Native0Border {...box} x={0} y={0}>
+                    {!data && <Native0Text background={0xffffff} bold text={nativeCaption(findNativeNode(frame, 'loading_txt'))} width={70} x={120} y={45} />}
+                    {data && (
+                        <div style={{ position: 'absolute', left: fieldsAt.x, top: fieldsAt.y, width: fieldsAt.width, height: fieldsAt.height, overflow: 'hidden' }}>
+                            {[0, 26, 52, 78, 104, 130, 156, 182].map((top) => (
+                                <div key={top} style={{ position: 'absolute', left: 0, top, width: 187, height: 13, backgroundColor: `#${SHADE.toString(16)}` }} />
                             ))}
-                        <Native0Text text={data.userName} width={at('name_txt').width} x={at('name_txt').x} y={at('name_txt').y} />
-                        <Native0Text text={formatTime(data.registrationAgeInMinutes * 60)} width={at('registered_txt').width} x={at('registered_txt').x} y={at('registered_txt').y} />
-                        {countRow('cfh_count_txt', data.cfhCount)}
-                        {countRow('abusive_cfh_count_txt', data.abusiveCfhCount)}
-                        {countRow('caution_count_txt', data.cautionCount, 'view_caution_count_txt', () => OpenModeratorActionLog(data.userName), 0xffffff)}
-                        {countRow('ban_count_txt', data.banCount, 'view_ban_count_txt', () => OpenModeratorActionLog(data.userName))}
-                        <Native0Text color={sanctionColor} text={data.lastSanctionTime} width={at('last_sanction_time_txt').width} x={at('last_sanction_time_txt').x} y={at('last_sanction_time_txt').y} />
-                        {countRow('trading_lock_count_txt', data.tradingLockCount, 'view_trading_lock_count_txt', () => OpenModeratorActionLog(data.userName))}
-                        <Native0Text text={data.tradingExpiryDate || caption('trading_lock_expiry_txt')} width={at('trading_lock_expiry_txt').width} x={at('trading_lock_expiry_txt').x} y={at('trading_lock_expiry_txt').y} />
-                        <Native0Text text={formatTime(data.minutesSinceLastLogin * 60)} width={at('last_login_txt').width} x={at('last_login_txt').x} y={at('last_login_txt').y} />
-                        <Native0Text text={roomUser ? 'Yes (in room)' : data.online ? 'Yes' : 'No'} width={at('online_txt').width + 30} x={at('online_txt').x} y={at('online_txt').y} />
-                        <Native0Text text={data.lastPurchaseDate || 'No purchases'} width={at('last_purchase_txt').width} x={at('last_purchase_txt').x} y={at('last_purchase_txt').y} />
-                        <Native0Text text={data.primaryEmailAddress || 'No email found'} width={at('email_address_txt').width} x={at('email_address_txt').x} y={at('email_address_txt').y} />
-                        <Native0Text text={`${data.identityRelatedBanCount}`} width={at('id_bans_txt').width} x={at('id_bans_txt').x} y={at('id_bans_txt').y} />
-                        <Native0Text background={SHADE} bold text="view" underline width={30} height={13} x={at('view_id_bans_txt').x} y={at('view_id_bans_txt').y} onClick={() => OpenIdentityInformation(data.identityId)} />
-                        <Native0Text text={data.userClassification || '-'} width={at('user_class_txt').width} x={at('user_class_txt').x} y={at('user_class_txt').y} />
-                        <div style={{ position: 'absolute', left: rectOf(buttons).x, top: rectOf(buttons).y, width: rectOf(buttons).width, height: rectOf(buttons).height }}>
-                            <Native0Button enabled={settings.chatlogsPermission} height={21} label={text(findNativeNode(buttons, 'chatlog_but'))} width={80} x={button('chatlog_but').x} y={button('chatlog_but').y} onClick={onOpenChatlog} />
-                            <Native0Button enabled={canMessage} height={21} label={text(findNativeNode(buttons, 'message_but'))} width={80} x={button('message_but').x} y={button('message_but').y} onClick={() => onOpenSendMessage(data.userName)} />
-                            <Native0Button height={21} label={text(findNativeNode(buttons, 'roomvisits_but'))} width={80} x={button('roomvisits_but').x} y={button('roomvisits_but').y} onClick={onOpenRoomVisits} />
-                            <Native0Button
-                                height={21}
-                                label={text(findNativeNode(buttons, 'habboinfotool_but'))}
-                                width={80}
-                                x={button('habboinfotool_but').x}
-                                y={button('habboinfotool_but').y}
-                                onClick={() => OpenModeratorTool('habboinfotool.url', data.userName)}
-                            />
-                            <Native0Button enabled={canModAction} height={21} label={text(findNativeNode(buttons, 'modaction_but'))} width={80} x={button('modaction_but').x} y={button('modaction_but').y} onClick={() => onOpenModAction(data.userName)} />
-                            <Native0Button height={21} label={localizeWithFallback('modtools.native.refresh', 'Refresh')} width={80} x={button('modaction_but').x} y={button('modaction_but').y + 22} onClick={refresh} />
+                            {fields.children
+                                .filter((node) => node.tag === 'text' && !node.attrs.name)
+                                .map((node, index) => (
+                                    <Native0Text key={index} text={text(node)} width={rectOf(node).width} x={rectOf(node).x} y={rectOf(node).y} />
+                                ))}
+                            <Native0Text text={data.userName} width={at('name_txt').width} x={at('name_txt').x} y={at('name_txt').y} />
+                            <Native0Text text={formatTime(data.registrationAgeInMinutes * 60)} width={at('registered_txt').width} x={at('registered_txt').x} y={at('registered_txt').y} />
+                            {countRow('cfh_count_txt', data.cfhCount)}
+                            {countRow('abusive_cfh_count_txt', data.abusiveCfhCount)}
+                            {countRow('caution_count_txt', data.cautionCount, 'view_caution_count_txt', () => OpenModeratorActionLog(data.userName), 0xffffff)}
+                            {countRow('ban_count_txt', data.banCount, 'view_ban_count_txt', () => OpenModeratorActionLog(data.userName))}
+                            <Native0Text color={sanctionColor} text={data.lastSanctionTime} width={at('last_sanction_time_txt').width} x={at('last_sanction_time_txt').x} y={at('last_sanction_time_txt').y} />
+                            {countRow('trading_lock_count_txt', data.tradingLockCount, 'view_trading_lock_count_txt', () => OpenModeratorActionLog(data.userName))}
+                            <Native0Text text={data.tradingExpiryDate || caption('trading_lock_expiry_txt')} width={at('trading_lock_expiry_txt').width} x={at('trading_lock_expiry_txt').x} y={at('trading_lock_expiry_txt').y} />
+                            <Native0Text text={formatTime(data.minutesSinceLastLogin * 60)} width={at('last_login_txt').width} x={at('last_login_txt').x} y={at('last_login_txt').y} />
+                            <Native0Text text={roomUser ? 'Yes (in room)' : data.online ? 'Yes' : 'No'} width={at('online_txt').width + 30} x={at('online_txt').x} y={at('online_txt').y} />
+                            <Native0Text text={data.lastPurchaseDate || 'No purchases'} width={at('last_purchase_txt').width} x={at('last_purchase_txt').x} y={at('last_purchase_txt').y} />
+                            <Native0Text text={data.primaryEmailAddress || 'No email found'} width={at('email_address_txt').width} x={at('email_address_txt').x} y={at('email_address_txt').y} />
+                            <Native0Text text={`${data.identityRelatedBanCount}`} width={at('id_bans_txt').width} x={at('id_bans_txt').x} y={at('id_bans_txt').y} />
+                            <Native0Text background={SHADE} bold text="view" underline width={30} height={13} x={at('view_id_bans_txt').x} y={at('view_id_bans_txt').y} onClick={() => OpenIdentityInformation(data.identityId)} />
+                            <Native0Text text={data.userClassification || '-'} width={at('user_class_txt').width} x={at('user_class_txt').x} y={at('user_class_txt').y} />
+                            <div style={{ position: 'absolute', left: rectOf(buttons).x, top: rectOf(buttons).y, width: rectOf(buttons).width, height: rectOf(buttons).height }}>
+                                <Native0Button enabled={settings.chatlogsPermission} height={21} label={text(findNativeNode(buttons, 'chatlog_but'))} width={80} x={button('chatlog_but').x} y={button('chatlog_but').y} onClick={onOpenChatlog} />
+                                <Native0Button enabled={canMessage} height={21} label={text(findNativeNode(buttons, 'message_but'))} width={80} x={button('message_but').x} y={button('message_but').y} onClick={() => onOpenSendMessage(data.userName)} />
+                                <Native0Button height={21} label={text(findNativeNode(buttons, 'roomvisits_but'))} width={80} x={button('roomvisits_but').x} y={button('roomvisits_but').y} onClick={onOpenRoomVisits} />
+                                <Native0Button
+                                    height={21}
+                                    label={text(findNativeNode(buttons, 'habboinfotool_but'))}
+                                    width={80}
+                                    x={button('habboinfotool_but').x}
+                                    y={button('habboinfotool_but').y}
+                                    onClick={() => OpenModeratorTool('habboinfotool.url', data.userName)}
+                                />
+                                <Native0Button enabled={canModAction} height={21} label={text(findNativeNode(buttons, 'modaction_but'))} width={80} x={button('modaction_but').x} y={button('modaction_but').y} onClick={() => onOpenModAction(data.userName)} />
+                                <Native0Button height={21} label={localizeWithFallback('modtools.native.refresh', 'Refresh')} width={80} x={button('modaction_but').x} y={button('modaction_but').y + 22} onClick={refresh} />
+                            </div>
                         </div>
-                    </div>
-                )}
-            </Native0Border>
+                    )}
+                </Native0Border>
+        </NativeTextTree>
     );
 };
 

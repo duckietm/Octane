@@ -108,6 +108,7 @@ import {
 } from './WiredCreatorTools.constants';
 import {
     buildMonitorLogs,
+    clampWiredVariableValue,
     exceedsVariableHighlightLimit,
     formatMonitorHistoryOccurrence,
     formatMonitorSource,
@@ -116,6 +117,7 @@ import {
     getHotelTimeFormatter,
     isStackOnlyVariable,
     normalizeMonitorReason,
+    parseWiredVariableValue,
     resolveMonitorErrorDescription,
     resolveMonitorRoomCounters,
     splitMonitorStatLine,
@@ -164,6 +166,7 @@ import { useWiredCreatorToolsUiStore } from './wiredCreatorToolsUiStore';
 import { Select } from '../../common/Select';
 import { BaseButton } from '../../common/BaseButton';
 import { isDerivedVariableItemId } from '../wired/views/WiredVariablePickerData';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const WIRED_FURNI_GRAVITY_MODEL_KEY = 'wired_furni_gravity';
 /** Our variable types as the official idtype (0 made with a box, 1 internal). */
@@ -2352,7 +2355,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         if (variablesType === 'context') return;
 
         const parsedValue = Number(editingManagedHolderValue.trim());
-        const nextValue = Number.isFinite(parsedValue) ? Math.trunc(parsedValue) : 0;
+        const nextValue = clampWiredVariableValue(parsedValue);
 
         switch (variablesType) {
             case 'user':
@@ -2382,7 +2385,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         if (variablesType === 'global' || variablesType === 'context') return;
 
         const parsedValue = Number(managedGiveValue.trim());
-        const nextValue = Number.isFinite(parsedValue) ? Math.trunc(parsedValue) : 0;
+        const nextValue = clampWiredVariableValue(parsedValue);
 
         if (variablesType === 'user') assignUserVariable(selectedManagedVariableEntry.entityId, selectedManagedGiveDefinition.itemId, nextValue);
         else assignFurniVariable(selectedManagedVariableEntry.entityId, selectedManagedGiveDefinition.itemId, nextValue);
@@ -2474,7 +2477,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 return;
             }
 
-            const parsed = parseInt(editingValue.trim(), 10);
+            const parsed = parseWiredVariableValue(editingValue);
 
             if (Number.isNaN(parsed)) {
                 cancelVariableEdit();
@@ -2499,7 +2502,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             const customDefinition = selectedUserCustomVariableDefinitionMap.get(editingVariable);
 
             if (customDefinition?.hasValue && !customDefinition.isReadOnly) {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     cancelVariableEdit();
@@ -2539,7 +2542,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
             switch (editingVariable) {
                 case '@position_x': {
-                    const parsed = parseInt(editingValue.trim(), 10);
+                    const parsed = parseWiredVariableValue(editingValue);
 
                     if (Number.isNaN(parsed)) {
                         isValid = false;
@@ -2550,7 +2553,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     break;
                 }
                 case '@position_y': {
-                    const parsed = parseInt(editingValue.trim(), 10);
+                    const parsed = parseWiredVariableValue(editingValue);
 
                     if (Number.isNaN(parsed)) {
                         isValid = false;
@@ -2561,7 +2564,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     break;
                 }
                 case '@direction': {
-                    const parsed = parseInt(editingValue.trim(), 10);
+                    const parsed = parseWiredVariableValue(editingValue);
 
                     if (Number.isNaN(parsed)) {
                         isValid = false;
@@ -2622,7 +2625,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         const customFurniDefinition = selectedFurniCustomVariableDefinitionMap.get(editingVariable);
 
         if (customFurniDefinition?.hasValue && !customFurniDefinition.isReadOnly) {
-            const parsed = parseInt(editingValue.trim(), 10);
+            const parsed = parseWiredVariableValue(editingValue);
 
             if (Number.isNaN(parsed)) {
                 cancelVariableEdit();
@@ -2659,7 +2662,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         }
 
         if (editingVariable === '@gravity') {
-            const parsed = parseInt(editingValue.trim(), 10);
+            const parsed = parseWiredVariableValue(editingValue);
             if (!selectedFurni || !roomSession || (parsed !== 0 && parsed !== 1)) {
                 cancelVariableEdit();
                 return;
@@ -2697,7 +2700,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         switch (editingVariable) {
             case '@position_x': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2708,7 +2711,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@position_y': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2719,7 +2722,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@rotation': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2730,7 +2733,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@altitude': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2741,7 +2744,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@state': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2752,7 +2755,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@opacity': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2763,7 +2766,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@gravity': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2995,7 +2998,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         if (!canManageInspectionVariableAssignments || !selectedInspectionGiveDefinition) return;
 
         const parsedValue = Number(inspectionGiveValue.trim());
-        const nextValue = Number.isFinite(parsedValue) ? parsedValue : 0;
+        const nextValue = clampWiredVariableValue(parsedValue);
 
         if (inspectionType === 'user' && selectedUser) {
             assignUserVariable(selectedUserHolderKey, selectedInspectionGiveDefinition.itemId, nextValue);
@@ -3147,371 +3150,373 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     if (!isVisible) return null;
 
     return (
-        <>
-            {isVariableHighlightActive && !!variableHighlightOverlays.length && (
-                <div className="pointer-events-none absolute left-0 top-0 z-30">
-                    {variableHighlightOverlays.map((overlay) => (
-                        <div
-                            key={overlay.key}
-                            className="pointer-events-none absolute"
-                            style={{
-                                left: overlay.x,
-                                top: overlay.y,
-                                transform: 'translateX(-50%)'
-                            }}
-                        >
-                            {overlay.hasValue && (
-                                <div className="absolute left-1/2 top-[-30px] -translate-x-1/2">
-                                    <div className="relative min-w-[24px] rounded-[8px] bg-[#86aebccc] px-[8px] py-[4px] text-center text-[12px] font-bold leading-none text-white shadow-[inset_0_0_0_1px_rgba(176,211,225,.7)]">
-                                        {overlay.value ?? 0}
-                                        <span className="absolute left-1/2 bottom-[-7px] z-10 h-0 w-0 -translate-x-1/2 border-x-[6px] border-t-[7px] border-x-transparent border-t-[#86aebccc]" />
+        <NativeTextTree>
+            <>
+                {isVariableHighlightActive && !!variableHighlightOverlays.length && (
+                    <div className="pointer-events-none absolute left-0 top-0 z-30">
+                        {variableHighlightOverlays.map((overlay) => (
+                            <div
+                                key={overlay.key}
+                                className="pointer-events-none absolute"
+                                style={{
+                                    left: overlay.x,
+                                    top: overlay.y,
+                                    transform: 'translateX(-50%)'
+                                }}
+                            >
+                                {overlay.hasValue && (
+                                    <div className="absolute left-1/2 top-[-30px] -translate-x-1/2">
+                                        <div className="relative min-w-[24px] rounded-[8px] bg-[#86aebccc] px-[8px] py-[4px] text-center text-[12px] font-bold leading-none text-white shadow-[inset_0_0_0_1px_rgba(176,211,225,.7)]">
+                                            {overlay.value ?? 0}
+                                            <span className="absolute left-1/2 bottom-[-7px] z-10 h-0 w-0 -translate-x-1/2 border-x-[6px] border-t-[7px] border-x-transparent border-t-[#86aebccc]" />
+                                        </div>
                                     </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+                <OctaneCardView
+                    className="octane-wired-menu min-w-[520px] max-w-[520px]"
+                    theme="primary-slim"
+                    uniqueKey="wired-creator-tools"
+                    windowPosition={DraggableWindowPosition.TOP_LEFT}
+                >
+                    <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.title', 'Wired Creator Tools (:wired)')} onCloseClick={() => setIsVisible(false)} />
+                    <OctaneCardTabsView justifyContent="start">
+                        {TABS.map((tab) => (
+                            <OctaneCardTabsItemView key={tab.key} isActive={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>
+                                <Text>{localizeWithFallback(wiredMenuTabKey(tab.key), tab.label)}</Text>
+                            </OctaneCardTabsItemView>
+                        ))}
+                    </OctaneCardTabsView>
+                    <OctaneCardContentView className="text-black bg-[#e9e6d9]" gap={3}>
+                        {activeTab === 'monitor' && (
+                            <WiredMonitorTabView
+                                monitorStats={monitorStats}
+                                monitorLogs={monitorLogs}
+                                monitorHistoryRows={monitorHistoryRows}
+                                onOpenMonitorInfo={() => setIsMonitorInfoOpen(true)}
+                                onOpenMonitorHistory={() => setIsMonitorHistoryOpen(true)}
+                                onOpenRoomLogs={() => setIsRoomLogsOpen(true)}
+                                isClearCoolingDown={isMonitorClearCoolingDown}
+                                canClearLogs={!!roomSettings.canModify}
+                                onClearMonitorLogs={clearMonitorLogs}
+                                onOpenMonitorLogDetails={openMonitorLogDetails}
+                            />
+                        )}
+                        {activeTab === 'inspection' && (
+                            <WiredInspectionTabView
+                                selectedFurni={selectedFurni}
+                                selectedUser={selectedUser}
+                                roomId={roomSession?.roomId ?? null}
+                                previewRevision={furniInternalRevision}
+                                previewPlaceholder={previewPlaceholder}
+                                keepSelected={keepSelected}
+                                onKeepSelectedChange={setKeepSelected}
+                                displayedVariables={displayedVariables}
+                                selectedInspectionVariableKey={selectedInspectionVariableKey}
+                                onSelectInspectionVariable={(variable) => {
+                                    setSelectedInspectionVariableKeys((prev) => ({ ...prev, [inspectionType]: variable.key }));
+                                    beginVariableEdit(variable);
+                                }}
+                                onCancelVariableEdit={cancelVariableEdit}
+                                onVariableInputKeyDown={onVariableInputKeyDown}
+                                onBeginVariableEdit={(variable) => {
+                                    setSelectedInspectionVariableKeys((prev) => ({ ...prev, [inspectionType]: variable.key }));
+                                    beginVariableEdit(variable);
+                                }}
+                                selectedInspectionGiveDefinition={selectedInspectionGiveDefinition}
+                                onSelectGiveVariable={setInspectionGiveVariableItemId}
+                                availableInspectionDefinitions={availableInspectionDefinitions}
+                                inspectionGiveValue={inspectionGiveValue}
+                                onInspectionGiveValueChange={setInspectionGiveValue}
+                                canGiveInspectionVariable={canGiveInspectionVariable}
+                                onGiveInspectionVariable={() => giveInspectionVariable()}
+                                canRemoveInspectionVariable={canRemoveInspectionVariable}
+                                onRemoveInspectionVariable={() => removeInspectionVariable()}
+                                canHighlightWireds={canHighlightConfiguredWireds}
+                                isHighlightingWireds={isHighlightingConfiguredWireds && canHighlightConfiguredWireds}
+                                onToggleHighlightWireds={() => setIsHighlightingConfiguredWireds((value) => !value)}
+                            />
+                        )}
+                        {activeTab === 'variables' && (
+                            <WiredVariablesTabView
+                                variablePickerDefinitions={variablePickerDefinitions}
+                                selectedVariableDefinition={selectedVariableDefinition}
+                                onPickVariable={(key) => setSelectedVariableKeys((prev) => ({ ...prev, [variablesType]: key }))}
+                                canVariableHighlight={canVariableHighlight}
+                                variableManageCanOpen={variableManageCanOpen}
+                                canVariableClear={canVariableClear}
+                                onClearVariable={confirmClearVariable}
+                                onOpenManagePanel={() => {
+                                    requestUserVariables();
+                                    setSelectedManagedVariableEntry(null);
+                                    setIsVariableManageOpen(true);
+                                }}
+                                arrayInspectorCanOpen={!!selectedVariableDefinition?.itemId}
+                                onOpenArrayInspector={() => setIsArrayInspectorOpen(true)}
+                                selectedVariableProperties={selectedVariableProperties}
+                                selectedVariableTextValues={selectedVariableTextValues}
+                                onOpenWebApiExplorer={() => openVariablesExplorer({ roomId: roomSession?.roomId })}
+                            />
+                        )}
+                        {activeTab === 'settings' && <WiredToolsSettingsTabView onOpenSelfDonation={() => setIsSelfDonationOpen(true)} />}
+                        {activeTab === 'chests' && <WiredChestsTabView />}
+                        {activeTab === 'share' && <WiredShareTabView />}
+                    </OctaneCardContentView>
+                </OctaneCardView>
+                {isMonitorHistoryOpen && (
+                    <OctaneCardView
+                        className="octane-wired-menu min-w-[760px] max-w-[760px] max-h-[520px]"
+                        theme="primary-slim"
+                        uniqueKey="wired-monitor-history"
+                        windowPosition={DraggableWindowPosition.TOP_LEFT}
+                        offsetLeft={560}
+                        offsetTop={40}
+                    >
+                        <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.monitor.history.title', 'Wired Monitor Logs')} onCloseClick={() => setIsMonitorHistoryOpen(false)} />
+                        <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
+                            <div className="flex flex-wrap items-center gap-2 text-[12px]">
+                                <span className="text-[#555]">Severity:</span>
+                                {['ALL', 'WARNING', 'ERROR'].map((severity) => (
+                                    <BaseButton
+                                        key={severity}
+                                        className={`rounded border px-2 py-[2px] ${monitorHistorySeverityFilter === severity ? 'border-[#4d7892] bg-[#dbeaf4] text-[#1a4d68]' : 'border-[#b8b2a4] bg-white text-[#555]'}`}
+                                        type="button"
+                                        onClick={() => setMonitorHistorySeverityFilter(severity as 'ALL' | 'ERROR' | 'WARNING')}
+                                    >
+                                        {severity}
+                                    </BaseButton>
+                                ))}
+                                <span className="ml-2 text-[#555]">Type:</span>
+                                <Select
+                                    className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
+                                    value={monitorHistoryTypeFilter}
+                                    onChange={(event) => setMonitorHistoryTypeFilter(event.target.value)}
+                                >
+                                    {monitorHistoryTypeOptions.map((type) => (
+                                        <option key={type} value={type}>
+                                            {type}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </div>
+                            <div className="grow overflow-y-auto border border-[#d1ccbf] rounded bg-white">
+                                <table className="w-full text-[12px]">
+                                    <thead className="bg-[#efede5] sticky top-0">
+                                        <tr>
+                                            <th className="text-left px-2 py-1">Type</th>
+                                            <th className="text-left px-2 py-1">Severity</th>
+                                            <th className="text-left px-2 py-1">Trigger</th>
+                                            <th className="text-left px-2 py-1">Motivation</th>
+                                            <th className="text-left px-2 py-1">Occurred at</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {!filteredMonitorHistoryRows.length && (
+                                            <tr>
+                                                <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={5}>
+                                                    No log history for the current filters
+                                                </td>
+                                            </tr>
+                                        )}
+                                        {filteredMonitorHistoryRows.map((row, index) => (
+                                            <tr
+                                                key={row.id}
+                                                className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#f8f6f0]'} cursor-pointer hover:bg-[#e8eefc]`}
+                                                onClick={() =>
+                                                    openMonitorLogDetails(row.type, {
+                                                        severity: row.category,
+                                                        occurredAt: row.occurredAt,
+                                                        reason: row.reason,
+                                                        sourceLabel: row.sourceLabel,
+                                                        sourceId: row.sourceId
+                                                    })
+                                                }
+                                            >
+                                                <td className="px-2 py-1 text-[#1b57b2]">{row.type}</td>
+                                                <td className="px-2 py-1">{row.category}</td>
+                                                <td className="px-2 py-1">{formatMonitorSource(row.sourceLabel, row.sourceId)}</td>
+                                                <td className="px-2 py-1 text-[#555]">{row.reason}</td>
+                                                <td className="px-2 py-1">{row.occurredAt}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </OctaneCardContentView>
+                    </OctaneCardView>
+                )}
+                {isMonitorInfoOpen && (
+                    <OctaneCardView
+                        className="octane-wired-menu min-w-[560px] max-w-[560px] max-h-[520px]"
+                        theme="primary-slim"
+                        uniqueKey="wired-monitor-info"
+                        windowPosition={DraggableWindowPosition.TOP_LEFT}
+                        offsetLeft={610}
+                        offsetTop={80}
+                    >
+                        <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.monitor.info.title', 'Wired Monitor Information')} onCloseClick={() => setIsMonitorInfoOpen(false)} />
+                        <OctaneCardContentView className="text-black bg-[#f4efe3] p-4 flex flex-col gap-4 overflow-y-auto">
+                            {monitorInfoSections.map((section) => (
+                                <div key={section.title} className="flex flex-col gap-1">
+                                    <Text bold>{section.title}</Text>
+                                    {section.lines.map((line, index) => (
+                                        <Text key={`${section.title}-${index}`}>{line}</Text>
+                                    ))}
+                                </div>
+                            ))}
+                        </OctaneCardContentView>
+                    </OctaneCardView>
+                )}
+                {isVariableManageOpen && !!selectedVariableDefinition?.itemId && variablesType !== 'context' && (
+                    <WiredVariableOwnersView
+                        variableId={selectedVariableDefinition.variableId}
+                        variableName={selectedVariableDefinition.key}
+                        variablesType={variablesType}
+                        hasValue={!!selectedVariableDefinition.hasValue}
+                        describeHolder={describeVariableHolder}
+                        onManage={setSelectedManagedVariableEntry}
+                        onClose={() => setIsVariableManageOpen(false)}
+                    />
+                )}
+                {isArrayInspectorOpen && !!selectedVariableDefinition?.itemId && (
+                    <WiredArrayInspectorView
+                        definitionItemId={selectedVariableDefinition.itemId}
+                        variableName={selectedVariableDefinition.key}
+                        variableType={wiredArrayVariableTypeOf(variablesType)}
+                        onClose={() => setIsArrayInspectorOpen(false)}
+                    />
+                )}
+                {isRoomLogsOpen && <WiredRoomLogsView onClose={() => setIsRoomLogsOpen(false)} />}
+                {isSelfDonationOpen && <WiredSelfDonationView onClose={() => setIsSelfDonationOpen(false)} />}
+                {!!selectedManagedVariableEntry && !!selectedVariableDefinition && (
+                    <WiredVariableHolderPanelView
+                        title={managedHolderPanelTitle}
+                        warningText={managedHolderWarningText}
+                        onRefresh={() => requestUserVariables()}
+                        onClose={() => setSelectedManagedVariableEntry(null)}
+                        preview={
+                            <>
+                                {variablesType === 'furni' && roomSession && (
+                                    <LayoutRoomObjectImageView
+                                        category={managedHolderFurniCategory}
+                                        objectId={selectedManagedVariableEntry.entityId}
+                                        roomId={roomSession.roomId}
+                                    />
+                                )}
+                                {variablesType === 'user' && managedHolderUserData && (
+                                    <>
+                                        {managedHolderUserData.type === RoomObjectType.PET ? (
+                                            <LayoutPetImageView direction={2} figure={managedHolderUserData.figure} />
+                                        ) : (
+                                            <LayoutAvatarImageView direction={2} figure={managedHolderUserData.figure} />
+                                        )}
+                                    </>
+                                )}
+                                {variablesType === 'global' && (
+                                    <img alt="Global placeholder" className="max-w-full max-h-full object-contain p-3" src={wiredGlobalPlaceholderImage} />
+                                )}
+                            </>
+                        }
+                        infoLines={managedHolderInfoLines}
+                        variablesTitle={variablesType === 'global' ? 'Room variables:' : 'Assigned variables:'}
+                        entries={managedHolderVariableEntries.map((entry) => ({
+                            id: String(entry.variableItemId),
+                            name: entry.name,
+                            availability: entry.availability,
+                            hasValue: entry.hasValue,
+                            value: entry.value,
+                            isReadOnly: entry.isReadOnly
+                        }))}
+                        selectedId={selectedManagedHolderVariableEntry ? String(selectedManagedHolderVariableEntry.variableItemId) : null}
+                        onSelect={(id) => setSelectedManagedHolderVariableId(Number(id))}
+                        canEdit={roomSettings.canModify}
+                        editingId={editingManagedHolderVariableId ? String(editingManagedHolderVariableId) : null}
+                        editingValue={editingManagedHolderValue}
+                        onBeginEdit={(entry) => {
+                            setSelectedManagedHolderVariableId(Number(entry.id));
+                            setEditingManagedHolderVariableId(Number(entry.id));
+                            setEditingManagedHolderValue(String(entry.value ?? 0));
+                        }}
+                        onEditingValueChange={setEditingManagedHolderValue}
+                        onEditBlur={() => setEditingManagedHolderVariableId(0)}
+                        onEditKeyDown={onManagedHolderValueInputKeyDown}
+                        isGiveOpen={isManagedGiveOpen}
+                        onToggleGive={() => setIsManagedGiveOpen((value) => !value)}
+                        giveOptions={availableManagedHolderDefinitions.map((definition) => ({
+                            id: String(definition.itemId),
+                            name: definition.name,
+                            hasValue: !!definition.hasValue
+                        }))}
+                        giveSelectedId={selectedManagedGiveDefinition ? String(selectedManagedGiveDefinition.itemId) : ''}
+                        onGiveSelect={(id) => setManagedGiveVariableItemId(Number(id))}
+                        giveValue={managedGiveValue}
+                        onGiveValueChange={setManagedGiveValue}
+                        canGive={canGiveManagedHolderVariable}
+                        onGive={() => giveManagedHolderVariable()}
+                        canRemove={canRemoveManagedHolderVariable}
+                        onRemove={() => removeManagedHolderVariable()}
+                    />
+                )}
+                {!!selectedMonitorErrorInfo && (
+                    <OctaneCardView
+                        className="octane-wired-menu min-w-[470px] max-w-[470px] max-h-[500px]"
+                        theme="primary-slim"
+                        uniqueKey="wired-monitor-error-info"
+                        windowPosition={DraggableWindowPosition.TOP_LEFT}
+                        offsetLeft={660}
+                        offsetTop={120}
+                    >
+                        <OctaneCardHeaderView
+                            headerText={localizeWithFallback('wiredmenu.error_info.title', 'Wired Error Information')}
+                            onCloseClick={() => {
+                                setSelectedMonitorErrorType(null);
+                                setSelectedMonitorLogDetails(null);
+                            }}
+                        />
+                        <OctaneCardContentView className="text-black bg-[#f4efe3] p-4 flex flex-col gap-3 overflow-y-auto">
+                            <div className="flex items-start justify-between gap-3">
+                                <Text bold>{selectedMonitorErrorInfo.title}</Text>
+                                <span
+                                    className={`rounded px-2 py-[2px] text-[10px] font-semibold ${(selectedMonitorLogDetails?.severity ?? selectedMonitorErrorInfo.severity) === 'WARNING' ? 'bg-[#d4f0d0] text-[#2a6a24]' : 'bg-[#f6d7d7] text-[#8c2424]'}`}
+                                >
+                                    {selectedMonitorLogDetails?.severity ?? selectedMonitorErrorInfo.severity}
+                                </span>
+                            </div>
+                            {!!selectedMonitorLogDetails && (
+                                <div className="rounded border border-[#d8d2c3] bg-white/60 p-3 flex flex-col gap-1">
+                                    <Text>
+                                        <b>Trigger:</b> {selectedMonitorDetailSource}
+                                    </Text>
+                                    <Text>
+                                        <b>Motivation:</b> {selectedMonitorLogDetails.reason}
+                                    </Text>
+                                    {!!selectedMonitorLogDetails.amount && (
+                                        <Text>
+                                            <b>Amount:</b> {selectedMonitorLogDetails.amount}
+                                        </Text>
+                                    )}
+                                    {!!selectedMonitorLogDetails.latest && (
+                                        <Text>
+                                            <b>Latest occurrence:</b> {selectedMonitorLogDetails.latest}
+                                        </Text>
+                                    )}
+                                    {!!selectedMonitorLogDetails.occurredAt && (
+                                        <Text>
+                                            <b>Occurred at:</b> {selectedMonitorLogDetails.occurredAt}
+                                        </Text>
+                                    )}
                                 </div>
                             )}
-                        </div>
-                    ))}
-                </div>
-            )}
-            <OctaneCardView
-                className="octane-wired-menu min-w-[520px] max-w-[520px]"
-                theme="primary-slim"
-                uniqueKey="wired-creator-tools"
-                windowPosition={DraggableWindowPosition.TOP_LEFT}
-            >
-                <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.title', 'Wired Creator Tools (:wired)')} onCloseClick={() => setIsVisible(false)} />
-                <OctaneCardTabsView justifyContent="start">
-                    {TABS.map((tab) => (
-                        <OctaneCardTabsItemView key={tab.key} isActive={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>
-                            <Text>{localizeWithFallback(wiredMenuTabKey(tab.key), tab.label)}</Text>
-                        </OctaneCardTabsItemView>
-                    ))}
-                </OctaneCardTabsView>
-                <OctaneCardContentView className="text-black bg-[#e9e6d9]" gap={3}>
-                    {activeTab === 'monitor' && (
-                        <WiredMonitorTabView
-                            monitorStats={monitorStats}
-                            monitorLogs={monitorLogs}
-                            monitorHistoryRows={monitorHistoryRows}
-                            onOpenMonitorInfo={() => setIsMonitorInfoOpen(true)}
-                            onOpenMonitorHistory={() => setIsMonitorHistoryOpen(true)}
-                            onOpenRoomLogs={() => setIsRoomLogsOpen(true)}
-                            isClearCoolingDown={isMonitorClearCoolingDown}
-                            canClearLogs={!!roomSettings.canModify}
-                            onClearMonitorLogs={clearMonitorLogs}
-                            onOpenMonitorLogDetails={openMonitorLogDetails}
-                        />
-                    )}
-                    {activeTab === 'inspection' && (
-                        <WiredInspectionTabView
-                            selectedFurni={selectedFurni}
-                            selectedUser={selectedUser}
-                            roomId={roomSession?.roomId ?? null}
-                            previewRevision={furniInternalRevision}
-                            previewPlaceholder={previewPlaceholder}
-                            keepSelected={keepSelected}
-                            onKeepSelectedChange={setKeepSelected}
-                            displayedVariables={displayedVariables}
-                            selectedInspectionVariableKey={selectedInspectionVariableKey}
-                            onSelectInspectionVariable={(variable) => {
-                                setSelectedInspectionVariableKeys((prev) => ({ ...prev, [inspectionType]: variable.key }));
-                                beginVariableEdit(variable);
-                            }}
-                            onCancelVariableEdit={cancelVariableEdit}
-                            onVariableInputKeyDown={onVariableInputKeyDown}
-                            onBeginVariableEdit={(variable) => {
-                                setSelectedInspectionVariableKeys((prev) => ({ ...prev, [inspectionType]: variable.key }));
-                                beginVariableEdit(variable);
-                            }}
-                            selectedInspectionGiveDefinition={selectedInspectionGiveDefinition}
-                            onSelectGiveVariable={setInspectionGiveVariableItemId}
-                            availableInspectionDefinitions={availableInspectionDefinitions}
-                            inspectionGiveValue={inspectionGiveValue}
-                            onInspectionGiveValueChange={setInspectionGiveValue}
-                            canGiveInspectionVariable={canGiveInspectionVariable}
-                            onGiveInspectionVariable={() => giveInspectionVariable()}
-                            canRemoveInspectionVariable={canRemoveInspectionVariable}
-                            onRemoveInspectionVariable={() => removeInspectionVariable()}
-                            canHighlightWireds={canHighlightConfiguredWireds}
-                            isHighlightingWireds={isHighlightingConfiguredWireds && canHighlightConfiguredWireds}
-                            onToggleHighlightWireds={() => setIsHighlightingConfiguredWireds((value) => !value)}
-                        />
-                    )}
-                    {activeTab === 'variables' && (
-                        <WiredVariablesTabView
-                            variablePickerDefinitions={variablePickerDefinitions}
-                            selectedVariableDefinition={selectedVariableDefinition}
-                            onPickVariable={(key) => setSelectedVariableKeys((prev) => ({ ...prev, [variablesType]: key }))}
-                            canVariableHighlight={canVariableHighlight}
-                            variableManageCanOpen={variableManageCanOpen}
-                            canVariableClear={canVariableClear}
-                            onClearVariable={confirmClearVariable}
-                            onOpenManagePanel={() => {
-                                requestUserVariables();
-                                setSelectedManagedVariableEntry(null);
-                                setIsVariableManageOpen(true);
-                            }}
-                            arrayInspectorCanOpen={!!selectedVariableDefinition?.itemId}
-                            onOpenArrayInspector={() => setIsArrayInspectorOpen(true)}
-                            selectedVariableProperties={selectedVariableProperties}
-                            selectedVariableTextValues={selectedVariableTextValues}
-                            onOpenWebApiExplorer={() => openVariablesExplorer({ roomId: roomSession?.roomId })}
-                        />
-                    )}
-                    {activeTab === 'settings' && <WiredToolsSettingsTabView onOpenSelfDonation={() => setIsSelfDonationOpen(true)} />}
-                    {activeTab === 'chests' && <WiredChestsTabView />}
-                    {activeTab === 'share' && <WiredShareTabView />}
-                </OctaneCardContentView>
-            </OctaneCardView>
-            {isMonitorHistoryOpen && (
-                <OctaneCardView
-                    className="octane-wired-menu min-w-[760px] max-w-[760px] max-h-[520px]"
-                    theme="primary-slim"
-                    uniqueKey="wired-monitor-history"
-                    windowPosition={DraggableWindowPosition.TOP_LEFT}
-                    offsetLeft={560}
-                    offsetTop={40}
-                >
-                    <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.monitor.history.title', 'Wired Monitor Logs')} onCloseClick={() => setIsMonitorHistoryOpen(false)} />
-                    <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
-                        <div className="flex flex-wrap items-center gap-2 text-[12px]">
-                            <span className="text-[#555]">Severity:</span>
-                            {['ALL', 'WARNING', 'ERROR'].map((severity) => (
-                                <BaseButton
-                                    key={severity}
-                                    className={`rounded border px-2 py-[2px] ${monitorHistorySeverityFilter === severity ? 'border-[#4d7892] bg-[#dbeaf4] text-[#1a4d68]' : 'border-[#b8b2a4] bg-white text-[#555]'}`}
-                                    type="button"
-                                    onClick={() => setMonitorHistorySeverityFilter(severity as 'ALL' | 'ERROR' | 'WARNING')}
-                                >
-                                    {severity}
-                                </BaseButton>
+                            {selectedMonitorErrorInfo.description.map((paragraph, index) => (
+                                <Text key={index}>{paragraph}</Text>
                             ))}
-                            <span className="ml-2 text-[#555]">Type:</span>
-                            <Select
-                                className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                                value={monitorHistoryTypeFilter}
-                                onChange={(event) => setMonitorHistoryTypeFilter(event.target.value)}
-                            >
-                                {monitorHistoryTypeOptions.map((type) => (
-                                    <option key={type} value={type}>
-                                        {type}
-                                    </option>
-                                ))}
-                            </Select>
-                        </div>
-                        <div className="grow overflow-y-auto border border-[#d1ccbf] rounded bg-white">
-                            <table className="w-full text-[12px]">
-                                <thead className="bg-[#efede5] sticky top-0">
-                                    <tr>
-                                        <th className="text-left px-2 py-1">Type</th>
-                                        <th className="text-left px-2 py-1">Severity</th>
-                                        <th className="text-left px-2 py-1">Trigger</th>
-                                        <th className="text-left px-2 py-1">Motivation</th>
-                                        <th className="text-left px-2 py-1">Occurred at</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {!filteredMonitorHistoryRows.length && (
-                                        <tr>
-                                            <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={5}>
-                                                No log history for the current filters
-                                            </td>
-                                        </tr>
-                                    )}
-                                    {filteredMonitorHistoryRows.map((row, index) => (
-                                        <tr
-                                            key={row.id}
-                                            className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#f8f6f0]'} cursor-pointer hover:bg-[#e8eefc]`}
-                                            onClick={() =>
-                                                openMonitorLogDetails(row.type, {
-                                                    severity: row.category,
-                                                    occurredAt: row.occurredAt,
-                                                    reason: row.reason,
-                                                    sourceLabel: row.sourceLabel,
-                                                    sourceId: row.sourceId
-                                                })
-                                            }
-                                        >
-                                            <td className="px-2 py-1 text-[#1b57b2]">{row.type}</td>
-                                            <td className="px-2 py-1">{row.category}</td>
-                                            <td className="px-2 py-1">{formatMonitorSource(row.sourceLabel, row.sourceId)}</td>
-                                            <td className="px-2 py-1 text-[#555]">{row.reason}</td>
-                                            <td className="px-2 py-1">{row.occurredAt}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </OctaneCardContentView>
-                </OctaneCardView>
-            )}
-            {isMonitorInfoOpen && (
-                <OctaneCardView
-                    className="octane-wired-menu min-w-[560px] max-w-[560px] max-h-[520px]"
-                    theme="primary-slim"
-                    uniqueKey="wired-monitor-info"
-                    windowPosition={DraggableWindowPosition.TOP_LEFT}
-                    offsetLeft={610}
-                    offsetTop={80}
-                >
-                    <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.monitor.info.title', 'Wired Monitor Information')} onCloseClick={() => setIsMonitorInfoOpen(false)} />
-                    <OctaneCardContentView className="text-black bg-[#f4efe3] p-4 flex flex-col gap-4 overflow-y-auto">
-                        {monitorInfoSections.map((section) => (
-                            <div key={section.title} className="flex flex-col gap-1">
-                                <Text bold>{section.title}</Text>
-                                {section.lines.map((line, index) => (
-                                    <Text key={`${section.title}-${index}`}>{line}</Text>
-                                ))}
-                            </div>
-                        ))}
-                    </OctaneCardContentView>
-                </OctaneCardView>
-            )}
-            {isVariableManageOpen && !!selectedVariableDefinition?.itemId && variablesType !== 'context' && (
-                <WiredVariableOwnersView
-                    variableId={selectedVariableDefinition.variableId}
-                    variableName={selectedVariableDefinition.key}
-                    variablesType={variablesType}
-                    hasValue={!!selectedVariableDefinition.hasValue}
-                    describeHolder={describeVariableHolder}
-                    onManage={setSelectedManagedVariableEntry}
-                    onClose={() => setIsVariableManageOpen(false)}
-                />
-            )}
-            {isArrayInspectorOpen && !!selectedVariableDefinition?.itemId && (
-                <WiredArrayInspectorView
-                    definitionItemId={selectedVariableDefinition.itemId}
-                    variableName={selectedVariableDefinition.key}
-                    variableType={wiredArrayVariableTypeOf(variablesType)}
-                    onClose={() => setIsArrayInspectorOpen(false)}
-                />
-            )}
-            {isRoomLogsOpen && <WiredRoomLogsView onClose={() => setIsRoomLogsOpen(false)} />}
-            {isSelfDonationOpen && <WiredSelfDonationView onClose={() => setIsSelfDonationOpen(false)} />}
-            {!!selectedManagedVariableEntry && !!selectedVariableDefinition && (
-                <WiredVariableHolderPanelView
-                    title={managedHolderPanelTitle}
-                    warningText={managedHolderWarningText}
-                    onRefresh={() => requestUserVariables()}
-                    onClose={() => setSelectedManagedVariableEntry(null)}
-                    preview={
-                        <>
-                            {variablesType === 'furni' && roomSession && (
-                                <LayoutRoomObjectImageView
-                                    category={managedHolderFurniCategory}
-                                    objectId={selectedManagedVariableEntry.entityId}
-                                    roomId={roomSession.roomId}
-                                />
-                            )}
-                            {variablesType === 'user' && managedHolderUserData && (
-                                <>
-                                    {managedHolderUserData.type === RoomObjectType.PET ? (
-                                        <LayoutPetImageView direction={2} figure={managedHolderUserData.figure} />
-                                    ) : (
-                                        <LayoutAvatarImageView direction={2} figure={managedHolderUserData.figure} />
-                                    )}
-                                </>
-                            )}
-                            {variablesType === 'global' && (
-                                <img alt="Global placeholder" className="max-w-full max-h-full object-contain p-3" src={wiredGlobalPlaceholderImage} />
-                            )}
-                        </>
-                    }
-                    infoLines={managedHolderInfoLines}
-                    variablesTitle={variablesType === 'global' ? 'Room variables:' : 'Assigned variables:'}
-                    entries={managedHolderVariableEntries.map((entry) => ({
-                        id: String(entry.variableItemId),
-                        name: entry.name,
-                        availability: entry.availability,
-                        hasValue: entry.hasValue,
-                        value: entry.value,
-                        isReadOnly: entry.isReadOnly
-                    }))}
-                    selectedId={selectedManagedHolderVariableEntry ? String(selectedManagedHolderVariableEntry.variableItemId) : null}
-                    onSelect={(id) => setSelectedManagedHolderVariableId(Number(id))}
-                    canEdit={roomSettings.canModify}
-                    editingId={editingManagedHolderVariableId ? String(editingManagedHolderVariableId) : null}
-                    editingValue={editingManagedHolderValue}
-                    onBeginEdit={(entry) => {
-                        setSelectedManagedHolderVariableId(Number(entry.id));
-                        setEditingManagedHolderVariableId(Number(entry.id));
-                        setEditingManagedHolderValue(String(entry.value ?? 0));
-                    }}
-                    onEditingValueChange={setEditingManagedHolderValue}
-                    onEditBlur={() => setEditingManagedHolderVariableId(0)}
-                    onEditKeyDown={onManagedHolderValueInputKeyDown}
-                    isGiveOpen={isManagedGiveOpen}
-                    onToggleGive={() => setIsManagedGiveOpen((value) => !value)}
-                    giveOptions={availableManagedHolderDefinitions.map((definition) => ({
-                        id: String(definition.itemId),
-                        name: definition.name,
-                        hasValue: !!definition.hasValue
-                    }))}
-                    giveSelectedId={selectedManagedGiveDefinition ? String(selectedManagedGiveDefinition.itemId) : ''}
-                    onGiveSelect={(id) => setManagedGiveVariableItemId(Number(id))}
-                    giveValue={managedGiveValue}
-                    onGiveValueChange={setManagedGiveValue}
-                    canGive={canGiveManagedHolderVariable}
-                    onGive={() => giveManagedHolderVariable()}
-                    canRemove={canRemoveManagedHolderVariable}
-                    onRemove={() => removeManagedHolderVariable()}
-                />
-            )}
-            {!!selectedMonitorErrorInfo && (
-                <OctaneCardView
-                    className="octane-wired-menu min-w-[470px] max-w-[470px] max-h-[500px]"
-                    theme="primary-slim"
-                    uniqueKey="wired-monitor-error-info"
-                    windowPosition={DraggableWindowPosition.TOP_LEFT}
-                    offsetLeft={660}
-                    offsetTop={120}
-                >
-                    <OctaneCardHeaderView
-                        headerText={localizeWithFallback('wiredmenu.error_info.title', 'Wired Error Information')}
-                        onCloseClick={() => {
-                            setSelectedMonitorErrorType(null);
-                            setSelectedMonitorLogDetails(null);
-                        }}
-                    />
-                    <OctaneCardContentView className="text-black bg-[#f4efe3] p-4 flex flex-col gap-3 overflow-y-auto">
-                        <div className="flex items-start justify-between gap-3">
-                            <Text bold>{selectedMonitorErrorInfo.title}</Text>
-                            <span
-                                className={`rounded px-2 py-[2px] text-[10px] font-semibold ${(selectedMonitorLogDetails?.severity ?? selectedMonitorErrorInfo.severity) === 'WARNING' ? 'bg-[#d4f0d0] text-[#2a6a24]' : 'bg-[#f6d7d7] text-[#8c2424]'}`}
-                            >
-                                {selectedMonitorLogDetails?.severity ?? selectedMonitorErrorInfo.severity}
-                            </span>
-                        </div>
-                        {!!selectedMonitorLogDetails && (
-                            <div className="rounded border border-[#d8d2c3] bg-white/60 p-3 flex flex-col gap-1">
-                                <Text>
-                                    <b>Trigger:</b> {selectedMonitorDetailSource}
-                                </Text>
-                                <Text>
-                                    <b>Motivation:</b> {selectedMonitorLogDetails.reason}
-                                </Text>
-                                {!!selectedMonitorLogDetails.amount && (
-                                    <Text>
-                                        <b>Amount:</b> {selectedMonitorLogDetails.amount}
-                                    </Text>
-                                )}
-                                {!!selectedMonitorLogDetails.latest && (
-                                    <Text>
-                                        <b>Latest occurrence:</b> {selectedMonitorLogDetails.latest}
-                                    </Text>
-                                )}
-                                {!!selectedMonitorLogDetails.occurredAt && (
-                                    <Text>
-                                        <b>Occurred at:</b> {selectedMonitorLogDetails.occurredAt}
-                                    </Text>
-                                )}
-                            </div>
-                        )}
-                        {selectedMonitorErrorInfo.description.map((paragraph, index) => (
-                            <Text key={index}>{paragraph}</Text>
-                        ))}
-                    </OctaneCardContentView>
-                </OctaneCardView>
-            )}
-        </>
+                        </OctaneCardContentView>
+                    </OctaneCardView>
+                )}
+            </>
+        </NativeTextTree>
     );
 };

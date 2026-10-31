@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
@@ -42,25 +43,27 @@ export const WiredExtraRandomView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
-            <div className="flex flex-col gap-2">
-                <WiredSliderSection
-                    max={MAX_RANDOM_VALUE}
-                    min={MIN_PICK_AMOUNT}
-                    numberInput={false}
-                    title={LocalizeText('wiredfurni.params.pickamount', ['picks'], [pickAmount.toString()])}
-                    value={pickAmount}
-                    onChange={(value) => setPickAmount(normalizePickAmount(value))}
-                />
-                <WiredSliderSection
-                    max={MAX_RANDOM_VALUE}
-                    min={MIN_SKIP_EXECUTIONS}
-                    numberInput={false}
-                    title={LocalizeText('wiredfurni.params.skipactions', ['skips'], [skipExecutions.toString()])}
-                    value={skipExecutions}
-                    onChange={(value) => setSkipExecutions(normalizeSkipExecutions(value))}
-                />
-            </div>
-        </WiredExtraBaseView>
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
+                <div className="flex flex-col gap-2">
+                    <WiredSliderSection
+                        max={MAX_RANDOM_VALUE}
+                        min={MIN_PICK_AMOUNT}
+                        numberInput={false}
+                        title={LocalizeText('wiredfurni.params.pickamount', ['picks'], [pickAmount.toString()])}
+                        value={pickAmount}
+                        onChange={(value) => setPickAmount(normalizePickAmount(value))}
+                    />
+                    <WiredSliderSection
+                        max={MAX_RANDOM_VALUE}
+                        min={MIN_SKIP_EXECUTIONS}
+                        numberInput={false}
+                        title={LocalizeText('wiredfurni.params.skipactions', ['skips'], [skipExecutions.toString()])}
+                        value={skipExecutions}
+                        onChange={(value) => setSkipExecutions(normalizeSkipExecutions(value))}
+                    />
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

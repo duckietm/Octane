@@ -10,6 +10,7 @@ import { getRegisteredPlugins, IOctanePlugin, subscribePlugins } from '../../../
 import { applyRoomZoom } from './roomZoom.helpers';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface RoomHistoryEntry {
     roomId: number;
@@ -279,119 +280,121 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
     const canZoomOut = getNextZoomScale(zoomScale, -1) !== getNearestZoomScale(zoomScale);
 
     return (
-        <div className={classNames('octane-room-tools-container', !isToolsOpen && 'is-collapsed')}>
-            <BaseButton className="room-tools-collapse-toggle" type="button" onClick={() => setIsToolsOpen((prevValue) => !prevValue)}>
-                {isToolsOpen ? '‹' : '›'}
-            </BaseButton>
-            {isToolsOpen && (
-                <div className="octane-room-tools">
-                    <div className="room-tools-zoom-row">
-                        <span>{LocalizeText('room.zoom.text', ['zoom_level'], [getZoomText(zoomScale)])}</span>
-                        <Hint content={LocalizeText('room.zoom.zoom_in.tooltip')}><BaseButton aria-label={LocalizeText('room.zoom.zoom_in.tooltip')} className="room-tools-zoom-button is-zoom-in" type="button" disabled={!canZoomIn} onClick={() => handleToolClick('zoom_in')} /></Hint>
-                        <Hint content={LocalizeText('room.zoom.zoom_out.tooltip')}><BaseButton aria-label={LocalizeText('room.zoom.zoom_out.tooltip')} className="room-tools-zoom-button is-zoom-out" type="button" disabled={!canZoomOut} onClick={() => handleToolClick('zoom_out')} /></Hint>
+        <NativeTextTree>
+            <div className={classNames('octane-room-tools-container', !isToolsOpen && 'is-collapsed')}>
+                <BaseButton className="room-tools-collapse-toggle" type="button" onClick={() => setIsToolsOpen((prevValue) => !prevValue)}>
+                    {isToolsOpen ? '‹' : '›'}
+                </BaseButton>
+                {isToolsOpen && (
+                    <div className="octane-room-tools">
+                        <div className="room-tools-zoom-row">
+                            <span>{LocalizeText('room.zoom.text', ['zoom_level'], [getZoomText(zoomScale)])}</span>
+                            <Hint content={LocalizeText('room.zoom.zoom_in.tooltip')}><BaseButton aria-label={LocalizeText('room.zoom.zoom_in.tooltip')} className="room-tools-zoom-button is-zoom-in" type="button" disabled={!canZoomIn} onClick={() => handleToolClick('zoom_in')} /></Hint>
+                            <Hint content={LocalizeText('room.zoom.zoom_out.tooltip')}><BaseButton aria-label={LocalizeText('room.zoom.zoom_out.tooltip')} className="room-tools-zoom-button is-zoom-out" type="button" disabled={!canZoomOut} onClick={() => handleToolClick('zoom_out')} /></Hint>
+                        </div>
+                        {tools.map((tool) => (
+                            <Hint key={tool.action} content={tool.label}><BaseButton aria-label={tool.label} type="button"
+                                className={classNames('room-tool-row', tool.disabled && 'is-disabled')}
+                                aria-disabled={tool.disabled || undefined}
+                                onClick={() => !tool.disabled && handleToolClick(tool.action)}
+                            >
+                                <div className={classNames('octane-icon', tool.icon)} />
+                                <span className="room-tool-label">{tool.label}</span>
+                            </BaseButton></Hint>
+                        ))}
+                        {plugins.map((plugin) => (
+                            <Hint key={plugin.name} content={plugin.label}><BaseButton aria-label={plugin.label} type="button"
+                                className="room-tool-row"
+                                onClick={() => plugin.onOpen()}
+                            >
+                                <div className={classNames('octane-icon', plugin.icon || 'icon-cog')} />
+                                <span className="room-tool-label">{plugin.label}</span>
+                            </BaseButton></Hint>
+                        ))}
+                        <div className="room-history-controls">
+                            <Hint content={LocalizeText('room.history.button.back.tooltip')}><BaseButton aria-label={LocalizeText('room.history.button.back.tooltip')} type="button"
+                                className={classNames('octane-icon', canGoBack ? 'cursor-pointer icon-room-history-back-enabled' : 'icon-room-history-back-disabled')}
+                                aria-disabled={!canGoBack}
+                                onClick={() => canGoBack && handleToolClick('room_history_back')}
+                            /></Hint>
+                            <Hint content={LocalizeText('room.history.button.tooltip')}><BaseButton aria-label={LocalizeText('room.history.button.tooltip')} type="button"
+                                className={classNames('octane-icon', hasHistory ? 'cursor-pointer icon-room-history-enabled' : 'icon-room-history-disabled')}
+                                aria-disabled={!hasHistory}
+                                onClick={() => hasHistory && handleToolClick('room_history')}
+                            /></Hint>
+                            <Hint content={LocalizeText('room.history.button.forward.tooltip')}><BaseButton aria-label={LocalizeText('room.history.button.forward.tooltip')} type="button"
+                                className={classNames('octane-icon', canGoNext ? 'cursor-pointer icon-room-history-next-enabled' : 'icon-room-history-next-disabled')}
+                                aria-disabled={!canGoNext}
+                                onClick={() => canGoNext && handleToolClick('room_history_next')}
+                            /></Hint>
+                        </div>
                     </div>
-                    {tools.map((tool) => (
-                        <Hint key={tool.action} content={tool.label}><BaseButton aria-label={tool.label} type="button"
-                            className={classNames('room-tool-row', tool.disabled && 'is-disabled')}
-                            aria-disabled={tool.disabled || undefined}
-                            onClick={() => !tool.disabled && handleToolClick(tool.action)}
+                )}
+                <AnimatePresence>
+                    {roomEnterInfo && roomEnterInfo.roomId === roomSession?.roomId && !isOpenHistory && (
+                        <motion.div
+                            key={roomEnterInfo.roomId}
+                            initial={{ x: -320, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: -320, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="octane-room-tools-info octane-room-tools-info--enter"
+                            onClick={() => setRoomEnterInfo(null)}
+                            onMouseEnter={() => setIsRoomInfoHovered(true)}
+                            onMouseLeave={() => setIsRoomInfoHovered(false)}
                         >
-                            <div className={classNames('octane-icon', tool.icon)} />
-                            <span className="room-tool-label">{tool.label}</span>
-                        </BaseButton></Hint>
-                    ))}
-                    {plugins.map((plugin) => (
-                        <Hint key={plugin.name} content={plugin.label}><BaseButton aria-label={plugin.label} type="button"
-                            className="room-tool-row"
-                            onClick={() => plugin.onOpen()}
+                            <Text bold variant="white" className="block truncate text-[14px]">{roomEnterInfo.roomName}</Text>
+                            <Text small className="block truncate text-[#999999]">{roomEnterInfo.ownerLine}</Text>
+                            {roomEnterInfo.tags.length > 0 && (
+                                <div className="flex gap-2 mt-1">
+                                    {roomEnterInfo.tags.map((tag) => (
+                                        <BaseButton
+                                            key={tag}
+                                            className="text-[12px] text-[#1b79ab] hover:text-[#47a8e6] bg-transparent border-0 p-0 cursor-pointer"
+                                            type="button"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                searchRoomTag(tag);
+                                            }}
+                                        >
+                                            #{trimRoomTag(tag)}
+                                        </BaseButton>
+                                    ))}
+                                </div>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+                <AnimatePresence>
+                    {isOpenHistory && isToolsOpen && (
+                        <motion.div
+                            initial={{ x: -100 }}
+                            animate={{ x: 0 }}
+                            exit={{ x: -100 }}
+                            transition={{ duration: 0.3 }}
+                            className="octane-room-tools-history"
                         >
-                            <div className={classNames('octane-icon', plugin.icon || 'icon-cog')} />
-                            <span className="room-tool-label">{plugin.label}</span>
-                        </BaseButton></Hint>
-                    ))}
-                    <div className="room-history-controls">
-                        <Hint content={LocalizeText('room.history.button.back.tooltip')}><BaseButton aria-label={LocalizeText('room.history.button.back.tooltip')} type="button"
-                            className={classNames('octane-icon', canGoBack ? 'cursor-pointer icon-room-history-back-enabled' : 'icon-room-history-back-disabled')}
-                            aria-disabled={!canGoBack}
-                            onClick={() => canGoBack && handleToolClick('room_history_back')}
-                        /></Hint>
-                        <Hint content={LocalizeText('room.history.button.tooltip')}><BaseButton aria-label={LocalizeText('room.history.button.tooltip')} type="button"
-                            className={classNames('octane-icon', hasHistory ? 'cursor-pointer icon-room-history-enabled' : 'icon-room-history-disabled')}
-                            aria-disabled={!hasHistory}
-                            onClick={() => hasHistory && handleToolClick('room_history')}
-                        /></Hint>
-                        <Hint content={LocalizeText('room.history.button.forward.tooltip')}><BaseButton aria-label={LocalizeText('room.history.button.forward.tooltip')} type="button"
-                            className={classNames('octane-icon', canGoNext ? 'cursor-pointer icon-room-history-next-enabled' : 'icon-room-history-next-disabled')}
-                            aria-disabled={!canGoNext}
-                            onClick={() => canGoNext && handleToolClick('room_history_next')}
-                        /></Hint>
-                    </div>
-                </div>
-            )}
-            <AnimatePresence>
-                {roomEnterInfo && roomEnterInfo.roomId === roomSession?.roomId && !isOpenHistory && (
-                    <motion.div
-                        key={roomEnterInfo.roomId}
-                        initial={{ x: -320, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: -320, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="octane-room-tools-info octane-room-tools-info--enter"
-                        onClick={() => setRoomEnterInfo(null)}
-                        onMouseEnter={() => setIsRoomInfoHovered(true)}
-                        onMouseLeave={() => setIsRoomInfoHovered(false)}
-                    >
-                        <Text bold variant="white" className="block truncate text-[14px]">{roomEnterInfo.roomName}</Text>
-                        <Text small className="block truncate text-[#999999]">{roomEnterInfo.ownerLine}</Text>
-                        {roomEnterInfo.tags.length > 0 && (
-                            <div className="flex gap-2 mt-1">
-                                {roomEnterInfo.tags.map((tag) => (
-                                    <BaseButton
-                                        key={tag}
-                                        className="text-[12px] text-[#1b79ab] hover:text-[#47a8e6] bg-transparent border-0 p-0 cursor-pointer"
-                                        type="button"
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-                                            searchRoomTag(tag);
-                                        }}
+                            <div className="flex flex-col px-3 py-2 rounded octane-room-history">
+                                {roomHistory.map((history) => (
+                                    <Text component={BaseButton} type="button"
+                                        key={history.roomId}
+                                        bold={history.roomId === navigatorData.currentRoomId}
+                                        variant="white"
+                                        pointer
+                                        className={classNames(
+                                            'room-history-item',
+                                            history.roomId === navigatorData.currentRoomId && 'room-history-item--current'
+                                        )}
+                                        onClick={() => TryVisitRoom(history.roomId)}
                                     >
-                                        #{trimRoomTag(tag)}
-                                    </BaseButton>
+                                        {history.roomName}
+                                    </Text>
                                 ))}
                             </div>
-                        )}
-                    </motion.div>
-                )}
-            </AnimatePresence>
-            <AnimatePresence>
-                {isOpenHistory && isToolsOpen && (
-                    <motion.div
-                        initial={{ x: -100 }}
-                        animate={{ x: 0 }}
-                        exit={{ x: -100 }}
-                        transition={{ duration: 0.3 }}
-                        className="octane-room-tools-history"
-                    >
-                        <div className="flex flex-col px-3 py-2 rounded octane-room-history">
-                            {roomHistory.map((history) => (
-                                <Text component={BaseButton} type="button"
-                                    key={history.roomId}
-                                    bold={history.roomId === navigatorData.currentRoomId}
-                                    variant="white"
-                                    pointer
-                                    className={classNames(
-                                        'room-history-item',
-                                        history.roomId === navigatorData.currentRoomId && 'room-history-item--current'
-                                    )}
-                                    onClick={() => TryVisitRoom(history.roomId)}
-                                >
-                                    {history.roomName}
-                                </Text>
-                            ))}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </NativeTextTree>
     );
 };

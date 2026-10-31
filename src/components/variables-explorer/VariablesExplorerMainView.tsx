@@ -24,6 +24,7 @@ import { VariablesExplorerBulkDeleteView } from './VariablesExplorerBulkDeleteVi
 import { VariablesExplorerHolderView } from './VariablesExplorerHolderView';
 import { VariablesExplorerHoldersView } from './VariablesExplorerHoldersView';
 import { Select } from '../../common/Select';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export interface VariablesExplorerMainViewProps {
     connection: ExplorerConnection;
@@ -103,139 +104,141 @@ export const VariablesExplorerMainView: FC<VariablesExplorerMainViewProps> = ({ 
     };
 
     return (
-        <>
-            <OctaneCardView
-                className="min-w-[560px] max-w-[560px] octane-variables-explorer-window"
-                theme="primary-slim"
-                uniqueKey="variables-explorer"
-                windowPosition={DraggableWindowPosition.TOP_LEFT}
-                offsetLeft={120}
-                offsetTop={60}
-            >
-                <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.variables_explorer.title', 'Variables Explorer')} onCloseClick={onClose} />
-                <OctaneCardContentView className="text-black bg-[#e9e6d9]" gap={2}>
-                    <div className="mx-3 mt-3 rounded border border-[#c8c2b2] bg-white px-3 py-2 flex items-center justify-between gap-3 text-[12px]">
-                        <div className="flex flex-col min-w-0">
-                            <Text bold truncate>
-                                {hotelName} &middot; Room {connection.roomId}
-                            </Text>
-                            <Text small className="text-[#6b6659]">
-                                {client.hasWriteAccess ? 'Read and write access' : 'Read-only access'}
-                            </Text>
-                        </div>
-                        <div className="flex gap-2 shrink-0">
-                            <Button variant="secondary" onClick={reloadVariables}>
-                                Reload
-                            </Button>
-                            <Button variant="secondary" onClick={onDisconnect}>
-                                Disconnect
-                            </Button>
-                        </div>
-                    </div>
-                    <WiredVariablesTabView
-                        variablePickerDefinitions={definitions}
-                        emptyPickerText={emptyPickerText(scope)}
-                        selectedVariableDefinition={selectedDefinition}
-                        onPickVariable={(key) => setSelectedKeys((previous) => ({ ...previous, [variablesType]: key }))}
-                        canVariableHighlight={false}
-                        variableManageCanOpen={!!selectedDefinition}
-                        onOpenManagePanel={() => {
-                            if (!selectedDefinition) return;
-
-                            if (scope === 'global') setHolderTarget({ scope: 'global' });
-                            else setIsOwnersOpen(true);
-                        }}
-                        arrayInspectorCanOpen={false}
-                        onOpenArrayInspector={() => undefined}
-                        canVariableClear={!!selectedDefinition && client.hasWriteAccess}
-                        onClearVariable={() => selectedDefinition && setBulkDeleteName(selectedDefinition.key)}
-                        selectedVariableProperties={variableProperties(selectedDefinition)}
-                        selectedVariableTextValues={[]}
-                        variablesType={variablesType}
-                        onVariablesTypeChange={(type) => {
-                            if (type === 'context') return;
-
-                            setVariablesType(type);
-                            setIsOwnersOpen(false);
-                        }}
-                        variableElements={EXPLORER_VARIABLE_ELEMENTS}
-                        showHighlight={false}
-                        showArrayInspector={false}
-                        showTextValues={false}
-                    />
-                    <div className="mx-3 flex flex-wrap items-center gap-2 text-[12px]">
-                        <Text bold>Look up a holder:</Text>
-                        <Select
-                            aria-label="Holder kind"
-                            className={FIELD_CLASS}
-                            value={lookupKind}
-                            onChange={(event) => setLookupKind(event.target.value as ExplorerLookupKind)}
-                        >
-                            {EXPLORER_LOOKUP_KINDS.map((kind) => (
-                                <option key={kind.value} value={kind.value}>
-                                    {kind.label}
-                                </option>
-                            ))}
-                        </Select>
-                        <input
-                            aria-label="Holder"
-                            className={`${FIELD_CLASS} w-[140px]`}
-                            type="text"
-                            value={lookupInput}
-                            onChange={(event) => setLookupInput(event.target.value)}
-                            onKeyDown={(event) => {
-                                if (event.key !== 'Enter') return;
-
-                                event.preventDefault();
-                                openLookup();
-                            }}
-                        />
-                        <Button variant="secondary" onClick={openLookup}>
-                            Open
-                        </Button>
-                        <Button variant="secondary" onClick={() => setHolderTarget({ scope: 'global' })}>
-                            Global variables
-                        </Button>
-                    </div>
-                    <div className="mx-3 mb-3 min-h-[26px]">
-                        {!!status && (
-                            <div
-                                className={`rounded border px-2 py-1 text-[12px] ${status.isError ? 'border-[#d9a3a3] bg-[#fbeaea] text-[#8c2424]' : 'border-[#a9c9a4] bg-[#e8f4e5] text-[#2a6a24]'}`}
-                                role={status.isError ? 'alert' : 'status'}
-                            >
-                                {status.text}
+        <NativeTextTree>
+            <>
+                <OctaneCardView
+                    className="min-w-[560px] max-w-[560px] octane-variables-explorer-window"
+                    theme="primary-slim"
+                    uniqueKey="variables-explorer"
+                    windowPosition={DraggableWindowPosition.TOP_LEFT}
+                    offsetLeft={120}
+                    offsetTop={60}
+                >
+                    <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.variables_explorer.title', 'Variables Explorer')} onCloseClick={onClose} />
+                    <OctaneCardContentView className="text-black bg-[#e9e6d9]" gap={2}>
+                        <div className="mx-3 mt-3 rounded border border-[#c8c2b2] bg-white px-3 py-2 flex items-center justify-between gap-3 text-[12px]">
+                            <div className="flex flex-col min-w-0">
+                                <Text bold truncate>
+                                    {hotelName} &middot; Room {connection.roomId}
+                                </Text>
+                                <Text small className="text-[#6b6659]">
+                                    {client.hasWriteAccess ? 'Read and write access' : 'Read-only access'}
+                                </Text>
                             </div>
-                        )}
-                    </div>
-                </OctaneCardContentView>
-            </OctaneCardView>
-            {isOwnersOpen && !!selectedDefinition && scope !== 'global' && (
-                <VariablesExplorerHoldersView
-                    client={client}
-                    scope={scope}
-                    variableName={selectedDefinition.key}
-                    hasValue={selectedDefinition.hasValue}
-                    onManage={setHolderTarget}
-                    onClose={() => setIsOwnersOpen(false)}
-                />
-            )}
-            {!!holderTarget && (
-                <VariablesExplorerHolderView
-                    client={client}
-                    roomId={connection.roomId}
-                    target={holderTarget}
-                    variables={variables}
-                    onClose={() => setHolderTarget(null)}
-                />
-            )}
-            {!!bulkDeleteName && (
-                <VariablesExplorerBulkDeleteView
-                    variableName={bulkDeleteName}
-                    busy={bulkBusy}
-                    onConfirm={runBulkDelete}
-                    onCancel={() => setBulkDeleteName(null)}
-                />
-            )}
-        </>
+                            <div className="flex gap-2 shrink-0">
+                                <Button variant="secondary" onClick={reloadVariables}>
+                                    Reload
+                                </Button>
+                                <Button variant="secondary" onClick={onDisconnect}>
+                                    Disconnect
+                                </Button>
+                            </div>
+                        </div>
+                        <WiredVariablesTabView
+                            variablePickerDefinitions={definitions}
+                            emptyPickerText={emptyPickerText(scope)}
+                            selectedVariableDefinition={selectedDefinition}
+                            onPickVariable={(key) => setSelectedKeys((previous) => ({ ...previous, [variablesType]: key }))}
+                            canVariableHighlight={false}
+                            variableManageCanOpen={!!selectedDefinition}
+                            onOpenManagePanel={() => {
+                                if (!selectedDefinition) return;
+
+                                if (scope === 'global') setHolderTarget({ scope: 'global' });
+                                else setIsOwnersOpen(true);
+                            }}
+                            arrayInspectorCanOpen={false}
+                            onOpenArrayInspector={() => undefined}
+                            canVariableClear={!!selectedDefinition && client.hasWriteAccess}
+                            onClearVariable={() => selectedDefinition && setBulkDeleteName(selectedDefinition.key)}
+                            selectedVariableProperties={variableProperties(selectedDefinition)}
+                            selectedVariableTextValues={[]}
+                            variablesType={variablesType}
+                            onVariablesTypeChange={(type) => {
+                                if (type === 'context') return;
+
+                                setVariablesType(type);
+                                setIsOwnersOpen(false);
+                            }}
+                            variableElements={EXPLORER_VARIABLE_ELEMENTS}
+                            showHighlight={false}
+                            showArrayInspector={false}
+                            showTextValues={false}
+                        />
+                        <div className="mx-3 flex flex-wrap items-center gap-2 text-[12px]">
+                            <Text bold>Look up a holder:</Text>
+                            <Select
+                                aria-label="Holder kind"
+                                className={FIELD_CLASS}
+                                value={lookupKind}
+                                onChange={(event) => setLookupKind(event.target.value as ExplorerLookupKind)}
+                            >
+                                {EXPLORER_LOOKUP_KINDS.map((kind) => (
+                                    <option key={kind.value} value={kind.value}>
+                                        {kind.label}
+                                    </option>
+                                ))}
+                            </Select>
+                            <input
+                                aria-label="Holder"
+                                className={`${FIELD_CLASS} w-[140px]`}
+                                type="text"
+                                value={lookupInput}
+                                onChange={(event) => setLookupInput(event.target.value)}
+                                onKeyDown={(event) => {
+                                    if (event.key !== 'Enter') return;
+
+                                    event.preventDefault();
+                                    openLookup();
+                                }}
+                            />
+                            <Button variant="secondary" onClick={openLookup}>
+                                Open
+                            </Button>
+                            <Button variant="secondary" onClick={() => setHolderTarget({ scope: 'global' })}>
+                                Global variables
+                            </Button>
+                        </div>
+                        <div className="mx-3 mb-3 min-h-[26px]">
+                            {!!status && (
+                                <div
+                                    className={`rounded border px-2 py-1 text-[12px] ${status.isError ? 'border-[#d9a3a3] bg-[#fbeaea] text-[#8c2424]' : 'border-[#a9c9a4] bg-[#e8f4e5] text-[#2a6a24]'}`}
+                                    role={status.isError ? 'alert' : 'status'}
+                                >
+                                    {status.text}
+                                </div>
+                            )}
+                        </div>
+                    </OctaneCardContentView>
+                </OctaneCardView>
+                {isOwnersOpen && !!selectedDefinition && scope !== 'global' && (
+                    <VariablesExplorerHoldersView
+                        client={client}
+                        scope={scope}
+                        variableName={selectedDefinition.key}
+                        hasValue={selectedDefinition.hasValue}
+                        onManage={setHolderTarget}
+                        onClose={() => setIsOwnersOpen(false)}
+                    />
+                )}
+                {!!holderTarget && (
+                    <VariablesExplorerHolderView
+                        client={client}
+                        roomId={connection.roomId}
+                        target={holderTarget}
+                        variables={variables}
+                        onClose={() => setHolderTarget(null)}
+                    />
+                )}
+                {!!bulkDeleteName && (
+                    <VariablesExplorerBulkDeleteView
+                        variableName={bulkDeleteName}
+                        busy={bulkBusy}
+                        onConfirm={runBulkDelete}
+                        onCancel={() => setBulkDeleteName(null)}
+                    />
+                )}
+            </>
+        </NativeTextTree>
     );
 };

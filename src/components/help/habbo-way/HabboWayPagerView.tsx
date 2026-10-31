@@ -2,6 +2,7 @@ import { FC, ImgHTMLAttributes } from 'react';
 import nextIcon from '../../../assets/images/help/habboway/help_habboway_next.png';
 import prevIcon from '../../../assets/images/help/habboway/help_habboway_prev.png';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 /** The `progress_indicator` widget: one dot per page, the current one lit (0 lights none). */
 export const HabboWayPageDotsView: FC<{ count: number; position: number }> = ({ count, position }) => (
@@ -14,14 +15,16 @@ export const HabboWayPageDotsView: FC<{ count: number; position: number }> = ({ 
 
 /** A picture of the image library: it hides itself when the hotel does not host it. */
 export const LibraryImageView: FC<ImgHTMLAttributes<HTMLImageElement>> = (props) => (
-    <img
-        alt=""
-        draggable={false}
-        {...props}
-        onError={(event) => {
-            event.currentTarget.style.visibility = 'hidden';
-        }}
-    />
+    <NativeTextTree>
+        <img
+            alt=""
+            draggable={false}
+            {...props}
+            onError={(event) => {
+                event.currentTarget.style.visibility = 'hidden';
+            }}
+        />
+    </NativeTextTree>
 );
 
 /** The `container_button`s of the Habbo Way layouts: arrow, separator and caption. */

@@ -27,6 +27,7 @@ import {
 } from '../../../../../../api';
 import { BaseButton, ClassicScrollAreaView } from '../../../../../../common';
 import { UbuntuDropmenuView } from '../../../../../../common/dropmenu/UbuntuDropmenuView';
+import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
 import { useMessageEvent, useNotification } from '../../../../../../hooks';
 import { CatalogLayoutProps } from '../CatalogLayout.types';
 import { CatalogLayoutMarketplaceItemView, OWN_OFFER } from './CatalogLayoutMarketplaceItemView';
@@ -256,63 +257,67 @@ export const CatalogLayoutMarketplaceOwnItemsView: FC<CatalogLayoutProps> = () =
     }));
 
     return (
-        <div className="octane-marketplace-page is-own">
-            <div className="octane-marketplace-own-info" data-testid="marketplace-own-info">
-                {creditsWaiting > 0 ? (
-                    <>
-                        <span>{text('catalog.marketplace.redeem.get_credits', ['count', 'credits'], [String(soldOffers.length), String(creditsWaiting)])}</span>
-                        <BaseButton className="octane-marketplace-button is-green marketplace-own-redeem" onClick={redeemSoldOffers}>
-                            {text('catalog.marketplace.offer.redeem')}
-                        </BaseButton>
-                    </>
-                ) : (
-                    <span>{text('catalog.marketplace.redeem.no_sold_items')}</span>
-                )}
-            </div>
-            <div className="octane-marketplace-own-search">
-                <UbuntuDropmenuView
-                    className="marketplace-own-category"
-                    label={localizeWithFallback('shop.marketplace.own.offers.category', 'Category')}
-                    options={categoryOptions}
-                    value={category}
-                    onSelect={selectCategory}
-                />
-                <span className="marketplace-own-search-input">
-                    <input
-                        aria-label={text('catalog.search')}
-                        autoComplete="off"
-                        maxLength={MARKETPLACE_MAX_SEARCH_LENGTH}
-                        placeholder={text('catalog.search')}
-                        type="text"
-                        value={searchInput}
-                        onChange={(event) => setSearchInput(event.target.value.substring(0, MARKETPLACE_MAX_SEARCH_LENGTH))}
-                        onKeyDown={onSearchKeyDown}
+        <NativeTextTree>
+            <div className="octane-marketplace-page is-own">
+                <div className="octane-marketplace-own-info" data-testid="marketplace-own-info">
+                    {creditsWaiting > 0 ? (
+                        <>
+                            <span>
+                                {text('catalog.marketplace.redeem.get_credits', ['count', 'credits'], [String(soldOffers.length), String(creditsWaiting)])}
+                            </span>
+                            <BaseButton className="octane-marketplace-button is-green marketplace-own-redeem" onClick={redeemSoldOffers}>
+                                {text('catalog.marketplace.offer.redeem')}
+                            </BaseButton>
+                        </>
+                    ) : (
+                        <span>{text('catalog.marketplace.redeem.no_sold_items')}</span>
+                    )}
+                </div>
+                <div className="octane-marketplace-own-search">
+                    <UbuntuDropmenuView
+                        className="marketplace-own-category"
+                        label={localizeWithFallback('shop.marketplace.own.offers.category', 'Category')}
+                        options={categoryOptions}
+                        value={category}
+                        onSelect={selectCategory}
                     />
-                    {searchInput.length > 0 && <BaseButton aria-label="clear" className="marketplace-own-search-clear" onClick={clearSearch} />}
-                </span>
-                <BaseButton className="octane-marketplace-button marketplace-own-search-button" onClick={performSearch}>
-                    {text('generic.search')}
-                </BaseButton>
-            </div>
-            <ClassicScrollAreaView className="octane-marketplace-list is-own" contentClassName="octane-marketplace-list-content">
-                {shownOffers.map((offer) => (
-                    <CatalogLayoutMarketplaceItemView key={offer.offerId} offerData={offer} type={OWN_OFFER} onClick={takeItemBack} />
-                ))}
-            </ClassicScrollAreaView>
-            <div className="octane-marketplace-own-bottom">
-                <span className="octane-marketplace-status" data-testid="marketplace-status" role="status">
-                    {status}
-                </span>
-                {bottomButton === 'recall' ? (
-                    <BaseButton className="octane-marketplace-button is-red marketplace-own-recall" disabled={!actionsEnabled} onClick={recallAllOffers}>
-                        {text('shop.marketplace.recall.all.button')}
+                    <span className="marketplace-own-search-input">
+                        <input
+                            aria-label={text('catalog.search')}
+                            autoComplete="off"
+                            maxLength={MARKETPLACE_MAX_SEARCH_LENGTH}
+                            placeholder={text('catalog.search')}
+                            type="text"
+                            value={searchInput}
+                            onChange={(event) => setSearchInput(event.target.value.substring(0, MARKETPLACE_MAX_SEARCH_LENGTH))}
+                            onKeyDown={onSearchKeyDown}
+                        />
+                        {searchInput.length > 0 && <BaseButton aria-label="clear" className="marketplace-own-search-clear" onClick={clearSearch} />}
+                    </span>
+                    <BaseButton className="octane-marketplace-button marketplace-own-search-button" onClick={performSearch}>
+                        {text('generic.search')}
                     </BaseButton>
-                ) : (
-                    <BaseButton className="octane-marketplace-button marketplace-own-seen" disabled={!actionsEnabled} onClick={markAsSeen}>
-                        {text('shop.marketplace.mark.as.seen.button')}
-                    </BaseButton>
-                )}
+                </div>
+                <ClassicScrollAreaView className="octane-marketplace-list is-own" contentClassName="octane-marketplace-list-content">
+                    {shownOffers.map((offer) => (
+                        <CatalogLayoutMarketplaceItemView key={offer.offerId} offerData={offer} type={OWN_OFFER} onClick={takeItemBack} />
+                    ))}
+                </ClassicScrollAreaView>
+                <div className="octane-marketplace-own-bottom">
+                    <span className="octane-marketplace-status" data-testid="marketplace-status" role="status">
+                        {status}
+                    </span>
+                    {bottomButton === 'recall' ? (
+                        <BaseButton className="octane-marketplace-button is-red marketplace-own-recall" disabled={!actionsEnabled} onClick={recallAllOffers}>
+                            {text('shop.marketplace.recall.all.button')}
+                        </BaseButton>
+                    ) : (
+                        <BaseButton className="octane-marketplace-button marketplace-own-seen" disabled={!actionsEnabled} onClick={markAsSeen}>
+                            {text('shop.marketplace.mark.as.seen.button')}
+                        </BaseButton>
+                    )}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

@@ -9,6 +9,7 @@ import { BaseButton } from '../../../../common/BaseButton';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const LIMIT_FURNI_PICKALL = 100;
 
@@ -132,85 +133,87 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
     const isRowSelected = (row: RoomObjectItem) => (pickallFurni ? checkedKeys.includes(chooserItemKey(row)) : selectedKey === chooserItemKey(row));
 
     return (
-        <OctaneCardView className={classNames('octane-chooser', isUsers ? 'w-[290px] h-[357px]' : 'w-[413px] h-[354px]')} theme="primary-slim">
-            <OctaneCardHeaderView headerText={title} onCloseClick={handleClose} />
-            <OctaneCardContentView overflow="hidden" gap={1}>
-                <div className="octane-chooser-bar">
-                    <div className="relative grow">
-                        <OctaneInput
-                            type="text"
-                            placeholder={localizeWithFallback('new_chooser.search', 'Search')}
-                            value={searchValue}
-                            onChange={(event) => setSearchValue(event.target.value)}
-                        />
-                        {searchValue.length > 0 && (
-                            <BaseButton
-                                aria-label={localizeWithFallback('generic.clear', 'Clear')}
-                                className="octane-chooser-clear"
-                                type="button"
-                                onClick={() => setSearchValue('')}
-                            >
-                                ×
-                            </BaseButton>
-                        )}
-                    </div>
-                    <Select
-                        aria-label={isUsers ? localizeWithFallback('new_user_chooser.col.type', 'Type') : localizeWithFallback('new_furni_chooser.col.owner', 'Owner')}
-                        className={classNames('octane-chooser-filter', !isUsers && 'octane-chooser-filter-wide')}
-                        value={selectedFilter}
-                        onChange={(event) => setSelectedFilter(event.target.value)}
-                    >
-                        <option value={FILTER_ALL}>
-                            {isUsers ? localizeWithFallback('new_user_chooser.usertype.all', 'All types') : localizeWithFallback('new_furni_chooser.owner_selector.default', 'All owners')}
-                        </option>
-                        {filterOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </Select>
-                </div>
-                <div className="octane-chooser-table">
-                    <div className="octane-chooser-row octane-chooser-head">
-                        {pickallFurni && (
-                            <Checkbox checked={allChecked} aria-label={localizeWithFallback('widget.chooser.checkall', 'Select all')} onCheckedChange={ () => updateChecked(allChecked ? [] : checkableItems.map(chooserItemKey)) } />
-                        )}
-                        <span className="octane-chooser-cell grow">{isUsers ? localizeWithFallback('new_user_chooser.col.name', 'Name') : localizeWithFallback('new_furni_chooser.col.name', 'Name')}</span>
-                        <span className={classNames('octane-chooser-cell', isUsers ? 'w-[90px]' : 'w-[120px]')}>
-                            {isUsers ? localizeWithFallback('new_user_chooser.col.type', 'Type') : localizeWithFallback('new_furni_chooser.col.owner', 'Owner')}
-                        </span>
-                        {!isUsers && <span className="octane-chooser-cell w-[90px]">{localizeWithFallback('new_furni_chooser.col.id', 'ID')}</span>}
-                    </div>
-                    <div className="octane-chooser-body">
-                        <InfiniteScroll
-                            rows={filteredItems}
-                            rowRender={(row) => (
-                                <div
-                                    aria-selected={isRowSelected(row)}
-                                    className={classNames('octane-chooser-row octane-chooser-item', isRowSelected(row) && 'is-selected')}
-                                    role="row"
-                                    onClick={() => choose(row)}
+        <NativeTextTree>
+            <OctaneCardView className={classNames('octane-chooser', isUsers ? 'w-[290px] h-[357px]' : 'w-[413px] h-[354px]')} theme="primary-slim">
+                <OctaneCardHeaderView headerText={title} onCloseClick={handleClose} />
+                <OctaneCardContentView overflow="hidden" gap={1}>
+                    <div className="octane-chooser-bar">
+                        <div className="relative grow">
+                            <OctaneInput
+                                type="text"
+                                placeholder={localizeWithFallback('new_chooser.search', 'Search')}
+                                value={searchValue}
+                                onChange={(event) => setSearchValue(event.target.value)}
+                            />
+                            {searchValue.length > 0 && (
+                                <BaseButton
+                                    aria-label={localizeWithFallback('generic.clear', 'Clear')}
+                                    className="octane-chooser-clear"
+                                    type="button"
+                                    onClick={() => setSearchValue('')}
                                 >
-                                    {pickallFurni && (
-                                        <Checkbox checked={checkedKeys.includes(chooserItemKey(row))} onClick={(event) => event.stopPropagation()} onCheckedChange={ () => toggleChecked(row) } />
-                                    )}
-                                    <span className="octane-chooser-cell grow truncate">{row.name}</span>
-                                    <span className={classNames('octane-chooser-cell truncate', isUsers ? 'w-[90px]' : 'w-[120px]')}>
-                                        {isUsers ? userTypeLabel(row.type) : furniOwnerCell(row)}
-                                    </span>
-                                    {!isUsers && <span className="octane-chooser-cell w-[90px] truncate">{row.id}</span>}
-                                </div>
+                                    ×
+                                </BaseButton>
                             )}
-                        />
+                        </div>
+                        <Select
+                            aria-label={isUsers ? localizeWithFallback('new_user_chooser.col.type', 'Type') : localizeWithFallback('new_furni_chooser.col.owner', 'Owner')}
+                            className={classNames('octane-chooser-filter', !isUsers && 'octane-chooser-filter-wide')}
+                            value={selectedFilter}
+                            onChange={(event) => setSelectedFilter(event.target.value)}
+                        >
+                            <option value={FILTER_ALL}>
+                                {isUsers ? localizeWithFallback('new_user_chooser.usertype.all', 'All types') : localizeWithFallback('new_furni_chooser.owner_selector.default', 'All owners')}
+                            </option>
+                            {filterOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </Select>
                     </div>
-                </div>
-                {pickallFurni && (
-                    <Button variant="secondary" onClick={onClickPickAll} disabled={!checkedItems.some((item) => item.category === RoomObjectCategory.FLOOR)}>
-                        {localizeWithFallback('widget.chooser.btn.pickall', 'Pick up selected')}
-                    </Button>
-                )}
-                <div className="octane-chooser-amount">{foundText}</div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    <div className="octane-chooser-table">
+                        <div className="octane-chooser-row octane-chooser-head">
+                            {pickallFurni && (
+                                <Checkbox checked={allChecked} aria-label={localizeWithFallback('widget.chooser.checkall', 'Select all')} onCheckedChange={ () => updateChecked(allChecked ? [] : checkableItems.map(chooserItemKey)) } />
+                            )}
+                            <span className="octane-chooser-cell grow">{isUsers ? localizeWithFallback('new_user_chooser.col.name', 'Name') : localizeWithFallback('new_furni_chooser.col.name', 'Name')}</span>
+                            <span className={classNames('octane-chooser-cell', isUsers ? 'w-[90px]' : 'w-[120px]')}>
+                                {isUsers ? localizeWithFallback('new_user_chooser.col.type', 'Type') : localizeWithFallback('new_furni_chooser.col.owner', 'Owner')}
+                            </span>
+                            {!isUsers && <span className="octane-chooser-cell w-[90px]">{localizeWithFallback('new_furni_chooser.col.id', 'ID')}</span>}
+                        </div>
+                        <div className="octane-chooser-body">
+                            <InfiniteScroll
+                                rows={filteredItems}
+                                rowRender={(row) => (
+                                    <div
+                                        aria-selected={isRowSelected(row)}
+                                        className={classNames('octane-chooser-row octane-chooser-item', isRowSelected(row) && 'is-selected')}
+                                        role="row"
+                                        onClick={() => choose(row)}
+                                    >
+                                        {pickallFurni && (
+                                            <Checkbox checked={checkedKeys.includes(chooserItemKey(row))} onClick={(event) => event.stopPropagation()} onCheckedChange={ () => toggleChecked(row) } />
+                                        )}
+                                        <span className="octane-chooser-cell grow truncate">{row.name}</span>
+                                        <span className={classNames('octane-chooser-cell truncate', isUsers ? 'w-[90px]' : 'w-[120px]')}>
+                                            {isUsers ? userTypeLabel(row.type) : furniOwnerCell(row)}
+                                        </span>
+                                        {!isUsers && <span className="octane-chooser-cell w-[90px] truncate">{row.id}</span>}
+                                    </div>
+                                )}
+                            />
+                        </div>
+                    </div>
+                    {pickallFurni && (
+                        <Button variant="secondary" onClick={onClickPickAll} disabled={!checkedItems.some((item) => item.category === RoomObjectCategory.FLOOR)}>
+                            {localizeWithFallback('widget.chooser.btn.pickall', 'Pick up selected')}
+                        </Button>
+                    )}
+                    <div className="octane-chooser-amount">{foundText}</div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

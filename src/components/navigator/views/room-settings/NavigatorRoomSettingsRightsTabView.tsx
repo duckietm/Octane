@@ -10,6 +10,7 @@ import {
 import { FC, useEffect, useRef, useState } from 'react';
 import { IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
 import { BaseButton, Button, Column, Flex, Grid, Text, UserProfileIconView } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useFriends, useMessageEvent } from '../../../../hooks';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
 
@@ -102,69 +103,71 @@ export const NavigatorRoomSettingsRightsTabView: FC<NavigatorRoomSettingsTabView
     }, [roomData]);
 
     return (
-        <Grid>
-            <Column size={6}>
-                <NavigatorRoomSettingsSectionView
-                    gap={1}
-                    className="h-full"
-                    title={LocalizeText(
-                        'navigator.flatctrls.userswithrights',
-                        ['displayed', 'total'],
-                        [filteredUsersWithRights.size.toString(), filteredUsersWithRights.size.toString()]
-                    )}
-                >
-                    <Flex overflow="hidden" className="octane-card-panel p-2 list-container">
-                        <Column fullWidth overflow="auto" gap={1}>
-                            {Array.from(filteredUsersWithRights.entries()).map(([id, name], index) => {
-                                return (
-                                    <Flex key={`${id}-${index}`} shrink alignItems="center" gap={1} overflow="hidden">
-                                        <UserProfileIconView userId={id} />
-                                        <Text pointer grow className="border-0 bg-transparent p-0 text-left" component={BaseButton} onClick={() => guardedSend(`take_${id}`, new RoomTakeRightsComposer(id))}>
-                                            {name}
-                                        </Text>
-                                    </Flex>
-                                );
-                            })}
-                        </Column>
-                    </Flex>
-
-                    <Button
-                        classNames={['octane-room-settings-clear-rights']}
-                        variant="secondary"
-                        disabled={!filteredUsersWithRights.size}
-                        onClick={() => roomData && guardedSend('removeAll', new RemoveAllRightsMessageComposer(roomData.roomId))}
+        <NativeTextTree>
+            <Grid>
+                <Column size={6}>
+                    <NavigatorRoomSettingsSectionView
+                        gap={1}
+                        className="h-full"
+                        title={LocalizeText(
+                            'navigator.flatctrls.userswithrights',
+                            ['displayed', 'total'],
+                            [filteredUsersWithRights.size.toString(), filteredUsersWithRights.size.toString()]
+                        )}
                     >
-                        {LocalizeText('navigator.flatctrls.clear')}
-                    </Button>
-                </NavigatorRoomSettingsSectionView>
-            </Column>
+                        <Flex overflow="hidden" className="octane-card-panel p-2 list-container">
+                            <Column fullWidth overflow="auto" gap={1}>
+                                {Array.from(filteredUsersWithRights.entries()).map(([id, name], index) => {
+                                    return (
+                                        <Flex key={`${id}-${index}`} shrink alignItems="center" gap={1} overflow="hidden">
+                                            <UserProfileIconView userId={id} />
+                                            <Text pointer grow className="border-0 bg-transparent p-0 text-left" component={BaseButton} onClick={() => guardedSend(`take_${id}`, new RoomTakeRightsComposer(id))}>
+                                                {name}
+                                            </Text>
+                                        </Flex>
+                                    );
+                                })}
+                            </Column>
+                        </Flex>
 
-            <Column size={6}>
-                <NavigatorRoomSettingsSectionView
-                    gap={1}
-                    className="h-full"
-                    title={LocalizeText(
-                        'navigator.flatctrls.friends',
-                        ['displayed', 'total'],
-                        [friendsWithoutRights.length.toString(), allFriends.length.toString()]
-                    )}
-                >
-                    <Flex overflow="hidden" className="octane-card-panel p-2 list-container">
-                        <Column fullWidth overflow="auto" gap={1}>
-                            {friendsWithoutRights.map((friend, index) => {
-                                return (
-                                    <Flex key={`${friend.id}-${index}`} shrink alignItems="center" gap={1} overflow="hidden">
-                                        <UserProfileIconView userId={friend.id} />
-                                        <Text pointer grow className="border-0 bg-transparent p-0 text-left" component={BaseButton} onClick={() => guardedSend(`give_${friend.id}`, new RoomGiveRightsComposer(friend.id))}>
-                                            {friend.name}
-                                        </Text>
-                                    </Flex>
-                                );
-                            })}
-                        </Column>
-                    </Flex>
-                </NavigatorRoomSettingsSectionView>
-            </Column>
-        </Grid>
+                        <Button
+                            classNames={['octane-room-settings-clear-rights']}
+                            variant="secondary"
+                            disabled={!filteredUsersWithRights.size}
+                            onClick={() => roomData && guardedSend('removeAll', new RemoveAllRightsMessageComposer(roomData.roomId))}
+                        >
+                            {LocalizeText('navigator.flatctrls.clear')}
+                        </Button>
+                    </NavigatorRoomSettingsSectionView>
+                </Column>
+
+                <Column size={6}>
+                    <NavigatorRoomSettingsSectionView
+                        gap={1}
+                        className="h-full"
+                        title={LocalizeText(
+                            'navigator.flatctrls.friends',
+                            ['displayed', 'total'],
+                            [friendsWithoutRights.length.toString(), allFriends.length.toString()]
+                        )}
+                    >
+                        <Flex overflow="hidden" className="octane-card-panel p-2 list-container">
+                            <Column fullWidth overflow="auto" gap={1}>
+                                {friendsWithoutRights.map((friend, index) => {
+                                    return (
+                                        <Flex key={`${friend.id}-${index}`} shrink alignItems="center" gap={1} overflow="hidden">
+                                            <UserProfileIconView userId={friend.id} />
+                                            <Text pointer grow className="border-0 bg-transparent p-0 text-left" component={BaseButton} onClick={() => guardedSend(`give_${friend.id}`, new RoomGiveRightsComposer(friend.id))}>
+                                                {friend.name}
+                                            </Text>
+                                        </Flex>
+                                    );
+                                })}
+                            </Column>
+                        </Flex>
+                    </NavigatorRoomSettingsSectionView>
+                </Column>
+            </Grid>
+        </NativeTextTree>
     );
 };

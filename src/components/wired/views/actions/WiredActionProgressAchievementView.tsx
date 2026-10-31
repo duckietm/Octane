@@ -9,6 +9,7 @@ import { readWiredVariableToken, toWiredVariableId, wiredVariableIdList } from '
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * Habbo's progress-achievement action (`wf_act_progress_achievement`): progresses one of the room's
@@ -79,73 +80,75 @@ export const WiredActionProgressAchievementView: FC<{}> = () => {
     const validate = () => achievement.length > 0 && valueValid && (!isVariable || getCustomVariableItemId(valueToken) > 0);
 
     return (
-        <WiredActionBaseView
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            validate={validate}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.progress_achievement.name', 'Achievement')}</Text>
-                {options.length ? (
-                    <Select className="form-select form-select-sm" value={achievement} onChange={(event) => setAchievement(event.target.value)}>
-                        {!achievement && <option value="">{localizeWithFallback('wiredfurni.params.progress_achievement.pick', 'Pick an achievement')}</option>}
-                        {options.map((name) => (
-                            <option key={name} value={name}>
-                                {name}
-                            </option>
-                        ))}
-                    </Select>
-                ) : (
-                    <Text small>
-                        {localizeWithFallback(
-                            'wiredfurni.params.progress_achievement.none',
-                            'No achievements in this room. Name them in an achievement enabler add-on; the hotel must allow them too.'
-                        )}
-                    </Text>
-                )}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.progress_achievement.mode', 'Progress')}</Text>
-                {[PROGRESS_ACHIEVEMENT_MODE_ADD, PROGRESS_ACHIEVEMENT_MODE_RAISE_TO].map((value) => (
-                    <label key={value} className="flex items-center gap-1">
-                        <Radio name="progressAchievementMode" checked={mode === value} onCheckedChange={() => setMode(value)} />
-                        <Text>
+        <NativeTextTree>
+            <WiredActionBaseView
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                validate={validate}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.progress_achievement.name', 'Achievement')}</Text>
+                    {options.length ? (
+                        <Select className="form-select form-select-sm" value={achievement} onChange={(event) => setAchievement(event.target.value)}>
+                            {!achievement && <option value="">{localizeWithFallback('wiredfurni.params.progress_achievement.pick', 'Pick an achievement')}</option>}
+                            {options.map((name) => (
+                                <option key={name} value={name}>
+                                    {name}
+                                </option>
+                            ))}
+                        </Select>
+                    ) : (
+                        <Text small>
                             {localizeWithFallback(
-                                `wiredfurni.params.progress_achievement.mode.${value}`,
-                                value === PROGRESS_ACHIEVEMENT_MODE_ADD ? 'Add the amount' : 'Raise the progress to the amount'
+                                'wiredfurni.params.progress_achievement.none',
+                                'No achievements in this room. Name them in an achievement enabler add-on; the hotel must allow them too.'
                             )}
                         </Text>
-                    </label>
-                ))}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.progress_achievement.score', 'Amount')}</Text>
-                {/* AIR ProgressAchievement: createValueOrVariableSection(0, mergedSourceOptions(0), score, 0, int max); the
-                    claimed merged slot 0 (furni 0 + users 1) is the value's holder in the popup. The amount is 0..int max
-                    as AIR (clampProgressAmount on save). */}
-                <WiredValueOrVariableField
-                    holderSource={{
-                        furniSource: valueFurniSource,
-                        userSource: valueUserSource,
-                        onFurniSourceChange: setValueFurniSource,
-                        onUserSourceChange: setValueUserSource
-                    }}
-                    isVariable={isVariable}
-                    label={localizeWithFallback('wiredfurni.params.progress_achievement.score', 'Amount')}
-                    literal={amount}
-                    max={PROGRESS_ACHIEVEMENT_MAX_AMOUNT}
-                    min={0}
-                    target={valueTarget}
-                    token={valueToken}
-                    onIsVariableChange={setIsVariable}
-                    onLiteralChange={setAmount}
-                    onTargetChange={setValueTarget}
-                    onTokenChange={setValueToken}
-                    onValidityChange={setValueValid}
-                />
-            </div>
-        </WiredActionBaseView>
+                    )}
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.progress_achievement.mode', 'Progress')}</Text>
+                    {[PROGRESS_ACHIEVEMENT_MODE_ADD, PROGRESS_ACHIEVEMENT_MODE_RAISE_TO].map((value) => (
+                        <label key={value} className="flex items-center gap-1">
+                            <Radio name="progressAchievementMode" checked={mode === value} onCheckedChange={() => setMode(value)} />
+                            <Text>
+                                {localizeWithFallback(
+                                    `wiredfurni.params.progress_achievement.mode.${value}`,
+                                    value === PROGRESS_ACHIEVEMENT_MODE_ADD ? 'Add the amount' : 'Raise the progress to the amount'
+                                )}
+                            </Text>
+                        </label>
+                    ))}
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.progress_achievement.score', 'Amount')}</Text>
+                    {/* AIR ProgressAchievement: createValueOrVariableSection(0, mergedSourceOptions(0), score, 0, int max); the
+                        claimed merged slot 0 (furni 0 + users 1) is the value's holder in the popup. The amount is 0..int max
+                        as AIR (clampProgressAmount on save). */}
+                    <WiredValueOrVariableField
+                        holderSource={{
+                            furniSource: valueFurniSource,
+                            userSource: valueUserSource,
+                            onFurniSourceChange: setValueFurniSource,
+                            onUserSourceChange: setValueUserSource
+                        }}
+                        isVariable={isVariable}
+                        label={localizeWithFallback('wiredfurni.params.progress_achievement.score', 'Amount')}
+                        literal={amount}
+                        max={PROGRESS_ACHIEVEMENT_MAX_AMOUNT}
+                        min={0}
+                        target={valueTarget}
+                        token={valueToken}
+                        onIsVariableChange={setIsVariable}
+                        onLiteralChange={setAmount}
+                        onTargetChange={setValueTarget}
+                        onTokenChange={setValueToken}
+                        onValidityChange={setValueValid}
+                    />
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

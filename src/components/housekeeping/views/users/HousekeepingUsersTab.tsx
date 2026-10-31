@@ -28,6 +28,7 @@ import { DEFAULT_SANCTION_DRAFT, HousekeepingSanctionDraft, HousekeepingUserSanc
 import { Checkbox } from '../../../../common/Checkbox';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const BULK_CONFIRM_THRESHOLD = 5;
 
@@ -138,157 +139,159 @@ export const HousekeepingUsersTab: FC = () => {
         : allSections;
 
     return (
-        <div className="flex flex-col gap-2">
-            <div className="relative">
-                <div className="flex items-center gap-1.5">
-                    <div className="flex grow items-center gap-1 rounded-md border border-zinc-300 bg-white px-2 py-1 shadow-sm focus-within:border-sky-400 focus-within:ring-1 focus-within:ring-sky-300">
-                        <FaSearch className="shrink-0 text-zinc-400" size={11} />
-                        <input
-                            className="grow bg-transparent text-xs outline-none placeholder:italic placeholder:text-zinc-500"
-                            placeholder={LocalizeText('housekeeping.user.search.placeholder')}
-                            value={query}
-                            onBlur={() => {
-                                if (blurTimerRef.current) clearTimeout(blurTimerRef.current);
-                                blurTimerRef.current = setTimeout(() => setIsFocused(false), 120);
-                            }}
-                            onChange={(event) => setQuery(event.target.value)}
-                            onFocus={() => setIsFocused(true)}
-                            onKeyDown={(event) => {
-                                if (event.key === 'Enter') submitLookup();
-                                if (event.key === 'Escape') setIsFocused(false);
-                            }}
-                        />
+        <NativeTextTree>
+            <div className="flex flex-col gap-2">
+                <div className="relative">
+                    <div className="flex items-center gap-1.5">
+                        <div className="flex grow items-center gap-1 rounded-md border border-zinc-300 bg-white px-2 py-1 shadow-sm focus-within:border-sky-400 focus-within:ring-1 focus-within:ring-sky-300">
+                            <FaSearch className="shrink-0 text-zinc-400" size={11} />
+                            <input
+                                className="grow bg-transparent text-xs outline-none placeholder:italic placeholder:text-zinc-500"
+                                placeholder={LocalizeText('housekeeping.user.search.placeholder')}
+                                value={query}
+                                onBlur={() => {
+                                    if (blurTimerRef.current) clearTimeout(blurTimerRef.current);
+                                    blurTimerRef.current = setTimeout(() => setIsFocused(false), 120);
+                                }}
+                                onChange={(event) => setQuery(event.target.value)}
+                                onFocus={() => setIsFocused(true)}
+                                onKeyDown={(event) => {
+                                    if (event.key === 'Enter') submitLookup();
+                                    if (event.key === 'Escape') setIsFocused(false);
+                                }}
+                            />
+                        </div>
+                        <HousekeepingButton disabled={isUserLoading} gap={1} onClick={submitLookup}>
+                            <FaSearch className={isUserLoading ? 'animate-pulse' : ''} size={10} />
+                            <span>{LocalizeText('housekeeping.user.search.button')}</span>
+                        </HousekeepingButton>
                     </div>
-                    <HousekeepingButton disabled={isUserLoading} gap={1} onClick={submitLookup}>
-                        <FaSearch className={isUserLoading ? 'animate-pulse' : ''} size={10} />
-                        <span>{LocalizeText('housekeeping.user.search.button')}</span>
-                    </HousekeepingButton>
-                </div>
-                {showSuggestionPanel && (
-                    <div className="octane-hk-popover absolute left-0 right-0 top-full z-30 mt-1 max-h-[200px] overflow-y-auto rounded border border-zinc-200 bg-white shadow-lg">
-                        {userSuggestions.length > 0
-                            ? userSuggestions.map((entry) => {
-                                  const isChecked = selectedUserIds.includes(entry.id);
+                    {showSuggestionPanel && (
+                        <div className="octane-hk-popover absolute left-0 right-0 top-full z-30 mt-1 max-h-[200px] overflow-y-auto rounded border border-zinc-200 bg-white shadow-lg">
+                            {userSuggestions.length > 0
+                                ? userSuggestions.map((entry) => {
+                                      const isChecked = selectedUserIds.includes(entry.id);
 
-                                  return (
-                                      <div
+                                      return (
+                                          <div
+                                              key={entry.id}
+                                              className="flex w-full items-center gap-2 border-b border-zinc-100 px-2 py-1 text-xs last:border-b-0 hover:bg-sky-50"
+                                              onMouseDown={(event) => event.preventDefault()}
+                                          >
+                                              <Checkbox checked={isChecked} className="shrink-0" title={isChecked ? LocalizeText('housekeeping.bulk.clear') : LocalizeText('housekeeping.bulk.apply')} onCheckedChange={() => toggleUserSelection(entry.id)} />
+                                              <BaseButton
+                                                  className="flex grow items-center gap-2 text-left"
+                                                  onClick={() => {
+                                                      setQuery(entry.username);
+                                                      setIsFocused(false);
+                                                      lookupUserById(entry.id);
+                                                  }}
+                                              >
+                                                  <FaCircle className={entry.online ? 'text-emerald-500' : 'text-zinc-400'} size={6} />
+                                                  <span className="grow truncate font-medium">{entry.username}</span>
+                                                  <span className="shrink-0 text-[10px] text-zinc-500">
+                                                      #{entry.id} · {entry.rank}
+                                                  </span>
+                                              </BaseButton>
+                                          </div>
+                                      );
+                                  })
+                                : recentUsers.map((entry) => (
+                                      <BaseButton
                                           key={entry.id}
-                                          className="flex w-full items-center gap-2 border-b border-zinc-100 px-2 py-1 text-xs last:border-b-0 hover:bg-sky-50"
+                                          className="flex w-full items-center gap-2 border-b border-zinc-100 px-2 py-1 text-left text-xs last:border-b-0 hover:bg-sky-50"
+                                          onClick={() => {
+                                              setQuery(entry.label);
+                                              setIsFocused(false);
+                                              lookupUserById(entry.id);
+                                          }}
                                           onMouseDown={(event) => event.preventDefault()}
                                       >
-                                          <Checkbox checked={isChecked} className="shrink-0" title={isChecked ? LocalizeText('housekeeping.bulk.clear') : LocalizeText('housekeeping.bulk.apply')} onCheckedChange={() => toggleUserSelection(entry.id)} />
-                                          <BaseButton
-                                              className="flex grow items-center gap-2 text-left"
-                                              onClick={() => {
-                                                  setQuery(entry.username);
-                                                  setIsFocused(false);
-                                                  lookupUserById(entry.id);
-                                              }}
-                                          >
-                                              <FaCircle className={entry.online ? 'text-emerald-500' : 'text-zinc-400'} size={6} />
-                                              <span className="grow truncate font-medium">{entry.username}</span>
-                                              <span className="shrink-0 text-[10px] text-zinc-500">
-                                                  #{entry.id} · {entry.rank}
-                                              </span>
-                                          </BaseButton>
-                                      </div>
-                                  );
-                              })
-                            : recentUsers.map((entry) => (
-                                  <BaseButton
-                                      key={entry.id}
-                                      className="flex w-full items-center gap-2 border-b border-zinc-100 px-2 py-1 text-left text-xs last:border-b-0 hover:bg-sky-50"
-                                      onClick={() => {
-                                          setQuery(entry.label);
-                                          setIsFocused(false);
-                                          lookupUserById(entry.id);
-                                      }}
-                                      onMouseDown={(event) => event.preventDefault()}
-                                  >
-                                      <span className="shrink-0 text-[10px] uppercase text-zinc-400">{LocalizeText('housekeeping.user.recent')}</span>
-                                      <span className="grow truncate font-medium">{entry.label}</span>
-                                      <span className="shrink-0 text-[10px] text-zinc-500">#{entry.id}</span>
-                                  </BaseButton>
-                              ))}
+                                          <span className="shrink-0 text-[10px] uppercase text-zinc-400">{LocalizeText('housekeeping.user.recent')}</span>
+                                          <span className="grow truncate font-medium">{entry.label}</span>
+                                          <span className="shrink-0 text-[10px] text-zinc-500">#{entry.id}</span>
+                                      </BaseButton>
+                                  ))}
+                        </div>
+                    )}
+                </div>
+
+                {selectedUserIds.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1 rounded border border-sky-300 bg-sky-50 p-1.5">
+                        <span className="mr-1 text-[10px] font-semibold uppercase tracking-wide text-sky-800">
+                            {LocalizeText('housekeeping.bulk.label', ['count'], [String(selectedUserIds.length)])}
+                        </span>
+                        <HousekeepingButton
+                            disabled={isActionPending}
+                            gap={1}
+                            size="sm"
+                            variant="danger"
+                            onClick={() =>
+                                runBulkWithGate(LocalizeText('housekeeping.action.ban_h', ['h'], [String(draft.banHours)]), () =>
+                                    banUsersBulk(selectedUserIds, reason, draft.banHours)
+                                )
+                            }
+                        >
+                            <FaBan size={10} />
+                            <span>{LocalizeText('housekeeping.action.ban_h', ['h'], [String(draft.banHours)])}</span>
+                        </HousekeepingButton>
+                        <HousekeepingButton
+                            disabled={isActionPending}
+                            gap={1}
+                            size="sm"
+                            variant="warning"
+                            onClick={() =>
+                                runBulkWithGate(LocalizeText('housekeeping.action.mute_min', ['m'], [String(draft.muteMinutes)]), () =>
+                                    muteUsersBulk(selectedUserIds, reason, draft.muteMinutes)
+                                )
+                            }
+                        >
+                            <FaVolumeMute size={10} />
+                            <span>{LocalizeText('housekeeping.action.mute_min', ['m'], [String(draft.muteMinutes)])}</span>
+                        </HousekeepingButton>
+                        <HousekeepingButton
+                            disabled={isActionPending}
+                            gap={1}
+                            size="sm"
+                            variant="warning"
+                            onClick={() => runBulkWithGate(LocalizeText('housekeeping.action.kick'), () => kickUsersBulk(selectedUserIds, reason))}
+                        >
+                            <FaUserSlash size={10} />
+                            <span>{LocalizeText('housekeeping.action.kick')}</span>
+                        </HousekeepingButton>
+                        <Hint content={LocalizeText('housekeeping.bulk.clear')}>
+                            <BaseButton aria-label={LocalizeText('housekeeping.bulk.clear')}
+                                className="ml-auto px-1 text-zinc-500 hover:text-rose-600"
+                                onClick={clearUserSelection}
+                            >
+                                <FaTimes size={10} />
+                            </BaseButton>
+                        </Hint>
                     </div>
                 )}
+
+                {!selectedUser && <HousekeepingEmptyState icon={<FaUserSlash size={14} />}>{LocalizeText('housekeeping.user.none')}</HousekeepingEmptyState>}
+
+                {selectedUser && (
+                    <>
+                        <HousekeepingUserCard user={selectedUser} onClear={() => setSelectedUser(null)} />
+                        <HousekeepingSubTabs<HousekeepingUserSection> active={userSection} tabs={sections} onChange={setUserSection} />
+                        {userSection === HousekeepingUserSection.SANCTIONS && (
+                            <HousekeepingUserSanctionsView draft={draft} isInCurrentRoom={isInCurrentRoom} setDraft={setDraft} user={selectedUser} />
+                        )}
+                        {userSection === HousekeepingUserSection.ACTIVITY && (
+                            <HousekeepingListView key={`activity-${selectedUser.id}`} lists={USER_ACTIVITY_LISTS} targetId={selectedUser.id} />
+                        )}
+                        {userSection === HousekeepingUserSection.SECURITY && (
+                            <HousekeepingListView key={`security-${selectedUser.id}`} lists={USER_SECURITY_LISTS} targetId={selectedUser.id} />
+                        )}
+                        {canEconomy && userSection === HousekeepingUserSection.ECONOMY && <HousekeepingUserEconomyView user={selectedUser} />}
+                        {userSection === HousekeepingUserSection.ACCOUNT && <HousekeepingUserAccountView key={selectedUser.id} user={selectedUser} />}
+                        {userSection === HousekeepingUserSection.NOTES && <HousekeepingUserNotesView key={selectedUser.id} user={selectedUser} />}
+                        {userSection === HousekeepingUserSection.HISTORY && <HousekeepingHistoryView entries={history} />}
+                    </>
+                )}
             </div>
-
-            {selectedUserIds.length > 0 && (
-                <div className="flex flex-wrap items-center gap-1 rounded border border-sky-300 bg-sky-50 p-1.5">
-                    <span className="mr-1 text-[10px] font-semibold uppercase tracking-wide text-sky-800">
-                        {LocalizeText('housekeeping.bulk.label', ['count'], [String(selectedUserIds.length)])}
-                    </span>
-                    <HousekeepingButton
-                        disabled={isActionPending}
-                        gap={1}
-                        size="sm"
-                        variant="danger"
-                        onClick={() =>
-                            runBulkWithGate(LocalizeText('housekeeping.action.ban_h', ['h'], [String(draft.banHours)]), () =>
-                                banUsersBulk(selectedUserIds, reason, draft.banHours)
-                            )
-                        }
-                    >
-                        <FaBan size={10} />
-                        <span>{LocalizeText('housekeeping.action.ban_h', ['h'], [String(draft.banHours)])}</span>
-                    </HousekeepingButton>
-                    <HousekeepingButton
-                        disabled={isActionPending}
-                        gap={1}
-                        size="sm"
-                        variant="warning"
-                        onClick={() =>
-                            runBulkWithGate(LocalizeText('housekeeping.action.mute_min', ['m'], [String(draft.muteMinutes)]), () =>
-                                muteUsersBulk(selectedUserIds, reason, draft.muteMinutes)
-                            )
-                        }
-                    >
-                        <FaVolumeMute size={10} />
-                        <span>{LocalizeText('housekeeping.action.mute_min', ['m'], [String(draft.muteMinutes)])}</span>
-                    </HousekeepingButton>
-                    <HousekeepingButton
-                        disabled={isActionPending}
-                        gap={1}
-                        size="sm"
-                        variant="warning"
-                        onClick={() => runBulkWithGate(LocalizeText('housekeeping.action.kick'), () => kickUsersBulk(selectedUserIds, reason))}
-                    >
-                        <FaUserSlash size={10} />
-                        <span>{LocalizeText('housekeeping.action.kick')}</span>
-                    </HousekeepingButton>
-                    <Hint content={LocalizeText('housekeeping.bulk.clear')}>
-                        <BaseButton aria-label={LocalizeText('housekeeping.bulk.clear')}
-                            className="ml-auto px-1 text-zinc-500 hover:text-rose-600"
-                            onClick={clearUserSelection}
-                        >
-                            <FaTimes size={10} />
-                        </BaseButton>
-                    </Hint>
-                </div>
-            )}
-
-            {!selectedUser && <HousekeepingEmptyState icon={<FaUserSlash size={14} />}>{LocalizeText('housekeeping.user.none')}</HousekeepingEmptyState>}
-
-            {selectedUser && (
-                <>
-                    <HousekeepingUserCard user={selectedUser} onClear={() => setSelectedUser(null)} />
-                    <HousekeepingSubTabs<HousekeepingUserSection> active={userSection} tabs={sections} onChange={setUserSection} />
-                    {userSection === HousekeepingUserSection.SANCTIONS && (
-                        <HousekeepingUserSanctionsView draft={draft} isInCurrentRoom={isInCurrentRoom} setDraft={setDraft} user={selectedUser} />
-                    )}
-                    {userSection === HousekeepingUserSection.ACTIVITY && (
-                        <HousekeepingListView key={`activity-${selectedUser.id}`} lists={USER_ACTIVITY_LISTS} targetId={selectedUser.id} />
-                    )}
-                    {userSection === HousekeepingUserSection.SECURITY && (
-                        <HousekeepingListView key={`security-${selectedUser.id}`} lists={USER_SECURITY_LISTS} targetId={selectedUser.id} />
-                    )}
-                    {canEconomy && userSection === HousekeepingUserSection.ECONOMY && <HousekeepingUserEconomyView user={selectedUser} />}
-                    {userSection === HousekeepingUserSection.ACCOUNT && <HousekeepingUserAccountView key={selectedUser.id} user={selectedUser} />}
-                    {userSection === HousekeepingUserSection.NOTES && <HousekeepingUserNotesView key={selectedUser.id} user={selectedUser} />}
-                    {userSection === HousekeepingUserSection.HISTORY && <HousekeepingHistoryView entries={history} />}
-                </>
-            )}
-        </div>
+        </NativeTextTree>
     );
 };

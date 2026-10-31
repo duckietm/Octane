@@ -255,6 +255,11 @@ export const invalidateCatalogIndex = (type: string): void => {
     boundClient?.invalidateQueries({ queryKey: catalogIndexKey(type) });
 };
 
+/** Every catalog type's index (normal, builders club, ...): a publish changes them all. */
+export const invalidateAllCatalogIndexes = (): void => {
+    boundClient?.invalidateQueries({ queryKey: [...CATALOG_QUERY_ROOT, 'index'] });
+};
+
 export const invalidateCatalogPage = (type: string, pageId: number): void => {
     boundClient?.invalidateQueries({ queryKey: catalogPageKey(type, pageId) });
 };

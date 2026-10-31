@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { GetConfigurationValue, LocalizeText, SanitizeHtml } from '../../../../../api';
 import { Column, Flex, Grid } from '../../../../../common';
 import { LayoutImage } from '../../../../../common/layout/LayoutImage';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogData, useCatalogUiState, useUserGroups } from '../../../../../hooks';
 import { CatalogFirstProductSelectorWidgetView } from '../widgets/CatalogFirstProductSelectorWidgetView';
 import { CatalogGuildBadgeWidgetView } from '../widgets/CatalogGuildBadgeWidgetView';
@@ -28,40 +29,42 @@ export const CatalogLayouGuildForumView: FC<CatalogLayoutProps> = (props) => {
     const selectedGroupHasForum = !!selectedGroup?.hasForum;
 
     return (
-        <>
-            <CatalogFirstProductSelectorWidgetView />
-            <Grid overflow="hidden">
-                <Column overflow="hidden" size={8}>
-                    <div
-                        className="octane-catalog-forum-text grow! min-h-0 overflow-auto text-black"
-                        dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(1)) }}
-                    />
-                    {!!currentOffer && (
-                        <div className="flex shrink-0 flex-col gap-1">
-                            <Flex alignItems="center" gap={2}>
-                                <CatalogGuildBadgeWidgetView className="shrink-0" />
-                                <CatalogTotalPriceWidget />
-                                <div className="grow! min-w-0">
-                                    <CatalogGuildSelectorWidgetView forumSelector />
-                                </div>
-                            </Flex>
-                            {selectedGroupHasForum && (
-                                <div className="octane-catalog-forum-warning text-center text-[11px] text-[#a81a12]" role="alert">
-                                    {LocalizeText('catalog.alert.group_has_forum')}
-                                </div>
-                            )}
-                            {hasGroups && (
-                                <div className="flex justify-center">
-                                    <CatalogPurchaseWidgetView noGiftOption={true} />
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </Column>
-                <Column alignItems="center" overflow="hidden" size={4}>
-                    {!!teaserImage && <LayoutImage className="max-w-full" imageUrl={teaserImage} />}
-                </Column>
-            </Grid>
-        </>
+        <NativeTextTree>
+            <>
+                <CatalogFirstProductSelectorWidgetView />
+                <Grid overflow="hidden">
+                    <Column overflow="hidden" size={8}>
+                        <div
+                            className="octane-catalog-forum-text grow! min-h-0 overflow-auto text-black"
+                            dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(1)) }}
+                        />
+                        {!!currentOffer && (
+                            <div className="flex shrink-0 flex-col gap-1">
+                                <Flex alignItems="center" gap={2}>
+                                    <CatalogGuildBadgeWidgetView className="shrink-0" />
+                                    <CatalogTotalPriceWidget />
+                                    <div className="grow! min-w-0">
+                                        <CatalogGuildSelectorWidgetView forumSelector />
+                                    </div>
+                                </Flex>
+                                {selectedGroupHasForum && (
+                                    <div className="octane-catalog-forum-warning text-center text-[11px] text-[#a81a12]" role="alert">
+                                        {LocalizeText('catalog.alert.group_has_forum')}
+                                    </div>
+                                )}
+                                {hasGroups && (
+                                    <div className="flex justify-center">
+                                        <CatalogPurchaseWidgetView noGiftOption={true} />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </Column>
+                    <Column alignItems="center" overflow="hidden" size={4}>
+                        {!!teaserImage && <LayoutImage className="max-w-full" imageUrl={teaserImage} />}
+                    </Column>
+                </Grid>
+            </>
+        </NativeTextTree>
     );
 };

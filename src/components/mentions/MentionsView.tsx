@@ -8,6 +8,7 @@ import { useUserDataSnapshot } from '../../hooks/session/useSessionSnapshots';
 import { MentionRowView } from './MentionRowView';
 import { BaseButton } from '../../common/BaseButton';
 import { ToggleButton } from '../../common/ToggleButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface MentionsViewProps {
     onClose: () => void;
@@ -104,23 +105,27 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
 
         if (status === 'error' && mentions.length === 0) {
             return (
-                <>
-                    <span className="mentions-empty-text">{localizeWithFallback('mentions.window.error', 'The mentions could not be loaded.')}</span>
-                    <BaseButton type="button" className="mentions-filter is-active" onClick={requestMentions}>
-                        {localizeWithFallback('mentions.window.retry', 'Try again')}
-                    </BaseButton>
-                </>
+                <NativeTextTree>
+                    <>
+                        <span className="mentions-empty-text">{localizeWithFallback('mentions.window.error', 'The mentions could not be loaded.')}</span>
+                        <BaseButton type="button" className="mentions-filter is-active" onClick={requestMentions}>
+                            {localizeWithFallback('mentions.window.retry', 'Try again')}
+                        </BaseButton>
+                    </>
+                </NativeTextTree>
             );
         }
 
         if (mentions.length > 0 && isFiltering) {
             return (
-                <>
-                    <span className="mentions-empty-text">{localizeWithFallback('mentions.window.noresults', 'No mention matches.')}</span>
-                    <BaseButton type="button" className="mentions-filter is-active" onClick={clearFilters}>
-                        {localizeWithFallback('mentions.filter.clear', 'Clear the filters')}
-                    </BaseButton>
-                </>
+                <NativeTextTree>
+                    <>
+                        <span className="mentions-empty-text">{localizeWithFallback('mentions.window.noresults', 'No mention matches.')}</span>
+                        <BaseButton type="button" className="mentions-filter is-active" onClick={clearFilters}>
+                            {localizeWithFallback('mentions.filter.clear', 'Clear the filters')}
+                        </BaseButton>
+                    </>
+                </NativeTextTree>
             );
         }
 
@@ -128,69 +133,71 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
     };
 
     return (
-        <OctaneCardView
-            className="mentions-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] has-classic-scrollbar"
-            theme="primary-slim"
-            uniqueKey="mentions"
-        >
-            <OctaneCardHeaderView headerText={title} onCloseClick={onClose} />
-            <OctaneCardContentView gap={1}>
-                <div className="mentions-search">
-                    <FaSearch className="mentions-search-icon" />
-                    <input
-                        type="text"
-                        value={query}
-                        aria-label={LocalizeText('generic.search')}
-                        placeholder={LocalizeText('generic.search')}
-                        onChange={(event) => setQuery(event.target.value)}
-                    />
-                </div>
-                <div className="mentions-toolbar">
-                    <div className="mentions-filters" role="group" aria-label={LocalizeText('mentions.window.title')}>
-                        {FILTERS.map(({ key, label }) => {
-                            const active = filter === key;
-                            const showCount = key === 'unread' && unreadCount > 0;
-
-                            return (
-                                <ToggleButton key={key} type="button" pressed={active} className={`mentions-filter ${active ? 'is-active' : ''}`} onClick={() => setFilter(key)}>
-                                    {LocalizeText(label)}
-                                    {showCount ? ` ${unreadCount}` : ''}
-                                </ToggleButton>
-                            );
-                        })}
+        <NativeTextTree>
+            <OctaneCardView
+                className="mentions-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] has-classic-scrollbar"
+                theme="primary-slim"
+                uniqueKey="mentions"
+            >
+                <OctaneCardHeaderView headerText={title} onCloseClick={onClose} />
+                <OctaneCardContentView gap={1}>
+                    <div className="mentions-search">
+                        <FaSearch className="mentions-search-icon" />
+                        <input
+                            type="text"
+                            value={query}
+                            aria-label={LocalizeText('generic.search')}
+                            placeholder={LocalizeText('generic.search')}
+                            onChange={(event) => setQuery(event.target.value)}
+                        />
                     </div>
-                    <BaseButton type="button" className="mentions-refresh" disabled={isLoading} aria-busy={isLoading} onClick={requestMentions}>
-                        {localizeWithFallback('mentions.action.refresh', 'Refresh')}
-                    </BaseButton>
-                </div>
-                <div className="mentions-list" role="list" aria-busy={isLoading}>
-                    {!hasAny && (
-                        <div className="mentions-empty">
-                            <span className="mentions-empty-glyph" aria-hidden />
-                            {renderEmpty()}
+                    <div className="mentions-toolbar">
+                        <div className="mentions-filters" role="group" aria-label={LocalizeText('mentions.window.title')}>
+                            {FILTERS.map(({ key, label }) => {
+                                const active = filter === key;
+                                const showCount = key === 'unread' && unreadCount > 0;
+
+                                return (
+                                    <ToggleButton key={key} type="button" pressed={active} className={`mentions-filter ${active ? 'is-active' : ''}`} onClick={() => setFilter(key)}>
+                                        {LocalizeText(label)}
+                                        {showCount ? ` ${unreadCount}` : ''}
+                                    </ToggleButton>
+                                );
+                            })}
                         </div>
-                    )}
-                    {hasAny &&
-                        groups.map((group) => (
-                            <div key={group.key} className="mentions-group">
-                                <div className="mentions-group-label">{LocalizeText(GROUP_LABEL[group.key])}</div>
-                                {group.items.map((mention) => (
-                                    <MentionRowView key={`${mention.mentionId}-${mention.timestamp}`} mention={mention} onGoto={goto} onOpen={open} onRemove={remove} ownUsername={ownUsername} />
-                                ))}
+                        <BaseButton type="button" className="mentions-refresh" disabled={isLoading} aria-busy={isLoading} onClick={requestMentions}>
+                            {localizeWithFallback('mentions.action.refresh', 'Refresh')}
+                        </BaseButton>
+                    </div>
+                    <div className="mentions-list" role="list" aria-busy={isLoading}>
+                        {!hasAny && (
+                            <div className="mentions-empty">
+                                <span className="mentions-empty-glyph" aria-hidden />
+                                {renderEmpty()}
                             </div>
-                        ))}
-                </div>
-                {hasMore && (
-                    <BaseButton type="button" className="mentions-refresh" disabled={loadingMore} aria-busy={loadingMore} onClick={requestMoreMentions}>
-                        {loadingMore ? localizeWithFallback('mentions.window.loadingmore', 'Loading...') : localizeWithFallback('mentions.window.loadmore', 'Load older mentions')}
-                    </BaseButton>
-                )}
-                {unreadCount > 0 && (
-                    <Button className="mentions-markall" variant="primary" onClick={markAll}>
-                        {LocalizeText('mentions.window.markall')}
-                    </Button>
-                )}
-            </OctaneCardContentView>
-        </OctaneCardView>
+                        )}
+                        {hasAny &&
+                            groups.map((group) => (
+                                <div key={group.key} className="mentions-group">
+                                    <div className="mentions-group-label">{LocalizeText(GROUP_LABEL[group.key])}</div>
+                                    {group.items.map((mention) => (
+                                        <MentionRowView key={`${mention.mentionId}-${mention.timestamp}`} mention={mention} onGoto={goto} onOpen={open} onRemove={remove} ownUsername={ownUsername} />
+                                    ))}
+                                </div>
+                            ))}
+                    </div>
+                    {hasMore && (
+                        <BaseButton type="button" className="mentions-refresh" disabled={loadingMore} aria-busy={loadingMore} onClick={requestMoreMentions}>
+                            {loadingMore ? localizeWithFallback('mentions.window.loadingmore', 'Loading...') : localizeWithFallback('mentions.window.loadmore', 'Load older mentions')}
+                        </BaseButton>
+                    )}
+                    {unreadCount > 0 && (
+                        <Button className="mentions-markall" variant="primary" onClick={markAll}>
+                            {LocalizeText('mentions.window.markall')}
+                        </Button>
+                    )}
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

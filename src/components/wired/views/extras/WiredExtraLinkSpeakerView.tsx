@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * Official Link Speaker add-on (2003): its picked WIRED Links join the send link boxes of its stack, for the kinds
@@ -28,18 +29,20 @@ export const WiredExtraLinkSpeakerView: FC<{}> = () =>
     const save = () => setIntParams([ message ? 1 : 0, dataframe ? 1 : 0 ]);
 
     return (
-        <WiredExtraBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID } save={ save }>
-            <div className="flex flex-col gap-1">
-                <Text bold>{ localizeWithFallback('wiredfurni.params.link_speaker.speak_for', 'Speak for:') }</Text>
-                <label className="flex cursor-pointer items-center gap-1">
-                    <Checkbox checked={ message } onCheckedChange={ nextChecked => setMessage(nextChecked) } />
-                    <Text small>{ localizeWithFallback('wiredfurni.params.link_speaker.message', 'Message') }</Text>
-                </label>
-                <label className="flex cursor-pointer items-center gap-1">
-                    <Checkbox checked={ dataframe } onCheckedChange={ nextChecked => setDataframe(nextChecked) } />
-                    <Text small>{ localizeWithFallback('wiredfurni.params.link_speaker.dataframe', 'Dataframe') }</Text>
-                </label>
-            </div>
-        </WiredExtraBaseView>
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID } save={ save }>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{ localizeWithFallback('wiredfurni.params.link_speaker.speak_for', 'Speak for:') }</Text>
+                    <label className="flex cursor-pointer items-center gap-1">
+                        <Checkbox checked={ message } onCheckedChange={ nextChecked => setMessage(nextChecked) } />
+                        <Text small>{ localizeWithFallback('wiredfurni.params.link_speaker.message', 'Message') }</Text>
+                    </label>
+                    <label className="flex cursor-pointer items-center gap-1">
+                        <Checkbox checked={ dataframe } onCheckedChange={ nextChecked => setDataframe(nextChecked) } />
+                        <Text small>{ localizeWithFallback('wiredfurni.params.link_speaker.dataframe', 'Dataframe') }</Text>
+                    </label>
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

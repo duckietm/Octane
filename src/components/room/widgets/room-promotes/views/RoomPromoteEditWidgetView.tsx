@@ -4,6 +4,7 @@ import { LocalizeText, localizeWithFallback, SendMessageComposer } from '../../.
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../../common';
 import { OctaneInput } from '../../../../../layout';
 import '../../../../../css/room/RoomWidgetsSweepAir.css';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 interface RoomPromoteEditWidgetViewProps {
     eventId: number;
@@ -29,46 +30,48 @@ export const RoomPromoteEditWidgetView: FC<RoomPromoteEditWidgetViewProps> = (pr
     };
 
     return (
-        <OctaneCardView
-            className="octane-room-promote-edit min-w-0 w-[min(340px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
-            theme="primary-slim"
-        >
-            <OctaneCardHeaderView headerText={LocalizeText('navigator.eventsettings.editcaption')} onCloseClick={() => setIsEditingPromote(false)} />
-            <OctaneCardContentView className="text-black">
-                <div className="flex flex-col">
-                    <Text bold className="octane-room-promote-edit__label">{LocalizeText('navigator.eventsettings.name')}</Text>
-                    <OctaneInput
-                        maxLength={64}
-                        placeholder={LocalizeText('navigator.eventsettings.name')}
-                        type="text"
-                        value={newEventName}
-                        onChange={(event) => setNewEventName(event.target.value)}
-                    />
-                </div>
-                <div className="flex flex-col">
-                    <Text bold className="octane-room-promote-edit__label">{LocalizeText('navigator.eventsettings.desc')}</Text>
-                    <textarea
-                        className="min-h-[calc(1.5em+ .5rem+2px)] px-[.5rem] py-[.25rem] rounded-[.2rem] form-control-sm"
-                        maxLength={64}
-                        placeholder={LocalizeText('navigator.eventsettings.desc')}
-                        value={newEventDescription}
-                        onChange={(event) => setNewEventDescription(event.target.value)}
-                    ></textarea>
-                </div>
-                <div className="flex flex-col gap-1">
-                    <Button
-                        fullWidth
-                        disabled={!newEventName || !newEventDescription}
-                        variant="secondary"
-                        onClick={(event) => updatePromote()}
-                    >
-                        {LocalizeText('navigator.eventsettings.edit')}
-                    </Button>
-                    <Button fullWidth variant="secondary" onClick={endPromote}>
-                        {localizeWithFallback('navigator.eventsettings.end', 'End event')}
-                    </Button>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <NativeTextTree>
+            <OctaneCardView
+                className="octane-room-promote-edit min-w-0 w-[min(340px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+                theme="primary-slim"
+            >
+                <OctaneCardHeaderView headerText={LocalizeText('navigator.eventsettings.editcaption')} onCloseClick={() => setIsEditingPromote(false)} />
+                <OctaneCardContentView className="text-black">
+                    <div className="flex flex-col">
+                        <Text bold className="octane-room-promote-edit__label">{LocalizeText('navigator.eventsettings.name')}</Text>
+                        <OctaneInput
+                            maxLength={64}
+                            placeholder={LocalizeText('navigator.eventsettings.name')}
+                            type="text"
+                            value={newEventName}
+                            onChange={(event) => setNewEventName(event.target.value)}
+                        />
+                    </div>
+                    <div className="flex flex-col">
+                        <Text bold className="octane-room-promote-edit__label">{LocalizeText('navigator.eventsettings.desc')}</Text>
+                        <textarea
+                            className="min-h-[calc(1.5em+ .5rem+2px)] px-[.5rem] py-[.25rem] rounded-[.2rem] form-control-sm"
+                            maxLength={64}
+                            placeholder={LocalizeText('navigator.eventsettings.desc')}
+                            value={newEventDescription}
+                            onChange={(event) => setNewEventDescription(event.target.value)}
+                        ></textarea>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <Button
+                            fullWidth
+                            disabled={!newEventName || !newEventDescription}
+                            variant="secondary"
+                            onClick={(event) => updatePromote()}
+                        >
+                            {LocalizeText('navigator.eventsettings.edit')}
+                        </Button>
+                        <Button fullWidth variant="secondary" onClick={endPromote}>
+                            {localizeWithFallback('navigator.eventsettings.end', 'End event')}
+                        </Button>
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

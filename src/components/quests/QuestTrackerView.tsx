@@ -4,6 +4,7 @@ import { getQuestDescription, getQuestImageUrl, getQuestName, getQuestProgressPe
 import { LayoutProgressBar } from '../../common';
 import { useQuests } from '../../hooks';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 /** The official check animation: 13 frames over success_pic_1..6, then a 1 s close wait. */
 const COMPLETION_FRAMES = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 4];
@@ -74,32 +75,34 @@ export const QuestTrackerView: FC<{}> = () => {
     const percent = completing ? 100 : getQuestProgressPercent(trackedQuest.completedSteps, trackedQuest.totalSteps);
 
     return (
-        <div className="octane-quest-tracker">
-            <div className="octane-quest-tracker-header">
-                {localizeWithFallback('quests.tracker.caption', 'Quest: %quest_name%', ['quest_name'], [getQuestName(trackedQuest)])}
+        <NativeTextTree>
+            <div className="octane-quest-tracker">
+                <div className="octane-quest-tracker-header">
+                    {localizeWithFallback('quests.tracker.caption', 'Quest: %quest_name%', ['quest_name'], [getQuestName(trackedQuest)])}
+                </div>
+                <div className="octane-quest-tracker-body">
+                    {frame > 0 ? (
+                        <div className={`octane-quest-tracker-check octane-quest-tracker-check-${frame}`} />
+                    ) : (
+                        <img className="octane-quest-tracker-image" src={getQuestImageUrl(trackedQuest)} alt="" draggable={false} />
+                    )}
+                    <div className="octane-quest-tracker-desc">{getQuestDescription(trackedQuest)}</div>
+                </div>
+                <LayoutProgressBar
+                    className="octane-quest-tracker-progress"
+                    progress={percent}
+                    maxProgress={100}
+                    text={localizeWithFallback(
+                        'quests.tracker.progress',
+                        '%progress% / %limit%',
+                        ['progress', 'limit'],
+                        [String(completing ? trackedQuest.totalSteps : trackedQuest.completedSteps), String(trackedQuest.totalSteps)]
+                    )}
+                />
+                <BaseButton className="octane-quest-tracker-moreinfo" onClick={() => CreateLinkEvent('quests/details')}>
+                    {localizeWithFallback('quests.tracker.moreinfo', 'More info')}
+                </BaseButton>
             </div>
-            <div className="octane-quest-tracker-body">
-                {frame > 0 ? (
-                    <div className={`octane-quest-tracker-check octane-quest-tracker-check-${frame}`} />
-                ) : (
-                    <img className="octane-quest-tracker-image" src={getQuestImageUrl(trackedQuest)} alt="" draggable={false} />
-                )}
-                <div className="octane-quest-tracker-desc">{getQuestDescription(trackedQuest)}</div>
-            </div>
-            <LayoutProgressBar
-                className="octane-quest-tracker-progress"
-                progress={percent}
-                maxProgress={100}
-                text={localizeWithFallback(
-                    'quests.tracker.progress',
-                    '%progress% / %limit%',
-                    ['progress', 'limit'],
-                    [String(completing ? trackedQuest.totalSteps : trackedQuest.completedSteps), String(trackedQuest.totalSteps)]
-                )}
-            />
-            <BaseButton className="octane-quest-tracker-moreinfo" onClick={() => CreateLinkEvent('quests/details')}>
-                {localizeWithFallback('quests.tracker.moreinfo', 'More info')}
-            </BaseButton>
-        </div>
+        </NativeTextTree>
     );
 };

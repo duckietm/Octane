@@ -108,7 +108,7 @@ export const GroupManagerView: FC<{}> = (props) => {
                             type="button"
                             onClick={() => changeTab(tab)}
                         >
-                            <GroupText blend="multiply" className="is-static" text={LocalizeText(`group.edit.tab.${tab}`)} textStyle="button_tab" x={0} y={0} />
+                            <GroupText blend="multiply" className="is-static" text={LocalizeText(`group.edit.tab.${tab}`)} textStyle="u_button_tab" x={0} y={0} />
                         </BaseButton>
                     ))}
                 </div>

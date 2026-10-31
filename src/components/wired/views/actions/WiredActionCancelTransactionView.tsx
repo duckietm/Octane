@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Radio } from '../../../../common/Radio';
 import { useWired } from '../../../../hooks';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
@@ -42,41 +43,43 @@ export const WiredActionCancelTransactionView: FC<{}> = () => {
     };
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
-            save={save}
-            selectionPreview={
-                <fieldset disabled={matchCriteria === CANCEL_MATCH_ANY}>
-                    <WiredFurniSelectionSourceRow
-                        title="wiredfurni.params.sources.furni.title"
-                        options={FURNI_SOURCES}
-                        value={contractSource}
-                        selectionKind="primary"
-                        selectionActive={picking}
-                        selectionCount={furniIds.length}
-                        selectionLimit={trigger?.maximumItemSelectionCount ?? 0}
-                        selectionEnabledValues={[SOURCE_SELECTED]}
-                        onChange={setContractSource}
-                    />
-                </fieldset>
-            }
-        >
-            <Text small className="whitespace-pre-line">
-                {localizeWithFallback(
-                    'wiredfurni.params.cancel_transaction.usage_info',
-                    'Cancels a running payment or trade. Stack "Initiate Transaction" on top of this box to replace a running transaction.'
-                ).replace(/\\n/g, '\n')}
-            </Text>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.cancel_transaction.match_criteria', 'Cancel transaction:')}</Text>
-                {[CANCEL_MATCH_SPECIFIC_CONTRACT, CANCEL_MATCH_ANY].map((value) => (
-                    <label key={value} className="flex items-center gap-1">
-                        <Radio name="cancelTransactionMatch" checked={matchCriteria === value} onCheckedChange={() => setMatchCriteria(value)} />
-                        <Text>{localizeWithFallback(`wiredfurni.params.cancel_transaction.match_criteria.${value}`, MATCH_LABELS[value])}</Text>
-                    </label>
-                ))}
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
+                save={save}
+                selectionPreview={
+                    <fieldset disabled={matchCriteria === CANCEL_MATCH_ANY}>
+                        <WiredFurniSelectionSourceRow
+                            title="wiredfurni.params.sources.furni.title"
+                            options={FURNI_SOURCES}
+                            value={contractSource}
+                            selectionKind="primary"
+                            selectionActive={picking}
+                            selectionCount={furniIds.length}
+                            selectionLimit={trigger?.maximumItemSelectionCount ?? 0}
+                            selectionEnabledValues={[SOURCE_SELECTED]}
+                            onChange={setContractSource}
+                        />
+                    </fieldset>
+                }
+            >
+                <Text small className="whitespace-pre-line">
+                    {localizeWithFallback(
+                        'wiredfurni.params.cancel_transaction.usage_info',
+                        'Cancels a running payment or trade. Stack "Initiate Transaction" on top of this box to replace a running transaction.'
+                    ).replace(/\\n/g, '\n')}
+                </Text>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.cancel_transaction.match_criteria', 'Cancel transaction:')}</Text>
+                    {[CANCEL_MATCH_SPECIFIC_CONTRACT, CANCEL_MATCH_ANY].map((value) => (
+                        <label key={value} className="flex items-center gap-1">
+                            <Radio name="cancelTransactionMatch" checked={matchCriteria === value} onCheckedChange={() => setMatchCriteria(value)} />
+                            <Text>{localizeWithFallback(`wiredfurni.params.cancel_transaction.match_criteria.${value}`, MATCH_LABELS[value])}</Text>
+                        </label>
+                    ))}
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

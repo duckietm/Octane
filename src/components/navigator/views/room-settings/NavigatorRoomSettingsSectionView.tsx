@@ -1,5 +1,6 @@
 import { FC, ReactNode } from 'react';
 import { Column, Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface NavigatorRoomSettingsSectionViewProps {
     title?: string;
@@ -12,13 +13,15 @@ export const NavigatorRoomSettingsSectionView: FC<NavigatorRoomSettingsSectionVi
     const { title = null, gap = 2, className = '', children = null } = props;
 
     return (
-        <Column gap={gap} className={`octane-room-settings-section ${className}`.trim()}>
-            {title && (
-                <Text bold small>
-                    {title}
-                </Text>
-            )}
-            {children}
-        </Column>
+        <NativeTextTree>
+            <Column gap={gap} className={`octane-room-settings-section ${className}`.trim()}>
+                {title && (
+                    <Text bold small>
+                        {title}
+                    </Text>
+                )}
+                {children}
+            </Column>
+        </NativeTextTree>
     );
 };

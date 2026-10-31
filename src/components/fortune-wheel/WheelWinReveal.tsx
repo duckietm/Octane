@@ -1,6 +1,7 @@
 import { IWheelPrize } from '@octane/renderer';
 import { FC, useEffect } from 'react';
 import { LocalizeText } from '../../api';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { renderPrizeIcon } from './wheelPrizeIcon';
 import { getPrizeTier } from './wheelPrizeTier';
 
@@ -38,46 +39,50 @@ export const WheelWinReveal: FC<WheelWinRevealProps> = ({ prize, onDismiss }) =>
     // The "nothing" slice gets a quiet, non-celebratory message.
     if (tier === 'none') {
         return (
-            <div className="wheel-win-reveal is-quiet absolute inset-0 z-40" onClick={onDismiss}>
-                <div className="wheel-win-card is-quiet">
-                    <div className="wheel-win-icon is-empty">?</div>
-                    <div className="wheel-win-title">{LocalizeText('wheel.win.nothing')}</div>
+            <NativeTextTree>
+                <div className="wheel-win-reveal is-quiet absolute inset-0 z-40" onClick={onDismiss}>
+                    <div className="wheel-win-card is-quiet">
+                        <div className="wheel-win-icon is-empty">?</div>
+                        <div className="wheel-win-title">{LocalizeText('wheel.win.nothing')}</div>
+                    </div>
                 </div>
-            </div>
+            </NativeTextTree>
         );
     }
 
     const isRare = tier === 'rare';
 
     return (
-        <div className={`wheel-win-reveal absolute inset-0 z-40 ${isRare ? 'is-rare' : ''}`} onClick={onDismiss}>
-            {isRare &&
-                CONFETTI.map((piece, i) => (
-                    <span
-                        key={i}
-                        className="pointer-events-none absolute top-0"
-                        style={{
-                            left: `${piece.left}%`,
-                            width: `${piece.width}px`,
-                            height: `${piece.width + 4}px`,
-                            background: piece.color,
-                            borderRadius: '2px',
-                            ['--drift' as any]: `${piece.drift}px`,
-                            animation: `wheelConfettiFall ${piece.duration}s ${piece.delay}s linear forwards`
-                        }}
-                    />
-                ))}
+        <NativeTextTree>
+            <div className={`wheel-win-reveal absolute inset-0 z-40 ${isRare ? 'is-rare' : ''}`} onClick={onDismiss}>
+                {isRare &&
+                    CONFETTI.map((piece, i) => (
+                        <span
+                            key={i}
+                            className="pointer-events-none absolute top-0"
+                            style={{
+                                left: `${piece.left}%`,
+                                width: `${piece.width}px`,
+                                height: `${piece.width + 4}px`,
+                                background: piece.color,
+                                borderRadius: '2px',
+                                ['--drift' as any]: `${piece.drift}px`,
+                                animation: `wheelConfettiFall ${piece.duration}s ${piece.delay}s linear forwards`
+                            }}
+                        />
+                    ))}
 
-            {isRare && <div className="wheel-win-jackpot">{LocalizeText('wheel.win.jackpot')}</div>}
+                {isRare && <div className="wheel-win-jackpot">{LocalizeText('wheel.win.jackpot')}</div>}
 
-            <div className={`wheel-win-card ${isRare ? 'is-rare' : ''}`}>
-                <div className="wheel-win-icon">{renderPrizeIcon(prize, true)}</div>
+                <div className={`wheel-win-card ${isRare ? 'is-rare' : ''}`}>
+                    <div className="wheel-win-icon">{renderPrizeIcon(prize, true)}</div>
 
-                <div className="wheel-win-copy">
-                    <div className="wheel-win-title">{LocalizeText('wheel.win.title')}</div>
-                    {!!prize.label && <div className="wheel-win-prize">{prize.label}</div>}
+                    <div className="wheel-win-copy">
+                        <div className="wheel-win-title">{LocalizeText('wheel.win.title')}</div>
+                        {!!prize.label && <div className="wheel-win-prize">{prize.label}</div>}
+                    </div>
                 </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

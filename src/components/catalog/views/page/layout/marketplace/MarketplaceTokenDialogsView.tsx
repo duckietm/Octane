@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { localizeWithFallback } from '../../../../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../../../common';
 import { BaseButton } from '../../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
 
 /** English fallbacks for the AIR texts, used only when the external texts lack the key. */
 const FALLBACKS: Record<string, string> = {
@@ -30,26 +31,28 @@ const text = (key: string, parameters: string[] = null, replacements: string[] =
  * the info text also names the `free` advertisements after the paid one.
  */
 export const MarketplaceBuyTokensView: FC<{ price: number; count: number; onBuy: () => void; onCancel: () => void }> = ({ price, count, onBuy, onCancel }) => (
-    <OctaneCardView
-        classNames={['octane-marketplace-token-dialog', 'is-buy-tokens']}
-        frameStyle={3}
-        isResizable={false}
-        theme="primary-slim"
-        uniqueKey="marketplace-buy-tokens"
-    >
-        <OctaneCardHeaderView headerText={text('inventory.marketplace.buy_tokens.title')} onCloseClick={onCancel} />
-        <OctaneCardContentView classNames={['octane-marketplace-token-dialog-content']} overflow="hidden">
-            <span className="octane-marketplace-token-dialog-info" data-testid="marketplace-buy-tokens-info">
-                {text('inventory.marketplace.buy_tokens.info', ['price', 'count', 'free'], [String(price), String(count), String(count - 1)])}
-            </span>
-            <BaseButton className="octane-marketplace-token-dialog-button is-buy" onClick={onBuy}>
-                {text('inventory.marketplace.buy_tokens.buy', ['price'], [String(price)])}
-            </BaseButton>
-            <BaseButton className="octane-marketplace-token-dialog-button is-cancel" onClick={onCancel}>
-                {text('inventory.marketplace.buy_tokens.cancel')}
-            </BaseButton>
-        </OctaneCardContentView>
-    </OctaneCardView>
+    <NativeTextTree>
+        <OctaneCardView
+            classNames={['octane-marketplace-token-dialog', 'is-buy-tokens']}
+            frameStyle={3}
+            isResizable={false}
+            theme="primary-slim"
+            uniqueKey="marketplace-buy-tokens"
+        >
+            <OctaneCardHeaderView headerText={text('inventory.marketplace.buy_tokens.title')} onCloseClick={onCancel} />
+            <OctaneCardContentView classNames={['octane-marketplace-token-dialog-content']} overflow="hidden">
+                <span className="octane-marketplace-token-dialog-info" data-testid="marketplace-buy-tokens-info">
+                    {text('inventory.marketplace.buy_tokens.info', ['price', 'count', 'free'], [String(price), String(count), String(count - 1)])}
+                </span>
+                <BaseButton className="octane-marketplace-token-dialog-button is-buy" onClick={onBuy}>
+                    {text('inventory.marketplace.buy_tokens.buy', ['price'], [String(price)])}
+                </BaseButton>
+                <BaseButton className="octane-marketplace-token-dialog-button is-cancel" onClick={onCancel}>
+                    {text('inventory.marketplace.buy_tokens.cancel')}
+                </BaseButton>
+            </OctaneCardContentView>
+        </OctaneCardView>
+    </NativeTextTree>
 );
 
 /**
@@ -57,24 +60,26 @@ export const MarketplaceBuyTokensView: FC<{ price: number; count: number; onBuy:
  * server refuses the token purchase for lack of credits. "Get credits" opens `web.shop.relativeUrl`.
  */
 export const MarketplaceNoCreditsView: FC<{ price: number; onGetCredits: () => void; onClose: () => void }> = ({ price, onGetCredits, onClose }) => (
-    <OctaneCardView
-        classNames={['octane-marketplace-token-dialog', 'is-no-credits']}
-        frameStyle={3}
-        isResizable={false}
-        theme="primary-slim"
-        uniqueKey="marketplace-no-credits"
-    >
-        <OctaneCardHeaderView headerText={text('inventory.marketplace.no_credits.title')} onCloseClick={onClose} />
-        <OctaneCardContentView classNames={['octane-marketplace-token-dialog-content']} overflow="hidden">
-            <span className="octane-marketplace-token-dialog-info" data-testid="marketplace-no-credits-info">
-                {text('inventory.marketplace.no_credits.info', ['price'], [String(price)])}
-            </span>
-            <BaseButton className="octane-marketplace-token-dialog-button is-get-credits" onClick={onGetCredits}>
-                {text('inventory.marketplace.no_credits.get_credits')}
-            </BaseButton>
-            <BaseButton className="octane-marketplace-token-dialog-button is-cancel" onClick={onClose}>
-                {text('inventory.marketplace.no_credits.cancel')}
-            </BaseButton>
-        </OctaneCardContentView>
-    </OctaneCardView>
+    <NativeTextTree>
+        <OctaneCardView
+            classNames={['octane-marketplace-token-dialog', 'is-no-credits']}
+            frameStyle={3}
+            isResizable={false}
+            theme="primary-slim"
+            uniqueKey="marketplace-no-credits"
+        >
+            <OctaneCardHeaderView headerText={text('inventory.marketplace.no_credits.title')} onCloseClick={onClose} />
+            <OctaneCardContentView classNames={['octane-marketplace-token-dialog-content']} overflow="hidden">
+                <span className="octane-marketplace-token-dialog-info" data-testid="marketplace-no-credits-info">
+                    {text('inventory.marketplace.no_credits.info', ['price'], [String(price)])}
+                </span>
+                <BaseButton className="octane-marketplace-token-dialog-button is-get-credits" onClick={onGetCredits}>
+                    {text('inventory.marketplace.no_credits.get_credits')}
+                </BaseButton>
+                <BaseButton className="octane-marketplace-token-dialog-button is-cancel" onClick={onClose}>
+                    {text('inventory.marketplace.no_credits.cancel')}
+                </BaseButton>
+            </OctaneCardContentView>
+        </OctaneCardView>
+    </NativeTextTree>
 );

@@ -8,6 +8,7 @@ import { getSnowWarFigure } from './SnowWarAvatarView';
 import { SnowWarSkillStars } from './SnowWarSkillStars';
 import { SnowWarStrokeText } from './SnowWarStrokeText';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const TEAM_COLORS = ['#e64545', '#4577e6', '#3fb550', '#e6c245'];
 
@@ -206,37 +207,39 @@ export const SnowWarLobbyView: FC = () =>
     };
 
     return (
-        <div className="snowwar-lobby snowwar-air-backdrop">
-            <div className="snowwar-results__card snowwar-loading">
-                <div className="snowwar-results__title snowwar-loading__title"><SnowWarStrokeText text={ localizeWithFallback('snowwar.loading.title', 'Get ready!') } /></div>
+        <NativeTextTree>
+            <div className="snowwar-lobby snowwar-air-backdrop">
+                <div className="snowwar-results__card snowwar-loading">
+                    <div className="snowwar-results__title snowwar-loading__title"><SnowWarStrokeText text={ localizeWithFallback('snowwar.loading.title', 'Get ready!') } /></div>
 
-                { !!mapId && (
-                    <div className="snowwar-loading__arena">
-                        { officialPreview && <img alt="" className="snowwar-loading__preview" src={ officialPreview } /> }
-                        { !officialPreview && levelData && <canvas ref={ previewRef } className="snowwar-lobby__preview" height={ 120 } width={ 220 } /> }
-                        <div className="snowwar-loading__arena-name">{ arenaName }</div>
-                    </div>
-                ) }
-
-                <div className="snowwar-results__teams">
-                    { teamIds.map(teamId => (
-                        <div key={ teamId } className={ `snowwar-results__team snowwar-results__team--${ getOfficialTeamReference(teamId) }` }>
-                            <div className="snowwar-results__team-list">
-                                { players.filter(player => player.teamId === teamId).map(renderPlayer) }
-                            </div>
+                    { !!mapId && (
+                        <div className="snowwar-loading__arena">
+                            { officialPreview && <img alt="" className="snowwar-loading__preview" src={ officialPreview } /> }
+                            { !officialPreview && levelData && <canvas ref={ previewRef } className="snowwar-lobby__preview" height={ 120 } width={ 220 } /> }
+                            <div className="snowwar-loading__arena-name">{ arenaName }</div>
                         </div>
-                    )) }
-                </div>
+                    ) }
 
-                <div className="snowwar-loading__status">
-                    { spinner && <img alt="" src={ spinner } /> }
-                    <SnowWarStrokeText text={ localizeWithFallback('snowwar.loading_arena', 'Going to the arena...') } />
-                </div>
+                    <div className="snowwar-results__teams">
+                        { teamIds.map(teamId => (
+                            <div key={ teamId } className={ `snowwar-results__team snowwar-results__team--${ getOfficialTeamReference(teamId) }` }>
+                                <div className="snowwar-results__team-list">
+                                    { players.filter(player => player.teamId === teamId).map(renderPlayer) }
+                                </div>
+                            </div>
+                        )) }
+                    </div>
 
-                <BaseButton className="snowwar-results__leave" type="button" onClick={ () => exitGame() }>
-                    { localizeWithFallback('snowwar.leave_game', 'Leave game') }
-                </BaseButton>
+                    <div className="snowwar-loading__status">
+                        { spinner && <img alt="" src={ spinner } /> }
+                        <SnowWarStrokeText text={ localizeWithFallback('snowwar.loading_arena', 'Going to the arena...') } />
+                    </div>
+
+                    <BaseButton className="snowwar-results__leave" type="button" onClick={ () => exitGame() }>
+                        { localizeWithFallback('snowwar.leave_game', 'Leave game') }
+                    </BaseButton>
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

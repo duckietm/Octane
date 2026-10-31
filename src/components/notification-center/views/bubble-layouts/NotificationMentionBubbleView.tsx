@@ -6,6 +6,7 @@ import { LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps } from 
 import { useUserDataSnapshot } from '../../../../hooks/session/useSessionSnapshots';
 import { MentionMessageView } from '../../../mentions/MentionMessageView';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export interface NotificationMentionBubbleViewProps extends LayoutNotificationBubbleViewProps {
     item: MentionNotificationBubbleItem;
@@ -32,32 +33,34 @@ export const NotificationMentionBubbleView: FC<NotificationMentionBubbleViewProp
     const [before, after] = line.split(marker);
 
     return (
-        <LayoutNotificationBubbleView classNames={['octane-mention-notification']} closeOnClick={false} onClose={onClose} {...rest}>
-            <div className="octane-mention-notification__border" />
-            <div className="octane-mention-notification__row">
-                <img alt="" className="octane-mention-notification__icon" src={mentionIcon} draggable={false} />
-                <div className="octane-mention-notification__text">
-                    {before}
-                    <b>{mention.senderUsername}</b>
-                    {after}
-                    <MentionMessageView className="octane-mention-notification__message" ownUsername={ownUsername} text={mention.message} />
+        <NativeTextTree>
+            <LayoutNotificationBubbleView classNames={['octane-mention-notification']} closeOnClick={false} onClose={onClose} {...rest}>
+                <div className="octane-mention-notification__border" />
+                <div className="octane-mention-notification__row">
+                    <img alt="" className="octane-mention-notification__icon" src={mentionIcon} draggable={false} />
+                    <div className="octane-mention-notification__text">
+                        {before}
+                        <b>{mention.senderUsername}</b>
+                        {after}
+                        <MentionMessageView className="octane-mention-notification__message" ownUsername={ownUsername} text={mention.message} />
+                    </div>
                 </div>
-            </div>
-            <div className="octane-mention-notification__actions">
-                <BaseButton className="octane-mention-notification__later" type="button" onClick={() => onClose()}>
-                    {LocalizeText('notifications.button.later')}
-                </BaseButton>
-                <BaseButton
-                    className="octane-mention-notification__button"
-                    type="button"
-                    onClick={() => {
-                        CreateLinkEvent('mentions/toggle');
-                        onClose();
-                    }}
-                >
-                    {LocalizeText('mentions.window.title')}
-                </BaseButton>
-            </div>
-        </LayoutNotificationBubbleView>
+                <div className="octane-mention-notification__actions">
+                    <BaseButton className="octane-mention-notification__later" type="button" onClick={() => onClose()}>
+                        {LocalizeText('notifications.button.later')}
+                    </BaseButton>
+                    <BaseButton
+                        className="octane-mention-notification__button"
+                        type="button"
+                        onClick={() => {
+                            CreateLinkEvent('mentions/toggle');
+                            onClose();
+                        }}
+                    >
+                        {LocalizeText('mentions.window.title')}
+                    </BaseButton>
+                </div>
+            </LayoutNotificationBubbleView>
+        </NativeTextTree>
     );
 };

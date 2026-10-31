@@ -7,6 +7,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * Puts the selected furni at a height you type, or hands them back their stacking height.
@@ -55,30 +56,32 @@ export const WiredActionOverrideHeightView: FC<{}> = () => {
     };
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
-        >
-            <div className="flex flex-col gap-2">
-                <Text bold>{localizeWithFallback('wiredfurni.params.override_height.type', 'Height')}</Text>
-                {[MODE_SET, MODE_RELEASE].map((value) => (
-                    <label key={value} className="flex items-center gap-1">
-                        <Radio checked={mode === value} name="overrideHeightMode" onCheckedChange={() => setMode(value)} />
-                        <Text>{localizeWithFallback(MODE_LABELS[value].key, MODE_LABELS[value].fallback)}</Text>
-                    </label>
-                ))}
-            </div>
-            <div className={mode === MODE_RELEASE ? 'pointer-events-none opacity-50' : ''}>
-                <WiredSliderSection
-                    max={MAX_HEIGHT}
-                    min={MIN_HEIGHT}
-                    title={localizeWithFallback('wiredfurni.params.override_height.height', 'Height')}
-                    value={height}
-                    onChange={(value) => setHeight(clampHeight(value))}
-                />
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
+            >
+                <div className="flex flex-col gap-2">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.override_height.type', 'Height')}</Text>
+                    {[MODE_SET, MODE_RELEASE].map((value) => (
+                        <label key={value} className="flex items-center gap-1">
+                            <Radio checked={mode === value} name="overrideHeightMode" onCheckedChange={() => setMode(value)} />
+                            <Text>{localizeWithFallback(MODE_LABELS[value].key, MODE_LABELS[value].fallback)}</Text>
+                        </label>
+                    ))}
+                </div>
+                <div className={mode === MODE_RELEASE ? 'pointer-events-none opacity-50' : ''}>
+                    <WiredSliderSection
+                        max={MAX_HEIGHT}
+                        min={MIN_HEIGHT}
+                        title={localizeWithFallback('wiredfurni.params.override_height.height', 'Height')}
+                        value={height}
+                        onChange={(value) => setHeight(clampHeight(value))}
+                    />
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

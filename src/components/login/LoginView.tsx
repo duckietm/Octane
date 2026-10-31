@@ -25,6 +25,7 @@ import { Radio } from '../../common/Radio';
 import { Select } from '../../common/Select';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 type DialogMode = 'login' | 'register' | 'forgot';
 type LoginLocale = { code: string; file: string; label: string; flag: string };
@@ -166,13 +167,15 @@ const LoginSubmitButton: FC<{ isEntering: boolean; isLocked: boolean; loginPingi
     const { pending } = useFormStatus();
 
     return (
-        <BaseButton type="submit" className="ok-button" disabled={pending || isEntering || isLocked}>
-            {isEntering
-                ? t('nitro.login.entering', 'Entering…')
-                : pending || loginPingingServer
-                  ? t('nitro.login.server.checking', 'Checking…')
-                  : t('login.title', 'Log in')}
-        </BaseButton>
+        <NativeTextTree>
+            <BaseButton type="submit" className="ok-button" disabled={pending || isEntering || isLocked}>
+                {isEntering
+                    ? t('nitro.login.entering', 'Entering…')
+                    : pending || loginPingingServer
+                      ? t('nitro.login.server.checking', 'Checking…')
+                      : t('login.title', 'Log in')}
+            </BaseButton>
+        </NativeTextTree>
     );
 };
 
@@ -728,201 +731,203 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
     );
 
     return (
-        <div className="octane-login-view" style={backgroundColor ? { background: backgroundColor } : undefined}>
-            {background ? <img className="login-background login-layer login-layer-img" src={background} alt="" draggable={false} /> : null}
-            {sun ? <img className="login-sun login-layer login-layer-img" src={sun} alt="" draggable={false} /> : null}
-            {drape ? <img className="login-drape login-layer login-layer-img" src={drape} alt="" draggable={false} /> : null}
-            {left ? <img className="login-left login-layer login-layer-img" src={left} alt="" draggable={false} /> : null}
-            {rightRepeat ? <div className="login-right-repeat login-layer" style={{ backgroundImage: `url(${rightRepeat})` }} /> : null}
-            {right ? <img className="login-right login-layer login-layer-img" src={right} alt="" draggable={false} /> : null}
-            <div className="login-image-preloader" aria-hidden="true" data-version={loginImagesVersion}>
-                {loginImageUrls.map((url) => (
-                    <img key={url} src={url} decoding="async" loading="eager" alt="" />
-                ))}
-            </div>
-
-            {loginWidgetSlots.length > 0 && (
-                <div className="login-widgets">
-                    {loginWidgetSlots.map((slot) => {
-                        const image = typeof slot.conf.image === 'string' ? interpolate(slot.conf.image) : '';
-                        const texts = typeof slot.conf.texts === 'string' ? slot.conf.texts : '';
-                        const btnText = typeof slot.conf.btnText === 'string' ? slot.conf.btnText : '';
-                        const btnLink = typeof slot.conf.btnLink === 'string' ? interpolate(slot.conf.btnLink) : '';
-                        const title = typeof slot.conf.title === 'string' ? slot.conf.title : texts || slot.type;
-                        const description = typeof slot.conf.description === 'string' ? slot.conf.description : '';
-
-                        return (
-                            <LoginWidgetSlot
-                                key={slot.key}
-                                slotKey={String(slot.key)}
-                                type={slot.type}
-                                image={image}
-                                title={title}
-                                description={description}
-                                buttonText={btnText}
-                                buttonLink={btnLink}
-                                dragHint={dragHint}
-                            />
-                        );
-                    })}
+        <NativeTextTree>
+            <div className="octane-login-view" style={backgroundColor ? { background: backgroundColor } : undefined}>
+                {background ? <img className="login-background login-layer login-layer-img" src={background} alt="" draggable={false} /> : null}
+                {sun ? <img className="login-sun login-layer login-layer-img" src={sun} alt="" draggable={false} /> : null}
+                {drape ? <img className="login-drape login-layer login-layer-img" src={drape} alt="" draggable={false} /> : null}
+                {left ? <img className="login-left login-layer login-layer-img" src={left} alt="" draggable={false} /> : null}
+                {rightRepeat ? <div className="login-right-repeat login-layer" style={{ backgroundImage: `url(${rightRepeat})` }} /> : null}
+                {right ? <img className="login-right login-layer login-layer-img" src={right} alt="" draggable={false} /> : null}
+                <div className="login-image-preloader" aria-hidden="true" data-version={loginImagesVersion}>
+                    {loginImageUrls.map((url) => (
+                        <img key={url} src={url} decoding="async" loading="eager" alt="" />
+                    ))}
                 </div>
-            )}
 
-            {newsUrl && <NewsWindow newsUrl={newsUrl} />}
+                {loginWidgetSlots.length > 0 && (
+                    <div className="login-widgets">
+                        {loginWidgetSlots.map((slot) => {
+                            const image = typeof slot.conf.image === 'string' ? interpolate(slot.conf.image) : '';
+                            const texts = typeof slot.conf.texts === 'string' ? slot.conf.texts : '';
+                            const btnText = typeof slot.conf.btnText === 'string' ? slot.conf.btnText : '';
+                            const btnLink = typeof slot.conf.btnLink === 'string' ? interpolate(slot.conf.btnLink) : '';
+                            const title = typeof slot.conf.title === 'string' ? slot.conf.title : texts || slot.type;
+                            const description = typeof slot.conf.description === 'string' ? slot.conf.description : '';
 
-            <div
-                className={`login-language-picker octane-card-shell${languageWindow.dragging ? ' is-dragging' : ''}`}
-                ref={languageWindowRef}
-                style={languageWindow.style}
-            >
-                <div className="login-language-header octane-card-header-shell login-drag-handle" title={dragHint} {...languageWindow.handleProps}>
-                    <label className="octane-card-title" htmlFor="login-language-select">
-                        {localeApplying ? t('nitro.login.language.loading', 'Loading...') : t('nitro.login.language.title', 'Language')}
-                    </label>
-                </div>
-                <div className="login-language-content octane-card-content-shell">
-                    <div className="login-language-select-wrap">
-                        <img src={selectedLocale.flag} alt="" draggable={false} />
-                        <Select
-                            id="login-language-select"
-                            className="form-select"
-                            value={selectedLocale.code}
-                            disabled={localeApplying}
-                            aria-label={t('nitro.login.language.aria', 'Language selection')}
-                            onChange={(event) => void changeLocaleSelection(event.target.value)}
-                        >
-                            {LOGIN_LOCALES.map((locale) => (
-                                <option key={locale.code} value={locale.code}>
-                                    {locale.label}
-                                </option>
-                            ))}
-                        </Select>
+                            return (
+                                <LoginWidgetSlot
+                                    key={slot.key}
+                                    slotKey={String(slot.key)}
+                                    type={slot.type}
+                                    image={image}
+                                    title={title}
+                                    description={description}
+                                    buttonText={btnText}
+                                    buttonLink={btnLink}
+                                    dragHint={dragHint}
+                                />
+                            );
+                        })}
                     </div>
-                    {localeError.length > 0 && <div className="language-error">{localeError}</div>}
-                </div>
-            </div>
+                )}
 
-            <div className="login-stack">
+                {newsUrl && <NewsWindow newsUrl={newsUrl} />}
+
                 <div
-                    className={`octane-login-card octane-card-shell login-auth-card${authWindow.dragging ? ' is-dragging' : ''}`}
-                    ref={authWindowRef}
-                    style={authWindow.style}
+                    className={`login-language-picker octane-card-shell${languageWindow.dragging ? ' is-dragging' : ''}`}
+                    ref={languageWindowRef}
+                    style={languageWindow.style}
                 >
-                    <div className="card-title octane-card-header-shell login-drag-handle" title={dragHint} {...authWindow.handleProps}>
-                        <span className="octane-card-title">{t('nitro.login.card.title', "What's your Habbo called?")}</span>
-                    </div>
-                    <form className="card-body octane-card-content-shell" action={submitLoginAction} autoComplete="on">
-                        <div className="field">
-                            <label htmlFor="login-username">{t('login.username', 'Name of your Habbo')}</label>
-                            <input
-                                id="login-username"
-                                name="username"
-                                autoComplete="username"
-                                type="text"
-                                maxLength={32}
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                            />
-                        </div>
-                        <div className="field">
-                            <label htmlFor="login-password">{t('generic.password', 'Password')}</label>
-                            <input
-                                id="login-password"
-                                name="password"
-                                autoComplete="current-password"
-                                type="password"
-                                maxLength={128}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-                        <label className="remember-row">
-                            <Checkbox name="remember" checked={rememberMe} onCheckedChange={(nextChecked) => setRememberMe(nextChecked)} />
-                            <span>{t('login.remember_me', 'Remember me')}</span>
+                    <div className="login-language-header octane-card-header-shell login-drag-handle" title={dragHint} {...languageWindow.handleProps}>
+                        <label className="octane-card-title" htmlFor="login-language-select">
+                            {localeApplying ? t('nitro.login.language.loading', 'Loading...') : t('nitro.login.language.title', 'Language')}
                         </label>
-                        {turnstileEnabled && mode === 'login' && (
-                            <TurnstileWidget
-                                siteKey={turnstileSiteKey}
-                                size="compact"
-                                onToken={setLoginTurnstileToken}
-                                onExpire={() => setLoginTurnstileToken('')}
-                                onError={() => setLoginTurnstileToken('')}
-                                resetSignal={loginTurnstileResetSignal}
-                            />
-                        )}
-                        {maintenance?.enabled && (
-                            <div className="error-line maintenance-notice" role="status">
-                                <strong>{t('nitro.login.maintenance.title', 'Maintenance mode')}</strong>
-                                <span>
-                                    {maintenance.message ||
-                                        t('nitro.login.maintenance.notice', 'The hotel is currently undergoing maintenance. Only staff can log in right now.')}
-                                </span>
-                            </div>
-                        )}
-                        {loginServerReachable === false && (
-                            <div className="error-line server-offline">
-                                {t('nitro.login.server.offline.short', "The gameserver isn't running right now. Please try again in a moment.")}
-                                <BaseButton type="button" className="retry-link" onClick={pingLoginServer} disabled={loginPingingServer}>
-                                    {loginPingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.server.retry', 'Retry')}
-                                </BaseButton>
-                            </div>
-                        )}
-                        {error && <div className="error-line">{error}</div>}
-                        {info && <div className="info-line">{info}</div>}
-                        <div className="submit-row">
-                            <LoginSubmitButton isEntering={isEntering} isLocked={isLocked} loginPingingServer={loginPingingServer} />
+                    </div>
+                    <div className="login-language-content octane-card-content-shell">
+                        <div className="login-language-select-wrap">
+                            <img src={selectedLocale.flag} alt="" draggable={false} />
+                            <Select
+                                id="login-language-select"
+                                className="form-select"
+                                value={selectedLocale.code}
+                                disabled={localeApplying}
+                                aria-label={t('nitro.login.language.aria', 'Language selection')}
+                                onChange={(event) => void changeLocaleSelection(event.target.value)}
+                            >
+                                {LOGIN_LOCALES.map((locale) => (
+                                    <option key={locale.code} value={locale.code}>
+                                        {locale.label}
+                                    </option>
+                                ))}
+                            </Select>
                         </div>
-                        <BaseButton className="forgot" onClick={() => setMode('forgot')}>
-                            {t('login.forgot_password', 'Forgotten your password?')}
-                        </BaseButton>
-                    </form>
+                        {localeError.length > 0 && <div className="language-error">{localeError}</div>}
+                    </div>
                 </div>
 
-                <div
-                    className={`octane-login-card octane-card-shell login-register-card${registerWindow.dragging ? ' is-dragging' : ''}`}
-                    ref={registerWindowRef}
-                    style={registerWindow.style}
-                >
-                    <div className="card-title octane-card-header-shell login-drag-handle" title={dragHint} {...registerWindow.handleProps}>
-                        <span className="octane-card-title">{t('nitro.login.firsttime.title', 'First time here?')}</span>
+                <div className="login-stack">
+                    <div
+                        className={`octane-login-card octane-card-shell login-auth-card${authWindow.dragging ? ' is-dragging' : ''}`}
+                        ref={authWindowRef}
+                        style={authWindow.style}
+                    >
+                        <div className="card-title octane-card-header-shell login-drag-handle" title={dragHint} {...authWindow.handleProps}>
+                            <span className="octane-card-title">{t('nitro.login.card.title', "What's your Habbo called?")}</span>
+                        </div>
+                        <form className="card-body octane-card-content-shell" action={submitLoginAction} autoComplete="on">
+                            <div className="field">
+                                <label htmlFor="login-username">{t('login.username', 'Name of your Habbo')}</label>
+                                <input
+                                    id="login-username"
+                                    name="username"
+                                    autoComplete="username"
+                                    type="text"
+                                    maxLength={32}
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                            </div>
+                            <div className="field">
+                                <label htmlFor="login-password">{t('generic.password', 'Password')}</label>
+                                <input
+                                    id="login-password"
+                                    name="password"
+                                    autoComplete="current-password"
+                                    type="password"
+                                    maxLength={128}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                            </div>
+                            <label className="remember-row">
+                                <Checkbox name="remember" checked={rememberMe} onCheckedChange={(nextChecked) => setRememberMe(nextChecked)} />
+                                <span>{t('login.remember_me', 'Remember me')}</span>
+                            </label>
+                            {turnstileEnabled && mode === 'login' && (
+                                <TurnstileWidget
+                                    siteKey={turnstileSiteKey}
+                                    size="compact"
+                                    onToken={setLoginTurnstileToken}
+                                    onExpire={() => setLoginTurnstileToken('')}
+                                    onError={() => setLoginTurnstileToken('')}
+                                    resetSignal={loginTurnstileResetSignal}
+                                />
+                            )}
+                            {maintenance?.enabled && (
+                                <div className="error-line maintenance-notice" role="status">
+                                    <strong>{t('nitro.login.maintenance.title', 'Maintenance mode')}</strong>
+                                    <span>
+                                        {maintenance.message ||
+                                            t('nitro.login.maintenance.notice', 'The hotel is currently undergoing maintenance. Only staff can log in right now.')}
+                                    </span>
+                                </div>
+                            )}
+                            {loginServerReachable === false && (
+                                <div className="error-line server-offline">
+                                    {t('nitro.login.server.offline.short', "The gameserver isn't running right now. Please try again in a moment.")}
+                                    <BaseButton type="button" className="retry-link" onClick={pingLoginServer} disabled={loginPingingServer}>
+                                        {loginPingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.server.retry', 'Retry')}
+                                    </BaseButton>
+                                </div>
+                            )}
+                            {error && <div className="error-line">{error}</div>}
+                            {info && <div className="info-line">{info}</div>}
+                            <div className="submit-row">
+                                <LoginSubmitButton isEntering={isEntering} isLocked={isLocked} loginPingingServer={loginPingingServer} />
+                            </div>
+                            <BaseButton className="forgot" onClick={() => setMode('forgot')}>
+                                {t('login.forgot_password', 'Forgotten your password?')}
+                            </BaseButton>
+                        </form>
                     </div>
-                    <div className="card-body octane-card-content-shell register-card-body">
-                        <span>{t('nitro.login.firsttime.text', "Don't have a Habbo yet?")}</span>
-                        <BaseButton type="button" className="register-link" onClick={() => setMode('register')}>
-                            {t('nitro.login.firsttime.link', 'You can create one here')}
-                        </BaseButton>
+
+                    <div
+                        className={`octane-login-card octane-card-shell login-register-card${registerWindow.dragging ? ' is-dragging' : ''}`}
+                        ref={registerWindowRef}
+                        style={registerWindow.style}
+                    >
+                        <div className="card-title octane-card-header-shell login-drag-handle" title={dragHint} {...registerWindow.handleProps}>
+                            <span className="octane-card-title">{t('nitro.login.firsttime.title', 'First time here?')}</span>
+                        </div>
+                        <div className="card-body octane-card-content-shell register-card-body">
+                            <span>{t('nitro.login.firsttime.text', "Don't have a Habbo yet?")}</span>
+                            <BaseButton type="button" className="register-link" onClick={() => setMode('register')}>
+                                {t('nitro.login.firsttime.link', 'You can create one here')}
+                            </BaseButton>
+                        </div>
                     </div>
                 </div>
+
+                {mode === 'register' && (
+                    <RegisterDialog
+                        onCancel={closeDialog}
+                        onSubmit={handleRegisterSubmit}
+                        onCheckEmail={checkEmailAvailable}
+                        onCheckUsername={checkUsernameAvailable}
+                        onCheckServer={checkServerReachable}
+                        submitting={submitting}
+                        error={error}
+                        info={info}
+                        turnstileEnabled={turnstileEnabled}
+                        turnstileSiteKey={turnstileSiteKey}
+                        roomTemplatesUrl={roomTemplatesUrl}
+                    />
+                )}
+
+                {mode === 'forgot' && (
+                    <ForgotDialog
+                        onCancel={closeDialog}
+                        onSubmit={handleForgotSubmit}
+                        submitting={submitting}
+                        error={error}
+                        info={info}
+                        turnstileEnabled={turnstileEnabled}
+                        turnstileSiteKey={turnstileSiteKey}
+                    />
+                )}
             </div>
-
-            {mode === 'register' && (
-                <RegisterDialog
-                    onCancel={closeDialog}
-                    onSubmit={handleRegisterSubmit}
-                    onCheckEmail={checkEmailAvailable}
-                    onCheckUsername={checkUsernameAvailable}
-                    onCheckServer={checkServerReachable}
-                    submitting={submitting}
-                    error={error}
-                    info={info}
-                    turnstileEnabled={turnstileEnabled}
-                    turnstileSiteKey={turnstileSiteKey}
-                    roomTemplatesUrl={roomTemplatesUrl}
-                />
-            )}
-
-            {mode === 'forgot' && (
-                <ForgotDialog
-                    onCancel={closeDialog}
-                    onSubmit={handleForgotSubmit}
-                    submitting={submitting}
-                    error={error}
-                    info={info}
-                    turnstileEnabled={turnstileEnabled}
-                    turnstileSiteKey={turnstileSiteKey}
-                />
-            )}
-        </div>
+        </NativeTextTree>
     );
 };
 
@@ -1460,265 +1465,267 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
     const serverOffline = serverReachable === false;
 
     return (
-        <LoginModal
-            title={t('nitro.login.register.title', 'Habbo Details')}
-            titleId="register-dialog-title"
-            closeLabel={t('generic.close', 'Close')}
-            dialogClassName={`${step === 'avatar' ? 'dialog-avatar' : ''} ${step === 'room' ? 'dialog-room' : ''}`}
-            onClose={closeAndSaveDraft}
-        >
-            {step === 'credentials' && (
-                <form className="card-body octane-card-content-shell" action={submitCredentialsAction} autoComplete="on">
-                    <div className="register-intro octane-card-panel">
-                        {t(
-                            'nitro.login.register.intro.credentials',
-                            "Let's create your account. Enter your email and pick a password — we'll check that email isn't already in use."
-                        )}
-                    </div>
-                    {draftRestored && (
-                        <div className="info-line">
+        <NativeTextTree>
+            <LoginModal
+                title={t('nitro.login.register.title', 'Habbo Details')}
+                titleId="register-dialog-title"
+                closeLabel={t('generic.close', 'Close')}
+                dialogClassName={`${step === 'avatar' ? 'dialog-avatar' : ''} ${step === 'room' ? 'dialog-room' : ''}`}
+                onClose={closeAndSaveDraft}
+            >
+                {step === 'credentials' && (
+                    <form className="card-body octane-card-content-shell" action={submitCredentialsAction} autoComplete="on">
+                        <div className="register-intro octane-card-panel">
                             {t(
-                                'nitro.login.register.draft.restored',
-                                'Your signup draft was restored. For security, re-enter your password to continue where you left off.'
+                                'nitro.login.register.intro.credentials',
+                                "Let's create your account. Enter your email and pick a password — we'll check that email isn't already in use."
                             )}
                         </div>
-                    )}
-                    {serverOffline && (
-                        <div className="error-line server-offline">
-                            {t(
-                                'nitro.login.server.offline.long',
-                                "The gameserver isn't running right now, so new accounts can't be created. Please try again in a moment."
-                            )}
-                            <BaseButton type="button" className="retry-link" onClick={pingServer} disabled={pingingServer}>
-                                {pingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.server.retry', 'Retry')}
-                            </BaseButton>
-                        </div>
-                    )}
-                    <div className="field">
-                        <label htmlFor="register-email">{t('nitro.login.forgot.email.label', 'Email')}</label>
-                        <input
-                            id="register-email"
-                            name="email"
-                            type="email"
-                            maxLength={120}
-                            autoComplete="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                    </div>
-                    <div className="field">
-                        <label htmlFor="register-password">{t('generic.password', 'Password')}</label>
-                        <input
-                            id="register-password"
-                            name="password"
-                            type="password"
-                            maxLength={128}
-                            autoComplete="new-password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-                    <div className="field">
-                        <label htmlFor="register-confirm">{t('nitro.login.register.confirm.label', 'Confirm password')}</label>
-                        <input
-                            id="register-confirm"
-                            name="confirm"
-                            type="password"
-                            maxLength={128}
-                            autoComplete="new-password"
-                            value={confirm}
-                            onChange={(e) => setConfirm(e.target.value)}
-                        />
-                    </div>
-                    {(localError || error) && <div className="error-line">{localError || error}</div>}
-                    {info && <div className="info-line">{info}</div>}
-                    <div className="step-footer">
-                        <span className="step-indicator">1/3</span>
-                        <BaseButton type="submit" className="ok-button" disabled={!credentialsValid || busy || serverOffline}>
-                            {isCredentialsPending || pingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.register.next', 'Next')}
-                        </BaseButton>
-                    </div>
-                </form>
-            )}
-
-            {step === 'avatar' && (
-                <form className="card-body octane-card-content-shell" action={submitAvatarAction} autoComplete="on">
-                    <div className="register-intro octane-card-panel">
-                        {t(
-                            'nitro.login.register.intro.avatar',
-                            "Now it's time to make your own Habbo character! To make your own Habbo, please start by choosing your Habbo Name."
-                        )}
-                    </div>
-                    {serverOffline && (
-                        <div className="error-line server-offline">
-                            {t(
-                                'nitro.login.server.offline.long',
-                                "The gameserver isn't running right now, so new accounts can't be created. Please try again in a moment."
-                            )}
-                            <BaseButton type="button" className="retry-link" onClick={pingServer} disabled={pingingServer}>
-                                {pingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.server.retry', 'Retry')}
-                            </BaseButton>
-                        </div>
-                    )}
-                    <div className="field">
-                        <input
-                            id="register-username"
-                            type="text"
-                            maxLength={16}
-                            autoComplete="username"
-                            placeholder={t('nitro.login.register.username.placeholder', 'HabboName')}
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="gender-row">
-                        <label>
-                            <Radio name="register-gender" checked={gender === 'F'} onCheckedChange={() => applyGender('F')} />
-                            <span>{t('nitro.login.register.gender.girl', 'Girl')}</span>
-                        </label>
-                        <label>
-                            <Radio name="register-gender" checked={gender === 'M'} onCheckedChange={() => applyGender('M')} />
-                            <span>{t('nitro.login.register.gender.boy', 'Boy')}</span>
-                        </label>
-                    </div>
-
-                    <RegistrationAvatarWardrobe
-                        gender={gender}
-                        figure={figure}
-                        selection={selection}
-                        partOptions={partOptions}
-                        paletteOptions={paletteOptions}
-                        onSelectPart={selectWardrobePart}
-                        onSelectColor={selectWardrobeColor}
-                    />
-
-                    <div className="hot-looks-row">
-                        <Hint content={
-                                hotLooks.length
-                                    ? t('nitro.login.register.hotlooks.count', '%count% looks available', ['count'], [String(hotLooks.length)])
-                                    : t('nitro.login.register.hotlooks.none', 'No hot looks loaded')
-                            }><BaseButton
-                            type="button"
-                            className="ok-button hot-looks-button"
-                            onClick={cycleHotLook}
-                            disabled={!hotLooks.length || busy}
-                        >
-                            {t('nitro.login.register.hotlooks', 'Hot Looks')}
-                            {hotLookIndex >= 0 && hotLooks.length ? ` (${hotLookIndex + 1}/${hotLooks.length})` : ''}
-                        </BaseButton></Hint>
-                        <Hint content={t('nitro.login.register.randomlook.title', 'Generate a random look')}><BaseButton
-                            type="button"
-                            className="ok-button back-button hot-looks-button random-look-button"
-                            onClick={randomizeLook}
-                            disabled={!canRandomizeLook || busy}
-                        >
-                            <FaDice aria-hidden="true" />
-                            {t('nitro.login.register.randomlook', 'Random Look')}
-                        </BaseButton></Hint>
-                    </div>
-
-                    {turnstileEnabled && (
-                        <TurnstileWidget
-                            siteKey={turnstileSiteKey}
-                            size="compact"
-                            onToken={setTurnstileToken}
-                            onExpire={() => setTurnstileToken('')}
-                            onError={() => setTurnstileToken('')}
-                            resetSignal={resetSignal}
-                        />
-                    )}
-                    {(localError || error) && <div className="error-line">{localError || error}</div>}
-                    {info && <div className="info-line">{info}</div>}
-
-                    <div className="step-footer step-footer-split">
-                        <BaseButton type="button" className="ok-button back-button" onClick={() => setStep('credentials')} disabled={busy}>
-                            {t('nitro.login.register.back', 'Back')}
-                        </BaseButton>
-                        <span className="step-indicator">2/3</span>
-                        <BaseButton type="submit" className="ok-button" disabled={!username.trim() || busy || serverOffline}>
-                            {isAvatarPending
-                                ? t('nitro.login.server.checking', 'Checking…')
-                                : pingingServer
-                                  ? t('nitro.login.server.checking', 'Checking…')
-                                  : t('nitro.login.register.next', 'Next')}
-                        </BaseButton>
-                    </div>
-                </form>
-            )}
-
-            {step === 'room' && (
-                <form className="card-body octane-card-content-shell" action={submitRoomAction} autoComplete="off">
-                    <div className="register-intro octane-card-panel">
-                        {t('nitro.login.register.intro.room', 'Last step — pick a starter room, or skip and create your own later.')}
-                    </div>
-
-                    {serverOffline && (
-                        <div className="error-line server-offline">
-                            {t(
-                                'nitro.login.server.offline.long',
-                                "The gameserver isn't running right now, so new accounts can't be created. Please try again in a moment."
-                            )}
-                            <BaseButton type="button" className="retry-link" onClick={pingServer} disabled={pingingServer}>
-                                {pingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.server.retry', 'Retry')}
-                            </BaseButton>
-                        </div>
-                    )}
-
-                    <div className="room-templates-list">
-                        <label className={`room-template-option room-template-skip ${selectedTemplateId === null ? 'selected' : ''}`}>
-                            <Radio name="register-room-template" checked={selectedTemplateId === null} onCheckedChange={() => setSelectedTemplateId(null)} />
-                            <div className="room-template-body">
-                                <div className="room-template-title">{t('nitro.login.register.room.skip.title', "I'm okay — I'll create my own rooms")}</div>
-                                <div className="room-template-description">
-                                    {t('nitro.login.register.room.skip.description', 'Skip for now and start with an empty hotel inventory.')}
-                                </div>
+                        {draftRestored && (
+                            <div className="info-line">
+                                {t(
+                                    'nitro.login.register.draft.restored',
+                                    'Your signup draft was restored. For security, re-enter your password to continue where you left off.'
+                                )}
                             </div>
-                        </label>
+                        )}
+                        {serverOffline && (
+                            <div className="error-line server-offline">
+                                {t(
+                                    'nitro.login.server.offline.long',
+                                    "The gameserver isn't running right now, so new accounts can't be created. Please try again in a moment."
+                                )}
+                                <BaseButton type="button" className="retry-link" onClick={pingServer} disabled={pingingServer}>
+                                    {pingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.server.retry', 'Retry')}
+                                </BaseButton>
+                            </div>
+                        )}
+                        <div className="field">
+                            <label htmlFor="register-email">{t('nitro.login.forgot.email.label', 'Email')}</label>
+                            <input
+                                id="register-email"
+                                name="email"
+                                type="email"
+                                maxLength={120}
+                                autoComplete="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </div>
+                        <div className="field">
+                            <label htmlFor="register-password">{t('generic.password', 'Password')}</label>
+                            <input
+                                id="register-password"
+                                name="password"
+                                type="password"
+                                maxLength={128}
+                                autoComplete="new-password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                        </div>
+                        <div className="field">
+                            <label htmlFor="register-confirm">{t('nitro.login.register.confirm.label', 'Confirm password')}</label>
+                            <input
+                                id="register-confirm"
+                                name="confirm"
+                                type="password"
+                                maxLength={128}
+                                autoComplete="new-password"
+                                value={confirm}
+                                onChange={(e) => setConfirm(e.target.value)}
+                            />
+                        </div>
+                        {(localError || error) && <div className="error-line">{localError || error}</div>}
+                        {info && <div className="info-line">{info}</div>}
+                        <div className="step-footer">
+                            <span className="step-indicator">1/3</span>
+                            <BaseButton type="submit" className="ok-button" disabled={!credentialsValid || busy || serverOffline}>
+                                {isCredentialsPending || pingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.register.next', 'Next')}
+                            </BaseButton>
+                        </div>
+                    </form>
+                )}
 
-                        {roomTemplates === null && <div className="info-line">{t('nitro.login.register.room.loading', 'Loading rooms…')}</div>}
+                {step === 'avatar' && (
+                    <form className="card-body octane-card-content-shell" action={submitAvatarAction} autoComplete="on">
+                        <div className="register-intro octane-card-panel">
+                            {t(
+                                'nitro.login.register.intro.avatar',
+                                "Now it's time to make your own Habbo character! To make your own Habbo, please start by choosing your Habbo Name."
+                            )}
+                        </div>
+                        {serverOffline && (
+                            <div className="error-line server-offline">
+                                {t(
+                                    'nitro.login.server.offline.long',
+                                    "The gameserver isn't running right now, so new accounts can't be created. Please try again in a moment."
+                                )}
+                                <BaseButton type="button" className="retry-link" onClick={pingServer} disabled={pingingServer}>
+                                    {pingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.server.retry', 'Retry')}
+                                </BaseButton>
+                            </div>
+                        )}
+                        <div className="field">
+                            <input
+                                id="register-username"
+                                type="text"
+                                maxLength={16}
+                                autoComplete="username"
+                                placeholder={t('nitro.login.register.username.placeholder', 'HabboName')}
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
+                        </div>
 
-                        {roomTemplates !== null &&
-                            roomTemplates.map((template) => (
-                                <label
-                                    key={template.templateId}
-                                    className={`room-template-option ${selectedTemplateId === template.templateId ? 'selected' : ''}`}
-                                >
-                                    <Radio name="register-room-template" checked={selectedTemplateId === template.templateId} onCheckedChange={() => setSelectedTemplateId(template.templateId)} />
-                                    {template.thumbnail && (
-                                        <img
-                                            className="room-template-thumb"
-                                            src={template.thumbnail}
-                                            alt={template.title}
-                                            onError={(e) => {
-                                                (e.currentTarget as HTMLImageElement).style.visibility = 'hidden';
-                                            }}
-                                        />
-                                    )}
-                                    <div className="room-template-body">
-                                        <div className="room-template-title">{template.title}</div>
-                                        {template.description && <div className="room-template-description">{template.description}</div>}
+                        <div className="gender-row">
+                            <label>
+                                <Radio name="register-gender" checked={gender === 'F'} onCheckedChange={() => applyGender('F')} />
+                                <span>{t('nitro.login.register.gender.girl', 'Girl')}</span>
+                            </label>
+                            <label>
+                                <Radio name="register-gender" checked={gender === 'M'} onCheckedChange={() => applyGender('M')} />
+                                <span>{t('nitro.login.register.gender.boy', 'Boy')}</span>
+                            </label>
+                        </div>
+
+                        <RegistrationAvatarWardrobe
+                            gender={gender}
+                            figure={figure}
+                            selection={selection}
+                            partOptions={partOptions}
+                            paletteOptions={paletteOptions}
+                            onSelectPart={selectWardrobePart}
+                            onSelectColor={selectWardrobeColor}
+                        />
+
+                        <div className="hot-looks-row">
+                            <Hint content={
+                                    hotLooks.length
+                                        ? t('nitro.login.register.hotlooks.count', '%count% looks available', ['count'], [String(hotLooks.length)])
+                                        : t('nitro.login.register.hotlooks.none', 'No hot looks loaded')
+                                }><BaseButton
+                                type="button"
+                                className="ok-button hot-looks-button"
+                                onClick={cycleHotLook}
+                                disabled={!hotLooks.length || busy}
+                            >
+                                {t('nitro.login.register.hotlooks', 'Hot Looks')}
+                                {hotLookIndex >= 0 && hotLooks.length ? ` (${hotLookIndex + 1}/${hotLooks.length})` : ''}
+                            </BaseButton></Hint>
+                            <Hint content={t('nitro.login.register.randomlook.title', 'Generate a random look')}><BaseButton
+                                type="button"
+                                className="ok-button back-button hot-looks-button random-look-button"
+                                onClick={randomizeLook}
+                                disabled={!canRandomizeLook || busy}
+                            >
+                                <FaDice aria-hidden="true" />
+                                {t('nitro.login.register.randomlook', 'Random Look')}
+                            </BaseButton></Hint>
+                        </div>
+
+                        {turnstileEnabled && (
+                            <TurnstileWidget
+                                siteKey={turnstileSiteKey}
+                                size="compact"
+                                onToken={setTurnstileToken}
+                                onExpire={() => setTurnstileToken('')}
+                                onError={() => setTurnstileToken('')}
+                                resetSignal={resetSignal}
+                            />
+                        )}
+                        {(localError || error) && <div className="error-line">{localError || error}</div>}
+                        {info && <div className="info-line">{info}</div>}
+
+                        <div className="step-footer step-footer-split">
+                            <BaseButton type="button" className="ok-button back-button" onClick={() => setStep('credentials')} disabled={busy}>
+                                {t('nitro.login.register.back', 'Back')}
+                            </BaseButton>
+                            <span className="step-indicator">2/3</span>
+                            <BaseButton type="submit" className="ok-button" disabled={!username.trim() || busy || serverOffline}>
+                                {isAvatarPending
+                                    ? t('nitro.login.server.checking', 'Checking…')
+                                    : pingingServer
+                                      ? t('nitro.login.server.checking', 'Checking…')
+                                      : t('nitro.login.register.next', 'Next')}
+                            </BaseButton>
+                        </div>
+                    </form>
+                )}
+
+                {step === 'room' && (
+                    <form className="card-body octane-card-content-shell" action={submitRoomAction} autoComplete="off">
+                        <div className="register-intro octane-card-panel">
+                            {t('nitro.login.register.intro.room', 'Last step — pick a starter room, or skip and create your own later.')}
+                        </div>
+
+                        {serverOffline && (
+                            <div className="error-line server-offline">
+                                {t(
+                                    'nitro.login.server.offline.long',
+                                    "The gameserver isn't running right now, so new accounts can't be created. Please try again in a moment."
+                                )}
+                                <BaseButton type="button" className="retry-link" onClick={pingServer} disabled={pingingServer}>
+                                    {pingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.server.retry', 'Retry')}
+                                </BaseButton>
+                            </div>
+                        )}
+
+                        <div className="room-templates-list">
+                            <label className={`room-template-option room-template-skip ${selectedTemplateId === null ? 'selected' : ''}`}>
+                                <Radio name="register-room-template" checked={selectedTemplateId === null} onCheckedChange={() => setSelectedTemplateId(null)} />
+                                <div className="room-template-body">
+                                    <div className="room-template-title">{t('nitro.login.register.room.skip.title', "I'm okay — I'll create my own rooms")}</div>
+                                    <div className="room-template-description">
+                                        {t('nitro.login.register.room.skip.description', 'Skip for now and start with an empty hotel inventory.')}
                                     </div>
-                                </label>
-                            ))}
-                    </div>
+                                </div>
+                            </label>
 
-                    {roomTemplatesError && <div className="error-line">{roomTemplatesError}</div>}
-                    {(localError || error) && <div className="error-line">{localError || error}</div>}
-                    {info && <div className="info-line">{info}</div>}
+                            {roomTemplates === null && <div className="info-line">{t('nitro.login.register.room.loading', 'Loading rooms…')}</div>}
 
-                    <div className="step-footer step-footer-split">
-                        <BaseButton type="button" className="ok-button back-button" onClick={() => setStep('avatar')} disabled={busy}>
-                            {t('nitro.login.register.back', 'Back')}
-                        </BaseButton>
-                        <span className="step-indicator">3/3</span>
-                        <BaseButton type="submit" className="ok-button" disabled={busy || serverOffline}>
-                            {submitting || isRoomPending ? t('nitro.login.register.creating', 'Creating…') : t('nitro.login.register.finish', 'Finish')}
-                        </BaseButton>
-                    </div>
-                </form>
-            )}
-        </LoginModal>
+                            {roomTemplates !== null &&
+                                roomTemplates.map((template) => (
+                                    <label
+                                        key={template.templateId}
+                                        className={`room-template-option ${selectedTemplateId === template.templateId ? 'selected' : ''}`}
+                                    >
+                                        <Radio name="register-room-template" checked={selectedTemplateId === template.templateId} onCheckedChange={() => setSelectedTemplateId(template.templateId)} />
+                                        {template.thumbnail && (
+                                            <img
+                                                className="room-template-thumb"
+                                                src={template.thumbnail}
+                                                alt={template.title}
+                                                onError={(e) => {
+                                                    (e.currentTarget as HTMLImageElement).style.visibility = 'hidden';
+                                                }}
+                                            />
+                                        )}
+                                        <div className="room-template-body">
+                                            <div className="room-template-title">{template.title}</div>
+                                            {template.description && <div className="room-template-description">{template.description}</div>}
+                                        </div>
+                                    </label>
+                                ))}
+                        </div>
+
+                        {roomTemplatesError && <div className="error-line">{roomTemplatesError}</div>}
+                        {(localError || error) && <div className="error-line">{localError || error}</div>}
+                        {info && <div className="info-line">{info}</div>}
+
+                        <div className="step-footer step-footer-split">
+                            <BaseButton type="button" className="ok-button back-button" onClick={() => setStep('avatar')} disabled={busy}>
+                                {t('nitro.login.register.back', 'Back')}
+                            </BaseButton>
+                            <span className="step-indicator">3/3</span>
+                            <BaseButton type="submit" className="ok-button" disabled={busy || serverOffline}>
+                                {submitting || isRoomPending ? t('nitro.login.register.creating', 'Creating…') : t('nitro.login.register.finish', 'Finish')}
+                            </BaseButton>
+                        </div>
+                    </form>
+                )}
+            </LoginModal>
+        </NativeTextTree>
     );
 };
 
@@ -1730,9 +1737,11 @@ const ForgotSubmitButton: FC = () => {
     const { pending } = useFormStatus();
 
     return (
-        <BaseButton type="submit" className="ok-button" disabled={pending}>
-            {t('nitro.login.forgot.send', 'Send email')}
-        </BaseButton>
+        <NativeTextTree>
+            <BaseButton type="submit" className="ok-button" disabled={pending}>
+                {t('nitro.login.forgot.send', 'Send email')}
+            </BaseButton>
+        </NativeTextTree>
     );
 };
 
@@ -1768,41 +1777,43 @@ const ForgotDialog: FC<ForgotDialogProps> = (props) => {
     const [, submitForgotAction] = useActionState<null, FormData>(forgotAction, null);
 
     return (
-        <LoginModal
-            title={t('nitro.login.forgot.title', 'Reset password')}
-            titleId="forgot-dialog-title"
-            closeLabel={t('generic.close', 'Close')}
-            onClose={onCancel}
-        >
-            <form className="card-body octane-card-content-shell" action={submitForgotAction} autoComplete="on">
-                <div className="field">
-                    <label htmlFor="forgot-email">{t('nitro.login.forgot.email.label', 'Email address')}</label>
-                    <input
-                        id="forgot-email"
-                        name="email"
-                        type="email"
-                        maxLength={120}
-                        autoComplete="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                {turnstileEnabled && (
-                    <TurnstileWidget
-                        siteKey={turnstileSiteKey}
-                        size="compact"
-                        onToken={setTurnstileToken}
-                        onExpire={() => setTurnstileToken('')}
-                        onError={() => setTurnstileToken('')}
-                        resetSignal={resetSignal}
-                    />
-                )}
-                {(localError || error) && <div className="error-line">{localError || error}</div>}
-                {info && <div className="info-line">{info}</div>}
-                <div className="submit-row">
-                    <ForgotSubmitButton />
-                </div>
-            </form>
-        </LoginModal>
+        <NativeTextTree>
+            <LoginModal
+                title={t('nitro.login.forgot.title', 'Reset password')}
+                titleId="forgot-dialog-title"
+                closeLabel={t('generic.close', 'Close')}
+                onClose={onCancel}
+            >
+                <form className="card-body octane-card-content-shell" action={submitForgotAction} autoComplete="on">
+                    <div className="field">
+                        <label htmlFor="forgot-email">{t('nitro.login.forgot.email.label', 'Email address')}</label>
+                        <input
+                            id="forgot-email"
+                            name="email"
+                            type="email"
+                            maxLength={120}
+                            autoComplete="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    {turnstileEnabled && (
+                        <TurnstileWidget
+                            siteKey={turnstileSiteKey}
+                            size="compact"
+                            onToken={setTurnstileToken}
+                            onExpire={() => setTurnstileToken('')}
+                            onError={() => setTurnstileToken('')}
+                            resetSignal={resetSignal}
+                        />
+                    )}
+                    {(localError || error) && <div className="error-line">{localError || error}</div>}
+                    {info && <div className="info-line">{info}</div>}
+                    <div className="submit-row">
+                        <ForgotSubmitButton />
+                    </div>
+                </form>
+            </LoginModal>
+        </NativeTextTree>
     );
 };

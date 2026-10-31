@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { LocalizeShortNumber } from '../../../../api';
 import { LayoutCurrencyIcon } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface CatalogAdminOfferPriceViewProps {
     credits?: number;
@@ -14,20 +15,22 @@ export const CatalogAdminOfferPriceView: FC<CatalogAdminOfferPriceViewProps> = (
     if (credits <= 0 && points <= 0) return null;
 
     return (
-        <span className="octane-catalog-admin-offer-price">
-            {credits > 0 && (
-                <span className="octane-catalog-admin-offer-price-entry">
-                    <span>{LocalizeShortNumber(credits)}</span>
-                    <LayoutCurrencyIcon type={-1} />
-                </span>
-            )}
-            {points > 0 && (
-                <span className="octane-catalog-admin-offer-price-entry">
-                    {credits > 0 && <span className="octane-catalog-admin-offer-price-plus">+</span>}
-                    <span>{LocalizeShortNumber(points)}</span>
-                    <LayoutCurrencyIcon type={pointsType} />
-                </span>
-            )}
-        </span>
+        <NativeTextTree>
+            <span className="octane-catalog-admin-offer-price">
+                {credits > 0 && (
+                    <span className="octane-catalog-admin-offer-price-entry">
+                        <span>{LocalizeShortNumber(credits)}</span>
+                        <LayoutCurrencyIcon type={-1} />
+                    </span>
+                )}
+                {points > 0 && (
+                    <span className="octane-catalog-admin-offer-price-entry">
+                        {credits > 0 && <span className="octane-catalog-admin-offer-price-plus">+</span>}
+                        <span>{LocalizeShortNumber(points)}</span>
+                        <LayoutCurrencyIcon type={pointsType} />
+                    </span>
+                )}
+            </span>
+        </NativeTextTree>
     );
 };

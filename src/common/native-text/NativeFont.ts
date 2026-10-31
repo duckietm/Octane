@@ -1,5 +1,5 @@
 import { NativeTextRenderer, layoutNativeText, layoutNormalText, prepareNativeBundle, swfGlyphHasInk } from './NativeTextRenderer';
-import { NativeBundle, NativeFont, NativeRenderOptions } from './NativeTextTypes';
+import { NativeBundle, NativeFont, NativeRenderOptions, RasterCache } from './NativeTextTypes';
 
 const fontAssets = {
     regular: new URL('../../assets/native-fonts/ubuntu_regular.json', import.meta.url).href,
@@ -14,8 +14,11 @@ type FontKey = keyof typeof fontAssets;
 interface LoadedFont {
     font: NativeFont;
     renderer: NativeTextRenderer;
+    /** Rasterised glyph occurrences of this font (the renderer's keys do not name the font), shared by every label. */
+    rasterCache: RasterCache;
 }
 const loadingFonts = new Map<FontKey, Promise<LoadedFont>>();
+const loadedFonts = new Map<FontKey, LoadedFont>();
 
 export interface NativeFontStyle {
     family: 'Ubuntu' | 'UbuntuCondensed' | 'Volter';
@@ -35,26 +38,36 @@ export interface NativeFontStyle {
     letterSpacing?: number;
 }
 
+function fontKeyFor(style: NativeFontStyle): FontKey {
+    return style.family === 'Volter'
+        ? style.bold
+            ? 'volterBold'
+            : 'volter'
+        : style.family === 'UbuntuCondensed'
+          ? 'condensed'
+          : style.bold
+            ? style.italic
+                ? 'boldItalic'
+                : 'bold'
+            : style.italic
+              ? 'italic'
+              : 'regular';
+}
+
+/** The font when it has already loaded, so a label can be drawn in the same frame it mounts; null until then. */
+export function peekNativeFont(style: NativeFontStyle): LoadedFont | null {
+    return loadedFonts.get(fontKeyFor(style)) ?? null;
+}
+
 export async function loadNativeFont(style: NativeFontStyle): Promise<LoadedFont> {
-    const key: FontKey =
-        style.family === 'Volter'
-            ? style.bold
-                ? 'volterBold'
-                : 'volter'
-            : style.family === 'UbuntuCondensed'
-              ? 'condensed'
-              : style.bold
-                ? style.italic
-                    ? 'boldItalic'
-                    : 'bold'
-                : style.italic
-                  ? 'italic'
-                  : 'regular';
+    const key = fontKeyFor(style);
     if (!loadingFonts.has(key)) {
         const loading = fetch(fontAssets[key]).then(async (response) => {
             if (!response.ok) throw new Error(`Native font ${key}: HTTP ${response.status}`);
             const font = prepareNativeBundle((await response.json()) as NativeBundle);
-            return { font, renderer: new NativeTextRenderer(font) };
+            const loaded = { font, renderer: new NativeTextRenderer(font), rasterCache: { entries: new Map(), bytes: 0 } };
+            loadedFonts.set(key, loaded);
+            return loaded;
         });
         loadingFonts.set(key, loading);
         loading.catch(() => loadingFonts.delete(key));

@@ -8,6 +8,7 @@ import { Select } from '../../common/Select';
 import { NumberInput } from '../../common/NumberInput';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface EditRow {
     id: number;
@@ -107,74 +108,76 @@ export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ on
         });
 
     return (
-        <OctaneCard className="w-[480px] h-[520px]" uniqueKey="fortune-wheel-settings">
-            <OctaneCard.Header headerText={LocalizeText('wheel.settings.title')} onCloseClick={onClose} />
-            <OctaneCard.Content>
-                <Column gap={1} className="h-full p-1">
-                    <Flex gap={1} className="px-1 text-[11px] font-bold text-black/60">
-                        <span className="w-28">{LocalizeText('rarevalues.editor.type')}</span>
-                        <span className="w-16">{LocalizeText('rarevalues.editor.value')}</span>
-                        <span className="w-12">{LocalizeText('rarevalues.editor.weight')}</span>
-                        <span className="grow">{LocalizeText('rarevalues.editor.label')}</span>
-                        <span className="w-6" />
-                    </Flex>
-                    <Column gap={1} overflow="auto" className="grow">
-                        {editRows.map((row) => (
-                            <Flex key={row.id} alignItems="center" gap={1} className="border-b border-black/10 pb-1">
-                                <Select
-                                    value={row.category}
-                                    onChange={(event) => updateRow(row.id, { category: event.target.value })}
-                                    className="w-28 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]"
-                                >
-                                    {CATEGORIES.map((cat) => (
-                                        <option key={cat.key} value={cat.key}>
-                                            {LocalizeText(cat.labelKey)}
-                                        </option>
-                                    ))}
-                                </Select>
-                                <NumberInput value={row.num} disabled={row.category === 'nothing'} onChange={(event) => updateRow(row.id, { num: parseInt(event.target.value) || 0 })} className="w-16 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34] disabled:opacity-40" />
-                                <NumberInput value={row.weight} onChange={(event) => updateRow(row.id, { weight: parseInt(event.target.value) || 0 })} className="w-12 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]" />
-                                <input
-                                    type="text"
-                                    value={row.label}
-                                    onChange={(event) => updateRow(row.id, { label: event.target.value })}
-                                    className="min-w-0 grow rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]"
-                                />
-                                <Hint content={LocalizeText('rarevalues.editor.remove')}>
-                                    <BaseButton aria-label={LocalizeText('rarevalues.editor.remove')}
-                                        type="button"
-                                        onClick={() => removeRow(row.id)}
-                                        className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded bg-[#d9534f] font-bold leading-none text-white hover:bg-[#c44440]"
+        <NativeTextTree>
+            <OctaneCard className="w-[480px] h-[520px]" uniqueKey="fortune-wheel-settings">
+                <OctaneCard.Header headerText={LocalizeText('wheel.settings.title')} onCloseClick={onClose} />
+                <OctaneCard.Content>
+                    <Column gap={1} className="h-full p-1">
+                        <Flex gap={1} className="px-1 text-[11px] font-bold text-black/60">
+                            <span className="w-28">{LocalizeText('rarevalues.editor.type')}</span>
+                            <span className="w-16">{LocalizeText('rarevalues.editor.value')}</span>
+                            <span className="w-12">{LocalizeText('rarevalues.editor.weight')}</span>
+                            <span className="grow">{LocalizeText('rarevalues.editor.label')}</span>
+                            <span className="w-6" />
+                        </Flex>
+                        <Column gap={1} overflow="auto" className="grow">
+                            {editRows.map((row) => (
+                                <Flex key={row.id} alignItems="center" gap={1} className="border-b border-black/10 pb-1">
+                                    <Select
+                                        value={row.category}
+                                        onChange={(event) => updateRow(row.id, { category: event.target.value })}
+                                        className="w-28 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]"
                                     >
-                                        ×
-                                    </BaseButton>
-                                </Hint>
-                            </Flex>
-                        ))}
-                        {!editRows.length && (
-                            <Text small className="text-black/50">
-                                {LocalizeText('wheel.settings.empty')}
-                            </Text>
-                        )}
+                                        {CATEGORIES.map((cat) => (
+                                            <option key={cat.key} value={cat.key}>
+                                                {LocalizeText(cat.labelKey)}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                    <NumberInput value={row.num} disabled={row.category === 'nothing'} onChange={(event) => updateRow(row.id, { num: parseInt(event.target.value) || 0 })} className="w-16 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34] disabled:opacity-40" />
+                                    <NumberInput value={row.weight} onChange={(event) => updateRow(row.id, { weight: parseInt(event.target.value) || 0 })} className="w-12 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]" />
+                                    <input
+                                        type="text"
+                                        value={row.label}
+                                        onChange={(event) => updateRow(row.id, { label: event.target.value })}
+                                        className="min-w-0 grow rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]"
+                                    />
+                                    <Hint content={LocalizeText('rarevalues.editor.remove')}>
+                                        <BaseButton aria-label={LocalizeText('rarevalues.editor.remove')}
+                                            type="button"
+                                            onClick={() => removeRow(row.id)}
+                                            className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded bg-[#d9534f] font-bold leading-none text-white hover:bg-[#c44440]"
+                                        >
+                                            ×
+                                        </BaseButton>
+                                    </Hint>
+                                </Flex>
+                            ))}
+                            {!editRows.length && (
+                                <Text small className="text-black/50">
+                                    {LocalizeText('wheel.settings.empty')}
+                                </Text>
+                            )}
+                        </Column>
+                        <BaseButton
+                            type="button"
+                            disabled={editRows.length >= 64}
+                            onClick={addRow}
+                            className="cursor-pointer rounded border border-dashed border-[#3a7bb5] px-4 py-1.5 text-sm font-bold text-[#3a7bb5] hover:bg-[#3a7bb5]/10 disabled:cursor-default disabled:opacity-40"
+                        >
+                            {LocalizeText('rarevalues.editor.add')}
+                        </BaseButton>
+                        <BaseButton
+                            type="button"
+                            disabled={!editRows.length}
+                            onClick={() => saveAdminPrizes?.(editRows.map(rowToEdit))}
+                            className="cursor-pointer rounded bg-[#3a7bb5] px-4 py-2 font-bold text-white hover:bg-[#336ea3] disabled:cursor-default disabled:opacity-40"
+                        >
+                            {LocalizeText('rarevalues.editor.save')}
+                        </BaseButton>
                     </Column>
-                    <BaseButton
-                        type="button"
-                        disabled={editRows.length >= 64}
-                        onClick={addRow}
-                        className="cursor-pointer rounded border border-dashed border-[#3a7bb5] px-4 py-1.5 text-sm font-bold text-[#3a7bb5] hover:bg-[#3a7bb5]/10 disabled:cursor-default disabled:opacity-40"
-                    >
-                        {LocalizeText('rarevalues.editor.add')}
-                    </BaseButton>
-                    <BaseButton
-                        type="button"
-                        disabled={!editRows.length}
-                        onClick={() => saveAdminPrizes?.(editRows.map(rowToEdit))}
-                        className="cursor-pointer rounded bg-[#3a7bb5] px-4 py-2 font-bold text-white hover:bg-[#336ea3] disabled:cursor-default disabled:opacity-40"
-                    >
-                        {LocalizeText('rarevalues.editor.save')}
-                    </BaseButton>
-                </Column>
-            </OctaneCard.Content>
-        </OctaneCard>
+                </OctaneCard.Content>
+            </OctaneCard>
+        </NativeTextTree>
     );
 };

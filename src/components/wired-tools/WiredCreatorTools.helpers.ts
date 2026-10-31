@@ -268,3 +268,17 @@ export const exceedsVariableHighlightLimit = (holderCount: number, hasValue: boo
 
 /** Official VariableTypePicker: the furni / users / global / context buttons are titled `wiredfurni.params.sourcetype.*`. */
 export const wiredSourceTypeLabelKey = (type: string): string => `wiredfurni.params.sourcetype.${type === 'user' ? 'users' : type}`;
+
+const WIRED_INT_MIN = -2147483648;
+const WIRED_INT_MAX = 2147483647;
+
+/** A variable value as the server stores it: a whole number held inside the int32 range, so what is shown is what is saved. */
+export const clampWiredVariableValue = (value: number): number =>
+    Number.isFinite(value) ? Math.min(WIRED_INT_MAX, Math.max(WIRED_INT_MIN, Math.trunc(value))) : 0;
+
+/** A typed variable value, NaN when the text holds no number (the caller then cancels the edit). */
+export const parseWiredVariableValue = (raw: string): number => {
+    const parsed = parseInt(raw.trim(), 10);
+
+    return Number.isNaN(parsed) ? Number.NaN : clampWiredVariableValue(parsed);
+};

@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
@@ -18,15 +19,17 @@ export const WiredTriggeExecutePeriodicallyShortView: FC<{}> = () => {
     const ms = String(time * 50);
 
     return (
-        <WiredTriggerBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <WiredSliderSection
-                max={10}
-                min={1}
-                numberInput={false}
-                title={localizeWithFallback('wiredfurni.params.setshorttime', `${ms} ms`, ['ms'], [ms])}
-                value={time}
-                onChange={setTime}
-            />
-        </WiredTriggerBaseView>
+        <NativeTextTree>
+            <WiredTriggerBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
+                <WiredSliderSection
+                    max={10}
+                    min={1}
+                    numberInput={false}
+                    title={localizeWithFallback('wiredfurni.params.setshorttime', `${ms} ms`, ['ms'], [ms])}
+                    value={time}
+                    onChange={setTime}
+                />
+            </WiredTriggerBaseView>
+        </NativeTextTree>
     );
 };

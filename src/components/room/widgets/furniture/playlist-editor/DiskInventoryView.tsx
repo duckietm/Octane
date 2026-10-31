@@ -3,6 +3,7 @@ import { FC, MouseEvent, useCallback, useEffect, useState } from 'react';
 import { CatalogPageName, GetConfigurationValue, GetDiskColor, LocalizeText, localizeWithFallback } from '../../../../../api';
 import { AutoGrid, Button, Flex, LayoutGridItem, Text } from '../../../../../common';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 export interface DiskInventoryViewProps {
     diskInventory: IAdvancedMap<number, number>;
@@ -55,65 +56,67 @@ export const DiskInventoryView: FC<DiskInventoryViewProps> = (props) =>
     }, []);
 
     return (
-        <>
-            <div className="flex justify-center py-3 rounded bg-success container-fluid">
-                <img alt="" className="my-music" src={GetConfigurationValue('image.library.url') + 'playlist/title_mymusic.gif'} />
-                <h2 className="octane-playlist__title ms-4">{LocalizeText('playlist.editor.my.music')}</h2>
-            </div>
-            <div className="h-full py-2 mt-4 overflow-y-scroll">
-                <AutoGrid columnCount={3} columnMinWidth={95} gap={1}>
-                    {diskInventory &&
-                        diskInventory.getKeys().map((key, index) =>
-                        {
-                            const diskId = diskInventory.getKey(index);
-                            const songId = diskInventory.getWithIndex(index);
-                            const songInfo = GetSoundManager().musicController?.getSongInfo(songId);
+        <NativeTextTree>
+            <>
+                <div className="flex justify-center py-3 rounded bg-success container-fluid">
+                    <img alt="" className="my-music" src={GetConfigurationValue('image.library.url') + 'playlist/title_mymusic.gif'} />
+                    <h2 className="octane-playlist__title ms-4">{LocalizeText('playlist.editor.my.music')}</h2>
+                </div>
+                <div className="h-full py-2 mt-4 overflow-y-scroll">
+                    <AutoGrid columnCount={3} columnMinWidth={95} gap={1}>
+                        {diskInventory &&
+                            diskInventory.getKeys().map((key, index) =>
+                            {
+                                const diskId = diskInventory.getKey(index);
+                                const songId = diskInventory.getWithIndex(index);
+                                const songInfo = GetSoundManager().musicController?.getSongInfo(songId);
 
-                            return (
-                                <LayoutGridItem
-                                    component="div"
-                                    key={index}
-                                    classNames={['text-black']}
-                                    itemActive={selectedItem === index}
-                                    onClick={() => setSelectedItem((prev) => (prev === index ? -1 : index))}
-                                >
-                                    <div className="shrink-0 disk-image -mb-2" style={{ backgroundColor: GetDiskColor(songInfo?.songData) }}></div>
-                                    <Text fullWidth truncate className="octane-playlist__song text-center">
-                                        {songInfo?.name}
-                                    </Text>
-                                    {selectedItem === index && (
-                                        <Flex
-                                            alignItems="center"
-                                            className="bottom-0 p-1 mb-1 rounded bg-secondary"
-                                            gap={2}
-                                            justifyContent="center"
-                                            position="absolute"
-                                        >
-                                            <Button variant="light" onClick={(event) => previewSong(event, songId)}>
-                                                <div className={previewSongId === songId ? 'pause-btn' : 'preview-song'} />
-                                            </Button>
-                                            <Button variant="light" onClick={(event) => addSong(event, diskId)}>
-                                                <div className="move-disk" />
-                                            </Button>
-                                        </Flex>
-                                    )}
-                                </LayoutGridItem>
-                            );
-                        })}
-                </AutoGrid>
-            </div>
-            <div className="p-1 text-black playlist-bottom">
-                <h5 className="octane-playlist__subtitle">{LocalizeText('playlist.editor.text.get.more.music')}</h5>
-                <div>{LocalizeText('playlist.editor.text.you.have.no.songdisks.available')}</div>
-                <div>{LocalizeText('playlist.editor.text.you.can.buy.some.from.the.catalogue')}</div>
-                <BaseButton className="btn btn-primary btn-sm" onClick={() => openCatalogPage()}>
-                    {LocalizeText('playlist.editor.button.open.catalogue')}
-                </BaseButton>
-                <BaseButton className="mt-1 btn btn-primary btn-sm" onClick={() => CreateLinkEvent('trax-editor/show')}>
-                    {localizeWithFallback('trax.editor.open', 'Compose your own music')}
-                </BaseButton>
-            </div>
-            <img alt="" className="get-more" src={`${GetConfigurationValue('image.library.url')}playlist/background_get_more_music.gif`} />
-        </>
+                                return (
+                                    <LayoutGridItem
+                                        component="div"
+                                        key={index}
+                                        classNames={['text-black']}
+                                        itemActive={selectedItem === index}
+                                        onClick={() => setSelectedItem((prev) => (prev === index ? -1 : index))}
+                                    >
+                                        <div className="shrink-0 disk-image -mb-2" style={{ backgroundColor: GetDiskColor(songInfo?.songData) }}></div>
+                                        <Text fullWidth truncate className="octane-playlist__song text-center">
+                                            {songInfo?.name}
+                                        </Text>
+                                        {selectedItem === index && (
+                                            <Flex
+                                                alignItems="center"
+                                                className="bottom-0 p-1 mb-1 rounded bg-secondary"
+                                                gap={2}
+                                                justifyContent="center"
+                                                position="absolute"
+                                            >
+                                                <Button variant="light" onClick={(event) => previewSong(event, songId)}>
+                                                    <div className={previewSongId === songId ? 'pause-btn' : 'preview-song'} />
+                                                </Button>
+                                                <Button variant="light" onClick={(event) => addSong(event, diskId)}>
+                                                    <div className="move-disk" />
+                                                </Button>
+                                            </Flex>
+                                        )}
+                                    </LayoutGridItem>
+                                );
+                            })}
+                    </AutoGrid>
+                </div>
+                <div className="p-1 text-black playlist-bottom">
+                    <h5 className="octane-playlist__subtitle">{LocalizeText('playlist.editor.text.get.more.music')}</h5>
+                    <div>{LocalizeText('playlist.editor.text.you.have.no.songdisks.available')}</div>
+                    <div>{LocalizeText('playlist.editor.text.you.can.buy.some.from.the.catalogue')}</div>
+                    <BaseButton className="btn btn-primary btn-sm" onClick={() => openCatalogPage()}>
+                        {LocalizeText('playlist.editor.button.open.catalogue')}
+                    </BaseButton>
+                    <BaseButton className="mt-1 btn btn-primary btn-sm" onClick={() => CreateLinkEvent('trax-editor/show')}>
+                        {localizeWithFallback('trax.editor.open', 'Compose your own music')}
+                    </BaseButton>
+                </div>
+                <img alt="" className="get-more" src={`${GetConfigurationValue('image.library.url')}playlist/background_get_more_music.gif`} />
+            </>
+        </NativeTextTree>
     );
 };

@@ -2,6 +2,7 @@ import { FC, ReactNode, useMemo } from 'react';
 import { GetBotSkillWindowPosition, GetRoomObjectBounds, GetRoomSession } from '../../../../api';
 import { DraggableWindow, DraggableWindowPosition } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Hint } from '../../../../common/Tooltip';
 
 export const BOT_SKILL_WINDOW_SIZES = {
@@ -45,14 +46,16 @@ export const AvatarInfoBotSkillWindowView: FC<AvatarInfoBotSkillWindowViewProps>
     );
 
     return (
-        <DraggableWindow handleSelector=".air-bot-skill-window-title" initialPosition={initialPosition} windowPosition={DraggableWindowPosition.NOTHING}>
-            <div className={`air-bot-skill-window air-bot-skill-window--${layout}`}>
-                <div className="air-bot-skill-window-title">
-                    <span>{title}</span>
+        <NativeTextTree>
+            <DraggableWindow handleSelector=".air-bot-skill-window-title" initialPosition={initialPosition} windowPosition={DraggableWindowPosition.NOTHING}>
+                <div className={`air-bot-skill-window air-bot-skill-window--${layout}`}>
+                    <div className="air-bot-skill-window-title">
+                        <span>{title}</span>
+                    </div>
+                    <div className="air-bot-skill-window-items">{children}</div>
                 </div>
-                <div className="air-bot-skill-window-items">{children}</div>
-            </div>
-        </DraggableWindow>
+            </DraggableWindow>
+        </NativeTextTree>
     );
 };
 
@@ -61,17 +64,19 @@ export const AvatarInfoBotSkillButtonsView: FC<AvatarInfoBotSkillButtonsViewProp
     const { saveLabel, cancelLabel, onSave, onCancel } = props;
 
     return (
-        <div className="air-bot-skill-buttons">
-            <Hint content={cancelLabel}>
-                <BaseButton className="air-bot-skill-button" type="button" onClick={onCancel}>
-                    <span>{cancelLabel}</span>
-                </BaseButton>
-            </Hint>
-            <Hint content={saveLabel}>
-                <BaseButton className="air-bot-skill-button air-bot-skill-button--save" type="button" onClick={onSave}>
-                    <span>{saveLabel}</span>
-                </BaseButton>
-            </Hint>
-        </div>
+        <NativeTextTree>
+            <div className="air-bot-skill-buttons">
+                <Hint content={cancelLabel}>
+                    <BaseButton className="air-bot-skill-button" type="button" onClick={onCancel}>
+                        <span>{cancelLabel}</span>
+                    </BaseButton>
+                </Hint>
+                <Hint content={saveLabel}>
+                    <BaseButton className="air-bot-skill-button air-bot-skill-button--save" type="button" onClick={onSave}>
+                        <span>{saveLabel}</span>
+                    </BaseButton>
+                </Hint>
+            </div>
+        </NativeTextTree>
     );
 };

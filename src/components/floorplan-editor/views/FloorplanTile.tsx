@@ -1,4 +1,5 @@
 import { FC, memo } from 'react';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { tileToScreen } from '../hooks/usePointerToTile';
 import { TILE_SIZE } from '../state/constants';
 import { tileFill } from '../state/selectors';
@@ -50,7 +51,16 @@ const FloorplanTileImpl: FC<Props> = ({ row, col, tile, selected, isDoor, southH
         if (!selected) return null;
         const points = diamondPoints(row, col, tile.h);
         return (
-            <polygon data-testid="selection-ring" points={points} fill="rgba(250, 204, 21, 0.45)" stroke="#facc15" strokeWidth={1.5} strokeDasharray="3 2" />
+            <NativeTextTree>
+                <polygon
+                    data-testid="selection-ring"
+                    points={points}
+                    fill="rgba(250, 204, 21, 0.45)"
+                    stroke="#facc15"
+                    strokeWidth={1.5}
+                    strokeDasharray="3 2"
+                />
+            </NativeTextTree>
         );
     }
     const points = diamondPoints(row, col, tile.h);
@@ -64,39 +74,49 @@ const FloorplanTileImpl: FC<Props> = ({ row, col, tile, selected, isDoor, southH
     const westFill = westDrop > 0 ? darkenHex(fill, 0.55) : null;
 
     return (
-        <g>
-            {southFill && (
-                <polygon data-testid="tile-south-wall" points={southWallPoints(cx, cy, southDrop)} fill={southFill} stroke="#222" strokeWidth={0.5} />
-            )}
-            {westFill && <polygon data-testid="tile-west-wall" points={westWallPoints(cx, cy, westDrop)} fill={westFill} stroke="#222" strokeWidth={0.5} />}
-            <polygon data-row={row} data-col={col} points={points} fill={fill} stroke="#222" strokeWidth={0.5} />
-            {tile.occupied && (
-                <polygon
-                    data-testid="occupied-marker"
-                    points={points}
-                    fill="rgba(249, 115, 22, 0.40)"
-                    stroke="#f97316"
-                    strokeWidth={1}
-                    strokeDasharray="2 2"
-                    pointerEvents="none"
-                />
-            )}
-            {selected && (
-                <polygon
-                    data-testid="selection-ring"
-                    data-row={row}
-                    data-col={col}
-                    points={points}
-                    fill="none"
-                    stroke="#fff"
-                    strokeWidth={2}
-                    strokeDasharray="3 2"
-                />
-            )}
-            {isDoor && (
-                <polygon data-testid="door-marker" data-row={row} data-col={col} points={points} fill="rgba(255,255,255,0.85)" stroke="#000" strokeWidth={1} />
-            )}
-        </g>
+        <NativeTextTree>
+            <g>
+                {southFill && (
+                    <polygon data-testid="tile-south-wall" points={southWallPoints(cx, cy, southDrop)} fill={southFill} stroke="#222" strokeWidth={0.5} />
+                )}
+                {westFill && <polygon data-testid="tile-west-wall" points={westWallPoints(cx, cy, westDrop)} fill={westFill} stroke="#222" strokeWidth={0.5} />}
+                <polygon data-row={row} data-col={col} points={points} fill={fill} stroke="#222" strokeWidth={0.5} />
+                {tile.occupied && (
+                    <polygon
+                        data-testid="occupied-marker"
+                        points={points}
+                        fill="rgba(249, 115, 22, 0.40)"
+                        stroke="#f97316"
+                        strokeWidth={1}
+                        strokeDasharray="2 2"
+                        pointerEvents="none"
+                    />
+                )}
+                {selected && (
+                    <polygon
+                        data-testid="selection-ring"
+                        data-row={row}
+                        data-col={col}
+                        points={points}
+                        fill="none"
+                        stroke="#fff"
+                        strokeWidth={2}
+                        strokeDasharray="3 2"
+                    />
+                )}
+                {isDoor && (
+                    <polygon
+                        data-testid="door-marker"
+                        data-row={row}
+                        data-col={col}
+                        points={points}
+                        fill="rgba(255,255,255,0.85)"
+                        stroke="#000"
+                        strokeWidth={1}
+                    />
+                )}
+            </g>
+        </NativeTextTree>
     );
 };
 

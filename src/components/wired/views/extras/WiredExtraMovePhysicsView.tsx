@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const SOURCE_ALL_ROOM = 900;
 const DEFAULT_SOURCE = SOURCE_ALL_ROOM;
@@ -67,66 +68,70 @@ export const WiredExtraMovePhysicsView: FC<{}> = () => {
         if (!moveThroughFurni && !blockByFurni && !moveThroughUsers) return null;
 
         return (
-            <div className="flex flex-col gap-3">
-                {moveThroughFurni && (
-                    <WiredSourcesSelector
-                        showFurni={true}
-                        furniSource={moveThroughFurniSource}
-                        furniSources={FURNI_SOURCES}
-                        furniTitle="wiredfurni.params.sources.furni.title.physics.0"
-                        onChangeFurni={(value) => setMoveThroughFurniSource(normalizeSource(value, FURNI_SOURCES))}
-                    />
-                )}
-                {blockByFurni && (
-                    <WiredSourcesSelector
-                        showFurni={true}
-                        furniSource={blockByFurniSource}
-                        furniSources={FURNI_SOURCES}
-                        furniTitle="wiredfurni.params.sources.furni.title.physics.1"
-                        onChangeFurni={(value) => setBlockByFurniSource(normalizeSource(value, FURNI_SOURCES))}
-                    />
-                )}
-                {moveThroughUsers && (
-                    <WiredSourcesSelector
-                        showUsers={true}
-                        userSource={moveThroughUsersSource}
-                        userSources={USER_SOURCES}
-                        usersTitle="wiredfurni.params.sources.users.title.physics.0"
-                        allowClickedUserSource={false}
-                        onChangeUsers={(value) => setMoveThroughUsersSource(normalizeSource(value, USER_SOURCES))}
-                    />
-                )}
-            </div>
+            <NativeTextTree>
+                <div className="flex flex-col gap-3">
+                    {moveThroughFurni && (
+                        <WiredSourcesSelector
+                            showFurni={true}
+                            furniSource={moveThroughFurniSource}
+                            furniSources={FURNI_SOURCES}
+                            furniTitle="wiredfurni.params.sources.furni.title.physics.0"
+                            onChangeFurni={(value) => setMoveThroughFurniSource(normalizeSource(value, FURNI_SOURCES))}
+                        />
+                    )}
+                    {blockByFurni && (
+                        <WiredSourcesSelector
+                            showFurni={true}
+                            furniSource={blockByFurniSource}
+                            furniSources={FURNI_SOURCES}
+                            furniTitle="wiredfurni.params.sources.furni.title.physics.1"
+                            onChangeFurni={(value) => setBlockByFurniSource(normalizeSource(value, FURNI_SOURCES))}
+                        />
+                    )}
+                    {moveThroughUsers && (
+                        <WiredSourcesSelector
+                            showUsers={true}
+                            userSource={moveThroughUsersSource}
+                            userSources={USER_SOURCES}
+                            usersTitle="wiredfurni.params.sources.users.title.physics.0"
+                            allowClickedUserSource={false}
+                            onChangeUsers={(value) => setMoveThroughUsersSource(normalizeSource(value, USER_SOURCES))}
+                        />
+                    )}
+                </div>
+            </NativeTextTree>
         );
     }, [blockByFurni, blockByFurniSource, moveThroughFurni, moveThroughFurniSource, moveThroughUsers, moveThroughUsersSource]);
 
     return (
-        <WiredExtraBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            cardStyle={{ width: 430 }}
-            footer={footer}
-        >
-            <div className="flex flex-col gap-2">
-                <Text bold>{LocalizeText('wiredfurni.params.select_options')}</Text>
-                <label className="flex items-center gap-2 cursor-pointer">
-                    <Checkbox checked={keepAltitude} onCheckedChange={(nextChecked) => setKeepAltitude(nextChecked)} />
-                    <Text>{LocalizeText('wiredfurni.params.movephysics.keep_altitude')}</Text>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                    <Checkbox checked={moveThroughFurni} onCheckedChange={(nextChecked) => setMoveThroughFurni(nextChecked)} />
-                    <Text>{LocalizeText('wiredfurni.params.movephysics.move_through_furni')}</Text>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                    <Checkbox checked={moveThroughUsers} onCheckedChange={(nextChecked) => setMoveThroughUsers(nextChecked)} />
-                    <Text>{LocalizeText('wiredfurni.params.movephysics.move_through_users')}</Text>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                    <Checkbox checked={blockByFurni} onCheckedChange={(nextChecked) => setBlockByFurni(nextChecked)} />
-                    <Text>{LocalizeText('wiredfurni.params.movephysics.block_by_furni')}</Text>
-                </label>
-            </div>
-        </WiredExtraBaseView>
+        <NativeTextTree>
+            <WiredExtraBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                cardStyle={{ width: 430 }}
+                footer={footer}
+            >
+                <div className="flex flex-col gap-2">
+                    <Text bold>{LocalizeText('wiredfurni.params.select_options')}</Text>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <Checkbox checked={keepAltitude} onCheckedChange={(nextChecked) => setKeepAltitude(nextChecked)} />
+                        <Text>{LocalizeText('wiredfurni.params.movephysics.keep_altitude')}</Text>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <Checkbox checked={moveThroughFurni} onCheckedChange={(nextChecked) => setMoveThroughFurni(nextChecked)} />
+                        <Text>{LocalizeText('wiredfurni.params.movephysics.move_through_furni')}</Text>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <Checkbox checked={moveThroughUsers} onCheckedChange={(nextChecked) => setMoveThroughUsers(nextChecked)} />
+                        <Text>{LocalizeText('wiredfurni.params.movephysics.move_through_users')}</Text>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <Checkbox checked={blockByFurni} onCheckedChange={(nextChecked) => setBlockByFurni(nextChecked)} />
+                        <Text>{LocalizeText('wiredfurni.params.movephysics.block_by_furni')}</Text>
+                    </label>
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

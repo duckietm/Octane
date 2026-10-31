@@ -2,6 +2,7 @@ import { AchievementData } from '@octane/renderer';
 import { FC } from 'react';
 import { AchievementUtilities } from '../../api';
 import { BaseProps, LayoutBadgeImageView } from '../../common';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface AchievementBadgeViewProps extends BaseProps<HTMLDivElement> {
     achievement: AchievementData;
@@ -14,11 +15,13 @@ export const AchievementBadgeView: FC<AchievementBadgeViewProps> = (props) => {
     if (!achievement) return null;
 
     return (
-        <LayoutBadgeImageView
-            badgeCode={AchievementUtilities.getAchievementBadgeCode(achievement)}
-            isGrayscale={!AchievementUtilities.getAchievementHasStarted(achievement)}
-            scale={scale}
-            {...rest}
-        />
+        <NativeTextTree>
+            <LayoutBadgeImageView
+                badgeCode={AchievementUtilities.getAchievementBadgeCode(achievement)}
+                isGrayscale={!AchievementUtilities.getAchievementHasStarted(achievement)}
+                scale={scale}
+                {...rest}
+            />
+        </NativeTextTree>
     );
 };

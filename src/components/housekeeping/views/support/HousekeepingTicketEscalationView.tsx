@@ -11,6 +11,7 @@ import {
     localizeSanctionTemplate,
     suggestHousekeepingSanction
 } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useHousekeeping, useHousekeepingConfirm } from '../../../../hooks';
 import { HousekeepingButton, HousekeepingPill } from '../common/HousekeepingParts';
 
@@ -55,13 +56,15 @@ export const HousekeepingTicketEscalationView: FC<{ ticket: IssueMessageData }> 
 
     if (pastSanctions === null) {
         return (
-            <div className="flex items-center gap-1.5 text-[11px]">
-                <HousekeepingButton disabled={requested} gap={1} size="sm" variant="secondary" onClick={() => setRequested(true)}>
-                    <FaGavel size={9} />
-                    <span>{LocalizeText('housekeeping.support.escalation.check', ['user'], [ticket.reportedUserName])}</span>
-                </HousekeepingButton>
-                {failed && <span className="text-[10px] text-rose-600">{LocalizeText('housekeeping.list.failed')}</span>}
-            </div>
+            <NativeTextTree>
+                <div className="flex items-center gap-1.5 text-[11px]">
+                    <HousekeepingButton disabled={requested} gap={1} size="sm" variant="secondary" onClick={() => setRequested(true)}>
+                        <FaGavel size={9} />
+                        <span>{LocalizeText('housekeeping.support.escalation.check', ['user'], [ticket.reportedUserName])}</span>
+                    </HousekeepingButton>
+                    {failed && <span className="text-[10px] text-rose-600">{LocalizeText('housekeeping.list.failed')}</span>}
+                </div>
+            </NativeTextTree>
         );
     }
 
@@ -86,33 +89,35 @@ export const HousekeepingTicketEscalationView: FC<{ ticket: IssueMessageData }> 
     };
 
     return (
-        <div className="flex flex-wrap items-center gap-1.5 rounded border border-rose-200 bg-rose-50/40 px-1.5 py-1 text-[11px]">
-            <FaGavel className="shrink-0 text-rose-600" size={9} />
-            <span className="text-zinc-700">
-                {LocalizeText('housekeeping.support.escalation.history', ['user', 'count'], [ticket.reportedUserName, String(pastSanctions)])}
-            </span>
-            {suggestion ? (
-                <>
-                    <HousekeepingPill tone="danger">{localizeSanctionTemplate(suggestion).name}</HousekeepingPill>
-                    {applied ? (
-                        <span className="ml-auto text-[10px] text-emerald-700">{LocalizeText('housekeeping.support.escalation.applied')}</span>
-                    ) : (
-                        <HousekeepingButton
-                            classNames={['ml-auto']}
-                            disabled={isActionPending}
-                            gap={1}
-                            size="sm"
-                            variant="danger"
-                            onClick={() => apply(suggestion)}
-                        >
-                            <FaGavel size={9} />
-                            <span>{LocalizeText('housekeeping.support.escalation.apply')}</span>
-                        </HousekeepingButton>
-                    )}
-                </>
-            ) : (
-                <span className="text-zinc-500">{LocalizeText('housekeeping.support.escalation.none')}</span>
-            )}
-        </div>
+        <NativeTextTree>
+            <div className="flex flex-wrap items-center gap-1.5 rounded border border-rose-200 bg-rose-50/40 px-1.5 py-1 text-[11px]">
+                <FaGavel className="shrink-0 text-rose-600" size={9} />
+                <span className="text-zinc-700">
+                    {LocalizeText('housekeeping.support.escalation.history', ['user', 'count'], [ticket.reportedUserName, String(pastSanctions)])}
+                </span>
+                {suggestion ? (
+                    <>
+                        <HousekeepingPill tone="danger">{localizeSanctionTemplate(suggestion).name}</HousekeepingPill>
+                        {applied ? (
+                            <span className="ml-auto text-[10px] text-emerald-700">{LocalizeText('housekeeping.support.escalation.applied')}</span>
+                        ) : (
+                            <HousekeepingButton
+                                classNames={['ml-auto']}
+                                disabled={isActionPending}
+                                gap={1}
+                                size="sm"
+                                variant="danger"
+                                onClick={() => apply(suggestion)}
+                            >
+                                <FaGavel size={9} />
+                                <span>{LocalizeText('housekeeping.support.escalation.apply')}</span>
+                            </HousekeepingButton>
+                        )}
+                    </>
+                ) : (
+                    <span className="text-zinc-500">{LocalizeText('housekeeping.support.escalation.none')}</span>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

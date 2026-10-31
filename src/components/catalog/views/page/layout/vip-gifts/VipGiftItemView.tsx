@@ -4,6 +4,7 @@ import { LocalizeText, ProductImageUtility } from '../../../../../../api';
 import vipIcon from '../../../../../../assets/images/catalog/air/vip-icon-medium.png';
 import { LayoutImage } from '../../../../../../common';
 import { BaseButton } from '../../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
 import { getClubGiftFurniText } from './clubGifts.helpers';
 
 export interface VipGiftItemViewProps {
@@ -39,26 +40,28 @@ export const VipGiftItem: FC<VipGiftItemViewProps> = (props) => {
     const description = getClubGiftFurniText(furniData, 'desc', (key) => LocalizeText(key));
 
     return (
-        <div className="octane-catalog-club-gift">
-            <div className="octane-catalog-club-gift__image">
-                <LayoutImage imageUrl={imageUrl} />
-            </div>
-            {isVip && <img src={vipIcon} alt="" className="octane-catalog-club-gift__vip" />}
-            <div className="octane-catalog-club-gift__name">{name}</div>
-            <div className="octane-catalog-club-gift__desc">{description}</div>
-            <div className="octane-catalog-club-gift__requirement">{requirementText}</div>
-            <BaseButton
-                className="octane-catalog-club-gift__select"
-                aria-disabled={!isAvailable}
-                disabled={!isAvailable}
-                onClick={() => {
-                    if (!isAvailable) return;
+        <NativeTextTree>
+            <div className="octane-catalog-club-gift">
+                <div className="octane-catalog-club-gift__image">
+                    <LayoutImage imageUrl={imageUrl} />
+                </div>
+                {isVip && <img src={vipIcon} alt="" className="octane-catalog-club-gift__vip" />}
+                <div className="octane-catalog-club-gift__name">{name}</div>
+                <div className="octane-catalog-club-gift__desc">{description}</div>
+                <div className="octane-catalog-club-gift__requirement">{requirementText}</div>
+                <BaseButton
+                    className="octane-catalog-club-gift__select"
+                    aria-disabled={!isAvailable}
+                    disabled={!isAvailable}
+                    onClick={() => {
+                        if (!isAvailable) return;
 
-                    onSelect(offer.localizationId);
-                }}
-            >
-                {LocalizeText('catalog.club_gift.select')}
-            </BaseButton>
-        </div>
+                        onSelect(offer.localizationId);
+                    }}
+                >
+                    {LocalizeText('catalog.club_gift.select')}
+                </BaseButton>
+            </div>
+        </NativeTextTree>
     );
 };

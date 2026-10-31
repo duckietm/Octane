@@ -4,6 +4,7 @@ import { DraggableWindowPosition, LayoutCurrencyIcon, LayoutHabbiconImageView, O
 import { usePurse } from '../../../../hooks/purse/usePurse';
 import { HabbiconPrice } from './HabbiconHubView';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const HabbiconPurchaseView: FC = () => {
     const catalog = useHabbiconCatalog();
@@ -35,82 +36,86 @@ export const HabbiconPurchaseView: FC = () => {
     const progress = Math.min(set?.total || 0, ownedCount + 1);
 
     return (
-        <OctaneCardView
-            classNames={['habbicon-purchase-window']}
-            frameStyle={3}
-            isResizable={false}
-            uniqueKey="habbicon-purchase"
-            windowPosition={DraggableWindowPosition.CENTER}
-        >
-            <OctaneCardHeaderView headerText={localizeWithFallback('habbicon_purchase.confirm.title', 'Confirm purchase')} onCloseClick={close} />
-            <div className="habbicon-purchase-body">
-                <div className="habbicon-purchase-top">
-                    <div className="habbicon-purchase-preview">
-                        <LayoutHabbiconImageView id={purchase.id} collection={purchase.collection} />
-                        <strong>{purchase.collection ? localizeWithFallback('habbicon_purchase.confirm.set.preview', 'Habicon set') : set?.title}</strong>
-                    </div>
-                    <div>
-                        <h3>{title}</h3>
-                        <p>
-                            {localizeWithFallback(
-                                purchase.collection ? 'habbicon_purchase.confirm.set.desc' : 'habbicon_purchase.confirm.habbicon.desc',
-                                purchase.collection ? `Buy the ${title} set?` : 'Buy this Habicon?',
-                                ['set_name'],
-                                [title]
-                            )}
-                        </p>
-                        <p className="habbicon-purchase-receive">
-                            {purchase.collection
-                                ? localizeWithFallback(
-                                      'habbicon_purchase.confirm.set.receive',
-                                      `You'll receive ${missing.length} Habicons`,
-                                      ['count'],
-                                      [String(missing.length)]
-                                  )
-                                : localizeWithFallback(
-                                      'habbicon_purchase.confirm.habbicon.progress',
-                                      `Progress after buy: ${progress} / ${set?.total || 0}`,
-                                      ['progress', 'total'],
-                                      [String(progress), String(set?.total || 0)]
-                                  )}
-                        </p>
-                    </div>
-                </div>
-                {discount > 0 && (
-                    <>
-                        <div className="habbicon-purchase-total">
-                            <span>{localizeWithFallback('catalog.purchase.confirmation.dialog.normal_price', 'Normal price')}</span>
-                            <del className="habbicon-price">
-                                {individualPrice}
-                                <LayoutCurrencyIcon type={currencyType} />
-                            </del>
+        <NativeTextTree>
+            <OctaneCardView
+                classNames={['habbicon-purchase-window']}
+                frameStyle={3}
+                isResizable={false}
+                uniqueKey="habbicon-purchase"
+                windowPosition={DraggableWindowPosition.CENTER}
+            >
+                <OctaneCardHeaderView headerText={localizeWithFallback('habbicon_purchase.confirm.title', 'Confirm purchase')} onCloseClick={close} />
+                <div className="habbicon-purchase-body">
+                    <div className="habbicon-purchase-top">
+                        <div className="habbicon-purchase-preview">
+                            <LayoutHabbiconImageView id={purchase.id} collection={purchase.collection} />
+                            <strong>{purchase.collection ? localizeWithFallback('habbicon_purchase.confirm.set.preview', 'Habicon set') : set?.title}</strong>
                         </div>
-                        <div className="habbicon-purchase-total">
-                            <span>{localizeWithFallback('catalog.purchase.confirmation.dialog.discount', 'Discount')}</span>
-                            <strong className="habbicon-price">
-                                {discount}
-                                <LayoutCurrencyIcon type={currencyType} />
-                            </strong>
+                        <div>
+                            <h3>{title}</h3>
+                            <p>
+                                {localizeWithFallback(
+                                    purchase.collection ? 'habbicon_purchase.confirm.set.desc' : 'habbicon_purchase.confirm.habbicon.desc',
+                                    purchase.collection ? `Buy the ${title} set?` : 'Buy this Habicon?',
+                                    ['set_name'],
+                                    [title]
+                                )}
+                            </p>
+                            <p className="habbicon-purchase-receive">
+                                {purchase.collection
+                                    ? localizeWithFallback(
+                                          'habbicon_purchase.confirm.set.receive',
+                                          `You'll receive ${missing.length} Habicons`,
+                                          ['count'],
+                                          [String(missing.length)]
+                                      )
+                                    : localizeWithFallback(
+                                          'habbicon_purchase.confirm.habbicon.progress',
+                                          `Progress after buy: ${progress} / ${set?.total || 0}`,
+                                          ['progress', 'total'],
+                                          [String(progress), String(set?.total || 0)]
+                                      )}
+                            </p>
                         </div>
-                    </>
-                )}
-                <div className="habbicon-purchase-total">
-                    <span>{localizeWithFallback('catalog.purchase.confirmation.dialog.cost', 'Cost')}</span>
-                    <HabbiconPrice {...item} />
+                    </div>
+                    {discount > 0 && (
+                        <>
+                            <div className="habbicon-purchase-total">
+                                <span>{localizeWithFallback('catalog.purchase.confirmation.dialog.normal_price', 'Normal price')}</span>
+                                <del className="habbicon-price">
+                                    {individualPrice}
+                                    <LayoutCurrencyIcon type={currencyType} />
+                                </del>
+                            </div>
+                            <div className="habbicon-purchase-total">
+                                <span>{localizeWithFallback('catalog.purchase.confirmation.dialog.discount', 'Discount')}</span>
+                                <strong className="habbicon-price">
+                                    {discount}
+                                    <LayoutCurrencyIcon type={currencyType} />
+                                </strong>
+                            </div>
+                        </>
+                    )}
+                    <div className="habbicon-purchase-total">
+                        <span>{localizeWithFallback('catalog.purchase.confirmation.dialog.cost', 'Cost')}</span>
+                        <HabbiconPrice {...item} />
+                    </div>
+                    {!affordable && (
+                        <p role="alert">
+                            {localizeWithFallback('habbicon.purchase.insufficient_balance', 'You do not have enough currency for this purchase.')}
+                        </p>
+                    )}
+                    {catalog.error && <p role="alert">{catalog.error}</p>}
+                    <div className="habbicon-purchase-actions">
+                        <BaseButton type="button" className="habbicon-action" disabled={!affordable || !!pending || missing.length === 0} onClick={catalog.buy}>
+                            {localizeWithFallback(pending ? 'generic.loading' : 'generic.buy', pending ? 'Buying…' : 'Buy')}
+                        </BaseButton>
+                        <BaseButton type="button" className="habbicon-cancel" disabled={!!pending} onClick={close}>
+                            {localizeWithFallback('generic.cancel', 'Cancel')}
+                        </BaseButton>
+                    </div>
                 </div>
-                {!affordable && (
-                    <p role="alert">{localizeWithFallback('habbicon.purchase.insufficient_balance', 'You do not have enough currency for this purchase.')}</p>
-                )}
-                {catalog.error && <p role="alert">{catalog.error}</p>}
-                <div className="habbicon-purchase-actions">
-                    <BaseButton type="button" className="habbicon-action" disabled={!affordable || !!pending || missing.length === 0} onClick={catalog.buy}>
-                        {localizeWithFallback(pending ? 'generic.loading' : 'generic.buy', pending ? 'Buying…' : 'Buy')}
-                    </BaseButton>
-                    <BaseButton type="button" className="habbicon-cancel" disabled={!!pending} onClick={close}>
-                        {localizeWithFallback('generic.cancel', 'Cancel')}
-                    </BaseButton>
-                </div>
-            </div>
-        </OctaneCardView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

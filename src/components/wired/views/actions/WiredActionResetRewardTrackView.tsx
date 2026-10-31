@@ -6,6 +6,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { normalizeResetRewardTrackId, REWARD_TRACK_ID_MAX_LENGTH } from './WiredActionProgressRewardTrackView';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * Habbo's reset-reward-track action (`wf_act_reset_reward_track`): puts the chosen users' tasks of a
@@ -33,26 +34,28 @@ export const WiredActionResetRewardTrackView: FC<{}> = () => {
     };
 
     return (
-        <WiredActionBaseView
-            footerCollapsible={false}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.reward_track.reset.track', 'Reward track to reset')}</Text>
-                <label className="flex items-center gap-2">
-                    <Text>{localizeWithFallback('wiredfurni.params.reward_track.track_id', 'Track ID')}</Text>
-                    <input
-                        aria-label="track"
-                        className="form-control form-control-sm"
-                        maxLength={REWARD_TRACK_ID_MAX_LENGTH}
-                        value={trackId}
-                        onChange={(event) => setTrackId(normalizeResetRewardTrackId(event.target.value))}
-                    />
-                </label>
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                footerCollapsible={false}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.reward_track.reset.track', 'Reward track to reset')}</Text>
+                    <label className="flex items-center gap-2">
+                        <Text>{localizeWithFallback('wiredfurni.params.reward_track.track_id', 'Track ID')}</Text>
+                        <input
+                            aria-label="track"
+                            className="form-control form-control-sm"
+                            maxLength={REWARD_TRACK_ID_MAX_LENGTH}
+                            value={trackId}
+                            onChange={(event) => setTrackId(normalizeResetRewardTrackId(event.target.value))}
+                        />
+                    </label>
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

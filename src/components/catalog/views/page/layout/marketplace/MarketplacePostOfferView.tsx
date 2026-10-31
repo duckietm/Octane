@@ -38,6 +38,7 @@ import {
     OctaneCardView
 } from '../../../../../../common';
 import { BaseButton } from '../../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
 import { CatalogPostMarketplaceOfferEvent } from '../../../../../../events';
 import { useMarketplaceConfiguration, useMarketplaceItemStats, useMessageEvent, useNotification, useUiEvent } from '../../../../../../hooks';
 import { MarketplaceBuyTokensView, MarketplaceNoCreditsView } from './MarketplaceTokenDialogsView';
@@ -215,7 +216,14 @@ export const MarketplacePostOfferView: FC<{}> = () => {
         // The marketplace configuration's third and fourth fields are the token batch: its price and size.
         if (tokenDialog === 'buy')
             return (
-                <MarketplaceBuyTokensView count={configuration.advertisements} price={configuration.credits} onBuy={buyTokens} onCancel={closeTokenDialog} />
+                <NativeTextTree>
+                    <MarketplaceBuyTokensView
+                        count={configuration.advertisements}
+                        price={configuration.credits}
+                        onBuy={buyTokens}
+                        onCancel={closeTokenDialog}
+                    />
+                </NativeTextTree>
             );
 
         return <MarketplaceNoCreditsView price={configuration.credits} onClose={closeTokenDialog} onGetCredits={getCredits} />;
@@ -304,91 +312,93 @@ export const MarketplacePostOfferView: FC<{}> = () => {
         );
 
     return (
-        <OctaneCardView
-            classNames={['octane-marketplace-post-offer']}
-            frameStyle={3}
-            isResizable={false}
-            theme="primary-slim"
-            uniqueKey="marketplace-post-offer"
-        >
-            <OctaneCardHeaderView headerText={text('inventory.marketplace.make_offer.title')} onCloseClick={close} />
-            <OctaneCardContentView classNames={['octane-marketplace-post-offer-content']} overflow="hidden">
-                <div className="octane-marketplace-post-offer-image">
-                    <LayoutFurniImageView
-                        direction={90}
-                        extraData={item.isWallItem ? (item.stuffData?.getLegacyString() ?? '') : String(item.extra)}
-                        productClassId={item.type}
-                        productType={item.isWallItem ? ProductTypeEnum.WALL : ProductTypeEnum.FLOOR}
-                    />
-                </div>
-                {uniqueNumber > 0 && (
-                    <LayoutLimitedEditionCompactPlateView
-                        className="octane-marketplace-post-offer-unique"
-                        uniqueNumber={uniqueNumber}
-                        uniqueSeries={item.stuffData.uniqueSeries}
-                    />
-                )}
-                {(item.stuffData?.rarityLevel ?? -1) >= 0 && (
-                    <LayoutRarityLevelView className="octane-marketplace-post-offer-rarity" level={item.stuffData.rarityLevel} />
-                )}
-                <span className="octane-marketplace-post-offer-name" data-testid="marketplace-post-offer-name">
-                    {furniName}
-                </span>
-                <span className="octane-marketplace-post-offer-expiration">
-                    {text('inventory.marketplace.make_offer.expiration_info_days', ['days'], [expirationDays])}
-                </span>
-                <label className="octane-marketplace-post-offer-label is-price" htmlFor="marketplace-post-offer-price">
-                    {text('inventory.marketplace.make_offer.price_request')}
-                </label>
-                <span className="octane-marketplace-post-offer-input is-price">
-                    <input
-                        autoComplete="off"
-                        id="marketplace-post-offer-price"
-                        inputMode="numeric"
-                        type="text"
-                        value={priceText}
-                        onChange={(event) => onPriceChange(event.target.value)}
-                    />
-                </span>
-                <label className="octane-marketplace-post-offer-label is-amount" htmlFor="marketplace-post-offer-amount">
-                    {text('sellinmarketplace.amount', ['max_amount'], [String(maxAmount)])}
-                </label>
-                <span className="octane-marketplace-post-offer-input is-amount">
-                    <input
-                        autoComplete="off"
-                        id="marketplace-post-offer-amount"
-                        inputMode="numeric"
-                        type="text"
-                        value={amountText}
-                        onChange={(event) => onAmountChange(event.target.value)}
-                    />
-                </span>
-                <div className="octane-marketplace-post-offer-list">
-                    {stats && statLine('average', 'inventory.marketplace.make_offer.average_price', stats.averagePrice, averageDays)}
-                    {stats && statLine('lowest', 'inventory.marketplace.make_offer.lowest_price', stats.lowestCurrentPrice)}
-                    {stats && statLine('suggested', 'inventory.marketplace.make_offer.suggested_price', stats.suggestedPrice)}
-                    {showCopySuggested && (
-                        <BaseButton className="octane-marketplace-post-offer-button is-copy" onClick={copySuggestedPrice}>
-                            {text('inventory.marketplace.make_offer.copy_suggested_price')}
-                        </BaseButton>
+        <NativeTextTree>
+            <OctaneCardView
+                classNames={['octane-marketplace-post-offer']}
+                frameStyle={3}
+                isResizable={false}
+                theme="primary-slim"
+                uniqueKey="marketplace-post-offer"
+            >
+                <OctaneCardHeaderView headerText={text('inventory.marketplace.make_offer.title')} onCloseClick={close} />
+                <OctaneCardContentView classNames={['octane-marketplace-post-offer-content']} overflow="hidden">
+                    <div className="octane-marketplace-post-offer-image">
+                        <LayoutFurniImageView
+                            direction={90}
+                            extraData={item.isWallItem ? (item.stuffData?.getLegacyString() ?? '') : String(item.extra)}
+                            productClassId={item.type}
+                            productType={item.isWallItem ? ProductTypeEnum.WALL : ProductTypeEnum.FLOOR}
+                        />
+                    </div>
+                    {uniqueNumber > 0 && (
+                        <LayoutLimitedEditionCompactPlateView
+                            className="octane-marketplace-post-offer-unique"
+                            uniqueNumber={uniqueNumber}
+                            uniqueSeries={item.stuffData.uniqueSeries}
+                        />
                     )}
-                    <div className="octane-marketplace-post-offer-final" data-testid="marketplace-post-offer-final" role="status">
-                        <span>
-                            {priceCheck.valid
-                                ? `${text('sell.in.marketplace.revenue.label')}: ${revenue}`
-                                : text('shop.marketplace.invalid.price', ['minPrice', 'maxPrice'], [String(minimumPrice), String(maximumPrice)])}
-                        </span>
+                    {(item.stuffData?.rarityLevel ?? -1) >= 0 && (
+                        <LayoutRarityLevelView className="octane-marketplace-post-offer-rarity" level={item.stuffData.rarityLevel} />
+                    )}
+                    <span className="octane-marketplace-post-offer-name" data-testid="marketplace-post-offer-name">
+                        {furniName}
+                    </span>
+                    <span className="octane-marketplace-post-offer-expiration">
+                        {text('inventory.marketplace.make_offer.expiration_info_days', ['days'], [expirationDays])}
+                    </span>
+                    <label className="octane-marketplace-post-offer-label is-price" htmlFor="marketplace-post-offer-price">
+                        {text('inventory.marketplace.make_offer.price_request')}
+                    </label>
+                    <span className="octane-marketplace-post-offer-input is-price">
+                        <input
+                            autoComplete="off"
+                            id="marketplace-post-offer-price"
+                            inputMode="numeric"
+                            type="text"
+                            value={priceText}
+                            onChange={(event) => onPriceChange(event.target.value)}
+                        />
+                    </span>
+                    <label className="octane-marketplace-post-offer-label is-amount" htmlFor="marketplace-post-offer-amount">
+                        {text('sellinmarketplace.amount', ['max_amount'], [String(maxAmount)])}
+                    </label>
+                    <span className="octane-marketplace-post-offer-input is-amount">
+                        <input
+                            autoComplete="off"
+                            id="marketplace-post-offer-amount"
+                            inputMode="numeric"
+                            type="text"
+                            value={amountText}
+                            onChange={(event) => onAmountChange(event.target.value)}
+                        />
+                    </span>
+                    <div className="octane-marketplace-post-offer-list">
+                        {stats && statLine('average', 'inventory.marketplace.make_offer.average_price', stats.averagePrice, averageDays)}
+                        {stats && statLine('lowest', 'inventory.marketplace.make_offer.lowest_price', stats.lowestCurrentPrice)}
+                        {stats && statLine('suggested', 'inventory.marketplace.make_offer.suggested_price', stats.suggestedPrice)}
+                        {showCopySuggested && (
+                            <BaseButton className="octane-marketplace-post-offer-button is-copy" onClick={copySuggestedPrice}>
+                                {text('inventory.marketplace.make_offer.copy_suggested_price')}
+                            </BaseButton>
+                        )}
+                        <div className="octane-marketplace-post-offer-final" data-testid="marketplace-post-offer-final" role="status">
+                            <span>
+                                {priceCheck.valid
+                                    ? `${text('sell.in.marketplace.revenue.label')}: ${revenue}`
+                                    : text('shop.marketplace.invalid.price', ['minPrice', 'maxPrice'], [String(minimumPrice), String(maximumPrice)])}
+                            </span>
+                        </div>
+                        <div className="octane-marketplace-post-offer-buttons">
+                            <BaseButton className="octane-marketplace-post-offer-button is-post" disabled={!priceCheck.valid} onClick={postOffer}>
+                                {text('inventory.marketplace.make_offer.post')}
+                            </BaseButton>
+                            <BaseButton className="octane-marketplace-post-offer-button is-cancel" onClick={close}>
+                                {text('inventory.marketplace.make_offer.cancel')}
+                            </BaseButton>
+                        </div>
                     </div>
-                    <div className="octane-marketplace-post-offer-buttons">
-                        <BaseButton className="octane-marketplace-post-offer-button is-post" disabled={!priceCheck.valid} onClick={postOffer}>
-                            {text('inventory.marketplace.make_offer.post')}
-                        </BaseButton>
-                        <BaseButton className="octane-marketplace-post-offer-button is-cancel" onClick={close}>
-                            {text('inventory.marketplace.make_offer.cancel')}
-                        </BaseButton>
-                    </div>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

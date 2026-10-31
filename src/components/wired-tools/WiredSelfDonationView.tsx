@@ -4,6 +4,7 @@ import { GetConfigurationValue, localizeWithFallback, NotificationAlertType, Sen
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useMessageEvent, useNotification } from '../../hooks';
 import { NumberInput } from '../../common/NumberInput';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 /** The official tool's range; the server clamps to its own `hotel.selfdonation.max.amount`. */
 const DEFAULT_MAX_AMOUNT = 500;
@@ -82,88 +83,90 @@ export const WiredSelfDonationView = ({ onClose }: WiredSelfDonationViewProps) =
     };
 
     return (
-        <OctaneCardView
-            className="octane-wired-menu min-w-[420px] max-w-[420px] max-h-[560px]"
-            theme="primary-slim"
-            uniqueKey="wired-self-donation"
-            windowPosition={DraggableWindowPosition.TOP_LEFT}
-            offsetLeft={560}
-            offsetTop={80}
-        >
-            <OctaneCardHeaderView headerText={localizeWithFallback('selfdonation.title', 'Sandbox donation tool')} onCloseClick={onClose} />
-            <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
-                <label className="flex items-center gap-2 text-[12px]">
-                    <Text bold>{localizeWithFallback('selfdonation.amount', 'Amount')}:</Text>
-                    <NumberInput aria-label="Amount" className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" min={1} max={maxAmount} value={amount} onChange={(event) => setAmount(Number.parseInt(event.target.value, 10) || 1)} onBlur={() => setAmount(clampedAmount)} />
-                    <Text small>{localizeWithFallback('selfdonation.amount.range', '1 to %max%', ['max'], [String(maxAmount)])}</Text>
-                </label>
-                <label className="flex items-center gap-2 text-[12px]">
-                    <Text bold>{localizeWithFallback('selfdonation.search', 'Furni')}:</Text>
-                    <input
-                        aria-label="Search furni"
-                        className="grow rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                        type="text"
-                        value={query}
-                        placeholder={localizeWithFallback('selfdonation.search.placeholder', 'Name or classname')}
-                        onChange={(event) => setQuery(event.target.value)}
-                    />
-                </label>
-                <div className="h-[300px] overflow-y-auto border border-[#d1ccbf] rounded bg-white" data-testid="self-donation-results">
-                    <table className="w-full text-[12px] table-fixed">
-                        <thead className="bg-[#efede5] sticky top-0">
-                            <tr>
-                                <th className="text-left px-2 py-1 w-[60px]">{localizeWithFallback('selfdonation.col.type', 'Type')}</th>
-                                <th className="text-left px-2 py-1">{localizeWithFallback('selfdonation.col.name', 'Name')}</th>
-                                <th className="text-left px-2 py-1 w-[150px]">{localizeWithFallback('selfdonation.col.classname', 'Classname')}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {!results.length && (
+        <NativeTextTree>
+            <OctaneCardView
+                className="octane-wired-menu min-w-[420px] max-w-[420px] max-h-[560px]"
+                theme="primary-slim"
+                uniqueKey="wired-self-donation"
+                windowPosition={DraggableWindowPosition.TOP_LEFT}
+                offsetLeft={560}
+                offsetTop={80}
+            >
+                <OctaneCardHeaderView headerText={localizeWithFallback('selfdonation.title', 'Sandbox donation tool')} onCloseClick={onClose} />
+                <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
+                    <label className="flex items-center gap-2 text-[12px]">
+                        <Text bold>{localizeWithFallback('selfdonation.amount', 'Amount')}:</Text>
+                        <NumberInput aria-label="Amount" className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" min={1} max={maxAmount} value={amount} onChange={(event) => setAmount(Number.parseInt(event.target.value, 10) || 1)} onBlur={() => setAmount(clampedAmount)} />
+                        <Text small>{localizeWithFallback('selfdonation.amount.range', '1 to %max%', ['max'], [String(maxAmount)])}</Text>
+                    </label>
+                    <label className="flex items-center gap-2 text-[12px]">
+                        <Text bold>{localizeWithFallback('selfdonation.search', 'Furni')}:</Text>
+                        <input
+                            aria-label="Search furni"
+                            className="grow rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
+                            type="text"
+                            value={query}
+                            placeholder={localizeWithFallback('selfdonation.search.placeholder', 'Name or classname')}
+                            onChange={(event) => setQuery(event.target.value)}
+                        />
+                    </label>
+                    <div className="h-[300px] overflow-y-auto border border-[#d1ccbf] rounded bg-white" data-testid="self-donation-results">
+                        <table className="w-full text-[12px] table-fixed">
+                            <thead className="bg-[#efede5] sticky top-0">
                                 <tr>
-                                    <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={3}>
-                                        {localizeWithFallback('selfdonation.empty', 'No furni matches the search')}
-                                    </td>
+                                    <th className="text-left px-2 py-1 w-[60px]">{localizeWithFallback('selfdonation.col.type', 'Type')}</th>
+                                    <th className="text-left px-2 py-1">{localizeWithFallback('selfdonation.col.name', 'Name')}</th>
+                                    <th className="text-left px-2 py-1 w-[150px]">{localizeWithFallback('selfdonation.col.classname', 'Classname')}</th>
                                 </tr>
-                            )}
-                            {results.map((candidate) => {
-                                const isSelected = selected?.id === candidate.id && selected?.isWallItem === candidate.isWallItem;
-
-                                return (
-                                    <tr
-                                        key={`${candidate.isWallItem ? 'w' : 'f'}-${candidate.id}`}
-                                        className={`cursor-pointer ${isSelected ? 'bg-[#dbeaf4]' : 'hover:bg-[#f8f6f0]'}`}
-                                        aria-selected={isSelected}
-                                        onClick={() => setSelected(candidate)}
-                                    >
-                                        <td className="px-2 py-1">{candidate.isWallItem ? 'Wall' : 'Floor'}</td>
-                                        <td className="px-2 py-1 truncate" title={candidate.name}>
-                                            {candidate.name}
-                                        </td>
-                                        <td className="px-2 py-1 truncate" title={candidate.className}>
-                                            {candidate.className}
+                            </thead>
+                            <tbody>
+                                {!results.length && (
+                                    <tr>
+                                        <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={3}>
+                                            {localizeWithFallback('selfdonation.empty', 'No furni matches the search')}
                                         </td>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                    <Text small>
-                        {selected
-                            ? localizeWithFallback('selfdonation.selected', 'Selected: %name%', ['name'], [selected.name])
-                            : localizeWithFallback('selfdonation.none_selected', 'Pick a furni from the list')}
-                    </Text>
-                    <div className="flex gap-2">
-                        <Button variant="secondary" onClick={onClose}>
-                            {localizeWithFallback('generic.cancel', 'Cancel')}
-                        </Button>
-                        <Button disabled={!selected} onClick={donate}>
-                            {localizeWithFallback('selfdonation.donate', 'Donate')}
-                        </Button>
+                                )}
+                                {results.map((candidate) => {
+                                    const isSelected = selected?.id === candidate.id && selected?.isWallItem === candidate.isWallItem;
+
+                                    return (
+                                        <tr
+                                            key={`${candidate.isWallItem ? 'w' : 'f'}-${candidate.id}`}
+                                            className={`cursor-pointer ${isSelected ? 'bg-[#dbeaf4]' : 'hover:bg-[#f8f6f0]'}`}
+                                            aria-selected={isSelected}
+                                            onClick={() => setSelected(candidate)}
+                                        >
+                                            <td className="px-2 py-1">{candidate.isWallItem ? 'Wall' : 'Floor'}</td>
+                                            <td className="px-2 py-1 truncate" title={candidate.name}>
+                                                {candidate.name}
+                                            </td>
+                                            <td className="px-2 py-1 truncate" title={candidate.className}>
+                                                {candidate.className}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    <div className="flex items-center justify-between gap-2">
+                        <Text small>
+                            {selected
+                                ? localizeWithFallback('selfdonation.selected', 'Selected: %name%', ['name'], [selected.name])
+                                : localizeWithFallback('selfdonation.none_selected', 'Pick a furni from the list')}
+                        </Text>
+                        <div className="flex gap-2">
+                            <Button variant="secondary" onClick={onClose}>
+                                {localizeWithFallback('generic.cancel', 'Cancel')}
+                            </Button>
+                            <Button disabled={!selected} onClick={donate}>
+                                {localizeWithFallback('selfdonation.donate', 'Donate')}
+                            </Button>
+                        </div>
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

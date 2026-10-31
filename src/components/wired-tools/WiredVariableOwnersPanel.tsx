@@ -7,6 +7,7 @@ import { VariablesElementType } from './WiredCreatorTools.types';
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
 import { Select } from '../../common/Select';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 /** The server's holder kinds (`entityType`). */
 export const HOLDER_TYPE_ROOM = 0;
@@ -149,69 +150,71 @@ export const WiredVariableOwnersPanel = (props: WiredVariableOwnersPanelProps) =
     };
 
     return (
-        <OctaneCardView
-            className="octane-wired-menu min-w-[860px] max-w-[860px] max-h-[620px]"
-            theme="primary-slim"
-            uniqueKey={uniqueKey}
-            windowPosition={DraggableWindowPosition.TOP_LEFT}
-            offsetLeft={offsetLeft}
-            offsetTop={offsetTop}
-        >
-            <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.variable_management.title', 'Variable Management')} onCloseClick={onClose} />
-            <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
-                <div className="rounded border border-[#c8c2b2] bg-white p-3 flex items-center justify-between gap-3">
-                    <div className="grow flex flex-col items-center text-center">
-                        <Text className="whitespace-pre-line">
-                            {(
-                                infoText ??
-                                localizeWithFallback(
-                                    'wiredmenu.variable_management.info',
-                                    'This is a tool to manage everyone and everything that holds this variable, in the room or not.'
-                                )
-                            ).replace(/\\n/g, '\n')}
-                        </Text>
-                        <Text>
-                            <b>{localizeWithFallback('wiredmenu.variable_management.variable_name', 'Variable name:')}</b> {variableName}
-                        </Text>
+        <NativeTextTree>
+            <OctaneCardView
+                className="octane-wired-menu min-w-[860px] max-w-[860px] max-h-[620px]"
+                theme="primary-slim"
+                uniqueKey={uniqueKey}
+                windowPosition={DraggableWindowPosition.TOP_LEFT}
+                offsetLeft={offsetLeft}
+                offsetTop={offsetTop}
+            >
+                <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.variable_management.title', 'Variable Management')} onCloseClick={onClose} />
+                <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
+                    <div className="rounded border border-[#c8c2b2] bg-white p-3 flex items-center justify-between gap-3">
+                        <div className="grow flex flex-col items-center text-center">
+                            <Text className="whitespace-pre-line">
+                                {(
+                                    infoText ??
+                                    localizeWithFallback(
+                                        'wiredmenu.variable_management.info',
+                                        'This is a tool to manage everyone and everything that holds this variable, in the room or not.'
+                                    )
+                                ).replace(/\\n/g, '\n')}
+                            </Text>
+                            <Text>
+                                <b>{localizeWithFallback('wiredmenu.variable_management.variable_name', 'Variable name:')}</b> {variableName}
+                            </Text>
+                        </div>
+                        <Button variant="secondary" onClick={() => requests.refresh()}>
+                            {localizeWithFallback('wiredmenu.variable_management.refresh', 'Refresh')}
+                        </Button>
                     </div>
-                    <Button variant="secondary" onClick={() => requests.refresh()}>
-                        {localizeWithFallback('wiredmenu.variable_management.refresh', 'Refresh')}
-                    </Button>
-                </div>
-                <div className="flex flex-wrap items-center gap-4 text-[12px]">
-                    {filters.map((filter) => (
-                        <label key={filter.id} className="flex items-center gap-2">
-                            <Text>{filter.label}</Text>
-                            <Select
-                                className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                                value={filter.value}
-                                onChange={(event) => filter.onChange(event.target.value)}
-                            >
-                                {filter.options.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </Select>
-                        </label>
-                    ))}
-                </div>
-                {status}
-                <WiredPagedTable
-                    columns={columns}
-                    rows={holders}
-                    getRowId={(holder) => `${holder.entityType}-${holder.entityId}`}
-                    getCell={getCell}
-                    currentPage={currentPage}
-                    totalEntries={totalEntries}
-                    lastPage={lastPage}
-                    requests={requests}
-                    pagingTextKey="wiredmenu.variable_management.bottom_text"
-                    emptyText={localizeWithFallback('wiredmenu.variable_management.empty', 'Nobody holds this variable with the current filters')}
-                    scrollResetKey={scrollResetKey}
-                    bodyClassName="h-[360px]"
-                />
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    <div className="flex flex-wrap items-center gap-4 text-[12px]">
+                        {filters.map((filter) => (
+                            <label key={filter.id} className="flex items-center gap-2">
+                                <Text>{filter.label}</Text>
+                                <Select
+                                    className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
+                                    value={filter.value}
+                                    onChange={(event) => filter.onChange(event.target.value)}
+                                >
+                                    {filter.options.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </label>
+                        ))}
+                    </div>
+                    {status}
+                    <WiredPagedTable
+                        columns={columns}
+                        rows={holders}
+                        getRowId={(holder) => `${holder.entityType}-${holder.entityId}`}
+                        getCell={getCell}
+                        currentPage={currentPage}
+                        totalEntries={totalEntries}
+                        lastPage={lastPage}
+                        requests={requests}
+                        pagingTextKey="wiredmenu.variable_management.bottom_text"
+                        emptyText={localizeWithFallback('wiredmenu.variable_management.empty', 'Nobody holds this variable with the current filters')}
+                        scrollResetKey={scrollResetKey}
+                        bodyClassName="h-[360px]"
+                    />
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

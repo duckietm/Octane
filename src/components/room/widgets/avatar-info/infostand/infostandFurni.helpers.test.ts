@@ -46,3 +46,22 @@ describe('branding options', () => {
         ]);
     });
 });
+
+describe('parseFurniHeight', () => {
+    it('reads an empty or broken field as nothing, not as the floor', async () => {
+        const { parseFurniHeight } = await import('./infostandFurni.helpers');
+
+        expect(parseFurniHeight('')).toBeNull();
+        expect(parseFurniHeight('   ')).toBeNull();
+        expect(parseFurniHeight('abc')).toBeNull();
+    });
+
+    it('keeps the height between 0 and 40 with 4 decimals', async () => {
+        const { parseFurniHeight, MAX_FURNI_HEIGHT } = await import('./infostandFurni.helpers');
+
+        expect(parseFurniHeight('12.5')).toBe(12.5);
+        expect(parseFurniHeight('-3')).toBe(0);
+        expect(parseFurniHeight('99')).toBe(MAX_FURNI_HEIGHT);
+        expect(parseFurniHeight('1.234567')).toBe(1.2346);
+    });
+});

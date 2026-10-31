@@ -6,6 +6,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const WiredActionToggleFurniStateView: FC<{}> = (props) => {
     const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
@@ -30,21 +31,23 @@ export const WiredActionToggleFurniStateView: FC<{}> = (props) => {
     const requiresFurni = WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT;
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={requiresFurni}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.toggletype_selection', LocalizeText('wiredfurni.params.operator.2'))}</Text>
-                {[0, 1].map((option) => (
-                    <label key={option} className="flex items-center gap-1">
-                        <Radio checked={toggleType === option} name="toggleType" onCheckedChange={() => setToggleType(option)} />
-                        <Text>{LocalizeText(`wiredfurni.params.toggletype.${option}`)}</Text>
-                    </label>
-                ))}
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={requiresFurni}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.toggletype_selection', LocalizeText('wiredfurni.params.operator.2'))}</Text>
+                    {[0, 1].map((option) => (
+                        <label key={option} className="flex items-center gap-1">
+                            <Radio checked={toggleType === option} name="toggleType" onCheckedChange={() => setToggleType(option)} />
+                            <Text>{LocalizeText(`wiredfurni.params.toggletype.${option}`)}</Text>
+                        </label>
+                    ))}
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

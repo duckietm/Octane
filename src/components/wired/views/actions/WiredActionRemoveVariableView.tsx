@@ -18,6 +18,7 @@ import { fromWiredVariableId, toWiredVariableId, wiredVariableIdList } from '../
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { WiredActionDelaySection } from './WiredActionDelaySection';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type VariableTargetType = 'user' | 'furni' | 'context';
 
@@ -186,72 +187,74 @@ export const WiredActionRemoveVariableView: FC<{}> = () => {
     };
 
     return (
-        <WiredActionBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} validate={validate} cardStyle={{ width: 244 }} hideDelay={true}>
-            <div className="octane-wired__give-var">
-                <div className="octane-wired__give-var-heading">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <div className="octane-wired__give-var-targets">
-                        {TARGET_BUTTONS.map((button) => (
-                            <BaseButton
-                                key={button.key}
-                                type="button"
-                                className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${selectedTargetType === button.key ? 'is-active' : ''}`}
-                                onClick={() => handleTargetTypeChange(button.key)}
-                            >
-                                <img src={button.icon} alt={button.key} />
-                            </BaseButton>
-                        ))}
-                    </div>
-                </div>
-
-                <WiredVariablePicker
-                    entries={resolvedVariableEntries}
-                    recentScope="variable-effects"
-                    selectedToken={selectedVariableToken}
-                    onSelect={(entry) => setSelectedVariableToken(entry.token)}
-                />
-
-                {!targetDefinitions.length && <Text small>{missingVariablesText}</Text>}
-
-                <div className="octane-wired__divider" />
-
-                <WiredActionDelaySection value={actionDelay} onChange={setActionDelay} />
-
-                {selectedTargetType !== 'context' && (
-                    <>
-                        <div className="octane-wired__divider" />
-
-                        <div className="octane-wired__give-var-section">
-                            <div className="octane-wired__give-var-section-title">{localizeWithFallback('wiredfurni.params.sources.merged.title.variables', 'Fonte variabile:')}</div>
-                            <div className="flex items-center gap-1">
-                                <Button
-                                    disabled={resolvedSourceOptions.length <= 1}
-                                    variant="primary"
-                                    classNames={['octane-wired__picker-button']}
-                                    className="px-2 py-1"
-                                    onClick={() => cycleSource(-1)}
+        <NativeTextTree>
+            <WiredActionBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} validate={validate} cardStyle={{ width: 244 }} hideDelay={true}>
+                <div className="octane-wired__give-var">
+                    <div className="octane-wired__give-var-heading">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
+                        <div className="octane-wired__give-var-targets">
+                            {TARGET_BUTTONS.map((button) => (
+                                <BaseButton
+                                    key={button.key}
+                                    type="button"
+                                    className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${selectedTargetType === button.key ? 'is-active' : ''}`}
+                                    onClick={() => handleTargetTypeChange(button.key)}
                                 >
-                                    <FaChevronLeft />
-                                </Button>
-                                <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
-                                    <Text small className="text-center">
-                                        {selectedSourceOption ? LocalizeText(selectedSourceOption.label) : '-'}
-                                    </Text>
-                                </div>
-                                <Button
-                                    disabled={resolvedSourceOptions.length <= 1}
-                                    variant="primary"
-                                    classNames={['octane-wired__picker-button']}
-                                    className="px-2 py-1"
-                                    onClick={() => cycleSource(1)}
-                                >
-                                    <FaChevronRight />
-                                </Button>
-                            </div>
+                                    <img src={button.icon} alt={button.key} />
+                                </BaseButton>
+                            ))}
                         </div>
-                    </>
-                )}
-            </div>
-        </WiredActionBaseView>
+                    </div>
+
+                    <WiredVariablePicker
+                        entries={resolvedVariableEntries}
+                        recentScope="variable-effects"
+                        selectedToken={selectedVariableToken}
+                        onSelect={(entry) => setSelectedVariableToken(entry.token)}
+                    />
+
+                    {!targetDefinitions.length && <Text small>{missingVariablesText}</Text>}
+
+                    <div className="octane-wired__divider" />
+
+                    <WiredActionDelaySection value={actionDelay} onChange={setActionDelay} />
+
+                    {selectedTargetType !== 'context' && (
+                        <>
+                            <div className="octane-wired__divider" />
+
+                            <div className="octane-wired__give-var-section">
+                                <div className="octane-wired__give-var-section-title">{localizeWithFallback('wiredfurni.params.sources.merged.title.variables', 'Fonte variabile:')}</div>
+                                <div className="flex items-center gap-1">
+                                    <Button
+                                        disabled={resolvedSourceOptions.length <= 1}
+                                        variant="primary"
+                                        classNames={['octane-wired__picker-button']}
+                                        className="px-2 py-1"
+                                        onClick={() => cycleSource(-1)}
+                                    >
+                                        <FaChevronLeft />
+                                    </Button>
+                                    <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
+                                        <Text small className="text-center">
+                                            {selectedSourceOption ? LocalizeText(selectedSourceOption.label) : '-'}
+                                        </Text>
+                                    </div>
+                                    <Button
+                                        disabled={resolvedSourceOptions.length <= 1}
+                                        variant="primary"
+                                        classNames={['octane-wired__picker-button']}
+                                        className="px-2 py-1"
+                                        onClick={() => cycleSource(1)}
+                                    >
+                                        <FaChevronRight />
+                                    </Button>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

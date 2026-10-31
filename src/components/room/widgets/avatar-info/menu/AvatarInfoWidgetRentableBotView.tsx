@@ -19,6 +19,7 @@ import {
     RoomWidgetUpdateRentableBotTextSkillEvent,
     SendMessageComposer
 } from '../../../../../api';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useMessageEvent } from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
@@ -139,74 +140,76 @@ export const AvatarInfoWidgetRentableBotView: FC<AvatarInfoWidgetRentableBotView
     };
 
     return (
-        <ContextMenuView
-            category={RoomObjectCategory.UNIT}
-            classNames={['octane-avatar-action-menu', 'octane-avatar-action-menu--own', 'octane-avatar-action-menu--widget']}
-            collapsable={true}
-            freezePositionOnHover={true}
-            objectId={avatarInfo.roomIndex}
-            showCaretIcon={false}
-            userType={RoomObjectType.RENTABLE_BOT}
-            onClose={onClose}
-        >
-            <ContextMenuHeaderView>{avatarInfo.name}</ContextMenuHeaderView>
-            <div className="air-avatar-menu-buttons">
-                {canControl && (
-                    <>
-                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.DONATE_TO_ALL) >= 0 && (
-                            <ContextMenuListItemView onClick={(event) => processAction('donate_to_all')}>
-                                {localizeWithFallback('avatar.widget.donate_to_all', 'Serve everyone')}
-                            </ContextMenuListItemView>
-                        )}
-                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.DONATE_TO_USER) >= 0 && (
-                            <ContextMenuListItemView onClick={(event) => processAction('donate_to_user')}>
-                                {localizeWithFallback('avatar.widget.donate_to_user', 'Serve me')}
-                            </ContextMenuListItemView>
-                        )}
-                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.CHANGE_BOT_NAME) >= 0 && (
-                            <ContextMenuListItemView onClick={(event) => processAction('change_bot_name')}>
-                                {LocalizeText('avatar.widget.change_bot_name')}
-                            </ContextMenuListItemView>
-                        )}
-                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.CHANGE_BOT_MOTTO) >= 0 && (
-                            <ContextMenuListItemView onClick={(event) => processAction('change_bot_motto')}>
-                                {localizeWithFallback('avatar.widget.change_bot_motto', 'Change motto')}
-                            </ContextMenuListItemView>
-                        )}
-                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.DRESS_UP) >= 0 && (
-                            <ContextMenuListItemView onClick={(event) => processAction('dress_up')}>
-                                {LocalizeText('avatar.widget.dress_up')}
-                            </ContextMenuListItemView>
-                        )}
-                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.RANDOM_WALK) >= 0 && (
-                            <ContextMenuListItemView onClick={(event) => processAction('random_walk')}>
-                                {LocalizeText('avatar.widget.random_walk')}
-                            </ContextMenuListItemView>
-                        )}
-                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.SETUP_CHAT) >= 0 && (
-                            <ContextMenuListItemView onClick={(event) => processAction('setup_chat')}>
-                                {LocalizeText('avatar.widget.setup_chat')}
-                            </ContextMenuListItemView>
-                        )}
-                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.DANCE) >= 0 && (
-                            <ContextMenuListItemView onClick={(event) => processAction('dance')}>{LocalizeText('avatar.widget.dance')}</ContextMenuListItemView>
-                        )}
-                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.ROTATE) >= 0 && (
-                            <ContextMenuListItemView onClick={(event) => processAction('rotate')}>
-                                {LocalizeText('tooltip.roombuilding.rotate')}
-                            </ContextMenuListItemView>
-                        )}
-                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.NO_PICK_UP) === -1 && (
-                            <ContextMenuListItemView onClick={(event) => processAction('pick')}>{LocalizeText('avatar.widget.pick_up')}</ContextMenuListItemView>
-                        )}
-                    </>
-                )}
-                {commandButtons.map((button) => (
-                    <ContextMenuListItemView key={button.key} onClick={(event) => processCommandButton(button.link, button.proceedStep)}>
-                        {button.label ?? localizeWithFallback('avatar.widget.nux.proceed', 'Proceed')}
-                    </ContextMenuListItemView>
-                ))}
-            </div>
-        </ContextMenuView>
+        <NativeTextTree>
+            <ContextMenuView
+                category={RoomObjectCategory.UNIT}
+                classNames={['octane-avatar-action-menu', 'octane-avatar-action-menu--own', 'octane-avatar-action-menu--widget']}
+                collapsable={true}
+                freezePositionOnHover={true}
+                objectId={avatarInfo.roomIndex}
+                showCaretIcon={false}
+                userType={RoomObjectType.RENTABLE_BOT}
+                onClose={onClose}
+            >
+                <ContextMenuHeaderView>{avatarInfo.name}</ContextMenuHeaderView>
+                <div className="air-avatar-menu-buttons">
+                    {canControl && (
+                        <>
+                            {avatarInfo.botSkills.indexOf(BotSkillsEnum.DONATE_TO_ALL) >= 0 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('donate_to_all')}>
+                                    {localizeWithFallback('avatar.widget.donate_to_all', 'Serve everyone')}
+                                </ContextMenuListItemView>
+                            )}
+                            {avatarInfo.botSkills.indexOf(BotSkillsEnum.DONATE_TO_USER) >= 0 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('donate_to_user')}>
+                                    {localizeWithFallback('avatar.widget.donate_to_user', 'Serve me')}
+                                </ContextMenuListItemView>
+                            )}
+                            {avatarInfo.botSkills.indexOf(BotSkillsEnum.CHANGE_BOT_NAME) >= 0 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('change_bot_name')}>
+                                    {LocalizeText('avatar.widget.change_bot_name')}
+                                </ContextMenuListItemView>
+                            )}
+                            {avatarInfo.botSkills.indexOf(BotSkillsEnum.CHANGE_BOT_MOTTO) >= 0 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('change_bot_motto')}>
+                                    {localizeWithFallback('avatar.widget.change_bot_motto', 'Change motto')}
+                                </ContextMenuListItemView>
+                            )}
+                            {avatarInfo.botSkills.indexOf(BotSkillsEnum.DRESS_UP) >= 0 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('dress_up')}>
+                                    {LocalizeText('avatar.widget.dress_up')}
+                                </ContextMenuListItemView>
+                            )}
+                            {avatarInfo.botSkills.indexOf(BotSkillsEnum.RANDOM_WALK) >= 0 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('random_walk')}>
+                                    {LocalizeText('avatar.widget.random_walk')}
+                                </ContextMenuListItemView>
+                            )}
+                            {avatarInfo.botSkills.indexOf(BotSkillsEnum.SETUP_CHAT) >= 0 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('setup_chat')}>
+                                    {LocalizeText('avatar.widget.setup_chat')}
+                                </ContextMenuListItemView>
+                            )}
+                            {avatarInfo.botSkills.indexOf(BotSkillsEnum.DANCE) >= 0 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('dance')}>{LocalizeText('avatar.widget.dance')}</ContextMenuListItemView>
+                            )}
+                            {avatarInfo.botSkills.indexOf(BotSkillsEnum.ROTATE) >= 0 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('rotate')}>
+                                    {LocalizeText('tooltip.roombuilding.rotate')}
+                                </ContextMenuListItemView>
+                            )}
+                            {avatarInfo.botSkills.indexOf(BotSkillsEnum.NO_PICK_UP) === -1 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('pick')}>{LocalizeText('avatar.widget.pick_up')}</ContextMenuListItemView>
+                            )}
+                        </>
+                    )}
+                    {commandButtons.map((button) => (
+                        <ContextMenuListItemView key={button.key} onClick={(event) => processCommandButton(button.link, button.proceedStep)}>
+                            {button.label ?? localizeWithFallback('avatar.widget.nux.proceed', 'Proceed')}
+                        </ContextMenuListItemView>
+                    ))}
+                </div>
+            </ContextMenuView>
+        </NativeTextTree>
     );
 };

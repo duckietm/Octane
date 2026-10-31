@@ -7,6 +7,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { WiredConditionQuantifierSection } from './WiredConditionQuantifierSection';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 // Official: 8 icon checkboxes move_0..move_7, 4 per row (0 1 2 3 / 4 5 6 7).
 const DIRECTION_OPTIONS = WIRED_SEQUENTIAL_DIRECTIONS.map((direction) => ({ value: direction, icon: WIRED_MOVE_ICONS[direction] }));
@@ -42,34 +43,36 @@ export const WiredConditionActorDirView: FC<{}> = () => {
     };
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footerCollapsible={false}
-            showQuantifier={false}
-            footer={
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footerCollapsible={false}
+                showQuantifier={false}
+                footer={
+                    <div className="flex flex-col gap-2">
+                        <BaseButton className="octane-wired__advanced-toggle" type="button" onClick={() => setShowAdvanced((value) => !value)}>
+                            {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
+                        </BaseButton>
+                        {showAdvanced && (
+                            <>
+                                <WiredConditionQuantifierSection />
+                                <WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />
+                            </>
+                        )}
+                    </div>
+                }
+            >
                 <div className="flex flex-col gap-2">
-                    <BaseButton className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
-                        {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
-                    </BaseButton>
-                    {showAdvanced && (
-                        <>
-                            <WiredConditionQuantifierSection />
-                            <WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />
-                        </>
-                    )}
+                    <Text bold>{LocalizeText('wiredfurni.params.direction_selection')}</Text>
+                    <WiredIconCheckboxGroup
+                        options={DIRECTION_OPTIONS}
+                        isChecked={(direction) => (directionMask & (1 << direction)) !== 0}
+                        onChange={(direction, checked) => setDirectionMask((mask) => toggleDirection(mask, direction, checked))}
+                    />
                 </div>
-            }
-        >
-            <div className="flex flex-col gap-2">
-                <Text bold>{LocalizeText('wiredfurni.params.direction_selection')}</Text>
-                <WiredIconCheckboxGroup
-                    options={DIRECTION_OPTIONS}
-                    isChecked={(direction) => (directionMask & (1 << direction)) !== 0}
-                    onChange={(direction, checked) => setDirectionMask((mask) => toggleDirection(mask, direction, checked))}
-                />
-            </div>
-        </WiredConditionBaseView>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

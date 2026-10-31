@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
@@ -27,11 +28,13 @@ export const WiredTriggerAvatarWalksOnFurniView: FC<{}> = () => {
     }, [trigger]);
 
     return (
-        <WiredTriggerBaseView
-            hasSpecialInput={false}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} furniSources={FURNI_SOURCE_OPTIONS} onChangeFurni={setFurniSource} />}
-        />
+        <NativeTextTree>
+            <WiredTriggerBaseView
+                hasSpecialInput={false}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} furniSources={FURNI_SOURCE_OPTIONS} onChangeFurni={setFurniSource} />}
+            />
+        </NativeTextTree>
     );
 };

@@ -3,7 +3,9 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { GetConfigurationValue, OpenUrl, resolveHabboPageUrl, SanitizePageHtml } from '../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import '../../css/octanepedia/OctanepediaAirText.css';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { getClickedAnchor } from './getClickedAnchor';
+import { createLatestRequest } from './latestRequest';
 
 const NEW_LINE_REGEX = /\n\r|\n|\r/gm;
 
@@ -14,13 +16,20 @@ export const OctanepediaView: FC<{}> = (props) => {
     const elementRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const openPage = async (link: string) => {
-            try {
-                const response = await fetch(link);
+        const latest = createLatestRequest();
 
-                if (!response?.ok) return;
+        const openPage = async (link: string) => {
+            const signal = latest.start();
+
+            try {
+                const response = await fetch(link, { signal });
+
+                if (!response?.ok || signal.aborted) return;
 
                 const text = await response.text();
+
+                // A newer page was asked for meanwhile: this one is not shown over it.
+                if (signal.aborted) return;
                 const splitData = text.split(NEW_LINE_REGEX);
                 const line = splitData.shift().split('|');
 
@@ -38,6 +47,8 @@ export const OctanepediaView: FC<{}> = (props) => {
 
                 setContent(SanitizePageHtml(splitData.join('')));
             } catch (error) {
+                if (signal.aborted) return;
+
                 OctaneLogger.error(`Failed to fetch ${link}`);
             }
         };
@@ -64,7 +75,10 @@ export const OctanepediaView: FC<{}> = (props) => {
 
         AddLinkEventTracker(linkTracker);
 
-        return () => RemoveLinkEventTracker(linkTracker);
+        return () => {
+            RemoveLinkEventTracker(linkTracker);
+            latest.abort();
+        };
     }, []);
 
     useEffect(() => {
@@ -97,14 +111,16 @@ export const OctanepediaView: FC<{}> = (props) => {
     if (!content) return null;
 
     return (
-        <OctaneCardView
-            className="octanepedia w-[450px] h-[400px] max-w-[90vw] max-h-[85vh]"
-            style={dimensions ? { width: dimensions.width, height: dimensions.height } : {}}
-            theme="primary-slim">
-            <OctaneCardHeaderView headerText={header} onCloseClick={() => setContent(null)} />
-            <OctaneCardContentView>
-                <div ref={elementRef} className="octanepedia__page text-black size-full" dangerouslySetInnerHTML={{ __html: content }} />
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <NativeTextTree>
+            <OctaneCardView
+                className="octanepedia w-[450px] h-[400px] max-w-[90vw] max-h-[85vh]"
+                style={dimensions ? { width: dimensions.width, height: dimensions.height } : {}}
+                theme="primary-slim">
+                <OctaneCardHeaderView headerText={header} onCloseClick={() => setContent(null)} />
+                <OctaneCardContentView>
+                    <div ref={elementRef} className="octanepedia__page text-black size-full" dangerouslySetInnerHTML={{ __html: content }} />
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

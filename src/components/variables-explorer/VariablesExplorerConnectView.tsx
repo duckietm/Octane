@@ -16,6 +16,7 @@ import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeade
 import { VariablesExplorerPrefill } from '../../state/variablesExplorer';
 import { Checkbox } from '../../common/Checkbox';
 import { Select } from '../../common/Select';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export interface VariablesExplorerConnectViewProps {
     prefill: VariablesExplorerPrefill | null;
@@ -82,106 +83,108 @@ export const VariablesExplorerConnectView: FC<VariablesExplorerConnectViewProps>
         ) : null;
 
     return (
-        <OctaneCardView
-            className="min-w-[380px] max-w-[380px] octane-variables-explorer-window"
-            theme="primary-slim"
-            uniqueKey="variables-explorer"
-            windowPosition={DraggableWindowPosition.TOP_LEFT}
-            offsetLeft={120}
-            offsetTop={60}
-        >
-            <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.variables_explorer.title', 'Variables Explorer')} onCloseClick={onClose} />
-            <OctaneCardContentView className="text-black bg-[#f4efe3] p-3" overflow="auto">
-                <form
-                    className="rounded border border-[#c8c2b2] bg-white p-4 flex flex-col gap-3"
-                    noValidate
-                    onKeyDown={(event) => {
-                        if (event.key !== 'Enter' || !(event.target instanceof HTMLInputElement) || event.target.type === 'checkbox') return;
+        <NativeTextTree>
+            <OctaneCardView
+                className="min-w-[380px] max-w-[380px] octane-variables-explorer-window"
+                theme="primary-slim"
+                uniqueKey="variables-explorer"
+                windowPosition={DraggableWindowPosition.TOP_LEFT}
+                offsetLeft={120}
+                offsetTop={60}
+            >
+                <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.variables_explorer.title', 'Variables Explorer')} onCloseClick={onClose} />
+                <OctaneCardContentView className="text-black bg-[#f4efe3] p-3" overflow="auto">
+                    <form
+                        className="rounded border border-[#c8c2b2] bg-white p-4 flex flex-col gap-3"
+                        noValidate
+                        onKeyDown={(event) => {
+                            if (event.key !== 'Enter' || !(event.target instanceof HTMLInputElement) || event.target.type === 'checkbox') return;
 
-                        event.preventDefault();
-                        void submit();
-                    }}
-                    onSubmit={(event) => {
-                        event.preventDefault();
-                        void submit();
-                    }}
-                >
-                    <div className="flex flex-col gap-1">
-                        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8a8476]">
-                            {localizeWithFallback('wiredmenu.variables_explorer.eyebrow', 'Variables Explorer')}
-                        </span>
-                        <Text bold className="text-[18px]">
-                            {localizeWithFallback('wiredmenu.variables_explorer.connect.title', 'Connect to a room')}
-                        </Text>
-                        <Text className="text-[#555]">
-                            {localizeWithFallback(
-                                'wiredmenu.variables_explorer.connect.desc',
-                                'Browse and manage variables and variable holders in your room, making use of the Variables Web API.'
-                            )}
-                        </Text>
-                    </div>
-                    <label className="flex flex-col gap-1">
-                        <span className={LABEL_CLASS}>{localizeWithFallback('wiredmenu.variables_explorer.hotel', 'Hotel')}</span>
-                        <Select className={FIELD_CLASS} value={hotelUrl} onChange={(event) => setHotelUrl(event.target.value)}>
-                            {!hotels.length && <option value="">-</option>}
-                            {hotels.map((hotel) => (
-                                <option key={hotel.url} value={hotel.url}>
-                                    {hotel.name}
-                                </option>
-                            ))}
-                        </Select>
-                        {fieldError('hotelUrl')}
-                    </label>
-                    <label className="flex flex-col gap-1">
-                        <span className={LABEL_CLASS}>{localizeWithFallback('wiredmenu.variables_explorer.room_id', 'Room ID')}</span>
-                        <input
-                            className={FIELD_CLASS}
-                            inputMode="numeric"
-                            type="text"
-                            value={roomId}
-                            onBlur={fillRememberedKeys}
-                            onChange={(event) => setRoomId(sanitizeRoomIdInput(event.target.value))}
-                        />
-                        {fieldError('roomId')}
-                    </label>
-                    <label className="flex flex-col gap-1">
-                        <span className={LABEL_CLASS}>{localizeWithFallback('wiredmenu.variables_explorer.read_key', 'Wired read key')}</span>
-                        <input
-                            autoComplete="off"
-                            className={`${FIELD_CLASS} font-mono`}
-                            spellCheck={false}
-                            type="password"
-                            value={readKey}
-                            onChange={(event) => setReadKey(event.target.value.trim())}
-                        />
-                        {fieldError('readKey')}
-                    </label>
-                    <label className="flex flex-col gap-1">
-                        <span className={LABEL_CLASS}>{localizeWithFallback('wiredmenu.variables_explorer.write_key', 'Wired write key')}</span>
-                        <input
-                            autoComplete="off"
-                            className={`${FIELD_CLASS} font-mono`}
-                            spellCheck={false}
-                            type="password"
-                            value={writeKey}
-                            onChange={(event) => setWriteKey(event.target.value.trim())}
-                        />
-                        {fieldError('writeKey')}
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <Checkbox checked={remember} onCheckedChange={(nextChecked) => setRemember(nextChecked)} />
-                        <Text small>{localizeWithFallback('wiredmenu.variables_explorer.remember', 'Remember the keys for this room on this device')}</Text>
-                    </label>
-                    {!!message && (
-                        <div className="rounded border border-[#d9a3a3] bg-[#fbeaea] px-2 py-1 text-[12px] text-[#8c2424]" role="alert">
-                            {message}
+                            event.preventDefault();
+                            void submit();
+                        }}
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            void submit();
+                        }}
+                    >
+                        <div className="flex flex-col gap-1">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8a8476]">
+                                {localizeWithFallback('wiredmenu.variables_explorer.eyebrow', 'Variables Explorer')}
+                            </span>
+                            <Text bold className="text-[18px]">
+                                {localizeWithFallback('wiredmenu.variables_explorer.connect.title', 'Connect to a room')}
+                            </Text>
+                            <Text className="text-[#555]">
+                                {localizeWithFallback(
+                                    'wiredmenu.variables_explorer.connect.desc',
+                                    'Browse and manage variables and variable holders in your room, making use of the Variables Web API.'
+                                )}
+                            </Text>
                         </div>
-                    )}
-                    <Button disabled={busy || !hotels.length} variant="success" onClick={() => void submit()}>
-                        {localizeWithFallback('wiredmenu.variables_explorer.open', 'Open explorer')}
-                    </Button>
-                </form>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                        <label className="flex flex-col gap-1">
+                            <span className={LABEL_CLASS}>{localizeWithFallback('wiredmenu.variables_explorer.hotel', 'Hotel')}</span>
+                            <Select className={FIELD_CLASS} value={hotelUrl} onChange={(event) => setHotelUrl(event.target.value)}>
+                                {!hotels.length && <option value="">-</option>}
+                                {hotels.map((hotel) => (
+                                    <option key={hotel.url} value={hotel.url}>
+                                        {hotel.name}
+                                    </option>
+                                ))}
+                            </Select>
+                            {fieldError('hotelUrl')}
+                        </label>
+                        <label className="flex flex-col gap-1">
+                            <span className={LABEL_CLASS}>{localizeWithFallback('wiredmenu.variables_explorer.room_id', 'Room ID')}</span>
+                            <input
+                                className={FIELD_CLASS}
+                                inputMode="numeric"
+                                type="text"
+                                value={roomId}
+                                onBlur={fillRememberedKeys}
+                                onChange={(event) => setRoomId(sanitizeRoomIdInput(event.target.value))}
+                            />
+                            {fieldError('roomId')}
+                        </label>
+                        <label className="flex flex-col gap-1">
+                            <span className={LABEL_CLASS}>{localizeWithFallback('wiredmenu.variables_explorer.read_key', 'Wired read key')}</span>
+                            <input
+                                autoComplete="off"
+                                className={`${FIELD_CLASS} font-mono`}
+                                spellCheck={false}
+                                type="password"
+                                value={readKey}
+                                onChange={(event) => setReadKey(event.target.value.trim())}
+                            />
+                            {fieldError('readKey')}
+                        </label>
+                        <label className="flex flex-col gap-1">
+                            <span className={LABEL_CLASS}>{localizeWithFallback('wiredmenu.variables_explorer.write_key', 'Wired write key')}</span>
+                            <input
+                                autoComplete="off"
+                                className={`${FIELD_CLASS} font-mono`}
+                                spellCheck={false}
+                                type="password"
+                                value={writeKey}
+                                onChange={(event) => setWriteKey(event.target.value.trim())}
+                            />
+                            {fieldError('writeKey')}
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <Checkbox checked={remember} onCheckedChange={(nextChecked) => setRemember(nextChecked)} />
+                            <Text small>{localizeWithFallback('wiredmenu.variables_explorer.remember', 'Remember the keys for this room on this device')}</Text>
+                        </label>
+                        {!!message && (
+                            <div className="rounded border border-[#d9a3a3] bg-[#fbeaea] px-2 py-1 text-[12px] text-[#8c2424]" role="alert">
+                                {message}
+                            </div>
+                        )}
+                        <Button disabled={busy || !hotels.length} variant="success" onClick={() => void submit()}>
+                            {localizeWithFallback('wiredmenu.variables_explorer.open', 'Open explorer')}
+                        </Button>
+                    </form>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

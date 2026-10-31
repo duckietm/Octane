@@ -12,6 +12,7 @@ import {
 import { GetCommunityGoalNeedleUrl } from '../../../assets/images/hotelview/community-goal';
 import { BaseButton } from '../../../common/BaseButton';
 import { useCommunityGoalProgress } from '../../../hooks';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 export type CommunityGoalWidgetMode = 'goal' | 'vs' | 'vsvote';
 
@@ -77,53 +78,55 @@ export const HotelViewCommunityGoalWidget: FC<{ mode: CommunityGoalWidgetMode; f
     const showVotes = mode === 'vsvote' && goal.personalContributionScore === 0 && !voted;
 
     return (
-        <div className={`hotelview-community-goal hotelview-community-goal-${mode}`}>
-            <div className="hotelview-community-goal-copy">
-                <span className="hotelview-widget-title">{goalText('landing.view.community.headline', code, title)}</span>
-                <h2>{goalText('landing.view.community.caption', code, title)}</h2>
-                <p>{goalText('landing.view.community.info', code, body)}</p>
-                {mode === 'goal' && interactive && (
-                    <BaseButton
-                        type="button"
-                        className="hotelview-widget-button"
-                        onClick={() => (catalogTarget ? CreateLinkEvent(`catalog/open/${catalogTarget}`) : link && onLink(link))}
-                    >
-                        {goalText('landing.view.community_catalog_button.text', code, localizeWithFallback('landing.view.community.button', 'Let\'s get started!'))}
-                    </BaseButton>
-                )}
-                {showVotes && vote && (
-                    <div className="hotelview-community-goal-votes">
-                        <BaseButton type="button" className="hotelview-widget-button" onClick={() => vote(1)}>
-                            {goalText('landing.view.vote_one_button.text', code, 'Vote 1')}
+        <NativeTextTree>
+            <div className={`hotelview-community-goal hotelview-community-goal-${mode}`}>
+                <div className="hotelview-community-goal-copy">
+                    <span className="hotelview-widget-title">{goalText('landing.view.community.headline', code, title)}</span>
+                    <h2>{goalText('landing.view.community.caption', code, title)}</h2>
+                    <p>{goalText('landing.view.community.info', code, body)}</p>
+                    {mode === 'goal' && interactive && (
+                        <BaseButton
+                            type="button"
+                            className="hotelview-widget-button"
+                            onClick={() => (catalogTarget ? CreateLinkEvent(`catalog/open/${catalogTarget}`) : link && onLink(link))}
+                        >
+                            {goalText('landing.view.community_catalog_button.text', code, localizeWithFallback('landing.view.community.button', 'Let\'s get started!'))}
                         </BaseButton>
-                        <BaseButton type="button" className="hotelview-widget-button" onClick={() => vote(2)}>
-                            {goalText('landing.view.vote_two_button.text', code, 'Vote 2')}
-                        </BaseButton>
-                    </div>
-                )}
+                    )}
+                    {showVotes && vote && (
+                        <div className="hotelview-community-goal-votes">
+                            <BaseButton type="button" className="hotelview-widget-button" onClick={() => vote(1)}>
+                                {goalText('landing.view.vote_one_button.text', code, 'Vote 1')}
+                            </BaseButton>
+                            <BaseButton type="button" className="hotelview-widget-button" onClick={() => vote(2)}>
+                                {goalText('landing.view.vote_two_button.text', code, 'Vote 2')}
+                            </BaseButton>
+                        </div>
+                    )}
+                </div>
+                <div className="hotelview-community-goal-meter">
+                    {METER_LEVELS.map((level) =>
+                        level === 0 || (mode === 'goal' && isCommunityGoalLevelLit(frame, level)) ? (
+                            <img
+                                key={level}
+                                className={`hotelview-community-goal-meter-level hotelview-community-goal-meter-level-${level}`}
+                                src={campaignizeAssetUri(`${imageLibraryUrl}reception/meter_level_${level}.png`, code)}
+                                alt=""
+                                draggable={false}
+                                onError={(event) => {
+                                    event.currentTarget.style.visibility = 'hidden';
+                                }}
+                            />
+                        ) : null
+                    )}
+                    {needleUrl && <img className="hotelview-community-goal-needle" src={needleUrl} alt="" draggable={false} />}
+                    {mode === 'goal' && (
+                        <strong className="hotelview-community-goal-status">
+                            {goalText('landing.view.community.meter', code, String(goal.communityTotalScore), meterParameters, meterValues)}
+                        </strong>
+                    )}
+                </div>
             </div>
-            <div className="hotelview-community-goal-meter">
-                {METER_LEVELS.map((level) =>
-                    level === 0 || (mode === 'goal' && isCommunityGoalLevelLit(frame, level)) ? (
-                        <img
-                            key={level}
-                            className={`hotelview-community-goal-meter-level hotelview-community-goal-meter-level-${level}`}
-                            src={campaignizeAssetUri(`${imageLibraryUrl}reception/meter_level_${level}.png`, code)}
-                            alt=""
-                            draggable={false}
-                            onError={(event) => {
-                                event.currentTarget.style.visibility = 'hidden';
-                            }}
-                        />
-                    ) : null
-                )}
-                {needleUrl && <img className="hotelview-community-goal-needle" src={needleUrl} alt="" draggable={false} />}
-                {mode === 'goal' && (
-                    <strong className="hotelview-community-goal-status">
-                        {goalText('landing.view.community.meter', code, String(goal.communityTotalScore), meterParameters, meterValues)}
-                    </strong>
-                )}
-            </div>
-        </div>
+        </NativeTextTree>
     );
 };

@@ -4,6 +4,7 @@ import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../
 import { BaseButton } from '../../../../common/BaseButton';
 import { TROPHY_VIEW_NIKO_GOLD } from '../../../../hooks';
 import '../../../../css/room/FurniWindowsAAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface FurnitureNikoTrophyViewProps {
     view: number;
@@ -34,29 +35,31 @@ export const FurnitureNikoTrophyView: FC<FurnitureNikoTrophyViewProps> = (props)
     };
 
     return (
-        <OctaneCardView className="octane-niko-trophy" theme="primary-slim">
-            <OctaneCardHeaderView headerText={localizeWithFallback('niko.trophy.title', 'Niko Trophy')} onCloseClick={onClose} />
-            <OctaneCardContentView className="octane-niko-trophy-content" gap={0}>
-                <div className="octane-niko-trophy-band">
-                    <img alt="" className="octane-niko-trophy-preview" src={`${imageLibraryUrl}niko/${isGold ? 'niko_trophy_gold' : 'niko_trophy_silver'}.png`} />
-                    <div className="octane-niko-trophy-texts">
-                        <div className="octane-niko-trophy-description" dangerouslySetInnerHTML={{ __html: SanitizeHtml(description) }} />
-                        <BaseButton className="octane-niko-trophy-link" onClick={openStore}>
-                            {localizeWithFallback('niko.trophy.link.text', 'Try Niko for free!')}
-                        </BaseButton>
-                        <div className="octane-niko-trophy-date" dangerouslySetInnerHTML={{ __html: SanitizeHtml(dateText) }} />
+        <NativeTextTree>
+            <OctaneCardView className="octane-niko-trophy" theme="primary-slim">
+                <OctaneCardHeaderView headerText={localizeWithFallback('niko.trophy.title', 'Niko Trophy')} onCloseClick={onClose} />
+                <OctaneCardContentView className="octane-niko-trophy-content" gap={0}>
+                    <div className="octane-niko-trophy-band">
+                        <img alt="" className="octane-niko-trophy-preview" src={`${imageLibraryUrl}niko/${isGold ? 'niko_trophy_gold' : 'niko_trophy_silver'}.png`} />
+                        <div className="octane-niko-trophy-texts">
+                            <div className="octane-niko-trophy-description" dangerouslySetInnerHTML={{ __html: SanitizeHtml(description) }} />
+                            <BaseButton className="octane-niko-trophy-link" onClick={openStore}>
+                                {localizeWithFallback('niko.trophy.link.text', 'Try Niko for free!')}
+                            </BaseButton>
+                            <div className="octane-niko-trophy-date" dangerouslySetInnerHTML={{ __html: SanitizeHtml(dateText) }} />
+                        </div>
                     </div>
-                </div>
-                {storeImage && (
-                    <BaseButton
-                        aria-label={localizeWithFallback('trophy.niko.link.tooltip', 'Download from the App Store')}
-                        className="octane-niko-trophy-store"
-                        onClick={openStore}
-                    >
-                        <img alt="" src={`${imageLibraryUrl}niko/${storeImage}.png`} />
-                    </BaseButton>
-                )}
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    {storeImage && (
+                        <BaseButton
+                            aria-label={localizeWithFallback('trophy.niko.link.tooltip', 'Download from the App Store')}
+                            className="octane-niko-trophy-store"
+                            onClick={openStore}
+                        >
+                            <img alt="" src={`${imageLibraryUrl}niko/${storeImage}.png`} />
+                        </BaseButton>
+                    )}
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

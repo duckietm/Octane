@@ -2,6 +2,7 @@ import { RoomObjectCategory } from '@octane/renderer';
 import { FC } from 'react';
 import { GetUserProfile, LocalizeText, MessengerRequest } from '../../../../api';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { ObjectLocationView } from '../object-location/ObjectLocationView';
 
 /**
@@ -18,26 +19,28 @@ export const FriendRequestDialogView: FC<{
     const { roomIndex = -1, request = null, hideFriendRequest = null, requestResponse = null } = props;
 
     return (
-        <ObjectLocationView category={RoomObjectCategory.UNIT} objectId={roomIndex}>
-            <div className="octane-friend-request">
-                <BaseButton className="octane-friend-request__profile" type="button" onClick={() => GetUserProfile(request.requesterUserId)}>
-                    <span aria-hidden="true" className="octane-friend-request__icon" />
-                    <span className="octane-friend-request__text">{LocalizeText('widget.friendrequest.from', ['username'], [request.name])}</span>
-                </BaseButton>
-                <BaseButton
-                    aria-label={LocalizeText('generic.close')}
-                    className="octane-friend-request__close"
-                    type="button"
-                    onClick={() => hideFriendRequest(request.requesterUserId)}
-                />
-                <BaseButton className="octane-friend-request__decline" type="button" onClick={() => requestResponse(request.id, false)}>
-                    {LocalizeText('widget.friendrequest.decline')}
-                </BaseButton>
-                <BaseButton className="octane-friend-request__accept" type="button" onClick={() => requestResponse(request.id, true)}>
-                    <span aria-hidden="true" className="octane-friend-request__check" />
-                    {LocalizeText('widget.friendrequest.accept')}
-                </BaseButton>
-            </div>
-        </ObjectLocationView>
+        <NativeTextTree>
+            <ObjectLocationView category={RoomObjectCategory.UNIT} objectId={roomIndex}>
+                <div className="octane-friend-request">
+                    <BaseButton className="octane-friend-request__profile" type="button" onClick={() => GetUserProfile(request.requesterUserId)}>
+                        <span aria-hidden="true" className="octane-friend-request__icon" />
+                        <span className="octane-friend-request__text">{LocalizeText('widget.friendrequest.from', ['username'], [request.name])}</span>
+                    </BaseButton>
+                    <BaseButton
+                        aria-label={LocalizeText('generic.close')}
+                        className="octane-friend-request__close"
+                        type="button"
+                        onClick={() => hideFriendRequest(request.requesterUserId)}
+                    />
+                    <BaseButton className="octane-friend-request__decline" type="button" onClick={() => requestResponse(request.id, false)}>
+                        {LocalizeText('widget.friendrequest.decline')}
+                    </BaseButton>
+                    <BaseButton className="octane-friend-request__accept" type="button" onClick={() => requestResponse(request.id, true)}>
+                        <span aria-hidden="true" className="octane-friend-request__check" />
+                        {LocalizeText('widget.friendrequest.accept')}
+                    </BaseButton>
+                </div>
+            </ObjectLocationView>
+        </NativeTextTree>
     );
 };

@@ -2,6 +2,7 @@ import { ForwardToSomeRoomMessageComposer } from '@octane/renderer';
 import { FC, ReactNode, useEffect, useState } from 'react';
 import { GetConfigurationValue, getQuestImageUrl, getQuestName, localizeWithFallback, SendMessageComposer } from '../../../api';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useQuests } from '../../../hooks';
 
 /**
@@ -55,71 +56,73 @@ export const HotelViewDailyQuestWidget: FC<{ fallback: ReactNode }> = ({ fallbac
     if (!dailyQuest) return <>{fallback}</>;
 
     return (
-        <div className="hotelview-daily-quest">
-            <div className="hotelview-daily-quest-header">
-                <span className="hotelview-widget-title">
-                    {quest?.accepted
-                        ? localizeWithFallback('landing.view.quest.title.accepted', 'Your current quest')
-                        : localizeWithFallback('landing.view.quest.title.notaccepted', 'Quests')}
-                </span>
-                {showDifficulty && (
-                    <span className="hotelview-daily-quest-difficulty">
-                        <BaseButton type="button" className={quest.easy ? 'hotelview-daily-quest-selected' : ''} disabled={quest.easy} onClick={() => switchDifficulty(true)}>
-                            {localizeWithFallback('landing.view.quest.easy', 'Easy')}
-                        </BaseButton>
-                        <span>|</span>
-                        <BaseButton type="button" className={!quest.easy ? 'hotelview-daily-quest-selected' : ''} disabled={!quest.easy} onClick={() => switchDifficulty(false)}>
-                            {localizeWithFallback('landing.view.quest.hard', 'Hard')}
-                        </BaseButton>
+        <NativeTextTree>
+            <div className="hotelview-daily-quest">
+                <div className="hotelview-daily-quest-header">
+                    <span className="hotelview-widget-title">
+                        {quest?.accepted
+                            ? localizeWithFallback('landing.view.quest.title.accepted', 'Your current quest')
+                            : localizeWithFallback('landing.view.quest.title.notaccepted', 'Quests')}
                     </span>
-                )}
-            </div>
-            <div className="hotelview-daily-quest-body">
-                {quest && <img className="hotelview-daily-quest-image" src={getQuestImageUrl(quest, false)} alt="" draggable={false} />}
-                <div className="hotelview-daily-quest-copy">
-                    <h2>{caption}</h2>
-                    {info && <p>{info}</p>}
-                    {quest?.accepted && (
-                        <p
-                            className="hotelview-daily-quest-current"
-                            // `<b>Current task:</b> %task%.` is markup of the external texts, the quest name is escaped.
-                            dangerouslySetInnerHTML={{
-                                __html: localizeWithFallback('landing.view.quest.currenttask', '<b>Current task:</b> %task%.', ['task'], [escapeHtml(getQuestName(quest))])
-                            }}
-                        />
-                    )}
-                    {quest && !quest.accepted && (
-                        <BaseButton type="button" className="hotelview-widget-button" onClick={() => {
-                                acceptQuest && acceptQuest(quest.id);
-                                // The server answers the activation with the quest, not the daily widget: ask again.
-                                requestDailyQuest && requestDailyQuest(quest.easy, index);
-                            }}>
-                            {localizeWithFallback('landing.view.quest.accept', 'Start >>')}
-                        </BaseButton>
-                    )}
-                    {quest?.accepted && (
-                        <BaseButton type="button" className="hotelview-widget-button" onClick={goToRoom}>
-                            {localizeWithFallback('landing.view.quest.go', 'Go >>')}
-                        </BaseButton>
-                    )}
-                    {showNext && (
-                        <BaseButton type="button" className="hotelview-widget-link" onClick={nextQuest}>
-                            {quest.easy
-                                ? localizeWithFallback('landing.view.quest.nextquest.easy', 'Show me another easy quest!')
-                                : localizeWithFallback('landing.view.quest.nextquest.hard', 'Show me another hard quest!')}
-                        </BaseButton>
-                    )}
-                    {quest?.accepted && (
-                        <BaseButton type="button" className="hotelview-widget-link" onClick={() => {
-                            cancelDailyQuest && cancelDailyQuest();
-                            requestDailyQuest && requestDailyQuest(quest.easy, index);
-                        }}>
-                            {localizeWithFallback('landing.view.quest.cancel', 'Cancel quest')}
-                        </BaseButton>
+                    {showDifficulty && (
+                        <span className="hotelview-daily-quest-difficulty">
+                            <BaseButton type="button" className={quest.easy ? 'hotelview-daily-quest-selected' : ''} disabled={quest.easy} onClick={() => switchDifficulty(true)}>
+                                {localizeWithFallback('landing.view.quest.easy', 'Easy')}
+                            </BaseButton>
+                            <span>|</span>
+                            <BaseButton type="button" className={!quest.easy ? 'hotelview-daily-quest-selected' : ''} disabled={!quest.easy} onClick={() => switchDifficulty(false)}>
+                                {localizeWithFallback('landing.view.quest.hard', 'Hard')}
+                            </BaseButton>
+                        </span>
                     )}
                 </div>
+                <div className="hotelview-daily-quest-body">
+                    {quest && <img className="hotelview-daily-quest-image" src={getQuestImageUrl(quest, false)} alt="" draggable={false} />}
+                    <div className="hotelview-daily-quest-copy">
+                        <h2>{caption}</h2>
+                        {info && <p>{info}</p>}
+                        {quest?.accepted && (
+                            <p
+                                className="hotelview-daily-quest-current"
+                                // `<b>Current task:</b> %task%.` is markup of the external texts, the quest name is escaped.
+                                dangerouslySetInnerHTML={{
+                                    __html: localizeWithFallback('landing.view.quest.currenttask', '<b>Current task:</b> %task%.', ['task'], [escapeHtml(getQuestName(quest))])
+                                }}
+                            />
+                        )}
+                        {quest && !quest.accepted && (
+                            <BaseButton type="button" className="hotelview-widget-button" onClick={() => {
+                                    acceptQuest && acceptQuest(quest.id);
+                                    // The server answers the activation with the quest, not the daily widget: ask again.
+                                    requestDailyQuest && requestDailyQuest(quest.easy, index);
+                                }}>
+                                {localizeWithFallback('landing.view.quest.accept', 'Start >>')}
+                            </BaseButton>
+                        )}
+                        {quest?.accepted && (
+                            <BaseButton type="button" className="hotelview-widget-button" onClick={goToRoom}>
+                                {localizeWithFallback('landing.view.quest.go', 'Go >>')}
+                            </BaseButton>
+                        )}
+                        {showNext && (
+                            <BaseButton type="button" className="hotelview-widget-link" onClick={nextQuest}>
+                                {quest.easy
+                                    ? localizeWithFallback('landing.view.quest.nextquest.easy', 'Show me another easy quest!')
+                                    : localizeWithFallback('landing.view.quest.nextquest.hard', 'Show me another hard quest!')}
+                            </BaseButton>
+                        )}
+                        {quest?.accepted && (
+                            <BaseButton type="button" className="hotelview-widget-link" onClick={() => {
+                                cancelDailyQuest && cancelDailyQuest();
+                                requestDailyQuest && requestDailyQuest(quest.easy, index);
+                            }}>
+                                {localizeWithFallback('landing.view.quest.cancel', 'Cancel quest')}
+                            </BaseButton>
+                        )}
+                    </div>
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };
 

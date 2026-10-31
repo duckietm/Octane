@@ -23,6 +23,7 @@ import {
 import { addWiredVariablePickerHistory, getWiredVariablePickerHistory, registerWiredVariablePickerFinalizer } from './WiredVariablePickerHistory';
 import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 /*
  * Port of the AIR variable picker, build WIN63-202610131318-860371703, under
@@ -214,59 +215,61 @@ const WiredVariableNodeList: FC<INodeListProps> = ({ nodes, width, isRoot, posit
         : { position: 'fixed', left: position?.left ?? 0, top: position?.top ?? 0, width, height: height + SUBLIST_EXTRA_HEIGHT };
 
     return (
-        <>
-            <div className={`octane-wired__vpicker-list ${isRoot ? '' : 'is-sublist'}`} role="listbox" style={style}>
-                {nodes.map((node, index) => {
-                    const selectable = canSelectWiredVariableNode(node);
-                    const disabled = isWiredVariableNodeDisabled(node);
-                    const hovered = hover?.index === index;
-                    // VariableNodeView.as:203-214.
-                    const tooltip = disabled
-                        ? LocalizeText('wiredfurni.variable_picker.tooltip_disabled')
-                        : !selectable
-                          ? LocalizeText('wiredfurni.variable_picker.tooltip_not_selectable')
-                          : undefined;
+        <NativeTextTree>
+            <>
+                <div className={`octane-wired__vpicker-list ${isRoot ? '' : 'is-sublist'}`} role="listbox" style={style}>
+                    {nodes.map((node, index) => {
+                        const selectable = canSelectWiredVariableNode(node);
+                        const disabled = isWiredVariableNodeDisabled(node);
+                        const hovered = hover?.index === index;
+                        // VariableNodeView.as:203-214.
+                        const tooltip = disabled
+                            ? LocalizeText('wiredfurni.variable_picker.tooltip_disabled')
+                            : !selectable
+                              ? LocalizeText('wiredfurni.variable_picker.tooltip_not_selectable')
+                              : undefined;
 
-                    return (
-                        <div
-                            key={`${index}:${node.name}`}
-                            aria-disabled={!selectable}
-                            className={`octane-wired__vpicker-node ${selectable ? 'is-selectable' : ''}`}
-                            role="option"
-                            title={tooltip}
-                            style={{
-                                width: rowWidth,
-                                height: NODE_HEIGHT,
-                                background: hovered ? NODE_HOVER_BG : index % 2 === 0 ? NODE_MODE1_BG : NODE_MODE2_BG
-                            }}
-                            onMouseEnter={(event) => hoverNode(index, event.currentTarget)}
-                            onClick={(event: MouseEvent<HTMLDivElement>) => {
-                                hoverNode(index, event.currentTarget);
-                                // VariableNodeView.onClick (VariableNodeView.as:234-241).
-                                if (selectable) onSelect(node.entry);
-                            }}
-                        >
-                            <span className="octane-wired__vpicker-node-name" style={{ opacity: disabled ? NODE_DISABLED_BLEND : 1 }}>
-                                {node.name}
-                            </span>
-                            {node.children.size > 0 && (
-                                <span aria-hidden="true" className="octane-wired__vpicker-node-arrow" style={{ opacity: disabled ? NODE_DISABLED_BLEND : 1 }} />
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
-            {hover && hoveredNode && hoveredNode.children.size > 0 && (
-                <WiredVariableNodeList
-                    key={`${hover.index}:${hoveredNode.name}`}
-                    nodes={[...hoveredNode.children.values()]}
-                    width={rowWidth - SUBLIST_EXTRA_WIDTH}
-                    isRoot={false}
-                    position={{ left: hover.left, top: hover.top }}
-                    onSelect={onSelect}
-                />
-            )}
-        </>
+                        return (
+                            <div
+                                key={`${index}:${node.name}`}
+                                aria-disabled={!selectable}
+                                className={`octane-wired__vpicker-node ${selectable ? 'is-selectable' : ''}`}
+                                role="option"
+                                title={tooltip}
+                                style={{
+                                    width: rowWidth,
+                                    height: NODE_HEIGHT,
+                                    background: hovered ? NODE_HOVER_BG : index % 2 === 0 ? NODE_MODE1_BG : NODE_MODE2_BG
+                                }}
+                                onMouseEnter={(event) => hoverNode(index, event.currentTarget)}
+                                onClick={(event: MouseEvent<HTMLDivElement>) => {
+                                    hoverNode(index, event.currentTarget);
+                                    // VariableNodeView.onClick (VariableNodeView.as:234-241).
+                                    if (selectable) onSelect(node.entry);
+                                }}
+                            >
+                                <span className="octane-wired__vpicker-node-name" style={{ opacity: disabled ? NODE_DISABLED_BLEND : 1 }}>
+                                    {node.name}
+                                </span>
+                                {node.children.size > 0 && (
+                                    <span aria-hidden="true" className="octane-wired__vpicker-node-arrow" style={{ opacity: disabled ? NODE_DISABLED_BLEND : 1 }} />
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+                {hover && hoveredNode && hoveredNode.children.size > 0 && (
+                    <WiredVariableNodeList
+                        key={`${hover.index}:${hoveredNode.name}`}
+                        nodes={[...hoveredNode.children.values()]}
+                        width={rowWidth - SUBLIST_EXTRA_WIDTH}
+                        isRoot={false}
+                        position={{ left: hover.left, top: hover.top }}
+                        onSelect={onSelect}
+                    />
+                )}
+            </>
+        </NativeTextTree>
     );
 };
 
@@ -551,26 +554,28 @@ export const WiredVariablePicker: FC<WiredVariablePickerProps> = (props) => {
     }
 
     return (
-        <div className="octane-wired__vpicker" ref={containerRef}>
-            <div className="octane-wired__vpicker-collapsed" style={isExpanded ? { visibility: 'hidden' } : undefined}>
-                {!isExpanded && input}
-            </div>
+        <NativeTextTree>
+            <div className="octane-wired__vpicker" ref={containerRef}>
+                <div className="octane-wired__vpicker-collapsed" style={isExpanded ? { visibility: 'hidden' } : undefined}>
+                    {!isExpanded && input}
+                </div>
 
-            {isExpanded &&
-                panelRect &&
-                portalTarget &&
-                createPortal(
-                    <div className="octane-wired octane-wired__variable-picker-portal">
-                        <div
-                            ref={panelRef}
-                            className="octane-wired__vpicker-expanded"
-                            style={{ left: panelRect.left, top: panelRect.top, width: panelRect.width }}
-                        >
-                            {expandedView}
-                        </div>
-                    </div>,
-                    portalTarget
-                )}
-        </div>
+                {isExpanded &&
+                    panelRect &&
+                    portalTarget &&
+                    createPortal(
+                        <div className="octane-wired octane-wired__variable-picker-portal">
+                            <div
+                                ref={panelRef}
+                                className="octane-wired__vpicker-expanded"
+                                style={{ left: panelRect.left, top: panelRect.top, width: panelRect.width }}
+                            >
+                                {expandedView}
+                            </div>
+                        </div>,
+                        portalTarget
+                    )}
+            </div>
+        </NativeTextTree>
     );
 };

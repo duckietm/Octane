@@ -11,6 +11,7 @@ import { FC, useEffect, useState } from 'react';
 import { GetConfigurationValue, GetOptionalConfigurationValue, localizeWithFallback, OpenUrl, SendMessageComposer } from '../../../api';
 import hcIcon from '../../../assets/images/purse-swf/icons/1801_hc_icon_png$2f8b554609e9c5cbbdc46bcbe5764be5-210881771.png';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useMessageEvent } from '../../../hooks';
 
 /** AIR SafetyLockStatus: 1 is unlocked. */
@@ -67,43 +68,45 @@ export const PurseNoticesView: FC<{}> = () => {
     const unlockUrl = GetOptionalConfigurationValue<string>('link.format.safetylock_unlock', '');
 
     return (
-        <>
-            {clubGiftVisible && (
-                <div className="octane-purse-notice octane-purse-notice--club-gift" role="status">
-                    <img src={hcIcon} alt="" className="octane-purse-notice__icon" />
-                    <div className="octane-purse-notice__text octane-purse-notice__text--with-icon">
-                        {localizeWithFallback('notifications.text.club_gift', "It's time to pick your monthly Habbo Club gift!")}
+        <NativeTextTree>
+            <>
+                {clubGiftVisible && (
+                    <div className="octane-purse-notice octane-purse-notice--club-gift" role="status">
+                        <img src={hcIcon} alt="" className="octane-purse-notice__icon" />
+                        <div className="octane-purse-notice__text octane-purse-notice__text--with-icon">
+                            {localizeWithFallback('notifications.text.club_gift', "It's time to pick your monthly Habbo Club gift!")}
+                        </div>
+                        <BaseButton
+                            type="button"
+                            className="octane-purse-notice__link"
+                            onClick={() => {
+                                setClubGiftCancelled(true);
+                                setClubGiftVisible(false);
+                            }}
+                        >
+                            {localizeWithFallback('notifications.button.later', 'Not now')}
+                        </BaseButton>
+                        <BaseButton type="button" className="octane-purse-notice__button" onClick={openClubGifts}>
+                            {localizeWithFallback('notifications.button.show_gift_list', 'Choose your gift')}
+                        </BaseButton>
                     </div>
-                    <BaseButton
-                        type="button"
-                        className="octane-purse-notice__link"
-                        onClick={() => {
-                            setClubGiftCancelled(true);
-                            setClubGiftVisible(false);
-                        }}
-                    >
-                        {localizeWithFallback('notifications.button.later', 'Not now')}
-                    </BaseButton>
-                    <BaseButton type="button" className="octane-purse-notice__button" onClick={openClubGifts}>
-                        {localizeWithFallback('notifications.button.show_gift_list', 'Choose your gift')}
-                    </BaseButton>
-                </div>
-            )}
-            {safetyLocked && (
-                <div className="octane-purse-notice octane-purse-notice--safety" role="status">
-                    <div className="octane-purse-notice__text">
-                        {localizeWithFallback(
-                            'notifications.text.safety_locked',
-                            'The safety lock of this account is on! Some features are disabled. Go to the website to unlock it.'
+                )}
+                {safetyLocked && (
+                    <div className="octane-purse-notice octane-purse-notice--safety" role="status">
+                        <div className="octane-purse-notice__text">
+                            {localizeWithFallback(
+                                'notifications.text.safety_locked',
+                                'The safety lock of this account is on! Some features are disabled. Go to the website to unlock it.'
+                            )}
+                        </div>
+                        {unlockUrl && (
+                            <BaseButton type="button" className="octane-purse-notice__link" onClick={() => OpenUrl(unlockUrl)}>
+                                {localizeWithFallback('notifications.button.safety_locked_unlock', 'Unlock')}
+                            </BaseButton>
                         )}
                     </div>
-                    {unlockUrl && (
-                        <BaseButton type="button" className="octane-purse-notice__link" onClick={() => OpenUrl(unlockUrl)}>
-                            {localizeWithFallback('notifications.button.safety_locked_unlock', 'Unlock')}
-                        </BaseButton>
-                    )}
-                </div>
-            )}
-        </>
+                )}
+            </>
+        </NativeTextTree>
     );
 };

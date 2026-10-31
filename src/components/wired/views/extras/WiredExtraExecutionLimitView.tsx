@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
@@ -51,31 +52,33 @@ export const WiredExtraExecutionLimitView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
-            <div className="flex flex-col gap-2">
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
                 <div className="flex flex-col gap-2">
-                    <Text>{LocalizeText('wiredfurni.params.setexecutions', ['amount'], [executions.toString()])}</Text>
-                    <Slider
-                        min={MIN_EXECUTIONS}
-                        max={MAX_EXECUTIONS}
-                        step={1}
-                        value={executions}
-                        onChange={(value) => setExecutions(normalizeExecutions(Array.isArray(value) ? value[0] : Number(value)))}
-                    />
-                    <Text small>{executions}</Text>
+                    <div className="flex flex-col gap-2">
+                        <Text>{LocalizeText('wiredfurni.params.setexecutions', ['amount'], [executions.toString()])}</Text>
+                        <Slider
+                            min={MIN_EXECUTIONS}
+                            max={MAX_EXECUTIONS}
+                            step={1}
+                            value={executions}
+                            onChange={(value) => setExecutions(normalizeExecutions(Array.isArray(value) ? value[0] : Number(value)))}
+                        />
+                        <Text small>{executions}</Text>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <Text>{LocalizeText('wiredfurni.params.settimewindow', ['timewindow'], [formatTimeWindow(timeWindowMs)])}</Text>
+                        <Slider
+                            min={MIN_TIME_WINDOW_MS}
+                            max={MAX_TIME_WINDOW_MS}
+                            step={TIME_WINDOW_STEP_MS}
+                            value={timeWindowMs}
+                            onChange={(value) => setTimeWindowMs(normalizeTimeWindow(Array.isArray(value) ? value[0] : Number(value)))}
+                        />
+                        <Text small>{formatTimeWindow(timeWindowMs)}s</Text>
+                    </div>
                 </div>
-                <div className="flex flex-col gap-2">
-                    <Text>{LocalizeText('wiredfurni.params.settimewindow', ['timewindow'], [formatTimeWindow(timeWindowMs)])}</Text>
-                    <Slider
-                        min={MIN_TIME_WINDOW_MS}
-                        max={MAX_TIME_WINDOW_MS}
-                        step={TIME_WINDOW_STEP_MS}
-                        value={timeWindowMs}
-                        onChange={(value) => setTimeWindowMs(normalizeTimeWindow(Array.isArray(value) ? value[0] : Number(value)))}
-                    />
-                    <Text small>{formatTimeWindow(timeWindowMs)}s</Text>
-                </div>
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

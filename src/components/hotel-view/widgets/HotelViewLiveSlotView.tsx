@@ -1,6 +1,7 @@
 import type { IHotelViewLandingSlot } from '@octane/renderer';
 import { FC, ReactNode } from 'react';
 import { WidgetErrorBoundary } from '../../../common/error-boundary/WidgetErrorBoundary';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { HotelViewBonusRareWidget } from './HotelViewBonusRareWidget';
 import { HotelViewCommunityGoalWidget } from './HotelViewCommunityGoalWidget';
 import { HotelViewCompetitionPrizesWidget } from './HotelViewCompetitionPrizesWidget';
@@ -71,9 +72,11 @@ export const HotelViewLiveSlotView: FC<HotelViewLiveSlotViewProps> = ({ slot, co
     })();
 
     return (
-        <WidgetErrorBoundary name={`HotelViewSlot-${slot.type}`} fallback={fallback}>
-            {content}
-        </WidgetErrorBoundary>
+        <NativeTextTree>
+            <WidgetErrorBoundary name={`HotelViewSlot-${slot.type}`} fallback={fallback}>
+                {content}
+            </WidgetErrorBoundary>
+        </NativeTextTree>
     );
 };
 

@@ -2,6 +2,7 @@ import { GuideSessionGuideDecidesMessageComposer } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../api';
 import { Button, Text } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 interface GuideToolAcceptViewProps {
     helpRequestDescription: string;
@@ -14,22 +15,24 @@ export const GuideToolAcceptView: FC<GuideToolAcceptViewProps> = (props) => {
     const answerRequest = (response: boolean) => SendMessageComposer(new GuideSessionGuideDecidesMessageComposer(response));
 
     return (
-        <div className="flex flex-col">
-            <div className="octane-card-panel flex flex-col gap-0 p-2">
-                <Text bold className="octane-guide-tool__heading-2">{LocalizeText('guide.help.request.guide.accept.request.title')}</Text>
-                <Text variant="muted">{LocalizeText('guide.help.request.type.1')}</Text>
-                <Text textBreak wrap>
-                    {helpRequestDescription}
-                </Text>
+        <NativeTextTree>
+            <div className="flex flex-col">
+                <div className="octane-card-panel flex flex-col gap-0 p-2">
+                    <Text bold className="octane-guide-tool__heading-2">{LocalizeText('guide.help.request.guide.accept.request.title')}</Text>
+                    <Text variant="muted">{LocalizeText('guide.help.request.type.1')}</Text>
+                    <Text textBreak wrap>
+                        {helpRequestDescription}
+                    </Text>
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Button variant="success" onClick={(event) => answerRequest(true)}>
+                        {LocalizeText('guide.help.request.guide.accept.accept.button')}
+                    </Button>
+                    <Button variant="danger" onClick={(event) => answerRequest(false)}>
+                        {LocalizeText('guide.help.request.guide.accept.skip.link')}
+                    </Button>
+                </div>
             </div>
-            <div className="flex flex-col gap-1">
-                <Button variant="success" onClick={(event) => answerRequest(true)}>
-                    {LocalizeText('guide.help.request.guide.accept.accept.button')}
-                </Button>
-                <Button variant="danger" onClick={(event) => answerRequest(false)}>
-                    {LocalizeText('guide.help.request.guide.accept.skip.link')}
-                </Button>
-            </div>
-        </div>
+        </NativeTextTree>
     );
 };

@@ -2,6 +2,7 @@ import { GetAvatarRenderManager, GetSessionDataManager, RoomObjectVariable, Vect
 import { FC, useEffect } from 'react';
 import { FurniCategory, GetProductIconUrl, Offer, ProductTypeEnum } from '../../../../../api';
 import { AutoGrid, Column, LayoutChatStyleImageView, LayoutGridItem, LayoutHabbiconImageView, LayoutRoomPreviewerView } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogData, useCatalogUiState } from '../../../../../hooks';
 
 const PREVIEW_LIFT = 21;
@@ -171,26 +172,28 @@ export const CatalogViewProductWidgetView: FC<{ height?: number }> = (props) => 
 
     if (currentOffer.pricingModel === Offer.PRICING_MODEL_BUNDLE) {
         return (
-            <Column fit className="bg-muted p-2 rounded" overflow="hidden">
-                <AutoGrid fullWidth className="octane-catalog-layout-bundle-grid" columnCount={4}>
-                    {currentOffer.products.length > 0 &&
-                        currentOffer.products.map((product, index) => {
-                            const iconUrl = GetProductIconUrl(product, currentOffer);
+            <NativeTextTree>
+                <Column fit className="bg-muted p-2 rounded" overflow="hidden">
+                    <AutoGrid fullWidth className="octane-catalog-layout-bundle-grid" columnCount={4}>
+                        {currentOffer.products.length > 0 &&
+                            currentOffer.products.map((product, index) => {
+                                const iconUrl = GetProductIconUrl(product, currentOffer);
 
-                            return (
-                                <LayoutGridItem key={index} itemCount={product.productCount}>
-                                    {product.productType === ProductTypeEnum.HABBICON ? (
-                                        <LayoutHabbiconImageView id={product.productClassId} />
-                                    ) : product.productType === ProductTypeEnum.CHAT_STYLE ? (
-                                        <LayoutChatStyleImageView styleId={product.extraParam} />
-                                    ) : (
-                                        iconUrl && <img alt="" className="octane-catalog-grid-offer-icon" draggable={false} src={iconUrl} />
-                                    )}
-                                </LayoutGridItem>
-                            );
-                        })}
-                </AutoGrid>
-            </Column>
+                                return (
+                                    <LayoutGridItem key={index} itemCount={product.productCount}>
+                                        {product.productType === ProductTypeEnum.HABBICON ? (
+                                            <LayoutHabbiconImageView id={product.productClassId} />
+                                        ) : product.productType === ProductTypeEnum.CHAT_STYLE ? (
+                                            <LayoutChatStyleImageView styleId={product.extraParam} />
+                                        ) : (
+                                            iconUrl && <img alt="" className="octane-catalog-grid-offer-icon" draggable={false} src={iconUrl} />
+                                        )}
+                                    </LayoutGridItem>
+                                );
+                            })}
+                    </AutoGrid>
+                </Column>
+            </NativeTextTree>
         );
     }
 

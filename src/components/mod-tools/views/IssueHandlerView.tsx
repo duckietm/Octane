@@ -10,6 +10,7 @@ import { NativeWindowShell } from '../native/NativeWindowShell';
 import { EvidenceChatlogList, useEvidence } from './EvidenceChatlogList';
 import { UserInfoPanel } from './UserInfoPanel';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SHADE = 0xa2d6ea;
@@ -214,142 +215,144 @@ export const IssueHandlerView: FC<IssueHandlerProps> = ({
     });
 
     return (
-        <NativeWindowShell type="issueHandler" windowKey={`${bundleId}`} x={x} y={y}>
-            <Native0Frame caption={nativeCaption(root)} height={height} width={width} onClose={() => onClose()} minHeight={390} minWidth={750} onResize={(_, h) => {
-                    const next = Math.trunc((h - columnBase) / 2);
+        <NativeTextTree>
+            <NativeWindowShell type="issueHandler" windowKey={`${bundleId}`} x={x} y={y}>
+                <Native0Frame caption={nativeCaption(root)} height={height} width={width} onClose={() => onClose()} minHeight={390} minWidth={750} onResize={(_, h) => {
+                        const next = Math.trunc((h - columnBase) / 2);
 
-                    setResized(true);
+                        setResized(true);
 
-                    if (next >= 1) setMessagesLatch(next);
+                        if (next >= 1) setMessagesLatch(next);
 
-                    onResize(750, h);
-                }}>
-                {/* left column */}
-                <div className="native0-box" style={{ left: left.x, top: left.y, width: left.width, height: Math.min(left.height + stretch, height - 32), backgroundColor: '#418db0' }} />
-                {/* the column is not clipped: below 515 its content is taller than the window and runs up over the frame's header like the classic client's */}
-                <div style={{ position: 'absolute', left: left.x, top: left.y, width: left.width, height: Math.min(left.height + stretch, height - 32) }}>
-                <div style={{ position: 'absolute', left: 0, top: 0, width: 285, height: 1200, willChange: 'transform', pointerEvents: 'none', clipPath: 'polygon(0 -4px, 100% -4px, 100% 100%, 0 100%)' }}>
-                    {/* the headings sit under the lists and panels and under the frame's header (the 4px above the client): when the window is small they are covered (the messages row hides most of "Reported User Info") */}
-                    <Native0Text bold color={0xffffff} glow={HANDLER_GLOW} text="Caller User Info" width={100} x={95} y={yCallerCaption} />
-                    <Native0Text bold color={0xffffff} glow={HANDLER_GLOW} text="Messages" width={60} x={110} y={yMessagesCaption} />
-                    {reportedShown && <Native0Text bold color={0xffffff} glow={HANDLER_GLOW} text="Reported User Info" width={120} x={80} y={yReportedCaption} />}
-                    {/* text on an opaque background is set with LCD subpixel fringes: the backgrounds are drawn apart and the texts get a layer of their own */}
-                        {header.children.map((node, index) => (
-                            <Native0Text key={index} bold color={0xffffff} glow={HANDLER_GLOW} text={nativeCaption(node)} width={nativeNumber(node, 'width')} x={nativeNumber(node, 'x')} y={yHeader + nativeNumber(node, 'y')} />
-                        ))}
-                </div>
-                <div className="native0-box" style={{ left: 0, top: yIssues, width: 280, height: rows.issues, backgroundColor: '#fff' }} />
-                <div className="native0-list" style={{ left: 0, top: yIssues, width: 280, height: rows.issues, willChange: 'transform' }}>
-                    <div style={{ position: 'absolute', left: 0, top: 0, width: 280, height: Math.max(rows.issues, issues.length * 16) }}>
-                        {issues.map((tracked, index) => (
-                            <BaseButton type="button" key={tracked.issue.issueId} style={{ position: 'absolute', left: 0, top: index * 16, width: 280, height: 16, cursor: 'pointer' }} onClick={() => {
-                                setSelectedIssueId(tracked.issue.issueId);
-
-                                if (tracked.issue.reporterUserId !== 0) setEvidenceIssueId(tracked.issue.issueId);
-                            }}>
-                                <Native0Text clip height={13} text={tracked.issue.reporterUserName ?? ''} width={78} x={itemX(region, 'reporter').x} y={0} />
-                                <Native0Text bold={tracked.issue.issueId === primary?.issue.issueId && issues.length > 1} clip height={13} text={categoryOf(tracked.issue.reportedCategoryId)} width={110} x={itemX(region, 'category').x} y={0} />
-                                <Native0Text clip height={13} text={sourceOf(tracked)} width={60} x={itemX(region, 'type').x} y={0} />
-                                <Native0Text height={13} text={issueOpenTime(tracked)} width={32} x={itemX(region, 'time_open').x} y={0} />
-                            </BaseButton>
-                        ))}
+                        onResize(750, h);
+                    }}>
+                    {/* left column */}
+                    <div className="native0-box" style={{ left: left.x, top: left.y, width: left.width, height: Math.min(left.height + stretch, height - 32), backgroundColor: '#418db0' }} />
+                    {/* the column is not clipped: below 515 its content is taller than the window and runs up over the frame's header like the classic client's */}
+                    <div style={{ position: 'absolute', left: left.x, top: left.y, width: left.width, height: Math.min(left.height + stretch, height - 32) }}>
+                    <div style={{ position: 'absolute', left: 0, top: 0, width: 285, height: 1200, willChange: 'transform', pointerEvents: 'none', clipPath: 'polygon(0 -4px, 100% -4px, 100% 100%, 0 100%)' }}>
+                        {/* the headings sit under the lists and panels and under the frame's header (the 4px above the client): when the window is small they are covered (the messages row hides most of "Reported User Info") */}
+                        <Native0Text bold color={0xffffff} glow={HANDLER_GLOW} text="Caller User Info" width={100} x={95} y={yCallerCaption} />
+                        <Native0Text bold color={0xffffff} glow={HANDLER_GLOW} text="Messages" width={60} x={110} y={yMessagesCaption} />
+                        {reportedShown && <Native0Text bold color={0xffffff} glow={HANDLER_GLOW} text="Reported User Info" width={120} x={80} y={yReportedCaption} />}
+                        {/* text on an opaque background is set with LCD subpixel fringes: the backgrounds are drawn apart and the texts get a layer of their own */}
+                            {header.children.map((node, index) => (
+                                <Native0Text key={index} bold color={0xffffff} glow={HANDLER_GLOW} text={nativeCaption(node)} width={nativeNumber(node, 'width')} x={nativeNumber(node, 'x')} y={yHeader + nativeNumber(node, 'y')} />
+                            ))}
                     </div>
-                </div>
-                <div style={{ position: 'absolute', left: 0, top: yCaller, width: 280, height: 207 }}>
-                    <UserInfoPanel key={callerId} settings={settings} userId={callerId} {...panelHandlers(callerId)} />
-                </div>
-                <div className="native0-box" style={{ left: 0, top: yMessages, width: 280, height: rows.messages, backgroundColor: '#fff' }} />
-                <div className="native0-list" style={{ left: 0, top: yMessages + (msgShift ?? 0), width: 280, height: msgShift === null ? 0 : msgView, willChange: 'transform' }} onWheel={(event) => setMessageOffset(Math.max(0, Math.min(Math.max(0, messagesHeight - msgView), clampedMessages + event.deltaY * 0.75)))}>
-                    <div style={{ position: 'absolute', left: 0, top: -clampedMessages, width: msgOverflow ? 263 : 280, height: messagesHeight }}>
-                        <Native0Rows colors={messageRows.map((row) => row.color)} heights={messageRows.map((row) => row.height)} width={msgOverflow ? 263 : 280} />
-                        {messageRows.map((row, index) => (
-                            <Native0Text key={index} height={19} text={row.text} width={msgOverflow ? 263 : 280} wrap x={0} y={messageRows.slice(0, index).reduce((sum, previous) => sum + previous.height, 0)} />
-                        ))}
-                    </div>
-                </div>
-                {msgOverflow && <Native0Scrollbar contentHeight={messagesHeight} height={msgView} offset={clampedMessages} viewHeight={msgView} x={263} y={yMessages} onOffset={setMessageOffset} />}
-                {reportedShown && (
-                    <>
-                        <div style={{ position: 'absolute', left: 0, top: yReported, width: 280, height: 207 }}>
-                            <UserInfoPanel key={bundle.reportedUserId} settings={settings} userId={bundle.reportedUserId} {...panelHandlers(bundle.reportedUserId)} />
+                    <div className="native0-box" style={{ left: 0, top: yIssues, width: 280, height: rows.issues, backgroundColor: '#fff' }} />
+                    <div className="native0-list" style={{ left: 0, top: yIssues, width: 280, height: rows.issues, willChange: 'transform' }}>
+                        <div style={{ position: 'absolute', left: 0, top: 0, width: 280, height: Math.max(rows.issues, issues.length * 16) }}>
+                            {issues.map((tracked, index) => (
+                                <BaseButton type="button" key={tracked.issue.issueId} style={{ position: 'absolute', left: 0, top: index * 16, width: 280, height: 16, cursor: 'pointer' }} onClick={() => {
+                                    setSelectedIssueId(tracked.issue.issueId);
+
+                                    if (tracked.issue.reporterUserId !== 0) setEvidenceIssueId(tracked.issue.issueId);
+                                }}>
+                                    <Native0Text clip height={13} text={tracked.issue.reporterUserName ?? ''} width={78} x={itemX(region, 'reporter').x} y={0} />
+                                    <Native0Text bold={tracked.issue.issueId === primary?.issue.issueId && issues.length > 1} clip height={13} text={categoryOf(tracked.issue.reportedCategoryId)} width={110} x={itemX(region, 'category').x} y={0} />
+                                    <Native0Text clip height={13} text={sourceOf(tracked)} width={60} x={itemX(region, 'type').x} y={0} />
+                                    <Native0Text height={13} text={issueOpenTime(tracked)} width={32} x={itemX(region, 'time_open').x} y={0} />
+                                </BaseButton>
+                            ))}
                         </div>
-                    </>
-                )}
-                </div>
-                {/* right column */}
-                <div style={{ position: 'absolute', left: buttons.x, top: buttons.y, width: buttons.width, height: buttons.height }}>
-                    <Native0Button
-                        color={0xff9090}
-                        height={22}
-                        label={nativeCaption(buttonNode('close_useless'))}
-                        width={110}
-                        x={itemX(buttonNode('buttons'), 'close_useless').x}
-                        y={itemX(buttonNode('buttons'), 'close_useless').y}
-                        onClick={() => closeAs(CLOSE_USELESS)}
-                    />
-                    <Native0Button
-                        height={22}
-                        label={localizeWithFallback('modtools.native.close_abusive', 'Close as abusive')}
-                        width={110}
-                        x={itemX(buttonNode('buttons'), 'close_useless').x}
-                        y={itemX(buttonNode('buttons'), 'close_useless').y + 25}
-                        onClick={() => closeAs(CLOSE_ABUSIVE)}
-                    />
-                    <Native0Button height={22} label={nativeCaption(buttonNode('close_resolved'))} width={110} x={itemX(buttonNode('buttons'), 'close_resolved').x} y={itemX(buttonNode('buttons'), 'close_resolved').y} onClick={() => closeAs(CLOSE_RESOLVED)} />
-                    <Native0Button
-                        height={22}
-                        label={nativeCaption(buttonNode('release'))}
-                        width={110}
-                        x={itemX(buttonNode('buttons'), 'release').x}
-                        y={itemX(buttonNode('buttons'), 'release').y}
-                        onClick={() => {
-                            if (finishedRef.current) return;
+                    </div>
+                    <div style={{ position: 'absolute', left: 0, top: yCaller, width: 280, height: 207 }}>
+                        <UserInfoPanel key={callerId} settings={settings} userId={callerId} {...panelHandlers(callerId)} />
+                    </div>
+                    <div className="native0-box" style={{ left: 0, top: yMessages, width: 280, height: rows.messages, backgroundColor: '#fff' }} />
+                    <div className="native0-list" style={{ left: 0, top: yMessages + (msgShift ?? 0), width: 280, height: msgShift === null ? 0 : msgView, willChange: 'transform' }} onWheel={(event) => setMessageOffset(Math.max(0, Math.min(Math.max(0, messagesHeight - msgView), clampedMessages + event.deltaY * 0.75)))}>
+                        <div style={{ position: 'absolute', left: 0, top: -clampedMessages, width: msgOverflow ? 263 : 280, height: messagesHeight }}>
+                            <Native0Rows colors={messageRows.map((row) => row.color)} heights={messageRows.map((row) => row.height)} width={msgOverflow ? 263 : 280} />
+                            {messageRows.map((row, index) => (
+                                <Native0Text key={index} height={19} text={row.text} width={msgOverflow ? 263 : 280} wrap x={0} y={messageRows.slice(0, index).reduce((sum, previous) => sum + previous.height, 0)} />
+                            ))}
+                        </div>
+                    </div>
+                    {msgOverflow && <Native0Scrollbar contentHeight={messagesHeight} height={msgView} offset={clampedMessages} viewHeight={msgView} x={263} y={yMessages} onOffset={setMessageOffset} />}
+                    {reportedShown && (
+                        <>
+                            <div style={{ position: 'absolute', left: 0, top: yReported, width: 280, height: 207 }}>
+                                <UserInfoPanel key={bundle.reportedUserId} settings={settings} userId={bundle.reportedUserId} {...panelHandlers(bundle.reportedUserId)} />
+                            </div>
+                        </>
+                    )}
+                    </div>
+                    {/* right column */}
+                    <div style={{ position: 'absolute', left: buttons.x, top: buttons.y, width: buttons.width, height: buttons.height }}>
+                        <Native0Button
+                            color={0xff9090}
+                            height={22}
+                            label={nativeCaption(buttonNode('close_useless'))}
+                            width={110}
+                            x={itemX(buttonNode('buttons'), 'close_useless').x}
+                            y={itemX(buttonNode('buttons'), 'close_useless').y}
+                            onClick={() => closeAs(CLOSE_USELESS)}
+                        />
+                        <Native0Button
+                            height={22}
+                            label={localizeWithFallback('modtools.native.close_abusive', 'Close as abusive')}
+                            width={110}
+                            x={itemX(buttonNode('buttons'), 'close_useless').x}
+                            y={itemX(buttonNode('buttons'), 'close_useless').y + 25}
+                            onClick={() => closeAs(CLOSE_ABUSIVE)}
+                        />
+                        <Native0Button height={22} label={nativeCaption(buttonNode('close_resolved'))} width={110} x={itemX(buttonNode('buttons'), 'close_resolved').x} y={itemX(buttonNode('buttons'), 'close_resolved').y} onClick={() => closeAs(CLOSE_RESOLVED)} />
+                        <Native0Button
+                            height={22}
+                            label={nativeCaption(buttonNode('release'))}
+                            width={110}
+                            x={itemX(buttonNode('buttons'), 'release').x}
+                            y={itemX(buttonNode('buttons'), 'release').y}
+                            onClick={() => {
+                                if (finishedRef.current) return;
 
-                            releaseBundle(bundle.id, context);
-                            finish();
+                                releaseBundle(bundle.id, context);
+                                finish();
+                            }}
+                        />
+                        <Native0Checkbox checked={autoNext} x={itemX(buttonNode('buttons'), 'handle_next_checkbox').x} y={itemX(buttonNode('buttons'), 'handle_next_checkbox').y} onToggle={() => setAutoNext((value) => !value)} />
+                        <Native0Text color={0xffffff} glow={HANDLER_GLOW} text={nativeCaption(buttonNode('handle_next_text'))} width={153} x={itemX(buttonNode('buttons'), 'handle_next_text').x} y={itemX(buttonNode('buttons'), 'handle_next_text').y} />
+                        <Native0Button height={22} label={nativeCaption(buttonNode('close_sanction'))} width={110} x={itemX(buttonNode('buttons'), 'close_sanction').x} y={itemX(buttonNode('buttons'), 'close_sanction').y} onClick={closeWithDefaultSanction} />
+                    </div>
+                    {proposedText && <Native0Text clip color={0xffffff} glow={HANDLER_GLOW} height={17} text={proposedText} width={sanctionInfo.width} x={sanctionInfo.x} y={sanctionInfo.y} />}
+                    {!evidence && (
+                        <div style={{ position: 'absolute', left: chatCont.x, top: chatCont.y }}>
+                            <Native0Scrollbar arrowsOpaque blend={0.4} contentHeight={0} height={scroller.height + stretch} offset={0} variant={3} viewHeight={evidenceList.height + stretch} x={scroller.x} y={0} onOffset={() => undefined} />
+                        </div>
+                    )}
+                    {evidence && (
+                        <div style={{ position: 'absolute', left: chatCont.x, top: chatCont.y }}>
+                            <EvidenceChatlogList
+                                evidence={evidence}
+                                listWidth={evidenceList.width}
+                                scrollbarHeight={scroller.height + stretch}
+                                scrollbarBlend={0.4}
+                                scrollbarVariant={3}
+                                scrollbarX={scroller.x}
+                                viewHeight={evidenceList.height + stretch}
+                                onEnterRoom={onEnterRoom}
+                                onOpenRoomTool={onOpenRoomTool}
+                                onOpenUserInfo={(userId) => onOpenUserInfo(userId, chatRect)}
+                            />
+                        </div>
+                    )}
+                    <Native100Dropmenu
+                        caption={topicIndex >= 0 ? topicNames[topicIndex] : nativeCaption(findNativeNode(root, 'cfh_topics'))}
+                        height={menu.height}
+                        items={topicNames}
+                        disabled={categoryId === CATEGORY_NO_TOPIC}
+                        selectedIndex={topicIndex}
+                        width={menu.width}
+                        x={menu.x}
+                        y={menu.y}
+                        onSelect={(index) => {
+                            // the classic client asks for the default sanction of the topic here (My(issueId, -1, topic)); that lookup is held, so only the choice is kept
+                            setChosenTopic(index);
                         }}
                     />
-                    <Native0Checkbox checked={autoNext} x={itemX(buttonNode('buttons'), 'handle_next_checkbox').x} y={itemX(buttonNode('buttons'), 'handle_next_checkbox').y} onToggle={() => setAutoNext((value) => !value)} />
-                    <Native0Text color={0xffffff} glow={HANDLER_GLOW} text={nativeCaption(buttonNode('handle_next_text'))} width={153} x={itemX(buttonNode('buttons'), 'handle_next_text').x} y={itemX(buttonNode('buttons'), 'handle_next_text').y} />
-                    <Native0Button height={22} label={nativeCaption(buttonNode('close_sanction'))} width={110} x={itemX(buttonNode('buttons'), 'close_sanction').x} y={itemX(buttonNode('buttons'), 'close_sanction').y} onClick={closeWithDefaultSanction} />
-                </div>
-                {proposedText && <Native0Text clip color={0xffffff} glow={HANDLER_GLOW} height={17} text={proposedText} width={sanctionInfo.width} x={sanctionInfo.x} y={sanctionInfo.y} />}
-                {!evidence && (
-                    <div style={{ position: 'absolute', left: chatCont.x, top: chatCont.y }}>
-                        <Native0Scrollbar arrowsOpaque blend={0.4} contentHeight={0} height={scroller.height + stretch} offset={0} variant={3} viewHeight={evidenceList.height + stretch} x={scroller.x} y={0} onOffset={() => undefined} />
-                    </div>
-                )}
-                {evidence && (
-                    <div style={{ position: 'absolute', left: chatCont.x, top: chatCont.y }}>
-                        <EvidenceChatlogList
-                            evidence={evidence}
-                            listWidth={evidenceList.width}
-                            scrollbarHeight={scroller.height + stretch}
-                            scrollbarBlend={0.4}
-                            scrollbarVariant={3}
-                            scrollbarX={scroller.x}
-                            viewHeight={evidenceList.height + stretch}
-                            onEnterRoom={onEnterRoom}
-                            onOpenRoomTool={onOpenRoomTool}
-                            onOpenUserInfo={(userId) => onOpenUserInfo(userId, chatRect)}
-                        />
-                    </div>
-                )}
-                <Native100Dropmenu
-                    caption={topicIndex >= 0 ? topicNames[topicIndex] : nativeCaption(findNativeNode(root, 'cfh_topics'))}
-                    height={menu.height}
-                    items={topicNames}
-                    disabled={categoryId === CATEGORY_NO_TOPIC}
-                    selectedIndex={topicIndex}
-                    width={menu.width}
-                    x={menu.x}
-                    y={menu.y}
-                    onSelect={(index) => {
-                        // the classic client asks for the default sanction of the topic here (My(issueId, -1, topic)); that lookup is held, so only the choice is kept
-                        setChosenTopic(index);
-                    }}
-                />
-            </Native0Frame>
-        </NativeWindowShell>
+                </Native0Frame>
+            </NativeWindowShell>
+        </NativeTextTree>
     );
 };

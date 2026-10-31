@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { localizeWithFallback, ShowVipBenefits } from '../../../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../../common';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 /** Which furni sent the user here: AIR's TYPE_VIPHOPPER uses `viphopper.*` texts, the HC gate `gate.*`. */
 export type VipRequiredKind = 'viphopper' | 'gate';
@@ -26,26 +27,28 @@ const text = (key: string): string => localizeWithFallback(key, FALLBACKS[key] ?
  * benefits link leaves it open, as in AIR's eventProc.
  */
 export const VipRequiredView: FC<{ kind: VipRequiredKind; onClose: () => void }> = ({ kind, onClose }) => (
-    <OctaneCardView classNames={['octane-vip-required']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="vip-required">
-        <OctaneCardHeaderView headerText={text('viprequired.header')} onCloseClick={onClose} />
-        <OctaneCardContentView classNames={['octane-vip-required-content']} overflow="hidden">
-            <span className="octane-vip-required-title">{text(`${kind}.viprequired.title`)}</span>
-            <span className="octane-vip-required-body" data-testid="vip-required-body">
-                {text(`${kind}.viprequired.bodytext`)}
-            </span>
-            <span className="octane-vip-required-separator" aria-hidden="true" />
-            <BaseButton
-                className="octane-vip-required-buy"
-                onClick={() => {
-                    CreateLinkEvent('habboUI/open/hccenter');
-                    onClose();
-                }}
-            >
-                {text('viprequired.buy.vip')}
-            </BaseButton>
-            <BaseButton className="octane-vip-required-benefits" onClick={() => ShowVipBenefits()}>
-                {text('viprequired.vip.benefits')}
-            </BaseButton>
-        </OctaneCardContentView>
-    </OctaneCardView>
+    <NativeTextTree>
+        <OctaneCardView classNames={['octane-vip-required']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="vip-required">
+            <OctaneCardHeaderView headerText={text('viprequired.header')} onCloseClick={onClose} />
+            <OctaneCardContentView classNames={['octane-vip-required-content']} overflow="hidden">
+                <span className="octane-vip-required-title">{text(`${kind}.viprequired.title`)}</span>
+                <span className="octane-vip-required-body" data-testid="vip-required-body">
+                    {text(`${kind}.viprequired.bodytext`)}
+                </span>
+                <span className="octane-vip-required-separator" aria-hidden="true" />
+                <BaseButton
+                    className="octane-vip-required-buy"
+                    onClick={() => {
+                        CreateLinkEvent('habboUI/open/hccenter');
+                        onClose();
+                    }}
+                >
+                    {text('viprequired.buy.vip')}
+                </BaseButton>
+                <BaseButton className="octane-vip-required-benefits" onClick={() => ShowVipBenefits()}>
+                    {text('viprequired.vip.benefits')}
+                </BaseButton>
+            </OctaneCardContentView>
+        </OctaneCardView>
+    </NativeTextTree>
 );

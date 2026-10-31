@@ -112,6 +112,36 @@ describe('secure assets', () => {
         expect(bootstraps()).toBe(2);
     });
 
+    it('keeps the session key away from an /api/ path on another origin', async () => {
+        const key = await serverKey();
+        const { calls, bootstraps } = await install(async () => new Response(JSON.stringify({ key }), { status: 200 }));
+
+        await window.fetch('https://elsewhere.test/api/auth/login', { method: 'POST', body: '{"user":"a"}' });
+
+        const call = calls.find((entry) => entry.url === 'https://elsewhere.test/api/auth/login');
+        expect(new Headers(call?.init?.headers).get('X-Nitro-Key')).toBeNull();
+        expect(call?.init?.body).toBe('{"user":"a"}');
+        expect(bootstraps()).toBe(0);
+    });
+
+    it('does not send a login in the clear once the server has spoken encrypted', async () => {
+        const key = await serverKey();
+        let available = true;
+        const { calls } = await install(async () =>
+            available ? new Response(JSON.stringify({ key, ttl: 60 }), { status: 200 }) : new Response('Down', { status: 503 })
+        );
+
+        await window.fetch(`${API}/api/badges/custom`);
+        available = false;
+        vi.setSystemTime(Date.now() + 120 * 1000);
+
+        await expect(window.fetch(`${API}/api/auth/login`, { method: 'POST', body: '{"user":"a"}' })).rejects.toThrow('Secure API unavailable');
+        expect(calls.some((call) => call.url === `${API}/api/auth/login`)).toBe(false);
+
+        const other = await window.fetch(`${API}/api/badges/custom`);
+        expect(await other.text()).toBe(`plain:${API}/api/badges/custom`);
+    });
+
     it('asks for nothing encrypted when no client mode was loaded', async () => {
         vi.resetModules();
         const { getClientMode } = await import('./secure-assets');

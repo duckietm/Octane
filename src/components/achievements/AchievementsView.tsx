@@ -8,6 +8,7 @@ import { AchievementCategoryView } from './AchievementCategoryView';
 import { AirAchievementProgressBar } from './AirAchievementProgressBar';
 import { AchievementsCategoryListView } from './category-list';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export const AchievementsView: FC = () => {
     const {
@@ -68,71 +69,73 @@ export const AchievementsView: FC = () => {
     if (!isVisible || !isLoaded) return null;
 
     return (
-        <OctaneCard
-            className="octane-achievements-air octane-card-frame-3 octane-card-frame-teal"
-            uniqueKey="achievements"
-            windowPosition={DraggableWindowPosition.TOP_CENTER}
-            offsetTop={-30}
-            data-view={selectedCategory ? 'category' : 'categories'}
-        >
-            <OctaneCard.Header headerText={LocalizeText('inventory.achievements')} onCloseClick={close} />
-            <OctaneCard.Content className="air-achievements-content">
-                {!selectedCategory && (
-                    <>
-                        <AchievementsCategoryListView
-                            categories={achievementCategories}
-                            selectedCategoryCode={selectedCategoryCode}
-                            setSelectedCategoryCode={setSelectedCategoryCode}
-                        />
-                        <div className="air-achievements-category-footer">
-                            <AirAchievementProgressBar
-                                className="air-achievements-total-progress"
-                                width={246}
-                                maxProgress={getMaxProgress}
-                                progress={getProgress}
-                                key={getMaxProgress}
-                                localizationKey="achievements.categories.totalprogress"
+        <NativeTextTree>
+            <OctaneCard
+                className="octane-achievements-air octane-card-frame-3 octane-card-frame-teal"
+                uniqueKey="achievements"
+                windowPosition={DraggableWindowPosition.TOP_CENTER}
+                offsetTop={-30}
+                data-view={selectedCategory ? 'category' : 'categories'}
+            >
+                <OctaneCard.Header headerText={LocalizeText('inventory.achievements')} onCloseClick={close} />
+                <OctaneCard.Content className="air-achievements-content">
+                    {!selectedCategory && (
+                        <>
+                            <AchievementsCategoryListView
+                                categories={achievementCategories}
+                                selectedCategoryCode={selectedCategoryCode}
+                                setSelectedCategoryCode={setSelectedCategoryCode}
                             />
-                            <div className="air-achievements-score">
-                                {LocalizeText('achievements.categories.score', ['score'], [achievementScore.toString()])}
+                            <div className="air-achievements-category-footer">
+                                <AirAchievementProgressBar
+                                    className="air-achievements-total-progress"
+                                    width={246}
+                                    maxProgress={getMaxProgress}
+                                    progress={getProgress}
+                                    key={getMaxProgress}
+                                    localizationKey="achievements.categories.totalprogress"
+                                />
+                                <div className="air-achievements-score">
+                                    {LocalizeText('achievements.categories.score', ['score'], [achievementScore.toString()])}
+                                </div>
                             </div>
-                        </div>
-                    </>
-                )}
-                {selectedCategory && (
-                    <>
-                        <div className="air-achievements-category-header">
-                            <BaseButton
-                                type="button"
-                                className="air-achievements-back"
-                                onClick={() => setSelectedCategoryCode(null)}
-                                aria-label={LocalizeText('generic.back')}
-                            />
-                            <div className="air-achievements-category-name">{AchievementUtilities.getAchievementCategoryName(selectedCategory)}</div>
-                            <div className="air-achievements-category-progress">
-                                {LocalizeText(
-                                    'achievements.details.categoryprogress',
-                                    ['progress', 'limit'],
-                                    [selectedCategory.getProgress().toString(), selectedCategory.getMaxProgress().toString()]
-                                )}
+                        </>
+                    )}
+                    {selectedCategory && (
+                        <>
+                            <div className="air-achievements-category-header">
+                                <BaseButton
+                                    type="button"
+                                    className="air-achievements-back"
+                                    onClick={() => setSelectedCategoryCode(null)}
+                                    aria-label={LocalizeText('generic.back')}
+                                />
+                                <div className="air-achievements-category-name">{AchievementUtilities.getAchievementCategoryName(selectedCategory)}</div>
+                                <div className="air-achievements-category-progress">
+                                    {LocalizeText(
+                                        'achievements.details.categoryprogress',
+                                        ['progress', 'limit'],
+                                        [selectedCategory.getProgress().toString(), selectedCategory.getMaxProgress().toString()]
+                                    )}
+                                </div>
+                                <img
+                                    className="air-achievements-category-icon"
+                                    src={AchievementUtilities.getAchievementCategoryImageUrl(selectedCategory, true)}
+                                    onError={(event) => {
+                                        event.currentTarget.style.visibility = 'hidden';
+                                    }}
+                                    onLoad={(event) => {
+                                        event.currentTarget.style.visibility = 'visible';
+                                    }}
+                                    alt=""
+                                    draggable={false}
+                                />
                             </div>
-                            <img
-                                className="air-achievements-category-icon"
-                                src={AchievementUtilities.getAchievementCategoryImageUrl(selectedCategory, true)}
-                                onError={(event) => {
-                                    event.currentTarget.style.visibility = 'hidden';
-                                }}
-                                onLoad={(event) => {
-                                    event.currentTarget.style.visibility = 'visible';
-                                }}
-                                alt=""
-                                draggable={false}
-                            />
-                        </div>
-                        <AchievementCategoryView category={selectedCategory} />
-                    </>
-                )}
-            </OctaneCard.Content>
-        </OctaneCard>
+                            <AchievementCategoryView category={selectedCategory} />
+                        </>
+                    )}
+                </OctaneCard.Content>
+            </OctaneCard>
+        </NativeTextTree>
     );
 };

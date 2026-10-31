@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { AchievementNotificationBubbleItem, CreateLinkEvent, GetConfigurationValue, LocalizeText, localizeWithFallback, NotificationBubbleItem } from '../../../../api';
 import { badgeRarityColorToCss, getBadgeRarityDisplayColor, getBadgeRarityFromPacket, getBadgeRarityLocalizationKey, isBadgeRarityStandaloneTier } from '../../../../api/badges/badgeRarity';
 import { LayoutNotificationBubbleViewProps } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { NotificationItemLayoutView } from './NotificationItemLayoutView';
 
 export interface NotificationBadgeReceivedBubbleViewProps extends LayoutNotificationBubbleViewProps {
@@ -28,13 +29,15 @@ export const NotificationBadgeReceivedBubbleView: FC<NotificationBadgeReceivedBu
     const openLink = () => CreateLinkEvent(isAchievement ? item.linkUrl : 'inventory/show/badges');
 
     return (
-        <NotificationItemLayoutView iconUrl={item.iconUrl} onClick={openLink} onClose={onClose} {...rest}>
-            <span>{text}</span>
-            {showRarity && (
-                <span className="octane-notification-item__rarity" style={{ color: badgeRarityColorToCss(getBadgeRarityDisplayColor(rarity.tier, uncommonEnabled)) }}>
-                    {LocalizeText(getBadgeRarityLocalizationKey(rarity.tier, uncommonEnabled))}
-                </span>
-            )}
-        </NotificationItemLayoutView>
+        <NativeTextTree>
+            <NotificationItemLayoutView iconUrl={item.iconUrl} onClick={openLink} onClose={onClose} {...rest}>
+                <span>{text}</span>
+                {showRarity && (
+                    <span className="octane-notification-item__rarity" style={{ color: badgeRarityColorToCss(getBadgeRarityDisplayColor(rarity.tier, uncommonEnabled)) }}>
+                        {LocalizeText(getBadgeRarityLocalizationKey(rarity.tier, uncommonEnabled))}
+                    </span>
+                )}
+            </NotificationItemLayoutView>
+        </NativeTextTree>
     );
 };

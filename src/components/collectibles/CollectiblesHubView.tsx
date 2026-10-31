@@ -12,6 +12,7 @@ import { CollectiblesMintTabView } from './CollectiblesMintTabView';
 import { CollectiblesRewardsTabView } from './CollectiblesRewardsTabView';
 import { CollectiblesShopTabView } from './CollectiblesShopTabView';
 import { CollectiblesTransferTabView } from './CollectiblesTransferTabView';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 /**
  * The official collectibles hub (`collectible_view_xml`, 500x600): the collector header with XP, high
@@ -30,60 +31,62 @@ export const CollectiblesHubView: FC = () => {
     const levelColor = toHexColor(collectorLevelColor(score?.level ?? 0));
 
     return (
-        <OctaneCardView classNames={['octane-collectibles-hub']} frameStyle={3} isResizable={false} uniqueKey="collectibles-hub">
-            <OctaneCardHeaderView headerText={localizeWithFallback('collectibles.title', 'Collectibles')} onCloseClick={() => closeHub?.()} />
-            <div className="octane-collectibles-hub-content" data-testid="collectibles-hub">
-                <div className="octane-collectibles-header">
-                    <div className="octane-collectibles-header-gradient" />
-                    <div className="octane-collectibles-header-bg-left" />
-                    <div className="octane-collectibles-header-bg-right" />
-                    <div className="octane-collectibles-level-strip" style={{ backgroundColor: levelColor }} />
-                    <div className="octane-collectibles-level-element" style={{ backgroundColor: levelColor }} />
-                    <div className="octane-collectibles-cabinet" />
-                    <div className="octane-collectibles-score">
-                        <span className="octane-collectibles-score-key">{localizeWithFallback('collectibles.score', 'Collector XP:')}</span>
-                        <span className="octane-collectibles-score-value" data-testid="collectibles-score">
-                            {score?.score ?? 0}
-                        </span>
-                        <span className="octane-collectibles-score-key">{localizeWithFallback('collectibles.high_score', 'All time highest XP:')}</span>
-                        <span className="octane-collectibles-score-value">{score?.highestScore ?? 0}</span>
+        <NativeTextTree>
+            <OctaneCardView classNames={['octane-collectibles-hub']} frameStyle={3} isResizable={false} uniqueKey="collectibles-hub">
+                <OctaneCardHeaderView headerText={localizeWithFallback('collectibles.title', 'Collectibles')} onCloseClick={() => closeHub?.()} />
+                <div className="octane-collectibles-hub-content" data-testid="collectibles-hub">
+                    <div className="octane-collectibles-header">
+                        <div className="octane-collectibles-header-gradient" />
+                        <div className="octane-collectibles-header-bg-left" />
+                        <div className="octane-collectibles-header-bg-right" />
+                        <div className="octane-collectibles-level-strip" style={{ backgroundColor: levelColor }} />
+                        <div className="octane-collectibles-level-element" style={{ backgroundColor: levelColor }} />
+                        <div className="octane-collectibles-cabinet" />
+                        <div className="octane-collectibles-score">
+                            <span className="octane-collectibles-score-key">{localizeWithFallback('collectibles.score', 'Collector XP:')}</span>
+                            <span className="octane-collectibles-score-value" data-testid="collectibles-score">
+                                {score?.score ?? 0}
+                            </span>
+                            <span className="octane-collectibles-score-key">{localizeWithFallback('collectibles.high_score', 'All time highest XP:')}</span>
+                            <span className="octane-collectibles-score-value">{score?.highestScore ?? 0}</span>
+                        </div>
+                        <div className="octane-collectibles-level">
+                            <span className="octane-collectibles-level-value" data-testid="collectibles-level">
+                                {score?.level ?? 0}
+                            </span>
+                            <span className="octane-collectibles-level-title">{localizeWithFallback('collectibles.level', 'Level').toUpperCase()}</span>
+                        </div>
+                        <div className="octane-collectibles-currency is-silver">
+                            <span data-testid="collectibles-silver">{silver}</span>
+                            <img alt="" draggable={false} src={silverIcon} />
+                        </div>
+                        <div className="octane-collectibles-currency is-emerald">
+                            <span data-testid="collectibles-emeralds">{emeralds}</span>
+                            <img alt="" draggable={false} src={emeraldIcon} />
+                        </div>
                     </div>
-                    <div className="octane-collectibles-level">
-                        <span className="octane-collectibles-level-value" data-testid="collectibles-level">
-                            {score?.level ?? 0}
-                        </span>
-                        <span className="octane-collectibles-level-title">{localizeWithFallback('collectibles.level', 'Level').toUpperCase()}</span>
+                    <div className="octane-collectibles-tabs" role="tablist">
+                        {tabs.map((tab) => (
+                            <ToggleButton
+                                key={tab}
+                                className={`octane-collectibles-tab${currentTab === tab ? ' is-active' : ''}`}
+                                pressed={currentTab === tab}
+                                onClick={() => setCurrentTab?.(tab)}
+                            >
+                                {localizeWithFallback(TAB_CAPTIONS[tab][0], TAB_CAPTIONS[tab][1])}
+                            </ToggleButton>
+                        ))}
                     </div>
-                    <div className="octane-collectibles-currency is-silver">
-                        <span data-testid="collectibles-silver">{silver}</span>
-                        <img alt="" draggable={false} src={silverIcon} />
-                    </div>
-                    <div className="octane-collectibles-currency is-emerald">
-                        <span data-testid="collectibles-emeralds">{emeralds}</span>
-                        <img alt="" draggable={false} src={emeraldIcon} />
+                    <div className="octane-collectibles-tab-content">
+                        {currentTab === 'rewards' && <CollectiblesRewardsTabView />}
+                        {currentTab === 'collections' && <CollectiblesCollectionsTabView />}
+                        {currentTab === 'shop' && <CollectiblesShopTabView />}
+                        {currentTab === 'minting' && <CollectiblesMintTabView />}
+                        {currentTab === 'transfer' && <CollectiblesTransferTabView />}
+                        {currentTab === 'info' && <CollectiblesInfoTabView />}
                     </div>
                 </div>
-                <div className="octane-collectibles-tabs" role="tablist">
-                    {tabs.map((tab) => (
-                        <ToggleButton
-                            key={tab}
-                            className={`octane-collectibles-tab${currentTab === tab ? ' is-active' : ''}`}
-                            pressed={currentTab === tab}
-                            onClick={() => setCurrentTab?.(tab)}
-                        >
-                            {localizeWithFallback(TAB_CAPTIONS[tab][0], TAB_CAPTIONS[tab][1])}
-                        </ToggleButton>
-                    ))}
-                </div>
-                <div className="octane-collectibles-tab-content">
-                    {currentTab === 'rewards' && <CollectiblesRewardsTabView />}
-                    {currentTab === 'collections' && <CollectiblesCollectionsTabView />}
-                    {currentTab === 'shop' && <CollectiblesShopTabView />}
-                    {currentTab === 'minting' && <CollectiblesMintTabView />}
-                    {currentTab === 'transfer' && <CollectiblesTransferTabView />}
-                    {currentTab === 'info' && <CollectiblesInfoTabView />}
-                </div>
-            </div>
-        </OctaneCardView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

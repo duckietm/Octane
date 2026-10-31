@@ -4,6 +4,7 @@ import { ChatEntryPlainText, ChatEntryType, IChatEntry, localizeWithFallback, Lo
 import { AutoGrid, Button, Column, Flex, LayoutAvatarImageView, LayoutGridItem, Text } from '../../../common';
 import { useChatHistory, useFriendsState, useHelp, useMessenger } from '../../../hooks';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 export const SelectReportedChatsView: FC<{}> = (props) => {
     const [selectedChats, setSelectedChats] = useState<IChatEntry[]>([]);
@@ -72,49 +73,51 @@ export const SelectReportedChatsView: FC<{}> = (props) => {
     };
 
     return (
-        <>
-            <div className="flex flex-col gap-1">
-                <Text fontSize={4}>{LocalizeText('help.emergency.chat_report.subtitle')}</Text>
-                <Text>{LocalizeText('help.emergency.chat_report.description')}</Text>
-            </div>
-            {reportedUser && (
-                <div className="octane-help-selected-user">
-                    <span className="octane-help-user__avatar">
-                        <LayoutAvatarImageView headOnly compactHead compactHeadSize={30} compactHeadPadding={0} direction={2} figure={reportedUser.look ?? ''} />
-                    </span>
-                    <span className="octane-help-selected-user__text">
-                        <span>{localizeWithFallback('help.cfh.selected_user.title', 'Selected user')}</span>
-                        <b>{reportedUser.name}</b>
-                    </span>
-                    {activeReport.reportType !== ReportType.IM && (
-                        <BaseButton className="help-link" type="button" onClick={changeUser}>
-                            {localizeWithFallback('help.cfh.selected_user.change', 'Select another user')}
-                        </BaseButton>
-                    )}
+        <NativeTextTree>
+            <>
+                <div className="flex flex-col gap-1">
+                    <Text fontSize={4}>{LocalizeText('help.emergency.chat_report.subtitle')}</Text>
+                    <Text>{LocalizeText('help.emergency.chat_report.description')}</Text>
                 </div>
-            )}
-            <Column gap={1} overflow="hidden">
-                {!userChats || (!userChats.length && <Text>{LocalizeText('help.cfh.error.no_user_data')}</Text>)}
-                {userChats.length > 0 && (
-                    <AutoGrid columnCount={1} columnMinHeight={25} gap={1} overflow="auto">
-                        {userChats.map((chat, index) => {
-                            return (
-                                <LayoutGridItem key={chat.id} itemActive={selectedChats.indexOf(chat) >= 0} onClick={(event) => selectChat(chat)}>
-                                    <Text>{ChatEntryPlainText(chat)}</Text>
-                                </LayoutGridItem>
-                            );
-                        })}
-                    </AutoGrid>
+                {reportedUser && (
+                    <div className="octane-help-selected-user">
+                        <span className="octane-help-user__avatar">
+                            <LayoutAvatarImageView headOnly compactHead compactHeadSize={30} compactHeadPadding={0} direction={2} figure={reportedUser.look ?? ''} />
+                        </span>
+                        <span className="octane-help-selected-user__text">
+                            <span>{localizeWithFallback('help.cfh.selected_user.title', 'Selected user')}</span>
+                            <b>{reportedUser.name}</b>
+                        </span>
+                        {activeReport.reportType !== ReportType.IM && (
+                            <BaseButton className="help-link" type="button" onClick={changeUser}>
+                                {localizeWithFallback('help.cfh.selected_user.change', 'Select another user')}
+                            </BaseButton>
+                        )}
+                    </div>
                 )}
-            </Column>
-            <Flex gap={2} justifyContent="between">
-                <Button disabled={activeReport.reportType === ReportType.IM} variant="secondary" onClick={back}>
-                    {LocalizeText('generic.back')}
-                </Button>
-                <Button disabled={selectedChats.length <= 0} onClick={submitChats}>
-                    {LocalizeText('help.emergency.main.submit.button')}
-                </Button>
-            </Flex>
-        </>
+                <Column gap={1} overflow="hidden">
+                    {!userChats || (!userChats.length && <Text>{LocalizeText('help.cfh.error.no_user_data')}</Text>)}
+                    {userChats.length > 0 && (
+                        <AutoGrid columnCount={1} columnMinHeight={25} gap={1} overflow="auto">
+                            {userChats.map((chat, index) => {
+                                return (
+                                    <LayoutGridItem key={chat.id} itemActive={selectedChats.indexOf(chat) >= 0} onClick={(event) => selectChat(chat)}>
+                                        <Text>{ChatEntryPlainText(chat)}</Text>
+                                    </LayoutGridItem>
+                                );
+                            })}
+                        </AutoGrid>
+                    )}
+                </Column>
+                <Flex gap={2} justifyContent="between">
+                    <Button disabled={activeReport.reportType === ReportType.IM} variant="secondary" onClick={back}>
+                        {LocalizeText('generic.back')}
+                    </Button>
+                    <Button disabled={selectedChats.length <= 0} onClick={submitChats}>
+                        {LocalizeText('help.emergency.main.submit.button')}
+                    </Button>
+                </Flex>
+            </>
+        </NativeTextTree>
     );
 };

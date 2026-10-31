@@ -22,6 +22,7 @@ import { useInventoryBadges, useInventoryUnseenTracker, useNotification } from '
 import { OctaneButton } from '../../../../layout';
 import { InventoryBadgeItemView } from './InventoryBadgeItemView';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const ActiveBadgeSlot: FC<{
     slotIndex: number;
@@ -34,32 +35,34 @@ const ActiveBadgeSlot: FC<{
     const [isDragOver, setIsDragOver] = useState(false);
 
     return (
-        <div
-            className={`octane-inventory-badge-slot ${badgeCode ? 'has-badge octane-inventory-thumb octane-inventory-badge-cell' : 'is-empty'} ${isSelected ? 'is-selected' : ''} ${isDragOver ? 'is-dragover' : ''}`}
-            draggable={!!badgeCode}
-            onDragEnd={() => undefined}
-            onDragLeave={() => setIsDragOver(false)}
-            onDragOver={(event) => {
-                event.preventDefault();
-                event.dataTransfer.dropEffect = 'move';
-                setIsDragOver(true);
-            }}
-            onDragStart={(event) => {
-                if (!badgeCode) return;
-                onDragStartFromSlot(event, badgeCode, slotIndex);
-            }}
-            onDrop={(event) => {
-                event.preventDefault();
-                setIsDragOver(false);
-                const droppedBadgeCode = event.dataTransfer.getData('badgeCode');
-                const sourceSlotStr = event.dataTransfer.getData('activeSlot');
-                const sourceSlot = sourceSlotStr !== '' ? parseInt(sourceSlotStr) : undefined;
-                if (droppedBadgeCode) onDropBadge(droppedBadgeCode, slotIndex, sourceSlot);
-            }}
-            onMouseDown={() => badgeCode && onSelectBadge(badgeCode)}
-        >
-            {badgeCode ? <LayoutBadgeImageView badgeCode={badgeCode} /> : null}
-        </div>
+        <NativeTextTree>
+            <div
+                className={`octane-inventory-badge-slot ${badgeCode ? 'has-badge octane-inventory-thumb octane-inventory-badge-cell' : 'is-empty'} ${isSelected ? 'is-selected' : ''} ${isDragOver ? 'is-dragover' : ''}`}
+                draggable={!!badgeCode}
+                onDragEnd={() => undefined}
+                onDragLeave={() => setIsDragOver(false)}
+                onDragOver={(event) => {
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = 'move';
+                    setIsDragOver(true);
+                }}
+                onDragStart={(event) => {
+                    if (!badgeCode) return;
+                    onDragStartFromSlot(event, badgeCode, slotIndex);
+                }}
+                onDrop={(event) => {
+                    event.preventDefault();
+                    setIsDragOver(false);
+                    const droppedBadgeCode = event.dataTransfer.getData('badgeCode');
+                    const sourceSlotStr = event.dataTransfer.getData('activeSlot');
+                    const sourceSlot = sourceSlotStr !== '' ? parseInt(sourceSlotStr) : undefined;
+                    if (droppedBadgeCode) onDropBadge(droppedBadgeCode, slotIndex, sourceSlot);
+                }}
+                onMouseDown={() => badgeCode && onSelectBadge(badgeCode)}
+            >
+                {badgeCode ? <LayoutBadgeImageView badgeCode={badgeCode} /> : null}
+            </div>
+        </NativeTextTree>
     );
 };
 
@@ -206,131 +209,133 @@ export const InventoryBadgeView: FC<{ filteredBadgeCodes?: string[] }> = (props)
     const rarityText = rarityStat ? localizeWithFallback('badge.rarity.badge', `${rarityLabel} badge`, ['rarity'], [rarityLabel]) : '';
 
     return (
-        <div className="octane-inventory-badges">
-            <div className="octane-inventory-badges-main">
-                <div
-                    className={`octane-inventory-badges-owned ${isDragOverInventory && isDraggingFromActive ? 'is-drop-remove' : ''}`}
-                    onDragLeave={() => {
-                        setIsDragOverInventory(false);
-                        setIsDraggingFromActive(false);
-                    }}
-                    onDragOver={(event) => {
-                        event.preventDefault();
-                        event.dataTransfer.dropEffect = 'move';
-                        setIsDraggingFromActive(event.dataTransfer.types.includes('activeslot'));
-                        setIsDragOverInventory(true);
-                    }}
-                    onDrop={(event) => {
-                        event.preventDefault();
-                        setIsDragOverInventory(false);
-                        setIsDraggingFromActive(false);
-                        const badgeCode = event.dataTransfer.getData('badgeCode');
-                        const source = event.dataTransfer.getData('source');
-                        if (source === 'active' && badgeCode) removeBadge(badgeCode);
-                    }}
-                >
-                    <div className="octane-inventory-badges-owned-grid" key={currentPage}>
-                        {inactiveCodes.slice(currentPage * 200, (currentPage + 1) * 200).map((code) => (
-                            <InventoryBadgeItemView key={code} badgeCode={code} />
-                        ))}
-                    </div>
-                    {pageCount > 1 && (
-                        <div className="octane-inventory-badges-pages">
-                            {Array.from({ length: pageCount }, (_, index) => (
-                                <BaseButton key={index} type="button" className={currentPage === index ? 'is-active' : ''} onClick={() => setPage(index)}>
-                                    {index}
-                                </BaseButton>
+        <NativeTextTree>
+            <div className="octane-inventory-badges">
+                <div className="octane-inventory-badges-main">
+                    <div
+                        className={`octane-inventory-badges-owned ${isDragOverInventory && isDraggingFromActive ? 'is-drop-remove' : ''}`}
+                        onDragLeave={() => {
+                            setIsDragOverInventory(false);
+                            setIsDraggingFromActive(false);
+                        }}
+                        onDragOver={(event) => {
+                            event.preventDefault();
+                            event.dataTransfer.dropEffect = 'move';
+                            setIsDraggingFromActive(event.dataTransfer.types.includes('activeslot'));
+                            setIsDragOverInventory(true);
+                        }}
+                        onDrop={(event) => {
+                            event.preventDefault();
+                            setIsDragOverInventory(false);
+                            setIsDraggingFromActive(false);
+                            const badgeCode = event.dataTransfer.getData('badgeCode');
+                            const source = event.dataTransfer.getData('source');
+                            if (source === 'active' && badgeCode) removeBadge(badgeCode);
+                        }}
+                    >
+                        <div className="octane-inventory-badges-owned-grid" key={currentPage}>
+                            {inactiveCodes.slice(currentPage * 200, (currentPage + 1) * 200).map((code) => (
+                                <InventoryBadgeItemView key={code} badgeCode={code} />
                             ))}
                         </div>
-                    )}
-                </div>
-                <div className="octane-inventory-badges-wearing">
-                    <div className="octane-inventory-badges-wearing-title">{localizeWithFallback('inventory.badges.activebadges', 'Wearing')}</div>
-                    <div className="octane-inventory-badges-wearing-grid">
-                        {Array.from({ length: maxSlots }).map((_, index) => (
-                            <ActiveBadgeSlot
-                                key={index}
-                                badgeCode={activeBadgeCodes[index]}
-                                isSelected={selectedBadgeCode === activeBadgeCodes[index] && !!activeBadgeCodes[index]}
-                                slotIndex={index}
-                                onDropBadge={handleDropOnSlot}
-                                onDragStartFromSlot={handleDragStartFromSlot}
-                                onSelectBadge={setSelectedBadgeCode}
-                            />
-                        ))}
+                        {pageCount > 1 && (
+                            <div className="octane-inventory-badges-pages">
+                                {Array.from({ length: pageCount }, (_, index) => (
+                                    <BaseButton key={index} type="button" className={currentPage === index ? 'is-active' : ''} onClick={() => setPage(index)}>
+                                        {index}
+                                    </BaseButton>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <div className="octane-inventory-badges-wearing">
+                        <div className="octane-inventory-badges-wearing-title">{localizeWithFallback('inventory.badges.activebadges', 'Wearing')}</div>
+                        <div className="octane-inventory-badges-wearing-grid">
+                            {Array.from({ length: maxSlots }).map((_, index) => (
+                                <ActiveBadgeSlot
+                                    key={index}
+                                    badgeCode={activeBadgeCodes[index]}
+                                    isSelected={selectedBadgeCode === activeBadgeCodes[index] && !!activeBadgeCodes[index]}
+                                    slotIndex={index}
+                                    onDropBadge={handleDropOnSlot}
+                                    onDragStartFromSlot={handleDragStartFromSlot}
+                                    onSelectBadge={setSelectedBadgeCode}
+                                />
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div className="octane-inventory-badges-footer">
-                {selectedBadgeCode ? (
-                    <>
-                        <div className="octane-inventory-badges-footer-image">
-                            <LayoutBadgeImageView badgeCode={selectedBadgeCode} />
-                        </div>
-                        <div className="octane-inventory-badges-footer-details">
-                            <div className="octane-inventory-badges-footer-name">{LocalizeBadgeName(selectedBadgeCode)}</div>
-                            {description && description !== selectedBadgeCode && <div className="octane-inventory-badges-footer-desc">{description}</div>}
-                            <div className="octane-inventory-badges-footer-meta">
-                                {rarityText && <span className={`octane-inventory-badge-rarity rarity-${rarityStat.rarity}`}>{rarityText}</span>}
-                                {rarityStat && rarityStat.ownerCount > 0 && rarityStat.ownerCount < 1000 && (
-                                    <span className="octane-inventory-badge-owners">
-                                        {localizeWithFallback(
-                                            'badge.owner_count',
-                                            `${rarityStat.ownerCount.toLocaleString()} owners`,
-                                            ['count'],
-                                            [rarityStat.ownerCount.toLocaleString()]
-                                        )}
-                                    </span>
-                                )}
+                <div className="octane-inventory-badges-footer">
+                    {selectedBadgeCode ? (
+                        <>
+                            <div className="octane-inventory-badges-footer-image">
+                                <LayoutBadgeImageView badgeCode={selectedBadgeCode} />
                             </div>
-                        </div>
-                        <div className="octane-inventory-badges-footer-actions">
-                            <OctaneButton
-                                className="button-shiny octane-inventory-btn-wear"
-                                disabled={!isWearingBadge(selectedBadgeCode) && !canWearBadges()}
-                                onClick={() => toggleBadge(selectedBadgeCode)}
-                            >
-                                {isWearingBadge(selectedBadgeCode)
-                                    ? localizeWithFallback('inventory.badges.clearbadge', 'Clear badge')
-                                    : localizeWithFallback('inventory.badges.wearbadge', 'Wear badge')}
-                            </OctaneButton>
-                        </div>
-                    </>
-                ) : (
-                    <OctaneButton className="button-shiny octane-inventory-btn-wear octane-inventory-badge-wear-empty" disabled>
-                        {localizeWithFallback('inventory.badges.wearbadge', 'Wear badge')}
-                    </OctaneButton>
-                )}
-            </div>
-            <div className="octane-inventory-badges-polaris-row">
-                {selectedBadgeCode && (
-                    <>
-                        {isOwnCustomBadge(selectedBadgeCode) && (
-                            <OctaneButton className="octane-inventory-btn-icon" onClick={handleEditCustom}>
-                                <FaPencilAlt className="fa-icon" />
-                            </OctaneButton>
-                        )}
-                        {!isWearingBadge(selectedBadgeCode) && (
-                            <OctaneButton
-                                className="octane-inventory-btn-delete"
-                                onClick={isOwnCustomBadge(selectedBadgeCode) ? handleDeleteCustom : attemptDeleteBadge}
-                            >
-                                <FaTrashAlt className="fa-icon" />
-                            </OctaneButton>
-                        )}
-                    </>
-                )}
+                            <div className="octane-inventory-badges-footer-details">
+                                <div className="octane-inventory-badges-footer-name">{LocalizeBadgeName(selectedBadgeCode)}</div>
+                                {description && description !== selectedBadgeCode && <div className="octane-inventory-badges-footer-desc">{description}</div>}
+                                <div className="octane-inventory-badges-footer-meta">
+                                    {rarityText && <span className={`octane-inventory-badge-rarity rarity-${rarityStat.rarity}`}>{rarityText}</span>}
+                                    {rarityStat && rarityStat.ownerCount > 0 && rarityStat.ownerCount < 1000 && (
+                                        <span className="octane-inventory-badge-owners">
+                                            {localizeWithFallback(
+                                                'badge.owner_count',
+                                                `${rarityStat.ownerCount.toLocaleString()} owners`,
+                                                ['count'],
+                                                [rarityStat.ownerCount.toLocaleString()]
+                                            )}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="octane-inventory-badges-footer-actions">
+                                <OctaneButton
+                                    className="button-shiny octane-inventory-btn-wear"
+                                    disabled={!isWearingBadge(selectedBadgeCode) && !canWearBadges()}
+                                    onClick={() => toggleBadge(selectedBadgeCode)}
+                                >
+                                    {isWearingBadge(selectedBadgeCode)
+                                        ? localizeWithFallback('inventory.badges.clearbadge', 'Clear badge')
+                                        : localizeWithFallback('inventory.badges.wearbadge', 'Wear badge')}
+                                </OctaneButton>
+                            </div>
+                        </>
+                    ) : (
+                        <OctaneButton className="button-shiny octane-inventory-btn-wear octane-inventory-badge-wear-empty" disabled>
+                            {localizeWithFallback('inventory.badges.wearbadge', 'Wear badge')}
+                        </OctaneButton>
+                    )}
+                </div>
+                <div className="octane-inventory-badges-polaris-row">
+                    {selectedBadgeCode && (
+                        <>
+                            {isOwnCustomBadge(selectedBadgeCode) && (
+                                <OctaneButton className="octane-inventory-btn-icon" onClick={handleEditCustom}>
+                                    <FaPencilAlt className="fa-icon" />
+                                </OctaneButton>
+                            )}
+                            {!isWearingBadge(selectedBadgeCode) && (
+                                <OctaneButton
+                                    className="octane-inventory-btn-delete"
+                                    onClick={isOwnCustomBadge(selectedBadgeCode) ? handleDeleteCustom : attemptDeleteBadge}
+                                >
+                                    <FaTrashAlt className="fa-icon" />
+                                </OctaneButton>
+                            )}
+                        </>
+                    )}
 
-                <BaseButton type="button" className={customFilter === 'all' ? 'is-active' : ''} onClick={() => setCustomFilter('all')}>
-                    {localizeWithFallback('inventory.badges.tab.all', 'All')} ({baseCodes.length})
-                </BaseButton>
-                <BaseButton type="button" className={customFilter === 'custom' ? 'is-active' : ''} onClick={() => setCustomFilter('custom')}>
-                    {localizeWithFallback('inventory.badges.tab.custom', 'Custom')} ({customCount})
-                </BaseButton>
-                <BaseButton type="button" className="is-create" onClick={() => CreateLinkEvent('badge-creator/show')}>
-                    <FaPaintBrush className="fa-icon" /> {localizeWithFallback('inventory.badges.create', 'Create badge')}
-                </BaseButton>
+                    <BaseButton type="button" className={customFilter === 'all' ? 'is-active' : ''} onClick={() => setCustomFilter('all')}>
+                        {localizeWithFallback('inventory.badges.tab.all', 'All')} ({baseCodes.length})
+                    </BaseButton>
+                    <BaseButton type="button" className={customFilter === 'custom' ? 'is-active' : ''} onClick={() => setCustomFilter('custom')}>
+                        {localizeWithFallback('inventory.badges.tab.custom', 'Custom')} ({customCount})
+                    </BaseButton>
+                    <BaseButton type="button" className="is-create" onClick={() => CreateLinkEvent('badge-creator/show')}>
+                        <FaPaintBrush className="fa-icon" /> {localizeWithFallback('inventory.badges.create', 'Create badge')}
+                    </BaseButton>
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

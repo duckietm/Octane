@@ -39,6 +39,7 @@ import { applyRoomZoom } from './room-tools/roomZoom.helpers';
 import { WiredContractWidgetView } from './wired-contract/WiredContractWidgetView';
 import { WiredLinkWidgetView } from './wired-link/WiredLinkWidgetView';
 import { WordQuizWidgetView } from './word-quiz/WordQuizWidgetView';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const MAX_ZOOM_SHIFT = 3;
 
@@ -228,83 +229,85 @@ export const RoomWidgetsView: FC<{}> = (props) => {
     );
 
     return (
-        <WidgetErrorBoundary name="RoomWidgets">
-            <div className="absolute top-0 left-0 pointer-events-none size-full">
-                <WidgetErrorBoundary name="FurnitureWidgets">
-                    <FurnitureWidgetsView />
-                </WidgetErrorBoundary>
-            </div>
-            {adTooltip && (
-                <div className="octane-room-ad-tooltip absolute left-1/2 top-[40%] -translate-x-1/2 pointer-events-none z-10 max-w-[260px] rounded-md bg-[rgba(34,34,30,0.9)] px-3 py-2 text-center text-[12px] text-white">
-                    {adTooltip.text}
+        <NativeTextTree>
+            <WidgetErrorBoundary name="RoomWidgets">
+                <div className="absolute top-0 left-0 pointer-events-none size-full">
+                    <WidgetErrorBoundary name="FurnitureWidgets">
+                        <FurnitureWidgetsView />
+                    </WidgetErrorBoundary>
                 </div>
-            )}
-            <WidgetErrorBoundary name="AvatarInfoWidget">
-                <AvatarInfoWidgetView />
+                {adTooltip && (
+                    <div className="octane-room-ad-tooltip absolute left-1/2 top-[40%] -translate-x-1/2 pointer-events-none z-10 max-w-[260px] rounded-md bg-[rgba(34,34,30,0.9)] px-3 py-2 text-center text-[12px] text-white">
+                        {adTooltip.text}
+                    </div>
+                )}
+                <WidgetErrorBoundary name="AvatarInfoWidget">
+                    <AvatarInfoWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="ChatWidget">
+                    <ChatWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="ChatInput">
+                    <ChatInputView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="RoomKeybind">
+                    <RoomKeybindView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="DoorbellWidget">
+                    <DoorbellWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="WiredLinkWidget">
+                    <WiredLinkWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="WiredContractWidget">
+                    <WiredContractWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="BuildHeightWidget">
+                    <BuildHeightWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="RoomToolsWidget">
+                    <RoomToolsWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="RoomFilterWordsWidget">
+                    <RoomFilterWordsWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="RoomThumbnailWidget">
+                    <RoomThumbnailWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="FurniChooserWidget">
+                    <FurniChooserWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="PetPackageWidget">
+                    <PetPackageWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="UserChooserWidget">
+                    <UserChooserWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="WordQuizWidget">
+                    <WordQuizWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="PollWidget">
+                    <PollWidgetView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="FurniRentConfirm">
+                    <FurniRentConfirmView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="RoomCompetition">
+                    <RoomCompetitionView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="AchievementResolution">
+                    <AchievementResolutionView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="PetBreeding">
+                    <PetBreedingView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="MonsterPlantBreeding">
+                    <MonsterPlantBreedingView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="FriendRequestWidget">
+                    <FriendRequestWidgetView />
+                </WidgetErrorBoundary>
             </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="ChatWidget">
-                <ChatWidgetView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="ChatInput">
-                <ChatInputView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="RoomKeybind">
-                <RoomKeybindView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="DoorbellWidget">
-                <DoorbellWidgetView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="WiredLinkWidget">
-                <WiredLinkWidgetView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="WiredContractWidget">
-                <WiredContractWidgetView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="BuildHeightWidget">
-                <BuildHeightWidgetView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="RoomToolsWidget">
-                <RoomToolsWidgetView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="RoomFilterWordsWidget">
-                <RoomFilterWordsWidgetView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="RoomThumbnailWidget">
-                <RoomThumbnailWidgetView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="FurniChooserWidget">
-                <FurniChooserWidgetView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="PetPackageWidget">
-                <PetPackageWidgetView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="UserChooserWidget">
-                <UserChooserWidgetView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="WordQuizWidget">
-                <WordQuizWidgetView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="PollWidget">
-                <PollWidgetView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="FurniRentConfirm">
-                <FurniRentConfirmView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="RoomCompetition">
-                <RoomCompetitionView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="AchievementResolution">
-                <AchievementResolutionView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="PetBreeding">
-                <PetBreedingView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="MonsterPlantBreeding">
-                <MonsterPlantBreedingView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="FriendRequestWidget">
-                <FriendRequestWidgetView />
-            </WidgetErrorBoundary>
-        </WidgetErrorBoundary>
+        </NativeTextTree>
     );
 };
