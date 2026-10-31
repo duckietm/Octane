@@ -5,6 +5,7 @@ import { UserIdentityView } from '../../../../common';
 import { useOnClickChat } from '../../../../hooks';
 import { useUserDataSnapshot } from '../../../../hooks/session/useSessionSnapshots';
 import { CHAT_TEXT_SIZE_EVENT, CHAT_TEXT_SIZE_PIXELS, ChatTextSize, getStoredChatTextSize } from '../chat-input/chatTextSize';
+import { ChatNativeContent } from './ChatNativeContent';
 import { measureBubbleVisualOffsets } from './chatBubbleMetrics';
 import { highlightMentions } from './highlightMentions';
 
@@ -196,7 +197,29 @@ const ChatWidgetMessageViewBase: FC<ChatWidgetMessageViewProps> = ({
                     )}
                 </div>
                 <div className="chat-content py-[5px] px-[6px] ml-[27px] leading-none min-h-[25px]">
-                    {!chat.hideUsername && (
+                    {!chat.showTranslation && (
+                        <ChatNativeContent measureKey={`${chat.username}|${chat.hideUsername}|${chat.type}|${chat.styleId}|${chatTextSize}|${bubbleWidth}|${formattedText}`}>
+                            {!chat.hideUsername && (
+                                <UserIdentityView
+                                    className="mr-1 align-middle"
+                                    displayOrder={chat.displayOrder}
+                                    iconClassName="inline-block w-auto h-auto align-[-1px]"
+                                    nameClassName="username font-bold"
+                                    nickIcon={chat.nickIcon}
+                                    prefixClassName=""
+                                    prefixColor={chat.prefixColor}
+                                    prefixEffect={chat.prefixEffect}
+                                    prefixFont={chat.prefixFont}
+                                    prefixIcon={chat.prefixIcon}
+                                    prefixText={chat.prefixText}
+                                    showColon={true}
+                                    username={chat.username}
+                                />
+                            )}
+                            <span className={`${messageClassName} align-middle`} dangerouslySetInnerHTML={{ __html: formattedText }} onClick={onClickChat} />
+                        </ChatNativeContent>
+                    )}
+                    {chat.showTranslation && !chat.hideUsername && (
                         <UserIdentityView
                             className="mr-1 align-middle"
                             displayOrder={chat.displayOrder}
@@ -212,9 +235,6 @@ const ChatWidgetMessageViewBase: FC<ChatWidgetMessageViewProps> = ({
                             showColon={true}
                             username={chat.username}
                         />
-                    )}
-                    {!chat.showTranslation && (
-                        <span className={`${messageClassName} align-middle`} dangerouslySetInnerHTML={{ __html: formattedText }} onClick={onClickChat} />
                     )}
                     {chat.showTranslation && (
                         <div className="mt-[2px] flex flex-col gap-[2px]" onClick={onClickChat}>

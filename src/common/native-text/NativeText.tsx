@@ -3,6 +3,7 @@ import { compositeRetainedToOpaque, resolveLineMetrics } from './NativeTextRende
 import { renderCanvasSpacedText, supportsCanvasSpacedText } from './CanvasSpacedText';
 import { loadNativeFont, measureNativeText, NativeFontStyle, peekNativeFont, supportsNativeText, unpremultiplyPixels } from './NativeFont';
 import { useNativeTextSampling, useNativeTextScale } from './NativeTextScale';
+import { nativeTextRasterCache } from './NativeTextRasterCache';
 import { NativeTextStyleName, nativeTextStyles } from './NativeTextStyles';
 
 /** A drawn raster handed to `onRaster`: the 1x or display-scale canvas, the text it shows and the surface colour it was composited against (null: transparent). */
@@ -157,6 +158,24 @@ export const NativeText: FC<NativeTextProps> = ({
                 }
             }
 
+            // The same label drawn before (every "0" of a list, a window opened again) is copied, not rasterised again.
+            const cacheKey = `${styleKey}|${background}|${maxWidth}|${leading}|${cssLineHeight}|${align}|${scale}|${text}`;
+            const cached = nativeTextRasterCache.get(cacheKey);
+
+            if (cached) {
+                const canvas = canvasRef.current;
+
+                if (!canvas) return;
+
+                canvas.width = cached.image.width;
+                canvas.height = cached.image.height;
+                canvas.getContext('2d').putImageData(cached.image, 0, 0);
+                setSize({ width: cached.width, height: cached.height });
+                onRasterRef.current?.({ canvas, text, background });
+
+                return;
+            }
+
             // An already loaded font draws without awaiting, inside this layout effect, so a remounted label never shows a frame of browser text.
             const loaded = peekNativeFont(fontStyle) ?? (await loadNativeFont(fontStyle));
             if (disposed || !supportsNativeText(loaded.font, text.replace(/[\r\n]/g, ''))) return;
@@ -190,6 +209,7 @@ export const NativeText: FC<NativeTextProps> = ({
                     fontStyle: fontStyle.italic ? 'italic' : 'normal',
                     stageQuality: 'high',
                     renderingPipeline: 'habbo-retained',
+                    rasterCache: loaded.rasterCache,
                     etchingColor: fontStyle.etchingColor,
                     etchingPosition: fontStyle.etchingPosition,
                     textDecoration: fontStyle.underline ? 'underline' : null,
@@ -216,7 +236,9 @@ export const NativeText: FC<NativeTextProps> = ({
                 background === null
                     ? unpremultiplyPixels(pixels)
                     : compositeRetainedToOpaque(pixels, [(background >>> 16) & 255, (background >>> 8) & 255, background & 255, 255]);
-            canvas.getContext('2d').putImageData(new ImageData(composited, pixelWidth, pixelHeight), 0, 0);
+            const image = new ImageData(composited, pixelWidth, pixelHeight);
+            canvas.getContext('2d').putImageData(image, 0, 0);
+            nativeTextRasterCache.set(cacheKey, { image, width: pixelWidth / scale, height: fieldHeight });
             setSize({ width: pixelWidth / scale, height: fieldHeight });
             onRasterRef.current?.({ canvas, text, background });
         };
