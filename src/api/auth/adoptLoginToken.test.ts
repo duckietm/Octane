@@ -47,4 +47,29 @@ describe('adoptLoginTokenFromUrl', () => {
     it('keeps the address out of the Referer', () => {
         expect(readFileSync('index.html', 'utf8')).toContain('<meta name="referrer" content="strict-origin" />');
     });
+
+    // The server does not tie a remember token to the browser it was issued to: a link built with someone else's
+    // token switched the account silently.
+    const jwtFor = (sub: number) => `e30.${btoa(JSON.stringify({ sub })).replace(/=+$/, '')}.sig`;
+
+    it('adopts a token for the remembered account without asking', () => {
+        SetRememberLogin({ token: jwtFor(7), expiresAt: 4102444800 });
+        const confirmSwitch = vi.fn(() => false);
+        const { location, history } = at(`?token=${jwtFor(7)}`);
+
+        expect(adoptLoginTokenFromUrl(location, history, confirmSwitch)).toBe(true);
+        expect(confirmSwitch).not.toHaveBeenCalled();
+    });
+
+    it('asks before switching to another account, and keeps the remembered one on no', () => {
+        SetRememberLogin({ token: jwtFor(7), expiresAt: 4102444800 });
+        const refuse = vi.fn(() => false);
+
+        expect(adoptLoginTokenFromUrl(at(`?token=${jwtFor(8)}`).location, at('').history, refuse)).toBe(false);
+        expect(refuse).toHaveBeenCalledTimes(1);
+        expect(GetRememberLogin()?.token).toBe(jwtFor(7));
+
+        expect(adoptLoginTokenFromUrl(at(`?token=${jwtFor(8)}`).location, at('').history, () => true)).toBe(true);
+        expect(GetRememberLogin()?.token).toBe(jwtFor(8));
+    });
 });
