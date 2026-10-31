@@ -490,7 +490,6 @@ export const EmuStatsView: FC<{}> = () => {
                                 { key: 'id', label: 'ID', className: 'is-xs' },
                                 { key: 'username', label: 'Username' },
                                 { key: 'rank', label: 'Rank' },
-                                { key: 'credits', label: 'Credits', className: 'is-sm' },
                                 { key: 'roomId', label: 'Room ID', className: 'is-sm' }
                             ]}
                             rowKey={(row) => `user-${row.id}`}
