@@ -37,11 +37,13 @@ export const HOUSEKEEPING_TABS: readonly HousekeepingTabId[] = [
 
 /**
  * The permission each tab needs on top of acc_housekeeping; tabs not listed are open to every
- * operator (dashboard, live, support, audit). The server enforces the same areas on every action.
+ * operator (dashboard, live, support). The audit log names users and their sanctions, so it is the users
+ * area's. The server enforces the same areas on every action.
  */
 export const HOUSEKEEPING_TAB_PERMISSIONS: Partial<Record<HousekeepingTabId, string>> = {
     [HousekeepingTabId.USERS]: 'acc_hk_users',
     [HousekeepingTabId.ECONOMY]: 'acc_hk_users',
+    [HousekeepingTabId.AUDIT]: 'acc_hk_users',
     [HousekeepingTabId.ROOMS]: 'acc_hk_rooms',
     [HousekeepingTabId.BANS]: 'acc_hk_bans',
     [HousekeepingTabId.HOTEL]: 'acc_hk_hotel',

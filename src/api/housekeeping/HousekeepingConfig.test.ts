@@ -27,7 +27,7 @@ describe('isHousekeepingTabOpen', () => {
             keys.includes(permission);
 
     it('opens the overview tabs to every operator', () => {
-        for (const tab of [HousekeepingTabId.DASHBOARD, HousekeepingTabId.LIVE, HousekeepingTabId.SUPPORT, HousekeepingTabId.AUDIT]) {
+        for (const tab of [HousekeepingTabId.DASHBOARD, HousekeepingTabId.LIVE, HousekeepingTabId.SUPPORT]) {
             expect(isHousekeepingTabOpen(tab, holding())).toBe(true);
         }
     });
@@ -35,6 +35,8 @@ describe('isHousekeepingTabOpen', () => {
     it('opens an area tab only with its permission', () => {
         expect(isHousekeepingTabOpen(HousekeepingTabId.USERS, holding())).toBe(false);
         expect(isHousekeepingTabOpen(HousekeepingTabId.USERS, holding('acc_hk_users'))).toBe(true);
+        expect(isHousekeepingTabOpen(HousekeepingTabId.AUDIT, holding())).toBe(false);
+        expect(isHousekeepingTabOpen(HousekeepingTabId.AUDIT, holding('acc_hk_users'))).toBe(true);
         expect(isHousekeepingTabOpen(HousekeepingTabId.BANS, holding('acc_hk_users'))).toBe(false);
         expect(isHousekeepingTabOpen(HousekeepingTabId.PERMISSIONS, holding('acc_hk_permissions'))).toBe(true);
         expect(isHousekeepingTabOpen(HousekeepingTabId.SOUNDBOARD, holding('acc_soundboard_manage'))).toBe(true);
