@@ -1,5 +1,7 @@
 import { Select as BaseSelect } from '@base-ui/react/select';
 import { Children, CSSProperties, FC, Fragment, isValidElement, ReactElement, ReactNode, useState } from 'react';
+import { nativeTextChildren } from './native-text/nativeTextChildren';
+import { isNativeTextEnabled } from './native-text/nativeTextEnabled';
 
 export interface SelectChangeEvent {
     target: { value: string; name?: string };
@@ -105,10 +107,20 @@ export const Select: FC<SelectProps> = (props) => {
     // A native select shows its first option when the value matches none.
     const shown = flat.find((option) => option.value === current) ?? flat[0];
 
+    // The option text is an AIR label keyed by the item state, so it is drawn again in the highlighted / selected colours.
     const renderOption = (option: SelectOption) => (
-        <BaseSelect.Item key={option.value} className="octane-select-item" disabled={option.disabled} label={textOf(option.label)} value={option.value}>
-            <BaseSelect.ItemText>{option.label}</BaseSelect.ItemText>
-        </BaseSelect.Item>
+        <BaseSelect.Item
+            key={option.value}
+            className="octane-select-item"
+            disabled={option.disabled}
+            label={textOf(option.label)}
+            render={(itemProps, state) => (
+                <div {...itemProps}>
+                    <BaseSelect.ItemText>{nativeTextChildren(option.label, `${state.highlighted}|${state.selected}|${state.disabled}`)}</BaseSelect.ItemText>
+                </div>
+            )}
+            value={option.value}
+        />
     );
 
     return (
@@ -131,9 +143,12 @@ export const Select: FC<SelectProps> = (props) => {
                 {...aria}
             >
                 <span className="octane-select-body">
-                    <BaseSelect.Value className="octane-select-value">{() => shown?.label ?? ''}</BaseSelect.Value>
+                    <BaseSelect.Value className="octane-select-value">
+                        {() => nativeTextChildren(shown?.label ?? '', `${className}|${disabled}`)}
+                    </BaseSelect.Value>
                     {/* Reserves the width of the widest option, like a native select, without duplicating text nodes. */}
-                    <span aria-hidden="true" className="octane-select-sizer">
+                    {/* With AIR text it measures in AIR's Ubuntu (wider than the condensed cut), so the drawn value is not cut off. */}
+                    <span aria-hidden="true" className={isNativeTextEnabled() ? 'octane-select-sizer is-native' : 'octane-select-sizer'}>
                         {flat.map((option) => (
                             <span key={option.value} data-label={textOf(option.label)} />
                         ))}
@@ -147,7 +162,7 @@ export const Select: FC<SelectProps> = (props) => {
                             {entries.map((entry, index) =>
                                 isGroup(entry) ? (
                                     <BaseSelect.Group key={`group-${index}`}>
-                                        <BaseSelect.GroupLabel className="octane-select-group-label">{entry.label}</BaseSelect.GroupLabel>
+                                        <BaseSelect.GroupLabel className="octane-select-group-label">{nativeTextChildren(entry.label)}</BaseSelect.GroupLabel>
                                         {entry.options.map(renderOption)}
                                     </BaseSelect.Group>
                                 ) : (

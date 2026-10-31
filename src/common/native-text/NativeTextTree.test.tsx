@@ -104,3 +104,36 @@ describe('NativeTextTree child lists', () => {
         expect(error).not.toHaveBeenCalled();
     });
 });
+
+describe('NativeTextTree labels beside text-less elements', () => {
+    afterEach(() => {
+        cleanup();
+        forceNativeTextEnabled(null);
+    });
+
+    it('labels the text next to a checkbox or icon, and keeps running text with markup as browser text', () => {
+        forceNativeTextEnabled(true);
+
+        const Box: FC<{ checked?: boolean }> = () => <input readOnly type="checkbox" />;
+
+        render(
+            <NativeTextTree>
+                <div>
+                    <label>
+                        <Box checked /> Onthoud mij
+                    </label>
+                    <span>
+                        {12} <i className="icon" />
+                    </span>
+                    <p>
+                        Hallo <b>wereld</b>
+                    </p>
+                </div>
+            </NativeTextTree>
+        );
+
+        expect(screen.getAllByTestId('label').map((node) => node.textContent)).toEqual([' Onthoud mij', '12 ']);
+        expect(screen.getByRole('checkbox')).toBeInTheDocument();
+        expect(screen.getByText('wereld').tagName).toBe('B');
+    });
+});

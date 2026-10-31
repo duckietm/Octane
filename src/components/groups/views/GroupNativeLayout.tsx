@@ -229,7 +229,7 @@ export const GroupInput: FC<GroupInputProps> = ({ label, value, maxLength, x, y,
                 <input {...inputProps} type="text" onChange={(event) => onChange(event.target.value)} />
             )}
             <div ref={overlayRef} aria-hidden="true" className={`octane-group-native__field-text${showRaster ? '' : ' is-hidden'}`} style={plain ? { top: 0, left: inset - 1 } : undefined}>
-                <NativeText background={0xffffff} maxWidth={multiline ? width - (plain ? 2 * (inset - 1) : 0) : undefined} overrides={flatText(fontSize)} text={value} textStyle="u_regular" />
+                <NativeText background={null} maxWidth={multiline ? width - (plain ? 2 * (inset - 1) : 0) : undefined} overrides={flatText(fontSize)} text={value} textStyle="u_regular" />
             </div>
         </div>
     );

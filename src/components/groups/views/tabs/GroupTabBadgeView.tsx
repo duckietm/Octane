@@ -43,8 +43,10 @@ export const GroupTabBadgeView: FC<GroupTabBadgeViewProps> = (props) => {
             return false;
         }
 
-        if (groupData.groupBadgeParts.length === badgeParts.length && badgeParts.every((part, index) =>
-            part.key === groupData.groupBadgeParts[index].key && part.color === groupData.groupBadgeParts[index].color && part.position === groupData.groupBadgeParts[index].position)) return true;
+        const badge = GroupBadgePart.serialize(badgeParts);
+
+        // Compared as sent: empty layers (and the colour they carry) are not part of the badge.
+        if (badge.join(',') === (GroupBadgePart.serialize(groupData.groupBadgeParts) ?? []).join(',')) return true;
 
         if (groupData.groupId <= 0) {
             setGroupData((prevValue) => {
@@ -57,8 +59,6 @@ export const GroupTabBadgeView: FC<GroupTabBadgeViewProps> = (props) => {
 
             return true;
         }
-
-        const badge = GroupBadgePart.serialize(badgeParts);
 
         SendMessageComposer(new GroupSaveBadgeComposer(groupData.groupId, badge));
         setGroupData(prevValue => ({ ...prevValue, groupBadgeParts: badgeParts }));
@@ -88,17 +88,13 @@ export const GroupTabBadgeView: FC<GroupTabBadgeViewProps> = (props) => {
         });
     }, [groupData.groupBadgeParts, groupCustomize, setGroupData]);
 
+    // The empty layers of a saved badge come with colour 0, which is no badge colour: a symbol picked into such a layer would be
+    // saved with it and the server refuses the whole badge. Like AIR's BadgeEditorCtrl, a colour outside the palette becomes its first.
     useEffect(() => {
-        if (groupData.groupId <= 0) {
-            const colorIds = groupCustomize?.badgePartColors?.map((color) => color.id) ?? [];
+        const colorIds = groupCustomize?.badgePartColors?.map((color) => color.id) ?? [];
 
-            setBadgeParts(groupData.groupBadgeParts ? GroupBadgePart.withPaletteColors([...groupData.groupBadgeParts], colorIds) : null);
-
-            return;
-        }
-
-        setBadgeParts(groupData.groupBadgeParts);
-    }, [groupData.groupId, groupData.groupBadgeParts, groupCustomize?.badgePartColors]);
+        setBadgeParts(groupData.groupBadgeParts ? GroupBadgePart.withPaletteColors([...groupData.groupBadgeParts], colorIds) : null);
+    }, [groupData.groupBadgeParts, groupCustomize?.badgePartColors]);
 
     useEffect(() => {
         setCloseAction({ action: saveBadge });
@@ -122,7 +118,7 @@ export const GroupTabBadgeView: FC<GroupTabBadgeViewProps> = (props) => {
                     width={94}
                     x={17}
                     y={135}
-                    onClick={() => setBadgeParts([...groupData.groupBadgeParts])}
+                    onClick={() => setBadgeParts(GroupBadgePart.withPaletteColors([...groupData.groupBadgeParts], groupCustomize?.badgePartColors?.map((color) => color.id) ?? []))}
                 />
             )}
             <GroupBadgeCreatorView badgeParts={badgeParts} setBadgeParts={setBadgeParts} />

@@ -78,8 +78,49 @@ const convert = (node: ReactNode): ReactNode => {
     return result;
 };
 
+const stateKeyOf = (node: ReactElement<ElementProps>) => {
+    const { className, disabled } = node.props;
+
+    return `${typeof className === 'string' ? className : ''}|${disabled ?? ''}|${node.props['aria-pressed'] ?? ''}|${node.props['aria-selected'] ?? ''}`;
+};
+
+const isTextPart = (part: unknown) => isEmpty(part) || typeof part === 'string' || typeof part === 'number';
+
+const isTextlessElement = (part: unknown) =>
+    isValidElement<ElementProps>(part) &&
+    (part.props.children === undefined || part.props.children === null) &&
+    !part.props.dangerouslySetInnerHTML &&
+    !(typeof part.type === 'string' && SKIP.has(part.type) && part.type !== 'input' && part.type !== 'svg');
+
+// Consecutive text parts become one label each; the elements between them stay as they are.
+const labelTextRuns = (children: ReactNode[], stateKey: string): ReactNode[] => {
+    const result: ReactNode[] = [];
+    let run: ReactNode[] = [];
+
+    const flush = () => {
+        const text = run.filter((part) => !isEmpty(part)).join('');
+
+        if (text.trim()) result.push(<NativeLabel stateKey={stateKey} text={text} />);
+        else result.push(...run);
+
+        run = [];
+    };
+
+    for (const child of children) {
+        if (isTextPart(child)) run.push(child);
+        else {
+            flush();
+            result.push(child);
+        }
+    }
+
+    flush();
+
+    return result;
+};
+
 const convertElement = (node: ReactElement<ElementProps>): ReactNode => {
-    const { children, className, disabled, dangerouslySetInnerHTML } = node.props;
+    const { children, dangerouslySetInnerHTML } = node.props;
 
     if (children === undefined || children === null || dangerouslySetInnerHTML) return node;
     if (typeof node.type === 'string' && SKIP.has(node.type)) return node;
@@ -91,15 +132,19 @@ const convertElement = (node: ReactElement<ElementProps>): ReactNode => {
         // A component may use its text in other ways (a title, a measurement): Text and BaseButton draw theirs already.
         if (!host) return node;
 
-        const stateKey = `${typeof className === 'string' ? className : ''}|${disabled ?? ''}|${node.props['aria-pressed'] ?? ''}|${node.props['aria-selected'] ?? ''}`;
-
-        return withChildren(node, <NativeLabel stateKey={stateKey} text={text} />);
+        return withChildren(node, <NativeLabel stateKey={stateKeyOf(node)} text={text} />);
     }
 
     if (!host && node.type !== Fragment && typeof children !== 'object') return node;
 
-    // Running text with inline markup (`Hallo <b>naam</b>`) stays browser text as a whole, so one line never mixes two renderers.
-    if (Array.isArray(children) && children.some((part) => typeof part === 'string' && part.trim())) return node;
+    if (Array.isArray(children) && children.some((part) => (typeof part === 'string' || typeof part === 'number') && String(part).trim())) {
+        // Text beside elements without text of their own (a checkbox, radio or icon: `<label><Checkbox /> Onthoud mij</label>`)
+        // gets labels for its text runs. Running text with inline markup (`Hallo <b>naam</b>`) stays browser text as a whole, so
+        // one line never mixes two renderers.
+        if (!(host || node.type === Fragment) || !children.every((part) => isTextPart(part) || isTextlessElement(part))) return node;
+
+        return withChildren(node, labelTextRuns(children, stateKeyOf(node)));
+    }
 
     const next = Array.isArray(children) ? children.map(convert) : convert(children);
 
