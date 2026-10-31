@@ -1,5 +1,12 @@
 import { FC } from 'react';
-import { GetConfigurationValue, getNavigatorLiftedImageUrl, INavigatorLiftedRoom, localizeWithFallback, TryVisitRoom } from '../../../../api';
+import {
+    GetConfigurationValue,
+    getNavigatorLiftedImageUrl,
+    INavigatorLiftedRoom,
+    localizeServerText,
+    localizeWithFallback,
+    TryVisitRoom
+} from '../../../../api';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
@@ -26,11 +33,11 @@ export const NavigatorLiftedRoomsView: FC<NavigatorLiftedRoomsViewProps> = ({ ro
                         <BaseButton
                             key={`${room.roomId}:${index}`}
                             className="octane-navigator-lifted__room"
-                            aria-label={room.caption || label}
+                            aria-label={localizeServerText(room.caption) || label}
                             onClick={() => TryVisitRoom(room.roomId)}
                         >
                             <img alt="" className="octane-navigator-lifted__image" draggable={false} src={getNavigatorLiftedImageUrl(room, imageLibraryUrl)} />
-                            {room.caption && <span className="octane-navigator-lifted__caption">{room.caption}</span>}
+                            {room.caption && <span className="octane-navigator-lifted__caption">{localizeServerText(room.caption)}</span>}
                         </BaseButton>
                     ))}
                 </div>

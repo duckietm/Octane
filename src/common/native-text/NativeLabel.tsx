@@ -27,6 +27,8 @@ interface Measurement {
     maxWidth?: number;
     lineHeight?: number;
     lines: number;
+    /** A wrapped label: the content width of its parent's container when it was laid out (see the resize watch). */
+    outerWidth?: number;
     /** One line in a box that asks for `text-overflow: ellipsis`: shortened when the raster overflows it. */
     ellipsisBox?: boolean;
     align?: 'left' | 'center' | 'right';
@@ -104,6 +106,7 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
             font,
             lines,
             maxWidth: lines > 1 && font?.wrap && host.parentElement ? contentWidth(host.parentElement) + 4 : undefined,
+            outerWidth: lines > 1 && host.parentElement?.parentElement ? contentWidth(host.parentElement.parentElement) : undefined,
             lineHeight: Number.isFinite(lineHeight) ? lineHeight : undefined,
             ellipsisBox,
             align: lines > 1 ? ALIGN[css.textAlign] : undefined
@@ -117,14 +120,22 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
     const [clip, setClip] = useState<{ key: string; width?: number } | null>(null);
     const currentClip = clip?.key === key ? clip : null;
     const watchedWidth = wrapWidth ?? currentClip?.width;
+    const outerWidth = wrapWidth === undefined ? undefined : current?.outerWidth;
 
+    // The parent of a wrapped label can be sized by the label itself (a flex item, an inline-block): once the raster holds the wrapped
+    // lines it keeps that width when the window around it widens (a window opening narrow, then laid out). The parent's container is
+    // watched too, so the label is laid out again when the room it may take really changes.
     useLayoutEffect(() => {
         const parent = hostRef.current?.parentElement;
+        const outer = parent?.parentElement;
 
         if (watchedWidth === undefined || !parent || typeof ResizeObserver === 'undefined') return;
 
         const observer = new ResizeObserver(() => {
-            if (Math.abs(contentWidth(parent) - watchedWidth) <= SCROLLBAR_SLACK) return;
+            const parentMoved = Math.abs(contentWidth(parent) - watchedWidth) > SCROLLBAR_SLACK;
+            const outerMoved = outerWidth !== undefined && !!outer && Math.abs(contentWidth(outer) - outerWidth) > SCROLLBAR_SLACK;
+
+            if (!parentMoved && !outerMoved) return;
 
             observer.disconnect();
             setResizeTick((tick) => tick + 1);
@@ -132,8 +143,10 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
 
         observer.observe(parent);
 
+        if (outerWidth !== undefined && outer) observer.observe(outer);
+
         return () => observer.disconnect();
-    }, [watchedWidth]);
+    }, [watchedWidth, outerWidth]);
 
     // A box that asks for dots is checked with the raster in it: one sized to its text (a tab, a title) grows with the raster and never
     // overflows; a fixed one (a dropdown value) does, and the label is then shortened to it. That needs the font's metrics: until it has

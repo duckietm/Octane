@@ -1,7 +1,7 @@
 import { Collapsible } from '@base-ui/react/collapsible';
 import { NavigatorSearchResultList, NavigatorSearchSaveComposer, PerkEnum } from '@octane/renderer';
 import { FC } from 'react';
-import { LocalizeText, localizeWithFallback, NavigatorSearchResultViewDisplayMode, SendMessageComposer } from '../../../../api';
+import { LocalizeText, localizeServerText, localizeWithFallback, NavigatorSearchResultViewDisplayMode, SendMessageComposer } from '../../../../api';
 import categoryCollapse from '../../../../assets/images/navigator/air/category-collapse.png';
 import categoryExpand from '../../../../assets/images/navigator/air/category-expand.png';
 import categoryShowMore from '../../../../assets/images/navigator/air/category-show-more.png';
@@ -42,9 +42,10 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
         const name = searchResult.code;
 
         // AIR: the server's block text when it has one, else the search code's title.
-        if (searchResult.data) return searchResult.data;
+        // The server often sends a text key (`${navigator.flatcategory.global.BC}`): it is looked up like AIR does.
+        if (searchResult.data) return localizeServerText(searchResult.data);
         if (!name || !name.length) return '';
-        if (name.startsWith('${')) return name.slice(2, name.length - 1);
+        if (name.startsWith('${')) return localizeServerText(name);
 
         return localizeWithFallback('navigator.searchcode.title.' + name, name);
     };
