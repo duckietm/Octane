@@ -1,4 +1,6 @@
 import { CSSProperties, DetailedHTMLProps, FC, HTMLAttributes, memo, useLayoutEffect, useRef, useState } from 'react';
+import { fitNativeText } from './fitNativeText';
+import { loadNativeFont, measureNativeText, peekNativeFont } from './NativeFont';
 import { NativeText } from './NativeText';
 import { isNativeTextEnabled } from './nativeTextEnabled';
 import { CssNativeFont, resolveCssNativeFont } from './resolveCssNativeFont';
@@ -25,6 +27,8 @@ interface Measurement {
     maxWidth?: number;
     lineHeight?: number;
     lines: number;
+    /** One line in a box that asks for `text-overflow: ellipsis`: shortened when the raster overflows it. */
+    ellipsisBox?: boolean;
     align?: 'left' | 'center' | 'right';
 }
 
@@ -91,6 +95,9 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
         });
         const lines = countLines(host);
         const lineHeight = parseFloat(css.lineHeight);
+        const parentCss = host.parentElement ? getComputedStyle(host.parentElement) : null;
+        const ellipsisBox =
+            lines === 1 && !!parentCss && parentCss.textOverflow === 'ellipsis' && parentCss.overflowX !== 'visible' && !parentCss.display.startsWith('inline');
 
         setMeasurement({
             key,
@@ -98,6 +105,7 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
             lines,
             maxWidth: lines > 1 && font?.wrap && host.parentElement ? contentWidth(host.parentElement) + 4 : undefined,
             lineHeight: Number.isFinite(lineHeight) ? lineHeight : undefined,
+            ellipsisBox,
             align: lines > 1 ? ALIGN[css.textAlign] : undefined
         });
     }, [key, measurement?.key]);
@@ -106,14 +114,17 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
     // scrollbar's width are left alone: the raster's own height can show or hide a scrollbar, and measuring again on that would
     // swap browser text and raster back and forth for ever.
     const wrapWidth = current?.maxWidth === undefined ? undefined : current.maxWidth - 4;
+    const [clip, setClip] = useState<{ key: string; width?: number } | null>(null);
+    const currentClip = clip?.key === key ? clip : null;
+    const watchedWidth = wrapWidth ?? currentClip?.width;
 
     useLayoutEffect(() => {
         const parent = hostRef.current?.parentElement;
 
-        if (wrapWidth === undefined || !parent || typeof ResizeObserver === 'undefined') return;
+        if (watchedWidth === undefined || !parent || typeof ResizeObserver === 'undefined') return;
 
         const observer = new ResizeObserver(() => {
-            if (Math.abs(contentWidth(parent) - wrapWidth) <= SCROLLBAR_SLACK) return;
+            if (Math.abs(contentWidth(parent) - watchedWidth) <= SCROLLBAR_SLACK) return;
 
             observer.disconnect();
             setResizeTick((tick) => tick + 1);
@@ -122,7 +133,58 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
         observer.observe(parent);
 
         return () => observer.disconnect();
-    }, [wrapWidth]);
+    }, [watchedWidth]);
+
+    // A box that asks for dots is checked with the raster in it: one sized to its text (a tab, a title) grows with the raster and never
+    // overflows; a fixed one (a dropdown value) does, and the label is then shortened to it. That needs the font's metrics: until it has
+    // loaded the label shows in full, then it is measured again.
+    const ellipsisStyle = current?.ellipsisBox ? current.font?.style : undefined;
+    const ellipsisFont = ellipsisStyle ? peekNativeFont(ellipsisStyle) : null;
+
+    useLayoutEffect(() => {
+        if (!ellipsisStyle) return;
+
+        if (!ellipsisFont) {
+            let disposed = false;
+
+            loadNativeFont(ellipsisStyle)
+                .then(() => !disposed && setResizeTick((tick) => tick + 1))
+                .catch(() => undefined);
+
+            return () => {
+                disposed = true;
+            };
+        }
+
+        const parent = hostRef.current?.parentElement;
+        const raster = hostRef.current?.firstElementChild;
+
+        if (currentClip || !parent || !raster) return;
+
+        // The raster is drawn in a render of its own (until then NativeText holds a browser-text placeholder): the check waits for it.
+        // Resize and mutation callbacks run before the frame is painted, so the full-length raster is never seen.
+        const check = () => {
+            if (raster.getAttribute('data-native-text') === 'fallback') return false;
+
+            setClip({ key, width: parent.scrollWidth > parent.clientWidth ? contentWidth(parent) : undefined });
+
+            return true;
+        };
+
+        if (check() || typeof ResizeObserver === 'undefined') return;
+
+        const observer = new ResizeObserver(() => check() && disconnect());
+        const mutations = new MutationObserver(() => check() && disconnect());
+        const disconnect = () => {
+            observer.disconnect();
+            mutations.disconnect();
+        };
+
+        observer.observe(raster);
+        mutations.observe(raster, { attributes: true, attributeFilter: ['data-native-text'] });
+
+        return disconnect;
+    }, [key, ellipsisStyle, ellipsisFont, currentClip]);
 
     if (!current?.font)
         return (
@@ -132,7 +194,10 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
         );
 
     const { font, maxWidth, lineHeight, align } = current;
-    const label = font.transform === 'uppercase' ? text.toUpperCase() : font.transform === 'lowercase' ? text.toLowerCase() : text;
+    const clipWidth = currentClip?.width;
+    const cased = font.transform === 'uppercase' ? text.toUpperCase() : font.transform === 'lowercase' ? text.toLowerCase() : text;
+    const label =
+        ellipsisFont && clipWidth !== undefined ? fitNativeText(cased, clipWidth, (part) => measureNativeText(ellipsisFont.font, part, font.style)) : cased;
     const hostStyle: CSSProperties = {
         ...INHERIT,
         display: 'inline-flex',

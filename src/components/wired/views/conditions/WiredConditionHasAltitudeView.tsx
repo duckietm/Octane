@@ -175,7 +175,7 @@ export const WiredConditionHasAltitudeView: FC<WiredConditionHasAltitudeViewProp
                 showQuantifier={false}
                 footer={
                     <div className="flex flex-col gap-2">
-                        <BaseButton className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
+                        <BaseButton className="octane-wired__advanced-toggle" type="button" onClick={() => setShowAdvanced((value) => !value)}>
                             {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
                         </BaseButton>
                         {showAdvanced && (

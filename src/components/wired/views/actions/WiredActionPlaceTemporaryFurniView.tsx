@@ -193,7 +193,7 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <BaseButton type="button" className="btn btn-link p-0 align-self-start" onClick={ () => setShowOffsets(value => !value) }>
+                        <BaseButton type="button" className="octane-wired__advanced-toggle" onClick={ () => setShowOffsets(value => !value) }>
                             <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.offsets', 'Offsets') }</Text>
                         </BaseButton>
                         { showOffsets &&

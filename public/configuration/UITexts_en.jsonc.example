@@ -9,6 +9,8 @@
     "infostand.plant.needswater": "Needs water!",
     "infostand.plant.dead": "Your plant is dead",
     "infostand.button.remove_landscape": "Remove Landscape",
+    "navigator.roomsettings.moderation": "Moderation",
+    "cancel": "Cancel",
     "navigator.roomsettings.remove_floor": "Remove Floor",
     "navigator.roomsettings.remove_wallpaper": "Remove Wallpaper",
     "friendlist.search": "Search friends",

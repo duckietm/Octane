@@ -35,6 +35,9 @@ export interface RoomToolProps {
 // Classic v75 RoomToolCtrl (RQ): the window is built from roomtool_frame and GetModeratorRoomInfo(flat) goes out when it opens; the XML placeholders show until
 // the answer for this flat arrives. The caution / message buttons act on the room alert permission and only for the room the moderator is in. The event box,
 // which this hotel never fills with an event, carries the room id and a refresh link kept from the earlier room tool.
+/** A one-line Volter text field: 10px line plus the 2px gutter above and below. */
+const TAGS_LABEL_HEIGHT = 14;
+
 export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, currentRoomId, onOpenUserInfo, onOpenChatlog, onClose }) => {
     const root = useMemo(() => parseNativeLayout(roomToolXml), []);
     const at = (name: string) => rectOf(findNativeNode(root, name));
@@ -80,10 +83,13 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
     const input = at('message_input');
     const footer = at('footer_cont');
     const exists = !!data && data.room.exists;
-    const tags = data?.room?.tags ?? [];
+    // A room without tags comes with one empty tag: only real tags show the tags row.
+    const tags = (data?.room?.tags ?? []).filter((tag) => tag.trim().length > 0);
+    const hasDesc = !!data?.room?.desc?.trim();
     // _r13a7bd05aa7cbe: name, description and tags stack with no spacing; the border is the stack plus the room_data margin twice. Without a room
     // (data.room.exists false) the room box and the spacing after the info box (event_spacing) are removed from the list.
-    const stackHeight = nameHeight + descHeight + (tags.length > 0 ? tagsHeight : 0);
+    // The tags row is as tall as its "Tags:" label (one line) or its wrapped tags, whichever is taller.
+    const stackHeight = nameHeight + (hasDesc ? descHeight : 0) + (tags.length > 0 ? Math.max(TAGS_LABEL_HEIGHT, tagsHeight) : 0);
     const roomContHeight = data ? (exists ? stackHeight + 2 * roomData.y : 0) : roomCont.height;
     const items: { key: string; height: number }[] = [
         ...(data && !exists ? [] : [{ key: 'room', height: roomContHeight }]),
@@ -168,9 +174,9 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
                                 {data && exists && (
                                     <div style={{ position: 'absolute', left: roomData.x, top: roomData.y, width: roomData.width, height: stackHeight }}>
                                         <Native0Text bold text={data.room.name} wrap width={220} x={0} y={0} onSize={(size) => setNameHeight(size.height)} />
-                                        <Native0Text color={0x808080} text={data.room.desc} wrap width={220} x={0} y={nameHeight} onSize={(size) => setDescHeight(size.height)} />
+                                        {hasDesc && <Native0Text color={0x808080} text={data.room.desc} wrap width={220} x={0} y={nameHeight} onSize={(size) => setDescHeight(size.height)} />}
                                         {tags.length > 0 && (
-                                            <div style={{ position: 'absolute', left: 0, top: nameHeight + descHeight }}>
+                                            <div style={{ position: 'absolute', left: 0, top: nameHeight + (hasDesc ? descHeight : 0) }}>
                                                 <Native0Text bold text="Tags:" width={40} x={0} y={0} />
                                                 <Native0Text bold text={tags.join(', ')} wrap width={178} x={39} y={0} onSize={(size) => setTagsHeight(size.height)} />
                                             </div>

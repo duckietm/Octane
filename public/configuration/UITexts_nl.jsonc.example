@@ -6,6 +6,8 @@
     "infostand.plant.needswater": "Heeft water nodig!",
     "infostand.plant.dead": "Je plant is dood",
     "infostand.button.remove_landscape": "Landschap verwijderen",
+    "navigator.roomsettings.moderation": "Moderatie",
+    "cancel": "Annuleren",
     "navigator.roomsettings.remove_floor": "Vloer verwijderen",
     "navigator.roomsettings.remove_wallpaper": "Behang verwijderen",
     "friendlist.search": "Vrienden zoeken",

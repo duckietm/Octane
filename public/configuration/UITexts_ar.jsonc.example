@@ -6,6 +6,8 @@
     "infostand.plant.needswater": "يحتاج إلى ماء!",
     "infostand.plant.dead": "نبتتك ماتت",
     "infostand.button.remove_landscape": "إزالة المنظر الطبيعي",
+    "navigator.roomsettings.moderation": "الإشراف",
+    "cancel": "إلغاء",
     "navigator.roomsettings.remove_floor": "إزالة الأرضية",
     "navigator.roomsettings.remove_wallpaper": "إزالة ورق الجدران",
     "friendlist.search": "البحث عن الأصدقاء",

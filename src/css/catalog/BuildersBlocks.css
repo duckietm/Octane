@@ -41,6 +41,27 @@
     flex: 0 0 60px;
 }
 
+/* On a default-layout page (a Builders Club page like "Verhuur Meubels") the widget sits in the purchase row, a 30 px high flex row made
+   for the buy button: there it takes the whole row, 60 px high and anchored at the bottom like AIR's builderWidget, instead of being
+   squeezed to its 60 px flex basis and having its buttons clipped. */
+.octane-catalog-window .octane-catalog-purchase-row:has(.octane-builders-widget) {
+    top: auto;
+    bottom: 0;
+    height: 60px;
+}
+
+.octane-catalog-window .octane-catalog-offer-actions:has(> .octane-builders-widget) {
+    width: 100%;
+    height: 60px;
+    margin: 0;
+}
+
+.octane-catalog-window .octane-catalog-offer-actions > .octane-builders-widget {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+}
+
 .octane-catalog-window .octane-builders-widget-hint {
     position: absolute;
     top: 3px;

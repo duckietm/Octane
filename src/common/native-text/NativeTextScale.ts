@@ -7,6 +7,13 @@ import { useSyncExternalStore } from 'react';
  */
 export const getNativeTextScale = (): number => Math.min(4, Math.max(1, Math.ceil((globalThis.devicePixelRatio || 1) - 0.01)));
 
+/**
+ * The scale a native raster is drawn at: the device pixel ratio itself, so every raster pixel is one screen pixel. On a fractional ratio
+ * (Windows display scaling of 125 % or 150 %, browser zoom) a raster drawn at the next whole scale is shrunk by the browser, which
+ * softens every glyph edge; drawn at the ratio it is not resampled at all. Whole ratios give the same value as getNativeTextScale.
+ */
+export const getNativeTextRasterScale = (): number => Math.min(4, Math.max(1, Math.round((globalThis.devicePixelRatio || 1) * 100) / 100));
+
 const subscribe = (onChange: () => void) => {
     if (typeof matchMedia !== 'function') return () => {};
 
@@ -30,6 +37,9 @@ const subscribe = (onChange: () => void) => {
 
 /** The native text scale, updated when the window moves to a display with another pixel ratio or zooms. */
 export const useNativeTextScale = (): number => useSyncExternalStore(subscribe, getNativeTextScale, () => 1);
+
+/** The raster scale (see getNativeTextRasterScale), updated like useNativeTextScale. */
+export const useNativeTextRasterScale = (): number => useSyncExternalStore(subscribe, getNativeTextRasterScale, () => 1);
 
 /**
  * Sampling of a native-resolution raster (a text drawn at 1x that the browser enlarges). The native stage is enlarged without smoothing

@@ -6,6 +6,8 @@
     "infostand.plant.needswater": "Besoin d'eau !",
     "infostand.plant.dead": "Votre plante est morte",
     "infostand.button.remove_landscape": "Supprimer le paysage",
+    "navigator.roomsettings.moderation": "Modération",
+    "cancel": "Annuler",
     "navigator.roomsettings.remove_floor": "Supprimer le sol",
     "navigator.roomsettings.remove_wallpaper": "Supprimer le papier peint",
     "friendlist.search": "Rechercher des amis",
