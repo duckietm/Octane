@@ -14,7 +14,14 @@ import vipIconMedium from '../../../../../assets/images/catalog/air/vip-icon-med
 import { Button, LayoutCurrencyIcon, LayoutLoadingSpinnerView } from '../../../../../common';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
-import { CatalogEvent, CatalogInitGiftEvent, CatalogPurchasedEvent, CatalogPurchaseFailureEvent } from '../../../../../events';
+import {
+    CatalogEvent,
+    CatalogInitGiftEvent,
+    CatalogPurchasedEvent,
+    CatalogPurchaseFailureEvent,
+    CatalogPurchaseNotAllowedEvent,
+    CatalogPurchaseSoldOutEvent
+} from '../../../../../events';
 import {
     useCatalogActions,
     useCatalogData,
@@ -59,7 +66,10 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
                 setPurchaseState(CatalogPurchaseState.NONE);
                 setPendingOffer(null);
                 return;
+            // A refusal of any kind ends the purchase: "not allowed" and "sold out" used to leave it pending forever.
             case CatalogPurchaseFailureEvent.PURCHASE_FAILED:
+            case CatalogPurchaseNotAllowedEvent.NOT_ALLOWED:
+            case CatalogPurchaseSoldOutEvent.SOLD_OUT:
                 isPurchasingRef.current = false;
                 setPurchaseWillBeGift(false);
                 setPurchaseState(CatalogPurchaseState.NONE);
@@ -70,6 +80,8 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
 
     useUiEvent(CatalogPurchasedEvent.PURCHASE_SUCCESS, onCatalogEvent);
     useUiEvent(CatalogPurchaseFailureEvent.PURCHASE_FAILED, onCatalogEvent);
+    useUiEvent(CatalogPurchaseNotAllowedEvent.NOT_ALLOWED, onCatalogEvent);
+    useUiEvent(CatalogPurchaseSoldOutEvent.SOLD_OUT, onCatalogEvent);
 
     const getOfferText = useCallback(
         (offer: ClubOfferData) => {

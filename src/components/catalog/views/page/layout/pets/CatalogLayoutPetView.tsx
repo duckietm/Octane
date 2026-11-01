@@ -12,7 +12,12 @@ import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaCheck, FaLock, FaTimes } from 'react-icons/fa';
 import { DispatchUiEvent, GetPetAvailableColors, GetPetIndexFromLocalization, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../../api';
 import { LayoutPetImageView } from '../../../../../../common';
-import { CatalogPurchasedEvent, CatalogPurchaseFailureEvent } from '../../../../../../events';
+import {
+    CatalogPurchasedEvent,
+    CatalogPurchaseFailureEvent,
+    CatalogPurchaseNotAllowedEvent,
+    CatalogPurchaseSoldOutEvent
+} from '../../../../../../events';
 import { useCatalogData, useCatalogUiState, useMessageEvent, useOctaneEvent, useSellablePetPalette, useUiEvent, useUserDataSnapshot } from '../../../../../../hooks';
 import { CatalogScrollAreaView } from '../../common/CatalogScrollAreaView';
 import { CatalogAddOnBadgeWidgetView } from '../../widgets/CatalogAddOnBadgeWidgetView';
@@ -204,6 +209,9 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
 
     useUiEvent(CatalogPurchasedEvent.PURCHASE_SUCCESS, finishPurchase);
     useUiEvent(CatalogPurchaseFailureEvent.PURCHASE_FAILED, finishPurchase);
+    // "Not allowed" and "sold out" end the purchase too: they used to leave it pending until the catalog closed.
+    useUiEvent(CatalogPurchaseNotAllowedEvent.NOT_ALLOWED, finishPurchase);
+    useUiEvent(CatalogPurchaseSoldOutEvent.SOLD_OUT, finishPurchase);
 
     useEffect(() => {
         if (!page?.offers.length) return;
