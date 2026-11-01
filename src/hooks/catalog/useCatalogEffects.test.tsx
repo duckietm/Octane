@@ -4,6 +4,7 @@ import {
     CatalogPublishedMessageEvent,
     LimitedEditionSoldOutEvent,
     ProductOfferEvent,
+    PurchaseNotAllowedMessageEvent,
     PurchaseOKMessageEvent
 } from '@octane/renderer';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -111,6 +112,16 @@ describe('useCatalogEffects', () => {
         client.setQueryData(catalogPageKey(CatalogType.NORMAL, 2), { page: null, frontPageItems: [], offerId: -1 });
         act(() => mockEventDispatcher.dispatchEvent(makeEvent(LimitedEditionSoldOutEvent, {})));
         expect(client.getQueryState(catalogPageKey(CatalogType.NORMAL, 2)).isInvalidated).toBe(true);
+    });
+
+    it('a refused purchase takes back the furni a placement purchase put in the room', () => {
+        const resetPlacedOfferData = vi.fn();
+        useCatalogStore.setState({ resetPlacedOfferData });
+        renderHook(() => useCatalogEffects(), { wrapper });
+
+        act(() => mockEventDispatcher.dispatchEvent(makeEvent(PurchaseNotAllowedMessageEvent, { code: 1 })));
+
+        expect(resetPlacedOfferData).toHaveBeenCalledWith(true);
     });
 
     it('a lazy product offer becomes the current offer with a page attached', () => {
