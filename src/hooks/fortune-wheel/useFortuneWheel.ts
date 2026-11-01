@@ -18,9 +18,12 @@ import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';
 
+/** How long a spin or a purchase waits for the server before the buttons come back. */
+const REQUEST_TIMEOUT_MS = 5000;
+
 // Fortune wheel state + actions. Shared via the Zustand bridge so the event listeners
 // register once regardless of how many components read it.
-const useFortuneWheelState = () => {
+export const useFortuneWheelState = () => {
     const [freeSpins, setFreeSpins] = useState(0);
     const [extraSpins, setExtraSpins] = useState(0);
     const [spinCost, setSpinCost] = useState(0);
@@ -32,6 +35,28 @@ const useFortuneWheelState = () => {
     const isSpinningRef = useRef(false);
     isSpinningRef.current = isSpinning;
     const [adminPrizes, setAdminPrizes] = useState<IWheelAdminPrize[]>([]);
+
+    // One spin or purchase at a time, until the server answers: a double click used to send two, spending two spins
+    // or paying twice. The wait ends on the answer, or after a few seconds if none comes.
+    const [isRequestPending, setIsRequestPending] = useState(false);
+    const requestPendingRef = useRef(false);
+    const requestTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const settleRequest = useCallback(() => {
+        if (requestTimerRef.current) clearTimeout(requestTimerRef.current);
+        requestTimerRef.current = null;
+        requestPendingRef.current = false;
+        setIsRequestPending(false);
+    }, []);
+    const sendOnce = useCallback(
+        (composer: WheelSpinComposer | WheelBuySpinComposer) => {
+            if (requestPendingRef.current) return;
+            requestPendingRef.current = true;
+            setIsRequestPending(true);
+            requestTimerRef.current = setTimeout(settleRequest, REQUEST_TIMEOUT_MS);
+            SendMessageComposer(composer);
+        },
+        [settleRequest]
+    );
 
     // While the wheel is animating we hold back the recent-wins refresh: the
     // server pushes the updated list (which already contains the just-won
@@ -47,6 +72,7 @@ const useFortuneWheelState = () => {
     });
 
     useMessageEvent<WheelDataEvent>(WheelDataEvent, (event) => {
+        settleRequest();
         const parser = event.getParser();
         setFreeSpins(parser.freeSpins);
         setExtraSpins(parser.extraSpins);
@@ -59,6 +85,7 @@ const useFortuneWheelState = () => {
         // Set synchronously before the recent-wins packet (sent right after by
         // the server) is processed, so its handler knows a spin is animating.
         spinAnimatingRef.current = true;
+        settleRequest();
         setPendingPrizeId(event.getParser().prizeId);
         setIsSpinning(true);
     });
@@ -75,9 +102,9 @@ const useFortuneWheelState = () => {
     const open = useCallback(() => SendMessageComposer(new WheelOpenComposer()), []);
     // Read from a ref, not inside a state updater: an updater may run twice (StrictMode) and sent the spin twice.
     const spin = useCallback(() => {
-        if (!isSpinningRef.current) SendMessageComposer(new WheelSpinComposer());
-    }, []);
-    const buySpin = useCallback(() => SendMessageComposer(new WheelBuySpinComposer()), []);
+        if (!isSpinningRef.current) sendOnce(new WheelSpinComposer());
+    }, [sendOnce]);
+    const buySpin = useCallback(() => sendOnce(new WheelBuySpinComposer()), [sendOnce]);
     const finishSpin = useCallback(() => {
         spinAnimatingRef.current = false;
         setIsSpinning(false);
@@ -103,6 +130,7 @@ const useFortuneWheelState = () => {
         recentWins,
         pendingPrizeId,
         isSpinning,
+        isRequestPending,
         open,
         spin,
         buySpin,
