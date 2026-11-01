@@ -12,7 +12,13 @@ import {
 import { LayoutCurrencyIcon, LayoutLoadingSpinnerView } from '../../../../../common';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
-import { CatalogEvent, CatalogPurchasedEvent, CatalogPurchaseFailureEvent } from '../../../../../events';
+import {
+    CatalogEvent,
+    CatalogPurchasedEvent,
+    CatalogPurchaseFailureEvent,
+    CatalogPurchaseNotAllowedEvent,
+    CatalogPurchaseSoldOutEvent
+} from '../../../../../events';
 import { useCatalogData, useCatalogSkipPurchaseConfirmation, useClubOffers, usePurse, useUiEvent } from '../../../../../hooks';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
@@ -74,6 +80,9 @@ export const CatalogLayoutBuildersClubBuyView: FC<CatalogLayoutProps> = (props) 
 
     useUiEvent(CatalogPurchasedEvent.PURCHASE_SUCCESS, onCatalogEvent);
     useUiEvent(CatalogPurchaseFailureEvent.PURCHASE_FAILED, onCatalogEvent);
+    // "Not allowed" and "sold out" end the purchase too: they used to leave it pending until the catalog closed.
+    useUiEvent(CatalogPurchaseNotAllowedEvent.NOT_ALLOWED, onCatalogEvent);
+    useUiEvent(CatalogPurchaseSoldOutEvent.SOLD_OUT, onCatalogEvent);
 
     const purchase = (offer: ClubOfferData) => {
         if (!page || isPurchasingRef.current) return;
