@@ -4,6 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
     links: [] as string[],
     openUrl: vi.fn(),
+    clearRemember: vi.fn(),
+    clearToken: vi.fn(),
     config: {} as Record<string, unknown>
 }));
 
@@ -29,7 +31,10 @@ vi.mock('../../api', async (importOriginal) => {
         GetOptionalConfigurationValue: value,
         LocalizeText: (key: string) => key,
         localizeWithFallback: (_key: string, fallback: string) => fallback,
-        OpenUrl: mocks.openUrl
+        OpenUrl: mocks.openUrl,
+        ClearRememberLogin: mocks.clearRemember,
+        clearAccessToken: mocks.clearToken,
+        SendMessageComposer: () => undefined
     };
 });
 
@@ -63,6 +68,21 @@ describe('PurseView (AIR purse_xml / PurseAreaExtension)', () => {
         mocks.links.length = 0;
         mocks.config = {};
         mocks.openUrl.mockClear();
+        mocks.clearRemember.mockClear();
+        mocks.clearToken.mockClear();
+        vi.unstubAllGlobals();
+    });
+
+    it('forgets the local credentials on log out even when the server never answers', async () => {
+        vi.stubGlobal('fetch', vi.fn(() => new Promise(() => undefined)));
+        render(<PurseView />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Log out' }));
+
+        await vi.waitFor(() => {
+            expect(mocks.clearRemember).toHaveBeenCalled();
+            expect(mocks.clearToken).toHaveBeenCalled();
+        });
     });
 
     it('shows each amount as the whole number, as AIR does', () => {
