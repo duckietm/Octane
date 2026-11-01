@@ -565,6 +565,7 @@
     "room.camera.follow_user": true,
     "room.camera.move.speed": 12,
     "room.branding.image.hosts": [],
+    "furni.external.image.hosts": ["youtube.com", "ytimg.com"],
     "chat.emoji.enabled": true,
     "habbicons.enabled": true,
     "habbicons.asset.root": "/habbicons",
