@@ -21,7 +21,7 @@ import {
     PrepareRenderer
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
-import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, isRememberedLogin, persistAccessTokenFromPayload, rememberRequestBody, StoreRememberLoginFromPayload, withRememberLock } from './api';
+import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, persistAccessTokenFromPayload, rememberRequestBody, StoreRememberLoginFromPayload, withRememberLock } from './api';
 import { Base } from './common';
 import { LoadingView } from './components/loading/LoadingView';
 import { LoginView } from './components/login/LoginView';
@@ -233,12 +233,16 @@ export const App: FC<{}> = (props) => {
                 StoreRememberLoginFromPayload(payload, typeof payload.username === 'string' ? payload.username : remembered.username, remembered.cookie === true);
                 return ssoTicket;
             }
+
+            // Only a refusal of the token forgets it: an emulator restarting or a dropped connection used to cost the
+            // player the remembered login.
+            if (isRememberRejection(response.status)) {
+                ClearRememberLoginIfStill(remembered.token);
+                OctaneLogger.log('[App] tryRememberLogin → token refused, cleared remember');
+            }
         } catch (error) {
             console.warn('[App] tryRememberLogin → fetch threw', error);
         }
-
-        ClearRememberLoginIfStill(remembered.token);
-        OctaneLogger.log('[App] tryRememberLogin → cleared remember, returning empty');
 
         return '';
     }, []);
@@ -276,7 +280,7 @@ export const App: FC<{}> = (props) => {
                 return;
             }
 
-            if (response.status === 400 || response.status === 401 || response.status === 403) ClearRememberLoginIfStill(remembered.token);
+            if (isRememberRejection(response.status)) ClearRememberLoginIfStill(remembered.token);
         } catch (error) {
             OctaneLogger.error('[LoginScreen] Remember rotation failed', error);
         }
