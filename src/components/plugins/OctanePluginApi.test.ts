@@ -9,6 +9,8 @@ describe('plugin registration', () => {
 
         pluginApi.register({
             name: 'broken-start',
+            label: 'Broken start',
+            onOpen: () => undefined,
             onInit: () => {
                 throw new Error('boom');
             }
@@ -26,7 +28,7 @@ describe('plugin registration', () => {
         });
         const stopHeard = subscribePlugins(heard);
 
-        pluginApi.register({ name: 'listener-check' });
+        pluginApi.register({ name: 'listener-check', label: 'Listener check', onOpen: () => undefined });
 
         expect(heard).toHaveBeenCalled();
         stopBroken();
