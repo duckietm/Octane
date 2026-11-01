@@ -200,8 +200,11 @@ describe('marketplace catalog pages', () => {
         act(() => mocks.showConfirm.mock.calls.at(-1)[1]());
         expect(sent('clearHistory')[0].args).toEqual([2]);
 
+        const listsBefore = sent('getOwnOffers').length;
         fireEvent.click(screen.getByRole('button', { name: 'Collect credits' }));
         expect(sent('redeem')).toHaveLength(1);
+        // The server's own list follows, so a refused redeem does not leave the credits shown as collected.
+        expect(sent('getOwnOffers')).toHaveLength(listsBefore + 1);
     });
 
     it('filters the own offers by the search field', () => {
