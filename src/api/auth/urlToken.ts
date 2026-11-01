@@ -28,6 +28,13 @@ export const takeLoginTokenFromUrl = (location: Location = window.location, hist
     return { token, expiresAt: Number.isFinite(expiry) && expiry > 0 ? expiry : Math.floor(Date.now() / 1000) + THIRTY_DAYS_SECONDS };
 };
 
+/** A room or friend id from the address: a positive whole number, or 0 (a value such as ?room=abc used to become NaN). */
+export const positiveIdFromSearch = (value: string | null): number => {
+    const id = Number(value);
+
+    return Number.isInteger(id) && id > 0 ? id : 0;
+};
+
 /** The account a remember token belongs to (its `sub`), or null when it is not a token this client can read. */
 export const loginTokenSubject = (token: string | undefined): number | null => {
     const payload = token?.split('.')[1];
