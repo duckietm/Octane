@@ -8,7 +8,7 @@ import {
     OpenCampaignCalendarDoorComposer,
     RemoveLinkEventTracker
 } from '@octane/renderer';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { CalendarItem, SendMessageComposer } from '../../api';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useMessageEvent } from '../../hooks';
@@ -16,14 +16,16 @@ import { CalendarView } from './CalendarView';
 
 export const CampaignView: FC<{}> = (props) => {
     const [calendarData, setCalendarData] = useState<CampaignCalendarData>(null);
-    const [lastOpenAttempt, setLastOpenAttempt] = useState<number>(-1);
+    const pendingDoorRef = useRef(-1);
     const [receivedProducts, setReceivedProducts] = useState<Map<number, CalendarItem>>(new Map());
     const [isCalendarOpen, setCalendarOpen] = useState(false);
 
     const openPackage = (id: number, asStaff = false) => {
-        if (!calendarData) return;
+        // One door at a time: the answer names no door, so two quick clicks used to file the first door's prize under
+        // the second and leave the second closed.
+        if (!calendarData || pendingDoorRef.current !== -1) return;
 
-        setLastOpenAttempt(id);
+        pendingDoorRef.current = id;
 
         if (asStaff) {
             SendMessageComposer(new OpenCampaignCalendarDoorAsStaffComposer(calendarData.campaignName, id));
@@ -37,6 +39,7 @@ export const CampaignView: FC<{}> = (props) => {
 
         if (!parser) return;
 
+        pendingDoorRef.current = -1;
         setCalendarData(parser.calendarData);
     });
 
@@ -45,12 +48,15 @@ export const CampaignView: FC<{}> = (props) => {
 
         if (!parser) return;
 
-        const lastAttempt = lastOpenAttempt;
+        const lastAttempt = pendingDoorRef.current;
+        pendingDoorRef.current = -1;
+
+        if (lastAttempt === -1) return;
 
         if (parser.doorOpened) {
             setCalendarData((prev) => {
                 const copy = prev.clone();
-                copy.openedDays.push(lastOpenAttempt);
+                copy.openedDays.push(lastAttempt);
 
                 return copy;
             });
@@ -73,7 +79,6 @@ export const CampaignView: FC<{}> = (props) => {
             });
         }
 
-        setLastOpenAttempt(-1);
     });
 
     useEffect(() => {
