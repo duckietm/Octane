@@ -21,7 +21,7 @@ import {
     PrepareRenderer
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
-import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, persistAccessTokenFromPayload, rememberRequestBody, StoreRememberLoginFromPayload, withRememberLock } from './api';
+import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock } from './api';
 import { Base } from './common';
 import { LoadingView } from './components/loading/LoadingView';
 import { LoginView } from './components/login/LoginView';
@@ -546,6 +546,8 @@ export const App: FC<{}> = (props) => {
                 const rotateMinutes = Math.max(1, Number(GetConfiguration().getValue<unknown>('login.remember.rotate.interval.minutes', 15)) || 15);
                 if (isRememberedLogin(GetRememberLogin()))
                     rememberRotateIntervalRef.current = window.setInterval(() => rotateRememberLogin(), rotateMinutes * 60 * 1000);
+                // Without a remembered login the access token is renewed from the session before it expires.
+                else rememberRotateIntervalRef.current = window.setInterval(() => void renewAccessTokenIfDue(), 60 * 1000);
 
                 if (!tickersStartedRef.current) {
                     tickersStartedRef.current = true;
