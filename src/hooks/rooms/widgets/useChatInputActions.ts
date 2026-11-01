@@ -14,7 +14,7 @@ import {
     TextureUtils,
     TriggerHabbiconComposer
 } from '@octane/renderer';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { CanOpenFurniChooser, CanOpenUserChooser,ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, IsAnyRoomController, LocalizeText, parseSignId, SendMessageComposer, WIRED_PLAYTEST_TOGGLE_LINK } from '../../../api';
 import { useNotification } from '../../notification';
 import { useTranslation } from '../../translation';
@@ -39,6 +39,11 @@ export const useChatInputActions = () => {
     const { showOctaneAlert = null, showConfirm = null } = useNotification();
     const { settings, translateOutgoing, enqueueOutgoingTranslation } = useTranslation();
     const { roomSession = null } = useRoom();
+    // Translated lines leave in the order they were typed and only in the room they were typed in: each waits for
+    // the one before it, and one whose room has changed meanwhile is dropped.
+    const roomSessionRef = useRef(roomSession);
+    roomSessionRef.current = roomSession;
+    const translatedSendsRef = useRef<Promise<void>>(Promise.resolve());
 
     const sendChat = useCallback(
         (text: string, chatType: number, recipientName: string = '', styleId: number = 0) => {
@@ -306,8 +311,13 @@ export const useChatInputActions = () => {
                 return null;
             }
 
-            void (async () => {
-                const translation = await translateOutgoing(text);
+            const sessionAtSend = roomSession;
+            const translating = translateOutgoing(text).catch(() => null);
+
+            translatedSendsRef.current = translatedSendsRef.current.then(async () => {
+                const translation = await translating;
+
+                if (roomSessionRef.current !== sessionAtSend) return;
 
                 if (translation) {
                     enqueueOutgoingTranslation(translation);
@@ -316,7 +326,7 @@ export const useChatInputActions = () => {
                 }
 
                 dispatchChatMessage(text);
-            })();
+            });
 
             return null;
         },
