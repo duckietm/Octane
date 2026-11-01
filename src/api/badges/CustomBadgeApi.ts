@@ -139,10 +139,13 @@ export const ensureCustomBadgeTexts = (): Promise<void> => {
         try {
             const url = buildUrl('badges.custom.texts.endpoint', '/api/badges/custom/texts');
             const response = await fetch(url, { method: 'GET', credentials: 'include', headers: { Accept: 'application/json' } });
-            if (!response.ok) return;
+            if (!response.ok) throw new Error(`texts ${response.status}`);
             const payload = await parseJson<{ texts: Record<string, string> }>(response);
             injectTextsIntoLocalization(payload.texts);
-        } catch {}
+        } catch {
+            // A failed load is not kept: the next caller tries again instead of the names staying empty all session.
+            customBadgeTextsLoadPromise = null;
+        }
     })();
     return customBadgeTextsLoadPromise;
 };

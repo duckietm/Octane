@@ -149,6 +149,9 @@ const buildHeaders = (): Record<string, string> => {
 };
 
 let cacheValue: EmuStatsSnapshot = null;
+// The snapshot belongs to the session that fetched it: after a logout in the same tab, the next user used to see the
+// last staff snapshot without the permission to fetch one.
+let cacheOwner: string = null;
 
 const parseJson = async <T>(response: Response): Promise<T> => {
     const text = await response.text();
@@ -163,7 +166,9 @@ const parseJson = async <T>(response: Response): Promise<T> => {
 };
 
 export const fetchEmuStats = async (force = false): Promise<EmuStatsSnapshot> => {
-    if (!force && cacheValue) return cacheValue;
+    const owner = getAccessToken() ?? '';
+
+    if (!force && cacheValue && cacheOwner === owner) return cacheValue;
 
     const response = await fetch(getUrl(), {
         method: 'GET',
@@ -178,10 +183,11 @@ export const fetchEmuStats = async (force = false): Promise<EmuStatsSnapshot> =>
     }
 
     cacheValue = payload;
+    cacheOwner = owner;
 
     return payload;
 };
 
 export const getCachedEmuStats = (): EmuStatsSnapshot => {
-    return cacheValue;
+    return cacheOwner === (getAccessToken() ?? '') ? cacheValue : null;
 };

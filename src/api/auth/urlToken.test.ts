@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { loginTokenSubject, takeLoginTokenFromUrl } from './urlToken';
+import { loginTokenSubject, positiveIdFromSearch, takeLoginTokenFromUrl } from './urlToken';
 
 const jwtFor = (sub: number) => `e30.${btoa(JSON.stringify({ sub })).replace(/=+$/, '')}.sig`;
 
@@ -41,5 +41,13 @@ describe('loginTokenSubject', () => {
         expect(loginTokenSubject(jwtFor(42))).toBe(42);
         expect(loginTokenSubject('not-a-token')).toBeNull();
         expect(loginTokenSubject(undefined)).toBeNull();
+    });
+
+    it('reads a room or friend id only when it is a positive whole number', () => {
+        expect(positiveIdFromSearch('42')).toBe(42);
+        expect(positiveIdFromSearch('abc')).toBe(0);
+        expect(positiveIdFromSearch('-3')).toBe(0);
+        expect(positiveIdFromSearch('1.5')).toBe(0);
+        expect(positiveIdFromSearch(null)).toBe(0);
     });
 });
