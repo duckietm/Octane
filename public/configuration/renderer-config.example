@@ -5,6 +5,7 @@
     "crypto.ws.enabled": false,
     "crypto.ws.signing.enabled": false,
     "crypto.ws.signing.public_key": "",
+    "crypto.ws.require_v2": false,
     "system.pong.manually": true,
     "system.pong.interval.ms": 20000,
     "// ---- Base URLs (used by the keys below) ----": "",
