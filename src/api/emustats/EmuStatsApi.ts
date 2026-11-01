@@ -38,7 +38,8 @@ export interface EmuStatsUserRow {
     id: number;
     username: string;
     rank: string;
-    credits: number;
+    /** Sent by servers before the emustats permission; the page no longer shows it. */
+    credits?: number;
     roomId: number;
 }
 

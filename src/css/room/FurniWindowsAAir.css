@@ -195,3 +195,224 @@
         font-weight: 700 !important;
     }
 }
+
+/* ---------- dimmer_ui layout (277 x 225). Positions are AIR's, relative to the tab pane (tab_context at client 4, 21). ---------- */
+.octane-room-widget-dimmer.octane-dimmer {
+    width: 277px;
+    min-width: 277px;
+    max-width: 277px;
+    resize: none !important;
+}
+
+/* tab_1..3: 60, 63 and 63 px wide, from the pane's left edge. */
+.octane-dimmer .octane-dimmer__tabs {
+    justify-content: flex-start !important;
+    gap: 0 !important;
+    padding-left: 8px !important;
+}
+
+/* tab_button: 60 / 63 px in the layout, growing with its caption up to width_max 100. */
+.octane-dimmer .octane-dimmer__tabs > .octane-card-tab-item {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 63px;
+    max-width: 100px;
+}
+
+.octane-dimmer .octane-dimmer__tabs > .octane-card-tab-item:first-child {
+    min-width: 60px;
+}
+
+.octane-dimmer .octane-dimmer__tabs.is-hidden {
+    visibility: hidden;
+}
+
+.octane-dimmer .octane-dimmer__content {
+    position: relative;
+    flex: 0 0 auto;
+    height: 177px;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.octane-dimmer__pane,
+.octane-dimmer__off {
+    position: absolute;
+    left: 8px;
+    top: 0;
+    width: 258px;
+    height: 142px;
+}
+
+/* color_grid: seven 27 x 22 cells over 210 px at (17, 13). A cell is the frame, the colour button multiplied by the colour (AIR's
+   ColorTransform) and, when chosen, the chosen overlay. */
+.octane-dimmer__colors {
+    position: absolute;
+    left: 17px;
+    top: 13px;
+    width: 210px;
+    height: 22px;
+}
+
+.octane-dimmer__color {
+    position: absolute;
+    top: 0;
+    width: 27px;
+    height: 22px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--dimmer-frame) no-repeat;
+    cursor: pointer;
+    image-rendering: pixelated;
+}
+
+.octane-dimmer__color-tint,
+.octane-dimmer__color-chosen {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.octane-dimmer__color-tint {
+    background: var(--dimmer-button) no-repeat, var(--dimmer-color);
+    background-blend-mode: multiply;
+    -webkit-mask: var(--dimmer-button) no-repeat;
+    mask: var(--dimmer-button) no-repeat;
+}
+
+.octane-dimmer__color-chosen {
+    background: var(--dimmer-chosen) no-repeat;
+}
+
+.octane-dimmer__color-input {
+    position: absolute;
+    left: 17px;
+    top: 13px;
+    width: 210px;
+    height: 22px;
+}
+
+/* brightness_container at (19, 47): slider_base (201 x 12) at (2, 0); slider_button (12 x 17) moves in the 206 px area at (0, 1), 7 down. */
+.octane-dimmer__brightness {
+    position: absolute;
+    left: 19px;
+    top: 47px;
+    width: 206px;
+    height: 25px;
+}
+
+.octane-dimmer__slider-base {
+    position: absolute;
+    left: 2px;
+    top: 0;
+    width: 201px;
+    height: 12px;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.octane-dimmer__slider-area {
+    position: absolute;
+    left: 0;
+    top: 1px;
+    width: 206px;
+    height: 24px;
+}
+
+.octane-dimmer__slider-button {
+    position: absolute;
+    top: 7px;
+    width: 12px;
+    height: 17px;
+    background: no-repeat;
+    image-rendering: pixelated;
+    cursor: pointer;
+    touch-action: none;
+    outline: none;
+}
+
+.octane-dimmer__slider-button:focus-visible {
+    outline: 1px dotted #000;
+    outline-offset: 1px;
+}
+
+/* type_checkbox at (18, 72) and type_text at (37, 73); dimmer_info (222 x 46, 0x999999) at (19, 92). */
+.octane-dimmer__type {
+    position: absolute;
+    left: 18px;
+    top: 72px;
+    display: flex;
+    align-items: center;
+    gap: 1px;
+}
+
+.octane-dimmer .octane-dimmer__info {
+    position: absolute;
+    left: 19px;
+    top: 92px;
+    width: 222px;
+    color: #999999 !important;
+    white-space: normal;
+}
+
+/* off_border (254 x 133) at (2, 6): dimmer_info picture at (96, 11), off_text (219 wide) at (19, 93). */
+.octane-dimmer__off {
+    left: 10px;
+    top: 6px;
+    width: 254px;
+    height: 133px;
+    box-sizing: border-box;
+    border: 1px solid #9c9c9c;
+    border-radius: 5px;
+    background: #ffffff;
+}
+
+.octane-dimmer__off-image {
+    position: absolute;
+    left: 95px;
+    top: 10px;
+    width: 56px;
+    height: 79px;
+    image-rendering: pixelated;
+}
+
+.octane-dimmer .octane-dimmer__off-text {
+    position: absolute;
+    left: 18px;
+    top: 92px;
+    width: 219px;
+    white-space: normal;
+}
+
+/* apply_button (89 x 24) at (0, 145) and on_off_button (58 x 22) at (199, 146). */
+.octane-dimmer__actions {
+    position: absolute;
+    left: 8px;
+    top: 145px;
+    width: 258px;
+    height: 24px;
+}
+
+@layer base {
+    .octane-dimmer .octane-dimmer__actions .octane-dimmer__apply,
+    .octane-dimmer .octane-dimmer__actions .octane-dimmer__on-off {
+        position: absolute;
+        min-height: 0 !important;
+        padding: 0 4px !important;
+    }
+
+    .octane-dimmer .octane-dimmer__actions .octane-dimmer__apply {
+        left: 0;
+        top: 0;
+        width: 89px;
+        height: 24px;
+    }
+
+    .octane-dimmer .octane-dimmer__actions .octane-dimmer__on-off {
+        left: 199px;
+        top: 1px;
+        width: 58px;
+        height: 22px;
+    }
+}
