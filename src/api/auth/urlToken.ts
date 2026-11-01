@@ -53,6 +53,20 @@ export const loginTokenSubject = (token: string | undefined): number | null => {
 
 const SWITCH_ACCOUNT_QUESTION = 'This link signs you in to a different account from the one this browser remembers. Sign in with the link?';
 
+/** The question asked before a link signs in a browser that remembers no login, naming the account when it can. */
+export const signInFromLinkQuestion = (subject: number | null): string =>
+    subject !== null ? `This link signs you in as account #${subject}. Sign in with the link?` : 'This link signs you in to an account. Sign in with the link?';
+
+/**
+ * Whether a login secret from the address (a CMS token or an SSO ticket) may be used. A browser that remembers no
+ * login used to take it at once, so a link built with the sender's own token signed the reader in to the sender's
+ * account (login CSRF): it is asked first. A browser with a remembered login is not asked here.
+ */
+export const confirmSignInFromLink = (
+    subject: number | null,
+    confirmSignIn: (question: string) => boolean = (question) => window.confirm(question)
+): boolean => (GetRememberLogin() ? true : confirmSignIn(signInFromLinkQuestion(subject)));
+
 /**
  * Takes the CMS login token out of the address and makes it the remembered login. It wins over what this browser
  * remembered: the CMS just logged someone in, and keeping an older remember would enter the hotel as whoever was
@@ -72,6 +86,7 @@ export const adoptLoginTokenFromUrl = (
     const remembered = loginTokenSubject(GetRememberLogin()?.token);
     const incoming = loginTokenSubject(urlToken.token);
 
+    if (!confirmSignInFromLink(incoming, confirmSwitch)) return false;
     if (remembered !== null && incoming !== null && remembered !== incoming && !confirmSwitch(SWITCH_ACCOUNT_QUESTION)) return false;
 
     ClearRememberLogin();

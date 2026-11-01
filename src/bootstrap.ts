@@ -1,5 +1,5 @@
 import { GetConfiguration } from '@octane/renderer';
-import { adoptLoginTokenFromUrl, positiveIdFromSearch } from './api/auth/urlToken';
+import { adoptLoginTokenFromUrl, confirmSignInFromLink, positiveIdFromSearch } from './api/auth/urlToken';
 import { derivePetConfig, DerivedPetConfig, PetDefinition } from './api/octane/PetData';
 import { parseJsonDocument, UiJsonMode } from './json/JsonDocumentParser';
 import { configFileUrl, getClientMode, installSecureFetch } from './secure-assets';
@@ -129,6 +129,11 @@ try {
     setBootDebug(`boot: login token from the address not kept ${error?.message || error}`);
 }
 
+// An SSO ticket from the address signs in only after the same question, when this browser remembers no login.
+let ssoTicket = search.get('sso') || null;
+
+if (ssoTicket && !confirmSignInFromLink(null)) ssoTicket = null;
+
 await loadClientMode();
 
 installSecureFetch();
@@ -142,7 +147,7 @@ const petConfigLoad = loadPetConfig();
 (window as any).OctaneClientMode = clientMode;
 (window as any).OctaneConfig = {
     'config.urls': [configFileUrl('renderer-config.json', true), configFileUrl('ui-config.json', true)],
-    'sso.ticket': search.get('sso') || null,
+    'sso.ticket': ssoTicket,
     'forward.type': forwardRoomId ? 2 : -1,
     'forward.id': forwardRoomId,
     'friend.id': friendId
