@@ -43,9 +43,10 @@ export const WiredTriggerReceiveSignalView: FC<{}> = () => {
                 save={save}
                 footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} furniSources={FURNI_SOURCE_OPTIONS} onChangeFurni={setFurniSource} />}
             >
-                <div className="flex items-center justify-between">
+                {/* The section's bold rule makes bold text 100% wide: the count keeps its own width, so the label is not squeezed onto two lines. */}
+                <div className="flex items-baseline justify-between gap-2">
                     <Text small>{localizeWithFallback('wiredfurni.params.signal.senders_connected', 'Senders connected')}</Text>
-                    <Text bold small>
+                    <Text bold small className="shrink-0" style={{ width: 'auto' }}>
                         {senderCount}
                     </Text>
                 </div>

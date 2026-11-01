@@ -1,9 +1,9 @@
 import { CSSProperties, FC, useLayoutEffect, useRef, useState } from 'react';
-import { compositeRetainedToOpaque, resolveLineMetrics } from './NativeTextRenderer';
 import { renderCanvasSpacedText, supportsCanvasSpacedText } from './CanvasSpacedText';
 import { loadNativeFont, measureNativeText, NativeFontStyle, peekNativeFont, supportsNativeText, unpremultiplyPixels } from './NativeFont';
-import { useNativeTextRasterScale, useNativeTextSampling, useNativeTextScale } from './NativeTextScale';
 import { nativeTextRasterCache } from './NativeTextRasterCache';
+import { compositeRetainedToOpaque, resolveLineMetrics } from './NativeTextRenderer';
+import { useNativeTextRasterScale, useNativeTextSampling, useNativeTextScale } from './NativeTextScale';
 import { NativeTextStyleName, nativeTextStyles } from './NativeTextStyles';
 
 /** A drawn raster handed to `onRaster`: the 1x or display-scale canvas, the text it shows and the surface colour it was composited against (null: transparent). */
@@ -102,10 +102,10 @@ export const NativeText: FC<NativeTextProps> = ({
     const displayScale = useNativeTextScale();
     const rasterScale = useNativeTextRasterScale();
     const sampling = useNativeTextSampling(nativeResolution);
-    // Smooth (ADVANCED) text is drawn at the device pixel ratio itself, so it is never resampled; the renderer takes whole sizes only, so
-    // on a fractional ratio it is drawn at the nearest whole size (13 px at 125 % as 16 px). Volter is a pixel font that an in-between size
-    // would distort: it, and the letter-spaced canvas path, keep the next whole scale.
-    const scale = nativeResolution ? 1 : fontStyle.antiAliasType === 'normal' ? displayScale : rasterScale;
+    // Text is drawn at the device pixel ratio itself, so it is never resampled; the renderer takes whole sizes only, so on a fractional
+    // ratio it is drawn at the nearest whole size (13 px at 125 % as 16 px, Volter 9 px as 11 px: sharp pixel letters, where a 2x raster
+    // shrunk by the browser came out soft). The letter-spaced canvas path keeps the next whole scale.
+    const scale = nativeResolution ? 1 : rasterScale;
     const spacedScale = nativeResolution ? 1 : displayScale;
     const onRasterRef = useRef(onRaster);
 
