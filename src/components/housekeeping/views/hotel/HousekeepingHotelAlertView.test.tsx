@@ -32,6 +32,7 @@ describe('HousekeepingHotelAlertView', () => {
         fireEvent.click(screen.getByText('housekeeping.hotel.alert.send.hotel'));
 
         expect(sendHotelAlert).toHaveBeenCalledWith('Hello', undefined);
+        expect(confirm).toHaveBeenCalled();
     });
 
     it('needs a username for one user and sends it as the recipient', () => {

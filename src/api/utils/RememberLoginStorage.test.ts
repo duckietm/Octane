@@ -1,6 +1,6 @@
 /* @vitest-environment jsdom */
 import { beforeEach, describe, expect, it } from 'vitest';
-import { GetRememberLogin, isRememberedLogin, rememberRequestBody, SetRememberLogin, StoreRememberLoginFromPayload } from './RememberLogin';
+import { GetRememberLogin, isRememberedLogin, isRememberRejection, rememberRequestBody, SetRememberLogin, StoreRememberLoginFromPayload } from './RememberLogin';
 
 const KEY = 'nitro.auth.remember';
 const stored = () => JSON.parse(window.localStorage.getItem(KEY) || 'null');
@@ -61,5 +61,10 @@ describe('remembered login storage', () => {
         StoreRememberLoginFromPayload({ accessToken: 'access-1' }, 'alice', true);
 
         expect(stored()).toBeNull();
+    });
+
+    it('forgets the remembered login only when the server refuses the token', () => {
+        for (const status of [400, 401, 403]) expect(isRememberRejection(status)).toBe(true);
+        for (const status of [0, 429, 500, 502, 503]) expect(isRememberRejection(status)).toBe(false);
     });
 });

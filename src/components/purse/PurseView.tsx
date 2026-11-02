@@ -27,6 +27,9 @@ import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
+/** How long logout waits for the server before going on: the local credentials are already gone. */
+const LOGOUT_TIMEOUT_MS = 3000;
+
 export const PurseView: FC<{}> = (props) => {
     const { purse = null, hcDisabled = false } = usePurse();
     const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
@@ -130,11 +133,19 @@ export const PurseView: FC<{}> = (props) => {
             /* best-effort — the HTTP logout below still performs server cleanup */
         }
 
+        // The local credentials go first: the server call below can hang, and on a shared computer the next user
+        // reloading the page must not find this account still remembered.
+        ClearRememberLogin();
+        clearAccessToken();
+        ClearStoredChatHistory();
+        if (window.OctaneConfig) window.OctaneConfig['sso.ticket'] = '';
+
         try {
             await fetch(logoutUrl, {
                 method: 'POST',
                 credentials: 'include',
                 keepalive: true,
+                signal: AbortSignal.timeout(LOGOUT_TIMEOUT_MS),
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
@@ -151,11 +162,6 @@ export const PurseView: FC<{}> = (props) => {
         } catch {
             /* best-effort — page reload will drop the transport if it is already closed */
         }
-
-        ClearRememberLogin();
-        clearAccessToken();
-        ClearStoredChatHistory();
-        if (window.OctaneConfig) window.OctaneConfig['sso.ticket'] = '';
 
         // When the client runs inside a CMS page, reloading the iframe alone
         // leaves the user logged in on the site with a dead client. Send the

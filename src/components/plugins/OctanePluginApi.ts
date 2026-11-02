@@ -56,15 +56,28 @@ const _plugins: IOctanePlugin[] = [];
 const _listeners: Array<() => void> = [];
 const _windowCleanup = new Map<string, () => void>();
 
+// One listener that throws must not stop the others from hearing the change.
 function notifyListeners() {
-    _listeners.forEach((fn) => fn());
+    _listeners.forEach((fn) => {
+        try {
+            fn();
+        } catch (error) {
+            console.error('[plugins] a listener failed', error);
+        }
+    });
 }
 
 const pluginApi: IOctanePluginApi = {
     register(plugin: IOctanePlugin) {
         if (_plugins.some((p) => p.name === plugin.name)) return;
+        // A plugin is listed once its onInit went through: one that failed used to stay registered half set up.
+        try {
+            plugin.onInit?.(pluginApi);
+        } catch (error) {
+            console.error(`[plugins] ${plugin.name} failed to start`, error);
+            return;
+        }
         _plugins.push(plugin);
-        plugin.onInit?.(pluginApi);
         notifyListeners();
     },
 

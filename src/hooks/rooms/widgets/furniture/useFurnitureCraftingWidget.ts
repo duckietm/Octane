@@ -12,7 +12,7 @@ import {
     RoomEngineTriggerWidgetEvent,
     RoomWidgetEnum
 } from '@octane/renderer';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ICraftingIngredient, ICraftingRecipe, LocalizeText, SendMessageComposer } from '../../../../api';
 import { useMessageEvent, useOctaneEvent } from '../../../events';
 import { useInventoryFurni } from '../../../inventory';
@@ -26,6 +26,7 @@ const useFurnitureCraftingWidgetState = () => {
     const [ingredientNames, setIngredientNames] = useState<string[]>(null);
     const [cachedIngredients, setCachedIngredients] = useState<Map<string, CraftingRecipeIngredientParser[]>>(new Map());
     const [isCrafting, setIsCrafting] = useState(false);
+    const requestedRecipesRef = useRef<string[]>([]);
     const { groupItems = [], getItemsByType = null, activate = null, deactivate = null } = useInventoryFurni();
     const { simpleAlert = null } = useNotification();
 
@@ -36,6 +37,7 @@ const useFurnitureCraftingWidgetState = () => {
         setSelectedRecipe(null);
         setIngredients([]);
         setCachedIngredients(new Map());
+        requestedRecipesRef.current = [];
     };
 
     const onClose = () => {
@@ -54,7 +56,10 @@ const useFurnitureCraftingWidgetState = () => {
 
         const cache = cachedIngredients.get(recipe.name);
 
-        if (!cache) SendMessageComposer(new GetCraftingRecipeComposer(recipe.name));
+        if (!cache) {
+            requestedRecipesRef.current.push(recipe.name);
+            SendMessageComposer(new GetCraftingRecipeComposer(recipe.name));
+        }
     };
 
     useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.OPEN_WIDGET, (event) => {
@@ -97,11 +102,17 @@ const useFurnitureCraftingWidgetState = () => {
 
     useMessageEvent<CraftingRecipeEvent>(CraftingRecipeEvent, (event) => {
         const parser = event.getParser();
+        // The answer carries no recipe name; the server answers in order, so it belongs to the oldest request. It
+        // was filed under the recipe selected now: two quick clicks put one recipe's ingredients under the other,
+        // and with nothing selected the widget threw.
+        const recipeName = requestedRecipesRef.current.shift();
+
+        if (!recipeName) return;
 
         setCachedIngredients((prevValue) => {
             const newValue = new Map(prevValue);
 
-            newValue.set(selectedRecipe.name, parser.ingredients);
+            newValue.set(recipeName, parser.ingredients);
 
             return newValue;
         });

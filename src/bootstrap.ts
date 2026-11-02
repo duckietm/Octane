@@ -1,5 +1,5 @@
 import { GetConfiguration } from '@octane/renderer';
-import { adoptLoginTokenFromUrl } from './api/auth/urlToken';
+import { adoptLoginTokenFromUrl, confirmSignInFromLink, positiveIdFromSearch } from './api/auth/urlToken';
 import { derivePetConfig, DerivedPetConfig, PetDefinition } from './api/octane/PetData';
 import { parseJsonDocument, UiJsonMode } from './json/JsonDocumentParser';
 import { configFileUrl, getClientMode, installSecureFetch } from './secure-assets';
@@ -108,11 +108,17 @@ const loadPetConfig = async (): Promise<DerivedPetConfig | null> => {
 // so none of them reaches the history, a bookmark or the Referer of a request.
 const search = new URLSearchParams(window.location.search);
 
-if (search.has('sso')) {
+// ?room= and ?friend= act once: left in the address they sent the user there again at every reload.
+const forwardRoomId = positiveIdFromSearch(search.get('room'));
+const friendId = positiveIdFromSearch(search.get('friend'));
+
+if (search.has('sso') || search.has('room') || search.has('friend')) {
     try {
         const url = new URL(window.location.href);
 
         url.searchParams.delete('sso');
+        url.searchParams.delete('room');
+        url.searchParams.delete('friend');
         window.history.replaceState(window.history.state, '', url.toString());
     } catch {}
 }
@@ -122,6 +128,11 @@ try {
 } catch (error) {
     setBootDebug(`boot: login token from the address not kept ${error?.message || error}`);
 }
+
+// An SSO ticket from the address signs in only after the same question, when this browser remembers no login.
+let ssoTicket = search.get('sso') || null;
+
+if (ssoTicket && !confirmSignInFromLink(null)) ssoTicket = null;
 
 await loadClientMode();
 
@@ -136,10 +147,10 @@ const petConfigLoad = loadPetConfig();
 (window as any).OctaneClientMode = clientMode;
 (window as any).OctaneConfig = {
     'config.urls': [configFileUrl('renderer-config.json', true), configFileUrl('ui-config.json', true)],
-    'sso.ticket': search.get('sso') || null,
-    'forward.type': search.get('room') ? 2 : -1,
-    'forward.id': search.get('room') || 0,
-    'friend.id': search.get('friend') || 0
+    'sso.ticket': ssoTicket,
+    'forward.type': forwardRoomId ? 2 : -1,
+    'forward.id': forwardRoomId,
+    'friend.id': friendId
 };
 
 // Legacy aliases so external scripts written against the old Nitro globals keep working

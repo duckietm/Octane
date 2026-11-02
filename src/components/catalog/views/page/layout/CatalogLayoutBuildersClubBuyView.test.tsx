@@ -6,7 +6,8 @@ const state = vi.hoisted(() => ({
     windows: [] as number[],
     secondsLeft: 0,
     credits: 1000,
-    skipConfirmation: false
+    skipConfirmation: false,
+    handlers: new Map<string, (event: { type: string }) => void>()
 }));
 
 vi.mock('../../../../../api', async (importOriginal) => ({
@@ -32,10 +33,12 @@ vi.mock('../../../../../hooks', async (importOriginal) => ({
         };
     },
     usePurse: () => ({ getCurrencyAmount: (type: number) => (type === -1 ? state.credits : 0) }),
-    useUiEvent: () => undefined
+    useUiEvent: (type: string, handler: (event: { type: string }) => void) => state.handlers.set(type, handler)
 }));
 
 import { PurchaseFromCatalogComposer } from '@octane/renderer';
+import { act } from 'react';
+import { CatalogPurchaseNotAllowedEvent } from '../../../../../events';
 import { CatalogLayoutBuildersClubBuyView } from './CatalogLayoutBuildersClubBuyView';
 
 const page = (layoutCode: string) =>
@@ -84,6 +87,17 @@ describe('Builders Club pages (AIR layout_builders_club_*)', () => {
         const purchase = state.sent.find((composer) => composer instanceof PurchaseFromCatalogComposer) as any;
 
         expect(purchase.getMessageArray()).toEqual([70, 11, null, 1]);
+    });
+
+    it('ends the purchase when the server refuses it as not allowed, instead of spinning forever', () => {
+        state.secondsLeft = 3600;
+        renderPage('builders_club_addons');
+
+        fireEvent.click(screen.getAllByRole('button', { name: 'buy' })[0]);
+        fireEvent.click(screen.getByRole('button', { name: 'catalog.marketplace.confirm_title' }));
+        act(() => state.handlers.get(CatalogPurchaseNotAllowedEvent.NOT_ALLOWED)?.({ type: CatalogPurchaseNotAllowedEvent.NOT_ALLOWED }));
+
+        expect(screen.getByRole('button', { name: 'generic.failed' })).toBeTruthy();
     });
 
     it('marks an offer the player cannot pay for', () => {

@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { localizeWithFallback, LocalizeText } from '../../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useDoorbellActions, useDoorbellState } from '../../../../hooks';
@@ -12,16 +12,22 @@ import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 export const DoorbellWidgetView: FC = () => {
     const users = useDoorbellState();
     const { answer } = useDoorbellActions();
-    const [dismissed, setDismissed] = useState(false);
+    // Closing hides the visitors waiting now, not every later one: a single flag used to stay set, so whoever rang
+    // afterwards (the same friend an hour later included) was never shown.
+    const [dismissedUsers, setDismissedUsers] = useState<readonly string[]>([]);
 
-    const isVisible = !dismissed && users.length > 0;
+    useEffect(() => {
+        if (!users.length && dismissedUsers.length) setDismissedUsers([]);
+    }, [users, dismissedUsers]);
+
+    const isVisible = users.some((userName) => !dismissedUsers.includes(userName));
 
     if (!isVisible) return null;
 
     return (
         <NativeTextTree>
             <OctaneCardView className="octane-widget-doorbell" theme="primary-slim">
-                <OctaneCardHeaderView headerText={localizeWithFallback('widgets.doorbell.title', LocalizeText('navigator.doorbell.title'))} onCloseClick={() => setDismissed(true)} />
+                <OctaneCardHeaderView headerText={localizeWithFallback('widgets.doorbell.title', LocalizeText('navigator.doorbell.title'))} onCloseClick={() => setDismissedUsers(users)} />
                 <OctaneCardContentView gap={2} overflow="hidden">
                     <div className="octane-doorbell-info">{localizeWithFallback('widgets.doorbell.info', 'These visitors are waiting at the door.')}</div>
                     <div className="octane-doorbell-list">

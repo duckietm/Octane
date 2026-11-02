@@ -86,8 +86,9 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
     const element = node as Element;
 
     if (strictPass) {
-        // A link may open a new tab, never replace the page that embeds the client (target=_top or _parent).
-        if (element.tagName === 'A' && element.getAttribute('target')) element.setAttribute('target', '_blank');
+        // A link opens a new tab, never the page that holds the client: one with no target (or _top, _parent) used to
+        // navigate the whole client away, and a look-alike page could then ask for the password.
+        if (element.tagName === 'A' && (element.getAttribute('target') || element.getAttribute('href'))) element.setAttribute('target', '_blank');
 
         if (element.tagName === 'IMG' && !isAllowedImageSource(element.getAttribute('src') ?? '')) element.removeAttribute('src');
 

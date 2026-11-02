@@ -1,7 +1,7 @@
 import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, KeyboardEvent, useEffect, useMemo, useState } from 'react';
 import { FaArrowLeft, FaCheckCircle, FaChevronRight, FaEnvelope, FaExclamationTriangle, FaEye, FaEyeSlash, FaIdBadge, FaInfoCircle, FaKey, FaShieldAlt, FaUserCog } from 'react-icons/fa';
-import { clearAccessToken, GetConfigurationValue, getAccessToken, LocalizeText, localizeWithFallback } from '../../api';
+import { ClearRememberLogin, clearAccessToken, GetConfigurationValue, getAccessToken, LocalizeText, localizeWithFallback } from '../../api';
 import { Button, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
@@ -374,6 +374,8 @@ export const UserAccountSettingsView: FC<{}> = () =>
 
             // The server has dropped our session — clear local credentials and bounce
             // the user back to the login screen so the whole client reloads cleanly.
+            // The remembered login names the old account too: kept, the reload signed in with it again.
+            ClearRememberLogin();
             clearAccessToken();
             window.setTimeout(() =>
             {

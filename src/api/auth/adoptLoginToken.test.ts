@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { GetRememberLogin, SetRememberLogin } from '../utils/RememberLogin';
 import { getAccessToken, setAccessToken } from './accessToken';
-import { adoptLoginTokenFromUrl } from './urlToken';
+import { adoptLoginTokenFromUrl, confirmSignInFromLink, signInFromLinkQuestion } from './urlToken';
 
 const at = (search: string) => ({
     location: { href: `https://hotel.example/client/${search}` } as Location,
@@ -59,6 +59,27 @@ describe('adoptLoginTokenFromUrl', () => {
 
         expect(adoptLoginTokenFromUrl(location, history, confirmSwitch)).toBe(true);
         expect(confirmSwitch).not.toHaveBeenCalled();
+    });
+
+    it('asks before a link signs in a browser that remembers no login, and keeps it out on no', () => {
+        const refuse = vi.fn(() => false);
+
+        expect(adoptLoginTokenFromUrl(at(`?token=${jwtFor(9)}`).location, at('').history, refuse)).toBe(false);
+        expect(refuse).toHaveBeenCalledWith(signInFromLinkQuestion(9));
+        expect(GetRememberLogin()).toBeNull();
+
+        expect(adoptLoginTokenFromUrl(at(`?token=${jwtFor(9)}`).location, at('').history, () => true)).toBe(true);
+        expect(GetRememberLogin()?.token).toBe(jwtFor(9));
+    });
+
+    it('asks the same before an SSO ticket from the address is used', () => {
+        const source = readFileSync('src/bootstrap.ts', 'utf8');
+
+        expect(source).toContain("if (ssoTicket && !confirmSignInFromLink(null)) ssoTicket = null;");
+        expect(source).toContain("'sso.ticket': ssoTicket,");
+        expect(confirmSignInFromLink(null, () => false)).toBe(false);
+        SetRememberLogin({ token: jwtFor(7), expiresAt: 4102444800 });
+        expect(confirmSignInFromLink(null, () => false)).toBe(true);
     });
 
     it('asks before switching to another account, and keeps the remembered one on no', () => {

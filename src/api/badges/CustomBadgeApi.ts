@@ -1,5 +1,5 @@
 import { GetConfiguration, GetLocalizationManager } from '@octane/renderer';
-import { clearAccessToken, getAccessToken } from '../auth';
+import { getAccessToken } from '../auth';
 
 export interface CustomBadgeRecord {
     badgeId: string;
@@ -65,7 +65,8 @@ const parseJson = async <T>(response: Response): Promise<T> => {
 
 const throwOnError = async (response: Response): Promise<void> => {
     if (response.ok) return;
-    if (response.status === 401) clearAccessToken();
+    // A 401 here no longer clears the token every other API shares: one refused call used to sign the whole client
+    // out of its HTTP features until the next login.
     const payload = await parseJson<CustomBadgeError>(response);
     const message = payload?.error || `Request failed (${response.status}).`;
     const err = new Error(message) as Error & { status: number; code?: string };
@@ -139,10 +140,13 @@ export const ensureCustomBadgeTexts = (): Promise<void> => {
         try {
             const url = buildUrl('badges.custom.texts.endpoint', '/api/badges/custom/texts');
             const response = await fetch(url, { method: 'GET', credentials: 'include', headers: { Accept: 'application/json' } });
-            if (!response.ok) return;
+            if (!response.ok) throw new Error(`texts ${response.status}`);
             const payload = await parseJson<{ texts: Record<string, string> }>(response);
             injectTextsIntoLocalization(payload.texts);
-        } catch {}
+        } catch {
+            // A failed load is not kept: the next caller tries again instead of the names staying empty all session.
+            customBadgeTextsLoadPromise = null;
+        }
     })();
     return customBadgeTextsLoadPromise;
 };

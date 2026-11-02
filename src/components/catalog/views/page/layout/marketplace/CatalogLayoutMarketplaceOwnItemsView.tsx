@@ -213,6 +213,9 @@ export const CatalogLayoutMarketplaceOwnItemsView: FC<CatalogLayoutProps> = () =
         setCreditsWaiting(0);
 
         SendMessageComposer(new RedeemMarketplaceOfferCreditsMessageComposer());
+        // The list above is a guess: the server's own list follows the redeem, so a refused redeem shows its sold
+        // offers and credits again instead of zero until the page is reopened.
+        SendMessageComposer(new GetMarketplaceOwnOffersMessageComposer());
 
         setTimeout(() => (isRedeemingRef.current = false), 3000);
     };

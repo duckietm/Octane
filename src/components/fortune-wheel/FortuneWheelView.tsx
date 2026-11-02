@@ -33,7 +33,7 @@ type SpinPhase = 'idle' | 'windback' | 'spin' | 'settle';
 export const FortuneWheelView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const { freeSpins, extraSpins, spinCost, spinCostType, prizes, recentWins, pendingPrizeId, isSpinning, open, spin, buySpin, finishSpin } =
+    const { freeSpins, extraSpins, spinCost, spinCostType, prizes, recentWins, pendingPrizeId, isSpinning, isRequestPending, open, spin, buySpin, finishSpin } =
         useFortuneWheel();
     const canManage = useHasPermission('acc_wheeladmin');
 
@@ -209,7 +209,7 @@ export const FortuneWheelView: FC<{}> = () => {
 
     if (!isVisible) return null;
 
-    const canSpin = freeSpins + extraSpins > 0 && !isSpinning && prizes.length > 0;
+    const canSpin = freeSpins + extraSpins > 0 && !isSpinning && !isRequestPending && prizes.length > 0;
 
     return (
         <NativeTextTree>
@@ -292,6 +292,7 @@ export const FortuneWheelView: FC<{}> = () => {
                                         {LocalizeText('wheel.spin')}
                                     </BaseButton>
                                     <BaseButton
+                                        disabled={isRequestPending}
                                         onClick={() => buySpin()}
                                         className="flex cursor-pointer items-center gap-1 rounded bg-[#6b7884] px-3 py-2 text-white hover:bg-[#5e6a75]"
                                     >

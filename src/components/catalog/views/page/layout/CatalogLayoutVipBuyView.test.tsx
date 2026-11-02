@@ -87,7 +87,9 @@ vi.mock('../../../../../events', () => ({
         ) {}
     },
     CatalogPurchasedEvent: { PURCHASE_SUCCESS: 'purchase-success' },
-    CatalogPurchaseFailureEvent: { PURCHASE_FAILED: 'purchase-failed' }
+    CatalogPurchaseFailureEvent: { PURCHASE_FAILED: 'purchase-failed' },
+    CatalogPurchaseNotAllowedEvent: { NOT_ALLOWED: 'purchase-not-allowed' },
+    CatalogPurchaseSoldOutEvent: { SOLD_OUT: 'purchase-sold-out' }
 }));
 
 vi.mock('../../../../../hooks', () => ({

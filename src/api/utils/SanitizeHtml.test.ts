@@ -115,6 +115,13 @@ describe('SanitizeHtml — no overlays, no foreign images, no page takeover', ()
         expect(a?.getAttribute('rel')).toBe('noopener noreferrer');
     });
 
+    it('opens a link with no target in a new tab instead of navigating the client away', () => {
+        const a = parse('<a href="https://example.com">x</a>').querySelector('a');
+
+        expect(a?.getAttribute('target')).toBe('_blank');
+        expect(a?.getAttribute('rel')).toBe('noopener noreferrer');
+    });
+
     it('leaves the richer help pages to their own rules', () => {
         const div = document.createElement('div');
         div.innerHTML = SanitizePageHtml('<div style="position:absolute;left:4px">page</div>');

@@ -231,16 +231,24 @@ export const useCatalogEffects = (): void => {
         if (activePageId > -1) invalidateCatalogPage(type, activePageId);
     });
 
+    // A refused purchase takes back the half-transparent furni a placement purchase put in the room: it used to stay
+    // there, looking bought, until the room was reloaded. With no placement pending this does nothing.
+    const takeBackRefusedPlacement = () => useCatalogStore.getState().resetPlacedOfferData(true);
+
     useMessageEvent<PurchaseErrorMessageEvent>(PurchaseErrorMessageEvent, (event) => {
+        takeBackRefusedPlacement();
         DispatchUiEvent(new CatalogPurchaseFailureEvent(event.getParser().code));
     });
 
     useMessageEvent<PurchaseNotAllowedMessageEvent>(PurchaseNotAllowedMessageEvent, (event) => {
+        takeBackRefusedPlacement();
         DispatchUiEvent(new CatalogPurchaseNotAllowedEvent(event.getParser().code));
     });
 
     useMessageEvent<LimitedEditionSoldOutEvent>(LimitedEditionSoldOutEvent, () => {
         const { currentType: type, pageId: activePageId } = useCatalogStore.getState();
+
+        takeBackRefusedPlacement();
 
         DispatchUiEvent(new CatalogPurchaseSoldOutEvent());
 

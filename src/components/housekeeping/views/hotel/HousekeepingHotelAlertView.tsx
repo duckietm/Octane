@@ -6,7 +6,6 @@ import { useHousekeeping, useHousekeepingConfirm } from '../../../../hooks';
 import { HOUSEKEEPING_INPUT_CLASS, HousekeepingButton, HousekeepingSection } from '../common/HousekeepingParts';
 import { HousekeepingSubTabs } from '../common/HousekeepingSubTabs';
 
-const HOTEL_ALERT_CONFIRM_THRESHOLD = 200;
 const HOTEL_ALERT_MAX = 1000;
 
 const SCOPE_ICONS: Record<HousekeepingAlertScope, ReactNode> = {
@@ -37,7 +36,8 @@ export const HousekeepingHotelAlertView: FC = () => {
         };
 
         // A long alert to everyone is the one worth a second look.
-        if (scope === 'hotel' && trimmedAlert.length >= HOTEL_ALERT_CONFIRM_THRESHOLD) {
+        // Every hotel-wide alert is confirmed: a short test line sent with the default scope used to reach everyone.
+        if (scope === 'hotel') {
             confirm(LocalizeText('housekeeping.hotel.alert.confirm', ['count'], [String(trimmedAlert.length)]), dispatch);
 
             return;

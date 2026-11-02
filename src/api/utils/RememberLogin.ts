@@ -103,6 +103,12 @@ export const StoreRememberLoginFromPayload = (payload: Record<string, unknown>, 
 };
 
 /**
+ * Whether the server turned the remembered login down for good: a bad request, an unknown or revoked token. A
+ * network error, a 429 or a 5xx says nothing about the token, which stays for the next try.
+ */
+export const isRememberRejection = (status: number): boolean => status === 400 || status === 401 || status === 403;
+
+/**
  * Clears the remembered login only if it still holds this token: another tab may have rotated it meanwhile. A cookie
  * entry has no token here, so it is cleared when it is still a cookie entry.
  */
