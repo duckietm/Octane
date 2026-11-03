@@ -110,7 +110,7 @@ export const AvatarEditorPetView: FC<{
                             className={`octane-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
                             onClick={() => (hasHC ? setAdvancedColorMode((prev) => !prev) : CreateLinkEvent('habboUI/open/hccenter'))}
                         >
-                            Advanced Color
+                            {localizeWithFallback('octane.avatar_editor.advanced_color', 'Advanced Color')}
                             <LayoutCurrencyIcon type="hc" />
                         </BaseButton>
                         <div className={`octane-avatar-editor-palettes${maxPaletteCount === 2 ? ' dual-palette' : ''}`}>

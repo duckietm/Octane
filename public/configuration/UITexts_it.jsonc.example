@@ -2734,5 +2734,6 @@
     "octane.customize.basic": "Base",
     "octane.customize.premium": "Premium",
     "octane.common.scroll_up": "Scorri su",
-    "octane.common.scroll_down": "Scorri giù"
+    "octane.common.scroll_down": "Scorri giù",
+    "octane.avatar_editor.advanced_color": "Colore avanzato"
 }

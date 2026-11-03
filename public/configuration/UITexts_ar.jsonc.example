@@ -2544,5 +2544,6 @@
     "octane.customize.basic": "أساسي",
     "octane.customize.premium": "مميز",
     "octane.common.scroll_up": "التمرير لأعلى",
-    "octane.common.scroll_down": "التمرير لأسفل"
+    "octane.common.scroll_down": "التمرير لأسفل",
+    "octane.avatar_editor.advanced_color": "لون متقدم"
 }

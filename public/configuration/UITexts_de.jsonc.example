@@ -2551,5 +2551,6 @@
     "octane.customize.basic": "Basis",
     "octane.customize.premium": "Premium",
     "octane.common.scroll_up": "Nach oben scrollen",
-    "octane.common.scroll_down": "Nach unten scrollen"
+    "octane.common.scroll_down": "Nach unten scrollen",
+    "octane.avatar_editor.advanced_color": "Erweiterte Farbe"
 }

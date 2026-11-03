@@ -2546,5 +2546,6 @@
     "octane.customize.basic": "Basis",
     "octane.customize.premium": "Premium",
     "octane.common.scroll_up": "Omhoog scrollen",
-    "octane.common.scroll_down": "Omlaag scrollen"
+    "octane.common.scroll_down": "Omlaag scrollen",
+    "octane.avatar_editor.advanced_color": "Geavanceerde kleur"
 }
