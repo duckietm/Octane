@@ -1,7 +1,7 @@
 import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, KeyboardEvent, useEffect, useMemo, useState } from 'react';
 import { FaArrowLeft, FaCheckCircle, FaChevronRight, FaEnvelope, FaExclamationTriangle, FaEye, FaEyeSlash, FaIdBadge, FaInfoCircle, FaKey, FaShieldAlt, FaUserCog } from 'react-icons/fa';
-import { ClearRememberLogin, clearAccessToken, GetConfigurationValue, getAccessToken, LocalizeText, localizeWithFallback } from '../../api';
+import { ClearRememberLogin, clearAccessToken, GetConfigurationValue, getAccessToken, LocalizeText, localizeWithFallback, localizeServerMessage } from '../../api';
 import { Button, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
@@ -191,9 +191,7 @@ export const UserAccountSettingsView: FC<{}> = () =>
 
             if(!response.ok)
             {
-                const message = typeof payload.error === 'string' && payload.error
-                    ? payload.error
-                    : LocalizeText('usersettings.error.request_failed', [ 'status' ], [ response.status.toString() ]);
+                const message = localizeServerMessage(payload.error, LocalizeText('usersettings.error.request_failed', [ 'status' ], [ response.status.toString() ]));
                 setFeedback({ kind: 'error', message });
                 return;
             }
@@ -274,9 +272,7 @@ export const UserAccountSettingsView: FC<{}> = () =>
 
             if(!response.ok)
             {
-                const message = typeof payload.error === 'string' && payload.error
-                    ? payload.error
-                    : LocalizeText('usersettings.error.request_failed', [ 'status' ], [ response.status.toString() ]);
+                const message = localizeServerMessage(payload.error, LocalizeText('usersettings.error.request_failed', [ 'status' ], [ response.status.toString() ]));
                 setFeedback({ kind: 'error', message });
                 return;
             }
@@ -361,9 +357,7 @@ export const UserAccountSettingsView: FC<{}> = () =>
 
             if(!response.ok)
             {
-                const message = typeof payload.error === 'string' && payload.error
-                    ? payload.error
-                    : LocalizeText('usersettings.error.request_failed', [ 'status' ], [ response.status.toString() ]);
+                const message = localizeServerMessage(payload.error, LocalizeText('usersettings.error.request_failed', [ 'status' ], [ response.status.toString() ]));
                 setFeedback({ kind: 'error', message });
                 return;
             }

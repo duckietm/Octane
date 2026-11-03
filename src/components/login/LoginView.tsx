@@ -2,7 +2,7 @@ import { GetAvatarRenderManager, GetConfiguration } from '@octane/renderer';
 import { FC, useActionState, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { FaDice } from 'react-icons/fa';
-import { ClearRememberLogin, GetConfigurationValue, GetOptionalConfigurationValue, GetRememberLogin, isRememberCookieMode, persistAccessTokenFromPayload, StoreRememberLoginFromPayload } from '../../api';
+import { ClearRememberLogin, GetConfigurationValue, GetOptionalConfigurationValue, GetRememberLogin, isRememberCookieMode, persistAccessTokenFromPayload, StoreRememberLoginFromPayload, localizeServerMessage } from '../../api';
 import flagEn from '../../assets/images/flag_icon/flag_icon_en.png';
 import flagEs from '../../assets/images/flag_icon/flag_icon_es.png';
 import flagFr from '../../assets/images/flag_icon/flag_icon_fr.png';
@@ -575,7 +575,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
 
                 recordFailure();
                 const message =
-                    typeof payload.error === 'string' ? payload.error : t('nitro.login.error.invalid_credentials', 'Invalid Habbo name or password.');
+                    localizeServerMessage(payload.error, t('nitro.login.error.invalid_credentials', 'Invalid Habbo name or password.'));
                 setError(message);
                 resetLoginTurnstile();
             } catch {
@@ -601,12 +601,12 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
             if (isTrue(payload.available) || isFalse(payload.exists) || isFalse(payload.taken) || isFalse(payload.inUse) || isFalse(payload.in_use))
                 return { available: true };
             if (isFalse(payload.available) || isTrue(payload.exists) || isTrue(payload.taken) || isTrue(payload.inUse) || isTrue(payload.in_use))
-                return { available: false, error: typeof payload.error === 'string' ? payload.error : undefined };
+                return { available: false, error: localizeServerMessage(payload.error) || undefined };
             return { available: true };
         }
 
         if (status === 404 || status === 405 || status === 501) return { available: true };
-        if (status === 409) return { available: false, error: typeof payload.error === 'string' ? payload.error : undefined };
+        if (status === 409) return { available: false, error: localizeServerMessage(payload.error) || undefined };
 
         return { available: true };
     };
@@ -681,7 +681,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                     return;
                 }
 
-                setError(typeof payload.error === 'string' ? payload.error : t('nitro.login.error.register_failed', 'Unable to create your account.'));
+                setError(localizeServerMessage(payload.error, t('nitro.login.error.register_failed', 'Unable to create your account.')));
                 onDialogReset();
             } catch {
                 setError(t('nitro.login.error.register_unreachable', 'Unable to reach the registration service.'));
@@ -722,7 +722,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                     return;
                 }
 
-                setError(typeof payload.error === 'string' ? payload.error : t('nitro.login.error.forgot_failed', 'Unable to send a reset email right now.'));
+                setError(localizeServerMessage(payload.error, t('nitro.login.error.forgot_failed', 'Unable to send a reset email right now.')));
                 onDialogReset();
             } catch {
                 setError(t('nitro.login.error.forgot_unreachable', 'Unable to reach the password reset service.'));
