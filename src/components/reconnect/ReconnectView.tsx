@@ -74,7 +74,7 @@ export const ReconnectView: FC<{}> = () => {
                                 {localizeWithFallback('octane.reconnect.connection_lost', 'Connection lost')}
                             </Text>
                             <Text fontSizeCustom={14} variant="white" className="text-center opacity-70">
-                                Reconnecting to server... (attempt {attempt}/{maxAttempts})
+                                {localizeWithFallback('octane.reconnect.reconnecting_attempt', 'Reconnecting to server... (attempt %attempt%/%max%)', ['attempt', 'max'], [String(attempt), String(maxAttempts)])}
                             </Text>
                             <Base className="w-full h-[4px] rounded-full bg-white/10 overflow-hidden mt-1">
                                 <Base

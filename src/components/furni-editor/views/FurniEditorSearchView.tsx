@@ -198,7 +198,7 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                 {/* Result count + activity */}
                 <Flex alignItems="center" gap={2} className="px-0.5">
                     <Text className="text-[11px] text-slate-500">
-                        {total > 0 ? `Showing ${from}–${to} of ${total.toLocaleString()}` : loading ? 'Searching…' : localizeWithFallback('octane.furni_editor.no_results', 'No results')}
+                        {total > 0 ? localizeWithFallback('octane.furni_editor.showing_from_to_of_total', 'Showing %from%–%to% of %total%', ['from', 'to', 'total'], [String(from), String(to), total.toLocaleString()]) : loading ? localizeWithFallback('octane.furni_editor.searching', 'Searching…') : localizeWithFallback('octane.furni_editor.no_results', 'No results')}
                     </Text>
                     {loading && <span className="w-3 h-3 rounded-full border-2 border-slate-300 border-t-primary animate-spin" />}
                     {flaggedCount > 0 && (

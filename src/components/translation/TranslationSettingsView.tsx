@@ -100,7 +100,7 @@ export const TranslationSettingsView: FC<{}> = () => {
                     <div className="flex flex-col gap-2">
                         <Text bold>{localizeWithFallback('octane.translation.incoming_messages', 'Incoming messages')}</Text>
                         <div className="flex flex-col gap-1">
-                            <Text>Detected language (auto): {getLanguageName(lastIncomingLanguage)}</Text>
+                            <Text>{localizeWithFallback('octane.translation.detected_language', 'Detected language (auto): %language%', ['language'], [getLanguageName(lastIncomingLanguage)])}</Text>
                             <label className="flex flex-col gap-1 text-[12px]">
                                 <span>{localizeWithFallback('octane.translation.translate_into', 'Translate into')}</span>
                                 <Select
@@ -121,7 +121,7 @@ export const TranslationSettingsView: FC<{}> = () => {
                     <div className="flex flex-col gap-2">
                         <Text bold>{localizeWithFallback('octane.translation.outgoing_messages', 'Outgoing messages')}</Text>
                         <div className="flex flex-col gap-1">
-                            <Text>Detected writing language (auto): {getLanguageName(lastOutgoingLanguage)}</Text>
+                            <Text>{localizeWithFallback('octane.translation.detected_writing_language', 'Detected writing language (auto): %language%', ['language'], [getLanguageName(lastOutgoingLanguage)])}</Text>
                             <label className="flex flex-col gap-1 text-[12px]">
                                 <span>{localizeWithFallback('octane.translation.send_text_as', 'Send text as')}</span>
                                 <Select

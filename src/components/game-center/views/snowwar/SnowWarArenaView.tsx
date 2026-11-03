@@ -676,7 +676,7 @@ export const SnowWarArenaView: FC = () =>
         setEditorArea(null);
         setFloorplanEditorVisible(false);
         editorGestureRef.current = null;
-        setEditorArenaName(levelData?.arenaName || (levelData ? `Custom Arena ${levelData.mapId}` : localizeWithFallback('octane.game_center.custom_arena', 'Custom Arena')));
+        setEditorArenaName(levelData?.arenaName || (levelData ? localizeWithFallback('octane.game_center.custom_arena_map_id', 'Custom Arena %map_id%').replace('%map_id%', String(levelData.mapId)) : localizeWithFallback('octane.game_center.custom_arena', 'Custom Arena')));
 
         // Drop the preview walker on the walkable tile nearest the arena centre.
         const rows = levelData?.heightmapRows ?? [];

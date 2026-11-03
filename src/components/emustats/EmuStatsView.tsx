@@ -599,7 +599,7 @@ export const EmuStatsView: FC<{}> = () => {
                                 <BaseButton className="octane-emustats__refresh-button" onClick={() => setVersion((value) => value + 1)} type="button">
                                     {localizeWithFallback('octane.emustats.refresh_now', 'Refresh now')}
                                 </BaseButton>
-                                <p>Auto refresh every {REFRESH_INTERVAL_MS / 1000}s</p>
+                                <p>{localizeWithFallback('octane.emustats.auto_refresh_every', 'Auto refresh every %seconds%s', ['seconds'], [String(REFRESH_INTERVAL_MS / 1000)])}</p>
                             </div>
                         </aside>
                         <section className="octane-emustats__main">

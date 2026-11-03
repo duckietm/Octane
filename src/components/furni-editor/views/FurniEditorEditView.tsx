@@ -1005,7 +1005,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                 <span
                                     title={`furnidata id ${furnidataIdMismatch}, sprite id ${item.spriteId}: rooms draw the furni that owns id ${furnidataIdMismatch}`}
                                 >
-                                    Furnidata id {furnidataIdMismatch} ≠ sprite
+                                    {localizeWithFallback('octane.furni_editor.furnidata_id_differs_from_sprite', 'Furnidata id %id% ≠ sprite', ['id'], [String(furnidataIdMismatch)])}
                                 </span>
                                 <BaseButton type="button" className={statusLink} onClick={() => setGroup('data')}>
                                     {localizeWithFallback('octane.furni_editor.see', 'see ›')}

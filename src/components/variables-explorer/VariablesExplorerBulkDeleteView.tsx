@@ -37,7 +37,7 @@ export const VariablesExplorerBulkDeleteView: FC<VariablesExplorerBulkDeleteView
                 />
                 <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3">
                     <div className="rounded border border-[#d9a3a3] bg-[#fbeaea] p-3 flex flex-col gap-2">
-                        <Text bold>Delete {variableName} from every holder in this room?</Text>
+                        <Text bold>{localizeWithFallback('octane.variables_explorer.delete_from_every_holder', 'Delete %name% from every holder in this room?', ['name'], [String(variableName)])}</Text>
                         <Text className="whitespace-pre-line">{warning}</Text>
                     </div>
                     <label className="flex flex-col gap-1">

@@ -507,7 +507,7 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
 
     const savePage = useCallback(
         (data: IPageEditData) => {
-            const summary = `Updated page: ${data.caption || `#${data.pageId}`}`;
+            const summary = localizeWithFallback('octane.catalog.updated_page', 'Updated page: %page%', ['page'], [data.caption || `#${data.pageId}`]);
             if (!studio.session) {
                 setLastError('Catalog Manager is not ready');
                 return null;
@@ -599,7 +599,7 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
 
     const saveOffer = useCallback(
         (data: IOfferEditData) => {
-            const summary = `Updated offer: ${data.catalogName || `#${data.offerId}`}`;
+            const summary = localizeWithFallback('octane.catalog.updated_offer', 'Updated offer: %offer%', ['offer'], [data.catalogName || `#${data.offerId}`]);
             if (!studio.session) {
                 setLastError('Catalog Manager is not ready');
                 return null;

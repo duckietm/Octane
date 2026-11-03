@@ -348,7 +348,7 @@ export const Floorplan3DView: FC<Props> = ({ state, dispatch, panMode = false })
                     </div>
                 )}
                 <div className="fp-stage-buttons" onPointerDown={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()}>
-                    <Hint content={`Fit room to view (double-click)${zoomLabel ? ` · distance ${zoomLabel}` : ''}`}><BaseButton aria-label={`Fit room to view (double-click)${zoomLabel ? ` · distance ${zoomLabel}` : ''}`} type="button" data-testid="view3d-reset" className="fp-round-btn is-small" disabled={status !== 'ready'} onClick={resetView}>
+                    <Hint content={(localizeWithFallback('octane.floorplan_editor.fit_room_to_view_double_click', 'Fit room to view (double-click)') + (zoomLabel ? localizeWithFallback('octane.floorplan_editor.distance', ' · distance %distance%', ['distance'], [String(zoomLabel)]) : ''))}><BaseButton aria-label={`Fit room to view (double-click)${zoomLabel ? ` · distance ${zoomLabel}` : ''}`} type="button" data-testid="view3d-reset" className="fp-round-btn is-small" disabled={status !== 'ready'} onClick={resetView}>
                         <FaExpand size={10} />
                     </BaseButton></Hint>
                     <Hint content={localizeWithFallback('octane.floorplan_editor.zoom_in_wheel', 'Zoom in (wheel)')}><BaseButton aria-label={localizeWithFallback('octane.floorplan_editor.zoom_in_wheel', 'Zoom in (wheel)')} type="button" data-testid="view3d-zoom-in" className="fp-round-btn" disabled={status !== 'ready'} onClick={() => zoomBy(1 / ZOOM_STEP)}>

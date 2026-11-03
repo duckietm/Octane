@@ -271,7 +271,7 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
             : smartSave.status === 'error'
               ? (smartSave.message || 'Save failed')
               : smartSave.lastSavedAt
-                ? `Saved · ${new Date(smartSave.lastSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                ? localizeWithFallback('octane.catalog.saved_at', 'Saved · %time%', ['time'], [new Date(smartSave.lastSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })])
                 : 'Saved';
     const canSubmit = interaction.canSave && !validationError && (smartSave.isDirty || !!smartSave.inFlight);
 

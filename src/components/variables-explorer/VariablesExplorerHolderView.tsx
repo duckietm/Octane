@@ -231,7 +231,7 @@ export const VariablesExplorerHolderView: FC<VariablesExplorerHolderViewProps> =
                 extraActions={
                     canWrite && selectedEntry?.hasValue ? (
                         <div className="flex items-center justify-end gap-2 text-[12px]">
-                            <span>Add to {selectedEntry.name}:</span>
+                            <span>{localizeWithFallback('octane.variables_explorer.add_to_holder', 'Add to %name%:', ['name'], [String(selectedEntry.name)])}</span>
                             <NumberInput aria-label={localizeWithFallback('octane.variables_explorer.amount_to_add', 'Amount to add')} className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={addValue} onChange={(event) => setAddValue(event.target.value)} />
                             <Button disabled={busy || !holderReady} variant="secondary" onClick={addToSelected}>
                                 {localizeWithFallback('octane.variables_explorer.add', 'Add')}

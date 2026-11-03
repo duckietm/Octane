@@ -471,8 +471,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                     <div className="octane-catalog-admin-offers">
                         {isReadOnlyPage ? (
                             <div className="octane-catalog-admin-placeholder is-small">
-                                This page lists each user's own recent purchases ({selectedPageLayout}), so it has no editable
-                                offers. You can still edit the page settings.
+                                {localizeWithFallback('octane.catalog.page_lists_recent_purchases', 'This page lists each user\'s own recent purchases (%layout%), so it has no editable offers. You can still edit the page settings.', ['layout'], [String(selectedPageLayout)])}
                             </div>
                         ) : (
                         <>

@@ -599,7 +599,7 @@ export const HotelView: FC = () => {
                         </div>}
                         {editingSlot && (
                             <form className="hotelview-editor" onSubmit={saveSlot}>
-                                <header>Edit slot {editingSlot.id}</header>
+                                <header>{localizeWithFallback('octane.hotel_view.edit_slot_id', 'Edit slot %id%', ['id'], [String(editingSlot.id)])}</header>
                                 <div className={`hotelview-editor-preview hotelview-editor-slot-preview${editingSlot.enabled ? '' : ' hotelview-slot-disabled'}`}>
                                     <span className="hotelview-editor-preview-label">{localizeWithFallback('octane.hotel_view.preview', 'Preview')}</span>
                                     {editingSlot.imageUrl && <img src={resolveImageUrl(editingSlot.imageUrl, imageLibraryUrl, assetUrl)} alt="" />}
