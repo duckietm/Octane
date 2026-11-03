@@ -1626,5 +1626,19 @@
     "reward_track.debug.copy_track_id.success": "Track ID copied to the clipboard",
     "reward_track.debug.copy_task_id.success": "Task ID copied to the clipboard",
     "chat.confirm.openurl": "You are about to open %url%. Only continue if you trust the link.",
-    "campaign.calendar.title": "Calendar"
+    "campaign.calendar.title": "Calendar",
+    "toolbar.me.quests": "Quests",
+    "toolbar.me.dailytasks": "Daily rewards",
+    "toolbar.me.rewardtrack": "Reward track",
+    "nux.step.1": "This is the reception button, it takes you back to the hotel view.",
+    "nux.step.2": "This is the navigator, from here you can visit other rooms.",
+    "nux.step.3": "To talk, just type your message here.",
+    "nux.step.4": "The chat history lets you read back your previous conversations.",
+    "nux.step.5": "If you want to change your look, use the wardrobe.",
+    "nux.step.6": "In the shop you can buy furniture to decorate your own room.",
+    "nux.step.7": "Furniture can be bought with credits...",
+    "nux.step.8": "...duckets,",
+    "nux.step.9": "or diamonds.",
+    "nux.step.10": "All your friends are down here.",
+    "nux.step.11": "Have fun and start exploring the hotel!"
 }

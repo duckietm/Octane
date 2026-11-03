@@ -1618,5 +1618,19 @@
     "nitro.info.title": "À propos de ce client",
     "notifications.text.club_gift.selected": "Tu as choisi ton cadeau.",
     "chat.confirm.openurl": "Tu vas ouvrir %url%. Continue seulement si tu fais confiance au lien.",
-    "campaign.calendar.title": "Calendrier"
+    "campaign.calendar.title": "Calendrier",
+    "toolbar.me.quests": "Missions",
+    "toolbar.me.dailytasks": "Tâches quotidiennes",
+    "toolbar.me.rewardtrack": "Programme de récompense",
+    "nux.step.1": "Voici le bouton de la réception, il te ramène à la vue de l'hôtel.",
+    "nux.step.2": "Voici le navigateur, il te permet de visiter les autres apparts.",
+    "nux.step.3": "Pour parler, tape simplement ton message ici.",
+    "nux.step.4": "L'historique du tchat te permet de relire tes conversations précédentes.",
+    "nux.step.5": "Pour changer de look, utilise la garde-robe.",
+    "nux.step.6": "Dans la boutique, tu peux acheter des mobis pour décorer ton appart.",
+    "nux.step.7": "Les mobis s'achètent avec des crédits...",
+    "nux.step.8": "...des duckets,",
+    "nux.step.9": "ou des diamants.",
+    "nux.step.10": "Tous tes amis se trouvent ici, en bas.",
+    "nux.step.11": "Amuse-toi bien et pars explorer l'hôtel !"
 }

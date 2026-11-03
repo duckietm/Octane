@@ -1618,5 +1618,19 @@
     "nitro.info.title": "Acerca de este cliente",
     "notifications.text.club_gift.selected": "Has elegido tu regalo.",
     "chat.confirm.openurl": "Vas a abrir %url%. Continúa solo si confías en el enlace.",
-    "campaign.calendar.title": "Calendario"
+    "campaign.calendar.title": "Calendario",
+    "toolbar.me.quests": "Misiones",
+    "toolbar.me.dailytasks": "Recompensas diarias",
+    "toolbar.me.rewardtrack": "Camino de recompensas",
+    "nux.step.1": "Este es el botón de recepción, te lleva de vuelta a la vista del hotel.",
+    "nux.step.2": "Este es el navegador, desde aquí puedes visitar otras salas.",
+    "nux.step.3": "Para hablar, escribe tu mensaje aquí.",
+    "nux.step.4": "El historial del chat te permite releer tus conversaciones anteriores.",
+    "nux.step.5": "Si quieres cambiar tu look, usa el vestuario.",
+    "nux.step.6": "En la tienda puedes comprar furnis para decorar tu propia sala.",
+    "nux.step.7": "Los furnis se compran con créditos...",
+    "nux.step.8": "...duckets",
+    "nux.step.9": "o diamantes.",
+    "nux.step.10": "Todos tus amigos están aquí abajo.",
+    "nux.step.11": "¡Diviértete y empieza a explorar el hotel!"
 }

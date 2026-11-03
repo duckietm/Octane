@@ -1625,5 +1625,19 @@
     "nitro.info.title": "Über diesen Client",
     "notifications.text.club_gift.selected": "Du hast dein Geschenk gewählt.",
     "chat.confirm.openurl": "Du bist dabei, %url% zu öffnen. Fahre nur fort, wenn du dem Link vertraust.",
-    "campaign.calendar.title": "Kalender"
+    "campaign.calendar.title": "Kalender",
+    "toolbar.me.quests": "Aufgaben",
+    "toolbar.me.dailytasks": "Tägliche Belohnungen",
+    "toolbar.me.rewardtrack": "Belohnungspfad",
+    "nux.step.1": "Das ist der Rezeption-Button, er bringt dich zurück zur Hotelansicht.",
+    "nux.step.2": "Das ist der Navigator, hier kannst du andere Räume besuchen.",
+    "nux.step.3": "Um zu sprechen, gib einfach hier deine Nachricht ein.",
+    "nux.step.4": "Im Chatverlauf kannst du deine früheren Unterhaltungen nachlesen.",
+    "nux.step.5": "Wenn du dein Aussehen ändern möchtest, nutze die Garderobe.",
+    "nux.step.6": "Im Shop kannst du Möbel kaufen, um deinen eigenen Raum einzurichten.",
+    "nux.step.7": "Möbel kannst du mit Credits kaufen...",
+    "nux.step.8": "...mit Duckets",
+    "nux.step.9": "oder mit Diamanten.",
+    "nux.step.10": "Alle deine Freunde findest du hier unten.",
+    "nux.step.11": "Viel Spaß, erkunde jetzt das Hotel!"
 }
