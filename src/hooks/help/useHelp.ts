@@ -29,7 +29,8 @@ import {
     ReportType,
     reportingStatusCode,
     resolutionCode,
-    SendMessageComposer
+    SendMessageComposer,
+    localizeWithFallback
 } from '../../api';
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
@@ -185,7 +186,7 @@ const useHelpState = () => {
     });
 
     useMessageEvent<CallForHelpPendingCallsDeletedMessageEvent>(CallForHelpPendingCallsDeletedMessageEvent, (event) => {
-        const message = 'Your pending calls were deleted'; // todo: add localization
+        const message = localizeWithFallback('octane.help.your_pending_calls_were_deleted', 'Your pending calls were deleted'); // todo: add localization
 
         simpleAlert(message, NotificationAlertType.MODERATION, null, null, LocalizeText('mod.alert.title'));
     });

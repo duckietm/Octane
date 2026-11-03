@@ -145,7 +145,7 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
                 <BaseButton
                     className="octane-catalog-admin-btn is-small"
                     disabled={loading}
-                    aria-label={`Undo ${group.summary}`}
+                    aria-label={localizeWithFallback('octane.catalog.undo_summary', 'Undo %summary%', ['summary'], [String(group.summary)])}
                     onClick={() => setUndoCandidate(group)}
                 >
                     <FaUndo /> {localizeWithFallback('octane.catalog.undo', 'Undo')}

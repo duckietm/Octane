@@ -129,7 +129,7 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
 
                 const orders = reordered.map((o, i) => ({ id: o.offerId, orderNumber: i }));
 
-                catalogAdmin?.reorderOffers(orders, `Reordered offers on page #${currentPage.pageId}`);
+                catalogAdmin?.reorderOffers(orders, localizeWithFallback('octane.catalog.reordered_offers_on_page_page_id', 'Reordered offers on page #%page_id%', ['page_id'], [String(currentPage.pageId)]));
             }
 
             setDragIndex(null);

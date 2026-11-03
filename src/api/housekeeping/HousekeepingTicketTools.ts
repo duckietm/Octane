@@ -1,5 +1,6 @@
 import { LocalizeText } from '../utils/LocalizeText';
 import { HousekeepingSanctionTemplate } from './HousekeepingSanctionTemplates';
+import { localizeWithFallback } from '../utils/localizeWithFallback';
 
 /** A canned answer to the reporter of a ticket; the text files translate it by id. */
 export interface HousekeepingTicketReply {
@@ -8,11 +9,11 @@ export interface HousekeepingTicketReply {
 }
 
 export const HK_TICKET_REPLIES: HousekeepingTicketReply[] = [
-    { id: 'thanks', text: 'Thank you for your report. We are looking into it.' },
-    { id: 'handled', text: 'Thank you for your report. We have taken action.' },
-    { id: 'more_info', text: 'We need more details to act on your report. Please report again with what happened and when.' },
-    { id: 'no_violation', text: 'We looked into your report and found no breach of the hotel rules.' },
-    { id: 'false_report', text: 'This report was not accurate. Please use the help button only for real problems.' }
+    { id: 'thanks', get text() { return localizeWithFallback('octane.housekeeping.thank_you_for_your_report_we', 'Thank you for your report. We are looking into it.'); } },
+    { id: 'handled', get text() { return localizeWithFallback('octane.housekeeping.thank_you_for_your_report_we_2', 'Thank you for your report. We have taken action.'); } },
+    { id: 'more_info', get text() { return localizeWithFallback('octane.housekeeping.we_need_more_details_to_act', 'We need more details to act on your report. Please report again with what happened and when.'); } },
+    { id: 'no_violation', get text() { return localizeWithFallback('octane.housekeeping.we_looked_into_your_report_and', 'We looked into your report and found no breach of the hotel rules.'); } },
+    { id: 'false_report', get text() { return localizeWithFallback('octane.housekeeping.this_report_was_not_accurate_please', 'This report was not accurate. Please use the help button only for real problems.'); } }
 ];
 
 export const HOUSEKEEPING_TICKET_REPLIES_KEY = 'housekeeping.ticket_replies';

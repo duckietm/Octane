@@ -116,15 +116,15 @@ const JUMP_FIELD_LABELS = Object.values(FIELD_LABELS);
 const validateForm = (form: EditForm): Partial<Record<EditField, string>> => {
     const errors: Partial<Record<EditField, string>> = {};
     const maxLen = (field: EditField, max: number) => {
-        if (String(form[field]).length > max) errors[field] = `Max ${max} chars`;
+        if (String(form[field]).length > max) errors[field] = localizeWithFallback('octane.furni_editor.max_max_chars', 'Max %max% chars', ['max'], [String(max)]);
     };
 
     if (form.width < 1 || form.width > 64) errors.width = '1 to 64';
     if (form.length < 1 || form.length > 64) errors.length = '1 to 64';
     if (form.stackHeight < 0 || form.stackHeight > 99.99) errors.stackHeight = '0 to 99.99';
     if (form.interactionModesCount < 0 || form.interactionModesCount > 100) errors.interactionModesCount = '0 to 100';
-    if (form.effectIdMale < 0) errors.effectIdMale = 'Min 0';
-    if (form.effectIdFemale < 0) errors.effectIdFemale = 'Min 0';
+    if (form.effectIdMale < 0) errors.effectIdMale = localizeWithFallback('octane.furni_editor.min_0', 'Min 0');
+    if (form.effectIdFemale < 0) errors.effectIdFemale = localizeWithFallback('octane.furni_editor.min_0', 'Min 0');
     maxLen('interactionType', 500);
     maxLen('customparams', 256);
     maxLen('vendingIds', 255);
@@ -332,7 +332,7 @@ const FurniPreview: FC<FurniPreviewProps> = ({ item, width, length, modes }) => 
                 <div
                     className="absolute top-1 right-1 grid gap-px"
                     style={{ gridTemplateColumns: `repeat(${cols}, 6px)` }}
-                    aria-label={`Footprint ${width} by ${length}`}
+                    aria-label={localizeWithFallback('octane.furni_editor.footprint_width_by_length', 'Footprint %width% by %length%', ['width', 'length'], [String(width), String(length)])}
                     title={`Footprint ${width}×${length}${clipped ? ' (clipped)' : ''}`}
                 >
                     {Array.from({ length: cols * rows }, (_, i) => (
@@ -346,7 +346,7 @@ const FurniPreview: FC<FurniPreviewProps> = ({ item, width, length, modes }) => 
                     <Hint content={localizeWithFallback('octane.furni_editor.rotate', 'Rotate')}><BaseButton
                         type="button"
                         onClick={() => setDirectionIndex((prev) => prev + 1)}
-                        aria-label={`Rotate, facing ${direction}`}
+                        aria-label={localizeWithFallback('octane.furni_editor.rotate_facing_direction', 'Rotate, facing %direction%', ['direction'], [String(direction)])}
                         className="inline-flex items-center gap-0.5 text-[9px] rounded-full border border-slate-200 bg-[#ffffff] px-1.5 py-px text-slate-600 hover:border-slate-300"
                     >
                         <span aria-hidden="true">⟳</span> {direction}
@@ -754,9 +754,9 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
         if (importResult.found) {
             setFurniName(importResult.name);
             setFurniDescription(importResult.description);
-            setImportNote('Imported from Habbo — review and Save');
+            setImportNote(localizeWithFallback('octane.furni_editor.imported_from_habbo_review_and_save', 'Imported from Habbo — review and Save'));
         } else {
-            setImportNote('Not found on Habbo for this classname');
+            setImportNote(localizeWithFallback('octane.furni_editor.not_found_on_habbo_for_this', 'Not found on Habbo for this classname'));
         }
     }, [importResult, item]);
 
@@ -1067,7 +1067,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                     )}
                     <div className="mt-auto flex flex-col gap-1">
                         <Button variant="success" disabled={loading || !isValid || !isDirty} onClick={handleSave} className="w-full">
-                            {loading ? 'Saving...' : isDirty ? `Save (${changedFields.length})` : 'Save'}
+                            {loading ? 'Saving...' : isDirty ? localizeWithFallback('octane.furni_editor.save_changed_fields', 'Save (%changed_fields%)', ['changed_fields'], [String(changedFields.length)]) : 'Save'}
                         </Button>
                         <div className="flex gap-1">
                             {isDirty && (
@@ -1080,7 +1080,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                 disabled={loading || item.usageCount > 0}
                                 onClick={() => setShowDeleteDialog(true)}
                                 className="flex-1"
-                                title={item.usageCount > 0 ? 'Placed furni cannot be deleted' : undefined}
+                                title={item.usageCount > 0 ? localizeWithFallback('octane.furni_editor.placed_furni_cannot_be_deleted', 'Placed furni cannot be deleted') : undefined}
                             >
                                 Delete
                             </Button>
@@ -1178,14 +1178,14 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                                 disabled={furnidataEditable ? loading || !furnidataDirty : loading}
                                                 onClick={() => setConfirmFurnidata(true)}
                                             >
-                                                {furnidataEditable ? 'Save name/desc' : 'Create entry'}
+                                                {furnidataEditable ? localizeWithFallback('octane.furni_editor.save_name_desc', 'Save name/desc') : localizeWithFallback('octane.furni_editor.create_entry', 'Create entry')}
                                             </Button>
                                             {furnidataEditable && (
                                                 <>
                                                     <Button variant="secondary" disabled={loading} onClick={() => onRevertFurnidata(item.id)}>
                                                         {localizeWithFallback('octane.furni_editor.revert', 'Revert')}
                                                     </Button>
-                                                    <Hint content="Fetch the official name &amp; description from Habbo"><BaseButton
+                                                    <Hint content={localizeWithFallback('octane.furni_editor.fetch_the_official_name_description_from', 'Fetch the official name & description from Habbo')}><BaseButton
                                                         type="button"
                                                         disabled={loading}
                                                         onClick={() => onImportText(item.id)}
@@ -1257,14 +1257,14 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                     </div>
                                     <div>
                                         <label className={labelClass}>{localizeWithFallback('octane.furni_editor.type', 'Type')}</label>
-                                        <CopyValue value={item.type === 's' ? 'Floor (s)' : 'Wall (i)'} />
+                                        <CopyValue value={item.type === 's' ? localizeWithFallback('octane.furni_editor.floor_s', 'Floor (s)') : localizeWithFallback('octane.furni_editor.wall_i', 'Wall (i)')} />
                                     </div>
                                 </div>
                             </Section>
                         </div>
 
                         <div className={groupClass('catalogue')}>
-                            <Section title={`Catalogue (${catalogItems.length})`}>
+                            <Section title={localizeWithFallback('octane.furni_editor.catalogue_catalog_items', 'Catalogue (%catalog_items%)', ['catalog_items'], [String(catalogItems.length)])}>
                                 <div data-testid="furni-editor-catalog">
                                     {catalogItems.length === 0 ? (
                                         <Text className="text-[11px] text-slate-400">{localizeWithFallback('octane.furni_editor.not_in_the_catalogue', 'Not in the catalogue')}</Text>
@@ -1305,8 +1305,8 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                         {structureDiff.length === 0 ? (
                                             <Text className="text-[11px] text-slate-400">
                                                 {furnidataEditable
-                                                    ? 'Footprint, height and walk, sit, lay flags agree with the DB.'
-                                                    : 'No matching entry to compare.'}
+                                                    ? localizeWithFallback('octane.furni_editor.footprint_height_and_walk_sit_lay', 'Footprint, height and walk, sit, lay flags agree with the DB.')
+                                                    : localizeWithFallback('octane.furni_editor.no_matching_entry_to_compare', 'No matching entry to compare.')}
                                             </Text>
                                         ) : (
                                             <>
@@ -1347,7 +1347,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                             )}
 
                             {duplicates.length > 0 && (
-                                <Section title={`Duplicates (${duplicates.length})`}>
+                                <Section title={localizeWithFallback('octane.furni_editor.duplicates_duplicates', 'Duplicates (%duplicates%)', ['duplicates'], [String(duplicates.length)])}>
                                     <Text className="text-[10px] text-amber-700 mb-1 block">
                                         Other items_base rows with this classname or sprite id. Two rows for one furni usually means an import ran twice; keep the
                                         one placed in rooms.
@@ -1370,7 +1370,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                 </Section>
                             )}
                             {related.siblings.length > 0 && (
-                                <Section title={`Same line (${related.siblings.length})`}>
+                                <Section title={localizeWithFallback('octane.furni_editor.same_line_siblings', 'Same line (%siblings%)', ['siblings'], [String(related.siblings.length)])}>
                                     <Text className="text-[10px] text-slate-400 mb-1 block">
                                         {localizeWithFallback('octane.furni_editor.furni_sharing_the_classname_prefix_when', 'Furni sharing the classname prefix. When most of them agree on a value, it is offered under the matching field.')}
                                     </Text>
@@ -1460,7 +1460,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                                 {group.keys.map((key) => {
                                                     const on = form[key] === true;
                                                     return (
-                                                        <Hint key={key} content={on ? 'Enabled — click to disable' : 'Disabled — click to enable'}><ToggleButton
+                                                        <Hint key={key} content={on ? localizeWithFallback('octane.furni_editor.enabled_click_to_disable', 'Enabled — click to disable') : localizeWithFallback('octane.furni_editor.disabled_click_to_enable', 'Disabled — click to enable')}><ToggleButton
                                                             type="button"
                                                             pressed={on}
                                                             onClick={() => setField(key, !on)}
@@ -1575,7 +1575,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                 </div>
                             </Section>
 
-                            <Section title="Effects &amp; clothing">
+                            <Section title={localizeWithFallback('octane.furni_editor.effects_clothing', 'Effects & clothing')}>
                                 <div className="grid grid-cols-3 gap-2">
                                     <div>
                                         <label className={labelClass} htmlFor="furni-editor-effectIdMale">

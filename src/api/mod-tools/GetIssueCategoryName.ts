@@ -1,3 +1,4 @@
+import { localizeWithFallback } from '../utils/localizeWithFallback';
 export const GetIssueCategoryName = (categoryId: number) => {
     switch (categoryId) {
         case 1:
@@ -6,9 +7,9 @@ export const GetIssueCategoryName = (categoryId: number) => {
         case 3:
             return 'Automatic';
         case 4:
-            return 'Automatic IM';
+            return localizeWithFallback('octane.mod_tools.automatic_im', 'Automatic IM');
         case 5:
-            return 'Guide System';
+            return localizeWithFallback('octane.mod_tools.guide_system', 'Guide System');
         case 6:
             return 'IM';
         case 7:
@@ -18,7 +19,7 @@ export const GetIssueCategoryName = (categoryId: number) => {
         case 9:
             return 'Guardian';
         case 10:
-            return 'Automatic Helper';
+            return localizeWithFallback('octane.mod_tools.automatic_helper', 'Automatic Helper');
         case 11:
             return 'Discussion';
         case 12:

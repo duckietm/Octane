@@ -247,21 +247,21 @@ export const getRewardTrackTaskHintLink = (actionType: string, configuredLink: s
     switch ((actionType || '').toLowerCase()) {
         case 'enter_other_users_room':
         case 'chat_with_someone':
-            return { fallbackText: 'Open the Navigator', link: 'navigator/show' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_navigator', 'Open the Navigator'), link: 'navigator/show' };
         case 'create_room':
-            return { fallbackText: 'Open the Navigator', link: 'navigator/create' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_navigator', 'Open the Navigator'), link: 'navigator/create' };
         case 'place_item':
-            return { fallbackText: 'Open the inventory', link: 'inventory/show' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_inventory', 'Open the inventory'), link: 'inventory/show' };
         case 'wear_badge':
-            return { fallbackText: 'Open the inventory', link: 'inventory/show/badges' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_inventory', 'Open the inventory'), link: 'inventory/show/badges' };
         case 'buy_from_catalogue':
-            return { fallbackText: 'Open the Catalogue', link: 'catalog/show' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_catalogue', 'Open the Catalogue'), link: 'catalog/show' };
         case 'change_figure':
-            return { fallbackText: 'Open the Look Editor', link: 'avatar-editor/show' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_look_editor', 'Open the Look Editor'), link: 'avatar-editor/show' };
         case 'request_friend':
-            return { fallbackText: 'Find friends', link: 'friends/show' };
+            return { fallbackText: localizeWithFallback('octane.quests.find_friends', 'Find friends'), link: 'friends/show' };
         case 'publish_picture':
-            return { fallbackText: 'Open the Camera', link: 'camera/show' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_camera', 'Open the Camera'), link: 'camera/show' };
         default:
             return null;
     }

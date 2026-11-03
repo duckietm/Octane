@@ -140,7 +140,7 @@ export const TranslationSettingsView: FC<{}> = () => {
                         </div>
                     </div>
                     <div className="flex items-center justify-between text-[11px] text-black/60">
-                        <span>{languagesLoading ? 'Loading languages...' : `${supportedLanguages.length} languages available`}</span>
+                        <span>{languagesLoading ? localizeWithFallback('octane.translation.loading_languages', 'Loading languages...') : `${supportedLanguages.length} languages available`}</span>
                         <BaseButton
                             className="translation-settings-window__refresh"
                             type="button"

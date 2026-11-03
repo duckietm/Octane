@@ -385,7 +385,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                             )}
                                             {iconUrl && <img className="h-auto max-h-[28px] w-auto object-contain" src={iconUrl} alt={item.iconKey} />}
                                             <div className="flex flex-col items-center gap-1 text-center text-[11px]">
-                                                <span>{item.owned ? (item.active ? 'Owned - Active' : 'Owned') : 'Locked'}</span>
+                                                <span>{item.owned ? (item.active ? localizeWithFallback('octane.customize.owned_active', 'Owned - Active') : 'Owned') : 'Locked'}</span>
                                                 <span className="max-w-[140px] truncate">{item.displayName || `Icon #${item.iconKey}`}</span>
                                                 <span className="inline-flex items-center gap-1">
                                                     <LayoutCurrencyIcon type={item.pointsType} />
@@ -452,7 +452,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                                     username="Username"
                                                 />
                                                 <div className="flex flex-col gap-1 text-[11px]">
-                                                    <span>{item.owned ? (item.active ? 'Owned - Active' : 'Owned') : 'Locked'}</span>
+                                                    <span>{item.owned ? (item.active ? localizeWithFallback('octane.customize.owned_active', 'Owned - Active') : 'Owned') : 'Locked'}</span>
                                                     <span className="truncate">
                                                         {item.displayName || item.text}
                                                         {item.isCustom ? ' - Custom' : ''}

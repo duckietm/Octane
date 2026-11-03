@@ -351,10 +351,10 @@ export const Floorplan3DView: FC<Props> = ({ state, dispatch, panMode = false })
                     <Hint content={`Fit room to view (double-click)${zoomLabel ? ` · distance ${zoomLabel}` : ''}`}><BaseButton aria-label={`Fit room to view (double-click)${zoomLabel ? ` · distance ${zoomLabel}` : ''}`} type="button" data-testid="view3d-reset" className="fp-round-btn is-small" disabled={status !== 'ready'} onClick={resetView}>
                         <FaExpand size={10} />
                     </BaseButton></Hint>
-                    <Hint content="Zoom in (wheel)"><BaseButton aria-label="Zoom in (wheel)" type="button" data-testid="view3d-zoom-in" className="fp-round-btn" disabled={status !== 'ready'} onClick={() => zoomBy(1 / ZOOM_STEP)}>
+                    <Hint content={localizeWithFallback('octane.floorplan_editor.zoom_in_wheel', 'Zoom in (wheel)')}><BaseButton aria-label={localizeWithFallback('octane.floorplan_editor.zoom_in_wheel', 'Zoom in (wheel)')} type="button" data-testid="view3d-zoom-in" className="fp-round-btn" disabled={status !== 'ready'} onClick={() => zoomBy(1 / ZOOM_STEP)}>
                         <FaPlus size={13} />
                     </BaseButton></Hint>
-                    <Hint content="Zoom out (wheel)"><BaseButton aria-label="Zoom out (wheel)" type="button" data-testid="view3d-zoom-out" className="fp-round-btn" disabled={status !== 'ready'} onClick={() => zoomBy(ZOOM_STEP)}>
+                    <Hint content={localizeWithFallback('octane.floorplan_editor.zoom_out_wheel', 'Zoom out (wheel)')}><BaseButton aria-label={localizeWithFallback('octane.floorplan_editor.zoom_out_wheel', 'Zoom out (wheel)')} type="button" data-testid="view3d-zoom-out" className="fp-round-btn" disabled={status !== 'ready'} onClick={() => zoomBy(ZOOM_STEP)}>
                         <FaMinus size={13} />
                     </BaseButton></Hint>
                 </div>
@@ -384,7 +384,7 @@ export const Floorplan3DView: FC<Props> = ({ state, dispatch, panMode = false })
                     </BaseButton></Hint>
                 </div>
                 <div className="fp-stage-hint">
-                    {panMode ? 'Drag to rotate · Shift-drag to pan · Wheel to zoom' : 'Click or drag to edit · Right-drag to rotate · Shift-drag to pan · Wheel to zoom'}
+                    {panMode ? localizeWithFallback('octane.floorplan_editor.drag_to_rotate_shift_drag_to', 'Drag to rotate · Shift-drag to pan · Wheel to zoom') : localizeWithFallback('octane.floorplan_editor.click_or_drag_to_edit_right', 'Click or drag to edit · Right-drag to rotate · Shift-drag to pan · Wheel to zoom')}
                 </div>
             </div>
         </NativeTextTree>

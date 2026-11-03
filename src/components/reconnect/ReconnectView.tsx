@@ -6,16 +6,16 @@ import { getDisconnectReasonKey, getReconnectPresentation, useConnectionState } 
 
 /** English when the hotel texts lack the key. */
 const DISCONNECT_FALLBACKS: Record<string, { title: string, info: string }> = {
-    maintenance: { title: 'Maintenance break!', info: 'The hotel is being worked on. Please come back in a little while.' },
-    logged_out: { title: 'Logged out!', info: 'You have been logged out.' },
-    just_banned: { title: 'You were banned!', info: 'Your account has been banned from the hotel.' },
-    still_banned: { title: "You've been banned!", info: 'Your account is still banned from the hotel.' },
-    concurrent_login: { title: "You've logged in elsewhere!", info: 'This session was closed because you logged in somewhere else.' },
-    hotel_closed: { title: 'Hotel is closed!', info: 'The hotel is closed right now. Please come back later.' },
-    incorrect_password: { title: 'Incorrect password!', info: 'Please log in again.' },
-    idle: { title: 'Idle disconnection!', info: 'You were away for too long, so the hotel closed your session.' },
-    incompatible_client_version: { title: 'Old version. Please update!', info: 'Please reload the page to get the latest version.' },
-    generic: { title: 'Disconnected', info: 'You have been disconnected. Please try again.' }
+    maintenance: { get title() { return localizeWithFallback('octane.reconnect.maintenance_break', 'Maintenance break!'); }, get info() { return localizeWithFallback('octane.reconnect.the_hotel_is_being_worked_on', 'The hotel is being worked on. Please come back in a little while.'); } },
+    logged_out: { get title() { return localizeWithFallback('octane.reconnect.logged_out', 'Logged out!'); }, get info() { return localizeWithFallback('octane.reconnect.you_have_been_logged_out', 'You have been logged out.'); } },
+    just_banned: { get title() { return localizeWithFallback('octane.reconnect.you_were_banned', 'You were banned!'); }, get info() { return localizeWithFallback('octane.reconnect.your_account_has_been_banned_from', 'Your account has been banned from the hotel.'); } },
+    still_banned: { get title() { return localizeWithFallback('octane.reconnect.you_ve_been_banned', 'You\'ve been banned!'); }, get info() { return localizeWithFallback('octane.reconnect.your_account_is_still_banned_from', 'Your account is still banned from the hotel.'); } },
+    concurrent_login: { get title() { return localizeWithFallback('octane.reconnect.you_ve_logged_in_elsewhere', 'You\'ve logged in elsewhere!'); }, get info() { return localizeWithFallback('octane.reconnect.this_session_was_closed_because_you', 'This session was closed because you logged in somewhere else.'); } },
+    hotel_closed: { get title() { return localizeWithFallback('octane.reconnect.hotel_is_closed', 'Hotel is closed!'); }, get info() { return localizeWithFallback('octane.reconnect.the_hotel_is_closed_right_now', 'The hotel is closed right now. Please come back later.'); } },
+    incorrect_password: { get title() { return localizeWithFallback('octane.reconnect.incorrect_password', 'Incorrect password!'); }, get info() { return localizeWithFallback('octane.reconnect.please_log_in_again', 'Please log in again.'); } },
+    idle: { get title() { return localizeWithFallback('octane.reconnect.idle_disconnection', 'Idle disconnection!'); }, get info() { return localizeWithFallback('octane.reconnect.you_were_away_for_too_long', 'You were away for too long, so the hotel closed your session.'); } },
+    incompatible_client_version: { get title() { return localizeWithFallback('octane.reconnect.old_version_please_update', 'Old version. Please update!'); }, get info() { return localizeWithFallback('octane.reconnect.please_reload_the_page_to_get', 'Please reload the page to get the latest version.'); } },
+    generic: { title: 'Disconnected', get info() { return localizeWithFallback('octane.reconnect.you_have_been_disconnected_please_try', 'You have been disconnected. Please try again.'); } }
 };
 
 const localizeOr = (key: string, fallback: string): string => {
@@ -52,7 +52,7 @@ export const ReconnectView: FC<{}> = () => {
                                 href={window.location.origin + '/'}
                                 className="px-6 py-2 rounded-lg bg-[#3b82f6] text-white font-semibold cursor-pointer hover:bg-[#2563eb] transition-colors no-underline"
                             >
-                                {localizeOr('disconnected.back_to_hotel', 'Back to Hotel')}
+                                {localizeOr('disconnected.back_to_hotel', localizeWithFallback('octane.reconnect.back_to_hotel', 'Back to Hotel'))}
                             </a>
                         </Base>
                     </Column>

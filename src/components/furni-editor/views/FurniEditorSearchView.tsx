@@ -37,7 +37,7 @@ const COLUMNS: { field: SortField; label: string; align: 'left' | 'center' }[] =
     { field: 'id', label: 'ID', align: 'left' },
     { field: 'spriteId', label: 'Sprite', align: 'left' },
     { field: 'itemName', label: 'Name', align: 'left' },
-    { field: 'publicName', label: 'Public Name', align: 'left' },
+    { field: 'publicName', label: localizeWithFallback('octane.furni_editor.public_name', 'Public Name'), align: 'left' },
     { field: 'type', label: 'Type', align: 'center' },
     { field: 'interactionType', label: 'Interaction', align: 'left' }
 ];
@@ -198,7 +198,7 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                 {/* Result count + activity */}
                 <Flex alignItems="center" gap={2} className="px-0.5">
                     <Text className="text-[11px] text-slate-500">
-                        {total > 0 ? `Showing ${from}–${to} of ${total.toLocaleString()}` : loading ? 'Searching…' : 'No results'}
+                        {total > 0 ? `Showing ${from}–${to} of ${total.toLocaleString()}` : loading ? 'Searching…' : localizeWithFallback('octane.furni_editor.no_results', 'No results')}
                     </Text>
                     {loading && <span className="w-3 h-3 rounded-full border-2 border-slate-300 border-t-primary animate-spin" />}
                     {flaggedCount > 0 && (

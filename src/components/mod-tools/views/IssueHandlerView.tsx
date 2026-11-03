@@ -179,7 +179,7 @@ export const IssueHandlerView: FC<IssueHandlerProps> = ({
         const topicId = topicIndex >= 0 ? (topics[topicIndex]?.id ?? -1) : -1;
 
         if (topicId <= 0 && primary.issue.reportedCategoryId === CATEGORY_NEEDS_TOPIC) {
-            showModAlert('You need to select the topic first.', 'Topic missing');
+            showModAlert(localizeWithFallback('octane.mod_tools.you_need_to_select_the_topic', 'You need to select the topic first.'), localizeWithFallback('octane.mod_tools.topic_missing', 'Topic missing'));
 
             return;
         }

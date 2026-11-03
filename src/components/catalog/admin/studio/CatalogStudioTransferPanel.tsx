@@ -79,7 +79,7 @@ export const CatalogStudioTransferPanel: FC = () => {
             <BaseButton
                 className="octane-catalog-admin-btn is-publish"
                 disabled={studio.loading || result?.code !== 'DRY_RUN_READY' || result.changedEntities === 0}
-                onClick={() => result && studio.applyDocument('SQL', document, result.fingerprint, 'Import catalog SQL file')}
+                onClick={() => result && studio.applyDocument('SQL', document, result.fingerprint, localizeWithFallback('octane.catalog.import_catalog_sql_file', 'Import catalog SQL file'))}
             >
                 <FaUpload /> Apply {result?.changedEntities ?? 0} changes
             </BaseButton>

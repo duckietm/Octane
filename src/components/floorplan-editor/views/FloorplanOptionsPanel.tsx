@@ -45,7 +45,7 @@ export const FloorplanOptionsPanel: FC<Props> = ({ state, dispatch }) => {
                             data-testid="entry-dir"
                             data-dir={state.door.dir}
                             pointer
-                            title={`Direction ${state.door.dir}/7 (click to rotate)`}
+                            title={localizeWithFallback('octane.floorplan_editor.direction_dir_7_click_to_rotate', 'Direction %dir%/7 (click to rotate)', ['dir'], [String(state.door.dir)])}
                             className="fp-orientation-avatar"
                             onClick={() => setDir(rotateDir(state.door.dir, 1))}
                         >

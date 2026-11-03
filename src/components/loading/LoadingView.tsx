@@ -71,7 +71,7 @@ export const LoadingView: FC<LoadingViewProps> = (props) => {
     }, [isError, messages.length]);
 
     const clampedProgress = typeof progress === 'number' && Number.isFinite(progress) ? Math.max(0, Math.min(100, Math.round(progress))) : null;
-    const headline = isError ? configString('client.loading.failed', 'Loading failed') : (messages[messageIndex] ?? message);
+    const headline = isError ? configString('client.loading.failed', localizeWithFallback('octane.loading.loading_failed', 'Loading failed')) : (messages[messageIndex] ?? message);
 
     return (
         <NativeTextTree>

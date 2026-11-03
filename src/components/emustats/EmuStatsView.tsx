@@ -263,7 +263,7 @@ const SystemSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) => {
                             { label: 'Total', value: formatCompactNumber(databasePool.totalConnections) },
                             { label: 'Max', value: formatCompactNumber(databasePool.maxConnections) },
                             {
-                                label: 'Waiting Threads',
+                                label: localizeWithFallback('octane.emustats.waiting_threads', 'Waiting Threads'),
                                 value: formatCompactNumber(databasePool.waitingThreads),
                                 tone: databasePool.waitingThreads > 0 ? 'warn' : 'good'
                             }
@@ -273,22 +273,22 @@ const SystemSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) => {
                 <DetailPanel title={localizeWithFallback('octane.emustats.network_throughput', 'Network Throughput')} description={localizeWithFallback('octane.emustats.realtime_rates_sampled_from_incoming_and', 'Realtime rates sampled from incoming and outgoing packet pipelines.')}>
                     <KeyValueGrid
                         items={[
-                            { label: 'Incoming Packets/s', value: formatThroughput(network.incomingPacketsPerSecond, 'pkt') },
-                            { label: 'Outgoing Packets/s', value: formatThroughput(network.outgoingPacketsPerSecond, 'pkt') },
-                            { label: 'Incoming KB/s', value: formatThroughput(network.incomingKilobytesPerSecond, 'KB') },
-                            { label: 'Outgoing KB/s', value: formatThroughput(network.outgoingKilobytesPerSecond, 'KB') },
-                            { label: 'Total Incoming', value: formatCompactNumber(network.totalIncomingPackets) },
-                            { label: 'Total Outgoing', value: formatCompactNumber(network.totalOutgoingPackets) }
+                            { label: localizeWithFallback('octane.emustats.incoming_packets_s', 'Incoming Packets/s'), value: formatThroughput(network.incomingPacketsPerSecond, 'pkt') },
+                            { label: localizeWithFallback('octane.emustats.outgoing_packets_s', 'Outgoing Packets/s'), value: formatThroughput(network.outgoingPacketsPerSecond, 'pkt') },
+                            { label: localizeWithFallback('octane.emustats.incoming_kb_s', 'Incoming KB/s'), value: formatThroughput(network.incomingKilobytesPerSecond, 'KB') },
+                            { label: localizeWithFallback('octane.emustats.outgoing_kb_s', 'Outgoing KB/s'), value: formatThroughput(network.outgoingKilobytesPerSecond, 'KB') },
+                            { label: localizeWithFallback('octane.emustats.total_incoming', 'Total Incoming'), value: formatCompactNumber(network.totalIncomingPackets) },
+                            { label: localizeWithFallback('octane.emustats.total_outgoing', 'Total Outgoing'), value: formatCompactNumber(network.totalOutgoingPackets) }
                         ]}
                     />
                 </DetailPanel>
                 <DetailPanel title={localizeWithFallback('octane.emustats.scheduler', 'Scheduler')} description={localizeWithFallback('octane.emustats.executor_load_behind_delayed_tasks_and', 'Executor load behind delayed tasks and internal service work.')}>
                     <KeyValueGrid
                         items={[
-                            { label: 'Queued Tasks', value: formatCompactNumber(scheduler.queuedTasks), tone: scheduler.queuedTasks > 0 ? 'warn' : 'good' },
-                            { label: 'Active Threads', value: formatCompactNumber(scheduler.activeThreads) },
-                            { label: 'Pool Size', value: formatCompactNumber(scheduler.poolSize) },
-                            { label: 'Completed Tasks', value: formatCompactNumber(scheduler.completedTasks) },
+                            { label: localizeWithFallback('octane.emustats.queued_tasks', 'Queued Tasks'), value: formatCompactNumber(scheduler.queuedTasks), tone: scheduler.queuedTasks > 0 ? 'warn' : 'good' },
+                            { label: localizeWithFallback('octane.emustats.active_threads', 'Active Threads'), value: formatCompactNumber(scheduler.activeThreads) },
+                            { label: localizeWithFallback('octane.emustats.pool_size', 'Pool Size'), value: formatCompactNumber(scheduler.poolSize) },
+                            { label: localizeWithFallback('octane.emustats.completed_tasks', 'Completed Tasks'), value: formatCompactNumber(scheduler.completedTasks) },
                             { label: 'Running', value: formatBoolean(scheduler.running), tone: scheduler.running ? 'good' : 'warn' }
                         ]}
                     />
@@ -296,30 +296,30 @@ const SystemSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) => {
                 <DetailPanel title={localizeWithFallback('octane.emustats.garbage_collection', 'Garbage Collection')} description={localizeWithFallback('octane.emustats.observed_jvm_collection_activity_since_emulator', 'Observed JVM collection activity since emulator startup.')}>
                     <KeyValueGrid
                         items={[
-                            { label: 'Total Collections', value: formatCompactNumber(garbageCollector.totalCollections) },
-                            { label: 'Collections This Sample', value: formatCompactNumber(garbageCollector.collectionsSinceLastSample) },
-                            { label: 'Total Pause Time', value: `${formatCompactNumber(garbageCollector.totalCollectionTimeMs)} ms` },
+                            { label: localizeWithFallback('octane.emustats.total_collections', 'Total Collections'), value: formatCompactNumber(garbageCollector.totalCollections) },
+                            { label: localizeWithFallback('octane.emustats.collections_this_sample', 'Collections This Sample'), value: formatCompactNumber(garbageCollector.collectionsSinceLastSample) },
+                            { label: localizeWithFallback('octane.emustats.total_pause_time', 'Total Pause Time'), value: `${formatCompactNumber(garbageCollector.totalCollectionTimeMs)} ms` },
                             {
-                                label: 'Last Observed Pause',
+                                label: localizeWithFallback('octane.emustats.last_observed_pause', 'Last Observed Pause'),
                                 value: `${formatCompactNumber(garbageCollector.lastObservedPauseMs)} ms`,
                                 tone: garbageCollector.lastObservedPauseMs > 250 ? 'warn' : 'default'
                             },
-                            { label: 'Sampled At', value: formatDateTime(garbageCollector.sampledAtEpochMs) }
+                            { label: localizeWithFallback('octane.emustats.sampled_at', 'Sampled At'), value: formatDateTime(garbageCollector.sampledAtEpochMs) }
                         ]}
                     />
                 </DetailPanel>
                 <DetailPanel title={localizeWithFallback('octane.emustats.cycle_health', 'Cycle Health')} description={localizeWithFallback('octane.emustats.aggregated_timing_from_the_active_room', 'Aggregated timing from the active room update loop.')}>
                     <KeyValueGrid
                         items={[
-                            { label: 'Average Room Cycle', value: formatMs(overview.averageRoomCycleMs) },
+                            { label: localizeWithFallback('octane.emustats.average_room_cycle', 'Average Room Cycle'), value: formatMs(overview.averageRoomCycleMs) },
                             {
-                                label: 'Worst Room Cycle',
+                                label: localizeWithFallback('octane.emustats.worst_room_cycle', 'Worst Room Cycle'),
                                 value: formatMs(overview.worstRoomCycleMs),
                                 tone: overview.worstRoomCycleMs > 20 ? 'warn' : 'default'
                             },
-                            { label: 'Worst Room', value: formatRoomLabel(overview.worstRoomCycleRoomId, overview.worstRoomCycleRoomName) },
+                            { label: localizeWithFallback('octane.emustats.worst_room', 'Worst Room'), value: formatRoomLabel(overview.worstRoomCycleRoomId, overview.worstRoomCycleRoomName) },
                             {
-                                label: 'WebSocket Sessions',
+                                label: localizeWithFallback('octane.emustats.websocket_sessions', 'WebSocket Sessions'),
                                 value: `${formatCompactNumber(overview.activeWebSocketSessions)} / ${formatCompactNumber(overview.peakWebSocketSessions)} peak`
                             }
                         ]}
@@ -342,21 +342,21 @@ const WiredInsightsSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) 
                         items={[
                             { label: 'Tickables', value: formatCompactNumber(overview.wiredTickables) },
                             {
-                                label: 'Delayed Events',
+                                label: localizeWithFallback('octane.emustats.delayed_events', 'Delayed Events'),
                                 value: formatCompactNumber(overview.delayedEventsPending),
                                 tone: overview.delayedEventsPending > 0 ? 'warn' : 'good'
                             },
                             {
-                                label: 'Heavy Rooms',
+                                label: localizeWithFallback('octane.emustats.heavy_rooms', 'Heavy Rooms'),
                                 value: formatCompactNumber(overview.heavyWiredRooms),
                                 tone: overview.heavyWiredRooms > 0 ? 'warn' : 'good'
                             },
                             {
-                                label: 'Overloaded Rooms',
+                                label: localizeWithFallback('octane.emustats.overloaded_rooms', 'Overloaded Rooms'),
                                 value: formatCompactNumber(overview.overloadedWiredRooms),
                                 tone: overview.overloadedWiredRooms > 0 ? 'warn' : 'good'
                             },
-                            { label: 'Activity / Second', value: formatThroughput(overview.wiredActivityPerSecond, 'ops') }
+                            { label: localizeWithFallback('octane.emustats.activity_second', 'Activity / Second'), value: formatThroughput(overview.wiredActivityPerSecond, 'ops') }
                         ]}
                     />
                 </DetailPanel>
@@ -366,8 +366,8 @@ const WiredInsightsSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) 
                             { key: 'roomId', label: 'Room', className: 'is-xs' },
                             { key: 'name', label: 'Name' },
                             { key: 'usagePercent', label: 'Usage', className: 'is-xs', render: (row) => `${row.usagePercent}%` },
-                            { key: 'averageTickMs', label: 'Avg Tick', className: 'is-sm', render: (row) => `${row.averageTickMs} ms` },
-                            { key: 'peakTickMs', label: 'Peak Tick', className: 'is-sm', render: (row) => `${row.peakTickMs} ms` },
+                            { key: 'averageTickMs', label: localizeWithFallback('octane.emustats.avg_tick', 'Avg Tick'), className: 'is-sm', render: (row) => `${row.averageTickMs} ms` },
+                            { key: 'peakTickMs', label: localizeWithFallback('octane.emustats.peak_tick', 'Peak Tick'), className: 'is-sm', render: (row) => `${row.peakTickMs} ms` },
                             { key: 'delayedEventsPending', label: 'Delayed', className: 'is-xs' },
                             { key: 'activityPerSecond', label: 'Ops/s', className: 'is-sm', render: (row) => row.activityPerSecond.toFixed(1) },
                             { key: 'heavy', label: 'Heavy', className: 'is-sm', render: (row) => formatBoolean(row.heavy) }
@@ -468,11 +468,11 @@ export const EmuStatsView: FC<{}> = () => {
 
     const navItems: { key: EmuStatsSection; label: string; count?: number }[] = [
         { key: 'overview', label: 'Overview' },
-        { key: 'system', label: 'System Health' },
-        { key: 'wiredInsights', label: 'Wired Insights', count: snapshot?.wiredTopRooms?.length || 0 },
-        { key: 'wired', label: 'Wired Diagnostics', count: snapshot?.wired?.length || 0 },
-        { key: 'users', label: 'Online Users', count: snapshot?.users?.length || 0 },
-        { key: 'rooms', label: 'Active Rooms', count: snapshot?.rooms?.length || 0 }
+        { key: 'system', label: localizeWithFallback('octane.emustats.system_health', 'System Health') },
+        { key: 'wiredInsights', label: localizeWithFallback('octane.emustats.wired_insights', 'Wired Insights'), count: snapshot?.wiredTopRooms?.length || 0 },
+        { key: 'wired', label: localizeWithFallback('octane.emustats.wired_diagnostics', 'Wired Diagnostics'), count: snapshot?.wired?.length || 0 },
+        { key: 'users', label: localizeWithFallback('octane.emustats.online_users', 'Online Users'), count: snapshot?.users?.length || 0 },
+        { key: 'rooms', label: localizeWithFallback('octane.emustats.active_rooms', 'Active Rooms'), count: snapshot?.rooms?.length || 0 }
     ];
 
     const content = useMemo(() => {
@@ -491,7 +491,7 @@ export const EmuStatsView: FC<{}> = () => {
                                 { key: 'id', label: 'ID', className: 'is-xs' },
                                 { key: 'username', label: 'Username' },
                                 { key: 'rank', label: 'Rank' },
-                                { key: 'roomId', label: 'Room ID', className: 'is-sm' }
+                                { key: 'roomId', label: localizeWithFallback('octane.emustats.room_id', 'Room ID'), className: 'is-sm' }
                             ]}
                             rowKey={(row) => `user-${row.id}`}
                             rows={snapshot.users}
@@ -523,8 +523,8 @@ export const EmuStatsView: FC<{}> = () => {
                         <StatsTable<EmuStatsWiredRow>
                             columns={[
                                 { key: 'roomId', label: 'Room', className: 'is-xs' },
-                                { key: 'averageTickMs', label: 'Avg Tick', className: 'is-sm', render: (row) => `${row.averageTickMs} ms` },
-                                { key: 'peakTickMs', label: 'Peak Tick', className: 'is-sm', render: (row) => `${row.peakTickMs} ms` },
+                                { key: 'averageTickMs', label: localizeWithFallback('octane.emustats.avg_tick', 'Avg Tick'), className: 'is-sm', render: (row) => `${row.averageTickMs} ms` },
+                                { key: 'peakTickMs', label: localizeWithFallback('octane.emustats.peak_tick', 'Peak Tick'), className: 'is-sm', render: (row) => `${row.peakTickMs} ms` },
                                 { key: 'usagePercent', label: 'Usage', className: 'is-xs', render: (row) => `${row.usagePercent}%` },
                                 { key: 'delayedEventsPending', label: 'Delayed', className: 'is-xs' },
                                 { key: 'overloaded', label: 'Overloaded', className: 'is-sm', render: (row) => formatBoolean(row.overloaded) },

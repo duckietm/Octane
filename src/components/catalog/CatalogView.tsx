@@ -193,7 +193,7 @@ const CatalogViewInner: FC<{}> = () => {
                                                 setMobileMenuOpen(false);
                                             }}
                                         >
-                                            {adminMode ? 'Exit Admin' : 'Admin'}
+                                            {adminMode ? localizeWithFallback('octane.catalog.exit_admin', 'Exit Admin') : 'Admin'}
                                         </BaseButton>
                                     </div>
                                 )}

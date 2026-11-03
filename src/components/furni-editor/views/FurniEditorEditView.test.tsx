@@ -5,7 +5,8 @@ import { FurniEditorEditView } from './FurniEditorEditView';
 
 vi.mock('../../../api', () => ({
     CopyToClipboard: () => Promise.resolve(true),
-    localizeWithFallback: (_key: string, fallback: string) => fallback
+    localizeWithFallback: (_key: string, fallback: string, params?: string[], values?: string[]) =>
+        (params ?? []).reduce((text, name, index) => text.replace(`%${name}%`, values?.[index] ?? ''), fallback)
 }));
 
 vi.mock('../../../common', () => ({

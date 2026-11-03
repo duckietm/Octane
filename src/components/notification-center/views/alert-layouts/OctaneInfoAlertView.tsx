@@ -70,7 +70,7 @@ export const OctaneInfoAlertView: FC<OctaneInfoAlertViewProps> = (props) => {
     }, [item]);
 
     const rawTitle = titleProp || (item && item.title) || '';
-    const displayTitle = rawTitle && rawTitle !== 'nitro.info.title' ? rawTitle : 'Hotel Info';
+    const displayTitle = rawTitle && rawTitle !== 'nitro.info.title' ? rawTitle : localizeWithFallback('octane.notification_center.hotel_info', 'Hotel Info');
 
     return (
         <NativeTextTree>

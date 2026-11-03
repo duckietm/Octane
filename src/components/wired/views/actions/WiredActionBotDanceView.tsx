@@ -8,7 +8,7 @@ import { Select } from '../../../../common/Select';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const DANCE_TYPES = [
-    { value: 0, key: null, label: 'Stop dancing' },
+    { value: 0, key: null, get label() { return localizeWithFallback('octane.wired.stop_dancing', 'Stop dancing'); } },
     { value: 1, key: 'wiredfurni.params.action.dance.1', label: 'Hap Hop' },
     { value: 2, key: 'wiredfurni.params.action.dance.2', label: 'Pogo Mogo' },
     { value: 3, key: 'wiredfurni.params.action.dance.3', label: 'Duck Funk' },

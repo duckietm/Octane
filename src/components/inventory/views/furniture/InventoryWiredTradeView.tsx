@@ -446,7 +446,7 @@ export const InventoryWiredTradeView: FC<{}> = () => {
                                                 paymentOnly
                                                     ? 'inventory.wired_trading.requirements.auto_mode_hint_payment'
                                                     : 'inventory.wired_trading.requirements.auto_mode_hint_trade',
-                                                `You can keep adding items to run this ${ tradeTypeLower } several times (max ${ autoMultiplierMax }x)`,
+                                                localizeWithFallback('octane.inventory.you_can_keep_adding_items_to', 'You can keep adding items to run this %trade_type_lower% several times (max %auto_multiplier_max%x)', ['trade_type_lower', 'auto_multiplier_max'], [String(tradeTypeLower), String(autoMultiplierMax)]),
                                                 ['amount'],
                                                 [String(autoMultiplierMax)],
                                             )),

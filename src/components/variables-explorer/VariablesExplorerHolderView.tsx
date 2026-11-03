@@ -113,7 +113,7 @@ export const VariablesExplorerHolderView: FC<VariablesExplorerHolderViewProps> =
         setEditingName(null);
 
         if (value === null) {
-            setStatus('Enter a whole number.');
+            setStatus(localizeWithFallback('octane.variables_explorer.enter_a_whole_number', 'Enter a whole number.'));
             return;
         }
 
@@ -138,7 +138,7 @@ export const VariablesExplorerHolderView: FC<VariablesExplorerHolderViewProps> =
         const value = selectedGive.hasValue ? parseInt32(giveValue) : null;
 
         if (selectedGive.hasValue && value === null) {
-            setStatus('Enter a whole number.');
+            setStatus(localizeWithFallback('octane.variables_explorer.enter_a_whole_number', 'Enter a whole number.'));
             return;
         }
 
@@ -156,7 +156,7 @@ export const VariablesExplorerHolderView: FC<VariablesExplorerHolderViewProps> =
         const amount = parseInt32(addValue);
 
         if (amount === null) {
-            setStatus('Enter a whole number.');
+            setStatus(localizeWithFallback('octane.variables_explorer.enter_a_whole_number', 'Enter a whole number.'));
             return;
         }
 
@@ -189,7 +189,7 @@ export const VariablesExplorerHolderView: FC<VariablesExplorerHolderViewProps> =
                     )
                 }
                 infoLines={holderInfoLines(target, profile, roomId, local?.name, local?.owner)}
-                variablesTitle={target.scope === 'global' ? 'Room variables:' : 'Assigned variables:'}
+                variablesTitle={target.scope === 'global' ? localizeWithFallback('octane.variables_explorer.room_variables', 'Room variables:') : localizeWithFallback('octane.variables_explorer.assigned_variables', 'Assigned variables:')}
                 entries={entries.map((entry) => ({
                     id: entry.name,
                     name: entry.name,

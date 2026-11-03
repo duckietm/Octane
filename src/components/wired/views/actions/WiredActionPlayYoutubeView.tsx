@@ -8,8 +8,8 @@ import { Select } from '../../../../common/Select';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const PLAYBACK_OPTIONS = [
-    { value: 1, key: 'wiredfurni.params.youtube.play', label: 'Play video' },
-    { value: 0, key: 'wiredfurni.params.youtube.stop', label: 'Stop / clear video' }
+    { value: 1, key: 'wiredfurni.params.youtube.play', get label() { return localizeWithFallback('octane.wired.play_video', 'Play video'); } },
+    { value: 0, key: 'wiredfurni.params.youtube.stop', get label() { return localizeWithFallback('octane.wired.stop_clear_video', 'Stop / clear video'); } }
 ];
 
 export const WiredActionPlayYoutubeView: FC<{}> = (props) => {

@@ -90,7 +90,7 @@ export const AvatarEditorPetView: FC<{
                     </ToggleButton>
                     <div className="octane-avatar-editor-pet-equipped">
                         {selectedPartItem && slotThumbUrl ? <img src={slotThumbUrl} alt="" draggable={false} /> : <AvatarEditorIcon icon="pt" />}
-                        <span>{selectedPartItem ? 'Companion equipped' : 'No companion selected'}</span>
+                        <span>{selectedPartItem ? localizeWithFallback('octane.avatar_editor.companion_equipped', 'Companion equipped') : localizeWithFallback('octane.avatar_editor.no_companion_selected', 'No companion selected')}</span>
                         {selectedPartItem && (
                             <BaseButton type="button" className="octane-avatar-editor-pet-remove" aria-label={localizeWithFallback('octane.avatar_editor.remove_companion', 'Remove companion')} onClick={removePet}>
                                 <AvatarEditorIcon icon="clear" />

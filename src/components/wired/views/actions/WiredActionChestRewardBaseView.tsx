@@ -106,7 +106,7 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
                     {[CHEST_REWARD_MODE_AMOUNT, CHEST_REWARD_MODE_EVERYTHING].map((value) => (
                         <label key={value} className="flex items-center gap-1">
                             <Radio name="chestRewardMode" checked={mode === value} onCheckedChange={() => setMode(value)} />
-                            <Text>{localizeWithFallback(`wiredfurni.params.rewarding_mode.${value}`, value === 0 ? 'Give a specific amount' : 'Give everything')}</Text>
+                            <Text>{localizeWithFallback(`wiredfurni.params.rewarding_mode.${value}`, value === 0 ? localizeWithFallback('octane.wired.give_a_specific_amount', 'Give a specific amount') : localizeWithFallback('octane.wired.give_everything', 'Give everything'))}</Text>
                         </label>
                     ))}
                 </div>

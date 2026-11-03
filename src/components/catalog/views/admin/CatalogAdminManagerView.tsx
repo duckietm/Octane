@@ -220,7 +220,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
             const dragged = findNodeByPageId(managerRootNode, Number(data.pageId));
             const plan = planCatalogAdminPageDrop(dragged, null, 'root', managerRootNode);
             if (!plan) return;
-            catalogAdmin.reorderPage(plan.pageId, plan.newParentId, plan.newIndex, `Moved page #${plan.pageId} to catalog root`);
+            catalogAdmin.reorderPage(plan.pageId, plan.newParentId, plan.newIndex, localizeWithFallback('octane.catalog.moved_page_page_id_to_catalog', 'Moved page #%page_id% to catalog root', ['page_id'], [String(plan.pageId)]));
         } catch {
         }
     }, [catalogAdmin, managerRootNode]);
@@ -239,7 +239,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
             const pageLabel = selectedNode ? nodeName(selectedNode) : 'page';
             catalogAdmin.reorderOffers(
                 reordered.map((offer, i) => ({ id: offer.offerId, orderNumber: i })),
-                `Reordered offers on "${pageLabel}"`,
+                localizeWithFallback('octane.catalog.reordered_offers_on_page_label', 'Reordered offers on "%page_label%"', ['page_label'], [String(pageLabel)]),
                 currentPage.pageId
             );
         },
@@ -350,7 +350,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
         if (isReadOnlyPage) return;
 
         const label = offer.localizationName || `#${offer.offerId}`;
-        if (confirm(`Delete offer "${label}"?`)) catalogAdmin.deleteOffer(offer.offerId, `Deleted offer: ${label}`);
+        if (confirm(localizeWithFallback('octane.catalog.delete_offer_label', 'Delete offer "%label%"?', ['label'], [String(label)]))) catalogAdmin.deleteOffer(offer.offerId, localizeWithFallback('octane.catalog.deleted_offer_label', 'Deleted offer: %label%', ['label'], [String(label)]));
     };
 
     const moveOffer = (index: number, direction: -1 | 1) => {
@@ -554,9 +554,9 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                                             {editableProducts.map((product, productIndex) => {
                                                 const productLabel = product.furnitureData?.className || `#${product.productClassId}`;
 
-                                                return <Hint key={`${product.productType}-${product.productClassId}-${productIndex}`} content={`Edit Furni: ${productLabel}`}>
+                                                return <Hint key={`${product.productType}-${product.productClassId}-${productIndex}`} content={localizeWithFallback('octane.catalog.edit_furni_product_label', 'Edit Furni: %product_label%', ['product_label'], [String(productLabel)])}>
                                                     <BaseButton
-                                                                                                    aria-label={`Edit Furni ${productLabel}`}
+                                                                                                    aria-label={localizeWithFallback('octane.catalog.edit_furni_product_label_2', 'Edit Furni %product_label%', ['product_label'], [String(productLabel)])}
                                                                                                     onClick={() => window.dispatchEvent(new CustomEvent('furni-editor:open', {
                                                                                                         detail: { spriteId: product.productClassId }
                                                                                                     }))}
@@ -680,7 +680,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
     const tabPresentation = {
         catalog: { label: 'Catalog', icon: <FaSitemap />, count: categoryCount },
         sql: { label: 'SQL tools', icon: <FaEdit />, count: 0 },
-        history: { label: 'Problems & History', icon: <FaHistory />, count: validationIssueCount }
+        history: { label: localizeWithFallback('octane.catalog.problems_history', 'Problems & History'), icon: <FaHistory />, count: validationIssueCount }
     };
     const tabs = getCatalogStudioWorkspaceTabs().map(id => ({ id, ...tabPresentation[id] }));
 

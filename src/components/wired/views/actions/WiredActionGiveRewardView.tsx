@@ -42,9 +42,9 @@ const clampPrizeLimit = (value: number) => (Number.isFinite(value) ? Math.max(MI
 const REWARD_TYPES: { value: RewardType; key: string; label: string }[] = [
     { value: 'badge', key: 'wiredfurni.params.reward.type.badge', label: 'Badge' },
     { value: 'credits', key: 'wiredfurni.params.reward.type.credits', label: 'Credits' },
-    { value: 'pixels', key: 'wiredfurni.params.reward.type.pixels', label: 'Pixels / Duckets' },
+    { value: 'pixels', key: 'wiredfurni.params.reward.type.pixels', get label() { return localizeWithFallback('octane.wired.pixels_duckets', 'Pixels / Duckets'); } },
     { value: 'diamonds', key: 'wiredfurni.params.reward.type.diamonds', label: 'Diamonds' },
-    { value: 'points', key: 'wiredfurni.params.reward.type.points', label: 'Extra Currency' },
+    { value: 'points', key: 'wiredfurni.params.reward.type.points', get label() { return localizeWithFallback('octane.wired.extra_currency', 'Extra Currency'); } },
     { value: 'furni', key: 'wiredfurni.params.reward.type.furni', label: 'Furni' },
     { value: 'respect', key: 'wiredfurni.params.reward.type.respect', label: 'Respect' }
 ];
@@ -61,26 +61,26 @@ const createReward = (): RewardEntry => ({
 const getRewardValuePlaceholder = (rewardType: RewardType) => {
     switch (rewardType) {
         case 'badge':
-            return 'Badge code';
+            return localizeWithFallback('octane.wired.badge_code', 'Badge code');
         case 'credits':
-            return 'Credits amount';
+            return localizeWithFallback('octane.wired.credits_amount', 'Credits amount');
         case 'pixels':
-            return 'Pixels amount';
+            return localizeWithFallback('octane.wired.pixels_amount', 'Pixels amount');
         case 'diamonds':
-            return 'Diamonds amount';
+            return localizeWithFallback('octane.wired.diamonds_amount', 'Diamonds amount');
         case 'points':
             return 'Amount';
         case 'furni':
-            return 'Furni base item id';
+            return localizeWithFallback('octane.wired.furni_base_item_id', 'Furni base item id');
         case 'respect':
-            return 'Respect amount';
+            return localizeWithFallback('octane.wired.respect_amount', 'Respect amount');
     }
 };
 
 const getExtraFieldLabel = (rewardType: RewardType) => {
     switch (rewardType) {
         case 'points':
-            return 'Currency Type';
+            return localizeWithFallback('octane.wired.currency_type_2', 'Currency Type');
         case 'badge':
             return 'Code';
         default:
@@ -91,7 +91,7 @@ const getExtraFieldLabel = (rewardType: RewardType) => {
 const getExtraFieldPlaceholder = (rewardType: RewardType) => {
     switch (rewardType) {
         case 'points':
-            return 'Type id (e.g. 105)';
+            return localizeWithFallback('octane.wired.type_id_e_g_105', 'Type id (e.g. 105)');
         case 'badge':
             return 'Badge';
         default:
@@ -154,19 +154,19 @@ export const validateRewards = (rewards: RewardEntry[], unique: boolean): string
 
         if (!rewardValue) continue;
 
-        if (rewardValue.includes(',')) return "Product/badge codes must not contain ',' characters.";
-        if (rewardValue.includes(';')) return "Product/badge codes must not contain ';' characters.";
-        if (encodeRewardCode(reward, rewardValue).length > MAX_CODE_LENGTH) return `Product/badge codes cannot contain more than ${MAX_CODE_LENGTH} characters.`;
+        if (rewardValue.includes(',')) return localizeWithFallback('octane.wired.product_badge_codes_must_not_contain', 'Product/badge codes must not contain \',\' characters.');
+        if (rewardValue.includes(';')) return localizeWithFallback('octane.wired.product_badge_codes_must_not_contain_2', 'Product/badge codes must not contain \';\' characters.');
+        if (encodeRewardCode(reward, rewardValue).length > MAX_CODE_LENGTH) return localizeWithFallback('octane.wired.product_badge_codes_cannot_contain_more', 'Product/badge codes cannot contain more than %max_code_length% characters.', ['max_code_length'], [String(MAX_CODE_LENGTH)]);
 
         if (unique) continue;
 
-        if (!Number.isFinite(reward.probability)) return 'Make sure are probabilities are numbers.';
-        if (reward.probability < 1 || reward.probability > 100) return 'Make sure all probabilities are numbers between 1 and 100.';
+        if (!Number.isFinite(reward.probability)) return localizeWithFallback('octane.wired.make_sure_all_probabilities_are_numbers', 'Make sure all probabilities are numbers.');
+        if (reward.probability < 1 || reward.probability > 100) return localizeWithFallback('octane.wired.make_sure_all_probabilities_are_numbers_2', 'Make sure all probabilities are numbers between 1 and 100.');
 
         sum += Math.floor(reward.probability);
     }
 
-    return sum > 100 ? `The sum of probabilities cannot exceed 100. You now have ${sum}.` : null;
+    return sum > 100 ? localizeWithFallback('octane.wired.the_sum_of_probabilities_cannot_exceed', 'The sum of probabilities cannot exceed 100. You now have %sum%.', ['sum'], [String(sum)]) : null;
 };
 
 export const WiredActionGiveRewardView: FC<{}> = (props) => {

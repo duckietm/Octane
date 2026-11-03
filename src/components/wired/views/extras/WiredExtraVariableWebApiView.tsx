@@ -93,7 +93,7 @@ export const WiredExtraVariableWebApiView: FC<{}> = () => {
     const copyKey = async (key: string) => {
         if (!key || !(await CopyToClipboard(key))) return;
 
-        showSingleBubble?.(localizeText('notification.wired.copied_api_key', 'Successfully copied API key to clipboard'), NotificationBubbleType.INFO);
+        showSingleBubble?.(localizeText('notification.wired.copied_api_key', localizeWithFallback('octane.wired.successfully_copied_api_key_to_clipboard', 'Successfully copied API key to clipboard')), NotificationBubbleType.INFO);
     };
 
     const toggleBulkDelete = (checked: boolean) => {
@@ -107,13 +107,13 @@ export const WiredExtraVariableWebApiView: FC<{}> = () => {
         showConfirm(
             localizeText(
                 'wiredfurni.params.web_api.permissions.bulk_delete.warning.desc',
-                'Enabling this option is dangerous.\nAccidentally calling the "/variables/bulk-delete" endpoint irreversibly deletes all contents of variables.\n\nMake sure to test your application on test variables in a different room first.'
+                localizeWithFallback('octane.wired.enabling_this_option_is_dangerous_accidentally', 'Enabling this option is dangerous.\nAccidentally calling the "/variables/bulk-delete" endpoint irreversibly deletes all contents of variables.\n\nMake sure to test your application on test variables in a different room first.')
             ),
             () => setBulkDelete(true),
             null,
             null,
             null,
-            localizeText('wiredfurni.params.web_api.permissions.bulk_delete.warning.title', 'Are you sure?'),
+            localizeText('wiredfurni.params.web_api.permissions.bulk_delete.warning.title', localizeWithFallback('octane.wired.are_you_sure', 'Are you sure?')),
             null,
             NotificationConfirmItem.TITLE_BAR_DANGER
         );
@@ -139,7 +139,7 @@ export const WiredExtraVariableWebApiView: FC<{}> = () => {
                             : localizeText('wiredfurni.params.web_api.write.title', 'API key for writing:')}
                     </Text>
                     <input
-                        aria-label={isReadKey ? 'Read key' : 'Write key'}
+                        aria-label={isReadKey ? localizeWithFallback('octane.wired.read_key', 'Read key') : localizeWithFallback('octane.wired.write_key', 'Write key')}
                         className="form-control form-control-sm font-mono"
                         readOnly
                         spellCheck={false}
@@ -178,14 +178,14 @@ export const WiredExtraVariableWebApiView: FC<{}> = () => {
                 footer={
                     <div className="flex gap-1">
                         <Button disabled={!docsUrl} fullWidth variant="secondary" onClick={() => OpenUrl(docsUrl)}>
-                            {localizeText('wiredfurni.params.web_api.link', 'Open API documentation')}
+                            {localizeText('wiredfurni.params.web_api.link', localizeWithFallback('octane.wired.open_api_documentation', 'Open API documentation'))}
                         </Button>
                         <Button
                             fullWidth
                             variant="secondary"
                             onClick={() => openExplorer({ roomId: GetRoomSession()?.roomId, readKey: readKey || undefined, writeKey: writeKey || undefined })}
                         >
-                            {localizeText('wiredfurni.params.web_api.open_explorer', 'Open explorer')}
+                            {localizeText('wiredfurni.params.web_api.open_explorer', localizeWithFallback('octane.wired.open_explorer', 'Open explorer'))}
                         </Button>
                     </div>
                 }
@@ -194,7 +194,7 @@ export const WiredExtraVariableWebApiView: FC<{}> = () => {
                     <Text className="whitespace-pre-line">
                         {localizeText(
                             'wiredfurni.params.web_api.usage_info',
-                            "Create API keys for reading and writing variables from dedicated HTTPS endpoints.\nNobody else can see the contents of this box, and you should not share these keys with anyone you don't trust.\n\nAfter changing variable configurations in the room, you may need to reload the room for the API to work properly."
+                            localizeWithFallback('octane.wired.create_api_keys_for_reading_and', 'Create API keys for reading and writing variables from dedicated HTTPS endpoints.\nNobody else can see the contents of this box, and you should not share these keys with anyone you don\'t trust.\n\nAfter changing variable configurations in the room, you may need to reload the room for the API to work properly.')
                         )}
                     </Text>
                     <div className="octane-wired__divider" />
@@ -203,15 +203,15 @@ export const WiredExtraVariableWebApiView: FC<{}> = () => {
                     {keySection(false)}
                     <div className="octane-wired__divider" />
                     <div className="flex flex-col gap-1">
-                        <Text bold>{localizeText('wiredfurni.params.web_api.permissions', 'Extra permissions:')}</Text>
+                        <Text bold>{localizeText('wiredfurni.params.web_api.permissions', localizeWithFallback('octane.wired.extra_permissions', 'Extra permissions:'))}</Text>
                         <label className={`flex items-center gap-1 ${canAllowBulkDelete(writeKey) ? 'cursor-pointer' : 'opacity-60'}`}>
                             <Checkbox checked={bulkDelete && canAllowBulkDelete(writeKey)} disabled={!canAllowBulkDelete(writeKey)} onCheckedChange={(nextChecked) => toggleBulkDelete(nextChecked)} />
-                            <Text>{localizeText('wiredfurni.params.web_api.permissions.bulk_delete', 'Allow mass deletion')}</Text>
+                            <Text>{localizeText('wiredfurni.params.web_api.permissions.bulk_delete', localizeWithFallback('octane.wired.allow_mass_deletion', 'Allow mass deletion'))}</Text>
                         </label>
                         <Text small className="text-[#6b6659]">
                             {localizeText(
                                 'wiredfurni.params.web_api.permissions.bulk_delete.info',
-                                'Enables access to the /variables/bulk-delete endpoint. Use with caution!'
+                                localizeWithFallback('octane.wired.enables_access_to_the_variables_bulk', 'Enables access to the /variables/bulk-delete endpoint. Use with caution!')
                             )}
                         </Text>
                     </div>

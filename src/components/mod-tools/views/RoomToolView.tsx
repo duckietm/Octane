@@ -142,7 +142,7 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
         if (sentRef.current || flatId === 0) return;
 
         if (isPlaceholder || message === '') {
-            showModAlert('You must input a message to the user');
+            showModAlert(localizeWithFallback('octane.mod_tools.you_must_input_a_message_to', 'You must input a message to the user'));
 
             return;
         }

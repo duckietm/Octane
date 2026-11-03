@@ -9,7 +9,7 @@ import {
     ReleaseIssuesMessageComposer
 } from '@octane/renderer';
 import { useEffect, useMemo } from 'react';
-import { PlaySound, SendMessageComposer, SoundNames } from '../../api';
+import { PlaySound, SendMessageComposer, SoundNames, localizeWithFallback } from '../../api';
 import { useMessageEvent } from '../events';
 import { showModAlert } from './modAlertStore';
 import {
@@ -101,7 +101,7 @@ export const useIssueManager = (): IssueManagerContext => {
         }
 
         if (heldByOthers && parser.retryEnabled && parser.retryCount < 10) pickNext('pick failed retry', context, parser.retryEnabled, parser.retryCount);
-        else showModAlert('Issue picking failed', 'Error');
+        else showModAlert(localizeWithFallback('octane.mod_tools.issue_picking_failed', 'Issue picking failed'), 'Error');
     });
 
     useEffect(() => {

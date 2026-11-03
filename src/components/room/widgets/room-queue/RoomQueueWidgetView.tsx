@@ -12,7 +12,7 @@ const positionKey = (target: number, isClubQueue: boolean): string => {
 };
 
 const positionFallback = (target: number, position: number): string =>
-    target === ROOM_QUEUE_TARGET_SPECTATOR ? `Your place in the spectator queue: ${position}` : `Your place in the queue: ${position}`;
+    target === ROOM_QUEUE_TARGET_SPECTATOR ? localizeWithFallback('octane.room.your_place_in_the_spectator_queue', 'Your place in the spectator queue: %position%', ['position'], [String(position)]) : localizeWithFallback('octane.room.your_place_in_the_queue_position', 'Your place in the queue: %position%', ['position'], [String(position)]);
 
 /**
  * Official `RoomQueueWidget` (`room_queue` layout, 229 px): the "Queue" frame with the bold, centred

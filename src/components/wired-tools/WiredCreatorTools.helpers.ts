@@ -1,4 +1,5 @@
 import type { HotelDateTimeParts, MonitorErrorLog, MonitorLog, MonitorRoomStats, MonitorSnapshot } from './WiredCreatorTools.types';
+import { localizeWithFallback } from '../../api/utils/localizeWithFallback';
 
 const HOTEL_TIME_FORMATTERS: Map<string, Intl.DateTimeFormat> = new Map();
 
@@ -159,7 +160,7 @@ export const formatMonitorLatestOccurrence = (latestOccurrenceSeconds: number, n
     const diffMs = Math.max(0, nowMs - latestOccurrenceSeconds * 1000);
     const diffSeconds = Math.floor(diffMs / 1000);
 
-    if (diffSeconds < 5) return 'Just now';
+    if (diffSeconds < 5) return localizeWithFallback('octane.wired_tools.just_now', 'Just now');
     if (diffSeconds < 60) return `${diffSeconds}s ago`;
 
     const diffMinutes = Math.floor(diffSeconds / 60);
@@ -190,7 +191,7 @@ export const formatVariableTimestamp = (timestamp: number): string => {
 export const formatMonitorSource = (sourceLabel: string, sourceId: number): string => {
     const normalizedLabel = (sourceLabel || '').trim();
 
-    if (!normalizedLabel && !(sourceId > 0)) return 'Room monitor';
+    if (!normalizedLabel && !(sourceId > 0)) return localizeWithFallback('octane.wired_tools.room_monitor', 'Room monitor');
     if (sourceId > 0) return `${normalizedLabel || 'wired'} (#${sourceId})`;
 
     return normalizedLabel;

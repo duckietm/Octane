@@ -189,7 +189,7 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
 
                     <div className="flex flex-col gap-1">
                         <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.target_altitude', 'Altitude') }</Text>
-                        { [ 0, 1, 2 ].map(value => radio('placeAltitude', value, altitude, setAltitude, localizeWithFallback(`wiredfurni.params.place_furni.target_altitude.${ value }`, [ 'On top of the location', 'The furni\'s own altitude', 'The custom target\'s altitude' ][value]))) }
+                        { [ 0, 1, 2 ].map(value => radio('placeAltitude', value, altitude, setAltitude, localizeWithFallback(`wiredfurni.params.place_furni.target_altitude.${ value }`, [ localizeWithFallback('octane.wired.on_top_of_the_location', 'On top of the location'), 'The furni\'s own altitude', 'The custom target\'s altitude' ][value]))) }
                     </div>
 
                     <div className="flex flex-col gap-1">
