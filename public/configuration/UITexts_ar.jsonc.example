@@ -1632,5 +1632,13 @@
     "nux.step.8": "...والدكات،",
     "nux.step.9": "أو الماس.",
     "nux.step.10": "جميع أصدقائك موجودون هنا في الأسفل.",
-    "nux.step.11": "استمتع وابدأ باستكشاف الفندق!"
+    "nux.step.11": "استمتع وابدأ باستكشاف الفندق!",
+    "nitro.login.news.title": "أخبار الفندق",
+    "quests.currency.credits": "الرصيد",
+    "quests.currency.diamonds": "الماس",
+    "quests.currency.duckets": "الدكات",
+    "reward_track.loading": "جارٍ تحميل مسار المكافآت...",
+    "reward_track.rewards.next": "المكافآت التالية",
+    "reward_track.rewards.previous": "المكافآت السابقة",
+    "reward_track.admin.open": "تعديل مسارات المكافآت"
 }

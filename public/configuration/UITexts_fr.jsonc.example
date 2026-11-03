@@ -1632,5 +1632,13 @@
     "nux.step.8": "...des duckets,",
     "nux.step.9": "ou des diamants.",
     "nux.step.10": "Tous tes amis se trouvent ici, en bas.",
-    "nux.step.11": "Amuse-toi bien et pars explorer l'hôtel !"
+    "nux.step.11": "Amuse-toi bien et pars explorer l'hôtel !",
+    "nitro.login.news.title": "Actualités de l'hôtel",
+    "quests.currency.credits": "Crédits",
+    "quests.currency.diamonds": "Diamants",
+    "quests.currency.duckets": "Duckets",
+    "reward_track.loading": "Chargement du programme de récompense...",
+    "reward_track.rewards.next": "Récompenses suivantes",
+    "reward_track.rewards.previous": "Récompenses précédentes",
+    "reward_track.admin.open": "Modifier les programmes de récompense"
 }

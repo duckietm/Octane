@@ -1639,5 +1639,13 @@
     "nux.step.8": "...mit Duckets",
     "nux.step.9": "oder mit Diamanten.",
     "nux.step.10": "Alle deine Freunde findest du hier unten.",
-    "nux.step.11": "Viel Spaß, erkunde jetzt das Hotel!"
+    "nux.step.11": "Viel Spaß, erkunde jetzt das Hotel!",
+    "nitro.login.news.title": "Hotel-News",
+    "quests.currency.credits": "Credits",
+    "quests.currency.diamonds": "Diamanten",
+    "quests.currency.duckets": "Duckets",
+    "reward_track.loading": "Belohnungspfad wird geladen...",
+    "reward_track.rewards.next": "Nächste Belohnungen",
+    "reward_track.rewards.previous": "Vorherige Belohnungen",
+    "reward_track.admin.open": "Belohnungspfade bearbeiten"
 }

@@ -1822,5 +1822,13 @@
     "nux.step.8": "...i duckets",
     "nux.step.9": "o i diamanti.",
     "nux.step.10": "Tutti i tuoi amici sono qui in basso.",
-    "nux.step.11": "Divertiti e inizia a esplorare l'hotel!"
+    "nux.step.11": "Divertiti e inizia a esplorare l'hotel!",
+    "nitro.login.news.title": "Notizie dell'hotel",
+    "quests.currency.credits": "Crediti",
+    "quests.currency.diamonds": "Diamanti",
+    "quests.currency.duckets": "Duckets",
+    "reward_track.loading": "Caricamento del percorso ricompense...",
+    "reward_track.rewards.next": "Ricompense successive",
+    "reward_track.rewards.previous": "Ricompense precedenti",
+    "reward_track.admin.open": "Modifica i percorsi ricompense"
 }

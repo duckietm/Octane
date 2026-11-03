@@ -1634,5 +1634,13 @@
     "nux.step.8": "...duckets",
     "nux.step.9": "of diamanten.",
     "nux.step.10": "Al je vrienden vind je hier beneden.",
-    "nux.step.11": "Veel plezier en ga het hotel verkennen!"
+    "nux.step.11": "Veel plezier en ga het hotel verkennen!",
+    "nitro.login.news.title": "Hotelnieuws",
+    "quests.currency.credits": "Credits",
+    "quests.currency.diamonds": "Diamanten",
+    "quests.currency.duckets": "Duckets",
+    "reward_track.loading": "Beloningspad wordt geladen...",
+    "reward_track.rewards.next": "Volgende beloningen",
+    "reward_track.rewards.previous": "Vorige beloningen",
+    "reward_track.admin.open": "Beloningspaden bewerken"
 }

@@ -1640,5 +1640,13 @@
     "nux.step.8": "...duckets,",
     "nux.step.9": "or diamonds.",
     "nux.step.10": "All your friends are down here.",
-    "nux.step.11": "Have fun and start exploring the hotel!"
+    "nux.step.11": "Have fun and start exploring the hotel!",
+    "nitro.login.news.title": "Hotel News",
+    "quests.currency.credits": "Credits",
+    "quests.currency.diamonds": "Diamonds",
+    "quests.currency.duckets": "Duckets",
+    "reward_track.loading": "Loading the reward track...",
+    "reward_track.rewards.next": "Next rewards",
+    "reward_track.rewards.previous": "Previous rewards",
+    "reward_track.admin.open": "Edit the reward tracks"
 }
