@@ -48,7 +48,7 @@
     "friendlist.search": "Cerca amici",
     "widget.buildheight.title": "Altezza di costruzione",
     "widget.buildheight.description": "Imposta l'altezza di impilamento dei mobili che posizioni.",
-    "widget.buildheight.reset": "Reimposta (off)",
+    "widget.buildheight.reset": "Disattiva",
     "widget.buildheight.underpass": "Consenti di passare sotto i mobili posizionati",
     "widget.buildheight.underpass.min_height": "Alza l'altezza ad almeno %height% per consentire di passarci sotto.",
     "navigator.roomsettings.allow_underpass": "Consenti di passare sotto i mobili piazzati in modalità costruzione",
@@ -1808,5 +1808,8 @@
     "nitro.info.title": "Informazioni sul client",
     "notifications.text.club_gift.selected": "Hai scelto il tuo regalo.",
     "chat.confirm.openurl": "Stai per aprire %url%. Continua solo se ti fidi del link.",
-    "campaign.calendar.title": "Calendario"
+    "campaign.calendar.title": "Calendario",
+    "widget.buildheight.floor": "Livello del pavimento",
+    "widget.buildheight.lower": "Abbassa",
+    "widget.buildheight.raise": "Alza"
 }

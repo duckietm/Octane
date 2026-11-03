@@ -1,16 +1,16 @@
 import { FC, useEffect } from 'react';
-import { LocalizeText } from '../../../api';
-import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Slider, Text } from '../../../common';
+import { LocalizeText, localizeWithFallback } from '../../../api';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Slider } from '../../../common';
 import { useBuildHeight } from '../../../hooks';
 import { Checkbox } from '../../../common/Checkbox';
+import { NumberInput } from '../../../common/NumberInput';
 import '../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { formatBuildHeight, getBuildHeightMarks, roundBuildHeight } from './buildHeightScale';
 
 const STEP = 0.1;
 
 const UNDERPASS_MIN_HEIGHT = 1.5;
-
-const format = (value: number) => (Number.isInteger(value) ? value.toString() : value.toFixed(1));
 
 export const BuildHeightWidgetView: FC<{}> = () => {
     const { available, minHeight, maxHeight, isOpen, height, underpass, applyHeight, toggleUnderpass, close } = useBuildHeight();
@@ -23,42 +23,87 @@ export const BuildHeightWidgetView: FC<{}> = () => {
 
     if (!available || !isOpen) return null;
 
-    const clamp = (value: number) => Math.min(maxHeight, Math.max(minHeight, Math.round(value / STEP) * STEP));
+    const clamp = (value: number) => Math.min(maxHeight, Math.max(minHeight, roundBuildHeight(value)));
+    const setHeight = (value: number) => {
+        if (Number.isFinite(value)) applyHeight(clamp(value));
+    };
+    const marks = getBuildHeightMarks(minHeight, maxHeight);
+    const floorLevel = Math.min(maxHeight, Math.max(minHeight, 0));
 
     return (
         <NativeTextTree>
             <OctaneCardView className="octane-build-height-widget" theme="primary-slim" uniqueKey="build-height">
                 <OctaneCardHeaderView headerText={LocalizeText('widget.buildheight.title')} onCloseClick={close} />
-                <OctaneCardContentView className="gap-2">
-                    <Text center>{LocalizeText('widget.buildheight.description')}</Text>
-                    <Flex alignItems="center" justifyContent="center" gap={2}>
-                        <Button variant="secondary" onClick={() => applyHeight(clamp(height - STEP))}>-</Button>
-                        <Text bold variant="black" className="build-height-value">{format(height)}</Text>
-                        <Button variant="secondary" onClick={() => applyHeight(clamp(height + STEP))}>+</Button>
-                    </Flex>
-                    <Slider
-                        min={minHeight}
-                        max={maxHeight}
-                        step={STEP}
-                        value={height}
-                        onChange={(value: number) => applyHeight(clamp(value))}
-                    />
-                    <Column gap={1}>
-                        <Flex justifyContent="between">
-                            <Text>{format(minHeight)}</Text>
-                            <Text>{format(maxHeight)}</Text>
-                        </Flex>
-                        <Flex
-                            alignItems="center"
-                            gap={1}
-                            className={underpassAllowed ? undefined : 'opacity-50'}
-                            title={underpassAllowed ? undefined : LocalizeText('widget.buildheight.underpass.min_height', ['height'], [format(UNDERPASS_MIN_HEIGHT)])}
+                <OctaneCardContentView className="build-height-content">
+                    <p className="build-height-description">{LocalizeText('widget.buildheight.description')}</p>
+                    <div className="build-height-stepper">
+                        <Button
+                            variant="secondary"
+                            aria-label={localizeWithFallback('widget.buildheight.lower', 'Lower')}
+                            disabled={height <= minHeight}
+                            onClick={() => setHeight(height - STEP)}
+                            classNames={['build-height-step']}
                         >
-                            <Checkbox checked={underpass && underpassAllowed} disabled={!underpassAllowed} onCheckedChange={(nextChecked) => toggleUnderpass(nextChecked)} />
-                            <Text>{LocalizeText('widget.buildheight.underpass')}</Text>
-                        </Flex>
-                        <Button variant="secondary" onClick={close}>{LocalizeText('widget.buildheight.reset')}</Button>
-                    </Column>
+                            -
+                        </Button>
+                        <NumberInput
+                            aria-label={LocalizeText('widget.buildheight.title')}
+                            className="build-height-field"
+                            steppers={false}
+                            min={minHeight}
+                            max={maxHeight}
+                            step={STEP}
+                            value={roundBuildHeight(height)}
+                            onChange={(event) => setHeight(event.target.valueAsNumber)}
+                        />
+                        <Button
+                            variant="secondary"
+                            aria-label={localizeWithFallback('widget.buildheight.raise', 'Raise')}
+                            disabled={height >= maxHeight}
+                            onClick={() => setHeight(height + STEP)}
+                            classNames={['build-height-step']}
+                        >
+                            +
+                        </Button>
+                    </div>
+                    <div className="build-height-scale">
+                        <Slider
+                            bare
+                            className="build-height-slider"
+                            trackClassName="build-height-track"
+                            thumbClassName="build-height-thumb"
+                            thumbAriaLabel={LocalizeText('widget.buildheight.title')}
+                            min={minHeight}
+                            max={maxHeight}
+                            step={STEP}
+                            value={height}
+                            onChange={(value: number) => setHeight(value)}
+                        />
+                        <div className="build-height-marks" aria-hidden="true">
+                            {marks.map((mark) => (
+                                <span key={mark.value} className={`build-height-mark ${mark.major ? 'is-major' : ''}`} style={{ left: `${mark.position}%` }}>
+                                    {mark.major && <span className="build-height-mark-label">{formatBuildHeight(mark.value)}</span>}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                    <label className={`build-height-underpass ${underpassAllowed ? '' : 'is-locked'}`}>
+                        <Checkbox checked={underpass && underpassAllowed} disabled={!underpassAllowed} onCheckedChange={(nextChecked) => toggleUnderpass(nextChecked)} />
+                        <span>{LocalizeText('widget.buildheight.underpass')}</span>
+                    </label>
+                    {!underpassAllowed && (
+                        <p className="build-height-hint">
+                            {LocalizeText('widget.buildheight.underpass.min_height', ['height'], [formatBuildHeight(UNDERPASS_MIN_HEIGHT)])}
+                        </p>
+                    )}
+                    <div className="build-height-actions">
+                        <Button variant="secondary" disabled={height === floorLevel} onClick={() => setHeight(floorLevel)}>
+                            {localizeWithFallback('widget.buildheight.floor', 'Floor level')}
+                        </Button>
+                        <Button variant="secondary" onClick={close}>
+                            {LocalizeText('widget.buildheight.reset')}
+                        </Button>
+                    </div>
                 </OctaneCardContentView>
             </OctaneCardView>
         </NativeTextTree>

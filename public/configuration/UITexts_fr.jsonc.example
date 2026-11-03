@@ -45,10 +45,10 @@
     "navigator.roomsettings.remove_wallpaper": "Supprimer le papier peint",
     "friendlist.search": "Rechercher des amis",
     "widget.buildheight.title": "Hauteur de construction",
-    "widget.buildheight.description": "Définissez la hauteur d'empilement du mobilier que vous placez.",
-    "widget.buildheight.reset": "Réinitialiser (désactivé)",
+    "widget.buildheight.description": "Choisis la hauteur à laquelle tu poses ton mobilier.",
+    "widget.buildheight.reset": "Désactiver",
     "widget.buildheight.underpass": "Autoriser le passage sous le mobilier placé",
-    "widget.buildheight.underpass.min_height": "Montez la hauteur à au moins %height% pour permettre de passer en dessous.",
+    "widget.buildheight.underpass.min_height": "Monte la hauteur à %height% au moins pour pouvoir passer dessous.",
     "navigator.roomsettings.allow_underpass": "Autoriser à marcher sous les meubles placés en mode construction",
     "purse.seasonal.currency.101": "cash",
     "widget.chooser.checkall": "Sélectionner les meubles",
@@ -1618,5 +1618,8 @@
     "nitro.info.title": "À propos de ce client",
     "notifications.text.club_gift.selected": "Tu as choisi ton cadeau.",
     "chat.confirm.openurl": "Tu vas ouvrir %url%. Continue seulement si tu fais confiance au lien.",
-    "campaign.calendar.title": "Calendrier"
+    "campaign.calendar.title": "Calendrier",
+    "widget.buildheight.floor": "Au sol",
+    "widget.buildheight.lower": "Descendre",
+    "widget.buildheight.raise": "Monter"
 }

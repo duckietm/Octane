@@ -49,7 +49,7 @@
     "friendlist.search": "Freunde suchen",
     "widget.buildheight.title": "Bauhöhe",
     "widget.buildheight.description": "Lege die Stapelhöhe für Möbel fest, die du platzierst.",
-    "widget.buildheight.reset": "Zurücksetzen (aus)",
+    "widget.buildheight.reset": "Ausschalten",
     "widget.buildheight.underpass": "Durchlaufen unter platzierten Möbeln erlauben",
     "widget.buildheight.underpass.min_height": "Erhöhe die Höhe auf mindestens %height%, um das Durchlaufen zu erlauben.",
     "navigator.roomsettings.allow_underpass": "Laufen unter Möbeln erlauben, die im Baumodus platziert wurden",
@@ -1625,5 +1625,8 @@
     "nitro.info.title": "Über diesen Client",
     "notifications.text.club_gift.selected": "Du hast dein Geschenk gewählt.",
     "chat.confirm.openurl": "Du bist dabei, %url% zu öffnen. Fahre nur fort, wenn du dem Link vertraust.",
-    "campaign.calendar.title": "Kalender"
+    "campaign.calendar.title": "Kalender",
+    "widget.buildheight.floor": "Bodenhöhe",
+    "widget.buildheight.lower": "Senken",
+    "widget.buildheight.raise": "Anheben"
 }

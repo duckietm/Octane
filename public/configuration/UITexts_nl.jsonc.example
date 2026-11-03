@@ -46,7 +46,7 @@
     "friendlist.search": "Vrienden zoeken",
     "widget.buildheight.title": "Bouwhoogte",
     "widget.buildheight.description": "Stel de stapelhoogte in voor meubels die je plaatst.",
-    "widget.buildheight.reset": "Herstellen (uit)",
+    "widget.buildheight.reset": "Uitschakelen",
     "widget.buildheight.underpass": "Onderdoor lopen toestaan bij geplaatste meubels",
     "widget.buildheight.underpass.min_height": "Verhoog de hoogte naar minstens %height% om eronderdoor te kunnen lopen.",
     "navigator.roomsettings.allow_underpass": "Lopen onder meubels toestaan die in bouwmodus zijn geplaatst",
@@ -1620,5 +1620,8 @@
     "reward_track.debug.copy_track_id.success": "Track-ID gekopieerd naar het klembord",
     "reward_track.debug.copy_task_id.success": "Taak-ID gekopieerd naar het klembord",
     "chat.confirm.openurl": "Je staat op het punt %url% te openen. Ga alleen verder als je de link vertrouwt.",
-    "campaign.calendar.title": "Kalender"
+    "campaign.calendar.title": "Kalender",
+    "widget.buildheight.floor": "Vloerniveau",
+    "widget.buildheight.lower": "Omlaag",
+    "widget.buildheight.raise": "Omhoog"
 }
