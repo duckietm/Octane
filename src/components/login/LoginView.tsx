@@ -18,7 +18,7 @@ import { NewsWindow } from './components/NewsWindow';
 import { useDraggableLoginWindow } from './hooks/useDraggableLoginWindow';
 import { RegistrationAvatarWardrobe } from './components/RegistrationAvatarWardrobe';
 import { TurnstileWidget } from './TurnstileWidget';
-import { t } from './utils/i18n';
+import { t, tOrServer } from './utils/i18n';
 import { clearRegistrationDraft, loadRegistrationDraft, saveRegistrationDraft } from './utils/registrationDraft';
 import { Checkbox } from '../../common/Checkbox';
 import { Radio } from '../../common/Radio';
@@ -666,13 +666,15 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
 
                 if (ok) {
                     clearRegistrationDraft();
-                    const friendly = t(
-                        'nitro.login.register.success',
-                        'Welcome aboard, %username%! Your account is ready — log in below with the password you just chose.',
-                        ['username'],
-                        [body.username]
+                    setInfo(
+                        tOrServer(
+                            'nitro.login.register.success',
+                            payload.message,
+                            'Welcome aboard, %username%! Your account is ready — log in below with the password you just chose.',
+                            ['username'],
+                            [body.username]
+                        )
                     );
-                    setInfo(typeof payload.message === 'string' ? payload.message : friendly);
                     setMode('login');
                     setUsername(body.username);
                     setPassword('');
@@ -709,11 +711,13 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                 });
 
                 if (ok) {
-                    const friendly = t(
-                        'nitro.login.forgot.success',
-                        "Email sent! If an account matches that address you'll find a reset link in your inbox shortly (check spam if it doesn't show up within a minute)."
+                    setInfo(
+                        tOrServer(
+                            'nitro.login.forgot.success',
+                            payload.message,
+                            "Email sent! If an account matches that address you'll find a reset link in your inbox shortly (check spam if it doesn't show up within a minute)."
+                        )
                     );
-                    setInfo(typeof payload.message === 'string' ? payload.message : friendly);
                     setMode('login');
                     return;
                 }

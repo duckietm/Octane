@@ -198,9 +198,11 @@ export const UserAccountSettingsView: FC<{}> = () =>
                 return;
             }
 
-            const message = typeof payload.message === 'string' && payload.message
-                ? payload.message
-                : localizeWithFallback('usersettings.success.password', "Password updated successfully.");
+            // The hotel's text first: the account API answers in English.
+            const message = localizeWithFallback(
+                'usersettings.success.password',
+                typeof payload.message === 'string' && payload.message ? payload.message : "Password updated successfully."
+            );
             setFeedback({ kind: 'success', message });
             setCurrentPassword('');
             setNewPassword('');
@@ -279,9 +281,11 @@ export const UserAccountSettingsView: FC<{}> = () =>
                 return;
             }
 
-            const message = typeof payload.message === 'string' && payload.message
-                ? payload.message
-                : localizeWithFallback('usersettings.success.email', "Email updated successfully.");
+            // The hotel's text first: the account API answers in English.
+            const message = localizeWithFallback(
+                'usersettings.success.email',
+                typeof payload.message === 'string' && payload.message ? payload.message : "Email updated successfully."
+            );
             setFeedback({ kind: 'success', message });
             setEmailCurrentPassword('');
             setNewEmail('');
@@ -364,9 +368,11 @@ export const UserAccountSettingsView: FC<{}> = () =>
                 return;
             }
 
-            const message = typeof payload.message === 'string' && payload.message
-                ? payload.message
-                : localizeWithFallback('usersettings.success.username', "Username updated. Log in again with your new name.");
+            // The hotel's text first: the account API answers in English.
+            const message = localizeWithFallback(
+                'usersettings.success.username',
+                typeof payload.message === 'string' && payload.message ? payload.message : "Username updated. Log in again with your new name."
+            );
             setFeedback({ kind: 'success', message });
             setUsernameCurrentPassword('');
             setNewUsername('');
