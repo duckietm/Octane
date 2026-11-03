@@ -214,7 +214,7 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
                         { spawnWithVariable &&
                             <>
                                 <WiredVariablePicker entries={ spawnEntries } recentScope="variable-effects" selectedToken={ spawnToken } onSelect={ entry => setSpawnToken(entry.token) } />
-                                { !furniVariableDefinitions.length && <Text small>No wf_var_furni variables found in this room.</Text> }
+                                { !furniVariableDefinitions.length && <Text small>{localizeWithFallback('octane.wired.no_wf_var_furni_variables_found', 'No wf_var_furni variables found in this room.')}</Text> }
                                 { /* AIR ?_-9T?: createValueOrVariableSection(1, mergedSourceOptions(1), spawn_with_value, int min, int max)
                                     next to the spawn variable; the claimed merged slot 1 is the value's holder in the popup. */ }
                                 <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.spawn_with_value', 'Spawn with value:') }</Text>

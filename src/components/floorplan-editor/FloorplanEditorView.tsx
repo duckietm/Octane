@@ -15,7 +15,7 @@ import {
     UpdateFloorPropertiesMessageComposer
 } from '@octane/renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
-import { LocalizeText, SendMessageComposer } from '../../api';
+import { LocalizeText, SendMessageComposer, localizeWithFallback } from '../../api';
 import { Base, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { useMessageEvent, useOctaneEvent } from '../../hooks';
 import { isTextEntryTarget } from '../../hooks/rooms/useRoomKeyboardMovement';
@@ -328,7 +328,7 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
                                         />
                                         <div className="fp-panel-head">
                                             <span className="fp-panel-title">{localizeOr('floor.plan.editor.tile.height', 'Set height')}</span>
-                                            <Hint content="Brush height">
+                                            <Hint content={localizeWithFallback('octane.floorplan_editor.brush_height', 'Brush height')}>
                                                 <div aria-label={`Brush height ${state.brush.h}`} className="fp-badge is-brush" data-testid="brush-height-badge" role="img">
                                                     {state.brush.h}
                                                 </div>
@@ -350,7 +350,7 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
                                         )}
                                         <div className="fp-panel-head">
                                             <span className="fp-panel-title">{LocalizeText('floor.editor.wall.height')}</span>
-                                            <Hint content="Wall height">
+                                            <Hint content={localizeWithFallback('octane.floorplan_editor.wall_height', 'Wall height')}>
                                                 <div aria-label={`Wall height ${state.wallHeight}`} className="fp-badge" data-testid="wall-height-badge" role="img">
                                                     {state.wallHeight}
                                                 </div>

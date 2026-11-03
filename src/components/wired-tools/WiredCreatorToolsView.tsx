@@ -3278,7 +3278,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                         <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.monitor.history.title', 'Wired Monitor Logs')} onCloseClick={() => setIsMonitorHistoryOpen(false)} />
                         <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
                             <div className="flex flex-wrap items-center gap-2 text-[12px]">
-                                <span className="text-[#555]">Severity:</span>
+                                <span className="text-[#555]">{localizeWithFallback('octane.wired_tools.severity', 'Severity:')}</span>
                                 {['ALL', 'WARNING', 'ERROR'].map((severity) => (
                                     <BaseButton
                                         key={severity}
@@ -3289,7 +3289,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                         {severity}
                                     </BaseButton>
                                 ))}
-                                <span className="ml-2 text-[#555]">Type:</span>
+                                <span className="ml-2 text-[#555]">{localizeWithFallback('octane.wired_tools.type', 'Type:')}</span>
                                 <Select
                                     className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
                                     value={monitorHistoryTypeFilter}
@@ -3306,18 +3306,18 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                 <table className="w-full text-[12px]">
                                     <thead className="bg-[#efede5] sticky top-0">
                                         <tr>
-                                            <th className="text-left px-2 py-1">Type</th>
-                                            <th className="text-left px-2 py-1">Severity</th>
-                                            <th className="text-left px-2 py-1">Trigger</th>
-                                            <th className="text-left px-2 py-1">Motivation</th>
-                                            <th className="text-left px-2 py-1">Occurred at</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.type_2', 'Type')}</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.severity_2', 'Severity')}</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.trigger', 'Trigger')}</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.motivation', 'Motivation')}</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.occurred_at', 'Occurred at')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {!filteredMonitorHistoryRows.length && (
                                             <tr>
                                                 <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={5}>
-                                                    No log history for the current filters
+                                                    {localizeWithFallback('octane.wired_tools.no_log_history_for_the_current', 'No log history for the current filters')}
                                                 </td>
                                             </tr>
                                         )}
@@ -3416,7 +3416,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                     </>
                                 )}
                                 {variablesType === 'global' && (
-                                    <img alt="Global placeholder" className="max-w-full max-h-full object-contain p-3" src={wiredGlobalPlaceholderImage} />
+                                    <img alt={localizeWithFallback('octane.wired_tools.global_placeholder', 'Global placeholder')} className="max-w-full max-h-full object-contain p-3" src={wiredGlobalPlaceholderImage} />
                                 )}
                             </>
                         }
@@ -3488,24 +3488,24 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                             {!!selectedMonitorLogDetails && (
                                 <div className="rounded border border-[#d8d2c3] bg-white/60 p-3 flex flex-col gap-1">
                                     <Text>
-                                        <b>Trigger:</b> {selectedMonitorDetailSource}
+                                        <b>{localizeWithFallback('octane.wired_tools.trigger_2', 'Trigger:')}</b> {selectedMonitorDetailSource}
                                     </Text>
                                     <Text>
-                                        <b>Motivation:</b> {selectedMonitorLogDetails.reason}
+                                        <b>{localizeWithFallback('octane.wired_tools.motivation_2', 'Motivation:')}</b> {selectedMonitorLogDetails.reason}
                                     </Text>
                                     {!!selectedMonitorLogDetails.amount && (
                                         <Text>
-                                            <b>Amount:</b> {selectedMonitorLogDetails.amount}
+                                            <b>{localizeWithFallback('octane.wired_tools.amount_2', 'Amount:')}</b> {selectedMonitorLogDetails.amount}
                                         </Text>
                                     )}
                                     {!!selectedMonitorLogDetails.latest && (
                                         <Text>
-                                            <b>Latest occurrence:</b> {selectedMonitorLogDetails.latest}
+                                            <b>{localizeWithFallback('octane.wired_tools.latest_occurrence', 'Latest occurrence:')}</b> {selectedMonitorLogDetails.latest}
                                         </Text>
                                     )}
                                     {!!selectedMonitorLogDetails.occurredAt && (
                                         <Text>
-                                            <b>Occurred at:</b> {selectedMonitorLogDetails.occurredAt}
+                                            <b>{localizeWithFallback('octane.wired_tools.occurred_at_2', 'Occurred at:')}</b> {selectedMonitorLogDetails.occurredAt}
                                         </Text>
                                     )}
                                 </div>

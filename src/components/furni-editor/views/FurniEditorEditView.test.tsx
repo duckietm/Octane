@@ -4,7 +4,8 @@ import type { CatalogRef, FurniDetail, FurniItem } from '../../../hooks/furni-ed
 import { FurniEditorEditView } from './FurniEditorEditView';
 
 vi.mock('../../../api', () => ({
-    CopyToClipboard: () => Promise.resolve(true)
+    CopyToClipboard: () => Promise.resolve(true),
+    localizeWithFallback: (_key: string, fallback: string) => fallback
 }));
 
 vi.mock('../../../common', () => ({

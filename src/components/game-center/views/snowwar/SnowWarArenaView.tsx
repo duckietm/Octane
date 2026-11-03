@@ -1794,8 +1794,8 @@ export const SnowWarArenaView: FC = () =>
                             {localizeWithFallback('snowwar.editor.hint', 'Pick a piece, floor tile, or hotel furni and build directly on the arena. Select / Move and Edit let you refine placed pieces; Walk tests the finished routes.')}
                         </div>
                         <div className="snowwar-editor__shortcuts">
-                            <span><kbd>Ctrl / ⌘</kbd> + drag <b>Paint line</b></span>
-                            <span><kbd>Shift</kbd> + drag <b>Fill area</b></span>
+                            <span><kbd>Ctrl / ⌘</kbd> {localizeWithFallback('octane.game_center.drag', '+ drag')} <b>{localizeWithFallback('octane.game_center.paint_line', 'Paint line')}</b></span>
+                            <span><kbd>Shift</kbd> {localizeWithFallback('octane.game_center.drag', '+ drag')} <b>{localizeWithFallback('octane.game_center.fill_area', 'Fill area')}</b></span>
                         </div>
                         {/* Function controls (modes + tools), grouped and separated
                             from the furni palette below - these are actions, not furni. */}

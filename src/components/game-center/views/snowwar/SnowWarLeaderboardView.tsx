@@ -113,7 +113,7 @@ export const SnowWarLeaderboardView: FC = () =>
                         </div>
 
                         { canScrollUp && (
-                            <BaseButton aria-label="Scroll up" className="snowwar-leaderboard__scroll snowwar-leaderboard__scroll--up" style={ scrollImages('up') } type="button" onClick={ () => setRowOffset(offset => Math.max(0, offset - PAGE_SIZE)) } />
+                            <BaseButton aria-label={localizeWithFallback('octane.game_center.scroll_up', 'Scroll up')} className="snowwar-leaderboard__scroll snowwar-leaderboard__scroll--up" style={ scrollImages('up') } type="button" onClick={ () => setRowOffset(offset => Math.max(0, offset - PAGE_SIZE)) } />
                         ) }
 
                         <div className="snowwar-leaderboard__list">
@@ -148,17 +148,17 @@ export const SnowWarLeaderboardView: FC = () =>
                         </div>
 
                         { canScrollDown && (
-                            <BaseButton aria-label="Scroll down" className="snowwar-leaderboard__scroll snowwar-leaderboard__scroll--down" style={ scrollImages('down') } type="button" onClick={ () => setRowOffset(offset => Math.min(Math.max(0, leaderboard.entries.length - PAGE_SIZE), offset + PAGE_SIZE)) } />
+                            <BaseButton aria-label={localizeWithFallback('octane.game_center.scroll_down', 'Scroll down')} className="snowwar-leaderboard__scroll snowwar-leaderboard__scroll--down" style={ scrollImages('down') } type="button" onClick={ () => setRowOffset(offset => Math.min(Math.max(0, leaderboard.entries.length - PAGE_SIZE), offset + PAGE_SIZE)) } />
                         ) }
 
                         { leaderboard.weekly && (
                             <>
                                 { /* AIR previousWeek (left, scroll_left) goes back a week; nextWeek (right) forward. */ }
                                 { (leaderboard.currentOffset < leaderboard.maxOffset) && (
-                                    <BaseButton aria-label="Previous week" className="snowwar-leaderboard__week snowwar-leaderboard__week--previous" style={ { backgroundImage: `url(${ asset('scroll_left') })` } } type="button" onClick={ () => goWeek(leaderboard.currentOffset + 1) } />
+                                    <BaseButton aria-label={localizeWithFallback('octane.game_center.previous_week', 'Previous week')} className="snowwar-leaderboard__week snowwar-leaderboard__week--previous" style={ { backgroundImage: `url(${ asset('scroll_left') })` } } type="button" onClick={ () => goWeek(leaderboard.currentOffset + 1) } />
                                 ) }
                                 { pastWeek && (
-                                    <BaseButton aria-label="Next week" className="snowwar-leaderboard__week snowwar-leaderboard__week--next" style={ { backgroundImage: `url(${ asset('scroll_right') })` } } type="button" onClick={ () => goWeek(leaderboard.currentOffset - 1) } />
+                                    <BaseButton aria-label={localizeWithFallback('octane.game_center.next_week', 'Next week')} className="snowwar-leaderboard__week snowwar-leaderboard__week--next" style={ { backgroundImage: `url(${ asset('scroll_right') })` } } type="button" onClick={ () => goWeek(leaderboard.currentOffset - 1) } />
                                 ) }
                                 { !pastWeek && (
                                     <div className="snowwar-leaderboard__reset">

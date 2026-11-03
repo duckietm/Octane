@@ -259,7 +259,7 @@ export const ModActionView: FC<ModActionProps> = ({ userId, userName, settings, 
                 )}
                 {templates.length > 0 && (
                     <Native0Dropmenu
-                        caption="Select from message templates"
+                        caption={localizeWithFallback('octane.mod_tools.select_from_message_templates', 'Select from message templates')}
                         height={20}
                         items={templates.map((template) => (template.length > 50 ? `${template.slice(0, 47)}...` : template))}
                         width={210}

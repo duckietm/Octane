@@ -10,6 +10,7 @@ import { FloorplanAction, FloorplanState } from '../state/types';
 import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../../api';
 
 type Props = {
     state: FloorplanState;
@@ -338,12 +339,12 @@ export const Floorplan3DView: FC<Props> = ({ state, dispatch, panMode = false })
             >
                 {status === 'loading' && (
                     <div className="absolute z-10 inset-0 flex items-center justify-center text-xs text-zinc-400" data-testid="floorplan-3d-loading">
-                        Loading 3D preview...
+                        {localizeWithFallback('octane.floorplan_editor.loading_3d_preview', 'Loading 3D preview...')}
                     </div>
                 )}
                 {status === 'unavailable' && (
                     <div className="absolute z-10 inset-0 flex items-center justify-center px-4 text-center text-xs text-zinc-300" data-testid="floorplan-3d-unavailable">
-                        The 3D preview needs WebGL, which is not available here.
+                        {localizeWithFallback('octane.floorplan_editor.the_3d_preview_needs_webgl_which', 'The 3D preview needs WebGL, which is not available here.')}
                     </div>
                 )}
                 <div className="fp-stage-buttons" onPointerDown={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()}>
@@ -358,10 +359,10 @@ export const Floorplan3DView: FC<Props> = ({ state, dispatch, panMode = false })
                     </BaseButton></Hint>
                 </div>
                 <div className="fp-stage-toggles" onPointerDown={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()}>
-                    <Hint content="Show the room walls"><BaseButton aria-label="Show the room walls" type="button" data-testid="view3d-walls" data-active={showWalls ? 'true' : 'false'} className={`fp-pill ${showWalls ? 'is-on' : ''}`} onClick={() => setShowWalls((value) => !value)}>
-                        Walls
+                    <Hint content={localizeWithFallback('octane.floorplan_editor.show_the_room_walls', 'Show the room walls')}><BaseButton aria-label={localizeWithFallback('octane.floorplan_editor.show_the_room_walls', 'Show the room walls')} type="button" data-testid="view3d-walls" data-active={showWalls ? 'true' : 'false'} className={`fp-pill ${showWalls ? 'is-on' : ''}`} onClick={() => setShowWalls((value) => !value)}>
+                        {localizeWithFallback('octane.floorplan_editor.walls', 'Walls')}
                     </BaseButton></Hint>
-                    <Hint content="Draw floor and wall patterns instead of the height colours"><BaseButton aria-label="Draw floor and wall patterns instead of the height colours"
+                    <Hint content={localizeWithFallback('octane.floorplan_editor.draw_floor_and_wall_patterns_instead', 'Draw floor and wall patterns instead of the height colours')}><BaseButton aria-label={localizeWithFallback('octane.floorplan_editor.draw_floor_and_wall_patterns_instead', 'Draw floor and wall patterns instead of the height colours')}
                         type="button"
                         data-testid="view3d-textures"
                         data-active={textured ? 'true' : 'false'}
@@ -370,7 +371,7 @@ export const Floorplan3DView: FC<Props> = ({ state, dispatch, panMode = false })
                     >
                         Textures
                     </BaseButton></Hint>
-                    <Hint content="Turn the room around 360°"><BaseButton aria-label="Turn the room around 360°"
+                    <Hint content={localizeWithFallback('octane.floorplan_editor.turn_the_room_around_360', 'Turn the room around 360°')}><BaseButton aria-label={localizeWithFallback('octane.floorplan_editor.turn_the_room_around_360', 'Turn the room around 360°')}
                         type="button"
                         data-testid="view3d-rotate"
                         data-active={autoRotate ? 'true' : 'false'}

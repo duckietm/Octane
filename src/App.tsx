@@ -21,7 +21,7 @@ import {
     PrepareRenderer
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
-import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock } from './api';
+import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock, localizeWithFallback } from './api';
 import { Base } from './common';
 import { LoadingView } from './components/loading/LoadingView';
 import { LoginView } from './components/login/LoginView';
@@ -589,7 +589,7 @@ export const App: FC<{}> = (props) => {
             )}
             {!isReady && showLogin && <LoginView onAuthenticated={handleAuthenticated} isEntering={isEnteringHotel} />}
             {isReady && (
-                <SharedHookRegistry fallback={<LoadingView message="Loading…" />}>
+                <SharedHookRegistry fallback={<LoadingView message={localizeWithFallback('octane.common.loading', 'Loading…')} />}>
                     <MainView />
                     <ReconnectView />
                 </SharedHookRegistry>

@@ -1,6 +1,6 @@
 import { InfiniteGrid } from '@layout/InfiniteGrid';
 import { CSSProperties, FC, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { CatalogType, IPurchasableOffer } from '../../../../../api';
+import { CatalogType, IPurchasableOffer, localizeWithFallback } from '../../../../../api';
 import { AutoGrid, AutoGridProps, ClassicScrollAreaView } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogActions, useCatalogData, useCatalogUiState, useInventoryFurni, useScrollWindow } from '../../../../../hooks';
@@ -187,7 +187,7 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
             <NativeTextTree>
                 <ClassicScrollAreaView className="octane-catalog-item-grid-scroll-area h-full min-h-0" viewportRef={elementRef}>
                     <div
-                        aria-label="Catalog items"
+                        aria-label={localizeWithFallback('octane.catalog.catalog_items', 'Catalog items')}
                         className={`octane-catalog-air-mixed-grid ${gridClassName}`}
                         role="listbox"
                         style={{ ...airGridStyle, width: mixedLayout.width, minWidth: '100%', height: mixedLayout.height }}
@@ -205,7 +205,7 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
         return (
             <NativeTextTree>
                 <div
-                    aria-label="Catalog items"
+                    aria-label={localizeWithFallback('octane.catalog.catalog_items', 'Catalog items')}
                     className={`octane-catalog-grid-virtual h-full min-h-0 ${gridClassName}`.trim()}
                     role="listbox"
                     onDragEnd={adminMode ? handleDragEnd : undefined}
@@ -240,7 +240,7 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
         <NativeTextTree>
             <ClassicScrollAreaView className="octane-catalog-item-grid-scroll-area h-full min-h-0" viewportRef={elementRef}>
                 <AutoGrid
-                    aria-label="Catalog items"
+                    aria-label={localizeWithFallback('octane.catalog.catalog_items', 'Catalog items')}
                     className={gridClassName}
                     columnCount={columnCount}
                     columnMinHeight={effectiveColumnMinHeight}

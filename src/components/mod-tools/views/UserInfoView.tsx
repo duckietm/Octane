@@ -7,6 +7,7 @@ import { nativeNumber, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Frame } from '../native/NativeWindow0';
 import { NativeWindowShell } from '../native/NativeWindowShell';
 import { UserInfoPanel } from './UserInfoPanel';
+import { localizeWithFallback } from '../../../api';
 
 export interface UserInfoProps {
     userId: number;
@@ -34,7 +35,7 @@ export const UserInfoView: FC<UserInfoProps> = ({ userId, settings, x, y, onClos
     return (
         <NativeTextTree>
             <NativeWindowShell type="userInfo" windowKey={`${userId}`} x={x} y={y}>
-                <Native0Frame caption="User Info" height={height} width={nativeNumber(root, 'width')} onClose={onClose}>
+                <Native0Frame caption={localizeWithFallback('octane.mod_tools.user_info', 'User Info')} height={height} width={nativeNumber(root, 'width')} onClose={onClose}>
                     <UserInfoPanel settings={settings} userId={userId} onOpenChatlog={onOpenChatlog} onOpenModAction={onOpenModAction} onOpenRoomVisits={onOpenRoomVisits} onOpenSendMessage={onOpenSendMessage} />
                 </Native0Frame>
             </NativeWindowShell>

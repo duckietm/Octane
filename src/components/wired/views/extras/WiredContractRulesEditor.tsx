@@ -7,6 +7,7 @@ import {
     emptyRow,
 } from './contractTermWire';
 import { WiredContractTermRow } from './WiredContractTermRow';
+import { localizeWithFallback } from '../../../../api';
 
 interface WiredContractRulesEditorProps {
     /** Alternatives: satisfying any one of them satisfies the contract. */
@@ -57,22 +58,22 @@ export const WiredContractRulesEditor: FC<WiredContractRulesEditorProps> = ({
                         <div className="flex items-center gap-2">
                             <div className="h-px flex-1 bg-black/10" />
                             <Text small bold>
-                                or
+                                {localizeWithFallback('octane.wired.or', 'or')}
                             </Text>
                             <div className="h-px flex-1 bg-black/10" />
                         </div>
                     )}
 
                     <div className="flex flex-col gap-2 rounded border border-black/10 p-2">
-                        {!rule.length && <Text small>Nothing in this option yet.</Text>}
+                        {!rule.length && <Text small>{localizeWithFallback('octane.wired.nothing_in_this_option_yet', 'Nothing in this option yet.')}</Text>}
 
                         {rule.map((row, rowIndex) => (
                             <div key={rowIndex} className="flex flex-col gap-1">
-                                {rowIndex > 0 && <Text small bold>and</Text>}
+                                {rowIndex > 0 && <Text small bold>{localizeWithFallback('octane.wired.and', 'and')}</Text>}
                                 <WiredContractTermRow row={row} onChange={(patch) => patchRow(ruleIndex, rowIndex, patch)} />
                                 <div className="flex justify-end">
                                     <Button variant="danger" onClick={() => removeRow(ruleIndex, rowIndex)}>
-                                        Remove
+                                        {localizeWithFallback('octane.wired.remove', 'Remove')}
                                     </Button>
                                 </div>
                             </div>
@@ -80,11 +81,11 @@ export const WiredContractRulesEditor: FC<WiredContractRulesEditorProps> = ({
 
                         <div className="flex flex-wrap justify-between gap-1">
                             <Button disabled={rule.length >= CONTRACT_MAX_NODES} variant="secondary" onClick={() => addRow(ruleIndex)}>
-                                Add requirement
+                                {localizeWithFallback('octane.wired.add_requirement', 'Add requirement')}
                             </Button>
                             {allowAlternatives && rules.length > 1 && (
                                 <Button variant="danger" onClick={() => removeRule(ruleIndex)}>
-                                    Remove option
+                                    {localizeWithFallback('octane.wired.remove_option', 'Remove option')}
                                 </Button>
                             )}
                         </div>
@@ -94,7 +95,7 @@ export const WiredContractRulesEditor: FC<WiredContractRulesEditorProps> = ({
 
             {allowAlternatives && (
                 <Button disabled={rules.length >= CONTRACT_MAX_RULES} variant="secondary" onClick={addRule}>
-                    Add another option
+                    {localizeWithFallback('octane.wired.add_another_option', 'Add another option')}
                 </Button>
             )}
         </div>

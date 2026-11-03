@@ -46,7 +46,7 @@ export const WiredActionBotDanceView: FC<{}> = props =>
                     <OctaneInput maxLength={ 32 } type="text" value={ botName } onChange={ event => setBotName(event.target.value) } />
                 </div>
                 <div className="flex flex-col gap-1">
-                    <Text bold>Dance</Text>
+                    <Text bold>{localizeWithFallback('octane.wired.dance', 'Dance')}</Text>
                     <Select
                         className="form-select form-select-sm"
                         value={ danceType }

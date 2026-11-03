@@ -1021,7 +1021,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                                                 <InfoStandStat icon={<StatIcon src={statXIcon} />} label="X" value={itemLocation.x} />
                                                 <InfoStandStat iconAfter icon={<StatIcon src={statRotationIcon} />} label="Rotation (0-7)" value={furniDirection} />
                                                 <InfoStandStat icon={<StatIcon src={statYIcon} />} label="Y" value={itemLocation.y} />
-                                                <InfoStandStat iconAfter icon={<StatIcon src={statStateIcon} />} label="State" value={furniState} />
+                                                <InfoStandStat iconAfter icon={<StatIcon src={statStateIcon} />} label={localizeWithFallback('octane.room.state', 'State')} value={furniState} />
                                                 <InfoStandStat icon={<StatIcon src={statHeightIcon} />} label="H" value={itemLocation.z < 0.01 ? 0 : Number(itemLocation.z.toFixed(2))} />
                                             </>
                                         )}
@@ -1271,7 +1271,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                 <Flex gap={1} justifyContent="end">
                     {showInspectButton && !roomSession?.playTestMode && (
                         <Button variant="dark" onClick={() => openInspectionForFurni(avatarInfo.id, avatarInfo.category)}>
-                            Inspect
+                            {localizeWithFallback('octane.room.inspect', 'Inspect')}
                         </Button>
                     )}
                     {canMove && (

@@ -475,7 +475,7 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                     type="button"
                                     onClick={smartSave.reset}
                                 >
-                                    <FaUndo className="text-[8px]" /> Reset
+                                    <FaUndo className="text-[8px]" /> {localizeWithFallback('octane.catalog.reset', 'Reset')}
                                 </BaseButton>
                                 <BaseButton
                                     className="octane-catalog-admin-button is-muted"

@@ -6,6 +6,7 @@ import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
 import { NumberInput } from '../../../../common/NumberInput';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../../../api';
 
 interface WiredContractTermRowProps {
     row: ContractTermRow;
@@ -29,11 +30,11 @@ export const WiredContractTermRow: FC<WiredContractTermRowProps> = ({ row, showD
             <div className="flex flex-wrap gap-2">
                 <label className="flex items-center gap-1">
                     <Radio checked={row.kind === CONTRACT_KIND_CURRENCY} onCheckedChange={() => onChange({ kind: CONTRACT_KIND_CURRENCY })} />
-                    <Text small>Currency</Text>
+                    <Text small>{localizeWithFallback('octane.wired.currency', 'Currency')}</Text>
                 </label>
                 <label className="flex items-center gap-1">
                     <Radio checked={row.kind === CONTRACT_KIND_FURNI} onCheckedChange={() => onChange({ kind: CONTRACT_KIND_FURNI, wallItem: false, baseItemId: row.baseItemId || 0 })} />
-                    <Text small>Furni</Text>
+                    <Text small>{localizeWithFallback('octane.wired.furni', 'Furni')}</Text>
                 </label>
             </div>
             {row.kind === CONTRACT_KIND_CURRENCY ? (
@@ -48,7 +49,7 @@ export const WiredContractTermRow: FC<WiredContractTermRowProps> = ({ row, showD
             ) : (
                 <div className="flex flex-col gap-1">
                     <ChestFurniIconPreview baseItemId={row.baseItemId} />
-                    <NumberInput min={0} className="form-control form-control-sm" placeholder="Base item ID" value={row.baseItemId} onChange={(event) => onChange({ baseItemId: Math.max(0, parseInt(event.target.value, 10) || 0) })} />
+                    <NumberInput min={0} className="form-control form-control-sm" placeholder={localizeWithFallback('octane.wired.base_item_id', 'Base item ID')} value={row.baseItemId} onChange={(event) => onChange({ baseItemId: Math.max(0, parseInt(event.target.value, 10) || 0) })} />
                 </div>
             )}
             <NumberInput min={0} className="form-control form-control-sm" value={row.amount} onChange={(event) => onChange({ amount: Math.max(0, parseInt(event.target.value, 10) || 0) })} />

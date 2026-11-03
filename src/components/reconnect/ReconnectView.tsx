@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { LocalizeText } from '../../api';
+import { LocalizeText, localizeWithFallback } from '../../api';
 import { Base, Column, Text } from '../../common';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { getDisconnectReasonKey, getReconnectPresentation, useConnectionState } from '../../hooks';
@@ -71,7 +71,7 @@ export const ReconnectView: FC<{}> = () => {
                         <>
                             <Base className="w-[48px] h-[48px] border-4 border-white/20 border-t-[#4dabf7] rounded-full animate-spin" />
                             <Text fontSizeCustom={18} variant="white" className="text-center font-semibold">
-                                Connection lost
+                                {localizeWithFallback('octane.reconnect.connection_lost', 'Connection lost')}
                             </Text>
                             <Text fontSizeCustom={14} variant="white" className="text-center opacity-70">
                                 Reconnecting to server... (attempt {attempt}/{maxAttempts})
@@ -83,7 +83,7 @@ export const ReconnectView: FC<{}> = () => {
                                 />
                             </Base>
                             <Text fontSizeCustom={12} variant="white" className="text-center opacity-50">
-                                Please wait, your session will be restored automatically
+                                {localizeWithFallback('octane.reconnect.please_wait_your_session_will_be', 'Please wait, your session will be restored automatically')}
                             </Text>
                         </>
                     )}
@@ -94,10 +94,10 @@ export const ReconnectView: FC<{}> = () => {
                                 &#9888;
                             </Text>
                             <Text fontSizeCustom={18} variant="white" className="text-center font-semibold">
-                                Session expired
+                                {localizeWithFallback('octane.reconnect.session_expired', 'Session expired')}
                             </Text>
                             <Text fontSizeCustom={14} variant="white" className="text-center opacity-70">
-                                Your session has expired. Please log in again to enter the hotel.
+                                {localizeWithFallback('octane.reconnect.your_session_has_expired_please_log', 'Your session has expired. Please log in again to enter the hotel.')}
                             </Text>
                             <Base className="mt-2 flex gap-3">
                                 <a

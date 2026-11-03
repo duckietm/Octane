@@ -6,6 +6,7 @@ import { AvatarEffectPreviewView } from '../avatar-effects/AvatarEffectPreviewVi
 import { useAvatarEditor } from '../../hooks';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../api';
 
 const DEFAULT_DIRECTION: number = 4;
 const AVATAR_DIRECTIONS: number = 8;
@@ -31,7 +32,7 @@ export const AvatarEditorFigurePreviewView: FC<{ effectType?: number }> = (props
                         <LayoutAvatarImageView direction={direction} figure={getFigureString} gender={gender} />
                     )}
                 </div>
-                <BaseButton type="button" className="octane-avatar-editor-rotate" aria-label="Rotate avatar" onClick={rotateFigure}>
+                <BaseButton type="button" className="octane-avatar-editor-rotate" aria-label={localizeWithFallback('octane.avatar_editor.rotate_avatar', 'Rotate avatar')} onClick={rotateFigure}>
                     <img src={rotateSrc} alt="" draggable={false} />
                 </BaseButton>
             </div>

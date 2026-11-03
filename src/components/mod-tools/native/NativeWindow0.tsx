@@ -19,6 +19,7 @@ import { NativeSkinView } from './NativeSkinView';
 import { BaseButton } from '../../../common/BaseButton';
 import { ListSelect } from '../../../common/ListSelect';
 import { ToggleButton } from '../../../common/ToggleButton';
+import { localizeWithFallback } from '../../../api';
 
 // Legacy window-manager style 0 (habbo_element_description_xml): blue frame 0xff418db0, white border, default button, checkbox, dropmenu, close button.
 const SKINS = {
@@ -356,7 +357,7 @@ export const Native0Frame: FC<Native0FrameProps> = ({ width, height, caption, on
                     <span className="native0-text__line is-bold">{caption}</span>
                 </div>
                 <BaseButton
-                    aria-label="Close"
+                    aria-label={localizeWithFallback('octane.mod_tools.close', 'Close')}
                     className="native0-close"
                     type="button"
                     style={rect(headerWidth - 15, 0, 15, 15)}

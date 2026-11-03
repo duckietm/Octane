@@ -1,6 +1,6 @@
 import { AvatarFigurePartType } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AvatarEditorThumbnailsHelper, CreateLinkEvent, GetClubMemberLevel, IAvatarEditorCategory, IAvatarEditorCategoryPartItem } from '../../api';
+import { AvatarEditorThumbnailsHelper, CreateLinkEvent, GetClubMemberLevel, IAvatarEditorCategory, IAvatarEditorCategoryPartItem, localizeWithFallback } from '../../api';
 import { LayoutCurrencyIcon } from '../../common';
 import { useAvatarEditor } from '../../hooks';
 import { AvatarEditorIcon } from './AvatarEditorIcon';
@@ -78,7 +78,7 @@ export const AvatarEditorPetView: FC<{
     }, [selectEditorPart]);
 
     if (!petCategory || !petCategory.partItems || !petCategory.partItems.length) {
-        return <div className="octane-avatar-editor-empty-state">No companion pets available.</div>;
+        return <div className="octane-avatar-editor-empty-state">{localizeWithFallback('octane.avatar_editor.no_companion_pets_available', 'No companion pets available.')}</div>;
     }
 
     return (
@@ -92,7 +92,7 @@ export const AvatarEditorPetView: FC<{
                         {selectedPartItem && slotThumbUrl ? <img src={slotThumbUrl} alt="" draggable={false} /> : <AvatarEditorIcon icon="pt" />}
                         <span>{selectedPartItem ? 'Companion equipped' : 'No companion selected'}</span>
                         {selectedPartItem && (
-                            <BaseButton type="button" className="octane-avatar-editor-pet-remove" aria-label="Remove companion" onClick={removePet}>
+                            <BaseButton type="button" className="octane-avatar-editor-pet-remove" aria-label={localizeWithFallback('octane.avatar_editor.remove_companion', 'Remove companion')} onClick={removePet}>
                                 <AvatarEditorIcon icon="clear" />
                             </BaseButton>
                         )}

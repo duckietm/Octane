@@ -8,7 +8,8 @@ import {
     MessengerThread,
     MessengerThreadChat,
     MessengerThreadChatGroup,
-    useHabbiconCatalog
+    useHabbiconCatalog,
+    localizeWithFallback
 } from '../../../../../api';
 import MessengerCautionIcon from '../../../../../assets/images/friends/messenger_caution.png';
 import MessengerNotificationIcon from '../../../../../assets/images/friends/messenger_notification_icon.png';
@@ -108,10 +109,10 @@ export const FriendsMessengerThreadGroup: FC<{ thread: MessengerThread; group: M
                             ) : (
                                 <div key={index} className="messenger-translation-block">
                                     <div>
-                                        <b>original:</b> {chat.originalMessage || chat.message}
+                                        <b>{localizeWithFallback('octane.friends.original', 'original:')}</b> {chat.originalMessage || chat.message}
                                     </div>
                                     <div>
-                                        <b>translate:</b> {chat.translatedMessage || chat.message}
+                                        <b>{localizeWithFallback('octane.friends.translate', 'translate:')}</b> {chat.translatedMessage || chat.message}
                                     </div>
                                 </div>
                             )

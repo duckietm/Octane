@@ -1,6 +1,6 @@
 import { GetRoomEngine, GetSessionDataManager, RoomObjectCategory, RoomObjectVariable } from '@octane/renderer';
 import { FC, KeyboardEvent, ReactNode, useMemo, useState } from 'react';
-import { GetRoomSession, giveableVariables, isWallTargetKind, parseInt32, profileToEntries, VariablesWebApiClient, WebApiVariable } from '../../api';
+import { GetRoomSession, giveableVariables, isWallTargetKind, parseInt32, profileToEntries, VariablesWebApiClient, WebApiVariable, localizeWithFallback } from '../../api';
 import wiredGlobalPlaceholderImage from '../../assets/images/wiredtools/wired_global_placeholder.png';
 import { Button, LayoutAvatarImageView, LayoutPetImageView, LayoutRoomObjectImageView } from '../../common';
 import { useVariablesExplorerProfile } from '../../hooks/variables-explorer/useVariablesExplorerProfile';
@@ -232,9 +232,9 @@ export const VariablesExplorerHolderView: FC<VariablesExplorerHolderViewProps> =
                     canWrite && selectedEntry?.hasValue ? (
                         <div className="flex items-center justify-end gap-2 text-[12px]">
                             <span>Add to {selectedEntry.name}:</span>
-                            <NumberInput aria-label="Amount to add" className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={addValue} onChange={(event) => setAddValue(event.target.value)} />
+                            <NumberInput aria-label={localizeWithFallback('octane.variables_explorer.amount_to_add', 'Amount to add')} className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={addValue} onChange={(event) => setAddValue(event.target.value)} />
                             <Button disabled={busy || !holderReady} variant="secondary" onClick={addToSelected}>
-                                Add
+                                {localizeWithFallback('octane.variables_explorer.add', 'Add')}
                             </Button>
                         </div>
                     ) : null

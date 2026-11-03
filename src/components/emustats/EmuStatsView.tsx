@@ -8,7 +8,8 @@ import {
     EmuStatsWiredRow,
     EmuStatsWiredTopRoomRow,
     fetchEmuStats,
-    getCachedEmuStats
+    getCachedEmuStats,
+    localizeWithFallback
 } from '../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
@@ -113,8 +114,8 @@ const MemoryChart: FC<{ history: EmuStatsMemoryPoint[] }> = ({ history }) => {
             <div className="octane-emustats__chart-card">
                 <div className="octane-emustats__section-header">
                     <div>
-                        <h3>Realtime Memory Usage</h3>
-                        <p>Rolling history from the emulator process.</p>
+                        <h3>{localizeWithFallback('octane.emustats.realtime_memory_usage', 'Realtime Memory Usage')}</h3>
+                        <p>{localizeWithFallback('octane.emustats.rolling_history_from_the_emulator_process', 'Rolling history from the emulator process.')}</p>
                     </div>
                     <div className="octane-emustats__chart-meta">
                         <span>Peak {chart.peak} MB</span>
@@ -201,7 +202,7 @@ const StatsTable = <TRow extends object>({
                         {rows.length === 0 && (
                             <tr>
                                 <td colSpan={columns.length} className="octane-emustats__table-empty">
-                                    Nothing to show right now.
+                                    {localizeWithFallback('octane.emustats.nothing_to_show_right_now', 'Nothing to show right now.')}
                                 </td>
                             </tr>
                         )}
@@ -254,7 +255,7 @@ const SystemSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) => {
     return (
         <NativeTextTree>
             <div className="octane-emustats__detail-layout">
-                <DetailPanel title="Database Pool" description="Current Hikari pool pressure and connection availability.">
+                <DetailPanel title={localizeWithFallback('octane.emustats.database_pool', 'Database Pool')} description={localizeWithFallback('octane.emustats.current_hikari_pool_pressure_and_connection', 'Current Hikari pool pressure and connection availability.')}>
                     <KeyValueGrid
                         items={[
                             { label: 'Active', value: formatCompactNumber(databasePool.activeConnections) },
@@ -269,7 +270,7 @@ const SystemSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) => {
                         ]}
                     />
                 </DetailPanel>
-                <DetailPanel title="Network Throughput" description="Realtime rates sampled from incoming and outgoing packet pipelines.">
+                <DetailPanel title={localizeWithFallback('octane.emustats.network_throughput', 'Network Throughput')} description={localizeWithFallback('octane.emustats.realtime_rates_sampled_from_incoming_and', 'Realtime rates sampled from incoming and outgoing packet pipelines.')}>
                     <KeyValueGrid
                         items={[
                             { label: 'Incoming Packets/s', value: formatThroughput(network.incomingPacketsPerSecond, 'pkt') },
@@ -281,7 +282,7 @@ const SystemSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) => {
                         ]}
                     />
                 </DetailPanel>
-                <DetailPanel title="Scheduler" description="Executor load behind delayed tasks and internal service work.">
+                <DetailPanel title={localizeWithFallback('octane.emustats.scheduler', 'Scheduler')} description={localizeWithFallback('octane.emustats.executor_load_behind_delayed_tasks_and', 'Executor load behind delayed tasks and internal service work.')}>
                     <KeyValueGrid
                         items={[
                             { label: 'Queued Tasks', value: formatCompactNumber(scheduler.queuedTasks), tone: scheduler.queuedTasks > 0 ? 'warn' : 'good' },
@@ -292,7 +293,7 @@ const SystemSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) => {
                         ]}
                     />
                 </DetailPanel>
-                <DetailPanel title="Garbage Collection" description="Observed JVM collection activity since emulator startup.">
+                <DetailPanel title={localizeWithFallback('octane.emustats.garbage_collection', 'Garbage Collection')} description={localizeWithFallback('octane.emustats.observed_jvm_collection_activity_since_emulator', 'Observed JVM collection activity since emulator startup.')}>
                     <KeyValueGrid
                         items={[
                             { label: 'Total Collections', value: formatCompactNumber(garbageCollector.totalCollections) },
@@ -307,7 +308,7 @@ const SystemSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) => {
                         ]}
                     />
                 </DetailPanel>
-                <DetailPanel title="Cycle Health" description="Aggregated timing from the active room update loop.">
+                <DetailPanel title={localizeWithFallback('octane.emustats.cycle_health', 'Cycle Health')} description={localizeWithFallback('octane.emustats.aggregated_timing_from_the_active_room', 'Aggregated timing from the active room update loop.')}>
                     <KeyValueGrid
                         items={[
                             { label: 'Average Room Cycle', value: formatMs(overview.averageRoomCycleMs) },
@@ -336,7 +337,7 @@ const WiredInsightsSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) 
     return (
         <NativeTextTree>
             <div className="octane-emustats__detail-layout">
-                <DetailPanel title="Wired Pressure" description="Live summary of tick load, delayed actions and heavy rooms.">
+                <DetailPanel title={localizeWithFallback('octane.emustats.wired_pressure', 'Wired Pressure')} description={localizeWithFallback('octane.emustats.live_summary_of_tick_load_delayed', 'Live summary of tick load, delayed actions and heavy rooms.')}>
                     <KeyValueGrid
                         items={[
                             { label: 'Tickables', value: formatCompactNumber(overview.wiredTickables) },
@@ -359,7 +360,7 @@ const WiredInsightsSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) 
                         ]}
                     />
                 </DetailPanel>
-                <DetailPanel title="Top Wired Rooms" description="Highest usage rooms in the current diagnostics window.">
+                <DetailPanel title={localizeWithFallback('octane.emustats.top_wired_rooms', 'Top Wired Rooms')} description={localizeWithFallback('octane.emustats.highest_usage_rooms_in_the_current', 'Highest usage rooms in the current diagnostics window.')}>
                     <StatsTable<EmuStatsWiredTopRoomRow>
                         columns={[
                             { key: 'roomId', label: 'Room', className: 'is-xs' },
@@ -540,26 +541,26 @@ export const EmuStatsView: FC<{}> = () => {
                     <NativeTextTree>
                         <div className="octane-emustats__overview">
                             <div className="octane-emustats__overview-cards">
-                                <MetricCard title="Uptime" accent="#6366f1" value={formatUptime(overview.uptimeSeconds)} />
-                                <MetricCard title="Last Refresh" accent="#22c55e" value={formatDateTime(overview.lastRefreshEpochMs)} />
-                                <MetricCard title="GUI Status" accent="#f59e0b" value={overview.guiStatus} />
+                                <MetricCard title={localizeWithFallback('octane.emustats.uptime', 'Uptime')} accent="#6366f1" value={formatUptime(overview.uptimeSeconds)} />
+                                <MetricCard title={localizeWithFallback('octane.emustats.last_refresh', 'Last Refresh')} accent="#22c55e" value={formatDateTime(overview.lastRefreshEpochMs)} />
+                                <MetricCard title={localizeWithFallback('octane.emustats.gui_status', 'GUI Status')} accent="#f59e0b" value={overview.guiStatus} />
                                 <MetricCard
-                                    title="Memory Allocation"
+                                    title={localizeWithFallback('octane.emustats.memory_allocation', 'Memory Allocation')}
                                     value={formatMemory(overview.memoryUsedMb, overview.memoryMaxMb)}
                                     subtitle={`${overview.memoryAllocatedMb} MB allocated`}
                                 />
-                                <MetricCard title="CPU Load" value={formatCpu(overview.cpuLoadPercent)} />
-                                <MetricCard title="Active OS Threads" value={String(overview.activeOsThreads)} />
-                                <MetricCard title="Connected Players" value={String(overview.connectedPlayers)} />
-                                <MetricCard title="Peak Players" value={String(overview.peakPlayers)} />
-                                <MetricCard title="Loaded Rooms" value={String(overview.loadedRooms)} />
-                                <MetricCard title="Wired Tickables" value={String(overview.wiredTickables)} />
+                                <MetricCard title={localizeWithFallback('octane.emustats.cpu_load', 'CPU Load')} value={formatCpu(overview.cpuLoadPercent)} />
+                                <MetricCard title={localizeWithFallback('octane.emustats.active_os_threads', 'Active OS Threads')} value={String(overview.activeOsThreads)} />
+                                <MetricCard title={localizeWithFallback('octane.emustats.connected_players', 'Connected Players')} value={String(overview.connectedPlayers)} />
+                                <MetricCard title={localizeWithFallback('octane.emustats.peak_players', 'Peak Players')} value={String(overview.peakPlayers)} />
+                                <MetricCard title={localizeWithFallback('octane.emustats.loaded_rooms', 'Loaded Rooms')} value={String(overview.loadedRooms)} />
+                                <MetricCard title={localizeWithFallback('octane.emustats.wired_tickables', 'Wired Tickables')} value={String(overview.wiredTickables)} />
                                 <MetricCard
-                                    title="WS Sessions"
+                                    title={localizeWithFallback('octane.emustats.ws_sessions', 'WS Sessions')}
                                     value={`${overview.activeWebSocketSessions} / ${overview.peakWebSocketSessions}`}
                                     subtitle="current / peak"
                                 />
-                                <MetricCard title="Avg Room Cycle" value={formatMs(overview.averageRoomCycleMs)} />
+                                <MetricCard title={localizeWithFallback('octane.emustats.avg_room_cycle', 'Avg Room Cycle')} value={formatMs(overview.averageRoomCycleMs)} />
                             </div>
                             <MemoryChart history={snapshot.memoryHistory} />
                         </div>
@@ -573,7 +574,7 @@ export const EmuStatsView: FC<{}> = () => {
     return (
         <NativeTextTree>
             <OctaneCardView className="octane-emustats-window w-[980px] h-[620px]" isResizable={false} theme="primary-slim" uniqueKey="emu-stats">
-                <OctaneCardHeaderView headerText="Emulator Stats" onCloseClick={() => setIsVisible(false)} />
+                <OctaneCardHeaderView headerText={localizeWithFallback('octane.emustats.emulator_stats', 'Emulator Stats')} onCloseClick={() => setIsVisible(false)} />
                 <OctaneCardContentView classNames={['octane-emustats-window__content']}>
                     <div className="octane-emustats">
                         <aside className="octane-emustats__sidebar">
@@ -596,7 +597,7 @@ export const EmuStatsView: FC<{}> = () => {
                             </nav>
                             <div className="octane-emustats__sidebar-footer">
                                 <BaseButton className="octane-emustats__refresh-button" onClick={() => setVersion((value) => value + 1)} type="button">
-                                    Refresh now
+                                    {localizeWithFallback('octane.emustats.refresh_now', 'Refresh now')}
                                 </BaseButton>
                                 <p>Auto refresh every {REFRESH_INTERVAL_MS / 1000}s</p>
                             </div>
@@ -605,7 +606,7 @@ export const EmuStatsView: FC<{}> = () => {
                             <div className="octane-emustats__header">
                                 <div>
                                     <h1>{navItems.find((item) => item.key === section)?.label || 'Overview'}</h1>
-                                    <p>Live operational view of emulator health, activity and wired performance.</p>
+                                    <p>{localizeWithFallback('octane.emustats.live_operational_view_of_emulator_health', 'Live operational view of emulator health, activity and wired performance.')}</p>
                                 </div>
                                 {overview && (
                                     <div className="octane-emustats__status-pill" data-status={overview.guiStatus.toLowerCase().replace(/\s+/g, '-')}>
@@ -614,8 +615,8 @@ export const EmuStatsView: FC<{}> = () => {
                                 )}
                             </div>
                             {error && <div className="octane-emustats__error">{error}</div>}
-                            {isLoading && !snapshot && <div className="octane-emustats__empty">Loading emulator stats...</div>}
-                            {!isLoading && !snapshot && !error && <div className="octane-emustats__empty">No emulator stats available yet.</div>}
+                            {isLoading && !snapshot && <div className="octane-emustats__empty">{localizeWithFallback('octane.emustats.loading_emulator_stats', 'Loading emulator stats...')}</div>}
+                            {!isLoading && !snapshot && !error && <div className="octane-emustats__empty">{localizeWithFallback('octane.emustats.no_emulator_stats_available_yet', 'No emulator stats available yet.')}</div>}
                             {snapshot && (
                                 <div className="octane-emustats__body" style={{ '--emustats-section': `"${section}"` } as CSSProperties}>
                                     {content}

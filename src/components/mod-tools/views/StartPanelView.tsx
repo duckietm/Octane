@@ -13,6 +13,7 @@ import chatlogIcon from '../../../assets/mod-tools/images/roomtools_chat_history
 import userIcon from '../../../assets/mod-tools/images/placeholder_avatar_small_head_cropped_png.png';
 import ticketIcon from '../../../assets/mod-tools/images/tools_file_icon.png';
 import { BaseButton } from '../../../common/BaseButton';
+import { localizeWithFallback } from '../../../api';
 
 const IMAGES: Record<string, string> = {
     roomtools_history_open_icon: roomToolIcon,
@@ -108,7 +109,7 @@ export const StartPanelView: FC<StartPanelProps> = (props) => {
                 )}
                 {selectedUser && <span className={`native-start-panel__presence${selectedUser.present ? ' is-present' : ''}`} style={{ left: 20, top: userTop + 19 }} />}
                 {selectedUser && (
-                    <BaseButton aria-label="Clear" className="native-start-panel__clear" style={{ left: 141, top: userTop + 9 }} type="button" onClick={onClearUser}>
+                    <BaseButton aria-label={localizeWithFallback('octane.mod_tools.clear', 'Clear')} className="native-start-panel__clear" style={{ left: 141, top: userTop + 9 }} type="button" onClick={onClearUser}>
                         ×
                     </BaseButton>
                 )}

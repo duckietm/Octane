@@ -4,6 +4,7 @@ import { AIR_SPLASH_BG, AIR_SPLASH_TOP, AIR_USER_PHOTOS } from '@/assets/images/
 import octaneLogo from '@/assets/images/loading/octane-logo.png';
 import '@/css/loading/LoadingView.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../api';
 
 interface LoadingViewProps {
     isError?: boolean;
@@ -90,7 +91,7 @@ export const LoadingView: FC<LoadingViewProps> = (props) => {
                             {message && <div>{message}</div>}
                             {homeUrl && (
                                 <a href={homeUrl} className="octane-loading__home">
-                                    Back to Hotel
+                                    {localizeWithFallback('octane.loading.back_to_hotel', 'Back to Hotel')}
                                 </a>
                             )}
                         </div>

@@ -126,7 +126,7 @@ export const InventoryPetView: FC<{
                         )}
                     </div>
                     <InventoryFilterSelect
-                        aria-label="Pet type"
+                        aria-label={localizeWithFallback('octane.inventory.pet_type', 'Pet type')}
                         value={activeType}
                         onChange={(value) => {
                             setTypeFilter(Number(value));
@@ -145,7 +145,7 @@ export const InventoryPetView: FC<{
                         ))}
                     </InventoryFilterSelect>
                     <InventoryFilterSelect
-                        aria-label="Pet rarity"
+                        aria-label={localizeWithFallback('octane.inventory.pet_rarity', 'Pet rarity')}
                         disabled={!rarityFilterEnabled}
                         value={activeRarity}
                         onChange={(value) => setRarityFilter(Number(value))}

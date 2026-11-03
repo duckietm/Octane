@@ -42,10 +42,10 @@ export const VariablesExplorerBulkDeleteView: FC<VariablesExplorerBulkDeleteView
                     </div>
                     <label className="flex flex-col gap-1">
                         <Text small>
-                            Type <b>{variableName}</b> to confirm:
+                            {localizeWithFallback('octane.variables_explorer.type', 'Type')} <b>{variableName}</b> to confirm:
                         </Text>
                         <input
-                            aria-label="Variable name"
+                            aria-label={localizeWithFallback('octane.variables_explorer.variable_name', 'Variable name')}
                             autoComplete="off"
                             className="rounded border border-[#b8b2a4] bg-white px-2 py-[4px] text-[12px]"
                             spellCheck={false}

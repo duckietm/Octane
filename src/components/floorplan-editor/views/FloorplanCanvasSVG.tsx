@@ -8,6 +8,7 @@ import { FloorplanTile } from './FloorplanTile';
 import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../../api';
 
 type Props = {
     state: FloorplanState;
@@ -250,7 +251,7 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
                     {outOfBoundsOverlay}
                 </svg>
                 <div className="fp-stage-buttons">
-                    <Hint content="Fit room to view"><BaseButton aria-label="Fit room to view" type="button" data-testid="zoom-reset" className="fp-round-btn is-small" disabled={!roomBounds} onClick={resetView}>
+                    <Hint content={localizeWithFallback('octane.floorplan_editor.fit_room_to_view', 'Fit room to view')}><BaseButton aria-label={localizeWithFallback('octane.floorplan_editor.fit_room_to_view', 'Fit room to view')} type="button" data-testid="zoom-reset" className="fp-round-btn is-small" disabled={!roomBounds} onClick={resetView}>
                         <FaExpand size={10} />
                     </BaseButton></Hint>
                     <Hint content="Recenter on room (keep zoom)"><BaseButton aria-label="Recenter on room (keep zoom)"

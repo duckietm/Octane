@@ -268,12 +268,12 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                 footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
             >
                 <div className="flex flex-col gap-1">
-                    <Text bold>Reward limit</Text>
+                    <Text bold>{localizeWithFallback('octane.wired.reward_limit', 'Reward limit')}</Text>
                     <div className="flex items-center gap-1">
-                        <Checkbox checked={limitEnabled} id="limitEnabled" aria-label="Reward limit" onCheckedChange={(nextChecked) => setLimitEnabled(nextChecked)} />
+                        <Checkbox checked={limitEnabled} id="limitEnabled" aria-label={localizeWithFallback('octane.wired.reward_limit', 'Reward limit')} onCheckedChange={(nextChecked) => setLimitEnabled(nextChecked)} />
                         <Text>{LocalizeText('wiredfurni.params.prizelimit', ['amount'], [''])}</Text>
                         <OctaneInput
-                            aria-label="Prize limit"
+                            aria-label={localizeWithFallback('octane.wired.prize_limit', 'Prize limit')}
                             className="w-[60px]"
                             max={MAX_PRIZE_LIMIT}
                             min={MIN_PRIZE_LIMIT}
@@ -284,12 +284,12 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                     </div>
                     {!limitEnabled && (
                         <Text small className="text-[#cc0000]">
-                            Reward limit not set. Make sure rewards are badges or non-tradeable items.
+                            {localizeWithFallback('octane.wired.reward_limit_not_set_make_sure', 'Reward limit not set. Make sure rewards are badges or non-tradeable items.')}
                         </Text>
                     )}
                 </div>
                 <div className="flex flex-col gap-1">
-                    <Text bold>How often can a user be rewarded</Text>
+                    <Text bold>{localizeWithFallback('octane.wired.how_often_can_a_user_be', 'How often can a user be rewarded')}</Text>
                     <div className="grid grid-cols-2 gap-x-2 gap-y-1 w-fit">
                         {REWARD_INTERVALS.map((option) => (
                             <label key={option.value} className="flex items-center gap-1 cursor-pointer">
@@ -311,17 +311,17 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                     </div>
                 </div>
                 <div className="flex flex-col gap-1">
-                    <Text bold>Unique Rewards</Text>
+                    <Text bold>{localizeWithFallback('octane.wired.unique_rewards', 'Unique Rewards')}</Text>
                     <div className="flex items-center gap-1">
-                        <Checkbox checked={uniqueRewards} id="uniqueRewards" aria-label="Unique Rewards?" onCheckedChange={(nextChecked) => setUniqueRewards(nextChecked)} />
-                        <Text>Unique Rewards?</Text>
+                        <Checkbox checked={uniqueRewards} id="uniqueRewards" aria-label={localizeWithFallback('octane.wired.unique_rewards_2', 'Unique Rewards?')} onCheckedChange={(nextChecked) => setUniqueRewards(nextChecked)} />
+                        <Text>{localizeWithFallback('octane.wired.unique_rewards_2', 'Unique Rewards?')}</Text>
                     </div>
-                    <Text small>If checked each reward will be given once to each user. Probabilities are not in use.</Text>
+                    <Text small>{localizeWithFallback('octane.wired.if_checked_each_reward_will_be', 'If checked each reward will be given once to each user. Probabilities are not in use.')}</Text>
                 </div>
                 <div className="flex items-center justify-between">
-                    <Text bold>Rewards</Text>
+                    <Text bold>{localizeWithFallback('octane.wired.rewards', 'Rewards')}</Text>
                     <Button disabled={rewards.length >= MAX_REWARDS} variant="secondary" onClick={addReward}>
-                        Add reward
+                        {localizeWithFallback('octane.wired.add_reward', 'Add reward')}
                     </Button>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -333,7 +333,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                                 <div key={index} className="flex flex-col gap-1 p-1 rounded bg-muted">
                                     <div className="flex items-center gap-1">
                                         <Select
-                                            aria-label="Reward type"
+                                            aria-label={localizeWithFallback('octane.wired.reward_type', 'Reward type')}
                                             className="min-w-0 grow form-select form-select-sm"
                                             value={reward.rewardType}
                                             onChange={(event) =>
@@ -367,15 +367,15 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                                     <div className="flex gap-1">
                                         <div className="flex flex-col gap-[2px] min-w-0 grow">
                                             <Text small bold>
-                                                Chance %
+                                                {localizeWithFallback('octane.wired.chance', 'Chance %')}
                                             </Text>
                                             {uniqueRewards ? (
                                                 <Text small className="px-1">
-                                                    Unique
+                                                    {localizeWithFallback('octane.wired.unique', 'Unique')}
                                                 </Text>
                                             ) : (
                                                 <OctaneInput
-                                                    aria-label="Chance %"
+                                                    aria-label={localizeWithFallback('octane.wired.chance', 'Chance %')}
                                                     min={0}
                                                     max={100}
                                                     type="number"
@@ -411,7 +411,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                 )}
                 {hasCustomCurrencyReward && (
                     <Text center small className="p-1 rounded bg-muted">
-                        Extra Currency uses Amount as the quantity and Currency Type as the purse type id. Example: amount 200 + type 105.
+                        {localizeWithFallback('octane.wired.extra_currency_uses_amount_as_the', 'Extra Currency uses Amount as the quantity and Currency Type as the purse type id. Example: amount 200 + type 105.')}
                     </Text>
                 )}
             </WiredActionBaseView>
