@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { GetRememberLogin, SetRememberLogin } from '../utils/RememberLogin';
 import { getAccessToken, setAccessToken } from './accessToken';
-import { adoptLoginTokenFromUrl, confirmSignInFromLink, signInFromLinkQuestion } from './urlToken';
+import { adoptLoginTokenFromUrl, confirmSignInFromLink, isFramedByOwnSite, signInFromLinkQuestion } from './urlToken';
 
 const at = (search: string) => ({
     location: { href: `https://hotel.example/client/${search}` } as Location,
@@ -75,11 +75,40 @@ describe('adoptLoginTokenFromUrl', () => {
     it('asks the same before an SSO ticket from the address is used', () => {
         const source = readFileSync('src/bootstrap.ts', 'utf8');
 
-        expect(source).toContain("if (ssoTicket && !confirmSignInFromLink(null)) ssoTicket = null;");
+        expect(source).toContain('if (ssoTicket && !confirmSignInFromLink(null)) ssoTicket = null;');
         expect(source).toContain("'sso.ticket': ssoTicket,");
         expect(confirmSignInFromLink(null, () => false)).toBe(false);
         SetRememberLogin({ token: jwtFor(7), expiresAt: 4102444800 });
         expect(confirmSignInFromLink(null, () => false)).toBe(true);
+    });
+
+    // AtomCMS shows the client in a frame on its own /hotel page with a ticket it just issued for the visitor's session:
+    // that must not ask, while a link opened in a tab or a frame on another site still does.
+    it('does not ask when the client is framed by a page of its own site', () => {
+        const ask = vi.fn(() => false);
+
+        expect(confirmSignInFromLink(null, ask, () => true)).toBe(true);
+        expect(ask).not.toHaveBeenCalled();
+        expect(confirmSignInFromLink(null, ask, () => false)).toBe(false);
+        expect(ask).toHaveBeenCalledTimes(1);
+    });
+
+    it('knows a frame of its own site from a tab of its own and from a frame on another site', () => {
+        const own = { location: { origin: 'https://hotel.example' } } as unknown as Window;
+        const framed = (parent: unknown) => ({ location: { origin: 'https://hotel.example' }, parent }) as unknown as Window;
+        const foreign = {
+            get location(): Location {
+                throw new DOMException('Blocked a frame', 'SecurityError');
+            }
+        };
+        const tab = { location: { origin: 'https://hotel.example' } } as unknown as Window & { parent: Window };
+        tab.parent = tab;
+
+        expect(isFramedByOwnSite(framed(own))).toBe(true);
+        expect(isFramedByOwnSite(framed({ location: { origin: 'https://evil.example' } }))).toBe(false);
+        expect(isFramedByOwnSite(framed(foreign))).toBe(false);
+        expect(isFramedByOwnSite(tab)).toBe(false);
+        expect(isFramedByOwnSite()).toBe(false);
     });
 
     it('asks before switching to another account, and keeps the remembered one on no', () => {

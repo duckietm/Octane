@@ -58,14 +58,31 @@ export const signInFromLinkQuestion = (subject: number | null): string =>
     subject !== null ? `This link signs you in as account #${subject}. Sign in with the link?` : 'This link signs you in to an account. Sign in with the link?';
 
 /**
+ * Whether the client is shown in a frame by a page of its own site, as a CMS does on its hotel page (AtomCMS frames
+ * the client with the ticket it just issued for the visitor's own session). A page of another site cannot be read
+ * from here, so reading its origin throws and the answer is no; a client opened in a tab of its own is not framed.
+ */
+export const isFramedByOwnSite = (win: Window = window): boolean => {
+    try {
+        if (!win.parent || win.parent === win) return false;
+
+        return win.parent.location.origin === win.location.origin;
+    } catch {
+        return false;
+    }
+};
+
+/**
  * Whether a login secret from the address (a CMS token or an SSO ticket) may be used. A browser that remembers no
  * login used to take it at once, so a link built with the sender's own token signed the reader in to the sender's
- * account (login CSRF): it is asked first. A browser with a remembered login is not asked here.
+ * account (login CSRF): it is asked first. A browser with a remembered login is not asked here, and neither is a
+ * client framed by its own site: a link from someone else cannot put its ticket in the address of that frame.
  */
 export const confirmSignInFromLink = (
     subject: number | null,
-    confirmSignIn: (question: string) => boolean = (question) => window.confirm(question)
-): boolean => (GetRememberLogin() ? true : confirmSignIn(signInFromLinkQuestion(subject)));
+    confirmSignIn: (question: string) => boolean = (question) => window.confirm(question),
+    framedByOwnSite: () => boolean = () => isFramedByOwnSite()
+): boolean => (GetRememberLogin() || framedByOwnSite() ? true : confirmSignIn(signInFromLinkQuestion(subject)));
 
 /**
  * Takes the CMS login token out of the address and makes it the remembered login. It wins over what this browser
