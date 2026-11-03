@@ -1009,7 +1009,7 @@
     "wheel.title": "Ruleta de la Fortuna",
     "wheel.free.today": "¡Tienes %count% giros gratis hoy!",
     "wheel.extra": "Giros extra: %count%",
-    "wheel.spin": "GIRAR",
+    "wheel.spin": "¡Girar!",
     "wheel.buy": "Comprar giro",
     "wheel.settings": "Ajustes",
     "wheel.settings.title": "Ajustes del Sistema de la Ruleta",
@@ -1618,5 +1618,15 @@
     "nitro.info.title": "Acerca de este cliente",
     "notifications.text.club_gift.selected": "Has elegido tu regalo.",
     "chat.confirm.openurl": "Vas a abrir %url%. Continúa solo si confías en el enlace.",
-    "campaign.calendar.title": "Calendario"
+    "campaign.calendar.title": "Calendario",
+    "wheel.spins.free": "Giros gratis hoy",
+    "wheel.spins.extra": "Giros extra",
+    "wheel.prize.credits": "%amount% créditos",
+    "wheel.prize.duckets": "%amount% duckets",
+    "wheel.prize.diamonds": "%amount% diamantes",
+    "wheel.prize.points": "%amount% %currency%",
+    "wheel.prize.points.name": "puntos",
+    "wheel.prize.spin": "1 giro extra",
+    "wheel.prize.spins": "%amount% giros extra",
+    "wheel.prize.nothing": "Sin suerte esta vez"
 }

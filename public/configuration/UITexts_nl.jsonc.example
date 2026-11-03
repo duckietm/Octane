@@ -1009,7 +1009,7 @@
     "wheel.title": "Rad van Fortuin",
     "wheel.free.today": "Je hebt vandaag %count% gratis draaibeurten!",
     "wheel.extra": "Extra draaibeurten: %count%",
-    "wheel.spin": "DRAAIEN",
+    "wheel.spin": "Draaien!",
     "wheel.buy": "Draaibeurt kopen",
     "wheel.settings": "Instellingen",
     "wheel.settings.title": "Instellingen rad-systeem",
@@ -1620,5 +1620,15 @@
     "reward_track.debug.copy_track_id.success": "Track-ID gekopieerd naar het klembord",
     "reward_track.debug.copy_task_id.success": "Taak-ID gekopieerd naar het klembord",
     "chat.confirm.openurl": "Je staat op het punt %url% te openen. Ga alleen verder als je de link vertrouwt.",
-    "campaign.calendar.title": "Kalender"
+    "campaign.calendar.title": "Kalender",
+    "wheel.spins.free": "Gratis draaibeurten vandaag",
+    "wheel.spins.extra": "Extra draaibeurten",
+    "wheel.prize.credits": "%amount% credits",
+    "wheel.prize.duckets": "%amount% duckets",
+    "wheel.prize.diamonds": "%amount% diamanten",
+    "wheel.prize.points": "%amount% %currency%",
+    "wheel.prize.points.name": "punten",
+    "wheel.prize.spin": "1 extra draaibeurt",
+    "wheel.prize.spins": "%amount% extra draaibeurten",
+    "wheel.prize.nothing": "Deze keer geen geluk"
 }

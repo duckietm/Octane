@@ -1618,5 +1618,15 @@
     "nitro.info.title": "حول هذا العميل",
     "notifications.text.club_gift.selected": "لقد اخترت هديتك.",
     "chat.confirm.openurl": "أنت على وشك فتح %url%. تابع فقط إذا كنت تثق بالرابط.",
-    "campaign.calendar.title": "التقويم"
+    "campaign.calendar.title": "التقويم",
+    "wheel.spins.free": "لفات مجانية اليوم",
+    "wheel.spins.extra": "لفات إضافية",
+    "wheel.prize.credits": "%amount% كريدت",
+    "wheel.prize.duckets": "%amount% داكت",
+    "wheel.prize.diamonds": "%amount% ماس",
+    "wheel.prize.points": "%amount% %currency%",
+    "wheel.prize.points.name": "نقاط",
+    "wheel.prize.spin": "لفة إضافية واحدة",
+    "wheel.prize.spins": "%amount% لفات إضافية",
+    "wheel.prize.nothing": "لا حظ هذه المرة"
 }

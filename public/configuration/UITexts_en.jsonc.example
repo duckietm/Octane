@@ -1012,7 +1012,7 @@
     "wheel.title": "Wheel of Fortune",
     "wheel.free.today": "You have %count% free spins today!",
     "wheel.extra": "Extra spins: %count%",
-    "wheel.spin": "SPIN",
+    "wheel.spin": "Spin!",
     "wheel.buy": "Buy spin",
     "wheel.settings": "Settings",
     "wheel.settings.title": "Wheel System Settings",
@@ -1626,5 +1626,15 @@
     "reward_track.debug.copy_track_id.success": "Track ID copied to the clipboard",
     "reward_track.debug.copy_task_id.success": "Task ID copied to the clipboard",
     "chat.confirm.openurl": "You are about to open %url%. Only continue if you trust the link.",
-    "campaign.calendar.title": "Calendar"
+    "campaign.calendar.title": "Calendar",
+    "wheel.spins.free": "Free spins today",
+    "wheel.spins.extra": "Extra spins",
+    "wheel.prize.credits": "%amount% credits",
+    "wheel.prize.duckets": "%amount% duckets",
+    "wheel.prize.diamonds": "%amount% diamonds",
+    "wheel.prize.points": "%amount% %currency%",
+    "wheel.prize.points.name": "points",
+    "wheel.prize.spin": "1 extra spin",
+    "wheel.prize.spins": "%amount% extra spins",
+    "wheel.prize.nothing": "No luck this time"
 }

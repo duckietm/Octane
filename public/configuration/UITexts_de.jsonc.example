@@ -1012,7 +1012,7 @@
     "wheel.title": "Glücksrad",
     "wheel.free.today": "Du hast heute %count% kostenlose Drehungen!",
     "wheel.extra": "Extra-Drehungen: %count%",
-    "wheel.spin": "DREHEN",
+    "wheel.spin": "Drehen!",
     "wheel.buy": "Drehung kaufen",
     "wheel.settings": "Einstellungen",
     "wheel.settings.title": "Einstellungen des Glücksrad-Systems",
@@ -1625,5 +1625,15 @@
     "nitro.info.title": "Über diesen Client",
     "notifications.text.club_gift.selected": "Du hast dein Geschenk gewählt.",
     "chat.confirm.openurl": "Du bist dabei, %url% zu öffnen. Fahre nur fort, wenn du dem Link vertraust.",
-    "campaign.calendar.title": "Kalender"
+    "campaign.calendar.title": "Kalender",
+    "wheel.spins.free": "Gratis-Drehungen heute",
+    "wheel.spins.extra": "Extra-Drehungen",
+    "wheel.prize.credits": "%amount% Taler",
+    "wheel.prize.duckets": "%amount% Duckets",
+    "wheel.prize.diamonds": "%amount% Diamanten",
+    "wheel.prize.points": "%amount% %currency%",
+    "wheel.prize.points.name": "Punkte",
+    "wheel.prize.spin": "1 Extra-Drehung",
+    "wheel.prize.spins": "%amount% Extra-Drehungen",
+    "wheel.prize.nothing": "Diesmal kein Glück"
 }

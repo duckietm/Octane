@@ -1165,7 +1165,7 @@
     "wheel.title": "Ruota della Fortuna",
     "wheel.free.today": "Hai %count% giri gratuiti oggi!",
     "wheel.extra": "Giri extra: %count%",
-    "wheel.spin": "GIRA",
+    "wheel.spin": "Gira!",
     "wheel.buy": "Acquista giro",
 	"wheel.settings": "Configurações",
 	"wheel.settings.title": "Configuração de Sistema da Roleta",
@@ -1808,5 +1808,15 @@
     "nitro.info.title": "Informazioni sul client",
     "notifications.text.club_gift.selected": "Hai scelto il tuo regalo.",
     "chat.confirm.openurl": "Stai per aprire %url%. Continua solo se ti fidi del link.",
-    "campaign.calendar.title": "Calendario"
+    "campaign.calendar.title": "Calendario",
+    "wheel.spins.free": "Giri gratuiti oggi",
+    "wheel.spins.extra": "Giri extra",
+    "wheel.prize.credits": "%amount% crediti",
+    "wheel.prize.duckets": "%amount% duckets",
+    "wheel.prize.diamonds": "%amount% diamanti",
+    "wheel.prize.points": "%amount% %currency%",
+    "wheel.prize.points.name": "punti",
+    "wheel.prize.spin": "1 giro extra",
+    "wheel.prize.spins": "%amount% giri extra",
+    "wheel.prize.nothing": "Niente fortuna stavolta"
 }
