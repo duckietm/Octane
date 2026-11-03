@@ -1,24 +1,25 @@
 import { AddLinkEventTracker, ILinkEventTracker, IWheelPrize, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, TransitionEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { LocalizeText } from '../../api';
-import { Column, Flex, LayoutAvatarImageView, LayoutCurrencyIcon, Text } from '../../common';
+import { LocalizeText, localizeWithFallback } from '../../api';
+import { Button, LayoutAvatarImageView, LayoutCurrencyIcon } from '../../common';
 import { useFortuneWheel, useHasPermission } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { FortuneWheelSettingsView } from './FortuneWheelSettingsView';
 import { WheelWinReveal } from './WheelWinReveal';
 import { renderPrizeIcon } from './wheelPrizeIcon';
-import { BaseButton } from '../../common/BaseButton';
+import { getWinCurrencyType, getWinLabel } from './wheelPrizeLabel';
+import { getSliceColorIndexes, WHEEL_SLICE_COLORS } from './wheelSliceColors';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
-// Stock UI palette (white / light-blue / grey / black). Exposed as CSS custom
-// properties so a runtime theme can recolor the wheel without changing defaults
-// (the fallback values keep the stock look when no theme overrides them).
-const SLICE_COLORS = ['var(--wheel-slice-1, #eef2f5)', 'var(--wheel-slice-2, #c3dcec)'];
-const RIM = 'var(--wheel-rim, #4c606c)';
-const DIVIDER = 'var(--wheel-divider, rgba(76,96,108,0.3))';
-const HUB = 'var(--wheel-hub, #eef2f5)';
-const WHEEL_SIZE = 420;
-const ICON_RADIUS = 150;
+// Habbo's bright slice palette, each colour overridable by a runtime theme
+// through --wheel-slice-<n> (the fallback values keep the stock look).
+const sliceColor = (index: number) => `var(--wheel-slice-${index + 1}, ${WHEEL_SLICE_COLORS[index]})`;
+const WHEEL_SIZE = 360;
+const DISC_INSET = 22;
+const DISC_RADIUS = WHEEL_SIZE / 2 - DISC_INSET;
+const ICON_RADIUS = 104;
+const BULB_COUNT = 16;
+const BULB_RADIUS = WHEEL_SIZE / 2 - DISC_INSET / 2;
 const FULL_TURNS = 5;
 
 // Spin motion (wind-back → fast spin past target → settle back).
@@ -188,9 +189,11 @@ export const FortuneWheelView: FC<{}> = () => {
     const sliceAngle = prizes.length ? 360 / prizes.length : 0;
 
     const background = useMemo(() => {
-        if (!prizes.length) return SLICE_COLORS[0];
+        if (!prizes.length) return sliceColor(0);
 
-        const stops = prizes.map((_, i) => `${SLICE_COLORS[i % 2]} ${i * sliceAngle}deg ${(i + 1) * sliceAngle}deg`).join(', ');
+        const colors = getSliceColorIndexes(prizes.length);
+        const stops = prizes.map((_, i) => `${sliceColor(colors[i])} ${i * sliceAngle}deg ${(i + 1) * sliceAngle}deg`).join(', ');
+
         return `conic-gradient(${stops})`;
     }, [prizes, sliceAngle]);
 
@@ -207,141 +210,135 @@ export const FortuneWheelView: FC<{}> = () => {
         }
     }, [phase]);
 
+    // The server sends the new spin counts with the result: shown at once, a won "+2" would read on the
+    // counters before the wheel stops. They follow the server again once the spin is over.
+    const isSettled = phase === 'idle' && pendingPrizeId < 0;
+    const [shownSpins, setShownSpins] = useState({ free: freeSpins, extra: extraSpins });
+
+    if (isSettled && (shownSpins.free !== freeSpins || shownSpins.extra !== extraSpins)) setShownSpins({ free: freeSpins, extra: extraSpins });
+
     if (!isVisible) return null;
 
     const canSpin = freeSpins + extraSpins > 0 && !isSpinning && !isRequestPending && prizes.length > 0;
+    const isTurning = phase !== 'idle';
 
     return (
         <NativeTextTree>
-            <OctaneCard className="wheel-card w-[780px] max-w-[96vw]" uniqueKey="fortune-wheel">
+            <OctaneCard className="wheel-card w-[684px] max-w-[96vw]" uniqueKey="fortune-wheel">
                 <OctaneCard.Header headerText={LocalizeText('wheel.title')} onCloseClick={() => setIsVisible(false)} />
-                <OctaneCard.Content>
+                <OctaneCard.Content className="wheel-content">
                     <div className="relative">
-                        <Flex gap={3} className="flex-col sm:flex-row">
-                            <Column alignItems="center" gap={2} className="w-full shrink-0 sm:w-[420px]">
-                                <div ref={wheelHostRef} className="relative w-full" style={{ height: WHEEL_SIZE * wheelScale }}>
-                                    <div
-                                        className="absolute left-1/2 top-0"
-                                        style={{
-                                            width: WHEEL_SIZE,
-                                            height: WHEEL_SIZE,
-                                            transform: `translateX(-50%) scale(${wheelScale})`,
-                                            transformOrigin: 'top center'
-                                        }}
-                                    >
+                        <div className="wheel-layout">
+                            <div ref={wheelHostRef} className="wheel-stage-host" style={{ height: WHEEL_SIZE * wheelScale }}>
+                                <div
+                                    className={`wheel-stage ${isTurning ? 'is-turning' : ''}`}
+                                    style={{ width: WHEEL_SIZE, height: WHEEL_SIZE, transform: `translateX(-50%) scale(${wheelScale})` }}
+                                >
+                                    <div className="wheel-rim" />
+                                    {Array.from({ length: BULB_COUNT }, (_, i) => {
+                                        const angle = (i * 360) / BULB_COUNT;
+
+                                        return (
+                                            <span
+                                                key={`bulb-${i}`}
+                                                className={`wheel-bulb ${i % 2 ? 'is-alt' : ''}`}
+                                                style={{ transform: `rotate(${angle}deg) translateY(-${BULB_RADIUS}px)` }}
+                                            />
+                                        );
+                                    })}
+                                    {/* A turned square box grows past its circle and would scroll the window: the still frame clips it. */}
+                                    <div className="wheel-disc-frame" style={{ inset: DISC_INSET }}>
                                         <div
-                                            className="absolute left-1/2 -top-2 z-20 -translate-x-1/2 drop-shadow-[0_2px_2px_rgba(0,0,0,0.25)]"
-                                            style={{
-                                                width: 0,
-                                                height: 0,
-                                                borderLeft: '14px solid transparent',
-                                                borderRight: '14px solid transparent',
-                                                borderTop: `28px solid ${RIM}`
-                                            }}
-                                        />
-                                        <div
-                                            className="absolute inset-0 rounded-full shadow-[0_0_0_4px_rgba(0,0,0,0.12),inset_0_0_18px_rgba(0,0,0,0.1)]"
-                                            style={{ background, border: `8px solid ${RIM}`, transform: `rotate(${rotation}deg)`, transition: wheelTransition }}
+                                            className="wheel-disc"
+                                            style={{ background, transform: `rotate(${rotation}deg)`, transition: wheelTransition }}
                                             onTransitionEnd={handleTransitionEnd}
                                         >
                                             {prizes.map((_, i) => (
                                                 <div
                                                     key={`divider-${i}`}
-                                                    className="absolute bottom-1/2 left-1/2 origin-bottom"
-                                                    style={{
-                                                        width: '2px',
-                                                        height: `${WHEEL_SIZE / 2}px`,
-                                                        transform: `translateX(-1px) rotate(${i * sliceAngle}deg)`,
-                                                        background: DIVIDER
-                                                    }}
+                                                    className="wheel-divider"
+                                                    style={{ height: DISC_RADIUS, transform: `translateX(-1px) rotate(${i * sliceAngle}deg)` }}
                                                 />
                                             ))}
                                             {prizes.map((prize, i) => {
                                                 const centerAngle = (i + 0.5) * sliceAngle;
+
                                                 return (
                                                     <div
                                                         key={prize.id}
-                                                        className="absolute left-1/2 top-1/2"
-                                                        style={{
-                                                            transform: `rotate(${centerAngle}deg) translateY(-${ICON_RADIUS}px) rotate(-${centerAngle}deg)`
-                                                        }}
+                                                        className="wheel-slice-anchor"
+                                                        style={{ transform: `rotate(${centerAngle}deg) translateY(-${ICON_RADIUS}px) rotate(-${centerAngle}deg)` }}
                                                     >
-                                                        <div className="wheel-slice-icon -translate-x-1/2 -translate-y-1/2">{renderPrizeIcon(prize)}</div>
+                                                        {/* Turned back by the wheel's own angle, on the same curve, so the prizes stay upright while it spins. */}
+                                                        <div className="wheel-slice-plate" style={{ transform: `translate(-50%, -50%) rotate(${-rotation}deg)`, transition: wheelTransition }}>
+                                                            {renderPrizeIcon(prize)}
+                                                        </div>
                                                     </div>
                                                 );
                                             })}
                                         </div>
-                                        <div
-                                            className="absolute left-1/2 top-1/2 z-10 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.25)]"
-                                            style={{ border: `4px solid ${RIM}`, background: HUB }}
-                                        />
+                                    </div>
+                                    <div className="wheel-hub" />
+                                    <svg className="wheel-pointer" width="32" height="38" viewBox="0 0 32 38" aria-hidden="true">
+                                        <path d="M3 3 H29 V13 L16 35 L3 13 Z" />
+                                        <path className="wheel-pointer-shine" d="M7 7 H25 V11 H7 Z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div className="wheel-side">
+                                <div className="wheel-panel wheel-spins">
+                                    <div className="wheel-spins-row">
+                                        <span>{localizeWithFallback('wheel.spins.free', 'Free spins today')}</span>
+                                        <span className="wheel-spins-count">{shownSpins.free}</span>
+                                    </div>
+                                    <div className="wheel-spins-row">
+                                        <span>{localizeWithFallback('wheel.spins.extra', 'Extra spins')}</span>
+                                        <span className="wheel-spins-count">{shownSpins.extra}</span>
                                     </div>
                                 </div>
-                                <Text bold className="text-[#2f6f95]">
-                                    {LocalizeText('wheel.free.today', ['count'], [freeSpins.toString()])}
-                                </Text>
-                                <Text small className="text-[#33424c]">
-                                    {LocalizeText('wheel.extra', ['count'], [extraSpins.toString()])}
-                                </Text>
-                                <Flex gap={2} alignItems="center" className="flex-wrap justify-center">
-                                    <BaseButton
-                                        disabled={!canSpin}
-                                        onClick={() => spin()}
-                                        className="cursor-pointer rounded bg-[#3a7bb5] px-4 py-2 font-bold text-white hover:bg-[#336ea3] disabled:cursor-default disabled:opacity-40"
-                                    >
-                                        {LocalizeText('wheel.spin')}
-                                    </BaseButton>
-                                    <BaseButton
-                                        disabled={isRequestPending}
-                                        onClick={() => buySpin()}
-                                        className="flex cursor-pointer items-center gap-1 rounded bg-[#6b7884] px-3 py-2 text-white hover:bg-[#5e6a75]"
-                                    >
-                                        {LocalizeText('wheel.buy')} {spinCost}
-                                        <LayoutCurrencyIcon type={spinCostType} />
-                                    </BaseButton>
+                                <Button variant="primary" size="lg" disabled={!canSpin} onClick={() => spin()} classNames={['wheel-spin-button']}>
+                                    {LocalizeText('wheel.spin')}
+                                </Button>
+                                <div className="wheel-actions">
+                                    <Button variant="secondary" disabled={isRequestPending} onClick={() => buySpin()} classNames={['wheel-buy-button']}>
+                                        <span>{LocalizeText('wheel.buy')}</span>
+                                        <span className="wheel-buy-cost">
+                                            {spinCost}
+                                            <LayoutCurrencyIcon type={spinCostType} />
+                                        </span>
+                                    </Button>
                                     {canManage && (
-                                        <BaseButton
-                                            onClick={() => setIsSettingsOpen(true)}
-                                            className="cursor-pointer rounded bg-[#8a6b3a] px-3 py-2 font-bold text-white hover:bg-[#735730]"
-                                        >
+                                        <Button variant="secondary" onClick={() => setIsSettingsOpen(true)}>
                                             {LocalizeText('wheel.settings')}
-                                        </BaseButton>
+                                        </Button>
                                     )}
-                                </Flex>
-                            </Column>
-                            <Column gap={2} className="min-w-[300px] grow rounded-lg border border-black/10 bg-black/5 p-3">
-                                <Text bold className="text-base text-[#33424c]">
-                                    {LocalizeText('wheel.winners')}
-                                </Text>
-                                <Column gap={1} overflow="auto" className="h-[440px] max-h-[60vh]">
-                                    {recentWins.map((win, i) => (
-                                        <Flex key={i} alignItems="center" gap={2} className="rounded border-b border-black/10 py-1.5 hover:bg-black/5">
-                                            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded bg-black/5">
-                                                <LayoutAvatarImageView
-                                                    figure={win.look}
-                                                    headOnly
-                                                    direction={2}
-                                                    style={{ backgroundSize: 'auto', backgroundPosition: '-22px -32px' }}
-                                                />
-                                            </div>
-                                            <Column gap={0} className="min-w-0">
-                                                <Text bold truncate className="text-[#1f2d34]">
-                                                    {win.username}
-                                                </Text>
-                                                <Text small truncate className="text-[#2f6f95]">
-                                                    {win.prizeLabel}
-                                                </Text>
-                                            </Column>
-                                        </Flex>
-                                    ))}
-                                    {!recentWins.length && (
-                                        <Text small className="text-black/50">
-                                            {LocalizeText('wheel.winners.empty')}
-                                        </Text>
-                                    )}
-                                </Column>
-                            </Column>
-                        </Flex>
+                                </div>
+                                <div className="wheel-panel wheel-winners">
+                                    <div className="wheel-winners-title">{LocalizeText('wheel.winners')}</div>
+                                    <div className="wheel-winners-list">
+                                        {recentWins.map((win, i) => {
+                                            const currencyType = getWinCurrencyType(win.prizeLabel, prizes);
+
+                                            return (
+                                                <div key={i} className="wheel-winner">
+                                                    <div className="wheel-winner-avatar">
+                                                        <LayoutAvatarImageView figure={win.look} headOnly direction={2} style={{ backgroundSize: 'auto', backgroundPosition: '-22px -32px' }} />
+                                                    </div>
+                                                    <div className="wheel-winner-copy">
+                                                        <span className="wheel-winner-name">{win.username}</span>
+                                                        <span className="wheel-winner-prize">
+                                                            {currencyType !== null && <LayoutCurrencyIcon type={currencyType} />}
+                                                            <span>{getWinLabel(win.prizeLabel, prizes)}</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                        {!recentWins.length && <div className="wheel-winners-empty">{LocalizeText('wheel.winners.empty')}</div>}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         {revealPrize && <WheelWinReveal prize={revealPrize} onDismiss={() => setRevealPrize(null)} />}
                     </div>
                 </OctaneCard.Content>
