@@ -1,9 +1,10 @@
 import { AddLinkEventTracker, Game2GetAccountGameStatusMessageComposer, GetGameStatusMessageComposer, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { useEffect } from 'react';
-import { LocalizeText, SendMessageComposer } from '../../api';
+import { GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../api';
 import { useGameCenter } from '../../hooks';
 import { GameStageView } from './views/GameStageView';
 import { GameTileView } from './views/GameTileView';
+import { UnoGameTileView } from './views/UnoGameTileView';
 import { SnowWarInstructionsView } from './views/snowwar/SnowWarInstructionsView';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
@@ -64,6 +65,7 @@ export const GameCenterView = () => {
                     : (
                         <div className="game-tile-grid">
                             {games.map((game) => <GameTileView key={game.gameId} game={game} />)}
+                            {GetConfigurationValue<boolean>('uno.enabled', true) && <UnoGameTileView onOpen={() => setIsVisible(false)} />}
                         </div>
                     )}
                 <GameStageView />

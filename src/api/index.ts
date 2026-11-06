@@ -35,6 +35,7 @@ export * from './snowwar';
 export * from './soundboard';
 export * from './talent';
 export * from './ui-settings';
+export * from './uno/UnoApi';
 export * from './user';
 export * from './utils';
 export * from './wired';
