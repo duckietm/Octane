@@ -3,7 +3,7 @@ import { FC, MouseEvent, PointerEvent, ReactNode, useCallback, useEffect, useRef
 import { GetDiskColor, localizeWithFallback } from '../../api';
 import { GetTraxCartridgeUrl } from '../../assets/images/trax';
 import { Button, Column, Flex, LayoutCurrencyIcon, Text } from '../../common';
-import { useOctaneEvent, usePurse, useTraxEditor } from '../../hooks';
+import { useOctaneEvent, usePurse, useTraxEditor, useTraxSongRequests } from '../../hooks';
 import { OctaneCard, OctaneInput } from '../../layout';
 import { CreateEmptyChannels, ITraxPlacement, ParseTraxSong, SerializeTraxSong, TRAX_CHANNEL_COUNT, TRAX_DEFAULT_UNITS, TRAX_MAX_UNITS, TRAX_MIN_UNITS, TraxChannels } from './TraxSongData';
 import { GetTraxSampleId, GetTraxSoundSetForSample, TraxSoundSets } from './TraxSoundSets';
@@ -75,8 +75,7 @@ export const TraxEditorView: FC<{}> = () =>
     const [isDirty, setIsDirty] = useState(false);
     const [hoverCell, setHoverCell] = useState<{ channel: number; unit: number } | null>(null);
     const [playheadUnit, setPlayheadUnit] = useState(0);
-    const pendingBuyRef = useRef(false);
-    const { songs, maxSongs, costCurrency, costAmount, lastError, loaded, requestSongs, buySong, saveSong, deleteSong, clearError } = useTraxEditor();
+    const { songs, maxSongs, costCurrency, costAmount, lastError, errorCount, loaded, requestSongs, buySong, saveSong, deleteSong, clearError } = useTraxEditor();
     const { getCurrencyAmount } = usePurse();
 
     const canAfford = costAmount <= 0 || getCurrencyAmount(costCurrency) >= costAmount;
@@ -170,13 +169,14 @@ export const TraxEditorView: FC<{}> = () =>
         [stopPreview, clearError, movePlayhead]
     );
 
-    useEffect(() =>
-    {
-        if (!pendingBuyRef.current || !songs.length) return;
-
-        pendingBuyRef.current = false;
-        openSong(songs[songs.length - 1]);
-    }, [songs, openSong]);
+    const { pendingAction, buy, save } = useTraxSongRequests({
+        songs,
+        errorCount,
+        buySong,
+        saveSong,
+        onBought: openSong,
+        onSaveRefused: () => setIsDirty(true)
+    });
 
     useEffect(() =>
     {
@@ -447,9 +447,8 @@ export const TraxEditorView: FC<{}> = () =>
     {
         if (editingSongId < 0) return;
 
-        saveSong(editingSongId, songName, SerializeTraxSong(channels, songLength));
-        setIsDirty(false);
-    }, [editingSongId, songName, channels, songLength, saveSong]);
+        if (save(editingSongId, songName, SerializeTraxSong(channels, songLength))) setIsDirty(false);
+    }, [editingSongId, songName, channels, songLength, save]);
 
     const deleteCurrentSong = useCallback(() =>
     {
@@ -462,9 +461,8 @@ export const TraxEditorView: FC<{}> = () =>
 
     const buyNewSong = useCallback(() =>
     {
-        pendingBuyRef.current = true;
-        buySong(localizeWithFallback('trax.editor.new.song.name', 'My new song'));
-    }, [buySong]);
+        buy(localizeWithFallback('trax.editor.new.song.name', 'My new song'));
+    }, [buy]);
 
     if (!isVisible) return null;
 
@@ -522,7 +520,7 @@ export const TraxEditorView: FC<{}> = () =>
                                         style={{ borderColor: 'rgba(0, 0, 0, 0.25)', background: 'rgba(0, 0, 0, 0.03)' }}
                                     >
                                         {index === 0 ? (
-                                            <Button fullWidth disabled={!canAfford} variant="success" onClick={buyNewSong}>
+                                            <Button fullWidth disabled={!canAfford || pendingAction === 'buy'} variant="success" onClick={buyNewSong}>
                                                 <Flex alignItems="center" gap={1} justifyContent="center">
                                                     <span>{localizeWithFallback('trax.editor.buy.song', 'New song')}</span>
                                                     {costAmount > 0 && (
