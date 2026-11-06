@@ -403,11 +403,13 @@ export const Native0Frame: FC<Native0FrameProps> = ({ width, height, caption, on
                         const up = () => {
                             window.removeEventListener('pointermove', move);
                             window.removeEventListener('pointerup', up);
+                            window.removeEventListener('pointercancel', up);
                         };
 
                         event.preventDefault();
                         window.addEventListener('pointermove', move);
                         window.addEventListener('pointerup', up);
+                        window.addEventListener('pointercancel', up);
                     }}
                 >
                     <NativeSkinView atlas={blueAtlas} color={FRAME_COLOR} height={15} layout="scaler" skin={SKINS.scaler} width={15} />
@@ -541,23 +543,37 @@ export const Native0Scrollbar: FC<Native0ScrollbarProps> = ({ x, y, height, view
 
     offsetRef.current = offset;
 
-    const stop = () => {
+    const clearTimers = () => {
         window.clearTimeout(timers.current.delay);
         window.clearInterval(timers.current.repeat);
         timers.current = { delay: null, repeat: null };
-        setPressed(null);
+        window.removeEventListener('pointerup', stop);
+        window.removeEventListener('pointercancel', stop);
+        window.removeEventListener('blur', stop);
     };
+
+    function stop() {
+        clearTimers();
+        setPressed(null);
+    }
+
+    // A hold that ends without a pointerup (a cancelled touch, the window losing focus) or a scrollbar that unmounts
+    // mid-hold used to keep scrolling a dead view from its interval.
+    useEffect(() => clearTimers, []);
 
     // An arrow steps once on press and, held for 400ms, keeps stepping.
     const hold = (direction: 1 | -1, which: 'up' | 'down') => {
         const step = () => onOffset(clamp(offsetRef.current + direction * SCROLL_LINE));
 
+        clearTimers();
         setPressed(which);
         step();
         timers.current.delay = window.setTimeout(() => {
             timers.current.repeat = window.setInterval(step, 60);
         }, 400);
-        window.addEventListener('pointerup', stop, { once: true });
+        window.addEventListener('pointerup', stop);
+        window.addEventListener('pointercancel', stop);
+        window.addEventListener('blur', stop);
     };
 
     return (
@@ -589,6 +605,7 @@ export const Native0Scrollbar: FC<Native0ScrollbarProps> = ({ x, y, height, view
                         const up = () => {
                             window.removeEventListener('pointermove', move);
                             window.removeEventListener('pointerup', up);
+                            window.removeEventListener('pointercancel', up);
                             setPressed(null);
                         };
 
@@ -596,6 +613,7 @@ export const Native0Scrollbar: FC<Native0ScrollbarProps> = ({ x, y, height, view
                         setPressed('lift');
                         window.addEventListener('pointermove', move);
                         window.addEventListener('pointerup', up);
+                        window.addEventListener('pointercancel', up);
                     }}
                 >
                     <NativeSkinView atlas={atlas} height={liftHeight} layout={`scrollbar_lift_vertical${suffix}`} skin={skin} state={stateOf('lift', 'default')} width={17} />

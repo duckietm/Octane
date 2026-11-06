@@ -145,6 +145,11 @@ export const WiredLeaderboardPanelView: FC<WiredLeaderboardPanelViewProps> = (pr
         return () => window.clearInterval(interval);
     }, []);
 
+    // The drag in progress, ended when the panel closes mid-drag: its window listeners kept moving a dead panel.
+    const stopDragRef = useRef<() => void>(null);
+
+    useEffect(() => () => stopDragRef.current?.(), []);
+
     const startDrag = (event: ReactMouseEvent) => {
         if (!onRelocate || event.button !== 0) return;
 
@@ -162,10 +167,15 @@ export const WiredLeaderboardPanelView: FC<WiredLeaderboardPanelViewProps> = (pr
         const stop = () => {
             window.removeEventListener('mousemove', move);
             window.removeEventListener('mouseup', stop);
+            window.removeEventListener('blur', stop);
+            stopDragRef.current = null;
         };
 
+        stopDragRef.current?.();
+        stopDragRef.current = stop;
         window.addEventListener('mousemove', move);
         window.addEventListener('mouseup', stop);
+        window.addEventListener('blur', stop);
     };
 
     const entriesPerPage = LEADERBOARD_PAGE_SIZES[pageSizeOption] ?? 10;

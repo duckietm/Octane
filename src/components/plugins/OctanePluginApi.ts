@@ -84,9 +84,16 @@ const pluginApi: IOctanePluginApi = {
     unregister(name: string) {
         const index = _plugins.findIndex((p) => p.name === name);
         if (index >= 0) {
-            _plugins[index].onClose?.();
-            _plugins.splice(index, 1);
-            notifyListeners();
+            const plugin = _plugins[index];
+            try {
+                plugin.onClose?.();
+            } catch (error) {
+                console.error(`[plugins] ${plugin.name} failed to close`, error);
+            } finally {
+                // A plugin whose onClose threw used to stay registered.
+                _plugins.splice(_plugins.indexOf(plugin), 1);
+                notifyListeners();
+            }
         }
     },
 
@@ -126,8 +133,13 @@ const pluginApi: IOctanePluginApi = {
             const texture = GetRoomEngine().createTextureFromRoom(session.roomId, 1);
             if (!texture) return;
 
-            const imageUrl = await TextureUtils.generateImageUrl(texture);
-            texture.destroy(true);
+            let imageUrl: string = null;
+            try {
+                imageUrl = await TextureUtils.generateImageUrl(texture);
+            } finally {
+                // A whole-room texture: freed even when the image could not be made.
+                texture.destroy(true);
+            }
             if (!imageUrl) return;
 
             // Download the image
