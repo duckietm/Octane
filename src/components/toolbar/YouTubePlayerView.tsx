@@ -1,5 +1,6 @@
 import {
     ControlYoutubeDisplayPlaybackMessageComposer,
+    RoomSessionEvent,
     YouTubeRoomBroadcastEvent,
     YouTubeRoomPlayComposer,
     YouTubeRoomSettingsEvent,
@@ -9,7 +10,7 @@ import {
 import { FC, useEffect, useRef, useState } from 'react';
 import { CopyToClipboard, GetRoomSession, getYoutubeRoomEnabled, LocalizeText, SendMessageComposer, YoutubeVideoPlaybackStateEnum, localizeWithFallback } from '../../api';
 import { LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
-import { useFurnitureYoutubeWidget, useHasPermission, useMessageEvent } from '../../hooks';
+import { useFurnitureYoutubeWidget, useHasPermission, useMessageEvent, useOctaneEvent } from '../../hooks';
 import ReactPlayer from '../youtube/YoutubeReactPlayer';
 import { Checkbox } from '../../common/Checkbox';
 import { Slider } from '../../common/Slider';
@@ -98,6 +99,29 @@ export const YouTubePlayerView: FC<{}> = () => {
             sentWatchingRef.current = false;
         }
     }, [isOpen, hasVideo]);
+
+    // The player belongs to the room: going straight to another room kept the last room's video playing, and its
+    // controls drove the last room's furni. Closing it also sends watching false through the effect above.
+    useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.ENDED, () => {
+        setIsOpen(false);
+        setInputValue('');
+        setBroadcastVideo('');
+        setBroadcastSender('');
+        setBroadcastPlaylist([]);
+        setWatcherIds(new Set());
+    });
+
+    useEffect(
+        () => () => {
+            if (!sentWatchingRef.current) return;
+
+            try {
+                SendMessageComposer(new YouTubeRoomWatchingComposer(false));
+            } catch (e) {}
+            sentWatchingRef.current = false;
+        },
+        []
+    );
 
     const loadRoomUsers = () => {
         try {
