@@ -1621,7 +1621,7 @@
     "campaign.calendar.title": "Calendrier",
     "widget.buildheight.floor": "Au sol",
     "widget.buildheight.lower": "Descendre",
-    "widget.buildheight.raise": "Monter"
+    "widget.buildheight.raise": "Monter",
     "wheel.spins.free": "Tours gratuits aujourd'hui",
     "wheel.spins.extra": "Tours bonus",
     "wheel.prize.credits": "%amount% crédits",
@@ -1631,7 +1631,7 @@
     "wheel.prize.points.name": "points",
     "wheel.prize.spin": "1 tour bonus",
     "wheel.prize.spins": "%amount% tours bonus",
-    "wheel.prize.nothing": "Pas de chance cette fois"
+    "wheel.prize.nothing": "Pas de chance cette fois",
     "avatar.widget.donate_to_all": "Servir tout le monde",
     "avatar.widget.donate_to_user": "Me servir",
     "avatar.widget.nux.proceed": "Continuer",
