@@ -1,5 +1,5 @@
 import { GetStage, OctaneRectangle, RoomObjectType } from '@octane/renderer';
-import { CSSProperties, FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { AddAnimationTickerCallback, FixedSizeStack, GetRoomObjectBounds, GetRoomObjectScreenLocation, GetRoomSession } from '../../../../api';
 import { BaseProps } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
@@ -53,6 +53,14 @@ export const ContextMenuView: FC<ContextMenuViewProps> = ({
     const [isFading, setIsFading] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const elementRef = useRef<HTMLDivElement>(null);
+    // The parent passes onClose inline, a new function each render: keying the fade on it restarted the five
+    // seconds at every parent render.
+    const onCloseRef = useRef(onClose);
+
+    useLayoutEffect(() =>
+    {
+        onCloseRef.current = onClose;
+    });
     const isPointerOverRef = useRef(false);
     const forcePositionUpdateRef = useRef(false);
     const stackRef = useRef<FixedSizeStack>(new FixedSizeStack(LOCATION_STACK_SIZE));
@@ -145,7 +153,7 @@ export const ContextMenuView: FC<ContextMenuViewProps> = ({
 
             if (!roomSession)
             {
-                onClose();
+                onCloseRef.current();
                 return;
             }
 
@@ -155,20 +163,26 @@ export const ContextMenuView: FC<ContextMenuViewProps> = ({
         };
 
         return AddAnimationTickerCallback(update);
-    }, [objectId, category, updatePosition, onClose]);
+    }, [objectId, category, updatePosition]);
 
     useEffect(() =>
     {
         if (!fades) return;
 
+        let closeTimeout: ReturnType<typeof setTimeout> = null;
         const timeout = setTimeout(() =>
         {
             setIsFading(true);
-            setTimeout(onClose, FADE_LENGTH);
+            closeTimeout = setTimeout(() => onCloseRef.current(), FADE_LENGTH);
         }, FADE_DELAY);
 
-        return () => clearTimeout(timeout);
-    }, [fades, onClose]);
+        // The close after the fade used to outlive the bubble and close the one that took its place.
+        return () =>
+        {
+            clearTimeout(timeout);
+            clearTimeout(closeTimeout);
+        };
+    }, [fades]);
 
     useEffect(() =>
     {

@@ -266,7 +266,10 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
                     </Column>
                 )}
                 {nameBubbles.length > 0 &&
-                    nameBubbles.map((name, index) => <AvatarInfoWidgetNameView key={index} nameInfo={name} onClose={() => removeNameBubble(index)} />)}
+                    nameBubbles.map((name) => (
+                        // Keyed by the avatar, not the position: removing one bubble made the next take over its faded instance.
+                        <AvatarInfoWidgetNameView key={name.roomIndex} nameInfo={name} onClose={() => removeNameBubble(nameBubbles.indexOf(name))} />
+                    ))}
                 {productBubbles.length > 0 &&
                     productBubbles.map((item, index) => {
                         return (

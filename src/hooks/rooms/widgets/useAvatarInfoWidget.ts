@@ -80,6 +80,9 @@ const useAvatarInfoWidgetState = () => {
     };
 
     const removeNameBubble = (index: number) => {
+        // A bubble already gone (index -1) must not take the last one with it.
+        if (index < 0) return;
+
         setNameBubbles((prevValue) => {
             const newValue = [...prevValue];
 
