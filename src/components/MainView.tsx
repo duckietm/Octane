@@ -35,6 +35,7 @@ import { GameCenterView } from './game-center/GameCenterView';
 import { UnoView } from './uno/UnoView';
 import { WerewolfView } from './werewolf/WerewolfView';
 import { WobbleView } from './wobble/WobbleView';
+import { BattleBallView } from './battleball/BattleBallView';
 import { SnowWarView } from './game-center/views/snowwar/SnowWarView';
 import { GroupsView } from './groups/GroupsView';
 import { GroupForumView } from './groups/views/forums/GroupForumView';
@@ -254,6 +255,7 @@ export const MainView: FC<{}> = (props) =>
                 <WidgetErrorBoundary name="UnoView"><UnoView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="WerewolfView"><WerewolfView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="WobbleView"><WobbleView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="BattleBallView"><BattleBallView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="FloorplanEditorView"><FloorplanEditorView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="FurniEditorView"><FurniEditorView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="RareValuesView"><RareValuesView /></WidgetErrorBoundary>

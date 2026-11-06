@@ -29,6 +29,11 @@ declare module '*.webp' {
     export default src;
 }
 
+declare module '*.mp3' {
+    const src: string;
+    export default src;
+}
+
 declare module '*.css';
 declare module '*.scss';
 declare module '*.sass';
