@@ -56,7 +56,8 @@ export const CampaignView: FC<{}> = (props) => {
         if (parser.doorOpened) {
             setCalendarData((prev) => {
                 const copy = prev.clone();
-                copy.openedDays.push(lastAttempt);
+                // clone() shares the opened days with the previous state: pushing into it changed that state too.
+                copy.openedDays = [...copy.openedDays, lastAttempt];
 
                 return copy;
             });
