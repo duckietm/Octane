@@ -42,6 +42,7 @@ import { QuizView } from './quiz/QuizView';
 import { SnailRaceView } from './snailrace/SnailRaceView';
 import { TetrisView } from './tetris/TetrisView';
 import { PlongeoirView } from './plongeoir/PlongeoirView';
+import { KartView } from './kart/KartView';
 import { SnowWarView } from './game-center/views/snowwar/SnowWarView';
 import { GroupsView } from './groups/GroupsView';
 import { GroupForumView } from './groups/views/forums/GroupForumView';
@@ -268,6 +269,7 @@ export const MainView: FC<{}> = (props) =>
                 <WidgetErrorBoundary name="QuizView"><QuizView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="TetrisView"><TetrisView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="PlongeoirView"><PlongeoirView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="KartView"><KartView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="FloorplanEditorView"><FloorplanEditorView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="FurniEditorView"><FurniEditorView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="RareValuesView"><RareValuesView /></WidgetErrorBoundary>

@@ -1,0 +1,88 @@
+/* HabboKart: the ground at the hotel's zoom, the hotel's track pieces and furni on it, the players in car effects. */
+
+.kart-world {
+    background: #3f7a24;
+}
+
+.kart-item {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.kart-car {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.kart-car.is-smooth {
+    transition: left 0.2s linear, top 0.2s linear;
+}
+
+.kart-car img {
+    position: absolute;
+    bottom: -24px;
+    left: 0;
+    display: block;
+    max-width: none;
+    image-rendering: pixelated;
+    transform: translateX(-50%);
+}
+
+.kart-car__name {
+    position: absolute;
+    bottom: 64px;
+    left: 0;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #ffffff;
+    font: 700 11px HabboAirUbuntu, sans-serif;
+    white-space: nowrap;
+    transform: translateX(-50%);
+}
+
+.kart-car__name.is-you {
+    background: #b0280f;
+}
+
+.kart-ranking {
+    position: fixed;
+    top: 60px;
+    right: 18px;
+    z-index: 5;
+    display: flex;
+    min-width: 190px;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px;
+    border: 2px solid #6b360d;
+    border-radius: 8px;
+    background: rgba(255, 248, 230, 0.94);
+    color: #3d2108;
+    font: 400 12px HabboAirUbuntu, sans-serif;
+}
+
+.kart-ranking__row {
+    display: flex;
+    gap: 8px;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.kart-ranking__row em {
+    margin-left: auto;
+    color: #6b360d;
+    font-style: normal;
+}
+
+.kart-ranking__row.is-you {
+    background: #ffefc6;
+}
+
+.kart-panel {
+    bottom: 40px;
+}
