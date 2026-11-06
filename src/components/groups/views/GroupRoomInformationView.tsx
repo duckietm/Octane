@@ -12,7 +12,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { GetGroupInformation, GetGroupManager, GroupMembershipType, GroupType, LocalizeText, SendMessageComposer, TryJoinGroup } from '../../../api';
 import groupBaseIcon from '../../../assets/images/groups/swf/group_base_icon.png';
 import { Button, Flex, LayoutBadgeImageView, Text } from '../../../common';
-import { useGroupLeave, useMessageEvent } from '../../../hooks';
+import { useGroupLeave, useMessageEvent, useRoomEnterOnce } from '../../../hooks';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
@@ -76,10 +76,13 @@ export const GroupRoomInformationView: FC<{}> = (props) => {
         resetGroupState();
     });
 
+    const isFirstRoomEnter = useRoomEnterOnce();
+
     useMessageEvent<GetGuestRoomResultEvent>(GetGuestRoomResultEvent, (event) => {
         const parser = event.getParser();
 
-        if (!parser.roomEnter) return;
+        // A room info refresh is not an entry: the group was looked up again at each refresh.
+        if (!parser.roomEnter || !isFirstRoomEnter(parser.data.roomId)) return;
 
         if (parser.data.habboGroupId > 0) {
             setRequestedGroupId(parser.data.habboGroupId);

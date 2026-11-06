@@ -9,7 +9,7 @@ import {
 } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { localizeWithFallback, SendMessageComposer } from '../../../../api';
-import { useMessageEvent, useRoom } from '../../../../hooks';
+import { useMessageEvent, useRoom, useRoomEnterOnce } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
@@ -55,11 +55,14 @@ const SUBMIT_RESULT_MISSING_FURNI = 3;
 export const RoomCompetitionView: FC = () => {
     const [state, setState] = useState<CompetitionState>(null);
     const { roomSession = null } = useRoom();
+    const isFirstRoomEnter = useRoomEnterOnce();
 
     useMessageEvent<GetGuestRoomResultEvent>(GetGuestRoomResultEvent, (event) => {
         const parser = event.getParser();
 
         if (!parser.roomEnter || !roomSession || parser.data.roomId !== roomSession.roomId) return;
+        // A room info refresh is not an entry: it used to reset the competition and ask for it again.
+        if (!isFirstRoomEnter(parser.data.roomId)) return;
 
         setState(null);
         SendMessageComposer(new RoomCompetitionInitMessageComposer());

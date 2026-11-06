@@ -54,6 +54,7 @@ import {
 } from '../../api';
 import { useMessageEvent, useOctaneEvent } from '../events';
 import { useNotification } from '../notification';
+import { useRoomEnterOnce } from '../rooms/useRoomEnterOnce';
 import { useNavigatorFavouritesStore } from './navigatorFavouritesStore';
 import { useNavigatorUiStore } from './navigatorUiStore';
 
@@ -175,6 +176,8 @@ export const useNavigatorStore = () => {
         }, [])
     );
 
+    const isFirstRoomEnter = useRoomEnterOnce();
+
     useMessageEvent<GetGuestRoomResultEvent>(
         GetGuestRoomResultEvent,
         useCallback((event) => {
@@ -187,7 +190,8 @@ export const useNavigatorStore = () => {
                     next.enteredGuestRoom = parser.data;
                     next.currentRoomIsStaffPick = parser.staffPick;
                     const isCreated = next.createdFlatId === parser.data.roomId;
-                    if (!isCreated && parser.data.displayRoomEntryAd) {
+                    // The data refreshes with every answer; the entry ad opens on the entry only, not on each refresh.
+                    if (!isCreated && parser.data.displayRoomEntryAd && isFirstRoomEnter(parser.data.roomId)) {
                         if (GetConfigurationValue<boolean>('roomenterad.habblet.enabled', false)) HabboWebTools.openRoomEnterAd();
                     }
                     next.createdFlatId = 0;
@@ -217,7 +221,7 @@ export const useNavigatorStore = () => {
                 enteredGuestRoom: parser.data,
                 currentRoomIsStaffPick: parser.staffPick
             }));
-        }, [])
+        }, [isFirstRoomEnter])
     );
 
     useMessageEvent<RoomScoreEvent>(
