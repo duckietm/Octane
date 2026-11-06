@@ -106,7 +106,13 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
         const prevValue = latestRoomData.current;
         if (!prevValue) return;
 
-        const newValue = { ...prevValue };
+        // The nested settings are copied too: writing into them changed the previous state, so a VIP chat tab keyed
+        // on chatSettings never saw the change and a refused save had nothing to go back to.
+        const newValue = {
+            ...prevValue,
+            chatSettings: { ...prevValue.chatSettings },
+            moderationSettings: { ...prevValue.moderationSettings }
+        };
 
         switch (field) {
             case 'name':

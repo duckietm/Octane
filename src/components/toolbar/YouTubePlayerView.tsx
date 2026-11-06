@@ -31,7 +31,30 @@ const extractVideoId = (input: string): string => {
         const match = input.match(pattern);
         if (match) return match[1];
     }
-    return input;
+    // Text that is no video id used to become one: it went into the history, the playlist and the room play packet.
+    return '';
+};
+
+const VIDEO_ID = /^[a-zA-Z0-9_-]{11}$/;
+
+/** A stored list of video ids; storage that is blocked, full or holds something else gives an empty list. */
+const readStoredIds = (key: string): string[] => {
+    try {
+        const parsed: unknown = JSON.parse(localStorage.getItem(key) ?? '[]');
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+            .map((entry: unknown) => (typeof entry === 'string' ? entry : (entry as { id?: unknown })?.id))
+            .filter((id): id is string => typeof id === 'string' && VIDEO_ID.test(id));
+    } catch {
+        return [];
+    }
+};
+
+/** Storage that is blocked or full must not take the toolbar down with it. */
+const writeStoredIds = (key: string, ids: string[]) => {
+    try {
+        localStorage.setItem(key, JSON.stringify(ids));
+    } catch {}
 };
 
 export const YouTubePlayerView: FC<{}> = () => {
@@ -167,32 +190,16 @@ export const YouTubePlayerView: FC<{}> = () => {
     }, []);
 
     useEffect(() => {
-        const savedHistory = localStorage.getItem('youtube_history');
-        if (savedHistory) {
-            try {
-                const parsed = JSON.parse(savedHistory);
-                if (Array.isArray(parsed)) {
-                    setHistory(parsed.map((entry: any) => (typeof entry === 'string' ? entry : entry?.id)).filter(Boolean));
-                }
-            } catch (e) {}
-        }
-        const savedPlaylist = localStorage.getItem('youtube_playlist');
-        if (savedPlaylist) {
-            try {
-                const parsed = JSON.parse(savedPlaylist);
-                if (Array.isArray(parsed)) {
-                    setPlaylist(parsed.map((entry: any) => (typeof entry === 'string' ? entry : entry?.id)).filter(Boolean));
-                }
-            } catch (e) {}
-        }
+        setHistory(readStoredIds('youtube_history'));
+        setPlaylist(readStoredIds('youtube_playlist'));
     }, []);
 
     useEffect(() => {
-        localStorage.setItem('youtube_history', JSON.stringify(history.slice(0, 50)));
+        writeStoredIds('youtube_history', history.slice(0, 50));
     }, [history]);
 
     useEffect(() => {
-        localStorage.setItem('youtube_playlist', JSON.stringify(playlist));
+        writeStoredIds('youtube_playlist', playlist);
     }, [playlist]);
 
     const addToHistory = (id: string) => {

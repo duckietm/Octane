@@ -19,6 +19,7 @@ import { useDraggableLoginWindow } from './hooks/useDraggableLoginWindow';
 import { RegistrationAvatarWardrobe } from './components/RegistrationAvatarWardrobe';
 import { TurnstileWidget } from './TurnstileWidget';
 import { t, tOrServer } from './utils/i18n';
+import { LOCK_DURATION_MS, LOCK_WINDOW_MS, MAX_ATTEMPTS, readLock, writeLock } from './utils/lockState';
 import { clearRegistrationDraft, loadRegistrationDraft, saveRegistrationDraft } from './utils/registrationDraft';
 import { Checkbox } from '../../common/Checkbox';
 import { Radio } from '../../common/Radio';
@@ -62,11 +63,7 @@ const interpolate = (value: string | null | undefined): string => {
     });
 };
 
-const LOCK_KEY = 'nitro.login.lock';
 const CHAT_TRANSLATION_SETTINGS_KEY = 'chatTranslationSettings';
-const MAX_ATTEMPTS = 5;
-const LOCK_WINDOW_MS = 60_000;
-const LOCK_DURATION_MS = 2 * 60_000;
 const getDefaultLoginImages = (): Record<string, string> => {
     const imagesBase = (GetConfigurationValue<string>('images.url', '') || '').replace(/\/$/, '');
 
@@ -89,24 +86,6 @@ const LOGIN_LOCALES: LoginLocale[] = [
     { code: 'de', file: 'de', label: 'Deutsch', flag: flagDe },
     { code: 'ar', file: 'ar', label: 'العربية', flag: flagAr }
 ];
-
-type AttemptState = { attempts: number; firstAt: number; lockedUntil: number };
-
-const readLock = (): AttemptState => {
-    try {
-        const raw = sessionStorage.getItem(LOCK_KEY);
-        if (!raw) return { attempts: 0, firstAt: 0, lockedUntil: 0 };
-        return JSON.parse(raw);
-    } catch {
-        return { attempts: 0, firstAt: 0, lockedUntil: 0 };
-    }
-};
-
-const writeLock = (state: AttemptState) => {
-    try {
-        sessionStorage.setItem(LOCK_KEY, JSON.stringify(state));
-    } catch {}
-};
 
 const normalizeLanguageCode = (value: string): string => {
     if (!value) return '';

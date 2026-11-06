@@ -8,6 +8,20 @@ interface NotificationDefaultAlertViewProps extends LayoutNotificationAlertViewP
     item: NotificationAlertItem;
 }
 
+/**
+ * The search alert's results, sent as a JSON array of strings. A message that was not one threw inside render,
+ * and the error boundary around the right side of the screen then hid every later alert for the session.
+ */
+export const parseSearchResults = (message: string): string[] => {
+    try {
+        const parsed: unknown = JSON.parse(message);
+
+        return Array.isArray(parsed) ? parsed.filter((value): value is string => typeof value === 'string') : [];
+    } catch {
+        return [];
+    }
+};
+
 export const NotificationSeachAlertView: FC<NotificationDefaultAlertViewProps> = (props) => {
     const { item = null, title = (props.item && props.item.title) || '', onClose = null, ...rest } = props;
 
@@ -21,14 +35,12 @@ export const NotificationSeachAlertView: FC<NotificationDefaultAlertViewProps> =
     };
 
     const updateSearchValue = (value: string) => {
-        let res = JSON.parse(item.messages[0]);
-
-        setResults(res.filter((val: string) => val.includes(value)));
+        setResults(parseSearchResults(item.messages[0]).filter((val) => val.includes(value)));
         setSearchValue(value);
     };
 
     useEffect(() => {
-        setResults(JSON.parse(item.messages[0]));
+        setResults(parseSearchResults(item.messages[0]));
     }, [item]);
 
     const isAction = item.clickUrl && item.clickUrl.startsWith('event:');
