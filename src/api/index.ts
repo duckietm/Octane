@@ -37,6 +37,7 @@ export * from './talent';
 export * from './ui-settings';
 export * from './uno/UnoApi';
 export * from './werewolf/WerewolfApi';
+export * from './wobble/WobbleApi';
 export * from './user';
 export * from './utils';
 export * from './wired';

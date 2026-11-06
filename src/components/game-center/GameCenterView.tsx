@@ -6,6 +6,7 @@ import { GameStageView } from './views/GameStageView';
 import { GameTileView } from './views/GameTileView';
 import { UnoGameTileView } from './views/UnoGameTileView';
 import { WerewolfGameTileView } from './views/WerewolfGameTileView';
+import { WobbleGameTileView } from './views/WobbleGameTileView';
 import { SnowWarInstructionsView } from './views/snowwar/SnowWarInstructionsView';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
@@ -68,6 +69,7 @@ export const GameCenterView = () => {
                             {games.map((game) => <GameTileView key={game.gameId} game={game} />)}
                             {GetConfigurationValue<boolean>('uno.enabled', true) && <UnoGameTileView onOpen={() => setIsVisible(false)} />}
                             {GetConfigurationValue<boolean>('werewolf.enabled', true) && <WerewolfGameTileView onOpen={() => setIsVisible(false)} />}
+                            {GetConfigurationValue<boolean>('wobble.enabled', true) && <WobbleGameTileView onOpen={() => setIsVisible(false)} />}
                         </div>
                     )}
                 <GameStageView />

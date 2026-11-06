@@ -45,8 +45,17 @@ export const useUnoAvatar = (figure: string, gender: string, direction: number, 
             avatar.appendAction(AvatarAction.POSTURE, posture);
             avatar.endActionAppends();
 
-            const image = avatar.processAsImageUrl(AvatarSetType.FULL);
-            const placeholder = avatar.isPlaceholder();
+            let image: string = null;
+            let placeholder = false;
+
+            try {
+                image = avatar.processAsImageUrl(AvatarSetType.FULL);
+                placeholder = avatar.isPlaceholder();
+            } catch {
+                // A pose the renderer cannot draw for this look: nothing rather than a crash.
+                image = null;
+                retries = RETRY_MAX;
+            }
 
             avatar.dispose();
 
