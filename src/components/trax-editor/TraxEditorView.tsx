@@ -3,7 +3,7 @@ import { FC, MouseEvent, PointerEvent, ReactNode, useCallback, useEffect, useRef
 import { GetDiskColor, localizeWithFallback } from '../../api';
 import { GetTraxCartridgeUrl } from '../../assets/images/trax';
 import { Button, Column, Flex, LayoutCurrencyIcon, Text } from '../../common';
-import { useOctaneEvent, usePurse, useTraxEditor, useTraxSongRequests } from '../../hooks';
+import { useNotification, useOctaneEvent, usePurse, useTraxEditor, useTraxSongRequests } from '../../hooks';
 import { OctaneCard, OctaneInput } from '../../layout';
 import { CreateEmptyChannels, ITraxPlacement, ParseTraxSong, SerializeTraxSong, TRAX_CHANNEL_COUNT, TRAX_DEFAULT_UNITS, TRAX_MAX_UNITS, TRAX_MIN_UNITS, TraxChannels } from './TraxSongData';
 import { GetTraxSampleId, GetTraxSoundSetForSample, TraxSoundSets } from './TraxSoundSets';
@@ -77,6 +77,7 @@ export const TraxEditorView: FC<{}> = () =>
     const [playheadUnit, setPlayheadUnit] = useState(0);
     const { songs, maxSongs, costCurrency, costAmount, lastError, errorCount, loaded, requestSongs, buySong, saveSong, deleteSong, clearError } = useTraxEditor();
     const { getCurrencyAmount } = usePurse();
+    const { showConfirm = null } = useNotification();
 
     const canAfford = costAmount <= 0 || getCurrencyAmount(costCurrency) >= costAmount;
 
@@ -454,10 +455,23 @@ export const TraxEditorView: FC<{}> = () =>
     {
         if (editingSongId < 0) return;
 
-        stopPreview();
-        deleteSong(editingSongId);
-        setEditingSongId(-1);
-    }, [editingSongId, deleteSong, stopPreview]);
+        const songId = editingSongId;
+
+        // A paid song went with a single click on the bin.
+        showConfirm(
+            localizeWithFallback('trax.editor.delete.confirm', 'Delete this song? It cannot be undone.'),
+            () =>
+            {
+                stopPreview();
+                deleteSong(songId);
+                setEditingSongId((current) => (current === songId ? -1 : current));
+            },
+            null,
+            null,
+            null,
+            localizeWithFallback('trax.editor.delete', 'Delete')
+        );
+    }, [editingSongId, deleteSong, stopPreview, showConfirm]);
 
     const buyNewSong = useCallback(() =>
     {
