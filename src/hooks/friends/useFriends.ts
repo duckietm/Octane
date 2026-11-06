@@ -257,6 +257,12 @@ const useFriendsStore = () => {
 
         setSettings((previous) => withUpdatedFriendCategories(previous, parser.categories));
 
+        // A request is settled once its user joins or leaves the list: keeping the id hid "Add friend" for that user
+        // for the rest of the session, even after the friendship ended.
+        const settledIds = new Set<number>([...parser.addedFriends.map((friend) => friend.id), ...parser.removedFriendIds]);
+
+        if (settledIds.size) setSentRequests((prevValue) => prevValue.filter((userId) => !settledIds.has(userId)));
+
         setFriends((prevValue) => {
             const newValue = [...prevValue];
 
@@ -372,6 +378,7 @@ const useFriendsStore = () => {
         friendsRef.current = [];
         setFriends([]);
         setRequests([]);
+        setSentRequests([]);
         setOfflineMessagesReady(false);
         SendMessageComposer(new MessengerInitComposer());
     });
