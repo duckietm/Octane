@@ -1621,7 +1621,7 @@
     "campaign.calendar.title": "التقويم",
     "widget.buildheight.floor": "مستوى الأرض",
     "widget.buildheight.lower": "خفض",
-    "widget.buildheight.raise": "رفع"
+    "widget.buildheight.raise": "رفع",
     "wheel.spins.free": "لفات مجانية اليوم",
     "wheel.spins.extra": "لفات إضافية",
     "wheel.prize.credits": "%amount% كريدت",
@@ -1631,7 +1631,7 @@
     "wheel.prize.points.name": "نقاط",
     "wheel.prize.spin": "لفة إضافية واحدة",
     "wheel.prize.spins": "%amount% لفات إضافية",
-    "wheel.prize.nothing": "لا حظ هذه المرة"
+    "wheel.prize.nothing": "لا حظ هذه المرة",
     "avatar.widget.donate_to_all": "خدمة الجميع",
     "avatar.widget.donate_to_user": "اخدمني",
     "avatar.widget.nux.proceed": "متابعة",
