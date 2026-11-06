@@ -1,12 +1,11 @@
 import { IWheelAdminPrize, IWheelAdminPrizeEdit } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText } from '../../api';
-import { Column, Flex, Text } from '../../common';
+import { Button, Column, Flex, Text } from '../../common';
 import { useFortuneWheel } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { Select } from '../../common/Select';
 import { NumberInput } from '../../common/NumberInput';
-import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
@@ -143,13 +142,9 @@ export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ on
                                         className="min-w-0 grow rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]"
                                     />
                                     <Hint content={LocalizeText('rarevalues.editor.remove')}>
-                                        <BaseButton aria-label={LocalizeText('rarevalues.editor.remove')}
-                                            type="button"
-                                            onClick={() => removeRow(row.id)}
-                                            className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded bg-[#d9534f] font-bold leading-none text-white hover:bg-[#c44440]"
-                                        >
-                                            ×
-                                        </BaseButton>
+                                        <Button variant="danger" aria-label={LocalizeText('rarevalues.editor.remove')} onClick={() => removeRow(row.id)} classNames={['w-6 shrink-0 px-0!']}>
+                                            X
+                                        </Button>
                                     </Hint>
                                 </Flex>
                             ))}
@@ -159,22 +154,12 @@ export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ on
                                 </Text>
                             )}
                         </Column>
-                        <BaseButton
-                            type="button"
-                            disabled={editRows.length >= 64}
-                            onClick={addRow}
-                            className="cursor-pointer rounded border border-dashed border-[#3a7bb5] px-4 py-1.5 text-sm font-bold text-[#3a7bb5] hover:bg-[#3a7bb5]/10 disabled:cursor-default disabled:opacity-40"
-                        >
+                        <Button variant="secondary" disabled={editRows.length >= 64} onClick={addRow}>
                             {LocalizeText('rarevalues.editor.add')}
-                        </BaseButton>
-                        <BaseButton
-                            type="button"
-                            disabled={!editRows.length}
-                            onClick={() => saveAdminPrizes?.(editRows.map(rowToEdit))}
-                            className="cursor-pointer rounded bg-[#3a7bb5] px-4 py-2 font-bold text-white hover:bg-[#336ea3] disabled:cursor-default disabled:opacity-40"
-                        >
+                        </Button>
+                        <Button variant="primary" disabled={!editRows.length} onClick={() => saveAdminPrizes?.(editRows.map(rowToEdit))}>
                             {LocalizeText('rarevalues.editor.save')}
-                        </BaseButton>
+                        </Button>
                     </Column>
                 </OctaneCard.Content>
             </OctaneCard>
