@@ -12,6 +12,7 @@ import { FastFoodGameTileView } from './views/FastFoodGameTileView';
 import { HallGameTileView } from './views/HallGameTileView';
 import { SnailGameTileView } from './views/SnailGameTileView';
 import { QuizGameTileView } from './views/QuizGameTileView';
+import { TetrisGameTileView } from './views/TetrisGameTileView';
 import { SnowWarInstructionsView } from './views/snowwar/SnowWarInstructionsView';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
@@ -80,6 +81,7 @@ export const GameCenterView = () => {
                             {GetConfigurationValue<boolean>('hall.enabled', true) && <HallGameTileView onOpen={() => setIsVisible(false)} />}
                             {GetConfigurationValue<boolean>('hall.enabled', true) && <SnailGameTileView onOpen={() => setIsVisible(false)} />}
                             {GetConfigurationValue<boolean>('hall.enabled', true) && <QuizGameTileView onOpen={() => setIsVisible(false)} />}
+                            {GetConfigurationValue<boolean>('hall.enabled', true) && <TetrisGameTileView onOpen={() => setIsVisible(false)} />}
                         </div>
                     )}
                 <GameStageView />

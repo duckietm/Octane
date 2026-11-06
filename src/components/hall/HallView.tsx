@@ -7,6 +7,7 @@ import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import bannerImage from '../../assets/images/hall/hall-banner.png';
 import { useUnoAvatar } from '../uno/useUnoAvatar';
 import { BattleshipsBoard, ChessBoard, ConnectFourBoard, HallSprite, PokerBoard, QuizBoard, SnailBoard, TicTacToeBoard } from './HallBoards';
+import { TetrisBoard } from './TetrisBoard';
 import '../../css/hall/HallView.css';
 
 const POLL_TABLE_MS = 1000;
@@ -20,6 +21,7 @@ const RULES: Record<HallGameName, string> = {
     chess: 'The real rules of chess: castling, en passant, promotion. Checkmate the other king to win; white begins.',
     poker: 'Five-card draw with two jokers: change the cards you like once, then the best hand wins.',
     quiz: 'Ten questions on the hotel and the world, four answers each: answer right and fast to score the most points!',
+    tetris: 'Everyone plays their own Tetris. Clear two lines or more at once to send rubbish to the others: the last one standing wins! Arrows to move and turn, space to drop, C to hold.',
     snails: 'Each player has a snail. They crawl on their own, nap now and then or get a burst of energy: cheer yours on (space) to give it a boost. The first across the line wins!'
 };
 
@@ -43,7 +45,7 @@ const Players: FC<{ table: IHallTable }> = ({ table }) => (
                     <PlayerHead player={player} />
                     <span className="hall-player__info" data-browser-text>
                         <strong>{player.name}{player.bot ? ` (${hallt('robot', 'robot')})` : ''}</strong>
-                        <span>{hallt('wins', '%n% won', [ 'n' ], [ String(player.wins) ])}{player.waiting && player.timeLeft >= 0 && table.game !== 'snails' && table.game !== 'quiz' ? ` · ${Math.ceil(player.timeLeft / 1000)} s` : ''}</span>
+                        <span>{hallt('wins', '%n% won', [ 'n' ], [ String(player.wins) ])}{player.waiting && player.timeLeft >= 0 && table.game !== 'snails' && table.game !== 'quiz' && table.game !== 'tetris' ? ` · ${Math.ceil(player.timeLeft / 1000)} s` : ''}</span>
                     </span>
                     {mark && <HallSprite name={mark} scale={mark.startsWith('TicTac') ? 2 : 1} className="is-static hall-player__mark" />}
                 </div>
@@ -71,6 +73,7 @@ const statusText = (table: IHallTable): string => {
     if (table.state === 'finished') return resultText(table);
     if (table.game === 'chess' && board.ending === '' && board.check) return board.turn === table.you ? hallt('chess.you_check', 'Check! Protect your king.') : hallt('chess.check', 'Check!');
     if (table.game === 'quiz') return board.phase === 'reveal' ? hallt('quiz.answer', 'The answer!') : table.players[table.you]?.waiting ? hallt('quiz.your_turn', 'Your answer?') : hallt('quiz.wait', 'Waiting for the others...');
+    if (table.game === 'tetris') return Number(board.startsIn ?? 0) > 0 ? hallt('tetris.starting', 'Get ready...') : table.players[table.you]?.waiting ? hallt('tetris.playing', 'Clear lines to send rubbish to the others!') : hallt('tetris.watching', 'You are out: watch the others!');
     if (table.game === 'snails') return Number(board.startsIn ?? 0) > 0 ? hallt('snails.starting', 'On your marks...') : hallt('snails.racing', 'They are off!');
     if (board.turn === -1) return table.players[table.you]?.waiting ? hallt('your_move_all', 'Your move!') : hallt('wait_others', 'Waiting for the others...');
 
@@ -95,7 +98,7 @@ export const HallView: FC = () => {
 
     const table = view?.table;
     const current = (table?.game ?? game) as HallGameName;
-    const racing = (table?.game === 'snails' || table?.game === 'quiz') && table.state === 'playing';
+    const racing = (table?.game === 'snails' || table?.game === 'quiz' || table?.game === 'tetris') && table.state === 'playing';
     const receivedRef = useRef(0);
     const [ tick, setTick ] = useState(0);
 
@@ -225,6 +228,7 @@ export const HallView: FC = () => {
                                 {table.game === 'chess' && <ChessBoard board={board} you={table.you} myTurn={myTurn} play={play} />}
                                 {table.game === 'poker' && <PokerBoard key={table.round} board={board} table={table} play={play} />}
                                 {table.game === 'snails' && <SnailBoard board={board} table={table} play={play} tick={tick} />}
+                                {table.game === 'tetris' && <TetrisBoard key={table.round} board={board} table={table} onView={setView} />}
                                 {table.game === 'quiz' && <QuizBoard board={board} table={table} play={play} now={performance.now() - receivedRef.current} />}
                             </div>
                         )}
