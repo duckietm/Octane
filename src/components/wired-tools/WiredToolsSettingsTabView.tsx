@@ -158,7 +158,7 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
                             {localizeWithFallback('wiredmenu.settings.room_settings.timezone', 'Timezone:')}
                         </Text>
                         <Select
-                            aria-label="Timezone"
+                            aria-label={localizeWithFallback('octane.wired_tools.timezone', 'Timezone')}
                             className="w-full rounded border border-[#9d998e] bg-[#f4f0e8] px-2 py-[6px] text-[12px] text-[#555] disabled:opacity-70"
                             disabled={!roomSettings.isLoaded || !canManageSettings}
                             value={selectedTimeZone}

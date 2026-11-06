@@ -97,7 +97,7 @@ export const UserInfoPanel: FC<UserInfoPanelProps> = ({ userId, settings, onOpen
                             {countRow('trading_lock_count_txt', data.tradingLockCount, 'view_trading_lock_count_txt', () => OpenModeratorActionLog(data.userName))}
                             <Native0Text text={data.tradingExpiryDate || caption('trading_lock_expiry_txt')} width={at('trading_lock_expiry_txt').width} x={at('trading_lock_expiry_txt').x} y={at('trading_lock_expiry_txt').y} />
                             <Native0Text text={formatTime(data.minutesSinceLastLogin * 60)} width={at('last_login_txt').width} x={at('last_login_txt').x} y={at('last_login_txt').y} />
-                            <Native0Text text={roomUser ? 'Yes (in room)' : data.online ? 'Yes' : 'No'} width={at('online_txt').width + 30} x={at('online_txt').x} y={at('online_txt').y} />
+                            <Native0Text text={roomUser ? localizeWithFallback('octane.mod_tools.yes_in_room', 'Yes (in room)') : data.online ? 'Yes' : 'No'} width={at('online_txt').width + 30} x={at('online_txt').x} y={at('online_txt').y} />
                             <Native0Text text={data.lastPurchaseDate || 'No purchases'} width={at('last_purchase_txt').width} x={at('last_purchase_txt').x} y={at('last_purchase_txt').y} />
                             <Native0Text text={data.primaryEmailAddress || 'No email found'} width={at('email_address_txt').width} x={at('email_address_txt').x} y={at('email_address_txt').y} />
                             <Native0Text text={`${data.identityRelatedBanCount}`} width={at('id_bans_txt').width} x={at('id_bans_txt').x} y={at('id_bans_txt').y} />

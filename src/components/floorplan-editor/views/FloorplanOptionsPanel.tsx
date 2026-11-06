@@ -1,6 +1,6 @@
 import { Dispatch, FC } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { LocalizeText } from '../../../api';
+import { LocalizeText, localizeWithFallback } from '../../../api';
 import { localizeOr } from '../state/localize';
 import { Base, LayoutAvatarImageView } from '../../../common';
 import { useUserDataSnapshot } from '../../../hooks/session/useSessionSnapshots';
@@ -38,20 +38,20 @@ export const FloorplanOptionsPanel: FC<Props> = ({ state, dispatch }) => {
                     {/* AIR enterdirection_container: left turns the ghost avatar one step up (entryPointDir++), right one
                         step back; the avatar in the middle faces the door direction. */}
                     <div className="fp-orientation">
-                        <Base component={BaseButton} type="button" data-testid="entry-dir-prev" pointer title="Rotate left" className="fp-orientation-step" onClick={() => setDir(rotateDir(state.door.dir, 1))}>
+                        <Base component={BaseButton} type="button" data-testid="entry-dir-prev" pointer title={localizeWithFallback('octane.floorplan_editor.rotate_left', 'Rotate left')} className="fp-orientation-step" onClick={() => setDir(rotateDir(state.door.dir, 1))}>
                             <FaChevronLeft size={11} />
                         </Base>
                         <Base component={BaseButton} type="button"
                             data-testid="entry-dir"
                             data-dir={state.door.dir}
                             pointer
-                            title={`Direction ${state.door.dir}/7 (click to rotate)`}
+                            title={localizeWithFallback('octane.floorplan_editor.direction_dir_7_click_to_rotate', 'Direction %dir%/7 (click to rotate)', ['dir'], [String(state.door.dir)])}
                             className="fp-orientation-avatar"
                             onClick={() => setDir(rotateDir(state.door.dir, 1))}
                         >
                             <LayoutAvatarImageView figure={figure || GHOST_FIGURE} gender={gender || 'M'} direction={state.door.dir} fit small />
                         </Base>
-                        <Base component={BaseButton} type="button" data-testid="entry-dir-next" pointer title="Rotate right" className="fp-orientation-step" onClick={() => setDir(rotateDir(state.door.dir, -1))}>
+                        <Base component={BaseButton} type="button" data-testid="entry-dir-next" pointer title={localizeWithFallback('octane.floorplan_editor.rotate_right', 'Rotate right')} className="fp-orientation-step" onClick={() => setDir(rotateDir(state.door.dir, -1))}>
                             <FaChevronRight size={11} />
                         </Base>
                     </div>
@@ -88,17 +88,17 @@ const ThicknessStepper: FC<StepperProps> = ({ value, onChange, testIdPrefix, lab
                     {label}
                 </BaseButton>
                 <div className="fp-select-arrows">
-                    <Hint content="Thicker"><BaseButton
+                    <Hint content={localizeWithFallback('octane.floorplan_editor.thicker', 'Thicker')}><BaseButton
                         aria-disabled={thicker === null}
-                        aria-label="Thicker"
+                        aria-label={localizeWithFallback('octane.floorplan_editor.thicker', 'Thicker')}
                         data-testid={`${testIdPrefix}-up`}
                         className={`fp-select-arrow is-up ${thicker === null ? 'is-disabled' : ''}`}
                         type="button"
                         onClick={() => thicker !== null && onChange(thicker)}
                     /></Hint>
-                    <Hint content="Thinner"><BaseButton
+                    <Hint content={localizeWithFallback('octane.floorplan_editor.thinner', 'Thinner')}><BaseButton
                         aria-disabled={thinner === null}
-                        aria-label="Thinner"
+                        aria-label={localizeWithFallback('octane.floorplan_editor.thinner', 'Thinner')}
                         data-testid={`${testIdPrefix}-down`}
                         className={`fp-select-arrow is-down ${thinner === null ? 'is-disabled' : ''}`}
                         type="button"

@@ -1,3 +1,4 @@
+import { localizeWithFallback } from '../utils/localizeWithFallback';
 /**
  * Client for the Variables Web API (`/api/public/rooms/{roomId}/...`, see docs/wired/web-api.md), which
  * speaks Habbo's Wired Variables API: the read key in `X-Wired-Read-Key`, the write key in
@@ -289,7 +290,7 @@ export const createVariablesWebApiClient = (options: VariablesWebApiClientOption
         if (blockedUntil > current) {
             const seconds = Math.ceil((blockedUntil - current) / 1000);
 
-            throw new VariablesWebApiError(429, 'wired.variables.too_many_requests', 'Too many requests', seconds);
+            throw new VariablesWebApiError(429, 'wired.variables.too_many_requests', localizeWithFallback('octane.wired.too_many_requests', 'Too many requests'), seconds);
         }
 
         const key = keyHeader(requestOptions.key);
@@ -321,9 +322,9 @@ export const createVariablesWebApiClient = (options: VariablesWebApiClientOption
                 referrerPolicy: 'no-referrer'
             });
         } catch (error) {
-            if (controller.signal.aborted) throw new VariablesWebApiError(0, 'timeout', 'The request timed out');
+            if (controller.signal.aborted) throw new VariablesWebApiError(0, 'timeout', localizeWithFallback('octane.wired.the_request_timed_out', 'The request timed out'));
 
-            throw new VariablesWebApiError(0, 'network', error instanceof Error && error.message ? error.message : 'Network error');
+            throw new VariablesWebApiError(0, 'network', error instanceof Error && error.message ? error.message : localizeWithFallback('octane.wired.network_error', 'Network error'));
         } finally {
             clearTimeout(timer);
         }
@@ -351,7 +352,7 @@ export const createVariablesWebApiClient = (options: VariablesWebApiClientOption
         try {
             return (await response.json()) as T;
         } catch {
-            throw new VariablesWebApiError(response.status, 'invalid_response', 'The server sent an unreadable response');
+            throw new VariablesWebApiError(response.status, 'invalid_response', localizeWithFallback('octane.wired.the_server_sent_an_unreadable_response', 'The server sent an unreadable response'));
         }
     };
 

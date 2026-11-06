@@ -94,7 +94,7 @@ const SeasonalArrow: FC<{ direction: 'back' | 'next'; active: boolean; onStep: (
             <BaseButton
                 type="button"
                 className={`octane-seasonal-arrow octane-seasonal-arrow-${direction}${pressed ? ' octane-seasonal-arrow-pressed' : ''}`}
-                aria-label={direction === 'back' ? 'Previous days' : 'Next days'}
+                aria-label={direction === 'back' ? localizeWithFallback('octane.quests.previous_days', 'Previous days') : localizeWithFallback('octane.quests.next_days', 'Next days')}
                 disabled={!active}
                 onPointerDown={onPointerDown}
                 onPointerUp={stop}

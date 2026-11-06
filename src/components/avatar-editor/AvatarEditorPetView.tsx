@@ -1,6 +1,6 @@
 import { AvatarFigurePartType } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AvatarEditorThumbnailsHelper, CreateLinkEvent, GetClubMemberLevel, IAvatarEditorCategory, IAvatarEditorCategoryPartItem } from '../../api';
+import { AvatarEditorThumbnailsHelper, CreateLinkEvent, GetClubMemberLevel, IAvatarEditorCategory, IAvatarEditorCategoryPartItem, localizeWithFallback } from '../../api';
 import { LayoutCurrencyIcon } from '../../common';
 import { useAvatarEditor } from '../../hooks';
 import { AvatarEditorIcon } from './AvatarEditorIcon';
@@ -78,7 +78,7 @@ export const AvatarEditorPetView: FC<{
     }, [selectEditorPart]);
 
     if (!petCategory || !petCategory.partItems || !petCategory.partItems.length) {
-        return <div className="octane-avatar-editor-empty-state">No companion pets available.</div>;
+        return <div className="octane-avatar-editor-empty-state">{localizeWithFallback('octane.avatar_editor.no_companion_pets_available', 'No companion pets available.')}</div>;
     }
 
     return (
@@ -90,9 +90,9 @@ export const AvatarEditorPetView: FC<{
                     </ToggleButton>
                     <div className="octane-avatar-editor-pet-equipped">
                         {selectedPartItem && slotThumbUrl ? <img src={slotThumbUrl} alt="" draggable={false} /> : <AvatarEditorIcon icon="pt" />}
-                        <span>{selectedPartItem ? 'Companion equipped' : 'No companion selected'}</span>
+                        <span>{selectedPartItem ? localizeWithFallback('octane.avatar_editor.companion_equipped', 'Companion equipped') : localizeWithFallback('octane.avatar_editor.no_companion_selected', 'No companion selected')}</span>
                         {selectedPartItem && (
-                            <BaseButton type="button" className="octane-avatar-editor-pet-remove" aria-label="Remove companion" onClick={removePet}>
+                            <BaseButton type="button" className="octane-avatar-editor-pet-remove" aria-label={localizeWithFallback('octane.avatar_editor.remove_companion', 'Remove companion')} onClick={removePet}>
                                 <AvatarEditorIcon icon="clear" />
                             </BaseButton>
                         )}
@@ -110,7 +110,7 @@ export const AvatarEditorPetView: FC<{
                             className={`octane-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
                             onClick={() => (hasHC ? setAdvancedColorMode((prev) => !prev) : CreateLinkEvent('habboUI/open/hccenter'))}
                         >
-                            Advanced Color
+                            {localizeWithFallback('octane.avatar_editor.advanced_color', 'Advanced Color')}
                             <LayoutCurrencyIcon type="hc" />
                         </BaseButton>
                         <div className={`octane-avatar-editor-palettes${maxPaletteCount === 2 ? ' dual-palette' : ''}`}>

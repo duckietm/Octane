@@ -6,27 +6,29 @@ import { LocalizeText, localizeWithFallback } from '../utils';
 
 export const QUEST_TIMER_IMAGE = 'quest_timer_questionmark';
 
-/** The prompt-animated quests of the official client (their image carries an `_a` suffix). */
-export const QUESTS_WITH_PROMPTS = ['MOVEITEM', 'ENTEROTHERSROOM', 'CHANGEFIGURE', 'FINDLIFEGUARDTOWER', 'SCRATCHAPET'];
-
-/** `${image.library.questing.url}` with the generic image library as fallback. */
+/**
+ * `${image.library.questing.url}`, or the `Quests/` folder of the image library, where the official
+ * gamedata keeps the quest and campaign images (`c_images/Quests/explore_findjukebox.png`).
+ */
 export const getQuestingImageBaseUrl = (): string => {
     const configured = GetConfigurationValue<string>('image.library.questing.url', '');
 
     if (configured && configured.length) return configured;
 
-    return `${GetConfigurationValue<string>('image.library.url', '')}questing/`;
+    return `${GetConfigurationValue<string>('image.library.url', '')}Quests/`;
 };
 
 export const getQuestingImageUrl = (name: string): string => `${getQuestingImageBaseUrl()}${name}.png`;
 
-/** `<campaign>_<code><imageVersion>[_a]`, lower-cased, or the hourglass while the quest waits. */
+/**
+ * `<campaign>_<code><imageVersion>`, lower-cased, or the hourglass while the quest waits. The quests
+ * the official client animates (MOVEITEM, ENTEROTHERSROOM...) use the same image: the gamedata has
+ * no `_a` variant of them.
+ */
 export const getQuestImageName = (campaignCode: string, localizationCode: string, imageVersion: string, waiting: boolean = false): string => {
     if (waiting) return QUEST_TIMER_IMAGE;
 
-    const prompt = QUESTS_WITH_PROMPTS.includes((localizationCode || '').toUpperCase()) ? '_a' : '';
-
-    return `${campaignCode}_${localizationCode}${imageVersion || ''}${prompt}`.toLowerCase();
+    return `${campaignCode}_${localizationCode}${imageVersion || ''}`.toLowerCase();
 };
 
 export const getQuestImageUrl = (quest: QuestMessageData, waiting: boolean = quest.waitPeriodSeconds > 0): string =>
@@ -247,21 +249,21 @@ export const getRewardTrackTaskHintLink = (actionType: string, configuredLink: s
     switch ((actionType || '').toLowerCase()) {
         case 'enter_other_users_room':
         case 'chat_with_someone':
-            return { fallbackText: 'Open the Navigator', link: 'navigator/show' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_navigator', 'Open the Navigator'), link: 'navigator/show' };
         case 'create_room':
-            return { fallbackText: 'Open the Navigator', link: 'navigator/create' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_navigator', 'Open the Navigator'), link: 'navigator/create' };
         case 'place_item':
-            return { fallbackText: 'Open the inventory', link: 'inventory/show' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_inventory', 'Open the inventory'), link: 'inventory/show' };
         case 'wear_badge':
-            return { fallbackText: 'Open the inventory', link: 'inventory/show/badges' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_inventory', 'Open the inventory'), link: 'inventory/show/badges' };
         case 'buy_from_catalogue':
-            return { fallbackText: 'Open the Catalogue', link: 'catalog/show' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_catalogue', 'Open the Catalogue'), link: 'catalog/show' };
         case 'change_figure':
-            return { fallbackText: 'Open the Look Editor', link: 'avatar-editor/show' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_look_editor', 'Open the Look Editor'), link: 'avatar-editor/show' };
         case 'request_friend':
-            return { fallbackText: 'Find friends', link: 'friends/show' };
+            return { fallbackText: localizeWithFallback('octane.quests.find_friends', 'Find friends'), link: 'friends/show' };
         case 'publish_picture':
-            return { fallbackText: 'Open the Camera', link: 'camera/show' };
+            return { fallbackText: localizeWithFallback('octane.quests.open_the_camera', 'Open the Camera'), link: 'camera/show' };
         default:
             return null;
     }

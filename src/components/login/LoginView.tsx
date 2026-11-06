@@ -2,7 +2,7 @@ import { GetAvatarRenderManager, GetConfiguration } from '@octane/renderer';
 import { FC, useActionState, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { FaDice } from 'react-icons/fa';
-import { ClearRememberLogin, GetConfigurationValue, GetOptionalConfigurationValue, GetRememberLogin, isRememberCookieMode, persistAccessTokenFromPayload, StoreRememberLoginFromPayload } from '../../api';
+import { ClearRememberLogin, GetConfigurationValue, GetOptionalConfigurationValue, GetRememberLogin, isRememberCookieMode, persistAccessTokenFromPayload, StoreRememberLoginFromPayload, localizeServerMessage } from '../../api';
 import flagEn from '../../assets/images/flag_icon/flag_icon_en.png';
 import flagEs from '../../assets/images/flag_icon/flag_icon_es.png';
 import flagFr from '../../assets/images/flag_icon/flag_icon_fr.png';
@@ -18,7 +18,7 @@ import { NewsWindow } from './components/NewsWindow';
 import { useDraggableLoginWindow } from './hooks/useDraggableLoginWindow';
 import { RegistrationAvatarWardrobe } from './components/RegistrationAvatarWardrobe';
 import { TurnstileWidget } from './TurnstileWidget';
-import { t } from './utils/i18n';
+import { t, tOrServer } from './utils/i18n';
 import { clearRegistrationDraft, loadRegistrationDraft, saveRegistrationDraft } from './utils/registrationDraft';
 import { Checkbox } from '../../common/Checkbox';
 import { Radio } from '../../common/Radio';
@@ -575,7 +575,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
 
                 recordFailure();
                 const message =
-                    typeof payload.error === 'string' ? payload.error : t('nitro.login.error.invalid_credentials', 'Invalid Habbo name or password.');
+                    localizeServerMessage(payload.error, t('nitro.login.error.invalid_credentials', 'Invalid Habbo name or password.'));
                 setError(message);
                 resetLoginTurnstile();
             } catch {
@@ -601,12 +601,12 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
             if (isTrue(payload.available) || isFalse(payload.exists) || isFalse(payload.taken) || isFalse(payload.inUse) || isFalse(payload.in_use))
                 return { available: true };
             if (isFalse(payload.available) || isTrue(payload.exists) || isTrue(payload.taken) || isTrue(payload.inUse) || isTrue(payload.in_use))
-                return { available: false, error: typeof payload.error === 'string' ? payload.error : undefined };
+                return { available: false, error: localizeServerMessage(payload.error) || undefined };
             return { available: true };
         }
 
         if (status === 404 || status === 405 || status === 501) return { available: true };
-        if (status === 409) return { available: false, error: typeof payload.error === 'string' ? payload.error : undefined };
+        if (status === 409) return { available: false, error: localizeServerMessage(payload.error) || undefined };
 
         return { available: true };
     };
@@ -666,20 +666,22 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
 
                 if (ok) {
                     clearRegistrationDraft();
-                    const friendly = t(
-                        'nitro.login.register.success',
-                        'Welcome aboard, %username%! Your account is ready — log in below with the password you just chose.',
-                        ['username'],
-                        [body.username]
+                    setInfo(
+                        tOrServer(
+                            'nitro.login.register.success',
+                            payload.message,
+                            'Welcome aboard, %username%! Your account is ready — log in below with the password you just chose.',
+                            ['username'],
+                            [body.username]
+                        )
                     );
-                    setInfo(typeof payload.message === 'string' ? payload.message : friendly);
                     setMode('login');
                     setUsername(body.username);
                     setPassword('');
                     return;
                 }
 
-                setError(typeof payload.error === 'string' ? payload.error : t('nitro.login.error.register_failed', 'Unable to create your account.'));
+                setError(localizeServerMessage(payload.error, t('nitro.login.error.register_failed', 'Unable to create your account.')));
                 onDialogReset();
             } catch {
                 setError(t('nitro.login.error.register_unreachable', 'Unable to reach the registration service.'));
@@ -709,16 +711,18 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                 });
 
                 if (ok) {
-                    const friendly = t(
-                        'nitro.login.forgot.success',
-                        "Email sent! If an account matches that address you'll find a reset link in your inbox shortly (check spam if it doesn't show up within a minute)."
+                    setInfo(
+                        tOrServer(
+                            'nitro.login.forgot.success',
+                            payload.message,
+                            "Email sent! If an account matches that address you'll find a reset link in your inbox shortly (check spam if it doesn't show up within a minute)."
+                        )
                     );
-                    setInfo(typeof payload.message === 'string' ? payload.message : friendly);
                     setMode('login');
                     return;
                 }
 
-                setError(typeof payload.error === 'string' ? payload.error : t('nitro.login.error.forgot_failed', 'Unable to send a reset email right now.'));
+                setError(localizeServerMessage(payload.error, t('nitro.login.error.forgot_failed', 'Unable to send a reset email right now.')));
                 onDialogReset();
             } catch {
                 setError(t('nitro.login.error.forgot_unreachable', 'Unable to reach the password reset service.'));

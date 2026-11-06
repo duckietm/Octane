@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { LocalizeText } from '../../../../api';
+import { LocalizeText, localizeWithFallback } from '../../../../api';
 import { Button, DraggableWindow, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useFurnitureFriendFurniWidget } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
@@ -70,7 +70,7 @@ export const FurnitureFriendFurniView: FC<{}> = (props) => {
             <NativeTextTree>
                 <DraggableWindow handleSelector=".octane-engraving-lock-view">
                     <div className={`octane-engraving-lock-view octane-furni-lovelock ${engravingTypeClass}`.trim()}>
-                        <BaseButton type="button" className="engraving-lock-close" onClick={onClose} aria-label="Close" />
+                        <BaseButton type="button" className="engraving-lock-close" onClick={onClose} aria-label={localizeWithFallback('octane.room.close', 'Close')} />
                         <div className="engraving-lock-avatar engraving-lock-avatar--left">
                             <LayoutAvatarImageView direction={2} figure={figures[0]} />
                         </div>

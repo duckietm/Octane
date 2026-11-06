@@ -17,7 +17,7 @@ import {
     FaTrash,
     FaWrench,
 } from 'react-icons/fa';
-import { GetConfigurationValue, ICatalogNode, IPurchasableOffer, LocalizeText, ProductTypeEnum } from '../../../../api';
+import { GetConfigurationValue, ICatalogNode, IPurchasableOffer, LocalizeText, ProductTypeEnum, localizeWithFallback } from '../../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useCatalogActions, useCatalogData, useCatalogUiState } from '../../../../hooks';
 import { replaceCatalogPageOffers } from '../../../../hooks/catalog/useCatalog.helpers';
@@ -220,7 +220,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
             const dragged = findNodeByPageId(managerRootNode, Number(data.pageId));
             const plan = planCatalogAdminPageDrop(dragged, null, 'root', managerRootNode);
             if (!plan) return;
-            catalogAdmin.reorderPage(plan.pageId, plan.newParentId, plan.newIndex, `Moved page #${plan.pageId} to catalog root`);
+            catalogAdmin.reorderPage(plan.pageId, plan.newParentId, plan.newIndex, localizeWithFallback('octane.catalog.moved_page_page_id_to_catalog', 'Moved page #%page_id% to catalog root', ['page_id'], [String(plan.pageId)]));
         } catch {
         }
     }, [catalogAdmin, managerRootNode]);
@@ -239,7 +239,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
             const pageLabel = selectedNode ? nodeName(selectedNode) : 'page';
             catalogAdmin.reorderOffers(
                 reordered.map((offer, i) => ({ id: offer.offerId, orderNumber: i })),
-                `Reordered offers on "${pageLabel}"`,
+                localizeWithFallback('octane.catalog.reordered_offers_on_page_label', 'Reordered offers on "%page_label%"', ['page_label'], [String(pageLabel)]),
                 currentPage.pageId
             );
         },
@@ -350,7 +350,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
         if (isReadOnlyPage) return;
 
         const label = offer.localizationName || `#${offer.offerId}`;
-        if (confirm(`Delete offer "${label}"?`)) catalogAdmin.deleteOffer(offer.offerId, `Deleted offer: ${label}`);
+        if (confirm(localizeWithFallback('octane.catalog.delete_offer_label', 'Delete offer "%label%"?', ['label'], [String(label)]))) catalogAdmin.deleteOffer(offer.offerId, localizeWithFallback('octane.catalog.deleted_offer_label', 'Deleted offer: %label%', ['label'], [String(label)]));
     };
 
     const moveOffer = (index: number, direction: -1 | 1) => {
@@ -391,7 +391,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                     }}
                     onDrop={(event) => handlePageDrop(event, node)}
                 >
-                    <FaArrowsAlt className="octane-catalog-admin-tree-drag" title="Drag to reorder or reparent" />
+                    <FaArrowsAlt className="octane-catalog-admin-tree-drag" title={localizeWithFallback('octane.catalog.drag_to_reorder_or_reparent', 'Drag to reorder or reparent')} />
                     <span className="octane-catalog-admin-tree-caret">
                         {hasChildren ? (
                             <BaseButton
@@ -420,7 +420,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
 
     const renderDetail = () => {
         if (!selectedNode) {
-            return <div className="octane-catalog-admin-placeholder">Select a page from the tree to edit</div>;
+            return <div className="octane-catalog-admin-placeholder">{localizeWithFallback('octane.catalog.select_a_page_from_the_tree', 'Select a page from the tree to edit')}</div>;
         }
 
         const siblings = selectedNode.parent?.children ?? [];
@@ -444,10 +444,10 @@ export const CatalogAdminManagerView: FC<{}> = () => {
 
                     <div className="octane-catalog-admin-detail-actions">
                         <BaseButton className="octane-catalog-admin-btn is-primary" onClick={() => editPage(selectedNode, false)}>
-                            <FaEdit /> <span>Edit page</span>
+                            <FaEdit /> <span>{localizeWithFallback('octane.catalog.edit_page', 'Edit page')}</span>
                         </BaseButton>
                         <BaseButton className="octane-catalog-admin-btn" onClick={() => createCategory(selectedNode)}>
-                            <FaPlus /> <span>Add sub-page</span>
+                            <FaPlus /> <span>{localizeWithFallback('octane.catalog.add_sub_page', 'Add sub-page')}</span>
                         </BaseButton>
                         <BaseButton
                             className="octane-catalog-admin-btn"
@@ -458,33 +458,32 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                             {isHidden ? <FaEye /> : <FaEyeSlash />} <span>{isHidden ? 'Show' : 'Hide'}</span>
                         </BaseButton>
                         <BaseButton className="octane-catalog-admin-btn" disabled={index <= 0} onClick={() => movePage(selectedNode, -1)}>
-                            <FaArrowUp /> <span>Move up</span>
+                            <FaArrowUp /> <span>{localizeWithFallback('octane.catalog.move_up', 'Move up')}</span>
                         </BaseButton>
                         <BaseButton className="octane-catalog-admin-btn" disabled={index < 0 || index >= siblings.length - 1} onClick={() => movePage(selectedNode, 1)}>
-                            <FaArrowDown /> <span>Move down</span>
+                            <FaArrowDown /> <span>{localizeWithFallback('octane.catalog.move_down', 'Move down')}</span>
                         </BaseButton>
                         <BaseButton className="octane-catalog-admin-btn is-danger" onClick={() => deletePage(selectedNode)}>
-                            <FaTrash /> <span>Delete</span>
+                            <FaTrash /> <span>{localizeWithFallback('octane.catalog.delete', 'Delete')}</span>
                         </BaseButton>
                     </div>
 
                     <div className="octane-catalog-admin-offers">
                         {isReadOnlyPage ? (
                             <div className="octane-catalog-admin-placeholder is-small">
-                                This page lists each user's own recent purchases ({selectedPageLayout}), so it has no editable
-                                offers. You can still edit the page settings.
+                                {localizeWithFallback('octane.catalog.page_lists_recent_purchases', 'This page lists each user\'s own recent purchases (%layout%), so it has no editable offers. You can still edit the page settings.', ['layout'], [String(selectedPageLayout)])}
                             </div>
                         ) : (
                         <>
                         <div className="octane-catalog-admin-offers-head">
                             <span className="octane-catalog-admin-offers-title">Offers ({offers.length})</span>
                             <BaseButton className="octane-catalog-admin-btn is-primary" disabled={!currentPage} onClick={newOffer}>
-                                <FaPlus /> <span>New offer</span>
+                                <FaPlus /> <span>{localizeWithFallback('octane.catalog.new_offer', 'New offer')}</span>
                             </BaseButton>
                         </div>
                         <div className="octane-catalog-admin-offers-list">
-                            {!currentPage && <div className="octane-catalog-admin-placeholder is-small">Loading offers…</div>}
-                            {currentPage && offers.length === 0 && <div className="octane-catalog-admin-placeholder is-small">No offers on this page</div>}
+                            {!currentPage && <div className="octane-catalog-admin-placeholder is-small">{localizeWithFallback('octane.catalog.loading_offers', 'Loading offers…')}</div>}
+                            {currentPage && offers.length === 0 && <div className="octane-catalog-admin-placeholder is-small">{localizeWithFallback('octane.catalog.no_offers_on_this_page', 'No offers on this page')}</div>}
                             {offers.map((offer, index) => {
                                 const iconUrl = getOfferIconUrl(offer);
                                 const isSelected = currentOffer?.offerId === offer.offerId;
@@ -513,16 +512,16 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                                         onDragStart={(event) => handleOfferDragStart(event, index)}
                                         onDrop={(event) => handleOfferDrop(event, index)}
                                     >
-                                        <Hint content="Drag to reorder">
-                                            <span aria-label="Drag to reorder" className="octane-catalog-admin-offer-drag" role="img">
+                                        <Hint content={localizeWithFallback('octane.catalog.drag_to_reorder', 'Drag to reorder')}>
+                                            <span aria-label={localizeWithFallback('octane.catalog.drag_to_reorder', 'Drag to reorder')} className="octane-catalog-admin-offer-drag" role="img">
                                                 <FaArrowsAlt />
                                             </span>
                                         </Hint>
                                         <div className="octane-catalog-admin-manager-reorder">
-                                            <Hint content="Move up"><BaseButton aria-label="Move up" disabled={index === 0} onClick={() => moveOffer(index, -1)}>
+                                            <Hint content={localizeWithFallback('octane.catalog.move_up', 'Move up')}><BaseButton aria-label={localizeWithFallback('octane.catalog.move_up', 'Move up')} disabled={index === 0} onClick={() => moveOffer(index, -1)}>
                                                 <FaArrowUp />
                                             </BaseButton></Hint>
-                                            <Hint content="Move down"><BaseButton aria-label="Move down" disabled={index === offers.length - 1} onClick={() => moveOffer(index, 1)}>
+                                            <Hint content={localizeWithFallback('octane.catalog.move_down', 'Move down')}><BaseButton aria-label={localizeWithFallback('octane.catalog.move_down', 'Move down')} disabled={index === offers.length - 1} onClick={() => moveOffer(index, 1)}>
                                                 <FaArrowDown />
                                             </BaseButton></Hint>
                                         </div>
@@ -554,9 +553,9 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                                             {editableProducts.map((product, productIndex) => {
                                                 const productLabel = product.furnitureData?.className || `#${product.productClassId}`;
 
-                                                return <Hint key={`${product.productType}-${product.productClassId}-${productIndex}`} content={`Edit Furni: ${productLabel}`}>
+                                                return <Hint key={`${product.productType}-${product.productClassId}-${productIndex}`} content={localizeWithFallback('octane.catalog.edit_furni_product_label', 'Edit Furni: %product_label%', ['product_label'], [String(productLabel)])}>
                                                     <BaseButton
-                                                                                                    aria-label={`Edit Furni ${productLabel}`}
+                                                                                                    aria-label={localizeWithFallback('octane.catalog.edit_furni_product_label_2', 'Edit Furni %product_label%', ['product_label'], [String(productLabel)])}
                                                                                                     onClick={() => window.dispatchEvent(new CustomEvent('furni-editor:open', {
                                                                                                         detail: { spriteId: product.productClassId }
                                                                                                     }))}
@@ -565,15 +564,15 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                                                                                                 </BaseButton>
                                                 </Hint>;
                                             })}
-                                            <Hint content="Edit offer">
-                                                <BaseButton aria-label="Edit offer" onClick={() => {
+                                            <Hint content={localizeWithFallback('octane.catalog.edit_offer', 'Edit offer')}>
+                                                <BaseButton aria-label={localizeWithFallback('octane.catalog.edit_offer', 'Edit offer')} onClick={() => {
                                                     catalogAdmin.setEditingOffer(offer);
                                                 }}>
                                                     <FaEdit />
                                                 </BaseButton>
                                             </Hint>
-                                            <Hint content="Delete offer">
-                                                <BaseButton aria-label="Delete offer" className="danger" onClick={() => deleteOffer(offer)}>
+                                            <Hint content={localizeWithFallback('octane.catalog.delete_offer', 'Delete offer')}>
+                                                <BaseButton aria-label={localizeWithFallback('octane.catalog.delete_offer', 'Delete offer')} className="danger" onClick={() => deleteOffer(offer)}>
                                                     <FaTrash />
                                                 </BaseButton>
                                             </Hint>
@@ -592,32 +591,32 @@ export const CatalogAdminManagerView: FC<{}> = () => {
 
     const renderInspector = () => {
         if (!selectedNode) {
-            return <aside className="octane-catalog-admin-inspector"><div className="octane-catalog-admin-placeholder is-small">No page selected</div></aside>;
+            return <aside className="octane-catalog-admin-inspector"><div className="octane-catalog-admin-placeholder is-small">{localizeWithFallback('octane.catalog.no_page_selected', 'No page selected')}</div></aside>;
         }
 
         return (
             <NativeTextTree>
                 <aside className="octane-catalog-admin-inspector">
                     <div className="octane-catalog-admin-inspector-head">
-                        <strong>Inspector</strong>
+                        <strong>{localizeWithFallback('octane.catalog.inspector', 'Inspector')}</strong>
                         <span>Page #{selectedNode.pageId}</span>
                     </div>
                     <dl className="octane-catalog-admin-inspector-data">
-                        <div><dt>Name</dt><dd title={nodeName(selectedNode)}>{nodeName(selectedNode)}</dd></div>
-                        <div><dt>Sub-pages</dt><dd>{selectedNode.children.length}</dd></div>
-                        <div><dt>Offers</dt><dd>{offers.length}</dd></div>
-                        <div><dt>Visibility</dt><dd className={selectedNode.isVisible ? 'is-positive' : 'is-muted'}>{selectedNode.isVisible ? 'Visible' : 'Hidden'}</dd></div>
-                        <div><dt>Revision</dt><dd>{studio.revision}</dd></div>
+                        <div><dt>{localizeWithFallback('octane.catalog.name', 'Name')}</dt><dd title={nodeName(selectedNode)}>{nodeName(selectedNode)}</dd></div>
+                        <div><dt>{localizeWithFallback('octane.catalog.sub_pages', 'Sub-pages')}</dt><dd>{selectedNode.children.length}</dd></div>
+                        <div><dt>{localizeWithFallback('octane.catalog.offers', 'Offers')}</dt><dd>{offers.length}</dd></div>
+                        <div><dt>{localizeWithFallback('octane.catalog.visibility', 'Visibility')}</dt><dd className={selectedNode.isVisible ? 'is-positive' : 'is-muted'}>{selectedNode.isVisible ? 'Visible' : 'Hidden'}</dd></div>
+                        <div><dt>{localizeWithFallback('octane.catalog.revision', 'Revision')}</dt><dd>{studio.revision}</dd></div>
                     </dl>
                     <div className="octane-catalog-admin-inspector-actions">
                         <BaseButton className="octane-catalog-admin-btn is-primary" onClick={() => editPage(selectedNode, false)}>
-                            <FaEdit /> Edit
+                            <FaEdit /> {localizeWithFallback('octane.catalog.edit', 'Edit')}
                         </BaseButton>
                         <BaseButton className="octane-catalog-admin-btn" onClick={() => createCategory(selectedNode)}>
-                            <FaPlus /> Sub-page
+                            <FaPlus /> {localizeWithFallback('octane.catalog.sub_page', 'Sub-page')}
                         </BaseButton>
                         <BaseButton className="octane-catalog-admin-btn" disabled={isReadOnlyPage} onClick={newOffer}>
-                            <FaPlus /> Offer
+                            <FaPlus /> {localizeWithFallback('octane.catalog.offer', 'Offer')}
                         </BaseButton>
                     </div>
                 </aside>
@@ -631,9 +630,9 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                 <div className="octane-catalog-admin-search-row">
                     <span className="octane-catalog-admin-search">
                         <FaSearch />
-                        <input aria-label="Search catalog pages" placeholder="Search pages..." value={search} onChange={(event) => setSearch(event.target.value)} />
+                        <input aria-label={localizeWithFallback('octane.catalog.search_catalog_pages', 'Search catalog pages')} placeholder={localizeWithFallback('octane.catalog.search_pages', 'Search pages...')} value={search} onChange={(event) => setSearch(event.target.value)} />
                     </span>
-                    <Hint content="New root category"><BaseButton aria-label="New root category"
+                    <Hint content={localizeWithFallback('octane.catalog.new_root_category', 'New root category')}><BaseButton aria-label={localizeWithFallback('octane.catalog.new_root_category', 'New root category')}
                         className="octane-catalog-admin-add"
                         disabled={!managerRootNode}
                         onClick={() => managerRootNode && createCategory(managerRootNode)}
@@ -641,7 +640,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                         <FaPlus />
                     </BaseButton></Hint>
                 </div>
-                <div className="octane-catalog-admin-tree" role="tree" aria-label="Catalog pages">
+                <div className="octane-catalog-admin-tree" role="tree" aria-label={localizeWithFallback('octane.catalog.catalog_pages', 'Catalog pages')}>
                     <div
                         className={`octane-catalog-admin-root-drop ${rootDropActive ? 'is-active' : ''}`}
                         onDragLeave={() => setRootDropActive(false)}
@@ -649,10 +648,10 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                         onDrop={handleRootDrop}
                     >
                         <FaSitemap />
-                        <span>Drop here to move to catalog root</span>
+                        <span>{localizeWithFallback('octane.catalog.drop_here_to_move_to_catalog', 'Drop here to move to catalog root')}</span>
                     </div>
                     {!managerRootNode || managerRootNode.children.length === 0 ? (
-                        <div className="octane-catalog-admin-placeholder is-small">No categories</div>
+                        <div className="octane-catalog-admin-placeholder is-small">{localizeWithFallback('octane.catalog.no_categories', 'No categories')}</div>
                     ) : (
                         managerRootNode.children.map((child) => renderNode(child, 0))
                     )}
@@ -680,19 +679,19 @@ export const CatalogAdminManagerView: FC<{}> = () => {
     const tabPresentation = {
         catalog: { label: 'Catalog', icon: <FaSitemap />, count: categoryCount },
         sql: { label: 'SQL tools', icon: <FaEdit />, count: 0 },
-        history: { label: 'Problems & History', icon: <FaHistory />, count: validationIssueCount }
+        history: { label: localizeWithFallback('octane.catalog.problems_history', 'Problems & History'), icon: <FaHistory />, count: validationIssueCount }
     };
     const tabs = getCatalogStudioWorkspaceTabs().map(id => ({ id, ...tabPresentation[id] }));
 
     return (
         <NativeTextTree>
             <OctaneCardView classNames={['octane-catalog-admin-manager']} uniqueKey="catalog-admin-manager">
-                <OctaneCardHeaderView headerText="Catalog Admin Editor" onCloseClick={() => catalogAdmin.setAdminMode(false)} />
+                <OctaneCardHeaderView headerText={localizeWithFallback('octane.catalog.catalog_admin_editor', 'Catalog Admin Editor')} onCloseClick={() => catalogAdmin.setAdminMode(false)} />
                 <OctaneCardContentView classNames={['octane-catalog-admin-manager-body']}>
                     <div aria-live="polite" className={`octane-catalog-admin-command-bar is-${commandState.phase}`}>
                         <div className="octane-catalog-admin-command-title">
-                            <strong>Catalog Manager</strong>
-                            <span>Direct live catalog controls</span>
+                            <strong>{localizeWithFallback('octane.catalog.catalog_manager', 'Catalog Manager')}</strong>
+                            <span>{localizeWithFallback('octane.catalog.direct_live_catalog_controls', 'Direct live catalog controls')}</span>
                         </div>
                         <div className="octane-catalog-admin-command-stats">
                             <span className={validationIssueCount > 0 ? 'has-error' : validationCurrent ? 'is-valid' : 'has-warning'}>
@@ -707,7 +706,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                             <span>{catalogAdmin.lastError}</span>
                         </div>
                     )}
-                    <TabBar className="octane-catalog-admin-tabs" aria-label="Catalog Studio sections" value={activeTab}>
+                    <TabBar className="octane-catalog-admin-tabs" aria-label={localizeWithFallback('octane.catalog.catalog_studio_sections', 'Catalog Studio sections')} value={activeTab}>
                         {tabs.map((tab) => (
                             <TabBarTab
                                 key={tab.id}

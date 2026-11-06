@@ -21,7 +21,8 @@ import {
     PRESET_PREFIX_EFFECTS,
     PRESET_PREFIX_FONTS,
     parsePrefixColors,
-    SendMessageComposer
+    SendMessageComposer,
+    localizeWithFallback
 } from '../../api';
 import { GetNickIconUrl } from '../../assets/images/user_custom/nick_icons';
 import {
@@ -334,21 +335,21 @@ export const CustomizeNickIconView: FC<{}> = () => {
     return (
         <NativeTextTree>
             <OctaneCardView className="customize-nick-icon-window w-[680px] max-w-[95vw]" theme="primary-slim" uniqueKey="customize-nick-icons">
-                <OctaneCardHeaderView headerText="Customize Bubble Identity" onCloseClick={() => setIsVisible(false)} />
+                <OctaneCardHeaderView headerText={localizeWithFallback('octane.customize.customize_bubble_identity', 'Customize Bubble Identity')} onCloseClick={() => setIsVisible(false)} />
                 <OctaneCardTabsView>
                     <OctaneCardTabsItemView isActive={activeTab === 'icons'} onClick={() => setActiveTab('icons')}>
-                        <Text>Icons</Text>
+                        <Text>{localizeWithFallback('octane.customize.icons', 'Icons')}</Text>
                     </OctaneCardTabsItemView>
                     <OctaneCardTabsItemView isActive={activeTab === 'prefix'} onClick={() => setActiveTab('prefix')}>
-                        <Text>Prefix</Text>
+                        <Text>{localizeWithFallback('octane.customize.prefix', 'Prefix')}</Text>
                     </OctaneCardTabsItemView>
                     <OctaneCardTabsItemView isActive={activeTab === 'settings'} onClick={() => setActiveTab('settings')}>
-                        <Text>Settings</Text>
+                        <Text>{localizeWithFallback('octane.customize.settings', 'Settings')}</Text>
                     </OctaneCardTabsItemView>
                 </OctaneCardTabsView>
                 <OctaneCardContentView className="flex max-h-[78vh] flex-col gap-3 overflow-y-auto text-black">
                     <div className="rounded border border-black/10 bg-black/5 p-3">
-                        <Text bold>Live preview</Text>
+                        <Text bold>{localizeWithFallback('octane.customize.live_preview', 'Live preview')}</Text>
                         <div className="mt-2 flex min-h-[54px] items-center justify-center rounded border border-black/10 bg-[#cfe8fb] px-3 py-2 text-[#1f2937]">
                             <UserIdentityView
                                 displayOrder={displayOrder}
@@ -366,7 +367,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                     {activeTab === 'icons' && (
                         <>
                             <div className="rounded border border-black/10 bg-black/5 p-2 text-[11px] leading-4">
-                                Choose the icon shown in your bubble identity.
+                                {localizeWithFallback('octane.customize.choose_the_icon_shown_in_your', 'Choose the icon shown in your bubble identity.')}
                             </div>
                             <div className="grid grid-cols-3 gap-2">
                                 {iconItems.map((item) => {
@@ -379,12 +380,12 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                         >
                                             {item.active && (
                                                 <span className="absolute right-1 top-1 rounded bg-[#418db0] px-1.5 py-0.5 text-[10px] font-bold uppercase text-white">
-                                                    Active
+                                                    {localizeWithFallback('octane.customize.active', 'Active')}
                                                 </span>
                                             )}
                                             {iconUrl && <img className="h-auto max-h-[28px] w-auto object-contain" src={iconUrl} alt={item.iconKey} />}
                                             <div className="flex flex-col items-center gap-1 text-center text-[11px]">
-                                                <span>{item.owned ? (item.active ? 'Owned - Active' : 'Owned') : 'Locked'}</span>
+                                                <span>{item.owned ? (item.active ? localizeWithFallback('octane.customize.owned_active', 'Owned - Active') : 'Owned') : 'Locked'}</span>
                                                 <span className="max-w-[140px] truncate">{item.displayName || `Icon #${item.iconKey}`}</span>
                                                 <span className="inline-flex items-center gap-1">
                                                     <LayoutCurrencyIcon type={item.pointsType} />
@@ -427,7 +428,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                             {activePrefixSubTab === 'library' && (
                                 <>
                                     <div className="rounded border border-black/10 bg-black/5 p-2 text-[11px] leading-4">
-                                        Choose a preset or custom prefix for your bubble identity.
+                                        {localizeWithFallback('octane.customize.choose_a_preset_or_custom_prefix', 'Choose a preset or custom prefix for your bubble identity.')}
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         {combinedPrefixes.map((item) => (
@@ -437,7 +438,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                             >
                                                 {item.active && (
                                                     <span className="absolute right-1 top-1 rounded bg-[#418db0] px-1.5 py-0.5 text-[10px] font-bold uppercase text-white">
-                                                        Active
+                                                        {localizeWithFallback('octane.customize.active', 'Active')}
                                                     </span>
                                                 )}
                                                 <UserIdentityView
@@ -451,7 +452,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                                     username="Username"
                                                 />
                                                 <div className="flex flex-col gap-1 text-[11px]">
-                                                    <span>{item.owned ? (item.active ? 'Owned - Active' : 'Owned') : 'Locked'}</span>
+                                                    <span>{item.owned ? (item.active ? localizeWithFallback('octane.customize.owned_active', 'Owned - Active') : 'Owned') : 'Locked'}</span>
                                                     <span className="truncate">
                                                         {item.displayName || item.text}
                                                         {item.isCustom ? ' - Custom' : ''}
@@ -475,9 +476,9 @@ export const CustomizeNickIconView: FC<{}> = () => {
                             {activePrefixSubTab === 'custom' && (
                                 <div className="rounded border border-black/10 bg-black/5 p-3">
                                     <div className="mb-2 flex items-center justify-between">
-                                        <Text bold>Custom prefix</Text>
+                                        <Text bold>{localizeWithFallback('octane.customize.custom_prefix', 'Custom prefix')}</Text>
                                         <Button variant="secondary" disabled={isLoading} onClick={refreshCustomizeData}>
-                                            Refresh
+                                            {localizeWithFallback('octane.customize.refresh', 'Refresh')}
                                         </Button>
                                     </div>
                                     <div className="mt-2 flex flex-col gap-2">
@@ -485,7 +486,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                             <input
                                                 className="flex-1 rounded border border-black/10 bg-white px-3 py-2 text-[12px]"
                                                 maxLength={customPrefixMaxLength}
-                                                placeholder="Enter your prefix"
+                                                placeholder={localizeWithFallback('octane.customize.enter_your_prefix', 'Enter your prefix')}
                                                 type="text"
                                                 value={customPrefixText}
                                                 onChange={(event) => setCustomPrefixText(event.target.value)}
@@ -502,11 +503,11 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                             >
                                                 {customPrefixIcon || 'Emoji'}
                                             </BaseButton>
-                                            {!!customPrefixIcon && <Button variant="secondary" onClick={() => setCustomPrefixIcon('')}>Clear</Button>}
+                                            {!!customPrefixIcon && <Button variant="secondary" onClick={() => setCustomPrefixIcon('')}>{localizeWithFallback('octane.customize.clear', 'Clear')}</Button>}
                                         </div>
                                         <div className="rounded border border-black/10 bg-white p-2">
                                             <div className="mb-2 text-[11px] leading-4 text-black/70">
-                                                Safe colors only, chosen to stay readable on both light and dark backgrounds.
+                                                {localizeWithFallback('octane.customize.safe_colors_only_chosen_to_stay', 'Safe colors only, chosen to stay readable on both light and dark backgrounds.')}
                                             </div>
                                             <div className="grid grid-cols-6 gap-2">
                                                 {PRESET_COLORS.map((color) => (
@@ -523,21 +524,21 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                             </div>
                                         </div>
                                         <div className="rounded border border-black/10 bg-white p-2">
-                                            <div className="mb-2 text-[11px] leading-4 text-black/70">Effect</div>
+                                            <div className="mb-2 text-[11px] leading-4 text-black/70">{localizeWithFallback('octane.customize.effect', 'Effect')}</div>
                                             <div className="flex items-center gap-2">
                                                 <Select
                                                     className="flex-1 rounded border border-black/10 bg-white px-2 py-2 text-[12px]"
                                                     value={customPrefixEffect}
                                                     onChange={(event) => setCustomPrefixEffect(event.target.value)}
                                                 >
-                                                    <optgroup label="Basic">
+                                                    <optgroup label={localizeWithFallback('octane.customize.basic', 'Basic')}>
                                                         {basicEffects.map((effect) => (
                                                             <option key={effect.id || 'none'} value={effect.id}>
                                                                 {effect.label}
                                                             </option>
                                                         ))}
                                                     </optgroup>
-                                                    <optgroup label="Premium">
+                                                    <optgroup label={localizeWithFallback('octane.customize.premium', 'Premium')}>
                                                         {premiumEffects.map((effect) => (
                                                             <option key={effect.id} value={effect.id}>
                                                                 {effect.label}
@@ -552,21 +553,21 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                             </div>
                                         </div>
                                         <div className="rounded border border-black/10 bg-white p-2">
-                                            <div className="mb-2 text-[11px] leading-4 text-black/70">Font</div>
+                                            <div className="mb-2 text-[11px] leading-4 text-black/70">{localizeWithFallback('octane.customize.font', 'Font')}</div>
                                             <div className="flex items-center gap-2">
                                                 <Select
                                                     className="flex-1 rounded border border-black/10 bg-white px-2 py-2 text-[12px]"
                                                     value={customPrefixFont}
                                                     onChange={(event) => setCustomPrefixFont(event.target.value)}
                                                 >
-                                                    <optgroup label="Basic">
+                                                    <optgroup label={localizeWithFallback('octane.customize.basic', 'Basic')}>
                                                         {basicFonts.map((font) => (
                                                             <option key={font.id || 'default'} value={font.id}>
                                                                 {font.label}
                                                             </option>
                                                         ))}
                                                     </optgroup>
-                                                    <optgroup label="Premium">
+                                                    <optgroup label={localizeWithFallback('octane.customize.premium', 'Premium')}>
                                                         {premiumFonts.map((font) => (
                                                             <option key={font.id} value={font.id}>
                                                                 {font.label}
@@ -581,7 +582,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                             </div>
                                             {!!customPrefixFont && (
                                                 <div className="mt-2 text-[10px] leading-4 text-black/60">
-                                                    Premium fonts add an extra price on top of the custom prefix.
+                                                    {localizeWithFallback('octane.customize.premium_fonts_add_an_extra_price', 'Premium fonts add an extra price on top of the custom prefix.')}
                                                 </div>
                                             )}
                                         </div>
@@ -614,7 +615,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                                 )}
                                             </div>
                                             <Button variant="success" disabled={!customPrefixIsValid || isLoading} onClick={handleCustomPrefixPurchase}>
-                                                Buy custom prefix
+                                                {localizeWithFallback('octane.customize.buy_custom_prefix', 'Buy custom prefix')}
                                             </Button>
                                         </div>
                                     </div>
@@ -626,7 +627,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                     {activeTab === 'settings' && (
                         <div className="flex flex-col gap-3">
                             <div className="rounded border border-black/10 bg-black/5 p-3">
-                                <Text bold>Display order</Text>
+                                <Text bold>{localizeWithFallback('octane.customize.display_order', 'Display order')}</Text>
                                 <div className="mt-2 grid grid-cols-2 gap-2">
                                     {Object.entries(ORDER_LABELS).map(([key, label]) => (
                                         <Button key={key} variant="secondary" active={displayOrder === key} disabled={isLoading && displayOrder === key} onClick={() => handleDisplayOrderChange(key)}>
@@ -638,13 +639,13 @@ export const CustomizeNickIconView: FC<{}> = () => {
                             </div>
                             <div className="rounded border border-black/10 bg-black/5 p-3">
                                 <div className="mb-2 flex items-center justify-between">
-                                    <Text bold>Refresh data</Text>
+                                    <Text bold>{localizeWithFallback('octane.customize.refresh_data', 'Refresh data')}</Text>
                                     <Button variant="secondary" disabled={isLoading} onClick={refreshCustomizeData}>
-                                        Refresh
+                                        {localizeWithFallback('octane.customize.refresh', 'Refresh')}
                                     </Button>
                                 </div>
                                 <div className="text-[11px] leading-4 text-black/70">
-                                    Use this tab to control how your icon, prefix and username are ordered in bubbles, profile and infostand.
+                                    {localizeWithFallback('octane.customize.use_this_tab_to_control_how', 'Use this tab to control how your icon, prefix and username are ordered in bubbles, profile and infostand.')}
                                 </div>
                             </div>
                         </div>

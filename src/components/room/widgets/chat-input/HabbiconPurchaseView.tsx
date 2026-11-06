@@ -56,7 +56,7 @@ export const HabbiconPurchaseView: FC = () => {
                             <p>
                                 {localizeWithFallback(
                                     purchase.collection ? 'habbicon_purchase.confirm.set.desc' : 'habbicon_purchase.confirm.habbicon.desc',
-                                    purchase.collection ? `Buy the ${title} set?` : 'Buy this Habicon?',
+                                    purchase.collection ? localizeWithFallback('octane.room.buy_the_title_set', 'Buy the %title% set?', ['title'], [String(title)]) : localizeWithFallback('octane.room.buy_this_habicon', 'Buy this Habicon?'),
                                     ['set_name'],
                                     [title]
                                 )}

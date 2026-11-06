@@ -1,5 +1,5 @@
 import { FC, useMemo } from 'react';
-import { LocalizeText, NotificationAlertItem, NotificationAlertType, OpenUrl } from '../../../../api';
+import { LocalizeText, NotificationAlertItem, NotificationAlertType, OpenUrl, localizeWithFallback } from '../../../../api';
 import { Button, Column, Flex, LayoutAvatarImageView, LayoutNotificationAlertView, LayoutNotificationAlertViewProps, Text } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
@@ -70,7 +70,7 @@ export const OctaneInfoAlertView: FC<OctaneInfoAlertViewProps> = (props) => {
     }, [item]);
 
     const rawTitle = titleProp || (item && item.title) || '';
-    const displayTitle = rawTitle && rawTitle !== 'nitro.info.title' ? rawTitle : 'Hotel Info';
+    const displayTitle = rawTitle && rawTitle !== 'nitro.info.title' ? rawTitle : localizeWithFallback('octane.notification_center.hotel_info', 'Hotel Info');
 
     return (
         <NativeTextTree>
@@ -125,11 +125,11 @@ export const OctaneInfoAlertView: FC<OctaneInfoAlertViewProps> = (props) => {
                         ))}
                         <div className="octane-info-footer">
                             <Text center small italics>
-                                Found a bug? Help us improve!
+                                {localizeWithFallback('octane.notification_center.found_a_bug_help_us_improve', 'Found a bug? Help us improve!')}
                             </Text>
                             <Flex gap={1} fullWidth className="octane-info-actions">
                                 <Button fullWidth variant="success" className="octane-info-report-btn" onClick={() => OpenUrl(REPORT_ISSUES_URL)}>
-                                    <span>🐞 Report Issues</span>
+                                    <span>{localizeWithFallback('octane.notification_center.report_issues', '🐞 Report Issues')}</span>
                                 </Button>
                                 <Button fullWidth onClick={onClose}>
                                     {LocalizeText('generic.close')}

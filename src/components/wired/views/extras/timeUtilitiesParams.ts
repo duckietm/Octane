@@ -1,3 +1,4 @@
+import { localizeWithFallback } from '../../../../api/utils/localizeWithFallback';
 /**
  * Int params of the time-utilities add-on: `[mask, mode]`. Bit `id` of the mask creates the
  * sub-variable with that id; calendar parts are ids 1-10, time units since 1970 are ids 20-26.
@@ -34,15 +35,15 @@ export interface ITimeUtilSubVariable {
 }
 
 export const TIME_UTIL_SUB_VARIABLES: ITimeUtilSubVariable[] = [
-    { id: 1, name: 'milliseconds_of_seconds', label: 'Millisecond of the second' },
-    { id: 2, name: 'seconds_of_minute', label: 'Second of the minute' },
-    { id: 3, name: 'minute_of_hour', label: 'Minute of the hour' },
-    { id: 4, name: 'hour_of_day', label: 'Hour of the day' },
-    { id: 5, name: 'day_of_week', label: 'Day of the week' },
-    { id: 6, name: 'day_of_month', label: 'Day of the month' },
-    { id: 7, name: 'day_of_year', label: 'Day of the year' },
-    { id: 8, name: 'week_of_year', label: 'Week of the year' },
-    { id: 9, name: 'month_of_year', label: 'Month of the year' },
+    { id: 1, name: 'milliseconds_of_seconds', get label() { return localizeWithFallback('octane.wired.millisecond_of_the_second', 'Millisecond of the second'); } },
+    { id: 2, name: 'seconds_of_minute', get label() { return localizeWithFallback('octane.wired.second_of_the_minute', 'Second of the minute'); } },
+    { id: 3, name: 'minute_of_hour', get label() { return localizeWithFallback('octane.wired.minute_of_the_hour', 'Minute of the hour'); } },
+    { id: 4, name: 'hour_of_day', get label() { return localizeWithFallback('octane.wired.hour_of_the_day', 'Hour of the day'); } },
+    { id: 5, name: 'day_of_week', get label() { return localizeWithFallback('octane.wired.day_of_the_week', 'Day of the week'); } },
+    { id: 6, name: 'day_of_month', get label() { return localizeWithFallback('octane.wired.day_of_the_month', 'Day of the month'); } },
+    { id: 7, name: 'day_of_year', get label() { return localizeWithFallback('octane.wired.day_of_the_year', 'Day of the year'); } },
+    { id: 8, name: 'week_of_year', get label() { return localizeWithFallback('octane.wired.week_of_the_year', 'Week of the year'); } },
+    { id: 9, name: 'month_of_year', get label() { return localizeWithFallback('octane.wired.month_of_the_year', 'Month of the year'); } },
     { id: 10, name: 'year', label: 'Year' }
 ];
 

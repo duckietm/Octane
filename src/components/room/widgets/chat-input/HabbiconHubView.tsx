@@ -137,7 +137,7 @@ export const HabbiconHubView: FC = () => {
                                         setPopup(null);
                                     }}
                                 >
-                                    {localizeWithFallback(`habbicon_book.tab.${value}`, ['All sets', 'Owned', 'Favourited'][index])}
+                                    {localizeWithFallback(`habbicon_book.tab.${value}`, [localizeWithFallback('octane.room.all_sets', 'All sets'), 'Owned', 'Favourited'][index])}
                                 </TabBarTab>
                             ))}
                         </TabBar>
@@ -208,10 +208,10 @@ export const HabbiconHubView: FC = () => {
                                                     {localizeWithFallback(
                                                         `habbicon_book.reward.${activeSet.reward.owned ? 'claimed' : activeSet.reward.claimable ? 'claimable' : 'locked'}`,
                                                         activeSet.reward.owned
-                                                            ? 'Reward claimed.'
+                                                            ? localizeWithFallback('octane.room.reward_claimed', 'Reward claimed.')
                                                             : activeSet.reward.claimable
-                                                              ? 'Reward ready to claim.'
-                                                              : 'Complete this set to unlock the reward.'
+                                                              ? localizeWithFallback('octane.room.reward_ready_to_claim', 'Reward ready to claim.')
+                                                              : localizeWithFallback('octane.room.complete_this_set_to_unlock_the', 'Complete this set to unlock the reward.')
                                                     )}
                                                 </p>
                                                 <BaseButton
@@ -301,7 +301,7 @@ export const HabbiconHubView: FC = () => {
                                                 >
                                                     {localizeWithFallback(
                                                         popupEntry.favorite ? 'habbicon.favourite.remove' : 'habbicon.favourite.add',
-                                                        popupEntry.favorite ? 'Remove from favourites' : 'Add to favourites'
+                                                        popupEntry.favorite ? localizeWithFallback('octane.room.remove_from_favourites', 'Remove from favourites') : localizeWithFallback('octane.room.add_to_favourites', 'Add to favourites')
                                                     )}
                                                 </BaseButton>
                                             ) : popupEntry.claimable ? (
@@ -318,7 +318,7 @@ export const HabbiconHubView: FC = () => {
                                                     <p>
                                                         {localizeWithFallback(
                                                             popupEntry.isReward ? 'habbicon.popup.desc.locked' : 'habbicon.popup.desc.not_owned',
-                                                            popupEntry.isReward ? 'Locked' : 'Not owned'
+                                                            popupEntry.isReward ? 'Locked' : localizeWithFallback('octane.room.not_owned', 'Not owned')
                                                         )}
                                                     </p>
                                                     {popupEntry.purchasable && (

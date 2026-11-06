@@ -56,12 +56,12 @@ const useRewardTracksState = () => {
     );
 
     const copyTrackId = useCallback(
-        (trackId: string) => copyDebugId(trackId, 'reward_track.debug.copy_track_id.success', 'Track ID copied to the clipboard'),
+        (trackId: string) => copyDebugId(trackId, 'reward_track.debug.copy_track_id.success', localizeWithFallback('octane.quests.track_id_copied_to_the_clipboard', 'Track ID copied to the clipboard')),
         [copyDebugId]
     );
 
     const copyTaskId = useCallback(
-        (taskId: string) => copyDebugId(taskId, 'reward_track.debug.copy_task_id.success', 'Task ID copied to the clipboard'),
+        (taskId: string) => copyDebugId(taskId, 'reward_track.debug.copy_task_id.success', localizeWithFallback('octane.quests.task_id_copied_to_the_clipboard', 'Task ID copied to the clipboard')),
         [copyDebugId]
     );
 

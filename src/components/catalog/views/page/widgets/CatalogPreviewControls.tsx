@@ -1,6 +1,6 @@
 import { RoomPreviewer } from '@octane/renderer';
 import { FC, MouseEvent, useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
-import { ProductTypeEnum } from '../../../../../api';
+import { ProductTypeEnum, localizeWithFallback } from '../../../../../api';
 import previewArrowLeft from '../../../../../assets/images/catalog/air/preview-arrow-left.png';
 import previewArrowRight from '../../../../../assets/images/catalog/air/preview-arrow-right.png';
 import { BaseButton } from '../../../../../common/BaseButton';
@@ -116,11 +116,11 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
 
     return (
         <NativeTextTree>
-            <div className={`octane-catalog-preview-controls is-${capabilities.mode}`} role="toolbar" aria-label="Product preview">
+            <div className={`octane-catalog-preview-controls is-${capabilities.mode}`} role="toolbar" aria-label={localizeWithFallback('octane.catalog.product_preview', 'Product preview')}>
                 {showRotationControls && (
                     <>
                         <BaseButton
-                            aria-label="Rotate left"
+                            aria-label={localizeWithFallback('octane.catalog.rotate_left', 'Rotate left')}
                             className="octane-catalog-preview-btn is-left"
                             disabled={!capabilities.canRotate}
                             type="button"
@@ -129,7 +129,7 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
                             <CatalogPreviewArrowIcon direction="left" />
                         </BaseButton>
                         <BaseButton
-                            aria-label="Rotate right"
+                            aria-label={localizeWithFallback('octane.catalog.rotate_right', 'Rotate right')}
                             className="octane-catalog-preview-btn is-right"
                             disabled={!capabilities.canRotate}
                             type="button"
@@ -141,7 +141,7 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
                 )}
                 {canToggleZoom && (
                     <ToggleButton
-                        aria-label="Toggle zoom" pressed={avatarZoomed}
+                        aria-label={localizeWithFallback('octane.catalog.toggle_zoom', 'Toggle zoom')} pressed={avatarZoomed}
                         className="octane-catalog-preview-region octane-catalog-preview-zoom-btn"
                         type="button"
                         onClick={(event) => runPreviewAction(event, () => setAvatarZoomed((value) => !value))}
@@ -151,7 +151,7 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
                 )}
                 {isAvatarPreview && (
                     <BaseButton
-                        aria-label="Change avatar action"
+                        aria-label={localizeWithFallback('octane.catalog.change_avatar_action', 'Change avatar action')}
                         className="octane-catalog-preview-region octane-catalog-preview-action-btn"
                         disabled={!canChangeAvatarAction}
                         type="button"

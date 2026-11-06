@@ -80,22 +80,22 @@ export const createCatalogAdminNewOfferFormState = (pageId: number, orderNumber 
 });
 
 export const validateCatalogAdminOfferForm = (data: IOfferEditData, builderCatalog: boolean, limitedSells: number): string | null => {
-    if (data.pageId <= 0) return 'Select a valid catalog page.';
-    if (!data.catalogName.trim()) return 'Offer name is required.';
+    if (data.pageId <= 0) return localizeWithFallback('octane.catalog.select_a_valid_catalog_page', 'Select a valid catalog page.');
+    if (!data.catalogName.trim()) return localizeWithFallback('octane.catalog.offer_name_is_required', 'Offer name is required.');
 
     const cleanItemIds = data.itemIds.replace(/\s+/g, '');
-    if (!builderCatalog && !cleanItemIds) return 'Item IDs are required.';
+    if (!builderCatalog && !cleanItemIds) return localizeWithFallback('octane.catalog.item_ids_are_required', 'Item IDs are required.');
     if (cleanItemIds) {
         const entries = cleanItemIds.split(/[;,]/);
         if (entries.some((entry) => !/^\d+(?::[1-9]\d*)?$/.test(entry) || Number(entry.split(':')[0]) <= 0)) {
-            return 'Item IDs must use the format 123 or 123:2, separated by semicolons.';
+            return localizeWithFallback('octane.catalog.item_ids_must_use_the_format', 'Item IDs must use the format 123 or 123:2, separated by semicolons.');
         }
     }
 
-    if (data.costCredits < 0 || data.costPoints < 0 || data.pointsType < 0) return 'Prices and currency type cannot be negative.';
-    if (data.amount < 1 || data.amount > 10000) return 'Quantity must be between 1 and 10,000.';
-    if (data.songId < 0) return 'Song ID cannot be negative.';
-    if (data.limitedStack < limitedSells) return 'Limited stack cannot be lower than the number already sold.';
+    if (data.costCredits < 0 || data.costPoints < 0 || data.pointsType < 0) return localizeWithFallback('octane.catalog.prices_and_currency_type_cannot_be', 'Prices and currency type cannot be negative.');
+    if (data.amount < 1 || data.amount > 10000) return localizeWithFallback('octane.catalog.quantity_must_be_between_1_and', 'Quantity must be between 1 and 10,000.');
+    if (data.songId < 0) return localizeWithFallback('octane.catalog.song_id_cannot_be_negative', 'Song ID cannot be negative.');
+    if (data.limitedStack < limitedSells) return localizeWithFallback('octane.catalog.limited_stack_cannot_be_lower_than', 'Limited stack cannot be lower than the number already sold.');
     return null;
 };
 
@@ -106,9 +106,9 @@ export const resolveCatalogAdminOfferInteraction = (
     error: string | null
 ) => {
     if (error) return { canSave: false, message: error };
-    if (!sessionReady) return { canSave: false, message: 'Connecting to Catalog Studio...' };
-    if (!detailsReady) return { canSave: false, message: 'Loading offer details...' };
-    if (loading) return { canSave: false, message: 'Saving offer...' };
+    if (!sessionReady) return { canSave: false, message: localizeWithFallback('octane.catalog.connecting_to_catalog_studio', 'Connecting to Catalog Studio...') };
+    if (!detailsReady) return { canSave: false, message: localizeWithFallback('octane.catalog.loading_offer_details', 'Loading offer details...') };
+    if (loading) return { canSave: false, message: localizeWithFallback('octane.catalog.saving_offer', 'Saving offer...') };
     return { canSave: true, message: null };
 };
 
@@ -265,13 +265,13 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
     const saveStatusText = smartSave.status === 'saving'
         ? 'Saving...'
         : smartSave.status === 'dirty'
-          ? 'Unsaved changes'
+          ? localizeWithFallback('octane.catalog.unsaved_changes', 'Unsaved changes')
           : smartSave.status === 'conflict'
             ? (smartSave.message || 'The catalog changed. Review and save again.')
             : smartSave.status === 'error'
               ? (smartSave.message || 'Save failed')
               : smartSave.lastSavedAt
-                ? `Saved · ${new Date(smartSave.lastSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                ? localizeWithFallback('octane.catalog.saved_at', 'Saved · %time%', ['time'], [new Date(smartSave.lastSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })])
                 : 'Saved';
     const canSubmit = interaction.canSave && !validationError && (smartSave.isDirty || !!smartSave.inFlight);
 
@@ -475,7 +475,7 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                     type="button"
                                     onClick={smartSave.reset}
                                 >
-                                    <FaUndo className="text-[8px]" /> Reset
+                                    <FaUndo className="text-[8px]" /> {localizeWithFallback('octane.catalog.reset', 'Reset')}
                                 </BaseButton>
                                 <BaseButton
                                     className="octane-catalog-admin-button is-muted"

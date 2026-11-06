@@ -1,6 +1,6 @@
 import { Dispatch, FC } from 'react';
 import { FaRedo, FaUndo } from 'react-icons/fa';
-import { LocalizeText } from '../../../api';
+import { LocalizeText, localizeWithFallback } from '../../../api';
 import { Base } from '../../../common';
 import { FloorActionMode, FloorplanAction, FloorplanState } from '../state/types';
 import { BaseButton } from '../../../common/BaseButton';
@@ -64,7 +64,7 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                         pointer
                         data-testid="tool-select-all"
                         className="fp-tool is-extra"
-                        title={state.brush.action === 'UNSET' ? 'Erase all tiles' : 'Apply brush to all tiles'}
+                        title={state.brush.action === 'UNSET' ? localizeWithFallback('octane.floorplan_editor.erase_all_tiles', 'Erase all tiles') : localizeWithFallback('octane.floorplan_editor.apply_brush_to_all_tiles', 'Apply brush to all tiles')}
                         onClick={() => {
                             exitPan();
                             dispatch({ type: 'SELECT_ALL' });
@@ -79,8 +79,8 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                         data-active={state.squareSelect && !panMode ? 'true' : 'false'}
                         title={
                             state.squareSelect && !panMode
-                                ? 'Rectangular selection mode active — drag on the canvas to apply the brush'
-                                : 'Rectangular selection — apply the brush to all tiles in an area'
+                                ? localizeWithFallback('octane.floorplan_editor.rectangular_selection_mode_active_drag_on', 'Rectangular selection mode active — drag on the canvas to apply the brush')
+                                : localizeWithFallback('octane.floorplan_editor.rectangular_selection_apply_the_brush_to', 'Rectangular selection — apply the brush to all tiles in an area')
                         }
                         className={`fp-tool is-extra ${state.squareSelect && !panMode ? 'is-active' : ''}`}
                         onClick={() => {
@@ -95,7 +95,7 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                             pointer
                             data-testid="tool-pan"
                             data-active={panMode ? 'true' : 'false'}
-                            title={panMode ? 'Hand mode active — drag to pan the view' : 'Hand mode — drag to pan the view'}
+                            title={panMode ? localizeWithFallback('octane.floorplan_editor.hand_mode_active_drag_to_pan', 'Hand mode active — drag to pan the view') : localizeWithFallback('octane.floorplan_editor.hand_mode_drag_to_pan_the', 'Hand mode — drag to pan the view')}
                             className={`fp-tool is-extra is-gap ${panMode ? 'is-active' : ''}`}
                             onClick={() => setPanMode(!panMode)}
                         >
@@ -107,7 +107,7 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                             <Base component={BaseButton} type="button"
                                 pointer={Boolean(canUndo)}
                                 data-testid="tool-undo"
-                                title="Undo (Ctrl+Z)"
+                                title={localizeWithFallback('octane.floorplan_editor.undo_ctrl_z', 'Undo (Ctrl+Z)')}
                                 className={`fp-tool is-extra is-gap ${canUndo ? '' : 'is-disabled'}`}
                                 onClick={canUndo && onUndo ? onUndo : undefined}
                             >
@@ -116,7 +116,7 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                             <Base component={BaseButton} type="button"
                                 pointer={Boolean(canRedo)}
                                 data-testid="tool-redo"
-                                title="Redo (Ctrl+Shift+Z)"
+                                title={localizeWithFallback('octane.floorplan_editor.redo_ctrl_shift_z', 'Redo (Ctrl+Shift+Z)')}
                                 className={`fp-tool is-extra ${canRedo ? '' : 'is-disabled'}`}
                                 onClick={canRedo && onRedo ? onRedo : undefined}
                             >

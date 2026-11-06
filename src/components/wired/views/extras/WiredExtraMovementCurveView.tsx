@@ -37,9 +37,9 @@ type VariableTarget = 'user' | 'furni' | 'global' | 'context';
 const CURVE_OPTIONS: { value: number; label: string }[] = [
     { value: 7, label: 'Jump' },
     { value: 0, label: 'Linear' },
-    { value: 1, label: 'Ease in' },
-    { value: 2, label: 'Ease out' },
-    { value: 3, label: 'Ease in / out' },
+    { value: 1, get label() { return localizeWithFallback('octane.wired.ease_in', 'Ease in'); } },
+    { value: 2, get label() { return localizeWithFallback('octane.wired.ease_out', 'Ease out'); } },
+    { value: 3, get label() { return localizeWithFallback('octane.wired.ease_in_out', 'Ease in / out'); } },
     { value: 4, label: 'Bounce' },
     { value: 5, label: 'Elastic' },
     { value: 6, label: 'Drop' }

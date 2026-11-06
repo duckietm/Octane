@@ -17,7 +17,9 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../../api', () => ({
     NotificationAlertType: { ALERT: 'alert' },
-    SendMessageComposer: mocks.sendMessage
+    SendMessageComposer: mocks.sendMessage,
+    localizeWithFallback: (_key: string, fallback: string, params?: string[], values?: string[]) =>
+        (params ?? []).reduce((text, name, index) => text.replace(`%${name}%`, values?.[index] ?? ''), fallback)
 }));
 
 vi.mock('../../hooks', () => ({

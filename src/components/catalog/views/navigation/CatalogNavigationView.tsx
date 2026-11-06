@@ -1,5 +1,5 @@
 import { FC, useCallback, useMemo } from 'react';
-import { CatalogType, getCatalogNodeKey, ICatalogNode, LocalizeText } from '../../../../api';
+import { CatalogType, getCatalogNodeKey, ICatalogNode, LocalizeText, localizeWithFallback } from '../../../../api';
 import { ClassicScrollAreaView } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useCatalogActions, useCatalogData } from '../../../../hooks';
@@ -59,7 +59,7 @@ export const CatalogNavigationView: FC<CatalogNavigationViewProps> = (props) => 
     return (
         <NativeTextTree>
             <ClassicScrollAreaView
-                aria-label="Catalog categories"
+                aria-label={localizeWithFallback('octane.catalog.catalog_categories', 'Catalog categories')}
                 className="octane-catalog-navigation-scroll-area"
                 contentClassName={`octane-catalog-navigation-list ${catalogType === CatalogType.BUILDER ? 'is-builders-club' : 'is-normal'}`}
                 role="tree"

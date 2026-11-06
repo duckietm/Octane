@@ -16,6 +16,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('../../../../api', () => ({
     GetConfigurationValue: () => '',
     LocalizeText: (key: string) => key,
+    localizeWithFallback: (_key: string, fallback: string) => fallback,
     ProductTypeEnum: { FLOOR: 's', WALL: 'i' }
 }));
 

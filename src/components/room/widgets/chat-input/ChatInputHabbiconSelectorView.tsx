@@ -127,7 +127,7 @@ export const ChatInputHabbiconSelectorView: FC = () => {
                             <div className="habbicon-selector-search">
                                 <input maxLength={24} value={search} onChange={(event) => setSearch(event.target.value)} />
                                 {!search && <span>{localizeWithFallback('generic.search', 'Search')}</span>}
-                                {search && <BaseButton aria-label="Clear" type="button" onClick={() => setSearch('')} />}
+                                {search && <BaseButton aria-label={localizeWithFallback('octane.room.clear', 'Clear')} type="button" onClick={() => setSearch('')} />}
                             </div>
                             <BaseButton
                                 className="habbicon-selector-book-button"

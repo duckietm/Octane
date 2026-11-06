@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from 'react';
-import { GetConfigurationValue } from '../../api';
+import { GetConfigurationValue, localizeWithFallback } from '../../api';
 import { resolveAdsFrame } from '../../api/utils/resolveAdsFrame';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { configFileUrl } from '../../secure-assets';
@@ -138,22 +138,22 @@ export const GoogleAdsView: FC<{}> = () => {
                 {publisherId && !framed && (
                     <script async crossOrigin="anonymous" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-${publisherId}`} />
                 )}
-                <OctaneCardHeaderView headerText="Sponsored" onCloseClick={() => setIsOpen(false)} />
+                <OctaneCardHeaderView headerText={localizeWithFallback('octane.ads.sponsored', 'Sponsored')} onCloseClick={() => setIsOpen(false)} />
                 <OctaneCardContentView>
                     <div className="flex items-center justify-center w-[300px] h-[250px] bg-white">
                         {loadError && <div className="text-xs text-red-600 text-center px-2">Ads unavailable: {loadError}</div>}
-                        {!loadError && (!publisherId || !config) && <div className="octane-google-ads__hint">Loading…</div>}
+                        {!loadError && (!publisherId || !config) && <div className="octane-google-ads__hint">{localizeWithFallback('octane.ads.loading', 'Loading…')}</div>}
                         {!loadError && framed && adsFrame && (
                             <iframe
                                 className="w-full h-full border-0"
                                 referrerPolicy="strict-origin"
                                 sandbox={adsFrame.sandbox}
                                 src={adsFrame.src}
-                                title="Sponsored"
+                                title={localizeWithFallback('octane.ads.sponsored', 'Sponsored')}
                             />
                         )}
                         {!loadError && framed && publisherId && config?.slot && !adsFrame && (
-                            <div className="text-xs text-red-600 text-center px-2">Ads unavailable: ads.frame.url is not a web URL</div>
+                            <div className="text-xs text-red-600 text-center px-2">{localizeWithFallback('octane.ads.ads_unavailable_ads_frame_url_is', 'Ads unavailable: ads.frame.url is not a web URL')}</div>
                         )}
                         {!loadError && !framed && publisherId && config?.slot && (
                             <ins
@@ -168,7 +168,7 @@ export const GoogleAdsView: FC<{}> = () => {
                             />
                         )}
                         {!loadError && publisherId && config && !config.slot && (
-                            <div className="octane-google-ads__hint text-center px-2">Ad slot not configured in configuration/adsense.json</div>
+                            <div className="octane-google-ads__hint text-center px-2">{localizeWithFallback('octane.ads.ad_slot_not_configured_in_configuration', 'Ad slot not configured in configuration/adsense.json')}</div>
                         )}
                     </div>
                 </OctaneCardContentView>

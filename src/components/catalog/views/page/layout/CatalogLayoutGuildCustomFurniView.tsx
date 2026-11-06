@@ -14,6 +14,7 @@ import { CatalogViewProductWidgetView } from '../widgets/CatalogViewProductWidge
 import { CatalogLayoutProps } from './CatalogLayout.types';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../../../../api';
 
 export const CatalogLayouGuildCustomFurniView: FC<CatalogLayoutProps> = () => {
     const { currentOffer = null, roomPreviewer = null } = useCatalogData();
@@ -56,7 +57,7 @@ export const CatalogLayouGuildCustomFurniView: FC<CatalogLayoutProps> = () => {
                     {!!currentOffer && (
                         <div className="relative shrink-0 overflow-hidden">
                             <BaseButton
-                                aria-label="Rotate preview"
+                                aria-label={localizeWithFallback('octane.catalog.rotate_preview', 'Rotate preview')}
                                 className="octane-catalog-preview-btn octane-catalog-preview-rotate"
                                 type="button"
                                 onClick={() => roomPreviewer?.changeRoomObjectDirection()}
@@ -64,7 +65,7 @@ export const CatalogLayouGuildCustomFurniView: FC<CatalogLayoutProps> = () => {
                                 <FaSyncAlt />
                             </BaseButton>
                             <BaseButton
-                                aria-label="Change preview state"
+                                aria-label={localizeWithFallback('octane.catalog.change_preview_state', 'Change preview state')}
                                 className="octane-catalog-preview-btn octane-catalog-preview-state"
                                 type="button"
                                 onClick={() => roomPreviewer?.changeRoomObjectState()}

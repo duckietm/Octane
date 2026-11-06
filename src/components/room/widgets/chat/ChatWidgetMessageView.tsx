@@ -1,6 +1,6 @@
 import { GetRoomEngine, RoomChatSettings, RoomObjectCategory } from '@octane/renderer';
 import { CSSProperties, FC, memo, useEffect, useMemo, useRef, useState } from 'react';
-import { ChatBubbleMessage, GetConfigurationValue } from '../../../../api';
+import { ChatBubbleMessage, GetConfigurationValue, localizeWithFallback } from '../../../../api';
 import { UserIdentityView } from '../../../../common';
 import { useOnClickChat } from '../../../../hooks';
 import { useUserDataSnapshot } from '../../../../hooks/session/useSessionSnapshots';
@@ -240,13 +240,13 @@ const ChatWidgetMessageViewBase: FC<ChatWidgetMessageViewProps> = ({
                         <div className="mt-[2px] flex flex-col gap-[2px]" onClick={onClickChat}>
                             <div className="flex items-start gap-1 leading-[1.1]">
                                 <span className="inline-block min-w-[52px] font-bold" style={{ opacity: 0.75 }}>
-                                    original:
+                                    {localizeWithFallback('octane.room.original', 'original:')}
                                 </span>
                                 <span className={messageClassName} dangerouslySetInnerHTML={{ __html: originalFormattedText }} />
                             </div>
                             <div className="flex items-start gap-1 leading-[1.1]">
                                 <span className="inline-block min-w-[52px] font-bold" style={{ opacity: 0.75 }}>
-                                    translate:
+                                    {localizeWithFallback('octane.room.translate', 'translate:')}
                                 </span>
                                 <span className={messageClassName} dangerouslySetInnerHTML={{ __html: translatedFormattedText }} />
                             </div>

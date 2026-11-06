@@ -145,7 +145,7 @@ export const WiredActionSetHighlightView: FC<{}> = () => {
 
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.set_furni_highlight.type', 'Highlight type:')}</Text>
-                    <Select aria-label="highlight type" className="form-select form-select-sm" value={state.highlightType} onChange={(event) => changeType(Number(event.target.value))}>
+                    <Select aria-label={localizeWithFallback('octane.wired.highlight_type', 'highlight type')} className="form-select form-select-sm" value={state.highlightType} onChange={(event) => changeType(Number(event.target.value))}>
                         {WIRED_HIGHLIGHT_TYPES.map((type) => (
                             <option key={type} value={type}>
                                 {localizeWithFallback(`wiredfurni.params.set_furni_highlight.type.${type}`, TYPE_FALLBACKS[type])}
@@ -157,7 +157,7 @@ export const WiredActionSetHighlightView: FC<{}> = () => {
 
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.set_furni_highlight.strength', 'Strength:')}</Text>
-                    <Select aria-label="highlight strength" className="form-select form-select-sm" value={state.strength} onChange={(event) => update({ strength: Number(event.target.value) })}>
+                    <Select aria-label={localizeWithFallback('octane.wired.highlight_strength', 'highlight strength')} className="form-select form-select-sm" value={state.strength} onChange={(event) => update({ strength: Number(event.target.value) })}>
                         {strengthOptions.map((option) => (
                             <option key={option.value} value={option.value}>
                                 {strengthLabel(option.level)}
@@ -185,7 +185,7 @@ export const WiredActionSetHighlightView: FC<{}> = () => {
 
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.set_furni_highlight.animation', 'Animation:')}</Text>
-                    <Select aria-label="highlight animation" className="form-select form-select-sm" value={state.animation} onChange={(event) => update({ animation: Number(event.target.value) })}>
+                    <Select aria-label={localizeWithFallback('octane.wired.highlight_animation', 'highlight animation')} className="form-select form-select-sm" value={state.animation} onChange={(event) => update({ animation: Number(event.target.value) })}>
                         {wiredHighlightAnimations(state.highlightType).map((animation) => (
                             <option key={animation} value={animation}>
                                 {localizeWithFallback(`wiredfurni.params.set_furni_highlight.animation.${animation}`, animation === 0 ? 'Steady' : 'Pulse')}
@@ -196,7 +196,7 @@ export const WiredActionSetHighlightView: FC<{}> = () => {
 
                 <div className={`flex flex-col gap-1 ${state.animation === WIRED_HIGHLIGHT_ANIMATION_STEADY ? '' : 'opacity-50 pointer-events-none'}`}>
                     <Text bold>{localizeWithFallback('wiredfurni.params.set_furni_highlight.easing', 'Transition:')}</Text>
-                    <Select aria-label="highlight easing" className="form-select form-select-sm" value={state.easing} onChange={(event) => update({ easing: Number(event.target.value) })}>
+                    <Select aria-label={localizeWithFallback('octane.wired.highlight_easing', 'highlight easing')} className="form-select form-select-sm" value={state.easing} onChange={(event) => update({ easing: Number(event.target.value) })}>
                         {EASING_FALLBACKS.map((fallback, value) => (
                             <option key={value} value={value}>
                                 {localizeWithFallback(`wiredfurni.params.set_furni_highlight.easing.${value}`, fallback)}

@@ -60,7 +60,7 @@ export const CatalogBuildersClubStatusView: FC = () => {
         isFullMember ? localizeWithFallback('catalog.bc.member.full', 'Full Member') : localizeWithFallback('catalog.bc.member.trial', 'Free Trial')
     );
 
-    const title = localizeOrDefault('builder.header.title', `Stato Builders' Club: ${membershipStatus}`, ['BCSTATUS'], [membershipStatus]);
+    const title = localizeOrDefault('builder.header.title', localizeWithFallback('octane.catalog.builders_club_status_membership_status', 'Builders Club status: %membership_status%', ['membership_status'], [String(membershipStatus)]), ['BCSTATUS'], [membershipStatus]);
 
     const duration = FriendlyTime.format(remainingSeconds);
     const durationText = highlightBuilderValues(localizeOrDefault('builder.header.status.membership', `Days left: ${marker(0)}`, ['DURATION'], [marker(0)]), [

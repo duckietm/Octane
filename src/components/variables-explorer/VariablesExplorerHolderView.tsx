@@ -1,6 +1,6 @@
 import { GetRoomEngine, GetSessionDataManager, RoomObjectCategory, RoomObjectVariable } from '@octane/renderer';
 import { FC, KeyboardEvent, ReactNode, useMemo, useState } from 'react';
-import { GetRoomSession, giveableVariables, isWallTargetKind, parseInt32, profileToEntries, VariablesWebApiClient, WebApiVariable } from '../../api';
+import { GetRoomSession, giveableVariables, isWallTargetKind, parseInt32, profileToEntries, VariablesWebApiClient, WebApiVariable, localizeWithFallback } from '../../api';
 import wiredGlobalPlaceholderImage from '../../assets/images/wiredtools/wired_global_placeholder.png';
 import { Button, LayoutAvatarImageView, LayoutPetImageView, LayoutRoomObjectImageView } from '../../common';
 import { useVariablesExplorerProfile } from '../../hooks/variables-explorer/useVariablesExplorerProfile';
@@ -113,7 +113,7 @@ export const VariablesExplorerHolderView: FC<VariablesExplorerHolderViewProps> =
         setEditingName(null);
 
         if (value === null) {
-            setStatus('Enter a whole number.');
+            setStatus(localizeWithFallback('octane.variables_explorer.enter_a_whole_number', 'Enter a whole number.'));
             return;
         }
 
@@ -138,7 +138,7 @@ export const VariablesExplorerHolderView: FC<VariablesExplorerHolderViewProps> =
         const value = selectedGive.hasValue ? parseInt32(giveValue) : null;
 
         if (selectedGive.hasValue && value === null) {
-            setStatus('Enter a whole number.');
+            setStatus(localizeWithFallback('octane.variables_explorer.enter_a_whole_number', 'Enter a whole number.'));
             return;
         }
 
@@ -156,7 +156,7 @@ export const VariablesExplorerHolderView: FC<VariablesExplorerHolderViewProps> =
         const amount = parseInt32(addValue);
 
         if (amount === null) {
-            setStatus('Enter a whole number.');
+            setStatus(localizeWithFallback('octane.variables_explorer.enter_a_whole_number', 'Enter a whole number.'));
             return;
         }
 
@@ -189,7 +189,7 @@ export const VariablesExplorerHolderView: FC<VariablesExplorerHolderViewProps> =
                     )
                 }
                 infoLines={holderInfoLines(target, profile, roomId, local?.name, local?.owner)}
-                variablesTitle={target.scope === 'global' ? 'Room variables:' : 'Assigned variables:'}
+                variablesTitle={target.scope === 'global' ? localizeWithFallback('octane.variables_explorer.room_variables', 'Room variables:') : localizeWithFallback('octane.variables_explorer.assigned_variables', 'Assigned variables:')}
                 entries={entries.map((entry) => ({
                     id: entry.name,
                     name: entry.name,
@@ -231,10 +231,10 @@ export const VariablesExplorerHolderView: FC<VariablesExplorerHolderViewProps> =
                 extraActions={
                     canWrite && selectedEntry?.hasValue ? (
                         <div className="flex items-center justify-end gap-2 text-[12px]">
-                            <span>Add to {selectedEntry.name}:</span>
-                            <NumberInput aria-label="Amount to add" className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={addValue} onChange={(event) => setAddValue(event.target.value)} />
+                            <span>{localizeWithFallback('octane.variables_explorer.add_to_holder', 'Add to %name%:', ['name'], [String(selectedEntry.name)])}</span>
+                            <NumberInput aria-label={localizeWithFallback('octane.variables_explorer.amount_to_add', 'Amount to add')} className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={addValue} onChange={(event) => setAddValue(event.target.value)} />
                             <Button disabled={busy || !holderReady} variant="secondary" onClick={addToSelected}>
-                                Add
+                                {localizeWithFallback('octane.variables_explorer.add', 'Add')}
                             </Button>
                         </div>
                     ) : null

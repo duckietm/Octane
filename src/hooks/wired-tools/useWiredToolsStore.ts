@@ -398,7 +398,7 @@ export const useWiredToolsStore = () => {
 
             updateAccountPreferences({ playTestMode });
             showSingleBubble?.(
-                localizeWithFallback(wiredPlayTestNotificationKey(playTestMode), playTestMode ? 'Playtest mode enabled' : 'Playtest mode disabled'),
+                localizeWithFallback(wiredPlayTestNotificationKey(playTestMode), playTestMode ? localizeWithFallback('octane.wired_tools.playtest_mode_enabled', 'Playtest mode enabled') : localizeWithFallback('octane.wired_tools.playtest_mode_disabled', 'Playtest mode disabled')),
                 NotificationBubbleType.INFO,
                 null,
                 'wiredmenu/open/settings'
