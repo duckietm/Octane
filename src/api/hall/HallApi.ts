@@ -12,10 +12,10 @@ export type HallTabName = typeof HALL_GAMES[number];
  * Every game the server's tables run: the game hall's, and the games that have their own world (the snail race, the
  * quiz, Tetris) but share the tables (`/api/hall`).
  */
-export type HallGameName = HallTabName | 'snails' | 'quiz' | 'tetris';
+export type HallGameName = HallTabName | 'snails' | 'quiz' | 'tetris' | 'diving';
 
 /** The seats a table of each game may have (from, to). */
-export const HALL_SEATS: Record<HallGameName, [number, number]> = { tictactoe: [ 2, 2 ], connect4: [ 2, 2 ], battleships: [ 2, 2 ], chess: [ 2, 2 ], poker: [ 2, 4 ], snails: [ 2, 6 ], quiz: [ 2, 8 ], tetris: [ 2, 4 ] };
+export const HALL_SEATS: Record<HallGameName, [number, number]> = { tictactoe: [ 2, 2 ], connect4: [ 2, 2 ], battleships: [ 2, 2 ], chess: [ 2, 2 ], poker: [ 2, 4 ], snails: [ 2, 6 ], quiz: [ 2, 8 ], tetris: [ 2, 4 ], diving: [ 2, 8 ] };
 
 export interface IHallPlayer {
     userId: number;
@@ -124,7 +124,7 @@ export const HallApi = {
 export const hallt = (key: string, fallback: string, parameters: string[] = null, replacements: string[] = null): string =>
     localizeWithFallback(`hall.${key}`, fallback, parameters, replacements);
 
-const GAME_NAMES: Record<HallGameName, string> = { tictactoe: 'Tic-tac-toe', connect4: 'Four in a row', battleships: 'Battleships', chess: 'Chess', poker: 'Poker', snails: 'Snail race', quiz: 'Habbi quiz', tetris: 'Tetris duel' };
+const GAME_NAMES: Record<HallGameName, string> = { tictactoe: 'Tic-tac-toe', connect4: 'Four in a row', battleships: 'Battleships', chess: 'Chess', poker: 'Poker', snails: 'Snail race', quiz: 'Habbi quiz', tetris: 'Blocks duel', diving: 'The diving board' };
 
 export const hallGameName = (game: string): string => hallt(`game.${game}`, GAME_NAMES[game as HallGameName] ?? game);
 

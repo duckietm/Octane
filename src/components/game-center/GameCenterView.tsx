@@ -13,6 +13,7 @@ import { HallGameTileView } from './views/HallGameTileView';
 import { SnailGameTileView } from './views/SnailGameTileView';
 import { QuizGameTileView } from './views/QuizGameTileView';
 import { TetrisGameTileView } from './views/TetrisGameTileView';
+import { PlongeoirGameTileView } from './views/PlongeoirGameTileView';
 import { SnowWarInstructionsView } from './views/snowwar/SnowWarInstructionsView';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
@@ -82,6 +83,7 @@ export const GameCenterView = () => {
                             {GetConfigurationValue<boolean>('snailrace.enabled', true) && <SnailGameTileView onOpen={() => setIsVisible(false)} />}
                             {GetConfigurationValue<boolean>('habbiquiz.enabled', true) && <QuizGameTileView onOpen={() => setIsVisible(false)} />}
                             {GetConfigurationValue<boolean>('tetrisduel.enabled', true) && <TetrisGameTileView onOpen={() => setIsVisible(false)} />}
+                            {GetConfigurationValue<boolean>('plongeoir.enabled', true) && <PlongeoirGameTileView onOpen={() => setIsVisible(false)} />}
                         </div>
                     )}
                 <GameStageView />

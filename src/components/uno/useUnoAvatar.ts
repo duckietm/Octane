@@ -5,7 +5,7 @@ const RETRY_MS = 500;
 const RETRY_MAX = 30;
 
 /** An avatar drawn by the hotel's renderer in one pose (standing or sitting), facing one of the hotel's directions. */
-export const useUnoAvatar = (figure: string, gender: string, direction: number, posture: string = AvatarAction.POSTURE_SIT): string | null => {
+export const useUnoAvatar = (figure: string, gender: string, direction: number, posture: string = AvatarAction.POSTURE_SIT, sign = -1): string | null => {
     const [url, setUrl] = useState<string | null>(null);
 
     useEffect(() => {
@@ -43,6 +43,7 @@ export const useUnoAvatar = (figure: string, gender: string, direction: number, 
             avatar.initActionAppends();
             avatar.setDirection(AvatarSetType.FULL, direction);
             avatar.appendAction(AvatarAction.POSTURE, posture);
+            if (sign >= 0) avatar.appendAction(AvatarAction.SIGN, sign);
             avatar.endActionAppends();
 
             let image: string = null;
@@ -73,7 +74,7 @@ export const useUnoAvatar = (figure: string, gender: string, direction: number, 
             disposed = true;
             if (timer) clearTimeout(timer);
         };
-    }, [figure, gender, direction, posture]);
+    }, [figure, gender, direction, posture, sign]);
 
     return url;
 };
