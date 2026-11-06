@@ -4,7 +4,7 @@ import { FC, useEffect, useEffectEvent, useRef, useState } from 'react';
 import { GetConfigurationValue, LocalizeText, SendMessageComposer, SetLocalStorage, TryVisitRoom } from '../../../../api';
 import { Text } from '../../../../common';
 import { localizeWithFallback } from '../../../../api/utils/localizeWithFallback';
-import { useAchievements, useMessageEvent, useNavigatorData, useOctaneEvent, useRoom } from '../../../../hooks';
+import { useAchievements, useMessageEvent, useNavigatorData, useOctaneEvent, useRoom, useRoomEnterOnce } from '../../../../hooks';
 import { classNames } from '../../../../layout';
 import { getRegisteredPlugins, IOctanePlugin, subscribePlugins } from '../../../plugins/OctanePluginApi';
 import { applyRoomZoom } from './roomZoom.helpers';
@@ -197,9 +197,13 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
         SetLocalStorage(ROOM_HISTORY_KEY, newStorage);
     };
 
+    const isFirstRoomEnter = useRoomEnterOnce();
+
     useMessageEvent<GetGuestRoomResultEvent>(GetGuestRoomResultEvent, (event) => {
         const parser = event.getParser();
         if (!parser.roomEnter || parser.data.roomId !== roomSession.roomId) return;
+        // Refreshing the room info answers roomEnter too: the entry card showed again at each refresh.
+        if (!isFirstRoomEnter(parser.data.roomId)) return;
 
         onChangeRoomHistory(parser.data.roomId, parser.data.roomName);
 
