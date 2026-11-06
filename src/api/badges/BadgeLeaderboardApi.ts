@@ -1,5 +1,7 @@
 import { GetConfiguration, GetSessionDataManager } from '@octane/renderer';
 import { getAccessToken } from '../auth';
+import { localizeServerMessage } from '../utils/localizeServerMessage';
+import { localizeWithFallback } from '../utils/localizeWithFallback';
 
 export type BadgeRarityKey = 'common' | 'rare' | 'epic' | 'legendary' | 'mythical' | 'unique';
 
@@ -84,7 +86,7 @@ const throwOnError = async (response: Response): Promise<void> => {
     if (response.ok) return;
 
     const payload = await parseJson<{ error?: string }>(response);
-    const message = payload?.error || `Request failed (${response.status}).`;
+    const message = localizeServerMessage(payload?.error, localizeWithFallback('api.message.request_failed', 'Request failed (%status%).', ['status'], [String(response.status)]));
     const error = new Error(message) as Error & { status?: number };
 
     error.status = response.status;
