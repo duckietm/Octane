@@ -1,0 +1,577 @@
+/*
+ * Habbi's game hall: the hotel's windows (the games' tables and the tables' lists), the boards drawn with the Cunning
+ * Fox Gamehall's pictures (HallBoards), on the gamehall's dark blue (#003163).
+ */
+
+.hall-sprite {
+    position: absolute;
+    display: block;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+
+.hall-sprite.is-static {
+    position: relative;
+    display: inline-block;
+    flex: 0 0 auto;
+}
+
+/* ---- The lobby ---- */
+
+.hall-lobby {
+    width: 560px;
+    min-height: 420px;
+}
+
+.hall-lobby__intro {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px;
+    border: 1px solid #c9b48a;
+    border-radius: 4px;
+    background: #fff8e6;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.hall-lobby__intro img,
+.hall-table__waiting img {
+    width: 180px;
+    flex: 0 0 auto;
+    border-radius: 4px;
+    image-rendering: pixelated;
+}
+
+.hall-lobby__list {
+    display: flex;
+    min-height: 130px;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.hall-lobby__empty {
+    color: #666666;
+    font-size: 12px;
+}
+
+.hall-lobby__table {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.hall-lobby__info {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    font-size: 12px;
+}
+
+.hall-lobby__create {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.hall-lobby__seats,
+.hall-lobby__bots,
+.hall-table__seats {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ---- A table ---- */
+
+.hall-table {
+    width: 560px;
+}
+
+.hall-table.is-tictactoe {
+    width: 540px;
+}
+
+.hall-table.is-connect4 {
+    width: 640px;
+}
+
+.hall-table.is-battleships {
+    width: 860px;
+}
+
+.hall-table.is-chess {
+    width: 560px;
+}
+
+.hall-table.is-poker {
+    width: 740px;
+}
+
+/* The boards' texts on the gamehall's dark blue (the card's content colours every text: this block wins). */
+.hall-table .hall-table__board [data-browser-text],
+.hall-table .hall-table__board [data-browser-text] * {
+    color: #ffffff;
+}
+
+.hall-table .hall-table__board .hall-bs__title {
+    color: #9fe86b;
+}
+
+.hall-table .hall-table__board .hall-poker__name strong {
+    color: #ffe873;
+}
+
+.hall-players {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.hall-player {
+    display: flex;
+    min-width: 160px;
+    flex: 1 1 0;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px 3px 3px;
+    border: 2px solid #cccccc;
+    border-radius: 6px;
+    background: #ffffff;
+    font-size: 12px;
+}
+
+.hall-player.is-you {
+    border-color: #f2a900;
+}
+
+.hall-player.is-waiting {
+    background: #fff3c2;
+    box-shadow: 0 0 0 2px #f2b51c;
+}
+
+.hall-player.is-winner {
+    background: #def5d4;
+    border-color: #4a9c2e;
+}
+
+.hall-player__head {
+    position: relative;
+    width: 40px;
+    height: 44px;
+    flex: 0 0 auto;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #003163;
+}
+
+.hall-player__head img {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    max-width: none;
+    image-rendering: pixelated;
+    transform: translateX(-50%);
+}
+
+.hall-player__info {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.hall-player__info strong {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.hall-table__status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #eef2f7;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.hall-table__status.is-turn {
+    background: #fff3c2;
+    color: #6b360d;
+}
+
+.hall-table__status.is-over {
+    background: #def5d4;
+    color: #22521a;
+}
+
+.hall-table__board {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    border-radius: 6px;
+    background: #003163;
+}
+
+.hall-table__waiting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    text-align: center;
+}
+
+.hall-table__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    font-size: 12px;
+}
+
+.hall-toast {
+    padding: 5px 10px;
+    border: 1px solid #8c1c12;
+    border-radius: 6px;
+    background: #fde2df;
+    color: #8c1c12;
+    font-size: 12px;
+}
+
+/* ---- The boards ---- */
+
+.hall-board {
+    position: relative;
+    flex: 0 0 auto;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    user-select: none;
+}
+
+.hall-board.is-my-turn {
+    cursor: pointer;
+}
+
+.hall-ttt {
+    width: 482px;
+    height: 462px;
+    background-size: 482px 462px;
+}
+
+.hall-sprite.is-line {
+    animation: hall-blink 0.5s steps(1) infinite;
+}
+
+.hall-sprite.is-last {
+    outline: 2px solid #f2b51c;
+    outline-offset: 1px;
+}
+
+@keyframes hall-blink {
+    50% {
+        opacity: 0.25;
+    }
+}
+
+.hall-c4 {
+    width: 592px;
+    height: 512px;
+}
+
+.hall-c4__frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 592px;
+    height: 512px;
+    max-width: none;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.hall-sprite.is-dropped {
+    animation: hall-drop 0.45s cubic-bezier(0.5, 0, 1, 1) both;
+}
+
+@keyframes hall-drop {
+    from {
+        transform: translateY(var(--hall-drop));
+    }
+
+    80% {
+        transform: translateY(6px);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+.hall-c4__arrow {
+    position: absolute;
+    top: -2px;
+    width: 28px;
+    height: 14px;
+    background: #f2b51c;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    pointer-events: none;
+}
+
+.hall-sea {
+    position: relative;
+    flex: 0 0 auto;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+
+.hall-sea.is-target {
+    cursor: crosshair;
+}
+
+.hall-sprite.is-sunk {
+    filter: grayscale(0.7) brightness(0.7);
+}
+
+.hall-sprite.is-preview {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.hall-sprite.is-bad {
+    filter: hue-rotate(-90deg) saturate(3);
+}
+
+.hall-bs,
+.hall-bs-place {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.hall-bs__column {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hall-bs__title {
+    color: #9fe86b;
+    font: 700 12px HabboAirUbuntu, sans-serif;
+}
+
+.hall-bs__result {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font: 700 16px HabboAirUbuntu, sans-serif;
+    text-align: center;
+}
+
+.hall-bs__result.is-hit,
+.hall-bs__result.is-sink {
+    color: #ffb340;
+}
+
+.hall-bs-place__side {
+    display: flex;
+    width: 200px;
+    flex-direction: column;
+    gap: 8px;
+    color: #ffffff;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.hall-bs-place__ships {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.hall-chess {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.hall-chess__board {
+    width: 432px;
+    height: 432px;
+    background-size: 432px 432px;
+}
+
+.hall-chess__grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 434px;
+    height: 434px;
+    max-width: none;
+    opacity: 0.55;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.hall-chess__board.is-flipped .hall-chess__grid {
+    display: none;
+}
+
+.hall-chess__square {
+    position: absolute;
+    width: 54px;
+    height: 54px;
+    cursor: pointer;
+}
+
+.hall-chess__square.is-last {
+    background: rgba(242, 181, 28, 0.35);
+}
+
+.hall-chess__square.is-selected {
+    background: rgba(242, 181, 28, 0.7);
+}
+
+.hall-chess__square.is-target::after {
+    position: absolute;
+    top: 19px;
+    left: 19px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(0, 49, 99, 0.45);
+    content: '';
+}
+
+.hall-chess__square.is-check {
+    background: radial-gradient(circle, rgba(231, 57, 41, 0.85) 30%, transparent 75%);
+}
+
+.hall-chess__taken {
+    display: flex;
+    min-height: 22px;
+    gap: 2px;
+}
+
+.hall-chess__promotion {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px;
+    border: 2px solid #f2b51c;
+    border-radius: 8px;
+    background: #fff8e6;
+    font-size: 12px;
+    transform: translate(-50%, -50%);
+}
+
+.hall-chess__promotion button {
+    padding: 4px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.hall-poker {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hall-poker__hand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.hall-poker__hand.is-you {
+    order: 10;
+    background: rgba(242, 181, 28, 0.15);
+}
+
+.hall-poker__hand.is-winner {
+    box-shadow: 0 0 0 2px #9fe86b;
+}
+
+.hall-poker__hand.is-folded {
+    opacity: 0.45;
+}
+
+.hall-poker__name {
+    display: flex;
+    width: 120px;
+    flex: 0 0 auto;
+    flex-direction: column;
+    font-size: 12px;
+}
+
+.hall-poker__cards {
+    display: flex;
+    gap: 6px;
+}
+
+.hall-poker__hand.is-you .hall-poker__card {
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+
+.hall-poker__card.is-picked {
+    transform: translateY(-14px);
+    filter: brightness(0.8) sepia(0.6);
+}
+
+.hall-poker__actions {
+    display: flex;
+    order: 11;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    color: #ffffff;
+    font-size: 12px;
+}
+
+/* ---- The Game Center tile ---- */
+
+.game-tile.game-tile--hall {
+    align-self: start;
+    height: auto;
+    min-height: 250px;
+}
+
+.game-tile--hall .game-tile__banner {
+    background-color: #003163;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    image-rendering: pixelated;
+}
+
+.game-tile--hall .game-tile__body {
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.game-tile--hall .game-tile__desc {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+}

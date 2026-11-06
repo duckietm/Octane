@@ -40,6 +40,7 @@ export * from './werewolf/WerewolfApi';
 export * from './wobble/WobbleApi';
 export * from './battleball/BattleBallApi';
 export * from './fastfood/FastFoodApi';
+export * from './hall/HallApi';
 export * from './user';
 export * from './utils';
 export * from './wired';
