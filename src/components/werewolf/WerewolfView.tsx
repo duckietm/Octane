@@ -1,9 +1,11 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { IWerewolfGame, IWerewolfRules, IWerewolfView, WEREWOLF_DEFAULT_RULES, WerewolfApi, werewolfErrorText, werewolfEventSpeaker, werewolfEventText, werewolfRoleName, werewolfRolePower, werewolfStepName, wt } from '../../api';
+import { IWerewolfEvent, IWerewolfGame, IWerewolfRules, IWerewolfView, WEREWOLF_DEFAULT_RULES, WerewolfApi, werewolfCampName, werewolfCauseText, werewolfErrorText, werewolfEventSpeaker, werewolfEventText, werewolfRoleDescription, werewolfRoleName, werewolfStepName, wt } from '../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { FOREST_BACKDROP, FOREST_HEIGHT, FOREST_WIDTH, WerewolfScene } from './WerewolfScene';
+import { IWerewolfReveal, WerewolfReveal } from './WerewolfReveal';
+import { WerewolfRoleCard } from './WerewolfRoleCard';
 import { WerewolfRoleIcon } from './WerewolfRoleIcon';
 import { WerewolfRulesView } from './WerewolfRulesView';
 import '../../css/werewolf/WerewolfView.css';
@@ -34,11 +36,47 @@ const stageTop = (zoom: number): number => (typeof window === 'undefined' ? TOP_
 
 const INSTRUCTIONS: Record<string, [string, string]> = {
     cupid: [ 'Choose two players who will fall in love (you can choose yourself), then confirm.', 'Unite the lovers' ],
+    wild_child: [ 'Choose your model. If they die, you become a werewolf.', 'Choose' ],
+    fox: [ 'Choose a player to sniff: you will learn whether a werewolf is among them and their two neighbours.', 'Sniff' ],
+    raven: [ 'Choose a player to mark: tomorrow they start the vote with two votes against them.', 'Mark' ],
+    big_bad_wolf: [ 'Alone now: choose a second prey to devour.', 'Devour' ],
+    white_wolf: [ 'You may devour a werewolf of the pack tonight, or spare them.', 'Devour' ],
+    piper: [ 'Choose two players to charm.', 'Charm' ],
     guard: [ 'Choose a player to protect from the werewolves tonight.', 'Protect' ],
     seer: [ 'Choose a player whose role you want to see.', 'See their role' ],
     wolves: [ 'Choose tonight\'s prey with your pack.', 'Devour' ],
     vote: [ 'Vote against the player you suspect.', 'Vote' ],
-    hunter: [ 'You are dying... choose who you take with you.', 'Shoot' ]
+    hunter: [ 'You are dead... but you still have your rifle! Choose who you take with you.', 'Shoot' ]
+};
+
+/** The big card an event shows: the player's role at the start, a death (for everybody), a player joining the pack. */
+const revealOf = (event: IWerewolfEvent, game: IWerewolfGame): IWerewolfReveal | null => {
+    const key = `${game.id}-${event.seq}`;
+
+    switch (event.type) {
+        case 'your_role':
+            return { key, kind: 'role', role: event.a, title: wt('reveal.your_role', 'Your role'), subtitle: wt('reveal.secret', 'Keep it secret!') };
+        case 'death': {
+            const seat = game.seats.find((other) => other.name === event.a);
+
+            return {
+                key,
+                kind: 'death',
+                role: event.b,
+                title: seat?.you ? wt('reveal.you_died', 'You are dead!') : wt('reveal.died', '%name% is dead', [ 'name' ], [ event.a ]),
+                subtitle: `${event.a} ${werewolfCauseText(event.c)}.`,
+                text: event.b ? '' : wt('reveal.hidden', 'Their role stays a secret.'),
+                figure: seat?.figure,
+                gender: seat?.gender
+            };
+        }
+        case 'infected':
+        case 'wolf_dog_wolf':
+        case 'wild_child_turns':
+            return { key, kind: 'side', role: game.you.role ?? 'werewolf', camp: 'wolves', title: wt('reveal.pack', 'You join the pack!'), text: werewolfEventText(event) ?? '' };
+        default:
+            return null;
+    }
 };
 
 /**
@@ -51,12 +89,14 @@ export const WerewolfView: FC = () => {
     const [view, setView] = useState<IWerewolfView | null>(null);
     const [error, setError] = useState('');
     const [busy, setBusy] = useState(false);
-    const [rulesOpen, setRulesOpen] = useState<'create' | 'edit' | 'read' | null>(null);
+    const [rulesOpen, setRulesOpen] = useState<'create' | 'edit' | 'read' | 'help' | null>(null);
     const [powerOpen, setPowerOpen] = useState(false);
     const [selected, setSelected] = useState<number[]>([]);
     const [poisoning, setPoisoning] = useState(false);
     const [text, setText] = useState('');
     const [bubbles, setBubbles] = useState<Map<string, string>>(new Map());
+    const [reveals, setReveals] = useState<IWerewolfReveal[]>([]);
+    const nextReveal = useCallback(() => setReveals((current) => current.slice(1)), []);
     const busyRef = useRef(false);
     const lastSeqRef = useRef(0);
     const gameRef = useRef(0);
@@ -75,6 +115,10 @@ export const WerewolfView: FC = () => {
         lastSeqRef.current = Math.max(...game.log.map((event) => event.seq));
 
         if (first) return;
+
+        const cards = fresh.map((event) => revealOf(event, game)).filter(Boolean);
+
+        if (cards.length) setReveals((current) => [ ...current, ...cards ]);
 
         for (const event of fresh) {
             const speaker = werewolfEventSpeaker(event);
@@ -97,7 +141,10 @@ export const WerewolfView: FC = () => {
     const receive = (next: IWerewolfView) => {
         const gameId = next.game?.id ?? 0;
 
-        if (gameId !== gameRef.current) lastSeqRef.current = 0;
+        if (gameId !== gameRef.current) {
+            lastSeqRef.current = 0;
+            setReveals([]);
+        }
 
         gameRef.current = gameId;
         showBubbles(next.game);
@@ -184,7 +231,7 @@ export const WerewolfView: FC = () => {
         run(() => WerewolfApi.leave());
     };
     const onSelect = (userId: number) => {
-        if (action === 'cupid') {
+        if (action === 'cupid' || action === 'piper') {
             setSelected((current) => (current.includes(userId) ? current.filter((id) => id !== userId) : [ ...current, userId ].slice(-2)));
             return;
         }
@@ -246,7 +293,14 @@ export const WerewolfView: FC = () => {
         if (!you?.alive && action !== 'hunter') return <div className="ww-panel"><div className="ww-panel__text">{wt('dead', 'You are dead: watch the game, and talk with the other dead.')}</div></div>;
 
         if (!action) {
-            return <div className="ww-panel"><div className="ww-panel__text">{game.isNight ? wt('sleeping', 'The village sleeps... close your eyes.') : game.step === 'dawn' ? wt('dawn', 'The village wakes up...') : wt('wait', 'Wait for the others...')}</div></div>;
+            const hunter = [ ...game.log ].reverse().find((event) => event.type === 'hunter_wakes')?.a ?? '';
+            const waiting = game.step === 'hunter'
+                ? wt('hunter_aims', 'The hunter %name% takes aim...', [ 'name' ], [ hunter ])
+                : game.isNight
+                    ? (you?.peeks && game.step === 'wolves' ? wt('peeking', 'You peek at the werewolves through your fingers... read their words in the chat.') : wt('sleeping', 'The village sleeps... close your eyes.'))
+                    : game.step === 'dawn' ? wt('dawn', 'The village wakes up...') : game.step === 'vote' && you?.canVote === false ? wt('no_vote', 'You no longer vote: watch the others.') : wt('wait', 'Wait for the others...');
+
+            return <div className="ww-panel"><div className="ww-panel__text">{waiting}</div></div>;
         }
 
         if (you.done) return <div className="ww-panel"><div className="ww-panel__text">{wt('done', 'Noted. Waiting for the others...')}</div></div>;
@@ -256,6 +310,30 @@ export const WerewolfView: FC = () => {
                 <div className="ww-panel">
                     <div className="ww-panel__text">{wt('debate', 'Debate! Who are the werewolves? When you are ready, go to the vote.')}</div>
                     <div className="ww-panel__actions"><Button variant="success" disabled={busy} onClick={() => run(() => WerewolfApi.ready())}>{wt('ready', 'Ready to vote')}</Button></div>
+                </div>
+            );
+        }
+
+        if (action === 'wolf_dog') {
+            return (
+                <div className="ww-panel">
+                    <div className="ww-panel__text">{wt('wolf_dog.what', 'Choose your side, for the whole game.')}</div>
+                    <div className="ww-panel__actions">
+                        <Button variant="success" disabled={busy} onClick={() => run(() => WerewolfApi.choose(false))}>{wt('wolf_dog.village', 'Stay a villager')}</Button>
+                        <Button variant="danger" disabled={busy} onClick={() => run(() => WerewolfApi.choose(true))}>{wt('wolf_dog.wolf', 'Join the werewolves')}</Button>
+                    </div>
+                </div>
+            );
+        }
+
+        if (action === 'accursed') {
+            return (
+                <div className="ww-panel">
+                    <div className="ww-panel__text">{wt('accursed.what', 'The pack chose %name%. Infect them instead (once in the game)?', [ 'name' ], [ you.victim || '?' ])}</div>
+                    <div className="ww-panel__actions">
+                        <Button variant="danger" disabled={busy} onClick={() => run(() => WerewolfApi.choose(true))}>{wt('accursed.infect', 'Infect %name%', [ 'name' ], [ you.victim || '?' ])}</Button>
+                        <Button variant="secondary" disabled={busy} onClick={() => run(() => WerewolfApi.choose(false))}>{wt('accursed.devour', 'Let them be devoured')}</Button>
+                    </div>
                 </div>
             );
         }
@@ -279,15 +357,18 @@ export const WerewolfView: FC = () => {
         }
 
         const [ instruction, label ] = INSTRUCTIONS[action] ?? [ '', '' ];
-        const needed = action === 'cupid' ? 2 : 1;
+        const choices = game.seats.filter((seat) => seat.targetable).length;
+        const needed = action === 'cupid' ? 2 : action === 'piper' ? Math.min(2, Math.max(1, choices)) : 1;
+        const optional = action === 'raven' || action === 'white_wolf';
 
         return (
             <div className="ww-panel">
                 <div className="ww-panel__text">{wt(`instruction.${action}`, instruction)}</div>
                 <div className="ww-panel__actions">
-                    <Button variant="success" disabled={busy || selected.length < needed} onClick={() => run(() => WerewolfApi.act(selected[0], selected[1] ?? 0))}>
-                        {selected.length >= needed && action !== 'cupid' ? `${wt(`button.${action}`, label)} : ${selectedName()}` : wt(`button.${action}`, label)}
+                    <Button variant={action === 'hunter' ? 'danger' : 'success'} disabled={busy || selected.length < needed} onClick={() => run(() => WerewolfApi.act(selected[0], selected[1] ?? 0))}>
+                        {selected.length >= needed ? `${wt(`button.${action}`, label)} : ${needed === 2 ? `${selectedName()} + ${selectedName(1)}` : selectedName()}` : wt(`button.${action}`, label)}
                     </Button>
+                    {optional && <Button variant="secondary" disabled={busy} onClick={() => run(() => WerewolfApi.pass())}>{wt(`pass.${action}`, 'Nobody')}</Button>}
                 </div>
             </div>
         );
@@ -308,11 +389,12 @@ export const WerewolfView: FC = () => {
                 </div>
 
                 {game && you?.role && game.state !== 'waiting' && (
-                    <button type="button" className="ww-rolecard" onClick={() => setPowerOpen(true)}>
+                    <button type="button" className={`ww-rolecard is-${you.camp ?? 'village'}`} onClick={() => setPowerOpen(true)}>
                         <WerewolfRoleIcon role={you.role} zoom={3} />
                         <span className="ww-rolecard__text">
                             <span className="ww-rolecard__label">{wt('your_role', 'Your role')}</span>
                             <span className="ww-rolecard__name">{werewolfRoleName(you.role)}</span>
+                            <span className="ww-rolecard__camp">{you.pack && you.role !== 'werewolf' && you.camp === 'wolves' ? wt('in_pack', 'In the pack') : werewolfCampName(you.camp ?? 'village')}{you.charmed ? ` · ${wt('charmed', 'Charmed')}` : ''}</span>
                             <span className="ww-rolecard__link">{wt('see_power', 'see the power')}</span>
                         </span>
                     </button>
@@ -356,6 +438,8 @@ export const WerewolfView: FC = () => {
                 )}
 
                 {error && <div className="ww-toast" data-browser-text>{error}</div>}
+
+                {reveals.length > 0 && <WerewolfReveal key={reveals[0].key} reveal={reveals[0]} onClose={nextReveal} />}
             </div>
 
             {!game && !rulesOpen && (
@@ -375,7 +459,10 @@ export const WerewolfView: FC = () => {
                                 </div>
                             ))}
                         </div>
-                        <Button variant="success" onClick={() => setRulesOpen('create')}>{wt('create', 'Create a village')}</Button>
+                        <div className="ww-lobby__actions">
+                            <Button variant="secondary" onClick={() => setRulesOpen('help')}>{wt('rules.help', 'Rules of the game')}</Button>
+                            <Button variant="success" onClick={() => setRulesOpen('create')}>{wt('create', 'Create a village')}</Button>
+                        </div>
                     </OctaneCardContentView>
                 </OctaneCardView>
             )}
@@ -383,7 +470,8 @@ export const WerewolfView: FC = () => {
             {rulesOpen && (
                 <WerewolfRulesView
                     rules={game?.rules ?? WEREWOLF_DEFAULT_RULES}
-                    editable={rulesOpen !== 'read'}
+                    editable={rulesOpen === 'create' || rulesOpen === 'edit'}
+                    tab={rulesOpen === 'read' && game?.state === 'playing' ? 'roles' : undefined}
                     mode={rulesOpen}
                     busy={busy}
                     onClose={() => setRulesOpen(null)}
@@ -397,8 +485,9 @@ export const WerewolfView: FC = () => {
                 <OctaneCardView className="ww-power" theme="primary-slim" uniqueKey="werewolf-power" isResizable={false}>
                     <OctaneCardHeaderView headerText={werewolfRoleName(you.role)} onCloseClick={() => setPowerOpen(false)} />
                     <OctaneCardContentView className="text-black items-center" gap={2}>
-                        <WerewolfRoleIcon role={you.role} zoom={4} />
-                        <div className="ww-power__text" data-browser-text>{werewolfRolePower(you.role)}</div>
+                        <WerewolfRoleCard role={you.role} camp={you.camp} zoom={3} />
+                        <span className={`ww-camp is-${you.camp ?? 'village'}`}>{werewolfCampName(you.camp ?? 'village')}</span>
+                        <div className="ww-power__text" data-browser-text>{werewolfRoleDescription(you.role)}</div>
                     </OctaneCardContentView>
                 </OctaneCardView>
             )}

@@ -203,6 +203,10 @@
     box-shadow: 0 0 0 2px rgba(226, 59, 44, 0.45);
 }
 
+.ww-tag.is-pack {
+    background: #4a1616;
+}
+
 .ww-tag.is-prey {
     border-color: #b30000;
 }
@@ -325,6 +329,23 @@
 .ww-rolecard__name {
     font-size: 18px;
     font-weight: 700;
+}
+
+.ww-rolecard.is-village {
+    border-color: #6fb04e;
+}
+
+.ww-rolecard.is-wolves {
+    border-color: #d23a2a;
+}
+
+.ww-rolecard.is-alone {
+    border-color: #9a6ad8;
+}
+
+.ww-rolecard__camp {
+    color: #dddddd;
+    font-size: 12px;
 }
 
 .ww-rolecard__link {
@@ -577,7 +598,144 @@
 }
 
 .ww-rules {
-    width: 440px;
+    width: 560px;
+    height: 600px;
+}
+
+.ww-rules .ww-rules__content {
+    overflow-y: auto;
+}
+
+.ww-rules__label--icon {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ww-rules__roles-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 6px;
+    border-top: 1px solid #dddddd;
+}
+
+.ww-rules__camp {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ww-rules__how {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.ww-rules .ww-rules__how strong,
+.ww-rules .ww-rules__how p,
+.ww-rules .ww-roleinfo__power,
+.ww-rules .ww-roleinfo__text {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.ww-rules__section strong {
+    display: block;
+    margin-bottom: 2px;
+    color: #6b360d;
+    font-size: 14px;
+}
+
+.ww-rules__section p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.ww-rules__rolelist {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ww-roleinfo {
+    border: 1px solid #cfc3a6;
+    border-radius: 6px;
+    background: #ffffff;
+}
+
+.ww-roleinfo.is-open {
+    border-color: #965019;
+    background: #fff8e6;
+}
+
+.ww-roleinfo__head {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 36px 150px 1fr;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ww-roleinfo__name {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.ww-roleinfo__power {
+    color: #555555;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.ww-roleinfo__body {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 4px 10px 10px;
+}
+
+.ww-roleinfo__text {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* A camp, as a small coloured badge. */
+.ww-camp {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 1px 8px;
+    border: 1px solid #000000;
+    border-radius: 999px;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.ww-camp.is-village {
+    background: #4f8a3a;
+}
+
+.ww-camp.is-wolves {
+    background: #a32222;
+}
+
+.ww-camp.is-alone {
+    background: #6b3fa8;
+}
+
+.ww-lobby__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
 }
 
 .ww-rules__row {
@@ -640,7 +798,11 @@
 }
 
 .ww-power {
-    width: 320px;
+    width: 360px;
+}
+
+.ww-power .ww-camp {
+    align-self: center;
 }
 
 .ww-power__text {
@@ -674,4 +836,198 @@
     display: block;
     overflow: visible;
     -webkit-line-clamp: unset;
+}
+
+/* ---- The big cards ---- */
+
+.ww-card {
+    position: relative;
+    flex: 0 0 auto;
+    perspective: 900px;
+}
+
+.ww-card__inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+.ww-card.is-back .ww-card__inner {
+    transform: rotateY(180deg);
+}
+
+.ww-card.is-flipping .ww-card__inner {
+    animation: ww-card-flip 0.9s cubic-bezier(0.3, 1.4, 0.5, 1) 0.7s both;
+}
+
+@keyframes ww-card-flip {
+    from {
+        transform: rotateY(180deg);
+    }
+
+    to {
+        transform: rotateY(0);
+    }
+}
+
+.ww-card__face {
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    backface-visibility: hidden;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.45));
+}
+
+.ww-card__back {
+    transform: rotateY(180deg);
+}
+
+.ww-card__portrait {
+    position: absolute;
+    line-height: 0;
+}
+
+.ww-card__name {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: #2a1608;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-weight: 700;
+    line-height: 1.05;
+    text-align: center;
+}
+
+/* ---- A card shown big over the clearing ---- */
+
+.ww-reveal {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.62);
+    animation: ww-reveal-fade 0.35s ease-out;
+}
+
+@keyframes ww-reveal-fade {
+    from {
+        opacity: 0;
+    }
+}
+
+.ww-reveal__box {
+    display: flex;
+    max-width: 520px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+    text-align: center;
+}
+
+.ww-reveal__title {
+    font-size: 30px;
+    font-weight: 700;
+    text-shadow: 0 3px 0 #000000;
+    animation: ww-reveal-drop 0.5s ease-out both;
+}
+
+.ww-reveal.is-death .ww-reveal__title {
+    color: #ff8a7a;
+}
+
+.ww-reveal.is-side .ww-reveal__title {
+    color: #ff6b5a;
+}
+
+.ww-reveal__subtitle {
+    color: #f0e0c0;
+    font-size: 16px;
+    text-shadow: 0 2px 0 #000000;
+}
+
+@keyframes ww-reveal-drop {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.ww-reveal__stage {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+    padding: 6px 0;
+}
+
+.ww-reveal__card {
+    animation: ww-reveal-card 0.7s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+
+@keyframes ww-reveal-card {
+    from {
+        opacity: 0;
+        transform: scale(0.2) rotate(-12deg);
+    }
+}
+
+.ww-reveal__card::after {
+    position: absolute;
+    inset: -40px;
+    z-index: -1;
+    background: radial-gradient(circle, rgba(255, 214, 100, 0.45) 0%, rgba(255, 214, 100, 0) 65%);
+    content: "";
+    animation: ww-reveal-glow 2s ease-in-out infinite alternate;
+}
+
+.ww-reveal.is-death .ww-reveal__card::after,
+.ww-reveal.is-side .ww-reveal__card::after {
+    background: radial-gradient(circle, rgba(230, 40, 30, 0.5) 0%, rgba(230, 40, 30, 0) 65%);
+}
+
+@keyframes ww-reveal-glow {
+    to {
+        opacity: 0.55;
+    }
+}
+
+.ww-reveal__avatar {
+    margin-right: 24px;
+    margin-bottom: 8px;
+    image-rendering: pixelated;
+    filter: grayscale(1) brightness(0.75);
+    transform: scale(1.8);
+    transform-origin: 50% 100%;
+    animation: ww-reveal-fall 1.4s ease-in 0.4s both;
+}
+
+@keyframes ww-reveal-fall {
+    from {
+        filter: none;
+    }
+}
+
+.ww-reveal__role {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    text-shadow: 0 2px 0 #000000;
+    animation: ww-reveal-drop 0.5s ease-out 1.3s both;
+}
+
+.ww-reveal__text {
+    padding: 8px 14px;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    background: rgba(26, 26, 26, 0.9);
+    font-size: 14px;
+    line-height: 1.5;
+    animation: ww-reveal-drop 0.5s ease-out 1.5s both;
 }

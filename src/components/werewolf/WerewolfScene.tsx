@@ -97,7 +97,7 @@ const Player: FC<{ seat: IWerewolfSeat; game: IWerewolfGame; chairs: typeof WERE
     const centre = forestTile(chair.x + 0.5, chair.y + 0.5);
     const depth = (chair.x + chair.y) * 10 + 6;
     const style: CSSProperties = { left: centre.left, top: centre.top + FEET_FROM_BOTTOM - SIT_LIFT, zIndex: depth };
-    const classes = [ 'ww-tag', seat.you ? 'is-you' : '', !seat.alive ? 'is-dead' : '', selectable ? 'is-selectable' : '', selected || seat.chosen ? 'is-selected' : '', seat.wolves.length ? 'is-prey' : '', seat.lover ? 'is-lover' : '' ].join(' ');
+    const classes = [ 'ww-tag', seat.you ? 'is-you' : '', !seat.alive ? 'is-dead' : '', selectable ? 'is-selectable' : '', selected || seat.chosen ? 'is-selected' : '', seat.wolves.length ? 'is-prey' : '', seat.lover ? 'is-lover' : '', seat.pack ? 'is-pack' : '' ].join(' ');
 
     return (
         <>
@@ -105,6 +105,8 @@ const Player: FC<{ seat: IWerewolfSeat; game: IWerewolfGame; chairs: typeof WERE
             <button type="button" className={classes} style={{ left: centre.left, top: centre.top - 80, zIndex: 900 }} disabled={!selectable} onClick={() => onSelect(seat.userId)}>
                 {seat.role && <WerewolfRoleIcon role={seat.role} zoom={1} />}
                 {seat.lover && <span className="ww-tag__heart">♥</span>}
+                {seat.charmed && <WerewolfRoleIcon role="piper" zoom={1} />}
+                {seat.raven && <WerewolfRoleIcon role="raven" zoom={1} />}
                 <span className="ww-tag__name">{seat.name}</span>
                 {seat.votes > 0 && <span className="ww-tag__votes">{seat.votes}</span>}
                 {game.step === 'debate' && seat.ready && <span className="ww-tag__ready">✓</span>}
