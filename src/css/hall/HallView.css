@@ -575,3 +575,137 @@
     overflow: visible;
     -webkit-line-clamp: unset;
 }
+
+/* ---- The snail race: lanes of 600 x 30 shown 1.2x ---- */
+
+.hall-table.is-snails {
+    width: 780px;
+}
+
+.hall-snails {
+    position: relative;
+    display: flex;
+    width: 720px;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.hall-snails__lane {
+    position: relative;
+    width: 720px;
+    height: 36px;
+    background-repeat: no-repeat;
+    background-size: 720px 36px;
+    image-rendering: pixelated;
+}
+
+.hall-snails__lane.is-you {
+    box-shadow: 0 0 0 2px #f2b51c;
+}
+
+.hall-table .hall-table__board .hall-snails__name {
+    position: absolute;
+    top: 9px;
+    left: 4px;
+    max-width: 44px;
+    overflow: hidden;
+    color: #ffffff;
+    font: 700 9px/12px HabboAirUbuntu, sans-serif;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 0 #000000;
+}
+
+.hall-snails__runner {
+    position: absolute;
+    top: 0;
+    width: 68px;
+    height: 36px;
+    transition: left 0.25s linear;
+}
+
+.hall-snails__zzz {
+    animation: hall-zzz 1.2s ease-in-out infinite;
+}
+
+@keyframes hall-zzz {
+    50% {
+        transform: translate(4px, -6px);
+        opacity: 0.6;
+    }
+}
+
+.hall-snails__leaf {
+    animation: hall-leaf 0.6s ease-out infinite;
+}
+
+@keyframes hall-leaf {
+    from {
+        transform: translateY(6px) rotate(-20deg);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateY(-10px) rotate(20deg);
+        opacity: 0;
+    }
+}
+
+.hall-table .hall-table__board .hall-snails__place {
+    position: absolute;
+    top: 8px;
+    right: 6px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #ffffff;
+    font: 700 11px/16px HabboAirUbuntu, sans-serif;
+}
+
+.hall-table .hall-table__board .hall-snails__place.is-1 {
+    background: #f2b51c;
+    color: #5a2c08;
+}
+
+.hall-table .hall-table__board .hall-snails__count {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+    color: #ffe873;
+    font: 700 72px/80px HabboAirUbuntu, sans-serif;
+    text-shadow: 0 4px 0 #6b360d;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.hall-snails__actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 6px;
+}
+
+.game-tile.game-tile--snails {
+    align-self: start;
+    height: auto;
+    min-height: 250px;
+}
+
+.game-tile--snails .game-tile__banner {
+    background-color: #5ca834;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    image-rendering: pixelated;
+}
+
+.game-tile--snails .game-tile__body {
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.game-tile--snails .game-tile__desc {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+}

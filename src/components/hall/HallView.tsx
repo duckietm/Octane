@@ -6,10 +6,11 @@ import { Checkbox } from '../../common/Checkbox';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import bannerImage from '../../assets/images/hall/hall-banner.png';
 import { useUnoAvatar } from '../uno/useUnoAvatar';
-import { BattleshipsBoard, ChessBoard, ConnectFourBoard, HallSprite, PokerBoard, TicTacToeBoard } from './HallBoards';
+import { BattleshipsBoard, ChessBoard, ConnectFourBoard, HallSprite, PokerBoard, SnailBoard, TicTacToeBoard } from './HallBoards';
 import '../../css/hall/HallView.css';
 
 const POLL_TABLE_MS = 1000;
+const POLL_RACE_MS = 250;
 const POLL_LOBBY_MS = 3000;
 
 const RULES: Record<HallGameName, string> = {
@@ -17,7 +18,8 @@ const RULES: Record<HallGameName, string> = {
     connect4: 'Drop your discs into the columns in turn: the first to line up four, straight or across, wins.',
     battleships: 'Place your fleet without the ships touching, then shoot at the other\'s sea in turns. A hit shoots again: sink every ship to win!',
     chess: 'The real rules of chess: castling, en passant, promotion. Checkmate the other king to win; white begins.',
-    poker: 'Five-card draw with two jokers: change the cards you like once, then the best hand wins.'
+    poker: 'Five-card draw with two jokers: change the cards you like once, then the best hand wins.',
+    snails: 'Each player has a snail. They crawl on their own, nap now and then or get a burst of energy: cheer yours on (space) to give it a boost. The first across the line wins!'
 };
 
 /** The mark of each seat (tic-tac-toe X / O, the discs, the colours of chess). */
@@ -40,7 +42,7 @@ const Players: FC<{ table: IHallTable }> = ({ table }) => (
                     <PlayerHead player={player} />
                     <span className="hall-player__info" data-browser-text>
                         <strong>{player.name}{player.bot ? ` (${hallt('robot', 'robot')})` : ''}</strong>
-                        <span>{hallt('wins', '%n% won', [ 'n' ], [ String(player.wins) ])}{player.waiting && player.timeLeft >= 0 ? ` · ${Math.ceil(player.timeLeft / 1000)} s` : ''}</span>
+                        <span>{hallt('wins', '%n% won', [ 'n' ], [ String(player.wins) ])}{player.waiting && player.timeLeft >= 0 && table.game !== 'snails' ? ` · ${Math.ceil(player.timeLeft / 1000)} s` : ''}</span>
                     </span>
                     {mark && <HallSprite name={mark} scale={mark.startsWith('TicTac') ? 2 : 1} className="is-static hall-player__mark" />}
                 </div>
@@ -67,6 +69,7 @@ const statusText = (table: IHallTable): string => {
     if (!board) return '';
     if (table.state === 'finished') return resultText(table);
     if (table.game === 'chess' && board.ending === '' && board.check) return board.turn === table.you ? hallt('chess.you_check', 'Check! Protect your king.') : hallt('chess.check', 'Check!');
+    if (table.game === 'snails') return Number(board.startsIn ?? 0) > 0 ? hallt('snails.starting', 'On your marks...') : hallt('snails.racing', 'They are off!');
     if (board.turn === -1) return table.players[table.you]?.waiting ? hallt('your_move_all', 'Your move!') : hallt('wait_others', 'Waiting for the others...');
 
     return board.turn === table.you ? hallt('your_turn', 'Your turn!') : hallt('their_turn', '%name% is playing...', [ 'name' ], [ table.players[board.turn]?.name ?? '' ]);
@@ -90,6 +93,8 @@ export const HallView: FC = () => {
 
     const table = view?.table;
     const current = (table?.game ?? game) as HallGameName;
+    const racing = table?.game === 'snails' && table.state === 'playing';
+    const [ tick, setTick ] = useState(0);
 
     const refresh = useCallback(() => {
         if (busyRef.current || pollingRef.current) return;
@@ -144,10 +149,33 @@ export const HallView: FC = () => {
 
         refresh();
 
-        const timer = setInterval(refresh, table ? POLL_TABLE_MS : POLL_LOBBY_MS);
+        const timer = setInterval(refresh, racing ? POLL_RACE_MS : table ? POLL_TABLE_MS : POLL_LOBBY_MS);
 
         return () => clearInterval(timer);
-    }, [ visible, !!table, refresh ]);
+    }, [ visible, !!table, racing, refresh ]);
+
+    // The snails' crawling legs, and space to cheer.
+    useEffect(() => {
+        if (!racing) return;
+
+        const timer = setInterval(() => setTick((value) => value + 1), 250);
+        const onKey = (event: KeyboardEvent) => {
+            const target = event.target as HTMLElement | null;
+
+            if (event.key !== ' ' || event.repeat || (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable))) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+            HallApi.move('snails', { cheer: true }).then(setView).catch(() => undefined);
+        };
+
+        window.addEventListener('keydown', onKey, true);
+
+        return () => {
+            clearInterval(timer);
+            window.removeEventListener('keydown', onKey, true);
+        };
+    }, [ racing ]);
 
     useEffect(() => {
         if (!error) return;
@@ -185,6 +213,7 @@ export const HallView: FC = () => {
                                 {table.game === 'battleships' && <BattleshipsBoard key={table.round} board={board} you={table.you} myTurn={myTurn} play={play} />}
                                 {table.game === 'chess' && <ChessBoard board={board} you={table.you} myTurn={myTurn} play={play} />}
                                 {table.game === 'poker' && <PokerBoard key={table.round} board={board} table={table} play={play} />}
+                                {table.game === 'snails' && <SnailBoard board={board} table={table} play={play} tick={tick} />}
                             </div>
                         )}
                         {table.state === 'waiting' && (

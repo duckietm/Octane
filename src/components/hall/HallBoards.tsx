@@ -8,6 +8,9 @@ import chessBoard from '../../assets/images/hall/hall-board-chess.png';
 import chessGrid from '../../assets/images/hall/hall-chess-grid.png';
 import connect4Board from '../../assets/images/hall/hall-board-connect4.png';
 import tictactoeBoard from '../../assets/images/hall/hall-board-tictactoe.png';
+import snailData from '../../assets/images/snails/snail-sprites.json';
+import snailImage from '../../assets/images/snails/snail-sprites.png';
+import snailTrack from '../../assets/images/snails/snail-track.png';
 
 /**
  * The boards of the game hall, drawn with the Cunning Fox Gamehall's own pictures (the cards, the chess pieces and
@@ -353,6 +356,71 @@ export const PokerBoard: FC<{ board: IHallBoard; table: IHallTable; play: Play }
                         play({ change: picked });
                         setPicked([]);
                     }}>{picked.length ? hallt('poker.change', 'Change %n% cards', [ 'n' ], [ String(picked.length) ]) : hallt('poker.keep', 'Keep my hand')}</Button>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// ---- The snail race: a lane a seat (600 x 30, shown 1.2x), the start at 40, the finish at 552
+
+const SNAILS = snailData as unknown as { width: number; height: number; frames: Record<string, [number, number, number, number]> };
+const LANE_SCALE = 1.2;
+
+const SnailSprite: FC<{ name: string; x: number; y: number; className?: string }> = ({ name, x, y, className = '' }) => {
+    const frame = SNAILS.frames[name];
+
+    if (!frame) return null;
+
+    const scale = 2;
+
+    return (
+        <span className={`hall-sprite ${className}`} style={{
+            left: x,
+            top: y,
+            width: frame[2] * scale,
+            height: frame[3] * scale,
+            backgroundImage: `url(${snailImage})`,
+            backgroundSize: `${SNAILS.width * scale}px ${SNAILS.height * scale}px`,
+            backgroundPosition: `${-frame[0] * scale}px ${-frame[1] * scale}px`
+        }} />
+    );
+};
+
+const PLACES = [ '', '1er', '2e', '3e', '4e', '5e', '6e' ];
+
+export const SnailBoard: FC<{ board: IHallBoard; table: IHallTable; play: Play; tick: number }> = ({ board, table, play, tick }) => {
+    const snails = (board.snails as { x: number; speed: number; mood: string; place: number; time: number; cheerIn: number }[]) ?? [];
+    const length = Number(board.length ?? 100);
+    const startsIn = Number(board.startsIn ?? 0);
+    const me = snails[table.you];
+    const canCheer = !!me && table.state === 'playing' && !!table.players[table.you]?.waiting;
+
+    return (
+        <div className="hall-snails">
+            {startsIn > 0 && table.state === 'playing' && <div className="hall-snails__count" data-browser-text>{Math.ceil(startsIn / 1000)}</div>}
+            {snails.map((snail, seat) => {
+                const left = (40 + (552 - 40) * Math.min(1, snail.x / length)) * LANE_SCALE - 60;
+                const frame = snail.mood === 'sleep' ? 2 : snail.mood === 'done' || snail.speed <= 0 ? 1 : tick % 2;
+
+                return (
+                    <div key={seat} className={`hall-snails__lane ${seat === table.you ? 'is-you' : ''}`} style={{ backgroundImage: `url(${snailTrack})` }}>
+                        <span className="hall-snails__name" data-browser-text>{table.players[seat]?.name ?? ''}</span>
+                        <div className="hall-snails__runner" style={{ left }}>
+                            {snail.mood === 'turbo' && <SnailSprite name="dust" x={-26} y={22} />}
+                            <SnailSprite name={`snail_${seat % 6}_${frame}`} x={0} y={-6} />
+                            {snail.mood === 'sleep' && <SnailSprite name="zzz" x={30} y={-28} className="hall-snails__zzz" />}
+                            {snail.mood === 'cheered' && <SnailSprite name="leaf" x={54} y={-18} className="hall-snails__leaf" />}
+                        </div>
+                        {snail.place > 0 && <span className={`hall-snails__place is-${snail.place}`} data-browser-text>{PLACES[snail.place] ?? snail.place}{snail.time > 0 ? ` · ${(snail.time / 1000).toFixed(1)} s` : ''}</span>}
+                    </div>
+                );
+            })}
+            {me && table.state === 'playing' && (
+                <div className="hall-snails__actions" data-browser-text>
+                    <Button variant="success" disabled={!canCheer} onClick={() => play({ cheer: true })}>
+                        {canCheer ? hallt('snails.cheer', 'Cheer your snail! (space)') : me.place > 0 ? hallt('snails.arrived', 'Your snail has arrived!') : startsIn > 0 ? hallt('snails.ready', 'Get ready...') : hallt('snails.wait', 'Catching its breath...')}
+                    </Button>
                 </div>
             )}
         </div>
