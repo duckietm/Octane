@@ -1628,7 +1628,7 @@
     "campaign.calendar.title": "Kalender",
     "widget.buildheight.floor": "Bodenhöhe",
     "widget.buildheight.lower": "Senken",
-    "widget.buildheight.raise": "Anheben"
+    "widget.buildheight.raise": "Anheben",
     "wheel.spins.free": "Gratis-Drehungen heute",
     "wheel.spins.extra": "Extra-Drehungen",
     "wheel.prize.credits": "%amount% Taler",
@@ -1638,7 +1638,7 @@
     "wheel.prize.points.name": "Punkte",
     "wheel.prize.spin": "1 Extra-Drehung",
     "wheel.prize.spins": "%amount% Extra-Drehungen",
-    "wheel.prize.nothing": "Diesmal kein Glück"
+    "wheel.prize.nothing": "Diesmal kein Glück",
     "avatar.widget.donate_to_all": "Alle bedienen",
     "avatar.widget.donate_to_user": "Mich bedienen",
     "avatar.widget.nux.proceed": "Weiter",

@@ -1621,7 +1621,7 @@
     "campaign.calendar.title": "Calendario",
     "widget.buildheight.floor": "Nivel del suelo",
     "widget.buildheight.lower": "Bajar",
-    "widget.buildheight.raise": "Subir"
+    "widget.buildheight.raise": "Subir",
     "wheel.spins.free": "Giros gratis hoy",
     "wheel.spins.extra": "Giros extra",
     "wheel.prize.credits": "%amount% créditos",
@@ -1631,7 +1631,7 @@
     "wheel.prize.points.name": "puntos",
     "wheel.prize.spin": "1 giro extra",
     "wheel.prize.spins": "%amount% giros extra",
-    "wheel.prize.nothing": "Sin suerte esta vez"
+    "wheel.prize.nothing": "Sin suerte esta vez",
     "avatar.widget.donate_to_all": "Servir a todos",
     "avatar.widget.donate_to_user": "Servirme",
     "avatar.widget.nux.proceed": "Continuar",

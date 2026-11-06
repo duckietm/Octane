@@ -1623,7 +1623,7 @@
     "campaign.calendar.title": "Kalender",
     "widget.buildheight.floor": "Vloerniveau",
     "widget.buildheight.lower": "Omlaag",
-    "widget.buildheight.raise": "Omhoog"
+    "widget.buildheight.raise": "Omhoog",
     "wheel.spins.free": "Gratis draaibeurten vandaag",
     "wheel.spins.extra": "Extra draaibeurten",
     "wheel.prize.credits": "%amount% credits",
@@ -1633,7 +1633,7 @@
     "wheel.prize.points.name": "punten",
     "wheel.prize.spin": "1 extra draaibeurt",
     "wheel.prize.spins": "%amount% extra draaibeurten",
-    "wheel.prize.nothing": "Deze keer geen geluk"
+    "wheel.prize.nothing": "Deze keer geen geluk",
     "avatar.widget.donate_to_all": "Iedereen bedienen",
     "avatar.widget.donate_to_user": "Bedien mij",
     "avatar.widget.nux.proceed": "Doorgaan",
