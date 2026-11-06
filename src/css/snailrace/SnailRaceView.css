@@ -1,0 +1,114 @@
+/* The snail race's garden: the stage is 960 x 680, the garden drawn at 1x and shown twice its size. */
+
+.snailrace-world {
+    background: #3f7a24;
+}
+
+.snailrace-sprite {
+    position: absolute;
+    display: block;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+
+.snailrace-runner {
+    position: absolute;
+    width: 68px;
+    height: 52px;
+    transition: left 0.25s linear;
+}
+
+.snailrace-zzz {
+    animation: snailrace-float 1.6s ease-in-out infinite;
+}
+
+.snailrace-leaf {
+    animation: snailrace-float 0.6s ease-in-out infinite;
+}
+
+@keyframes snailrace-float {
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.snailrace-name {
+    position: absolute;
+    left: 20px;
+    width: 88px;
+    overflow: hidden;
+    color: #3d2108;
+    font: 700 12px/44px HabboAirUbuntu, sans-serif;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.snailrace-name.is-you {
+    color: #b0280f;
+}
+
+.snailrace-place {
+    position: absolute;
+    top: -14px;
+    left: 20px;
+    width: 26px;
+    height: 26px;
+    border: 2px solid #6b360d;
+    border-radius: 50%;
+    background: #f0c81e;
+    color: #5a2c08;
+    font: 700 14px/22px HabboAirUbuntu, sans-serif;
+    text-align: center;
+}
+
+.snailrace-place.is-1 {
+    background: #ffe873;
+    box-shadow: 0 0 8px #ffe873;
+}
+
+.snailrace-fan {
+    position: absolute;
+    bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateX(-50%);
+}
+
+.snailrace-fan__flag {
+    margin-top: -4px;
+    padding: 1px 8px;
+    border: 2px solid #3d2108;
+    border-radius: 8px;
+    color: #ffffff;
+    font: 700 11px HabboAirUbuntu, sans-serif;
+    white-space: nowrap;
+}
+
+.snailrace-fan__flag.is-0 { background: #d6342b; }
+.snailrace-fan__flag.is-1 { background: #2870dc; }
+.snailrace-fan__flag.is-2 { background: #c9a10a; }
+.snailrace-fan__flag.is-3 { background: #4f9a24; }
+.snailrace-fan__flag.is-4 { background: #8f45c2; }
+.snailrace-fan__flag.is-5 { background: #e07a14; }
+
+.snailrace-fan.is-you .snailrace-fan__flag {
+    outline: 2px solid #ffe873;
+}
+
+.snailrace-fan__shout {
+    position: absolute;
+    top: 24px;
+    padding: 2px 8px;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #000000;
+    font: 700 12px HabboAirUbuntu, sans-serif;
+}
+
+.snailrace-cheer {
+    bottom: 140px;
+    padding: 8px 12px;
+}

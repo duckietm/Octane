@@ -79,9 +79,9 @@ export const GameCenterView = () => {
                             {GetConfigurationValue<boolean>('battleball.enabled', true) && <BattleBallGameTileView onOpen={() => setIsVisible(false)} />}
                             {GetConfigurationValue<boolean>('fastfood.enabled', true) && <FastFoodGameTileView onOpen={() => setIsVisible(false)} />}
                             {GetConfigurationValue<boolean>('hall.enabled', true) && <HallGameTileView onOpen={() => setIsVisible(false)} />}
-                            {GetConfigurationValue<boolean>('hall.enabled', true) && <SnailGameTileView onOpen={() => setIsVisible(false)} />}
-                            {GetConfigurationValue<boolean>('hall.enabled', true) && <QuizGameTileView onOpen={() => setIsVisible(false)} />}
-                            {GetConfigurationValue<boolean>('hall.enabled', true) && <TetrisGameTileView onOpen={() => setIsVisible(false)} />}
+                            {GetConfigurationValue<boolean>('snailrace.enabled', true) && <SnailGameTileView onOpen={() => setIsVisible(false)} />}
+                            {GetConfigurationValue<boolean>('habbiquiz.enabled', true) && <QuizGameTileView onOpen={() => setIsVisible(false)} />}
+                            {GetConfigurationValue<boolean>('tetrisduel.enabled', true) && <TetrisGameTileView onOpen={() => setIsVisible(false)} />}
                         </div>
                     )}
                 <GameStageView />

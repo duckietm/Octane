@@ -4,9 +4,15 @@ import { GetConfigurationValue } from '../octane/GetConfigurationValue';
 import { localizeWithFallback } from '../utils/localizeWithFallback';
 
 /** The games of the game hall, in the order of its tabs. */
-export const HALL_GAMES = [ 'tictactoe', 'connect4', 'battleships', 'chess', 'poker', 'snails', 'quiz', 'tetris' ] as const;
+export const HALL_GAMES = [ 'tictactoe', 'connect4', 'battleships', 'chess', 'poker' ] as const;
 
-export type HallGameName = typeof HALL_GAMES[number];
+export type HallTabName = typeof HALL_GAMES[number];
+
+/**
+ * Every game the server's tables run: the game hall's, and the games that have their own world (the snail race, the
+ * quiz, Tetris) but share the tables (`/api/hall`).
+ */
+export type HallGameName = HallTabName | 'snails' | 'quiz' | 'tetris';
 
 /** The seats a table of each game may have (from, to). */
 export const HALL_SEATS: Record<HallGameName, [number, number]> = { tictactoe: [ 2, 2 ], connect4: [ 2, 2 ], battleships: [ 2, 2 ], chess: [ 2, 2 ], poker: [ 2, 4 ], snails: [ 2, 6 ], quiz: [ 2, 8 ], tetris: [ 2, 4 ] };

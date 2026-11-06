@@ -1,28 +1,23 @@
 import { AddLinkEventTracker, AvatarAction, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { HALL_GAMES, HALL_SEATS, HallApi, HallGameName, IHallPlayer, IHallTable, IHallView, hallErrorText, hallGameName, hallt } from '../../api';
+import { HALL_GAMES, HALL_SEATS, HallApi, HallGameName, HallTabName, IHallPlayer, IHallTable, IHallView, hallErrorText, hallGameName, hallt } from '../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
 import { Checkbox } from '../../common/Checkbox';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import bannerImage from '../../assets/images/hall/hall-banner.png';
 import { useUnoAvatar } from '../uno/useUnoAvatar';
-import { BattleshipsBoard, ChessBoard, ConnectFourBoard, HallSprite, PokerBoard, QuizBoard, SnailBoard, TicTacToeBoard } from './HallBoards';
-import { TetrisBoard } from './TetrisBoard';
+import { BattleshipsBoard, ChessBoard, ConnectFourBoard, HallSprite, PokerBoard, TicTacToeBoard } from './HallBoards';
 import '../../css/hall/HallView.css';
 
 const POLL_TABLE_MS = 1000;
-const POLL_RACE_MS = 250;
 const POLL_LOBBY_MS = 3000;
 
-const RULES: Record<HallGameName, string> = {
+const RULES: Record<HallTabName, string> = {
     tictactoe: 'Line up five of your marks in a row, straight or across, before the other! X begins.',
     connect4: 'Drop your discs into the columns in turn: the first to line up four, straight or across, wins.',
     battleships: 'Place your fleet without the ships touching, then shoot at the other\'s sea in turns. A hit shoots again: sink every ship to win!',
     chess: 'The real rules of chess: castling, en passant, promotion. Checkmate the other king to win; white begins.',
-    poker: 'Five-card draw with two jokers: change the cards you like once, then the best hand wins.',
-    quiz: 'Ten questions on the hotel and the world, four answers each: answer right and fast to score the most points!',
-    tetris: 'Everyone plays their own Tetris. Clear two lines or more at once to send rubbish to the others: the last one standing wins! Arrows to move and turn, space to drop, C to hold.',
-    snails: 'Each player has a snail. They crawl on their own, nap now and then or get a burst of energy: cheer yours on (space) to give it a boost. The first across the line wins!'
+    poker: 'Five-card draw with two jokers: change the cards you like once, then the best hand wins.'
 };
 
 /** The mark of each seat (tic-tac-toe X / O, the discs, the colours of chess). */
@@ -45,7 +40,7 @@ const Players: FC<{ table: IHallTable }> = ({ table }) => (
                     <PlayerHead player={player} />
                     <span className="hall-player__info" data-browser-text>
                         <strong>{player.name}{player.bot ? ` (${hallt('robot', 'robot')})` : ''}</strong>
-                        <span>{hallt('wins', '%n% won', [ 'n' ], [ String(player.wins) ])}{player.waiting && player.timeLeft >= 0 && table.game !== 'snails' && table.game !== 'quiz' && table.game !== 'tetris' ? ` · ${Math.ceil(player.timeLeft / 1000)} s` : ''}</span>
+                        <span>{hallt('wins', '%n% won', [ 'n' ], [ String(player.wins) ])}{player.waiting && player.timeLeft >= 0 ? ` · ${Math.ceil(player.timeLeft / 1000)} s` : ''}</span>
                     </span>
                     {mark && <HallSprite name={mark} scale={mark.startsWith('TicTac') ? 2 : 1} className="is-static hall-player__mark" />}
                 </div>
@@ -72,9 +67,6 @@ const statusText = (table: IHallTable): string => {
     if (!board) return '';
     if (table.state === 'finished') return resultText(table);
     if (table.game === 'chess' && board.ending === '' && board.check) return board.turn === table.you ? hallt('chess.you_check', 'Check! Protect your king.') : hallt('chess.check', 'Check!');
-    if (table.game === 'quiz') return board.phase === 'reveal' ? hallt('quiz.answer', 'The answer!') : table.players[table.you]?.waiting ? hallt('quiz.your_turn', 'Your answer?') : hallt('quiz.wait', 'Waiting for the others...');
-    if (table.game === 'tetris') return Number(board.startsIn ?? 0) > 0 ? hallt('tetris.starting', 'Get ready...') : table.players[table.you]?.waiting ? hallt('tetris.playing', 'Clear lines to send rubbish to the others!') : hallt('tetris.watching', 'You are out: watch the others!');
-    if (table.game === 'snails') return Number(board.startsIn ?? 0) > 0 ? hallt('snails.starting', 'On your marks...') : hallt('snails.racing', 'They are off!');
     if (board.turn === -1) return table.players[table.you]?.waiting ? hallt('your_move_all', 'Your move!') : hallt('wait_others', 'Waiting for the others...');
 
     return board.turn === table.you ? hallt('your_turn', 'Your turn!') : hallt('their_turn', '%name% is playing...', [ 'name' ], [ table.players[board.turn]?.name ?? '' ]);
@@ -87,7 +79,7 @@ const statusText = (table: IHallTable): string => {
  */
 export const HallView: FC = () => {
     const [ visible, setVisible ] = useState(false);
-    const [ game, setGame ] = useState<HallGameName>('tictactoe');
+    const [ game, setGame ] = useState<HallTabName>('tictactoe');
     const [ view, setView ] = useState<IHallView | null>(null);
     const [ error, setError ] = useState('');
     const [ busy, setBusy ] = useState(false);
@@ -98,9 +90,6 @@ export const HallView: FC = () => {
 
     const table = view?.table;
     const current = (table?.game ?? game) as HallGameName;
-    const racing = (table?.game === 'snails' || table?.game === 'quiz' || table?.game === 'tetris') && table.state === 'playing';
-    const receivedRef = useRef(0);
-    const [ tick, setTick ] = useState(0);
 
     const refresh = useCallback(() => {
         if (busyRef.current || pollingRef.current) return;
@@ -108,7 +97,6 @@ export const HallView: FC = () => {
         pollingRef.current = true;
         HallApi.view(current)
             .then((next) => {
-                receivedRef.current = performance.now();
                 setView(next);
             })
             .catch((caught) => setError(hallErrorText(caught) ?? ''))
@@ -127,7 +115,6 @@ export const HallView: FC = () => {
         try {
             const next = await action();
 
-            receivedRef.current = performance.now();
             setView(next);
         } catch (caught) {
             setError(hallErrorText(caught) ?? '');
@@ -143,7 +130,7 @@ export const HallView: FC = () => {
                 const parts = url.split('/');
 
                 if (parts[1] === 'show') {
-                    if (HALL_GAMES.includes(parts[2] as HallGameName)) setGame(parts[2] as HallGameName);
+                    if (HALL_GAMES.includes(parts[2] as HallTabName)) setGame(parts[2] as HallTabName);
                     setVisible(true);
                 } else if (parts[1] === 'hide') setVisible(false);
                 else if (parts[1] === 'toggle') setVisible((value) => !value);
@@ -161,35 +148,10 @@ export const HallView: FC = () => {
 
         refresh();
 
-        const timer = setInterval(refresh, racing ? POLL_RACE_MS : table ? POLL_TABLE_MS : POLL_LOBBY_MS);
+        const timer = setInterval(refresh, table ? POLL_TABLE_MS : POLL_LOBBY_MS);
 
         return () => clearInterval(timer);
-    }, [ visible, !!table, racing, refresh ]);
-
-    // The snails' crawling legs, and space to cheer.
-    useEffect(() => {
-        if (!racing) return;
-
-        const timer = setInterval(() => setTick((value) => value + 1), 250);
-        const onKey = (event: KeyboardEvent) => {
-            if (table?.game !== 'snails') return;
-
-            const target = event.target as HTMLElement | null;
-
-            if (event.key !== ' ' || event.repeat || (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable))) return;
-
-            event.preventDefault();
-            event.stopPropagation();
-            HallApi.move('snails', { cheer: true }).then(setView).catch(() => undefined);
-        };
-
-        window.addEventListener('keydown', onKey, true);
-
-        return () => {
-            clearInterval(timer);
-            window.removeEventListener('keydown', onKey, true);
-        };
-    }, [ racing, table?.game ]);
+    }, [ visible, !!table, refresh ]);
 
     useEffect(() => {
         if (!error) return;
@@ -227,15 +189,12 @@ export const HallView: FC = () => {
                                 {table.game === 'battleships' && <BattleshipsBoard key={table.round} board={board} you={table.you} myTurn={myTurn} play={play} />}
                                 {table.game === 'chess' && <ChessBoard board={board} you={table.you} myTurn={myTurn} play={play} />}
                                 {table.game === 'poker' && <PokerBoard key={table.round} board={board} table={table} play={play} />}
-                                {table.game === 'snails' && <SnailBoard board={board} table={table} play={play} tick={tick} />}
-                                {table.game === 'tetris' && <TetrisBoard key={table.round} board={board} table={table} onView={setView} />}
-                                {table.game === 'quiz' && <QuizBoard board={board} table={table} play={play} now={performance.now() - receivedRef.current} />}
                             </div>
                         )}
                         {table.state === 'waiting' && (
                             <div className="hall-table__waiting" data-browser-text>
                                 <img src={bannerImage} alt="" draggable={false} />
-                                <span>{hallt(`rules.${table.game}`, RULES[table.game])}</span>
+                                <span>{hallt(`rules.${table.game}`, RULES[table.game as HallTabName])}</span>
                                 {seats[1] > seats[0] && table.youAreHost && (
                                     <div className="hall-table__seats">
                                         <span>{hallt('seats', 'Players')}</span>

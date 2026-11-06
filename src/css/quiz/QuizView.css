@@ -1,0 +1,206 @@
+/* The Habbi quiz's studio: the stage is 960 x 640, the studio drawn at 1x and shown twice its size. */
+
+.quiz-world {
+    background: #1d0b2c;
+}
+
+/* The inside of the big screen: x 208..752, y 36..292. */
+.quiz-screen {
+    position: absolute;
+    top: 36px;
+    left: 208px;
+    display: flex;
+    width: 544px;
+    height: 256px;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px 14px;
+    box-sizing: border-box;
+    color: #ffffff;
+    font-family: HabboAirUbuntu, sans-serif;
+}
+
+.quiz-screen__title {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #ffe873;
+    font: 700 40px HabboAirUbuntu, sans-serif;
+    text-shadow: 0 3px 0 #6b360d;
+}
+
+.quiz-screen__title span {
+    color: #ffffff;
+    font-size: 16px;
+    text-shadow: none;
+}
+
+.quiz-screen__head {
+    display: flex;
+    justify-content: space-between;
+    color: #ffe873;
+    font: 700 13px HabboAirUbuntu, sans-serif;
+}
+
+.quiz-screen__category {
+    padding: 1px 8px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+}
+
+.quiz-screen__question {
+    display: flex;
+    min-height: 56px;
+    align-items: center;
+    justify-content: center;
+    font: 700 17px/1.3 HabboAirUbuntu, sans-serif;
+    text-align: center;
+}
+
+.quiz-screen__answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.quiz-answer {
+    display: flex;
+    min-height: 50px;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 10px;
+    border: 2px solid rgba(0, 0, 0, 0.45);
+    border-radius: 8px;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+    color: #ffffff;
+    cursor: pointer;
+    font: 700 14px/1.2 HabboAirUbuntu, sans-serif;
+    text-align: left;
+}
+
+.quiz-answer.is-0 { background: #d6342b; }
+.quiz-answer.is-1 { background: #2870dc; }
+.quiz-answer.is-2 { background: #d29a0c; }
+.quiz-answer.is-3 { background: #4f9a24; }
+
+.quiz-answer:not(:disabled):hover {
+    filter: brightness(1.15);
+}
+
+.quiz-answer:disabled {
+    cursor: default;
+}
+
+.quiz-answer.is-mine {
+    outline: 3px solid #ffffff;
+}
+
+.quiz-answer.is-right {
+    box-shadow: 0 0 0 4px #9fe86b, 0 0 18px #9fe86b;
+}
+
+.quiz-answer.is-dim {
+    opacity: 0.35;
+}
+
+.quiz-answer__letter {
+    display: flex;
+    width: 26px;
+    height: 26px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.quiz-screen__timer {
+    height: 8px;
+    margin-top: auto;
+    overflow: hidden;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.quiz-screen__timer span {
+    display: block;
+    height: 100%;
+    background: #9fe86b;
+    transition: width 0.25s linear;
+}
+
+.quiz-screen__timer span.is-hurry { background: #ff7a5c; }
+.quiz-screen__timer span.is-reveal { background: #f2b51c; }
+
+/* A contestant: the avatar standing behind the podium (112 x 88). */
+.quiz-contestant {
+    position: absolute;
+    width: 112px;
+    height: 88px;
+}
+
+.quiz-contestant__avatar {
+    position: absolute;
+    bottom: 56px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.quiz-podium {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 6px;
+    background-repeat: no-repeat;
+    background-size: 336px 88px;
+    image-rendering: pixelated;
+}
+
+.quiz-podium__name {
+    max-width: 70px;
+    overflow: hidden;
+    color: #ffe873;
+    font: 700 11px HabboAirUbuntu, sans-serif;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.quiz-podium__score {
+    color: #ffffff;
+    font: 700 16px HabboAirUbuntu, sans-serif;
+}
+
+.quiz-contestant.is-you .quiz-podium__name {
+    color: #ffffff;
+}
+
+.quiz-contestant__gain,
+.quiz-contestant__done {
+    position: absolute;
+    bottom: 150px;
+    left: 50%;
+    z-index: 2;
+    padding: 2px 8px;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #000000;
+    font: 700 12px HabboAirUbuntu, sans-serif;
+    white-space: nowrap;
+    transform: translateX(-50%);
+}
+
+.quiz-contestant__gain {
+    background: #9fe86b;
+}
+
+.quiz-panel {
+    bottom: 130px;
+}

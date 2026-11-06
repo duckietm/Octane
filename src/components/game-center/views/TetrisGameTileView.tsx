@@ -1,24 +1,24 @@
 import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
-import { hallt } from '../../../api';
+import { localizeWithFallback } from '../../../api/utils/localizeWithFallback';
 import { BaseButton } from '../../../common/BaseButton';
 import bannerImage from '../../../assets/images/tetris/tetris-banner.png';
 
-/** The Tetris duel's card in the Game Center: it opens the game hall on Tetris. */
+/** The blocks duel's card in the Game Center: it opens the arcade. */
 export const TetrisGameTileView: FC<{ onOpen: () => void }> = ({ onOpen }) => {
     const open = () => {
         onOpen();
-        CreateLinkEvent('hall/show/tetris');
+        CreateLinkEvent('tetrisduel/show');
     };
 
     return (
-        <div className="game-tile game-tile--quiz game-tile--tetris">
-            <div className="game-tile__banner" style={{ backgroundImage: `url(${bannerImage})` }} />
+        <div className="game-tile game-tile--world">
+            <div className="game-tile__banner" style={{ backgroundImage: `url(${bannerImage})`, backgroundColor: '#003163' }} />
             <div className="game-tile__body">
-                <div className="game-tile__title">{hallt('tetris.tile.title', 'Tetris duel')}</div>
-                <div className="game-tile__desc">{hallt('tetris.tile.description', 'Clear lines to bury the others under rubbish: the last one standing wins! Two to four players, robots welcome.')}</div>
+                <div className="game-tile__title">{localizeWithFallback('tetrisduel.tile.title', 'Blocks duel')}</div>
+                <div className="game-tile__desc">{localizeWithFallback('tetrisduel.tile.description', 'Clear rows to bury the others under rubbish: the last one standing wins! Two to four players, robots welcome.')}</div>
                 <div className="game-tile__actions">
-                    <BaseButton className="snowwar-button game-tile__play" type="button" onClick={open}>{hallt('tile.play', 'Play!')}</BaseButton>
+                    <BaseButton className="snowwar-button game-tile__play" type="button" onClick={open}>{localizeWithFallback('minigame.tile.play', 'Play!')}</BaseButton>
                 </div>
             </div>
         </div>
