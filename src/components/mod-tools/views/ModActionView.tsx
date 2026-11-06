@@ -145,7 +145,7 @@ export const ModActionView: FC<ModActionProps> = ({ userId, userName, settings, 
         if (sentRef.current) return;
 
         if (topicIndex < 0) {
-            showModAlert('Please select a topic.');
+            showModAlert(localizeWithFallback('octane.mod_tools.please_select_a_topic', 'Please select a topic.'));
 
             return;
         }
@@ -162,7 +162,7 @@ export const ModActionView: FC<ModActionProps> = ({ userId, userName, settings, 
 
         const topicId = topics[topicIndex].id;
         const text = messageOrDefault(topicId);
-        const denied = () => showModAlert('You have insufficient permissions.');
+        const denied = () => showModAlert(localizeWithFallback('octane.mod_tools.you_have_insufficient_permissions', 'You have insufficient permissions.'));
 
         switch (sanction.actionType) {
             case ModActionDefinition.ALERT:
@@ -188,7 +188,7 @@ export const ModActionView: FC<ModActionProps> = ({ userId, userName, settings, 
                 break;
             case ModActionDefinition.MESSAGE:
                 if (message.trim().length === 0) {
-                    showModAlert('Please write a message to user.');
+                    showModAlert(localizeWithFallback('octane.mod_tools.please_write_a_message_to_user', 'Please write a message to user.'));
 
                     return;
                 }
@@ -206,19 +206,19 @@ export const ModActionView: FC<ModActionProps> = ({ userId, userName, settings, 
         if (sentRef.current) return;
 
         if (topicIndex < 0) {
-            showModAlert('Please select a topic.');
+            showModAlert(localizeWithFallback('octane.mod_tools.please_select_a_topic', 'Please select a topic.'));
 
             return;
         }
 
         if (sanctionIndex < 0) {
-            showModAlert('Please select a sanction.');
+            showModAlert(localizeWithFallback('octane.mod_tools.please_select_a_sanction', 'Please select a sanction.'));
 
             return;
         }
 
         if (!settings?.cfhPermission) {
-            showModAlert('You have insufficient permissions.');
+            showModAlert(localizeWithFallback('octane.mod_tools.you_have_insufficient_permissions', 'You have insufficient permissions.'));
 
             return;
         }
@@ -239,7 +239,7 @@ export const ModActionView: FC<ModActionProps> = ({ userId, userName, settings, 
     return (
         <>
         <NativeWindowShell type="modAction" windowKey={userName} x={x} y={y}>
-            <Native0Frame caption={`Mod action on: ${userName}`} height={nativeNumber(root, 'height')} width={nativeNumber(root, 'width')} onClose={onClose}>
+            <Native0Frame caption={localizeWithFallback('octane.mod_tools.mod_action_on_user_name', 'Mod action on: %user_name%', ['user_name'], [String(userName)])} height={nativeNumber(root, 'height')} width={nativeNumber(root, 'width')} onClose={onClose}>
                 <div style={{ position: 'absolute', left: info.x, top: info.y, width: info.width, height: info.height, fontSize: 0, lineHeight: 0 }}>
                     <NativeText background={FRAME_COLOR} maxWidth={info.width} overrides={{ color: 0xffffff, size: 11 }} text={nativeCaption(findNativeNode(root, 'message_info'))} textStyle="u_regular" />
                 </div>
@@ -259,7 +259,7 @@ export const ModActionView: FC<ModActionProps> = ({ userId, userName, settings, 
                 )}
                 {templates.length > 0 && (
                     <Native0Dropmenu
-                        caption="Select from message templates"
+                        caption={localizeWithFallback('octane.mod_tools.select_from_message_templates', 'Select from message templates')}
                         height={20}
                         items={templates.map((template) => (template.length > 50 ? `${template.slice(0, 47)}...` : template))}
                         width={210}

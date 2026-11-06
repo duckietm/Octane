@@ -71,6 +71,15 @@
     max-width: 280px;
   }
 
+  /* A custom card background or a coloured border replaces the black AIR frame: the frame stayed as a grey ring
+     inside the border and around the background, which filled only the padding box. Without either, the frame stays. */
+  &.profile-card-background[class*='card-background-']:not(.card-background-0),
+  &:has(> .infostand-border) {
+    border-image-source: none;
+    border-color: transparent;
+    background-clip: border-box;
+  }
+
   .form-control-sm {
     height: 25px;
     min-height: 25px;

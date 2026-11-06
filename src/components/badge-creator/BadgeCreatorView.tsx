@@ -72,10 +72,11 @@ const PALETTE: number[] = [
     0xffe8c3a0
 ];
 
+/** The purse tooltips of the official texts name the currencies in every language. */
 const currencyName = (type: number): string => {
-    if (type === -1) return 'credits';
-    if (type === 0) return 'duckets';
-    if (type === 5) return 'diamonds';
+    if (type === -1) return t('tooltip.credits', 'credits');
+    if (type === 0) return t('tooltip.duckets', 'duckets');
+    if (type === 5) return t('tooltip.diamonds', 'diamonds');
     return `currency #${type}`;
 };
 

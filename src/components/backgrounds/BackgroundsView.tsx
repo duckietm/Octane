@@ -1,6 +1,6 @@
 import { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { GetSessionDataManager } from '@octane/renderer';
-import { GetOptionalConfigurationValue } from '../../api';
+import { GetOptionalConfigurationValue, localizeWithFallback } from '../../api';
 import { Base, Flex, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView, Text } from '../../common';
 import { useRoom } from '../../hooks';
 import { configFileUrl } from '../../secure-assets';
@@ -205,7 +205,7 @@ export const BackgroundsView: FC<BackgroundsViewProps> = ({
     return (
         <NativeTextTree>
             <OctaneCardView uniqueKey="backgrounds" className="octane-backgrounds-window absolute min-w-[535px] max-w-[535px] min-h-[389px] max-h-[389px]">
-                <OctaneCardHeaderView headerText="Profile Background" onCloseClick={() => setIsVisible(false)} />
+                <OctaneCardHeaderView headerText={localizeWithFallback('octane.backgrounds.profile_background', 'Profile Background')} onCloseClick={() => setIsVisible(false)} />
                 <OctaneCardTabsView>
                     {TABS.map((tab) => (
                         <OctaneCardTabsItemView key={tab} isActive={activeTab === tab} onClick={() => setActiveTab(tab)}>
@@ -215,7 +215,7 @@ export const BackgroundsView: FC<BackgroundsViewProps> = ({
                 </OctaneCardTabsView>
                 <OctaneCardContentView gap={1}>
                     <Text bold center className="octane-backgrounds-window__prompt">
-                        Select an Option
+                        {localizeWithFallback('octane.backgrounds.select_an_option', 'Select an Option')}
                     </Text>
                     <Grid gap={1} columnCount={7} overflow="auto">
                         {allData[activeTab].map((item) => (PREVIEW_TABS.includes(activeTab) ? renderPreview(item) : renderItem(item, itemTypeFor(activeTab))))}

@@ -106,7 +106,7 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
                     {[CHEST_REWARD_MODE_AMOUNT, CHEST_REWARD_MODE_EVERYTHING].map((value) => (
                         <label key={value} className="flex items-center gap-1">
                             <Radio name="chestRewardMode" checked={mode === value} onCheckedChange={() => setMode(value)} />
-                            <Text>{localizeWithFallback(`wiredfurni.params.rewarding_mode.${value}`, value === 0 ? 'Give a specific amount' : 'Give everything')}</Text>
+                            <Text>{localizeWithFallback(`wiredfurni.params.rewarding_mode.${value}`, value === 0 ? localizeWithFallback('octane.wired.give_a_specific_amount', 'Give a specific amount') : localizeWithFallback('octane.wired.give_everything', 'Give everything'))}</Text>
                         </label>
                     ))}
                 </div>
@@ -134,7 +134,7 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.reward_contract.reward_popup', 'Reward popup')}</Text>
                     <textarea
-                        aria-label="reward popup"
+                        aria-label={localizeWithFallback('octane.wired.reward_popup', 'reward popup')}
                         className="form-control form-control-sm"
                         maxLength={CHEST_POPUP_MAX_LENGTH}
                         rows={CHEST_POPUP_MAX_LINES}
@@ -150,7 +150,7 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
                 <CollapsibleSection title={<Text bold>{localizeWithFallback(extra.titleKey, extra.title)}</Text>}>
                     <fieldset className="flex flex-col gap-1 pt-1" disabled={extraDisabled}>
                         {extra.dropdown ? (
-                            <Select aria-label="chest extra" className="form-select form-select-sm" value={extraValue} onChange={(event) => setExtraValue(Number(event.target.value))}>
+                            <Select aria-label={localizeWithFallback('octane.wired.chest_extra', 'chest extra')} className="form-select form-select-sm" value={extraValue} onChange={(event) => setExtraValue(Number(event.target.value))}>
                                 {extra.options.map((option) => (
                                     <option key={option.value} value={option.value}>
                                         {localizeWithFallback(option.key, option.label)}

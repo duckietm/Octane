@@ -1,5 +1,5 @@
 import { Dispatch, FC, useState } from 'react';
-import { LocalizeText } from '../../../api';
+import { LocalizeText, localizeWithFallback } from '../../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { serializeTilemap } from '../state/encoding';
@@ -38,10 +38,10 @@ export const FloorplanImportExport: FC<Props> = ({ state, dispatch, onClose, onS
                     <textarea className="form-control w-full flex-1 font-mono" value={raw} onChange={(e) => setRaw(e.target.value)} />
                     <div className="flex gap-2 justify-end">
                         <Button data-testid="import-revert" onClick={revert}>
-                            Revert
+                            {localizeWithFallback('octane.floorplan_editor.revert', 'Revert')}
                         </Button>
                         <Button data-testid="import-load" onClick={load}>
-                            Load
+                            {localizeWithFallback('octane.floorplan_editor.load', 'Load')}
                         </Button>
                         <Button data-testid="import-save" onClick={save}>
                             {LocalizeText('floor.plan.editor.save')}

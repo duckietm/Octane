@@ -62,7 +62,7 @@ export const VariablesExplorerHoldersView: FC<VariablesExplorerHoldersViewProps>
                 filters={[
                     {
                         id: 'kind',
-                        label: scope === 'furni' ? 'Furni type:' : 'User type:',
+                        label: scope === 'furni' ? localizeWithFallback('octane.variables_explorer.furni_type', 'Furni type:') : localizeWithFallback('octane.variables_explorer.user_type', 'User type:'),
                         value: targetKind,
                         options: targetKindsOf(scope).map((kind) => ({ value: kind, label: targetKindLabel(kind) })),
                         onChange: (value) => changeFilters(value as WebApiTargetKind, sortId)
@@ -78,7 +78,7 @@ export const VariablesExplorerHoldersView: FC<VariablesExplorerHoldersViewProps>
                 onManage={(holder) => onManage({ scope, kind: targetKind, entityId: holder.entityId })}
                 onDelete={client.hasWriteAccess ? (holder) => deleteHolder(holder.entityId) : undefined}
                 onClose={onClose}
-                infoText="Everyone and everything that holds this variable, read through the Variables Web API."
+                infoText={localizeWithFallback('octane.variables_explorer.everyone_and_everything_that_holds_this', 'Everyone and everything that holds this variable, read through the Variables Web API.')}
                 status={
                     status ? (
                         <div className="rounded border border-[#d9a3a3] bg-[#fbeaea] px-2 py-1 text-[12px] text-[#8c2424]" role="alert">

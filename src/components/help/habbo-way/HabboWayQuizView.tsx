@@ -62,7 +62,7 @@ export const HabboWayQuizView: FC<HabboWayQuizViewProps> = ({ quiz, selectAnswer
     const locked = isQuizLocked(quiz);
     const count = questionIds.length.toString();
     const [titleKey, titleFallback] = PAGE_TITLES[page];
-    const caption = locked ? key('title', 'The Quiz') : key(titleKey, titleFallback);
+    const caption = locked ? key('title', localizeWithFallback('octane.help.the_quiz', 'The Quiz')) : key(titleKey, titleFallback);
     const showIndicator = !locked && (page === QUIZ_PAGE_QUESTION || page === QUIZ_PAGE_ANALYSIS);
     const indicator =
         page === QUIZ_PAGE_QUESTION
@@ -122,7 +122,7 @@ export const HabboWayQuizView: FC<HabboWayQuizViewProps> = ({ quiz, selectAnswer
                                     [getQuizCorrectCount(questionIds, quiz.wrongQuestionIds).toString(), count]
                                 )}
                             </div>
-                            <div className="octane-habboway-quiz__result-advice">{key('failure.advice', 'Have a look at your results and try again later.')}</div>
+                            <div className="octane-habboway-quiz__result-advice">{key('failure.advice', localizeWithFallback('octane.help.have_a_look_at_your_results', 'Have a look at your results and try again later.'))}</div>
                             <LibraryImageView className="octane-habboway-quiz__result-image" src={images.failure} />
                         </div>
                     )}

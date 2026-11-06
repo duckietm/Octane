@@ -193,7 +193,7 @@ const CatalogViewInner: FC<{}> = () => {
                                                 setMobileMenuOpen(false);
                                             }}
                                         >
-                                            {adminMode ? 'Exit Admin' : 'Admin'}
+                                            {adminMode ? localizeWithFallback('octane.catalog.exit_admin', 'Exit Admin') : 'Admin'}
                                         </BaseButton>
                                     </div>
                                 )}
@@ -250,7 +250,7 @@ const CatalogViewInner: FC<{}> = () => {
                     )}
                     <div className={`octane-catalog-standard-header ${isBuilder ? 'is-builder' : ''}`}>
                         {isBuilder && isMod && (
-                            <ToggleButton aria-label="Admin" className="octane-catalog-builder-admin-toggle" pressed={adminMode} onPressedChange={setAdminMode}>
+                            <ToggleButton aria-label={localizeWithFallback('octane.catalog.admin', 'Admin')} className="octane-catalog-builder-admin-toggle" pressed={adminMode} onPressedChange={setAdminMode}>
                                 {adminToggle}
                             </ToggleButton>
                         )}

@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { WiredFurniType } from '../../../../api';
+import { WiredFurniType, localizeWithFallback } from '../../../../api';
 import { Text } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
@@ -29,9 +29,9 @@ export const WiredContractPaymentView: FC<{}> = () => {
         <NativeTextTree>
             <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID} save={save} cardStyle={{ width: 400 }}>
                 <div className="flex flex-col gap-2">
-                    <Text bold>The user must PAY:</Text>
+                    <Text bold>{localizeWithFallback('octane.wired.the_user_must_pay', 'The user must PAY:')}</Text>
                     <WiredContractRulesEditor direction={CONTRACT_DIR_PAY} rules={giveRules} onChange={setGiveRules} />
-                    <Text small>Each option is an alternative — the player pays whichever one they can.</Text>
+                    <Text small>{localizeWithFallback('octane.wired.each_option_is_an_alternative_the', 'Each option is an alternative — the player pays whichever one they can.')}</Text>
                     <Text small>Optional: pick a chest above to deposit the payment into (else it is removed).</Text>
                 </div>
             </WiredExtraBaseView>

@@ -27,8 +27,9 @@ describe('quest image names', () => {
         expect(getQuestImageName('Chat', 'chat_1', '2')).toBe('chat_chat_12');
     });
 
-    it('adds the prompt suffix for the animated quests', () => {
-        expect(getQuestImageName('social', 'MOVEITEM', '')).toBe('social_moveitem_a');
+    it('uses the plain image for the quests the official client animates', () => {
+        expect(getQuestImageName('room_builder', 'MOVEITEM', '')).toBe('room_builder_moveitem');
+        expect(getQuestImageName('social', 'ENTEROTHERSROOM', '')).toBe('social_enterothersroom');
     });
 
     it('shows the hourglass while the quest waits', () => {

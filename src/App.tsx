@@ -21,7 +21,7 @@ import {
     PrepareRenderer
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
-import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock } from './api';
+import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock, localizeWithFallback } from './api';
 import { Base } from './common';
 import { LoadingView } from './components/loading/LoadingView';
 import { LoginView } from './components/login/LoginView';
@@ -138,7 +138,7 @@ export const App: FC<{}> = (props) => {
 
         const baseUrl = window.location.origin + '/';
         setHomeUrl(baseUrl);
-        setErrorMessage('Your session has expired.\nPlease log in again to enter the hotel.');
+        setErrorMessage(localizeWithFallback('octane.app.your_session_has_expired_please_log', 'Your session has expired.\nPlease log in again to enter the hotel.'));
         setIsReady(false);
         setShowLogin(false);
         setIsEnteringHotel(false);
@@ -348,7 +348,7 @@ export const App: FC<{}> = (props) => {
         (width: number, height: number) => {
             return runBootStep('warmup', async () => {
                 await GetConfiguration().init();
-                bumpProgress(25, taskLabel('loader.waiting', 'Loading content...'));
+                bumpProgress(25, taskLabel('loader.waiting', localizeWithFallback('octane.app.loading_content', 'Loading content...')));
 
                 // 0 = the display's refresh rate. A cap (the old 24 default) makes
                 // Pixi skip whole animation frames: on a 60 Hz display it ticks at an
@@ -381,13 +381,13 @@ export const App: FC<{}> = (props) => {
                 loginImageUrls.forEach(preloadImage);
 
                 const warmupTasks: { promise: Promise<any>; label: string }[] = [
-                    { promise: runBootStep('assets', () => GetAssetManager().downloadAssets(assetUrls)), label: taskLabel('loading.task.assets', 'Loading game assets...') },
+                    { promise: runBootStep('assets', () => GetAssetManager().downloadAssets(assetUrls)), label: taskLabel('loading.task.assets', localizeWithFallback('octane.app.loading_game_assets', 'Loading game assets...')) },
                     {
                         promise: runBootStep('localization', () => GetLocalizationManager().init().then(() => getLocalizationReady().resolve())),
-                        label: taskLabel('loading.task.localization', 'Loading translations...')
+                        label: taskLabel('loading.task.localization', localizeWithFallback('octane.app.loading_translations', 'Loading translations...'))
                     },
-                    { promise: runBootStep('avatars', () => GetAvatarRenderManager().init()), label: taskLabel('loading.task.avatar', 'Loading wardrobe...') },
-                    { promise: runBootStep('sounds', () => GetSoundManager().init()), label: taskLabel('loading.task.sounds', 'Loading sounds...') }
+                    { promise: runBootStep('avatars', () => GetAvatarRenderManager().init()), label: taskLabel('loading.task.avatar', localizeWithFallback('octane.app.loading_wardrobe', 'Loading wardrobe...')) },
+                    { promise: runBootStep('sounds', () => GetSoundManager().init()), label: taskLabel('loading.task.sounds', localizeWithFallback('octane.app.loading_sounds', 'Loading sounds...')) }
                 ];
                 let warmupDone = 0;
                 const warmupStart = 25;
@@ -448,7 +448,7 @@ export const App: FC<{}> = (props) => {
                 let ssoTicket = window.OctaneConfig['sso.ticket'];
                 if (ssoTicket) GetConfiguration().setValue('sso.ticket', ssoTicket);
 
-                bumpProgress(10, taskLabel('loading.task.session', 'Verifying session...'));
+                bumpProgress(10, taskLabel('loading.task.session', localizeWithFallback('octane.app.verifying_session', 'Verifying session...')));
 
                 if (!ssoTicket || ssoTicket === '') {
                     let configInitError: unknown = null;
@@ -508,7 +508,7 @@ export const App: FC<{}> = (props) => {
                 connected.catch(() => undefined);
 
                 await startRenderer(width, height);
-                bumpProgress(20, taskLabel('loading.task.renderer', 'Initializing renderer...'));
+                bumpProgress(20, taskLabel('loading.task.renderer', localizeWithFallback('octane.app.initializing_renderer', 'Initializing renderer...')));
 
                 const sessionData = runBootStep('session-data', async () => {
                     await getLocalizationReady().promise;
@@ -518,15 +518,15 @@ export const App: FC<{}> = (props) => {
                 sessionData.catch(() => undefined);
 
                 await startWarmup(width, height);
-                bumpProgress(70, taskLabel('loading.task.startsession', 'Starting session...'));
+                bumpProgress(70, taskLabel('loading.task.startsession', localizeWithFallback('octane.app.starting_session', 'Starting session...')));
                 await sessionData;
-                bumpProgress(78, taskLabel('loading.task.userdata', 'Loading user data...'));
+                bumpProgress(78, taskLabel('loading.task.userdata', localizeWithFallback('octane.app.loading_user_data', 'Loading user data...')));
                 await runBootStep('room-sessions', () => GetRoomSessionManager().init());
-                bumpProgress(85, taskLabel('loading.task.rooms', 'Loading rooms...'));
+                bumpProgress(85, taskLabel('loading.task.rooms', localizeWithFallback('octane.app.loading_rooms', 'Loading rooms...')));
                 await runBootStep('room-engine', () => GetRoomEngine().init());
-                bumpProgress(92, taskLabel('loading.task.engine', 'Loading graphics engine...'));
+                bumpProgress(92, taskLabel('loading.task.engine', localizeWithFallback('octane.app.loading_graphics_engine', 'Loading graphics engine...')));
                 await connected;
-                bumpProgress(98, taskLabel('generic.reconnecting', 'Connecting to server...'));
+                bumpProgress(98, taskLabel('generic.reconnecting', localizeWithFallback('octane.app.connecting_to_server', 'Connecting to server...')));
 
                 if (run !== prepareRunRef.current) return;
 
@@ -589,7 +589,7 @@ export const App: FC<{}> = (props) => {
             )}
             {!isReady && showLogin && <LoginView onAuthenticated={handleAuthenticated} isEntering={isEnteringHotel} />}
             {isReady && (
-                <SharedHookRegistry fallback={<LoadingView message="Loading…" />}>
+                <SharedHookRegistry fallback={<LoadingView message={localizeWithFallback('octane.common.loading', 'Loading…')} />}>
                     <MainView />
                     <ReconnectView />
                 </SharedHookRegistry>

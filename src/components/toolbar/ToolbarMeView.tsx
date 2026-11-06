@@ -87,20 +87,20 @@ export const ToolbarMeView: FC<
                 <MeMenuItem
                     name="quests"
                     iconClassName="icon-me-quests"
-                    label={localizeWithFallback('toolbar.me.quests', 'Quests')}
+                    label={localizeWithFallback('toolbar.me.quests', localizeWithFallback('quests.list.caption', 'Quests'))}
                     onClick={() => CreateLinkEvent('quests/toggle')}
                 />
                 <MeMenuItem
                     name="dailytasks"
                     iconClassName="icon-me-dailytasks"
-                    label={localizeWithFallback('toolbar.me.dailytasks', 'Daily rewards')}
+                    label={localizeWithFallback('toolbar.me.dailytasks', localizeWithFallback('dailytasks.title', 'Daily rewards'))}
                     count={unseenDailyTaskCount}
                     onClick={() => CreateLinkEvent('dailytasks/toggle')}
                 />
                 <MeMenuItem
                     name="rewardtrack"
                     iconClassName="icon-me-rewardtrack"
-                    label={localizeWithFallback('toolbar.me.rewardtrack', 'Reward track')}
+                    label={localizeWithFallback('toolbar.me.rewardtrack', localizeWithFallback('reward_track.title', 'Reward track'))}
                     count={unseenRewardTrackCount}
                     onClick={() => CreateLinkEvent('reward_track/toggle')}
                 />

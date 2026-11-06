@@ -206,11 +206,11 @@ export const WiredActionGiveVariableView: FC<{}> = () => {
     const missingVariablesText = (() => {
         switch (selectedTargetType) {
             case 'furni':
-                return 'No wf_var_furni variables found in this room.';
+                return localizeWithFallback('octane.wired.no_wf_var_furni_variables_found', 'No wf_var_furni variables found in this room.');
             case 'context':
-                return 'No wf_var_context variables found in this room.';
+                return localizeWithFallback('octane.wired.no_wf_var_context_variables_found', 'No wf_var_context variables found in this room.');
             default:
-                return 'No wf_var_user variables found in this room.';
+                return localizeWithFallback('octane.wired.no_wf_var_user_variables_found', 'No wf_var_user variables found in this room.');
         }
     })();
 

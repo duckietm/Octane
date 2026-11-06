@@ -312,14 +312,14 @@ export const WiredNeighborhoodSelectorView: FC<{}> = () =>
                     <Text bold>{ LocalizeText('wiredfurni.params.neighborhood_selection') }</Text>
 
                     <div className="flex items-center gap-1">
-                        { modeButton('add_tile', <FaPlus />, 'wiredfurni.params.neighborhood.add', 'Add tiles') }
-                        { modeButton('remove_tile', <FaMinus />, 'wiredfurni.params.neighborhood.remove', 'Remove tiles') }
-                        { modeButton('set_root_tile', <FaCrosshairs />, 'wiredfurni.params.neighborhood.reference', 'Set the root tile') }
+                        { modeButton('add_tile', <FaPlus />, 'wiredfurni.params.neighborhood.add', localizeWithFallback('octane.wired.add_tiles', 'Add tiles')) }
+                        { modeButton('remove_tile', <FaMinus />, 'wiredfurni.params.neighborhood.remove', localizeWithFallback('octane.wired.remove_tiles', 'Remove tiles')) }
+                        { modeButton('set_root_tile', <FaCrosshairs />, 'wiredfurni.params.neighborhood.reference', localizeWithFallback('octane.wired.set_the_root_tile', 'Set the root tile')) }
                         <Button
                             className="ms-auto px-2 py-1"
                             variant="secondary"
                             disabled={ !fitsSmall }
-                            aria-label={ localizeWithFallback(bigMode ? 'wiredfurni.params.neighborhood.reduce' : 'wiredfurni.params.neighborhood.enlarge', bigMode ? 'Smaller view' : 'Bigger view') }
+                            aria-label={ localizeWithFallback(bigMode ? 'wiredfurni.params.neighborhood.reduce' : 'wiredfurni.params.neighborhood.enlarge', bigMode ? localizeWithFallback('octane.wired.smaller_view', 'Smaller view') : localizeWithFallback('octane.wired.bigger_view', 'Bigger view')) }
                             onClick={ () => setBigMode(value => !value) }>
                             { bigMode ? <FaCompress /> : <FaExpand /> }
                         </Button>

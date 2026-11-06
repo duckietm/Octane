@@ -4,6 +4,7 @@ import { interpolate, t } from '../utils/i18n';
 import { resolveNewsImage, resolveNewsLink } from '../utils/news';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../../api';
 
 interface NewsItem {
     id: number;
@@ -146,13 +147,13 @@ export const NewsWindow: FC<NewsWindowProps> = ({ newsUrl }) => {
 
                                 {hasMany && (
                                     <div className="news-pager">
-                                        <BaseButton type="button" className="arrow-btn" aria-label="Previous news" onClick={prev}>
+                                        <BaseButton type="button" className="arrow-btn" aria-label={localizeWithFallback('octane.login.previous_news', 'Previous news')} onClick={prev}>
                                             &lsaquo;
                                         </BaseButton>
                                         <span className="news-counter">
                                             {index + 1}/{items.length}
                                         </span>
-                                        <BaseButton type="button" className="arrow-btn" aria-label="Next news" onClick={next}>
+                                        <BaseButton type="button" className="arrow-btn" aria-label={localizeWithFallback('octane.login.next_news', 'Next news')} onClick={next}>
                                             &rsaquo;
                                         </BaseButton>
                                     </div>

@@ -1,6 +1,6 @@
 import { FC, useMemo, useState } from 'react';
 import { FaCheck, FaCopy } from 'react-icons/fa';
-import { LocalizeText, NotificationAlertItem } from '../../../../api';
+import { LocalizeText, NotificationAlertItem, localizeWithFallback } from '../../../../api';
 import { Button, Column, LayoutNotificationAlertView, LayoutNotificationAlertViewProps } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
@@ -131,11 +131,11 @@ export const NotificationFurniDataAlertView: FC<NotificationFurniDataAlertViewPr
                                 <BaseButton className="furnidata-copy-btn" type="button" onClick={() => copySection(section)}>
                                     {copiedSection === section.title ? (
                                         <>
-                                            <FaCheck size={10} /> Copied!
+                                            <FaCheck size={10} /> {localizeWithFallback('octane.notification_center.copied', 'Copied!')}
                                         </>
                                     ) : (
                                         <>
-                                            <FaCopy size={10} /> Copy
+                                            <FaCopy size={10} /> {localizeWithFallback('octane.notification_center.copy', 'Copy')}
                                         </>
                                     )}
                                 </BaseButton>

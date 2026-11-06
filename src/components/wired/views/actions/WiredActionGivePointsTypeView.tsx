@@ -10,11 +10,11 @@ import { NumberInput } from '../../../../common/NumberInput';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const POINTS_TYPE_OPTIONS = [
-    { value: 0, key: 'wiredfurni.params.points_type.0', label: 'Pixels / Duckets' },
+    { value: 0, key: 'wiredfurni.params.points_type.0', get label() { return localizeWithFallback('octane.wired.pixels_duckets', 'Pixels / Duckets'); } },
     { value: 5, key: 'wiredfurni.params.points_type.5', label: 'Diamonds' },
     { value: 101, key: 'wiredfurni.params.points_type.101', label: 'Seasonal' },
     { value: 103, key: 'wiredfurni.params.points_type.103', label: 'GotW Points' },
-    { value: 104, key: 'wiredfurni.params.points_type.104', label: 'Soft Currency' }
+    { value: 104, key: 'wiredfurni.params.points_type.104', get label() { return localizeWithFallback('octane.wired.soft_currency', 'Soft Currency'); } }
 ];
 
 export const WiredActionGivePointsTypeView: FC<{}> = (props) => {

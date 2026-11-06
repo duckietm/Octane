@@ -174,7 +174,7 @@ export const WiredShareTabView: FC<{}> = () => {
                             <Text small>{localizeWithFallback('wiredmenu.share.export.count', '%count% wired boxes in this code.', [ 'count' ], [ String(exportCount) ])}</Text>
                             <textarea
                                 readOnly
-                                aria-label="Wired code"
+                                aria-label={localizeWithFallback('octane.wired_tools.wired_code', 'Wired code')}
                                 className="w-full h-[60px] rounded border border-[#9d998e] bg-[#f4f0e8] p-1 text-[10px] font-mono break-all"
                                 value={exportCode}
                                 onFocus={(event) => event.target.select()}
@@ -193,7 +193,7 @@ export const WiredShareTabView: FC<{}> = () => {
                         )}
                     </Text>
                     <textarea
-                        aria-label="Wired code to import"
+                        aria-label={localizeWithFallback('octane.wired_tools.wired_code_to_import', 'Wired code to import')}
                         className="w-full h-[60px] rounded border border-[#9d998e] bg-[#f4f0e8] p-1 text-[10px] font-mono break-all"
                         maxLength={WIRED_SHARE_MAX_CODE_LENGTH * 2}
                         placeholder={localizeWithFallback('wiredmenu.share.import.paste', 'Paste the wired code here')}

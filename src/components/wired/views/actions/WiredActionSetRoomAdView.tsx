@@ -49,7 +49,7 @@ export const WiredActionSetRoomAdView: FC<{}> = (props) => {
                     />
                 </div>
                 <div className="flex flex-col gap-1">
-                    <Text bold>Category</Text>
+                    <Text bold>{localizeWithFallback('octane.wired.category', 'Category')}</Text>
                     <NumberInput className="form-control form-control-sm" min={0} max={50} value={category} onChange={(event) => setCategory(parseInt(event.target.value, 10) || 0)} />
                 </div>
             </WiredActionBaseView>

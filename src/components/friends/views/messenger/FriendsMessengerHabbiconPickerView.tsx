@@ -114,12 +114,12 @@ export const FriendsMessengerHabbiconPickerView: FC<{
 
     return (
         <NativeTextTree>
-            <InlineDialog ref={pickerRef} aria-label="Habbicons" className="messenger-habbicon-picker" closeOnEscape={false} style={{ height: windowHeight }}>
+            <InlineDialog ref={pickerRef} aria-label={localizeWithFallback('octane.friends.habbicons', 'Habbicons')} className="messenger-habbicon-picker" closeOnEscape={false} style={{ height: windowHeight }}>
                 <div className="messenger-habbicon-controls">
                     <div className="messenger-habbicon-search">
                         <input autoFocus maxLength={24} value={search} onChange={(event) => setSearch(event.target.value)} />
                         {!search && <span>{localizeWithFallback('generic.search', 'Search')}</span>}
-                        {search && <BaseButton aria-label="Clear" type="button" onClick={() => setSearch('')} />}
+                        {search && <BaseButton aria-label={localizeWithFallback('octane.friends.clear', 'Clear')} type="button" onClick={() => setSearch('')} />}
                     </div>
                     <BaseButton className="messenger-btn messenger-habbicon-get-more" type="button" onClick={onOpenHub}>
                         {localizeWithFallback('habbicons.hud.get_more', 'Get more')}

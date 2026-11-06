@@ -40,10 +40,10 @@ export const resolveCatalogAdminPageInteraction = (
     error: string | null
 ) => {
     if (error) return { canSave: false, message: error };
-    if (!sessionReady) return { canSave: false, message: 'Connecting to Catalog Studio...' };
-    if (!detailsReady) return { canSave: false, message: 'Loading page details...' };
-    if (!editReady) return { canSave: false, message: 'Waiting for the live catalog revision...' };
-    if (loading) return { canSave: false, message: 'Saving page...' };
+    if (!sessionReady) return { canSave: false, message: localizeWithFallback('octane.catalog.connecting_to_catalog_studio', 'Connecting to Catalog Studio...') };
+    if (!detailsReady) return { canSave: false, message: localizeWithFallback('octane.catalog.loading_page_details', 'Loading page details...') };
+    if (!editReady) return { canSave: false, message: localizeWithFallback('octane.catalog.waiting_for_the_live_catalog_revision', 'Waiting for the live catalog revision...') };
+    if (loading) return { canSave: false, message: localizeWithFallback('octane.catalog.saving_page', 'Saving page...') };
     return { canSave: true, message: null };
 };
 
@@ -100,16 +100,16 @@ export const createCatalogAdminNewPageFormState = (parentId: number, catalogMode
 });
 
 export const validateCatalogAdminPageForm = (data: IPageEditData): string | null => {
-    if (!data.caption.trim()) return 'Page caption is required.';
-    if (!isCatalogStudioLayoutCode(data.pageLayout)) return 'Select a valid page layout.';
-    if (data.minRank < 1) return 'Minimum rank must be at least 1.';
-    if (data.iconImage < 0 || data.iconColor < 0) return 'Icon values cannot be negative.';
-    if (data.parentId < -1) return 'Parent page ID is invalid.';
-    if ((data.roomId || 0) < 0) return 'Room ID cannot be negative.';
+    if (!data.caption.trim()) return localizeWithFallback('octane.catalog.page_caption_is_required', 'Page caption is required.');
+    if (!isCatalogStudioLayoutCode(data.pageLayout)) return localizeWithFallback('octane.catalog.select_a_valid_page_layout', 'Select a valid page layout.');
+    if (data.minRank < 1) return localizeWithFallback('octane.catalog.minimum_rank_must_be_at_least', 'Minimum rank must be at least 1.');
+    if (data.iconImage < 0 || data.iconColor < 0) return localizeWithFallback('octane.catalog.icon_values_cannot_be_negative', 'Icon values cannot be negative.');
+    if (data.parentId < -1) return localizeWithFallback('octane.catalog.parent_page_id_is_invalid', 'Parent page ID is invalid.');
+    if ((data.roomId || 0) < 0) return localizeWithFallback('octane.catalog.room_id_cannot_be_negative', 'Room ID cannot be negative.');
 
     const includes = (data.includes || '').replace(/\s+/g, '');
     if (includes && includes.split(/[;,]/).some((id) => !/^[1-9]\d*$/.test(id))) {
-        return 'Included page IDs must be positive numbers separated by semicolons.';
+        return localizeWithFallback('octane.catalog.included_page_ids_must_be_positive', 'Included page IDs must be positive numbers separated by semicolons.');
     }
     return null;
 };
@@ -314,13 +314,13 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
         smartSave.status === 'saving'
             ? 'Saving...'
             : smartSave.status === 'dirty'
-              ? 'Unsaved changes'
+              ? localizeWithFallback('octane.catalog.unsaved_changes', 'Unsaved changes')
               : smartSave.status === 'conflict'
                 ? smartSave.message || 'The catalog changed. Review and save again.'
                 : smartSave.status === 'error'
                   ? smartSave.message || 'Save failed'
                   : smartSave.lastSavedAt
-                    ? `Saved · ${new Date(smartSave.lastSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                    ? localizeWithFallback('octane.catalog.saved_at', 'Saved · %time%', ['time'], [new Date(smartSave.lastSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })])
                     : 'Saved';
     const canSubmit = interaction.canSave && !validationError && (smartSave.isDirty || !!smartSave.inFlight);
 
@@ -651,10 +651,10 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                     type="button"
                                     onClick={smartSave.reset}
                                 >
-                                    <FaUndo className="text-[8px]" /> Reset
+                                    <FaUndo className="text-[8px]" /> {localizeWithFallback('octane.catalog.reset', 'Reset')}
                                 </BaseButton>
                                 <BaseButton className="octane-catalog-admin-button is-muted" disabled={!canSubmit} type="button" onClick={() => handleSave(true)}>
-                                    Save and close
+                                    {localizeWithFallback('octane.catalog.save_and_close', 'Save and close')}
                                 </BaseButton>
                                 <BaseButton className="octane-catalog-admin-button is-primary" disabled={!canSubmit} type="button" onClick={() => handleSave(false)}>
                                     {smartSave.status === 'saving' ? <FaSpinner className="text-[8px] animate-spin" /> : <FaSave className="text-[8px]" />}{' '}

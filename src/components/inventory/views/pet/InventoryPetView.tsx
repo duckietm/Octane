@@ -126,7 +126,7 @@ export const InventoryPetView: FC<{
                         )}
                     </div>
                     <InventoryFilterSelect
-                        aria-label="Pet type"
+                        aria-label={localizeWithFallback('octane.inventory.pet_type', 'Pet type')}
                         value={activeType}
                         onChange={(value) => {
                             setTypeFilter(Number(value));
@@ -135,7 +135,7 @@ export const InventoryPetView: FC<{
                     >
                         <option value={-1}>
                             {LocalizeText('inventory.pets.filter.type.all') === 'inventory.pets.filter.type.all'
-                                ? 'All types'
+                                ? localizeWithFallback('octane.inventory.all_types', 'All types')
                                 : LocalizeText('inventory.pets.filter.type.all')}
                         </option>
                         {availableTypes.map((type) => (
@@ -145,14 +145,14 @@ export const InventoryPetView: FC<{
                         ))}
                     </InventoryFilterSelect>
                     <InventoryFilterSelect
-                        aria-label="Pet rarity"
+                        aria-label={localizeWithFallback('octane.inventory.pet_rarity', 'Pet rarity')}
                         disabled={!rarityFilterEnabled}
                         value={activeRarity}
                         onChange={(value) => setRarityFilter(Number(value))}
                     >
                         <option value={-1}>
                             {LocalizeText('inventory.pets.filter.rarity.all') === 'inventory.pets.filter.rarity.all'
-                                ? 'All rarities'
+                                ? localizeWithFallback('octane.inventory.all_rarities', 'All rarities')
                                 : LocalizeText('inventory.pets.filter.rarity.all')}
                         </option>
                         {rarityFilterEnabled &&

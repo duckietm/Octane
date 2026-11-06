@@ -56,12 +56,12 @@ export const UserProfileView: FC<{}> = () => {
 
         showConfirm(
             // The pack stores the line breaks as literal "\n".
-            localizeWithFallback(`${key}.desc`, isBlocked ? 'Unblock this user?' : 'Block this user?').replace(/\\n/g, '\n'),
+            localizeWithFallback(`${key}.desc`, isBlocked ? localizeWithFallback('octane.user_profile.unblock_this_user', 'Unblock this user?') : localizeWithFallback('octane.user_profile.block_this_user', 'Block this user?')).replace(/\\n/g, '\n'),
             apply,
             null,
             null,
             null,
-            localizeWithFallback(`${key}.title`, isBlocked ? 'Unblock user' : 'Block user')
+            localizeWithFallback(`${key}.title`, isBlocked ? localizeWithFallback('octane.user_profile.unblock_user', 'Unblock user') : localizeWithFallback('octane.user_profile.block_user', 'Block user'))
         );
     };
 

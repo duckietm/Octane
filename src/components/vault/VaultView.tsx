@@ -55,16 +55,16 @@ interface EarningCategory {
 // before data lands. 'games' and 'club_job' have no standard earnings.*.label
 // key — they use a custom key (add it to your texts) and fall back to Italian.
 const CATEGORIES: EarningCategory[] = [
-    { key: 'daily_gift', textKey: 'earnings.dailygift.label', label: 'Regalo giornaliero', img: imgDailygift, fallbackCurrencies: [5] },
+    { key: 'daily_gift', textKey: 'earnings.dailygift.label', get label() { return localizeWithFallback('octane.vault.daily_gift', 'Daily gift'); }, img: imgDailygift, fallbackCurrencies: [5] },
     { key: 'games', textKey: 'earnings.games.label', label: 'Giochi', img: imgGames, fallbackCurrencies: [0] },
     { key: 'achievements', textKey: 'earnings.achievements.label', label: 'Traguardi', img: imgAchievements, fallbackCurrencies: [5, 0] },
     { key: 'marketplace', textKey: 'earnings.marketplace.label', label: 'Mercatino', img: imgMarketplace, fallbackCurrencies: [0] },
-    { key: 'hc_payday', textKey: 'earnings.hc.label', label: 'Bonus giorno di paga HC', img: imgHcpayday, fallbackCurrencies: [0] },
-    { key: 'level_progress', textKey: 'earnings.levelprogression.label', label: 'Progressione Livello', img: imgLevel, fallbackCurrencies: [5, 0] },
+    { key: 'hc_payday', textKey: 'earnings.hc.label', get label() { return localizeWithFallback('octane.vault.hc_payday_bonus', 'HC payday bonus'); }, img: imgHcpayday, fallbackCurrencies: [0] },
+    { key: 'level_progress', textKey: 'earnings.levelprogression.label', get label() { return localizeWithFallback('octane.vault.level_progression', 'Level progression'); }, img: imgLevel, fallbackCurrencies: [5, 0] },
     { key: 'donations', textKey: 'earnings.donations.label', label: 'Donazioni', img: imgDonations, fallbackCurrencies: [0] },
-    { key: 'bonus_bag', textKey: 'earnings.bonusbag.label', label: 'Sacco Bonus', img: imgBonusbag, fallbackCurrencies: [0] },
-    { key: 'mystery_boxes', textKey: 'earnings.surpriseboxes.label', label: 'Scatole Sorprese', img: imgSurprise, fallbackCurrencies: [5, 0] },
-    { key: 'club_job', textKey: 'earnings.clubwork.label', label: 'Club e Lavoro', img: imgGeneric, fallbackCurrencies: [0] },
+    { key: 'bonus_bag', textKey: 'earnings.bonusbag.label', get label() { return localizeWithFallback('octane.vault.bonus_bag', 'Bonus bag'); }, img: imgBonusbag, fallbackCurrencies: [0] },
+    { key: 'mystery_boxes', textKey: 'earnings.surpriseboxes.label', get label() { return localizeWithFallback('octane.vault.surprise_boxes', 'Surprise boxes'); }, img: imgSurprise, fallbackCurrencies: [5, 0] },
+    { key: 'club_job', textKey: 'earnings.clubwork.label', get label() { return localizeWithFallback('octane.vault.club_and_work', 'Club and work'); }, img: imgGeneric, fallbackCurrencies: [0] },
     // AIR earnings category 13: the credits wired gives with that earnings category wait here (games is category 11).
     { key: 'agency', textKey: 'earnings.agency.label', label: 'Agenzia', img: imgGeneric, fallbackCurrencies: [-1], onlyWhenEnabled: true }
 ];

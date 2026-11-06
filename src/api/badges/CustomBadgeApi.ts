@@ -1,5 +1,7 @@
 import { GetConfiguration, GetLocalizationManager } from '@octane/renderer';
 import { getAccessToken } from '../auth';
+import { localizeServerMessage } from '../utils/localizeServerMessage';
+import { localizeWithFallback } from '../utils/localizeWithFallback';
 
 export interface CustomBadgeRecord {
     badgeId: string;
@@ -68,7 +70,7 @@ const throwOnError = async (response: Response): Promise<void> => {
     // A 401 here no longer clears the token every other API shares: one refused call used to sign the whole client
     // out of its HTTP features until the next login.
     const payload = await parseJson<CustomBadgeError>(response);
-    const message = payload?.error || `Request failed (${response.status}).`;
+    const message = localizeServerMessage(payload?.error, localizeWithFallback('api.message.request_failed', 'Request failed (%status%).', ['status'], [String(response.status)]));
     const err = new Error(message) as Error & { status: number; code?: string };
     err.status = response.status;
     if (payload?.code) err.code = payload.code;

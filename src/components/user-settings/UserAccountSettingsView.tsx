@@ -1,7 +1,7 @@
 import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, KeyboardEvent, useEffect, useMemo, useState } from 'react';
 import { FaArrowLeft, FaCheckCircle, FaChevronRight, FaEnvelope, FaExclamationTriangle, FaEye, FaEyeSlash, FaIdBadge, FaInfoCircle, FaKey, FaShieldAlt, FaUserCog } from 'react-icons/fa';
-import { ClearRememberLogin, clearAccessToken, GetConfigurationValue, getAccessToken, LocalizeText, localizeWithFallback } from '../../api';
+import { ClearRememberLogin, clearAccessToken, GetConfigurationValue, getAccessToken, LocalizeText, localizeWithFallback, localizeServerMessage } from '../../api';
 import { Button, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
@@ -191,16 +191,16 @@ export const UserAccountSettingsView: FC<{}> = () =>
 
             if(!response.ok)
             {
-                const message = typeof payload.error === 'string' && payload.error
-                    ? payload.error
-                    : LocalizeText('usersettings.error.request_failed', [ 'status' ], [ response.status.toString() ]);
+                const message = localizeServerMessage(payload.error, LocalizeText('usersettings.error.request_failed', [ 'status' ], [ response.status.toString() ]));
                 setFeedback({ kind: 'error', message });
                 return;
             }
 
-            const message = typeof payload.message === 'string' && payload.message
-                ? payload.message
-                : localizeWithFallback('usersettings.success.password', "Password updated successfully.");
+            // The hotel's text first: the account API answers in English.
+            const message = localizeWithFallback(
+                'usersettings.success.password',
+                typeof payload.message === 'string' && payload.message ? payload.message : "Password updated successfully."
+            );
             setFeedback({ kind: 'success', message });
             setCurrentPassword('');
             setNewPassword('');
@@ -272,16 +272,16 @@ export const UserAccountSettingsView: FC<{}> = () =>
 
             if(!response.ok)
             {
-                const message = typeof payload.error === 'string' && payload.error
-                    ? payload.error
-                    : LocalizeText('usersettings.error.request_failed', [ 'status' ], [ response.status.toString() ]);
+                const message = localizeServerMessage(payload.error, LocalizeText('usersettings.error.request_failed', [ 'status' ], [ response.status.toString() ]));
                 setFeedback({ kind: 'error', message });
                 return;
             }
 
-            const message = typeof payload.message === 'string' && payload.message
-                ? payload.message
-                : localizeWithFallback('usersettings.success.email', "Email updated successfully.");
+            // The hotel's text first: the account API answers in English.
+            const message = localizeWithFallback(
+                'usersettings.success.email',
+                typeof payload.message === 'string' && payload.message ? payload.message : "Email updated successfully."
+            );
             setFeedback({ kind: 'success', message });
             setEmailCurrentPassword('');
             setNewEmail('');
@@ -357,16 +357,16 @@ export const UserAccountSettingsView: FC<{}> = () =>
 
             if(!response.ok)
             {
-                const message = typeof payload.error === 'string' && payload.error
-                    ? payload.error
-                    : LocalizeText('usersettings.error.request_failed', [ 'status' ], [ response.status.toString() ]);
+                const message = localizeServerMessage(payload.error, LocalizeText('usersettings.error.request_failed', [ 'status' ], [ response.status.toString() ]));
                 setFeedback({ kind: 'error', message });
                 return;
             }
 
-            const message = typeof payload.message === 'string' && payload.message
-                ? payload.message
-                : localizeWithFallback('usersettings.success.username', "Username updated. Log in again with your new name.");
+            // The hotel's text first: the account API answers in English.
+            const message = localizeWithFallback(
+                'usersettings.success.username',
+                typeof payload.message === 'string' && payload.message ? payload.message : "Username updated. Log in again with your new name."
+            );
             setFeedback({ kind: 'success', message });
             setUsernameCurrentPassword('');
             setNewUsername('');

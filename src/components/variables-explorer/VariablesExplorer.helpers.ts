@@ -1,4 +1,4 @@
-import { holderScopeOfKind, targetKindLabel, WebApiHolderScope, WebApiProfile, WebApiTargetKind, WebApiUserTargetKind, WebApiVariable, WebApiVariableScope } from '../../api';
+import { holderScopeOfKind, targetKindLabel, WebApiHolderScope, WebApiProfile, WebApiTargetKind, WebApiUserTargetKind, WebApiVariable, WebApiVariableScope, localizeWithFallback } from '../../api';
 import { VARIABLES_ELEMENTS } from '../wired-tools/WiredCreatorTools.constants';
 import { VariableDefinition, VariablesElementButton, VariablesElementType } from '../wired-tools/WiredCreatorTools.types';
 
@@ -36,10 +36,10 @@ export const variableProperties = (definition: VariableDefinition | null): { key
         { key: 'Type', value: definition.type },
         { key: 'Target', value: definition.target },
         { key: 'Availability', value: definition.availability },
-        { key: 'Has value', value: yesNo(definition.hasValue) },
-        { key: 'Can write to', value: yesNo(definition.canWriteTo) },
-        { key: 'Can create/delete', value: yesNo(definition.canCreateDelete) },
-        { key: 'Is text connected', value: yesNo(definition.isTextConnected) }
+        { key: localizeWithFallback('octane.variables_explorer.has_value', 'Has value'), value: yesNo(definition.hasValue) },
+        { key: localizeWithFallback('octane.variables_explorer.can_write_to', 'Can write to'), value: yesNo(definition.canWriteTo) },
+        { key: localizeWithFallback('octane.variables_explorer.can_create_delete', 'Can create/delete'), value: yesNo(definition.canCreateDelete) },
+        { key: localizeWithFallback('octane.variables_explorer.is_text_connected', 'Is text connected'), value: yesNo(definition.isTextConnected) }
     ];
 };
 
@@ -52,14 +52,14 @@ export type ExplorerHolderTarget =
 export type ExplorerLookupKind = 'username' | WebApiTargetKind;
 
 export const EXPLORER_LOOKUP_KINDS: { value: ExplorerLookupKind; label: string }[] = [
-    { value: 'username', label: 'User name' },
-    { value: 'users', label: 'User id' },
-    { value: 'pets', label: 'Pet id' },
-    { value: 'bots', label: 'Bot id' },
-    { value: 'furni', label: 'Floor furni id' },
-    { value: 'wall-items', label: 'Wall furni id' },
-    { value: 'furni-bc', label: 'Builders Club floor furni id' },
-    { value: 'wall-items-bc', label: 'Builders Club wall furni id' }
+    { value: 'username', get label() { return localizeWithFallback('octane.variables_explorer.user_name', 'User name'); } },
+    { value: 'users', get label() { return localizeWithFallback('octane.variables_explorer.user_id', 'User id'); } },
+    { value: 'pets', get label() { return localizeWithFallback('octane.variables_explorer.pet_id', 'Pet id'); } },
+    { value: 'bots', get label() { return localizeWithFallback('octane.variables_explorer.bot_id', 'Bot id'); } },
+    { value: 'furni', get label() { return localizeWithFallback('octane.variables_explorer.floor_furni_id', 'Floor furni id'); } },
+    { value: 'wall-items', get label() { return localizeWithFallback('octane.variables_explorer.wall_furni_id', 'Wall furni id'); } },
+    { value: 'furni-bc', get label() { return localizeWithFallback('octane.variables_explorer.builders_club_floor_furni_id', 'Builders Club floor furni id'); } },
+    { value: 'wall-items-bc', get label() { return localizeWithFallback('octane.variables_explorer.builders_club_wall_furni_id', 'Builders Club wall furni id'); } }
 ];
 
 /** The lookup field's target, or `null` when the input does not fit the kind. */
@@ -97,17 +97,17 @@ export const explorerHolderDescription = (kind: WebApiTargetKind, entityId: numb
 export const holderPanelTitle = (target: ExplorerHolderTarget): string => {
     switch (target.scope) {
         case 'furni':
-            return 'Manage Furni Variables';
+            return localizeWithFallback('octane.variables_explorer.manage_furni_variables', 'Manage Furni Variables');
         case 'global':
-            return 'Manage Global Variables';
+            return localizeWithFallback('octane.variables_explorer.manage_global_variables', 'Manage Global Variables');
         default:
-            return 'Manage User Variables';
+            return localizeWithFallback('octane.variables_explorer.manage_user_variables', 'Manage User Variables');
     }
 };
 
 /** The same lines as the creator tools' holder window; `localName` is what the room you stand in knows. */
 export const holderInfoLines = (target: ExplorerHolderTarget, profile: WebApiProfile | null, roomId: number, localName = '', localOwner = ''): string[] => {
-    if (target.scope === 'global') return ['Scope: Room', `Room id: ${roomId}`];
+    if (target.scope === 'global') return [localizeWithFallback('octane.variables_explorer.scope_room', 'Scope: Room'), localizeWithFallback('octane.variables_explorer.room_id_room_id', 'Room id: %room_id%', ['room_id'], [String(roomId)])];
 
     const entityId = resolvedEntityId(target, profile);
     const idText = entityId === null ? '?' : String(entityId);
@@ -115,9 +115,9 @@ export const holderInfoLines = (target: ExplorerHolderTarget, profile: WebApiPro
     if (target.scope === 'furni') {
         return [
             `Furni type: ${targetKindLabel(target.kind)}`,
-            ...(localName ? [`Name: ${localName}`] : []),
-            ...(localOwner ? [`Owner: ${localOwner}`] : []),
-            `Furni id: ${idText}`
+            ...(localName ? [localizeWithFallback('octane.variables_explorer.name_local_name', 'Name: %local_name%', ['local_name'], [String(localName)])] : []),
+            ...(localOwner ? [localizeWithFallback('octane.variables_explorer.owner_local_owner', 'Owner: %local_owner%', ['local_owner'], [String(localOwner)])] : []),
+            localizeWithFallback('octane.variables_explorer.furni_id_id_text', 'Furni id: %id_text%', ['id_text'], [String(idText)])
         ];
     }
 
@@ -125,8 +125,8 @@ export const holderInfoLines = (target: ExplorerHolderTarget, profile: WebApiPro
 
     return [
         `User type: ${targetKindLabel(target.kind as WebApiUserTargetKind)}`,
-        ...(name ? [`Name: ${name}`] : []),
-        ...(localOwner ? [`Owner: ${localOwner}`] : []),
+        ...(name ? [localizeWithFallback('octane.variables_explorer.name_name', 'Name: %name%', ['name'], [String(name)])] : []),
+        ...(localOwner ? [localizeWithFallback('octane.variables_explorer.owner_local_owner', 'Owner: %local_owner%', ['local_owner'], [String(localOwner)])] : []),
         `${target.kind === 'pets' ? 'Pet' : target.kind === 'bots' ? 'Bot' : 'User'} id: ${idText}`
     ];
 };

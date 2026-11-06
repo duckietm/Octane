@@ -253,7 +253,7 @@ export const ModToolsView: FC<{}> = () => {
                         searchQuery={userQuery}
                         searchResults={userResults}
                         selectedUser={selectedUser ? { ...selectedUser, present: isSelectedUserPresent } : null}
-                        userCaption={selectedUser ? `User info: ${selectedUser.username}` : 'User info:'}
+                        userCaption={selectedUser ? localizeWithFallback('octane.mod_tools.user_info_username', 'User info: %username%', ['username'], [String(selectedUser.username)]) : localizeWithFallback('octane.mod_tools.user_info_2', 'User info:')}
                         x={startPanel.x}
                         y={startPanel.y}
                         onChatlog={() => CreateLinkEvent(`mod-tools/toggle-room-chatlog/${currentRoomId}`)}

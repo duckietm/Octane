@@ -15,7 +15,7 @@ import {
     FurniEditorUpdateFurnidataComposer
 } from '@octane/renderer';
 import { useCallback, useRef, useState } from 'react';
-import { NotificationAlertType, SendMessageComposer } from '../../api';
+import { NotificationAlertType, SendMessageComposer, localizeWithFallback } from '../../api';
 import { useMessageEvent, useNotification } from '../../hooks';
 
 export interface FurniItem {
@@ -229,7 +229,7 @@ export const useFurniEditor = () => {
             }
 
             if (simpleAlert) {
-                simpleAlert(parser.message || 'Operation failed', NotificationAlertType.ALERT, null, null, 'Furni Editor Error');
+                simpleAlert(parser.message || 'Operation failed', NotificationAlertType.ALERT, null, null, localizeWithFallback('octane.furni_editor.furni_editor_error', 'Furni Editor Error'));
             }
 
             return;
@@ -244,7 +244,7 @@ export const useFurniEditor = () => {
             }
 
             if (simpleAlert) {
-                simpleAlert('Item updated successfully', NotificationAlertType.DEFAULT, null, null, 'Furni Editor');
+                simpleAlert(localizeWithFallback('octane.furni_editor.item_updated_successfully', 'Item updated successfully'), NotificationAlertType.DEFAULT, null, null, localizeWithFallback('octane.furni_editor.furni_editor', 'Furni Editor'));
             }
         } else if (action === 'delete') {
             setSelectedItem(null);
@@ -253,7 +253,7 @@ export const useFurniEditor = () => {
             setFurniDataDiagnostic(null);
 
             if (simpleAlert) {
-                simpleAlert('Item deleted successfully', NotificationAlertType.DEFAULT, null, null, 'Furni Editor');
+                simpleAlert(localizeWithFallback('octane.furni_editor.item_deleted_successfully', 'Item deleted successfully'), NotificationAlertType.DEFAULT, null, null, localizeWithFallback('octane.furni_editor.furni_editor', 'Furni Editor'));
             }
         }
     });

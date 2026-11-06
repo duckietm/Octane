@@ -118,13 +118,13 @@ export const WiredPagedTable = <T,>(props: WiredPagedTableProps<T>) => {
                 </div>
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex gap-2">
-                        <Hint content="First page">
-                            <BaseButton aria-label="First page" className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" onClick={() => requests.requestFirstPage()}>
+                        <Hint content={localizeWithFallback('octane.wired_tools.first_page', 'First page')}>
+                            <BaseButton aria-label={localizeWithFallback('octane.wired_tools.first_page', 'First page')} className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" onClick={() => requests.requestFirstPage()}>
                                 &laquo;
                             </BaseButton>
                         </Hint>
-                        <Hint content="Previous page">
-                            <BaseButton aria-label="Previous page" className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" onClick={() => requests.requestPreviousPage()}>
+                        <Hint content={localizeWithFallback('octane.wired_tools.previous_page', 'Previous page')}>
+                            <BaseButton aria-label={localizeWithFallback('octane.wired_tools.previous_page', 'Previous page')} className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" onClick={() => requests.requestPreviousPage()}>
                                 &lsaquo;
                             </BaseButton>
                         </Hint>
@@ -132,7 +132,7 @@ export const WiredPagedTable = <T,>(props: WiredPagedTableProps<T>) => {
                     <div className="flex items-center gap-2 text-[12px] text-[#555]">
                         {pagingText && <span>{pagingText.start}</span>}
                         <input
-                            aria-label="Page"
+                            aria-label={localizeWithFallback('octane.wired_tools.page', 'Page')}
                             className="w-[42px] rounded border border-[#b8b2a4] bg-white px-1 py-[2px] text-center text-[12px]"
                             type="text"
                             inputMode="numeric"
@@ -149,13 +149,13 @@ export const WiredPagedTable = <T,>(props: WiredPagedTableProps<T>) => {
                         {pagingText && <span>{pagingText.end}</span>}
                     </div>
                     <div className="flex gap-2">
-                        <Hint content="Next page">
-                            <BaseButton aria-label="Next page" className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" onClick={() => requests.requestNextPage()}>
+                        <Hint content={localizeWithFallback('octane.wired_tools.next_page', 'Next page')}>
+                            <BaseButton aria-label={localizeWithFallback('octane.wired_tools.next_page', 'Next page')} className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" onClick={() => requests.requestNextPage()}>
                                 &rsaquo;
                             </BaseButton>
                         </Hint>
-                        <Hint content="Last page">
-                            <BaseButton aria-label="Last page" className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" onClick={() => requests.requestLastPage()}>
+                        <Hint content={localizeWithFallback('octane.wired_tools.last_page', 'Last page')}>
+                            <BaseButton aria-label={localizeWithFallback('octane.wired_tools.last_page', 'Last page')} className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" onClick={() => requests.requestLastPage()}>
                                 &raquo;
                             </BaseButton>
                         </Hint>

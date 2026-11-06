@@ -42,7 +42,7 @@ export const SendMessageView: FC<SendMessageProps> = ({ userId, userName, settin
         if (sentRef.current) return;
 
         if (isHint || message === '') {
-            showModAlert('You must input a message to the user');
+            showModAlert(localizeWithFallback('octane.mod_tools.you_must_input_a_message_to', 'You must input a message to the user'));
 
             return;
         }
@@ -55,7 +55,7 @@ export const SendMessageView: FC<SendMessageProps> = ({ userId, userName, settin
     return (
         <NativeTextTree>
             <NativeWindowShell type="sendMessage" windowKey={userName} x={x} y={y}>
-                <Native0Frame caption={`Msg To: ${userName}`} height={nativeNumber(root, 'height')} width={nativeNumber(root, 'width')} onClose={onClose}>
+                <Native0Frame caption={localizeWithFallback('octane.mod_tools.msg_to_user_name', 'Msg To: %user_name%', ['user_name'], [String(userName)])} height={nativeNumber(root, 'height')} width={nativeNumber(root, 'width')} onClose={onClose}>
                     <Native0Input
                         active={inputActive}
                         height={nativeNumber(input, 'height')}

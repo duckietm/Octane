@@ -12,6 +12,7 @@ import {
     WebApiVariable
 } from './variablesWebApi';
 import { normalizeWebApiBaseUrl, WebApiHotel } from './WiredWebApi';
+import { localizeWithFallback } from '../utils/localizeWithFallback';
 
 /** Pure pieces of the Variables Explorer window. */
 
@@ -47,11 +48,11 @@ export const validateExplorerConnect = (
     const roomText = (input.roomId ?? '').trim();
     const roomId = /^[0-9]{1,10}$/.test(roomText) ? Number(roomText) : 0;
 
-    if (!hotelUrl || !hotels.some((hotel) => hotel.url === hotelUrl)) errors.hotelUrl = 'Pick a hotel';
-    if (roomId <= 0 || roomId > MAX_ROOM_ID) errors.roomId = 'Enter a room id';
-    if (readKey && !KEY_PATTERN.test(readKey)) errors.readKey = 'This is not a valid key';
-    if (writeKey && !KEY_PATTERN.test(writeKey)) errors.writeKey = 'This is not a valid key';
-    if (!readKey && !writeKey) errors.readKey = 'Enter a read key or a write key';
+    if (!hotelUrl || !hotels.some((hotel) => hotel.url === hotelUrl)) errors.hotelUrl = localizeWithFallback('octane.wired.pick_a_hotel', 'Pick a hotel');
+    if (roomId <= 0 || roomId > MAX_ROOM_ID) errors.roomId = localizeWithFallback('octane.wired.enter_a_room_id', 'Enter a room id');
+    if (readKey && !KEY_PATTERN.test(readKey)) errors.readKey = localizeWithFallback('octane.wired.this_is_not_a_valid_key', 'This is not a valid key');
+    if (writeKey && !KEY_PATTERN.test(writeKey)) errors.writeKey = localizeWithFallback('octane.wired.this_is_not_a_valid_key', 'This is not a valid key');
+    if (!readKey && !writeKey) errors.readKey = localizeWithFallback('octane.wired.enter_a_read_key_or_a', 'Enter a read key or a write key');
 
     if (Object.keys(errors).length) return { errors, connection: null };
 
@@ -121,13 +122,13 @@ export const targetKindLabel = (kind: string): string => {
         case 'bots':
             return 'Bot';
         case 'furni':
-            return 'Floor furni';
+            return localizeWithFallback('octane.wired.floor_furni', 'Floor furni');
         case 'wall-items':
-            return 'Wall furni';
+            return localizeWithFallback('octane.wired.wall_furni', 'Wall furni');
         case 'furni-bc':
-            return 'Builders Club floor furni';
+            return localizeWithFallback('octane.wired.builders_club_floor_furni', 'Builders Club floor furni');
         case 'wall-items-bc':
-            return 'Builders Club wall furni';
+            return localizeWithFallback('octane.wired.builders_club_wall_furni', 'Builders Club wall furni');
         default:
             return kind || 'Room';
     }
@@ -143,11 +144,11 @@ export interface ExplorerSortOption {
 }
 
 export const EXPLORER_SORT_OPTIONS: ExplorerSortOption[] = [
-    { id: 'id_asc', label: 'Entity id', sort: 'id', order: 'asc' },
-    { id: 'value_desc', label: 'Highest value', sort: 'value', order: 'desc' },
-    { id: 'value_asc', label: 'Lowest value', sort: 'value', order: 'asc' },
-    { id: 'id_desc', label: 'Newest entity id', sort: 'id', order: 'desc' },
-    { id: 'updated_desc', label: 'Last updated', sort: 'update_time', order: 'desc' }
+    { id: 'id_asc', get label() { return localizeWithFallback('octane.wired.entity_id', 'Entity id'); }, sort: 'id', order: 'asc' },
+    { id: 'value_desc', get label() { return localizeWithFallback('octane.wired.highest_value', 'Highest value'); }, sort: 'value', order: 'desc' },
+    { id: 'value_asc', get label() { return localizeWithFallback('octane.wired.lowest_value', 'Lowest value'); }, sort: 'value', order: 'asc' },
+    { id: 'id_desc', get label() { return localizeWithFallback('octane.wired.newest_entity_id', 'Newest entity id'); }, sort: 'id', order: 'desc' },
+    { id: 'updated_desc', get label() { return localizeWithFallback('octane.wired.last_updated', 'Last updated'); }, sort: 'update_time', order: 'desc' }
 ];
 
 export const sortOptionById = (id: string): ExplorerSortOption => EXPLORER_SORT_OPTIONS.find((option) => option.id === id) ?? EXPLORER_SORT_OPTIONS[0];
@@ -222,21 +223,21 @@ export const parseInt32 = (text: string): number | null => {
 
 /** What each of the API's error codes means for the person using the explorer. */
 const ERROR_MESSAGES: Record<string, string> = {
-    'wired.variables.key_missing': 'This needs the write key.',
-    'wired.variables.key_invalid': 'The key was not accepted.',
-    'wired.variables.api_disabled': 'The Variables Web API add-on does not work in this room.',
-    'wired.variables.bulk_delete_not_enabled': 'This write key may not bulk delete. Allow mass deletion in the Web API add-on first.',
-    'wired.variables.operation_not_allowed': 'This room does not allow that.',
-    'wired.variables.user_not_participating': 'That user is not in the room and has no saved variables in it.',
-    'wired.variables.entity_not_found': 'Nothing with that id is in the room.',
-    'wired.variables.not_found': 'Not found.',
-    'room.not_found': 'That room was not found.',
-    'wired.variables.unknown_endpoint': 'The Variables Web API is not available on this hotel.',
-    'wired.variables.invalid_value': 'That value is not accepted.',
-    'wired.variables.invalid_target': 'That holder is not valid for this variable.',
-    'wired.variables.bulk_delete_invalid_variable': 'That variable is not in this room.',
-    'timeout': 'The hotel did not answer in time.',
-    'network': 'The hotel could not be reached.'
+    'wired.variables.key_missing': localizeWithFallback('octane.wired.this_needs_the_write_key', 'This needs the write key.'),
+    'wired.variables.key_invalid': localizeWithFallback('octane.wired.the_key_was_not_accepted', 'The key was not accepted.'),
+    'wired.variables.api_disabled': localizeWithFallback('octane.wired.the_variables_web_api_add_on', 'The Variables Web API add-on does not work in this room.'),
+    'wired.variables.bulk_delete_not_enabled': localizeWithFallback('octane.wired.this_write_key_may_not_bulk', 'This write key may not bulk delete. Allow mass deletion in the Web API add-on first.'),
+    'wired.variables.operation_not_allowed': localizeWithFallback('octane.wired.this_room_does_not_allow_that', 'This room does not allow that.'),
+    'wired.variables.user_not_participating': localizeWithFallback('octane.wired.that_user_is_not_in_the', 'That user is not in the room and has no saved variables in it.'),
+    'wired.variables.entity_not_found': localizeWithFallback('octane.wired.nothing_with_that_id_is_in', 'Nothing with that id is in the room.'),
+    'wired.variables.not_found': localizeWithFallback('octane.wired.not_found', 'Not found.'),
+    'room.not_found': localizeWithFallback('octane.wired.that_room_was_not_found', 'That room was not found.'),
+    'wired.variables.unknown_endpoint': localizeWithFallback('octane.wired.the_variables_web_api_is_not', 'The Variables Web API is not available on this hotel.'),
+    'wired.variables.invalid_value': localizeWithFallback('octane.wired.that_value_is_not_accepted', 'That value is not accepted.'),
+    'wired.variables.invalid_target': localizeWithFallback('octane.wired.that_holder_is_not_valid_for', 'That holder is not valid for this variable.'),
+    'wired.variables.bulk_delete_invalid_variable': localizeWithFallback('octane.wired.that_variable_is_not_in_this', 'That variable is not in this room.'),
+    'timeout': localizeWithFallback('octane.wired.the_hotel_did_not_answer_in', 'The hotel did not answer in time.'),
+    'network': localizeWithFallback('octane.wired.the_hotel_could_not_be_reached', 'The hotel could not be reached.')
 };
 
 export const explorerErrorMessage = (error: unknown): string => {
@@ -247,5 +248,5 @@ export const explorerErrorMessage = (error: unknown): string => {
         return ERROR_MESSAGES[error.code] ?? (error.message || 'Something went wrong.');
     }
 
-    return error instanceof Error && error.message ? error.message : 'Something went wrong.';
+    return error instanceof Error && error.message ? error.message : localizeWithFallback('octane.wired.something_went_wrong', 'Something went wrong.');
 };

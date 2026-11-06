@@ -60,7 +60,7 @@ export const WiredActionGiveEffectView: FC<{}> = () => {
                 save={save}
                 footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
             >
-                {numberSection('wiredfurni.params.give_effect.id', 'Effect id', effectId, GIVE_EFFECT_MAX_ID, setEffectId)}
+                {numberSection('wiredfurni.params.give_effect.id', localizeWithFallback('octane.wired.effect_id', 'Effect id'), effectId, GIVE_EFFECT_MAX_ID, setEffectId)}
                 {numberSection('wiredfurni.params.give_effect.priority', 'Priority', priority, 2, setPriority)}
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.give_effect.type', 'Type')}</Text>

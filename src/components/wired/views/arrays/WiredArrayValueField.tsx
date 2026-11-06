@@ -174,9 +174,9 @@ export const wiredArrayOwnerSources = (variableType: number): Array<{ label: str
 };
 
 export const WIRED_ARRAY_OWNER_SOURCE_FALLBACKS: Record<number, string> = {
-    0: 'The user or furni that set the stack off',
-    11: 'The clicked user',
-    100: 'The picked furni',
-    200: 'Whatever the selector picked',
-    201: 'Whatever the signal carried'
+    0: localizeWithFallback('octane.wired.the_user_or_furni_that_set', 'The user or furni that set the stack off'),
+    11: localizeWithFallback('octane.wired.the_clicked_user', 'The clicked user'),
+    100: localizeWithFallback('octane.wired.the_picked_furni', 'The picked furni'),
+    200: localizeWithFallback('octane.wired.whatever_the_selector_picked', 'Whatever the selector picked'),
+    201: localizeWithFallback('octane.wired.whatever_the_signal_carried', 'Whatever the signal carried')
 };
