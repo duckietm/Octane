@@ -34,7 +34,8 @@ export interface IWobbleFighter {
     lean: number;
     stabilising: boolean;
     pushIn: number;
-    stabiliseIn: number;
+    /** Stabilise is used once a round. */
+    stabilised: boolean;
     action: '' | 'push' | 'miss' | 'hit' | 'move' | 'stabilise' | 'fall';
     actionDir: number;
     /** How long ago the action was, in milliseconds; -1 for none. */
@@ -158,7 +159,7 @@ const ERRORS: Record<string, string> = {
 export const wobbleErrorText = (error: unknown): string | null => {
     const code = error instanceof WobbleApiError ? error.code : 'http_error';
 
-    if ([ 'too_soon', 'stabilising', 'beam_end', 'blocked', 'not_playing' ].includes(code)) return null;
+    if ([ 'too_soon', 'already_stabilised', 'beam_end', 'blocked', 'not_playing' ].includes(code)) return null;
 
     return wbt(`error.${code}`, ERRORS[code] ?? 'Something went wrong, try again.');
 };

@@ -1,28 +1,23 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { CSSProperties, FC, useCallback, useEffect, useRef, useState } from 'react';
 import { IWobbleFighter, IWobbleRules, IWobbleView, WOBBLE_DEFAULT_RULES, WobbleApi, wbt, wobbleErrorText, wobbleEventText } from '../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import gaugeImage from '../../assets/images/wobble/wobble-gauge.png';
-import { POOL_HEIGHT, POOL_WIDTH, WobbleScene } from './WobbleScene';
+import buttonsImage from '../../assets/images/wobble/wobble-buttons.png';
+import countImage from '../../assets/images/wobble/wobble-count.png';
+import needleImage from '../../assets/images/wobble/wobble-needle.png';
+import panelImage from '../../assets/images/wobble/wobble-panel.png';
+import { POOL_HEIGHT, POOL_WIDTH, SKY, WobbleScene } from './WobbleScene';
 import { WobbleRulesView } from './WobbleRulesView';
 import '../../css/wobble/WobbleView.css';
 
 const POLL_FAST_MS = 250;
 const POLL_SLOW_MS = 1000;
 const POLL_LOBBY_MS = 3000;
-const TOP_BAR = 40;
-/** The sky's height in the picture (it fades to the light blue of the roof's wall there; wobble-art.py). */
-const SKY_HEIGHT = 250;
-/** Room kept at the bottom for the keys. */
-const BOTTOM_UI = 120;
 
-/** The part of the picture that must show: round the beam, from above the fighters' heads to below the water. */
-const VIEW = { top: 230, bottom: 640, width: 640 };
-
+/** The room's zoom: the whole rooftop on the screen, never bigger than its own size (twice the original's). */
 const useSceneZoom = (): number => {
-    // What must show decides the zoom; the sky, the far corners of the roof and its front may go off the screen.
-    const read = () => (typeof window === 'undefined' ? 1 : Math.max(1, Math.floor(Math.min(window.innerWidth / VIEW.width, (window.innerHeight - TOP_BAR - BOTTOM_UI) / (VIEW.bottom - VIEW.top)))));
+    const read = () => (typeof window === 'undefined' ? 1 : Math.max(0.5, Math.min(1, window.innerWidth / POOL_WIDTH, window.innerHeight / POOL_HEIGHT)));
     const [zoom, setZoom] = useState(read);
 
     useEffect(() => {
@@ -36,41 +31,50 @@ const useSceneZoom = (): number => {
     return zoom;
 };
 
+/** The original game's buttons: a key (31x31) or the space bar (76x31), as the panel lays them out (paaluUI.window). */
+const PanelKey: FC<{ x: number; y: number; label: string; wide?: boolean; active?: boolean; disabled?: boolean; onDown?: () => void; onUp?: () => void }> = ({ x, y, label, wide = false, active = false, disabled = false, onDown, onUp }) => {
+    const frame = disabled ? 2 : active ? 1 : 0;
 
-/** The pool's top: what must show centred between the top bar and the keys (the rest may go off the screen). */
-const stageTop = (zoom: number): number => {
-    if (typeof window === 'undefined') return 0;
-
-    const room = window.innerHeight - TOP_BAR - BOTTOM_UI;
-    const shown = (VIEW.bottom - VIEW.top) * zoom;
-    const top = TOP_BAR + Math.round((room - shown) / 2) - VIEW.top * zoom;
-
-    // Never a gap under the picture.
-    return Math.max(top, window.innerHeight - POOL_HEIGHT * zoom);
+    return (
+        <button
+            type="button"
+            className={`wb-key ${wide ? 'is-wide' : ''} ${active ? 'is-active' : ''}`}
+            disabled={disabled}
+            style={{ left: x * 2, top: y * 2, backgroundPosition: wide ? `${-(93 + frame * 76) * 2}px 0` : `${-frame * 31 * 2}px 0`, backgroundImage: `url(${buttonsImage})` }}
+            onPointerDown={(event) => {
+                event.preventDefault();
+                onDown?.();
+            }}
+            onPointerUp={() => onUp?.()}
+            onPointerLeave={() => active && onUp?.()}>
+            {!wide && <span data-browser-text>{label}</span>}
+        </button>
+    );
 };
 
-/** A fighter's balance dial: the needle turns from -90 to 90 degrees with the balance. */
-const Gauge: FC<{ fighter?: IWobbleFighter; small?: boolean }> = ({ fighter, small = false }) => (
-    <div className={`wb-gauge ${small ? 'is-small' : ''}`} style={{ backgroundImage: `url(${gaugeImage})` }}>
-        <span className="wb-gauge__needle" style={{ transform: `rotate(${Math.max(-100, Math.min(100, fighter?.balance ?? 0)) * 0.9}deg)` }} />
-    </div>
-);
+/** Habbo's original Wobble Squabble panel (hh_paalu: paaluUI_bg, paaluUI_mittari, the keys), twice its size. */
+const Panel: FC<{ fighter: IWobbleFighter; playing: boolean; lean: number; hold: (side: 'left' | 'right', down: boolean) => void; push: (dir: number) => void; move: (dir: number) => void; stabilise: () => void }> = ({ fighter, playing, lean, hold, push, move, stabilise }) => {
+    const angle = Math.max(-100, Math.min(100, fighter.balance)) * 0.9;
 
-const ControlKey: FC<{ label: string; text: string; active?: boolean; disabled?: boolean; wide?: boolean; onDown?: () => void; onUp?: () => void }> = ({ label, text, active = false, disabled = false, wide = false, onDown, onUp }) => (
-    <button
-        type="button"
-        className={`wb-control ${active ? 'is-active' : ''}`}
-        disabled={disabled}
-        onPointerDown={(event) => {
-            event.preventDefault();
-            onDown?.();
-        }}
-        onPointerUp={() => onUp?.()}
-        onPointerLeave={() => active && onUp?.()}>
-        <span className={`wb-key ${wide ? 'is-wide' : ''}`}>{label}</span>
-        <span className="wb-control__text">{text}</span>
-    </button>
-);
+    return (
+        <div className="wb-panel-classic" style={{ backgroundImage: `url(${panelImage})` }}>
+            <span className="wb-panel-classic__label" style={{ left: 28 * 2, top: 31 * 2 }} data-browser-text>{wbt('group.balance', 'Balance')}</span>
+            <span className="wb-panel-classic__label" style={{ left: 28 * 2, top: 81 * 2 }} data-browser-text>{wbt('group.push', 'Push')}</span>
+            <span className="wb-panel-classic__label" style={{ left: 28 * 2, top: 131 * 2 }} data-browser-text>{wbt('group.move', 'Moving')}</span>
+            <span className="wb-panel-classic__label" style={{ left: 28 * 2, top: 181 * 2 }} data-browser-text>{wbt('group.stabilise', 'Stabilise')}</span>
+            <span className="wb-panel-classic__gauge-label" style={{ left: 138 * 2, top: 65 * 2 }} data-browser-text>{wbt('gauge', 'Balance')}</span>
+            <PanelKey x={26} y={44} label="Q" active={lean < 0} disabled={!playing} onDown={() => hold('left', true)} onUp={() => hold('left', false)} />
+            <PanelKey x={68} y={44} label="E" active={lean > 0} disabled={!playing} onDown={() => hold('right', true)} onUp={() => hold('right', false)} />
+            <PanelKey x={26} y={94} label="A" disabled={!playing || fighter.pushIn > 0} onDown={() => push(-1)} />
+            <PanelKey x={68} y={94} label="D" disabled={!playing || fighter.pushIn > 0} onDown={() => push(1)} />
+            <PanelKey x={26} y={144} label="N" disabled={!playing} onDown={() => move(-1)} />
+            <PanelKey x={69} y={144} label="M" disabled={!playing} onDown={() => move(1)} />
+            <PanelKey x={26} y={194} label="" wide active={fighter.stabilising} disabled={!playing || fighter.stabilised} onDown={stabilise} />
+            <span className="wb-panel-classic__needle" style={{ left: 183 * 2, top: 123 * 2, transform: `translate(-50%, -100%) rotate(${angle}deg)`, backgroundImage: `url(${needleImage})` }} />
+            <span className="wb-panel-classic__pin" style={{ left: 183 * 2, top: 123 * 2, backgroundImage: `url(${needleImage})` }} />
+        </div>
+    );
+};
 
 /**
  * Habbi's Wobble Squabble (`wobble/show`, from the Game Center): a beam over the rooftop pool. Out of a duel, a window
@@ -287,7 +291,6 @@ export const WobbleView: FC = () => {
     const suddenLeft = match ? Math.max(0, Math.ceil((match.suddenIn - match.roundTime) / 1000)) : 0;
     const countdown = match?.state === 'countdown' ? Math.ceil(match.phaseLeft / 1000) : 0;
     const won = match?.state === 'finished' && me && match.winnerSide === me.side;
-    const top = stageTop(zoom);
 
     const bottomPanel = () => {
         if (!match) return null;
@@ -324,42 +327,15 @@ export const WobbleView: FC = () => {
 
         if (!me) return <div className="wb-panel"><div className="wb-panel__text">{wbt('watching', 'You are watching the duel.')}</div></div>;
 
-        const disabled = !playing;
-
-        return (
-            <div className="wb-controls">
-                <Gauge fighter={me} />
-                <div className="wb-controls__keys">
-                    <div className="wb-controls__group">
-                        <span className="wb-controls__label">{wbt('group.balance', 'Balance')}</span>
-                        <ControlKey label="Q" text={wbt('key.lean_left', 'Lean left (hold)')} active={lean < 0} disabled={disabled} onDown={() => hold('left', true)} onUp={() => hold('left', false)} />
-                        <ControlKey label="E" text={wbt('key.lean_right', 'Lean right (hold)')} active={lean > 0} disabled={disabled} onDown={() => hold('right', true)} onUp={() => hold('right', false)} />
-                    </div>
-                    <div className="wb-controls__group">
-                        <span className="wb-controls__label">{wbt('group.push', 'Push')}</span>
-                        <ControlKey label="A" text={wbt('key.push_left', 'Push to the left')} disabled={disabled || me.pushIn > 0} onDown={() => push(-1)} />
-                        <ControlKey label="D" text={wbt('key.push_right', 'Push to the right')} disabled={disabled || me.pushIn > 0} onDown={() => push(1)} />
-                    </div>
-                    <div className="wb-controls__group">
-                        <span className="wb-controls__label">{wbt('group.move', 'Move')}</span>
-                        <ControlKey label="N" text={wbt('key.step_left', 'Step left')} disabled={disabled} onDown={() => move(-1)} />
-                        <ControlKey label="M" text={wbt('key.step_right', 'Step right')} disabled={disabled} onDown={() => move(1)} />
-                    </div>
-                    <div className="wb-controls__group">
-                        <span className="wb-controls__label">{wbt('group.stabilise', 'Stabilise')}</span>
-                        <ControlKey label="Espace" wide text={me.stabiliseIn > 0 ? wbt('key.wait', 'Wait %s% s', [ 's' ], [ String(Math.ceil(me.stabiliseIn / 1000)) ]) : wbt('key.stabilise', 'Stabilise')} active={me.stabilising} disabled={disabled || me.stabiliseIn > 0} onDown={stabilise} />
-                    </div>
-                </div>
-            </div>
-        );
+        return <Panel fighter={me} playing={playing} lean={lean} hold={hold} push={push} move={move} stabilise={stabilise} />;
     };
 
     return (
         <NativeTextTree>
-            <div className="wb-room" style={{ background: `linear-gradient(rgb(92, 166, 236) ${top}px, rgb(196, 230, 252) ${top + SKY_HEIGHT * zoom}px)` }}>
-                <div className="wb-room__stage" style={{ width: POOL_WIDTH * zoom, height: POOL_HEIGHT * zoom, marginTop: top }}>
+            <div className="wb-room" style={{ background: SKY }}>
+                <div className="wb-room__stage" style={{ width: POOL_WIDTH * zoom, height: POOL_HEIGHT * zoom }}>
                     <div style={{ transform: `scale(${zoom})`, transformOrigin: '0 0' }}>
-                        <WobbleScene match={match ?? null} zoom={zoom} />
+                        <WobbleScene match={match ?? null} />
                     </div>
                 </div>
 
@@ -371,7 +347,6 @@ export const WobbleView: FC = () => {
                 {match && match.state !== 'waiting' && (
                     <div className={`wb-score ${match.sudden ? 'is-sudden' : ''}`}>
                         <div className="wb-score__side">
-                            <Gauge fighter={left} small />
                             <span className={`wb-score__name ${left?.you ? 'is-you' : ''}`}>{left?.name ?? '?'}</span>
                             <span className="wb-score__wins">{left?.wins ?? 0}</span>
                         </div>
@@ -382,16 +357,15 @@ export const WobbleView: FC = () => {
                         <div className="wb-score__side is-right">
                             <span className="wb-score__wins">{right?.wins ?? 0}</span>
                             <span className={`wb-score__name ${right?.you ? 'is-you' : ''}`}>{right?.name ?? '?'}</span>
-                            <Gauge fighter={right} small />
                         </div>
                     </div>
                 )}
 
-                {countdown > 0 && <div key={countdown} className="wb-countdown">{countdown}</div>}
+                {countdown > 0 && countdown <= 3 && <span key={countdown} className="wb-countdown" style={{ backgroundImage: `url(${countImage})`, backgroundPosition: `${-2 * 56 * 2}px ${-(3 - countdown) * 64 * 2}px` }} />}
                 {match?.state === 'playing' && match.roundTime < 900 && <div className="wb-countdown is-go">{wbt('go', 'Wobble!')}</div>}
                 {banner && <div key={banner.key} className={`wb-banner is-${banner.kind}`} data-browser-text>{banner.text}</div>}
 
-                {match && <div className="wb-bottom">{bottomPanel()}</div>}
+                {match && <div className={`wb-bottom ${me && live ? 'is-panel' : ''}`} style={{ '--wb-zoom': String(zoom) } as CSSProperties}>{bottomPanel()}</div>}
 
                 {error && <div className="wb-toast" data-browser-text>{error}</div>}
             </div>

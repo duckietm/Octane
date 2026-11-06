@@ -20,57 +20,80 @@
     flex: 0 0 auto;
 }
 
-/* ---- The pool ---- */
+/* ---- The rooftop: Habbo's original md_a, twice its size ---- */
 
 .wb-scene {
     position: relative;
+    overflow: hidden;
     image-rendering: pixelated;
 }
 
-.wb-scene__floor,
-.wb-fighter__avatar,
-.wb-swimmer img {
+.wb-scene__layer {
+    position: absolute;
+    top: 0;
+    left: 0;
     display: block;
+    max-width: none;
     image-rendering: pixelated;
     pointer-events: none;
     user-select: none;
 }
 
-.wb-scene__floor {
-    position: absolute;
-    top: 0;
-    left: 0;
+.wb-scene__front {
+    z-index: 5000;
 }
 
-/* The water's glitter, moving slowly over the basin. */
-.wb-scene__water {
+.wb-clouds {
     position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(170deg, rgba(255, 255, 255, 0) 0 22px, rgba(255, 255, 255, 0.16) 22px 24px, rgba(255, 255, 255, 0) 24px 46px);
-    clip-path: polygon(456px 324px, 712px 452px, 456px 580px, 200px 452px);
+    inset: 0 0 auto;
+    height: 300px;
+    overflow: hidden;
     pointer-events: none;
-    animation: wb-water 6s linear infinite;
 }
 
-@keyframes wb-water {
+.wb-cloud,
+.wb-falls,
+.wb-buoy,
+.wb-hit,
+.wb-splash {
+    position: absolute;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.wb-cloud {
+    left: 0;
+    animation: wb-cloud linear infinite;
+}
+
+@keyframes wb-cloud {
+    from {
+        transform: translateX(1460px);
+    }
+
     to {
-        background-position: 0 92px;
+        transform: translateX(-180px);
     }
 }
 
-.wb-scene__item {
-    position: absolute;
-    width: 0;
-    height: 0;
-    pointer-events: none;
+.wb-falls {
+    z-index: 50;
+    animation: wb-falls 0.7s steps(7) infinite;
 }
 
-/* A fighter: placed by the feet on the beam, tilted round the feet by the balance. */
+@keyframes wb-falls {
+    to {
+        background-position: -1792px 0;
+    }
+}
+
+/* A fighter: placed by the feet on their buoy, tilted round the feet by the balance. */
 .wb-fighter {
     position: absolute;
     width: 0;
     height: 0;
-    transition: left 0.3s ease-out;
+    transition: left 0.3s ease-out, top 0.3s ease-out;
 }
 
 .wb-fighter__tilt {
@@ -92,15 +115,20 @@
 }
 
 .wb-fighter__avatar {
+    display: block;
     max-width: none;
+    margin-bottom: -14px;
+    image-rendering: pixelated;
+    pointer-events: none;
+    user-select: none;
 }
 
 .wb-fighter.is-pushing .wb-fighter__body {
-    transform: translateX(calc(-50% + var(--wb-toward) * 12px));
+    transform: translate(calc(-50% + var(--wb-toward) * 10px), calc(var(--wb-toward) * -5px));
 }
 
 .wb-fighter.is-lunging .wb-fighter__body {
-    transform: translateX(calc(-50% + var(--wb-toward) * 18px)) rotate(calc(var(--wb-toward) * 8deg));
+    transform: translate(calc(-50% + var(--wb-toward) * 16px), calc(var(--wb-toward) * -8px)) rotate(calc(var(--wb-toward) * 8deg));
 }
 
 .wb-fighter.is-hit .wb-fighter__body {
@@ -118,9 +146,15 @@
     }
 }
 
-.wb-fighter.is-crouching .wb-fighter__body {
-    transform: translateX(-50%) scaleY(0.86);
-    transform-origin: 50% 100%;
+.wb-fighter.is-stabilising .wb-fighter__body {
+    animation: wb-steady 0.6s ease-out;
+}
+
+@keyframes wb-steady {
+    30% {
+        transform: translateX(-50%) scaleY(0.88);
+        transform-origin: 50% 100%;
+    }
 }
 
 /* Falling: the fighter topples to the side they leaned, and drops into the water. */
@@ -141,7 +175,7 @@
 
     to {
         opacity: 0;
-        transform: translate(calc(var(--wb-fall) * 30px), 70px) rotate(calc(var(--wb-fall) * 100deg));
+        transform: translate(calc(var(--wb-fall) * 40px), 50px) rotate(calc(var(--wb-fall) * 100deg));
     }
 }
 
@@ -161,17 +195,18 @@
     bottom: -54px;
     left: 50%;
     max-width: none;
+    image-rendering: pixelated;
     transform: translateX(-50%);
 }
 
 .wb-swimmer::after {
     position: absolute;
-    right: 0;
+    right: 8px;
     bottom: 0;
-    left: 0;
+    left: 8px;
     height: 10px;
-    background: linear-gradient(rgba(120, 210, 250, 0.9), rgba(60, 160, 220, 0.95));
     border-radius: 50% 50% 0 0 / 60% 60% 0 0;
+    background: rgba(0, 156, 156, 0.75);
     content: "";
 }
 
@@ -193,17 +228,11 @@
     }
 }
 
+/* The game's own splash, 10 frames, and its hit bubbles. */
 .wb-splash {
-    position: absolute;
-    width: 96px;
-    height: 80px;
-    background-repeat: no-repeat;
-    background-size: 384px 80px;
-    image-rendering: pixelated;
-    pointer-events: none;
-    transform: translate(-50%, -88%);
+    transform: translate(-50%, -90%);
     opacity: 0;
-    animation: wb-splash 0.8s steps(4) 0.45s forwards;
+    animation: wb-splash 0.9s steps(10) 0.45s forwards;
 }
 
 @keyframes wb-splash {
@@ -218,7 +247,29 @@
 
     100% {
         opacity: 0;
-        background-position: -384px 0;
+        background-position: -960px 0;
+    }
+}
+
+.wb-hit {
+    transform: translate(-50%, -100%);
+    animation: wb-hit-pop 0.45s ease-out both;
+}
+
+@keyframes wb-hit-pop {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -100%) scale(0.3);
+    }
+
+    25% {
+        opacity: 1;
+        transform: translate(-50%, -100%) scale(1.15);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -100%) scale(1);
     }
 }
 
@@ -346,51 +397,27 @@
     min-width: 170px;
 }
 
-/* A balance dial: the drawn dial, its needle turned round the pivot. */
-.wb-gauge {
-    position: relative;
-    width: 132px;
-    height: 76px;
-    flex: 0 0 auto;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    image-rendering: pixelated;
-}
-
-.wb-gauge.is-small {
-    width: 66px;
-    height: 38px;
-}
-
-.wb-gauge__needle {
-    position: absolute;
-    bottom: calc(10 / 76 * 100%);
-    left: calc(50% - 2px);
-    width: 4px;
-    height: calc(48 / 76 * 100%);
-    border-radius: 2px;
-    background: #ffffff;
-    box-shadow: 0 0 0 1px #000000;
-    transform-origin: 50% 100%;
-    transition: transform 0.25s linear;
-}
-
 .wb-countdown {
     position: absolute;
     top: 34%;
     left: 50%;
-    color: #ffffff;
-    font-size: 110px;
-    font-weight: 700;
-    text-shadow: 0 6px 0 #1f3550, 0 0 22px rgba(0, 0, 0, 0.4);
+    width: 112px;
+    height: 128px;
+    background-repeat: no-repeat;
+    background-size: 336px 384px;
+    image-rendering: pixelated;
     transform: translate(-50%, -50%);
     pointer-events: none;
     animation: wb-count 1s ease-out both;
 }
 
 .wb-countdown.is-go {
+    width: auto;
+    height: auto;
     color: #ffd84a;
     font-size: 84px;
+    font-weight: 700;
+    text-shadow: 0 6px 0 #1f3550, 0 0 22px rgba(0, 0, 0, 0.4);
     animation: wb-count 0.9s ease-out both;
 }
 
@@ -483,87 +510,6 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 8px;
-}
-
-/* The keys at the bottom: they work with the keyboard and with a click (or a finger). */
-.wb-controls {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 8px 14px;
-    border: 2px solid #000000;
-    border-radius: 10px;
-    background: #f5b400;
-    box-shadow: inset 0 0 0 3px #c98a00, 0 3px 0 rgba(0, 0, 0, 0.35);
-}
-
-.wb-controls__keys {
-    display: flex;
-    gap: 12px;
-}
-
-.wb-controls__group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.wb-controls__label {
-    color: #5a2c08;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.wb-control {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0;
-    border: none;
-    background: transparent;
-    color: #3a1c04;
-    font-size: 12px;
-    text-align: left;
-    cursor: pointer;
-    touch-action: none;
-}
-
-.wb-control:disabled {
-    cursor: default;
-    opacity: 0.55;
-}
-
-.wb-control__text {
-    width: 96px;
-    line-height: 1.15;
-}
-
-.wb-key {
-    display: inline-flex;
-    min-width: 30px;
-    height: 30px;
-    align-items: center;
-    justify-content: center;
-    padding: 0 6px;
-    border: 2px solid #000000;
-    border-radius: 6px;
-    background: linear-gradient(#fff6c8, #ffd056);
-    box-shadow: inset 0 -3px 0 #c98a00;
-    color: #000000;
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.wb-key.is-wide {
-    min-width: 64px;
-    font-size: 11px;
-}
-
-.wb-control.is-active .wb-key,
-.wb-control:not(:disabled):active .wb-key {
-    background: linear-gradient(#ffd056, #f2a900);
-    box-shadow: inset 0 2px 0 #c98a00;
 }
 
 .wb-toast {
@@ -729,8 +675,9 @@
 
 .game-tile--wobble .game-tile__banner {
     overflow: hidden;
-    background-position: 50% 62%;
-    background-size: 150%;
+    background-color: rgb(156, 206, 255);
+    background-position: 40% 62%;
+    background-size: 190%;
     image-rendering: pixelated;
 }
 
@@ -743,4 +690,94 @@
     display: block;
     overflow: visible;
     -webkit-line-clamp: unset;
+}
+
+/* ---- Habbo's original panel (paaluUI), twice its size ---- */
+
+.wb-bottom.is-panel {
+    bottom: 10px;
+    left: 10px;
+    transform: scale(var(--wb-zoom, 1));
+    transform-origin: 0 100%;
+}
+
+.wb-panel-classic {
+    position: relative;
+    width: 500px;
+    height: 474px;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    image-rendering: pixelated;
+}
+
+.wb-panel-classic__label,
+.wb-panel-classic__gauge-label {
+    position: absolute;
+    color: #663300;
+    font: 18px/22px Volter, monospace;
+    white-space: nowrap;
+}
+
+.wb-panel-classic__gauge-label {
+    width: 182px;
+    color: #333333;
+    text-align: center;
+}
+
+.wb-key {
+    position: absolute;
+    display: flex;
+    width: 62px;
+    height: 62px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-size: 642px 62px;
+    color: #000000;
+    font: 700 34px/1 Volter, monospace;
+    image-rendering: pixelated;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.wb-key.is-wide {
+    width: 152px;
+}
+
+.wb-key:disabled {
+    cursor: default;
+}
+
+.wb-key:disabled span {
+    opacity: 0.45;
+}
+
+.wb-key.is-active span {
+    transform: translateY(2px);
+}
+
+.wb-panel-classic__needle {
+    position: absolute;
+    width: 21px;
+    height: 56px;
+    background-repeat: no-repeat;
+    background-size: 28px 56px;
+    background-position: 0 0;
+    image-rendering: pixelated;
+    transform-origin: 50% 100%;
+    transition: transform 0.25s linear;
+}
+
+.wb-panel-classic__pin {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    background-repeat: no-repeat;
+    background-size: 112px 224px;
+    background-position: -84px 0;
+    image-rendering: pixelated;
+    transform: translate(-50%, -50%);
 }

@@ -2,7 +2,7 @@ import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
 import { wbt } from '../../../api';
 import { BaseButton } from '../../../common/BaseButton';
-import poolImage from '../../../assets/images/wobble/wobble-pool.png';
+import poolImage from '../../../assets/images/wobble/wobble-rooftop.png';
 
 /** Wobble Squabble's card in the Game Center: it opens the rooftop pool. */
 export const WobbleGameTileView: FC<{ onOpen: () => void }> = ({ onOpen }) => {

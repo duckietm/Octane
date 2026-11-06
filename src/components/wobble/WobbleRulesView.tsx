@@ -11,7 +11,7 @@ export const WOBBLE_KEYS: [string, string, string][] = [
     [ 'D', 'push_right', 'Push to the right' ],
     [ 'N', 'step_left', 'Step left' ],
     [ 'M', 'step_right', 'Step right' ],
-    [ 'Espace', 'stabilise', 'Stabilise' ]
+    [ 'Espace', 'stabilise', 'Stabilise (once a round)' ]
 ];
 
 const HOW: [string, string, string][] = [
@@ -19,7 +19,7 @@ const HOW: [string, string, string][] = [
     [ 'balance', 'Your balance', 'The needle of your dial shows your balance. It moves by itself, more and more the further it leans: hold Q to lean left and E to lean right, against the tilt. If the needle reaches the red end, you fall!' ],
     [ 'push', 'Pushing', 'Next to your opponent, A pushes them to the left and D to the right. Push them the way they already lean: that is when it hurts. A push in the air makes you lunge, and wobble.' ],
     [ 'move', 'Moving', 'N and M take a step left or right along the beam. Each step wobbles a little. You cannot walk past your opponent.' ],
-    [ 'stabilise', 'Stabilising', 'Space makes you crouch for a second: your wobble calms down. But a push while you crouch hurts even more, and you must wait a few seconds before crouching again.' ],
+    [ 'stabilise', 'Stabilising', 'Space sets you straight again, the needle back in the middle. But only once a round: keep it for the worst moment!' ],
     [ 'sudden', 'Sudden death', 'After 45 seconds, the beam wobbles much harder: someone will soon fall!' ]
 ];
 

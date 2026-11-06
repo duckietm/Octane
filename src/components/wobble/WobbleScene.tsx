@@ -1,128 +1,114 @@
-import { AvatarAction, GetRoomEngine, Vector3d } from '@octane/renderer';
-import { CSSProperties, FC, useEffect, useMemo, useState } from 'react';
-import { GetSessionDataManager, IWobbleFighter, IWobbleMatch, WOBBLE_FALL } from '../../api';
-import { LayoutFurniImageView } from '../../common';
-import poolImage from '../../assets/images/wobble/wobble-pool.png';
+import { AvatarAction } from '@octane/renderer';
+import { CSSProperties, FC } from 'react';
+import { IWobbleFighter, IWobbleMatch, WOBBLE_FALL } from '../../api';
+import buoysImage from '../../assets/images/wobble/wobble-buoys.png';
+import cloudsImage from '../../assets/images/wobble/wobble-clouds.png';
+import fallsImage from '../../assets/images/wobble/wobble-falls.png';
+import hitsImage from '../../assets/images/wobble/wobble-hits.png';
+import frontImage from '../../assets/images/wobble/wobble-rooftop-front.png';
+import roomImage from '../../assets/images/wobble/wobble-rooftop.png';
 import splashImage from '../../assets/images/wobble/wobble-splash.png';
 import { useUnoAvatar } from '../uno/useUnoAvatar';
 
 /**
- * The rooftop pool, drawn as the hotel draws a room: the picture (wobble-pool.png, deploy/scripts/wobble-art.py), the
- * hotel's own Lido furni round it, drawn by its renderer, and the two fighters on the beam. Tile (x, y) has its top
- * corner at ORIGIN + (32 * (x - y), 16 * (x + y)); the beam is a level line at BEAM_Y, its 8 places 64 pixels apart.
+ * Habbo's original Wobble Squabble room, the rooftop `md_a` of the Shockwave client (deploy/scripts/wobble-classic.py),
+ * drawn twice its size so that the hotel's avatars fit its tiles: the sky with its clouds, the rooftop, the waterfall,
+ * the line of buoys across the pool, the two fighters on it, and the roof's front edge over everything.
+ *
+ * The room's tiles are 32x16 (64x32 here); tile (x, y) at height h has its top corner at
+ * (270 + 16 * (x - y), 158 + 8 * (x + y) - 8 * h) in the room's pixels. The buoys stand on x = 21, y = 8 to 18, height 8.
  */
-export const POOL_WIDTH = 912;
-export const POOL_HEIGHT = 682;
-/** The sky above the floor: it may go off the top of the screen. */
-export const POOL_BACKDROP = 170;
-const ORIGIN = { x: 456, y: 210 };
-const BEAM_LEFT = 200;
-const BEAM_Y = 434;
-const PLACE = 64;
-/** How far the water lies under the beam, where the fallen swim. */
-const WATER_BELOW = 64;
-/** A fighter tilts this many degrees per point of balance. */
-const TILT = 0.42;
-const FEET_FROM_BOTTOM = 12;
+export const ROOM_SCALE = 2;
+export const POOL_WIDTH = 720 * ROOM_SCALE;
+export const POOL_HEIGHT = 540 * ROOM_SCALE;
+export const SKY = 'rgb(156, 206, 255)';
 
-const DECOR: { name: string; x: number; y: number; dir: number; lift?: number }[] = [
-    { name: 'lm_palm1', x: 1, y: 1, dir: 2 },
-    { name: 'bw_shower', x: 3, y: 0, dir: 4 },
-    { name: 'lido_chair', x: 5, y: 1, dir: 4 },
-    { name: 'lido_parasol', x: 6, y: 1, dir: 2 },
-    { name: 'lido_chair', x: 7, y: 1, dir: 4 },
-    { name: 'lido_chair', x: 9, y: 1, dir: 4 },
-    { name: 'lido_parasol', x: 10, y: 1, dir: 2 },
-    { name: 'bolly_palm', x: 12, y: 1, dir: 2 },
-    { name: 'pink_flamingo', x: 13, y: 8, dir: 6 },
-    { name: 'habbo25_c25_lifeguardchair2', x: 1, y: 6, dir: 2 },
-    { name: 'lido_bench', x: 1, y: 9, dir: 2 },
-    { name: 'bolly_palm', x: 1, y: 12, dir: 2 },
-    { name: 'bw_bball', x: 9, y: 12, dir: 2 },
-    { name: 'summer_c22_lifering', x: 12, y: 9, dir: 6 },
-    { name: 'habbo25_c25_duckfloat1', x: 10, y: 9, dir: 4, lift: -18 }
-];
+const BUOY_X = 21;
+const BUOY_HEIGHT = 8;
+/** The water's level, where the fallen swim (the pool is full to its rim, height 7). */
+const WATER_HEIGHT = 7;
+/** Place 0 of the duel stands on buoy y = 10, place 7 on y = 17; the buoys 8, 9 and 18 are the queue's. */
+const FIRST_PLACE = 10;
 
-export const poolTile = (x: number, y: number) => ({ left: ORIGIN.x + 32 * (x - y), top: ORIGIN.y + 16 * (x + y) });
+/** The centre of tile (x, y) at height h, in this scene's pixels. */
+export const roomTile = (x: number, y: number, h: number) => ({
+    left: ROOM_SCALE * (270 + 16 * (x - y)),
+    top: ROOM_SCALE * (158 + 8 * (x + y + 1) - 8 * h)
+});
 
-export const beamPlace = (pos: number) => BEAM_LEFT + PLACE / 2 + PLACE * pos;
+const placeTile = (pos: number) => roomTile(BUOY_X, FIRST_PLACE + pos, BUOY_HEIGHT);
+const depth = (y: number) => 100 + Math.round(y * 10);
 
-const useFurniLoads = (names: string[]): number => {
-    const [loads, setLoads] = useState(0);
+const sprite = (image: string, width: number, height: number, frames: number, frame: number): CSSProperties => ({
+    width: width * ROOM_SCALE,
+    height: height * ROOM_SCALE,
+    backgroundImage: `url(${image})`,
+    backgroundSize: `${width * frames * ROOM_SCALE}px ${height * ROOM_SCALE}px`,
+    backgroundPosition: `${-frame * width * ROOM_SCALE}px 0`
+});
 
-    useEffect(() => {
-        const engine = GetRoomEngine?.();
-        const session = GetSessionDataManager();
-        let active = true;
-        const loaded = () => active && setLoads((count) => count + 1);
-        const listener = { imageReady: loaded, imageFailed: loaded };
+/** The line of buoys: orange at the far end, yellow in the middle, orange with a mark at the near end (as in md_a). */
+const Buoys: FC = () => (
+    <>
+        {Array.from({ length: 11 }, (_, index) => {
+            const y = 8 + index;
+            const kind = y <= 11 ? 2 : y <= 14 ? 1 : 0;
+            const centre = roomTile(BUOY_X, y, BUOY_HEIGHT);
 
-        for (const name of names) {
-            const id = session?.getFloorItemDataByName?.(name)?.id;
+            return <span key={y} className="wb-buoy" style={{ ...sprite(buoysImage, 36, 32, 3, kind), left: centre.left - 18 * ROOM_SCALE, top: centre.top - 11 * ROOM_SCALE, zIndex: depth(y) }} />;
+        })}
+    </>
+);
 
-            try {
-                if (engine && id !== undefined) engine.getFurnitureFloorImage(id, new Vector3d(0), 64, listener, 0, '', -1);
-            } catch {
-                // The renderer is not ready: the furni ask for themselves.
-            }
-        }
-
-        return () => {
-            active = false;
-        };
-    }, [names]);
-
-    return loads;
-};
-
-const Furni: FC<{ name: string; x: number; y: number; dir: number; lift?: number; loads: number }> = ({ name, x, y, dir, lift = 0, loads }) => {
-    const id = GetSessionDataManager()?.getFloorItemDataByName?.(name)?.id;
-    const bottom = poolTile(x + 1, y + 1);
-
-    if (id === undefined) return null;
-
-    return (
-        <div className="wb-scene__item" style={{ left: bottom.left, top: bottom.top - lift, zIndex: (x + y) * 10 }}>
-            <LayoutFurniImageView key={`${name}-${loads}`} productType="s" productClassId={id} direction={dir * 45} style={{ position: 'absolute', transform: 'translate(-50%, -100%)' }} />
-        </div>
-    );
-};
+const Clouds: FC = () => (
+    <div className="wb-clouds">
+        {[ [ 4, 0, 70 ], [ 1, 38, 95 ], [ 3, 14, 120 ], [ 0, 60, 80 ], [ 2, 26, 105 ] ].map(([ kind, top, seconds ], index) => (
+            <span key={index} className="wb-cloud" style={{ ...sprite(cloudsImage, 80, 64, 5, kind), top: top * ROOM_SCALE, animationDuration: `${seconds}s`, animationDelay: `${-index * seconds / 5}s` }} />
+        ))}
+    </div>
+);
 
 /**
- * A fighter on the beam, tilted by their balance, pushing, hit, crouching; once fallen, swimming under the beam with a
- * splash. The left fighter looks right (direction 1), the right one looks left (direction 5).
+ * A fighter on the buoys, tilted by their balance: the one at the far end looks down the line (direction 4), the
+ * other up it (direction 0). Hit, they get one of the game's bubbles; fallen, they swim beside the line with a splash.
  */
-const Fighter: FC<{ fighter: IWobbleFighter; showFall: boolean }> = ({ fighter, showFall }) => {
-    const standing = useUnoAvatar(fighter.figure, fighter.gender, fighter.side === 0 ? 1 : 5, AvatarAction.POSTURE_STAND);
-    const swimming = useUnoAvatar(fighter.figure, fighter.gender, fighter.side === 0 ? 2 : 4, AvatarAction.POSTURE_STAND);
-    const x = beamPlace(fighter.pos);
-    const toward = fighter.side === 0 ? 1 : -1;
-    const recent = fighter.actionAgo >= 0 && fighter.actionAgo < 380;
-    const tilt = Math.max(-WOBBLE_FALL, Math.min(WOBBLE_FALL, fighter.balance)) * TILT;
+const Fighter: FC<{ fighter: IWobbleFighter; showFall: boolean; hitFrame: number }> = ({ fighter, showFall, hitFrame }) => {
+    const picture = useUnoAvatar(fighter.figure, fighter.gender, fighter.side === 0 ? 4 : 0, AvatarAction.POSTURE_STAND);
+    const feet = placeTile(fighter.pos);
+    const y = FIRST_PLACE + fighter.pos;
+    const recent = fighter.actionAgo >= 0 && fighter.actionAgo < 450;
+    const tilt = Math.max(-WOBBLE_FALL, Math.min(WOBBLE_FALL, fighter.balance)) * 0.42;
+    const fallen = fighter.fell && showFall;
+    // Fallen to the left, into the water on x = 20; to the right, on x = 22 (as Kepler drops them).
+    const side = fighter.balance < 0 ? -1 : 1;
+    const water = roomTile(BUOY_X + side, y, WATER_HEIGHT);
     const classes = [
         'wb-fighter',
         recent && fighter.action === 'push' ? 'is-pushing' : '',
         recent && fighter.action === 'miss' ? 'is-lunging' : '',
         recent && fighter.action === 'hit' ? 'is-hit' : '',
-        fighter.stabilising ? 'is-crouching' : '',
-        fighter.fell && showFall ? 'is-fallen' : ''
+        fighter.stabilising ? 'is-stabilising' : '',
+        fallen ? 'is-fallen' : ''
     ].join(' ');
 
     return (
         <>
-            <div className={classes} style={{ left: x, top: BEAM_Y - 6, zIndex: 300, '--wb-toward': toward, '--wb-fall': Math.sign(fighter.balance) || toward } as CSSProperties}>
+            <div className={classes} style={{ left: feet.left, top: feet.top, zIndex: depth(y) + 5, '--wb-toward': fighter.side === 0 ? -1 : 1, '--wb-fall': side } as CSSProperties}>
                 <div className="wb-fighter__tilt" style={{ transform: `rotate(${tilt}deg)` }}>
                     <div className="wb-fighter__body">
-                        {standing && <img className="wb-fighter__avatar" src={standing} alt="" draggable={false} style={{ marginBottom: -FEET_FROM_BOTTOM }} />}
+                        {picture && <img className="wb-fighter__avatar" src={picture} alt="" draggable={false} />}
                     </div>
                 </div>
             </div>
-            {fighter.fell && showFall && (
+            {recent && fighter.action === 'hit' && !fallen && (
+                <span className="wb-hit" style={{ ...sprite(hitsImage, 72, 56, 8, hitFrame + (fighter.side === 0 ? 0 : 4)), left: feet.left, top: feet.top - 112, zIndex: 2000 }} />
+            )}
+            {fallen && (
                 <>
-                    <div className="wb-splash" style={{ left: x + Math.sign(fighter.balance) * 24, top: BEAM_Y + WATER_BELOW, zIndex: 310, backgroundImage: `url(${splashImage})` }} />
-                    {swimming && (
-                        <div className="wb-swimmer" style={{ left: x + Math.sign(fighter.balance) * 24, top: BEAM_Y + WATER_BELOW + 6, zIndex: 305 }}>
-                            <img src={swimming} alt="" draggable={false} />
+                    <span className="wb-splash" style={{ ...sprite(splashImage, 48, 48, 10, 0), left: water.left, top: water.top, zIndex: depth(y) + 6 }} />
+                    {picture && (
+                        <div className="wb-swimmer" style={{ left: water.left, top: water.top, zIndex: depth(y) + 4 }}>
+                            <img src={picture} alt="" draggable={false} />
                         </div>
                     )}
                 </>
@@ -131,33 +117,35 @@ const Fighter: FC<{ fighter: IWobbleFighter; showFall: boolean }> = ({ fighter, 
     );
 };
 
-const NameTag: FC<{ fighter: IWobbleFighter; match: IWobbleMatch; zoom: number }> = ({ fighter, match, zoom }) => {
+const NameTag: FC<{ fighter: IWobbleFighter; match: IWobbleMatch }> = ({ fighter, match }) => {
+    const feet = placeTile(fighter.pos);
     const stars = Array.from({ length: match.rules.roundsToWin }, (_, index) => index < fighter.wins);
 
     return (
-        <div className={`wb-tag ${fighter.you ? 'is-you' : ''}`} style={{ left: beamPlace(fighter.pos), top: BEAM_Y - 118, zIndex: 900, transform: `translate(-50%, -100%) scale(${1 / zoom})` }}>
+        <div className={`wb-tag ${fighter.you ? 'is-you' : ''}`} style={{ left: feet.left, top: feet.top - 124, zIndex: 1900 }}>
             <span className="wb-tag__name">{fighter.name}</span>
             <span className="wb-tag__stars">{stars.map((won, index) => <span key={index} className={won ? 'is-won' : ''}>★</span>)}</span>
         </div>
     );
 };
 
-export const WobbleScene: FC<{ match: IWobbleMatch | null; zoom: number }> = ({ match, zoom }) => {
-    const names = useMemo(() => [ ...new Set(DECOR.map((item) => item.name)) ], []);
-    const loads = useFurniLoads(names);
+export const WobbleScene: FC<{ match: IWobbleMatch | null }> = ({ match }) => {
     const showFall = match?.state === 'round_over' || match?.state === 'finished';
+    const hitFrame = match ? (match.round + match.log.length) % 4 : 0;
 
     return (
-        <div className={`wb-scene ${match?.sudden ? 'is-sudden' : ''}`} style={{ width: POOL_WIDTH, height: POOL_HEIGHT }}>
-            <img className="wb-scene__floor" src={poolImage} alt="" width={POOL_WIDTH} height={POOL_HEIGHT} draggable={false} />
-            <div className="wb-scene__water" />
-            {DECOR.map((item, index) => <Furni key={`${item.name}-${index}`} {...item} loads={loads} />)}
+        <div className={`wb-scene ${match?.sudden ? 'is-sudden' : ''}`} style={{ width: POOL_WIDTH, height: POOL_HEIGHT, background: SKY }}>
+            <Clouds />
+            <img className="wb-scene__layer" src={roomImage} alt="" width={POOL_WIDTH} height={POOL_HEIGHT} draggable={false} />
+            <span className="wb-falls" style={{ ...sprite(fallsImage, 128, 200, 7, 0), left: 470 * ROOM_SCALE, top: 80 * ROOM_SCALE }} />
+            <Buoys />
             {match?.fighters.map((fighter) => (
                 <div key={fighter.userId}>
-                    <Fighter fighter={fighter} showFall={showFall} />
-                    {!(fighter.fell && showFall) && <NameTag fighter={fighter} match={match} zoom={zoom} />}
+                    <Fighter fighter={fighter} showFall={showFall} hitFrame={hitFrame} />
+                    {!(fighter.fell && showFall) && <NameTag fighter={fighter} match={match} />}
                 </div>
             ))}
+            <img className="wb-scene__layer wb-scene__front" src={frontImage} alt="" width={708 * ROOM_SCALE} height={311 * ROOM_SCALE} style={{ top: 266 * ROOM_SCALE }} draggable={false} />
         </div>
     );
 };
