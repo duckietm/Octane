@@ -1,5 +1,5 @@
 import { GetTargetedOfferComposer, PurchaseTargetedOfferComposer, TargetedOfferData } from '@octane/renderer';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
     clampTargetedOfferQuantity,
     FriendlyTime,
@@ -14,8 +14,6 @@ import { Button, Column, Flex, LayoutCurrencyIcon, OctaneCardContentView, Octane
 import { usePurse } from '../../../../hooks';
 import { NumberInput } from '../../../../common/NumberInput';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-
-let isBuyingOffer = false;
 
 export const OfferWindowView = (props: { offer: TargetedOfferData; secondsLeft: number | null; onMinimize: () => void }) => {
     const { offer = null, secondsLeft = null, onMinimize = null } = props;
@@ -32,15 +30,35 @@ export const OfferWindowView = (props: { offer: TargetedOfferData; secondsLeft: 
         [offer, getCurrencyAmount, amount]
     );
 
-    const buyOffer = () => {
-        if (isBuyingOffer || purchaseBlock !== null) return;
+    // A purchase waits for the refreshed offer the request below brings back. The guard was a module flag released
+    // after five seconds whatever the server did, so on a slower server a second click was a second purchase.
+    const buyingRef = useRef(false);
+    const [buying, setBuying] = useState(false);
 
-        isBuyingOffer = true;
+    useEffect(() => {
+        buyingRef.current = false;
+        setBuying(false);
+    }, [offer]);
+
+    useEffect(() => {
+        if (!buying) return;
+
+        const timeout = setTimeout(() => {
+            buyingRef.current = false;
+            setBuying(false);
+        }, 15000);
+
+        return () => clearTimeout(timeout);
+    }, [buying]);
+
+    const buyOffer = () => {
+        if (buyingRef.current || purchaseBlock !== null) return;
+
+        buyingRef.current = true;
+        setBuying(true);
 
         SendMessageComposer(new PurchaseTargetedOfferComposer(offer.id, amount));
         SendMessageComposer(new GetTargetedOfferComposer());
-
-        setTimeout(() => (isBuyingOffer = false), 5000);
     };
 
     if (!offer) return;
@@ -68,7 +86,7 @@ export const OfferWindowView = (props: { offer: TargetedOfferData; secondsLeft: 
                                         <NumberInput max={offer.purchaseLimit} min={1} value={amount} onChange={(evt) => setAmount(parseInt(evt.target.value))} />
                                     </div>
                                 )}
-                                <Button className="octane-targeted-offer__buy" disabled={purchaseBlock !== null} variant="primary" onClick={() => buyOffer()}>
+                                <Button className="octane-targeted-offer__buy" disabled={buying || purchaseBlock !== null} variant="primary" onClick={() => buyOffer()}>
                                     {LocalizeText('targeted.offer.button.buy')}
                                 </Button>
                             </Flex>
