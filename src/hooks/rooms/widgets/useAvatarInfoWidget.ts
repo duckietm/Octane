@@ -67,6 +67,10 @@ const useAvatarInfoWidgetState = () => {
     const { roomSession = null } = useRoom();
 
     const clearPendingAvatarInfo = () => {
+        // Any other selection, or none, drops the pet whose info is still on its way: its late reply used to replace
+        // the card of the user picked next, or reopen the infostand after it was closed.
+        setPendingPetId(-1);
+
         if (!pendingAvatarInfoTimeout.current) return;
 
         clearTimeout(pendingAvatarInfoTimeout.current);
