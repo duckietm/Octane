@@ -426,3 +426,53 @@ export const SnailBoard: FC<{ board: IHallBoard; table: IHallTable; play: Play; 
         </div>
     );
 };
+
+// ---- The Habbi quiz: the question, four answers, the time, the scores
+
+const LETTERS = [ 'A', 'B', 'C', 'D' ];
+
+export const QuizBoard: FC<{ board: IHallBoard; table: IHallTable; play: Play; now: number }> = ({ board, table, play, now }) => {
+    const answers = (board.answers as string[]) ?? [];
+    const players = (board.players as { score: number; answered: boolean; answer: number; gained: number }[]) ?? [];
+    const phase = String(board.phase ?? 'intro');
+    const right = Number(board.right ?? -1);
+    const mine = players[table.you];
+    const timeLeft = Math.max(0, Number(board.timeLeft ?? 0) - now);
+    const total = phase === 'ask' ? 15000 : phase === 'reveal' ? 4000 : 3000;
+    const canAnswer = phase === 'ask' && !!mine && !mine.answered;
+
+    return (
+        <div className="hall-quiz">
+            <div className="hall-quiz__head" data-browser-text>
+                <span>{phase === 'intro' ? hallt('quiz.ready', 'Get ready!') : hallt('quiz.round', 'Question %n%/%max%', [ 'n', 'max' ], [ String(Number(board.round) + 1), String(board.rounds) ])}</span>
+                {board.category && <span className="hall-quiz__category">{String(board.category)}</span>}
+            </div>
+            <div className="hall-quiz__timer"><span style={{ width: `${(100 * timeLeft) / total}%` }} className={phase === 'reveal' ? 'is-reveal' : timeLeft < 4000 ? 'is-hurry' : ''} /></div>
+            {phase === 'intro' && <div className="hall-quiz__question" data-browser-text>{hallt('quiz.intro', '10 questions, 15 seconds each. The faster your right answer, the more points!')}</div>}
+            {board.question && phase !== 'intro' && <div className="hall-quiz__question" data-browser-text>{String(board.question)}</div>}
+            {phase !== 'intro' && (
+                <div className="hall-quiz__answers">
+                    {answers.map((answer, index) => {
+                        const classes = [ 'hall-quiz__answer', `is-${index}`, mine?.answer === index ? 'is-mine' : '', right === index ? 'is-right' : right >= 0 && mine?.answer === index ? 'is-wrong' : '', right >= 0 && right !== index ? 'is-dim' : '' ].join(' ');
+
+                        return (
+                            <button key={index} type="button" className={classes} disabled={!canAnswer} onClick={() => play({ answer: index })} data-browser-text>
+                                <span className="hall-quiz__letter">{LETTERS[index]}</span>
+                                <span>{answer}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+            <div className="hall-quiz__scores" data-browser-text>
+                {players.map((player, seat) => (
+                    <span key={seat} className={`hall-quiz__score ${seat === table.you ? 'is-you' : ''} ${player.answered && phase === 'ask' ? 'is-answered' : ''}`}>
+                        <strong>{table.players[seat]?.name ?? ''}</strong>
+                        <span>{player.score}{player.gained > 0 ? ` (+${player.gained})` : ''}</span>
+                        {phase === 'ask' && <em>{player.answered ? hallt('quiz.answered', 'answered') : '...'}</em>}
+                    </span>
+                ))}
+            </div>
+        </div>
+    );
+};

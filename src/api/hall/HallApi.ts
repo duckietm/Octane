@@ -4,12 +4,12 @@ import { GetConfigurationValue } from '../octane/GetConfigurationValue';
 import { localizeWithFallback } from '../utils/localizeWithFallback';
 
 /** The games of the game hall, in the order of its tabs. */
-export const HALL_GAMES = [ 'tictactoe', 'connect4', 'battleships', 'chess', 'poker', 'snails' ] as const;
+export const HALL_GAMES = [ 'tictactoe', 'connect4', 'battleships', 'chess', 'poker', 'snails', 'quiz' ] as const;
 
 export type HallGameName = typeof HALL_GAMES[number];
 
 /** The seats a table of each game may have (from, to). */
-export const HALL_SEATS: Record<HallGameName, [number, number]> = { tictactoe: [ 2, 2 ], connect4: [ 2, 2 ], battleships: [ 2, 2 ], chess: [ 2, 2 ], poker: [ 2, 4 ], snails: [ 2, 6 ] };
+export const HALL_SEATS: Record<HallGameName, [number, number]> = { tictactoe: [ 2, 2 ], connect4: [ 2, 2 ], battleships: [ 2, 2 ], chess: [ 2, 2 ], poker: [ 2, 4 ], snails: [ 2, 6 ], quiz: [ 2, 8 ] };
 
 export interface IHallPlayer {
     userId: number;
@@ -118,7 +118,7 @@ export const HallApi = {
 export const hallt = (key: string, fallback: string, parameters: string[] = null, replacements: string[] = null): string =>
     localizeWithFallback(`hall.${key}`, fallback, parameters, replacements);
 
-const GAME_NAMES: Record<HallGameName, string> = { tictactoe: 'Tic-tac-toe', connect4: 'Four in a row', battleships: 'Battleships', chess: 'Chess', poker: 'Poker', snails: 'Snail race' };
+const GAME_NAMES: Record<HallGameName, string> = { tictactoe: 'Tic-tac-toe', connect4: 'Four in a row', battleships: 'Battleships', chess: 'Chess', poker: 'Poker', snails: 'Snail race', quiz: 'Habbi quiz' };
 
 export const hallGameName = (game: string): string => hallt(`game.${game}`, GAME_NAMES[game as HallGameName] ?? game);
 

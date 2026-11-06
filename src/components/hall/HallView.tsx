@@ -6,7 +6,7 @@ import { Checkbox } from '../../common/Checkbox';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import bannerImage from '../../assets/images/hall/hall-banner.png';
 import { useUnoAvatar } from '../uno/useUnoAvatar';
-import { BattleshipsBoard, ChessBoard, ConnectFourBoard, HallSprite, PokerBoard, SnailBoard, TicTacToeBoard } from './HallBoards';
+import { BattleshipsBoard, ChessBoard, ConnectFourBoard, HallSprite, PokerBoard, QuizBoard, SnailBoard, TicTacToeBoard } from './HallBoards';
 import '../../css/hall/HallView.css';
 
 const POLL_TABLE_MS = 1000;
@@ -19,6 +19,7 @@ const RULES: Record<HallGameName, string> = {
     battleships: 'Place your fleet without the ships touching, then shoot at the other\'s sea in turns. A hit shoots again: sink every ship to win!',
     chess: 'The real rules of chess: castling, en passant, promotion. Checkmate the other king to win; white begins.',
     poker: 'Five-card draw with two jokers: change the cards you like once, then the best hand wins.',
+    quiz: 'Ten questions on the hotel and the world, four answers each: answer right and fast to score the most points!',
     snails: 'Each player has a snail. They crawl on their own, nap now and then or get a burst of energy: cheer yours on (space) to give it a boost. The first across the line wins!'
 };
 
@@ -42,7 +43,7 @@ const Players: FC<{ table: IHallTable }> = ({ table }) => (
                     <PlayerHead player={player} />
                     <span className="hall-player__info" data-browser-text>
                         <strong>{player.name}{player.bot ? ` (${hallt('robot', 'robot')})` : ''}</strong>
-                        <span>{hallt('wins', '%n% won', [ 'n' ], [ String(player.wins) ])}{player.waiting && player.timeLeft >= 0 && table.game !== 'snails' ? ` · ${Math.ceil(player.timeLeft / 1000)} s` : ''}</span>
+                        <span>{hallt('wins', '%n% won', [ 'n' ], [ String(player.wins) ])}{player.waiting && player.timeLeft >= 0 && table.game !== 'snails' && table.game !== 'quiz' ? ` · ${Math.ceil(player.timeLeft / 1000)} s` : ''}</span>
                     </span>
                     {mark && <HallSprite name={mark} scale={mark.startsWith('TicTac') ? 2 : 1} className="is-static hall-player__mark" />}
                 </div>
@@ -69,6 +70,7 @@ const statusText = (table: IHallTable): string => {
     if (!board) return '';
     if (table.state === 'finished') return resultText(table);
     if (table.game === 'chess' && board.ending === '' && board.check) return board.turn === table.you ? hallt('chess.you_check', 'Check! Protect your king.') : hallt('chess.check', 'Check!');
+    if (table.game === 'quiz') return board.phase === 'reveal' ? hallt('quiz.answer', 'The answer!') : table.players[table.you]?.waiting ? hallt('quiz.your_turn', 'Your answer?') : hallt('quiz.wait', 'Waiting for the others...');
     if (table.game === 'snails') return Number(board.startsIn ?? 0) > 0 ? hallt('snails.starting', 'On your marks...') : hallt('snails.racing', 'They are off!');
     if (board.turn === -1) return table.players[table.you]?.waiting ? hallt('your_move_all', 'Your move!') : hallt('wait_others', 'Waiting for the others...');
 
@@ -93,7 +95,8 @@ export const HallView: FC = () => {
 
     const table = view?.table;
     const current = (table?.game ?? game) as HallGameName;
-    const racing = table?.game === 'snails' && table.state === 'playing';
+    const racing = (table?.game === 'snails' || table?.game === 'quiz') && table.state === 'playing';
+    const receivedRef = useRef(0);
     const [ tick, setTick ] = useState(0);
 
     const refresh = useCallback(() => {
@@ -101,7 +104,10 @@ export const HallView: FC = () => {
 
         pollingRef.current = true;
         HallApi.view(current)
-            .then(setView)
+            .then((next) => {
+                receivedRef.current = performance.now();
+                setView(next);
+            })
             .catch((caught) => setError(hallErrorText(caught) ?? ''))
             .finally(() => {
                 pollingRef.current = false;
@@ -116,7 +122,10 @@ export const HallView: FC = () => {
         setError('');
 
         try {
-            setView(await action());
+            const next = await action();
+
+            receivedRef.current = performance.now();
+            setView(next);
         } catch (caught) {
             setError(hallErrorText(caught) ?? '');
         } finally {
@@ -160,6 +169,8 @@ export const HallView: FC = () => {
 
         const timer = setInterval(() => setTick((value) => value + 1), 250);
         const onKey = (event: KeyboardEvent) => {
+            if (table?.game !== 'snails') return;
+
             const target = event.target as HTMLElement | null;
 
             if (event.key !== ' ' || event.repeat || (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable))) return;
@@ -175,7 +186,7 @@ export const HallView: FC = () => {
             clearInterval(timer);
             window.removeEventListener('keydown', onKey, true);
         };
-    }, [ racing ]);
+    }, [ racing, table?.game ]);
 
     useEffect(() => {
         if (!error) return;
@@ -214,6 +225,7 @@ export const HallView: FC = () => {
                                 {table.game === 'chess' && <ChessBoard board={board} you={table.you} myTurn={myTurn} play={play} />}
                                 {table.game === 'poker' && <PokerBoard key={table.round} board={board} table={table} play={play} />}
                                 {table.game === 'snails' && <SnailBoard board={board} table={table} play={play} tick={tick} />}
+                                {table.game === 'quiz' && <QuizBoard board={board} table={table} play={play} now={performance.now() - receivedRef.current} />}
                             </div>
                         )}
                         {table.state === 'waiting' && (

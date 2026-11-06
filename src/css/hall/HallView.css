@@ -709,3 +709,179 @@
     overflow: visible;
     -webkit-line-clamp: unset;
 }
+
+/* ---- The Habbi quiz ---- */
+
+.hall-table.is-quiz {
+    width: 640px;
+}
+
+.hall-quiz {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.hall-table .hall-table__board .hall-quiz__head {
+    display: flex;
+    justify-content: space-between;
+    color: #ffe873;
+    font: 700 13px HabboAirUbuntu, sans-serif;
+}
+
+.hall-table .hall-table__board .hall-quiz__category {
+    padding: 1px 8px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+}
+
+.hall-quiz__timer {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.hall-quiz__timer span {
+    display: block;
+    height: 100%;
+    background: #9fe86b;
+    transition: width 0.25s linear;
+}
+
+.hall-quiz__timer span.is-hurry {
+    background: #ff7a5c;
+}
+
+.hall-quiz__timer span.is-reveal {
+    background: #f2b51c;
+}
+
+.hall-table .hall-table__board .hall-quiz__question {
+    min-height: 54px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #fff8e6;
+    color: #3d2108;
+    font: 700 16px/1.35 HabboAirUbuntu, sans-serif;
+    text-align: center;
+}
+
+.hall-quiz__answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.hall-quiz__answer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 46px;
+    padding: 6px 10px;
+    border: 2px solid rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    text-align: left;
+}
+
+.hall-quiz__answer.is-0 {
+    background: #d6342b;
+}
+
+.hall-quiz__answer.is-1 {
+    background: #2870dc;
+}
+
+.hall-quiz__answer.is-2 {
+    background: #e2a414;
+}
+
+.hall-quiz__answer.is-3 {
+    background: #50aa28;
+}
+
+.hall-quiz__answer:disabled {
+    cursor: default;
+}
+
+.hall-quiz__answer.is-mine {
+    outline: 3px solid #ffffff;
+}
+
+.hall-quiz__answer.is-right {
+    box-shadow: 0 0 0 4px #9fe86b, 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+.hall-quiz__answer.is-dim {
+    opacity: 0.4;
+}
+
+.hall-table .hall-table__board .hall-quiz__answer,
+.hall-table .hall-table__board .hall-quiz__answer * {
+    color: #ffffff;
+    font: 700 14px/1.25 HabboAirUbuntu, sans-serif;
+}
+
+.hall-table .hall-table__board .hall-quiz__letter {
+    display: flex;
+    width: 26px;
+    height: 26px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.hall-quiz__scores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.hall-table .hall-table__board .hall-quiz__score {
+    display: flex;
+    min-width: 110px;
+    flex: 1 1 0;
+    flex-direction: column;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 11px;
+}
+
+.hall-table .hall-table__board .hall-quiz__score.is-you {
+    background: rgba(242, 181, 28, 0.25);
+}
+
+.hall-table .hall-table__board .hall-quiz__score.is-answered em {
+    color: #9fe86b;
+}
+
+.game-tile.game-tile--quiz {
+    align-self: start;
+    height: auto;
+    min-height: 250px;
+}
+
+.game-tile--quiz .game-tile__banner {
+    background-color: #f5b400;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.game-tile--quiz .game-tile__body {
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.game-tile--quiz .game-tile__desc {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+}
