@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { WiredFurniType } from '../../../../api';
+import { WiredFurniType, localizeWithFallback } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
@@ -28,9 +28,9 @@ export const WiredChestFurniView: FC<{}> = () => {
         <NativeTextTree>
             <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
                 <div className="flex flex-col gap-2">
-                    <Text bold>Furni base item id to store</Text>
+                    <Text bold>{localizeWithFallback('octane.wired.furni_base_item_id_to_store', 'Furni base item id to store')}</Text>
                     <NumberInput min={0} className="form-control form-control-sm" value={baseItemId} onChange={(event) => setBaseItemId(Math.max(0, parseInt(event.target.value, 10) || 0))} />
-                    <Text bold>Quantity stored</Text>
+                    <Text bold>{localizeWithFallback('octane.wired.quantity_stored', 'Quantity stored')}</Text>
                     <NumberInput min={0} className="form-control form-control-sm" value={quantity} onChange={(event) => setQuantity(Math.max(0, parseInt(event.target.value, 10) || 0))} />
                 </div>
             </WiredExtraBaseView>

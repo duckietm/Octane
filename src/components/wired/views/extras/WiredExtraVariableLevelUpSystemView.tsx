@@ -427,7 +427,7 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                                         <Text>
                                             {localizeWithFallback(
                                                 'wiredfurni.params.levelup.mode.0',
-                                                localizeOrFallback('wiredfurni.params.levelup.mode.3', 'Inserimento manuale')
+                                                localizeOrFallback('wiredfurni.params.levelup.mode.3', localizeWithFallback('octane.wired.manual_entry', 'Manual entry'))
                                             )}
                                         </Text>
                                     </label>
@@ -457,7 +457,7 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                                     <div key={entry.level} className="octane-wired__levelup-preview-entry">
                                         {localizeOrFallback(
                                             'wiredfurni.params.levelup.preview.entry',
-                                            `Livello: ${entry.level} - XP: ${entry.requiredXp}`,
+                                            localizeWithFallback('octane.wired.level_level_xp_required_xp', 'Level: %level% - XP: %required_xp%', ['level', 'required_xp'], [String(entry.level), String(entry.requiredXp)]),
                                             ['lvl', 'xp'],
                                             [entry.level.toString(), entry.requiredXp.toString()]
                                         )}

@@ -1,3 +1,4 @@
+import { localizeWithFallback } from '../utils/localizeWithFallback';
 export const HousekeepingSanctionType = {
     BAN: 'ban',
     MUTE: 'mute',
@@ -31,17 +32,17 @@ export interface HousekeepingSanctionTemplate {
  */
 export const HK_SANCTION_TEMPLATES: HousekeepingSanctionTemplate[] = [
     { id: 'kick', name: 'Kick', type: HousekeepingSanctionType.KICK, durationValue: 0, defaultReason: 'Removed from session' },
-    { id: 'mute_5m', name: 'Mute 5m', type: HousekeepingSanctionType.MUTE, durationValue: 5, defaultReason: 'Cool down - chat flood' },
-    { id: 'mute_60m', name: 'Mute 60m', type: HousekeepingSanctionType.MUTE, durationValue: 60, defaultReason: 'Mute - repeat offender' },
-    { id: 'ban_1h', name: 'Ban 1h', type: HousekeepingSanctionType.BAN, durationValue: 1, defaultReason: 'Temporary ban - rule violation' },
-    { id: 'ban_24h', name: 'Ban 24h', type: HousekeepingSanctionType.BAN, durationValue: 24, defaultReason: '24h ban - rule violation' },
-    { id: 'ban_7d', name: 'Ban 7d', type: HousekeepingSanctionType.BAN, durationValue: 168, defaultReason: '7-day ban - serious violation' },
-    { id: 'ban_30d', name: 'Ban 30d', type: HousekeepingSanctionType.BAN, durationValue: 720, defaultReason: '30-day ban - final warning' },
-    { id: 'ban_perm', name: 'Ban permanent', type: HousekeepingSanctionType.BAN, durationValue: 24 * 365 * 100, defaultReason: 'Permanent ban' },
-    { id: 'tlock_7d', name: 'Trade lock 7d', type: HousekeepingSanctionType.TRADE_LOCK, durationValue: 168, defaultReason: 'Trade lock - suspected scam' },
+    { id: 'mute_5m', get name() { return localizeWithFallback('octane.housekeeping.mute_5m', 'Mute 5m'); }, type: HousekeepingSanctionType.MUTE, durationValue: 5, defaultReason: 'Cool down - chat flood' },
+    { id: 'mute_60m', get name() { return localizeWithFallback('octane.housekeeping.mute_60m', 'Mute 60m'); }, type: HousekeepingSanctionType.MUTE, durationValue: 60, defaultReason: 'Mute - repeat offender' },
+    { id: 'ban_1h', get name() { return localizeWithFallback('octane.housekeeping.ban_1h', 'Ban 1h'); }, type: HousekeepingSanctionType.BAN, durationValue: 1, defaultReason: 'Temporary ban - rule violation' },
+    { id: 'ban_24h', get name() { return localizeWithFallback('octane.housekeeping.ban_24h', 'Ban 24h'); }, type: HousekeepingSanctionType.BAN, durationValue: 24, defaultReason: '24h ban - rule violation' },
+    { id: 'ban_7d', get name() { return localizeWithFallback('octane.housekeeping.ban_7d', 'Ban 7d'); }, type: HousekeepingSanctionType.BAN, durationValue: 168, defaultReason: '7-day ban - serious violation' },
+    { id: 'ban_30d', get name() { return localizeWithFallback('octane.housekeeping.ban_30d', 'Ban 30d'); }, type: HousekeepingSanctionType.BAN, durationValue: 720, defaultReason: '30-day ban - final warning' },
+    { id: 'ban_perm', get name() { return localizeWithFallback('octane.housekeeping.ban_permanent', 'Ban permanent'); }, type: HousekeepingSanctionType.BAN, durationValue: 24 * 365 * 100, defaultReason: 'Permanent ban' },
+    { id: 'tlock_7d', get name() { return localizeWithFallback('octane.housekeeping.trade_lock_7d', 'Trade lock 7d'); }, type: HousekeepingSanctionType.TRADE_LOCK, durationValue: 168, defaultReason: 'Trade lock - suspected scam' },
     {
         id: 'tlock_perm',
-        name: 'Trade lock perm',
+        get name() { return localizeWithFallback('octane.housekeeping.trade_lock_perm', 'Trade lock perm'); },
         type: HousekeepingSanctionType.TRADE_LOCK,
         durationValue: 24 * 365 * 100,
         defaultReason: 'Permanent trade lock'

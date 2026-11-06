@@ -1,6 +1,7 @@
 import { CSSProperties, FC } from 'react';
 import { Slider } from '../../../common/Slider';
 import { MAX_WALL_HEIGHT, MIN_WALL_HEIGHT } from '../state/constants';
+import { localizeWithFallback } from '../../../api';
 
 type Props = {
     value: number;
@@ -21,8 +22,8 @@ export const FloorplanWallHeightSlider: FC<Props> = ({ value, onChange }) => {
             max={MAX_WALL_HEIGHT}
             step={1}
             value={clamped}
-            thumbAriaLabel="Wall height"
-            title={`Wall height ${clamped}`}
+            thumbAriaLabel={localizeWithFallback('octane.floorplan_editor.wall_height', 'Wall height')}
+            title={localizeWithFallback('octane.floorplan_editor.wall_height_clamped', 'Wall height %clamped%', ['clamped'], [String(clamped)])}
             trackClassName="fp-hslider-track"
             thumbClassName="fp-hslider-thumb"
             trackStyle={{ '--fp-rung': `${(100 / count).toFixed(4)}%` } as CSSProperties}

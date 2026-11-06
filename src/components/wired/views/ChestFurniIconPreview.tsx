@@ -38,7 +38,7 @@ export const ChestFurniIconPreview: FC<ChestFurniIconPreviewProps> = ({ baseItem
                         </Text>
                     ) : isUnknown ? (
                         <Text small className="text-[#c0392b]">
-                            {localizeWithFallback('wiredfurni.chest.furni.unknown', `Unknown furni (#${baseItemId})`, ['%id%'], [String(baseItemId)])}
+                            {localizeWithFallback('wiredfurni.chest.furni.unknown', `Unknown furni (#${baseItemId})`, ['id'], [String(baseItemId)])}
                         </Text>
                     ) : (
                         <Text bold>{furniData.name}</Text>

@@ -380,7 +380,7 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                                 </ContextMenuListItemView>
                             )}
                             <ContextMenuListItemView onClick={(event) => processAction('report')}>{LocalizeText('infostand.button.report')}</ContextMenuListItemView>
-                            {showInspectButton && <ContextMenuListItemView onClick={(event) => processAction('inspect')}>Inspect</ContextMenuListItemView>}
+                            {showInspectButton && <ContextMenuListItemView onClick={(event) => processAction('inspect')}>{localizeWithFallback('octane.room.inspect', 'Inspect')}</ContextMenuListItemView>}
                             {moderateMenuHasContent && (
                                 <ContextMenuListItemView onClick={(event) => processAction('moderate')}>
                                     <FaChevronRight className="right fa-icon" />

@@ -2,6 +2,7 @@ import { CSSProperties, FC, useMemo } from 'react';
 import { Slider } from '../../../common/Slider';
 import { HEIGHT_BRUSH_MAX, HEIGHT_BRUSH_MIN } from '../state/constants';
 import { tileFill } from '../state/selectors';
+import { localizeWithFallback } from '../../../api';
 
 type Props = {
     selectedH: number;
@@ -38,8 +39,8 @@ export const FloorplanHeightPicker: FC<Props> = ({ selectedH, onSelect }) => {
             max={HEIGHT_BRUSH_MAX}
             step={1}
             value={selectedH}
-            thumbAriaLabel="Brush height"
-            title={`Brush height ${selectedH}`}
+            thumbAriaLabel={localizeWithFallback('octane.floorplan_editor.brush_height', 'Brush height')}
+            title={localizeWithFallback('octane.floorplan_editor.brush_height_selected_h', 'Brush height %selected_h%', ['selected_h'], [String(selectedH)])}
             trackClassName="fp-hslider-track"
             thumbClassName="fp-hslider-thumb"
             trackStyle={{ background: gradient }}

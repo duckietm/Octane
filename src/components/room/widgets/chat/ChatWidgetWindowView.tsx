@@ -1,6 +1,6 @@
 import { GetSessionDataManager, RoomObjectType } from '@octane/renderer';
 import { FC, UIEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChatEntryType, LocalizeText, SanitizeHtml } from '../../../../api';
+import { ChatEntryType, LocalizeText, SanitizeHtml, localizeWithFallback } from '../../../../api';
 import { DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useChatHistory, useChatWindow, useOnClickChat } from '../../../../hooks';
 import { useRoom } from '../../../../hooks/rooms';
@@ -86,7 +86,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
             windowPosition={DraggableWindowPosition.TOP_LEFT}
         >
             <OctaneCardHeaderView
-                headerText="Chat window"
+                headerText={localizeWithFallback('octane.room.chat_window', 'Chat window')}
                 onCloseClick={() => {
                     setChatWindowEnabled(false);
 
@@ -122,7 +122,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                     <div>
                         <input
                             className="h-[20px] px-1 rounded border border-black/30 bg-white/70 text-[11px] text-black"
-                            placeholder="Search"
+                            placeholder={localizeWithFallback('octane.room.search', 'Search')}
                             type="text"
                             value={LocalizeText('navigator.frontpage.staticsearch.8')}
                             onChange={(event) => setSearch(event.target.value)}
@@ -152,14 +152,14 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                                         {chat.showTranslation && (
                                             <div className="mt-[2px] flex flex-col gap-[2px]">
                                                 <div className="flex items-start gap-1 leading-[1.15]">
-                                                    <span className="inline-block min-w-[52px] font-bold opacity-75">original:</span>
+                                                    <span className="inline-block min-w-[52px] font-bold opacity-75">{localizeWithFallback('octane.room.original', 'original:')}</span>
                                                     <span
                                                         className={messageClassName}
                                                         dangerouslySetInnerHTML={{ __html: SanitizeHtml(chat.originalMessage || chat.message || '') }}
                                                     />
                                                 </div>
                                                 <div className="flex items-start gap-1 leading-[1.15]">
-                                                    <span className="inline-block min-w-[52px] font-bold opacity-75">translate:</span>
+                                                    <span className="inline-block min-w-[52px] font-bold opacity-75">{localizeWithFallback('octane.room.translate', 'translate:')}</span>
                                                     <span
                                                         className={messageClassName}
                                                         dangerouslySetInnerHTML={{ __html: SanitizeHtml(chat.translatedMessage || chat.message || '') }}
@@ -204,7 +204,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                                                     <div className="mt-[2px] flex flex-col gap-[2px]" onClick={onClickChat}>
                                                         <div className="flex items-start gap-1 leading-[1.1]">
                                                             <span className="inline-block min-w-[52px] font-bold" style={{ opacity: 0.75 }}>
-                                                                original:
+                                                                {localizeWithFallback('octane.room.original', 'original:')}
                                                             </span>
                                                             <span
                                                                 className={messageClassName}
@@ -215,7 +215,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                                                         </div>
                                                         <div className="flex items-start gap-1 leading-[1.1]">
                                                             <span className="inline-block min-w-[52px] font-bold" style={{ opacity: 0.75 }}>
-                                                                translate:
+                                                                {localizeWithFallback('octane.room.translate', 'translate:')}
                                                             </span>
                                                             <span
                                                                 className={messageClassName}

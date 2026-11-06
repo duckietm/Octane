@@ -1,5 +1,5 @@
 import { FC, KeyboardEvent } from 'react';
-import { LocalizeText } from '../../../../api';
+import { LocalizeText, localizeWithFallback } from '../../../../api';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
@@ -33,7 +33,7 @@ export const FurniChestSearchBar: FC<{
                     onKeyDown={onKeyDown}
                 />
                 {draft.length > 0 && (
-                    <BaseButton type="button" className="octane-chest__search-clear" onClick={onClear} aria-label="Clear">
+                    <BaseButton type="button" className="octane-chest__search-clear" onClick={onClear} aria-label={localizeWithFallback('octane.room.clear', 'Clear')}>
                         ×
                     </BaseButton>
                 )}

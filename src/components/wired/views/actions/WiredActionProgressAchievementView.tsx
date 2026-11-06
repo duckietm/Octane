@@ -116,7 +116,7 @@ export const WiredActionProgressAchievementView: FC<{}> = () => {
                             <Text>
                                 {localizeWithFallback(
                                     `wiredfurni.params.progress_achievement.mode.${value}`,
-                                    value === PROGRESS_ACHIEVEMENT_MODE_ADD ? 'Add the amount' : 'Raise the progress to the amount'
+                                    value === PROGRESS_ACHIEVEMENT_MODE_ADD ? localizeWithFallback('octane.wired.add_the_amount', 'Add the amount') : localizeWithFallback('octane.wired.raise_the_progress_to_the_amount', 'Raise the progress to the amount')
                                 )}
                             </Text>
                         </label>

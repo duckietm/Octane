@@ -189,7 +189,7 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
 
                     <div className="flex flex-col gap-1">
                         <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.target_altitude', 'Altitude') }</Text>
-                        { [ 0, 1, 2 ].map(value => radio('placeAltitude', value, altitude, setAltitude, localizeWithFallback(`wiredfurni.params.place_furni.target_altitude.${ value }`, [ 'On top of the location', 'The furni\'s own altitude', 'The custom target\'s altitude' ][value]))) }
+                        { [ 0, 1, 2 ].map(value => radio('placeAltitude', value, altitude, setAltitude, localizeWithFallback(`wiredfurni.params.place_furni.target_altitude.${ value }`, [ localizeWithFallback('octane.wired.on_top_of_the_location', 'On top of the location'), localizeWithFallback('octane.wired.the_furni_s_own_altitude', 'The furni\'s own altitude'), localizeWithFallback('octane.wired.the_custom_target_s_altitude', 'The custom target\'s altitude') ][value]))) }
                     </div>
 
                     <div className="flex flex-col gap-1">
@@ -214,7 +214,7 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
                         { spawnWithVariable &&
                             <>
                                 <WiredVariablePicker entries={ spawnEntries } recentScope="variable-effects" selectedToken={ spawnToken } onSelect={ entry => setSpawnToken(entry.token) } />
-                                { !furniVariableDefinitions.length && <Text small>No wf_var_furni variables found in this room.</Text> }
+                                { !furniVariableDefinitions.length && <Text small>{localizeWithFallback('octane.wired.no_wf_var_furni_variables_found', 'No wf_var_furni variables found in this room.')}</Text> }
                                 { /* AIR ?_-9T?: createValueOrVariableSection(1, mergedSourceOptions(1), spawn_with_value, int min, int max)
                                     next to the spawn variable; the claimed merged slot 1 is the value's holder in the popup. */ }
                                 <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.spawn_with_value', 'Spawn with value:') }</Text>

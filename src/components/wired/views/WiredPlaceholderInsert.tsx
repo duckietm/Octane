@@ -31,7 +31,7 @@ export const WiredPlaceholderInsert: FC<WiredPlaceholderInsertProps> = ({ trigge
     return (
         <NativeTextTree>
             <Select
-                aria-label="add placeholder"
+                aria-label={localizeWithFallback('octane.wired.add_placeholder', 'add placeholder')}
                 className="form-select form-select-sm"
                 disabled={!names.length}
                 value=""

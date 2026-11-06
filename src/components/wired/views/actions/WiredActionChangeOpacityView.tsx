@@ -169,7 +169,7 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
                     {state.easing !== WIRED_OPACITY_EASING_INSTANT && (
                         <label className="flex items-center justify-between gap-2">
                             <Text>{localizeWithFallback('wiredfurni.params.variables.duration', 'Duration (seconds, 0 = default)')}</Text>
-                            <NumberInput aria-label="Transition duration in seconds, 0 uses the default transition" className="form-control form-control-sm max-w-[80px]" max={WIRED_OPACITY_MAXIMUM_DURATION} min={WIRED_OPACITY_DEFAULT_DURATION} value={state.duration} onChange={(event) => update({ duration: Number(event.target.value) })} />
+                            <NumberInput aria-label={localizeWithFallback('octane.wired.transition_duration_in_seconds_0_uses', 'Transition duration in seconds, 0 uses the default transition')} className="form-control form-control-sm max-w-[80px]" max={WIRED_OPACITY_MAXIMUM_DURATION} min={WIRED_OPACITY_DEFAULT_DURATION} value={state.duration} onChange={(event) => update({ duration: Number(event.target.value) })} />
                         </label>
                     )}
                 </div>

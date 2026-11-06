@@ -290,7 +290,7 @@ export const WiredActionInitTransactionView: FC<{}> = () => {
                         <Text>{localizeWithFallback('wiredfurni.params.contract.timeout.selection', 'Timeout (seconds):')}</Text>
                         <NumberInput
                             allowOutOfRange
-                            aria-label="timeout seconds"
+                            aria-label={localizeWithFallback('octane.wired.timeout_seconds', 'timeout seconds')}
                             className="form-control form-control-sm"
                             max={TRANSACTION_TIMEOUT_MAX}
                             min={TRANSACTION_TIMEOUT_MIN}

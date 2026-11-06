@@ -157,7 +157,7 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
                             )}
                             {inspectionType === 'global' && (
                                 <div className="absolute inset-0 flex items-center justify-center p-3">
-                                    <img alt="Global placeholder" className="max-w-full max-h-full object-contain" src={wiredGlobalPlaceholderImage} />
+                                    <img alt={localizeWithFallback('octane.wired_tools.global_placeholder', 'Global placeholder')} className="max-w-full max-h-full object-contain" src={wiredGlobalPlaceholderImage} />
                                 </div>
                             )}
                             {((inspectionType === 'furni' && !selectedFurni) || (inspectionType === 'user' && !selectedUser) || inspectionType === 'global') && (

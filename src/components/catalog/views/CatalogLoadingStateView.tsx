@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { LocalizeText } from '../../../api';
+import { LocalizeText, localizeWithFallback } from '../../../api';
 import { LayoutLoadingSpinnerView } from '../../../common';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
@@ -20,7 +20,7 @@ export const CatalogLoadingStateView: FC<CatalogLoadingStateViewProps> = ({ erro
         return (
             <NativeTextTree>
                 <div aria-live="assertive" className="octane-catalog-loading-state is-error" role="alert">
-                    <span>{localizedOrFallback('catalog.loading.timeout', 'The catalog page took too long to load.')}</span>
+                    <span>{localizedOrFallback('catalog.loading.timeout', localizeWithFallback('octane.catalog.the_catalog_page_took_too_long', 'The catalog page took too long to load.'))}</span>
                     {!!onRetry && (
                         <BaseButton className="octane-catalog-standard-button" type="button" onClick={onRetry}>
                             {localizedOrFallback('generic.retry', 'Retry')}

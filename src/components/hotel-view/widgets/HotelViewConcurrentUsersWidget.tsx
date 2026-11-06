@@ -27,11 +27,11 @@ export const HotelViewConcurrentUsersWidget: FC<{ fallback: ReactNode; badgeCode
         <NativeTextTree>
             <div className={`hotelview-concurrent-users${view.achieved ? ' hotelview-concurrent-users-achieved' : ''}`}>
                 <span className="hotelview-widget-title">{localizeWithFallback('landing.view.concurrentusers.title', 'Habbo Challenge')}</span>
-                <h2>{localizeWithFallback(view.captionKey, view.achieved ? 'We did it!' : 'Break the record!')}</h2>
+                <h2>{localizeWithFallback(view.captionKey, view.achieved ? localizeWithFallback('octane.hotel_view.we_did_it', 'We did it!') : localizeWithFallback('octane.hotel_view.break_the_record', 'Break the record!'))}</h2>
                 <p>
                     {localizeWithFallback(
                         view.bodyKey,
-                        view.achieved ? 'We reached the goal: enough users were online at the same time!' : 'Get %userGoal% users online at the same time!',
+                        view.achieved ? localizeWithFallback('octane.hotel_view.we_reached_the_goal_enough_users', 'We reached the goal: enough users were online at the same time!') : localizeWithFallback('octane.hotel_view.get_usergoal_users_online_at_the', 'Get %userGoal% users online at the same time!'),
                         parameters,
                         values
                     )}

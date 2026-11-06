@@ -127,10 +127,10 @@ export const VariablesExplorerMainView: FC<VariablesExplorerMainViewProps> = ({ 
                             </div>
                             <div className="flex gap-2 shrink-0">
                                 <Button variant="secondary" onClick={reloadVariables}>
-                                    Reload
+                                    {localizeWithFallback('octane.variables_explorer.reload', 'Reload')}
                                 </Button>
                                 <Button variant="secondary" onClick={onDisconnect}>
-                                    Disconnect
+                                    {localizeWithFallback('octane.variables_explorer.disconnect', 'Disconnect')}
                                 </Button>
                             </div>
                         </div>
@@ -166,9 +166,9 @@ export const VariablesExplorerMainView: FC<VariablesExplorerMainViewProps> = ({ 
                             showTextValues={false}
                         />
                         <div className="mx-3 flex flex-wrap items-center gap-2 text-[12px]">
-                            <Text bold>Look up a holder:</Text>
+                            <Text bold>{localizeWithFallback('octane.variables_explorer.look_up_a_holder', 'Look up a holder:')}</Text>
                             <Select
-                                aria-label="Holder kind"
+                                aria-label={localizeWithFallback('octane.variables_explorer.holder_kind', 'Holder kind')}
                                 className={FIELD_CLASS}
                                 value={lookupKind}
                                 onChange={(event) => setLookupKind(event.target.value as ExplorerLookupKind)}
@@ -180,7 +180,7 @@ export const VariablesExplorerMainView: FC<VariablesExplorerMainViewProps> = ({ 
                                 ))}
                             </Select>
                             <input
-                                aria-label="Holder"
+                                aria-label={localizeWithFallback('octane.variables_explorer.holder', 'Holder')}
                                 className={`${FIELD_CLASS} w-[140px]`}
                                 type="text"
                                 value={lookupInput}
@@ -193,10 +193,10 @@ export const VariablesExplorerMainView: FC<VariablesExplorerMainViewProps> = ({ 
                                 }}
                             />
                             <Button variant="secondary" onClick={openLookup}>
-                                Open
+                                {localizeWithFallback('octane.variables_explorer.open', 'Open')}
                             </Button>
                             <Button variant="secondary" onClick={() => setHolderTarget({ scope: 'global' })}>
-                                Global variables
+                                {localizeWithFallback('octane.variables_explorer.global_variables', 'Global variables')}
                             </Button>
                         </div>
                         <div className="mx-3 mb-3 min-h-[26px]">

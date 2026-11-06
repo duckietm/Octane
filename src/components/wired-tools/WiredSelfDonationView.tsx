@@ -96,13 +96,13 @@ export const WiredSelfDonationView = ({ onClose }: WiredSelfDonationViewProps) =
                 <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
                     <label className="flex items-center gap-2 text-[12px]">
                         <Text bold>{localizeWithFallback('selfdonation.amount', 'Amount')}:</Text>
-                        <NumberInput aria-label="Amount" className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" min={1} max={maxAmount} value={amount} onChange={(event) => setAmount(Number.parseInt(event.target.value, 10) || 1)} onBlur={() => setAmount(clampedAmount)} />
+                        <NumberInput aria-label={localizeWithFallback('octane.wired_tools.amount', 'Amount')} className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" min={1} max={maxAmount} value={amount} onChange={(event) => setAmount(Number.parseInt(event.target.value, 10) || 1)} onBlur={() => setAmount(clampedAmount)} />
                         <Text small>{localizeWithFallback('selfdonation.amount.range', '1 to %max%', ['max'], [String(maxAmount)])}</Text>
                     </label>
                     <label className="flex items-center gap-2 text-[12px]">
                         <Text bold>{localizeWithFallback('selfdonation.search', 'Furni')}:</Text>
                         <input
-                            aria-label="Search furni"
+                            aria-label={localizeWithFallback('octane.wired_tools.search_furni', 'Search furni')}
                             className="grow rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
                             type="text"
                             value={query}

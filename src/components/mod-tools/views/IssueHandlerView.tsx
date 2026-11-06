@@ -179,7 +179,7 @@ export const IssueHandlerView: FC<IssueHandlerProps> = ({
         const topicId = topicIndex >= 0 ? (topics[topicIndex]?.id ?? -1) : -1;
 
         if (topicId <= 0 && primary.issue.reportedCategoryId === CATEGORY_NEEDS_TOPIC) {
-            showModAlert('You need to select the topic first.', 'Topic missing');
+            showModAlert(localizeWithFallback('octane.mod_tools.you_need_to_select_the_topic', 'You need to select the topic first.'), localizeWithFallback('octane.mod_tools.topic_missing', 'Topic missing'));
 
             return;
         }
@@ -232,9 +232,9 @@ export const IssueHandlerView: FC<IssueHandlerProps> = ({
                     <div style={{ position: 'absolute', left: left.x, top: left.y, width: left.width, height: Math.min(left.height + stretch, height - 32) }}>
                     <div style={{ position: 'absolute', left: 0, top: 0, width: 285, height: 1200, willChange: 'transform', pointerEvents: 'none', clipPath: 'polygon(0 -4px, 100% -4px, 100% 100%, 0 100%)' }}>
                         {/* the headings sit under the lists and panels and under the frame's header (the 4px above the client): when the window is small they are covered (the messages row hides most of "Reported User Info") */}
-                        <Native0Text bold color={0xffffff} glow={HANDLER_GLOW} text="Caller User Info" width={100} x={95} y={yCallerCaption} />
-                        <Native0Text bold color={0xffffff} glow={HANDLER_GLOW} text="Messages" width={60} x={110} y={yMessagesCaption} />
-                        {reportedShown && <Native0Text bold color={0xffffff} glow={HANDLER_GLOW} text="Reported User Info" width={120} x={80} y={yReportedCaption} />}
+                        <Native0Text bold color={0xffffff} glow={HANDLER_GLOW} text={localizeWithFallback('octane.mod_tools.caller_user_info', 'Caller User Info')} width={100} x={95} y={yCallerCaption} />
+                        <Native0Text bold color={0xffffff} glow={HANDLER_GLOW} text={localizeWithFallback('octane.mod_tools.messages', 'Messages')} width={60} x={110} y={yMessagesCaption} />
+                        {reportedShown && <Native0Text bold color={0xffffff} glow={HANDLER_GLOW} text={localizeWithFallback('octane.mod_tools.reported_user_info', 'Reported User Info')} width={120} x={80} y={yReportedCaption} />}
                         {/* text on an opaque background is set with LCD subpixel fringes: the backgrounds are drawn apart and the texts get a layer of their own */}
                             {header.children.map((node, index) => (
                                 <Native0Text key={index} bold color={0xffffff} glow={HANDLER_GLOW} text={nativeCaption(node)} width={nativeNumber(node, 'width')} x={nativeNumber(node, 'x')} y={yHeader + nativeNumber(node, 'y')} />

@@ -1,6 +1,6 @@
 import { InventoryFilterSelect } from './InventoryFilterSelect';
 import { FC } from 'react';
-import { FURNI_MAIN_FILTER, FURNI_TYPE_OPTIONS, FurniMainFilter, furniMainFilterKey, furniTypeFilterKey, LocalizeText } from '../../../api';
+import { FURNI_MAIN_FILTER, FURNI_TYPE_OPTIONS, FurniMainFilter, furniMainFilterKey, furniTypeFilterKey, LocalizeText, localizeWithFallback } from '../../../api';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
@@ -85,7 +85,7 @@ export const InventoryCategoryFilterView: FC<InventoryCategoryFilterViewProps> =
                 <div className="octane-inventory-filter-search">
                     <input
                         className="octane-inventory-filter-input"
-                        aria-label={localizeOr('catalog.search', 'Search inventory')}
+                        aria-label={localizeOr('catalog.search', localizeWithFallback('octane.inventory.search_inventory', 'Search inventory'))}
                         onKeyDown={(event) => {
                             if (event.key === 'Enter') onSearchApply?.(searchValue);
                             if (event.key === 'Escape') {
@@ -100,7 +100,7 @@ export const InventoryCategoryFilterView: FC<InventoryCategoryFilterViewProps> =
                         <BaseButton
                             type="button"
                             className="octane-inventory-filter-clear"
-                            aria-label={localizeOr('generic.clear', 'Clear search')}
+                            aria-label={localizeOr('generic.clear', localizeWithFallback('octane.inventory.clear_search', 'Clear search'))}
                             onClick={() => {
                                 onSearchChange?.('');
                                 onSearchApply?.('');
@@ -142,7 +142,7 @@ export const InventoryCategoryFilterView: FC<InventoryCategoryFilterViewProps> =
                             onChange={(value) => onMainFilterChange?.(value)}
                         >
                             <option value={BADGE_MAIN_ALL}>{localizeOr('inventory.badges.filter.all', 'All')}</option>
-                            <option value={BADGE_MAIN_NORMAL}>{localizeOr('inventory.badges.filter.normal_badges', 'Normal badges')}</option>
+                            <option value={BADGE_MAIN_NORMAL}>{localizeOr('inventory.badges.filter.normal_badges', localizeWithFallback('octane.inventory.normal_badges', 'Normal badges'))}</option>
                             <option value={BADGE_MAIN_ACHIEVEMENTS}>{localizeOr('inventory.badges.filter.achievements', 'Achievements')}</option>
                         </InventoryFilterSelect>
                         <InventoryFilterSelect
@@ -150,7 +150,7 @@ export const InventoryCategoryFilterView: FC<InventoryCategoryFilterViewProps> =
                             aria-label={isBadges ? localizeOr('inventory.badges.filter.rarity.all', 'Rarity') : localizeOr('inventory.filter.type', 'Type')}
                             onChange={(value) => onTypeFilterChange?.(value)}
                         >
-                            <option value={String(BADGE_RARITY_ALL)}>{localizeOr('inventory.badges.filter.rarity.all', 'All rarities')}</option>
+                            <option value={String(BADGE_RARITY_ALL)}>{localizeOr('inventory.badges.filter.rarity.all', localizeWithFallback('octane.inventory.all_rarities', 'All rarities'))}</option>
                             <option value="0">{localizeOr('inventory.badges.filter.rarity.common', 'Common')}</option>
                             <option value="1">{localizeOr('badge.rarity.uncommon', 'Uncommon')}</option>
                             <option value="2">{localizeOr('badge.rarity.rare', 'Rare')}</option>

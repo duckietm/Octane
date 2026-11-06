@@ -46,7 +46,7 @@ export const HotelViewNextLimitedRareWidget: FC<{ fallback: ReactNode; title: st
                         <span className="hotelview-ltd-countdown-values">
                             {padCountdown(countdown.days)}:{padCountdown(countdown.hours)}:{padCountdown(countdown.minutes)}:{padCountdown(countdown.seconds)}
                         </span>
-                        <small>Days Hours Minutes Seconds</small>
+                        <small>{localizeWithFallback('octane.hotel_view.days_hours_minutes_seconds', 'Days Hours Minutes Seconds')}</small>
                     </strong>
                 )}
                 {mode === 'available' && (

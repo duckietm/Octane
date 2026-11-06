@@ -8,6 +8,7 @@ import { FloorplanTile } from './FloorplanTile';
 import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../../api';
 
 type Props = {
     state: FloorplanState;
@@ -250,10 +251,10 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
                     {outOfBoundsOverlay}
                 </svg>
                 <div className="fp-stage-buttons">
-                    <Hint content="Fit room to view"><BaseButton aria-label="Fit room to view" type="button" data-testid="zoom-reset" className="fp-round-btn is-small" disabled={!roomBounds} onClick={resetView}>
+                    <Hint content={localizeWithFallback('octane.floorplan_editor.fit_room_to_view', 'Fit room to view')}><BaseButton aria-label={localizeWithFallback('octane.floorplan_editor.fit_room_to_view', 'Fit room to view')} type="button" data-testid="zoom-reset" className="fp-round-btn is-small" disabled={!roomBounds} onClick={resetView}>
                         <FaExpand size={10} />
                     </BaseButton></Hint>
-                    <Hint content="Recenter on room (keep zoom)"><BaseButton aria-label="Recenter on room (keep zoom)"
+                    <Hint content={localizeWithFallback('octane.floorplan_editor.recenter_on_room_keep_zoom', 'Recenter on room (keep zoom)')}><BaseButton aria-label={localizeWithFallback('octane.floorplan_editor.recenter_on_room_keep_zoom', 'Recenter on room (keep zoom)')}
                         type="button"
                         data-testid="zoom-recenter"
                         className="fp-round-btn is-small"
@@ -265,8 +266,8 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
                     >
                         <FaCrosshairs size={10} />
                     </BaseButton></Hint>
-                    <Hint content={flipped ? 'Original view' : 'View from the other side'}>
-                        <BaseButton aria-label={flipped ? 'Original view' : 'View from the other side'}
+                    <Hint content={flipped ? localizeWithFallback('octane.floorplan_editor.original_view', 'Original view') : localizeWithFallback('octane.floorplan_editor.view_from_the_other_side', 'View from the other side')}>
+                        <BaseButton aria-label={flipped ? localizeWithFallback('octane.floorplan_editor.original_view', 'Original view') : localizeWithFallback('octane.floorplan_editor.view_from_the_other_side', 'View from the other side')}
                             type="button"
                             data-testid="zoom-flip"
                             data-active={flipped ? 'true' : 'false'}
