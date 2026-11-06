@@ -97,11 +97,12 @@ const useAvatarInfoWidgetState = () => {
     };
 
     const removeProductBubble = (index: number) => {
+        // The confirm is closed here, outside the updater, which must stay free of side effects.
+        if (confirmingProduct && confirmingProduct === productBubbles[index]) setConfirmingProduct(null);
+
         setProductBubbles((prevValue) => {
             const newValue = [...prevValue];
-            const item = newValue.splice(index, 1)[0];
-
-            if (confirmingProduct === item) setConfirmingProduct(null);
+            newValue.splice(index, 1);
 
             return newValue;
         });
@@ -418,9 +419,13 @@ const useAvatarInfoWidgetState = () => {
 
             if (index > -1) setProductBubbles((prevValue) => prevValue.filter((bubble) => bubble.id !== event.id));
         } else if (event.category === RoomObjectCategory.FLOOR) {
-            const index = productBubbles.findIndex((bubble) => bubble.id === event.id);
+            // The bubbles name the product furni in requestRoomObjectId: comparing their id never matched, so the
+            // bubbles and the confirm stayed after the shampoo or the food was picked up.
+            if (productBubbles.some((bubble) => bubble.requestRoomObjectId === event.id)) {
+                setProductBubbles((prevValue) => prevValue.filter((bubble) => bubble.requestRoomObjectId !== event.id));
+            }
 
-            if (index > -1) setProductBubbles((prevValue) => prevValue.filter((bubble) => bubble.requestRoomObjectId !== event.id));
+            if (confirmingProduct?.requestRoomObjectId === event.id) setConfirmingProduct(null);
         }
 
         if (avatarInfo) {
