@@ -49,7 +49,7 @@
     "friendlist.search": "Search friends",
     "widget.buildheight.title": "Build height",
     "widget.buildheight.description": "Set the stacking height for furniture you place.",
-    "widget.buildheight.reset": "Reset (off)",
+    "widget.buildheight.reset": "Turn off",
     "widget.buildheight.underpass": "Allow walking underneath placed furni",
     "widget.buildheight.underpass.min_height": "Raise the height to at least %height% to allow walking underneath.",
     "navigator.roomsettings.allow_underpass": "Allow walking underneath furni placed in build mode",
@@ -1627,6 +1627,9 @@
     "reward_track.debug.copy_task_id.success": "Task ID copied to the clipboard",
     "chat.confirm.openurl": "You are about to open %url%. Only continue if you trust the link.",
     "campaign.calendar.title": "Calendar",
+    "widget.buildheight.floor": "Floor level",
+    "widget.buildheight.lower": "Lower",
+    "widget.buildheight.raise": "Raise"
     "wheel.spins.free": "Free spins today",
     "wheel.spins.extra": "Extra spins",
     "wheel.prize.credits": "%amount% credits",

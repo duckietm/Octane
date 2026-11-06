@@ -21,6 +21,8 @@ export interface NumberInputProps extends Omit<InputHTMLAttributes<HTMLInputElem
      * while arrows, buttons and the wheel stay inside it. Without it Base UI clamps the typed text too.
      */
     allowOutOfRange?: boolean;
+    /** The up / down overlay; off for a field that sits between its own step buttons. */
+    steppers?: boolean;
     ref?: Ref<HTMLInputElement>;
 }
 
@@ -120,6 +122,7 @@ export const NumberInput = (props: NumberInputProps) => {
         max,
         step,
         allowOutOfRange,
+        steppers = true,
         className,
         disabled,
         readOnly,
@@ -164,7 +167,7 @@ export const NumberInput = (props: NumberInputProps) => {
         [ref]
     );
 
-    const steppersVisible = !!input && !disabled && !readOnly && (pointerOver || focused);
+    const steppersVisible = steppers && !!input && !disabled && !readOnly && (pointerOver || focused);
 
     return (
         <NumberField.Root

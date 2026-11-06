@@ -130,6 +130,14 @@ describe('NumberInput', () => {
         expect(screen.queryByRole('button', { name: /increase/i })).toBeNull();
     });
 
+    it('leaves the buttons out when the field has its own step buttons around it', () => {
+        render(<NumberInput steppers={false} aria-label="Bare" value={1} onChange={() => undefined} />);
+
+        fireEvent.focus(screen.getByRole('spinbutton'));
+        fireEvent.mouseEnter(screen.getByRole('spinbutton'));
+        expect(screen.queryByRole('button', { name: /increase/i })).toBeNull();
+    });
+
     it('is disabled and read-only on request', () => {
         render(<NumberInput disabled aria-label="Off" value={1} onChange={() => undefined} />);
 

@@ -286,7 +286,7 @@
     }
 
     /* Grey `button_thick` (style 3): habbo_skin_button_shiny_thick, button_shiny_bold 12 px black. */
-    :is(.octane-wired-label-settings, .octane-build-height-widget, .octane-image-position-editor) .habbo-btn-secondary,
+    :is(.octane-wired-label-settings, .octane-image-position-editor) .habbo-btn-secondary,
     .octane-widget-rentablespace .habbo-btn-secondary.rentablespace-rent-button {
         border-width: 5px !important;
         border-image-source: var(--habbo-skin-shiny-thick) !important;
@@ -334,17 +334,17 @@
         color: #777777 !important;
     }
 
-    :is(.octane-wired-label-settings, .octane-build-height-widget, .octane-image-position-editor) .habbo-btn-secondary:hover,
+    :is(.octane-wired-label-settings, .octane-image-position-editor) .habbo-btn-secondary:hover,
     .octane-widget-rentablespace .habbo-btn-secondary.rentablespace-rent-button:hover {
         border-image-source: var(--habbo-skin-shiny-thick-hover) !important;
     }
 
-    :is(.octane-wired-label-settings, .octane-build-height-widget, .octane-image-position-editor) .habbo-btn-secondary:active,
+    :is(.octane-wired-label-settings, .octane-image-position-editor) .habbo-btn-secondary:active,
     .octane-widget-rentablespace .habbo-btn-secondary.rentablespace-rent-button:active {
         border-image-source: var(--habbo-skin-shiny-thick-pressed) !important;
     }
 
-    :is(.octane-wired-label-settings, .octane-build-height-widget, .octane-image-position-editor)
+    :is(.octane-wired-label-settings, .octane-image-position-editor)
         :is(.habbo-btn-secondary:disabled, .habbo-btn-secondary.pointer-events-none),
     .octane-widget-rentablespace .habbo-btn-secondary.rentablespace-rent-button:disabled {
         border-image-source: var(--habbo-skin-shiny-thick-disabled) !important;
@@ -368,4 +368,159 @@
         font-size: 10px !important;
         font-weight: 700 !important;
     }
+}
+
+/* ---------- build height: a stepper with a typed field, AIR's slider (yellow knob over a ruled bar),
+   the underpass option and two default buttons. ---------- */
+.octane-build-height-widget {
+    width: 300px;
+    max-width: 96vw;
+}
+
+.octane-build-height-widget .build-height-content {
+    gap: 8px;
+}
+
+.octane-build-height-widget .build-height-description,
+.octane-build-height-widget .build-height-hint {
+    margin: 0;
+}
+
+.octane-build-height-widget .build-height-hint {
+    margin-top: -4px;
+    padding-left: 20px;
+    color: #666666;
+    font-size: 11px;
+    line-height: 13px;
+}
+
+.octane-build-height-widget .build-height-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.octane-build-height-widget .build-height-step {
+    width: 24px;
+    min-width: 24px;
+    padding: 0 !important;
+    font-size: 14px !important;
+    font-weight: 700;
+}
+
+.octane-build-height-widget .build-height-field {
+    width: 56px;
+    height: 24px;
+    box-sizing: border-box;
+    border: 1px solid #7f7f7f;
+    border-radius: 2px;
+    background: #ffffff;
+    box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.15);
+    color: #000000;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* The bar and its ruler share one box: the knob centre and the marks run over the same width. */
+.octane-build-height-widget .build-height-scale {
+    position: relative;
+    height: 40px;
+    margin: 0 8px;
+}
+
+.octane-build-height-widget .build-height-slider {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 20px;
+    touch-action: none;
+    user-select: none;
+}
+
+.octane-build-height-widget .build-height-slider .octane-slider-bare-control {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+/* AIR slider_base: a light grey bar over a dark base line. */
+.octane-build-height-widget .build-height-track {
+    position: absolute;
+    top: 8px;
+    left: -4px;
+    right: -4px;
+    height: 6px;
+    background: linear-gradient(#a8a8a8 0 3px, transparent 3px 4px, #555555 4px 6px);
+}
+
+/* AIR slider_button: the yellow knob. */
+.octane-build-height-widget .build-height-thumb {
+    top: 3px;
+    width: 12px;
+    height: 15px;
+    translate: -50% 0 !important;
+    background: url('../../assets/images/user-settings/air/slider-button.png') no-repeat 0 0;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    cursor: grab;
+}
+
+.octane-build-height-widget .build-height-thumb:has(input:focus-visible) {
+    outline: 1px solid #1e90ff;
+    outline-offset: 1px;
+}
+
+.octane-build-height-widget .build-height-marks {
+    position: absolute;
+    top: 21px;
+    left: 0;
+    right: 0;
+    height: 18px;
+    pointer-events: none;
+}
+
+.octane-build-height-widget .build-height-mark {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 2px;
+    background: #555555;
+    translate: -50% 0;
+}
+
+.octane-build-height-widget .build-height-mark.is-major {
+    height: 4px;
+}
+
+.octane-build-height-widget .build-height-mark-label {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    color: #000000;
+    font-size: 11px;
+    line-height: 12px;
+    white-space: nowrap;
+    translate: -50% 0;
+}
+
+.octane-build-height-widget .build-height-underpass {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.octane-build-height-widget .build-height-underpass.is-locked {
+    color: #777777;
+    cursor: default;
+}
+
+.octane-build-height-widget .build-height-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.octane-build-height-widget .build-height-actions > * {
+    flex: 1;
 }
