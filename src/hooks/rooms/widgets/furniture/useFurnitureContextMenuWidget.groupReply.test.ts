@@ -14,7 +14,8 @@ const fire = (type: unknown, event: any) => act(() => handlers.get(type)?.(event
 vi.mock('../../../events', () => ({ useMessageEvent: on, useOctaneEvent: on }));
 vi.mock('../../engine', () => ({
     useObjectSelectedEvent: (handler: any) => on('selected', handler),
-    useObjectDeselectedEvent: (handler: any) => on('deselected', handler)
+    useObjectDeselectedEvent: (handler: any) => on('deselected', handler),
+    useFurniRemovedEvent: (_active: boolean, handler: any) => on('removed', handler)
 }));
 vi.mock('../../useRoom', () => ({ useRoom: () => ({ roomSession: { roomId: 1 } }) }));
 
@@ -54,5 +55,17 @@ describe('useFurnitureContextMenuWidget group reply', () => {
         fire(GroupFurniContextMenuInfoMessageEvent, groupReply(10));
 
         expect(result.current.mode).toBeNull();
+    });
+
+    it('closes the menu of a furni that is removed', () => {
+        const { result } = renderHook(() => useFurnitureContextMenuWidget());
+
+        fire('selected', { id: 10, category: RoomObjectCategory.FLOOR });
+        fire(GroupFurniContextMenuInfoMessageEvent, groupReply(10));
+        // A confirm or a menu left open acted on an object that was gone.
+        fire('removed', { id: 10 });
+
+        expect(result.current.mode).toBeNull();
+        expect(result.current.objectId).toBe(-1);
     });
 });

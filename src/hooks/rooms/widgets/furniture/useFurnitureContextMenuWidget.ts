@@ -10,7 +10,7 @@ import {
 import { useRef, useState } from 'react';
 import { CreateLinkEvent, IsOwnerOfFurniture, TryJoinGroup, TryVisitRoom } from '../../../../api';
 import { useMessageEvent, useOctaneEvent } from '../../../events';
-import { useObjectDeselectedEvent, useObjectSelectedEvent } from '../../engine';
+import { useFurniRemovedEvent, useObjectDeselectedEvent, useObjectSelectedEvent } from '../../engine';
 import { useRoom } from '../../useRoom';
 
 export const MONSTERPLANT_SEED_CONFIRMATION: string = 'MONSTERPLANT_SEED_CONFIRMATION';
@@ -182,6 +182,12 @@ const useFurnitureContextMenuWidgetState = () => {
 
     useObjectDeselectedEvent(() => {
         selectedFurniIdRef.current = -1;
+    });
+
+    // A confirm for a furni that is picked up or deleted meanwhile would act on an object that is gone.
+    useFurniRemovedEvent(confirmingObjectId !== -1 || objectId !== -1, (event) => {
+        if (event.id === confirmingObjectId) closeConfirm();
+        if (event.id === objectId) onClose();
     });
 
     useMessageEvent<GroupFurniContextMenuInfoMessageEvent>(GroupFurniContextMenuInfoMessageEvent, (event) => {
