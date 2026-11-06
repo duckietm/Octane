@@ -20,6 +20,7 @@ import {
     onIssueInfo,
     pickNext,
     releaseBundle,
+    resetTrackedIssues,
     useIssueManagerStore
 } from './issueManagerStore';
 import { MOD_WINDOW_SIZE, useModWindowTrackerStore } from './modWindowTrackerStore';
@@ -58,6 +59,7 @@ export const useIssueManager = (): IssueManagerContext => {
     );
 
     useMessageEvent<ModeratorInitMessageEvent>(ModeratorInitMessageEvent, (event) => {
+        resetTrackedIssues();
         for (const issue of event.getParser()?.data?.issues ?? []) onIssueInfo(issue, context);
     });
 
