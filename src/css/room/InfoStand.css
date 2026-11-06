@@ -75,7 +75,7 @@
      inside the border and around the background, which filled only the padding box. Without either, the frame stays. */
   &.profile-card-background[class*='card-background-']:not(.card-background-0),
   &:has(> .infostand-border) {
-    border-image: none;
+    border-image-source: none;
     border-color: transparent;
     background-clip: border-box;
   }
