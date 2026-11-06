@@ -21,7 +21,7 @@ export const WiredTriggerPressKeybindView: FC<{}> = () =>
 
         setMatchEnabled(value > 0);
         setKeyCode(value);
-        setKeyLabel(value > 0 ? ('Key code ' + value) : '');
+        setKeyLabel(value > 0 ? (localizeWithFallback('octane.wired.key_code', 'Key code ') + value) : '');
     }, [ trigger ]);
 
     const captureKey = (event: KeyboardEvent<HTMLInputElement>) =>

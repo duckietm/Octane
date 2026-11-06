@@ -11,7 +11,7 @@ import {
     UserChatlogEvent
 } from '@octane/renderer';
 import { ElementType, FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { OpenUrl, SendMessageComposer } from '../../../api';
+import { OpenUrl, SendMessageComposer, localizeWithFallback } from '../../../api';
 import { NativeText } from '../../../common/native-text/NativeText';
 import { useMessageEvent } from '../../../hooks';
 import evidenceXml from '../../../assets/mod-tools/xml/evidence_frame.xml?raw';
@@ -62,29 +62,29 @@ interface HeaderOptions {
  * with the room tool of the room they were taken in. The forum "Delete" button is left out: this server's thread delete erases the thread instead of hiding it.
  */
 const headerOf = (record: ChatRecordData, options: HeaderOptions): { label: string; action: HeaderButton | null; action2: HeaderButton | null } => {
-    const roomTool = record.roomId > 0 ? { label: 'Room tool', onClick: () => options.onOpenRoomTool(record.roomId) } : null;
+    const roomTool = record.roomId > 0 ? { label: localizeWithFallback('octane.mod_tools.room_tool', 'Room tool'), onClick: () => options.onOpenRoomTool(record.roomId) } : null;
     const context = record.context;
 
     switch (record.recordType) {
         case ChatRecordData.TYPE_IM_SESSION:
             return { label: 'IM session', action: null, action2: null };
         case ChatRecordData.TYPE_DISCUSSION_THREAD:
-            return { label: 'Forum thread', action: null, action2: record.groupId > 0 ? { label: 'Open thread', onClick: () => CreateLinkEvent(`groupforum/${record.groupId}`) } : null };
+            return { label: localizeWithFallback('octane.mod_tools.forum_thread', 'Forum thread'), action: null, action2: record.groupId > 0 ? { label: localizeWithFallback('octane.mod_tools.open_thread', 'Open thread'), onClick: () => CreateLinkEvent(`groupforum/${record.groupId}`) } : null };
         case ChatRecordData.TYPE_DISCUSSION_MESSAGE:
-            return { label: 'Forum message', action: null, action2: record.groupId > 0 ? { label: 'Open Message', onClick: () => CreateLinkEvent(`groupforum/${record.groupId}`) } : null };
+            return { label: localizeWithFallback('octane.mod_tools.forum_message', 'Forum message'), action: null, action2: record.groupId > 0 ? { label: localizeWithFallback('octane.mod_tools.open_message', 'Open Message'), onClick: () => CreateLinkEvent(`groupforum/${record.groupId}`) } : null };
         case ChatRecordData.TYPE_SELFIE: {
             const url = context?.get('url');
 
-            return { label: 'Selfie report', action: roomTool, action2: url ? { label: 'View selfie', onClick: () => OpenUrl(`${url}`) } : null };
+            return { label: localizeWithFallback('octane.mod_tools.selfie_report', 'Selfie report'), action: roomTool, action2: url ? { label: localizeWithFallback('octane.mod_tools.view_selfie', 'View selfie'), onClick: () => OpenUrl(`${url}`) } : null };
         }
         case ChatRecordData.TYPE_PHOTO: {
             const base = GetConfiguration().getValue<string>('stories.admin.tool.base.url', '');
             const photoId = context?.get('extraDataId');
 
-            return { label: 'Photo report', action: roomTool, action2: base && photoId ? { label: 'Moderate photo', onClick: () => OpenUrl(`${base}${photoId}`) } : null };
+            return { label: localizeWithFallback('octane.mod_tools.photo_report', 'Photo report'), action: roomTool, action2: base && photoId ? { label: localizeWithFallback('octane.mod_tools.moderate_photo', 'Moderate photo'), onClick: () => OpenUrl(`${base}${photoId}`) } : null };
         }
         default:
-            if (record.roomId > 0) return { label: record.roomName == null ? `Room #${record.roomId}` : `Room: ${record.roomName}`, action: roomTool, action2: { label: 'View room', onClick: () => options.onEnterRoom(record.roomId) } };
+            if (record.roomId > 0) return { label: record.roomName == null ? localizeWithFallback('octane.mod_tools.room_room_id', 'Room #%room_id%', ['room_id'], [String(record.roomId)]) : localizeWithFallback('octane.mod_tools.room_room_name', 'Room: %room_name%', ['room_name'], [String(record.roomName)]), action: roomTool, action2: { label: localizeWithFallback('octane.mod_tools.view_room', 'View room'), onClick: () => options.onEnterRoom(record.roomId) } };
 
             return { label: 'Chatlog', action: null, action2: null };
     }
@@ -152,13 +152,13 @@ export const useEvidence = (kind: EvidenceChatlogKind, id: number): Evidence => 
     useMessageEvent<UserChatlogEvent>(UserChatlogEvent, (event) => {
         const data = event.getParser()?.data;
 
-        if (kind === 'user' && data?.userId === id) setEvidence({ serial: ++evidenceSerial, subject: `user:${id}`, caption: `User Chatlog: ${data.username}`, records: data.roomChatlogs, highlights: new Map([[data.userId, 0]]) });
+        if (kind === 'user' && data?.userId === id) setEvidence({ serial: ++evidenceSerial, subject: `user:${id}`, caption: localizeWithFallback('octane.mod_tools.user_chatlog_username', 'User Chatlog: %username%', ['username'], [String(data.username)]), records: data.roomChatlogs, highlights: new Map([[data.userId, 0]]) });
     });
 
     useMessageEvent<RoomChatlogEvent>(RoomChatlogEvent, (event) => {
         const data = event.getParser()?.data;
 
-        if (kind === 'room' && data?.roomId === id) setEvidence({ serial: ++evidenceSerial, subject: `room:${id}`, caption: `Room Chatlog: ${data.roomName}`, records: [data], highlights: new Map() });
+        if (kind === 'room' && data?.roomId === id) setEvidence({ serial: ++evidenceSerial, subject: `room:${id}`, caption: localizeWithFallback('octane.mod_tools.room_chatlog_room_name', 'Room Chatlog: %room_name%', ['room_name'], [String(data.roomName)]), records: [data], highlights: new Map() });
     });
 
     useMessageEvent<CfhChatlogEvent>(CfhChatlogEvent, (event) => {
@@ -168,7 +168,7 @@ export const useEvidence = (kind: EvidenceChatlogKind, id: number): Evidence => 
             setEvidence({
                 serial: ++evidenceSerial,
                 subject: `cfh:${id}`,
-                caption: `Call For Help Evidence #${data.chatRecordId}`,
+                caption: localizeWithFallback('octane.mod_tools.call_for_help_evidence_chat_record', 'Call For Help Evidence #%chat_record_id%', ['chat_record_id'], [String(data.chatRecordId)]),
                 records: [data.chatRecord],
                 highlights: new Map([
                     [data.callerUserId, 0],
@@ -305,7 +305,7 @@ export const EvidenceChatlogList: FC<EvidenceChatlogListProps> = ({ evidence, li
                                     <NativeText
                                         background={item.color}
                                         overrides={{ underline: item.line.userId > 0, bold: true }}
-                                        text={item.line.userId > 0 ? item.line.userName : item.line.userId === 0 ? 'Bot / pet' : '-'}
+                                        text={item.line.userId > 0 ? item.line.userName : item.line.userId === 0 ? localizeWithFallback('octane.mod_tools.bot_pet', 'Bot / pet') : '-'}
                                         textStyle="u_bold"
                                     />
                                 </Chatter>

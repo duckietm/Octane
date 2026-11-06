@@ -6,6 +6,7 @@ import { BaseButton } from '../../../common/BaseButton';
 import { ToggleButton } from '../../../common/ToggleButton';
 import { Hint } from '../../../common/Tooltip';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../../api';
 
 interface FurniEditorSearchViewProps {
     items: FurniItem[];
@@ -36,7 +37,7 @@ const COLUMNS: { field: SortField; label: string; align: 'left' | 'center' }[] =
     { field: 'id', label: 'ID', align: 'left' },
     { field: 'spriteId', label: 'Sprite', align: 'left' },
     { field: 'itemName', label: 'Name', align: 'left' },
-    { field: 'publicName', label: 'Public Name', align: 'left' },
+    { field: 'publicName', label: localizeWithFallback('octane.furni_editor.public_name', 'Public Name'), align: 'left' },
     { field: 'type', label: 'Type', align: 'center' },
     { field: 'interactionType', label: 'Interaction', align: 'left' }
 ];
@@ -162,7 +163,7 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                         <input
                             type="text"
                             className={inputClass}
-                            placeholder="Search by ID, name or sprite ID…"
+                            placeholder={localizeWithFallback('octane.furni_editor.search_by_id_name_or_sprite', 'Search by ID, name or sprite ID…')}
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                         />
@@ -197,11 +198,11 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                 {/* Result count + activity */}
                 <Flex alignItems="center" gap={2} className="px-0.5">
                     <Text className="text-[11px] text-slate-500">
-                        {total > 0 ? `Showing ${from}–${to} of ${total.toLocaleString()}` : loading ? 'Searching…' : 'No results'}
+                        {total > 0 ? localizeWithFallback('octane.furni_editor.showing_from_to_of_total', 'Showing %from%–%to% of %total%', ['from', 'to', 'total'], [String(from), String(to), total.toLocaleString()]) : loading ? localizeWithFallback('octane.furni_editor.searching', 'Searching…') : localizeWithFallback('octane.furni_editor.no_results', 'No results')}
                     </Text>
                     {loading && <span className="w-3 h-3 rounded-full border-2 border-slate-300 border-t-primary animate-spin" />}
                     {flaggedCount > 0 && (
-                        <Hint content="Rows whose interaction type has no class or does not match the classname"><ToggleButton
+                        <Hint content={localizeWithFallback('octane.furni_editor.rows_whose_interaction_type_has_no', 'Rows whose interaction type has no class or does not match the classname')}><ToggleButton
                             type="button"
                             onClick={() => setOnlyFlagged((prev) => !prev)} pressed={onlyFlagged}
                             className={`ml-auto inline-flex items-center gap-1.5 text-[10px] font-medium rounded-full border px-2 py-0.5 transition ${onlyFlagged ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-[#ffffff] border-slate-200 text-slate-500 hover:border-slate-300'}`}
@@ -287,8 +288,8 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                             {items.length === 0 && !loading && (
                                 <tr>
                                     <td colSpan={7} className="px-2 py-10 text-center">
-                                        <div className="text-slate-400 text-sm">No furni found</div>
-                                        <div className="text-slate-300 text-[11px] mt-0.5">Try a different search or filter</div>
+                                        <div className="text-slate-400 text-sm">{localizeWithFallback('octane.furni_editor.no_furni_found', 'No furni found')}</div>
+                                        <div className="text-slate-300 text-[11px] mt-0.5">{localizeWithFallback('octane.furni_editor.try_a_different_search_or_filter', 'Try a different search or filter')}</div>
                                     </td>
                                 </tr>
                             )}
@@ -300,10 +301,10 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                 <Flex justifyContent="between" alignItems="center" className="px-0.5">
                     <Text className="text-[11px] text-slate-400">{total.toLocaleString()} items</Text>
                     <Flex alignItems="center" gap={1}>
-                        <PagBtn title="First" disabled={page <= 1} onClick={() => goTo(1)}>
+                        <PagBtn title={localizeWithFallback('octane.furni_editor.first', 'First')} disabled={page <= 1} onClick={() => goTo(1)}>
                             «
                         </PagBtn>
-                        <PagBtn title="Previous" disabled={page <= 1} onClick={() => goTo(page - 1)}>
+                        <PagBtn title={localizeWithFallback('octane.furni_editor.previous', 'Previous')} disabled={page <= 1} onClick={() => goTo(page - 1)}>
                             ‹
                         </PagBtn>
                         <Flex alignItems="center" gap={1} className="px-1 text-[11px] text-slate-500">
@@ -318,10 +319,10 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                             />
                             <span className="text-slate-400">/ {totalPages.toLocaleString()}</span>
                         </Flex>
-                        <PagBtn title="Next" disabled={page >= totalPages} onClick={() => goTo(page + 1)}>
+                        <PagBtn title={localizeWithFallback('octane.furni_editor.next', 'Next')} disabled={page >= totalPages} onClick={() => goTo(page + 1)}>
                             ›
                         </PagBtn>
-                        <PagBtn title="Last" disabled={page >= totalPages} onClick={() => goTo(totalPages)}>
+                        <PagBtn title={localizeWithFallback('octane.furni_editor.last', 'Last')} disabled={page >= totalPages} onClick={() => goTo(totalPages)}>
                             »
                         </PagBtn>
                     </Flex>

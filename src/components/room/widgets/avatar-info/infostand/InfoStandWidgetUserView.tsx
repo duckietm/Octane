@@ -209,7 +209,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
             <>
                 <div className={`octane-infostand pointer-events-auto z-30 profile-card-background ${infostandCardBackgroundClass}`}>
                     {borderId ? <Base className={`infostand-border ${infostandBorderClass}`} /> : null}
-                    <BaseButton type="button" className="octane-infostand__close" aria-label="Close" onClick={onClose} />
+                    <BaseButton type="button" className="octane-infostand__close" aria-label={localizeWithFallback('octane.room.close', 'Close')} onClick={onClose} />
                     <div className="octane-infostand__header">
                         <BaseButton
                             type="button"
@@ -247,7 +247,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                                 className="background-edit-icon background-edit-position"
                                 style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                                 onClick={handleEditClick}
-                                aria-label="Edit profile background"
+                                aria-label={localizeWithFallback('octane.room.edit_profile_background', 'Edit profile background')}
                             />
                         )}
                         <div className="octane-infostand__badges">

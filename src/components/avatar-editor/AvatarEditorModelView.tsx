@@ -1,6 +1,6 @@
 import { AvatarEditorFigureCategory, AvatarFigurePartType, FigureDataContainer } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { CreateLinkEvent, GetClubMemberLevel, IAvatarEditorCategory, LocalizeText } from '../../api';
+import { CreateLinkEvent, GetClubMemberLevel, IAvatarEditorCategory, LocalizeText, localizeWithFallback } from '../../api';
 import { LayoutCurrencyIcon } from '../../common';
 import { useAvatarEditor } from '../../hooks';
 import { AvatarEditorIcon } from './AvatarEditorIcon';
@@ -98,7 +98,7 @@ export const AvatarEditorModelView: FC<{
                     className={`octane-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
                     onClick={() => (hasHC ? setAdvancedColorMode((prev) => !prev) : CreateLinkEvent('habboUI/open/hccenter'))}
                 >
-                    Advanced Color
+                    {localizeWithFallback('octane.avatar_editor.advanced_color', 'Advanced Color')}
                     <LayoutCurrencyIcon type="hc" />
                 </BaseButton>
 

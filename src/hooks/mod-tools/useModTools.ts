@@ -13,7 +13,7 @@ import {
 } from '@octane/renderer';
 import { useCallback, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { NotificationAlertType, SendMessageComposer } from '../../api';
+import { NotificationAlertType, SendMessageComposer, localizeWithFallback } from '../../api';
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
 import { showModAlert } from './modAlertStore';
@@ -74,8 +74,8 @@ const useModToolsState = () => {
         if (parser.success) {
             if (parser.userId > 0) SendMessageComposer(new GetModeratorUserInfoMessageComposer(parser.userId));
 
-            simpleAlert?.('Moderation action was successful', NotificationAlertType.MODERATION, null, null, 'Success');
-        } else showModAlert('Moderation action failed. If you tried to ban a user, please check if the user is already banned.');
+            simpleAlert?.(localizeWithFallback('octane.mod_tools.moderation_action_was_successful', 'Moderation action was successful'), NotificationAlertType.MODERATION, null, null, 'Success');
+        } else showModAlert(localizeWithFallback('octane.mod_tools.moderation_action_failed_if_you_tried', 'Moderation action failed. If you tried to ban a user, please check if the user is already banned.'));
     });
 
     useMessageEvent<CfhTopicsInitEvent>(CfhTopicsInitEvent, (event) => {

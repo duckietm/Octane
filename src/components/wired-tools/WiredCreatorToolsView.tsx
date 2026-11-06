@@ -374,7 +374,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         if (localizedName && localizedName !== localizationKey) return localizedName;
 
-        return `Sign ${value}`;
+        return localizeWithFallback('octane.wired_tools.sign_value', 'Sign %value%', ['value'], [String(value)]);
     };
 
     const getDanceDisplayName = (value: number): string => {
@@ -385,7 +385,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         if (localizedName && localizedName !== localizationKey) return localizedName;
 
-        return `Dance ${value}`;
+        return localizeWithFallback('octane.wired_tools.dance_value', 'Dance %value%', ['value'], [String(value)]);
     };
 
     const getHandItemDisplayName = (value: number): string => {
@@ -396,7 +396,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         if (localizedName && localizedName !== localizationKey) return localizedName;
 
-        return `Item ${value}`;
+        return localizeWithFallback('octane.wired_tools.item_value', 'Item %value%', ['value'], [String(value)]);
     };
 
     const getEffectDisplayName = (value: number): string => {
@@ -407,7 +407,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         if (localizedName && localizedName !== localizationKey) return localizedName;
 
-        return `Effect ${value}`;
+        return localizeWithFallback('octane.wired_tools.effect_value', 'Effect %value%', ['value'], [String(value)]);
     };
 
     const getRoomEntryMethodNumericValue = (value: string): number => {
@@ -448,7 +448,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     };
 
     const getVariableAvailabilityLabel = (value: number, targetType: 'user' | 'furni' | 'global' | 'context'): string => {
-        if (targetType === 'context') return 'Current wired execution';
+        if (targetType === 'context') return localizeWithFallback('octane.wired_tools.current_wired_execution', 'Current wired execution');
         if (value === 11) return localizeWithFallback('wiredfurni.params.variables.availability.11', 'Permanent, shared between rooms');
         if (value === 10) return localizeWithFallback('wiredfurni.params.variables.availability.10', 'Permanent');
 
@@ -466,7 +466,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         if (localizedName && localizedName !== localizationKey) return localizedName;
 
-        return TEAM_COLOR_NAMES[value] ?? `Team ${value}`;
+        return TEAM_COLOR_NAMES[value] ?? localizeWithFallback('octane.wired_tools.team_value', 'Team %value%', ['value'], [String(value)]);
     };
 
     const getTeamTypeDisplayName = (value: number): string => {
@@ -1268,20 +1268,20 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             officialLine(key, fallbackLabel, wiredMonitorColor(amount, limit, thresholds), `${amount}/${limit}`, ['amount', 'limit'], [String(amount), String(limit)]);
         const yesNo = (value: boolean) => (value ? localizeWithFallback('wiredmenu.bool.yes', 'Yes') : localizeWithFallback('wiredmenu.bool.no', 'No'));
         const official = (usage: number, usageLimit: number, isHeavy: boolean, counters: ReturnType<typeof resolveMonitorRoomCounters>) => [
-            amountLine('wiredmenu.monitor.statistics.usage', 'Wired usage', usage, usageLimit, WIRED_MONITOR_THRESHOLDS.usage),
+            amountLine('wiredmenu.monitor.statistics.usage', localizeWithFallback('octane.wired_tools.wired_usage', 'Wired usage'), usage, usageLimit, WIRED_MONITOR_THRESHOLDS.usage),
             officialLine(
                 'wiredmenu.monitor.statistics.is_heavy',
-                'Is heavy',
+                localizeWithFallback('octane.wired_tools.is_heavy', 'Is heavy'),
                 isHeavy ? WIRED_MONITOR_COLOR.ORANGE : WIRED_MONITOR_COLOR.GREEN,
                 yesNo(isHeavy),
                 ['bool'],
                 [yesNo(isHeavy)]
             ),
-            amountLine('wiredmenu.monitor.statistics.floorfurni', 'Floor furni', counters.floorCount, counters.floorLimit, WIRED_MONITOR_THRESHOLDS.furni),
-            amountLine('wiredmenu.monitor.statistics.wallfurni', 'Wall furni', counters.wallCount, counters.wallLimit, WIRED_MONITOR_THRESHOLDS.furni),
+            amountLine('wiredmenu.monitor.statistics.floorfurni', localizeWithFallback('octane.wired_tools.floor_furni', 'Floor furni'), counters.floorCount, counters.floorLimit, WIRED_MONITOR_THRESHOLDS.furni),
+            amountLine('wiredmenu.monitor.statistics.wallfurni', localizeWithFallback('octane.wired_tools.wall_furni', 'Wall furni'), counters.wallCount, counters.wallLimit, WIRED_MONITOR_THRESHOLDS.furni),
             amountLine(
                 'wiredmenu.monitor.statistics.perm_furni_vars',
-                'Permanent furni vars',
+                localizeWithFallback('octane.wired_tools.permanent_furni_vars', 'Permanent furni vars'),
                 counters.permanentFurniVariables,
                 counters.permanentFurniVariablesLimit,
                 WIRED_MONITOR_THRESHOLDS.variables
@@ -1291,14 +1291,14 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 ? [
                       amountLine(
                           'wiredmenu.monitor.statistics.perm_user_vars',
-                          'Permanent user vars',
+                          localizeWithFallback('octane.wired_tools.permanent_user_vars', 'Permanent user vars'),
                           counters.permanentUserVariables,
                           counters.permanentUserVariablesLimit,
                           WIRED_MONITOR_THRESHOLDS.variables
                       ),
                       amountLine(
                           'wiredmenu.monitor.statistics.perm_global_vars',
-                          'Permanent global vars',
+                          localizeWithFallback('octane.wired_tools.permanent_global_vars', 'Permanent global vars'),
                           counters.permanentGlobalVariables,
                           counters.permanentGlobalVariablesLimit,
                           WIRED_MONITOR_THRESHOLDS.variables
@@ -1310,11 +1310,11 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         if (!roomSession) {
             return [
                 ...official(0, 0, false, monitorRoomStats),
-                { label: 'Delayed events', value: '0/0' },
-                { label: 'Average execution', value: '0ms' },
-                { label: 'Peak execution', value: '0ms' },
+                { label: localizeWithFallback('octane.wired_tools.delayed_events', 'Delayed events'), value: '0/0' },
+                { label: localizeWithFallback('octane.wired_tools.average_execution', 'Average execution'), value: '0ms' },
+                { label: localizeWithFallback('octane.wired_tools.peak_execution', 'Peak execution'), value: '0ms' },
                 { label: 'Recursion', value: '0/0' },
-                { label: 'Killed remaining', value: '0s' }
+                { label: localizeWithFallback('octane.wired_tools.killed_remaining', 'Killed remaining'), value: '0s' }
             ];
         }
 
@@ -1331,11 +1331,11 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 roomStats ? roomStats.isHeavy : monitorSnapshot.isHeavy,
                 monitorRoomStats
             ),
-            { label: 'Delayed events', value: delayedValue },
-            { label: 'Average execution', value: `${monitorSnapshot.averageExecutionMs}ms` },
-            { label: 'Peak execution', value: `${monitorSnapshot.peakExecutionMs}ms` },
+            { label: localizeWithFallback('octane.wired_tools.delayed_events', 'Delayed events'), value: delayedValue },
+            { label: localizeWithFallback('octane.wired_tools.average_execution', 'Average execution'), value: `${monitorSnapshot.averageExecutionMs}ms` },
+            { label: localizeWithFallback('octane.wired_tools.peak_execution', 'Peak execution'), value: `${monitorSnapshot.peakExecutionMs}ms` },
             { label: 'Recursion', value: `${monitorSnapshot.recursionDepthCurrent}/${Math.max(0, monitorSnapshot.recursionDepthLimit)}` },
-            { label: 'Killed remaining', value: `${Math.max(0, monitorSnapshot.killedRemainingSeconds)}s` }
+            { label: localizeWithFallback('octane.wired_tools.killed_remaining', 'Killed remaining'), value: `${Math.max(0, monitorSnapshot.killedRemainingSeconds)}s` }
         ];
     }, [roomSession, monitorRoomStats, monitorSnapshot]);
     // AIR's error list (15) in the server's order, with the latest detail of each row from our monitor packet (5101).
@@ -1366,15 +1366,15 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const monitorInfoSections = useMemo(() => {
         return [
             {
-                title: 'Wired usage',
+                title: localizeWithFallback('octane.wired_tools.wired_usage', 'Wired usage'),
                 lines: [
                     `Current value: ${monitorSnapshot.usageCurrentWindow}/${Math.max(0, monitorSnapshot.usageLimitPerWindow)}`,
                     `This is the room execution budget used inside a ${Math.max(0, monitorSnapshot.usageWindowMs)}ms server window.`,
-                    'Each triggered stack consumes cost based on conditions, selectors, effects, delayed effects, and recursion depth.'
+                    localizeWithFallback('octane.wired_tools.each_triggered_stack_consumes_cost_based', 'Each triggered stack consumes cost based on conditions, selectors, effects, delayed effects, and recursion depth.')
                 ]
             },
             {
-                title: 'Heavy / overload',
+                title: localizeWithFallback('octane.wired_tools.heavy_overload', 'Heavy / overload'),
                 lines: [
                     `Heavy warning starts when usage stays above ${Math.max(0, monitorSnapshot.heavyUsageThresholdPercent)}% for ${Math.max(0, monitorSnapshot.heavyConsecutiveWindowsThreshold)} consecutive window(s).`,
                     `Delayed pressure also contributes when the queue stays above ${Math.max(0, monitorSnapshot.heavyDelayedThresholdPercent)}% of its limit.`,
@@ -1382,15 +1382,15 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 ]
             },
             {
-                title: 'Execution times',
+                title: localizeWithFallback('octane.wired_tools.execution_times', 'Execution times'),
                 lines: [
                     `Average execution: ${monitorSnapshot.averageExecutionMs}ms (threshold ${Math.max(0, monitorSnapshot.overloadAverageThresholdMs)}ms)`,
                     `Peak execution: ${monitorSnapshot.peakExecutionMs}ms (threshold ${Math.max(0, monitorSnapshot.overloadPeakThresholdMs)}ms)`,
-                    'These values reset with each server usage window.'
+                    localizeWithFallback('octane.wired_tools.these_values_reset_with_each_server', 'These values reset with each server usage window.')
                 ]
             },
             {
-                title: 'Other numbers',
+                title: localizeWithFallback('octane.wired_tools.other_numbers', 'Other numbers'),
                 lines: [
                     `Delayed events: ${monitorSnapshot.delayedEventsPending}/${Math.max(0, monitorSnapshot.delayedEventsLimit)} pending scheduled execution(s).`,
                     `Recursion: ${monitorSnapshot.recursionDepthCurrent}/${Math.max(0, monitorSnapshot.recursionDepthLimit)} nested wired call(s).`,
@@ -1398,15 +1398,15 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 ]
             },
             {
-                title: 'Room counters',
+                title: localizeWithFallback('octane.wired_tools.room_counters', 'Room counters'),
                 lines: [
-                    `Floor furni: ${monitorRoomStats.floorCount}/${monitorRoomStats.floorLimit}`,
-                    `Wall furni: ${monitorRoomStats.wallCount}/${monitorRoomStats.wallLimit}`,
-                    `Permanent furni vars: ${monitorRoomStats.permanentFurniVariables}/${monitorRoomStats.permanentFurniVariablesLimit}`,
+                    localizeWithFallback('octane.wired_tools.floor_furni_floor_count_floor_limit', 'Floor furni: %floor_count%/%floor_limit%', ['floor_count', 'floor_limit'], [String(monitorRoomStats.floorCount), String(monitorRoomStats.floorLimit)]),
+                    localizeWithFallback('octane.wired_tools.wall_furni_wall_count_wall_limit', 'Wall furni: %wall_count%/%wall_limit%', ['wall_count', 'wall_limit'], [String(monitorRoomStats.wallCount), String(monitorRoomStats.wallLimit)]),
+                    localizeWithFallback('octane.wired_tools.permanent_furni_vars_permanent_furni_variables', 'Permanent furni vars: %permanent_furni_variables%/%permanent_furni_variables_limit%', ['permanent_furni_variables', 'permanent_furni_variables_limit'], [String(monitorRoomStats.permanentFurniVariables), String(monitorRoomStats.permanentFurniVariablesLimit)]),
                     ...(monitorRoomStats.hasVariableTotals
                         ? [
-                              `Permanent user vars: ${monitorRoomStats.permanentUserVariables}/${monitorRoomStats.permanentUserVariablesLimit}`,
-                              `Permanent global vars: ${monitorRoomStats.permanentGlobalVariables}/${monitorRoomStats.permanentGlobalVariablesLimit}`
+                              localizeWithFallback('octane.wired_tools.permanent_user_vars_permanent_user_variables', 'Permanent user vars: %permanent_user_variables%/%permanent_user_variables_limit%', ['permanent_user_variables', 'permanent_user_variables_limit'], [String(monitorRoomStats.permanentUserVariables), String(monitorRoomStats.permanentUserVariablesLimit)]),
+                              localizeWithFallback('octane.wired_tools.permanent_global_vars_permanent_global_variables', 'Permanent global vars: %permanent_global_variables%/%permanent_global_variables_limit%', ['permanent_global_variables', 'permanent_global_variables_limit'], [String(monitorRoomStats.permanentGlobalVariables), String(monitorRoomStats.permanentGlobalVariablesLimit)])
                           ]
                         : [])
                 ]
@@ -1915,7 +1915,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                         categoryLabel = 'Bot';
                         break;
                     case RoomObjectType.RENTABLE_BOT:
-                        categoryLabel = 'Rentable bot';
+                        categoryLabel = localizeWithFallback('octane.wired_tools.rentable_bot', 'Rentable bot');
                         break;
                     case RoomObjectType.PET:
                         categoryLabel = 'Pet';
@@ -1941,7 +1941,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                       : GetSessionDataManager().getFloorItemData(typeId);
 
                 return {
-                    categoryLabel: wallObject ? 'Wall furni' : 'Floor furni',
+                    categoryLabel: wallObject ? localizeWithFallback('octane.wired_tools.wall_furni', 'Wall furni') : localizeWithFallback('octane.wired_tools.floor_furni', 'Floor furni'),
                     entityName: furnitureData?.name || furnitureData?.className || entityName || `#${entityId}`
                 };
             }
@@ -2173,25 +2173,25 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const variableManageCategoryHeader = useMemo(() => {
         switch (variablesType) {
             case 'furni':
-                return 'Furni type';
+                return localizeWithFallback('octane.wired_tools.furni_type', 'Furni type');
             case 'global':
                 return 'Scope';
             case 'context':
-                return 'Execution scope';
+                return localizeWithFallback('octane.wired_tools.execution_scope', 'Execution scope');
             default:
-                return 'User type';
+                return localizeWithFallback('octane.wired_tools.user_type', 'User type');
         }
     }, [variablesType]);
     const managedHolderPanelTitle = useMemo(() => {
         switch (variablesType) {
             case 'furni':
-                return 'Manage Furni Variables';
+                return localizeWithFallback('octane.wired_tools.manage_furni_variables', 'Manage Furni Variables');
             case 'global':
-                return 'Manage Global Variables';
+                return localizeWithFallback('octane.wired_tools.manage_global_variables', 'Manage Global Variables');
             case 'context':
-                return 'Manage Context Variables';
+                return localizeWithFallback('octane.wired_tools.manage_context_variables', 'Manage Context Variables');
             default:
-                return 'Manage User Variables';
+                return localizeWithFallback('octane.wired_tools.manage_user_variables', 'Manage User Variables');
         }
     }, [variablesType]);
     const managedHolderInfoLines = useMemo(() => {
@@ -2200,12 +2200,12 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         if (variablesType === 'user') {
             const userData = findUserVariableHolderData(roomSession.userDataManager, selectedManagedVariableEntry.entityId);
             const holder = decodeUserVariableHolder(selectedManagedVariableEntry.entityId);
-            const idLabel = holder?.kind === 'pet' ? 'Pet id' : holder?.kind === 'bot' ? 'Bot id' : 'User id';
+            const idLabel = holder?.kind === 'pet' ? localizeWithFallback('octane.wired_tools.pet_id', 'Pet id') : holder?.kind === 'bot' ? localizeWithFallback('octane.wired_tools.bot_id', 'Bot id') : localizeWithFallback('octane.wired_tools.user_id', 'User id');
 
             return [
                 `${variableManageCategoryHeader}: ${selectedManagedVariableEntry.categoryLabel}`,
-                `Name: ${selectedManagedVariableEntry.entityName}`,
-                ...(holder?.kind !== 'user' && userData?.ownerName ? [`Owner: ${userData.ownerName}`] : []),
+                localizeWithFallback('octane.wired_tools.name_entity_name', 'Name: %entity_name%', ['entity_name'], [String(selectedManagedVariableEntry.entityName)]),
+                ...(holder?.kind !== 'user' && userData?.ownerName ? [localizeWithFallback('octane.wired_tools.owner_owner_name', 'Owner: %owner_name%', ['owner_name'], [String(userData.ownerName)])] : []),
                 `${idLabel}: ${holder?.id ?? selectedManagedVariableEntry.entityId}`,
                 ...(userData?.type === RoomObjectType.PET ? [`Pet level: ${Number(userData.petLevel ?? 0)}`] : [])
             ];
@@ -2220,32 +2220,32 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
             return [
                 `${variableManageCategoryHeader}: ${selectedManagedVariableEntry.categoryLabel}`,
-                `Name: ${selectedManagedVariableEntry.entityName}`,
-                ...(owner ? [`Owner: ${owner}`] : []),
-                `Furni id: ${selectedManagedVariableEntry.entityId}`
+                localizeWithFallback('octane.wired_tools.name_entity_name', 'Name: %entity_name%', ['entity_name'], [String(selectedManagedVariableEntry.entityName)]),
+                ...(owner ? [localizeWithFallback('octane.wired_tools.owner_owner', 'Owner: %owner%', ['owner'], [String(owner)])] : []),
+                localizeWithFallback('octane.wired_tools.furni_id_entity_id', 'Furni id: %entity_id%', ['entity_id'], [String(selectedManagedVariableEntry.entityId)])
             ];
         }
 
         if (variablesType === 'context') {
             return [
                 `${variableManageCategoryHeader}: Current execution`,
-                `Name: ${selectedManagedVariableEntry.entityName}`,
-                `Context id: ${selectedManagedVariableEntry.entityId}`
+                localizeWithFallback('octane.wired_tools.name_entity_name', 'Name: %entity_name%', ['entity_name'], [String(selectedManagedVariableEntry.entityName)]),
+                localizeWithFallback('octane.wired_tools.context_id_entity_id', 'Context id: %entity_id%', ['entity_id'], [String(selectedManagedVariableEntry.entityId)])
             ];
         }
 
-        return [`${variableManageCategoryHeader}: Room`, `Name: Room #${roomSession.roomId}`, `Room id: ${roomSession.roomId}`];
+        return [`${variableManageCategoryHeader}: Room`, localizeWithFallback('octane.wired_tools.name_room_room_id', 'Name: Room #%room_id%', ['room_id'], [String(roomSession.roomId)]), localizeWithFallback('octane.wired_tools.room_id_room_id', 'Room id: %room_id%', ['room_id'], [String(roomSession.roomId)])];
     }, [selectedManagedVariableEntry, roomSession, variablesType, variableManageCategoryHeader]);
     const managedHolderWarningText = useMemo(() => {
         switch (variablesType) {
             case 'furni':
-                return 'Use this tool only for furni that are currently loaded in the room. Reload the panel after major room changes.';
+                return localizeWithFallback('octane.wired_tools.use_this_tool_only_for_furni', 'Use this tool only for furni that are currently loaded in the room. Reload the panel after major room changes.');
             case 'global':
-                return 'Global variables are room-scoped. Only the latest update time is tracked for these values.';
+                return localizeWithFallback('octane.wired_tools.global_variables_are_room_scoped_only', 'Global variables are room-scoped. Only the latest update time is tracked for these values.');
             case 'context':
-                return 'Context variables only live inside the current wired execution. They are shared through the signal chain until a branch overrides them.';
+                return localizeWithFallback('octane.wired_tools.context_variables_only_live_inside_the', 'Context variables only live inside the current wired execution. They are shared through the signal chain until a branch overrides them.');
             default:
-                return 'Do not use this tool for users who are currently in the room/using the changed variable in another room.';
+                return localizeWithFallback('octane.wired_tools.do_not_use_this_tool_for', 'Do not use this tool for users who are currently in the room/using the changed variable in another room.');
         }
     }, [variablesType]);
     const managedHolderUserData = useMemo(() => {
@@ -3278,7 +3278,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                         <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.monitor.history.title', 'Wired Monitor Logs')} onCloseClick={() => setIsMonitorHistoryOpen(false)} />
                         <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
                             <div className="flex flex-wrap items-center gap-2 text-[12px]">
-                                <span className="text-[#555]">Severity:</span>
+                                <span className="text-[#555]">{localizeWithFallback('octane.wired_tools.severity', 'Severity:')}</span>
                                 {['ALL', 'WARNING', 'ERROR'].map((severity) => (
                                     <BaseButton
                                         key={severity}
@@ -3289,7 +3289,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                         {severity}
                                     </BaseButton>
                                 ))}
-                                <span className="ml-2 text-[#555]">Type:</span>
+                                <span className="ml-2 text-[#555]">{localizeWithFallback('octane.wired_tools.type', 'Type:')}</span>
                                 <Select
                                     className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
                                     value={monitorHistoryTypeFilter}
@@ -3306,18 +3306,18 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                 <table className="w-full text-[12px]">
                                     <thead className="bg-[#efede5] sticky top-0">
                                         <tr>
-                                            <th className="text-left px-2 py-1">Type</th>
-                                            <th className="text-left px-2 py-1">Severity</th>
-                                            <th className="text-left px-2 py-1">Trigger</th>
-                                            <th className="text-left px-2 py-1">Motivation</th>
-                                            <th className="text-left px-2 py-1">Occurred at</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.type_2', 'Type')}</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.severity_2', 'Severity')}</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.trigger', 'Trigger')}</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.motivation', 'Motivation')}</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.occurred_at', 'Occurred at')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {!filteredMonitorHistoryRows.length && (
                                             <tr>
                                                 <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={5}>
-                                                    No log history for the current filters
+                                                    {localizeWithFallback('octane.wired_tools.no_log_history_for_the_current', 'No log history for the current filters')}
                                                 </td>
                                             </tr>
                                         )}
@@ -3416,12 +3416,12 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                     </>
                                 )}
                                 {variablesType === 'global' && (
-                                    <img alt="Global placeholder" className="max-w-full max-h-full object-contain p-3" src={wiredGlobalPlaceholderImage} />
+                                    <img alt={localizeWithFallback('octane.wired_tools.global_placeholder', 'Global placeholder')} className="max-w-full max-h-full object-contain p-3" src={wiredGlobalPlaceholderImage} />
                                 )}
                             </>
                         }
                         infoLines={managedHolderInfoLines}
-                        variablesTitle={variablesType === 'global' ? 'Room variables:' : 'Assigned variables:'}
+                        variablesTitle={variablesType === 'global' ? localizeWithFallback('octane.wired_tools.room_variables', 'Room variables:') : localizeWithFallback('octane.wired_tools.assigned_variables', 'Assigned variables:')}
                         entries={managedHolderVariableEntries.map((entry) => ({
                             id: String(entry.variableItemId),
                             name: entry.name,
@@ -3488,24 +3488,24 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                             {!!selectedMonitorLogDetails && (
                                 <div className="rounded border border-[#d8d2c3] bg-white/60 p-3 flex flex-col gap-1">
                                     <Text>
-                                        <b>Trigger:</b> {selectedMonitorDetailSource}
+                                        <b>{localizeWithFallback('octane.wired_tools.trigger_2', 'Trigger:')}</b> {selectedMonitorDetailSource}
                                     </Text>
                                     <Text>
-                                        <b>Motivation:</b> {selectedMonitorLogDetails.reason}
+                                        <b>{localizeWithFallback('octane.wired_tools.motivation_2', 'Motivation:')}</b> {selectedMonitorLogDetails.reason}
                                     </Text>
                                     {!!selectedMonitorLogDetails.amount && (
                                         <Text>
-                                            <b>Amount:</b> {selectedMonitorLogDetails.amount}
+                                            <b>{localizeWithFallback('octane.wired_tools.amount_2', 'Amount:')}</b> {selectedMonitorLogDetails.amount}
                                         </Text>
                                     )}
                                     {!!selectedMonitorLogDetails.latest && (
                                         <Text>
-                                            <b>Latest occurrence:</b> {selectedMonitorLogDetails.latest}
+                                            <b>{localizeWithFallback('octane.wired_tools.latest_occurrence', 'Latest occurrence:')}</b> {selectedMonitorLogDetails.latest}
                                         </Text>
                                     )}
                                     {!!selectedMonitorLogDetails.occurredAt && (
                                         <Text>
-                                            <b>Occurred at:</b> {selectedMonitorLogDetails.occurredAt}
+                                            <b>{localizeWithFallback('octane.wired_tools.occurred_at_2', 'Occurred at:')}</b> {selectedMonitorLogDetails.occurredAt}
                                         </Text>
                                     )}
                                 </div>

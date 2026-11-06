@@ -15,7 +15,7 @@ import {
     UpdateFloorPropertiesMessageComposer
 } from '@octane/renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
-import { LocalizeText, SendMessageComposer } from '../../api';
+import { LocalizeText, SendMessageComposer, localizeWithFallback } from '../../api';
 import { Base, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { useMessageEvent, useOctaneEvent } from '../../hooks';
 import { isTextEntryTarget } from '../../hooks/rooms/useRoomKeyboardMovement';
@@ -284,7 +284,7 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
                                 <div className="fp-banner">
                                     <span className="fp-banner-logo" />
                                     <span className="fp-banner-text">
-                                        {localizeOr('floor.plan.editor.subtitle', 'Edit the floor plan of your room to build more complex rooms and games.')}
+                                        {localizeOr('floor.plan.editor.subtitle', localizeWithFallback('octane.floorplan_editor.edit_the_floor_plan_of_your', 'Edit the floor plan of your room to build more complex rooms and games.'))}
                                     </span>
                                     {!isExternal && (
                                         <div className="fp-banner-toggles">
@@ -294,10 +294,10 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
                                                 data-active={liveSync ? 'true' : 'false'}
                                                 className={`fp-toggle ${liveSync ? 'is-on' : ''}`}
                                                 onClick={() => setLiveSync((v) => !v)}
-                                                title="Local in-room preview while drawing (does not save to server)"
+                                                title={localizeWithFallback('octane.floorplan_editor.local_in_room_preview_while_drawing', 'Local in-room preview while drawing (does not save to server)')}
                                             >
                                                 <span className="fp-toggle-dot" />
-                                                {liveSync ? 'Live preview ON' : 'Live preview OFF'}
+                                                {liveSync ? localizeWithFallback('octane.floorplan_editor.live_preview_on', 'Live preview ON') : localizeWithFallback('octane.floorplan_editor.live_preview_off', 'Live preview OFF')}
                                             </Base>
                                             <Base component={BaseButton} type="button"
                                                 pointer
@@ -305,10 +305,10 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
                                                 data-active={state.pickUpBlocking ? 'true' : 'false'}
                                                 className={`fp-toggle is-warm ${state.pickUpBlocking ? 'is-on' : ''}`}
                                                 onClick={() => dispatch({ type: 'SET_PICK_UP_BLOCKING', value: !state.pickUpBlocking })}
-                                                title="On save: pick up furniture blocking the new floor plan and return it to its owner's inventory"
+                                                title={localizeWithFallback('octane.floorplan_editor.on_save_pick_up_furniture_blocking', 'On save: pick up furniture blocking the new floor plan and return it to its owner\'s inventory')}
                                             >
                                                 <span className="fp-toggle-dot" />
-                                                {state.pickUpBlocking ? 'Pick up blocking furni ON' : 'Pick up blocking furni OFF'}
+                                                {state.pickUpBlocking ? localizeWithFallback('octane.floorplan_editor.pick_up_blocking_furni_on', 'Pick up blocking furni ON') : localizeWithFallback('octane.floorplan_editor.pick_up_blocking_furni_off', 'Pick up blocking furni OFF')}
                                             </Base>
                                         </div>
                                     )}
@@ -327,14 +327,14 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
                                             includeDoor={!isExternal}
                                         />
                                         <div className="fp-panel-head">
-                                            <span className="fp-panel-title">{localizeOr('floor.plan.editor.tile.height', 'Set height')}</span>
-                                            <Hint content="Brush height">
-                                                <div aria-label={`Brush height ${state.brush.h}`} className="fp-badge is-brush" data-testid="brush-height-badge" role="img">
+                                            <span className="fp-panel-title">{localizeOr('floor.plan.editor.tile.height', localizeWithFallback('octane.floorplan_editor.set_height', 'Set height'))}</span>
+                                            <Hint content={localizeWithFallback('octane.floorplan_editor.brush_height', 'Brush height')}>
+                                                <div aria-label={localizeWithFallback('octane.floorplan_editor.brush_height_h', 'Brush height %h%', ['h'], [String(state.brush.h)])} className="fp-badge is-brush" data-testid="brush-height-badge" role="img">
                                                     {state.brush.h}
                                                 </div>
                                             </Hint>
                                             <span className="fp-panel-info" data-testid="floorplan-area">
-                                                {localizeOr('floor.plan.editor.area', `Area: ${area.total} (${area.walkable} tiles)`, ['total', 'walkable'], [String(area.total), String(area.walkable)])}
+                                                {localizeOr('floor.plan.editor.area', localizeWithFallback('octane.floorplan_editor.area_total_walkable_tiles', 'Area: %total% (%walkable% tiles)', ['total', 'walkable'], [String(area.total), String(area.walkable)]), ['total', 'walkable'], [String(area.total), String(area.walkable)])}
                                             </span>
                                         </div>
                                         <FloorplanHeightPicker selectedH={state.brush.h} onSelect={(h) => dispatch({ type: 'BRUSH_SET', h })} />
@@ -350,8 +350,8 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
                                         )}
                                         <div className="fp-panel-head">
                                             <span className="fp-panel-title">{LocalizeText('floor.editor.wall.height')}</span>
-                                            <Hint content="Wall height">
-                                                <div aria-label={`Wall height ${state.wallHeight}`} className="fp-badge" data-testid="wall-height-badge" role="img">
+                                            <Hint content={localizeWithFallback('octane.floorplan_editor.wall_height', 'Wall height')}>
+                                                <div aria-label={localizeWithFallback('octane.floorplan_editor.wall_height_wall_height', 'Wall height %wall_height%', ['wall_height'], [String(state.wallHeight)])} className="fp-badge" data-testid="wall-height-badge" role="img">
                                                     {state.wallHeight}
                                                 </div>
                                             </Hint>

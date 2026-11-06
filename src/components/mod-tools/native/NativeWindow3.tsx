@@ -10,6 +10,7 @@ import '../../../css/mod-tools/NativeWindow3.css';
 import { parseNativeSkin } from './NativeSkin';
 import { NativeSkinView } from './NativeSkinView';
 import { BaseButton } from '../../../common/BaseButton';
+import { localizeWithFallback } from '../../../api';
 
 // Window-manager style 3 (the Ubuntu skin): frame_3 coloured 0xff418db0, close button, shiny thick button, Ubuntu text styles.
 const SKINS = { frame: parseNativeSkin(frameXml), close: parseNativeSkin(closeXml), thick: parseNativeSkin(thickXml), shiny: parseNativeSkin(shinyXml) };
@@ -49,7 +50,7 @@ export const Native3Frame: FC<Native3FrameProps> = ({ width, height, title, onCl
                 <NativeText background={color === FRAME3_COLOR ? FRAME3_TITLE_COLOR : titleColorFor(color)} overrides={{ color: 0xffffff }} text={title} textStyle="u_frame_title" />
             </div>
             <BaseButton
-                aria-label="Close"
+                aria-label={localizeWithFallback('octane.mod_tools.close', 'Close')}
                 className="native3-close"
                 type="button"
                 style={rect(width - 29, 8, 19, 20)}

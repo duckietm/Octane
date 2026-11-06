@@ -55,7 +55,7 @@ export const WiredMonitorTabView = (props: WiredMonitorTabViewProps) => {
                         ))}
                     </div>
                     <div className="min-h-[140px] flex items-center justify-center px-4">
-                        <img alt="Monitor preview" className="max-w-full max-h-[180px] object-contain" src={wiredMonitorImage} />
+                        <img alt={localizeWithFallback('octane.wired_tools.monitor_preview', 'Monitor preview')} className="max-w-full max-h-[180px] object-contain" src={wiredMonitorImage} />
                     </div>
                 </div>
                 <div className="bg-white rounded border border-[#b9b3a5] p-2 flex flex-col gap-2">

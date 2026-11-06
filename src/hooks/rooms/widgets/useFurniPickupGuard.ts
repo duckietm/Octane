@@ -52,13 +52,13 @@ export const useFurniPickupGuard = () => {
             showConfirm(
                 localizeText(
                     'wiredfurni.web_api.pickup.body',
-                    'Are you sure you want to pick up this add-on? The Web API will stop working for this room, and the keys will be different when placing it again.'
+                    localizeWithFallback('octane.rooms.are_you_sure_you_want_to', 'Are you sure you want to pick up this add-on? The Web API will stop working for this room, and the keys will be different when placing it again.')
                 ),
                 proceed,
                 null,
                 null,
                 null,
-                localizeText('wiredfurni.web_api.pickup.title', 'Removing a Web API Add-On')
+                localizeText('wiredfurni.web_api.pickup.title', localizeWithFallback('octane.rooms.removing_a_web_api_add_on', 'Removing a Web API Add-On'))
             );
         },
         [showConfirm]
@@ -83,7 +83,7 @@ export const useFurniPickupGuard = () => {
             showConfirm(
                 localizeText(
                     'room.confirm.not_in_warehouse',
-                    'This furni is not in the Builders Club warehouse. If you pick it up you cannot place it again. Continue?'
+                    localizeWithFallback('octane.rooms.this_furni_is_not_in_the', 'This furni is not in the Builders Club warehouse. If you pick it up you cannot place it again. Continue?')
                 ),
                 pickup,
                 null,

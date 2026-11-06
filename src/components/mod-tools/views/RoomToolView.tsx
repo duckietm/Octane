@@ -142,7 +142,7 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
         if (sentRef.current || flatId === 0) return;
 
         if (isPlaceholder || message === '') {
-            showModAlert('You must input a message to the user');
+            showModAlert(localizeWithFallback('octane.mod_tools.you_must_input_a_message_to', 'You must input a message to the user'));
 
             return;
         }
@@ -177,7 +177,7 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
                                         {hasDesc && <Native0Text color={0x808080} text={data.room.desc} wrap width={220} x={0} y={nameHeight} onSize={(size) => setDescHeight(size.height)} />}
                                         {tags.length > 0 && (
                                             <div style={{ position: 'absolute', left: 0, top: nameHeight + (hasDesc ? descHeight : 0) }}>
-                                                <Native0Text bold text="Tags:" width={40} x={0} y={0} />
+                                                <Native0Text bold text={localizeWithFallback('octane.mod_tools.tags', 'Tags:')} width={40} x={0} y={0} />
                                                 <Native0Text bold text={tags.join(', ')} wrap width={178} x={39} y={0} onSize={(size) => setTagsHeight(size.height)} />
                                             </div>
                                         )}
@@ -186,19 +186,19 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
                             </Native0Border>
                         )}
                         <Native0Border {...info} y={row.info}>
-                            <Native0Text bold text="Room owner:" width={80} x={5} y={2} />
-                            <Native0Text bold text="Users in room:" width={90} x={5} y={15} />
-                            <Native0Text bold text="Owner in room:" width={90} x={5} y={28} />
-                            <Native0Text bold text="Has event:" width={90} x={5} y={41} />
+                            <Native0Text bold text={localizeWithFallback('octane.mod_tools.room_owner', 'Room owner:')} width={80} x={5} y={2} />
+                            <Native0Text bold text={localizeWithFallback('octane.mod_tools.users_in_room', 'Users in room:')} width={90} x={5} y={15} />
+                            <Native0Text bold text={localizeWithFallback('octane.mod_tools.owner_in_room', 'Owner in room:')} width={90} x={5} y={28} />
+                            <Native0Text bold text={localizeWithFallback('octane.mod_tools.has_event', 'Has event:')} width={90} x={5} y={41} />
                             <Native0Text text={data ? data.ownerName : 'sulka'} underline width={71} x={85} y={2} onClick={data ? () => onOpenUserInfo(data.ownerId) : undefined} />
                             <Native0Text text={data ? `${data.userCount}` : '18'} width={40} x={100} y={15} />
                             <Native0Text text={data ? (data.ownerInRoom ? 'Yes' : 'No') : 'yes'} width={40} x={100} y={28} />
                             <Native0Text text="no" width={40} x={100} y={41} />
-                            <Native0Button height={21} label="Enter room" width={70} x={155} y={4} onClick={() => data && TryVisitRoom(data.flatId)} />
-                            <Native0Button enabled={settings.chatlogsPermission} height={21} label="Chatlog" width={70} x={155} y={26} onClick={() => data && onOpenChatlog(data.flatId)} />
+                            <Native0Button height={21} label={localizeWithFallback('octane.mod_tools.enter_room', 'Enter room')} width={70} x={155} y={4} onClick={() => data && TryVisitRoom(data.flatId)} />
+                            <Native0Button enabled={settings.chatlogsPermission} height={21} label={localizeWithFallback('octane.mod_tools.chatlog', 'Chatlog')} width={70} x={155} y={26} onClick={() => data && onOpenChatlog(data.flatId)} />
                             <Native0Button
                                 height={21}
-                                label="Edit in HK"
+                                label={localizeWithFallback('octane.mod_tools.edit_in_hk', 'Edit in HK')}
                                 width={70}
                                 x={155}
                                 y={48}
@@ -240,8 +240,8 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
                             }}
                         />
                         <div style={{ position: 'absolute', left: 0, top: row.footer }}>
-                            <Native0Button enabled={canAct} height={21} label="Send Caution" width={97} x={0} y={0} onClick={() => send(true)} />
-                            <Native0Button enabled={canAct} height={21} label="Send message" width={97} x={131} y={0} onClick={() => send(false)} />
+                            <Native0Button enabled={canAct} height={21} label={localizeWithFallback('octane.mod_tools.send_caution', 'Send Caution')} width={97} x={0} y={0} onClick={() => send(true)} />
+                            <Native0Button enabled={canAct} height={21} label={localizeWithFallback('octane.mod_tools.send_message', 'Send message')} width={97} x={131} y={0} onClick={() => send(false)} />
                         </div>
                         <Native0Dropmenu
                             caption={selectedTemplate >= 0 ? templates[selectedTemplate] : menuCaption}

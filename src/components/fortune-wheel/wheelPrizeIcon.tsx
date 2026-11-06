@@ -1,58 +1,50 @@
 import { GetRoomEngine, IWheelPrize } from '@octane/renderer';
 import { ReactNode } from 'react';
-import { Column, LayoutBadgeImageView, LayoutCurrencyIcon, LayoutImage } from '../../common';
+import { LayoutBadgeImageView, LayoutCurrencyIcon, LayoutImage } from '../../common';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 // Shared prize-icon renderer used both on the wheel slices (small) and in the
 // win-reveal overlay (large). Keeping it in one place means the two stay
-// visually consistent when prize types change.
+// visually consistent when prize types change. The look lives in FortuneWheelView.css.
 export const renderPrizeIcon = (prize: IWheelPrize, large = false): ReactNode => {
-    const imageClass = large ? 'h-20 w-20' : 'h-9 w-9';
-    const amountClass = large ? 'text-xl font-bold text-[#2a3a42]' : 'text-[10px] font-bold text-[#2a3a42]';
+    const size = large ? 'is-large' : 'is-small';
 
     switch (prize.type) {
         case 'item':
             return (
                 <NativeTextTree>
-                    <LayoutImage
-                        imageUrl={GetRoomEngine().getFurnitureFloorIconUrl(prize.spriteId)}
-                        className={`${imageClass} bg-contain bg-center bg-no-repeat`}
-                    />
+                    <LayoutImage imageUrl={GetRoomEngine().getFurnitureFloorIconUrl(prize.spriteId)} className={`wheel-prize-furni ${size}`} />
                 </NativeTextTree>
             );
         case 'badge':
             return (
                 <NativeTextTree>
-                    <div className={large ? 'scale-[1.8]' : ''}>
+                    <div className={`wheel-prize-badge ${size}`}>
                         <LayoutBadgeImageView badgeCode={prize.badgeCode} />
                     </div>
                 </NativeTextTree>
             );
         case 'credits':
-            return (
-                <NativeTextTree>
-                    <Column alignItems="center" gap={0}>
-                        <div className={large ? 'scale-150' : ''}>
-                            <LayoutCurrencyIcon type={-1} />
-                        </div>
-                        <span className={amountClass}>{prize.amount}</span>
-                    </Column>
-                </NativeTextTree>
-            );
         case 'points':
             return (
                 <NativeTextTree>
-                    <Column alignItems="center" gap={0}>
-                        <div className={large ? 'scale-150' : ''}>
-                            <LayoutCurrencyIcon type={prize.pointsType} />
-                        </div>
-                        <span className={amountClass}>{prize.amount}</span>
-                    </Column>
+                    <div className={`wheel-prize-currency ${size}`}>
+                        <LayoutCurrencyIcon type={prize.type === 'credits' ? -1 : prize.pointsType} classNames={['wheel-prize-currency-icon']} />
+                        <span className="wheel-prize-amount">{prize.amount}</span>
+                    </div>
                 </NativeTextTree>
             );
         case 'spin':
-            return <span className={large ? 'text-2xl font-bold text-[#2a3a42]' : 'text-xs font-bold text-[#2a3a42]'}>+{prize.amount}</span>;
+            return (
+                <NativeTextTree>
+                    <div className={`wheel-prize-spin ${size}`}>
+                        <span className="wheel-prize-spin-icon" />
+                        <span className="wheel-prize-amount">+{prize.amount}</span>
+                    </div>
+                </NativeTextTree>
+            );
         default:
-            return <span className={large ? 'text-2xl font-bold text-[#2a3a42]/60' : 'text-xs font-bold text-[#2a3a42]/60'}>—</span>;
+            // The empty slice: a plain mark, not a text glyph (the pixel font has no dash and drew a note instead).
+            return <span className={`wheel-prize-nothing ${size}`} aria-hidden="true" />;
     }
 };

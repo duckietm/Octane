@@ -9,6 +9,7 @@ import { lineQueryFor } from './furniEditorSuggestions';
 import { BaseButton } from '../../common/BaseButton';
 import '../../css/furni-editor/FurniEditorAirText.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../api';
 
 const TAB_SEARCH = 0;
 const TAB_EDIT = 1;
@@ -140,20 +141,20 @@ export const FurniEditorView: FC<{}> = () => {
     return (
         <NativeTextTree>
             <OctaneCardView uniqueKey="furni-editor" className="octane-furni-editor w-[780px] h-[600px] min-w-[720px] min-h-[560px]">
-                <OctaneCardHeaderView headerText="Furni Editor" onCloseClick={handleClose} />
+                <OctaneCardHeaderView headerText={localizeWithFallback('octane.furni_editor.furni_editor', 'Furni Editor')} onCloseClick={handleClose} />
                 <OctaneCardTabsView>
                     <OctaneCardTabsItemView isActive={activeTab === TAB_SEARCH} onClick={() => setActiveTab(TAB_SEARCH)}>
-                        Search
+                        {localizeWithFallback('octane.furni_editor.search', 'Search')}
                     </OctaneCardTabsItemView>
                     <OctaneCardTabsItemView isActive={activeTab === TAB_EDIT} onClick={() => selectedItem && setActiveTab(TAB_EDIT)}>
-                        Edit
+                        {localizeWithFallback('octane.furni_editor.edit', 'Edit')}
                     </OctaneCardTabsItemView>
                 </OctaneCardTabsView>
                 <OctaneCardContentView>
                     {error && (
                         <div className="bg-[#f8d7da] border border-[#f5c6cb] rounded p-2 text-[#721c24] text-xs mb-1 flex justify-between items-center">
                             <span>{error}</span>
-                            <BaseButton aria-label="dismiss error" className="cursor-pointer font-bold" onClick={clearError}>
+                            <BaseButton aria-label={localizeWithFallback('octane.furni_editor.dismiss_error', 'dismiss error')} className="cursor-pointer font-bold" onClick={clearError}>
                                 x
                             </BaseButton>
                         </div>

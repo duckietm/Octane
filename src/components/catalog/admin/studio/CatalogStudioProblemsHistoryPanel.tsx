@@ -4,6 +4,7 @@ import { FaChevronDown, FaChevronRight, FaExclamationTriangle, FaHistory, FaSync
 import { CatalogStudioHistoryGroup, CatalogStudioValidationIssue } from './CatalogStudioTypes';
 import { InlineDialog } from '../../../../common/InlineDialog';
 import { BaseButton } from '../../../../common/BaseButton';
+import { localizeWithFallback } from '../../../../api';
 
 interface CatalogStudioProblemsHistoryPanelProps {
     issues: CatalogStudioValidationIssue[];
@@ -87,7 +88,7 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
     return <div className="octane-catalog-admin-publish">
         <div className="octane-catalog-admin-validation-list">
             <div className="octane-catalog-admin-publish-changes-head">
-                Current catalog problems
+                {localizeWithFallback('octane.catalog.current_catalog_problems', 'Current catalog problems')}
                 <span className="octane-catalog-admin-validation-meta">
                     {checkedAt ? `checked at ${formatTime(checkedAt)}` : 'not checked yet'}
                     {revalidate && <BaseButton
@@ -95,13 +96,13 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
                         type="button"
                         disabled={loading}
                         onClick={revalidate}
-                        aria-label="Check the catalog again"
+                        aria-label={localizeWithFallback('octane.catalog.check_the_catalog_again', 'Check the catalog again')}
                     >
-                        <FaSyncAlt /> Recheck
+                        <FaSyncAlt /> {localizeWithFallback('octane.catalog.recheck', 'Recheck')}
                     </BaseButton>}
                 </span>
             </div>
-            {!issues.length && <div className="octane-catalog-admin-placeholder is-small">No structural problems found.</div>}
+            {!issues.length && <div className="octane-catalog-admin-placeholder is-small">{localizeWithFallback('octane.catalog.no_structural_problems_found', 'No structural problems found.')}</div>}
             {ruleGroups.map(group => {
                 const isOpen = expandedRules.includes(group.code);
 
@@ -134,8 +135,8 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
         </div>
 
         <div className="octane-catalog-admin-publish-changes">
-            <div className="octane-catalog-admin-publish-changes-head"><FaHistory /> Live operation history</div>
-            {!history.length && <div className="octane-catalog-admin-placeholder is-small">No recorded operations.</div>}
+            <div className="octane-catalog-admin-publish-changes-head"><FaHistory /> {localizeWithFallback('octane.catalog.live_operation_history', 'Live operation history')}</div>
+            {!history.length && <div className="octane-catalog-admin-placeholder is-small">{localizeWithFallback('octane.catalog.no_recorded_operations', 'No recorded operations.')}</div>}
             {history.map(group => <div key={group.id} className="octane-catalog-admin-history-row">
                 <div className="octane-catalog-admin-history-main">
                     <strong>{group.summary}</strong>
@@ -144,23 +145,23 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
                 <BaseButton
                     className="octane-catalog-admin-btn is-small"
                     disabled={loading}
-                    aria-label={`Undo ${group.summary}`}
+                    aria-label={localizeWithFallback('octane.catalog.undo_summary', 'Undo %summary%', ['summary'], [String(group.summary)])}
                     onClick={() => setUndoCandidate(group)}
                 >
-                    <FaUndo /> Undo
+                    <FaUndo /> {localizeWithFallback('octane.catalog.undo', 'Undo')}
                 </BaseButton>
             </div>)}
         </div>
 
-        {undoCandidate && <InlineDialog className="octane-catalog-admin-publish-confirmation" aria-modal="true" aria-label="Confirm operation undo" onClose={() => setUndoCandidate(null)}>
+        {undoCandidate && <InlineDialog className="octane-catalog-admin-publish-confirmation" aria-modal="true" aria-label={localizeWithFallback('octane.catalog.confirm_operation_undo', 'Confirm operation undo')} onClose={() => setUndoCandidate(null)}>
             <FaUndo />
             <div>
                 <strong>Undo &ldquo;{undoCandidate.summary}&rdquo;?</strong>
-                <span>The complete live operation will be reversed and recorded in history.</span>
+                <span>{localizeWithFallback('octane.catalog.the_complete_live_operation_will_be', 'The complete live operation will be reversed and recorded in history.')}</span>
             </div>
             <div className="octane-catalog-admin-publish-actions">
-                <BaseButton className="octane-catalog-admin-btn" onClick={() => setUndoCandidate(null)}>Cancel</BaseButton>
-                <BaseButton className="octane-catalog-admin-btn is-publish" onClick={undoNow}>Undo operation</BaseButton>
+                <BaseButton className="octane-catalog-admin-btn" onClick={() => setUndoCandidate(null)}>{localizeWithFallback('octane.catalog.cancel', 'Cancel')}</BaseButton>
+                <BaseButton className="octane-catalog-admin-btn is-publish" onClick={undoNow}>{localizeWithFallback('octane.catalog.undo_operation', 'Undo operation')}</BaseButton>
             </div>
         </InlineDialog>}
     </div>;

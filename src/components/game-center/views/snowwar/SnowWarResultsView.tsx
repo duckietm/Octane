@@ -183,7 +183,7 @@ export const SnowWarResultsView: FC = () => {
                             stroke={headline.color}
                             text={headline.type === 'tie'
                                 ? localizeWithFallback('snowwar.result.tie', 'Game Was A Tie!')
-                                : localizeWithFallback(headline.textKey, headline.textKey === 'snowwar.team_1_wins' ? 'Blue Team wins!' : 'Red Team wins!')} />
+                                : localizeWithFallback(headline.textKey, headline.textKey === 'snowwar.team_1_wins' ? localizeWithFallback('octane.game_center.blue_team_wins', 'Blue Team wins!') : localizeWithFallback('octane.game_center.red_team_wins', 'Red Team wins!'))} />
                     </div>
 
                     <div className="snowwar-results__teams">
@@ -204,8 +204,8 @@ export const SnowWarResultsView: FC = () => {
 
                     {(mostHits || mostKills) && (
                         <div className="snowwar-results__spotlights">
-                            {mostHits && renderSpotlight(mostHits, 'snowwar.most_hits', 'Most Hits')}
-                            {mostKills && renderSpotlight(mostKills, 'snowwar.most_kills', "Most K.O.'s")}
+                            {mostHits && renderSpotlight(mostHits, 'snowwar.most_hits', localizeWithFallback('octane.game_center.most_hits', 'Most Hits'))}
+                            {mostKills && renderSpotlight(mostKills, 'snowwar.most_kills', localizeWithFallback('octane.game_center.most_k_o_s', 'Most K.O.\'s'))}
                         </div>
                     )}
 
@@ -213,7 +213,7 @@ export const SnowWarResultsView: FC = () => {
                         <BaseButton type="button" className="snowwar-button" disabled={rematch.kind === 'please_wait'} onClick={onRematch}>
                             {rematch.kind === 'join_hc'
                                 ? localizeWithFallback('catalog.vip.buy.title', 'Join HC!')
-                                : localizeWithFallback(rematch.textKey, rematch.kind === 'rematch' ? 'Rematch (%seconds%)' : 'Please wait (%seconds%)').replace(
+                                : localizeWithFallback(rematch.textKey, rematch.kind === 'rematch' ? localizeWithFallback('octane.game_center.rematch_seconds', 'Rematch (%seconds%)') : localizeWithFallback('octane.game_center.please_wait_seconds', 'Please wait (%seconds%)')).replace(
                                       '%seconds%',
                                       rematch.seconds.toString()
                                   )}

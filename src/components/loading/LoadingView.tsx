@@ -4,6 +4,7 @@ import { AIR_SPLASH_BG, AIR_SPLASH_TOP, AIR_USER_PHOTOS } from '@/assets/images/
 import octaneLogo from '@/assets/images/loading/octane-logo.png';
 import '@/css/loading/LoadingView.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../api';
 
 interface LoadingViewProps {
     isError?: boolean;
@@ -70,7 +71,7 @@ export const LoadingView: FC<LoadingViewProps> = (props) => {
     }, [isError, messages.length]);
 
     const clampedProgress = typeof progress === 'number' && Number.isFinite(progress) ? Math.max(0, Math.min(100, Math.round(progress))) : null;
-    const headline = isError ? configString('client.loading.failed', 'Loading failed') : (messages[messageIndex] ?? message);
+    const headline = isError ? configString('client.loading.failed', localizeWithFallback('octane.loading.loading_failed', 'Loading failed')) : (messages[messageIndex] ?? message);
 
     return (
         <NativeTextTree>
@@ -90,7 +91,7 @@ export const LoadingView: FC<LoadingViewProps> = (props) => {
                             {message && <div>{message}</div>}
                             {homeUrl && (
                                 <a href={homeUrl} className="octane-loading__home">
-                                    Back to Hotel
+                                    {localizeWithFallback('octane.loading.back_to_hotel', 'Back to Hotel')}
                                 </a>
                             )}
                         </div>

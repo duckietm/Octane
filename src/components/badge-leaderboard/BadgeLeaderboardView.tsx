@@ -1,6 +1,6 @@
 import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useMemo, useState } from 'react';
-import { BadgeLeaderboardBoard, BadgeLeaderboardEntry, BadgeRarityKey, fetchBadgeLeaderboard, getCachedBadgeLeaderboard, LocalizeText } from '../../api';
+import { BadgeLeaderboardBoard, BadgeLeaderboardEntry, BadgeRarityKey, fetchBadgeLeaderboard, getCachedBadgeLeaderboard, LocalizeText, localizeWithFallback } from '../../api';
 import {
     badgeEmblemAchievement,
     badgeEmblemCommon,
@@ -225,7 +225,7 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
                             type="button"
                             onPointerDown={(event) => event.stopPropagation()}
                             onClick={() => setIsVisible(false)}
-                            aria-label="Close"
+                            aria-label={localizeWithFallback('octane.badge_leaderboard.close', 'Close')}
                         >
                             <span className="octane-badge-leaderboard__close-icon" style={{ backgroundImage: `url(${leaderboardButtonCloseSwf})` }} />
                         </BaseButton>

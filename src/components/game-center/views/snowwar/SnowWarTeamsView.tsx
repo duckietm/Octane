@@ -74,9 +74,9 @@ export const SnowWarTeamsView: FC = () =>
             : localizeWithFallback('snowwar.loading_arena', 'Going to the arena...'))
         : (arenaQueuePosition > 0)
             // Every arena is busy (AIR Game2InArenaQueue): full matches ahead.
-            ? localizeSnowWarCount('snowwar.lobby_arena_queue_position', 'position', arenaQueuePosition, 'Position in queue: %position%')
+            ? localizeSnowWarCount('snowwar.lobby_arena_queue_position', 'position', arenaQueuePosition, localizeWithFallback('octane.game_center.position_in_queue_position', 'Position in queue: %position%'))
         : (!inLineUp && (queuePosition > 0) && players.length)
-            ? localizeSnowWarCount('snowwar.lobby_arena_queue_position', 'position', queuePosition, 'Position in queue: %position%')
+            ? localizeSnowWarCount('snowwar.lobby_arena_queue_position', 'position', queuePosition, localizeWithFallback('octane.game_center.position_in_queue_position', 'Position in queue: %position%'))
             : (minPlayers > 1 && queueSize < minPlayers)
                 ? `${localizeWithFallback('snowwar.lobby_waiting_for_more_players', 'Waiting for more players...')} (${queueSize}/${minPlayers})`
                 : localizeWithFallback('snowwar.lobby_waiting_for_more_players', 'Waiting for more players...');

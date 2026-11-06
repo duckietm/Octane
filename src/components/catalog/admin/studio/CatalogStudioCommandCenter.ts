@@ -1,3 +1,4 @@
+import { localizeWithFallback } from '../../../../api/utils/localizeWithFallback';
 export interface CatalogStudioCommandInput {
     sessionReady: boolean;
     validationCurrent: boolean;
@@ -35,6 +36,6 @@ export const getCatalogStudioCommandState = (input: CatalogStudioCommandInput): 
         canValidate,
         validationLabel: hasIssues
             ? quantity(input.validationIssueCount, 'live problem', 'live problems')
-            : input.validationCurrent ? 'Live catalog healthy' : 'Health check available'
+            : input.validationCurrent ? localizeWithFallback('octane.catalog.live_catalog_healthy', 'Live catalog healthy') : localizeWithFallback('octane.catalog.health_check_available', 'Health check available')
     };
 };

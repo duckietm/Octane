@@ -1,6 +1,6 @@
 import { GetRoomEngine, GetSessionDataManager, IRoomObject, RoomObjectCategory, RoomObjectVariable } from '@octane/renderer';
 import { useState } from 'react';
-import { GetRoomSession, IsBuildersClubFurniId, IsTemporaryFurniId, LocalizeText, RoomObjectItem } from '../../../api';
+import { GetRoomSession, IsBuildersClubFurniId, IsTemporaryFurniId, LocalizeText, RoomObjectItem, localizeWithFallback } from '../../../api';
 import { useFurniAddedEvent, useFurniRemovedEvent } from '../engine';
 import { useRoom } from '../useRoom';
 
@@ -14,7 +14,7 @@ const isPetOrBot = (roomObjectType: string): boolean =>
 /** Official ChooserItem.owner: a Wired copy is listed as "Temp (Wired)", a Builders Club item as "Builders Club". */
 const chooserOwnerName = (roomObject: IRoomObject, ownerId: number): string => {
     if (IsBuildersClubFurniId(roomObject.id)) return 'Builders Club';
-    if (IsTemporaryFurniId(roomObject.id)) return 'Temp (Wired)';
+    if (IsTemporaryFurniId(roomObject.id)) return localizeWithFallback('octane.rooms.temp_wired', 'Temp (Wired)');
 
     return roomObject.model.getValue<string>(RoomObjectVariable.FURNITURE_OWNER_NAME) || `User_${ownerId}`;
 };

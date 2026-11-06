@@ -81,13 +81,13 @@ export const HotelViewCompetitionPrizesWidget: FC<{ fallback: ReactNode }> = ({ 
         localizeWithFallback(prizesKey(`${code}.${key}`), fallbackText, parameters, values);
     const rank = goal.personalContributionRank;
     const rankKey = getPrizesUserRankKey(goal.hasGoalExpired, rank);
-    const rankFallbacks = { yourfinalrank: 'Your final rank: %rank%', yourrank: 'Your current rank: %rank%', youarenotranked: 'You are not ranked' };
+    const rankFallbacks = { yourfinalrank: localizeWithFallback('octane.hotel_view.your_final_rank_rank', 'Your final rank: %rank%'), yourrank: localizeWithFallback('octane.hotel_view.your_current_rank_rank', 'Your current rank: %rank%'), youarenotranked: localizeWithFallback('octane.hotel_view.you_are_not_ranked', 'You are not ranked') };
 
     return (
         <NativeTextTree>
             <div className="hotelview-competition-prizes">
                 {earned}
-                <h2>{goalText('caption', 'Competition prizes')}</h2>
+                <h2>{goalText('caption', localizeWithFallback('octane.hotel_view.competition_prizes', 'Competition prizes'))}</h2>
                 <p>{goalText('info', '')}</p>
                 <div className="hotelview-competition-prizes-box">
                     <img
@@ -111,7 +111,7 @@ export const HotelViewCompetitionPrizesWidget: FC<{ fallback: ReactNode }> = ({ 
                                     <div key={level} className="hotelview-competition-prizes-rank">
                                         <strong>{goalText(`rank${level}`, `#${level}`)}</strong>
                                         <span>
-                                            {localizeWithFallback(prizesKey(single ? 'rank' : 'ranks'), single ? 'Rank %start%' : 'Ranks %start%-%end%', ['start', 'end'], [String(start), String(end)])}
+                                            {localizeWithFallback(prizesKey(single ? 'rank' : 'ranks'), single ? localizeWithFallback('octane.hotel_view.rank_start', 'Rank %start%') : localizeWithFallback('octane.hotel_view.ranks_start_end', 'Ranks %start%-%end%'), ['start', 'end'], [String(start), String(end)])}
                                         </span>
                                     </div>
                                 );
@@ -126,8 +126,8 @@ export const HotelViewCompetitionPrizesWidget: FC<{ fallback: ReactNode }> = ({ 
                                 {!goal.hasGoalExpired && (
                                     <p>
                                         {rank > 0
-                                            ? goalText('yourrankinfo', 'You are almost there! Keep going!', ['points'], [String(goal.personalContributionScore)])
-                                            : goalText('youarenotrankedinfo', 'Take part to get into the ranking.')}
+                                            ? goalText('yourrankinfo', localizeWithFallback('octane.hotel_view.you_are_almost_there_keep_going', 'You are almost there! Keep going!'), ['points'], [String(goal.personalContributionScore)])
+                                            : goalText('youarenotrankedinfo', localizeWithFallback('octane.hotel_view.take_part_to_get_into_the', 'Take part to get into the ranking.'))}
                                     </p>
                                 )}
                             </div>

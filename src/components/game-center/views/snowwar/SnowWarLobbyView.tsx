@@ -181,7 +181,7 @@ export const SnowWarLobbyView: FC = () =>
         ? ''
         : (lobbyArena && !lobbyArena.official)
             ? lobbyArena.name
-            : localizeWithFallback(`snowwar.field.name.${ mapId }`, localizeWithFallback(`gamecenter.snowwar.map.name.${ mapId }`, lobbyArena?.name ?? `Arena ${ mapId }`));
+            : localizeWithFallback(`snowwar.field.name.${ mapId }`, localizeWithFallback(`gamecenter.snowwar.map.name.${ mapId }`, lobbyArena?.name ?? localizeWithFallback('octane.game_center.arena_map_id', 'Arena %map_id%').replace('%map_id%', String(mapId))));
     const spinner = SNOWWAR_AIR_ASSETS[`load_${ getLoopFrame(now, 8) }`];
 
     const renderPlayer = (player: typeof players[number]) =>

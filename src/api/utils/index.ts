@@ -18,6 +18,7 @@ export * from './LocalizeFormattedNumber';
 export * from './LocalizeShortNumber';
 export * from './LocalizeText';
 export * from './LocalStorageKeys';
+export * from './localizeServerMessage';
 export * from './localizeWithFallback';
 export * from './parseCommandNumbers';
 export * from './PlaySound';

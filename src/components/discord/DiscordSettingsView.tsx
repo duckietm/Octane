@@ -131,7 +131,7 @@ const DiscordPresencePreview: FC<DiscordPresencePreviewProps> = ({ preferences }
                     <div className="min-w-0 flex-1 leading-tight">
                         <div className="truncate text-[14px] font-bold text-white">
                             {preferences.showHabbo
-                                ? localizeWithFallback('discord.settings.preview.playing', `Playing ${hotelName}`)
+                                ? localizeWithFallback('discord.settings.preview.playing', 'Playing %hotel%').replace('%hotel%', hotelName)
                                 : localizeWithFallback('discord.settings.preview.not_sharing', 'Not sharing on Discord')}
                         </div>
                         <div className="truncate text-[12px] text-[#b5bac1]">{preferences.showHabbo ? details : ''}</div>

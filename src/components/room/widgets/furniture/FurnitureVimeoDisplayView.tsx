@@ -61,13 +61,13 @@ const VimeoViewer: FC<VimeoViewerProps> = ({ videoId, canEdit, onClose, onSave }
                         )}
                     </div>
                     <div className="octane-vimeo-viewer-id">
-                        <span className="octane-vimeo-viewer-id-label">Video id:</span>
+                        <span className="octane-vimeo-viewer-id-label">{localizeWithFallback('octane.room.video_id', 'Video id:')}</span>
                         <input
-                            aria-label="Video id"
+                            aria-label={localizeWithFallback('octane.room.video_id_2', 'Video id')}
                             className="octane-vimeo-viewer-id-input"
                             disabled={!canEdit}
                             inputMode="numeric"
-                            placeholder={videoId > 0 ? '' : 'No configured video id'}
+                            placeholder={videoId > 0 ? '' : localizeWithFallback('octane.room.no_configured_video_id', 'No configured video id')}
                             type="text"
                             value={draft}
                             onBlur={commit}

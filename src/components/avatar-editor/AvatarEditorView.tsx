@@ -10,7 +10,7 @@ import {
 } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaDice, FaRedo, FaTrash } from 'react-icons/fa';
-import { AVATAR_EDITOR_EFFECTS_TAB, AvatarEditorAction, GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../api';
+import { AVATAR_EDITOR_EFFECTS_TAB, AvatarEditorAction, GetConfigurationValue, LocalizeText, SendMessageComposer, localizeWithFallback } from '../../api';
 import mainEffectsSrc from '../../assets/images/avatareditor/air/main-effects.png';
 import mainGenericSrc from '../../assets/images/avatareditor/air/main-generic.png';
 import mainHeadSrc from '../../assets/images/avatareditor/air/main-head.png';
@@ -263,28 +263,28 @@ export const AvatarEditorView: FC<{}> = (props) => {
                             {isNftOpen && <AvatarEditorNftOutfitInfoView outfit={nftWardrobe.selectedOutfit} />}
                             {!clothingChangeData && !isNftOpen && (
                                 <div className="octane-avatar-editor-secondary-actions">
-                                    <Hint content="Reset avatar">
+                                    <Hint content={localizeWithFallback('octane.avatar_editor.reset_avatar', 'Reset avatar')}>
                                         <BaseButton
                                             type="button"
-                                            aria-label="Reset avatar"
+                                            aria-label={localizeWithFallback('octane.avatar_editor.reset_avatar', 'Reset avatar')}
                                             onClick={() => processAction(AvatarEditorAction.ACTION_RESET)}
                                         >
                                             <FaRedo className="fa-icon" />
                                         </BaseButton>
                                     </Hint>
-                                    <Hint content="Clear avatar">
+                                    <Hint content={localizeWithFallback('octane.avatar_editor.clear_avatar', 'Clear avatar')}>
                                         <BaseButton
                                             type="button"
-                                            aria-label="Clear avatar"
+                                            aria-label={localizeWithFallback('octane.avatar_editor.clear_avatar', 'Clear avatar')}
                                             onClick={() => processAction(AvatarEditorAction.ACTION_CLEAR)}
                                         >
                                             <FaTrash className="fa-icon" />
                                         </BaseButton>
                                     </Hint>
-                                    <Hint content="Randomize avatar">
+                                    <Hint content={localizeWithFallback('octane.avatar_editor.randomize_avatar', 'Randomize avatar')}>
                                         <BaseButton
                                             type="button"
-                                            aria-label="Randomize avatar"
+                                            aria-label={localizeWithFallback('octane.avatar_editor.randomize_avatar', 'Randomize avatar')}
                                             onClick={() => processAction(AvatarEditorAction.ACTION_RANDOMIZE)}
                                         >
                                             <FaDice className="fa-icon" />

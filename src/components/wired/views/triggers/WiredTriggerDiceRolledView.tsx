@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { WiredFurniType } from '../../../../api';
+import { WiredFurniType, localizeWithFallback } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
@@ -29,11 +29,11 @@ export const WiredTriggerDiceRolledView: FC<{}> = () =>
         <NativeTextTree>
             <WiredTriggerBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } save={ save }>
                 <div className="flex flex-col gap-1">
-                    <Text bold>Dice rolled</Text>
-                    <Text small>Fires when a dice is rolled. Leave unchecked to match any value.</Text>
+                    <Text bold>{localizeWithFallback('octane.wired.dice_rolled', 'Dice rolled')}</Text>
+                    <Text small>{localizeWithFallback('octane.wired.fires_when_a_dice_is_rolled', 'Fires when a dice is rolled. Leave unchecked to match any value.')}</Text>
                     <div className="flex items-center gap-1">
                         <Checkbox checked={ matchEnabled } id="diceMatchEnabled" onCheckedChange={(nextChecked) => setMatchEnabled(nextChecked)} />
-                        <Text>Only a specific rolled value</Text>
+                        <Text>{localizeWithFallback('octane.wired.only_a_specific_rolled_value', 'Only a specific rolled value')}</Text>
                     </div>
                     { matchEnabled &&
                         <NumberInput className="form-control form-control-sm" min={ 1 } value={ requiredValue } onChange={ event => setRequiredValue(parseInt(event.target.value, 10) || 0) } /> }

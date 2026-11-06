@@ -52,8 +52,8 @@ const ORIGIN_EXTERNAL = 3;
 const ORIGIN_OPTIONS = [
     { bit: ORIGIN_THIS_ROOM, fallback: 'This room', info: null },
     { bit: ORIGIN_OTHER_ROOM, fallback: 'Another room', info: null },
-    { bit: ORIGIN_INSPECTION, fallback: 'Inspection', info: 'The inspection tool (:inspect)' },
-    { bit: ORIGIN_EXTERNAL, fallback: 'External', info: 'Variable management or the variable web API' }
+    { bit: ORIGIN_INSPECTION, fallback: 'Inspection', get info() { return localizeWithFallback('octane.wired.the_inspection_tool_inspect', 'The inspection tool (:inspect)'); } },
+    { bit: ORIGIN_EXTERNAL, fallback: 'External', get info() { return localizeWithFallback('octane.wired.variable_management_or_the_variable_web', 'Variable management or the variable web API'); } }
 ] as const;
 const ORIGIN_EVERY_BIT = ORIGIN_OPTIONS.reduce((mask, option) => mask | (1 << option.bit), 0);
 

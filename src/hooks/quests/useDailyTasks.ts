@@ -78,8 +78,8 @@ const useDailyTasksState = () => {
             task.rawSecondsLeft = parser.secondsLeft;
 
             if (previousStatus !== parser.status) {
-                if (parser.status === DailyTaskData.STATUS_COMPLETED) notify('dailytasks.completed.caption', 'Daily task completed - claim your reward!');
-                else if (parser.status === DailyTaskData.STATUS_CLAIMED) notify('dailytasks.claimed.caption', 'Daily task reward claimed!');
+                if (parser.status === DailyTaskData.STATUS_COMPLETED) notify('dailytasks.completed.caption', localizeWithFallback('octane.quests.daily_task_completed_claim_your_reward', 'Daily task completed - claim your reward!'));
+                else if (parser.status === DailyTaskData.STATUS_CLAIMED) notify('dailytasks.claimed.caption', localizeWithFallback('octane.quests.daily_task_reward_claimed', 'Daily task reward claimed!'));
             }
 
             return [...prevValue];
