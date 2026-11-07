@@ -11,13 +11,13 @@ import {
     LocalizeText,
     SendMessageComposer,
     snowWarBlockSecondsLeft,
-    SNOWWAR_TOKEN_BUTTONS
+    SNOWWAR_TOKEN_BUTTONS,
+    gct
 } from '../../../api';
 import { SNOWWAR_AIR_ASSETS } from '../../../assets/images/snowstorm/air';
 import snowStormLogo from '../../../assets/images/snowstorm/snowstorm.png';
 import { useGameCenter, useNotification, useSnowWar } from '../../../hooks';
 import { localizeWithFallback, snowWarErrorText } from './snowwar/SnowWarErrorTexts';
-import { SnowWarStrokeText } from './snowwar/SnowWarStrokeText';
 import { BaseButton } from '../../../common/BaseButton';
 import { PlayingNow } from './GameCardView';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
@@ -27,7 +27,7 @@ import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
  * on the server; for SnowWar the queue/countdown status is shown inside the
  * tile until the match starts and the arena takes over the screen.
  */
-export const GameTileView: FC<{ game: GameConfigurationData; playing?: number }> = ({ game, playing = 0 }) =>
+export const GameTileView: FC<{ game: GameConfigurationData; playing?: number; club?: boolean }> = ({ game, playing = 0, club = false }) =>
 {
     const { accountStatus, setSelectedGame, blockedUntil, setInstructionsOpen, tokenOffers } = useGameCenter();
     const { showConfirm = null } = useNotification();
@@ -157,11 +157,11 @@ export const GameTileView: FC<{ game: GameConfigurationData; playing?: number }>
                     {isSnowWar && !inQueue && (
                         <div className="game-tile__links">
                             <BaseButton className="game-tile__link" type="button" onClick={() => setInstructionsOpen(true)}>
-                                {localizeWithFallback('snowwar.instructions.link', 'How To Play')}
+                                {gct('howto.link', 'How to play')}
                             </BaseButton>
                             {showLeaderboard && (
                                 <BaseButton className="game-tile__link" type="button" onClick={() => requestLeaderboard(false, true, 0)}>
-                                    {localizeWithFallback('snowwar.leaderboards.link', 'Leaderboard')}
+                                    {gct('leaderboard.link', 'Leaderboard')}
                                 </BaseButton>
                             )}
                         </div>
@@ -170,16 +170,14 @@ export const GameTileView: FC<{ game: GameConfigurationData; playing?: number }>
                         <div className="game-tile__footer">
                             {gamesLeft.showCounter && (
                                 <div className="game-tile__games-left">
-                                    <span>{localizeWithFallback('snowwar.games_left', 'Total Games Left:')}</span>
-                                    {/* AIR games_left over games_left_stroke: red stroke at 0, blue otherwise. */}
-                                    <span className={`game-tile__games-left-count game-tile__games-left-count--${gamesLeft.counterTone}`}>
-                                        <SnowWarStrokeText stroke={(gamesLeft.counterTone === 'red') ? '#ff0000' : '#1077ac'} text={freeGamesLeft} />
-                                    </span>
+                                    {/* The same counter as every game of the Game Center. */}
+                                    <span>{gct('games_left', 'Games left today:')}</span>
+                                    <span className={`game-tile__games-left-count game-tile__games-left-count--${gamesLeft.counterTone}`}>{freeGamesLeft}</span>
                                 </div>
                             )}
                             {gamesLeft.showCounter && (tokenButtons.length > 0) && (
                                 <div className="game-tile__tokens">
-                                    <span>{localizeWithFallback('snowwar.buy_more_games', 'Buy more games:')}</span>
+                                    <span>{gct('buy_more', 'Buy more games:')}</span>
                                     <div className="game-tile__token-buttons">
                                         {tokenButtons.map(({ button, offer }) => (
                                             <BaseButton
@@ -193,10 +191,10 @@ export const GameTileView: FC<{ game: GameConfigurationData; playing?: number }>
                                     </div>
                                 </div>
                             )}
-                            {gamesLeft.showCounter && (
+                            {gamesLeft.showCounter && !club && (
                                 <BaseButton className="game-tile__vip" type="button" onClick={openClubCenter}>
                                     <img alt="" className="game-tile__hc-icon" src={SNOWWAR_AIR_ASSETS.hc_icon} />
-                                    <span>{localizeWithFallback('snowwar.get_more_games', 'Get additional free daily games with HC!')}</span>
+                                    <span>{gct('more_with_hc', 'More free games every day with the Habbo Club!')}</span>
                                 </BaseButton>
                             )}
                             <div className="game-tile__actions">
@@ -209,7 +207,7 @@ export const GameTileView: FC<{ game: GameConfigurationData; playing?: number }>
                                         onClick={onPlay}>
                                         {(blockSeconds > 0)
                                             ? formatSnowWarBlockCountdown(blockSeconds)
-                                            : localizeWithFallback('snowwar.play', 'Play now!')}
+                                            : gct('play', 'Play!')}
                                     </BaseButton>
                                 )}
                             </div>

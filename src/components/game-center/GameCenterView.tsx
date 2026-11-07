@@ -4,6 +4,7 @@ import { GameCenterApi, GameCenterApiError, GetConfigurationValue, IGameCenterOf
 import { useGameCenter } from '../../hooks';
 import { GAME_CATALOG } from './GameCatalog';
 import { GameCardView } from './views/GameCardView';
+import { GameHowToView } from './views/GameHowToView';
 import { GameLeaderboardView } from './views/GameLeaderboardView';
 import { GameStageView } from './views/GameStageView';
 import { GameTileView } from './views/GameTileView';
@@ -27,9 +28,10 @@ const REFRESH_MS = 10000;
  * Play. The list (`/api/gamecenter`) is asked for again every ten seconds while it shows.
  */
 export const GameCenterView = () => {
-    const { isVisible, setIsVisible, games, selectedGame, accountStatus, instructionsOpen } = useGameCenter();
+    const { isVisible, setIsVisible, games, selectedGame, accountStatus, instructionsOpen, setInstructionsOpen } = useGameCenter();
     const [ overview, setOverview ] = useState<IGameCenterOverview | null>(null);
     const [ leaderboard, setLeaderboard ] = useState<{ id: string; title: string } | null>(null);
+    const [ howTo, setHowTo ] = useState<string | null>(null);
     const [ error, setError ] = useState('');
 
     useEffect(() => {
@@ -109,27 +111,33 @@ export const GameCenterView = () => {
                     <div className="game-center-header__title">{localizeWithFallback('gamecenter.game_list_title', 'Choose a game')}</div>
                     <BaseButton className="game-center-header__close" type="button" onClick={close}>&times;</BaseButton>
                 </div>
-                {instructionsOpen
-                    ? <SnowWarInstructionsView />
-                    : (
-                        <div className="game-tile-grid game-card-grid">
-                            {snowWar.map((game) => <GameTileView key={game.gameId} game={game} playing={overview?.snowwar ?? 0} />)}
-                            {GAME_CATALOG.filter((entry) => GetConfigurationValue<boolean>(entry.option, true)).map((entry) => (
-                                <GameCardView
-                                    key={entry.id}
-                                    entry={entry}
-                                    status={overview?.games.find((game) => game.id === entry.id) ?? null}
-                                    offers={overview?.offers ?? []}
-                                    club={!!overview?.club}
-                                    onOpen={close}
-                                    onLeaderboard={() => setLeaderboard({ id: entry.id, title: gct(`${ entry.id }.title`, entry.title) })}
-                                    onBuy={(offer) => buy(entry.id, offer)} />
-                            ))}
-                        </div>
-                    )}
+                <div className="game-tile-grid game-card-grid">
+                    {snowWar.map((game) => <GameTileView key={game.gameId} game={game} playing={overview?.snowwar ?? 0} club={!!overview?.club} />)}
+                    {GAME_CATALOG.filter((entry) => GetConfigurationValue<boolean>(entry.option, true)).map((entry) => (
+                        <GameCardView
+                            key={entry.id}
+                            entry={entry}
+                            status={overview?.games.find((game) => game.id === entry.id) ?? null}
+                            club={!!overview?.club}
+                            onOpen={close}
+                            onLeaderboard={() => setLeaderboard({ id: entry.id, title: gct(`${ entry.id }.title`, entry.title) })}
+                            onHowTo={() => setHowTo(entry.id)}
+                            onBuy={(offer) => buy(entry.id, offer)} />
+                    ))}
+                </div>
+                {instructionsOpen && (
+                    <div className="game-howto-overlay" onClick={(event) => event.target === event.currentTarget && setInstructionsOpen(false)}>
+                        <SnowWarInstructionsView />
+                    </div>
+                )}
                 {error && <div className="game-center-toast" data-browser-text>{error}</div>}
                 <GameStageView />
             </div>
+            {howTo && (() => {
+                const entry = GAME_CATALOG.find((item) => item.id === howTo);
+
+                return entry ? <GameHowToView game={entry.id} title={gct(`${ entry.id }.title`, entry.title)} banner={entry.banner} onClose={() => setHowTo(null)} /> : null;
+            })()}
             {leaderboard && <GameLeaderboardView game={leaderboard.id} title={leaderboard.title} onClose={() => setLeaderboard(null)} />}
         </NativeTextTree>
     );

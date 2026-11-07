@@ -150,7 +150,7 @@ export const GAME_CATALOG: IGameCatalogEntry[] = [
         link: 'kart/show',
         option: 'kart.enabled',
         title: 'HabboKart',
-        description: 'Three laps of a circuit made of the hotel\'s track, at the wheel of a hotel car: dragster, police car, ambulance or scooter. Stay on the road, the grass slows you down!',
+        description: 'Choose your kart and race three laps: drifts, turbos, banana peels and shells! Up to eight drivers, online or against robots.',
         players: '2-8',
         banner: <Banner image={kartBanner} colour="#5ca834" />
     },

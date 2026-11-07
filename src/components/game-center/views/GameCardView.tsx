@@ -1,6 +1,8 @@
 import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
-import { GetConfigurationValue, IGameCenterGame, IGameCenterOffer, LocalizeText, gct } from '../../../api';
+import { GetConfigurationValue, IGameCenterGame, IGameCenterOffer, LocalizeText, gct, getSnowWarTokenPrice } from '../../../api';
+import { SNOWWAR_AIR_ASSETS } from '../../../assets/images/snowstorm/air';
+import { GameTokenButton } from './GameCenterArt';
 import { BaseButton } from '../../../common/BaseButton';
 import { useNotification } from '../../../hooks';
 import { IGameCatalogEntry } from '../GameCatalog';
@@ -15,11 +17,11 @@ export const PlayingNow: FC<{ count: number }> = ({ count }) => (
     </span>
 );
 
-const priceText = (offer: IGameCenterOffer): string => {
-    if (offer.credits > 0 && offer.points > 0) return gct('price.both', '%c% credits + %p% duckets', [ 'c', 'p' ], [ String(offer.credits), String(offer.points) ]);
-    if (offer.points > 0) return gct('price.points', '%p% duckets', [ 'p' ], [ String(offer.points) ]);
+/** A pack's price as the catalogue writes it (credits, or the activity points of its type). */
+export const priceText = (offer: IGameCenterOffer): string => {
+    const price = offer.currency < 0 ? getSnowWarTokenPrice(offer.price, 0, 0) : getSnowWarTokenPrice(0, offer.price, offer.currency);
 
-    return gct('price.credits', '%c% credits', [ 'c' ], [ String(offer.credits) ]);
+    return LocalizeText(price.key, price.parameters, price.replacements);
 };
 
 /**
@@ -30,16 +32,18 @@ const priceText = (offer: IGameCenterOffer): string => {
 export const GameCardView: FC<{
     entry: IGameCatalogEntry;
     status: IGameCenterGame | null;
-    offers: IGameCenterOffer[];
     club: boolean;
     onOpen: () => void;
     onLeaderboard: () => void;
+    onHowTo: () => void;
     onBuy: (offer: IGameCenterOffer) => void;
-}> = ({ entry, status, offers, club, onOpen, onLeaderboard, onBuy }) => {
+}> = ({ entry, status, club, onOpen, onLeaderboard, onHowTo, onBuy }) => {
     const { showConfirm = null } = useNotification();
     const gamesLeft = status?.gamesLeft ?? -1;
     const limited = gamesLeft >= 0;
     const canPlay = !limited || gamesLeft > 0;
+    const offers = status?.offers ?? [];
+    const hcExtra = status?.hcExtra ?? 0;
 
     const play = () => {
         onOpen();
@@ -72,6 +76,7 @@ export const GameCardView: FC<{
                 <div className="game-tile__title">{gct(`${ entry.id }.title`, entry.title)}</div>
                 <div className="game-card__desc" data-browser-text>{gct(`${ entry.id }.description`, entry.description)}</div>
                 <div className="game-tile__links">
+                    <BaseButton className="game-tile__link" type="button" onClick={onHowTo}>{gct('howto.link', 'How to play')}</BaseButton>
                     <BaseButton className="game-tile__link" type="button" onClick={onLeaderboard}>{gct('leaderboard.link', 'Leaderboard')}</BaseButton>
                 </div>
                 <div className="game-tile__footer game-card__footer">
@@ -84,18 +89,17 @@ export const GameCardView: FC<{
                         )
                         : <div className="game-card__unlimited">{gct('unlimited', 'Unlimited games')}</div>}
                     {limited && offers.length > 0 && (
-                        <div className="game-card__offers" data-browser-text>
-                            {offers.map((offer) => (
-                                <BaseButton key={offer.id} className="game-card__offer" type="button" title={priceText(offer)} onClick={() => buy(offer)}>
-                                    <strong>+{offer.games}</strong>
-                                    <span>{priceText(offer)}</span>
-                                </BaseButton>
-                            ))}
+                        <div className="game-tile__tokens">
+                            <span>{gct('buy_more', 'Buy more games:')}</span>
+                            <div className="game-tile__token-buttons">
+                                {offers.map((offer) => <GameTokenButton key={offer.id} game={entry.id} games={offer.games} title={priceText(offer)} onClick={() => buy(offer)} />)}
+                            </div>
                         </div>
                     )}
-                    {limited && !club && (
-                        <BaseButton className="game-tile__vip game-card__vip" type="button" onClick={openClub}>
-                            {gct('more_with_hc', 'More free games every day with the Habbo Club!')}
+                    {limited && !club && hcExtra > 0 && (
+                        <BaseButton className="game-tile__vip" type="button" onClick={openClub}>
+                            <img alt="" className="game-tile__hc-icon" src={SNOWWAR_AIR_ASSETS.hc_icon} />
+                            <span>{hcExtra === 1 ? gct('hc_more_one', '+1 free game every day with HC!') : gct('hc_more', '+%n% free games every day with HC!', [ 'n' ], [ String(hcExtra) ])}</span>
                         </BaseButton>
                     )}
                     <div className="game-tile__actions">

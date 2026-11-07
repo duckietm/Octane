@@ -9,15 +9,21 @@ export interface IGameCenterGame {
     playing: number;
     /** -1: unlimited (the Habbo Club, or no limit set). */
     gamesLeft: number;
+    /** The player's free games a day (with the Habbo Club's extra ones when a member). */
     freePerDay: number;
+    /** The free games a day for everybody, and the Habbo Club's extra ones (set in the Moderation). */
+    freeDaily: number;
+    hcExtra: number;
+    /** The packs of games to buy. */
+    offers: IGameCenterOffer[];
 }
 
 export interface IGameCenterOffer {
     id: number;
     games: number;
-    credits: number;
-    points: number;
-    pointsType: number;
+    price: number;
+    /** -1: credits, else the activity points' type (0 duckets, 5 diamonds...). */
+    currency: number;
 }
 
 export interface IGameCenterOverview {
@@ -25,7 +31,6 @@ export interface IGameCenterOverview {
     /** SnowStorm's players now. */
     snowwar: number;
     games: IGameCenterGame[];
-    offers: IGameCenterOffer[];
 }
 
 export type GameLeaderboardScope = 'everyone' | 'friends' | 'groups';
@@ -51,6 +56,47 @@ export interface IGameLeaderboard {
     minutesUntilReset: number;
     favouriteGroupId: number;
     entries: IGameLeaderboardEntry[];
+}
+
+/** The Moderation's Games page (`acc_hk_games`). */
+export type GameRewardKind = 'play' | 'win' | 'week';
+export type GameRewardType = 'furni' | 'clothing' | 'badge' | 'currency';
+
+export interface IGameAdminOffer {
+    games: number;
+    price: number;
+    currency: number;
+}
+
+export interface IGameAdminReward {
+    kind: GameRewardKind;
+    rankFrom: number;
+    rankTo: number;
+    type: GameRewardType;
+    /** The furniture's or the clothes' id, the badge's code, or the currency's type (-1 credits). */
+    value: string;
+    amount: number;
+    label?: string;
+}
+
+export interface IGameAdminGame {
+    id: string;
+    /** -1: unlimited. */
+    freeDaily: number;
+    hcExtra: number;
+    offers: IGameAdminOffer[];
+    rewards: IGameAdminReward[];
+}
+
+export interface IGameAdminView {
+    games: IGameAdminGame[];
+    currencies: { id: number; name: string }[];
+}
+
+export interface IGameAdminFound {
+    id: number;
+    name: string;
+    detail: string;
 }
 
 export class GameCenterApiError extends Error {
@@ -95,7 +141,11 @@ export const GameCenterApi = {
     overview: () => request<IGameCenterOverview>(''),
     buy: (game: string, offerId: number) => request<IGameCenterOverview>('/buy', { game, offerId }),
     leaderboard: (game: string, weekly: boolean, scope: GameLeaderboardScope, week: number) =>
-        request<IGameLeaderboard>(`/leaderboard?game=${ encodeURIComponent(game) }&weekly=${ weekly ? 1 : 0 }&scope=${ scope }&week=${ week }`)
+        request<IGameLeaderboard>(`/leaderboard?game=${ encodeURIComponent(game) }&weekly=${ weekly ? 1 : 0 }&scope=${ scope }&week=${ week }`),
+    admin: () => request<IGameAdminView>('/admin'),
+    adminLookup: (type: 'furni' | 'clothing', query: string) =>
+        request<{ found: IGameAdminFound[] }>(`/admin/lookup?type=${ type }&q=${ encodeURIComponent(query) }`),
+    adminSave: (game: IGameAdminGame) => request<IGameAdminView>('/admin/save', { game: game.id, freeDaily: game.freeDaily, hcExtra: game.hcExtra, offers: game.offers, rewards: game.rewards })
 };
 
 /** A text of the Game Center, `gamecenter.<key>`. */
