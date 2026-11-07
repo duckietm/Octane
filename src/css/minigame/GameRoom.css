@@ -1,0 +1,80 @@
+/* A game played in a room of the hotel (GameRoomScene): the room at the hotel's zoom, shown at a whole zoom. */
+
+.game-room {
+  position: relative;
+  image-rendering: pixelated;
+}
+
+.game-room__floor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+}
+
+.game-room__item {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.game-room__avatar {
+  position: absolute;
+  display: block;
+  max-width: none;
+  image-rendering: pixelated;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  user-select: none;
+}
+
+.game-room__avatar.is-dimmed {
+  filter: grayscale(0.8) brightness(0.75);
+}
+
+.game-room__tag {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 6px;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+  font: 400 11px HabboAirUbuntu, sans-serif;
+  white-space: nowrap;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+}
+
+.game-room__tag.is-you {
+  background: #b0280f;
+}
+
+.game-room__bubble {
+  position: absolute;
+  width: max-content;
+  max-width: 200px;
+  padding: 3px 8px;
+  border: 1px solid #000000;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+  color: #000000;
+  font: 400 12px HabboAirUbuntu, sans-serif;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+  animation: game-room-bubble 0.15s ease-out;
+}
+
+@keyframes game-room-bubble {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -80%);
+  }
+}

@@ -1,60 +1,81 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { localizeWithFallback } from '../../api/utils/localizeWithFallback';
 import { Button } from '../../common';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import roomImage from '../../assets/images/gamerooms/snail-room.png';
 import bannerImage from '../../assets/images/snails/snail-banner.png';
-import gardenImage from '../../assets/images/snails/snail-garden.png';
 import snailData from '../../assets/images/snails/snail-sprites.json';
 import snailImage from '../../assets/images/snails/snail-sprites.png';
-import { MiniGameAvatar, MiniGameLobby, MiniGameResults, MiniGameTopBar, MiniGameWaiting, mgt } from '../minigame/MiniGameParts';
+import { GameRoomScene, IRoomAvatar, IRoomFurni, ROOM_H, ROOM_W, roomPoint } from '../minigame/GameRoomScene';
+import { MiniGameLobby, MiniGameResults, MiniGameTopBar, MiniGameWaiting, mgt } from '../minigame/MiniGameParts';
 import { useHallGame, useStageZoom } from '../minigame/useHallGame';
 import '../../css/snailrace/SnailRaceView.css';
 
 /** A text of the snail race, `snailrace.<key>`. */
 const st = (key: string, fallback: string, parameters: string[] = null, replacements: string[] = null): string =>
-    localizeWithFallback(`snailrace.${key}`, fallback, parameters, replacements);
+    localizeWithFallback(`snailrace.${ key }`, fallback, parameters, replacements);
 
-/** The garden (snail-garden.png, deploy/scripts/snail-art.py) is drawn at 1x and shown twice its size. */
-const STAGE_W = 960;
-const STAGE_H = 680;
-const LANE_TOP = 192;
-const LANE_H = 60;
-const START_X = 128;
-const FINISH_X = 880;
-/** The snail's nose, from the left of its picture (2x). */
-const NOSE = 62;
 const SEATS: [number, number] = [ 2, 6 ];
 const SHEET = snailData as unknown as { width: number; height: number; frames: Record<string, [number, number, number, number]> };
+/** The lanes of the garden (game-rooms.py): lane n on the tiles y = 2 + n, from the start (x = 2) to the finish. */
+const START_X = 2;
+const FINISH_X = 12.7;
+const SNAIL_ZOOM = 1.5;
+const COLOURS = [ '#d6342b', '#2870dc', '#c9a10a', '#4f9a24', '#8f45c2', '#e07a14' ];
+
+/** The hotel's furni round the race: the fence the players lean on, the finish flags, the gardener's things. */
+const DECOR: IRoomFurni[] = [
+    ...Array.from({ length: 12 }, (_, index) => ({ name: 'horse_track_fence', x: 1 + index, y: 1, dir: 2 })),
+    { name: 'horse_fin_flag', x: 13, y: 1, dir: 2 },
+    { name: 'horse_fin_flag', x: 13, y: 8, dir: 2 },
+    { name: 'traffic_light', id: 1761, x: 1, y: 8, dir: 2 },
+    { name: 'garden_c15_toolshed', x: 0, y: 9, dir: 2 },
+    { name: 'garden15_lawnmower', x: 3, y: 9, dir: 2 },
+    { name: 'garden_c15_shroomchr', x: 5, y: 9, dir: 2 },
+    { name: 'garden_flo1', x: 6, y: 9, dir: 2 },
+    { name: 'garden_lupin2', x: 7, y: 9, dir: 2 },
+    { name: 'garden_flo3', x: 8, y: 9, dir: 2 },
+    { name: 'garden_lupin5', x: 9, y: 9, dir: 2 },
+    { name: 'garden_flo2', x: 10, y: 9, dir: 2 },
+    { name: 'garden_caterpillar', x: 11, y: 9, dir: 2, size: 1 },
+    { name: 'paris15_giftsnails', x: 13, y: 9, dir: 2 },
+    { name: 'garden_mursu', x: 0, y: 3, dir: 2 },
+    { name: 'garden_lupin1', x: 0, y: 5, dir: 2 },
+    { name: 'garden_mursu3', x: 0, y: 7, dir: 2 }
+];
 
 interface ISnail { x: number; speed: number; mood: string; place: number; time: number; cheerIn: number }
 
-const Sprite: FC<{ name: string; x: number; y: number; className?: string }> = ({ name, x, y, className = '' }) => {
+const Sprite: FC<{ name: string; left: number; top: number; zoom?: number; className?: string }> = ({ name, left, top, zoom = SNAIL_ZOOM, className = '' }) => {
     const frame = SHEET.frames[name];
 
     if (!frame) return null;
 
     return (
-        <span className={`snailrace-sprite ${className}`} style={{
-            left: x,
-            top: y,
-            width: frame[2] * 2,
-            height: frame[3] * 2,
-            backgroundImage: `url(${snailImage})`,
-            backgroundSize: `${SHEET.width * 2}px ${SHEET.height * 2}px`,
-            backgroundPosition: `${-frame[0] * 2}px ${-frame[1] * 2}px`
+        <span className={`snailrace-sprite ${ className }`} style={{
+            left,
+            top,
+            width: frame[2] * zoom,
+            height: frame[3] * zoom,
+            backgroundImage: `url(${ snailImage })`,
+            backgroundSize: `${ SHEET.width * zoom }px ${ SHEET.height * zoom }px`,
+            backgroundPosition: `${ -frame[0] * zoom }px ${ -frame[1] * zoom }px`
         }} />
     );
 };
 
 /**
- * Habbi's snail race (`snailrace/show`, from the Game Center): a garden with six lanes, a snail a player. The snails
- * crawl on their own, nap or get a burst of energy; space cheers yours on. The players watch from the grass in front.
- * The race runs on the server's tables (`/api/hall`, game `snails`), asked for every 250 ms during a race.
+ * Habbi's snail race (`snailrace/show`, from the Game Center), in a garden of the hotel: six dirt lanes, the hotel's
+ * racing fence, flags and garden furni, and the players as their avatars, leaning on the fence behind the lanes and
+ * shouting for their snail. The snails crawl on their own, nap or get a burst of energy; space cheers yours on. The
+ * race runs on the server's tables (`/api/hall`, game `snails`), asked for every 250 ms during a race.
  */
 export const SnailRaceView: FC = () => {
     const g = useHallGame('snails', 'snailrace', 250);
-    const zoom = useStageZoom(STAGE_W, STAGE_H);
+    const zoom = useStageZoom(ROOM_W, ROOM_H);
     const [ tick, setTick ] = useState(0);
+    const [ shouts, setShouts ] = useState<Record<number, number>>({});
+    const lastMood = useRef<string[]>([]);
     const table = g.table;
     const board = table?.board;
     const racing = table?.state === 'playing';
@@ -86,45 +107,62 @@ export const SnailRaceView: FC = () => {
         };
     }, [ racing, g.send ]);
 
+    // A cheer: the player shouts for a moment.
+    useEffect(() => {
+        snails.forEach((snail, seat) => {
+            if (snail.mood === 'cheered' && lastMood.current[seat] !== 'cheered') setShouts((current) => ({ ...current, [seat]: performance.now() }));
+        });
+        lastMood.current = snails.map((snail) => snail.mood);
+    }, [ snails.map((snail) => snail.mood).join() ]);
+
+    const players = table?.players ?? [];
+    const avatars: IRoomAvatar[] = useMemo(() => {
+        const now = performance.now();
+        const spacing = Math.min(2, 10 / Math.max(1, players.length));
+
+        return players.map((player, seat) => ({
+            key: player.userId,
+            figure: player.figure,
+            gender: player.gender,
+            x: 2.5 + seat * spacing,
+            y: 0,
+            dir: 4,
+            name: player.name,
+            you: seat === table?.you,
+            bubble: shouts[seat] && now - shouts[seat] < 1600 ? [ st('shout.1', 'Go!'), st('shout.2', 'Come on!'), st('shout.3', 'Faster!') ][seat % 3] : null,
+            above: <span className="snailrace-tag__colour" style={{ background: COLOURS[seat % 6] }} />
+        }));
+    }, [ players.map((player) => player.userId).join(), shouts, tick ]);
+
     if (!g.visible) return null;
 
     const rules = st('rules', 'Each player has a snail. They crawl on their own, nap now and then or get a burst of energy: cheer yours on (space) to give it a boost. The first across the line wins!');
-    const players = table?.players ?? [];
-    const spacing = Math.min(150, (STAGE_W - 80) / Math.max(1, players.length));
-    const first = (STAGE_W - spacing * (players.length - 1)) / 2;
 
     return (
         <NativeTextTree>
             <div className="minigame-world snailrace-world">
-                <div className="minigame-stage" style={{ width: STAGE_W * zoom, height: STAGE_H * zoom }}>
-                    <div className="minigame-stage__inner" style={{ width: STAGE_W, height: STAGE_H, transform: `scale(${zoom})` }}>
-                        <img className="minigame-backdrop" src={gardenImage} alt="" width={STAGE_W} height={STAGE_H} draggable={false} />
-                        {players.map((player, seat) => (
-                            <span key={`name-${seat}`} className={`snailrace-name ${seat === table.you ? 'is-you' : ''}`} style={{ top: LANE_TOP + seat * LANE_H + 8 }} data-browser-text>{player.name}</span>
-                        ))}
-                        {table && snails.map((snail, seat) => {
-                            const left = START_X + (FINISH_X - START_X) * Math.min(1, snail.x / length) - NOSE;
-                            const top = LANE_TOP + seat * LANE_H + 4;
-                            const frame = snail.mood === 'sleep' ? 2 : snail.mood === 'done' || snail.speed <= 0 ? 1 : tick % 2;
+                <div className="minigame-stage" style={{ width: ROOM_W * zoom, height: ROOM_H * zoom }}>
+                    <div className="minigame-stage__inner" style={{ width: ROOM_W, height: ROOM_H, transform: `scale(${ zoom })` }}>
+                        <GameRoomScene image={roomImage} furni={DECOR} avatars={avatars}>
+                            {table && snails.map((snail, seat) => {
+                                const x = START_X + (FINISH_X - START_X) * Math.min(1, snail.x / length);
+                                const point = roomPoint(x, 2 + seat + 0.5);
+                                const frame = snail.mood === 'sleep' ? 2 : snail.mood === 'done' || snail.speed <= 0 ? 1 : tick % 2;
+                                const nose = 31 * SNAIL_ZOOM;
 
-                            return (
-                                <div key={seat} className="snailrace-runner" style={{ left, top }}>
-                                    {snail.mood === 'turbo' && <Sprite name="dust" x={-26} y={28} />}
-                                    <Sprite name={`snail_${seat % 6}_${frame}`} x={0} y={0} />
-                                    {snail.mood === 'sleep' && <Sprite name="zzz" x={30} y={-22} className="snailrace-zzz" />}
-                                    {snail.mood === 'cheered' && <Sprite name="leaf" x={56} y={-12} className="snailrace-leaf" />}
-                                    {snail.place > 0 && <span className={`snailrace-place is-${snail.place}`} data-browser-text>{snail.place}</span>}
-                                </div>
-                            );
-                        })}
-                        {players.map((player, seat) => (
-                            <div key={`fan-${player.userId}`} className={`snailrace-fan ${seat === table.you ? 'is-you' : ''}`} style={{ left: first + seat * spacing }}>
-                                <MiniGameAvatar player={player} direction={seat < players.length / 2 ? 2 : 4} />
-                                <span className={`snailrace-fan__flag is-${seat % 6}`} data-browser-text>{player.name}</span>
-                                {snails[seat]?.mood === 'cheered' && <span className="snailrace-fan__shout" data-browser-text>{st('shout', 'Go!')}</span>}
-                            </div>
-                        ))}
-                        {racing && startsIn > 0 && <span className="minigame-count" style={{ left: STAGE_W / 2, top: LANE_TOP + 3 * LANE_H }} data-browser-text>{Math.ceil(startsIn / 1000)}</span>}
+                                return (
+                                    <div key={seat} className="snailrace-runner" style={{ left: point.left - nose, top: point.top - 26 * SNAIL_ZOOM + 6, zIndex: Math.floor((x + 2 + seat + 0.5) * 10) + 7 }}>
+                                        {snail.mood === 'turbo' && <Sprite name="dust" left={-22} top={24} />}
+                                        <Sprite name={`snail_${ seat % 6 }_${ frame }`} left={0} top={0} />
+                                        {snail.mood === 'sleep' && <Sprite name="zzz" left={26} top={-18} className="snailrace-zzz" />}
+                                        {snail.mood === 'cheered' && <Sprite name="leaf" left={46} top={-10} className="snailrace-leaf" />}
+                                        <span className="snailrace-snail-name" style={{ borderColor: COLOURS[seat % 6] }} data-browser-text>{players[seat]?.name ?? ''}</span>
+                                        {snail.place > 0 && <span className={`snailrace-place is-${ snail.place }`} data-browser-text>{snail.place}</span>}
+                                    </div>
+                                );
+                            })}
+                            {racing && startsIn > 0 && <span className="minigame-count" style={{ left: ROOM_W / 2, top: ROOM_H / 2 }} data-browser-text>{Math.ceil(startsIn / 1000)}</span>}
+                        </GameRoomScene>
                     </div>
                 </div>
 

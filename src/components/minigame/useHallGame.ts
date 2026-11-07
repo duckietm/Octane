@@ -124,6 +124,9 @@ export const useStageZoom = (width: number, height: number, topBar = 44): number
 
         const ratio = Math.min(window.innerWidth / width, (window.innerHeight - topBar) / height);
 
+        // Twice the size when it nearly fits (a few pixels short is better than half the size), else a whole zoom.
+        if (ratio >= 1.85 && ratio < 2) return ratio;
+
         return ratio >= 1 ? Math.floor(ratio) : Math.max(0.5, ratio);
     };
     const [ zoom, setZoom ] = useState(read);

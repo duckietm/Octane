@@ -1,7 +1,48 @@
 /* The snail race's garden: the stage is 960 x 680, the garden drawn at 1x and shown twice its size. */
 
 .snailrace-world {
-    background: #3f7a24;
+    background: radial-gradient(ellipse at 50% 40%, #9fdcff 0%, #5fa8d8 60%, #2f6d98 100%);
+}
+
+.snailrace-snail-name {
+    position: absolute;
+    top: -12px;
+    left: 4px;
+    max-width: 70px;
+    overflow: hidden;
+    padding: 0 4px;
+    border: 2px solid;
+    border-radius: 5px;
+    background: rgba(255, 248, 230, 0.92);
+    color: #3d2108;
+    font: 700 8px/11px HabboAirUbuntu, sans-serif;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.snailrace-lane-name {
+    position: absolute;
+    max-width: 90px;
+    overflow: hidden;
+    padding: 0 6px;
+    border: 2px solid;
+    border-radius: 6px;
+    background: rgba(255, 248, 230, 0.92);
+    color: #3d2108;
+    font: 700 11px/16px HabboAirUbuntu, sans-serif;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.snailrace-tag__colour {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border: 1px solid #ffffff;
+    border-radius: 50%;
 }
 
 .snailrace-sprite {
@@ -13,9 +54,9 @@
 
 .snailrace-runner {
     position: absolute;
-    width: 68px;
-    height: 52px;
-    transition: left 0.25s linear;
+    width: 51px;
+    height: 39px;
+    transition: left 0.25s linear, top 0.25s linear;
 }
 
 .snailrace-zzz {
@@ -50,8 +91,8 @@
 
 .snailrace-place {
     position: absolute;
-    top: -14px;
-    left: 20px;
+    top: -16px;
+    left: -18px;
     width: 26px;
     height: 26px;
     border: 2px solid #6b360d;

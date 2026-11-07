@@ -1,21 +1,29 @@
 /* The Game Center's list: every game side by side, the same card for each (SnowStorm's own card included). */
 
 .game-center-main .game-center-header {
-  width: min(100%, 1580px);
+  position: relative;
+  justify-content: center;
+  width: min(100%, 1530px);
+}
+
+/* The close button on the left: the hotel's purse covers the top right corner. */
+.game-center-main .game-center-header__close {
+  position: absolute;
+  left: 0;
 }
 
 .game-tile-grid.game-card-grid {
   display: grid;
-  width: min(100%, 1580px);
-  grid-template-columns: repeat(auto-fill, 300px);
+  width: min(100%, 1530px);
+  grid-template-columns: repeat(auto-fill, 290px);
   justify-content: center;
-  gap: 18px;
+  gap: 16px;
 }
 
 .game-card-grid .game-tile.game-card {
   position: relative;
   display: flex;
-  width: 300px;
+  width: 290px;
   height: 520px;
   min-height: 0;
   flex-direction: column;
@@ -186,8 +194,11 @@
   line-height: 1.1;
 }
 
-.game-card__vip {
+.game-card-grid .game-card .game-card__vip {
+  max-width: 100%;
   font-size: 12px;
+  text-align: center;
+  white-space: normal;
 }
 
 .game-center-toast {
