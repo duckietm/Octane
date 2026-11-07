@@ -32,6 +32,7 @@ export const HOUSEKEEPING_TABS: readonly HousekeepingTabId[] = [
     HousekeepingTabId.AUDIT,
     HousekeepingTabId.HOTEL,
     HousekeepingTabId.PERMISSIONS,
+    HousekeepingTabId.GAMES,
     HousekeepingTabId.SOUNDBOARD
 ];
 
@@ -48,6 +49,7 @@ export const HOUSEKEEPING_TAB_PERMISSIONS: Partial<Record<HousekeepingTabId, str
     [HousekeepingTabId.BANS]: 'acc_hk_bans',
     [HousekeepingTabId.HOTEL]: 'acc_hk_hotel',
     [HousekeepingTabId.PERMISSIONS]: 'acc_hk_permissions',
+    [HousekeepingTabId.GAMES]: 'acc_hk_games',
     [HousekeepingTabId.SOUNDBOARD]: 'acc_soundboard_manage'
 };
 
@@ -59,6 +61,7 @@ export const HOUSEKEEPING_AREA_PERMISSIONS = [
     'acc_hk_economy',
     'acc_hk_hotel',
     'acc_hk_permissions',
+    'acc_hk_games',
     'acc_soundboard_manage'
 ] as const;
 

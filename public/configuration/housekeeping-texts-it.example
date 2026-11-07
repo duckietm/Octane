@@ -156,6 +156,7 @@
     "housekeeping.validation.invalid_rank": "Rank non valido - deve essere tra 1 e 12.",
 
     "housekeeping.tab.soundboard": "Soundboard",
+    "housekeeping.tab.games": "Giochi",
     "housekeeping.soundboard.search": "Cerca suoni",
     "housekeeping.soundboard.filter": "Filtra suoni",
     "housekeeping.soundboard.filter.all": "Tutti",

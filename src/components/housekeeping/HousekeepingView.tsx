@@ -10,6 +10,7 @@ import { HousekeepingStatusBanner } from './HousekeepingStatusBanner';
 import { HousekeepingAuditTab } from './views/audit/HousekeepingAuditTab';
 import { HousekeepingBansTab } from './views/bans/HousekeepingBansTab';
 import { HousekeepingDashboardTab } from './views/dashboard/HousekeepingDashboardTab';
+import { HousekeepingGamesTab } from './views/games/HousekeepingGamesTab';
 import { HousekeepingHotelTab } from './views/hotel/HousekeepingHotelTab';
 import { HousekeepingLiveTab } from './views/live/HousekeepingLiveTab';
 import { HousekeepingPermissionsTab } from './views/permissions/HousekeepingPermissionsTab';
@@ -57,6 +58,7 @@ export const HousekeepingView: FC = () => {
     const canBans = useHasPermission('acc_hk_bans');
     const canHotel = useHasPermission('acc_hk_hotel');
     const canPermissions = useHasPermission('acc_hk_permissions');
+    const canGames = useHasPermission('acc_hk_games');
     const holds = useMemo(() => {
         const held: Record<string, boolean> = {
             acc_hk_users: canUsers,
@@ -64,11 +66,12 @@ export const HousekeepingView: FC = () => {
             acc_hk_bans: canBans,
             acc_hk_hotel: canHotel,
             acc_hk_permissions: canPermissions,
+            acc_hk_games: canGames,
             acc_soundboard_manage: canManageSoundboard
         };
 
         return (permission: string) => held[permission] === true;
-    }, [canUsers, canRooms, canBans, canHotel, canPermissions, canManageSoundboard]);
+    }, [canUsers, canRooms, canBans, canHotel, canPermissions, canGames, canManageSoundboard]);
     // Config gate on top of the permission: `housekeeping.enabled`
     // (boolean, default false) is the master switch for the whole module.
     // Config is read after `await GetConfiguration().init()` in
@@ -198,7 +201,8 @@ export const HousekeepingView: FC = () => {
                 titleKey: 'housekeeping.nav.hotel',
                 items: [
                     { id: HousekeepingTabId.HOTEL, icon: 'icon-catalog', labelKey: 'housekeeping.tab.hotel' },
-                    { id: HousekeepingTabId.PERMISSIONS, icon: 'icon-cog', labelKey: 'housekeeping.tab.permissions' }
+                    { id: HousekeepingTabId.PERMISSIONS, icon: 'icon-cog', labelKey: 'housekeeping.tab.permissions' },
+                    { id: HousekeepingTabId.GAMES, icon: 'icon-game', labelKey: 'housekeeping.tab.games' }
                 ]
             },
             {
@@ -226,6 +230,8 @@ export const HousekeepingView: FC = () => {
                 return <HousekeepingHotelTab />;
             case HousekeepingTabId.PERMISSIONS:
                 return <HousekeepingPermissionsTab />;
+            case HousekeepingTabId.GAMES:
+                return <HousekeepingGamesTab />;
             case HousekeepingTabId.SOUNDBOARD:
                 return canManageSoundboard ? <HousekeepingSoundboardTab /> : <HousekeepingUsersTab />;
             case HousekeepingTabId.USERS:

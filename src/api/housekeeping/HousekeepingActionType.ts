@@ -39,6 +39,8 @@ export const HousekeepingTabId = {
     HOTEL: 'hotel',
     /** Every permission against every rank. */
     PERMISSIONS: 'permissions',
+    /** The Game Center: free games, packs, rewards. */
+    GAMES: 'games',
     SOUNDBOARD: 'soundboard'
 } as const;
 
