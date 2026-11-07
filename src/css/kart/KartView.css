@@ -1,88 +1,433 @@
-/* HabboKart: the ground at the hotel's zoom, the hotel's track pieces and furni on it, the players in car effects. */
+/* HabboKart: the kart choice, then the race seen from above, the camera on your kart. */
 
 .kart-world {
     background: #3f7a24;
 }
 
-.kart-item {
+.kart-race {
     position: absolute;
-    width: 0;
-    height: 0;
-    pointer-events: none;
-}
-
-.kart-car {
-    position: absolute;
-    width: 0;
-    height: 0;
-    pointer-events: none;
-}
-
-.kart-car.is-smooth {
-    transition: left 0.2s linear, top 0.2s linear;
-}
-
-.kart-car img {
-    position: absolute;
-    bottom: -24px;
+    top: 44px;
     left: 0;
+    overflow: hidden;
+}
+
+.kart-race__ground {
+    position: absolute;
+    inset: 0;
+    display: block;
+}
+
+.kart-race__world {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    will-change: transform;
+}
+
+.kart-scenery,
+.kart-racer {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.kart-world-item {
+    position: absolute;
+    display: block;
+    pointer-events: none;
+    image-rendering: pixelated;
+}
+
+.kart-world-item.is-box {
+    animation: kart-box-float 1.2s ease-in-out infinite;
+}
+
+@keyframes kart-box-float {
+    50% {
+        margin-top: -5px;
+    }
+}
+
+.kart-item-icon {
+    display: inline-block;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+
+/* A driver in a kart: the kart behind, the avatar, the kart in front, the ground point at (0, 0). */
+.kart-driver {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+}
+
+.kart-layer {
+    position: absolute;
+    display: block;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+
+.kart-driver__avatar {
+    position: absolute;
     display: block;
     max-width: none;
     image-rendering: pixelated;
-    transform: translateX(-50%);
 }
 
-.kart-car__name {
+.kart-racer::before {
     position: absolute;
-    bottom: 64px;
+    top: -10px;
+    left: -34px;
+    width: 68px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.25);
+    content: '';
+}
+
+.kart-racer.is-boost::after {
+    position: absolute;
+    top: -26px;
+    left: -40px;
+    width: 80px;
+    height: 40px;
+    border-radius: 50%;
+    background: radial-gradient(rgba(255, 196, 40, 0.75), rgba(255, 120, 0, 0) 70%);
+    content: '';
+    animation: kart-flame 0.12s linear infinite alternate;
+}
+
+.kart-racer.is-drift::before {
+    background: rgba(70, 170, 255, 0.45);
+    box-shadow: 0 0 10px rgba(110, 200, 255, 0.9);
+}
+
+@keyframes kart-flame {
+    to {
+        opacity: 0.55;
+    }
+}
+
+.kart-racer__name {
+    position: absolute;
+    top: -96px;
     left: 0;
     padding: 1px 6px;
     border-radius: 6px;
-    background: rgba(0, 0, 0, 0.55);
-    color: #ffffff;
+    background: rgba(0, 0, 0, 0.6);
     font: 700 11px HabboAirUbuntu, sans-serif;
     white-space: nowrap;
     transform: translateX(-50%);
 }
 
-.kart-car__name.is-you {
-    background: #b0280f;
+/* The race's panels. */
+.kart-hud {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 6px 14px;
+    border: 2px solid #1b1b1b;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.62);
+    color: #ffffff;
+    font: 700 16px HabboAirUbuntu, sans-serif;
 }
 
-.kart-ranking {
-    position: fixed;
-    top: 60px;
-    right: 18px;
+.kart-hud__rank {
+    color: #ffd23a;
+    font-size: 34px;
+    line-height: 1;
+    text-shadow: 0 2px 0 #7a4b00;
+}
+
+.kart-hud__rank small {
+    margin-left: 2px;
+    color: #ffffff;
+    font-size: 14px;
+    text-shadow: none;
+}
+
+.kart-slot {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    z-index: 4;
+    display: flex;
+    width: 66px;
+    height: 66px;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #ffffff;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.55);
+    transform: translateX(-50%);
+}
+
+.kart-minimap {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    z-index: 4;
+    border: 2px solid #1b1b1b;
+    border-radius: 10px;
+    background: rgba(40, 80, 30, 0.78);
+}
+
+.kart-start {
+    position: absolute;
+    top: 30%;
+    left: 50%;
     z-index: 5;
     display: flex;
-    min-width: 190px;
     flex-direction: column;
-    gap: 3px;
-    padding: 8px;
-    border: 2px solid #6b360d;
-    border-radius: 8px;
-    background: rgba(255, 248, 230, 0.94);
-    color: #3d2108;
+    align-items: center;
+    gap: 8px;
+    transform: translate(-50%, -50%);
+}
+
+.kart-start__lights {
+    display: flex;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 3px solid #111111;
+    border-radius: 14px;
+    background: #2b2b2b;
+}
+
+.kart-start__light {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #4a1410;
+}
+
+.kart-start__light.is-on {
+    background: #ff3b25;
+    box-shadow: 0 0 14px #ff6a4a;
+}
+
+.kart-start__count,
+.kart-go {
+    color: #ffffff;
+    font: 700 64px HabboAirUbuntu, sans-serif;
+    text-shadow: 0 4px 0 #111111, 0 0 12px rgba(0, 0, 0, 0.6);
+}
+
+.kart-go {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    z-index: 5;
+    color: #63e23a;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.kart-go.is-finish {
+    color: #ffd23a;
+    font-size: 48px;
+    white-space: nowrap;
+}
+
+.kart-help {
+    position: absolute;
+    bottom: 14px;
+    left: 16px;
+    z-index: 4;
+    display: flex;
+    max-width: 430px;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #ffffff;
     font: 400 12px HabboAirUbuntu, sans-serif;
 }
 
-.kart-ranking__row {
+.kart-help b {
+    color: #ffd23a;
+}
+
+.kart-pad {
+    position: absolute;
+    right: 254px;
+    bottom: 14px;
+    z-index: 4;
+    display: grid;
+    grid-template-columns: repeat(3, 44px);
+    grid-template-rows: repeat(2, 44px);
+    gap: 4px;
+}
+
+.kart-pad__button {
+    border: 2px solid #1b1b1b;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.82);
+    color: #1b1b1b;
+    font: 700 14px HabboAirUbuntu, sans-serif;
+    touch-action: none;
+    user-select: none;
+}
+
+.kart-pad__button:active {
+    background: #ffd23a;
+}
+
+.kart-pad .is-up {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.kart-pad .is-left {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.kart-pad .is-down {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.kart-pad .is-right {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.kart-actions {
+    position: absolute;
+    right: 254px;
+    bottom: 118px;
+    z-index: 4;
     display: flex;
-    gap: 8px;
-    padding: 2px 6px;
-    border-radius: 4px;
+    gap: 4px;
 }
 
-.kart-ranking__row em {
-    margin-left: auto;
-    color: #6b360d;
-    font-style: normal;
+.kart-actions .kart-pad__button {
+    padding: 6px 10px;
 }
 
-.kart-ranking__row.is-you {
-    background: #ffefc6;
+/* The kart choice. */
+.kart-choice {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    width: min(980px, 94vw);
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 22px 22px;
+    border: 3px solid #1b1b1b;
+    border-radius: 14px;
+    background: linear-gradient(#2a6fd6, #1c4c9c);
+    color: #ffffff;
+    font: 400 13px HabboAirUbuntu, sans-serif;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.45);
+}
+
+.kart-choice__logo {
+    max-height: 90px;
+    image-rendering: pixelated;
+}
+
+.kart-choice__title {
+    font: 700 22px HabboAirUbuntu, sans-serif;
+    text-shadow: 0 2px 0 #0d2a5a;
+}
+
+.kart-choice__karts {
+    display: flex;
+    gap: 10px;
+}
+
+.kart-choice__kart {
+    display: flex;
+    width: 160px;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 6px 10px;
+    border: 3px solid rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.14);
+    cursor: pointer;
+}
+
+.kart-choice__kart:hover {
+    background: rgba(255, 255, 255, 0.24);
+}
+
+.kart-choice__kart.is-on {
+    border-color: #ffd23a;
+    background: rgba(255, 210, 58, 0.28);
+    box-shadow: 0 0 0 2px #ffffff inset;
+}
+
+.kart-choice__picture {
+    position: relative;
+    display: block;
+    width: 140px;
+    height: 150px;
+}
+
+.kart-choice__picture .kart-driver {
+    top: 118px;
+    left: 70px;
+    transform: scale(1.35);
+    transform-origin: 0 0;
+}
+
+.kart-choice__name {
+    padding: 2px 10px;
+    border-radius: 8px;
+    background: #ffffff;
+    font: 700 15px HabboAirUbuntu, sans-serif;
+}
+
+.kart-choice__text {
+    max-width: 760px;
+    line-height: 1.45;
+    text-align: center;
+}
+
+.kart-choice__buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.kart-choice__buttons button {
+    min-width: 170px;
+    font-size: 14px;
 }
 
 .kart-panel {
     bottom: 40px;
+}
+
+/* The music and sound switches in the top bar. */
+.kart-sound {
+    margin-left: 6px;
+    padding: 3px 10px;
+    border: 2px solid #1b1b1b;
+    border-radius: 6px;
+    background: #ffd23a;
+    color: #3d2108;
+    font: 700 12px HabboAirUbuntu, sans-serif;
+    cursor: pointer;
+}
+
+.kart-sound.is-off {
+    background: #8d8d8d;
+    color: #e6e6e6;
+    text-decoration: line-through;
 }
