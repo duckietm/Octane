@@ -132,7 +132,7 @@ const RewardRow: FC<{ reward: IGameAdminReward; currencies: { id: number; name: 
 };
 
 /**
- * The Moderation's Games page (`acc_hk_games`): for each game of the Game Center (SnowStorm first), the free games a
+ * Housekeeping's Games page (`acc_hk_games`): for each game of the Game Center (SnowStorm first), the free games a
  * day, the Habbo Club's extra ones, the packs of games to buy (games, price, currency) and the rewards: for each game
  * played or won, and for the week's leaderboard (by ranks), a furni, clothes, a badge or currency.
  */

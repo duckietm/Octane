@@ -11,7 +11,7 @@ export interface IGameCenterGame {
     gamesLeft: number;
     /** The player's free games a day (with the Habbo Club's extra ones when a member). */
     freePerDay: number;
-    /** The free games a day for everybody, and the Habbo Club's extra ones (set in the Moderation). */
+    /** The free games a day for everybody, and the Habbo Club's extra ones (set in housekeeping). */
     freeDaily: number;
     hcExtra: number;
     /** The packs of games to buy. */
@@ -58,7 +58,7 @@ export interface IGameLeaderboard {
     entries: IGameLeaderboardEntry[];
 }
 
-/** The Moderation's Games page (`acc_hk_games`). */
+/** Housekeeping's Games page (`acc_hk_games`). */
 export type GameRewardKind = 'play' | 'win' | 'week';
 export type GameRewardType = 'furni' | 'clothing' | 'badge' | 'currency';
 
