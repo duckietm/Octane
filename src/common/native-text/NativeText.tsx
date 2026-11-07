@@ -3,7 +3,8 @@ import { renderCanvasSpacedText, supportsCanvasSpacedText } from './CanvasSpaced
 import { loadNativeFont, measureNativeText, NativeFontStyle, peekNativeFont, supportsNativeText, unpremultiplyPixels } from './NativeFont';
 import { nativeTextRasterCache } from './NativeTextRasterCache';
 import { compositeRetainedToOpaque, resolveLineMetrics } from './NativeTextRenderer';
-import { useNativeTextRasterScale, useNativeTextSampling, useNativeTextScale } from './NativeTextScale';
+import { getTransformedRasterScale, getTransformedSpacedScale, useNativeTextRasterScale, useNativeTextSampling, useNativeTextScale } from './NativeTextScale';
+import { measureNativeTextTransformScale, nativeTextTransformScaleAt, useNativeTextTransform } from './NativeTextTransformScale';
 import { NativeTextStyleName, nativeTextStyles } from './NativeTextStyles';
 
 /** A drawn raster handed to `onRaster`: the 1x or display-scale canvas, the text it shows and the surface colour it was composited against (null: transparent). */
@@ -102,11 +103,10 @@ export const NativeText: FC<NativeTextProps> = ({
     const displayScale = useNativeTextScale();
     const rasterScale = useNativeTextRasterScale();
     const sampling = useNativeTextSampling(nativeResolution);
-    // Text is drawn at the device pixel ratio itself, so it is never resampled; the renderer takes whole sizes only, so on a fractional
-    // ratio it is drawn at the nearest whole size (13 px at 125 % as 16 px, Volter 9 px as 11 px: sharp pixel letters, where a 2x raster
-    // shrunk by the browser came out soft). The letter-spaced canvas path keeps the next whole scale.
-    const scale = nativeResolution ? 1 : rasterScale;
-    const spacedScale = nativeResolution ? 1 : displayScale;
+    // A label in a stage zoomed by a CSS transform (the hotel view) is drawn at the size it is shown, not stretched from 1x. The zoom is
+    // measured on the label itself when it is drawn: a dropdown list or tooltip in a portal is not zoomed, and stays 1x.
+    const transform = useNativeTextTransform();
+    const rootRef = useRef<HTMLSpanElement>(null);
     const onRasterRef = useRef(onRaster);
 
     // Refreshed before the render effect below runs (declared first, so it runs first), like the other callback refs of the code base.
@@ -118,6 +118,13 @@ export const NativeText: FC<NativeTextProps> = ({
         let disposed = false;
         setSize(null);
         onRasterRef.current?.(null);
+        // Text is drawn at the device pixel ratio itself, so it is never resampled; the renderer takes whole sizes only, so on a fractional
+        // ratio it is drawn at the nearest whole size (13 px at 125 % as 16 px, Volter 9 px as 11 px: sharp pixel letters, where a 2x raster
+        // shrunk by the browser came out soft). The letter-spaced canvas path keeps the next whole scale.
+        const transformScale =
+            transform.scale === 1 ? 1 : (measureNativeTextTransformScale(rootRef.current) ?? nativeTextTransformScaleAt(transform, canvasRef.current));
+        const scale = nativeResolution ? 1 : getTransformedRasterScale(rasterScale, transformScale);
+        const spacedScale = nativeResolution ? 1 : getTransformedSpacedScale(displayScale, transformScale);
         const render = async () => {
             // Bound work before tokenisation or native layout. Oversized messages
             // retain the existing DOM text rather than being truncated.
@@ -256,10 +263,11 @@ export const NativeText: FC<NativeTextProps> = ({
         return () => {
             disposed = true;
         };
-    }, [text, textStyle, styleKey, maxWidth, leading, cssLineHeight, align, scale, spacedScale]);
+    }, [text, textStyle, styleKey, maxWidth, leading, cssLineHeight, align, nativeResolution, rasterScale, displayScale, transform]);
 
     return (
         <span
+            ref={rootRef}
             className={className}
             data-native-text={size ? textStyle : 'fallback'}
             style={{ display: 'inline-block', verticalAlign: 'top', position: 'relative', ...size, ...(align ? { textAlign: align } : {}), ...style }}
@@ -271,7 +279,7 @@ export const NativeText: FC<NativeTextProps> = ({
                     display: size ? 'block' : 'none',
                     width: size?.width,
                     height: size?.height,
-                    imageRendering: nativeResolution ? sampling : scale === rasterScale ? 'pixelated' : 'auto'
+                    imageRendering: nativeResolution ? sampling : 'pixelated'
                 }}
             />
             <span

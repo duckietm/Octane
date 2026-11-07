@@ -14,6 +14,23 @@ export const getNativeTextScale = (): number => Math.min(4, Math.max(1, Math.cei
  */
 export const getNativeTextRasterScale = (): number => Math.min(4, Math.max(1, Math.round((globalThis.devicePixelRatio || 1) * 100) / 100));
 
+/**
+ * The raster scale of a label shown under a CSS transform scale: the device pixel ratio times the transform, so the raster matches the
+ * screen pixels it covers (between a quarter and 8, in hundredths). Without a transform it is getNativeTextRasterScale's answer.
+ */
+export const getTransformedRasterScale = (rasterScale: number, transformScale: number): number => {
+    if (!Number.isFinite(transformScale) || transformScale <= 0 || transformScale === 1) return rasterScale;
+
+    return Math.min(8, Math.max(0.25, Math.round(rasterScale * transformScale * 100) / 100));
+};
+
+/** The letter-spaced canvas path's whole scale under a transform: the next whole multiple of what the label covers. */
+export const getTransformedSpacedScale = (displayScale: number, transformScale: number): number => {
+    if (!Number.isFinite(transformScale) || transformScale <= 0 || transformScale === 1) return displayScale;
+
+    return Math.min(8, Math.max(1, Math.ceil(displayScale * transformScale - 0.01)));
+};
+
 const subscribe = (onChange: () => void) => {
     if (typeof matchMedia !== 'function') return () => {};
 
@@ -55,4 +72,5 @@ export const getNativeTextSampling = (): 'pixelated' | 'auto' => {
 const subscribeNothing = () => () => {};
 
 /** Only a native-resolution text follows the pixel ratio; every other text keeps its constant answer and subscribes to nothing. */
-export const useNativeTextSampling = (enabled: boolean): 'pixelated' | 'auto' => useSyncExternalStore(enabled ? subscribe : subscribeNothing, enabled ? getNativeTextSampling : () => 'pixelated', () => 'pixelated');
+export const useNativeTextSampling = (enabled: boolean): 'pixelated' | 'auto' =>
+    useSyncExternalStore(enabled ? subscribe : subscribeNothing, enabled ? getNativeTextSampling : () => 'pixelated', () => 'pixelated');
