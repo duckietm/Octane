@@ -42,6 +42,7 @@ export * from './battleball/BattleBallApi';
 export * from './fastfood/FastFoodApi';
 export * from './hall/HallApi';
 export * from './gamecenter/GameCenterApi';
+export * from './lostmonkey/LostMonkeyApi';
 export * from './user';
 export * from './utils';
 export * from './wired';

@@ -44,6 +44,7 @@ import { TetrisView } from './tetris/TetrisView';
 import { PlongeoirView } from './plongeoir/PlongeoirView';
 import { KartView } from './kart/KartView';
 import { LostMonkeyView } from './lostmonkey/LostMonkeyView';
+import { CopyWriterView } from './lostmonkey/CopyWriterView';
 import { WobbleNextView } from './wobblenext/WobbleNextView';
 import { SnowWarView } from './game-center/views/snowwar/SnowWarView';
 import { GroupsView } from './groups/GroupsView';
@@ -273,6 +274,7 @@ export const MainView: FC<{}> = (props) =>
                 <WidgetErrorBoundary name="PlongeoirView"><PlongeoirView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="KartView"><KartView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="LostMonkeyView"><LostMonkeyView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="CopyWriterView"><CopyWriterView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="WobbleNextView"><WobbleNextView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="FloorplanEditorView"><FloorplanEditorView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="FurniEditorView"><FurniEditorView /></WidgetErrorBoundary>

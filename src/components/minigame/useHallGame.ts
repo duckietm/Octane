@@ -79,7 +79,7 @@ export const useHallGame = (game: HallGameName, prefix: string, playingMs: numbe
     useEffect(() => {
         const tracker: ILinkEventTracker = {
             linkReceived: (url: string) => {
-                const action = url.split('/')[1];
+                const action = url.slice(prefix.length + 1).split('/')[0];
 
                 if (action === 'show') setVisible(true);
                 else if (action === 'hide') setVisible(false);
