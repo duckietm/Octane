@@ -3125,5 +3125,7 @@
     "octane.catalog.page_lists_recent_purchases": "Deze pagina toont de eigen recente aankopen van elke gebruiker (%layout%), dus er zijn geen bewerkbare aanbiedingen. De pagina-instellingen kun je wel bewerken.",
     "octane.variables_explorer.delete_from_every_holder": "%name% bij alle houders in deze kamer verwijderen?",
     "octane.variables_explorer.add_to_holder": "Toevoegen aan %name%:",
-    "octane.emustats.auto_refresh_every": "Automatisch vernieuwen elke %seconds% s"
+    "octane.emustats.auto_refresh_every": "Automatisch vernieuwen elke %seconds% s",
+    "infostand.room_link.room_id": "Kamer-ID",
+    "infostand.custom_values.unsaved": "Nog niet opgeslagen: klik op Opslaan om de wijziging te bewaren."
 }

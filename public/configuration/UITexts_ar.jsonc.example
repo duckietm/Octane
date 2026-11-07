@@ -3123,5 +3123,7 @@
     "octane.catalog.page_lists_recent_purchases": "تعرض هذه الصفحة المشتريات الأخيرة لكل مستخدم (%layout%)، لذا لا تحتوي على عروض قابلة للتعديل. يمكنك مع ذلك تعديل إعدادات الصفحة.",
     "octane.variables_explorer.delete_from_every_holder": "حذف %name% من كل الحاملين في هذه الغرفة؟",
     "octane.variables_explorer.add_to_holder": "إضافة إلى %name%:",
-    "octane.emustats.auto_refresh_every": "تحديث تلقائي كل %seconds% ث"
+    "octane.emustats.auto_refresh_every": "تحديث تلقائي كل %seconds% ث",
+    "infostand.room_link.room_id": "معرّف الغرفة",
+    "infostand.custom_values.unsaved": "لم يُحفظ بعد: اضغط حفظ للاحتفاظ بالتغيير."
 }

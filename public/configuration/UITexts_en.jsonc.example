@@ -3131,5 +3131,7 @@
     "octane.catalog.page_lists_recent_purchases": "This page lists each user's own recent purchases (%layout%), so it has no editable offers. You can still edit the page settings.",
     "octane.variables_explorer.delete_from_every_holder": "Delete %name% from every holder in this room?",
     "octane.variables_explorer.add_to_holder": "Add to %name%:",
-    "octane.emustats.auto_refresh_every": "Auto refresh every %seconds%s"
+    "octane.emustats.auto_refresh_every": "Auto refresh every %seconds%s",
+    "infostand.room_link.room_id": "Room ID",
+    "infostand.custom_values.unsaved": "Not saved yet: press Save to keep the change."
 }

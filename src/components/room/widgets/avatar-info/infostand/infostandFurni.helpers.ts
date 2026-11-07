@@ -73,3 +73,34 @@ export const parseFurniHeight = (raw: string): number | null => {
 
     return parseFloat(Math.min(MAX_FURNI_HEIGHT, Math.max(0, value)).toFixed(4));
 };
+
+/** The data key of a step link furni (room_noob_exit): the id of the room it sends the user who steps on it to. */
+export const INTERNAL_LINK_VARIABLE = 'internalLink';
+
+/**
+ * The custom variables staff edit in the infostand: the ones the furni's file declares, else the link of a step
+ * link furni (room_noob_exit), whose file declares none but whose data carries it.
+ */
+export const infostandCustomVariables = (declared: string[] | null | undefined, data: { [key: string]: string } | null | undefined): string[] => {
+    if (declared && declared.length) return declared;
+
+    return data && Object.prototype.hasOwnProperty.call(data, INTERNAL_LINK_VARIABLE) ? [INTERNAL_LINK_VARIABLE] : [];
+};
+
+/** The text key and English fallback of the label staff see for a custom variable, or null to show its key. */
+export const infostandCustomVariableLabel = (key: string): { textKey: string; fallback: string } | null =>
+    key === INTERNAL_LINK_VARIABLE ? { textKey: 'infostand.room_link.room_id', fallback: 'Room ID' } : null;
+
+/** The save map of the custom variables: every key, a cleared one with an empty value so the save clears it. */
+export const customVariablesSaveMap = (keys: string[], values: string[]): Map<string, string> => {
+    const map = new Map<string, string>();
+
+    keys.forEach((key, index) => {
+        if (key && key.length) map.set(key, values[index] ?? '');
+    });
+
+    return map;
+};
+
+/** Which custom variables were changed since they were loaded or last saved. */
+export const unsavedCustomVariables = (values: string[], saved: string[]): boolean[] => values.map((value, index) => (value ?? '') !== (saved[index] ?? ''));

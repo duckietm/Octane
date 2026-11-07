@@ -71,7 +71,7 @@ import statXIcon from '../../../../../assets/images/infostand/stat-x.png';
 import statYIcon from '../../../../../assets/images/infostand/stat-y.png';
 import chestLockedIcon from '../../../../../assets/images/groups/native/forum_forum_locked.png';
 import { ImagePositionEditorView } from './ImagePositionEditorView';
-import { BRANDING_NUMBER_RANGES, brandingSaveMap, infostandFurniOwnerText, infostandFurniPanelClass, parseBrandingOptions, parseFurniHeight } from './infostandFurni.helpers';
+import { BRANDING_NUMBER_RANGES, brandingSaveMap, customVariablesSaveMap, infostandCustomVariableLabel, infostandCustomVariables, infostandFurniOwnerText, infostandFurniPanelClass, parseBrandingOptions, parseFurniHeight, unsavedCustomVariables } from './infostandFurni.helpers';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NumberInput } from '../../../../../common/NumberInput';
 import { Hint } from '../../../../../common/Tooltip';
@@ -231,6 +231,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
     const [furniValues, setFurniValues] = useState<string[]>([]);
     const [customKeys, setCustomKeys] = useState<string[]>([]);
     const [customValues, setCustomValues] = useState<string[]>([]);
+    const [savedCustomValues, setSavedCustomValues] = useState<string[]>([]);
     const [isCrackable, setIsCrackable] = useState(false);
     const [crackableHits, setCrackableHits] = useState(0);
     const [crackableTarget, setCrackableTarget] = useState(0);
@@ -530,11 +531,9 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                 const customVariables = roomObject.model.getValue<string[]>(RoomObjectVariable.FURNITURE_CUSTOM_VARIABLES);
                 const furnitureData = roomObject.model.getValue<{ [index: string]: string }>(RoomObjectVariable.FURNITURE_DATA);
 
-                if (customVariables && customVariables.length) {
-                    for (const customVariable of customVariables) {
-                        customKeyss.push(customVariable);
-                        customValuess.push(furnitureData[customVariable] || '');
-                    }
+                for (const customVariable of infostandCustomVariables(customVariables, furnitureData)) {
+                    customKeyss.push(customVariable);
+                    customValuess.push(furnitureData?.[customVariable] || '');
                 }
             }
         }
@@ -558,6 +557,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
         setFurniValues(furniValuess);
         setCustomKeys(customKeyss);
         setCustomValues(customValuess);
+        setSavedCustomValues(customValuess);
         setIsCrackable(isCrackable);
         setCrackableHits(crackableHits);
         setCrackableTarget(crackableTarget);
@@ -746,19 +746,10 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                     GetRoomEngine().modifyRoomObjectDataWithMap(avatarInfo.id, avatarInfo.category, RoomObjectOperationType.OBJECT_SAVE_STUFF_DATA, mapData);
                     break;
                 }
-                case 'save_custom_variables': {
-                    const map = new Map();
-
-                    for (let i = 0; i < customKeys.length; i++) {
-                        const key = customKeys[i];
-                        const value = customValues[i];
-
-                        if (key && key.length && value && value.length) map.set(key, value);
-                    }
-
-                    SendMessageComposer(new SetObjectDataMessageComposer(avatarInfo.id, map));
+                case 'save_custom_variables':
+                    SendMessageComposer(new SetObjectDataMessageComposer(avatarInfo.id, customVariablesSaveMap(customKeys, customValues)));
+                    setSavedCustomValues(Array.from(customValues));
                     break;
-                }
             }
         },
         [avatarInfo, pickupMode, customKeys, customValues, furniKeys, furniValues, pickupRoomObject]
@@ -1247,21 +1238,29 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                                     <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
                                     <div className="flex flex-col gap-1">
                                         {customKeys.map((key, index) => {
+                                            const label = infostandCustomVariableLabel(key);
+                                            const unsaved = unsavedCustomVariables(customValues, savedCustomValues)[index];
+
                                             return (
                                                 <Flex key={index} alignItems="center" gap={1}>
                                                     <Text small wrap align="end" className="col-span-4" variant="white">
-                                                        {key}
+                                                        {label ? localizeWithFallback(label.textKey, label.fallback) : key}
                                                     </Text>
                                                     <OctaneInput
                                                         type="text"
                                                         className="text-black"
-                                                        style={{ color: '#000' }}
+                                                        style={unsaved ? { color: '#000', outline: '2px solid #f5a623', background: '#fff6e0' } : { color: '#000' }}
                                                         value={customValues[index]}
                                                         onChange={(event) => onCustomVariableChange(index, event.target.value)}
                                                     />
                                                 </Flex>
                                             );
                                         })}
+                                        {unsavedCustomVariables(customValues, savedCustomValues).some(Boolean) && (
+                                            <Text small wrap style={{ color: '#f5a623' }}>
+                                                {localizeWithFallback('infostand.custom_values.unsaved', 'Not saved yet: press Save to keep the change.')}
+                                            </Text>
+                                        )}
                                     </div>
                                 </>
                             )}

@@ -3130,5 +3130,7 @@
     "octane.catalog.page_lists_recent_purchases": "Diese Seite zeigt die eigenen letzten Käufe jedes Nutzers (%layout%) und hat daher keine bearbeitbaren Angebote. Die Seiteneinstellungen kannst du trotzdem bearbeiten.",
     "octane.variables_explorer.delete_from_every_holder": "%name% bei allen Haltern in diesem Raum löschen?",
     "octane.variables_explorer.add_to_holder": "Zu %name% hinzufügen:",
-    "octane.emustats.auto_refresh_every": "Automatische Aktualisierung alle %seconds% s"
+    "octane.emustats.auto_refresh_every": "Automatische Aktualisierung alle %seconds% s",
+    "infostand.room_link.room_id": "Raum-ID",
+    "infostand.custom_values.unsaved": "Noch nicht gespeichert: Klicke auf Speichern, um die Änderung zu behalten."
 }

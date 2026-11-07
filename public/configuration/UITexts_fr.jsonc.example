@@ -3123,5 +3123,7 @@
     "octane.catalog.page_lists_recent_purchases": "Cette page affiche les achats récents de chaque utilisateur (%layout%) : elle n'a pas d'offre modifiable. Tu peux quand même modifier les réglages de la page.",
     "octane.variables_explorer.delete_from_every_holder": "Supprimer %name% de tous les détenteurs de cet appart ?",
     "octane.variables_explorer.add_to_holder": "Ajouter à %name% :",
-    "octane.emustats.auto_refresh_every": "Actualisation auto toutes les %seconds% s"
+    "octane.emustats.auto_refresh_every": "Actualisation auto toutes les %seconds% s",
+    "infostand.room_link.room_id": "ID de l'appart",
+    "infostand.custom_values.unsaved": "Pas encore enregistré : clique sur Enregistrer pour garder la modification."
 }
