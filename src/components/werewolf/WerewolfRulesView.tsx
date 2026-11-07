@@ -5,6 +5,10 @@ import { Checkbox } from '../../common/Checkbox';
 import { WerewolfRoleCard } from './WerewolfRoleCard';
 import { WerewolfRoleIcon } from './WerewolfRoleIcon';
 
+/** A village takes 5 to 49 players (WerewolfRules.MAX_CHAIRS). */
+const MIN_PLAYERS = 5;
+const MAX_PLAYERS = 49;
+
 export type WerewolfRulesTab = 'game' | 'how' | 'roles';
 
 const CLASSIC: WerewolfRoleCode[] = [ 'seer', 'witch', 'hunter', 'cupid', 'little_girl' ];
@@ -56,6 +60,8 @@ export const WerewolfRulesView: FC<{
     const [tab, setTab] = useState<WerewolfRulesTab>(firstTab ?? (mode === 'help' ? 'how' : 'game'));
     const [openRole, setOpenRole] = useState<string>('');
     const set = <K extends keyof IWerewolfRules>(key: K, value: IWerewolfRules[K]) => setRules((current) => ({ ...current, [key]: value }));
+    const [ playersDraft, setPlayersDraft ] = useState<string | null>(null);
+    const setPlayers = (value: number) => set('maxPlayers', Math.max(MIN_PLAYERS, Math.min(MAX_PLAYERS, Math.round(Number.isFinite(value) ? value : MIN_PLAYERS))));
     const toggle = (role: WerewolfRoleCode, on: boolean) => set('roles', on ? [ ...rules.roles.filter((code) => code !== role), role ] : rules.roles.filter((code) => code !== role));
     const auto = werewolfAutoWolves(rules.maxPlayers);
     const places = rules.maxPlayers - (rules.wolves || auto);
@@ -75,10 +81,24 @@ export const WerewolfRulesView: FC<{
                     <>
                         <div className="ww-rules__row">
                             <span className="ww-rules__label">{wt('players', 'Players')}</span>
-                            <div className="ww-rules__choice">
-                                {[ 5, 6, 7, 8, 9, 10, 11, 12, 16, 20, 24, 30, 36, 42, 49 ].map((count) => (
-                                    <Button key={count} variant={count === rules.maxPlayers ? 'success' : 'secondary'} disabled={!editable} onClick={() => set('maxPlayers', count)}>{String(count)}</Button>
-                                ))}
+                            <div className="ww-rules__choice ww-rules__count">
+                                <Button variant="secondary" disabled={!editable || rules.maxPlayers <= MIN_PLAYERS} onClick={() => setPlayers(rules.maxPlayers - 1)}>-</Button>
+                                <input className="ww-rules__number" type="number" inputMode="numeric" min={MIN_PLAYERS} max={MAX_PLAYERS} disabled={!editable}
+                                    value={playersDraft ?? String(rules.maxPlayers)}
+                                    onChange={(event) => {
+                                        setPlayersDraft(event.target.value);
+
+                                        const value = Number(event.target.value);
+
+                                        if (Number.isInteger(value) && value >= MIN_PLAYERS && value <= MAX_PLAYERS) set('maxPlayers', value);
+                                    }}
+                                    onBlur={() => {
+                                        setPlayers(Number(playersDraft ?? rules.maxPlayers));
+                                        setPlayersDraft(null);
+                                    }}
+                                    onKeyDown={(event) => event.stopPropagation()} />
+                                <Button variant="secondary" disabled={!editable || rules.maxPlayers >= MAX_PLAYERS} onClick={() => setPlayers(rules.maxPlayers + 1)}>+</Button>
+                                <span className="ww-rules__hint">{wt('rules.players_range', 'from %min% to %max%', [ 'min', 'max' ], [ String(MIN_PLAYERS), String(MAX_PLAYERS) ])}</span>
                             </div>
                         </div>
                         <div className="ww-rules__row">

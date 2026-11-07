@@ -3,7 +3,7 @@ import { FC, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { IWerewolfEvent, IWerewolfGame, IWerewolfRules, IWerewolfView, WEREWOLF_DEFAULT_RULES, WerewolfApi, werewolfCampName, werewolfCauseText, werewolfErrorText, werewolfEventSpeaker, werewolfEventText, werewolfRoleDescription, werewolfRoleName, werewolfStepName, wt } from '../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { FOREST_BACKDROP, FOREST_HEIGHT, FOREST_WIDTH, WerewolfScene } from './WerewolfScene';
+import { FOREST_BACKDROP, IForestLayout, WerewolfScene, forestLayout } from './WerewolfScene';
 import { IWerewolfReveal, WerewolfReveal } from './WerewolfReveal';
 import { WerewolfRoleCard } from './WerewolfRoleCard';
 import { WerewolfRoleIcon } from './WerewolfRoleIcon';
@@ -15,24 +15,25 @@ const POLL_LOBBY_MS = 3000;
 const BUBBLE_MS = 4000;
 const TOP_BAR = 40;
 
-const useSceneZoom = (): number => {
+const useSceneZoom = (layout: IForestLayout): number => {
     // The floor decides the zoom; the forest's edge above it may go off the top of the screen.
-    const read = () => (typeof window === 'undefined' ? 1 : Math.max(1, Math.floor(Math.min(window.innerWidth / FOREST_WIDTH, (window.innerHeight - TOP_BAR) / (FOREST_HEIGHT - FOREST_BACKDROP)))));
+    const read = () => (typeof window === 'undefined' ? 1 : Math.max(1, Math.floor(Math.min(window.innerWidth / layout.width, (window.innerHeight - TOP_BAR) / (layout.height - FOREST_BACKDROP)))));
     const [zoom, setZoom] = useState(read);
 
     useEffect(() => {
         const onResize = () => setZoom(read());
 
+        onResize();
         window.addEventListener('resize', onResize);
 
         return () => window.removeEventListener('resize', onResize);
-    }, []);
+    }, [ layout ]);
 
     return zoom;
 };
 
 /** The clearing's top: under the top bar, or higher when it is too tall for the screen (its bottom then at the bottom). */
-const stageTop = (zoom: number): number => (typeof window === 'undefined' ? TOP_BAR : Math.min(TOP_BAR, window.innerHeight - FOREST_HEIGHT * zoom));
+const stageTop = (layout: IForestLayout, zoom: number): number => (typeof window === 'undefined' ? TOP_BAR : Math.min(TOP_BAR, window.innerHeight - layout.height * zoom));
 
 const INSTRUCTIONS: Record<string, [string, string]> = {
     cupid: [ 'Choose two players who will fall in love (you can choose yourself), then confirm.', 'Unite the lovers' ],
@@ -101,7 +102,8 @@ export const WerewolfView: FC = () => {
     const lastSeqRef = useRef(0);
     const gameRef = useRef(0);
     const logRef = useRef<HTMLDivElement>(null);
-    const zoom = useSceneZoom();
+    const layout = forestLayout(view?.game?.maxPlayers ?? 12);
+    const zoom = useSceneZoom(layout);
 
     const showBubbles = (game: IWerewolfGame | undefined) => {
         if (!game) return;
@@ -377,7 +379,7 @@ export const WerewolfView: FC = () => {
     return (
         <NativeTextTree>
             <div className="ww-room">
-                <div className="ww-room__stage" style={{ width: FOREST_WIDTH * zoom, height: FOREST_HEIGHT * zoom, marginTop: stageTop(zoom) }}>
+                <div className="ww-room__stage" style={{ width: layout.width * zoom, height: layout.height * zoom, marginTop: stageTop(layout, zoom) }}>
                     <div style={{ transform: `scale(${zoom})`, transformOrigin: '0 0' }}>
                         <WerewolfScene game={game ?? null} bubbles={bubbles} selected={selected} zoom={zoom} onSelect={onSelect} onChair={onChair} />
                     </div>

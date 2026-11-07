@@ -1033,3 +1033,29 @@
     line-height: 1.5;
     animation: ww-reveal-drop 0.5s ease-out 1.5s both;
 }
+
+/* The number of players: a field with - and +. */
+.ww-rules__count {
+    align-items: center;
+}
+
+.ww-rules__number {
+    width: 64px;
+    height: 28px;
+    padding: 0 6px;
+    border: 2px solid #6b5a8a;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #2b2140;
+    font: 700 15px HabboAirUbuntu, sans-serif;
+    text-align: center;
+}
+
+.ww-rules__number:disabled {
+    background: #eeeeee;
+}
+
+.ww-rules__hint {
+    color: #6b5a8a;
+    font-size: 11px;
+}
