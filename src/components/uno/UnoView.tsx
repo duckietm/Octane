@@ -50,7 +50,7 @@ const RuleBadges: FC<{ rules: IUnoRules }> = ({ rules }) => (
 );
 
 /**
- * Habbi's UNO (`uno/show`, from the Game Center): a room with a card table. Out of a table, a window lists the open
+ * UNO (`uno/show`, from the Game Center): a room with a card table. Out of a table, a window lists the open
  * tables; at a table the players sit on its chairs, the host chooses the rules and adds robots, and the game is played
  * with the hand at the bottom of the screen. The server keeps the game; the room asks for it every second.
  */

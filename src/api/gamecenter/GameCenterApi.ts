@@ -3,7 +3,7 @@ import { getAccessToken } from '../auth';
 import { GetConfigurationValue } from '../octane/GetConfigurationValue';
 import { localizeWithFallback } from '../utils/localizeWithFallback';
 
-/** A game of Habbi's Game Center (SnowStorm keeps its own counters): its players now and the player's games left. */
+/** A game of the Game Center (SnowStorm keeps its own counters): its players now and the player's games left. */
 export interface IGameCenterGame {
     id: string;
     playing: number;

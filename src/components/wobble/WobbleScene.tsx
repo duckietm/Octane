@@ -11,7 +11,7 @@ import splashImage from '../../assets/images/wobble/wobble-splash.png';
 import { useUnoAvatar } from '../uno/useUnoAvatar';
 
 /**
- * Habbo's original Wobble Squabble room, the rooftop `md_a` of the Shockwave client (deploy/scripts/wobble-classic.py),
+ * Habbo's original Wobble Squabble room, the rooftop `md_a` of the Shockwave client,
  * drawn twice its size so that the hotel's avatars fit its tiles: the sky with its clouds, the rooftop, the waterfall,
  * the line of buoys across the pool, the two fighters on it, and the roof's front edge over everything.
  *

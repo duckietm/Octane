@@ -3,7 +3,7 @@ import { UnoCardCode, unoCardName } from '../../api';
 import sheet from '../../assets/images/uno/uno-cards.png';
 
 /**
- * A card in Habbi's pixel art (uno-cards.png, drawn by deploy/scripts/uno-cards.py): 24x36 pixels, shown at a whole
+ * A card in pixel art drawn for this game (uno-cards.png): 24x36 pixels, shown at a whole
  * zoom. The sheet holds, in one row: 0-9, skip, reverse, +2 for red, yellow, green and blue, then wild, +4 and the back.
  */
 export const UNO_CARD_WIDTH = 24;

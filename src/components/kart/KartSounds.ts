@@ -3,12 +3,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 /**
  * HabboKart's sounds, made by the browser (Web Audio): no recording to load, nothing taken from another game. The
  * engine (two oscillators through a filter, its pitch following the speed), the tyres' squeal in a drift, the grass,
- * the start's beeps, the "?" boxes, the items, a hit, the laps, the finish, and a short chiptune loop written for
- * Habbi. Music and effects each have their switch, kept in the browser.
+ * the start's beeps, the "?" boxes, the items, a hit, the laps, the finish, and a short chiptune loop written for the
+ * game. Music and effects each have their switch, kept in the browser.
  */
 
-const MUSIC_KEY = 'habbi.kart.music';
-const EFFECTS_KEY = 'habbi.kart.effects';
+const MUSIC_KEY = 'octane.kart.music';
+const EFFECTS_KEY = 'octane.kart.effects';
 
 const readSwitch = (key: string): boolean => {
     try {

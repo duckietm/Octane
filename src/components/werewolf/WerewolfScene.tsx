@@ -8,8 +8,7 @@ import { useUnoAvatar } from '../uno/useUnoAvatar';
 import { WerewolfRoleIcon } from './WerewolfRoleIcon';
 
 /**
- * The village's clearing, drawn as the hotel draws a room: the floor picture (werewolf-forest.png,
- * deploy/scripts/werewolf-art.py), the hotel's own furni (a fire, stumps to sit on, trees, bushes, logs) drawn by its
+ * The village's clearing, drawn as the hotel draws a room: the floor picture (werewolf-forest.png), the hotel's own furni (a fire, stumps to sit on, trees, bushes, logs) drawn by its
  * renderer, and the players sitting round the fire. Tile (x, y) has its top corner at ORIGIN + (32 * (x - y), 16 * (x + y)).
  */
 /** The forest's edge above the floor: it may go off the top of the screen. */

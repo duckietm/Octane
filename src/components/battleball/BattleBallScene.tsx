@@ -19,7 +19,7 @@ import tilesImage from '../../assets/images/battleball/bb-tiles.png';
 import { useUnoAvatar } from '../uno/useUnoAvatar';
 
 /**
- * A BattleBall arena of Habbo's original game (deploy/scripts/battleball-classic.py), drawn twice its size so that the
+ * A BattleBall arena of Habbo's original game, drawn twice its size so that the
  * hotel's avatars fit its tiles: the arena's picture, its decor (in front of or behind the players, by the room file's
  * depth), the coloured tiles, the power-ups and pins on the floor, the players on their balls and the effects.
  *

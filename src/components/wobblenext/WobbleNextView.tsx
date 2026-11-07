@@ -73,7 +73,7 @@ const ControlKey: FC<{ label: string; text: string; active?: boolean; disabled?:
 );
 
 /**
- * Habbi's Wobble Squabble (`wobblenext/show`, from the Game Center): a beam over the rooftop pool. Out of a duel, a window
+ * Wobble Squabble (`wobblenext/show`, from the Game Center): a beam over the rooftop pool. Out of a duel, a window
  * lists the open duels; in a duel the two fighters stand on the beam, each with their balance dial, and the keys (or the
  * buttons at the bottom) lean, push, step and crouch until one of them falls in.
  */

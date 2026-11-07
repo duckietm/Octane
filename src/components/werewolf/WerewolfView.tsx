@@ -81,7 +81,7 @@ const revealOf = (event: IWerewolfEvent, game: IWerewolfGame): IWerewolfReveal |
 };
 
 /**
- * Habbi's werewolf game (`werewolf/show`, from the Game Center): a clearing in the woods with a fire. Out of a village,
+ * The werewolf game (`werewolf/show`, from the Game Center): a clearing in the woods with a fire. Out of a village,
  * a window lists the open villages; in a village the players sit round the fire, the host chooses the roles and adds
  * robots, and the game is played night after day, with the narrator's lines and the chat at the bottom right.
  */

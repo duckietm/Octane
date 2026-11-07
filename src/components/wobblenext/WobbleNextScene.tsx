@@ -7,7 +7,7 @@ import splashImage from '../../assets/images/wobblenext/wobble-splash.png';
 import { useUnoAvatar } from '../uno/useUnoAvatar';
 
 /**
- * The rooftop pool, drawn as the hotel draws a room: the picture (wobble-pool.png, deploy/scripts/wobble-art.py), the
+ * The rooftop pool, drawn as the hotel draws a room: the picture (wobble-pool.png), the
  * hotel's own Lido furni round it, drawn by its renderer, and the two fighters on the beam. Tile (x, y) has its top
  * corner at ORIGIN + (32 * (x - y), 16 * (x + y)); the beam is a level line at BEAM_Y, its 8 places 64 pixels apart.
  */

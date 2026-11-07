@@ -14,7 +14,7 @@ import wobblePool from '../../assets/images/wobblenext/wobble-pool.png';
 import { UnoCardView } from '../uno/UnoCardView';
 import { WerewolfRoleIcon } from '../werewolf/WerewolfRoleIcon';
 
-/** A game of Habbi's Game Center, other than SnowStorm (it has its own card). */
+/** A game of the Game Center, other than SnowStorm (it has its own card). */
 export interface IGameCatalogEntry {
     /** The game's id at the Game Center (`/api/gamecenter`), its theme (`data-game-theme`). */
     id: string;
@@ -120,9 +120,9 @@ export const GAME_CATALOG: IGameCatalogEntry[] = [
     },
     {
         id: 'quiz',
-        link: 'habbiquiz/show',
-        option: 'habbiquiz.enabled',
-        title: 'The Habbi quiz',
+        link: 'hotelquiz/show',
+        option: 'hotelquiz.enabled',
+        title: 'The hotel quiz',
         description: 'Lights, camera, questions! Ten questions on the hotel and the world on the studio\'s big screen. The faster your right answer, the more points you get.',
         players: '2-8',
         banner: <Banner image={quizBanner} colour="#f5b400" />

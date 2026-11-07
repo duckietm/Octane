@@ -6,7 +6,7 @@ import { useUnoAvatar } from '../uno/useUnoAvatar';
 import '../../css/minigame/GameRoom.css';
 
 /**
- * A game played in a room of the hotel: the room's floor and walls (deploy/scripts/game-rooms.py: 14 x 10 tiles), the
+ * A game played in a room of the hotel: the room's floor and walls (14 x 10 tiles), the
  * hotel's own furni drawn by its renderer, the players as the hotel's avatars (standing, sitting, holding up a sign,
  * in an effect), their names and what they say, and the game's own pieces on top. Tile (x, y) has its top corner at
  * ROOM_ORIGIN + (32 * (x - y), 16 * (x + y)).

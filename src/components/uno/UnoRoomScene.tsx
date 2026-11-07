@@ -7,7 +7,7 @@ import { UnoCardView } from './UnoCardView';
 import { useUnoAvatar } from './useUnoAvatar';
 
 /**
- * Habbi's UNO room, drawn as the hotel draws a room: the room picture (uno-room.png, deploy/scripts/uno-room.py),
+ * The UNO room, drawn as the hotel draws a room: the room picture (uno-room.png),
  * the hotel's own furni (a table, eight chairs, plants) drawn by its renderer, and the players sitting on the chairs.
  * Tile (x, y) has its top corner at ROOM_ORIGIN + (32 * (x - y), 16 * (x + y)).
  */

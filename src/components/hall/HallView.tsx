@@ -73,7 +73,7 @@ const statusText = (table: IHallTable): string => {
 };
 
 /**
- * Habbi's game hall (`hall/show[/<game>]`, from the Game Center): the Cunning Fox Gamehall's games of Habbo's 2004
+ * The game hall (`hall/show[/<game>]`, from the Game Center): the Cunning Fox Gamehall's games of Habbo's 2004
  * hotel (tic-tac-toe, battleships, chess, poker) and four in a row. A window lists the tables of each game; at a
  * table, the board, the players and their score, round after round.
  */

@@ -24,7 +24,7 @@ const REFRESH_MS = 10000;
 
 /**
  * The Game Center: every game of the hotel side by side, SnowStorm first (it keeps its own queue and counters), then
- * Habbi's games, each with its players right now, the games left today, packs of games to buy, its leaderboard and
+ * the other games, each with its players right now, the games left today, packs of games to buy, its leaderboard and
  * Play. The list (`/api/gamecenter`) is asked for again every ten seconds while it shows.
  */
 export const GameCenterView = () => {

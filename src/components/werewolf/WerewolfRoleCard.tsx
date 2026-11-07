@@ -17,7 +17,7 @@ const face = (frame: number, zoom: number): CSSProperties => ({
 });
 
 /**
- * A big role card in Habbi's pixel art (werewolf-cards.png, deploy/scripts/werewolf-art.py): the frame of the role's
+ * A big role card in pixel art drawn for this game (werewolf-cards.png): the frame of the role's
  * camp, its icon at twice its size in the window, its name on the plate. Without a role, the back of the card. With
  * `flip`, it shows its back first and turns over (`hidden` keeps it on its back: a role nobody may see).
  */

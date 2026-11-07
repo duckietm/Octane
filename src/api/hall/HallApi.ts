@@ -125,7 +125,7 @@ export const HallApi = {
 export const hallt = (key: string, fallback: string, parameters: string[] = null, replacements: string[] = null): string =>
     localizeWithFallback(`hall.${key}`, fallback, parameters, replacements);
 
-const GAME_NAMES: Record<HallGameName, string> = { tictactoe: 'Tic-tac-toe', connect4: 'Four in a row', battleships: 'Battleships', chess: 'Chess', poker: 'Poker', snails: 'Snail race', quiz: 'Habbi quiz', tetris: 'Blocks duel', diving: 'The diving board', kart: 'HabboKart', copywriter: 'Lost Monkey' };
+const GAME_NAMES: Record<HallGameName, string> = { tictactoe: 'Tic-tac-toe', connect4: 'Four in a row', battleships: 'Battleships', chess: 'Chess', poker: 'Poker', snails: 'Snail race', quiz: 'Hotel quiz', tetris: 'Blocks duel', diving: 'The diving board', kart: 'HabboKart', copywriter: 'Lost Monkey' };
 
 export const hallGameName = (game: string): string => hallt(`game.${game}`, GAME_NAMES[game as HallGameName] ?? game);
 

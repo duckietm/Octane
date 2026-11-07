@@ -65,7 +65,7 @@ const Sprite: FC<{ name: string; left: number; top: number; zoom?: number; class
 };
 
 /**
- * Habbi's snail race (`snailrace/show`, from the Game Center), in a garden of the hotel: six dirt lanes, the hotel's
+ * The snail race (`snailrace/show`, from the Game Center), in a garden of the hotel: six dirt lanes, the hotel's
  * racing fence, flags and garden furni, and the players as their avatars, leaning on the fence behind the lanes and
  * shouting for their snail. The snails crawl on their own, nap or get a burst of energy; space cheers yours on. The
  * race runs on the server's tables (`/api/hall`, game `snails`), asked for every 250 ms during a race.

@@ -1,5 +1,5 @@
 /*
- * Habbi's UNO: a room with a card table (UnoRoomScene), drawn at the hotel's zoom, the hand and the game's box over
+ * UNO: a room with a card table (UnoRoomScene), drawn at the hotel's zoom, the hand and the game's box over
  * it, and the hotel's own windows for the tables, the rules, the colour and the end of the game.
  * The room sits below the windows (they start at z-index 400) and above the hotel view.
  */

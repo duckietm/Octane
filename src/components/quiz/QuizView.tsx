@@ -8,9 +8,9 @@ import { MiniGameLobby, MiniGameResults, MiniGameTopBar, MiniGameWaiting } from 
 import { useHallGame, useStageZoom } from '../minigame/useHallGame';
 import '../../css/quiz/QuizView.css';
 
-/** A text of the quiz, `habbiquiz.<key>`. */
+/** A text of the quiz, `hotelquiz.<key>`. */
 const qt = (key: string, fallback: string, parameters: string[] = null, replacements: string[] = null): string =>
-    localizeWithFallback(`habbiquiz.${ key }`, fallback, parameters, replacements);
+    localizeWithFallback(`hotelquiz.${ key }`, fallback, parameters, replacements);
 
 const SEATS: [number, number] = [ 2, 8 ];
 const LETTERS = [ 'A', 'B', 'C', 'D' ];
@@ -36,13 +36,13 @@ const STUDIO: IRoomFurni[] = [
 interface IQuizPlayer { score: number; answered: boolean; answer: number; gained: number }
 
 /**
- * The Habbi quiz (`habbiquiz/show`, from the Game Center), in a TV studio of the hotel: the contestants as their
+ * The hotel quiz (`hotelquiz/show`, from the Game Center), in a TV studio of the hotel: the contestants as their
  * avatars behind the hotel's lecterns, the host, the cameras and lights, and the question on the big screen hanging
  * over the stage. Ten questions, 15 seconds each: the faster a right answer, the more points. It runs on the server's
  * tables (`/api/hall`, game `quiz`), asked for every 250 ms during a game.
  */
 export const QuizView: FC = () => {
-    const g = useHallGame('quiz', 'habbiquiz', 250);
+    const g = useHallGame('quiz', 'hotelquiz', 250);
     const zoom = useStageZoom(ROOM_W, ROOM_H);
     const table = g.table;
     const board = table?.board;
@@ -65,7 +65,7 @@ export const QuizView: FC = () => {
         ...players.map((player, seat) => ({ name: 'uni_lectern', x: first + seat * spacing - 0.5, y: 5.2, dir: 4 }))
     ], [ players.length ]);
 
-    const hostLine = !table ? qt('host.welcome', 'Welcome to the Habbi quiz!')
+    const hostLine = !table ? qt('host.welcome', 'Welcome to the hotel quiz!')
         : table.state === 'waiting' ? qt('host.waiting', 'Contestants, take your places!')
             : table.state === 'finished' ? qt('host.end', 'What a show! Thank you all!')
                 : phase === 'intro' ? qt('host.intro', 'Here is the first question...')
@@ -109,7 +109,7 @@ export const QuizView: FC = () => {
                             <div className="quiz-screen" data-browser-text>
                                 <span className="quiz-screen__cable is-left" />
                                 <span className="quiz-screen__cable is-right" />
-                                {(!table || table.state === 'waiting') && <div className="quiz-screen__title">{qt('title', 'The Habbi quiz')}<span>{qt('soon', 'The show starts soon!')}</span></div>}
+                                {(!table || table.state === 'waiting') && <div className="quiz-screen__title">{qt('title', 'The hotel quiz')}<span>{qt('soon', 'The show starts soon!')}</span></div>}
                                 {table && table.state !== 'waiting' && (
                                     <>
                                         <div className="quiz-screen__head">
@@ -134,7 +134,7 @@ export const QuizView: FC = () => {
                     </div>
                 </div>
 
-                <MiniGameTopBar game="quiz" g={g} title={qt('title', 'The Habbi quiz')}>
+                <MiniGameTopBar game="quiz" g={g} title={qt('title', 'The hotel quiz')}>
                     {playing && <span className="minigame-topbar__info">{phase === 'reveal' ? qt('answer', 'The answer!') : canAnswer ? qt('your_turn', 'Your answer?') : phase === 'ask' ? qt('wait', 'Waiting for the others...') : qt('ready', 'Get ready!')}</span>}
                 </MiniGameTopBar>
 
@@ -154,7 +154,7 @@ export const QuizView: FC = () => {
                 {g.error && <div className="minigame-toast" data-browser-text>{g.error}</div>}
             </div>
 
-            {!table && <MiniGameLobby game="quiz" g={g} className="quiz-lobby" title={qt('title', 'The Habbi quiz')} intro={rules} banner={bannerImage} seats={SEATS} />}
+            {!table && <MiniGameLobby game="quiz" g={g} className="quiz-lobby" title={qt('title', 'The hotel quiz')} intro={rules} banner={bannerImage} seats={SEATS} />}
 
             {table?.state === 'finished' && (
                 <MiniGameResults game="quiz" g={g} table={table} className="quiz-results" title={qt('results', 'The scores')}

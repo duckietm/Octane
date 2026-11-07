@@ -220,7 +220,7 @@ const Bar: FC<{ game: IBattleBallGame; you: number; sounds: ReturnType<typeof us
 };
 
 /**
- * Habbi's BattleBall (`battleball/show`, from the Game Center): Habbo's original BattleBall: Rebound!, its arenas,
+ * BattleBall (`battleball/show`, from the Game Center): Habbo's original BattleBall: Rebound!, its arenas,
  * tiles, power-ups, windows and sounds. Out of a game, a window lists the games; in a game, the teams window until
  * the host starts, then the arena: click a tile to bounce there, space (or the bar's button) for the power-up.
  */

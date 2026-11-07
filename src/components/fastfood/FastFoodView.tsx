@@ -201,7 +201,7 @@ const Results: FC<{ game: IFastFoodGame; you: number; busy: boolean; onAgain: ()
 };
 
 /**
- * Habbi's Fast Food (`fastfood/show`, from the Game Center): Habbo's original Fast Food (2010), its restaurant, plates,
+ * Fast Food (`fastfood/show`, from the Game Center): Habbo's original Fast Food (2010), its restaurant, plates,
  * parachutes, power-ups and sounds. Space (or the big button) drops the plate, then opens its parachute; E (or the
  * small button) uses the power-up.
  */

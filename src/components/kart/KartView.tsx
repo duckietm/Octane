@@ -20,7 +20,7 @@ const kt = (key: string, fallback: string, parameters: string[] = null, replacem
 const SEATS: [number, number] = [ 2, 8 ];
 const TOP_BAR = 44;
 const SEND_MS = 110;
-const KART_KEY = 'habbi.kart';
+const KART_KEY = 'octane.kart';
 
 const MAX_SPEED = 420;
 const ACCEL = 380;
