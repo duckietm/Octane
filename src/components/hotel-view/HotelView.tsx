@@ -18,6 +18,8 @@ import { Select } from '../../common/Select';
 import { NumberInput } from '../../common/NumberInput';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
+import { NativeTextTransformScale } from '../../common/native-text/NativeTextTransformScale';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { HotelViewLiveSlotView } from './widgets/HotelViewLiveSlotView';
 
 interface HotelViewLandingData {
@@ -72,6 +74,8 @@ const HOTEL_VIEW_WIDTH = 1172;
 const HOTEL_VIEW_HEIGHT = 822;
 /** The gap the scene keeps above the bottom of the window (its old height was the window minus this). */
 const HOTEL_VIEW_SCENE_BOTTOM = 55;
+/** How long the stage's zoom has to stay put before its labels are drawn again at the new size. */
+const TEXT_SCALE_SETTLE_MS = 150;
 const EMPTY_SCENE: IHotelViewLandingScene = { backgroundUrl: '', leftUrl: '', rightUrl: '', drapeUrl: '', leftX: -1, leftY: -1, rightX: -1, rightY: -1, drapeX: -1, drapeY: -1, hallOfFameX: -1, hallOfFameY: -1, hallOfFameEnabled: false, hallOfFameMode: 'latest_registered', hallOfFameCurrencyType: 0, hallOfFameUsers: [] };
 const HOTEL_VIEW_ACTIONS = [
     { value: 'catalog/open', get label() { return localizeWithFallback('octane.hotel_view.open_catalogue', 'Open catalogue'); } },
@@ -206,6 +210,9 @@ export const HotelView: FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const hotelViewRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);
+    // The zoom the labels are drawn for: follows the stage once a resize settles, so dragging the window edge does not draw every
+    // label again on every frame.
+    const [textScale, setTextScale] = useState(1);
     const [landingData, setLandingData] = useState<HotelViewLandingData>({ canEdit: false, scene: EMPTY_SCENE, slots: [] });
     const [editingSlot, setEditingSlot] = useState<IHotelViewLandingSlot | null>(null);
     const [countdownInput, setCountdownInput] = useState('');
@@ -256,6 +263,12 @@ export const HotelView: FC = () => {
 
         return () => observer.disconnect();
     }, []);
+
+    useEffect(() => {
+        const timeout = window.setTimeout(() => setTextScale(scale), TEXT_SCALE_SETTLE_MS);
+
+        return () => window.clearTimeout(timeout);
+    }, [scale]);
 
     const scene = landingData.scene ?? EMPTY_SCENE;
     const backgroundImage = scene.backgroundUrl ? `url("${resolveImageUrl(scene.backgroundUrl, imageLibraryUrl, assetUrl)}")` : 'none';
@@ -525,17 +538,19 @@ export const HotelView: FC = () => {
 
     return (
         // AIR fills the landing view behind the see-through toolbar; the scene keeps its old box, 55 px up.
+        <NativeTextTree>
         <div className="octane-hotel-view block fixed w-full h-full" style={containerStyle}>
+            {/* The left and right artwork stand on the bottom of the window, behind the see-through toolbar, as in AIR. */}
+            {scene.leftUrl && <div className="hotelview-edge hotelview-edge-left"><img src={resolveImageUrl(scene.leftUrl, imageLibraryUrl, assetUrl)} alt="" /><LayoutAvatarImageView classNames={['hotelview-avatar']} figure={GetSessionDataManager().figure} gender={GetSessionDataManager().gender} direction={2} /></div>}
+            {scene.rightUrl && <div className="hotelview-edge hotelview-edge-right"><img src={resolveImageUrl(scene.rightUrl, imageLibraryUrl, assetUrl)} alt="" /></div>}
             <div ref={containerRef} className="hotelview-frame">
-                {scene.leftUrl
-                    ? <div className="hotelview-edge hotelview-edge-left"><img src={resolveImageUrl(scene.leftUrl, imageLibraryUrl, assetUrl)} alt="" /><LayoutAvatarImageView classNames={['hotelview-avatar']} figure={GetSessionDataManager().figure} gender={GetSessionDataManager().gender} direction={2} /></div>
-                    : <LayoutAvatarImageView classNames={['hotelview-avatar hotelview-avatar-fallback']} figure={GetSessionDataManager().figure} gender={GetSessionDataManager().gender} direction={2} />}
-                {scene.rightUrl && <div className="hotelview-edge hotelview-edge-right"><img src={resolveImageUrl(scene.rightUrl, imageLibraryUrl, assetUrl)} alt="" /></div>}
+                {!scene.leftUrl && <LayoutAvatarImageView classNames={['hotelview-avatar hotelview-avatar-fallback']} figure={GetSessionDataManager().figure} gender={GetSessionDataManager().gender} direction={2} />}
                 {scene.drapeUrl && <div className="hotelview-edge hotelview-edge-drape" style={getScenePositionStyle('drape')}><img src={resolveImageUrl(scene.drapeUrl, imageLibraryUrl, assetUrl)} alt="" />{landingData.canEdit && <Hint content={localizeWithFallback('octane.hotel_view.drag_drape', 'Drag drape')}>
                     <BaseButton aria-label={localizeWithFallback('octane.hotel_view.drag_drape', 'Drag drape')} type="button" className="hotelview-scene-drag-handle" onPointerDown={(event) => startSceneDrag(event, 'drape')} onPointerMove={moveSceneDrag} onPointerUp={finishSceneDrag} onPointerCancel={finishSceneDrag}>↕</BaseButton>
                 </Hint>}</div>}
                 <div className="hotelview-stage" style={stageStyle}>
                     <div ref={hotelViewRef} className="hotelview">
+                        <NativeTextTransformScale scale={textScale} stage={hotelViewRef}>
                         <div className="hotelview-background" />
                         {landingData.canEdit && <BaseButton type="button" className="hotelview-scene-edit hotelview-scene-edit-left" onClick={() => setEditingScene(scene)} aria-label={localizeWithFallback('octane.hotel_view.edit_left_image', 'Edit left image')}>✎</BaseButton>}
                         {landingData.canEdit && <BaseButton type="button" className="hotelview-scene-edit hotelview-scene-edit-right" onClick={() => setEditingScene(scene)} aria-label={localizeWithFallback('octane.hotel_view.edit_right_image', 'Edit right image')}>✎</BaseButton>}
@@ -590,8 +605,11 @@ export const HotelView: FC = () => {
                                 <p>{localizeWithFallback('octane.hotel_view.celebrating_the_hotel_s_standout_habbos', 'Celebrating the hotel’s standout Habbos')}</p>
                             </header>
                             {scene.hallOfFameUsers.map((user, index) => <div key={user.id} className="hotelview-hall-of-fame-user" title={user.username}>
-                                <LayoutAvatarImageView classNames={['hotelview-hall-of-fame-avatar']} figure={user.figure} gender={user.gender} direction={[2, 4][index % 2]} />
-                                <span>{user.username}</span>
+                                {/* The CSS keeps each user from growing past 1x (scale(min(1, 1 / stage))): the name is drawn the same way. */}
+                                <NativeTextTransformScale scale={Math.min(1, 1 / textScale)}>
+                                    <LayoutAvatarImageView classNames={['hotelview-hall-of-fame-avatar']} figure={user.figure} gender={user.gender} direction={[2, 4][index % 2]} />
+                                    <span>{user.username}</span>
+                                </NativeTextTransformScale>
                             </div>)}
                             {landingData.canEdit && <Hint content={localizeWithFallback('octane.hotel_view.drag_hall_of_fame', 'Drag Hall of Fame')}>
                                 <BaseButton aria-label={localizeWithFallback('octane.hotel_view.drag_hall_of_fame', 'Drag Hall of Fame')} type="button" className="hotelview-hall-of-fame-drag-handle" onPointerDown={(event) => startSceneDrag(event, 'hallOfFame')} onPointerMove={moveSceneDrag} onPointerUp={finishSceneDrag} onPointerCancel={finishSceneDrag}>↕</BaseButton>
@@ -684,9 +702,11 @@ export const HotelView: FC = () => {
                                 <footer><BaseButton type="button" onClick={() => setEditingScene(null)}>{localizeWithFallback('octane.hotel_view.cancel', 'Cancel')}</BaseButton><BaseButton type="submit">{localizeWithFallback('octane.hotel_view.save', 'Save')}</BaseButton></footer>
                             </form>
                         )}
+                        </NativeTextTransformScale>
                     </div>
                 </div>
             </div>
         </div>
+        </NativeTextTree>
     );
 };
