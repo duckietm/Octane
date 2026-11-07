@@ -45,6 +45,12 @@ const useChatHistoryState = () => {
     // Stored entries survive a reload; the module counter does not. New ids go above the restored range, so an
     // update (translation, avatar image) never lands on an older entry that has the same id.
     const nextChatId = useMemo(() => chatHistory.reduce((next, entry) => Math.max(next, (entry.id ?? -1) + 1), 0), [chatHistory]);
+    // The stored messenger entries keep their ids across a reload: counting from 0 again gave new entries ids the
+    // stored ones already had, and the report list keyed by id mixed them up.
+    const nextMessengerId = useMemo(
+        () => messengerHistory.reduce((next, entry) => Math.max(next, (entry.id ?? -1) + 1), 0),
+        [messengerHistory]
+    );
 
     const addChatEntry = (entry: IChatEntry) => {
         CHAT_HISTORY_COUNTER = Math.max(CHAT_HISTORY_COUNTER, nextChatId);
@@ -94,6 +100,7 @@ const useChatHistoryState = () => {
     };
 
     const addMessengerEntry = (entry: IChatEntry) => {
+        MESSENGER_HISTORY_COUNTER = Math.max(MESSENGER_HISTORY_COUNTER, nextMessengerId);
         entry.id = MESSENGER_HISTORY_COUNTER++;
 
         setMessengerHistory((prevValue) => {

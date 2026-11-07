@@ -37,6 +37,7 @@ export * from './soundboard/useSoundboardManifest';
 export * from './talent';
 export * from './translation';
 export * from './traxeditor/useTraxEditor';
+export * from './traxeditor/useTraxSongRequests';
 export * from './useChatWindow';
 export * from './useCustomWordFilter';
 export * from './useDevicePixelRatio';

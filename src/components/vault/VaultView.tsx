@@ -90,6 +90,9 @@ const rewardCurrencyType = (reward: IEarningsReward): number | string | null => 
     }
 };
 
+const ALL_CLAIMS = '*';
+const CLAIM_TIMEOUT_MS = 10000;
+
 export const VaultView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
     const [entries, setEntries] = useState<IEarningsEntry[]>([]);
@@ -100,7 +103,10 @@ export const VaultView: FC<{}> = (props) => {
         return map;
     }, [entries]);
 
-    const anyClaimable = useMemo(() => entries.some((entry) => entry.enabled && entry.claimable), [entries]);
+    // Claims waiting for their result: a double click, or Claim then Claim all, sent the packet two or three times.
+    const [pendingClaims, setPendingClaims] = useState<ReadonlySet<string>>(new Set());
+    const claimingAll = pendingClaims.has(ALL_CLAIMS);
+    const anyClaimable = useMemo(() => entries.some((entry) => entry.enabled && entry.claimable), [entries]) && pendingClaims.size === 0;
     const { showSingleBubble = null } = useNotification();
     const firstStatus = useRef(true);
 
@@ -156,6 +162,7 @@ export const VaultView: FC<{}> = (props) => {
             const parser = event.getParser();
             if (!parser) return;
 
+            setPendingClaims(new Set());
             setEntries((prev) => {
                 const next = prev.slice();
 
@@ -210,11 +217,22 @@ export const VaultView: FC<{}> = (props) => {
         SendMessageComposer(new RequestEarningsCenterComposer());
     }, [isVisible]);
 
+    useEffect(() => {
+        if (!pendingClaims.size) return;
+
+        // A result that never comes must not keep the buttons locked.
+        const timeout = setTimeout(() => setPendingClaims(new Set()), CLAIM_TIMEOUT_MS);
+
+        return () => clearTimeout(timeout);
+    }, [pendingClaims]);
+
     const claimOne = useCallback((categoryKey: string) => {
+        setPendingClaims((prev) => new Set(prev).add(categoryKey));
         SendMessageComposer(new ClaimEarningsRewardComposer(categoryKey));
     }, []);
 
     const claimAll = useCallback(() => {
+        setPendingClaims(new Set([ALL_CLAIMS]));
         SendMessageComposer(new ClaimAllEarningsRewardsComposer());
     }, []);
 
@@ -231,7 +249,7 @@ export const VaultView: FC<{}> = (props) => {
                 <OctaneCardContentView className="octane-vault-content flex flex-col gap-[3px] text-black">
                     {visibleEarningCategories(entriesByKey).map((category) => {
                         const entry = entriesByKey.get(category.key) ?? null;
-                        const canClaim = !!entry && entry.enabled && entry.claimable;
+                        const canClaim = !!entry && entry.enabled && entry.claimable && !claimingAll && !pendingClaims.has(category.key);
                         const rewards = entry?.rewards ?? [];
 
                         return (

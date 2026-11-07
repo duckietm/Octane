@@ -176,6 +176,20 @@ export const useIssueManagerStore = createOctaneStore<IssueManagerState>()(() =>
 
 const touch = () => useIssueManagerStore.setState((state) => ({ version: state.version + 1 }));
 
+/**
+ * Forgets the tracked issues before a full ModeratorInit list replaces them: the list only ever merged, so a ticket
+ * closed while the socket was down stayed in the browser after the reconnect and picking it failed.
+ */
+export const resetTrackedIssues = () =>
+    useIssueManagerStore.setState((state) => ({
+        issues: new Map(),
+        bundles: new Map(),
+        issueBundle: new Map(),
+        pendingPick: [],
+        pendingRelease: [],
+        version: state.version + 1
+    }));
+
 export interface IssueManagerContext {
     userId: number;
     /** Sends a pick for the issues (`EF`): the retry flag, the retry count and the reason of the call. */

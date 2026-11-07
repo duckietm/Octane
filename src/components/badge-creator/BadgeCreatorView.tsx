@@ -266,7 +266,12 @@ export const BadgeCreatorView: FC<{}> = () => {
         }
     }, [isVisible, refresh]);
 
+    // The badge image load the editor is waiting for. A slower load of an earlier badge used to land last and fill
+    // the grid with that badge's pixels while editingBadgeId named the later one, so Save overwrote it.
+    const editRequestRef = useRef(0);
+
     const resetEditor = useCallback(() => {
+        editRequestRef.current++;
         setGrid(emptyGrid());
         setName('');
         setDescription('');
@@ -275,14 +280,16 @@ export const BadgeCreatorView: FC<{}> = () => {
     }, []);
 
     const startEdit = useCallback(async (badge: CustomBadgeRecord) => {
+        const request = ++editRequestRef.current;
         setError(null);
         setEditingBadgeId(badge.badgeId);
         setName(badge.name || '');
         setDescription(badge.description || '');
         try {
             const loaded = await loadGridFromUrl(badge.url);
-            setGrid(loaded);
+            if (request === editRequestRef.current) setGrid(loaded);
         } catch (err) {
+            if (request !== editRequestRef.current) return;
             setError((err as Error)?.message || 'Could not load that badge.');
             setGrid(emptyGrid());
         }

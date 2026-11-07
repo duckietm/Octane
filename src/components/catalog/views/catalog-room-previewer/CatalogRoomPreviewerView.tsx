@@ -13,19 +13,24 @@ export const CatalogRoomPreviewerView: FC<{
     const elementRef = useRef<HTMLDivElement>(null);
 
     useUiEvent(CatalogPurchasedEvent.PURCHASE_SUCCESS, (event) => {
-        if (!elementRef) return;
+        if (!elementRef.current) return;
 
         const renderTexture = roomPreviewer.getRoomObjectCurrentImage();
 
         if (!renderTexture) return;
 
         (async () => {
-            const image = await TextureUtils.generateImage(renderTexture);
+            let image: HTMLImageElement = null;
 
-            // getRoomObjectCurrentImage() renders a fresh texture that nobody else owns.
-            renderTexture.destroy(true);
+            try {
+                image = await TextureUtils.generateImage(renderTexture);
+            } finally {
+                // getRoomObjectCurrentImage() renders a fresh texture that nobody else owns, freed even on a failure.
+                renderTexture.destroy(true);
+            }
 
-            if (!image) return;
+            // The catalog may have closed while the image was made: the ref is empty then.
+            if (!image || !elementRef.current) return;
 
             const bounds = elementRef.current.getBoundingClientRect();
 

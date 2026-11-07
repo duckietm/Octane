@@ -11,6 +11,8 @@ const useTraxEditorState = () =>
     const [costCurrency, setCostCurrency] = useState(-1);
     const [costAmount, setCostAmount] = useState(0);
     const [lastError, setLastError] = useState(0);
+    // Counts every error reply, so the same error code twice in a row is still seen as a new answer.
+    const [errorCount, setErrorCount] = useState(0);
     const [loaded, setLoaded] = useState(false);
 
     useMessageEvent<TraxEditorSongsEvent>(TraxEditorSongsEvent, (event) =>
@@ -28,6 +30,7 @@ const useTraxEditorState = () =>
     useMessageEvent<TraxEditorErrorEvent>(TraxEditorErrorEvent, (event) =>
     {
         setLastError(event.getParser().errorCode);
+        setErrorCount((count) => count + 1);
     });
 
     const requestSongs = useCallback(() => SendMessageComposer(new GetTraxEditorSongsComposer()), []);
@@ -40,7 +43,7 @@ const useTraxEditorState = () =>
 
     const clearError = useCallback(() => setLastError(0), []);
 
-    return { songs, maxSongs, costCurrency, costAmount, lastError, loaded, requestSongs, buySong, saveSong, deleteSong, clearError };
+    return { songs, maxSongs, costCurrency, costAmount, lastError, errorCount, loaded, requestSongs, buySong, saveSong, deleteSong, clearError };
 };
 
 export const useTraxEditor = () => useSharedHook(useTraxEditorState);

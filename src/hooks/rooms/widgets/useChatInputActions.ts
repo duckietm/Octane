@@ -160,8 +160,13 @@ export const useChatInputActions = () => {
 
                             (async () => {
                                 try {
-                                    const imageUrl = await TextureUtils.generateImageUrl(texture);
-                                    texture?.destroy?.(true);
+                                    let imageUrl: string = null;
+                                    try {
+                                        imageUrl = await TextureUtils.generateImageUrl(texture);
+                                    } finally {
+                                        // A whole-room texture: freed even when the image could not be made.
+                                        texture?.destroy?.(true);
+                                    }
                                     if (!imageUrl) return;
 
                                     const link = document.createElement('a');

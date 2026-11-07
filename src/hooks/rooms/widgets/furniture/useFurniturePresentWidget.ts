@@ -37,6 +37,8 @@ const useFurniturePresentWidgetState = () => {
     // Official `PresentFurniWidget` only shows the contents of the present it is opening itself, so the
     // `PresentOpened` answer to an Ecotron box (the same packet) stays with the Ecotron card.
     const openingRef = useRef(false);
+    // The present whose image is awaited: an image for an earlier present that arrives late is dropped.
+    const imageRequestRef = useRef(0);
 
     const onClose = () => {
         openingRef.current = false;
@@ -54,7 +56,8 @@ const useFurniturePresentWidgetState = () => {
     };
 
     const openPresent = () => {
-        if (objectId === -1) return;
+        // A second click while the first open is on its way opened it twice.
+        if (objectId === -1 || openingRef.current) return;
 
         openingRef.current = true;
         roomSession.openGift(objectId);
@@ -72,10 +75,12 @@ const useFurniturePresentWidgetState = () => {
         // async fix image
         return {
             imageReady: (result) => {
+                const request = imageRequestRef.current;
+
                 (async () => {
                     const image = await result.getImage();
 
-                    if (image) setImageUrl(image.src);
+                    if (image && request === imageRequestRef.current) setImageUrl(image.src);
                 })();
             },
             imageFailed: () => {
@@ -88,6 +93,7 @@ const useFurniturePresentWidgetState = () => {
         if (!openingRef.current) return;
 
         openingRef.current = false;
+        const imageRequest = ++imageRequestRef.current;
 
         let furniData: IFurnitureData = null;
 
@@ -151,7 +157,7 @@ const useFurniturePresentWidgetState = () => {
                             break;
                         }
                         default: {
-                            setText(furniData.name || null);
+                            setText(furniData?.name || null);
                             setImageUrl(GetRoomEngine().getFurnitureWallIconUrl(event.classId));
                             break;
                         }
@@ -184,20 +190,24 @@ const useFurniturePresentWidgetState = () => {
                                 petFigureData.customParts
                             );
 
-                            if (petImage) setImageUrl((await petImage.getImage()).src);
+                            // getImage can resolve null; it threw here before the widget was reset.
+                            const image = petImage ? await petImage.getImage() : null;
+                            if (image && imageRequest === imageRequestRef.current) setImageUrl(image.src);
                         })();
                     }
                 } else {
                     (async () => {
                         const furniImage = GetRoomEngine().getFurnitureFloorImage(event.classId, new Vector3d(90), 64, imageListener);
 
-                        if (furniImage) setImageUrl((await furniImage.getImage()).src);
+                        const image = furniImage ? await furniImage.getImage() : null;
+                        if (image && imageRequest === imageRequestRef.current) setImageUrl(image.src);
                     })();
                 }
 
                 const productData = GetSessionDataManager().getProductData(event.productCode);
 
-                setText((productData && productData.name) || furniData.name);
+                // A class missing from the furnidata (a known state after bulk imports) threw and left the widget open.
+                setText((productData && productData.name) || furniData?.name || null);
                 break;
             }
         }

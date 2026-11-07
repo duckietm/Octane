@@ -1,5 +1,6 @@
 import {
     ControlYoutubeDisplayPlaybackMessageComposer,
+    RoomSessionEvent,
     YouTubeRoomBroadcastEvent,
     YouTubeRoomPlayComposer,
     YouTubeRoomSettingsEvent,
@@ -9,7 +10,7 @@ import {
 import { FC, useEffect, useRef, useState } from 'react';
 import { CopyToClipboard, GetRoomSession, getYoutubeRoomEnabled, LocalizeText, SendMessageComposer, YoutubeVideoPlaybackStateEnum, localizeWithFallback } from '../../api';
 import { LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
-import { useFurnitureYoutubeWidget, useHasPermission, useMessageEvent } from '../../hooks';
+import { useFurnitureYoutubeWidget, useHasPermission, useMessageEvent, useOctaneEvent } from '../../hooks';
 import ReactPlayer from '../youtube/YoutubeReactPlayer';
 import { Checkbox } from '../../common/Checkbox';
 import { Slider } from '../../common/Slider';
@@ -30,7 +31,30 @@ const extractVideoId = (input: string): string => {
         const match = input.match(pattern);
         if (match) return match[1];
     }
-    return input;
+    // Text that is no video id used to become one: it went into the history, the playlist and the room play packet.
+    return '';
+};
+
+const VIDEO_ID = /^[a-zA-Z0-9_-]{11}$/;
+
+/** A stored list of video ids; storage that is blocked, full or holds something else gives an empty list. */
+const readStoredIds = (key: string): string[] => {
+    try {
+        const parsed: unknown = JSON.parse(localStorage.getItem(key) ?? '[]');
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+            .map((entry: unknown) => (typeof entry === 'string' ? entry : (entry as { id?: unknown })?.id))
+            .filter((id): id is string => typeof id === 'string' && VIDEO_ID.test(id));
+    } catch {
+        return [];
+    }
+};
+
+/** Storage that is blocked or full must not take the toolbar down with it. */
+const writeStoredIds = (key: string, ids: string[]) => {
+    try {
+        localStorage.setItem(key, JSON.stringify(ids));
+    } catch {}
 };
 
 export const YouTubePlayerView: FC<{}> = () => {
@@ -99,6 +123,29 @@ export const YouTubePlayerView: FC<{}> = () => {
         }
     }, [isOpen, hasVideo]);
 
+    // The player belongs to the room: going straight to another room kept the last room's video playing, and its
+    // controls drove the last room's furni. Closing it also sends watching false through the effect above.
+    useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.ENDED, () => {
+        setIsOpen(false);
+        setInputValue('');
+        setBroadcastVideo('');
+        setBroadcastSender('');
+        setBroadcastPlaylist([]);
+        setWatcherIds(new Set());
+    });
+
+    useEffect(
+        () => () => {
+            if (!sentWatchingRef.current) return;
+
+            try {
+                SendMessageComposer(new YouTubeRoomWatchingComposer(false));
+            } catch (e) {}
+            sentWatchingRef.current = false;
+        },
+        []
+    );
+
     const loadRoomUsers = () => {
         try {
             const roomSession = GetRoomSession();
@@ -143,32 +190,16 @@ export const YouTubePlayerView: FC<{}> = () => {
     }, []);
 
     useEffect(() => {
-        const savedHistory = localStorage.getItem('youtube_history');
-        if (savedHistory) {
-            try {
-                const parsed = JSON.parse(savedHistory);
-                if (Array.isArray(parsed)) {
-                    setHistory(parsed.map((entry: any) => (typeof entry === 'string' ? entry : entry?.id)).filter(Boolean));
-                }
-            } catch (e) {}
-        }
-        const savedPlaylist = localStorage.getItem('youtube_playlist');
-        if (savedPlaylist) {
-            try {
-                const parsed = JSON.parse(savedPlaylist);
-                if (Array.isArray(parsed)) {
-                    setPlaylist(parsed.map((entry: any) => (typeof entry === 'string' ? entry : entry?.id)).filter(Boolean));
-                }
-            } catch (e) {}
-        }
+        setHistory(readStoredIds('youtube_history'));
+        setPlaylist(readStoredIds('youtube_playlist'));
     }, []);
 
     useEffect(() => {
-        localStorage.setItem('youtube_history', JSON.stringify(history.slice(0, 50)));
+        writeStoredIds('youtube_history', history.slice(0, 50));
     }, [history]);
 
     useEffect(() => {
-        localStorage.setItem('youtube_playlist', JSON.stringify(playlist));
+        writeStoredIds('youtube_playlist', playlist);
     }, [playlist]);
 
     const addToHistory = (id: string) => {

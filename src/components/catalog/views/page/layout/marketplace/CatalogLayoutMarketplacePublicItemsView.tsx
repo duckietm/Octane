@@ -117,6 +117,26 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
         doSearch({ combineUniques: value });
     };
 
+    // One buy at a time, released by its result or, when none comes, after a while: a lost result used to block
+    // buying until the page was opened again.
+    const buyTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+    const releaseBuy = () => {
+        isBuyingRef.current = false;
+        if (buyTimeoutRef.current) clearTimeout(buyTimeoutRef.current);
+        buyTimeoutRef.current = null;
+    };
+
+    const sendBuy = (offerId: number) => {
+        if (isBuyingRef.current) return;
+
+        isBuyingRef.current = true;
+        buyTimeoutRef.current = setTimeout(releaseBuy, 15000);
+        SendMessageComposer(new BuyMarketplaceOfferMessageComposer(offerId));
+    };
+
+    useEffect(() => () => releaseBuy(), []);
+
     const purchaseItem = (offerData: MarketplaceOfferData) => {
         if (offerData.price > getCurrencyAmount(-1)) {
             simpleAlert(
@@ -133,12 +153,7 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
 
         showConfirm(
             LocalizeText('catalog.marketplace.confirm_header'),
-            () => {
-                if (isBuyingRef.current) return;
-
-                isBuyingRef.current = true;
-                SendMessageComposer(new BuyMarketplaceOfferMessageComposer(offerId));
-            },
+            () => sendBuy(offerId),
             null,
             null,
             null,
@@ -179,7 +194,7 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
     useMessageEvent<MarketplaceBuyOfferResultEvent>(MarketplaceBuyOfferResultEvent, (event) => {
         const parser = event.getParser();
 
-        isBuyingRef.current = false;
+        releaseBuy();
 
         if (!parser) return;
 
@@ -206,8 +221,10 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
                 setOffers((prev) => {
                     const newVal = new Map(prev);
 
-                    const item = newVal.get(parser.requestedOfferId);
-                    if (item) {
+                    const previous = newVal.get(parser.requestedOfferId);
+                    if (previous) {
+                        // A copy: the offer belongs to the previous state, which this updater must not change.
+                        const item = Object.assign(Object.create(Object.getPrototypeOf(previous)), previous) as MarketplaceOfferData;
                         // Delete the OLD key first, then set under the (possibly
                         // unchanged) new id. The old code did set()-then-delete(),
                         // so when the server returned the same id for the re-priced
@@ -228,9 +245,8 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
                     LocalizeText('catalog.marketplace.confirm_higher_header') +
                         '\n' +
                         LocalizeText('catalog.marketplace.confirm_price', ['price'], [parser.newPrice.toString()]),
-                    () => {
-                        SendMessageComposer(new BuyMarketplaceOfferMessageComposer(parser.offerId));
-                    },
+                    // The higher price confirm is a buy like the first one, under the same guard.
+                    () => sendBuy(parser.offerId),
                     null,
                     null,
                     null,

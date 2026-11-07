@@ -8,7 +8,7 @@ import {
     RoomSessionUserFigureUpdateEvent,
     UserRelationshipsComposer
 } from '@octane/renderer';
-import React, { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useCallback, useEffect, useState } from 'react';
+import React, { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
     AvatarInfoUser,
     CloneObject,
@@ -44,6 +44,11 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     const [motto, setMotto] = useState<string>(null);
     const isBlocked = useIsUserBlocked(avatarInfo?.webID ?? 0);
     const [isEditingMotto, setIsEditingMotto] = useState(false);
+    const isEditingMottoRef = useRef(false);
+
+    useLayoutEffect(() => {
+        isEditingMottoRef.current = isEditingMotto;
+    });
     const [relationships, setRelationships] = useState<RelationshipStatusInfoMessageParser>(null);
     const [backgroundId, setBackgroundId] = useState<number>(null);
     const [standId, setStandId] = useState<number>(null);
@@ -181,20 +186,26 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
         setRelationships(parser);
     });
 
+    // Once per user shown: every figure, effect or badge update of the same user is a new avatarInfo object, and
+    // keying this on the object closed the motto editor (losing the text) and asked for the relationships again.
     useEffect(() => {
         setIsEditingMotto(false);
         setMotto(avatarInfo.motto);
-        setBackgroundId(avatarInfo.backgroundId);
-        setStandId(avatarInfo.standId);
-        setOverlayId(avatarInfo.overlayId);
-        setCardBackgroundId(avatarInfo.cardBackgroundId ?? 0);
-        setBorderId(avatarInfo.borderId ?? 0);
 
         SendMessageComposer(new UserRelationshipsComposer(avatarInfo.webID));
 
         return () => {
             setRelationships(null);
         };
+    }, [avatarInfo.webID]);
+
+    useEffect(() => {
+        if (!isEditingMottoRef.current) setMotto(avatarInfo.motto);
+        setBackgroundId(avatarInfo.backgroundId);
+        setStandId(avatarInfo.standId);
+        setOverlayId(avatarInfo.overlayId);
+        setCardBackgroundId(avatarInfo.cardBackgroundId ?? 0);
+        setBorderId(avatarInfo.borderId ?? 0);
     }, [avatarInfo]);
 
     if (!avatarInfo) return null;

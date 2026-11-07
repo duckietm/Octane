@@ -132,8 +132,18 @@ export const App: FC<{}> = (props) => {
         } catch {}
     }, []);
 
+    // The heartbeat and the token renewal belong to a live session: on the session expired screen they kept firing
+    // every ten seconds and every minute until the page was closed.
+    const stopSessionTimers = useCallback(() => {
+        if (heartbeatIntervalRef.current !== null) window.clearInterval(heartbeatIntervalRef.current);
+        if (rememberRotateIntervalRef.current !== null) window.clearInterval(rememberRotateIntervalRef.current);
+        heartbeatIntervalRef.current = null;
+        rememberRotateIntervalRef.current = null;
+    }, []);
+
     const showSessionExpired = useCallback(() => {
         OctaneLogger.log('[App] showSessionExpired — diagnostic shown (mid-game close)');
+        stopSessionTimers();
         clearStoredCredentials();
 
         const baseUrl = window.location.origin + '/';
@@ -142,7 +152,7 @@ export const App: FC<{}> = (props) => {
         setIsReady(false);
         setShowLogin(false);
         setIsEnteringHotel(false);
-    }, [clearStoredCredentials]);
+    }, [clearStoredCredentials, stopSessionTimers]);
 
     const fallbackToLogin = useCallback(() => {
         const rawLoginEnabled = GetConfiguration().getValue<unknown>('login.screen.enabled', false);
@@ -154,13 +164,14 @@ export const App: FC<{}> = (props) => {
             return;
         }
         OctaneLogger.log('[App] fallbackToLogin — surfacing login form, credentials cleared');
+        stopSessionTimers();
         clearStoredCredentials();
         setHomeUrl('');
         setErrorMessage('');
         setIsReady(false);
         setShowLogin(true);
         setIsEnteringHotel(false);
-    }, [clearStoredCredentials, showSessionExpired]);
+    }, [clearStoredCredentials, showSessionExpired, stopSessionTimers]);
 
     const applySsoTicket = useCallback((ssoTicket: string) => {
         if (!ssoTicket) return;

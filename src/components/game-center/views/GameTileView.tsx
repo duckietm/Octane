@@ -1,5 +1,5 @@
 import { GameConfigurationData, JoinQueueMessageComposer, PurchaseSnowWarGameTokensOfferComposer, SnowWarGameTokenOffer } from '@octane/renderer';
-import { CSSProperties, FC, useEffect, useState } from 'react';
+import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import {
     applySnowWarPlural,
     ColorUtils,
@@ -71,6 +71,8 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
         CreateLinkEvent(`catalog/open/${links?.['hc.buy_hc'] ?? 'habbo_club'}`);
     };
 
+    const tokenConfirmOpenRef = useRef(false);
+
     // AIR buySnowWarTokensOffer: confirm with the price, then buy the offer.
     const buyTokens = (offer: SnowWarGameTokenOffer, games: number) =>
     {
@@ -81,7 +83,25 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
 
         if (!showConfirm) return buy();
 
-        showConfirm(message, buy, null, null, null, localizeWithFallback('catalog.purchase.confirmation.dialog.title', 'Order Info'));
+        // A double click stacked two price confirms, and accepting both bought twice.
+        if (tokenConfirmOpenRef.current) return;
+        tokenConfirmOpenRef.current = true;
+        const release = () =>
+        {
+            tokenConfirmOpenRef.current = false;
+        };
+
+        showConfirm(
+            message,
+            () =>
+            {
+                release();
+                buy();
+            },
+            release,
+            null,
+            null,
+            localizeWithFallback('catalog.purchase.confirmation.dialog.title', 'Order Info'));
     };
     const showLeaderboard = GetConfigurationValue<boolean>('games.highscores.enabled', true);
 

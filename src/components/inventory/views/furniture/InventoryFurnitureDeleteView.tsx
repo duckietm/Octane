@@ -1,5 +1,5 @@
 import { DeleteItemMessageComposer } from '@octane/renderer';
-import { FC, useState } from 'react';
+import { FC, useRef, useState } from 'react';
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
 import { FurnitureItem, LocalizeText, localizeWithFallback, ProductTypeEnum, SendMessageComposer } from '../../../../api';
 import { LayoutFurniImageView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
@@ -12,9 +12,18 @@ export const InventoryFurnitureDeleteView: FC<{}> = (props) => {
     const [item, setItem] = useState<FurnitureItem>(null);
     const [amount, setAmount] = useState(1);
     const [maxAmount, setMaxAmount] = useState(1);
+    const [confirming, setConfirming] = useState(false);
+    // A second click on Delete used to stack a second confirm, and confirming both deleted the amount twice.
+    const confirmOpenRef = useRef(false);
     const { showConfirm = null } = useNotification();
 
+    const releaseConfirm = () => {
+        confirmOpenRef.current = false;
+        setConfirming(false);
+    };
+
     const onClose = () => {
+        releaseConfirm();
         setItem(null);
         setAmount(1);
         setMaxAmount(1);
@@ -32,7 +41,10 @@ export const InventoryFurnitureDeleteView: FC<{}> = (props) => {
     };
 
     const deleteItem = () => {
-        if (!item) return;
+        if (!item || confirmOpenRef.current) return;
+
+        confirmOpenRef.current = true;
+        setConfirming(true);
 
         const furniTitle = LocalizeText(item.isWallItem ? 'wallItem.name.' + item.type : 'roomItem.name.' + item.type);
 
@@ -94,7 +106,7 @@ export const InventoryFurnitureDeleteView: FC<{}> = (props) => {
                                     {localizeWithFallback('inventory.delete.max_amount.button', 'Maximum')}
                                 </OctaneButton>
                             </div>
-                            <OctaneButton className="bg-danger! hover:bg-danger/80! w-full" disabled={amount > maxAmount} onClick={deleteItem}>
+                            <OctaneButton className="bg-danger! hover:bg-danger/80! w-full" disabled={confirming || amount > maxAmount} onClick={deleteItem}>
                                 {localizeWithFallback('inventory.delete.confirm_delete.button', 'Delete')}
                             </OctaneButton>
                         </div>

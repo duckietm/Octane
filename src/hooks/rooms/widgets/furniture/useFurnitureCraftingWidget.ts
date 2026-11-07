@@ -16,6 +16,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ICraftingIngredient, ICraftingRecipe, LocalizeText, SendMessageComposer } from '../../../../api';
 import { useMessageEvent, useOctaneEvent } from '../../../events';
 import { useInventoryFurni } from '../../../inventory';
+import { useFurniRemovedEvent } from '../../engine';
 import { useNotification } from './../../../notification';
 
 const useFurnitureCraftingWidgetState = () => {
@@ -37,13 +38,20 @@ const useFurnitureCraftingWidgetState = () => {
         setSelectedRecipe(null);
         setIngredients([]);
         setCachedIngredients(new Map());
-        requestedRecipesRef.current = [];
+        // The request queue stays: an answer still on its way after a close and reopen would otherwise be filed
+        // under the next recipe asked for, whose own answer was then dropped. Answers come back in order.
+        setIsCrafting(false);
     };
 
     const onClose = () => {
         setObjectId(-1);
         resetData();
     };
+
+    // The crafting table picked up or deleted while open: nothing is left to craft on.
+    useFurniRemovedEvent(objectId !== -1, (event) => {
+        if (event.id === objectId) onClose();
+    });
 
     const craft = () => {
         setIsCrafting(true);

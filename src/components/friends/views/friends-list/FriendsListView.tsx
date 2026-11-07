@@ -65,9 +65,16 @@ export const FriendsListView: FC<{}> = (props) => {
         isOnlineExpanded && filteredOnlineFriends.length >= SELECT_ALL_MINIMUM && GetConfigurationValue<boolean>('friend_list.select_all.enabled', true) !== false;
     // AIR row order: the friends header (row 0), its friends when open, the offline header, its friends when open.
     const offlineHeaderRow = 1 + (isOnlineExpanded ? filteredOnlineFriends.length : 0);
+    const friendSearchPendingRef = useRef(false);
     const searchResultCount = searchFriendResults ? searchFriendResults.length + (searchOtherResults?.length ?? 0) : 0;
 
     useMessageEvent<HabboSearchResultEvent>(HabboSearchResultEvent, (event) => {
+        // The answer carries no request id and the mod tools and the housekeeping search the same way: only an answer
+        // to this list's own search fills it, or a moderator's lookups replaced the friend search results.
+        if (!friendSearchPendingRef.current) return;
+
+        friendSearchPendingRef.current = false;
+
         const parser = event.getParser();
 
         setSearchFriendResults(parser.friends);
@@ -279,7 +286,11 @@ export const FriendsListView: FC<{}> = (props) => {
                         </div>
                         {activePanel !== null && (
                             <div className="hfl-content">
-                                {activePanel === 'search' && <FriendsSearchView friendResults={searchFriendResults} otherResults={searchOtherResults} />}
+                                {activePanel === 'search' && <FriendsSearchView
+                                        friendResults={searchFriendResults}
+                                        otherResults={searchOtherResults}
+                                        onSearchSent={() => (friendSearchPendingRef.current = true)}
+                                    />}
                                 {activePanel === 'requests' && (
                                     <>
                                         <FriendsListRequestView rows={requestRows} onAccept={acceptRequest} onDecline={declineRequest} />

@@ -13,10 +13,12 @@ interface FriendsSearchViewProps {
     className?: string;
     friendResults: HabboSearchResultData[];
     otherResults: HabboSearchResultData[];
+    /** Told when this view sends a search, so only its answer fills the results. */
+    onSearchSent?: () => void;
 }
 
 /** AIR SearchView: the results of the last search (kept by the friend list) and the search footer. */
-export const FriendsSearchView: FC<FriendsSearchViewProps> = ({ className = '', friendResults = null, otherResults = null }) => {
+export const FriendsSearchView: FC<FriendsSearchViewProps> = ({ className = '', friendResults = null, otherResults = null, onSearchSent = null }) => {
     const [searchValue, setSearchValue] = useState('');
     const [askedIds, setAskedIds] = useState<number[]>([]);
     const { canRequestFriend = null, requestFriend = null, isFriendListFull = null, showFriendListFullAlert = null } = useFriends();
@@ -30,6 +32,7 @@ export const FriendsSearchView: FC<FriendsSearchViewProps> = ({ className = '', 
 
         if (!value.length) return;
 
+        onSearchSent?.();
         SendMessageComposer(new HabboSearchComposer(value));
     };
 
