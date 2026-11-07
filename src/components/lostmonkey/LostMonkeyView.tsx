@@ -74,6 +74,44 @@ const useZoom = (): number => {
     return zoom;
 };
 
+/** The first visit: the monkey's colour and name. */
+const MonkeyCreation: FC<{ busy: boolean; onCreate: (colour: number, name: string) => void; onClose: () => void }> = ({ busy, onCreate, onClose }) => {
+    const [ colour, setColour ] = useState(0);
+    const [ name, setName ] = useState('');
+    const clean = name.trim();
+    const valid = /^[\p{L}\p{N}][\p{L}\p{N} '_-]{1,15}$/u.test(clean);
+
+    return (
+        <OctaneCardView className="game-window lm-window lm-create" data-game-theme="copywriter" theme="primary-slim" uniqueKey="lostmonkey-create" isResizable={false}>
+            <OctaneCardHeaderView headerText={lmt('create.title', 'Your monkey')} onCloseClick={onClose} />
+            <OctaneCardContentView className="lm-window__content" gap={2}>
+                <div className="lm-create__intro" data-browser-text>{lmt('create.text', 'A little monkey is lost on this island and needs you! Choose his colour and give him a name.')}</div>
+                <div className="lm-create__picture"><MonkeyPicture colour={colour} scale={0.7} /></div>
+                <div className="lm-create__colours">
+                    {Array.from({ length: 9 }, (_, index) => (
+                        <button key={index} type="button" className={`lm-hud__colour ${ index === colour ? 'is-on' : '' }`} onClick={() => setColour(index)} aria-label={String(index + 1)}>
+                            <MonkeyPicture colour={index} scale={0.2} />
+                        </button>
+                    ))}
+                </div>
+                <label className="lm-create__name" data-browser-text>
+                    <span>{lmt('create.name', 'His name')}</span>
+                    <input type="text" maxLength={16} value={name} placeholder={lmt('create.placeholder', 'Bongo')}
+                        onChange={(event) => setName(event.target.value)}
+                        onKeyDown={(event) => {
+                            event.stopPropagation();
+                            if (event.key === 'Enter' && valid && !busy) onCreate(colour, clean);
+                        }} />
+                </label>
+                {clean.length > 0 && !valid && <div className="lm-create__error" data-browser-text>{lmt('error.bad_name', 'Your monkey\'s name: 2 to 16 letters or numbers (spaces, - _ and \' allowed).')}</div>}
+                <div className="lm-window__buttons">
+                    <Button variant="success" disabled={busy || !valid} onClick={() => onCreate(colour, clean)}>{lmt('create.go', 'Let\'s go!')}</Button>
+                </div>
+            </OctaneCardContentView>
+        </OctaneCardView>
+    );
+};
+
 /**
  * Lost Monkey (`lostmonkey/show`, from the Game Center), as Habbo's iPhone game: the monkey's island with its own
  * pictures. Click on the island to walk your monkey there; click a thing to use it: pick the banana trees, the TV,
@@ -332,6 +370,7 @@ export const LostMonkeyView: FC = () => {
                             feed();
                         }}>
                             <MonkeyPicture colour={island?.colour ?? 0} asleep={asleep || (island?.energy ?? 100) < 15} scale={MONKEY_SCALE} style={{ transform: `scaleX(${ monkey.facing })` }} />
+                            {island?.name && <span className="lm-monkey__name" data-browser-text>{island.name}</span>}
                             {bubble && <span className="lm-monkey__bubble" data-browser-text>{bubble.text}</span>}
                         </div>
                     </div>
@@ -348,6 +387,7 @@ export const LostMonkeyView: FC = () => {
                         <div className="lm-hud__head">
                             <MonkeyPicture colour={island.colour} asleep={asleep} scale={0.36} />
                             <div className="lm-hud__mood">
+                                {island.name && <strong className="lm-hud__name">{island.name}</strong>}
                                 <LmSprite name={`mood${ island.mood }`} anchor="none" style={{ position: 'relative' }} />
                                 <span>{lmt(`mood.${ island.mood }`, [ 'Very happy', 'Happy', 'So-so', 'Sad', 'Miserable' ][island.mood])}</span>
                             </div>
@@ -392,6 +432,8 @@ export const LostMonkeyView: FC = () => {
 
                 {error && <div className="minigame-toast" data-browser-text>{error}</div>}
             </div>
+
+            {island && !island.created && <MonkeyCreation busy={busy} onClose={() => setVisible(false)} onCreate={(colour, name) => run('create', { colour, name }, lmt('say.hello', 'Hello! Thanks for taking care of me!'))} />}
 
             {window_ === 'shop' && island && (
                 <OctaneCardView className="game-window lm-window" data-game-theme="copywriter" theme="primary-slim" uniqueKey="lostmonkey-shop" isResizable={false}>

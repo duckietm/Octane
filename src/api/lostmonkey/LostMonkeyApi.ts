@@ -18,6 +18,9 @@ export interface ILostMonkeyIsland {
     parts: number[];
     launches: number;
     colour: number;
+    /** The monkey's name, chosen with its colour on the first visit (`created`). */
+    name: string;
+    created: boolean;
     asleep: boolean;
     /** The bunches on each banana tree (0 to 3), and when the next grows (ms). */
     trees: number[];
@@ -33,7 +36,7 @@ export interface ILostMonkeyIsland {
     coinsWon?: number;
 }
 
-export type LostMonkeyAction = 'colour' | 'harvest' | 'feed' | 'wash' | 'tv' | 'sleep' | 'wake' | 'bananas' | 'build' | 'launch' | 'play' | 'score';
+export type LostMonkeyAction = 'create' | 'colour' | 'harvest' | 'feed' | 'wash' | 'tv' | 'sleep' | 'wake' | 'bananas' | 'build' | 'launch' | 'play' | 'score';
 
 export class LostMonkeyApiError extends Error {
     constructor(public readonly code: string) {
@@ -91,7 +94,9 @@ const ERRORS: Record<string, string> = {
     rocket_ready: 'The rocket is ready: launch it!',
     rocket_not_ready: 'The rocket is not finished.',
     too_tired: 'Your monkey is too tired to play: let him sleep in the hammock.',
-    disabled: 'Lost Monkey is closed for now.'
+    disabled: 'Lost Monkey is closed for now.',
+    bad_name: 'Your monkey\'s name: 2 to 16 letters or numbers (spaces, - _ and \' allowed).',
+    not_created: 'Choose your monkey first!'
 };
 
 export const lostMonkeyErrorText = (caught: unknown): string => {

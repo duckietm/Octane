@@ -421,3 +421,75 @@
 .lm-rocket-steps span.is-done {
     background: #f2d21c;
 }
+
+/* The monkey's name over him, in the HUD. */
+.lm-monkey__name {
+    position: absolute;
+    bottom: 74px;
+    left: 0;
+    padding: 1px 8px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff28a;
+    font: 700 12px HabboAirUbuntu, sans-serif;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.lm-hud__name {
+    color: #6b360d;
+    font-size: 15px;
+}
+
+/* The first visit: the monkey's colour and name. */
+.lm-create {
+    width: 380px;
+}
+
+.lm-create__intro {
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.lm-create__picture {
+    position: relative;
+    display: flex;
+    height: 150px;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.lm-create__colours {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+}
+
+.lm-create__name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.lm-create__name input {
+    width: 180px;
+    height: 30px;
+    padding: 0 8px;
+    border: 2px solid #2a8a3e;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #1d2f14;
+    font: 700 14px HabboAirUbuntu, sans-serif;
+}
+
+.lm-create__error {
+    color: #b0280f;
+    font-size: 12px;
+    text-align: center;
+}
