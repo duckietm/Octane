@@ -27,12 +27,42 @@ export const WEREWOLF_CHAIRS = [
     { x: 3, y: 8, dir: 0 }, { x: 2, y: 6, dir: 2 }, { x: 2, y: 5, dir: 2 }, { x: 3, y: 3, dir: 2 }
 ];
 
-/** The stumps of a village of `count` players (the server numbers them 0 to count - 1), spread round the fire. */
+/** Looking at the fire from a seat: the nearest of the four straight directions a Habbo sits in. */
+const facingFire = (x: number, y: number): number => {
+    const dx = 5.5 - (x + 0.5);
+    const dy = 5.5 - (y + 0.5);
+
+    if (Math.abs(dy) >= Math.abs(dx)) return dy > 0 ? 4 : 0;
+
+    return dx > 0 ? 2 : 6;
+};
+
+/** `count` seats on a ring round the fire, starting at the top. */
+const ring = (count: number, radius: number, turn: number) => Array.from({ length: count }, (_, index) => {
+    const angle = -Math.PI / 2 + turn + (index * 2 * Math.PI) / count;
+    const x = 5 + radius * Math.cos(angle);
+    const y = 5 + radius * Math.sin(angle);
+
+    return { x, y, dir: facingFire(x, y) };
+});
+
+/**
+ * The stumps of a village of `count` players (the server numbers them 0 to count - 1), spread round the fire: the
+ * twelve seats of the clearing, then for a big village (up to 49) a ring close to the fire and a second one behind it.
+ */
 export const werewolfChairs = (count: number) => {
     const total = WEREWOLF_CHAIRS.length;
-    const stumps = Math.max(1, Math.min(total, count || total));
 
-    return Array.from({ length: stumps }, (_, index) => WEREWOLF_CHAIRS[Math.round((index * total) / stumps) % total]);
+    if ((count || total) <= total) {
+        const stumps = Math.max(1, count || total);
+
+        return Array.from({ length: stumps }, (_, index) => WEREWOLF_CHAIRS[Math.round((index * total) / stumps) % total]);
+    }
+
+    const inner = Math.min(count, 20);
+    const outer = count - inner;
+
+    return [ ...ring(inner, 3.6, 0), ...ring(outer, 5.1, Math.PI / Math.max(1, outer)) ];
 };
 
 /** The fire, 1x1, set on the middle of the circle (the corner between four tiles). */

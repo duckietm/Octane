@@ -1,4 +1,5 @@
 import { GetConfiguration } from '@octane/renderer';
+import { gamesLeftErrorText } from '../gamecenter/GameCenterApi';
 import { getAccessToken } from '../auth';
 import { GetConfigurationValue } from '../octane/GetConfigurationValue';
 import { localizeWithFallback } from '../utils/localizeWithFallback';
@@ -187,6 +188,9 @@ const ERRORS: Record<string, string> = {
 
 export const unoErrorText = (error: unknown): string => {
     const code = error instanceof UnoApiError ? error.code : 'http_error';
+    const limit = gamesLeftErrorText(code);
+
+    if (limit) return limit;
 
     return ut(`error.${code}`, ERRORS[code] ?? 'Something went wrong, try again.');
 };

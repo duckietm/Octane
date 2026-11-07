@@ -19,6 +19,7 @@ import { useGameCenter, useNotification, useSnowWar } from '../../../hooks';
 import { localizeWithFallback, snowWarErrorText } from './snowwar/SnowWarErrorTexts';
 import { SnowWarStrokeText } from './snowwar/SnowWarStrokeText';
 import { BaseButton } from '../../../common/BaseButton';
+import { PlayingNow } from './GameCardView';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 /**
@@ -26,7 +27,7 @@ import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
  * on the server; for SnowWar the queue/countdown status is shown inside the
  * tile until the match starts and the arena takes over the screen.
  */
-export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
+export const GameTileView: FC<{ game: GameConfigurationData; playing?: number }> = ({ game, playing = 0 }) =>
 {
     const { accountStatus, setSelectedGame, blockedUntil, setInstructionsOpen, tokenOffers } = useGameCenter();
     const { showConfirm = null } = useNotification();
@@ -47,7 +48,7 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
     }, [ blockedUntil ]);
 
     const blockSeconds = snowWarBlockSecondsLeft(blockedUntil, now);
-    const { phase, queuePosition, queueSize, lobbySeconds, queueInfo, errorCode, arenaQueuePosition = -1, leaveQueue, requestLeaderboard, startEditing } = useSnowWar();
+    const { phase, queuePosition, queueSize, lobbySeconds, queueInfo, errorCode, arenaQueuePosition = -1, leaveQueue, requestLeaderboard } = useSnowWar();
 
     const isSnowWar = (game.gameNameId === 'snowwar');
     const inQueue = isSnowWar && ((phase === 'queued') || (phase === 'lobby'));
@@ -117,11 +118,14 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
 
     return (
         <NativeTextTree>
-            <div className={`game-tile${isSnowWar ? ' game-tile--snowwar' : ''}`}>
-                <div
-                    className="game-tile__banner"
-                    style={{ backgroundColor: ColorUtils.uintHexColor(game.bgColor), backgroundImage: `url(${game.assetUrl}${game.gameNameId}_theme.png)` }}>
-                    <img alt={game.gameNameId} className="game-tile__logo" src={isSnowWar ? snowStormLogo : `${game.assetUrl}${game.gameNameId}_logo.png`} />
+            <div className={`game-tile game-card${isSnowWar ? ' game-tile--snowwar' : ''}`} data-game-theme={game.gameNameId}>
+                <div className="game-card__banner-box">
+                    <div
+                        className="game-tile__banner"
+                        style={{ backgroundColor: ColorUtils.uintHexColor(game.bgColor), backgroundImage: `url(${game.assetUrl}${game.gameNameId}_theme.png)` }}>
+                        <img alt={game.gameNameId} className="game-tile__logo" src={isSnowWar ? snowStormLogo : `${game.assetUrl}${game.gameNameId}_logo.png`} />
+                    </div>
+                    <PlayingNow count={playing} />
                 </div>
                 <div className="game-tile__body">
                     <div className="game-tile__title">{title}</div>
@@ -206,11 +210,6 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
                                         {(blockSeconds > 0)
                                             ? formatSnowWarBlockCountdown(blockSeconds)
                                             : localizeWithFallback('snowwar.play', 'Play now!')}
-                                    </BaseButton>
-                                )}
-                                {queueInfo?.canEdit && (
-                                    <BaseButton className="snowwar-button snowwar-button--edit" type="button" onClick={() => startEditing()}>
-                                        {localizeWithFallback('snowwar.editor.build_custom', 'Build Custom Arena')}
                                     </BaseButton>
                                 )}
                             </div>

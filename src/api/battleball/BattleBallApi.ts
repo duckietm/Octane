@@ -1,4 +1,5 @@
 import { GetConfiguration } from '@octane/renderer';
+import { gamesLeftErrorText } from '../gamecenter/GameCenterApi';
 import { getAccessToken } from '../auth';
 import { GetConfigurationValue } from '../octane/GetConfigurationValue';
 import { localizeWithFallback } from '../utils/localizeWithFallback';
@@ -188,6 +189,9 @@ const ERRORS: Record<string, string> = {
 /** The text of a refused action; null for the refusals of the game itself (no power-up, stunned...), which stay silent. */
 export const battleBallErrorText = (error: unknown): string | null => {
     const code = error instanceof BattleBallApiError ? error.code : 'http_error';
+    const limit = gamesLeftErrorText(code);
+
+    if (limit) return limit;
 
     if ([ 'no_power', 'stunned', 'bad_tile', 'not_playing' ].includes(code)) return null;
 

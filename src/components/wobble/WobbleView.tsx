@@ -15,20 +15,35 @@ const POLL_FAST_MS = 250;
 const POLL_SLOW_MS = 1000;
 const POLL_LOBBY_MS = 3000;
 
-/** The room's zoom: the whole rooftop on the screen, never bigger than its own size (twice the original's). */
-const useSceneZoom = (): number => {
-    const read = () => (typeof window === 'undefined' ? 1 : Math.max(0.5, Math.min(1, window.innerWidth / POOL_WIDTH, window.innerHeight / POOL_HEIGHT)));
-    const [zoom, setZoom] = useState(read);
+/** What the camera looks at, in the scene's pixels: the pool and its beam, the fighters above it. */
+const FOCUS = { x: 790, y: 690, width: 1000, height: 660 };
+
+/**
+ * The camera: close on the pool (the beam fills the screen), never so far that the picture's empty edges show, and the
+ * picture always covering the whole screen.
+ */
+const useCamera = (): { zoom: number; left: number; top: number } => {
+    const read = () => {
+        const width = typeof window === 'undefined' ? 1600 : window.innerWidth;
+        const height = typeof window === 'undefined' ? 1100 : window.innerHeight;
+        const cover = Math.max(width / POOL_WIDTH, height / POOL_HEIGHT);
+        const zoom = Math.max(cover, Math.min(2.5, width / FOCUS.width, height / FOCUS.height));
+        const left = Math.min(0, Math.max(width - POOL_WIDTH * zoom, width / 2 - FOCUS.x * zoom));
+        const top = Math.min(0, Math.max(height - POOL_HEIGHT * zoom, height / 2 - FOCUS.y * zoom));
+
+        return { zoom, left, top };
+    };
+    const [camera, setCamera] = useState(read);
 
     useEffect(() => {
-        const onResize = () => setZoom(read());
+        const onResize = () => setCamera(read());
 
         window.addEventListener('resize', onResize);
 
         return () => window.removeEventListener('resize', onResize);
     }, []);
 
-    return zoom;
+    return camera;
 };
 
 /** The original game's buttons: a key (31x31) or the space bar (76x31), as the panel lays them out (paaluUI.window). */
@@ -95,7 +110,8 @@ export const WobbleView: FC = () => {
     const matchRef = useRef(0);
     const heldRef = useRef<{ left: boolean; right: boolean }>({ left: false, right: false });
     const leanRef = useRef(0);
-    const zoom = useSceneZoom();
+    const camera = useCamera();
+    const zoom = Math.min(1, camera.zoom);
 
     const receive = useCallback((next: IWobbleView) => {
         const match = next.match;
@@ -276,6 +292,8 @@ export const WobbleView: FC = () => {
         setLean(0);
     }, [match?.round, match?.state === 'countdown']);
 
+    const classicMatches = (view?.matches ?? []).filter((summary) => !summary.rules?.nextGen);
+
     if (!visible) return null;
 
     const close = () => {
@@ -333,8 +351,8 @@ export const WobbleView: FC = () => {
     return (
         <NativeTextTree>
             <div className="wb-room" style={{ background: SKY }}>
-                <div className="wb-room__stage" style={{ width: POOL_WIDTH * zoom, height: POOL_HEIGHT * zoom }}>
-                    <div style={{ transform: `scale(${zoom})`, transformOrigin: '0 0' }}>
+                <div className="wb-room__stage" style={{ position: 'absolute', left: camera.left, top: camera.top, width: POOL_WIDTH * camera.zoom, height: POOL_HEIGHT * camera.zoom }}>
+                    <div style={{ transform: `scale(${camera.zoom})`, transformOrigin: '0 0' }}>
                         <WobbleScene match={match ?? null} />
                     </div>
                 </div>
@@ -376,8 +394,8 @@ export const WobbleView: FC = () => {
                     <OctaneCardContentView className="text-black" gap={2}>
                         <div className="wb-lobby__intro" data-browser-text>{wbt('intro', 'Two fighters, one beam, one pool. Keep your balance and knock your opponent into the water!')}</div>
                         <div className="wb-lobby__list">
-                            {!view?.matches.length && <div className="wb-lobby__empty">{wbt('no_games', 'No duel yet: open one and challenge a player or a robot.')}</div>}
-                            {view?.matches.map((summary) => (
+                            {!classicMatches.length && <div className="wb-lobby__empty">{wbt('no_games', 'No duel yet: open one and challenge a player or a robot.')}</div>}
+                            {classicMatches.map((summary) => (
                                 <div key={summary.id} className="wb-lobby__game">
                                     <span className="wb-lobby__host">{summary.right ? `${summary.left || '?'} – ${summary.right}` : wbt('duel_of', '%name% is waiting for an opponent', [ 'name' ], [ summary.host || summary.left ])}</span>
                                     <Button variant="success" disabled={busy || summary.players >= 2} onClick={() => run(() => WobbleApi.join(summary.id))}>

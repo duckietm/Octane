@@ -1,4 +1,5 @@
 import { GetConfiguration } from '@octane/renderer';
+import { gamesLeftErrorText } from '../gamecenter/GameCenterApi';
 import { getAccessToken } from '../auth';
 import { GetConfigurationValue } from '../octane/GetConfigurationValue';
 import { localizeWithFallback } from '../utils/localizeWithFallback';
@@ -10,6 +11,8 @@ export interface IWobbleRules {
     bots: boolean;
     /** 1 easy, 2 normal, 3 hard. */
     botLevel: number;
+    /** The duel's look: the original rooftop, or Next Gen (its own list); chosen when it is opened. */
+    nextGen?: boolean;
 }
 
 export const WOBBLE_DEFAULT_RULES: IWobbleRules = { roundsToWin: 2, bots: true, botLevel: 2 };
@@ -158,6 +161,9 @@ const ERRORS: Record<string, string> = {
 /** The text of a refused action; null for the refusals of the game itself (too soon, blocked...), which stay silent. */
 export const wobbleErrorText = (error: unknown): string | null => {
     const code = error instanceof WobbleApiError ? error.code : 'http_error';
+    const limit = gamesLeftErrorText(code);
+
+    if (limit) return limit;
 
     if ([ 'too_soon', 'already_stabilised', 'beam_end', 'blocked', 'not_playing' ].includes(code)) return null;
 

@@ -1,4 +1,5 @@
 import { GetConfiguration } from '@octane/renderer';
+import { gamesLeftErrorText } from '../gamecenter/GameCenterApi';
 import { getAccessToken } from '../auth';
 import { GetConfigurationValue } from '../octane/GetConfigurationValue';
 import { localizeWithFallback } from '../utils/localizeWithFallback';
@@ -209,6 +210,9 @@ const ERRORS: Record<string, string> = {
 /** A refused action's text (`fastfood.error.<code>`); null for the game's own refusals, which stay silent. */
 export const fastFoodErrorText = (caught: unknown): string | null => {
     const code = caught instanceof FastFoodApiError ? caught.code : 'http_error';
+    const limit = gamesLeftErrorText(code);
+
+    if (limit) return limit;
 
     if ([ 'not_ready', 'no_plate', 'too_late', 'chute_broken', 'no_power', 'not_started' ].includes(code)) return null;
 

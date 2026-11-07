@@ -1,0 +1,306 @@
+/*
+ * Each game's colours: its card in the Game Center (--gt-*) and its windows (--gw-*: the lobby, the rules, the
+ * results, the leaderboard...). The windows keep the hotel's shape and get the game's look: the title bar, the frame,
+ * the body, the buttons. A game's windows are listed with its theme below.
+ */
+
+/* ---- The themes ---- */
+
+[data-game-theme='snowwar'] {
+  --gt-edge: #4b9fd8;
+  --gt-card: linear-gradient(#1c3e5c, #10263a);
+  --gt-glow: #9fdcff;
+}
+
+[data-game-theme='uno'],
+:is(.uno-lobby, .uno-rules, .uno-colours, .uno-end) {
+  --gt-edge: #ffce21;
+  --gt-card: linear-gradient(#2f7a40, #1d4f29);
+  --gt-glow: #ffce21;
+  --gw-head: linear-gradient(#ef4a3a 0 50%, #d6342b 50% 100%);
+  --gw-head-line: #ffce21;
+  --gw-edge: #8a1d14;
+  --gw-body: radial-gradient(ellipse at 50% 30%, #f6fff3 0%, #dff2d9 100%);
+  --gw-soft: #ffffff;
+  --gw-ink: #1f3a20;
+  --gw-accent: #ffce21;
+  --gw-accent-ink: #4a2a00;
+  --gw-row: rgba(44, 107, 57, 0.1);
+  --gw-button: linear-gradient(#ffe36b, #ffce21 55%, #e6a800);
+  --gw-button-ink: #4a2a00;
+}
+
+[data-game-theme='werewolf'],
+:is(.ww-lobby, .ww-rules, .ww-power) {
+  --gt-edge: #8f6ad9;
+  --gt-card: linear-gradient(#1f2a3d, #0e1420);
+  --gt-glow: #c9b3ff;
+  --gw-head: linear-gradient(#3b2f63 0 50%, #2a2149 50% 100%);
+  --gw-head-line: #c9b3ff;
+  --gw-edge: #1a1530;
+  --gw-body: linear-gradient(#f3ead2, #e6d8b4);
+  --gw-soft: #fbf5e4;
+  --gw-ink: #2b2140;
+  --gw-accent: #8f6ad9;
+  --gw-accent-ink: #ffffff;
+  --gw-row: rgba(43, 33, 64, 0.08);
+  --gw-button: linear-gradient(#a689e6, #7c56cc 55%, #5d3aa8);
+  --gw-button-ink: #ffffff;
+}
+
+[data-game-theme='wobble'],
+:is(.wb-lobby, .wb-rules) {
+  --gt-edge: #ff9a2e;
+  --gt-card: linear-gradient(#1b4f74, #0f2d45);
+  --gt-glow: #ffc56b;
+  --gw-head: linear-gradient(#ffb04a 0 50%, #ff8d1a 50% 100%);
+  --gw-head-line: #ffffff;
+  --gw-edge: #9a4a00;
+  --gw-body: linear-gradient(#e8f6ff, #c4e6fc);
+  --gw-soft: #ffffff;
+  --gw-ink: #123a58;
+  --gw-accent: #ff9a2e;
+  --gw-accent-ink: #3d1c00;
+  --gw-row: rgba(18, 58, 88, 0.08);
+  --gw-button: linear-gradient(#ffc56b, #ff9a2e 55%, #e07800);
+  --gw-button-ink: #3d1c00;
+}
+
+[data-game-theme='wobblenext'],
+:is(.wbn-lobby, .wbn-rules) {
+  --gt-edge: #2fe0e6;
+  --gt-card: linear-gradient(#0f5e78, #062f3d);
+  --gt-glow: #7ff7ff;
+  --gw-head: linear-gradient(90deg, #00b3c7, #0a6fb8);
+  --gw-head-line: #7ff7ff;
+  --gw-edge: #034b66;
+  --gw-body: linear-gradient(160deg, #f0feff, #c8f2f7);
+  --gw-soft: #ffffff;
+  --gw-ink: #053a4a;
+  --gw-accent: #2fe0e6;
+  --gw-accent-ink: #032a33;
+  --gw-row: rgba(5, 58, 74, 0.08);
+  --gw-button: linear-gradient(#6ff3f7, #19c6d6 55%, #0a98b0);
+  --gw-button-ink: #032a33;
+}
+
+[data-game-theme='battleball'],
+:is(.bb-teams, .bb-rules, .bb-lobby) {
+  --gt-edge: #ffce21;
+  --gt-card: linear-gradient(#3a2a5c, #1b1230);
+  --gt-glow: #ff7a2e;
+  --gw-head: linear-gradient(#ff7a2e 0 50%, #e85a10 50% 100%);
+  --gw-head-line: #ffce21;
+  --gw-edge: #2a1748;
+  --gw-body: repeating-linear-gradient(45deg, #f3eefc 0 14px, #ebe3fa 14px 28px);
+  --gw-soft: #ffffff;
+  --gw-ink: #2a1748;
+  --gw-accent: #217bef;
+  --gw-accent-ink: #ffffff;
+  --gw-row: rgba(42, 23, 72, 0.08);
+  --gw-button: linear-gradient(#ffd85a, #ffce21 55%, #e0a800);
+  --gw-button-ink: #3a2400;
+}
+
+[data-game-theme='fastfood'],
+:is(.ff-rules, .ff-tables, .ff-lobby) {
+  --gt-edge: #ffd200;
+  --gt-card: linear-gradient(#a8211a, #5e100c);
+  --gt-glow: #ffd200;
+  --gw-head: repeating-linear-gradient(90deg, #d6261c 0 18px, #b81c13 18px 36px);
+  --gw-head-line: #ffd200;
+  --gw-edge: #5e100c;
+  --gw-body: repeating-conic-gradient(#ffffff 0 25%, #fff2f0 0 50%) 0 0 / 24px 24px;
+  --gw-soft: #ffffff;
+  --gw-ink: #4a0c08;
+  --gw-accent: #ffd200;
+  --gw-accent-ink: #4a0c08;
+  --gw-row: rgba(214, 38, 28, 0.08);
+  --gw-button: linear-gradient(#ffe45c, #ffd200 55%, #e0a800);
+  --gw-button-ink: #4a0c08;
+}
+
+[data-game-theme='hall'],
+:is(.hall-table, .hall-lobby) {
+  --gt-edge: #e2b44a;
+  --gt-card: linear-gradient(#0c3e75, #03213f);
+  --gt-glow: #ffd57a;
+  --gw-head: linear-gradient(#0d4a8c 0 50%, #003163 50% 100%);
+  --gw-head-line: #e2b44a;
+  --gw-edge: #001a36;
+  --gw-body: linear-gradient(#f7f2e3, #ece2c6);
+  --gw-soft: #fffaf0;
+  --gw-ink: #0f2a4a;
+  --gw-accent: #e2b44a;
+  --gw-accent-ink: #1b1200;
+  --gw-row: rgba(0, 49, 99, 0.08);
+  --gw-button: linear-gradient(#f2d27a, #e2b44a 55%, #c08f20);
+  --gw-button-ink: #1b1200;
+}
+
+[data-game-theme='snails'],
+:is(.snailrace-lobby, .snailrace-results, .snailrace-panel) {
+  --gt-edge: #9ad15a;
+  --gt-card: linear-gradient(#3f7a24, #24481a);
+  --gt-glow: #d4f59a;
+  --gw-head: linear-gradient(#7cc246 0 50%, #5ca834 50% 100%);
+  --gw-head-line: #f7e36b;
+  --gw-edge: #6b4523;
+  --gw-body: linear-gradient(#fdf9e8, #efe5c2);
+  --gw-soft: #fffdf3;
+  --gw-ink: #3b2a12;
+  --gw-accent: #9ad15a;
+  --gw-accent-ink: #1d3a0c;
+  --gw-row: rgba(92, 168, 52, 0.12);
+  --gw-button: linear-gradient(#b6e57a, #8ccf4f 55%, #5ca834);
+  --gw-button-ink: #1d3a0c;
+}
+
+[data-game-theme='quiz'],
+:is(.quiz-lobby, .quiz-results, .quiz-panel) {
+  --gt-edge: #f5b400;
+  --gt-card: linear-gradient(#3e1a5c, #1d0b2c);
+  --gt-glow: #ffe873;
+  --gw-head: linear-gradient(#6a2d98 0 50%, #4e1d74 50% 100%);
+  --gw-head-line: #f5b400;
+  --gw-edge: #f5b400;
+  --gw-body: radial-gradient(circle at 20% 0%, #fff7dc 0%, #f4e9ff 70%);
+  --gw-soft: #ffffff;
+  --gw-ink: #2e0f47;
+  --gw-accent: #f5b400;
+  --gw-accent-ink: #2e0f47;
+  --gw-row: rgba(78, 29, 116, 0.08);
+  --gw-button: linear-gradient(#ffe873, #fcc72e 55%, #f2a900);
+  --gw-button-ink: #2e0f47;
+}
+
+[data-game-theme='tetris'],
+:is(.tetris-lobby, .tetris-results, .tetris-panel) {
+  --gt-edge: #ff46aa;
+  --gt-card: linear-gradient(#1c1238, #0c0818);
+  --gt-glow: #3ce6ff;
+  --gw-head: linear-gradient(90deg, #ff46aa, #8a3cff 55%, #3ce6ff);
+  --gw-head-line: #3ce6ff;
+  --gw-edge: #120a26;
+  --gw-body: linear-gradient(#f2efff, #e2dcfa);
+  --gw-soft: #ffffff;
+  --gw-ink: #1a0f3a;
+  --gw-accent: #3ce6ff;
+  --gw-accent-ink: #0c0818;
+  --gw-row: rgba(26, 15, 58, 0.08);
+  --gw-button: linear-gradient(#ff8ccb, #ff46aa 55%, #d81f86);
+  --gw-button-ink: #ffffff;
+}
+
+[data-game-theme='diving'],
+:is(.plongeoir-lobby, .plongeoir-results, .plongeoir-panel, .plongeoir-marks) {
+  --gt-edge: #9ad8ff;
+  --gt-card: linear-gradient(#2f78b4, #154a75);
+  --gt-glow: #d8f1ff;
+  --gw-head: linear-gradient(#5aaee8 0 50%, #3a8fd0 50% 100%);
+  --gw-head-line: #ffffff;
+  --gw-edge: #1d5f99;
+  --gw-body: linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.55)), repeating-linear-gradient(0deg, #cfe9fb 0 1px, #f3fbff 1px 14px), repeating-linear-gradient(90deg, #cfe9fb 0 1px, transparent 1px 14px);
+  --gw-soft: #ffffff;
+  --gw-ink: #0b3a5e;
+  --gw-accent: #ffce21;
+  --gw-accent-ink: #3a2400;
+  --gw-row: rgba(29, 95, 153, 0.08);
+  --gw-button: linear-gradient(#7fd0ff, #3aa8ee 55%, #1f86cc);
+  --gw-button-ink: #ffffff;
+}
+
+[data-game-theme='kart'],
+:is(.kart-lobby, .kart-results, .kart-panel) {
+  --gt-edge: #e8e8e8;
+  --gt-card: linear-gradient(#3a3d44, #1c1e22);
+  --gt-glow: #ff3b2e;
+  --gw-head: repeating-conic-gradient(#202020 0 25%, #f2f2f2 0 50%) 0 0 / 16px 16px;
+  --gw-head-line: #ff3b2e;
+  --gw-edge: #202020;
+  --gw-body: linear-gradient(#f3f4f6, #dfe2e7);
+  --gw-soft: #ffffff;
+  --gw-ink: #1c1e22;
+  --gw-accent: #ff3b2e;
+  --gw-accent-ink: #ffffff;
+  --gw-row: rgba(28, 30, 34, 0.07);
+  --gw-button: linear-gradient(#ff7a6e, #ff3b2e 55%, #d01e12);
+  --gw-button-ink: #ffffff;
+  --gw-title-plate: rgba(0, 0, 0, 0.75);
+}
+
+[data-game-theme='copywriter'],
+:is(.lm-lobby, .lm-results, .lm-panel) {
+  --gt-edge: #f2d21c;
+  --gt-card: linear-gradient(#1a5a2a, #0b3d1e);
+  --gt-glow: #fff28a;
+  --gw-head: linear-gradient(#3aa64a 0 50%, #238a35 50% 100%);
+  --gw-head-line: #f2d21c;
+  --gw-edge: #6b3f17;
+  --gw-body: linear-gradient(#fbf6dc, #f0e3a8);
+  --gw-soft: #fffbea;
+  --gw-ink: #3a2408;
+  --gw-accent: #f2d21c;
+  --gw-accent-ink: #3a2408;
+  --gw-row: rgba(35, 138, 53, 0.1);
+  --gw-button: linear-gradient(#fff07a, #f2d21c 55%, #d6a800);
+  --gw-button-ink: #3a2408;
+}
+
+/* ---- The windows: the frame, the title bar, the body, the buttons ---- */
+
+:is(.game-window, .uno-lobby, .uno-rules, .uno-colours, .uno-end, .ww-lobby, .ww-rules, .ww-power, .wb-lobby, .wb-rules,
+  .wbn-lobby, .wbn-rules, .bb-teams, .bb-rules, .bb-lobby, .ff-rules, .ff-tables, .ff-lobby, .hall-table, .hall-lobby,
+  .minigame-lobby, .minigame-results).octane-card-shell {
+  border: 3px solid var(--gw-edge, #6b360d) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35), 0 10px 26px rgba(0, 0, 0, 0.45) !important;
+  overflow: hidden;
+}
+
+:is(.game-window, .uno-lobby, .uno-rules, .uno-colours, .uno-end, .ww-lobby, .ww-rules, .ww-power, .wb-lobby, .wb-rules,
+  .wbn-lobby, .wbn-rules, .bb-teams, .bb-rules, .bb-lobby, .ff-rules, .ff-tables, .ff-lobby, .hall-table, .hall-lobby,
+  .minigame-lobby, .minigame-results) > .octane-card-header-shell {
+  border-bottom: 3px solid var(--gw-head-line, #f2b51c) !important;
+  border-image-source: none !important;
+  background: var(--gw-head, #965019) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+}
+
+:is(.game-window, .uno-lobby, .uno-rules, .uno-colours, .uno-end, .ww-lobby, .ww-rules, .ww-power, .wb-lobby, .wb-rules,
+  .wbn-lobby, .wbn-rules, .bb-teams, .bb-rules, .bb-lobby, .ff-rules, .ff-tables, .ff-lobby, .hall-table, .hall-lobby,
+  .minigame-lobby, .minigame-results) > .octane-card-header-shell .octane-card-title {
+  padding: 0 10px;
+  border-radius: 8px;
+  background: var(--gw-title-plate, transparent);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55), 0 0 6px rgba(0, 0, 0, 0.35);
+}
+
+:is(.game-window, .uno-lobby, .uno-rules, .uno-colours, .uno-end, .ww-lobby, .ww-rules, .ww-power, .wb-lobby, .wb-rules,
+  .wbn-lobby, .wbn-rules, .bb-teams, .bb-rules, .bb-lobby, .ff-rules, .ff-tables, .ff-lobby, .hall-table, .hall-lobby,
+  .minigame-lobby, .minigame-results) > .octane-card-content-shell {
+  border: 0 !important;
+  background: var(--gw-body, #fff8e6) !important;
+}
+
+:is(.game-window, .uno-lobby, .uno-rules, .uno-colours, .uno-end, .ww-lobby, .ww-rules, .ww-power, .wb-lobby, .wb-rules,
+  .wbn-lobby, .wbn-rules, .bb-teams, .bb-rules, .bb-lobby, .ff-rules, .ff-tables, .ff-lobby, .hall-table, .hall-lobby,
+  .minigame-lobby, .minigame-results, .minigame-panel) .habbo-btn-primary {
+  border: 2px solid rgba(0, 0, 0, 0.45) !important;
+  border-image-source: none !important;
+  border-radius: 7px !important;
+  background: var(--gw-button, linear-gradient(#ffe873, #fcc72e 55%, #f2a900)) !important;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+  color: var(--gw-button-ink, #3d2108) !important;
+}
+
+/* The panels drawn in a game's world (waiting, cheering, marks): its colours too. */
+.minigame-panel:is(.snailrace-panel, .quiz-panel, .tetris-panel, .plongeoir-panel, .plongeoir-marks, .kart-panel, .lm-panel) {
+  border: 3px solid var(--gw-edge, #6b360d);
+  border-top: 6px solid var(--gw-head-line, #f2b51c);
+  border-radius: 10px;
+  background: var(--gw-body, #fff8e6);
+  color: var(--gw-ink, #3d2108);
+}

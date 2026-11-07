@@ -1,4 +1,5 @@
 import { GetConfiguration } from '@octane/renderer';
+import { gamesLeftErrorText } from '../gamecenter/GameCenterApi';
 import { getAccessToken } from '../auth';
 import { GetConfigurationValue } from '../octane/GetConfigurationValue';
 import { localizeWithFallback } from '../utils/localizeWithFallback';
@@ -49,7 +50,7 @@ export interface IWerewolfRules {
 
 export const WEREWOLF_DEFAULT_RULES: IWerewolfRules = { maxPlayers: 8, wolves: 0, roles: [ 'seer', 'witch', 'hunter', 'cupid', 'little_girl' ], bots: true, revealRoles: true, speed: 2 };
 
-export const werewolfAutoWolves = (players: number): number => (players <= 5 ? 1 : players <= 8 ? 2 : 3);
+export const werewolfAutoWolves = (players: number): number => (players <= 5 ? 1 : players <= 8 ? 2 : players <= 12 ? 3 : Math.min(12, Math.floor(players / 4)));
 
 export interface IWerewolfSeat {
     userId: number;
@@ -308,6 +309,9 @@ const ERRORS: Record<string, string> = {
 
 export const werewolfErrorText = (error: unknown): string => {
     const code = error instanceof WerewolfApiError ? error.code : 'http_error';
+    const limit = gamesLeftErrorText(code);
+
+    if (limit) return limit;
 
     return wt(`error.${code}`, ERRORS[code] ?? 'Something went wrong, try again.');
 };

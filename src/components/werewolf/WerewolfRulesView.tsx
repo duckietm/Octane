@@ -76,7 +76,7 @@ export const WerewolfRulesView: FC<{
                         <div className="ww-rules__row">
                             <span className="ww-rules__label">{wt('players', 'Players')}</span>
                             <div className="ww-rules__choice">
-                                {[ 5, 6, 7, 8, 9, 10, 11, 12 ].map((count) => (
+                                {[ 5, 6, 7, 8, 9, 10, 11, 12, 16, 20, 24, 30, 36, 42, 49 ].map((count) => (
                                     <Button key={count} variant={count === rules.maxPlayers ? 'success' : 'secondary'} disabled={!editable} onClick={() => set('maxPlayers', count)}>{String(count)}</Button>
                                 ))}
                             </div>
@@ -85,7 +85,7 @@ export const WerewolfRulesView: FC<{
                             <span className="ww-rules__label ww-rules__label--icon"><WerewolfRoleIcon role="werewolf" zoom={1} />{wt('rules.wolves_count', 'Werewolves')}</span>
                             <div className="ww-rules__choice">
                                 <Button variant={rules.wolves === 0 ? 'success' : 'secondary'} disabled={!editable} onClick={() => set('wolves', 0)}>{wt('rules.auto', 'Auto (%n%)', [ 'n' ], [ String(auto) ])}</Button>
-                                {[ 1, 2, 3, 4 ].map((count) => (
+                                {[ 1, 2, 3, 4, 6, 8, 10, 12 ].filter((count) => count <= Math.max(4, Math.floor((rules.maxPlayers - 1) / 2))).map((count) => (
                                     <Button key={count} variant={count === rules.wolves ? 'success' : 'secondary'} disabled={!editable || count > Math.max(1, Math.floor((rules.maxPlayers - 1) / 2))} onClick={() => set('wolves', count)}>{String(count)}</Button>
                                 ))}
                             </div>
