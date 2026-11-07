@@ -3123,5 +3123,7 @@
     "octane.catalog.page_lists_recent_purchases": "Esta página muestra las compras recientes de cada usuario (%layout%), así que no tiene ofertas editables. Aun así puedes editar los ajustes de la página.",
     "octane.variables_explorer.delete_from_every_holder": "¿Eliminar %name% de todos los poseedores de esta sala?",
     "octane.variables_explorer.add_to_holder": "Añadir a %name%:",
-    "octane.emustats.auto_refresh_every": "Actualización automática cada %seconds% s"
+    "octane.emustats.auto_refresh_every": "Actualización automática cada %seconds% s",
+    "infostand.room_link.room_id": "ID de sala",
+    "infostand.custom_values.unsaved": "Aún no se ha guardado: pulsa Guardar para conservar el cambio."
 }
