@@ -13,4 +13,14 @@ describe('navigator shell', () => {
         expect(view).toContain('aria-label={navigatorLabel}');
         expect(view).toContain('octane-navigator-air__quick-toggle');
     });
+
+    it('reads the home room through a navigator data that may not be loaded yet', () => {
+        expect(view).toContain('const homeRoomId = navigatorData?.homeRoomId ?? 0;');
+        expect(view).not.toContain('navigatorData.homeRoomId');
+    });
+
+    it('removes the open-room callback it registers when the view unmounts', () => {
+        expect(view).toContain('LegacyExternalInterface.addCallback(HabboWebTools.OPENROOM');
+        expect(view).toContain('LegacyExternalInterface.removeCallback(HabboWebTools.OPENROOM);');
+    });
 });

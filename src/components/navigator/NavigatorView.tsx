@@ -112,8 +112,9 @@ export const NavigatorView: FC<{}> = () => {
                         if (parts.length <= 2) return;
                         const target = parts.slice(2).join('/');
                         if (target === 'home') {
-                            if (navigatorData.homeRoomId <= 0) return;
-                            TryVisitRoom(navigatorData.homeRoomId);
+                            const homeRoomId = navigatorData?.homeRoomId ?? 0;
+                            if (homeRoomId <= 0) return;
+                            TryVisitRoom(homeRoomId);
                             return;
                         }
                         if (target === 'random_friending_room') {
@@ -173,6 +174,9 @@ export const NavigatorView: FC<{}> = () => {
 
     useEffect(() => {
         LegacyExternalInterface.addCallback(HabboWebTools.OPENROOM, (k: string) => SendMessageComposer(new ConvertGlobalRoomIdMessageComposer(k)));
+        return () => {
+            LegacyExternalInterface.removeCallback(HabboWebTools.OPENROOM);
+        };
     }, []);
 
     useEffect(() => {
