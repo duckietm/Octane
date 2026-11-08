@@ -347,14 +347,15 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                             onMouseEnter={() => setIsRoomInfoHovered(true)}
                             onMouseLeave={() => setIsRoomInfoHovered(false)}
                         >
-                            <Text bold variant="white" className="block truncate text-[14px]">{roomEnterInfo.roomName}</Text>
-                            <Text small className="block truncate text-[#999999]">{roomEnterInfo.ownerLine}</Text>
+                            {/* AIR room_tools_info: the name on its own line, the owner under it, then up to two tags. */}
+                            <Text truncate className="octane-room-tools-info__name">{roomEnterInfo.roomName}</Text>
+                            <Text truncate className="octane-room-tools-info__owner">{roomEnterInfo.ownerLine}</Text>
                             {roomEnterInfo.tags.length > 0 && (
-                                <div className="flex gap-2 mt-1">
+                                <div className="octane-room-tools-info__tags">
                                     {roomEnterInfo.tags.map((tag) => (
                                         <BaseButton
                                             key={tag}
-                                            className="text-[12px] text-[#1b79ab] hover:text-[#47a8e6] bg-transparent border-0 p-0 cursor-pointer"
+                                            className="octane-room-tools-info__tag"
                                             type="button"
                                             onClick={(event) => {
                                                 event.stopPropagation();
