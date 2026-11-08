@@ -1,4 +1,5 @@
-import react from '@vitejs/plugin-react';
+import babel from '@rolldown/plugin-babel';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
@@ -148,6 +149,15 @@ const ReactCompilerConfig = {
     target: '19'
 };
 
+// The compiler is for this client's components only: the renderer sources the aliases pull in are plain
+// TypeScript outside this folder, where the Babel plugin does not switch its TypeScript parser on.
+const clientSourcePattern = new RegExp('^' + resolve(import.meta.dirname, 'src')
+    .split(/[\\/]/)
+    .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('[\\\\/]') + '[\\\\/]');
+const reactCompiler = reactCompilerPreset(ReactCompilerConfig);
+reactCompiler.rolldown.filter.id = clientSourcePattern;
+
 const resolveJsonMode = () =>
 {
     // OCTANE_* is the current name; NITRO_* stays as a fallback for existing setups
@@ -179,13 +189,9 @@ process.stdout.write(`[vite] OCTANE_SINGLE_BUNDLE = ${ octaneSingleBundle ? '1' 
 export default defineConfig({
     base: process.env.VITE_BASE || './',
     plugins: [
-        react({
-            babel: {
-                plugins: [
-                    [ 'babel-plugin-react-compiler', ReactCompilerConfig ]
-                ]
-            }
-        }),
+        react(),
+        // plugin-react 6 no longer reads a `babel` option: the compiler runs through the Babel plugin.
+        babel({ presets: [ reactCompiler ] }),
         octaneAssetsServer()
     ],
     define: {
