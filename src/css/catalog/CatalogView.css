@@ -2592,6 +2592,14 @@
     row-gap: 1px;
 }
 
+/* An offer that arrives without a price still gets its plate, hidden but holding the strip it
+   would occupy, so the tile keeps the shape of its priced neighbours instead of re-centering the
+   icon over the whole box. visibility (not display) also keeps the bots pill from painting. */
+.octane-catalog-grid-price.is-empty-price {
+    visibility: hidden;
+    min-height: 13px;
+}
+
 .octane-catalog-grid-density-standard .octane-catalog-grid-price.is-single-price {
     top: 36px;
     left: -3px;

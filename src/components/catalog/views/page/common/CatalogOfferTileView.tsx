@@ -16,6 +16,8 @@ export interface CatalogOfferTileViewProps extends LayoutGridItemProps {
     tintColor?: string;
     showTechnicalDetails?: boolean;
     showPrices?: boolean;
+    /** Page-level AIR template, from `catalogPageUsesAirBaseTemplate`. Left out, the tile decides on its own offer. */
+    pageUsesBaseTemplate?: boolean;
 }
 
 export const CatalogOfferTileView: FC<CatalogOfferTileViewProps> = (props) => {
@@ -30,6 +32,7 @@ export const CatalogOfferTileView: FC<CatalogOfferTileViewProps> = (props) => {
         tintColor = null,
         showTechnicalDetails = false,
         showPrices = true,
+        pageUsesBaseTemplate = undefined,
         ...rest
     } = props;
     const [isMouseDown, setMouseDown] = useState(false);
@@ -71,7 +74,10 @@ export const CatalogOfferTileView: FC<CatalogOfferTileViewProps> = (props) => {
     }, [offer]);
 
     const getCurrencyIconUrl = (type: number) => (GetConfigurationValue<string>('currency.asset.icon.url', '') || '').replace('%type%', type.toString());
-    const priceTemplateClassName = isAirBaseCatalogOffer(offer, currentType)
+    // The 36x36 base box belongs to a whole page, so the grid passes its verdict down. On its own
+    // (the layouts that render a tile outside the AIR grid) the tile still reads its own offer.
+    const usesBaseTemplate = pageUsesBaseTemplate ?? isAirBaseCatalogOffer(offer, currentType);
+    const priceTemplateClassName = usesBaseTemplate
         ? 'uses-base-grid-template'
         : prices.length > 1
           ? 'uses-multi-price-template'
@@ -153,8 +159,12 @@ export const CatalogOfferTileView: FC<CatalogOfferTileViewProps> = (props) => {
                             </span>
                         </Hint>
                     )}
-                    {showPrices && currentType !== CatalogType.BUILDER && prices.length > 0 && (
-                        <span className={`octane-catalog-grid-price ${prices.length > 1 ? 'is-multi-price' : 'is-single-price'}`}>
+                    {/* An offer with no price keeps an empty plate: dropping the node instead would
+                        re-centre the icon and leave this tile a different shape from its neighbours. */}
+                    {showPrices && currentType !== CatalogType.BUILDER && !usesBaseTemplate && (
+                        <span
+                            className={`octane-catalog-grid-price ${prices.length > 1 ? 'is-multi-price' : 'is-single-price'}${prices.length ? '' : ' is-empty-price'}`}
+                        >
                             {prices.map((price, index) => (
                                 <span key={`${price.type}-${index}`} className="octane-catalog-grid-price-entry">
                                     {index > 0 && <span className="octane-catalog-grid-price-plus">+</span>}
