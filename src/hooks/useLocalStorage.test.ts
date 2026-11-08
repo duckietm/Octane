@@ -51,6 +51,23 @@ describe('useLocalStorage', () =>
         vi.useRealTimers();
     });
 
+    it('writes a null set over a pending value', () =>
+    {
+        vi.useFakeTimers();
+        setLocalStorage.mockClear();
+
+        const { result } = renderHook(() => useLocalStorage<string | null>('null-test', null));
+
+        act(() => result.current[1]('picked'));
+        act(() => result.current[1](null));
+        act(() => vi.advanceTimersByTime(1000));
+
+        expect(setLocalStorage).toHaveBeenCalledTimes(1);
+        expect(setLocalStorage).toHaveBeenLastCalledWith('null-test', null);
+
+        vi.useRealTimers();
+    });
+
     it('restores a stored value of the expected shape', () =>
     {
         storedValues.set('restore-test', [ { id: 1 } ]);

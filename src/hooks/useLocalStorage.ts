@@ -84,7 +84,8 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
     // Event bursts and async callbacks can hold a setter from an earlier render. Every update is resolved
     // against the latest value, including updates React has not rendered yet, so none erases a newer one.
     const storedValueRef = useRef(storedValue);
-    const pendingWriteRef = useRef<T | null>(null);
+    // Boxed so that null is a value like any other: an empty ref means no write is pending.
+    const pendingWriteRef = useRef<{ value: T } | null>(null);
     const writeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const optionsRef = useRef(options);
 
@@ -128,14 +129,13 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
     // JSON.stringify + setItem per message. We coalesce bursts into one
     // write per STORAGE_WRITE_DEBOUNCE_MS window with the latest value.
     const scheduleWrite = (value: T) => {
-        pendingWriteRef.current = value;
+        pendingWriteRef.current = { value };
         if (writeTimerRef.current) clearTimeout(writeTimerRef.current);
         writeTimerRef.current = setTimeout(() => {
             writeTimerRef.current = null;
-            if (pendingWriteRef.current !== null) {
-                flushWrite(pendingWriteRef.current);
-                pendingWriteRef.current = null;
-            }
+            const pending = pendingWriteRef.current;
+            pendingWriteRef.current = null;
+            if (pending) flushWrite(pending.value);
         }, STORAGE_WRITE_DEBOUNCE_MS);
     };
 
@@ -143,11 +143,12 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
     // burst of activity.
     useEffect(() => {
         const flushOnLeave = () => {
-            if (pendingWriteRef.current === null) return;
+            const pending = pendingWriteRef.current;
+            if (!pending) return;
             if (writeTimerRef.current) clearTimeout(writeTimerRef.current);
             writeTimerRef.current = null;
-            flushWrite(pendingWriteRef.current);
             pendingWriteRef.current = null;
+            flushWrite(pending.value);
         };
 
         window.addEventListener('pagehide', flushOnLeave);
