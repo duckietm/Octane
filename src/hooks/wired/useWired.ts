@@ -5,6 +5,7 @@ import {
     GetRoomEngine,
     GetSessionDataManager,
     IFurnitureData,
+    IMessageComposer,
     IRoomObject,
     OpenMessageComposer,
     RoomObjectCategory,
@@ -66,7 +67,7 @@ import { useWiredTools } from '../wired-tools/useWiredTools';
 /** Whether a clicked floor furni may be picked, from its room object and furnidata. */
 export type WiredFurniPickCheck = (roomObject: IRoomObject, furniData: IFurnitureData) => boolean;
 
-const useWiredState = () => {
+export const useWiredState = () => {
     const [trigger, setTrigger, triggerRef] = useLiveState<Triggerable>(null);
     const [intParams, setIntParams, intParamsRef] = useLiveState<number[]>([]);
     const [stringParam, setStringParam, stringParamRef] = useLiveState<string>('');
@@ -115,10 +116,10 @@ const useWiredState = () => {
     // Each save says whether the window stays open: a save the server drops without an answer (more than 20
     // picks, as AIR) must not leave the next one open.
     const saveWired = (target: Triggerable = null, keepOpen = false) => {
-        keepOpenAfterSaveRef.current = keepOpen;
-
-        const save = (trigger: Triggerable) => {
-            if (!trigger) return;
+        // The packet is built when the save is asked for: a confirmation answered after the editor closed would
+        // otherwise read the values the close had already reset, and save the box empty.
+        const buildSaveMessage = (trigger: Triggerable): IMessageComposer<unknown[]> => {
+            if (!trigger) return null;
 
             const intParams = intParamsRef.current;
             const stringParam = stringParamRef.current;
@@ -135,54 +136,55 @@ const useWiredState = () => {
 
             // Addons, selectors and variables have their own official save packets.
             if (trigger instanceof WiredAddonDefinition) {
-                SendMessageComposer(
-                    new UpdateAddonMessageComposer(id, intParams, stringParam, furniIds, furniSources, userSources, variableIds, furniIds2)
-                );
+                return new UpdateAddonMessageComposer(id, intParams, stringParam, furniIds, furniSources, userSources, variableIds, furniIds2);
             } else if (trigger instanceof WiredSelectorDefinition) {
-                SendMessageComposer(
-                    new UpdateSelectorMessageComposer(
-                        id,
-                        intParams,
-                        stringParam,
-                        furniIds,
-                        selectorOptionsRef.current?.filter ?? trigger.isFilter ?? false,
-                        selectorOptionsRef.current?.invert ?? trigger.isInvert ?? false,
-                        furniSources,
-                        userSources,
-                        variableIds,
-                        furniIds2
-                    )
+                return new UpdateSelectorMessageComposer(
+                    id,
+                    intParams,
+                    stringParam,
+                    furniIds,
+                    selectorOptionsRef.current?.filter ?? trigger.isFilter ?? false,
+                    selectorOptionsRef.current?.invert ?? trigger.isInvert ?? false,
+                    furniSources,
+                    userSources,
+                    variableIds,
+                    furniIds2
                 );
             } else if (trigger instanceof WiredVariableDefinition) {
-                SendMessageComposer(
-                    new UpdateVariableMessageComposer(id, intParams, stringParam, furniIds, furniSources, userSources, variableIds, furniIds2)
-                );
+                return new UpdateVariableMessageComposer(id, intParams, stringParam, furniIds, furniSources, userSources, variableIds, furniIds2);
             } else if (trigger instanceof WiredActionDefinition) {
-                SendMessageComposer(
-                    new UpdateActionMessageComposer(id, intParams, stringParam, furniIds, actionDelay, furniSources, userSources, variableIds, furniIds2)
-                );
+                return new UpdateActionMessageComposer(id, intParams, stringParam, furniIds, actionDelay, furniSources, userSources, variableIds, furniIds2);
             } else if (trigger instanceof TriggerDefinition) {
-                SendMessageComposer(
-                    new UpdateTriggerMessageComposer(id, intParams, stringParam, furniIds, furniSources, userSources, variableIds, furniIds2)
-                );
+                return new UpdateTriggerMessageComposer(id, intParams, stringParam, furniIds, furniSources, userSources, variableIds, furniIds2);
             } else if (trigger instanceof ConditionDefinition) {
-                SendMessageComposer(
-                    new UpdateConditionMessageComposer(
-                        id,
-                        intParams,
-                        stringParam,
-                        furniIds,
-                        resolveWiredQuantifier(quantifierCodeRef.current, trigger.quantifierCode),
-                        furniSources,
-                        userSources,
-                        variableIds,
-                        furniIds2
-                    )
+                return new UpdateConditionMessageComposer(
+                    id,
+                    intParams,
+                    stringParam,
+                    furniIds,
+                    resolveWiredQuantifier(quantifierCodeRef.current, trigger.quantifierCode),
+                    furniSources,
+                    userSources,
+                    variableIds,
+                    furniIds2
                 );
             }
+
+            return null;
         };
 
         const trigger = triggerRef.current;
+
+        if (!trigger) return;
+
+        const savedId = target ? target.id : trigger.id;
+        const message = buildSaveMessage(trigger);
+        const save = () => {
+            if (!message) return;
+
+            keepOpenAfterSaveRef.current = keepOpen;
+            SendMessageComposer(message);
+        };
 
         const isSelector = trigger instanceof WiredSelectorDefinition;
         const invert = selectorOptionsRef.current?.invert ?? (isSelector ? trigger.isInvert : false) ?? false;
@@ -198,19 +200,19 @@ const useWiredState = () => {
                 ),
                 () => {
                     nonOwnerConfirmedRef.current = true;
-                    save(trigger);
+                    save();
                 },
                 null,
                 null,
                 null,
                 localizeWithFallback('wiredfurni.danger.1.change.confirm.title', 'Are you sure?')
             );
-        } else if (!nonOwnerConfirmedRef.current && !IsOwnerOfFloorFurniture(target ? target.id : trigger.id)) {
+        } else if (!nonOwnerConfirmedRef.current && !IsOwnerOfFloorFurniture(savedId)) {
             showConfirm(
                 LocalizeText('wiredfurni.nonowner.change.confirm.body'),
                 () => {
                     nonOwnerConfirmedRef.current = true;
-                    save(trigger);
+                    save();
                 },
                 null,
                 null,
@@ -218,7 +220,7 @@ const useWiredState = () => {
                 LocalizeText('wiredfurni.nonowner.change.confirm.title')
             );
         } else {
-            save(trigger);
+            save();
         }
     };
 
