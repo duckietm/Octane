@@ -5,6 +5,7 @@ import {
     GetRoomEngine,
     GetSessionDataManager,
     IFurnitureData,
+    IMessageComposer,
     IRoomObject,
     OpenMessageComposer,
     RoomObjectCategory,
@@ -66,7 +67,7 @@ import { useWiredTools } from '../wired-tools/useWiredTools';
 /** Whether a clicked floor furni may be picked, from its room object and furnidata. */
 export type WiredFurniPickCheck = (roomObject: IRoomObject, furniData: IFurnitureData) => boolean;
 
-const useWiredState = () => {
+export const useWiredState = () => {
     const [trigger, setTrigger, triggerRef] = useLiveState<Triggerable>(null);
     const [intParams, setIntParams, intParamsRef] = useLiveState<number[]>([]);
     const [stringParam, setStringParam, stringParamRef] = useLiveState<string>('');
@@ -97,6 +98,9 @@ const useWiredState = () => {
     const [clipboard, setClipboard] = useState<Map<string, WiredClipboardEntry>>(() => new Map());
     // "Save without closing": the next save success leaves the window open.
     const keepOpenAfterSaveRef = useRef(false);
+    // The box the last save was sent for: the success packet carries no id, so it closes the editor only while
+    // that box is still the open one.
+    const pendingSaveIdRef = useRef<number | null>(null);
     // The non-owner confirmation, once answered, holds for the rest of the session.
     const nonOwnerConfirmedRef = useRef(false);
     // Official "paste into": while on, opening another box of the same element saves the open
@@ -115,10 +119,10 @@ const useWiredState = () => {
     // Each save says whether the window stays open: a save the server drops without an answer (more than 20
     // picks, as AIR) must not leave the next one open.
     const saveWired = (target: Triggerable = null, keepOpen = false) => {
-        keepOpenAfterSaveRef.current = keepOpen;
-
-        const save = (trigger: Triggerable) => {
-            if (!trigger) return;
+        // The packet is built when the save is asked for: a confirmation answered after the editor closed would
+        // otherwise read the values the close had already reset, and save the box empty.
+        const buildSaveMessage = (trigger: Triggerable): IMessageComposer<unknown[]> => {
+            if (!trigger) return null;
 
             const intParams = intParamsRef.current;
             const stringParam = stringParamRef.current;
@@ -135,54 +139,56 @@ const useWiredState = () => {
 
             // Addons, selectors and variables have their own official save packets.
             if (trigger instanceof WiredAddonDefinition) {
-                SendMessageComposer(
-                    new UpdateAddonMessageComposer(id, intParams, stringParam, furniIds, furniSources, userSources, variableIds, furniIds2)
-                );
+                return new UpdateAddonMessageComposer(id, intParams, stringParam, furniIds, furniSources, userSources, variableIds, furniIds2);
             } else if (trigger instanceof WiredSelectorDefinition) {
-                SendMessageComposer(
-                    new UpdateSelectorMessageComposer(
-                        id,
-                        intParams,
-                        stringParam,
-                        furniIds,
-                        selectorOptionsRef.current?.filter ?? trigger.isFilter ?? false,
-                        selectorOptionsRef.current?.invert ?? trigger.isInvert ?? false,
-                        furniSources,
-                        userSources,
-                        variableIds,
-                        furniIds2
-                    )
+                return new UpdateSelectorMessageComposer(
+                    id,
+                    intParams,
+                    stringParam,
+                    furniIds,
+                    selectorOptionsRef.current?.filter ?? trigger.isFilter ?? false,
+                    selectorOptionsRef.current?.invert ?? trigger.isInvert ?? false,
+                    furniSources,
+                    userSources,
+                    variableIds,
+                    furniIds2
                 );
             } else if (trigger instanceof WiredVariableDefinition) {
-                SendMessageComposer(
-                    new UpdateVariableMessageComposer(id, intParams, stringParam, furniIds, furniSources, userSources, variableIds, furniIds2)
-                );
+                return new UpdateVariableMessageComposer(id, intParams, stringParam, furniIds, furniSources, userSources, variableIds, furniIds2);
             } else if (trigger instanceof WiredActionDefinition) {
-                SendMessageComposer(
-                    new UpdateActionMessageComposer(id, intParams, stringParam, furniIds, actionDelay, furniSources, userSources, variableIds, furniIds2)
-                );
+                return new UpdateActionMessageComposer(id, intParams, stringParam, furniIds, actionDelay, furniSources, userSources, variableIds, furniIds2);
             } else if (trigger instanceof TriggerDefinition) {
-                SendMessageComposer(
-                    new UpdateTriggerMessageComposer(id, intParams, stringParam, furniIds, furniSources, userSources, variableIds, furniIds2)
-                );
+                return new UpdateTriggerMessageComposer(id, intParams, stringParam, furniIds, furniSources, userSources, variableIds, furniIds2);
             } else if (trigger instanceof ConditionDefinition) {
-                SendMessageComposer(
-                    new UpdateConditionMessageComposer(
-                        id,
-                        intParams,
-                        stringParam,
-                        furniIds,
-                        resolveWiredQuantifier(quantifierCodeRef.current, trigger.quantifierCode),
-                        furniSources,
-                        userSources,
-                        variableIds,
-                        furniIds2
-                    )
+                return new UpdateConditionMessageComposer(
+                    id,
+                    intParams,
+                    stringParam,
+                    furniIds,
+                    resolveWiredQuantifier(quantifierCodeRef.current, trigger.quantifierCode),
+                    furniSources,
+                    userSources,
+                    variableIds,
+                    furniIds2
                 );
             }
+
+            return null;
         };
 
         const trigger = triggerRef.current;
+
+        if (!trigger) return;
+
+        const savedId = target ? target.id : trigger.id;
+        const message = buildSaveMessage(trigger);
+        const save = () => {
+            if (!message) return;
+
+            keepOpenAfterSaveRef.current = keepOpen;
+            pendingSaveIdRef.current = savedId;
+            SendMessageComposer(message);
+        };
 
         const isSelector = trigger instanceof WiredSelectorDefinition;
         const invert = selectorOptionsRef.current?.invert ?? (isSelector ? trigger.isInvert : false) ?? false;
@@ -198,19 +204,19 @@ const useWiredState = () => {
                 ),
                 () => {
                     nonOwnerConfirmedRef.current = true;
-                    save(trigger);
+                    save();
                 },
                 null,
                 null,
                 null,
                 localizeWithFallback('wiredfurni.danger.1.change.confirm.title', 'Are you sure?')
             );
-        } else if (!nonOwnerConfirmedRef.current && !IsOwnerOfFloorFurniture(target ? target.id : trigger.id)) {
+        } else if (!nonOwnerConfirmedRef.current && !IsOwnerOfFloorFurniture(savedId)) {
             showConfirm(
                 LocalizeText('wiredfurni.nonowner.change.confirm.body'),
                 () => {
                     nonOwnerConfirmedRef.current = true;
-                    save(trigger);
+                    save();
                 },
                 null,
                 null,
@@ -218,7 +224,7 @@ const useWiredState = () => {
                 LocalizeText('wiredfurni.nonowner.change.confirm.title')
             );
         } else {
-            save(trigger);
+            save();
         }
     };
 
@@ -424,16 +430,20 @@ const useWiredState = () => {
         SendMessageComposer(new OpenMessageComposer(parser.stuffId));
     });
 
-    useMessageEvent<WiredSaveSuccessEvent>(WiredSaveSuccessEvent, (event) => {
-        const parser = event.getParser();
-
+    useMessageEvent<WiredSaveSuccessEvent>(WiredSaveSuccessEvent, () => {
         if (roomSettings?.canInspect && requestUserVariables) requestUserVariables();
 
-        if (keepOpenAfterSaveRef.current) {
-            // Saved without closing: the picks stay highlighted and the window stays up.
-            keepOpenAfterSaveRef.current = false;
-            return;
-        }
+        const savedId = pendingSaveIdRef.current;
+        const keepOpen = keepOpenAfterSaveRef.current;
+
+        pendingSaveIdRef.current = null;
+        keepOpenAfterSaveRef.current = false;
+
+        // Saved without closing: the picks stay highlighted and the window stays up.
+        if (keepOpen) return;
+
+        // The success of a box saved earlier leaves the editor of the box opened since then alone.
+        if (savedId === null || triggerRef.current?.id !== savedId) return;
 
         WiredSelectionVisualizer.clearAllSelectionShaders();
         setTrigger(null);
