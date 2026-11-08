@@ -1,0 +1,16 @@
+{
+    "$schema": "https://unpkg.com/knip@6/schema.json",
+    // bootstrap.ts is found through index.html by the Vite plugin.
+    "entry": ["src/index.tsx", "scripts/*.mjs", ".github/scripts/*.mjs", "install.mjs"],
+    "project": ["src/**/*.{ts,tsx,css}", "scripts/**/*.mjs", ".github/scripts/*.mjs"],
+    "ignoreDependencies": [
+        // Resolved through the tsconfig/Vite aliases from the sibling renderer checkout, not from package.json.
+        "pixi.js",
+        // Type-only JSDoc import in postcss.config.js; the package comes with postcss tooling.
+        "postcss-load-config",
+        // scripts/catalog-stats.mjs is an optional local maintenance script run against the hotel database.
+        "mysql2",
+        // Only src/components/interface-settings/InterfaceColorTabView.tsx imports it, and nothing imports that view yet.
+        "react-colorful"
+    ]
+}
