@@ -1511,8 +1511,12 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
+/* Two rows of 70px tiles. The grid inside has no height of its own, so it never scrolled: a third row spilled over
+   the preview and the purchase panel. The shell scrolls instead. */
 .octane-catalog-color-grid-shell {
     max-height: 154px;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .octane-catalog-badge-display-layout {
