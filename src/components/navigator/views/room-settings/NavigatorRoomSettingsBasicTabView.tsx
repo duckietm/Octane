@@ -102,13 +102,14 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
     };
 
     const saveTags = (index: number) => {
-        if (index === 0 && (roomTag1 === roomData.tags[0] || roomTag1.length > TAGS_MAX_LENGTH)) return;
+        // A room without tags has no entries at all, so an empty field matches an absent tag.
+        if (index === 0 && (roomTag1 === (roomData.tags?.[0] ?? '') || roomTag1.length > TAGS_MAX_LENGTH)) return;
 
-        if (index === 1 && (roomTag2 === roomData.tags[1] || roomTag2.length > TAGS_MAX_LENGTH)) return;
+        if (index === 1 && (roomTag2 === (roomData.tags?.[1] ?? '') || roomTag2.length > TAGS_MAX_LENGTH)) return;
 
         if (roomTag1 === '' && roomTag2 !== '') setRoomTag2('');
 
-        handleChange('tags', roomTag1 === '' && roomTag2 !== '' ? [roomTag2] : [roomTag1, roomTag2]);
+        handleChange('tags', [roomTag1, roomTag2].filter((tag) => tag !== ''));
     };
 
     useEffect(() => {
