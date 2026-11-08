@@ -2323,9 +2323,18 @@
 
 /* The selected tile paints an opaque plate through ::before at z-index 0, so the
    habbicon has to be lifted over it the way the furni icon already is. */
+/* A habbicon sits in the same 36px icon box as a furni icon, scaled down to fit: drawn at its own size in the flow it
+   overflowed the tile and covered the price. */
 .octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item > .octane-catalog-grid-habbicon-icon {
-    position: relative;
+    position: absolute;
+    top: 2px;
+    left: 8px;
     z-index: 1;
+    width: 36px !important;
+    height: 36px !important;
+    margin: 0;
+    object-fit: contain !important;
+    pointer-events: none;
 }
 
 /* AIR gridItem_with_price: multiContainer is painted after the 36px image at
@@ -2371,7 +2380,7 @@
 .octane-catalog-window
     .octane-catalog-grid-density-standard
     .layout-grid-item.uses-base-grid-template:not(.unique-item)
-    > .octane-catalog-grid-offer-icon {
+    > :is(.octane-catalog-grid-offer-icon, .octane-catalog-grid-habbicon-icon) {
     top: 0;
     left: 0;
 }
