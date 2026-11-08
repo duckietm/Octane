@@ -175,7 +175,10 @@ const useInventoryTradeState = () => {
         const firstUserItems = parseTradeItems(parser.firstUserItemArray);
         const secondUserItems = parseTradeItems(parser.secondUserItemArray);
 
+        // A list that arrives with no trade open has nobody to apply to.
         setOwnUser((prevValue) => {
+            if (!prevValue) return prevValue;
+
             const newValue = CloneObject(prevValue);
 
             if (newValue.userId === parser.firstUserID) {
@@ -220,6 +223,8 @@ const useInventoryTradeState = () => {
         });
 
         setOtherUser((prevValue) => {
+            if (!prevValue) return prevValue;
+
             const newValue = CloneObject(prevValue);
 
             if (newValue.userId === parser.firstUserID) {
@@ -247,34 +252,39 @@ const useInventoryTradeState = () => {
     useMessageEvent<TradingOpenEvent>(TradingOpenEvent, (event) => {
         const parser = event.getParser();
 
+        // The ids come from the packet: the room may not list one of the two users (yet), and then only the name is missing.
+        const ownUserId = GetSessionDataManager().userId;
+        const userDataManager = GetRoomSession()?.userDataManager;
+        const firstUserName = userDataManager?.getUserData(parser.userID)?.name ?? '';
+        const secondUserName = userDataManager?.getUserData(parser.otherUserID)?.name ?? '';
+
         const firstUser = new TradeUserData();
-        const firstUserData = GetRoomSession().userDataManager.getUserData(parser.userID);
 
         firstUser.userItems = new AdvancedMap();
 
         const secondUser = new TradeUserData();
-        const secondUserData = GetRoomSession().userDataManager.getUserData(parser.otherUserID);
 
         secondUser.userItems = new AdvancedMap();
 
-        if (firstUserData.webID === GetSessionDataManager().userId) {
-            firstUser.userId = firstUserData.webID;
-            firstUser.userName = firstUserData.name;
+        if (parser.userID === ownUserId) {
+            firstUser.userId = parser.userID;
+            firstUser.userName = firstUserName;
             firstUser.canTrade = parser.userCanTrade;
 
-            secondUser.userId = secondUserData.webID;
-            secondUser.userName = secondUserData.name;
+            secondUser.userId = parser.otherUserID;
+            secondUser.userName = secondUserName;
             secondUser.canTrade = parser.otherUserCanTrade;
-        } else if (secondUserData.webID === GetSessionDataManager().userId) {
-            firstUser.userId = secondUserData.webID;
-            firstUser.userName = secondUserData.name;
+        } else if (parser.otherUserID === ownUserId) {
+            firstUser.userId = parser.otherUserID;
+            firstUser.userName = secondUserName;
             firstUser.canTrade = parser.otherUserCanTrade;
 
-            secondUser.userId = firstUserData.webID;
-            secondUser.userName = firstUserData.name;
+            secondUser.userId = parser.userID;
+            secondUser.userName = firstUserName;
             secondUser.canTrade = parser.userCanTrade;
         }
 
+        ownUserRef.current = firstUser;
         setOwnUser(firstUser);
         setOtherUser(secondUser);
         setTradeState(TradeState.TRADING_STATE_RUNNING);
