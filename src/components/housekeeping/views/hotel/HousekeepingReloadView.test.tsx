@@ -61,4 +61,24 @@ describe('HousekeepingReloadView', () => {
         expect(screen.getByText('housekeeping.hotel.reload.all.partial')).toBeTruthy();
         expect(screen.getByText('housekeeping.hotel.reload.failed_at')).toBeTruthy();
     });
+
+    it('stops a reload of every table when the panel closes', async () => {
+        vi.useFakeTimers();
+        const { unmount } = render(<HousekeepingReloadView />);
+
+        fireEvent.click(screen.getByText('housekeeping.hotel.reload.all'));
+
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(0);
+        });
+        expect(reloadHotel).toHaveBeenCalledTimes(1);
+
+        unmount();
+
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(2_100 * 6);
+        });
+
+        expect(reloadHotel).toHaveBeenCalledTimes(1);
+    });
 });

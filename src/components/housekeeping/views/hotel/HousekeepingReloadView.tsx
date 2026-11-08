@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState } from 'react';
+import { FC, ReactNode, useEffect, useRef, useState } from 'react';
 import { FaBook, FaCheck, FaCog, FaCompass, FaCube, FaFilter, FaLanguage, FaSync, FaTimes, FaUserShield } from 'react-icons/fa';
 import { formatHousekeepingDateTime, HOUSEKEEPING_RELOAD_TARGETS, HousekeepingReloadTarget, LocalizeText } from '../../../../api';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
@@ -28,6 +28,16 @@ export const HousekeepingReloadView: FC = () => {
     const confirm = useHousekeepingConfirm();
     const [outcomes, setOutcomes] = useState<Partial<Record<HousekeepingReloadTarget, ReloadOutcome>>>({});
     const [isReloadingAll, setIsReloadingAll] = useState(false);
+    // Closing the panel stops a reload-all between two targets: the rest would hit the server with nobody watching.
+    const mountedRef = useRef(true);
+
+    useEffect(() => {
+        mountedRef.current = true;
+
+        return () => {
+            mountedRef.current = false;
+        };
+    }, []);
 
     const run = async (target: HousekeepingReloadTarget) => {
         const result = await reloadHotel(target);
@@ -53,11 +63,13 @@ export const HousekeepingReloadView: FC = () => {
 
                     if (lastStart && sinceLast < RELOAD_SPACING_MS) await wait(RELOAD_SPACING_MS - sinceLast);
 
+                    if (!mountedRef.current) return;
+
                     lastStart = Date.now();
                     await run(target);
                 }
             } finally {
-                setIsReloadingAll(false);
+                if (mountedRef.current) setIsReloadingAll(false);
             }
         });
 
