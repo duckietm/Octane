@@ -1,0 +1,746 @@
+/*
+ * Wobble Squabble: the rooftop pool (WobbleNextScene) at the hotel's zoom, the score and the dials at the top, the
+ * keys at the bottom; the hotel's own windows for the duels and the rules. Below the windows (400+), above the hotel.
+ */
+
+.wbn-room {
+    position: fixed;
+    inset: 0;
+    z-index: 350;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+    background: #c4e6fc;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.wbn-room__stage {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+/* ---- The pool ---- */
+
+.wbn-scene {
+    position: relative;
+    image-rendering: pixelated;
+}
+
+.wbn-scene__floor,
+.wbn-fighter__avatar,
+.wbn-swimmer img {
+    display: block;
+    image-rendering: pixelated;
+    pointer-events: none;
+    user-select: none;
+}
+
+.wbn-scene__floor {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* The water's glitter, moving slowly over the basin. */
+.wbn-scene__water {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(170deg, rgba(255, 255, 255, 0) 0 22px, rgba(255, 255, 255, 0.16) 22px 24px, rgba(255, 255, 255, 0) 24px 46px);
+    clip-path: polygon(456px 324px, 712px 452px, 456px 580px, 200px 452px);
+    pointer-events: none;
+    animation: wbn-water 6s linear infinite;
+}
+
+@keyframes wbn-water {
+    to {
+        background-position: 0 92px;
+    }
+}
+
+.wbn-scene__item {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+/* A fighter: placed by the feet on the beam, tilted round the feet by the balance. */
+.wbn-fighter {
+    position: absolute;
+    width: 0;
+    height: 0;
+    transition: left 0.3s ease-out;
+}
+
+.wbn-fighter__tilt {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    transform-origin: 0 0;
+    transition: transform 0.25s linear;
+}
+
+.wbn-fighter__body {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-50%);
+    transition: transform 0.12s ease-out;
+}
+
+.wbn-fighter__avatar {
+    max-width: none;
+}
+
+.wbn-fighter.is-pushing .wbn-fighter__body {
+    transform: translateX(calc(-50% + var(--wbn-toward) * 12px));
+}
+
+.wbn-fighter.is-lunging .wbn-fighter__body {
+    transform: translateX(calc(-50% + var(--wbn-toward) * 18px)) rotate(calc(var(--wbn-toward) * 8deg));
+}
+
+.wbn-fighter.is-hit .wbn-fighter__body {
+    animation: wbn-hit 0.3s ease-out;
+}
+
+@keyframes wbn-hit {
+    25% {
+        transform: translateX(calc(-50% - var(--wbn-toward) * 10px));
+        filter: brightness(1.6);
+    }
+
+    60% {
+        transform: translateX(calc(-50% + var(--wbn-toward) * 4px));
+    }
+}
+
+.wbn-fighter.is-crouching .wbn-fighter__body {
+    transform: translateX(-50%) scaleY(0.86);
+    transform-origin: 50% 100%;
+}
+
+/* Falling: the fighter topples to the side they leaned, and drops into the water. */
+.wbn-fighter.is-fallen .wbn-fighter__tilt {
+    animation: wbn-fall 0.55s ease-in forwards;
+    transition: none;
+}
+
+@keyframes wbn-fall {
+    from {
+        opacity: 1;
+        transform: rotate(calc(var(--wbn-fall) * 42deg));
+    }
+
+    70% {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+        transform: translate(calc(var(--wbn-fall) * 30px), 70px) rotate(calc(var(--wbn-fall) * 100deg));
+    }
+}
+
+/* In the water: the avatar up to the shoulders, the rest under the surface. */
+.wbn-swimmer {
+    position: absolute;
+    width: 90px;
+    height: 64px;
+    overflow: hidden;
+    transform: translate(-50%, -100%);
+    opacity: 0;
+    animation: wbn-swim-in 0.4s ease-out 0.5s forwards, wbn-bob 1.4s ease-in-out 0.9s infinite;
+}
+
+.wbn-swimmer img {
+    position: absolute;
+    bottom: -54px;
+    left: 50%;
+    max-width: none;
+    transform: translateX(-50%);
+}
+
+.wbn-swimmer::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 10px;
+    background: linear-gradient(rgba(120, 210, 250, 0.9), rgba(60, 160, 220, 0.95));
+    border-radius: 50% 50% 0 0 / 60% 60% 0 0;
+    content: "";
+}
+
+@keyframes wbn-swim-in {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes wbn-bob {
+    0%, 100% {
+        opacity: 1;
+        transform: translate(-50%, -100%);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translate(-50%, calc(-100% + 3px));
+    }
+}
+
+.wbn-splash {
+    position: absolute;
+    width: 96px;
+    height: 80px;
+    background-repeat: no-repeat;
+    background-size: 384px 80px;
+    image-rendering: pixelated;
+    pointer-events: none;
+    transform: translate(-50%, -88%);
+    opacity: 0;
+    animation: wbn-splash 0.8s steps(4) 0.45s forwards;
+}
+
+@keyframes wbn-splash {
+    0% {
+        opacity: 1;
+        background-position: 0 0;
+    }
+
+    99% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        background-position: -384px 0;
+    }
+}
+
+.wbn-tag {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border: 2px solid #000000;
+    border-radius: 6px;
+    background: #2a2a2a;
+    color: #ffffff;
+    font-size: 12px;
+    white-space: nowrap;
+    transform-origin: 50% 100%;
+    transition: left 0.3s ease-out;
+    pointer-events: none;
+}
+
+.wbn-tag.is-you .wbn-tag__name {
+    color: #ffd84a;
+}
+
+.wbn-tag__stars span {
+    color: #666666;
+}
+
+.wbn-tag__stars span.is-won {
+    color: #ffd84a;
+}
+
+/* ---- Over the pool ---- */
+
+.wbn-topbar {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 8px;
+}
+
+.wbn-score {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 10px;
+    border: 3px solid #000000;
+    border-radius: 10px;
+    background: #1f3550;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4);
+    color: #ffffff;
+    transform: translateX(-50%);
+}
+
+.wbn-score.is-sudden {
+    background: #6b1a14;
+    animation: wbn-pulse 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes wbn-pulse {
+    to {
+        box-shadow: 0 0 0 4px rgba(255, 80, 60, 0.6), 0 3px 0 rgba(0, 0, 0, 0.4);
+    }
+}
+
+.wbn-score__side {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wbn-score__name {
+    max-width: 130px;
+    overflow: hidden;
+    font-size: 15px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wbn-score__name.is-you {
+    color: #ffd84a;
+}
+
+.wbn-score__wins {
+    min-width: 30px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: #000000;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.wbn-score__middle {
+    display: flex;
+    min-width: 110px;
+    flex-direction: column;
+    align-items: center;
+}
+
+.wbn-score__round {
+    color: #b8cce4;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.wbn-score__clock {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.wbn-score.is-sudden .wbn-score__clock {
+    color: #ffd84a;
+    font-size: 15px;
+}
+
+.wbn-score__middle {
+    min-width: 170px;
+}
+
+/* A balance dial: the drawn dial, its needle turned round the pivot. */
+.wbn-gauge {
+    position: relative;
+    width: 132px;
+    height: 76px;
+    flex: 0 0 auto;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    image-rendering: pixelated;
+}
+
+.wbn-gauge.is-small {
+    width: 66px;
+    height: 38px;
+}
+
+.wbn-gauge__needle {
+    position: absolute;
+    bottom: calc(10 / 76 * 100%);
+    left: calc(50% - 2px);
+    width: 4px;
+    height: calc(48 / 76 * 100%);
+    border-radius: 2px;
+    background: #ffffff;
+    box-shadow: 0 0 0 1px #000000;
+    transform-origin: 50% 100%;
+    transition: transform 0.25s linear;
+}
+
+.wbn-countdown {
+    position: absolute;
+    top: 34%;
+    left: 50%;
+    color: #ffffff;
+    font-size: 110px;
+    font-weight: 700;
+    text-shadow: 0 6px 0 #1f3550, 0 0 22px rgba(0, 0, 0, 0.4);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: wbn-count 1s ease-out both;
+}
+
+.wbn-countdown.is-go {
+    color: #ffd84a;
+    font-size: 84px;
+    animation: wbn-count 0.9s ease-out both;
+}
+
+@keyframes wbn-count {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2.2);
+    }
+
+    30% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+}
+
+.wbn-banner {
+    position: absolute;
+    top: 26%;
+    left: 50%;
+    max-width: 640px;
+    padding: 12px 26px;
+    border: 3px solid #000000;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+    color: #1f3550;
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    transform: translateX(-50%);
+    pointer-events: none;
+    animation: wbn-banner 0.35s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+.wbn-banner.is-sudden {
+    background: #e23b2c;
+    color: #ffffff;
+}
+
+.wbn-banner.is-win,
+.wbn-banner.is-forfeit {
+    background: #ffd84a;
+    color: #5a2c08;
+}
+
+@keyframes wbn-banner {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.4);
+    }
+}
+
+.wbn-bottom {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.wbn-panel {
+    display: flex;
+    min-width: 520px;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    background: rgba(31, 53, 80, 0.94);
+    color: #ffffff;
+    text-align: center;
+}
+
+.wbn-panel__text {
+    font-size: 14px;
+}
+
+.wbn-panel__title {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.wbn-panel__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* The keys at the bottom: they work with the keyboard and with a click (or a finger). */
+.wbn-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 14px;
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background: #f5b400;
+    box-shadow: inset 0 0 0 3px #c98a00, 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+.wbn-controls__keys {
+    display: flex;
+    gap: 12px;
+}
+
+.wbn-controls__group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wbn-controls__label {
+    color: #5a2c08;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.wbn-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #3a1c04;
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.wbn-control:disabled {
+    cursor: default;
+    opacity: 0.55;
+}
+
+.wbn-control__text {
+    width: 96px;
+    line-height: 1.15;
+}
+
+.wbn-key {
+    display: inline-flex;
+    min-width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    border: 2px solid #000000;
+    border-radius: 6px;
+    background: linear-gradient(#fff6c8, #ffd056);
+    box-shadow: inset 0 -3px 0 #c98a00;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.wbn-key.is-wide {
+    min-width: 64px;
+    font-size: 11px;
+}
+
+.wbn-control.is-active .wbn-key,
+.wbn-control:not(:disabled):active .wbn-key {
+    background: linear-gradient(#ffd056, #f2a900);
+    box-shadow: inset 0 2px 0 #c98a00;
+}
+
+.wbn-toast {
+    position: absolute;
+    bottom: 140px;
+    left: 50%;
+    padding: 5px 12px;
+    border: 1px solid #8c1c12;
+    border-radius: 6px;
+    background: #fde2df;
+    color: #8c1c12;
+    font-size: 12px;
+    transform: translateX(-50%);
+}
+
+/* ---- The hotel windows of the game ---- */
+
+.wbn-lobby {
+    width: 440px;
+    min-height: 300px;
+}
+
+.wbn-lobby__intro {
+    padding: 6px 8px;
+    border: 1px solid #c9b48a;
+    border-radius: 4px;
+    background: #fff8e6;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.wbn-lobby__list {
+    display: flex;
+    min-height: 120px;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wbn-lobby__empty {
+    color: #666666;
+    font-size: 12px;
+}
+
+.wbn-lobby__game {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.wbn-lobby__host {
+    flex: 1 1 auto;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.wbn-lobby__actions,
+.wbn-rules__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.wbn-rules {
+    width: 520px;
+    height: 520px;
+}
+
+.wbn-rules .wbn-rules__content {
+    overflow-y: auto;
+}
+
+.wbn-rules .wbn-rules__actions {
+    margin-top: auto;
+}
+
+.wbn-rules__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.wbn-rules__choice {
+    display: flex;
+    gap: 3px;
+}
+
+.wbn-rules__label {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.wbn-rules__toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.wbn-rules__toggle > span {
+    display: flex;
+    flex-direction: column;
+}
+
+.wbn-rules__hint {
+    color: #666666;
+    font-size: 11px;
+}
+
+.wbn-rules__how {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wbn-rules .wbn-rules__how strong,
+.wbn-rules .wbn-rules__how p,
+.wbn-rules .wbn-rules__key {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.wbn-rules__keys {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 8px;
+    border: 2px solid #c98a00;
+    border-radius: 8px;
+    background: #ffefc6;
+}
+
+.wbn-rules__key {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.wbn-rules__section strong {
+    display: block;
+    margin-bottom: 2px;
+    color: #1f3550;
+    font-size: 14px;
+}
+
+.wbn-rules__section p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* ---- The Game Center tile ---- */
+
+.game-tile.game-tile--wobblenext {
+    align-self: start;
+    height: auto;
+    min-height: 250px;
+}
+
+.game-tile--wobblenext .game-tile__banner {
+    overflow: hidden;
+    background-position: 50% 62%;
+    background-size: 150%;
+    image-rendering: pixelated;
+}
+
+.game-tile--wobblenext .game-tile__body {
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.game-tile--wobblenext .game-tile__desc {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+}

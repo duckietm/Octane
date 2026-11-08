@@ -9,7 +9,7 @@
   flex-direction: column;
   align-items: center;
   gap: 18px;
-  padding: 72px 24px 24px;
+  padding: 72px 24px 96px;
   overflow-y: auto;
   background: radial-gradient(circle at 50% 20%, #1d3247 0%, #0b141d 70%);
   color: #fff;

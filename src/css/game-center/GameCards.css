@@ -1,0 +1,414 @@
+/* The Game Center's list: every game side by side, the same card for each (SnowStorm's own card included). */
+
+.game-center-main .game-center-header {
+  position: relative;
+  justify-content: center;
+  width: min(100%, 1530px);
+}
+
+/* The close button on the left: the hotel's purse covers the top right corner. */
+.game-center-main .game-center-header__close {
+  position: absolute;
+  left: 0;
+}
+
+.game-tile-grid.game-card-grid {
+  display: grid;
+  width: min(100%, 1530px);
+  grid-template-columns: repeat(auto-fill, 290px);
+  justify-content: center;
+  gap: 16px;
+}
+
+.game-card-grid .game-tile.game-card {
+  position: relative;
+  display: flex;
+  width: 290px;
+  height: 520px;
+  min-height: 0;
+  flex-direction: column;
+  align-self: stretch;
+  border: 3px solid var(--gt-edge, #4b7ea1);
+  border-radius: 12px;
+  background: var(--gt-card, #1c323f);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.game-card-grid .game-tile.game-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6), 0 0 0 2px var(--gt-glow, rgba(255, 255, 255, 0.25));
+}
+
+.game-card__banner-box {
+  position: relative;
+  flex: 0 0 auto;
+  height: 125px;
+  overflow: hidden;
+}
+
+.game-card-grid .game-card .game-tile__banner {
+  width: 100%;
+  height: 125px;
+  background-repeat: no-repeat;
+}
+
+.game-card-grid .game-card .game-tile__logo {
+  max-height: 104px;
+}
+
+.game-banner--uno {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #2c6b39;
+}
+
+.game-banner--werewolf {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: radial-gradient(ellipse at center, #2c4a3a 0%, #0c1612 100%);
+}
+
+.game-card__playing {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 9px 2px 7px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.62);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.game-card__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #9a9a9a;
+}
+
+.game-card__playing.is-busy .game-card__dot {
+  background: #63e05a;
+  box-shadow: 0 0 6px #63e05a;
+  animation: game-card-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes game-card-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.game-card__players {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 1px 8px;
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffe873;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.game-card-grid .game-card .game-tile__body {
+  flex: 1 1 auto;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 8px 12px 12px;
+}
+
+.game-card-grid .game-card .game-tile__title {
+  color: var(--gt-title, #ffffff);
+  font-size: 17px;
+}
+
+.game-card__desc,
+.game-card-grid .game-tile--snowwar .game-tile__desc {
+  display: block;
+  overflow: hidden;
+  color: var(--gt-text, rgba(255, 255, 255, 0.85));
+  font-size: 12.5px;
+  line-height: 1.4;
+  opacity: 1;
+  -webkit-line-clamp: unset;
+}
+
+.game-card__desc {
+  min-height: 105px;
+}
+
+.game-card__footer,
+.game-card-grid .game-tile--snowwar .game-tile__footer {
+  margin-top: auto;
+}
+
+.game-card__unlimited {
+  color: #ffd75e;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.game-card-grid .game-card .game-card__vip {
+  max-width: 100%;
+  font-size: 12px;
+  text-align: center;
+  white-space: normal;
+}
+
+.game-center-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  z-index: 10;
+  padding: 8px 16px;
+  border: 2px solid #8c1c12;
+  border-radius: 8px;
+  background: #fde2df;
+  color: #8c1c12;
+  font-size: 13px;
+  transform: translateX(-50%);
+}
+
+/* ---- The leaderboard window (themed by GameThemes.css) ---- */
+
+/* A game's "buy more games" button, as SnowStorm's: the game's picture in the frame, "+N" on the band. */
+.game-tile__token.game-token {
+  position: relative;
+  background: var(--token-sheet) 0 var(--token-y) / var(--token-size) no-repeat;
+  image-rendering: pixelated;
+}
+
+.game-tile__token.game-token:hover,
+.game-tile__token.game-token:focus-visible {
+  background-image: var(--token-sheet);
+  background-position: var(--token-x-hi) var(--token-y);
+}
+
+.game-token__count {
+  position: absolute;
+  top: 44px;
+  left: 7px;
+  width: 38px;
+  height: 12px;
+  color: #ffffff;
+  font: 700 11px/12px HabboAirUbuntu, sans-serif;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
+}
+
+.game-card-grid .game-card .game-tile__tokens {
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.game-card-grid .game-card .game-tile__vip {
+  justify-content: center;
+  font-size: 12px;
+}
+
+/* A game's leaderboard: SnowStorm's window in the game's colours. */
+.snowwar-leaderboard-frame.game-leaderboard-frame {
+  background: var(--gw-edge, #418db0);
+}
+
+.snowwar-leaderboard.game-leaderboard-board {
+  color: var(--gw-ink, #1077ac);
+}
+
+.game-leaderboard-board .snowwar-leaderboard__empty {
+  color: var(--gw-ink, #1077ac);
+}
+
+.snowwar-leaderboard__tab.game-leaderboard__tab {
+  border: 2px solid var(--gw-edge, #0b5f86);
+  border-top: 0;
+  background: var(--gw-soft, #ffffff);
+}
+
+.snowwar-leaderboard__tab.game-leaderboard__tab.is-left {
+  border-radius: 0 0 0 12px;
+}
+
+.snowwar-leaderboard__tab.game-leaderboard__tab.is-right {
+  border-radius: 0 0 12px 0;
+}
+
+.snowwar-leaderboard__tab.game-leaderboard__tab.is-active {
+  background: var(--gw-edge, #000000);
+}
+
+.snowwar-leaderboard__highlight.game-leaderboard__highlight {
+  border: 2px solid var(--gw-accent, #ffce21);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--gw-accent, #ffce21) 35%, transparent);
+  box-sizing: border-box;
+}
+
+.snowwar-leaderboard__reset.game-leaderboard__reset {
+  top: 398px;
+  right: 0;
+  left: 0;
+  max-width: none;
+  font-size: 13px;
+  text-align: center;
+  text-shadow: -1px 0 var(--gw-edge, #1077ac), 0 1px var(--gw-edge, #1077ac), 1px 0 var(--gw-edge, #1077ac), 0 -1px var(--gw-edge, #1077ac);
+}
+
+.game-leaderboard__points {
+  position: absolute;
+  top: 421px;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  font-size: 11px;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.game-leaderboard-board .snowwar-leaderboard__link {
+  color: var(--gw-ink, #1077ac);
+}
+
+/* "How to play": a small window over the games list, SnowStorm's way, in the game's colours. */
+.game-howto-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1650;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 18, 28, 0.55);
+}
+
+.game-howto {
+  position: relative;
+  display: flex;
+  width: 400px;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0 0 14px;
+  overflow: hidden;
+  border: 3px solid var(--gw-edge, #4b7ea1);
+  border-radius: 10px;
+  background: var(--gw-body, #1c323f);
+  color: var(--gw-ink, #ffffff);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+.game-howto__title {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  background: var(--gw-head, #418db0);
+  color: #ffffff;
+  font: 700 13px HabboAirUbuntu, sans-serif;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+
+.game-howto__close {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #f28a32;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 15px;
+  cursor: pointer;
+}
+
+.game-howto__banner {
+  position: relative;
+  width: 360px;
+  height: 150px;
+  overflow: hidden;
+  border: 2px solid var(--gw-edge, #4b7ea1);
+  border-radius: 8px;
+}
+
+.game-howto__banner > .game-tile__banner {
+  width: 100%;
+  height: 100%;
+}
+
+.game-howto__page {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+.game-howto__arrow {
+  width: 14px;
+  height: 18px;
+  flex-shrink: 0;
+  border: 0;
+  padding: 0;
+  background: transparent no-repeat center;
+  cursor: pointer;
+}
+
+.game-howto__text {
+  display: flex;
+  min-height: 64px;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  font: 400 14px/1.35 HabboAirUbuntu, sans-serif;
+}
+
+.game-howto__number {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--gw-accent, #ffce21);
+  color: var(--gw-accent-ink, #4a2a00);
+  font-weight: 700;
+}
+
+.game-howto__balls {
+  display: flex;
+  gap: 4px;
+}
+
+.game-howto__ball {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  padding: 0;
+  background: transparent no-repeat center / contain;
+  cursor: pointer;
+}
+
+.game-howto__back {
+  border: 0;
+  background: none;
+  color: var(--gw-ink, #ffffff);
+  font: 700 13px HabboAirUbuntu, sans-serif;
+  text-decoration: underline;
+  cursor: pointer;
+}

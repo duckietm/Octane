@@ -61,7 +61,7 @@ describe('GameTileView (SnowWar hub tile)', () =>
         expect(screen.getByLabelText('100')).toBeTruthy();
         expect(screen.getByLabelText('300')).toBeTruthy();
 
-        fireEvent.click(screen.getByText('Play now!'));
+        fireEvent.click(screen.getByText('Play!'));
         expect(mocks.send).toHaveBeenCalledTimes(1);
     });
 
@@ -83,7 +83,7 @@ describe('GameTileView (SnowWar hub tile)', () =>
         mocks.gameCenter.accountStatus = { freeGamesLeft: 0, hasUnlimitedGames: false };
         render(<GameTileView game={ game } />);
 
-        expect(screen.queryByText('Play now!')).toBeNull();
+        expect(screen.queryByText('Play!')).toBeNull();
         expect(screen.getByLabelText('10')).toBeTruthy();
     });
 
@@ -93,7 +93,7 @@ describe('GameTileView (SnowWar hub tile)', () =>
         render(<GameTileView game={ game } />);
 
         expect(screen.queryByLabelText('10')).toBeNull();
-        expect(screen.getByText('Play now!')).toBeTruthy();
+        expect(screen.getByText('Play!')).toBeTruthy();
     });
 
     it('counts the leave block down on a disabled play button', () =>
@@ -109,7 +109,7 @@ describe('GameTileView (SnowWar hub tile)', () =>
     {
         render(<GameTileView game={ game } />);
 
-        fireEvent.click(screen.getByText('How To Play'));
+        fireEvent.click(screen.getByText('How to play'));
         expect(mocks.gameCenter.setInstructionsOpen).toHaveBeenCalledWith(true);
     });
 });

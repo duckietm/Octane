@@ -1,0 +1,267 @@
+/* The blocks duel's arcade: the stage is 960 x 640, the arcade drawn at 1x and shown twice its size. */
+
+.tetris-world {
+    background: #0c0818;
+}
+
+.tetris-cell {
+    display: block;
+    width: 22px;
+    height: 22px;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.tetris-cell.is-1 { background: #31c7ef; }
+.tetris-cell.is-2 { background: #2d5ad8; }
+.tetris-cell.is-3 { background: #ef7921; }
+.tetris-cell.is-4 { background: #f7d308; }
+.tetris-cell.is-5 { background: #42b642; }
+.tetris-cell.is-6 { background: #ad4d9c; }
+.tetris-cell.is-7 { background: #ef2029; }
+.tetris-cell.is-8 { background: #8a8a8a; }
+
+.tetris-cell[class*='is-']:not(.is-ghost) {
+    border: 2px solid;
+    border-color: rgba(255, 255, 255, 0.45) rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.35) rgba(255, 255, 255, 0.45);
+}
+
+.tetris-cell.is-ghost {
+    border: 1px dashed rgba(255, 255, 255, 0.45);
+}
+
+/* The room on the left, the player's own machine on the right. */
+.tetris-world {
+    justify-content: flex-start;
+    gap: 0;
+    background: radial-gradient(ellipse at 30% 40%, #2a1a52 0%, #0c0818 70%);
+}
+
+.tetris-room {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.tetris-console {
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    padding: 10px 14px 0;
+    border: 4px solid #0c0818;
+    border-radius: 16px 16px 6px 6px;
+    background: linear-gradient(90deg, #a01c34, #d8344c 18%, #d8344c 82%, #a01c34);
+    box-shadow: 0 0 30px rgba(255, 70, 170, 0.35), 0 10px 0 #5a0c1c;
+}
+
+.tetris-console__marquee {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 6px 0;
+    border: 3px solid #0c0818;
+    border-radius: 6px;
+    background: repeating-linear-gradient(90deg, #ff46aa 0 14px, #3ce6ff 14px 28px, #ffdc3c 28px 42px);
+    color: #ffffff;
+    font: 700 22px HabboAirUbuntu, sans-serif;
+    text-align: center;
+    text-shadow: 0 2px 0 #0c0818, 0 0 8px #0c0818;
+}
+
+.tetris-console__panel {
+    position: relative;
+    display: flex;
+    width: calc(100% + 28px);
+    height: 46px;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 10px;
+    background: #6e0f22;
+    clip-path: polygon(0 0, 100% 0, 96% 100%, 4% 100%);
+}
+
+.tetris-console__stick {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ff2b2b;
+    box-shadow: 0 10px 0 -4px #111111;
+}
+
+.tetris-console__button {
+    width: 16px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #0c0818;
+}
+
+.tetris-console__button.is-0 { background: #ff46aa; }
+.tetris-console__button.is-1 { background: #3ce6ff; }
+.tetris-console__button.is-2 { background: #ffdc3c; }
+
+.tetris-screen {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 10px;
+    border: 6px solid #18181f;
+    border-radius: 8px;
+    background: #000814;
+    box-shadow: inset 0 0 20px rgba(60, 230, 255, 0.25);
+    box-sizing: border-box;
+    color: #ffffff;
+    font-family: HabboAirUbuntu, sans-serif;
+}
+
+.tetris-screen__side {
+    display: flex;
+    width: 58px;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font: 700 15px HabboAirUbuntu, sans-serif;
+}
+
+.tetris-label {
+    margin-top: 6px;
+    color: #ffe873;
+    font: 700 10px HabboAirUbuntu, sans-serif;
+    text-transform: uppercase;
+}
+
+.tetris-keys {
+    margin-top: 14px;
+    color: rgba(255, 255, 255, 0.65);
+    font: 400 10px/1.4 HabboAirUbuntu, sans-serif;
+    text-align: center;
+}
+
+.tetris-well {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(10, 22px);
+    outline: 2px solid #3a3a52;
+    background: #000814;
+}
+
+.tetris-well.is-out .tetris-cell {
+    filter: grayscale(1) brightness(0.55);
+}
+
+.tetris-well__message {
+    position: absolute;
+    top: 45%;
+    left: 0;
+    right: 0;
+    padding: 0 10px;
+    color: #ffe873;
+    font: 700 18px HabboAirUbuntu, sans-serif;
+    text-align: center;
+    text-shadow: 0 2px 0 #000000;
+}
+
+.tetris-count {
+    top: 45%;
+    left: 50%;
+}
+
+.tetris-mini-piece {
+    display: grid;
+    width: 48px;
+    height: 24px;
+    margin: 2px 0;
+    grid-template-columns: repeat(4, 12px);
+}
+
+.tetris-mini-piece .tetris-cell {
+    width: 12px;
+    height: 12px;
+    background-color: transparent;
+}
+
+.tetris-mini-piece .tetris-cell[class*='is-'] {
+    border-width: 1px;
+}
+
+.tetris-mini-piece .tetris-cell.is-1 { background: #31c7ef; }
+.tetris-mini-piece .tetris-cell.is-2 { background: #2d5ad8; }
+.tetris-mini-piece .tetris-cell.is-3 { background: #ef7921; }
+.tetris-mini-piece .tetris-cell.is-4 { background: #f7d308; }
+.tetris-mini-piece .tetris-cell.is-5 { background: #42b642; }
+.tetris-mini-piece .tetris-cell.is-6 { background: #ad4d9c; }
+.tetris-mini-piece .tetris-cell.is-7 { background: #ef2029; }
+
+/* A machine's little screen over it, in the room (the room's pixels). */
+.tetris-small {
+    position: absolute;
+    display: flex;
+    width: 48px;
+    padding: 2px;
+    border: 2px solid #18181f;
+    border-radius: 3px;
+    background: #000814;
+    transform: translate(-50%, -100%);
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    color: #ffffff;
+    font: 700 7px HabboAirUbuntu, sans-serif;
+}
+
+.tetris-small.is-you {
+    border-color: #ffdc3c;
+    box-shadow: 0 0 6px #ffdc3c;
+}
+
+.tetris-small__well {
+    display: grid;
+    grid-template-columns: repeat(10, 4px);
+    background: #000814;
+}
+
+.tetris-small__well .tetris-cell {
+    width: 4px;
+    height: 4px;
+}
+
+.tetris-small__well .tetris-cell[class*='is-'] {
+    border-width: 1px;
+}
+
+.tetris-small.is-out .tetris-small__well {
+    filter: grayscale(1) brightness(0.55);
+}
+
+.tetris-small__name {
+    max-width: 46px;
+    overflow: hidden;
+    color: #ffe873;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tetris-small__out {
+    position: absolute;
+    top: 30px;
+    padding: 1px 3px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #ffe873;
+    font-weight: 700;
+}
+
+/* A player at a cabinet, seen from behind. */
+.tetris-player {
+    position: absolute;
+    bottom: 2px;
+    transform: translateX(-50%);
+}
+
+.tetris-panel {
+    bottom: 150px;
+}

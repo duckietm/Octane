@@ -119,7 +119,7 @@ export const SnowWarLeaderboardView: FC = () =>
                         <div className="snowwar-leaderboard__list">
                             { leaderboard.loading && <div className="snowwar-leaderboard__empty">{ localizeWithFallback('generic.loading', 'Loading...') }</div> }
                             { !leaderboard.loading && !rows.length && (
-                                <div className="snowwar-leaderboard__empty">{ localizeWithFallback('gamecenter.leaderboard_empty', 'No scores yet.') }</div>
+                                <div className="snowwar-leaderboard__empty" data-browser-text>{ localizeWithFallback('gamecenter.leaderboard_empty', 'No scores yet.') }</div>
                             ) }
                             { !leaderboard.loading && rows.map((entry, index) =>
                             {

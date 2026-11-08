@@ -3,6 +3,8 @@ import {
     Game2InArenaQueueMessageEvent,
     Game2GetWeeklyGroupLeaderboardComposer,
     Game2TotalGroupLeaderboardEvent,
+    Game2FriendsLeaderboardEvent,
+    Game2TotalLeaderboardEvent,
     Game2WeeklyFriendsLeaderboardEvent,
     Game2WeeklyGroupLeaderboardEvent,
     Game2WeeklyGroupLeaderboardParser,
@@ -727,6 +729,34 @@ const useSnowWarState = () =>
     const onWeeklyGroupLeaderboard = useCallback((event: Game2WeeklyGroupLeaderboardEvent) =>
         applyGroupLeaderboard(event, true), [applyGroupLeaderboard]);
 
+    // The all-time tables (Game2TotalLeaderboard 2594 / Game2FriendsLeaderboard 47): AIR's Game2LeaderboardParser,
+    // with no week header. The server answers the all-time requests with them.
+    const applyAllTime = useCallback((event: Game2TotalLeaderboardEvent | Game2FriendsLeaderboardEvent, friendsOnly: boolean) =>
+    {
+        const parser = event.getParser();
+        if (!parser || parser.gameTypeId !== 0) return;
+        setLeaderboard(current => ({
+            ...current,
+            isOpen: true,
+            weekly: false,
+            friendsOnly,
+            groups: false,
+            loading: false,
+            currentOffset: 0,
+            totalListSize: parser.totalListSize,
+            entries: parser.leaderboard.map(entry => ({
+                userId: entry.userId,
+                score: entry.score,
+                rank: entry.rank,
+                name: entry.name,
+                figure: entry.figure,
+                gender: entry.gender,
+            })),
+        }));
+    }, []);
+    const onTotalLeaderboard = useCallback((event: Game2TotalLeaderboardEvent) => applyAllTime(event, false), [applyAllTime]);
+    const onFriendsLeaderboard = useCallback((event: Game2FriendsLeaderboardEvent) => applyAllTime(event, true), [applyAllTime]);
+
     const onAllTimeLeaderboard = useCallback((event: Game2WeeklyLeaderboardEvent) =>
         applyLeaderboard(event, false, false), [applyLeaderboard]);
     const onAllTimeFriendsLeaderboard = useCallback((event: Game2WeeklyFriendsLeaderboardEvent) =>
@@ -762,6 +792,8 @@ const useSnowWarState = () =>
     useMessageEvent<SnowWarGamesLeftEvent>(SnowWarGamesLeftEvent, onGamesLeft);
     useMessageEvent<SnowWarGamesInformationEvent>(SnowWarGamesInformationEvent, onGamesInformation);
     useMessageEvent<Game2WeeklyLeaderboardEvent>(Game2WeeklyLeaderboardEvent, onAllTimeLeaderboard);
+    useMessageEvent<Game2TotalLeaderboardEvent>(Game2TotalLeaderboardEvent, onTotalLeaderboard);
+    useMessageEvent<Game2FriendsLeaderboardEvent>(Game2FriendsLeaderboardEvent, onFriendsLeaderboard);
     useMessageEvent<Game2WeeklyFriendsLeaderboardEvent>(Game2WeeklyFriendsLeaderboardEvent, onAllTimeFriendsLeaderboard);
     useMessageEvent<WeeklyCompetitiveLeaderboardEvent>(WeeklyCompetitiveLeaderboardEvent, onWeeklyLeaderboard);
     useMessageEvent<WeeklyCompetitiveFriendsLeaderboardEvent>(WeeklyCompetitiveFriendsLeaderboardEvent, onWeeklyFriendsLeaderboard);

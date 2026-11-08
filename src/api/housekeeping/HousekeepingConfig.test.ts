@@ -15,6 +15,7 @@ describe('HOUSEKEEPING_TABS', () => {
             HousekeepingTabId.AUDIT,
             HousekeepingTabId.HOTEL,
             HousekeepingTabId.PERMISSIONS,
+            HousekeepingTabId.GAMES,
             HousekeepingTabId.SOUNDBOARD
         ]);
     });

@@ -1,0 +1,169 @@
+/* The Lido's diving board: the original stage (720 x 528 for the tower, 720 x 493 for the pool) shown twice its size. */
+
+.plongeoir-world {
+    background: #1d3d5c;
+}
+
+.plongeoir-scene {
+    position: relative;
+    overflow: hidden;
+}
+
+.plongeoir-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    max-width: none;
+    image-rendering: pixelated;
+    pointer-events: none;
+    user-select: none;
+}
+
+.plongeoir-sprite {
+    position: absolute;
+    display: block;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.plongeoir-diver {
+    position: absolute;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+/* The others on the deck: the hotel's avatars, the feet at the point. */
+.plongeoir-spectator {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translate(-50%, -100%);
+}
+
+.plongeoir-spectator img {
+    display: block;
+    max-width: none;
+    image-rendering: pixelated;
+}
+
+.plongeoir-spectator__name {
+    margin-top: -6px;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #ffffff;
+    font: 700 11px HabboAirUbuntu, sans-serif;
+    white-space: nowrap;
+}
+
+.plongeoir-spectator__name.is-voted {
+    background: #2e8b2e;
+}
+
+/* The FUSE screen in the pool view: the diver's name, their mark. */
+.plongeoir-fuse {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: #101010;
+    color: #9fe86b;
+    font: 700 18px HabboAirUbuntu, sans-serif;
+    text-align: center;
+    text-shadow: 0 0 6px rgba(159, 232, 107, 0.6);
+}
+
+.plongeoir-fuse span:first-child {
+    color: #ffffff;
+    font-size: 16px;
+}
+
+/* The tower's help window (ph_instructions). */
+.plongeoir-help {
+    position: fixed;
+    top: 70px;
+    left: 24px;
+    z-index: 5;
+    width: 240px;
+    height: 540px;
+    padding: 10px;
+    border: 2px solid #6b360d;
+    border-radius: 8px;
+    background: rgba(255, 248, 230, 0.94);
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+}
+
+.plongeoir-help__label {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    color: #5a2c08;
+    font: 700 13px HabboAirUbuntu, sans-serif;
+}
+
+.plongeoir-help__buttons {
+    position: absolute;
+    left: 20px;
+    width: 214px;
+    height: 454px;
+}
+
+.plongeoir-help__key {
+    position: absolute;
+    width: 68px;
+    color: #000000;
+    font: 700 20px/40px HabboAirUbuntu, sans-serif;
+    text-align: center;
+}
+
+.plongeoir-help__key.is-space {
+    width: 172px;
+    font-size: 16px;
+}
+
+/* The scores, on the right. */
+.plongeoir-scores {
+    position: fixed;
+    top: 70px;
+    right: 18px;
+    z-index: 5;
+    display: flex;
+    min-width: 170px;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px;
+    border: 2px solid #6b360d;
+    border-radius: 8px;
+    background: rgba(255, 248, 230, 0.94);
+    color: #3d2108;
+    font: 400 12px HabboAirUbuntu, sans-serif;
+}
+
+.plongeoir-scores__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.plongeoir-scores__row.is-jumper {
+    background: #ffefc6;
+}
+
+.plongeoir-scores__row.is-you strong {
+    color: #b0280f;
+}
+
+.plongeoir-marks {
+    bottom: 40px;
+}
+
+.plongeoir-panel {
+    bottom: 60px;
+}

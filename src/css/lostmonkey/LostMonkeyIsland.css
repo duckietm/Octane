@@ -1,0 +1,495 @@
+/* Lost Monkey's island: the island's map (1024 x 1024) at the screen's height, the things on it at their foot, the
+   monkey, the needs on the left; the island's games over it. */
+
+.lm-island-world {
+    background: #0b3d1e;
+}
+
+.lm-island {
+    position: relative;
+    flex: 0 0 auto;
+    overflow: hidden;
+    border-left: 4px solid #6b3f17;
+    border-right: 4px solid #6b3f17;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+}
+
+.lm-island__inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+    cursor: pointer;
+}
+
+.lm-island__map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    max-width: none;
+    pointer-events: none;
+    user-select: none;
+}
+
+.lm-sprite {
+    position: absolute;
+    display: block;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+
+.lm-sprite.is-clickable {
+    cursor: pointer;
+}
+
+.lm-thing {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+.lm-thing.is-usable .lm-sprite {
+    cursor: pointer;
+}
+
+.lm-thing.is-usable:hover .lm-sprite {
+    filter: drop-shadow(0 0 4px #fff28a) brightness(1.08);
+}
+
+.lm-thing__label {
+    position: absolute;
+    top: 4px;
+    left: 0;
+    padding: 0 7px;
+    border: 2px solid #6b3f17;
+    border-radius: 8px;
+    background: rgba(251, 246, 220, 0.92);
+    color: #3a2408;
+    font: 700 11px HabboAirUbuntu, sans-serif;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(-50%);
+    transition: opacity 0.15s;
+    pointer-events: none;
+}
+
+.lm-thing.is-usable:hover .lm-thing__label {
+    opacity: 1;
+}
+
+.lm-monkey {
+    position: absolute;
+    width: 0;
+    height: 0;
+    cursor: pointer;
+}
+
+.lm-monkey-picture {
+    display: block;
+    background-repeat: no-repeat;
+}
+
+.lm-monkey > .lm-monkey-picture {
+    position: absolute;
+    bottom: 0;
+    left: -32px;
+    filter: drop-shadow(0 4px 2px rgba(0, 0, 0, 0.35));
+}
+
+.lm-monkey.is-walking > .lm-monkey-picture {
+    animation: lm-walk 0.36s ease-in-out infinite;
+}
+
+@keyframes lm-walk {
+    50% {
+        bottom: 6px;
+        rotate: 4deg;
+    }
+}
+
+.lm-monkey.is-asleep > .lm-monkey-picture {
+    rotate: -78deg;
+    bottom: -10px;
+}
+
+.lm-monkey__bubble {
+    position: absolute;
+    bottom: 96px;
+    left: 0;
+    padding: 3px 10px;
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #000000;
+    font: 700 14px HabboAirUbuntu, sans-serif;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.lm-topbar {
+    background: linear-gradient(#238a35, #155e22);
+    border-bottom: 3px solid #f2d21c;
+}
+
+.lm-topbar__logo {
+    height: 38px;
+}
+
+/* The needs, on the left: the game's own bars (a6) filled with the need. */
+.lm-hud {
+    position: fixed;
+    top: 60px;
+    left: 14px;
+    z-index: 5;
+    display: flex;
+    width: 196px;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px;
+    border: 3px solid #6b3f17;
+    border-top: 6px solid #f2d21c;
+    border-radius: 12px;
+    background: linear-gradient(#fbf6dc, #f0e3a8);
+    color: #3a2408;
+    font: 400 12px HabboAirUbuntu, sans-serif;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+.lm-hud__head {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.lm-hud__mood {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-weight: 700;
+}
+
+.lm-need {
+    position: relative;
+    width: 116px;
+    height: 29px;
+}
+
+.lm-need__fill {
+    position: absolute;
+    top: 8px;
+    left: 24px;
+    height: 13px;
+    border-radius: 6px;
+    transition: width 0.4s ease;
+}
+
+.lm-need__label {
+    position: absolute;
+    top: 6px;
+    left: 122px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.lm-hud__stock {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.lm-hud__stock > span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 16px;
+}
+
+.lm-hud__colours {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 1px;
+}
+
+.lm-hud__colour {
+    overflow: hidden;
+    height: 28px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+}
+
+.lm-hud__colour.is-on {
+    border-color: #6b3f17;
+    background: #f2d21c;
+}
+
+.lm-hud__hint {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+/* The island's games, over the island. */
+.lm-game-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 44px;
+    background: rgba(0, 0, 0, 0.75);
+}
+
+.lm-game {
+    position: relative;
+    overflow: hidden;
+    border: 4px solid #6b3f17;
+    border-radius: 10px;
+}
+
+.lm-game__inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-size: 100% 100%;
+    image-rendering: pixelated;
+    transform-origin: 0 0;
+}
+
+.lm-game__score {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 2px 10px;
+    padding: 8px 12px;
+    border: 3px solid #6b3f17;
+    border-radius: 10px;
+    background: rgba(251, 246, 220, 0.92);
+    color: #3a2408;
+    font: 700 14px HabboAirUbuntu, sans-serif;
+}
+
+.lm-game__lives {
+    color: #d6262c;
+}
+
+.lm-game__multiplier {
+    position: absolute;
+    top: 14px;
+    right: 20px;
+    color: #f2d21c;
+    font: 700 46px HabboAirUbuntu, sans-serif;
+    text-shadow: 0 3px 0 #6b3f17, 0 0 10px #000000;
+}
+
+.lm-game__count {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    color: #fff28a;
+    font: 700 110px HabboAirUbuntu, sans-serif;
+    text-shadow: 0 5px 0 #6b3f17;
+    transform: translate(-50%, -50%);
+}
+
+.lm-game__help {
+    position: absolute;
+    top: 112px;
+    left: 50%;
+    padding: 2px 10px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #ffffff;
+    font: 400 13px HabboAirUbuntu, sans-serif;
+    transform: translateX(-50%);
+}
+
+.lm-jam__lane {
+    position: absolute;
+    top: 0;
+    width: 116px;
+    height: 500px;
+    background: linear-gradient(transparent, rgba(255, 255, 160, 0.18));
+}
+
+.lm-jam__lane.is-miss {
+    background: linear-gradient(transparent, rgba(255, 40, 40, 0.45));
+}
+
+.lm-jam__drum {
+    cursor: pointer;
+}
+
+.lm-jam__drum:active {
+    transform: translateY(4px);
+}
+
+.lm-jam__keys span {
+    position: absolute;
+    bottom: 160px;
+    color: #ffffff;
+    font: 700 18px HabboAirUbuntu, sans-serif;
+    text-shadow: 0 2px 0 #000000;
+    transform: translateX(-50%);
+}
+
+.lm-sprite.is-missed {
+    opacity: 0.35;
+}
+
+/* The rocket's flight. */
+.lm-story {
+    position: fixed;
+    inset: 0;
+    z-index: 9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: #000000;
+    cursor: pointer;
+}
+
+.lm-story img {
+    width: min(960px, 90vw);
+    border: 4px solid #f2d21c;
+    border-radius: 10px;
+}
+
+.lm-story span {
+    max-width: 800px;
+    color: #ffffff;
+    font: 700 22px HabboAirUbuntu, sans-serif;
+    text-align: center;
+}
+
+.lm-story em {
+    color: #f2d21c;
+    font: 400 13px HabboAirUbuntu, sans-serif;
+}
+
+/* The windows of the island (themed by GameThemes.css). */
+.lm-window {
+    width: 430px;
+}
+
+.lm-window__content {
+    color: #3a2408;
+    font: 400 13px HabboAirUbuntu, sans-serif;
+}
+
+.lm-window__row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.lm-window__note {
+    display: block;
+    margin-top: 6px;
+    font-style: normal;
+    opacity: 0.8;
+}
+
+.lm-window__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+}
+
+.lm-rocket-steps {
+    display: flex;
+    gap: 4px;
+}
+
+.lm-rocket-steps span {
+    height: 10px;
+    flex: 1 1 0;
+    border: 2px solid #6b3f17;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.lm-rocket-steps span.is-done {
+    background: #f2d21c;
+}
+
+/* The monkey's name over him, in the HUD. */
+.lm-monkey__name {
+    position: absolute;
+    bottom: 74px;
+    left: 0;
+    padding: 1px 8px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff28a;
+    font: 700 12px HabboAirUbuntu, sans-serif;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.lm-hud__name {
+    color: #6b360d;
+    font-size: 15px;
+}
+
+/* The first visit: the monkey's colour and name. */
+.lm-create {
+    width: 380px;
+}
+
+.lm-create__intro {
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.lm-create__picture {
+    position: relative;
+    display: flex;
+    height: 150px;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.lm-create__colours {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+}
+
+.lm-create__name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.lm-create__name input {
+    width: 180px;
+    height: 30px;
+    padding: 0 8px;
+    border: 2px solid #2a8a3e;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #1d2f14;
+    font: 700 14px HabboAirUbuntu, sans-serif;
+}
+
+.lm-create__error {
+    color: #b0280f;
+    font-size: 12px;
+    text-align: center;
+}

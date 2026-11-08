@@ -32,6 +32,20 @@ import { FortuneWheelView } from './fortune-wheel/FortuneWheelView';
 import { FriendsView } from './friends/FriendsView';
 import { FurniEditorView } from './furni-editor/FurniEditorView';
 import { GameCenterView } from './game-center/GameCenterView';
+import { UnoView } from './uno/UnoView';
+import { WerewolfView } from './werewolf/WerewolfView';
+import { WobbleView } from './wobble/WobbleView';
+import { BattleBallView } from './battleball/BattleBallView';
+import { FastFoodView } from './fastfood/FastFoodView';
+import { HallView } from './hall/HallView';
+import { QuizView } from './quiz/QuizView';
+import { SnailRaceView } from './snailrace/SnailRaceView';
+import { TetrisView } from './tetris/TetrisView';
+import { PlongeoirView } from './plongeoir/PlongeoirView';
+import { KartView } from './kart/KartView';
+import { LostMonkeyView } from './lostmonkey/LostMonkeyView';
+import { CopyWriterView } from './lostmonkey/CopyWriterView';
+import { WobbleNextView } from './wobblenext/WobbleNextView';
 import { SnowWarView } from './game-center/views/snowwar/SnowWarView';
 import { GroupsView } from './groups/GroupsView';
 import { GroupForumView } from './groups/views/forums/GroupForumView';
@@ -248,6 +262,20 @@ export const MainView: FC<{}> = (props) =>
                 <WidgetErrorBoundary name="CampaignView"><CampaignView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="GameCenterView"><GameCenterView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="SnowWarView"><SnowWarView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="UnoView"><UnoView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="WerewolfView"><WerewolfView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="WobbleView"><WobbleView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="BattleBallView"><BattleBallView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="FastFoodView"><FastFoodView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="HallView"><HallView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="SnailRaceView"><SnailRaceView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="QuizView"><QuizView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="TetrisView"><TetrisView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="PlongeoirView"><PlongeoirView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="KartView"><KartView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="LostMonkeyView"><LostMonkeyView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="CopyWriterView"><CopyWriterView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="WobbleNextView"><WobbleNextView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="FloorplanEditorView"><FloorplanEditorView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="FurniEditorView"><FurniEditorView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="RareValuesView"><RareValuesView /></WidgetErrorBoundary>

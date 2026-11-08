@@ -1,0 +1,301 @@
+/*
+ * What the games with their own world share (the snail race, the quiz, Tetris): the world over the hotel, its stage
+ * at a whole zoom, the bar at the top, the panels and the hotel windows. Each game gives its colours with its class.
+ */
+
+.minigame-world {
+    position: fixed;
+    inset: 0;
+    z-index: 350;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding-top: 44px;
+    background: #000000;
+}
+
+.minigame-stage {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.minigame-stage__inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+}
+
+.minigame-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    image-rendering: pixelated;
+    pointer-events: none;
+    user-select: none;
+}
+
+.minigame-avatar {
+    display: block;
+    max-width: none;
+    image-rendering: pixelated;
+    pointer-events: none;
+    user-select: none;
+}
+
+.minigame-topbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    display: flex;
+    height: 44px;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #ffffff;
+    font: 700 14px HabboAirUbuntu, sans-serif;
+}
+
+.minigame-topbar__title {
+    font-size: 16px;
+}
+
+.minigame-topbar__info {
+    margin-left: auto;
+    font-size: 13px;
+}
+
+.minigame-panel {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    z-index: 4;
+    display: flex;
+    max-width: 560px;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 2px solid #6b360d;
+    border-radius: 8px;
+    background: #fff8e6;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+    color: #3d2108;
+    font: 400 13px/1.4 HabboAirUbuntu, sans-serif;
+    text-align: center;
+    transform: translateX(-50%);
+}
+
+.minigame-panel__rules {
+    font-size: 13px;
+}
+
+.minigame-panel__text {
+    font-weight: 700;
+}
+
+.minigame-panel__seats,
+.minigame-panel__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.minigame-toast {
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    z-index: 6;
+    padding: 5px 12px;
+    border: 1px solid #8c1c12;
+    border-radius: 6px;
+    background: #fde2df;
+    color: #8c1c12;
+    font: 400 12px HabboAirUbuntu, sans-serif;
+    transform: translateX(-50%);
+}
+
+.minigame-count {
+    position: absolute;
+    z-index: 3;
+    color: #ffe873;
+    font: 700 96px HabboAirUbuntu, sans-serif;
+    text-shadow: 0 4px 0 #000000, 0 0 12px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+
+/* ---- The windows ---- */
+
+.minigame-lobby {
+    width: 460px;
+    min-height: 360px;
+}
+
+.minigame-lobby__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font: 400 12px/1.4 HabboAirUbuntu, sans-serif;
+}
+
+.minigame-lobby__intro img {
+    display: block;
+    width: 100%;
+    border-radius: 4px;
+    image-rendering: pixelated;
+}
+
+.minigame-lobby__list {
+    display: flex;
+    min-height: 90px;
+    max-height: 180px;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+}
+
+.minigame-lobby__empty {
+    padding: 14px;
+    color: #6b360d;
+    font: 400 12px HabboAirUbuntu, sans-serif;
+    text-align: center;
+}
+
+.minigame-lobby__table {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    border: 1px solid #e2c58a;
+    border-radius: 4px;
+    background: #fff8e6;
+}
+
+.minigame-lobby__info {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    font: 400 12px HabboAirUbuntu, sans-serif;
+}
+
+.minigame-lobby__create {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font: 400 12px HabboAirUbuntu, sans-serif;
+}
+
+.minigame-lobby__seats,
+.minigame-lobby__bots {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.minigame-lobby__create > .btn:last-child,
+.minigame-lobby__create > button:last-child {
+    margin-left: auto;
+}
+
+.minigame-results {
+    width: 380px;
+}
+
+.minigame-results__head {
+    color: #5a2c08;
+    font: 700 16px HabboAirUbuntu, sans-serif;
+    text-align: center;
+}
+
+.minigame-results__list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.minigame-results__row {
+    display: flex;
+    height: 44px;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+    padding: 0 8px;
+    border: 1px solid #e2c58a;
+    border-radius: 4px;
+    background: #fff8e6;
+    font: 400 12px HabboAirUbuntu, sans-serif;
+}
+
+.minigame-results__row.is-first {
+    background: #ffefc6;
+}
+
+.minigame-results__row.is-you {
+    border-color: #965019;
+}
+
+.minigame-results__place {
+    width: 22px;
+    color: #965019;
+    font: 700 18px HabboAirUbuntu, sans-serif;
+    text-align: center;
+}
+
+.minigame-results__head-image {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    overflow: hidden;
+}
+
+.minigame-results__head-image .minigame-avatar {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.minigame-results__detail {
+    margin-left: auto;
+    color: #6b360d;
+}
+
+.minigame-results__note {
+    font: 400 12px HabboAirUbuntu, sans-serif;
+    text-align: center;
+}
+
+/* ---- Their cards in the Game Center ---- */
+
+.game-tile.game-tile--world {
+    align-self: start;
+    height: auto;
+    min-height: 250px;
+}
+
+.game-tile--world .game-tile__banner {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    image-rendering: pixelated;
+}
+
+.game-tile--world .game-tile__body {
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.game-tile--world .game-tile__desc {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+}
