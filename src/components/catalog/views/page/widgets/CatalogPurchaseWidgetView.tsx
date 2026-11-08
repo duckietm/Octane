@@ -68,7 +68,6 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
     const purchasePendingRef = useRef(false);
     const ownsPurchaseOutcomeRef = useRef(false);
     const confirmationOpenRef = useRef(false);
-    const purchaseGuardTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
     const { showConfirm = null, showSingleBubble = null, simpleAlert = null } = useNotification();
     // AIR PurchaseConfirmationDialog raffle_container: shown while the server holds this LTD purchase in a raffle.
     const [isRaffling, setIsRaffling] = useState(false);
@@ -108,10 +107,6 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
         purchasePendingRef.current = false;
         ownsPurchaseOutcomeRef.current = false;
         confirmationOpenRef.current = false;
-
-        if (purchaseGuardTimeoutRef.current) clearTimeout(purchaseGuardTimeoutRef.current);
-
-        purchaseGuardTimeoutRef.current = null;
     }, []);
 
     const alertNotEnoughCredits = useCallback(() => {
@@ -247,13 +242,10 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
     );
 
     // AIR HabboCatalog event 933 -> PurchaseConfirmationDialog.ltdRaffleEnded: keep the dialog open with the
-    // raffling line until the draw. The draw can outlast the purchase guard, so the guard stops here.
+    // raffling line until the draw; the purchase guard holds until the draw result arrives.
     useMessageEvent<LtdRaffleEnteredMessageEvent>(LtdRaffleEnteredMessageEvent, () => {
         if (!purchasePendingRef.current || !confirmationOpenRef.current) return;
 
-        if (purchaseGuardTimeoutRef.current) clearTimeout(purchaseGuardTimeoutRef.current);
-
-        purchaseGuardTimeoutRef.current = null;
         setRaffling(true);
     });
 
@@ -337,15 +329,11 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
             return;
         }
 
+        // The guard holds until the server answers (or the offer changes, or the widget unmounts): releasing it on
+        // a timer let a second click buy the offer again while the first purchase was still on its way.
         purchasePendingRef.current = true;
         ownsPurchaseOutcomeRef.current = true;
         setPurchaseState(CatalogPurchaseState.PURCHASE);
-
-        purchaseGuardTimeoutRef.current = setTimeout(() => {
-            resetPurchaseGuard();
-            setPurchaseWillBeGift(false);
-            setPurchaseState(CatalogPurchaseState.NONE);
-        }, 10000);
 
         if (purchaseCallback) {
             purchaseCallback();
@@ -594,7 +582,8 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
                             confirmationOpenRef.current = false;
                             resetPlacedOfferData?.();
                             setPurchaseWillBeGift(false);
-                            setPurchaseState(CatalogPurchaseState.NONE);
+                            // A purchase already sent keeps its spinner until the server answers it.
+                            setPurchaseState(purchasePendingRef.current ? CatalogPurchaseState.PURCHASE : CatalogPurchaseState.NONE);
                         }}
                         onConfirm={() => purchase(purchaseWillBeGift)}
                     />

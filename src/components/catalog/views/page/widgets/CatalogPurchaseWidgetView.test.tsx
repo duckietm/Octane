@@ -1,6 +1,6 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { GetClubMemberLevel } from '../../../../../api';
+import { GetClubMemberLevel, SendMessageComposer } from '../../../../../api';
 import {
     useCatalogActions,
     useCatalogBundleDiscountRuleset,
@@ -65,6 +65,7 @@ vi.mock('../../../../../events', () => ({
 }));
 
 const messageHandlers = vi.hoisted(() => new Map<string, (event: unknown) => void>());
+const uiHandlers = vi.hoisted(() => new Map<string, (event: unknown) => void>());
 const confirmProps = vi.hoisted(() => ({ current: null as any }));
 
 vi.mock('../../../../../hooks', () => ({
@@ -78,7 +79,9 @@ vi.mock('../../../../../hooks', () => ({
     useCatalogUiState: vi.fn(),
     useNotification: vi.fn(),
     usePurse: vi.fn(),
-    useUiEvent: vi.fn()
+    useUiEvent: (type: string, handler: (event: unknown) => void) => {
+        uiHandlers.set(type, handler);
+    }
 }));
 
 vi.mock('../../CatalogPurchaseConfirmView', () => ({
@@ -115,6 +118,7 @@ afterEach(cleanup);
 beforeEach(() => {
     vi.clearAllMocks();
     messageHandlers.clear();
+    uiHandlers.clear();
     confirmProps.current = null;
     habbiconCatalog.entries = [];
     vi.mocked(GetClubMemberLevel).mockReturnValue(0);
@@ -207,6 +211,44 @@ describe('catalog purchase widget', () => {
 
         expect(screen.getByRole('button', { name: 'catalog.purchase_confirmation.gift' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'catalog.purchase_confirmation.buy' })).toBeDisabled();
+    });
+
+    describe('purchase guard', () => {
+        const buyButton = () => screen.getByRole('button', { name: 'catalog.purchase_confirmation.buy' });
+
+        afterEach(() => {
+            vi.useRealTimers();
+        });
+
+        it('holds the guard while the server has not answered, however long it takes', () => {
+            vi.useFakeTimers();
+            render(<CatalogPurchaseWidgetView />);
+
+            fireEvent.click(buyButton());
+            act(() => confirmProps.current.onConfirm());
+            act(() => vi.advanceTimersByTime(60000));
+
+            expect(confirmProps.current.isSubmitting).toBe(true);
+            act(() => confirmProps.current.onConfirm());
+            expect(SendMessageComposer).toHaveBeenCalledTimes(1);
+        });
+
+        it('keeps the spinner when the dialog is closed before the answer, then reopens purchase on the answer', () => {
+            render(<CatalogPurchaseWidgetView />);
+
+            fireEvent.click(buyButton());
+            act(() => confirmProps.current.onConfirm());
+            act(() => confirmProps.current.onCancel());
+
+            expect(screen.queryByRole('button', { name: 'catalog.purchase_confirmation.buy' })).not.toBeInTheDocument();
+
+            act(() => uiHandlers.get('purchase-success')({ type: 'purchase-success' }));
+
+            expect(buyButton()).toBeEnabled();
+            fireEvent.click(buyButton());
+            act(() => confirmProps.current.onConfirm());
+            expect(SendMessageComposer).toHaveBeenCalledTimes(2);
+        });
     });
 
     describe('a balance the server finds short (AIR NotEnoughBalanceMessageEvent)', () => {
