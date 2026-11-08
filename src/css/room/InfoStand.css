@@ -80,6 +80,14 @@
     background-clip: border-box;
   }
 
+  /* Without the frame the background reached the outer edge with square corners: the card has no border and rounds
+     its background instead, at the same outer size (10px padding = 6px frame + 4px padding). */
+  &.profile-card-background[class*='card-background-']:not(.card-background-0) {
+    padding: 10px;
+    border-width: 0;
+    border-radius: 8px;
+  }
+
   .form-control-sm {
     height: 25px;
     min-height: 25px;
@@ -486,6 +494,13 @@
 
   .octane-infostand__rule {
     background: rgba(0, 0, 0, 0.45);
+  }
+
+  /* The faint dashed outline drawn for the grey card vanished on a light background. */
+  .octane-infostand__badge-slot.is-empty {
+    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(0, 0, 0, 0.25);
+    opacity: 0.85;
   }
 }
 
