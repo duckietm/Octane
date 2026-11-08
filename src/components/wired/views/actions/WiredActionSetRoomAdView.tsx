@@ -10,6 +10,9 @@ import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 const CAPTION_MAX_LENGTH = 60;
 const DESCRIPTION_MAX_LENGTH = 200;
 
+/** The caption and the description are saved as one string split on a TAB, so a pasted TAB must not reach either. */
+export const withoutTabs = (value: string) => value.replace(/\t/g, ' ');
+
 export const WiredActionSetRoomAdView: FC<{}> = (props) => {
     const { trigger = null, setStringParam = null, setIntParams = null } = useWired();
     const [caption, setCaption] = useState<string>('');
@@ -27,7 +30,7 @@ export const WiredActionSetRoomAdView: FC<{}> = (props) => {
     }, [trigger]);
 
     const save = () => {
-        setStringParam(`${caption}\t${description}`);
+        setStringParam(`${withoutTabs(caption)}\t${withoutTabs(description)}`);
         setIntParams([category]);
     };
 
@@ -36,7 +39,7 @@ export const WiredActionSetRoomAdView: FC<{}> = (props) => {
             <WiredActionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.room_ad.caption', 'Room ad caption')}</Text>
-                    <OctaneInput maxLength={CAPTION_MAX_LENGTH} type="text" value={caption} onChange={(event) => setCaption(event.target.value)} />
+                    <OctaneInput maxLength={CAPTION_MAX_LENGTH} type="text" value={caption} onChange={(event) => setCaption(withoutTabs(event.target.value))} />
                 </div>
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.room_ad.description', 'Room ad description')}</Text>
@@ -45,7 +48,7 @@ export const WiredActionSetRoomAdView: FC<{}> = (props) => {
                         maxLength={DESCRIPTION_MAX_LENGTH}
                         rows={3}
                         value={description}
-                        onChange={(event) => setDescription(event.target.value)}
+                        onChange={(event) => setDescription(withoutTabs(event.target.value))}
                     />
                 </div>
                 <div className="flex flex-col gap-1">
