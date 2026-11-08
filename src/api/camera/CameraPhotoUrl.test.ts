@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatCameraPhotoDate, getCameraPhotoCreatorId, getCameraPhotoUrl } from './CameraPhotoUrl';
+import { formatCameraPhotoDate, getCameraPhotoCreatorId, getCameraPhotoUrl, getPublishedPhotoUrl } from './CameraPhotoUrl';
 
 const BASES = ['https://hotel.example/usercontent/camera/', 'https://cdn.example/stories'];
 
@@ -51,5 +51,26 @@ describe('formatCameraPhotoDate', () => {
         expect(formatCameraPhotoDate(date.getTime())).toBe(expected);
         expect(formatCameraPhotoDate(0)).toBe('');
         expect(formatCameraPhotoDate(Number.NaN)).toBe('');
+    });
+});
+
+describe('getPublishedPhotoUrl', () => {
+    const CAMERA_URL = 'https://hotel.example/usercontent/camera/';
+
+    it('builds the photo page from an id', () => {
+        expect(getPublishedPhotoUrl('42', CAMERA_URL, 'some one')).toBe('/profile/some%20one/photo/42');
+    });
+
+    it('keeps an http(s) address and drops any other scheme', () => {
+        expect(getPublishedPhotoUrl('https://hotel.example/photo/42', CAMERA_URL, 'u')).toBe('https://hotel.example/photo/42');
+        expect(getPublishedPhotoUrl('javascript:alert(1)', CAMERA_URL, 'u')).toBe('');
+        expect(getPublishedPhotoUrl('data:text/html,x', CAMERA_URL, 'u')).toBe('');
+    });
+
+    it('resolves a rooted path against the camera folder and refuses protocol-relative addresses', () => {
+        expect(getPublishedPhotoUrl('/photo/42', CAMERA_URL, 'u')).toBe('https://hotel.example/photo/42');
+        expect(getPublishedPhotoUrl('/photo/42', '', 'u')).toBe('/photo/42');
+        expect(getPublishedPhotoUrl('//evil.example/x', CAMERA_URL, 'u')).toBe('');
+        expect(getPublishedPhotoUrl('/\\evil.example/x', CAMERA_URL, 'u')).toBe('');
     });
 });
