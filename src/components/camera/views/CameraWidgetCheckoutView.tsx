@@ -16,7 +16,17 @@ import {
     ToolbarIconEnum
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CameraPicture, FinishCameraRenderMessage, GetCameraEffectDataJson, GetCameraRenderMode, GetConfigurationValue, LocalizeText, OpenUrl, SendMessageComposer } from '../../../api';
+import {
+    CameraPicture,
+    FinishCameraRenderMessage,
+    GetCameraEffectDataJson,
+    GetCameraRenderMode,
+    GetConfigurationValue,
+    getPublishedPhotoUrl,
+    LocalizeText,
+    OpenUrl,
+    SendMessageComposer
+} from '../../../api';
 import creditIcon from '../../../assets/images/camera/checkout/credit.png';
 import ducketIcon from '../../../assets/images/camera/checkout/ducket.png';
 import { OctaneCardView } from '../../../common';
@@ -84,11 +94,8 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
 
     const publishedPhotoUrl = useMemo(() => {
         if (!publishId) return '';
-        if (/^(?:https?:)?\/\//i.test(publishId) || publishId.startsWith('/')) return publishId;
 
-        const userName = GetSessionDataManager()?.userName ?? '';
-
-        return `/profile/${encodeURIComponent(userName)}/photo/${encodeURIComponent(publishId)}`;
+        return getPublishedPhotoUrl(publishId, GetConfigurationValue<string>('camera.url', ''), GetSessionDataManager()?.userName ?? '');
     }, [publishId]);
 
     useEffect(() => {
