@@ -23,6 +23,7 @@ import {
 import { useCallback, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
+    EscapeHtml,
     GetConfigurationValue,
     getCalendarRewardBubble,
     IMentionEntry,
@@ -90,6 +91,18 @@ export const ltdRaffleResultText = (hasWon: boolean): string =>
     hasWon
         ? localizeWithFallback('notification.raffle.won', 'You successfully bought an LTD!')
         : localizeWithFallback('notification.raffle.lost', 'Unfortunately you were not lucky enough to get an LTD this time.');
+
+/**
+ * The text of a chest notification. The bubble renders its message as HTML, so the chest name and the name of the
+ * user who acted - both chosen by players - are escaped. A chest with no name of its own is still "your chest", so
+ * the message falls back rather than announcing an empty string.
+ */
+export const chestNotificationText = (key: string, chestName: string, actorName: string, amount: number): string =>
+    LocalizeText(
+        key,
+        ['chest', 'name', 'amount'],
+        [chestName ? EscapeHtml(chestName) : LocalizeText('wiredchests.notification.unnamed'), EscapeHtml(actorName), String(amount)]
+    );
 
 export const addSingleBubble = (alerts: NotificationBubbleItem[], item: NotificationBubbleItem): NotificationBubbleItem[] => {
     const shouldReplace = item.notificationType === NotificationBubbleType.CLUBGIFT || item.notificationType === NotificationBubbleType.SOUNDBOARD;
@@ -404,18 +417,7 @@ const useNotificationStore = () => {
 
         if (!key) return;
 
-        // A chest with no name of its own is still "your chest", so the message falls back rather
-        // than announcing an empty string.
-        const chestName = parser.chestName || LocalizeText('wiredchests.notification.unnamed');
-
-        showSingleBubble(
-            LocalizeText(
-                key,
-                ['chest', 'name', 'amount'],
-                [chestName, parser.actorName, String(parser.amount)],
-            ),
-            NotificationBubbleType.INFO,
-        );
+        showSingleBubble(chestNotificationText(key, parser.chestName, parser.actorName, parser.amount), NotificationBubbleType.INFO);
     });
 
     useMessageEvent<BadgeReceivedEvent>(BadgeReceivedEvent, (event) => {
