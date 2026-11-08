@@ -2934,6 +2934,7 @@
     "octane.wired.product_badge_codes_cannot_contain_more": "Product/badge codes cannot contain more than %max_code_length% characters.",
     "octane.wired.make_sure_all_probabilities_are_numbers": "Make sure all probabilities are numbers.",
     "octane.wired.make_sure_all_probabilities_are_numbers_2": "Make sure all probabilities are numbers between 1 and 100.",
+    "octane.wired.reward_amounts_must_be_whole_numbers": "Amounts and item ids must be whole numbers from 1 to %max%.",
     "octane.wired.the_sum_of_probabilities_cannot_exceed": "The sum of probabilities cannot exceed 100. You now have %sum%.",
     "octane.wired.add_the_amount": "Add the amount",
     "octane.wired.raise_the_progress_to_the_amount": "Raise the progress to the amount",
