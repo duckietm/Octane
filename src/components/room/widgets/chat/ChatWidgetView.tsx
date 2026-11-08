@@ -129,13 +129,9 @@ export const ChatWidgetView: FC<{}> = (props) => {
 
             elementRef.current.style.height = `${newHeight}px`;
 
-            setChatMessages((prevValue) => {
-                if (prevValue) {
-                    prevValue.forEach((chat) => (chat.top -= currentHeight - newHeight));
-                }
-
-                return prevValue;
-            });
+            // Positions are laid out on the bubbles themselves, as the layout pass does: a state updater that
+            // changed them and returned the same list re-rendered nothing and could run more than once.
+            chatMessagesRef.current.forEach((chat) => (chat.top -= currentHeight - newHeight));
 
             window.requestAnimationFrame(() => {
                 batcherRef.current.flushNow();
@@ -150,18 +146,14 @@ export const ChatWidgetView: FC<{}> = (props) => {
         return () => {
             window.removeEventListener('resize', resize);
         };
-    }, [layoutPass, setChatMessages]);
+    }, [layoutPass]);
 
     useEffect(() => {
         const moveAllChatsUp = (amount: number) => {
             batcherRef.current.flushNow();
 
-            setChatMessages((prevValue) => {
-                prevValue.forEach((chat) => {
-                    chat.top -= amount;
-                });
-
-                return prevValue;
+            chatMessagesRef.current.forEach((chat) => {
+                chat.top -= amount;
             });
 
             layoutPass();
@@ -187,7 +179,7 @@ export const ChatWidgetView: FC<{}> = (props) => {
 
             worker.terminate();
         };
-    }, [getScrollSpeed, layoutPass, setChatMessages]);
+    }, [getScrollSpeed, layoutPass]);
 
     useEffect(() => {
         const onTextSizeChange = () => {
