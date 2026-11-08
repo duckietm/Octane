@@ -285,6 +285,7 @@ const useMessengerState = () => {
         if (!thread) return;
 
         noteHabbiconMessage(message.conversationId, message.id);
+        stopTypingIndicator(message.senderId);
         sendMessage(thread, message.senderId, message.message, 0, message.metadata, MessengerMessageType.Habbicon);
         if (thread.threadId === activeThreadId) SendMessageComposer(new MarkConsoleReadComposer(message.senderId));
     });
@@ -293,9 +294,24 @@ const useMessengerState = () => {
         () => () => {
             for (const pending of pendingHabbicons.current.values()) clearTimeout(pending.timer);
             pendingHabbicons.current.clear();
+
+            for (const timer of typingTimersRef.current.values()) clearTimeout(timer);
+            typingTimersRef.current.clear();
         },
         []
     );
+
+    // A message from a friend ends their typing, as does their own "stopped typing" or the timeout.
+    const stopTypingIndicator = (senderId: number) => {
+        const timer = typingTimersRef.current.get(senderId);
+
+        if (timer) {
+            clearTimeout(timer);
+            typingTimersRef.current.delete(senderId);
+        }
+
+        setTypingUserIds((prev) => (prev.indexOf(senderId) >= 0 ? prev.filter((id) => id !== senderId) : prev));
+    };
 
     const sendTypingStatus = (peerId: number, isTyping: boolean) => {
         if (!peerId || peerId <= 0) return;
@@ -305,6 +321,8 @@ const useMessengerState = () => {
 
     useMessageEvent<NewConsoleMessageEvent>(NewConsoleMessageEvent, (event) => {
         const parser = event.getParser();
+        if (parser.senderId > 0) stopTypingIndicator(parser.senderId);
+
         const thread = getMessageThread(parser.senderId);
 
         if (!thread) return;
@@ -501,27 +519,26 @@ const useMessengerState = () => {
 
         if (senderId <= 0) return;
 
+        if (!parser.isTyping) {
+            stopTypingIndicator(senderId);
+
+            return;
+        }
+
         const timers = typingTimersRef.current;
         const existing = timers.get(senderId);
 
-        if (existing) {
-            clearTimeout(existing);
-            timers.delete(senderId);
-        }
+        if (existing) clearTimeout(existing);
 
-        if (parser.isTyping) {
-            setTypingUserIds((prev) => (prev.indexOf(senderId) >= 0 ? prev : [...prev, senderId]));
+        setTypingUserIds((prev) => (prev.indexOf(senderId) >= 0 ? prev : [...prev, senderId]));
 
-            timers.set(
-                senderId,
-                setTimeout(() => {
-                    typingTimersRef.current.delete(senderId);
-                    setTypingUserIds((prev) => prev.filter((id) => id !== senderId));
-                }, 6000)
-            );
-        } else {
-            setTypingUserIds((prev) => prev.filter((id) => id !== senderId));
-        }
+        timers.set(
+            senderId,
+            setTimeout(() => {
+                typingTimersRef.current.delete(senderId);
+                setTypingUserIds((prev) => prev.filter((id) => id !== senderId));
+            }, 6000)
+        );
     });
 
     useMessageEvent<ConsoleReadReceiptEvent>(ConsoleReadReceiptEvent, (event) => {
