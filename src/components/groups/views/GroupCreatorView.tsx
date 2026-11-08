@@ -1,5 +1,13 @@
-import { GroupBadgePartsComposer, GroupBuyComposer, GroupBuyDataComposer, GroupBuyDataEvent } from '@octane/renderer';
-import { FC, useEffect, useState } from 'react';
+import {
+    GroupBadgePartsComposer,
+    GroupBuyComposer,
+    GroupBuyDataComposer,
+    GroupBuyDataEvent,
+    GroupPurchasedEvent,
+    GuildEditFailedMessageEvent,
+    PurchaseErrorMessageEvent
+} from '@octane/renderer';
+import { FC, useEffect, useRef, useState } from 'react';
 import { CreateLinkEvent, GroupBadgePart, HasHabboClub, IGroupData, LocalizeText, SendMessageComposer } from '../../../api';
 import creditIcon from '../../../assets/images/groups/native/gcreate_icon_credit.png';
 import vipIcon from '../../../assets/images/groups/native/icon-vip-square.png';
@@ -15,7 +23,8 @@ interface GroupCreatorViewProps {
     onClose: () => void;
 }
 
-let isBuyingGroup = false;
+// Without an answer from the server the buy button unlocks again after this long.
+const BUY_ANSWER_TIMEOUT_MS = 5000;
 
 export const GroupCreatorView: FC<GroupCreatorViewProps> = (props) => {
     const { onClose = null } = props;
@@ -25,6 +34,17 @@ export const GroupCreatorView: FC<GroupCreatorViewProps> = (props) => {
     const [availableRooms, setAvailableRooms] = useState<{ id: number; name: string }[]>(null);
     const [purchaseCost, setPurchaseCost] = useState<number>(0);
     const hasClub = HasHabboClub();
+    const buyPendingRef = useRef(false);
+    const buyTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+    const releaseBuy = () => {
+        buyPendingRef.current = false;
+
+        if (buyTimeoutRef.current === null) return;
+
+        clearTimeout(buyTimeoutRef.current);
+        buyTimeoutRef.current = null;
+    };
 
     const onCloseClose = () => {
         setCloseAction(null);
@@ -34,15 +54,15 @@ export const GroupCreatorView: FC<GroupCreatorViewProps> = (props) => {
     };
 
     const buyGroup = () => {
-        if (!groupData || isBuyingGroup) return;
+        if (!groupData || buyPendingRef.current) return;
 
         // The badge step does not let a badge without a base through; a list that still lacks one is never sent.
         const badge = GroupBadgePart.serialize(groupData.groupBadgeParts);
 
         if (!badge) return;
 
-        isBuyingGroup = true;
-        setTimeout(() => (isBuyingGroup = false), 5000);
+        buyPendingRef.current = true;
+        buyTimeoutRef.current = setTimeout(releaseBuy, BUY_ANSWER_TIMEOUT_MS);
 
         SendMessageComposer(
             new GroupBuyComposer(
@@ -99,6 +119,13 @@ export const GroupCreatorView: FC<GroupCreatorViewProps> = (props) => {
             return { ...prevValue, groupBadgeParts: defaultBadgeParts };
         });
     });
+
+    // The purchase, a refusal of the group data or a failed payment each end the pending buy.
+    useMessageEvent<GroupPurchasedEvent>(GroupPurchasedEvent, releaseBuy);
+    useMessageEvent<GuildEditFailedMessageEvent>(GuildEditFailedMessageEvent, releaseBuy);
+    useMessageEvent<PurchaseErrorMessageEvent>(PurchaseErrorMessageEvent, releaseBuy);
+
+    useEffect(() => releaseBuy, []);
 
     useEffect(() => {
         setCurrentTab(1);
