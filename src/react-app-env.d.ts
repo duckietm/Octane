@@ -30,8 +30,6 @@ declare module '*.webp' {
 }
 
 declare module '*.css';
-declare module '*.scss';
-declare module '*.sass';
 
 interface Window {
     OctaneConfig?: Record<string, unknown>;
