@@ -2325,8 +2325,9 @@
 
 /* The selected tile paints an opaque plate through ::before at z-index 0, so the
    habbicon has to be lifted over it the way the furni icon already is. */
-/* A habbicon sits in the same 36px icon box as a furni icon, scaled down to fit: drawn at its own size in the flow it
-   overflowed the tile and covered the price. */
+/* A habbicon sits in the same 36px icon box as a furni icon: drawn at its own size in the flow it overflowed the tile
+   and covered the price. The preview is larger than the box, and a pixelated downscale by an odd factor drops pixels
+   unevenly, so it is scaled smoothly instead. */
 .octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item > .octane-catalog-grid-habbicon-icon {
     position: absolute;
     top: 2px;
@@ -2336,6 +2337,7 @@
     height: 36px !important;
     margin: 0;
     object-fit: contain !important;
+    image-rendering: auto !important;
     pointer-events: none;
 }
 
