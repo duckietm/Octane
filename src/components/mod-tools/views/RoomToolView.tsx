@@ -1,4 +1,5 @@
 import {
+    CreateLinkEvent,
     GetConfiguration,
     GetModeratorRoomInfoMessageComposer,
     ModerateRoomMessageComposer,
@@ -8,8 +9,8 @@ import {
     RoomModerationData
 } from '@octane/renderer';
 import { FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { localizeWithFallback, OpenUrl, SendMessageComposer, TryVisitRoom } from '../../../api';
-import { showModAlert, useMessageEvent, useModWindowTrackerStore } from '../../../hooks';
+import { isHousekeepingEnabled, localizeWithFallback, OpenUrl, SendMessageComposer, TryVisitRoom } from '../../../api';
+import { showModAlert, useHasPermission, useMessageEvent, useModWindowTrackerStore } from '../../../hooks';
 import roomToolXml from '../../../assets/mod-tools/xml/roomtool_frame.xml?raw';
 import { NativeWindowShell } from '../native/NativeWindowShell';
 import { findNativeNode, nativeCaption, nativeNumber, NativeNode, parseNativeLayout } from '../native/NativeLayout';
@@ -59,6 +60,23 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
 
     const resizeWindow = useModWindowTrackerStore((state) => state.resize);
     const requestedRef = useRef(false);
+    // "Edit in HK" is the classic link to the hotel's external room admin. Without a `roomadmin.url`
+    // the button used to do nothing at all, silently; the in-client housekeeping room page is the
+    // same destination, so it takes over, under the gate HousekeepingView applies to
+    // `housekeeping/room/<id>`: the master switch, acc_housekeeping and the rooms area.
+    // The two permission hooks are read separately: && would skip the second call on some renders.
+    const holdsHousekeeping = useHasPermission('acc_housekeeping');
+    const holdsHousekeepingRooms = useHasPermission('acc_hk_rooms');
+    const canOpenHousekeepingRoom = holdsHousekeeping && holdsHousekeepingRooms && isHousekeepingEnabled();
+    const roomAdminUrl = GetConfiguration().getValue<string>('roomadmin.url', '');
+    const openRoomAdmin = (flatId: number) => {
+        if (roomAdminUrl) {
+            OpenUrl(`${roomAdminUrl}${flatId}`);
+            return;
+        }
+
+        CreateLinkEvent(`housekeeping/room/${flatId}`);
+    };
 
     useEffect(() => {
         // one request per opened window (a development double effect run must not send it twice)
@@ -197,16 +215,13 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
                             <Native0Button height={21} label={localizeWithFallback('octane.mod_tools.enter_room', 'Enter room')} width={70} x={155} y={4} onClick={() => data && TryVisitRoom(data.flatId)} />
                             <Native0Button enabled={settings.chatlogsPermission} height={21} label={localizeWithFallback('octane.mod_tools.chatlog', 'Chatlog')} width={70} x={155} y={26} onClick={() => data && onOpenChatlog(data.flatId)} />
                             <Native0Button
+                                enabled={!!roomAdminUrl || canOpenHousekeepingRoom}
                                 height={21}
                                 label={localizeWithFallback('octane.mod_tools.edit_in_hk', 'Edit in HK')}
                                 width={70}
                                 x={155}
                                 y={48}
-                                onClick={() => {
-                                    const prefix = GetConfiguration().getValue<string>('roomadmin.url');
-
-                                    if (data && prefix) OpenUrl(`${prefix}${data.flatId}`);
-                                }}
+                                onClick={() => data && openRoomAdmin(data.flatId)}
                             />
                         </Native0Border>
                         <Native0Border {...eventCont} y={row.event}>
