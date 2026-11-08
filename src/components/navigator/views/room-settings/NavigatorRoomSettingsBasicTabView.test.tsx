@@ -90,3 +90,31 @@ describe('NavigatorRoomSettingsBasicTabView room toggles', () => {
         expect(container.textContent).not.toContain('Save catalog');
     });
 });
+
+describe('NavigatorRoomSettingsBasicTabView tags', () => {
+    afterEach(() => cleanup());
+
+    // The room name, then the two tags.
+    const tagInputs = (container: HTMLElement) => Array.from(container.querySelectorAll('input.form-control-sm'));
+
+    it('saves nothing when an empty tag field of a room without tags loses focus', () => {
+        const handleChange = vi.fn();
+        const { container } = render(<NavigatorRoomSettingsBasicTabView handleChange={handleChange} roomData={roomData} onClose={vi.fn()} />);
+        const [, firstTag] = tagInputs(container);
+
+        fireEvent.blur(firstTag);
+
+        expect(handleChange).not.toHaveBeenCalledWith('tags', expect.anything());
+    });
+
+    it('sends only the tags that are filled in', () => {
+        const handleChange = vi.fn();
+        const { container } = render(<NavigatorRoomSettingsBasicTabView handleChange={handleChange} roomData={roomData} onClose={vi.fn()} />);
+        const [, firstTag] = tagInputs(container);
+
+        fireEvent.change(firstTag, { target: { value: 'games' } });
+        fireEvent.blur(firstTag);
+
+        expect(handleChange).toHaveBeenCalledWith('tags', ['games']);
+    });
+});
