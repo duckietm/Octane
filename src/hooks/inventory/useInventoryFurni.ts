@@ -7,9 +7,9 @@ import {
     FurnitureListRemovedEvent,
     FurnitureListRemoveMultipleEvent
 } from '@octane/renderer';
-import { useEffect, useRef, useState } from 'react';
+import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { DispatchUiEvent, getGroupItemKey, GroupItem, mergeFurniFragments, SendMessageComposer, UnseenItemCategory } from '../../api';
+import { DispatchUiEvent, GroupItem, getGroupItemKey, mergeFurniFragments, SendMessageComposer, UnseenItemCategory } from '../../api';
 import { InventoryFurniAddedEvent } from '../../events';
 import { useMessageEvent } from '../events';
 import { useSharedVisibility } from '../useSharedVisibility';
@@ -67,12 +67,17 @@ const useInventoryFurniState = () => {
     const groupItemsRef = useRef(groupItems);
     groupItemsRef.current = groupItems;
 
-    const commitGroupItems = (next: GroupItem[]) => {
-        if (next === groupItemsRef.current) return;
+    // Every change goes through the list the packets read. A functional update queued with React's own setter
+    // reached the ref only at the next render, so a packet in the same turn (a trade lock, then an inventory
+    // update) was applied to the list before it and the lock was lost.
+    const updateGroupItems = useCallback((next: SetStateAction<GroupItem[]>) => {
+        const value = typeof next === 'function' ? next(groupItemsRef.current) : next;
 
-        groupItemsRef.current = next;
-        setGroupItems(next);
-    };
+        if (value === groupItemsRef.current) return;
+
+        groupItemsRef.current = value;
+        setGroupItems(value);
+    }, []);
 
     const buildContext = (): FurniReducerContext => ({
         isUnseen,
@@ -80,7 +85,7 @@ const useInventoryFurniState = () => {
     });
 
     useMessageEvent<FurnitureListAddOrUpdateEvent>(FurnitureListAddOrUpdateEvent, (event) => {
-        commitGroupItems(applyFurnitureListAddOrUpdate(groupItemsRef.current, event, buildContext()));
+        updateGroupItems(applyFurnitureListAddOrUpdate(groupItemsRef.current, event, buildContext()));
     });
 
     useMessageEvent<FurnitureListEvent>(FurnitureListEvent, (event) => {
@@ -99,7 +104,7 @@ const useInventoryFurniState = () => {
 
         const context = buildContext();
 
-        commitGroupItems(applyMergedFurnitureList(groupItemsRef.current, merged, context));
+        updateGroupItems(applyMergedFurnitureList(groupItemsRef.current, merged, context));
     });
 
     useMessageEvent<FurnitureListInvalidateEvent>(FurnitureListInvalidateEvent, () => {
@@ -107,13 +112,13 @@ const useInventoryFurniState = () => {
     });
 
     useMessageEvent<FurnitureListRemovedEvent>(FurnitureListRemovedEvent, (event) => {
-        commitGroupItems(applyFurnitureListRemoved(groupItemsRef.current, event));
+        updateGroupItems(applyFurnitureListRemoved(groupItemsRef.current, event));
     });
 
     useMessageEvent<FurnitureListRemoveMultipleEvent>(FurnitureListRemoveMultipleEvent, (event) => {
         const itemIds = event.getParser().stripIds;
 
-        commitGroupItems(applyFurnitureListRemovedMany(groupItemsRef.current, itemIds));
+        updateGroupItems(applyFurnitureListRemovedMany(groupItemsRef.current, itemIds));
     });
 
     useEffect(() => {
@@ -140,10 +145,10 @@ const useInventoryFurniState = () => {
 
         return () => {
             if (resetCategory(UnseenItemCategory.FURNI)) {
-                setGroupItems((prev) => clearUnseenFlags(prev));
+                updateGroupItems((prev) => clearUnseenFlags(prev));
             }
         };
-    }, [isVisible, resetCategory]);
+    }, [isVisible, resetCategory, updateGroupItems]);
 
     useEffect(() => {
         if (!isVisible || !needsUpdate) return;
@@ -155,7 +160,7 @@ const useInventoryFurniState = () => {
 
     useEffect(() => {
         const refreshFurnitureLocalization = () => {
-            setGroupItems((prev) => refreshGroupItemsLocalization(prev));
+            updateGroupItems((prev) => refreshGroupItemsLocalization(prev));
 
             setSelectedItem((prevValue) => {
                 if (!prevValue) return prevValue;
@@ -171,9 +176,20 @@ const useInventoryFurniState = () => {
         window.addEventListener('octane-localization-updated', refreshFurnitureLocalization);
 
         return () => window.removeEventListener('octane-localization-updated', refreshFurnitureLocalization);
-    }, []);
+    }, [updateGroupItems]);
 
-    return { isVisible, groupItems, setGroupItems, selectedItem, setSelectedItem, activate, deactivate, getWallItemById, getFloorItemById, getItemsByType };
+    return {
+        isVisible,
+        groupItems,
+        setGroupItems: updateGroupItems,
+        selectedItem,
+        setSelectedItem,
+        activate,
+        deactivate,
+        getWallItemById,
+        getFloorItemById,
+        getItemsByType
+    };
 };
 
 export const useInventoryFurni = () => useSharedHook(useInventoryFurniState);
