@@ -1,7 +1,14 @@
-import { GetConfiguration, GetModeratorUserInfoMessageComposer, ModeratorInitData, ModeratorUserInfoData, ModeratorUserInfoEvent } from '@octane/renderer';
+import {
+    CreateLinkEvent,
+    GetConfiguration,
+    GetModeratorUserInfoMessageComposer,
+    ModeratorInitData,
+    ModeratorUserInfoData,
+    ModeratorUserInfoEvent
+} from '@octane/renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
-import { localizeWithFallback, OpenUrl, SendMessageComposer } from '../../../api';
-import { useMessageEvent, useRoomUserListSnapshot } from '../../../hooks';
+import { isHousekeepingEnabled, localizeWithFallback, OpenUrl, SendMessageComposer } from '../../../api';
+import { useHasPermission, useMessageEvent, useRoomUserListSnapshot } from '../../../hooks';
 import userInfoXml from '../../../assets/mod-tools/xml/user_info.xml?raw';
 import { findNativeNode, nativeCaption, nativeNumber, NativeNode, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Border, Native0Button, Native0Text } from '../native/NativeWindow0';
@@ -44,6 +51,26 @@ export const UserInfoPanel: FC<UserInfoPanelProps> = ({ userId, settings, onOpen
     const roomUserList = useRoomUserListSnapshot();
     const roomUser = useMemo(() => roomUserList.find((user) => user && user.webID === userId) ?? null, [roomUserList, userId]);
     const refresh = () => SendMessageComposer(new GetModeratorUserInfoMessageComposer(userId));
+    // "Habbo Info" is the classic link to the hotel's external moderation tool. When the hotel has
+    // no `habboinfotool.url` the button used to do nothing at all, silently; the in-client
+    // housekeeping user page holds the same information, so it takes over. Its gate is the one
+    // HousekeepingView applies to `housekeeping/user/<id>`: the master switch, acc_housekeeping and
+    // the users area - the link is dropped without them, which would be the silent no-op again.
+    // The two permission hooks are read separately: && would skip the second call on some renders.
+    const holdsHousekeeping = useHasPermission('acc_housekeeping');
+    const holdsHousekeepingUsers = useHasPermission('acc_hk_users');
+    const canOpenHousekeepingUser = holdsHousekeeping && holdsHousekeepingUsers && isHousekeepingEnabled();
+    const habboInfoToolUrl = GetConfiguration().getValue<string>('habboinfotool.url', '');
+    const openHabboInfo = () => {
+        if (habboInfoToolUrl) {
+            OpenUrl(`${habboInfoToolUrl}${data.userName}`);
+            return;
+        }
+
+        // Only the id: HousekeepingView looks the user up, and the optional name / figure of the
+        // link are a painting shortcut for the avatar menu, which already holds both.
+        CreateLinkEvent(`housekeeping/user/${userId}`);
+    };
 
     useEffect(() => {
         // one request per opened window (a development double effect run must not send it twice)
@@ -110,12 +137,13 @@ export const UserInfoPanel: FC<UserInfoPanelProps> = ({ userId, settings, onOpen
                                 <Native0Button enabled={canMessage} height={21} label={text(findNativeNode(buttons, 'message_but'))} width={80} x={button('message_but').x} y={button('message_but').y} onClick={() => onOpenSendMessage(data.userName)} />
                                 <Native0Button height={21} label={text(findNativeNode(buttons, 'roomvisits_but'))} width={80} x={button('roomvisits_but').x} y={button('roomvisits_but').y} onClick={onOpenRoomVisits} />
                                 <Native0Button
+                                    enabled={!!habboInfoToolUrl || canOpenHousekeepingUser}
                                     height={21}
                                     label={text(findNativeNode(buttons, 'habboinfotool_but'))}
                                     width={80}
                                     x={button('habboinfotool_but').x}
                                     y={button('habboinfotool_but').y}
-                                    onClick={() => OpenModeratorTool('habboinfotool.url', data.userName)}
+                                    onClick={openHabboInfo}
                                 />
                                 <Native0Button enabled={canModAction} height={21} label={text(findNativeNode(buttons, 'modaction_but'))} width={80} x={button('modaction_but').x} y={button('modaction_but').y} onClick={() => onOpenModAction(data.userName)} />
                                 <Native0Button height={21} label={localizeWithFallback('modtools.native.refresh', 'Refresh')} width={80} x={button('modaction_but').x} y={button('modaction_but').y + 22} onClick={refresh} />
@@ -125,11 +153,4 @@ export const UserInfoPanel: FC<UserInfoPanelProps> = ({ userId, settings, onOpen
                 </Native0Border>
         </NativeTextTree>
     );
-};
-
-// ModerationManager._r23c6b981b6860a: the page is the configured property followed by the value, opened as the "housekeeping" page.
-const OpenModeratorTool = (key: string, value: string) => {
-    const prefix = GetConfiguration().getValue<string>(key, '');
-
-    if (prefix) OpenUrl(`${prefix}${value}`);
 };

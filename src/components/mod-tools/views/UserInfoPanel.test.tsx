@@ -7,11 +7,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const state = vi.hoisted(() => ({
     handlers: new Map<unknown, (event: unknown) => void>(),
     sent: [] as unknown[],
-    opened: [] as string[]
+    opened: [] as string[],
+    links: [] as string[],
+    config: new Map<string, unknown>(),
+    permissions: new Set<string>(),
+    housekeepingEnabled: false
 }));
 
 vi.mock('@octane/renderer', () => ({
-    GetConfiguration: () => ({ getValue: (_key: string, fallback: unknown) => fallback }),
+    CreateLinkEvent: (url: string) => state.links.push(url),
+    GetConfiguration: () => ({ getValue: (key: string, fallback: unknown) => (state.config.has(key) ? state.config.get(key) : fallback) }),
     GetModeratorUserInfoMessageComposer: class {
         constructor(public userId: number) {}
     },
@@ -20,9 +25,11 @@ vi.mock('@octane/renderer', () => ({
 vi.mock('../../../api', () => ({
     SendMessageComposer: (composer: unknown) => state.sent.push(composer),
     OpenUrl: (url: string) => state.opened.push(url),
+    isHousekeepingEnabled: () => state.housekeepingEnabled,
     localizeWithFallback: (_key: string, fallback: string) => fallback
 }));
 vi.mock('../../../hooks', () => ({
+    useHasPermission: (key: string) => state.permissions.has(key),
     useMessageEvent: (type: unknown, handler: (event: unknown) => void) => state.handlers.set(type, handler),
     useRoomUserListSnapshot: () => []
 }));
@@ -30,8 +37,8 @@ vi.mock('./UserRecordsView', () => ({ USER_RECORD_KIND: { cautions: 0, bans: 1, 
 vi.mock('../../../common/native-text/NativeTextTree', () => ({ NativeTextTree: ({ children }: { children?: ReactNode }) => <>{children}</> }));
 vi.mock('../native/NativeWindow0', () => ({
     Native0Border: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
-    Native0Button: ({ label, onClick }: { label: string; onClick?: () => void }) => (
-        <button type="button" onClick={onClick}>
+    Native0Button: ({ label, enabled = true, onClick }: { label: string; enabled?: boolean; onClick?: () => void }) => (
+        <button type="button" disabled={!enabled} onClick={enabled ? onClick : undefined}>
             {label}
         </button>
     ),
@@ -88,7 +95,19 @@ describe('UserInfoPanel', () => {
         state.handlers.clear();
         state.sent.length = 0;
         state.opened.length = 0;
+        state.links.length = 0;
+        state.config.clear();
+        state.permissions.clear();
+        state.housekeepingEnabled = false;
     });
+
+    const showUser = () =>
+        act(() =>
+            state.handlers.get(ModeratorUserInfoEvent)?.({
+                getParser: () => ({ data: userInfo({ cautionCount: 0, banCount: 0, tradingLockCount: 0, identityRelatedBanCount: 0 }) })
+            })
+        );
+    const habboInfoButton = () => screen.getByRole('button', { name: 'Habbo Info' });
 
     it('opens the records window of the matching kind from each "view" link', () => {
         const onOpenRecords = vi.fn();
@@ -112,6 +131,46 @@ describe('UserInfoPanel', () => {
             [3, 'target'],
             [2, 'target']
         ]);
+        expect(state.opened).toEqual([]);
+    });
+
+    it('opens the configured moderation tool on the user name when the hotel has one', () => {
+        state.config.set('habboinfotool.url', 'https://hotel.example/hk/user/');
+        state.permissions.add('acc_housekeeping').add('acc_hk_users');
+        state.housekeepingEnabled = true;
+
+        renderPanel(vi.fn());
+        showUser();
+        fireEvent.click(habboInfoButton());
+
+        expect(state.opened).toEqual(['https://hotel.example/hk/user/target']);
+        expect(state.links).toEqual([]);
+    });
+
+    it('falls back to the in-client housekeeping user page when no tool url is configured', () => {
+        state.permissions.add('acc_housekeeping').add('acc_hk_users');
+        state.housekeepingEnabled = true;
+
+        renderPanel(vi.fn());
+        showUser();
+        fireEvent.click(habboInfoButton());
+
+        expect(state.links).toEqual(['housekeeping/user/7']);
+        expect(state.opened).toEqual([]);
+    });
+
+    it('disables the button instead of doing nothing when neither destination is reachable', () => {
+        state.permissions.add('acc_housekeeping');
+        state.housekeepingEnabled = true;
+
+        renderPanel(vi.fn());
+        showUser();
+
+        expect(habboInfoButton()).toBeDisabled();
+
+        fireEvent.click(habboInfoButton());
+
+        expect(state.links).toEqual([]);
         expect(state.opened).toEqual([]);
     });
 
