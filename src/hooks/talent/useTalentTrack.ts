@@ -61,6 +61,7 @@ export const useTalentTrack = () => {
     const isCitizenRef = useRef(false);
     const citizenshipShownRef = useRef(false);
     const pendingGuideGroupRef = useRef(-1);
+    const citizenshipTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
     const promotedTrack = GetConfigurationValue<string>('talentpromo.track', '');
 
     isCitizenRef.current = isCitizen;
@@ -89,6 +90,14 @@ export const useTalentTrack = () => {
 
         return () => RemoveLinkEventTracker(linkTracker);
     }, []);
+
+    useEffect(
+        () => () => {
+            if (citizenshipTimerRef.current !== null) clearTimeout(citizenshipTimerRef.current);
+            citizenshipTimerRef.current = null;
+        },
+        []
+    );
 
     // TalentPromoCtrl: the level pair of the promoted track decides whether its promo shows.
     useEffect(() => {
@@ -163,7 +172,10 @@ export const useTalentTrack = () => {
         if (GetOptionalConfigurationValue<number>('new.identity', 0) <= 0 || !GetConfigurationValue<boolean>('new.user.citizenship.popup.enabled', false)) return;
 
         citizenshipShownRef.current = true;
-        window.setTimeout(() => setCitizenshipPopup(true), CITIZENSHIP_POPUP_DELAY_MS);
+        citizenshipTimerRef.current = setTimeout(() => {
+            citizenshipTimerRef.current = null;
+            setCitizenshipPopup(true);
+        }, CITIZENSHIP_POPUP_DELAY_MS);
     });
 
     const closeTrack = () => {
