@@ -45,6 +45,17 @@ const trimArrayForQuota = <T>(value: T): T => {
     return value.slice(value.length - keep) as unknown as T;
 };
 
+// A stored value of another shape than the initial one (an old format, a hand-edited or corrupted entry) would reach
+// callers that rely on that shape - a history that is not an array threw on every render - so it is replaced by the
+// initial value. An initial null or undefined accepts any stored value.
+const matchesInitialShape = <T>(stored: unknown, initialValue: T): stored is T => {
+    if (initialValue === null || initialValue === undefined) return true;
+    if (Array.isArray(initialValue)) return Array.isArray(stored);
+    if (typeof initialValue === 'object') return !!stored && typeof stored === 'object' && !Array.isArray(stored);
+
+    return typeof stored === typeof initialValue;
+};
+
 interface UseLocalStorageOptions<T> {
     /**
      * Optional projection applied right before the value is written to
@@ -60,8 +71,11 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
 
     const [storedValue, setStoredValue] = useState<T>(() => {
         try {
-            const item = typeof window !== 'undefined' ? GetLocalStorage<T>(key) : undefined;
-            return item ?? initialValue;
+            const item = typeof window !== 'undefined' ? GetLocalStorage<unknown>(key) : undefined;
+
+            if (item === null || item === undefined) return initialValue;
+
+            return matchesInitialShape(item, initialValue) ? item : initialValue;
         } catch (error) {
             return initialValue;
         }
