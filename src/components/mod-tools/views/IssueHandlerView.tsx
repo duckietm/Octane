@@ -9,6 +9,7 @@ import { Native0Button, Native0Checkbox, Native0Frame, Native0Rows, Native0Scrol
 import { NativeWindowShell } from '../native/NativeWindowShell';
 import { EvidenceChatlogList, useEvidence } from './EvidenceChatlogList';
 import { UserInfoPanel } from './UserInfoPanel';
+import { UserRecordKind } from './UserRecordsView';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
@@ -52,6 +53,7 @@ export interface IssueHandlerProps {
     onOpenModAction: (userId: number, userName: string) => void;
     onOpenRoomVisits: (userId: number) => void;
     onOpenChatlog: (userId: number) => void;
+    onOpenRecords: (userId: number, kind: UserRecordKind, userName: string) => void;
 }
 
 // Classic v75 issue handler (cme, issue_handler): the issues of one bundle with the reporter's and the reported user's info panels and the messages on the left, the evidence chatlog
@@ -76,7 +78,8 @@ export const IssueHandlerView: FC<IssueHandlerProps> = ({
     onOpenSendMessage,
     onOpenModAction,
     onOpenRoomVisits,
-    onOpenChatlog
+    onOpenChatlog,
+    onOpenRecords
 }) => {
     const root = useMemo(() => parseNativeLayout(issueHandlerXml), []);
     useIssueManagerStore((state) => state.version);
@@ -211,6 +214,7 @@ export const IssueHandlerView: FC<IssueHandlerProps> = ({
         onOpenChatlog: () => onOpenChatlog(userId),
         onOpenModAction: (userName: string) => onOpenModAction(userId, userName),
         onOpenRoomVisits: () => onOpenRoomVisits(userId),
+        onOpenRecords: (kind: UserRecordKind, userName: string) => onOpenRecords(userId, kind, userName),
         onOpenSendMessage: (userName: string) => onOpenSendMessage(userId, userName)
     });
 
