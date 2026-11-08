@@ -114,7 +114,11 @@ const useInventoryBotsState = () => {
     });
 
     useEffect(() => {
-        if (!botItems || !botItems.length) return;
+        if (!botItems || !botItems.length) {
+            setSelectedBot(null);
+
+            return;
+        }
 
         setSelectedBot((prevValue) => {
             let newValue = prevValue;
