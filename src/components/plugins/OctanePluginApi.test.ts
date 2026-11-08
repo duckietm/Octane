@@ -1,7 +1,7 @@
 /* @vitest-environment jsdom */
 
 import { describe, expect, it, vi } from 'vitest';
-import { getRegisteredPlugins, pluginApi, subscribePlugins } from './OctanePluginApi';
+import { getRegisteredPlugins, type IOctanePluginApi, pluginApi, subscribePlugins } from './OctanePluginApi';
 
 describe('plugin registration', () => {
     it('lists a plugin only once its onInit went through', () => {
@@ -33,6 +33,45 @@ describe('plugin registration', () => {
         expect(heard).toHaveBeenCalled();
         stopBroken();
         stopHeard();
+        error.mockRestore();
+    });
+
+    it('closes the windows a plugin opened when it is removed', () => {
+        let api: IOctanePluginApi = null;
+        pluginApi.register({
+            name: 'window-owner',
+            label: 'Window owner',
+            onOpen: () => undefined,
+            onInit: (received) => {
+                api = received;
+            }
+        });
+
+        api.createWindow('owned', 'Owned', 200);
+        expect(document.getElementById('octane-plugin-window-owned')).not.toBeNull();
+
+        pluginApi.unregister('window-owner');
+
+        expect(document.getElementById('octane-plugin-window-owned')).toBeNull();
+    });
+
+    it('closes the windows of a plugin whose onClose throws', () => {
+        const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        pluginApi.register({
+            name: 'broken-close',
+            label: 'Broken close',
+            onOpen: () => undefined,
+            onInit: (api) => {
+                api.createWindow('left-open', 'Left open', 200);
+            },
+            onClose: () => {
+                throw new Error('close');
+            }
+        });
+
+        pluginApi.unregister('broken-close');
+
+        expect(document.getElementById('octane-plugin-window-left-open')).toBeNull();
         error.mockRestore();
     });
 });

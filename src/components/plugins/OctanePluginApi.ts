@@ -55,6 +55,30 @@ export interface IOctanePluginApi {
 const _plugins: IOctanePlugin[] = [];
 const _listeners: Array<() => void> = [];
 const _windowCleanup = new Map<string, () => void>();
+// The windows each plugin opened through the API it received in onInit, closed when the plugin is removed.
+const _pluginWindows = new Map<string, Set<string>>();
+
+// The API a plugin gets in onInit: the shared one, with the windows it opens recorded under its name.
+function scopedApi(pluginName: string): IOctanePluginApi {
+    return {
+        ...pluginApi,
+        createWindow(id: string, title: string, width: number) {
+            const content = pluginApi.createWindow(id, title, width);
+            if (content) {
+                const windows = _pluginWindows.get(pluginName) ?? new Set<string>();
+                windows.add(id);
+                _pluginWindows.set(pluginName, windows);
+            }
+            return content;
+        }
+    };
+}
+
+function destroyPluginWindows(pluginName: string) {
+    const windows = _pluginWindows.get(pluginName);
+    _pluginWindows.delete(pluginName);
+    windows?.forEach((id) => pluginApi.destroyWindow(id));
+}
 
 // One listener that throws must not stop the others from hearing the change.
 function notifyListeners() {
@@ -72,9 +96,10 @@ const pluginApi: IOctanePluginApi = {
         if (_plugins.some((p) => p.name === plugin.name)) return;
         // A plugin is listed once its onInit went through: one that failed used to stay registered half set up.
         try {
-            plugin.onInit?.(pluginApi);
+            plugin.onInit?.(scopedApi(plugin.name));
         } catch (error) {
             console.error(`[plugins] ${plugin.name} failed to start`, error);
+            destroyPluginWindows(plugin.name);
             return;
         }
         _plugins.push(plugin);
@@ -90,8 +115,10 @@ const pluginApi: IOctanePluginApi = {
             } catch (error) {
                 console.error(`[plugins] ${plugin.name} failed to close`, error);
             } finally {
-                // A plugin whose onClose threw used to stay registered.
+                // A plugin whose onClose threw used to stay registered, and its windows, with their document
+                // listeners, stayed open after it was gone.
                 _plugins.splice(_plugins.indexOf(plugin), 1);
+                destroyPluginWindows(plugin.name);
                 notifyListeners();
             }
         }
@@ -241,6 +268,7 @@ const pluginApi: IOctanePluginApi = {
 
         cleanup?.();
         _windowCleanup.delete(id);
+        _pluginWindows.forEach((windows) => windows.delete(id));
 
         const existing = document.getElementById(`octane-plugin-window-${id}`);
         if (existing) existing.remove();
