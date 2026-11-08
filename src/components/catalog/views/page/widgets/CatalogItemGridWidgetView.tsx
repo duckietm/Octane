@@ -7,7 +7,13 @@ import { useCatalogActions, useCatalogData, useCatalogUiState, useInventoryFurni
 import { replaceCatalogPageOffers } from '../../../../../hooks/catalog/useCatalog.helpers';
 import { useCatalogAdmin } from '../../../CatalogAdminContext';
 import { CatalogGridOfferView } from '../common/CatalogGridOfferView';
-import { getAirCatalogColumnCount, getVisibleAirGridEntries, isAirBaseCatalogOffer, layoutAirCatalogOffers } from '../common/catalogAirGrid.helpers';
+import {
+    catalogPageUsesAirBaseTemplate,
+    getAirCatalogColumnCount,
+    getVisibleAirGridEntries,
+    isAirBaseCatalogOffer,
+    layoutAirCatalogOffers
+} from '../common/catalogAirGrid.helpers';
 import { shouldVirtualizeCatalogOffers } from './catalogGridPerformance.helpers';
 
 interface CatalogItemGridWidgetViewProps extends AutoGridProps {
@@ -43,7 +49,10 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
     const hasAirBaseOffer = offers.some((offer) => isAirBaseCatalogOffer(offer, currentType));
     const hasAirPricedOffer = offers.some((offer) => !isAirBaseCatalogOffer(offer, currentType));
     const usesAirMixedGridTemplate = isAirStandardDensity && hasAirBaseOffer && hasAirPricedOffer;
-    const usesAirBaseGridTemplate = isAirStandardDensity && offers.length > 0 && hasAirBaseOffer && !hasAirPricedOffer;
+    // The base box is the page's, not the offer's: a page that also sells something priced keeps
+    // every tile on the priced box, so one offer missing its price cannot resize its own tile.
+    const pageUsesAirBaseTemplate = catalogPageUsesAirBaseTemplate(offers, currentType);
+    const usesAirBaseGridTemplate = isAirStandardDensity && pageUsesAirBaseTemplate;
     const effectiveColumnMinHeight = usesAirBaseGridTemplate ? 36 : columnMinHeight;
     const effectiveColumnMinWidth = usesAirBaseGridTemplate ? 36 : columnMinWidth;
     const gridClassName =
@@ -176,6 +185,7 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
                     tintColor={tintColor}
                     showTechnicalDetails={adminMode}
                     showPrices={showPrices}
+                    pageUsesBaseTemplate={pageUsesAirBaseTemplate}
                     inventoryVisible={inventoryVisible}
                 />
             </div>

@@ -55,4 +55,23 @@ describe('catalog offer tile', () => {
         expect(screen.getByText('200')).toBeInTheDocument();
         expect(screen.getByText('+')).toBeInTheDocument();
     });
+
+    it('keeps an empty price plate when the offer has no price but the page is a priced one', () => {
+        const unpricedOffer = { ...offer(), priceInCredits: 0, priceInActivityPoints: 0 };
+
+        const { container } = render(<CatalogOfferTileView offer={unpricedOffer} pageUsesBaseTemplate={false} selectOffer={() => undefined} />);
+
+        expect(container.querySelector('.layout-grid-item')).not.toHaveClass('uses-base-grid-template');
+        expect(container.querySelector('.octane-catalog-grid-price')).toHaveClass('is-empty-price');
+        expect(container.querySelectorAll('.octane-catalog-grid-price-entry')).toHaveLength(0);
+    });
+
+    it('reads its own offer when no page verdict reaches it', () => {
+        const unpricedOffer = { ...offer(), priceInCredits: 0, priceInActivityPoints: 0 };
+
+        const { container } = render(<CatalogOfferTileView offer={unpricedOffer} selectOffer={() => undefined} />);
+
+        expect(container.querySelector('.layout-grid-item')).toHaveClass('uses-base-grid-template');
+        expect(container.querySelector('.octane-catalog-grid-price')).toBeNull();
+    });
 });
