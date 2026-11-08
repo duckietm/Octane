@@ -98,6 +98,9 @@ export const useWiredState = () => {
     const [clipboard, setClipboard] = useState<Map<string, WiredClipboardEntry>>(() => new Map());
     // "Save without closing": the next save success leaves the window open.
     const keepOpenAfterSaveRef = useRef(false);
+    // The box the last save was sent for: the success packet carries no id, so it closes the editor only while
+    // that box is still the open one.
+    const pendingSaveIdRef = useRef<number | null>(null);
     // The non-owner confirmation, once answered, holds for the rest of the session.
     const nonOwnerConfirmedRef = useRef(false);
     // Official "paste into": while on, opening another box of the same element saves the open
@@ -183,6 +186,7 @@ export const useWiredState = () => {
             if (!message) return;
 
             keepOpenAfterSaveRef.current = keepOpen;
+            pendingSaveIdRef.current = savedId;
             SendMessageComposer(message);
         };
 
@@ -426,16 +430,20 @@ export const useWiredState = () => {
         SendMessageComposer(new OpenMessageComposer(parser.stuffId));
     });
 
-    useMessageEvent<WiredSaveSuccessEvent>(WiredSaveSuccessEvent, (event) => {
-        const parser = event.getParser();
-
+    useMessageEvent<WiredSaveSuccessEvent>(WiredSaveSuccessEvent, () => {
         if (roomSettings?.canInspect && requestUserVariables) requestUserVariables();
 
-        if (keepOpenAfterSaveRef.current) {
-            // Saved without closing: the picks stay highlighted and the window stays up.
-            keepOpenAfterSaveRef.current = false;
-            return;
-        }
+        const savedId = pendingSaveIdRef.current;
+        const keepOpen = keepOpenAfterSaveRef.current;
+
+        pendingSaveIdRef.current = null;
+        keepOpenAfterSaveRef.current = false;
+
+        // Saved without closing: the picks stay highlighted and the window stays up.
+        if (keepOpen) return;
+
+        // The success of a box saved earlier leaves the editor of the box opened since then alone.
+        if (savedId === null || triggerRef.current?.id !== savedId) return;
 
         WiredSelectionVisualizer.clearAllSelectionShaders();
         setTrigger(null);

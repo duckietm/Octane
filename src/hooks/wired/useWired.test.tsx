@@ -103,6 +103,8 @@ import { useWiredState } from './useWired';
 
 const makeTrigger = (id: number) => Object.assign(new (TriggerDefinition as unknown as new () => object)(), { id, selectedItems2: [] }) as any;
 
+const saveSuccess = { getParser: () => ({}) };
+
 const sentArgs = (call: number) => (mocks.sendMessage.mock.calls[call][0] as { args: unknown[] }).args;
 
 describe('useWiredState saving', () => {
@@ -133,5 +135,35 @@ describe('useWiredState saving', () => {
 
         expect(mocks.sendMessage).toHaveBeenCalledTimes(1);
         expect(sentArgs(0).slice(0, 4)).toEqual([7, [3, 4], 'hello', [11, 12]]);
+    });
+
+    it('closes the editor when the success belongs to the box it shows', () => {
+        const { result } = renderHook(() => useWiredState());
+
+        act(() => result.current.setTrigger(makeTrigger(7)));
+        act(() => result.current.saveWired());
+        act(() => mocks.handlers.get(WiredSaveSuccessEvent)?.(saveSuccess));
+
+        expect(result.current.trigger).toBeNull();
+    });
+
+    it('leaves another box open when the success belongs to a box saved earlier', () => {
+        const { result } = renderHook(() => useWiredState());
+
+        act(() => result.current.setTrigger(makeTrigger(7)));
+        act(() => result.current.saveWired());
+        act(() => result.current.setTrigger(makeTrigger(8)));
+        act(() => mocks.handlers.get(WiredSaveSuccessEvent)?.(saveSuccess));
+
+        expect(result.current.trigger?.id).toBe(8);
+    });
+
+    it('leaves the editor open on a success no save of this editor asked for', () => {
+        const { result } = renderHook(() => useWiredState());
+
+        act(() => result.current.setTrigger(makeTrigger(7)));
+        act(() => mocks.handlers.get(WiredSaveSuccessEvent)?.(saveSuccess));
+
+        expect(result.current.trigger?.id).toBe(7);
     });
 });
