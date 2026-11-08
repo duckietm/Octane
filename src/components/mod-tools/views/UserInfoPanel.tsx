@@ -6,6 +6,7 @@ import userInfoXml from '../../../assets/mod-tools/xml/user_info.xml?raw';
 import { findNativeNode, nativeCaption, nativeNumber, NativeNode, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Border, Native0Button, Native0Text } from '../native/NativeWindow0';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { USER_RECORD_KIND, UserRecordKind } from './UserRecordsView';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SHADE = 0xa2d6ea;
@@ -27,12 +28,14 @@ export interface UserInfoPanelProps {
     onOpenSendMessage: (userName: string) => void;
     onOpenModAction: (userName: string) => void;
     onOpenRoomVisits: () => void;
+    /** Opens the in-client records window of this user for one kind (cautions, bans, banned accounts, trade locks). */
+    onOpenRecords: (kind: UserRecordKind, userName: string) => void;
 }
 
 // Classic v75 UserInfoCtrl (og): the user_info border with its fields and buttons. It is the content of the user info window (X5) and of the caller / reported panels of the issue handler: GetModeratorUserInfo(userId) goes out when the window opens, the fields stay hidden behind "Loading..."
-// until the answer for this user arrives; the sanction counts show a "view" link when they are above zero. Kept from the earlier user info: "Online" also says when the
+// until the answer for this user arrives; the sanction counts show a "view" link when they are above zero, which opens the records window of that kind. Kept from the earlier user info: "Online" also says when the
 // user is in the moderator's room, and the free space under the buttons holds a refresh button.
-export const UserInfoPanel: FC<UserInfoPanelProps> = ({ userId, settings, onOpenChatlog, onOpenSendMessage, onOpenModAction, onOpenRoomVisits }) => {
+export const UserInfoPanel: FC<UserInfoPanelProps> = ({ userId, settings, onOpenChatlog, onOpenSendMessage, onOpenModAction, onOpenRoomVisits, onOpenRecords }) => {
     const frame = useMemo(() => parseNativeLayout(userInfoXml), []);
     const fields = useMemo(() => findNativeNode(frame, 'fields'), [frame]);
     const buttons = useMemo(() => findNativeNode(frame, 'buttons'), [frame]);
@@ -91,17 +94,16 @@ export const UserInfoPanel: FC<UserInfoPanelProps> = ({ userId, settings, onOpen
                             <Native0Text text={formatTime(data.registrationAgeInMinutes * 60)} width={at('registered_txt').width} x={at('registered_txt').x} y={at('registered_txt').y} />
                             {countRow('cfh_count_txt', data.cfhCount)}
                             {countRow('abusive_cfh_count_txt', data.abusiveCfhCount)}
-                            {countRow('caution_count_txt', data.cautionCount, 'view_caution_count_txt', () => OpenModeratorActionLog(data.userName), 0xffffff)}
-                            {countRow('ban_count_txt', data.banCount, 'view_ban_count_txt', () => OpenModeratorActionLog(data.userName))}
+                            {countRow('caution_count_txt', data.cautionCount, 'view_caution_count_txt', () => onOpenRecords(USER_RECORD_KIND.cautions, data.userName), 0xffffff)}
+                            {countRow('ban_count_txt', data.banCount, 'view_ban_count_txt', () => onOpenRecords(USER_RECORD_KIND.bans, data.userName))}
                             <Native0Text color={sanctionColor} text={data.lastSanctionTime} width={at('last_sanction_time_txt').width} x={at('last_sanction_time_txt').x} y={at('last_sanction_time_txt').y} />
-                            {countRow('trading_lock_count_txt', data.tradingLockCount, 'view_trading_lock_count_txt', () => OpenModeratorActionLog(data.userName))}
+                            {countRow('trading_lock_count_txt', data.tradingLockCount, 'view_trading_lock_count_txt', () => onOpenRecords(USER_RECORD_KIND.tradeLocks, data.userName))}
                             <Native0Text text={data.tradingExpiryDate || caption('trading_lock_expiry_txt')} width={at('trading_lock_expiry_txt').width} x={at('trading_lock_expiry_txt').x} y={at('trading_lock_expiry_txt').y} />
                             <Native0Text text={formatTime(data.minutesSinceLastLogin * 60)} width={at('last_login_txt').width} x={at('last_login_txt').x} y={at('last_login_txt').y} />
                             <Native0Text text={roomUser ? localizeWithFallback('octane.mod_tools.yes_in_room', 'Yes (in room)') : data.online ? 'Yes' : 'No'} width={at('online_txt').width + 30} x={at('online_txt').x} y={at('online_txt').y} />
                             <Native0Text text={data.lastPurchaseDate || 'No purchases'} width={at('last_purchase_txt').width} x={at('last_purchase_txt').x} y={at('last_purchase_txt').y} />
                             <Native0Text text={data.primaryEmailAddress || 'No email found'} width={at('email_address_txt').width} x={at('email_address_txt').x} y={at('email_address_txt').y} />
-                            <Native0Text text={`${data.identityRelatedBanCount}`} width={at('id_bans_txt').width} x={at('id_bans_txt').x} y={at('id_bans_txt').y} />
-                            <Native0Text background={SHADE} bold text="view" underline width={30} height={13} x={at('view_id_bans_txt').x} y={at('view_id_bans_txt').y} onClick={() => OpenIdentityInformation(data.identityId)} />
+                            {countRow('id_bans_txt', data.identityRelatedBanCount, 'view_id_bans_txt', () => onOpenRecords(USER_RECORD_KIND.bannedAccounts, data.userName))}
                             <Native0Text text={data.userClassification || '-'} width={at('user_class_txt').width} x={at('user_class_txt').x} y={at('user_class_txt').y} />
                             <div style={{ position: 'absolute', left: rectOf(buttons).x, top: rectOf(buttons).y, width: rectOf(buttons).width, height: rectOf(buttons).height }}>
                                 <Native0Button enabled={settings.chatlogsPermission} height={21} label={text(findNativeNode(buttons, 'chatlog_but'))} width={80} x={button('chatlog_but').x} y={button('chatlog_but').y} onClick={onOpenChatlog} />
@@ -131,6 +133,3 @@ const OpenModeratorTool = (key: string, value: string) => {
 
     if (prefix) OpenUrl(`${prefix}${value}`);
 };
-
-const OpenModeratorActionLog = (userName: string) => OpenModeratorTool('moderatoractionlog.url', userName);
-const OpenIdentityInformation = (identityId: number) => OpenModeratorTool('identityinformationtool.url', `${identityId}`);
