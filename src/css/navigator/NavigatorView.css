@@ -1,0 +1,2426 @@
+.octane-navigator-air {
+    --navigator-air-orange: #fba800;
+    --navigator-air-row: #d6eeff;
+    --navigator-air-row-alt: #ffffff;
+    --navigator-air-surface: #e9e9e1;
+    --navigator-air-name: #0f557b;
+    position: relative;
+    box-sizing: border-box;
+    width: 425px;
+    min-width: 425px;
+    max-width: 425px;
+    height: var(--navigator-height, 628px);
+    min-height: 0;
+    max-height: none;
+    overflow: hidden;
+    zoom: min(1, calc((100vw - 16px) / 425px), calc((100dvh - 70px - env(safe-area-inset-bottom, 0px)) / var(--navigator-height, 628px)));
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    filter: drop-shadow(2.828px 2.828px 4px rgba(0, 0, 0, 0.349));
+    font-family: HabboAirUbuntu, UbuntuRegular, Ubuntu, sans-serif;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air img {
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air button,
+.octane-navigator-air input,
+.octane-navigator-air select,
+.octane-navigator-air .octane-select-trigger {
+    appearance: none;
+    font-family: inherit;
+    -webkit-appearance: none;
+}
+
+.octane-navigator-air button::before,
+.octane-navigator-air button::after {
+    content: none !important;
+    display: none !important;
+}
+
+.octane-navigator-air.is-quick-links {
+    width: 578px;
+    min-width: 578px;
+    max-width: 578px;
+    zoom: min(1, calc((100vw - 16px) / 578px), calc((100dvh - 70px - env(safe-area-inset-bottom, 0px)) / var(--navigator-height, 628px)));
+}
+
+.octane-navigator-air__skin {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-width: 33px 10px 10px !important;
+    border-radius: 0 !important;
+    border-image-source: url("@/assets/images/habbo-skin/slices/frame-ubuntu-3.png") !important;
+    border-image-slice: 33 10 10 10 fill !important;
+    border-image-width: 33px 10px 10px 10px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    image-rendering: pixelated;
+}
+
+.octane-navigator-air__skin::before {
+    content: "";
+    position: absolute;
+    inset: -29px -7px auto;
+    height: 28px;
+    background: #367997;
+}
+
+.octane-navigator-air__skin::after {
+    content: "";
+    position: absolute;
+    inset: 0 -7px -6px;
+    background: var(--navigator-air-surface);
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        100% calc(100% - 3px),
+        calc(100% - 1px) calc(100% - 3px),
+        calc(100% - 1px) calc(100% - 1px),
+        calc(100% - 3px) calc(100% - 1px),
+        calc(100% - 3px) 100%,
+        3px 100%,
+        3px calc(100% - 1px),
+        1px calc(100% - 1px),
+        1px calc(100% - 3px),
+        0 calc(100% - 3px)
+    );
+}
+
+.octane-navigator-air__tab-shelf {
+    position: absolute;
+    top: 31px;
+    right: 1px;
+    left: 1px;
+    z-index: 1;
+    height: 33px;
+    pointer-events: none;
+    background: #ffffff;
+}
+
+.octane-navigator-air__tab-shelf::after {
+    content: "";
+    position: absolute;
+    top: 33px;
+    right: 0;
+    left: 0;
+    height: 1px;
+    background: #242424;
+}
+
+.octane-navigator-air__caption {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    left: 6px;
+    z-index: 4;
+    height: 27px;
+}
+
+.octane-navigator-air__history {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 5;
+    display: flex;
+    gap: 2px;
+}
+
+.octane-navigator-air__history-button {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 16px;
+    cursor: pointer;
+}
+
+.octane-navigator-air__history-button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.octane-navigator-air__history-button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.octane-navigator-air__title {
+    display: block;
+    overflow: hidden;
+    color: #ffffff;
+    font-family: HabboAirUbuntu, UbuntuBold, Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    pointer-events: none;
+    padding: 3px 8px 0;
+}
+
+.octane-navigator-air__close {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    z-index: 5;
+    width: 19px !important;
+    height: 20px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: url("@/assets/images/habbo-skin/slices/close-3-default.png") 0 0 / 19px 20px no-repeat !important;
+    box-shadow: none !important;
+    filter: none !important;
+    transform: none !important;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__close:hover {
+    background-image: url("@/assets/images/habbo-skin/slices/close-3-hover.png") !important;
+}
+
+.octane-navigator-air__close:active {
+    background-image: url("@/assets/images/habbo-skin/slices/close-3-pressed.png") !important;
+}
+
+.octane-navigator-air__tabs {
+    position: absolute;
+    top: 35px;
+    right: 10px;
+    left: 46px;
+    z-index: 3;
+    display: flex;
+    box-sizing: border-box;
+    height: 32px;
+    align-items: flex-end;
+    overflow: visible;
+    background: transparent;
+    gap: 0;
+}
+
+.octane-navigator-air.is-quick-links .octane-navigator-air__tabs {
+    left: 126px;
+}
+
+.octane-navigator-air__body {
+    position: absolute;
+    top: 61px;
+    right: auto;
+    bottom: auto;
+    left: 10px;
+    z-index: 2;
+    display: flex;
+    box-sizing: border-box;
+    width: 410px;
+    height: calc(var(--navigator-height, 628px) - 80px);
+    min-height: 0;
+    flex-direction: column;
+    overflow: visible;
+}
+
+.octane-navigator-air.is-quick-links .octane-navigator-air__body {
+    left: 162px;
+}
+
+.octane-navigator-air__tab {
+    box-sizing: border-box;
+    flex: 0 1 auto !important;
+    width: var(--navigator-tab-width, 88px) !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    margin: 0 !important;
+    padding: 6px 10px 4px !important;
+    overflow: hidden;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image:
+        url("@/assets/images/habbo-skin/slices/tab-3-default-left.png"),
+        url("@/assets/images/habbo-skin/slices/tab-3-default-right.png"),
+        url("@/assets/images/habbo-skin/slices/tab-3-default-mid.png") !important;
+    background-repeat: no-repeat, no-repeat, no-repeat !important;
+    background-position: left top, right top, 7px top !important;
+    background-size: 9px 32px, 9px 32px, calc(100% - 14px) 32px !important;
+    box-shadow: none !important;
+    color: #111 !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 22px !important;
+    text-align: center;
+    white-space: nowrap;
+    image-rendering: pixelated;
+    appearance: none;
+    cursor: pointer;
+}
+
+.octane-navigator-air__tab:hover {
+    background-image:
+        url("@/assets/images/habbo-skin/slices/tab-3-hover-left.png"),
+        url("@/assets/images/habbo-skin/slices/tab-3-hover-right.png"),
+        url("@/assets/images/habbo-skin/slices/tab-3-hover-mid.png") !important;
+}
+
+.octane-navigator-air__tab.is-active,
+.octane-navigator-air__tab.is-active:hover {
+    background-image:
+        url("@/assets/images/habbo-skin/slices/tab-3-selected-left.png"),
+        url("@/assets/images/habbo-skin/slices/tab-3-selected-right.png"),
+        url("@/assets/images/habbo-skin/slices/tab-3-selected-mid.png") !important;
+}
+
+.octane-navigator-air__quick-toggle,
+.octane-navigator-air__icon-button,
+.octane-navigator-air__room-info,
+.octane-navigator-air__search-clear,
+.octane-navigator-air__search-refresh {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    appearance: none;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+}
+
+.octane-navigator-air__quick-toggle {
+    position: absolute;
+    top: 40px;
+    left: 17px;
+    z-index: 5;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    padding: 0;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.octane-navigator-air__quick-toggle img {
+    display: block;
+    width: 18px;
+    height: 18px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__quick-toggle img,
+.octane-navigator-air__icon-button img {
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__workspace {
+    position: relative;
+    display: block;
+    flex: 1 1 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: visible;
+}
+
+.octane-navigator-air__quick-links {
+    position: absolute;
+    top: 10px;
+    left: -153px;
+    box-sizing: border-box;
+    width: 141px;
+    min-width: 141px;
+    height: calc(var(--navigator-height, 628px) - 90px);
+    overflow: hidden;
+    clip-path: polygon(
+        5px 0,
+        calc(100% - 5px) 0,
+        calc(100% - 5px) 1px,
+        calc(100% - 3px) 1px,
+        calc(100% - 3px) 2px,
+        calc(100% - 2px) 2px,
+        calc(100% - 2px) 3px,
+        calc(100% - 1px) 3px,
+        calc(100% - 1px) 5px,
+        100% 5px,
+        100% calc(100% - 5px),
+        calc(100% - 1px) calc(100% - 5px),
+        calc(100% - 1px) calc(100% - 3px),
+        calc(100% - 2px) calc(100% - 3px),
+        calc(100% - 2px) calc(100% - 2px),
+        calc(100% - 3px) calc(100% - 2px),
+        calc(100% - 3px) calc(100% - 1px),
+        calc(100% - 5px) calc(100% - 1px),
+        calc(100% - 5px) 100%,
+        5px 100%,
+        5px calc(100% - 1px),
+        3px calc(100% - 1px),
+        3px calc(100% - 2px),
+        2px calc(100% - 2px),
+        2px calc(100% - 3px),
+        1px calc(100% - 3px),
+        1px calc(100% - 5px),
+        0 calc(100% - 5px),
+        0 5px,
+        1px 5px,
+        1px 3px,
+        2px 3px,
+        2px 2px,
+        3px 2px,
+        3px 1px,
+        5px 1px
+    );
+    background: #fff;
+}
+
+.octane-navigator-search-saves-result {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    width: 141px;
+    min-width: 141px;
+    height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    background: #fff;
+}
+
+.octane-navigator-search-saves-result__header {
+    position: relative;
+    box-sizing: border-box;
+    width: 141px;
+    height: 21px;
+    flex: 0 0 21px;
+    clip-path: polygon(5px 0, calc(100% - 5px) 0, calc(100% - 5px) 1px, calc(100% - 3px) 1px, calc(100% - 3px) 2px, calc(100% - 2px) 2px, calc(100% - 2px) 3px, calc(100% - 1px) 3px, calc(100% - 1px) 5px, 100% 5px, 100% 100%, 0 100%, 0 5px, 1px 5px, 1px 3px, 2px 3px, 2px 2px, 3px 2px, 3px 1px, 5px 1px);
+    background: var(--navigator-air-orange);
+}
+
+.octane-navigator-search-saves-result__header-icon {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    display: block;
+    width: 18px;
+    height: 18px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-search-saves-result__header-label {
+    position: absolute;
+    top: 2px;
+    left: 20px;
+    right: 3px;
+    overflow: hidden;
+    color: #fff;
+    font-family: HabboAirUbuntu, UbuntuBold, Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 17px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.octane-navigator-search-saves-result__list {
+    box-sizing: border-box;
+    width: 136px;
+    height: 100%;
+    margin: 4px 0 4px 3px;
+    padding: 0;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #fff;
+}
+
+.octane-navigator-search-saves-result__empty {
+    display: flex;
+    padding: 16px 0;
+    justify-content: center;
+    opacity: 0.3;
+}
+
+.octane-navigator-search-saves-result__empty img {
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.saved-search-row {
+    position: relative;
+    box-sizing: border-box;
+    width: 132px;
+    height: 17px;
+    min-height: 17px;
+    margin: 0 0 2px;
+}
+
+.saved-search-row:last-child {
+    margin-bottom: 0;
+}
+
+.saved-search-row__open {
+    position: absolute;
+    inset: 0;
+    display: block;
+    box-sizing: border-box;
+    width: 132px;
+    height: 17px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+}
+
+.saved-search-row__label {
+    display: block;
+    overflow: hidden;
+    color: #000;
+    font-family: HabboAirUbuntu, UbuntuRegular, Ubuntu, sans-serif;
+    font-size: 12px;
+    line-height: 17px;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.saved-search-row__delete {
+    position: absolute;
+    top: 1px;
+    left: 115px;
+    width: 16px;
+    height: 16px;
+    opacity: 0;
+    border: 0;
+    background: url("@/assets/images/navigator/air/icon-ql-remove.png") center / 10px 10px no-repeat;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.saved-search-row:hover .saved-search-row__delete,
+.saved-search-row:focus-within .saved-search-row__delete {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.octane-navigator-air__main {
+    display: flex;
+    position: relative;
+    box-sizing: border-box;
+    width: 410px;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.octane-navigator-air__search {
+    display: flex;
+    box-sizing: border-box;
+    flex: 0 0 36px;
+    width: 408px;
+    max-width: 408px;
+    height: 36px;
+    min-height: 36px;
+    align-items: flex-start;
+    margin: 3px 0 0;
+    padding: 10px 0 0 4px;
+    overflow: visible;
+    gap: 13px;
+}
+
+.octane-navigator-air__filter {
+    position: relative;
+    flex: 0 0 116px;
+    width: 116px;
+    height: 24px;
+    min-height: 24px;
+    z-index: 6;
+}
+
+.octane-navigator-air__filter-button {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    width: 116px;
+    height: 24px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 24px 4px 10px;
+    overflow: hidden;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-width: 0 !important;
+    border-radius: 0 !important;
+    border-image-source: url("@/assets/images/habbo-skin/slices/dropmenu-default.png") !important;
+    border-image-slice: 3 fill !important;
+    border-image-width: 3px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #111;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+    text-align: left;
+    white-space: nowrap;
+    appearance: none;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__filter-button span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.octane-navigator-air__filter-button img {
+    position: absolute;
+    top: 2px;
+    right: 5px;
+    flex: none;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.octane-navigator-air__filter-list {
+    position: relative;
+    box-sizing: border-box;
+    width: 116px;
+    margin: 0;
+    padding: 2px 0;
+    list-style: none;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-width: 6px !important;
+    border-image-source: url("@/assets/images/habbo-skin/slices/dropmenu-3.png") !important;
+    border-image-slice: 6 fill !important;
+    border-image-width: 6px !important;
+    border-image-repeat: stretch !important;
+    background: transparent;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__filter-list button,
+.octane-navigator-air__filter-option {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 16px;
+    padding: 0 6px;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #111;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 16px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.octane-navigator-air__filter-list button:hover,
+.octane-navigator-air__filter-list button.is-selected,
+.octane-navigator-air__filter-option[data-highlighted],
+.octane-navigator-air__filter-option[data-selected] {
+    background: #d6eeff !important;
+}
+
+.octane-navigator-air__search-field {
+    position: relative;
+    box-sizing: border-box;
+    flex: 0 0 235px;
+    width: 235px;
+    min-width: 0;
+    height: 24px;
+    overflow: hidden;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-width: 0 !important;
+    border-radius: 0 !important;
+    border-image-source: url("@/assets/images/habbo-skin/slices/border-4.png") !important;
+    border-image-slice: 6 fill !important;
+    border-image-width: 6px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__search-input {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 4px 18px 4px 6px;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000;
+    font-family: HabboAirUbuntu, UbuntuRegular, Ubuntu, sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    line-height: 16px;
+    outline: 0;
+}
+
+.octane-navigator-air__search-input::placeholder {
+    color: #9f9f9f;
+    font-style: italic;
+    opacity: 1;
+}
+
+.octane-navigator-air__search-clear {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 20px;
+    height: 20px;
+}
+
+.octane-navigator-air__search-clear img,
+.octane-navigator-air__search-refresh img {
+    display: block;
+    width: 16px;
+    height: 16px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* refreshButton (25x23): plain button style 5, color 0x7cc561: the grey habbo_skin_button_shiny multiplied by
+   0x7cc561, with the 17x12 newnavigator_refresh_search_icon at 5,5 on top. */
+.octane-navigator-air__search-refresh {
+    flex: 0 0 25px;
+    align-self: flex-start;
+    align-items: flex-start;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    width: 25px;
+    height: 23px;
+    border: 5px solid transparent;
+    border-image-source: var(--habbo-skin-shiny-tint-7cc561);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    overflow: visible;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__search-refresh:hover {
+    border-image-source: var(--habbo-skin-shiny-tint-7cc561-hover);
+}
+
+.octane-navigator-air__search-refresh:active {
+    border-image-source: var(--habbo-skin-shiny-tint-7cc561-pressed);
+}
+
+.octane-navigator-air__search-refresh img {
+    flex: none;
+    width: 17px;
+    height: 12px;
+}
+
+.octane-navigator-air__results {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+    box-sizing: border-box;
+    width: 407px;
+    max-width: 407px;
+    margin: 6px 0 0 1px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.octane-navigator-air__busy-mask {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: rgba(236, 234, 224, 0.435);
+    pointer-events: none;
+}
+
+.octane-navigator-air__empty {
+    width: 286px;
+    margin: 0 0 0 51px;
+    color: #111;
+    font-family: HabboAirUbuntu, UbuntuBold, Ubuntu, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 21px;
+    text-align: center;
+}
+
+.octane-navigator-air__category {
+    width: 394px;
+    max-width: 394px;
+    margin: 0 0 5px 2px;
+    background: #ffffff;
+}
+
+.octane-navigator-air__category-header {
+    display: flex;
+    box-sizing: border-box;
+    width: 394px;
+    max-width: 394px;
+    height: 30px;
+    min-height: 30px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px 0 0;
+    background: #fff;
+}
+
+.octane-navigator-air__category-toggle {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    max-width: calc(100% - 65px);
+    height: 30px;
+    align-items: center;
+    padding: 0 0 0 20px;
+    border: 0;
+    background: transparent;
+    color: var(--navigator-air-name);
+    cursor: pointer;
+    font-family: HabboAirUbuntu, UbuntuRegular, Ubuntu, sans-serif;
+    font-size: 14px;
+    text-align: left;
+}
+
+.octane-navigator-air__category-toggle img {
+    position: absolute;
+    top: 7px;
+    left: 5px;
+    width: 11px;
+    height: 19px;
+    object-fit: none;
+    object-position: center;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__category-toggle span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.octane-navigator-air__category-controls {
+    display: flex;
+    height: 18px;
+    align-items: center;
+    gap: 5px;
+}
+
+.octane-navigator-air__icon-button {
+    width: 11px;
+    height: 18px;
+    overflow: hidden;
+}
+
+.octane-navigator-air__icon-button img {
+    display: block;
+    width: 11px;
+    height: 19px;
+    object-fit: none;
+    object-position: center;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__rows {
+    display: flex;
+    width: 387px;
+    max-width: 387px;
+    margin: -1px 0 3px 4px;
+    flex-direction: column;
+    gap: 0;
+}
+
+.octane-navigator-air__tiles {
+    display: flex;
+    width: 387px;
+    max-width: 387px;
+    margin: -1px 0 3px 4px;
+    padding-top: 4px;
+    flex-wrap: wrap;
+    column-gap: 7px;
+    row-gap: 5px;
+}
+
+.octane-navigator-air__usercount {
+    display: flex;
+    box-sizing: border-box;
+    flex: 0 0 40px;
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    height: 18px;
+    align-items: center;
+    padding: 1px 2px 1px 3px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    gap: 1px;
+    clip-path: polygon(
+        2px 0,
+        calc(100% - 2px) 0,
+        calc(100% - 2px) 1px,
+        calc(100% - 1px) 1px,
+        calc(100% - 1px) 2px,
+        100% 2px,
+        100% calc(100% - 2px),
+        calc(100% - 1px) calc(100% - 2px),
+        calc(100% - 1px) calc(100% - 1px),
+        calc(100% - 2px) calc(100% - 1px),
+        calc(100% - 2px) 100%,
+        2px 100%,
+        2px calc(100% - 1px),
+        1px calc(100% - 1px),
+        1px calc(100% - 2px),
+        0 calc(100% - 2px),
+        0 2px,
+        1px 2px,
+        1px 1px,
+        2px 1px
+    );
+    color: #fff !important;
+    font-family: HabboAirUbuntu, UbuntuBold, Ubuntu, sans-serif;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 14px !important;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__usercount img {
+    flex: 0 0 13px;
+    width: 13px;
+    height: 14px;
+    object-fit: contain;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__usercount span {
+    color: #fff !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 14px !important;
+}
+
+.octane-navigator-air__row {
+    position: relative;
+    box-sizing: border-box;
+    flex: 0 0 20px;
+    width: 383px;
+    min-width: 383px;
+    max-width: 383px;
+    height: 20px;
+    min-height: 20px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    clip-path: polygon(
+        2px 0,
+        calc(100% - 2px) 0,
+        calc(100% - 2px) 1px,
+        calc(100% - 1px) 1px,
+        calc(100% - 1px) 2px,
+        100% 2px,
+        100% calc(100% - 2px),
+        calc(100% - 1px) calc(100% - 2px),
+        calc(100% - 1px) calc(100% - 1px),
+        calc(100% - 2px) calc(100% - 1px),
+        calc(100% - 2px) 100%,
+        2px 100%,
+        2px calc(100% - 1px),
+        1px calc(100% - 1px),
+        1px calc(100% - 2px),
+        0 calc(100% - 2px),
+        0 2px,
+        1px 2px,
+        1px 1px,
+        2px 1px
+    );
+    background: var(--navigator-air-row);
+    color: #1a1a1a;
+    cursor: pointer;
+}
+
+.octane-navigator-air__row.is-stripe {
+    background: var(--navigator-air-row-alt);
+}
+
+.octane-navigator-air__row .octane-navigator-air__usercount {
+    position: absolute;
+    top: 1px;
+    left: 0;
+}
+
+.octane-navigator-air__row-name {
+    position: absolute;
+    top: 1px;
+    left: 44px;
+    width: 282px;
+    height: 16px;
+    overflow: hidden;
+    font-family: HabboAirUbuntu, UbuntuRegular, Ubuntu, sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.octane-navigator-air__row-door {
+    position: absolute;
+    top: 2px;
+    left: 325px;
+}
+
+.octane-navigator-air__row-group {
+    position: absolute;
+    top: 4px;
+    left: 342px;
+}
+
+.octane-navigator-air__row .octane-navigator-air__room-info {
+    position: absolute;
+    top: 0;
+    left: 359px;
+}
+
+.octane-navigator-air__tile {
+    position: relative;
+    box-sizing: border-box;
+    width: 122px;
+    height: 146px;
+    min-height: 146px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    clip-path: polygon(
+        5px 0,
+        calc(100% - 5px) 0,
+        calc(100% - 5px) 1px,
+        calc(100% - 3px) 1px,
+        calc(100% - 3px) 2px,
+        calc(100% - 2px) 2px,
+        calc(100% - 2px) 3px,
+        calc(100% - 1px) 3px,
+        calc(100% - 1px) 5px,
+        100% 5px,
+        100% calc(100% - 5px),
+        calc(100% - 1px) calc(100% - 5px),
+        calc(100% - 1px) calc(100% - 3px),
+        calc(100% - 2px) calc(100% - 3px),
+        calc(100% - 2px) calc(100% - 2px),
+        calc(100% - 3px) calc(100% - 2px),
+        calc(100% - 3px) calc(100% - 1px),
+        calc(100% - 5px) calc(100% - 1px),
+        calc(100% - 5px) 100%,
+        5px 100%,
+        5px calc(100% - 1px),
+        3px calc(100% - 1px),
+        3px calc(100% - 2px),
+        2px calc(100% - 2px),
+        2px calc(100% - 3px),
+        1px calc(100% - 3px),
+        1px calc(100% - 5px),
+        0 calc(100% - 5px),
+        0 5px,
+        1px 5px,
+        1px 3px,
+        2px 3px,
+        2px 2px,
+        3px 2px,
+        3px 1px,
+        5px 1px
+    );
+    background: #ebe9df;
+    color: #1a1a1a;
+    cursor: pointer;
+    filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.2));
+}
+
+.octane-navigator-air__tile-thumb {
+    position: absolute !important;
+    top: 7px;
+    left: 8px;
+    width: 106px !important;
+    height: 106px !important;
+    border: 1px solid #111 !important;
+    border-radius: 0 !important;
+    background-color: #c4c4bc;
+    background-image: url("@/assets/images/navigator/air/default-room.png");
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.octane-navigator-air__tile-thumb .octane-navigator-air__usercount {
+    position: absolute;
+    top: 85px;
+    left: 31px;
+}
+
+.octane-navigator-air__tile-door {
+    position: absolute;
+    top: 87px;
+    left: 84px;
+}
+
+.octane-navigator-air__tile-badge {
+    position: absolute !important;
+    top: 2px;
+    left: 2px;
+    z-index: 2;
+    background-size: auto !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__tile-thumb,
+.octane-navigator-air__tile-thumb img {
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__tile-name {
+    position: absolute;
+    top: 116px;
+    left: 0;
+    display: flex;
+    width: 100px;
+    height: 30px;
+    padding: 2px 6px 0;
+    font-family: HabboAirUbuntu, UbuntuRegular, Ubuntu, sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 12px;
+}
+
+.octane-navigator-air__tile-name span {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.octane-navigator-air__tile .octane-navigator-air__room-info {
+    position: absolute;
+    top: 4px;
+    left: 98px;
+}
+
+.octane-navigator-air__room-info {
+    width: 18px;
+    height: 18px;
+    background-image: url("@/assets/images/navigator/air/show-room-info.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__door {
+    display: block;
+    width: 13px;
+    height: 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__door--doorbell {
+    background-image: url("@/assets/images/navigator/air/doormode-doorbell.png");
+}
+
+.octane-navigator-air__door--password {
+    background-image: url("@/assets/images/navigator/air/doormode-password.png");
+}
+
+.octane-navigator-air__door--invisible {
+    background-image: url("@/assets/images/navigator/air/doormode-invisible.png");
+}
+
+.octane-navigator-air__group {
+    display: block;
+    width: 13px;
+    height: 11px;
+    background: url("@/assets/images/navigator/air/icon-group.png") center / contain no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__room-bubble {
+    position: fixed;
+    z-index: 1070;
+    box-sizing: border-box;
+    width: 374px;
+    min-height: 220px;
+    max-width: calc(100vw - 16px);
+    padding: 8px 8px 8px 11px;
+    border-style: solid;
+    border-width: 7px;
+    border-image-source: url("@/assets/images/habbo-skin/slices/bubble-7.png");
+    border-image-slice: 7 fill;
+    border-image-width: 7px;
+    border-image-repeat: stretch;
+    background: transparent;
+    color: #111;
+    font-family: HabboAirUbuntu, UbuntuRegular, Ubuntu, sans-serif;
+    font-size: 12px;
+    filter: drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.349));
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__room-bubble::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -11px;
+    width: 11px;
+    height: 18px;
+    margin-top: -9px;
+    background: url("@/assets/images/habbo-skin/slices/bubble-pointer-left.png") center / 11px 18px no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__room-bubble-content {
+    display: flex;
+    width: 345px;
+    max-width: 100%;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.octane-navigator-air__room-popover-header {
+    display: grid;
+    box-sizing: border-box;
+    grid-template-columns: 112px minmax(0, 219px);
+    width: 345px;
+    max-width: 100%;
+    height: 125px;
+    padding: 6px 7px 7px;
+    background: #fff;
+}
+
+.octane-navigator-air__room-popover-thumbnail {
+    position: relative;
+    width: 110px !important;
+    height: 110px !important;
+    border: 1px solid #111 !important;
+    border-radius: 0 !important;
+    background-color: #000;
+    background-image: url("@/assets/images/navigator/air/default-room.png") !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+.octane-navigator-air__room-badge {
+    position: absolute !important;
+    top: 1px;
+    left: 1px;
+    z-index: 2;
+    width: 48px;
+    height: 48px;
+}
+
+.octane-navigator-air__room-popover-copy {
+    min-width: 0;
+    height: 112px;
+    padding: 0 0 0 6px;
+}
+
+.octane-navigator-air__room-popover-title {
+    min-height: 16px;
+    max-height: 33px;
+    overflow: hidden;
+    font-family: HabboAirUbuntu, UbuntuBold, Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+}
+
+.octane-navigator-air__room-popover-description {
+    max-height: 80px;
+    overflow: hidden;
+    color: #000;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.octane-navigator-air__room-popover-owner-row {
+    display: flex;
+    box-sizing: border-box;
+    width: 344px;
+    max-width: 100%;
+    height: 30px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 5px 0;
+}
+
+.octane-navigator-air__room-owner,
+.octane-navigator-air__room-group {
+    display: inline-flex;
+    max-width: 170px;
+    align-items: center;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    color: #111;
+    cursor: pointer;
+    font-family: HabboAirUbuntu, UbuntuBold, Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.octane-navigator-air__room-popover-details {
+    display: grid;
+    grid-template-columns: 166px 170px;
+    width: 344px;
+    max-width: 100%;
+    min-height: 80px;
+}
+
+.octane-navigator-air__room-popover-properties {
+    display: grid;
+    /* The value takes the rest of the 166 px column, and a row grows when a long value ("Niet toegestaan") wraps
+       instead of running into the next row. */
+    grid-template-columns: 70px minmax(0, 1fr);
+    grid-auto-rows: minmax(20px, auto);
+    align-content: start;
+    font-size: 12px;
+}
+
+.octane-navigator-air__room-popover-properties > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.octane-navigator-air__room-popover-properties .is-label {
+    font-weight: 700;
+}
+
+.octane-navigator-air__room-popover-actions {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    padding-left: 12px;
+}
+
+.octane-navigator-air__room-popover-actions button {
+    display: flex;
+    width: 170px;
+    height: 20px;
+    align-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #111;
+    cursor: pointer;
+    font-size: 12px;
+    text-align: left;
+}
+
+.octane-navigator-air__room-popover-actions button > i {
+    display: block;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__room-popover-actions .icon-navigator-favorite-room {
+    background-image: url("@/assets/images/navigator/air/icon-fav-no.png");
+}
+
+.octane-navigator-air__room-popover-actions .icon-navigator-favorite-room.active {
+    background-image: url("@/assets/images/navigator/air/icon-fav-yes.png");
+}
+
+.octane-navigator-air__room-popover-actions .icon-navigator-my-room {
+    background-image: url("@/assets/images/navigator/air/icon-home-no.png");
+}
+
+.octane-navigator-air__room-popover-actions .icon-navigator-my-room.active {
+    background-image: url("@/assets/images/navigator/air/icon-home-yes.png");
+}
+
+.octane-navigator-air__room-popover-actions .icon-navigator-room-settings {
+    background-image: url("@/assets/images/navigator/air/room-settings.png");
+}
+
+.octane-navigator-air__room-popover-actions .icon-navigator-room-report {
+    background-image: url("@/assets/images/navigator/air/report-room.png");
+}
+
+.octane-navigator-air__room-popover-actions button:hover span,
+.octane-navigator-air__room-popover-actions button:focus-visible span {
+    text-decoration: underline;
+}
+
+.octane-navigator-air__room-popover-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+/* tag layout: tag_region #f1a700 with tag_text u_small (10 px) white. */
+.octane-navigator-air__tag {
+    border: 0;
+    padding: 2px 3px;
+    border-radius: 2px;
+    background: #f1a700;
+    color: #fff;
+    cursor: pointer;
+    font-size: 10px;
+    line-height: 15px;
+    text-decoration: none;
+}
+
+.octane-navigator-air__room-popover-event {
+    display: grid;
+    box-sizing: border-box;
+    grid-template-columns: 48px minmax(0, 1fr);
+    width: 331px;
+    max-width: 100%;
+    min-height: 55px;
+    overflow: hidden;
+    border: 1px solid #123f53;
+    background: rgba(15, 26, 112, 0.7);
+    color: #fff;
+}
+
+.octane-navigator-air__room-popover-event-icon {
+    width: 38px;
+    height: 38px;
+    align-self: center;
+    justify-self: center;
+    background: url("@/assets/images/navigator/air/event-icon.png") center / contain no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__room-popover-event-copy {
+    min-width: 0;
+    padding: 3px 2px 2px 0;
+}
+
+.octane-navigator-air__room-popover-event-name,
+.octane-navigator-air__room-popover-event-description {
+    display: block;
+    overflow: hidden;
+    color: #fff;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.octane-navigator-air__room-popover-event-name {
+    height: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.octane-navigator-air__room-popover-event-description {
+    max-height: 36px;
+}
+
+.octane-navigator-air__actions {
+    position: relative;
+    box-sizing: border-box;
+    flex: 0 0 60px;
+    width: 394px;
+    min-width: 394px;
+    max-width: 394px;
+    height: 60px;
+    min-height: 60px;
+    margin: 20px 0 0;
+    padding: 0;
+    overflow: visible;
+}
+
+.octane-navigator-air__action {
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    width: 189px;
+    min-width: 189px;
+    max-width: 189px;
+    height: 60px;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: HabboAirUbuntu, UbuntuBold, Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__action--create {
+    left: 0;
+}
+
+.octane-navigator-air__action--random,
+.octane-navigator-air__action--promote {
+    left: 205px;
+}
+
+.octane-navigator-air__action-content {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    z-index: 1;
+    width: 185px;
+    height: 56px;
+    overflow: hidden;
+}
+
+.octane-navigator-air__action img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: block;
+    width: 187px;
+    max-width: none;
+    height: 59px;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__action span {
+    position: absolute;
+    top: 22px;
+    left: 60px;
+    z-index: 2;
+    width: 125px;
+    height: 17px;
+    overflow: hidden;
+    color: #ffffff !important;
+    font-family: HabboAirUbuntu, UbuntuBold, Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 17px;
+    text-align: center;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.247);
+    pointer-events: none;
+}
+
+.octane-navigator-air__action-border {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    box-sizing: border-box;
+    pointer-events: none;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 6px;
+    border-radius: 0;
+    border-image-source: url("@/assets/images/habbo-skin/slices/border-4.png");
+    border-image-slice: 6 fill;
+    border-image-width: 6px;
+    border-image-repeat: stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-navigator-air__action--random .octane-navigator-air__action-border,
+.octane-navigator-air__action--promote .octane-navigator-air__action-border {
+    border-width: 5px;
+    border-image-source: url("@/assets/images/habbo-skin/slices/border-5.png");
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+}
+
+.octane-navigator-air__action:focus-visible,
+.octane-navigator-air__icon-button:focus-visible,
+.octane-navigator-air__quick-toggle:focus-visible,
+.saved-search-row button:focus-visible {
+    outline: 2px solid #ffd95a;
+    outline-offset: 1px;
+}
+
+.octane-room-creator-air {
+    position: relative;
+    box-sizing: border-box;
+    width: 585px;
+    min-width: 585px;
+    max-width: 585px;
+    height: 367px;
+    min-height: 367px;
+    max-height: 367px;
+    overflow: visible;
+    zoom: min(1, calc((100vw - 16px) / 585px), calc((100dvh - 70px - env(safe-area-inset-bottom, 0px)) / 367px));
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    filter: drop-shadow(2.828px 2.828px 4px rgba(0, 0, 0, 0.349));
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+    -webkit-font-smoothing: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air button,
+.octane-room-creator-air input,
+.octane-room-creator-air textarea {
+    appearance: none;
+    font-family: inherit;
+    -webkit-appearance: none;
+}
+
+.octane-room-creator-air button::before,
+.octane-room-creator-air button::after {
+    content: none !important;
+    display: none !important;
+}
+
+.octane-room-creator-air__skin {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-width: 33px 10px 10px !important;
+    border-radius: 0 !important;
+    border-image-source: url("@/assets/images/habbo-skin/slices/frame-ubuntu-3.png") !important;
+    border-image-slice: 33 10 10 10 fill !important;
+    border-image-width: 33px 10px 10px 10px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    image-rendering: pixelated;
+}
+
+.octane-room-creator-air__skin::before {
+    content: "";
+    position: absolute;
+    inset: -27px -7px auto;
+    height: 27px;
+    background:
+        linear-gradient(#367997, #367997) 0 0 / 100% 26px no-repeat,
+        linear-gradient(#030f18, #030f18) 0 26px / 100% 1px no-repeat;
+}
+
+.octane-room-creator-air__skin::after {
+    content: "";
+    position: absolute;
+    inset: -1px -7px -6px;
+    background:
+        linear-gradient(#030f18, #030f18) 0 0 / 100% 1px no-repeat,
+        linear-gradient(var(--navigator-air-surface, #e9e9e1), var(--navigator-air-surface, #e9e9e1)) 0 1px / 100% calc(100% - 1px) no-repeat;
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        100% calc(100% - 3px),
+        calc(100% - 1px) calc(100% - 3px),
+        calc(100% - 1px) calc(100% - 1px),
+        calc(100% - 3px) calc(100% - 1px),
+        calc(100% - 3px) 100%,
+        3px 100%,
+        3px calc(100% - 1px),
+        1px calc(100% - 1px),
+        1px calc(100% - 3px),
+        0 calc(100% - 3px)
+    );
+}
+
+.octane-room-creator-air__caption {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    left: 6px;
+    z-index: 4;
+    height: 27px;
+}
+
+.octane-room-creator-air__title {
+    display: block;
+    overflow: hidden;
+    color: #ffffff;
+    font-family: HabboAirUbuntu, UbuntuBold, Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    pointer-events: none;
+    padding: 3px 28px 0 8px;
+    -webkit-font-smoothing: antialiased;
+}
+
+.octane-room-creator-air__close {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    z-index: 5;
+    width: 19px !important;
+    height: 20px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: url("@/assets/images/habbo-skin/slices/close-3-default.png") 0 0 / 19px 20px no-repeat !important;
+    box-shadow: none !important;
+    filter: none !important;
+    transform: none !important;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__close:hover {
+    background-image: url("@/assets/images/habbo-skin/slices/close-3-hover.png") !important;
+}
+
+.octane-room-creator-air__close:active {
+    background-image: url("@/assets/images/habbo-skin/slices/close-3-pressed.png") !important;
+}
+
+.octane-room-creator-air__label {
+    position: absolute;
+    z-index: 2;
+    height: 13px;
+    color: #000000;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 13px;
+    white-space: nowrap;
+}
+
+.octane-room-creator-air__label--name {
+    top: 40px;
+    left: 16px;
+}
+
+.octane-room-creator-air__label--desc {
+    top: 90px;
+    left: 16px;
+}
+
+.octane-room-creator-air__label--category {
+    top: 180px;
+    left: 16px;
+}
+
+.octane-room-creator-air__label--visitors {
+    top: 230px;
+    left: 16px;
+}
+
+.octane-room-creator-air__label--trade {
+    top: 280px;
+    left: 16px;
+}
+
+.octane-room-creator-air__label--layout {
+    top: 40px;
+    left: 276px;
+}
+
+.octane-room-creator-air__field {
+    position: absolute;
+    z-index: 2;
+    box-sizing: border-box;
+    left: 16px;
+    width: 240px;
+    overflow: hidden;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-width: 0 !important;
+    border-radius: 0 !important;
+    border-image-source: url("@/assets/images/habbo-skin/slices/border-4.png") !important;
+    border-image-slice: 6 fill !important;
+    border-image-width: 6px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__field--name {
+    top: 60px;
+    height: 19px;
+}
+
+.octane-room-creator-air__field--desc {
+    top: 110px;
+    height: 60px;
+}
+
+.octane-room-creator-air__field.is-invalid .octane-room-creator-air__input {
+    background: #f18f9b !important;
+}
+
+.octane-room-creator-air__input {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 3px 5px;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000000;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+    outline: 0;
+    resize: none;
+    -webkit-font-smoothing: none;
+}
+
+.octane-room-creator-air__input--multiline {
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.octane-room-creator-air__error {
+    position: absolute;
+    top: 30px;
+    left: 136px;
+    z-index: 7;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.octane-room-creator-air__error-border {
+    box-sizing: border-box;
+    height: 23px;
+    padding: 4px 8px 0;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 6px;
+    border-image-source: url("@/assets/images/habbo-skin/slices/border-white.png");
+    border-image-slice: 6 fill;
+    border-image-width: 6px;
+    border-image-repeat: stretch;
+    color: #000000;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+    white-space: nowrap;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__error-arrow {
+    display: block;
+    width: 11px;
+    height: 11px;
+    margin: -1px auto 0;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__dropmenu {
+    position: absolute;
+    z-index: 3;
+    left: 16px;
+    width: 240px;
+    height: 21px;
+}
+
+.octane-room-creator-air__dropmenu.is-open {
+    z-index: 8;
+}
+
+.octane-room-creator-air__dropmenu--category {
+    top: 200px;
+}
+
+.octane-room-creator-air__dropmenu--visitors {
+    top: 250px;
+}
+
+.octane-room-creator-air__dropmenu--trade {
+    top: 300px;
+}
+
+.octane-room-creator-air__dropmenu-button {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    width: 240px;
+    height: 21px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px 0 10px;
+    overflow: hidden;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-width: 0 !important;
+    border-radius: 0 !important;
+    border-image-source: url("@/assets/images/habbo-skin/slices/dropmenu-default.png") !important;
+    border-image-slice: 3 fill !important;
+    border-image-width: 3px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000000;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+    text-align: left;
+    white-space: nowrap;
+    appearance: none;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__dropmenu-button span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.octane-room-creator-air__dropmenu-button img {
+    position: absolute;
+    top: 2px;
+    right: 5px;
+    flex: none;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.octane-room-creator-air__dropmenu-list {
+    position: relative;
+    box-sizing: border-box;
+    width: 240px;
+    max-height: 160px;
+    margin: 0;
+    padding: 2px 0;
+    overflow-y: auto;
+    list-style: none;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-width: 6px !important;
+    border-image-source: url("@/assets/images/habbo-skin/slices/dropmenu-3.png") !important;
+    border-image-slice: 6 fill !important;
+    border-image-width: 6px !important;
+    border-image-repeat: stretch !important;
+    background: transparent;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__dropmenu-list button,
+.octane-room-creator-air__dropmenu-option {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 16px;
+    padding: 0 6px;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000000;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 16px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.octane-room-creator-air__dropmenu-list button:hover,
+.octane-room-creator-air__dropmenu-list button.is-selected,
+.octane-room-creator-air__dropmenu-option[data-highlighted],
+.octane-room-creator-air__dropmenu-option[data-selected] {
+    background: #d6eeff !important;
+}
+
+.octane-room-creator-air__button {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 330px;
+    z-index: 2;
+    box-sizing: border-box;
+    width: 100px;
+    height: 21px;
+    padding: 0;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-radius: 0 !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000000;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 13px;
+    text-align: center;
+    text-shadow: none !important;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__button--create {
+    left: 16px;
+    border-width: 4px !important;
+    border-image-source: url("@/assets/images/habbo-skin/slices/button-thick-default.png") !important;
+    border-image-slice: 4 fill !important;
+    border-image-width: 4px !important;
+}
+
+.octane-room-creator-air__button--create:hover {
+    border-image-source: url("@/assets/images/habbo-skin/slices/button-thick-hover.png") !important;
+}
+
+.octane-room-creator-air__button--create:active {
+    border-image-source: url("@/assets/images/habbo-skin/slices/button-thick-pressed.png") !important;
+}
+
+.octane-room-creator-air__button--cancel {
+    left: 156px;
+    border-width: 3px !important;
+    border-image-source: url("@/assets/images/habbo-skin/slices/button-default.png") !important;
+    border-image-slice: 3 fill !important;
+    border-image-width: 3px !important;
+    /* back_button: a style 0 `button`, text_style button_regular (Volter 9, not bold). */
+    font-weight: 400;
+}
+
+.octane-room-creator-air__button--cancel:hover {
+    border-image-source: url("@/assets/images/habbo-skin/slices/button-hover.png") !important;
+}
+
+.octane-room-creator-air__button--cancel:active {
+    border-image-source: url("@/assets/images/habbo-skin/slices/button-pressed.png") !important;
+}
+
+.octane-room-creator-air__layouts {
+    position: absolute;
+    top: 60px;
+    left: 276px;
+    z-index: 2;
+    box-sizing: border-box;
+    width: 295px;
+    height: 295px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 0;
+    border-image-source: url("@/assets/images/habbo-skin/slices/border-white.png");
+    border-image-slice: 6 fill;
+    border-image-width: 6px;
+    border-image-repeat: stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__layout-rows {
+    display: flex;
+    width: 274px;
+    flex-wrap: wrap;
+}
+
+.octane-room-creator-air__thumbnail {
+    position: relative;
+    box-sizing: border-box;
+    width: 137px;
+    height: 99px;
+    flex: 0 0 137px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-room-creator-air__thumbnail-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    box-sizing: border-box;
+    width: 135px;
+    height: 96px;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 6px;
+    border-image-source: url("@/assets/images/habbo-skin/slices/border-white-cccccc.png");
+    border-image-slice: 6 fill;
+    border-image-width: 6px;
+    border-image-repeat: stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__thumbnail.is-selected .octane-room-creator-air__thumbnail-bg {
+    border-image-source: url("@/assets/images/habbo-skin/slices/border-white-6f8285.png");
+}
+
+.octane-room-creator-air__thumbnail-pic {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: 135px;
+    height: 96px;
+    object-fit: none;
+    object-position: center;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__thumbnail-tile-icon {
+    position: absolute;
+    top: 80px;
+    left: 5px;
+    z-index: 2;
+    width: 18px;
+    height: 10px;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__thumbnail-tiles {
+    position: absolute;
+    top: 78px;
+    left: 25px;
+    z-index: 2;
+    height: 13px;
+    padding: 0 2px;
+    background: #cbcbcb;
+    color: #000000;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 13px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.octane-room-creator-air__thumbnail.is-selected .octane-room-creator-air__thumbnail-tiles {
+    background: #6e8184;
+    color: #ffffff;
+}
+
+.octane-room-creator-air__thumbnail-club {
+    position: absolute;
+    top: 5px;
+    left: 109px;
+    z-index: 3;
+    width: 19px;
+    height: 10px;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__vip-promo {
+    position: relative;
+    box-sizing: border-box;
+    width: 272px;
+    height: 52px;
+    flex: 0 0 272px;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 6px;
+    border-image-source: url("@/assets/images/habbo-skin/slices/border-colorless-d48612.png");
+    border-image-slice: 6 fill;
+    border-image-width: 6px;
+    border-image-repeat: stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__vip-promo-icon {
+    position: absolute;
+    top: 3px;
+    left: 5px;
+    width: 37px;
+    height: 37px;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-creator-air__vip-promo-text {
+    position: absolute;
+    top: 0;
+    left: 46px;
+    width: 206px;
+    height: 25px;
+    overflow: hidden;
+    color: #ffffff;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+}
+
+.octane-room-creator-air__vip-promo-link {
+    position: absolute;
+    top: 24px;
+    left: 46px;
+    width: 206px;
+    height: 12px;
+    padding: 0;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #ffffff;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+    text-align: left;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-room-creator-air__button:focus-visible,
+.octane-room-creator-air__close:focus-visible,
+.octane-room-creator-air__thumbnail:focus-visible,
+.octane-room-creator-air__dropmenu-button:focus-visible {
+    outline: 2px solid #ffd95a;
+    outline-offset: 1px;
+}
+
+.octane-navigator-air__link-field {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.octane-navigator-air__link-field input {
+    min-height: 28px;
+}
+
+.octane-navigator-air__door-state {
+    gap: 10px;
+}
+
+/*
+ * doorbell / passwd_input: room_name 12 px bold, info and labels 12 px regular, all black regular Ubuntu; ring /
+ * try are the grey `button` (style 3, habbo_skin_button_shiny) with button_shiny_regular 12 px black text. AIR's
+ * cancel is an underlined 12 px link; here it stays a button, in the same grey.
+ */
+.octane-navigator-doorbell .octane-navigator-air__door-state {
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+@layer base {
+    .octane-navigator-doorbell .octane-navigator-air__door-state :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    .octane-navigator-doorbell .octane-navigator-air__door-state .habbo-btn-secondary {
+        min-height: 28px !important;
+        border-width: 5px !important;
+        border-image-source: var(--habbo-skin-shiny) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        color: #000000 !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+    }
+
+    .octane-navigator-doorbell .octane-navigator-air__door-state .habbo-btn-secondary:hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    .octane-navigator-doorbell .octane-navigator-air__door-state .habbo-btn-secondary:active {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+
+    .octane-navigator-doorbell .octane-navigator-air__door-state .habbo-btn-secondary:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-disabled) !important;
+        color: #777777 !important;
+    }
+}
+
+/*
+ * enforce_category ok (132 x 32) and the room link's copy button: AIR's grey `button` (style 3,
+ * habbo_skin_button_shiny) with button_shiny_regular 12 px black text, not the flat button_default picture the
+ * shared .habbo-btn-secondary draws (an unlayered important rule only a layered important rule outranks).
+ */
+@layer base {
+    :is(.octane-navigator-enforce-category, .octane-room-link) .octane-card-content-shell .habbo-btn-secondary {
+        border-width: 5px !important;
+        border-image-source: var(--habbo-skin-shiny) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        color: #000000 !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+    }
+
+    .octane-navigator-enforce-category .octane-card-content-shell .habbo-btn-secondary {
+        min-height: 32px !important;
+    }
+
+    :is(.octane-navigator-enforce-category, .octane-room-link) .octane-card-content-shell .habbo-btn-secondary:hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    :is(.octane-navigator-enforce-category, .octane-room-link) .octane-card-content-shell .habbo-btn-secondary:active {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+
+    :is(.octane-navigator-enforce-category, .octane-room-link) .octane-card-content-shell .habbo-btn-secondary:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-disabled) !important;
+        color: #777777 !important;
+    }
+}
+
+.octane-navigator-search-save {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.octane-navigator-search-save img {
+    width: 18px;
+    height: 18px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+
+
+.octane-navigator-air__help {
+    right: 24px;
+    background-image: url("@/assets/images/habbo-skin/slices/help-3-default.png") !important;
+}
+
+.octane-navigator-air__help:hover {
+    background-image: url("@/assets/images/habbo-skin/slices/help-3-hover.png") !important;
+}
+
+.octane-navigator-air__help:active {
+    background-image: url("@/assets/images/habbo-skin/slices/help-3-pressed.png") !important;
+}
+
+.octane-navigator-air__resize {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 4;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    background: url("@/assets/images/habbo-skin/slices/scaler-3.png") no-repeat;
+    cursor: ns-resize;
+    touch-action: none;
+}
+
+.octane-navigator-air__category.is-collapsed .octane-navigator-air__category-header,
+.octane-navigator-air__category.is-collapsed .octane-navigator-air__category-toggle {
+    height: 26px;
+    min-height: 26px;
+}
+
+.octane-navigator-air__category.is-collapsed .octane-navigator-air__category-toggle img {
+    top: 4px;
+}
+
+.octane-navigator-air__tab-label {
+    display: inline-block;
+    width: max-content;
+    font-family: HabboAirUbuntu, UbuntuRegular, Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+/* Lifted rooms (AIR LiftDataContainer): promoted teasers above the hotel view results, one per page. */
+.octane-navigator-lifted {
+    box-sizing: border-box;
+    width: 396px;
+    margin: 0 0 6px 2px;
+}
+
+.octane-navigator-lifted__track {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+}
+
+.octane-navigator-lifted__room {
+    position: relative;
+    flex: 0 0 100%;
+    display: block;
+    padding: 0;
+    border: 1px solid #000000;
+    border-radius: 3px;
+    background: #2b2b2b;
+    cursor: pointer;
+    overflow: hidden;
+    scroll-snap-align: start;
+}
+
+.octane-navigator-lifted__room:focus-visible {
+    outline: 2px solid #7ecaee;
+    outline-offset: -2px;
+}
+
+.octane-navigator-lifted__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 60px;
+    object-fit: cover;
+}
+
+.octane-navigator-lifted__caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 3px 6px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    font-family: HabboAirUbuntu, UbuntuBold, Ubuntu, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

@@ -1,80 +1,34 @@
-import { GetSessionDataManager, RoomDataParser } from '@nitrots/nitro-renderer';
-import React, { FC, MouseEvent, useEffect } from 'react';
-import { FaUser } from 'react-icons/fa';
+import { GetSessionDataManager, RoomDataParser } from '@octane/renderer';
+import { FC, KeyboardEvent, MouseEvent } from 'react';
 import { CreateRoomSession, DoorStateType, TryVisitRoom } from '../../../../api';
-import { Column, Flex, LayoutBadgeImageView, LayoutGridItemProps, LayoutRoomThumbnailView, Text } from '../../../../common';
-import { useDoorState } from '../../../../hooks';
+import { LayoutBadgeImageView, LayoutRoomThumbnailView } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { useDoorState, useNavigatorRoomInfoPopupStore } from '../../../../hooks';
 import { NavigatorSearchResultItemInfoView } from './NavigatorSearchResultItemInfoView';
+import { NavigatorUserCountView } from './NavigatorUserCountView';
 
-export interface NavigatorSearchResultItemViewProps extends LayoutGridItemProps {
+export interface NavigatorSearchResultItemViewProps {
     roomData: RoomDataParser;
     thumbnail?: boolean;
-    selectedRoomId?: number | null;
-    setSelectedRoomId?: React.Dispatch<React.SetStateAction<number | null>>;
-    isPopoverActive?: boolean;
-    setIsPopoverActive?: React.Dispatch<React.SetStateAction<boolean>>;
+    eventTitle?: boolean;
+    stripe?: boolean;
 }
 
 export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProps> = (props) => {
-    const { roomData = null, children = null, thumbnail = false, selectedRoomId, setSelectedRoomId, isPopoverActive, setIsPopoverActive, ...rest } = props;
+    const { roomData = null, thumbnail = false, eventTitle = false, stripe = false } = props;
     const { setSnapshot: setDoorData } = useDoorState();
+    const title = eventTitle && roomData.roomAdName ? roomData.roomAdName : roomData.roomName;
 
-    const handleMouseEnter = () => {
-        if (isPopoverActive && setSelectedRoomId) setSelectedRoomId(roomData.roomId);
-    };
+    const doorClass = () => {
+        if (roomData.doorMode === RoomDataParser.DOORBELL_STATE) return 'octane-navigator-air__door octane-navigator-air__door--doorbell';
+        if (roomData.doorMode === RoomDataParser.PASSWORD_STATE) return 'octane-navigator-air__door octane-navigator-air__door--password';
+        if (roomData.doorMode === RoomDataParser.INVISIBLE_STATE) return 'octane-navigator-air__door octane-navigator-air__door--invisible';
 
-    const handleMouseLeave = () => {
-        if (setSelectedRoomId && setIsPopoverActive) {
-            setSelectedRoomId(null);
-            setIsPopoverActive(false);
-        }
-    };
-
-    const handleInfoClick = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (setIsPopoverActive && setSelectedRoomId) {
-            if (!isPopoverActive) {
-                setSelectedRoomId(roomData.roomId);
-                setIsPopoverActive(true);
-            } else if (selectedRoomId === roomData.roomId) {
-                setSelectedRoomId(null);
-                setIsPopoverActive(false);
-            } else {
-                setSelectedRoomId(roomData.roomId);
-            }
-        }
-    };
-
-    useEffect(() => {
-        const handleClickOutside = (event: Event) => {
-            const target = event.target as HTMLElement;
-            const navigatorItem = target.closest('.navigator-item');
-
-            if (!navigatorItem && setIsPopoverActive && setSelectedRoomId) {
-                setIsPopoverActive(false);
-                setSelectedRoomId(null);
-            }
-        };
-
-        document.addEventListener('click', handleClickOutside);
-        return () => document.removeEventListener('click', handleClickOutside);
-    }, [setIsPopoverActive, setSelectedRoomId]);
-
-    const getUserCounterColor = () => {
-        if (roomData.maxUserCount <= 0) return roomData.userCount > 0 ? 'bg-success' : 'bg-primary';
-
-        const num: number = 100 * (roomData.userCount / roomData.maxUserCount);
-
-        if (num >= 92) return 'bg-danger';
-        if (num >= 50) return 'bg-warning';
-        if (num > 0) return 'bg-success';
-
-        return 'bg-primary';
+        return '';
     };
 
     const visitRoom = (event: MouseEvent) => {
+        event.stopPropagation();
         if (roomData.ownerId !== GetSessionDataManager().userId) {
             if (roomData.habboGroupId !== 0) {
                 TryVisitRoom(roomData.roomId);
@@ -104,120 +58,63 @@ export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProp
         CreateRoomSession(roomData.roomId);
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+        // The info button inside the row has its own keys; only the row itself visits the room.
+        if (event.target !== event.currentTarget) return;
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+
+        event.preventDefault();
+        visitRoom(event as unknown as MouseEvent);
+    };
+
+    const retargetPopup = (event: MouseEvent<HTMLElement>) => {
+        useNavigatorRoomInfoPopupStore.getState().retargetIfVisible(roomData, thumbnail ? 'tile' : 'row', event.currentTarget.getBoundingClientRect());
+    };
+
     if (thumbnail)
         return (
-            <Column
-                pointer
-                overflow="hidden"
-                alignItems="center"
-                className="navigator-item nitro-card-row p-1 small mb-1 flex-col"
-                gap={0}
-                onClick={visitRoom}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-                {...rest}
-            >
-                <LayoutRoomThumbnailView
-                    className="flex flex-col items-center justify-end mb-1"
-                    customUrl={roomData.officialRoomPicRef}
-                    roomId={roomData.roomId}
+            <NativeTextTree>
+                <div
+                    role="button"
+                    tabIndex={0}
+                    aria-label={title}
+                    className={`octane-navigator-air__tile${stripe ? ' is-stripe' : ''}`}
+                    onClick={visitRoom}
+                    onKeyDown={handleKeyDown}
+                    onMouseEnter={retargetPopup}
                 >
-                    {roomData.habboGroupId > 0 && (
-                        <LayoutBadgeImageView badgeCode={roomData.groupBadgeCode} className="absolute top-0 inset-s-0 m-1" isGroup={true} />
-                    )}
-                    <Flex
-                        center
-                        className={
-                            'inline-block px-[.65em] py-[.35em] text-[.75em] font-bold leading-none text-white text-center whitespace-nowrap align-baseline rounded-[.25rem] p-1 absolute m-1 ' +
-                            getUserCounterColor()
-                        }
-                        gap={1}
-                    >
-                        <FaUser className="fa-icon" />
-                        {roomData.userCount}
-                    </Flex>
-                    {roomData.doorMode !== RoomDataParser.OPEN_STATE && (
-                        <i
-                            className={
-                                'absolute inset-e-0 mb-1 me-1 icon icon-navigator-room-' +
-                                (roomData.doorMode === RoomDataParser.DOORBELL_STATE
-                                    ? 'locked'
-                                    : roomData.doorMode === RoomDataParser.PASSWORD_STATE
-                                      ? 'password'
-                                      : roomData.doorMode === RoomDataParser.INVISIBLE_STATE
-                                        ? 'invisible'
-                                        : '')
-                            }
-                        />
-                    )}
-                </LayoutRoomThumbnailView>
-                <Flex className="w-full">
-                    <Text truncate className="grow!">
-                        {roomData.roomName}
-                    </Text>
-                    <Flex reverse alignItems="center" gap={1}>
-                        <NavigatorSearchResultItemInfoView
-                            isVisible={selectedRoomId === roomData.roomId}
-                            onToggle={handleInfoClick}
-                            setIsPopoverActive={setIsPopoverActive}
-                            roomData={roomData}
-                        />
-                    </Flex>
-                    {children}
-                </Flex>
-            </Column>
+                    <LayoutRoomThumbnailView className="octane-navigator-air__tile-thumb" customUrl={roomData.officialRoomPicRef} roomId={roomData.roomId}>
+                        {roomData.habboGroupId > 0 && (
+                            <LayoutBadgeImageView badgeCode={roomData.groupBadgeCode} className="octane-navigator-air__tile-badge" isGroup={true} />
+                        )}
+                        <NavigatorUserCountView userCount={roomData.userCount} maxUserCount={roomData.maxUserCount} />
+                        {roomData.doorMode !== RoomDataParser.OPEN_STATE && <i className={`octane-navigator-air__tile-door ${doorClass()}`} />}
+                    </LayoutRoomThumbnailView>
+                    <div className="octane-navigator-air__tile-name">
+                        <span>{title}</span>
+                        <NavigatorSearchResultItemInfoView roomData={roomData} thumbnail={true} />
+                    </div>
+                </div>
+            </NativeTextTree>
         );
 
     return (
-        <Flex
-            pointer
-            alignItems="center"
-            className="navigator-item px-2 py-1 small"
-            gap={2}
-            overflow="hidden"
-            onClick={visitRoom}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            {...rest}
-        >
-            <Flex
-                center
-                className={
-                    'inline-block px-[.65em] py-[.35em] text-[.75em] font-bold leading-none text-white text-center whitespace-nowrap align-baseline rounded-[.25rem] p-1 ' +
-                    getUserCounterColor()
-                }
-                gap={1}
+        <NativeTextTree>
+            <div
+                role="button"
+                tabIndex={0}
+                aria-label={title}
+                className={`octane-navigator-air__row${stripe ? ' is-stripe' : ''}`}
+                onClick={visitRoom}
+                onKeyDown={handleKeyDown}
+                onMouseEnter={retargetPopup}
             >
-                <FaUser className="fa-icon" />
-                {roomData.userCount}
-            </Flex>
-            <Text grow truncate className="min-w-0">
-                {roomData.roomName}
-            </Text>
-            <Flex reverse alignItems="center" gap={1} className="shrink-0">
-                <NavigatorSearchResultItemInfoView
-                    isVisible={selectedRoomId === roomData.roomId && isPopoverActive}
-                    onToggle={handleInfoClick}
-                    setIsPopoverActive={setIsPopoverActive}
-                    roomData={roomData}
-                />
-                {roomData.habboGroupId > 0 && <i className="nitro-icon icon-navigator-room-group" />}
-                {roomData.doorMode !== RoomDataParser.OPEN_STATE && (
-                    <i
-                        className={
-                            'nitro-icon icon-navigator-room-' +
-                            (roomData.doorMode === RoomDataParser.DOORBELL_STATE
-                                ? 'locked'
-                                : roomData.doorMode === RoomDataParser.PASSWORD_STATE
-                                  ? 'password'
-                                  : roomData.doorMode === RoomDataParser.INVISIBLE_STATE
-                                    ? 'invisible'
-                                    : '')
-                        }
-                    />
-                )}
-            </Flex>
-            {children}
-        </Flex>
+                <NavigatorUserCountView userCount={roomData.userCount} maxUserCount={roomData.maxUserCount} />
+                <span className="octane-navigator-air__row-name">{title}</span>
+                {roomData.doorMode !== RoomDataParser.OPEN_STATE && <i className={`octane-navigator-air__row-door ${doorClass()}`} />}
+                {roomData.habboGroupId > 0 && <i className="octane-navigator-air__row-group octane-navigator-air__group" />}
+                <NavigatorSearchResultItemInfoView roomData={roomData} />
+            </div>
+        </NativeTextTree>
     );
 };

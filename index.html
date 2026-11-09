@@ -2,12 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta name="referrer" content="strict-origin" />
+    <!-- Only what holds for every hotel: no plugins (<object>/<embed>) and no <base> that would redirect relative URLs.
+         The full policy depends on the hotel's hosts and belongs in the web server's headers: see
+         docs/secure-production-setup.md, "Content-Security-Policy". -->
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Nitro</title>
+    <title>Octane</title>
     <!-- Connection hints for the two domains the loader hits first.
          dns-prefetch + preconnect halve the TLS round-trips on cold load. -->
+    <!-- Turnstile is fetched by the login screen when the hotel has the check on; see loadTurnstileScript. -->
     <link rel="preconnect" href="https://challenges.cloudflare.com" crossorigin />
-    <script async defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"></script>
 </head>
 <body>
     <div id="root"></div>

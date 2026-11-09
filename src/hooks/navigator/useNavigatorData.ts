@@ -1,8 +1,8 @@
-import { useBetween } from 'use-between';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { useNavigatorStore } from './useNavigatorStore';
 
 export const useNavigatorData = () => {
-    const { categories, eventCategories, topLevelContext, topLevelContexts, navigatorSearches, navigatorData } = useBetween(useNavigatorStore);
+    const { categories, eventCategories, topLevelContext, topLevelContexts, navigatorSearches, navigatorData, liftedRooms } = useSharedHook(useNavigatorStore);
 
     return {
         categories,
@@ -10,6 +10,9 @@ export const useNavigatorData = () => {
         topLevelContext,
         topLevelContexts,
         navigatorSearches,
-        navigatorData
+        navigatorData,
+        liftedRooms
     };
 };
+
+registerSharedHook(useNavigatorStore);

@@ -24,6 +24,11 @@ describe('FloorplanToolbar', () => {
         expect(types).toEqual(['UNSET', 'UP', 'DOWN', 'DOOR']);
     });
 
+    it('can hide the room-entry tool for external floor-plan sessions', () => {
+        const { queryByTestId } = render(<FloorplanToolbar state={initialState} dispatch={() => {}} includeDoor={false} />);
+        expect(queryByTestId('tool-door')).toBeNull();
+    });
+
     it('select-all dispatches SELECT_ALL + APPLY_BRUSH_TO_SELECTION (bulk-apply UX)', () => {
         const dispatch = vi.fn();
         const { getByTestId } = render(<FloorplanToolbar state={initialState} dispatch={dispatch} />);

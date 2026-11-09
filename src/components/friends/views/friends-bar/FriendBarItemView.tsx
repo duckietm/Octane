@@ -1,15 +1,43 @@
-import { FindNewFriendsMessageComposer, MouseEventType } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, FindNewFriendsMessageComposer, MouseEventType } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FC, useEffect, useRef, useState } from 'react';
+import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import { GetUserProfile, LocalizeText, MessengerFriend, OpenMessengerChat, SendMessageComposer } from '../../../../api';
+import { FriendBarNotification } from '../../../../hooks/friends/friendBarNotifications.helpers';
+import { useFriendBarNotificationsStore } from '../../../../hooks/friends/friendBarNotificationsStore';
+import staffChatFrankIcon from '../../../../assets/images/friends/staff-chat-frank.svg';
+import addFriendsIcon from '../../../../assets/images/friends/swf/add_friends_icon.png';
+import chatIcon from '../../../../assets/images/friends/swf/friendlist_chat.png';
+import profileIcon from '../../../../assets/images/friends/swf/friendlist_eye.png';
+import visitIcon from '../../../../assets/images/friends/swf/friendlist_go_room.png';
+import searchFriendsIcon from '../../../../assets/images/friends/swf/search_friends_icon.png';
 import { LayoutAvatarImageView, LayoutBadgeImageView } from '../../../../common';
 import { useFriends } from '../../../../hooks';
+import { isStaffChatIdentity } from '../../staffChatIdentity';
+import { StaffChatFrankIconView } from '../../StaffChatFrankIconView';
+import { BaseButton } from '../../../../common/BaseButton';
+import { FriendBarNotificationIconView, FriendBarNotificationPieceView, isGameNotification } from './FriendBarNotificationViews';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+
+const NO_NOTIFICATIONS: ReadonlyArray<FriendBarNotification> = [];
+/** `message_piece_xml` height: each open notification adds one line above the controls. */
+const PIECE_HEIGHT = 37;
 
 export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
     const { friend = null } = props;
     const [isVisible, setVisible] = useState(false);
     const { followFriend = null } = useFriends();
     const elementRef = useRef<HTMLDivElement>(null);
+    const friendId = friend?.id ?? 0;
+    const notifications = useFriendBarNotificationsStore((state) => state.byFriend[friendId]) ?? NO_NOTIFICATIONS;
+    const dismissViewed = useFriendBarNotificationsStore((state) => state.dismissViewed);
+    const wasVisibleRef = useRef(false);
+
+    // AIR entity deselect: closing the open tab drops the notifications that are shown once.
+    useEffect(() => {
+        if (wasVisibleRef.current && !isVisible && friendId) dismissViewed(friendId);
+
+        wasVisibleRef.current = isVisible;
+    }, [isVisible, friendId, dismissViewed]);
 
     useEffect(() => {
         const onClick = (event: MouseEvent) => {
@@ -25,114 +53,170 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
 
     if (!friend) {
         return (
-            <div ref={elementRef} className="relative">
+            <NativeTextTree>
+                <div ref={elementRef} className={`friend-bar-find-friends ${isVisible ? 'is-selected' : ''}`}>
+                    <BaseButton
+                        type="button"
+                        className="friend-bar-item friend-bar-search find-friends"
+                        aria-expanded={isVisible}
+                        onClick={() => setVisible((prev) => !prev)}
+                    >
+                        <img className="friend-bar-search-icon" src={searchFriendsIcon} alt="" />
+                        <span className="friend-bar-text">{LocalizeText('friend.bar.find.title')}</span>
+                    </BaseButton>
+
+                    <AnimatePresence>
+                        {isVisible && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 6 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 6 }}
+                                transition={{ duration: 0.12 }}
+                                className="friend-bar-find-friends-panel"
+                            >
+                                <div className="friend-bar-find-friends-header">
+                                    <img src={addFriendsIcon} alt="" />
+                                    <span>{LocalizeText('friend.bar.find.title')}</span>
+                                </div>
+                                <div className="friend-bar-find-friends-copy">{LocalizeText('friend.bar.find.text')}</div>
+                                <BaseButton
+                                    className="friend-bar-find-friends-button"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        SendMessageComposer(new FindNewFriendsMessageComposer());
+                                        setVisible(false);
+                                    }}
+                                >
+                                    {LocalizeText('friend.bar.find.button')}
+                                </BaseButton>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </NativeTextTree>
+        );
+    }
+
+    const isStaffChat = isStaffChatIdentity(friend);
+    const pieceStyle = { '--friend-bar-pieces-height': `${notifications.length * PIECE_HEIGHT}px` } as CSSProperties;
+
+    const onNotificationIconClick = (notification: FriendBarNotification) => {
+        if (isGameNotification(notification)) {
+            CreateLinkEvent('games/show');
+            setVisible(false);
+            return;
+        }
+
+        setVisible((prev) => !prev);
+    };
+
+    return (
+        <NativeTextTree>
+            <div
+                ref={elementRef}
+                className={`friend-bar-friend relative ${isVisible ? 'is-selected' : ''} ${notifications.length ? 'has-notifications' : ''}`}
+                style={pieceStyle}
+            >
+                {notifications.length > 0 && (
+                    <div className="friend-bar-notification-icons">
+                        <AnimatePresence initial={false}>
+                            {notifications.map((notification) => (
+                                <FriendBarNotificationIconView key={notification.id} notification={notification} onClick={() => onNotificationIconClick(notification)} />
+                            ))}
+                        </AnimatePresence>
+                    </div>
+                )}
+                {isStaffChat ? (
+                    <div className="friend-bar-item-head avatar staff-chat absolute left-[-3px] bottom-[-2px] z-10 h-[40px] w-[40px] overflow-hidden pointer-events-none">
+                        <StaffChatFrankIconView size={40} className="friend-bar-staff-chat-frank" />
+                    </div>
+                ) : friend.id > 0 ? (
+                    <div className="friend-bar-item-head avatar friend-bar-item-head-avatar absolute left-[-3px] bottom-[-2px] z-10 h-[40px] w-[40px] overflow-hidden pointer-events-none">
+                        <LayoutAvatarImageView
+                            direction={2}
+                            figure={friend.figure}
+                            headOnly={true}
+                            style={{ backgroundPosition: '50% 42%', backgroundSize: '80px auto' }}
+                            className="block h-auto w-auto pointer-events-none"
+                        />
+                    </div>
+                ) : (
+                    <div className="friend-bar-item-head group friend-bar-item-head-group absolute left-[6px] top-1/2 -translate-y-1/2 z-10 flex h-[28px] w-[28px] items-center justify-center pointer-events-none">
+                        <LayoutBadgeImageView badgeCode="ADM" isGroup={false} className="block pointer-events-none drop-shadow-[1px_1px_0_rgba(0,0,0,0.6)]" />
+                    </div>
+                )}
+                {!isStaffChat && friend.id > 0 && (
+                    // AIR new_friend_entity region_profile (33 x 35 over the head): opens the friend's profile.
+                    <BaseButton
+                        type="button"
+                        aria-label={LocalizeText('infostand.profile.link.tooltip')}
+                        className="friend-bar-profile-region"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            GetUserProfile(friend.id);
+                            setVisible(false);
+                        }}
+                    />
+                )}
                 <motion.button
                     type="button"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="relative flex h-[34px] w-[132px] items-center rounded-[7px] border border-[#9fc56f] bg-[#5f7d2f] pl-[34px] pr-[10px] text-left text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_2px_0_rgba(0,0,0,0.25)]"
+                    className={`friend-bar-item friend-bar-tab find-friends-active ${friend.id <= 0 ? 'group' : ''}`}
                     onClick={() => setVisible((prev) => !prev)}
                 >
-                    <div className="absolute left-[6px] top-1/2 h-[24px] w-[24px] -translate-y-1/2 bg-[url('@/assets/images/toolbar/friend-search.png')] bg-contain bg-center bg-no-repeat pointer-events-none" />
-                    <div className="truncate text-[0.83rem]">{LocalizeText('friend.bar.find.title')}</div>
+                    <div className="friend-bar-text">{friend.name}</div>
                 </motion.button>
 
                 <AnimatePresence>
-                    {isVisible && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                            className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 tbme-panel whitespace-nowrap z-[80] flex flex-col items-center gap-2 pointer-events-auto min-w-[170px]"
-                        >
-                            <div className="text-white text-[13px] drop-shadow-[1px_1px_0_#000]">{LocalizeText('friend.bar.find.title')}</div>
-                            <div className="text-white/80 text-xs px-2">{LocalizeText('friend.bar.find.text')}</div>
-                            <button
-                                className="px-3 py-1 bg-black/40 hover:bg-black/60 border border-white/10 rounded-lg text-white text-[11px] transition-colors cursor-pointer mt-1"
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    SendMessageComposer(new FindNewFriendsMessageComposer());
-                                    setVisible(false);
-                                }}
+                        {isVisible && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.12 }}
+                                className="friend-bar-actions friend-bar-item find-friends-active"
                             >
-                                {LocalizeText('friend.bar.find.button')}
-                            </button>
+                            {notifications.length > 0 && (
+                                <div className="friend-bar-notification-pieces">
+                                    {notifications.map((notification) => (
+                                        <FriendBarNotificationPieceView key={notification.id} notification={notification} />
+                                    ))}
+                                </div>
+                            )}
+                            <div className="friend-bar-actions-buttons">
+                                <div
+                                    className="cursor-pointer friend-bar-action-icon"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        OpenMessengerChat(friend.id);
+                                        setVisible(false);
+                                    }}
+                                ><img src={chatIcon} alt="" /></div>
+                                {/* AIR NewFriendEntityTab.select: btn_visit only when the friend allows following. */}
+                                {!isStaffChat && friend.online && friend.followingAllowed && (
+                                    <div
+                                        className="cursor-pointer friend-bar-action-icon"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            followFriend(friend);
+                                            setVisible(false);
+                                        }}
+                                    ><img src={visitIcon} alt="" /></div>
+                                )}
+                                {!isStaffChat && (
+                                    <div
+                                        className="cursor-pointer friend-bar-action-icon"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            GetUserProfile(friend.id);
+                                            setVisible(false);
+                                        }}
+                                    ><img src={profileIcon} alt="" /></div>
+                                )}
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
             </div>
-        );
-    }
-
-    return (
-        <div ref={elementRef} className="relative">
-            {friend.id > 0 ? (
-                <div className="absolute left-[-4px] bottom-[-2px] z-10 h-[66px] w-[34px] overflow-hidden pointer-events-none">
-                    <LayoutAvatarImageView
-                        direction={2}
-                        figure={friend.figure}
-                        headOnly={false}
-                        className="block pointer-events-none drop-shadow-[1px_1px_0_rgba(0,0,0,0.6)]"
-                        style={{ marginLeft: '-28px', marginTop: '-10px' }}
-                    />
-                </div>
-            ) : (
-                <div className="absolute left-[6px] top-1/2 -translate-y-1/2 z-10 flex h-[28px] w-[28px] items-center justify-center pointer-events-none">
-                    <LayoutBadgeImageView badgeCode="ADM" isGroup={false} className="block pointer-events-none drop-shadow-[1px_1px_0_rgba(0,0,0,0.6)]" />
-                </div>
-            )}
-            <motion.button
-                type="button"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="relative flex h-[34px] w-[132px] items-center rounded-[7px] border border-[#9fc56f] bg-[#6f8f39] pl-[44px] pr-[10px] text-left text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_2px_0_rgba(0,0,0,0.25)] overflow-visible"
-                onClick={() => setVisible((prev) => !prev)}
-            >
-                <div className="truncate text-[0.83rem]">{friend.name}</div>
-            </motion.button>
-
-            <AnimatePresence>
-                {isVisible && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                        className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 tbme-panel flex flex-col items-center gap-2 z-[80] pointer-events-auto min-w-[110px]"
-                    >
-                        <div className="text-white font-bold text-[13px] drop-shadow-[1px_1px_0_#000] truncate max-w-[120px] px-1">{friend.name}</div>
-                        <div className="flex justify-center gap-3 px-2">
-                            <div
-                                className="cursor-pointer tbme-icon nitro-friends-spritesheet icon-friendbar-chat hover:-translate-y-1 transition-transform"
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    OpenMessengerChat(friend.id);
-                                    setVisible(false);
-                                }}
-                            />
-                            {friend.online && (
-                                <div
-                                    className="cursor-pointer tbme-icon nitro-friends-spritesheet icon-friendbar-visit hover:-translate-y-1 transition-transform"
-                                    onClick={(event) => {
-                                        event.stopPropagation();
-                                        followFriend(friend);
-                                        setVisible(false);
-                                    }}
-                                />
-                            )}
-                            <div
-                                className="cursor-pointer tbme-icon nitro-friends-spritesheet icon-profile hover:-translate-y-1 transition-transform"
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    GetUserProfile(friend.id);
-                                    setVisible(false);
-                                }}
-                            />
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
+        </NativeTextTree>
     );
 };

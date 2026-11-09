@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { Offer } from '../../../../../api';
 import { LayoutLimitedEditionCompletePlateView } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogData } from '../../../../../hooks';
 
 export const CatalogLimitedItemWidgetView: FC = (props) => {
@@ -9,12 +10,11 @@ export const CatalogLimitedItemWidgetView: FC = (props) => {
     if (!currentOffer || currentOffer.pricingModel !== Offer.PRICING_MODEL_SINGLE || !currentOffer.product.isUniqueLimitedItem) return null;
 
     return (
-        <div className="w-full">
+        <NativeTextTree>
             <LayoutLimitedEditionCompletePlateView
-                className="mx-auto"
                 uniqueLimitedItemsLeft={currentOffer.product.uniqueLimitedItemsLeft}
                 uniqueLimitedSeriesSize={currentOffer.product.uniqueLimitedItemSeriesSize}
             />
-        </div>
+        </NativeTextTree>
     );
 };

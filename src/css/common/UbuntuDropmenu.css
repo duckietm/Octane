@@ -1,0 +1,95 @@
+/*
+ * AIR dropmenu style 3 (habbo_skin_dropmenu_3_xml): dropmenu_frame_3 (6px slices, drawn over the box), the caption at
+ * _DROPLIST_TITLETEXT (6,4) plus the text field's 2px gutter, the 22x20 arrow cell 2px from the right edge, a 2px list
+ * inset and dropmenu_item_3 rows of 23px (a 17px u_regular line inside margins 4/2/4/4).
+ */
+.ubuntu-dropmenu {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+}
+
+.ubuntu-dropmenu__field,
+.ubuntu-dropmenu__list {
+    border: 0 solid transparent;
+    border-image-source: url('../../assets/images/habbo-skin/slices/dropmenu-3-frame.png');
+    border-image-slice: 6 fill;
+    border-image-width: 6px;
+    border-image-repeat: stretch;
+    background: transparent;
+    image-rendering: pixelated;
+}
+
+.ubuntu-dropmenu__field {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 25px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    color: #000;
+    font: 400 12px/14px HabboAirUbuntu, Ubuntu, sans-serif;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ubuntu-dropmenu__field:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.ubuntu-dropmenu__caption {
+    position: absolute;
+    top: 6px;
+    right: 24px;
+    left: 9px;
+    height: 16px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.ubuntu-dropmenu__arrow {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 22px;
+    height: 20px;
+    pointer-events: none;
+}
+
+.ubuntu-dropmenu__list {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 30;
+    margin: 0;
+    padding: 2px;
+    list-style: none;
+}
+
+.ubuntu-dropmenu__item {
+    box-sizing: border-box;
+    height: 23px;
+    padding: 2px 4px 4px 7px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ubuntu-dropmenu__item > span {
+    display: block;
+    overflow: hidden;
+    color: #000;
+    font: 400 12px/17px HabboAirUbuntu, Ubuntu, sans-serif;
+    white-space: nowrap;
+}
+
+.ubuntu-dropmenu__item.is-active {
+    background: #ebebeb;
+}
+
+.ubuntu-dropmenu__item.is-selected,
+.ubuntu-dropmenu__item:active {
+    background: #ddd;
+}

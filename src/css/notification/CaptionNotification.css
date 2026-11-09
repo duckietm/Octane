@@ -1,0 +1,135 @@
+/* Official notification_wired, notification_treasurehunt and notification_nft_opening: a 190 px box
+   with a coloured caption strip over the body. The modifier sets the two colours. */
+.octane-swf-notification-bubble.octane-caption-notification {
+    --caption-body: #355477;
+    --caption-strip: #1e3044;
+
+    display: block;
+    width: 190px;
+    max-width: 190px;
+    min-height: 60px;
+    padding: 0 !important;
+    border: 1px solid #000000;
+    border-radius: 4px !important;
+    background: var(--caption-body) !important;
+    box-shadow: none !important;
+    color: #ffffff;
+    /* The caption (st3, bold) and the description (font_size 11) are regular Ubuntu, not our condensed `Ubuntu`. */
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px !important;
+    line-height: 14px;
+    text-shadow: none;
+    cursor: pointer;
+}
+
+.octane-caption-notification--treasure_hunt {
+    --caption-body: #664e16;
+    --caption-strip: #382b0c;
+}
+
+.octane-caption-notification--nft_opening {
+    --caption-body: #006154;
+    --caption-strip: #012723;
+}
+
+.octane-caption-notification__caption {
+    height: 24px;
+    padding: 4px 7px 0;
+    background: var(--caption-strip);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 17px;
+}
+
+.octane-caption-notification--wired .octane-caption-notification__caption {
+    text-align: center;
+}
+
+.octane-caption-notification__row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 7px 8px 9px;
+}
+
+.octane-caption-notification__icon {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-caption-notification__product {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.octane-caption-notification__rarity {
+    margin-top: 3px;
+    font-weight: 700;
+}
+
+.octane-caption-notification__text {
+    min-width: 0;
+    flex: 1;
+    overflow-wrap: anywhere;
+}
+
+.octane-caption-notification--wired .octane-caption-notification__text {
+    text-align: center;
+}
+
+/* notification_treasurehunt: the 50x50 icon slot (the winner's head) and, without an icon, the
+   treasure_hunt_image key: mysterybox_key_base tinted 0xf0b834 under mysterybox_key_overlay, both
+   rotated 270 degrees. */
+.octane-caption-notification--treasure_hunt .octane-caption-notification__row {
+    gap: 1px;
+    padding: 5px 13px 6px 6px;
+}
+
+.octane-caption-notification--treasure_hunt .octane-caption-notification__icon {
+    width: 50px;
+    height: 50px;
+}
+
+.octane-caption-notification--treasure_hunt .octane-caption-notification__text {
+    min-height: 52px;
+}
+
+.octane-caption-notification__treasure-key {
+    position: relative;
+    flex: none;
+    width: 39px;
+    height: 39px;
+    margin: 3px 8px 0 3px;
+    transform: rotate(-90deg);
+}
+
+.octane-caption-notification__treasure-key-base,
+.octane-caption-notification__treasure-key-overlay {
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-caption-notification__treasure-key-base {
+    background-image: url('../../assets/images/notifications/treasurehunt/mysterybox_key_base.png');
+}
+
+.octane-caption-notification__treasure-key-base::after {
+    position: absolute;
+    inset: 0;
+    background-color: #f0b834;
+    content: '';
+    mix-blend-mode: multiply;
+    mask-image: url('../../assets/images/notifications/treasurehunt/mysterybox_key_base.png');
+    mask-repeat: no-repeat;
+}
+
+.octane-caption-notification__treasure-key-overlay {
+    background-image: url('../../assets/images/notifications/treasurehunt/mysterybox_key_overlay.png');
+}

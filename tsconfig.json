@@ -15,6 +15,10 @@
         "noFallthroughCasesInSwitch": false,
         "module": "ES2022",
         "moduleResolution": "bundler",
+        "types": [
+            "node",
+            "vite/client"
+        ],
         "resolveJsonModule": true,
         "isolatedModules": true,
         "noEmit": true,
@@ -27,21 +31,24 @@
                 "./src/*"
             ],
             "pixi.js": [
-                "../renderer/node_modules/pixi.js",
-                "../Nitro_Render_V3/node_modules/pixi.js"
+                "../Octane-Renderer/node_modules/pixi.js",
+                "../octane-renderer/node_modules/pixi.js",
+                "../renderer/node_modules/pixi.js"
             ],
-            "@nitrots/nitro-renderer": [
-                "../renderer/index.ts",
-                "../Nitro_Render_V3/index.ts"
+            "@octane/renderer": [
+                "../Octane-Renderer/index.ts",
+                "../octane-renderer/index.ts",
+                "../renderer/index.ts"
             ],
-            "@nitrots/*": [
-                "../renderer/packages/*/src/index.ts",
-                "../Nitro_Render_V3/packages/*/src/index.ts"
+            "@octane/*": [
+                "../Octane-Renderer/packages/*/src/index.ts",
+                "../octane-renderer/packages/*/src/index.ts",
+                "../renderer/packages/*/src/index.ts"
             ]
         }
     },
     "include": [
         "src",
-        "node_modules/@nitrots/nitro-renderer/src/**/*.ts"
+        "node_modules/@octane/renderer/src/**/*.ts"
     ]
 }

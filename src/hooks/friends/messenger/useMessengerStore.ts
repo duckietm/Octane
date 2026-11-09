@@ -1,5 +1,5 @@
 import { useReducer, useRef } from 'react';
-import { useBetween } from 'use-between';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { initialMessengerState, messengerReducer } from '../../../api';
 
 const useMessengerStoreState = () =>
@@ -10,4 +10,6 @@ const useMessengerStoreState = () =>
     return { state, dispatch, getState: () => stateRef.current };
 };
 
-export const useMessengerStore = () => useBetween(useMessengerStoreState);
+export const useMessengerStore = () => useSharedHook(useMessengerStoreState);
+
+registerSharedHook(useMessengerStoreState);

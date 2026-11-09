@@ -1,4 +1,4 @@
-import { GetCommunication, IMessageEvent, MessageEvent } from '@nitrots/nitro-renderer';
+import { GetCommunication, IMessageEvent, MessageEvent } from '@octane/renderer';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 /**

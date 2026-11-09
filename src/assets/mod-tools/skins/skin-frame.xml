@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<skin name="default_frame_skin" version="0.0">
+
+	<!-- shared variables -->
+
+	<variables>
+		<variable key="asset" value="habbo_blue_skin_png" type="String" />
+	</variables>
+
+	<!-- the following maps states to layouts and templates -->
+
+	<states>
+		<state name="default" layout="frame" template="default_frame" />
+	</states>
+
+	<!-- templates defines regions in bitmap asset -->
+
+	<templates>
+		<template name="default_frame" asset="$asset">
+			<entities>
+				<entity name="top_left"      type="bitmap"><region><Rectangle x="0"  y="0"  width="13" height="13" /></region></entity>
+				<entity name="top_center"    type="bitmap"><region><Rectangle x="13" y="0"  width="1"  height="13" /></region></entity>
+				<entity name="top_right"     type="bitmap"><region><Rectangle x="14" y="0"  width="13" height="13" /></region></entity>
+				<entity name="center_left"   type="bitmap"><region><Rectangle x="0"  y="13" width="13" height="1"  /></region></entity>
+				<entity name="center_center" type="bitmap"><region><Rectangle x="13" y="13" width="1"  height="1"  /></region></entity>
+				<entity name="center_right"  type="bitmap"><region><Rectangle x="14" y="13" width="13" height="1"  /></region></entity>
+				<entity name="bottom_left"   type="bitmap"><region><Rectangle x="0"  y="14" width="13" height="13" /></region></entity>
+				<entity name="bottom_center" type="bitmap"><region><Rectangle x="13" y="14" width="1"  height="13" /></region></entity>
+				<entity name="bottom_right"  type="bitmap"><region><Rectangle x="14" y="14" width="13" height="13" /></region></entity>
+				<entity name="shine_top_left"      type="bitmap"><region><Rectangle x="59" y="1"  width="7" height="7" /></region></entity>
+				<entity name="shine_top_center"    type="bitmap"><region><Rectangle x="66" y="2"  width="1" height="1" /></region></entity>
+				<entity name="shine_top_right"     type="bitmap"><region><Rectangle x="77" y="1"  width="7" height="7" /></region></entity>
+				<entity name="shine_center_left"   type="bitmap"><region><Rectangle x="60" y="8"  width="1" height="1" /></region></entity>
+				<entity name="shine_center_right"  type="bitmap"><region><Rectangle x="82" y="8"  width="1" height="1" /></region></entity>
+				<entity name="shine_bottom_left"   type="bitmap"><region><Rectangle x="59" y="19" width="7" height="7" /></region></entity>
+				<entity name="shine_bottom_center" type="bitmap"><region><Rectangle x="66" y="24" width="1" height="1" /></region></entity>
+				<entity name="shine_bottom_right"  type="bitmap"><region><Rectangle x="78" y="20" width="6" height="6" /></region></entity>
+			</entities>
+		</template>
+	</templates>
+
+	<!-- markup for layout drawer -->
+
+	<layouts>
+
+		<layout name="null" transparent="true">
+			<entities>
+				<entity name="null" id="0">
+					<region><Rectangle x="0" y="0" width="10" height="10" /></region>
+					<scale horizontal="strech" vertical="strech" />
+				</entity>
+			</entities>
+		</layout>
+
+		<layout name="frame" transparent="true">
+
+			<entities>
+
+				<!-- top line -->
+
+				<entity name="top_left" id="0">
+					<region><Rectangle x="0" y="0" width="13" height="13" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+				<entity name="top_center" id="0">
+					<region><Rectangle x="13"  y="0" width="1" height="13" /></region>
+					<scale horizontal="strech" vertical="fixed" />
+				</entity>
+				<entity name="top_right" id="0">
+					<region><Rectangle x="14" y="0" width="13" height="13" /></region>
+					<scale horizontal="move" vertical="fixed" />
+				</entity>
+
+				<!-- mid line -->
+
+				<entity name="center_left" id="0">
+					<region><Rectangle x="0" y="13" width="13" height="20" /></region>
+					<scale horizontal="fixed" vertical="strech" />
+				</entity>
+				<entity name="center_center" id="0">
+					<region><Rectangle x="13" y="13" width="1" height="20" /></region>
+					<scale horizontal="strech" vertical="strech" />
+				</entity>
+				<entity name="center_right" id="0">
+					<region><Rectangle x="14" y="13" width="13" height="20" /></region>
+					<scale horizontal="move" vertical="strech" />
+				</entity>
+
+				<!-- btm line -->
+
+				<entity name="bottom_left" id="0">
+					<region><Rectangle x="0" y="33" width="13" height="13" /></region>
+					<scale horizontal="fixed" vertical="move" />
+				</entity>
+				<entity name="bottom_center" id="0">
+					<region><Rectangle x="13" y="33" width="1" height="13" /></region>
+					<scale horizontal="strech" vertical="move" />
+				</entity>
+				<entity name="bottom_right" id="0">
+					<region><Rectangle x="14" y="33" width="13" height="13" /></region>
+					<scale horizontal="move" vertical="move" />
+				</entity>
+
+				<!-- top line -->
+
+				<entity name="shine_top_left" id="0" colorize="false">
+					<region><Rectangle x="1" y="1" width="7" height="7" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+				<entity name="shine_top_center" id="0" colorize="false">
+					<region><Rectangle x="8" y="2" width="11" height="1" /></region>
+					<scale horizontal="strech" vertical="fixed" />
+				</entity>
+				<entity name="shine_top_right" id="0" colorize="false">
+					<region><Rectangle x="19" y="1" width="7" height="7" /></region>
+					<scale horizontal="move" vertical="fixed" />
+				</entity>
+
+				<!-- mid line -->
+
+				<entity name="shine_center_left" id="0" colorize="false">
+					<region><Rectangle x="2" y="8" width="1" height="30" /></region>
+					<scale horizontal="fixed" vertical="strech" />
+				</entity>
+				<entity name="shine_center_right" id="0" colorize="false">
+					<region><Rectangle x="24" y="8" width="1" height="31" /></region>
+					<scale horizontal="move" vertical="strech" />
+				</entity>
+
+				<!-- btm line -->
+
+				<entity name="shine_bottom_left" id="0" colorize="false">
+					<region><Rectangle x="1" y="38" width="7" height="7" /></region>
+					<scale horizontal="fixed" vertical="move" />
+				</entity>
+				<entity name="shine_bottom_center" id="0" colorize="false">
+					<region><Rectangle x="8" y="43" width="12" height="1" /></region>
+					<scale horizontal="strech" vertical="move" />
+				</entity>
+				<entity name="shine_bottom_right" id="0" colorize="false">
+					<region><Rectangle x="20" y="39" width="6" height="6" /></region>
+					<scale horizontal="move" vertical="move" />
+				</entity>
+			</entities>
+		</layout>
+	</layouts>
+</skin>

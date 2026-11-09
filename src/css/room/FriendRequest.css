@@ -1,0 +1,132 @@
+/*
+ * AIR instant_friend_request (197 x 83): a bubble (skin habbo_skin_ubuntu 10,190, tinted #fac919: black outline, yellow
+ * ring, darker fill) with its down pointer under the middle. Inside, at the layout's places: the profile icon (5,10), the
+ * bold white text (25,5, 142 wide), the close button style 3 (171,3), the decline link (8,46, Ubuntu 11 underlined) and
+ * the shiny thick accept button (99,42, 90 x 24) with the accept symbol tinted #00aa00 and a bold black caption.
+ */
+.octane-friend-request {
+    position: absolute;
+    z-index: 40;
+    box-sizing: border-box;
+    width: 197px;
+    height: 74px;
+    border: solid transparent;
+    border-width: 5px 5px 6px;
+    border-image: url("@/assets/images/friend-request/bubble.png") 5 5 6 fill / 5px 5px 6px stretch;
+    color: #ffffff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    line-height: 14px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-friend-request::after {
+    position: absolute;
+    bottom: -14px;
+    left: calc(50% - 7px);
+    width: 13px;
+    height: 9px;
+    content: "";
+    background: url("@/assets/images/friend-request/bubble_pointer_down.png") no-repeat;
+}
+
+.octane-friend-request button {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-family: Ubuntu, sans-serif;
+    cursor: pointer;
+}
+
+.octane-friend-request .octane-friend-request__profile {
+    top: 0;
+    left: 0;
+    display: block;
+    width: 162px;
+    height: 32px;
+    text-align: left;
+}
+
+.octane-friend-request__icon {
+    position: absolute;
+    top: 7px;
+    left: 2px;
+    width: 13px;
+    height: 11px;
+    background: url("@/assets/images/friend-request/profile.png") no-repeat;
+}
+
+.octane-friend-request__text {
+    position: absolute;
+    top: 2px;
+    left: 22px;
+    width: 142px;
+    max-height: 32px;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+    overflow-wrap: anywhere;
+}
+
+.octane-friend-request .octane-friend-request__close {
+    top: 0;
+    left: 168px;
+    width: 19px;
+    height: 20px;
+    background: url("@/assets/images/friend-request/close_default.png") no-repeat;
+}
+
+.octane-friend-request .octane-friend-request__close:hover {
+    background-image: url("@/assets/images/friend-request/close_hover.png");
+}
+
+.octane-friend-request .octane-friend-request__close:active {
+    background-image: url("@/assets/images/friend-request/close_pressed.png");
+}
+
+.octane-friend-request .octane-friend-request__decline {
+    top: 43px;
+    left: 5px;
+    height: 16px;
+    font-size: 11px;
+    line-height: 16px;
+    text-decoration: underline;
+}
+
+.octane-friend-request .octane-friend-request__accept {
+    top: 39px;
+    left: 96px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: 90px;
+    height: 24px;
+    padding: 0 0 0 1px;
+    gap: 1px;
+    border: 5px solid transparent;
+    border-image: url("@/assets/images/friend-request/button_shiny_default.png") 5 5 5 5 fill / 5px stretch;
+    color: #000000;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 14px;
+    white-space: nowrap;
+}
+
+.octane-friend-request .octane-friend-request__accept:hover {
+    border-image-source: url("@/assets/images/friend-request/button_shiny_hover.png");
+}
+
+.octane-friend-request .octane-friend-request__accept:active {
+    border-image-source: url("@/assets/images/friend-request/button_shiny_pressed.png");
+}
+
+.octane-friend-request__check {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 13px;
+    background: url("@/assets/images/friend-request/accept.png") no-repeat;
+}

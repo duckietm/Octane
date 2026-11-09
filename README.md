@@ -1,22 +1,63 @@
-# Nitro V3
+<div align="center">
 
-## Prerequisites
+# Octane
 
--   [Git](https://git-scm.com/)
--   [NodeJS](https://nodejs.org/) >= 18
-    - If using NodeJS < 18 remove `--openssl-legacy-provider` from the package.json scripts
--   [Yarn](https://yarnpkg.com/) `npm i yarn -g`
+**A modern browser client for Habbo retro hotels, built with React 19, TypeScript and PixiJS 8.**
 
-## Quick install (recommended)
+[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
+![React 19](https://img.shields.io/badge/React-19-61dafb.svg)
+![Vite 8](https://img.shields.io/badge/Vite-8-646cff.svg)
+![Node 22.12+](https://img.shields.io/badge/node-%E2%89%A5%2022.12-339933.svg)
+[![Discord](https://img.shields.io/badge/Discord-join%20us-5865F2.svg)](https://discord.gg/aJ46cd3F9g)
 
-The repository ships a cross-platform installer that performs the full setup
-in one go: prerequisites check, renderer clone & link, dependency install,
-config copy, JSON parsing mode selection, URL prompt with validation, and the
-production build.
+[Octane](https://github.com/duckietm/Octane) ·
+[Octane Renderer](https://github.com/duckietm/Octane-Renderer) ·
+[Polaris Emulator](https://github.com/duckietm/Polaris-Emulator) ·
+[Confurter](https://github.com/duckietm/all-in-1-converter) ·
+[Discord](https://discord.gg/aJ46cd3F9g)
 
-After cloning Nitro V3, from its root run:
+</div>
 
-```
+---
+
+Octane is the user interface of the hotel: navigator, catalog, inventory, chat, Wired Creator Tools and everything
+else you click on. The rooms, avatars and furniture are drawn by its companion, the
+[Octane Renderer](https://github.com/duckietm/Octane-Renderer). It talks to the
+[Polaris Emulator](https://github.com/duckietm/Polaris-Emulator) over WebSockets.
+
+Octane started as a fork of [Nitro React](https://github.com/billsonnn/nitro-react) and
+[Nitro Renderer](https://github.com/billsonnn/nitro-renderer). It is developed independently and has no ties to
+Billsonnn / Nitro.
+
+## ✨ Highlights
+
+- **React 19 + Vite 8 + TypeScript**, with Zustand, TanStack Query and Vitest
+- **Habbo's `.hab` asset bundles** as well as `.nitro`: furniture, clothes and pets, including Habbo's own `.hab` files as downloaded
+- **JSON or JSONC configuration**: comments and trailing commas allowed when you want them
+- **Split gamedata**: FurnitureData, FigureData and friends as many small files in `core/`, `custom/` and `seasonal/` tiers
+- **UI texts in 7 languages**: English, Dutch, German, French, Spanish, Italian and Arabic
+- **One-command installer** for a fresh setup, with a headless mode for CI
+
+## 📋 Requirements
+
+| Tool | Version |
+|---|---|
+| [Git](https://git-scm.com/) | any recent version |
+| [Node.js](https://nodejs.org/) | 22.12 or newer |
+| [Yarn](https://yarnpkg.com/) | 4 (run `corepack enable` once; the version is pinned in `package.json`) |
+
+You also need a running [Polaris Emulator](https://github.com/duckietm/Polaris-Emulator) and your game assets
+(`.nitro` / `.hab` bundles and gamedata), which you can make with the
+[Confurter](https://github.com/duckietm/all-in-1-converter).
+
+## 🚀 Quick install (recommended)
+
+Clone Octane and run the installer from its root:
+
+```bash
+git clone https://github.com/duckietm/Octane.git
+cd Octane
+
 # Windows
 install.bat
 
@@ -24,36 +65,32 @@ install.bat
 ./install.sh
 ```
 
-Both wrappers just exec `node install.mjs`, so you can also invoke it directly:
+Both wrappers run `node install.mjs`, which you can also call directly. The installer:
 
-```
-node install.mjs
-```
+1. Checks Node, Yarn and Git
+2. Clones the renderer next to Octane (`../Octane-Renderer`) when it is not there yet
+3. Installs the renderer's dependencies
+4. Installs Octane's dependencies
+5. Copies `public/configuration/*.example` to `*.json` (existing files are kept)
+6. Asks for the JSON parsing mode (JSONC recommended) and saves it in `.octane-build.json`
+7. Asks for your URLs and validates them
+8. Asks whether to encrypt config, gamedata and `/api` (secure mode), sets the two flags in `client-mode.json`, and either patches the emulator's `config.ini` (backup first) or prints the lines to paste, with a freshly generated `nitro.secure.master_key`
+9. Builds the client
+10. Prints a summary
 
-The installer walks through these steps:
+Re-running it is safe: existing config files are kept and only the URL keys you pass are patched. A `nitro.secure.master_key` that is already set in `config.ini` is never replaced.
 
-```
-[1/9] Check prerequisites (node >= 18, yarn, git)
-[2/9] Clone Nitro_Render_V3
-[3/9] Setup renderer (yarn install + yarn link)
-[4/9] Setup client (yarn install + yarn link "@nitrots/nitro-renderer")
-[5/9] Copy public/configuration/*.example -> *.json
-[6/9] Choose JSON parsing mode (json5 recommended) -> writes .nitro-build.json
-[7/9] Configure URLs (interactive, validated)
-[8/9] Build (yarn build)
-[9/9] Summary
-```
+<details>
+<summary><b>Headless / CI install</b></summary>
 
-### Headless / CI runs
+Every step can be driven from flags:
 
-Every step can be driven from flags so the installer can be used in pipelines:
-
-```
+```bash
 node install.mjs --non-interactive \
-    --json-mode=json5 \
+    --json-mode=jsonc \
     --socket-url=wss://example.com/ws \
     --api-url=https://example.com \
-    --asset-url=https://example.com/nitro-assets/ \
+    --asset-url=https://example.com/gamedata \
     --image-library-url=https://example.com/c_images \
     --hof-furni-url=https://example.com/hof_furni \
     --camera-url=https://example.com/camera \
@@ -61,217 +98,149 @@ node install.mjs --non-interactive \
     --habbopages-url=/habbopages \
     --api-base-url=https://example.com \
     --plain-config-base-url=https://example.com/configuration \
-    --plain-gamedata-base-url=https://example.com/gamedata \
-    --skip-link
+    --plain-gamedata-base-url=https://example.com/gamedata
 ```
 
-Useful workflow flags:
+- `--non-interactive` / `--skip-prompts`: keep the example defaults unless a URL flag is passed
+- `--json-mode=<jsonc|legacy|auto>`: pick the parser without the prompt
+- `--secure=<on|off>`, `--secure-api=<on|off>`: secure mode without the prompt; without `--secure` a non-interactive run leaves it as it is
+- `--emulator-config=<path to config.ini>`: patch the emulator config instead of printing the values
+- `--skip-build`, `--skip-clone`, `--skip-link`: skip those steps on a re-run
+- `--help`: every flag, including one per URL key
 
--   `--non-interactive` / `--skip-prompts` — keep example defaults unless a URL override is passed
--   `--json-mode=<json5\|legacy\|auto>` — pick the parser without the JSON mode prompt
--   `--skip-build`, `--skip-clone`, `--skip-link` — re-runs without redoing those steps
--   `--help` — full flag reference and per-key URL flags
+</details>
 
-`install.mjs` is idempotent: re-running it keeps any `*.json` config files
-that already exist and only patches the URL keys you pass on the CLI.
+## 🛠️ Manual install
 
-## Splitting gamedata
+Octane finds the renderer as a **sibling folder**, so clone both repositories into the same parent folder:
 
-The renderer can load gamedata files (FigureData, FurnitureData, FigureMap,
-EffectMap, ProductData, HabboAvatarActions, ExternalTexts, UITexts) either as
-a single legacy JSON/JSON5 file or as a **directory of small files** organised
-in three tiers: `core/` (vendor baseline), `custom/` (your additions / overrides),
-`seasonal/` (date-bound content such as Christmas or Easter).
+```bash
+git clone https://github.com/duckietm/Octane-Renderer.git
+git clone https://github.com/duckietm/Octane.git
 
-The split layout is much easier to maintain — you edit a small focused file
-instead of a 43 MB FurnitureData.json — and lets you keep vendor and operator
-content cleanly separated.
-
-### Directory layout
-
-```
-nitro-assets/gamedata/furnidata/
-  manifest.json5           # { "tiers": ["core", "custom", "seasonal"] }
-  core/
-    manifest.json5         # { "files": ["floor-001.json5", ..., "wall-001.json5"] }
-    floor-001.json5
-    floor-002.json5
-    wall-001.json5
-  custom/                  # OPTIONAL — created by you
-    manifest.json5         # { "files": ["my-rares.json5"] }
-    my-rares.json5
-  seasonal/                # OPTIONAL — created by you
-    manifest.json5
-    xmas-2026.json5
+cd Octane-Renderer && yarn install
+cd ../Octane && yarn install
 ```
 
-Each tier is loaded in order. Within a tier, files load in the order listed in
-its `manifest.json5`. Items in later layers override items in earlier layers
-when they share the same identifier (`id`, `classname`, `name`, or the
-top-level key for flat dictionaries).
-
-### Generating the `core/` tier from a legacy file
-
-Use the bundled CLI splitter:
-
 ```
-node scripts/split-gamedata.mjs \
-    --input ~/legacy-gamedata/FurnitureData.json \
-    --output ~/nitro-assets/gamedata/furnidata
+your-folder/
+├── Octane/
+└── Octane-Renderer/
 ```
 
-It auto-detects the gamedata type from the file's top-level keys and applies
-the strategy that makes the most sense:
+Then copy the configuration examples (see below), set your URLs and build with `yarn build`.
 
-| Type                 | Split strategy                              |
-|----------------------|---------------------------------------------|
-| EffectMap            | one file per effect `type` (dance, fx, ...) |
-| FigureData           | one `palettes.json5` + one file per setType |
-| FigureMap            | chunks of `libraries` (default 500/file)    |
-| FurnitureData        | floor / wall, chunks of `furnitype` (300)   |
-| HabboAvatarActions   | grouped by `state` (or single file if ≤1)   |
-| ProductData          | chunks of products (default 500)            |
-| ExternalTexts/UITexts| grouped by key prefix (e.g. `gamecenter.*`) |
+## ⚙️ Configuration
 
-Useful flags: `--type=<name>` to force the type, `--chunk-size=N` to override
-the default chunk size, `--json` to emit standard JSON instead of JSON5,
-`--force` to overwrite an existing output directory. Full reference:
+All runtime configuration lives in `public/configuration/`. Copy each `.example` you need to its real name:
 
-```
-node scripts/split-gamedata.mjs --help
-```
+| File | What to set |
+|---|---|
+| `renderer-config.json` | `socket.url`, `api.url`, `asset.url`, `image.library.url`, `hof.furni.url` and the asset URLs below |
+| `ui-config.json` | `camera.url`, `thumbnails.url`, `url.prefix`, `habbopages.url` |
+| `client-mode.json` | `apiBaseUrl`, `plainConfigBaseUrl`, `plainGamedataBaseUrl` |
+| `UITexts_<lang>.jsonc` | the interface texts per language |
 
-We only ship the `core/` tier with vendor baselines — `custom/` and `seasonal/`
-are operator-owned: create their manifests when you need them and the loader
-picks them up automatically.
+### 📦 Asset bundles: `.nitro` and `.hab`
 
-### Pointing the renderer at a directory
+Habbo's own client now loads every asset as a `.hab` bundle. Octane loads **both** `.hab` and `.nitro`. Which one is
+used is decided by the extension in each asset URL:
 
-In `public/configuration/renderer-config.json`, replace the legacy file URL
-with the directory URL (note the trailing slash — that's how the loader
-detects split mode):
-
-```json5
-{
-  // single file (legacy, still supported):
-  "furnidata.url": "https://example.com/nitro-assets/gamedata/FurnitureData.json",
-
-  // directory (split mode):
-  "furnidata.url": "https://example.com/nitro-assets/gamedata/furnidata/",
-}
+```jsonc
+"furni.asset.url":  "${asset.url}/hab/%libname%.hab",
+"avatar.asset.url": "${asset.url}/clothes/%libname%.hab",
+"pet.asset.url":    "${asset.url}/pets/%libname%.hab"
 ```
 
-Both styles work; you can migrate one gamedata file at a time.
+- Habbo's `.hab` furniture, clothes and pets work as downloaded
+- A URL only loads its own extension: convert custom furni, custom pets and `landscape` before switching
+  (the Confurter's **Nitro … to HAB** tools do that)
+- Keep Octane's own `landscape` bundle: Habbo's `landscape.hab` is only the catalogue item
+- Your web server must send CORS headers for `.hab` just like for `.nitro`
 
-## Installation (manual)
+### 🧾 JSON or JSONC
 
--   First you should open terminal and navigate to the folder where you want to clone Nitro and Nitro-Renderer
--   Clone Nitro (Expl. C:\Github\)
-    -   `git clone https://github.com/duckietm/Nitro-V3.git` <== For now switch to Dev-RendererV2 
-	-   `git clone https://github.com/duckietm/Nitro_Render_V3.git`
-	-   Install the dependencies for the renderer : cd C:\Github\Nitro_Render_V3
-    	-   `yarn install`
-	-	Now we will create a Link for the Nitro Renderer : `yarn link` This will give you a link address `yarn link "@nitrots/nitro-renderer"`
-    -   Install the dependencies for Cool UI : cd C:\Github\Nitro-V3
-	-   `yarn install`
-	-   `yarn link "@nitrots/nitro-renderer"` <== This will link the renderer in the project
--   Rename a few files
-    -   Copy `public/configuration/renderer-config.example` to `public/configuration/renderer-config.json`
-    -   Copy `public/configuration/ui-config.example` to `public/configuration/ui-config.json`
-    -   Copy `public/configuration/client-mode.example` to `public/configuration/client-mode.json`
-    -   Set your links
-    -   Open `public/configuration/renderer-config.json`
-        -   Update `socket.url, asset.url, image.library.url, & hof.furni.url`
-    -   Open `public/configuration/ui-config.json`
-        -   Update `camera.url, thumbnails.url, url.prefix, habbopages.url`
-	-   `yarn build` <== the final step to build the DIST folder this is where your browser needs to point / or upload this to your /client if you do the compile on a other machine (preferd)
-    -   You can override any variable by passing it to `NitroConfig` in the index.html
+Octane can read the configuration and gamedata files in two ways:
 
-## JSON / JSON5 configuration mode
+| Mode | Behaviour |
+|---|---|
+| `jsonc` (recommended) | Comments and trailing commas are allowed; keys and strings still need double quotes |
+| `legacy` | Strict JSON only; a comment or trailing comma stops the load with a clear error |
+| `auto` | Strict JSON first, JSONC as a fallback |
 
-Starting with this version of Nitro V3, you can choose how the client parses the
-configuration files (`renderer-config.json`, `ui-config.json`, `client-mode.json`,
-and the gamedata JSONs served by the renderer):
+The first `yarn start` or `yarn build` asks which mode to use and stores it in `.octane-build.json` (git-ignored, so
+every deployment keeps its own choice). Change it later with `yarn configure`, or for one build only:
 
--   **JSON5** (recommended) — accepts comments, trailing commas, single quotes
-    and unquoted identifiers. Easier to maintain, especially in `ui-config.json`
-    where you may want inline notes.
--   **JSON (legacy strict)** — only valid standard JSON is accepted. Any comment
-    or trailing comma will fail the load with a clear error.
-
-### Picking a mode
-
-The first time you run `yarn start` or `yarn build`, an interactive prompt asks
-which mode to use:
-
-```
-════════════════════════════════════════════════════════════
-  Nitro V3 — JSON mode configuration
-════════════════════════════════════════════════════════════
-
-  1) JSON5  (recommended)
-  2) JSON   (legacy strict)
-
-Scelta [1=JSON5]:
+```bash
+OCTANE_JSON_MODE=legacy yarn build
 ```
 
-Your choice is stored in `.nitro-build.json` at the project root (gitignored, so
-each deployment keeps its own setting). Subsequent builds reuse it silently.
+The choice is compiled in as `__OCTANE_JSON_MODE__` and used for every config and gamedata file the renderer loads.
 
-### Changing the mode later
+### 🗂️ Split gamedata
 
-Run the prompt again at any time:
-
-```
-yarn configure
-```
-
-You can also set the mode without interaction (useful in CI / scripts):
+Instead of one large file (FurnitureData.json can be tens of MB), gamedata can be a **folder of small files** in three
+tiers:
 
 ```
-# one-shot override for a single build
-NITRO_JSON_MODE=legacy yarn build
-NITRO_JSON_MODE=json5  yarn build
-
-# write the choice persistently
-echo '{"jsonMode":"legacy"}' > .nitro-build.json
+gamedata/furnidata/
+├── manifest.jsonc        { "tiers": ["core", "custom", "seasonal"] }
+├── core/                 vendor baseline
+│   ├── manifest.jsonc    { "files": ["floor-001.jsonc", "wall-001.jsonc"] }
+│   ├── floor-001.jsonc
+│   └── wall-001.jsonc
+├── custom/               your additions and overrides (optional)
+└── seasonal/             date-bound content such as Christmas (optional)
 ```
 
-The recognized values are `legacy`, `json5`, and `auto` (auto = try strict JSON
-first, fall back to JSON5 — equivalent to the original Render V3 behaviour).
+Tiers load in order and later files override earlier ones that share an `id`, `classname` or `name`. Point the
+config at the folder; the trailing slash switches on split mode:
 
-### How it propagates
-
-The chosen mode is injected at build time as the compile-time constant
-`__NITRO_JSON_MODE__`. It is honoured by:
-
--   `src/bootstrap.ts` when loading `client-mode.json`
--   `@nitrots/utils` → `JsonParser.ts` in Render V3, used for every config file
-    and every gamedata JSON loaded by the renderer
-
-In `legacy` mode, an invalid file produces a clear error that suggests switching
-to JSON5; nothing is silently coerced.
-
-## Usage
-
--   To use Nitro you need `.nitro` assets generated, see [nitro-converter](https://git.krews.org/nitro/nitro-converter) for instructions
--   See [Morningstar Websockets](https://git.krews.org/nitro/ms-websockets) for instructions on configuring websockets on your server
-
-### Development
-
-Run Nitro in development mode when you are editing the files, this way you can see the changes in your browser instantly
-
-```
-yarn start
+```jsonc
+"furnidata.url": "https://example.com/gamedata/furnidata/"
 ```
 
-### Production
+Create the `core/` tier from an existing file with the bundled splitter:
 
-To build a production version of Nitro just run the following command
-
-```
-yarn build:prod
+```bash
+node scripts/split-gamedata.mjs --input ./FurnitureData.json --output ./gamedata/furnidata
 ```
 
--   A `dist` folder will be generated, these are the files that must be uploaded to your webserver
--   Consult your CMS documentation for compatibility with Nitro and how to add the production files
+It detects the gamedata type (FurnitureData, FigureData, FigureMap, EffectMap, ProductData, HabboAvatarActions,
+ExternalTexts / UITexts) and picks a sensible split. Run it with `--help` for all options. You can migrate one gamedata
+file at a time; single files keep working.
+
+## 💻 Development
+
+| Goal | Command |
+|---|---|
+| Dev server with hot reload | `yarn start` |
+| Production build (`dist/`) | `yarn build` |
+| Production build with fresh browser data | `yarn build:prod` |
+| Preview the production build | `yarn preview` |
+| Type-check | `yarn typecheck` |
+| Lint | `yarn lint` (Biome) |
+| Hook-order lint | `yarn lint:hooks` |
+| Tests | `yarn test` |
+
+During development, game assets are served from a sibling `Nitro-Files/` folder (`/nitro-assets` and `/swf`), so you
+do not need to copy them into `public/`.
+
+## 🌐 Production
+
+Run `yarn build` and upload the contents of `dist/` to your web server, or point your CMS at it. Check your CMS
+documentation for how it embeds the client.
+
+## 🤝 Related projects
+
+| Project | What it does |
+|---|---|
+| [Octane Renderer](https://github.com/duckietm/Octane-Renderer) | Draws rooms, avatars and furniture (PixiJS 8) and handles the WebSocket protocol |
+| [Polaris Emulator](https://github.com/duckietm/Polaris-Emulator) | The game server |
+| [Confurter](https://github.com/duckietm/all-in-1-converter) | Downloads Habbo's assets and converts SWF / Nitro / HAB bundles |
+
+Questions, bugs or ideas? Join us on [Discord](https://discord.gg/aJ46cd3F9g).
+
+## 📄 License
+
+Octane is licensed under the [GNU General Public License v3.0](LICENSE).

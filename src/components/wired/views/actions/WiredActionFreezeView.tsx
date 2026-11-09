@@ -3,57 +3,58 @@ import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
+import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
-const EFFECT_OPTIONS = [
-    { value: 218, label: 'fx_218' },
-    { value: 12, label: 'fx_12' },
-    { value: 11, label: 'fx_11' },
-    { value: 53, label: 'fx_53' },
-    { value: 163, label: 'fx_163' }
-];
+/** The official effect list; the box saves the index (wiredfurni.params.freeze.effect.0..4). */
+const EFFECT_OPTIONS = [218, 12, 11, 53, 163];
 
+/** Official: [effect index, cancel on teleport], both in one section; the user source is the official slot. */
 export const WiredActionFreezeView: FC<{}> = () => {
-    const [effectId, setEffectId] = useState(218);
+    const [effectIndex, setEffectIndex] = useState(0);
     const [cancelOnTeleport, setCancelOnTeleport] = useState(false);
     const [userSource, setUserSource] = useState(0);
-    const { trigger = null, setIntParams = null } = useWired();
+    const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
 
-    const save = () => setIntParams([effectId, cancelOnTeleport ? 1 : 0, userSource]);
+    const save = () => {
+        setIntParams([effectIndex, cancelOnTeleport ? 1 : 0]);
+        setSourceTypes({ furni: [], users: [userSource] });
+    };
 
     useEffect(() => {
-        setEffectId(trigger?.intData?.length > 0 ? trigger.intData[0] : 218);
-        setCancelOnTeleport(trigger?.intData?.length > 1 ? trigger.intData[1] === 1 : false);
-        setUserSource(trigger?.intData?.length > 2 ? trigger.intData[2] : 0);
+        const index = trigger?.intData?.[0] ?? 0;
+
+        setEffectIndex(index >= 0 && index < EFFECT_OPTIONS.length ? index : 0);
+        setCancelOnTeleport(trigger?.intData?.[1] === 1);
+        setUserSource(slotUserSource(trigger));
     }, [trigger]);
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.freeze.effect_selection', 'Effect')}</Text>
-                <select className="form-select form-select-sm" value={effectId} onChange={(event) => setEffectId(parseInt(event.target.value))}>
-                    {EFFECT_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {LocalizeText(option.label)}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div className="flex items-center gap-1">
-                <input
-                    checked={cancelOnTeleport}
-                    className="form-check-input"
-                    id="freezeCancelOnTeleport"
-                    type="checkbox"
-                    onChange={(event) => setCancelOnTeleport(event.target.checked)}
-                />
-                <Text>{LocalizeText('wiredfurni.params.freeze.cancel_on_teleport')}</Text>
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.freeze.effect_selection', 'Effect')}</Text>
+                    <Select className="form-select form-select-sm" value={effectIndex} onChange={(event) => setEffectIndex(parseInt(event.target.value))}>
+                        {EFFECT_OPTIONS.map((effectId, index) => (
+                            <option key={effectId} value={index}>
+                                {localizeWithFallback(`wiredfurni.params.freeze.effect.${index}`, LocalizeText(`fx_${effectId}`))}
+                            </option>
+                        ))}
+                    </Select>
+                    <label className="flex items-center gap-1">
+                        <Checkbox checked={cancelOnTeleport} onCheckedChange={(nextChecked) => setCancelOnTeleport(nextChecked)} />
+                        <Text>{LocalizeText('wiredfurni.params.freeze.cancel_on_teleport')}</Text>
+                    </label>
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

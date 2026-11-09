@@ -7,17 +7,17 @@ import {
     IRoomUserData,
     ISoundVolumesSnapshot,
     IUserDataSnapshot,
-    NitroEventType
-} from '@nitrots/nitro-renderer';
+    OctaneEventType
+} from '@octane/renderer';
 import { useMemo } from 'react';
 import { useExternalSnapshot } from '../events/useExternalSnapshot';
 
 /**
  * React-side consumers for the referentially-stable snapshot getters
- * the renderer exposes (Nitro_Render_V3 v2.1.0+ pattern).
+ * the renderer exposes (Octane Renderer v2.1.0+ pattern).
  *
  * Every hook here is a thin `useSyncExternalStore` wrapper: it subscribes
- * to the corresponding `NitroEventType.*_UPDATED` invalidation event and
+ * to the corresponding `OctaneEventType.*_UPDATED` invalidation event and
  * reads the matching `getXxxSnapshot()`. Because the renderer guarantees
  * snapshot reference invariance until invalidation, React's bailout logic
  * skips re-renders when the snapshot is unchanged — so widgets that read
@@ -66,7 +66,8 @@ const DEFAULT_USER_DATA: Readonly<IUserDataSnapshot> = Object.freeze({
     rankPrefixColor: ''
 }) as Readonly<IUserDataSnapshot>;
 
-const EMPTY_IGNORED_LIST: ReadonlyArray<string> = Object.freeze<string[]>([]) as ReadonlyArray<string>;
+const EMPTY_IGNORED_LIST: ReadonlyArray<number> = Object.freeze<number[]>([]) as ReadonlyArray<number>;
+const EMPTY_BLOCKED_LIST: ReadonlyArray<number> = Object.freeze<number[]>([]) as ReadonlyArray<number>;
 const EMPTY_GROUP_BADGES: ReadonlyMap<number, string> = new Map();
 const EMPTY_USER_LIST: ReadonlyArray<IRoomUserData> = Object.freeze<IRoomUserData[]>([]) as ReadonlyArray<IRoomUserData>;
 const EMPTY_PERMISSIONS: ReadonlyMap<string, number> = new Map();
@@ -90,7 +91,7 @@ const subscribeTo =
     };
 
 export const useUserDataSnapshot = (): Readonly<IUserDataSnapshot> =>
-    useExternalSnapshot(subscribeTo(NitroEventType.SESSION_DATA_UPDATED), () => {
+    useExternalSnapshot(subscribeTo(OctaneEventType.SESSION_DATA_UPDATED), () => {
         const manager = GetSessionDataManager();
 
         if (!manager || typeof manager.getUserDataSnapshot !== 'function') return DEFAULT_USER_DATA;
@@ -99,7 +100,7 @@ export const useUserDataSnapshot = (): Readonly<IUserDataSnapshot> =>
     });
 
 export const useActiveRoomSessionSnapshot = (): Readonly<IRoomSessionSnapshot> | null =>
-    useExternalSnapshot(subscribeTo(NitroEventType.ROOM_SESSION_UPDATED), () => {
+    useExternalSnapshot(subscribeTo(OctaneEventType.ROOM_SESSION_UPDATED), () => {
         const manager = GetRoomSessionManager();
 
         if (!manager || typeof manager.getActiveRoomSessionSnapshot !== 'function') return null;
@@ -107,8 +108,8 @@ export const useActiveRoomSessionSnapshot = (): Readonly<IRoomSessionSnapshot> |
         return manager.getActiveRoomSessionSnapshot();
     });
 
-export const useIgnoredUsersSnapshot = (): ReadonlyArray<string> =>
-    useExternalSnapshot(subscribeTo(NitroEventType.IGNORED_USERS_UPDATED), () => {
+export const useIgnoredUsersSnapshot = (): ReadonlyArray<number> =>
+    useExternalSnapshot(subscribeTo(OctaneEventType.IGNORED_USERS_UPDATED), () => {
         const inner = GetSessionDataManager()?.ignoredUsersManager;
 
         if (!inner || typeof inner.getIgnoredUsersSnapshot !== 'function') return EMPTY_IGNORED_LIST;
@@ -117,14 +118,34 @@ export const useIgnoredUsersSnapshot = (): ReadonlyArray<string> =>
     });
 
 /**
+ * Official `BlockedUsersManager` list (packets 485 / 697 / 1886 / 2649): the block list is
+ * keyed by user id and is separate from the ignore list.
+ */
+export const useBlockedUsersSnapshot = (): ReadonlyArray<number> =>
+    useExternalSnapshot(subscribeTo(OctaneEventType.BLOCKED_USERS_UPDATED), () => {
+        const inner = GetSessionDataManager()?.blockedUsersManager;
+
+        if (!inner || typeof inner.getBlockedUsersSnapshot !== 'function') return EMPTY_BLOCKED_LIST;
+
+        return inner.getBlockedUsersSnapshot();
+    });
+
+/** Reactive predicate built on top of `useBlockedUsersSnapshot`. */
+export const useIsUserBlocked = (userId: number): boolean => {
+    const list = useBlockedUsersSnapshot();
+
+    return useMemo(() => list.includes(userId), [list, userId]);
+};
+
+/**
  * Reactive predicate built on top of `useIgnoredUsersSnapshot`.
  * Re-renders only when the array reference flips (i.e. someone is added
  * or removed) — not on unrelated session updates.
  */
-export const useIsUserIgnored = (name: string): boolean => {
+export const useIsUserIgnored = (userId: number): boolean => {
     const list = useIgnoredUsersSnapshot();
 
-    return useMemo(() => list.includes(name), [list, name]);
+    return useMemo(() => list.includes(userId), [list, userId]);
 };
 
 /**
@@ -177,7 +198,7 @@ export const useUserRank = (): IUserRank => {
  * every key, which hides mod-only UI by default (safe).
  */
 export const useUserPermissions = (): ReadonlyMap<string, number> =>
-    useExternalSnapshot(subscribeTo(NitroEventType.USER_PERMISSIONS_UPDATED), () => {
+    useExternalSnapshot(subscribeTo(OctaneEventType.USER_PERMISSIONS_UPDATED), () => {
         const manager = GetSessionDataManager();
 
         if (!manager || typeof manager.getPermissionsSnapshot !== 'function') return EMPTY_PERMISSIONS;
@@ -237,7 +258,7 @@ export const usePermissionValue = (key: string): number => {
 export const useIsAmbassador = (): boolean => useHasPermission('acc_ambassador');
 
 export const useGroupBadgesSnapshot = (): ReadonlyMap<number, string> =>
-    useExternalSnapshot(subscribeTo(NitroEventType.GROUP_BADGES_UPDATED), () => {
+    useExternalSnapshot(subscribeTo(OctaneEventType.GROUP_BADGES_UPDATED), () => {
         const inner = GetSessionDataManager()?.groupInformationManager;
 
         if (!inner || typeof inner.getGroupBadgesSnapshot !== 'function') return EMPTY_GROUP_BADGES;
@@ -256,7 +277,7 @@ export const useGroupBadge = (groupId: number): string => {
 };
 
 export const useVolumesSnapshot = (): Readonly<ISoundVolumesSnapshot> =>
-    useExternalSnapshot(subscribeTo(NitroEventType.SOUND_VOLUMES_UPDATED), () => {
+    useExternalSnapshot(subscribeTo(OctaneEventType.SOUND_VOLUMES_UPDATED), () => {
         const manager = GetSoundManager();
 
         if (!manager || typeof manager.getVolumesSnapshot !== 'function') return DEFAULT_VOLUMES;
@@ -280,8 +301,8 @@ export const useRoomUserListSnapshot = (): ReadonlyArray<IRoomUserData> =>
 
             if (!dispatcher || typeof dispatcher.subscribe !== 'function') return NOOP_UNSUBSCRIBE;
 
-            const offList = dispatcher.subscribe(NitroEventType.ROOM_USER_LIST_UPDATED, onChange);
-            const offSession = dispatcher.subscribe(NitroEventType.ROOM_SESSION_UPDATED, onChange);
+            const offList = dispatcher.subscribe(OctaneEventType.ROOM_USER_LIST_UPDATED, onChange);
+            const offSession = dispatcher.subscribe(OctaneEventType.ROOM_SESSION_UPDATED, onChange);
 
             return () => {
                 offList();

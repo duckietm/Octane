@@ -1,0 +1,73 @@
+/*
+ * The variables explorer (connect, explorer, bulk delete) is Octane's own window, so it follows the AIR conventions:
+ * regular Ubuntu (our `Ubuntu` face is the condensed cut), u_regular 12 px black text, u_bold 12 headings, and grey
+ * buttons with black 12 px text: the plain `button` skin (habbo_skin_button_shiny, regular) for the secondary actions
+ * and button_thick (habbo_skin_button_shiny_thick, bold) for Connect. AIR has no green here; the destructive
+ * bulk delete keeps Octane's red. The holder windows reuse the wired creator tools panels and are styled there.
+ */
+.octane-variables-explorer-window .octane-card-content-shell {
+    color: #000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-variables-explorer-window .text-sm {
+    font-size: 12px;
+    line-height: 15px;
+}
+
+@layer base {
+    .octane-variables-explorer-window .octane-card-content-shell :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    /* Button's size is an important utility (12.6 px). */
+    .octane-variables-explorer-window .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger) {
+        font-size: 12px !important;
+    }
+
+    .octane-variables-explorer-window .octane-card-content-shell .habbo-btn-secondary {
+        border-width: 5px !important;
+        border-image-source: var(--habbo-skin-shiny) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        color: #000 !important;
+        font-weight: 400 !important;
+    }
+
+    .octane-variables-explorer-window .octane-card-content-shell .habbo-btn-secondary:hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    .octane-variables-explorer-window .octane-card-content-shell .habbo-btn-secondary:active {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+
+    .octane-variables-explorer-window .octane-card-content-shell .habbo-btn-secondary:disabled,
+    .octane-variables-explorer-window .octane-card-content-shell .habbo-btn-secondary.pointer-events-none {
+        border-image-source: var(--habbo-skin-shiny-disabled) !important;
+        color: #777 !important;
+    }
+
+    .octane-variables-explorer-window .octane-card-content-shell .habbo-btn-primary {
+        border-image-source: var(--habbo-skin-shiny-thick) !important;
+        color: #000 !important;
+        font-weight: 700 !important;
+        text-shadow: none !important;
+    }
+
+    .octane-variables-explorer-window .octane-card-content-shell .habbo-btn-primary:hover {
+        border-image-source: var(--habbo-skin-shiny-thick-hover) !important;
+    }
+
+    .octane-variables-explorer-window .octane-card-content-shell .habbo-btn-primary:active {
+        border-image-source: var(--habbo-skin-shiny-thick-pressed) !important;
+    }
+
+    .octane-variables-explorer-window .octane-card-content-shell .habbo-btn-primary:disabled,
+    .octane-variables-explorer-window .octane-card-content-shell .habbo-btn-primary.pointer-events-none {
+        border-image-source: var(--habbo-skin-shiny-thick-disabled) !important;
+        color: #777 !important;
+    }
+}

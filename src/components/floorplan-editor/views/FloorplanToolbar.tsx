@@ -1,8 +1,10 @@
 import { Dispatch, FC } from 'react';
-import { FaHandPaper, FaRedo, FaUndo } from 'react-icons/fa';
-import { LocalizeText } from '../../../api';
-import { Base, Flex, Text } from '../../../common';
+import { FaRedo, FaUndo } from 'react-icons/fa';
+import { LocalizeText, localizeWithFallback } from '../../../api';
+import { Base } from '../../../common';
 import { FloorActionMode, FloorplanAction, FloorplanState } from '../state/types';
+import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 type Props = {
     state: FloorplanState;
@@ -13,103 +15,117 @@ type Props = {
     onRedo?: () => void;
     panMode?: boolean;
     setPanMode?: (next: boolean) => void;
+    includeDoor?: boolean;
 };
 
-const BRUSH_BUTTONS: { id: string; mode: FloorActionMode; iconClass: string }[] = [
+const BRUSH_BUTTONS: { id: string; mode: FloorActionMode; iconClass: string; gap?: boolean }[] = [
     { id: 'tool-set', mode: 'SET', iconClass: 'icon-set-tile' },
     { id: 'tool-unset', mode: 'UNSET', iconClass: 'icon-unset-tile' },
-    { id: 'tool-up', mode: 'UP', iconClass: 'icon-increase-height' },
+    { id: 'tool-up', mode: 'UP', iconClass: 'icon-increase-height', gap: true },
     { id: 'tool-down', mode: 'DOWN', iconClass: 'icon-decrease-height' },
-    { id: 'tool-door', mode: 'DOOR', iconClass: 'icon-set-door' }
+    { id: 'tool-door', mode: 'DOOR', iconClass: 'icon-set-door', gap: true }
 ];
 
-export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo, onUndo, onRedo, panMode, setPanMode }) => {
+export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo, onUndo, onRedo, panMode, setPanMode, includeDoor = true }) => {
     const exitPan = () => {
         if (panMode && setPanMode) setPanMode(false);
     };
 
-    return (
-        <Flex gap={1} alignItems="center">
-            <Text bold small>
-                {LocalizeText('floor.plan.editor.draw.mode')}
-            </Text>
-            {setPanMode && (
-                <Base
-                    pointer
-                    data-testid="tool-pan"
-                    data-active={panMode ? 'true' : 'false'}
-                    title={panMode ? 'Hand mode active — drag to pan the view' : 'Hand mode — drag to pan the view'}
-                    className={`w-7 h-7 flex items-center justify-center rounded border ${panMode ? 'bg-emerald-500 border-emerald-700 text-white shadow-inner' : 'border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700'}`}
-                    onClick={() => setPanMode(!panMode)}
-                >
-                    <FaHandPaper size={12} />
-                </Base>
-            )}
-            {BRUSH_BUTTONS.map((b) => {
-                const active = state.brush.action === b.mode && !panMode;
+    const buttons = BRUSH_BUTTONS.filter((button) => includeDoor || button.mode !== 'DOOR');
 
-                return (
-                    <Base
-                        key={b.id}
+    return (
+        <NativeTextTree>
+            <div className="fp-control-group" data-testid="floorplan-toolbar">
+                <div className="fp-group-label">{LocalizeText('floor.plan.editor.draw.mode')}</div>
+                <div className="fp-tools">
+                    {buttons.map((b, index) => {
+                        const active = state.brush.action === b.mode && !panMode;
+
+                        return (
+                            <Base component={BaseButton} type="button"
+                                key={b.id}
+                                pointer
+                                data-testid={b.id}
+                                data-active={active ? 'true' : 'false'}
+                                className={`fp-tool ${active ? 'is-active' : ''} ${b.gap && index > 0 ? 'is-gap' : ''}`}
+                                onClick={() => {
+                                    exitPan();
+                                    dispatch({ type: 'BRUSH_SET', action: b.mode });
+                                }}
+                            >
+                                <span className={`octane-icon ${b.iconClass}`} />
+                            </Base>
+                        );
+                    })}
+                </div>
+                {/* Octane's extra tools, in a row of their own under AIR's five. */}
+                <div className="fp-tools is-extra">
+                    <Base component={BaseButton} type="button"
                         pointer
-                        data-testid={b.id}
-                        data-active={active ? 'true' : 'false'}
-                        className={`nitro-icon ${b.iconClass} ${active ? 'border border-primary' : ''}`}
+                        data-testid="tool-select-all"
+                        className="fp-tool is-extra"
+                        title={state.brush.action === 'UNSET' ? localizeWithFallback('octane.floorplan_editor.erase_all_tiles', 'Erase all tiles') : localizeWithFallback('octane.floorplan_editor.apply_brush_to_all_tiles', 'Apply brush to all tiles')}
                         onClick={() => {
                             exitPan();
-                            dispatch({ type: 'BRUSH_SET', action: b.mode });
+                            dispatch({ type: 'SELECT_ALL' });
+                            dispatch({ type: 'APPLY_BRUSH_TO_SELECTION', source: 'local' });
                         }}
-                    />
-                );
-            })}
-            <Base
-                pointer
-                data-testid="tool-select-all"
-                className={`nitro-icon ${state.brush.action === 'UNSET' ? 'icon-set-deselect' : 'icon-set-select'}`}
-                title={state.brush.action === 'UNSET' ? 'Erase all tiles' : 'Apply brush to all tiles'}
-                onClick={() => {
-                    exitPan();
-                    dispatch({ type: 'SELECT_ALL' });
-                    dispatch({ type: 'APPLY_BRUSH_TO_SELECTION', source: 'local' });
-                }}
-            />
-            <Base
-                pointer
-                data-testid="tool-square-select"
-                data-active={state.squareSelect && !panMode ? 'true' : 'false'}
-                title={
-                    state.squareSelect && !panMode
-                        ? 'Rectangular selection mode active — drag on the canvas to apply the brush'
-                        : 'Rectangular selection — apply the brush to all tiles in an area'
-                }
-                className={`nitro-icon icon-set-squaresselect transition-shadow ${state.squareSelect && !panMode ? 'border-2 border-amber-500 bg-amber-400 shadow-[0_0_0_2px_rgba(245,158,11,0.45)]' : ''}`}
-                onClick={() => {
-                    exitPan();
-                    dispatch({ type: 'SQUARE_SELECT_TOGGLE' });
-                }}
-            />
-            {(onUndo || onRedo) && (
-                <Flex gap={1} alignItems="center" className="ml-2 pl-2 border-l border-zinc-300">
-                    <Base
-                        pointer={Boolean(canUndo)}
-                        data-testid="tool-undo"
-                        title="Undo (Ctrl+Z)"
-                        className={`w-7 h-7 flex items-center justify-center rounded border ${canUndo ? 'border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700' : 'border-zinc-200 bg-zinc-100 text-zinc-300 cursor-not-allowed'}`}
-                        onClick={canUndo && onUndo ? onUndo : undefined}
                     >
-                        <FaUndo size={12} />
+                        <span className={`octane-icon ${state.brush.action === 'UNSET' ? 'icon-set-deselect' : 'icon-set-select'}`} />
                     </Base>
-                    <Base
-                        pointer={Boolean(canRedo)}
-                        data-testid="tool-redo"
-                        title="Redo (Ctrl+Shift+Z)"
-                        className={`w-7 h-7 flex items-center justify-center rounded border ${canRedo ? 'border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700' : 'border-zinc-200 bg-zinc-100 text-zinc-300 cursor-not-allowed'}`}
-                        onClick={canRedo && onRedo ? onRedo : undefined}
+                    <Base component={BaseButton} type="button"
+                        pointer
+                        data-testid="tool-square-select"
+                        data-active={state.squareSelect && !panMode ? 'true' : 'false'}
+                        title={
+                            state.squareSelect && !panMode
+                                ? localizeWithFallback('octane.floorplan_editor.rectangular_selection_mode_active_drag_on', 'Rectangular selection mode active — drag on the canvas to apply the brush')
+                                : localizeWithFallback('octane.floorplan_editor.rectangular_selection_apply_the_brush_to', 'Rectangular selection — apply the brush to all tiles in an area')
+                        }
+                        className={`fp-tool is-extra ${state.squareSelect && !panMode ? 'is-active' : ''}`}
+                        onClick={() => {
+                            exitPan();
+                            dispatch({ type: 'SQUARE_SELECT_TOGGLE' });
+                        }}
                     >
-                        <FaRedo size={12} />
+                        <span className="octane-icon icon-set-squaresselect" />
                     </Base>
-                </Flex>
-            )}
-        </Flex>
+                    {setPanMode && (
+                        <Base component={BaseButton} type="button"
+                            pointer
+                            data-testid="tool-pan"
+                            data-active={panMode ? 'true' : 'false'}
+                            title={panMode ? localizeWithFallback('octane.floorplan_editor.hand_mode_active_drag_to_pan', 'Hand mode active — drag to pan the view') : localizeWithFallback('octane.floorplan_editor.hand_mode_drag_to_pan_the', 'Hand mode — drag to pan the view')}
+                            className={`fp-tool is-extra is-gap ${panMode ? 'is-active' : ''}`}
+                            onClick={() => setPanMode(!panMode)}
+                        >
+                            <span className="octane-icon icon-hand-mode" />
+                        </Base>
+                    )}
+                    {(onUndo || onRedo) && (
+                        <>
+                            <Base component={BaseButton} type="button"
+                                pointer={Boolean(canUndo)}
+                                data-testid="tool-undo"
+                                title={localizeWithFallback('octane.floorplan_editor.undo_ctrl_z', 'Undo (Ctrl+Z)')}
+                                className={`fp-tool is-extra is-gap ${canUndo ? '' : 'is-disabled'}`}
+                                onClick={canUndo && onUndo ? onUndo : undefined}
+                            >
+                                <FaUndo size={16} />
+                            </Base>
+                            <Base component={BaseButton} type="button"
+                                pointer={Boolean(canRedo)}
+                                data-testid="tool-redo"
+                                title={localizeWithFallback('octane.floorplan_editor.redo_ctrl_shift_z', 'Redo (Ctrl+Shift+Z)')}
+                                className={`fp-tool is-extra ${canRedo ? '' : 'is-disabled'}`}
+                                onClick={canRedo && onRedo ? onRedo : undefined}
+                            >
+                                <FaRedo size={16} />
+                            </Base>
+                        </>
+                    )}
+                </div>
+            </div>
+        </NativeTextTree>
     );
 };

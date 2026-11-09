@@ -1,0 +1,222 @@
+/* Official main_help (main2): the sections of the help page, 400 px wide inside the window. An Illumina
+   (style 101) frame, so the plain texts are il_regular: regular Ubuntu 11 px. */
+.octane-help-index {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px;
+    line-height: 14px;
+}
+
+.octane-help-index__section-title {
+    padding-bottom: 2px;
+    border-bottom: 1px solid #c8c8c8;
+    color: #555555;
+    font-size: 10px; /* separator captions: il_border, 10 px bold */
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+.octane-help-index__section-title.is-left {
+    text-align: left;
+}
+
+.octane-help-index__row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    min-height: 135px;
+}
+
+.octane-help-index__pictures {
+    position: relative;
+    flex: none;
+    width: 170px;
+    height: 135px;
+}
+
+.octane-help-index__image {
+    flex: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-help-index__pictures .is-confused {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.octane-help-index__pictures .is-bully {
+    position: absolute;
+    top: 0;
+    left: 134px;
+}
+
+.octane-help-index__row > .octane-help-index__image {
+    width: 153px;
+    margin: 4px 7px 0 8px;
+}
+
+.octane-help-index__copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+/* help.main.help.title / help.main2.bully.subtitle: il_heading_2, 12 px bold. */
+.octane-help-index__heading {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+}
+
+.octane-help-index__text {
+    min-height: 32px;
+}
+
+/* The large shiny button, sliced alike in every state so its hover and pressed pictures stay whole. */
+.octane-help-index .octane-help-index__button {
+    align-self: flex-start;
+    min-width: 159px;
+    height: 48px;
+    padding: 0 10px;
+    border: solid transparent;
+    border-width: 6px 6px 7px;
+    border-image-source: var(--habbo-skin-shiny-large);
+    border-image-slice: 6 6 7 6 fill;
+    border-image-width: 6px 6px 7px;
+    border-image-repeat: stretch;
+    background: transparent;
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 10px; /* button style 100/101 (illumina_light_button): il_button, 10 px bold */
+    font-weight: 700;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-help-index .octane-help-index__button:hover {
+    border-image-source: var(--habbo-skin-shiny-large-hover);
+}
+
+.octane-help-index .octane-help-index__button:active {
+    border-image-source: var(--habbo-skin-shiny-large-pressed);
+}
+
+.octane-help-index .octane-help-index__button:disabled {
+    border-image-source: var(--habbo-skin-shiny-large-disabled);
+    color: #8a8a8a;
+    cursor: default;
+}
+
+.octane-help-index .octane-help-index__button.is-red {
+    min-width: 196px;
+    border-width: 5px;
+    border-image-source: var(--habbo-skin-shiny-red);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    color: #ffffff;
+}
+
+.octane-help-index .octane-help-index__button.is-red:hover {
+    border-image-source: var(--habbo-skin-shiny-red-hover);
+}
+
+.octane-help-index .octane-help-index__button.is-red:active {
+    border-image-source: var(--habbo-skin-shiny-red-pressed);
+}
+
+.octane-help-index__self {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #919191;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.octane-help-index__self-column {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.octane-help-index__self-column + .octane-help-index__self-column {
+    padding-left: 10px;
+    border-left: 1px solid #c8c8c8;
+}
+
+.octane-help-index .octane-help-index__link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #1f5c7a;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px; /* self_help / habboway / safetybooklet links: il_heading_2, 12 px bold, underlined */
+    font-weight: 700;
+    text-align: left;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-help-index .octane-help-index__link.is-plain {
+    color: #000000;
+    font-size: 11px; /* help.main.self.tips.content: no text_style, il_regular 11 px */
+    font-weight: 400;
+    text-decoration: none;
+}
+
+.octane-help-index__emergency {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 4px;
+    background: #ac1d19;
+    color: #ffffff;
+}
+
+.octane-help-index__emergency-title {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.octane-help-index__emergency-sub {
+    font-size: 11px;
+}
+
+.octane-help-index__emergency-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.octane-help-index__leave {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.octane-help-index__status {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    padding-top: 2px;
+}
+
+/* The two status links come from the report layout's start page (sanction_info_link, reports_status):
+   u_bold with font_size 14, underlined. */
+.octane-help-index .octane-help-index__status .octane-help-index__link {
+    font-size: 14px;
+}

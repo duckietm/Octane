@@ -1,9 +1,11 @@
-import { GetSessionDataManager, RoomObjectType } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager, RoomObjectType } from '@octane/renderer';
 import { FC, UIEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChatEntryType, LocalizeText, SanitizeHtml } from '../../../../api';
-import { DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { ChatEntryType, LocalizeText, SanitizeHtml, localizeWithFallback } from '../../../../api';
+import { DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useChatHistory, useChatWindow, useOnClickChat } from '../../../../hooks';
 import { useRoom } from '../../../../hooks/rooms';
+import { Checkbox } from '../../../../common/Checkbox';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const BOTTOM_SCROLL_THRESHOLD = 20;
 
@@ -75,7 +77,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
     }, [roomChatHistory.length, isAutoScrollEnabled, scrollToLatest]);
 
     return (
-        <NitroCardView
+        <OctaneCardView
             className="w-[460px] h-[240px]"
             disableDrag={false}
             style={{ pointerEvents: 'auto' }}
@@ -83,32 +85,32 @@ export const ChatWidgetWindowView: FC<{}> = () => {
             uniqueKey="chat-widget-window"
             windowPosition={DraggableWindowPosition.TOP_LEFT}
         >
-            <NitroCardHeaderView
-                headerText="Chat window"
+            <OctaneCardHeaderView
+                headerText={localizeWithFallback('octane.room.chat_window', 'Chat window')}
                 onCloseClick={() => {
                     setChatWindowEnabled(false);
 
                     if (clearChatHistory) clearChatHistory();
                 }}
             />
-            <NitroCardContentView className="bg-[#f2f2f2] relative" overflow="hidden">
+            <OctaneCardContentView className="bg-[#f2f2f2] relative" overflow="hidden">
                 <div className="flex items-center gap-2 px-2 py-1 border-b border-black/20 bg-white/40 text-black text-[11px]">
                     <label className="flex items-center gap-1 cursor-pointer select-none">
-                        <input checked={hidePets} type="checkbox" onChange={(event) => setHidePets(event.target.checked)} />
+                        <Checkbox checked={hidePets} onCheckedChange={(nextChecked) => setHidePets(nextChecked)} />
                         <span>{LocalizeText('widget.room.chat.hide_pets')}</span>
                     </label>
                     <label className="flex items-center gap-1 cursor-pointer select-none">
-                        <input checked={hideAvatars} type="checkbox" onChange={(event) => setHideAvatars(event.target.checked)} />
+                        <Checkbox checked={hideAvatars} onCheckedChange={(nextChecked) => setHideAvatars(nextChecked)} />
                         <span>{LocalizeText('widget.room.chat.hide_avatars')}</span>
                     </label>
-                    <button
+                    <BaseButton
                         className="ml-auto px-1 py-0.5 rounded border border-black/30 bg-white/70 text-[11px] text-black hover:bg-white"
                         onClick={() => setHideBalloons((value) => !value)}
                         type="button"
                     >
                         {hideBalloons ? LocalizeText('widget.room.chat.show_balloon') : LocalizeText('widget.room.chat.hide_balloon')}
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         className="px-1 py-0.5 rounded border border-black/30 bg-white/70 text-[11px] text-black hover:bg-white"
                         onClick={() => {
                             if (clearChatHistory) clearChatHistory();
@@ -116,11 +118,11 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                         type="button"
                     >
                         {LocalizeText('widget.room.chat.clear_history')}
-                    </button>
+                    </BaseButton>
                     <div>
                         <input
                             className="h-[20px] px-1 rounded border border-black/30 bg-white/70 text-[11px] text-black"
-                            placeholder="Search"
+                            placeholder={localizeWithFallback('octane.room.search', 'Search')}
                             type="text"
                             value={LocalizeText('navigator.frontpage.staticsearch.8')}
                             onChange={(event) => setSearch(event.target.value)}
@@ -143,21 +145,21 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                                 )}
                                 {hideBalloons && (
                                     <div onClick={onClickChat}>
-                                        <b dangerouslySetInnerHTML={{ __html: SanitizeHtml(`${chat.name}: `) }} />
+                                        <b>{`${chat.name}: `}</b>
                                         {!chat.showTranslation && (
                                             <span className={messageClassName} dangerouslySetInnerHTML={{ __html: SanitizeHtml(chat.message) }} />
                                         )}
                                         {chat.showTranslation && (
                                             <div className="mt-[2px] flex flex-col gap-[2px]">
                                                 <div className="flex items-start gap-1 leading-[1.15]">
-                                                    <span className="inline-block min-w-[52px] font-bold opacity-75">original:</span>
+                                                    <span className="inline-block min-w-[52px] font-bold opacity-75">{localizeWithFallback('octane.room.original', 'original:')}</span>
                                                     <span
                                                         className={messageClassName}
                                                         dangerouslySetInnerHTML={{ __html: SanitizeHtml(chat.originalMessage || chat.message || '') }}
                                                     />
                                                 </div>
                                                 <div className="flex items-start gap-1 leading-[1.15]">
-                                                    <span className="inline-block min-w-[52px] font-bold opacity-75">translate:</span>
+                                                    <span className="inline-block min-w-[52px] font-bold opacity-75">{localizeWithFallback('octane.room.translate', 'translate:')}</span>
                                                     <span
                                                         className={messageClassName}
                                                         dangerouslySetInnerHTML={{ __html: SanitizeHtml(chat.translatedMessage || chat.message || '') }}
@@ -190,7 +192,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                                             <div
                                                 className={`chat-content py-[5px] px-[6px] leading-none min-h-[25px] ${!hideAvatars ? (isOwnMessage ? 'mr-[27px]' : 'ml-[27px]') : ''}`}
                                             >
-                                                <b className="username" dangerouslySetInnerHTML={{ __html: SanitizeHtml(`${chat.name}: `) }} />
+                                                <b className="username">{`${chat.name}: `}</b>
                                                 {!chat.showTranslation && (
                                                     <span
                                                         className={messageClassName}
@@ -202,7 +204,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                                                     <div className="mt-[2px] flex flex-col gap-[2px]" onClick={onClickChat}>
                                                         <div className="flex items-start gap-1 leading-[1.1]">
                                                             <span className="inline-block min-w-[52px] font-bold" style={{ opacity: 0.75 }}>
-                                                                original:
+                                                                {localizeWithFallback('octane.room.original', 'original:')}
                                                             </span>
                                                             <span
                                                                 className={messageClassName}
@@ -213,7 +215,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                                                         </div>
                                                         <div className="flex items-start gap-1 leading-[1.1]">
                                                             <span className="inline-block min-w-[52px] font-bold" style={{ opacity: 0.75 }}>
-                                                                translate:
+                                                                {localizeWithFallback('octane.room.translate', 'translate:')}
                                                             </span>
                                                             <span
                                                                 className={messageClassName}
@@ -233,7 +235,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                     })}
                 </div>
                 {!isAutoScrollEnabled && (
-                    <button
+                    <BaseButton
                         className="absolute bottom-2 right-2 px-2 py-1 text-white text-[11px] rounded bg-black/45 hover:bg-black/60"
                         onClick={() => {
                             setIsAutoScrollEnabled(true);
@@ -242,9 +244,9 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                         type="button"
                     >
                         Go to latest message
-                    </button>
+                    </BaseButton>
                 )}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

@@ -2,73 +2,53 @@ import {
     AvatarFigurePartType,
     AvatarScaleType,
     AvatarSetType,
-    GetAssetManager,
     GetAvatarRenderManager,
+    IAvatarImage,
     IFigurePart,
     IGraphicAsset,
     IPartColor,
-    NitroAlphaFilter,
-    NitroContainer,
-    NitroRectangle,
-    NitroSprite,
+    OctaneAlphaFilter,
+    OctaneContainer,
+    OctaneSprite,
     TextureUtils
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
+import { canvasToThumbnailUrl, centerCanvasIntoBox, imageUrlToCanvas, ThumbnailUrlCache, trimCanvasToOpaqueBounds } from './avatarThumbnailUrls';
 import { IAvatarEditorCategoryPartItem } from './IAvatarEditorCategoryPartItem';
 
-const MAX_CACHE_BYTES = 200 * 1024 * 1024;
+const MAX_CACHE_BYTES = 48 * 1024 * 1024;
 
-class LRUImageCache {
-    private _cache: Map<string, string> = new Map();
-    private _currentBytes: number = 0;
+export type AvatarEditorThumbRect = { x: number; y: number; width: number; height: number };
 
-    public get(key: string): string | undefined {
-        const value = this._cache.get(key);
+export const unionAvatarEditorThumbRect = (left: AvatarEditorThumbRect, right: AvatarEditorThumbRect): AvatarEditorThumbRect => {
+    const x = Math.min(left.x, right.x);
+    const y = Math.min(left.y, right.y);
 
-        if (value !== undefined) {
-            this._cache.delete(key);
-            this._cache.set(key, value);
-        }
+    return {
+        x,
+        y,
+        width: Math.max(left.x + left.width, right.x + right.width) - x,
+        height: Math.max(left.y + left.height, right.y + right.height) - y
+    };
+};
 
-        return value;
-    }
-
-    public set(key: string, value: string): void {
-        if (this._cache.has(key)) {
-            const old = this._cache.get(key);
-
-            this._currentBytes -= (key.length + old.length) * 2;
-            this._cache.delete(key);
-        }
-
-        const entryBytes = (key.length + value.length) * 2;
-
-        while (this._currentBytes + entryBytes > MAX_CACHE_BYTES && this._cache.size > 0) {
-            const firstKey = this._cache.keys().next().value;
-            const firstValue = this._cache.get(firstKey);
-
-            this._currentBytes -= (firstKey.length + firstValue.length) * 2;
-            this._cache.delete(firstKey);
-        }
-
-        this._cache.set(key, value);
-        this._currentBytes += entryBytes;
-    }
-
-    public clear(): void {
-        this._cache.clear();
-        this._currentBytes = 0;
-    }
-}
+export const avatarEditorThumbDest = (assetX: number, assetY: number, union: AvatarEditorThumbRect) => ({
+    x: assetX - union.x,
+    y: assetY - union.y
+});
 
 export class AvatarEditorThumbnailsHelper {
-    private static THUMBNAIL_CACHE: LRUImageCache = new LRUImageCache();
+    private static THUMBNAIL_CACHE: ThumbnailUrlCache = new ThumbnailUrlCache(MAX_CACHE_BYTES);
+    private static PENDING_THUMBNAILS: Map<string, Promise<string>> = new Map();
     private static THUMB_DIRECTIONS: number[] = [2, 6, 0, 4, 3, 1];
-    private static ALPHA_FILTER: NitroAlphaFilter = new NitroAlphaFilter({ alpha: 0.2 });
+    private static THUMB_BOX: number = 50;
+    private static ALPHA_FILTER: OctaneAlphaFilter = new OctaneAlphaFilter({ alpha: 0.2 });
     private static DRAW_ORDER: string[] = [
         AvatarFigurePartType.LEFT_HAND_ITEM,
         AvatarFigurePartType.LEFT_HAND,
         AvatarFigurePartType.LEFT_SLEEVE,
         AvatarFigurePartType.LEFT_COAT_SLEEVE,
+        'mcl',
+        'ptl',
         AvatarFigurePartType.BODY,
         AvatarFigurePartType.SHOES,
         AvatarFigurePartType.LEGS,
@@ -76,10 +56,14 @@ export class AvatarEditorThumbnailsHelper {
         AvatarFigurePartType.CHEST_ACCESSORY,
         AvatarFigurePartType.COAT_CHEST,
         AvatarFigurePartType.CHEST_PRINT,
+        AvatarFigurePartType.MISC,
+        AvatarFigurePartType.PET,
         AvatarFigurePartType.WAIST_ACCESSORY,
         AvatarFigurePartType.RIGHT_HAND,
         AvatarFigurePartType.RIGHT_SLEEVE,
         AvatarFigurePartType.RIGHT_COAT_SLEEVE,
+        'mcr',
+        'ptr',
         AvatarFigurePartType.HEAD,
         AvatarFigurePartType.FACE,
         AvatarFigurePartType.EYES,
@@ -89,14 +73,18 @@ export class AvatarEditorThumbnailsHelper {
         AvatarFigurePartType.EYE_ACCESSORY,
         AvatarFigurePartType.HEAD_ACCESSORY,
         AvatarFigurePartType.HEAD_ACCESSORY_EXTRA,
-        AvatarFigurePartType.RIGHT_HAND_ITEM,
-        AvatarFigurePartType.PET,
-        'ptl',
-        'ptr',
-        AvatarFigurePartType.MISC,
-        'mcl',
-        'mcr'
+        AvatarFigurePartType.RIGHT_HAND_ITEM
     ];
+
+    private static async cacheCanvas(key: string, canvas: HTMLCanvasElement): Promise<string> {
+        const entry = await canvasToThumbnailUrl(canvas);
+
+        if (!entry) return null;
+
+        this.THUMBNAIL_CACHE.set(key, entry);
+
+        return entry.url;
+    }
 
     private static getThumbnailKey(setType: string, part: IAvatarEditorCategoryPartItem, partColors?: IPartColor[], isDisabled?: boolean): string {
         let key = `${setType}-${part.partSet.id}`;
@@ -128,62 +116,114 @@ export class AvatarEditorThumbnailsHelper {
 
         if (cached) return cached;
 
+        const pending = this.PENDING_THUMBNAILS.get(thumbnailKey);
+
+        if (pending) return pending;
+
         const buildContainer = (part: IAvatarEditorCategoryPartItem, useColors: boolean, partColors: IPartColor[], isDisabled: boolean = false) => {
-            const container = new NitroContainer();
-            const parts = part.partSet.parts.concat().sort(this.sortByDrawOrder);
+            const container = new OctaneContainer();
+            const sourceParts = part.partSet.parts;
+            const parts = sourceParts.concat().sort(this.sortByDrawOrder);
+            let renderedCount = 0;
+            let directionIndex = -1;
 
-            for (const part of parts) {
-                if (!part) continue;
+            for (const sourcePart of sourceParts) {
+                if (!sourcePart) continue;
 
-                let asset: IGraphicAsset = null;
-                let direction = 0;
-                let hasAsset = false;
+                for (let index = 0; index < AvatarEditorThumbnailsHelper.THUMB_DIRECTIONS.length; index++) {
+                    const assetName = `${AvatarFigurePartType.SCALE}_${AvatarFigurePartType.STD}_${sourcePart.type}_${sourcePart.id}_${AvatarEditorThumbnailsHelper.THUMB_DIRECTIONS[index]}_${AvatarFigurePartType.DEFAULT_FRAME}`;
 
-                while (!hasAsset && direction < AvatarEditorThumbnailsHelper.THUMB_DIRECTIONS.length) {
-                    const assetName = `${AvatarFigurePartType.SCALE}_${AvatarFigurePartType.STD}_${part.type}_${part.id}_${AvatarEditorThumbnailsHelper.THUMB_DIRECTIONS[direction]}_${AvatarFigurePartType.DEFAULT_FRAME}`;
+                    if (GetAvatarRenderManager().getAssetByName(assetName)?.texture) {
+                        directionIndex = index;
 
-                    asset = GetAssetManager().getAsset(assetName);
-
-                    if (asset && asset.texture) {
-                        hasAsset = true;
-                    } else {
-                        direction++;
+                        break;
                     }
                 }
 
-                if (!hasAsset) {
-                    continue;
-                }
+                if (directionIndex >= 0) break;
+            }
 
-                const x = asset.offsetX;
-                const y = asset.offsetY;
+            if (directionIndex < 0) return { container, renderedCount };
 
-                const sprite = new NitroSprite(asset.texture);
+            const drawn: { figurePart: IFigurePart; asset: IGraphicAsset }[] = [];
+            let union: AvatarEditorThumbRect = null;
 
-                sprite.position.set(x, y);
+            for (const figurePart of parts) {
+                if (!figurePart) continue;
 
-                if (useColors && part.colorLayerIndex > 0 && partColors && partColors.length) {
-                    const color = partColors[part.colorLayerIndex - 1];
+                const assetName = `${AvatarFigurePartType.SCALE}_${AvatarFigurePartType.STD}_${figurePart.type}_${figurePart.id}_${AvatarEditorThumbnailsHelper.THUMB_DIRECTIONS[directionIndex]}_${AvatarFigurePartType.DEFAULT_FRAME}`;
+                const asset: IGraphicAsset = GetAvatarRenderManager().getAssetByName(assetName);
+
+                if (!asset?.texture) continue;
+
+                drawn.push({ figurePart, asset });
+
+                const rect: AvatarEditorThumbRect = { x: asset.x, y: asset.y, width: asset.width, height: asset.height };
+
+                union = union ? unionAvatarEditorThumbRect(union, rect) : rect;
+            }
+
+            if (!union || union.width <= 0 || union.height <= 0) return { container, renderedCount };
+
+            for (const { figurePart, asset } of drawn) {
+                const sprite = new OctaneSprite(asset.texture);
+                const dest = avatarEditorThumbDest(asset.x, asset.y, union);
+
+                sprite.position.set(dest.x, dest.y);
+
+                if (useColors && figurePart.colorLayerIndex > 0 && partColors && partColors.length) {
+                    const color = partColors[figurePart.colorLayerIndex - 1];
 
                     if (color) sprite.tint = color.rgb;
                 }
 
-                if (isDisabled) container.filters = [AvatarEditorThumbnailsHelper.ALPHA_FILTER];
-
                 container.addChild(sprite);
+                renderedCount++;
             }
 
-            return container;
+            if (isDisabled) container.filters = [AvatarEditorThumbnailsHelper.ALPHA_FILTER];
+
+            return { container, renderedCount };
         };
 
-        return new Promise(async (resolve, reject) => {
+        const promise = new Promise<string>((resolve) => {
+            let completed = false;
+
             const resetFigure = async (figure: string) => {
-                const container = buildContainer(part, useColors, partColors, isDisabled);
-                const imageUrl = await TextureUtils.generateImageUrl({ target: container, resolution: 1 });
+                if (completed) return;
 
-                if (imageUrl) AvatarEditorThumbnailsHelper.THUMBNAIL_CACHE.set(thumbnailKey, imageUrl);
+                const { container, renderedCount } = buildContainer(part, useColors, partColors, isDisabled);
 
-                resolve(imageUrl);
+                if (renderedCount === 0) {
+                    completed = true;
+                    container.destroy({ children: true });
+                    resolve(null);
+
+                    return;
+                }
+
+                try {
+                    const rendered = TextureUtils.generateCanvas({ target: container, resolution: 1 }) as HTMLCanvasElement;
+                    const imageUrl = rendered
+                        ? await AvatarEditorThumbnailsHelper.cacheCanvas(
+                              thumbnailKey,
+                              centerCanvasIntoBox(rendered, AvatarEditorThumbnailsHelper.THUMB_BOX)
+                          )
+                        : null;
+
+                    if (completed) return;
+
+                    completed = true;
+
+                    resolve(imageUrl);
+                } catch {
+                    if (!completed) {
+                        completed = true;
+                        resolve(null);
+                    }
+                } finally {
+                    container.destroy({ children: true });
+                }
             };
 
             const figureContainer = GetAvatarRenderManager().createFigureContainer(`${setType}-${part.partSet.id}`);
@@ -198,81 +238,87 @@ export class AvatarEditorThumbnailsHelper {
                 resetFigure(null);
             }
         });
+
+        this.PENDING_THUMBNAILS.set(thumbnailKey, promise);
+        void promise.finally(() => {
+            if (this.PENDING_THUMBNAILS.get(thumbnailKey) === promise) this.PENDING_THUMBNAILS.delete(thumbnailKey);
+        });
+
+        return promise;
     }
 
     public static async buildForFace(figureString: string, isDisabled: boolean = false): Promise<string> {
         if (!figureString || !figureString.length) return null;
 
-        const thumbnailKey = figureString + (isDisabled ? '-d' : '');
+        const thumbnailKey = `face:${figureString}${isDisabled ? '-d' : ''}`;
         const cached = this.THUMBNAIL_CACHE.get(thumbnailKey);
 
         if (cached) return cached;
 
-        return new Promise(async (resolve, reject) => {
+        const pending = this.PENDING_THUMBNAILS.get(thumbnailKey);
+
+        if (pending) return pending;
+
+        const promise = new Promise<string>((resolve) => {
+            let completed = false;
+
             const resetFigure = async (figure: string) => {
-                const avatarImage = GetAvatarRenderManager().createAvatarImage(figure, AvatarScaleType.LARGE, null, {
-                    resetFigure,
-                    dispose: null,
-                    disposed: false
-                });
+                if (completed) return;
 
-                if (avatarImage.isPlaceholder()) return;
+                let avatarImage: IAvatarImage = null;
+                try {
+                    avatarImage = GetAvatarRenderManager().createAvatarImage(figure, AvatarScaleType.LARGE, null, {
+                        resetFigure,
+                        dispose: null,
+                        disposed: false
+                    });
 
-                const texture = avatarImage.processAsTexture(AvatarSetType.HEAD, false);
-                const sprite = new NitroSprite(texture);
-                if (isDisabled) sprite.filters = [AvatarEditorThumbnailsHelper.ALPHA_FILTER];
-                const frame = AvatarEditorThumbnailsHelper.findOpaqueBoundsFrame(sprite, texture.width, texture.height);
-                const imageUrl = await TextureUtils.generateImageUrl({
-                    target: sprite,
-                    frame
-                });
+                    if (!avatarImage) {
+                        completed = true;
+                        resolve(null);
 
-                sprite.destroy();
-                avatarImage.dispose();
+                        return;
+                    }
 
-                AvatarEditorThumbnailsHelper.THUMBNAIL_CACHE.set(thumbnailKey, imageUrl);
+                    if (avatarImage.isPlaceholder()) return;
 
-                resolve(imageUrl);
+                    const croppedImageUrl = avatarImage.processAsCroppedImageUrl(AvatarSetType.HEAD);
+                    if (!croppedImageUrl) {
+                        completed = true;
+                        resolve(null);
+
+                        return;
+                    }
+
+                    const decoded = await imageUrlToCanvas(croppedImageUrl);
+                    const imageUrl = decoded
+                        ? await AvatarEditorThumbnailsHelper.cacheCanvas(thumbnailKey, trimCanvasToOpaqueBounds(decoded))
+                        : null;
+
+                    if (completed) return;
+
+                    completed = true;
+
+                    resolve(imageUrl);
+                } catch {
+                    if (!completed) {
+                        completed = true;
+                        resolve(null);
+                    }
+                } finally {
+                    avatarImage?.dispose();
+                }
             };
 
             resetFigure(figureString);
         });
-    }
 
-    private static findOpaqueBoundsFrame(sprite: NitroSprite, fallbackWidth: number, fallbackHeight: number): NitroRectangle {
-        try {
-            const data = TextureUtils.getPixels(sprite);
-            if (!data) return new NitroRectangle(0, 0, fallbackWidth, fallbackHeight);
+        this.PENDING_THUMBNAILS.set(thumbnailKey, promise);
+        void promise.finally(() => {
+            if (this.PENDING_THUMBNAILS.get(thumbnailKey) === promise) this.PENDING_THUMBNAILS.delete(thumbnailKey);
+        });
 
-            const pixels = data.pixels as Uint8ClampedArray | Uint8Array;
-            const width = data.width;
-            const height = data.height;
-            if (!pixels || width <= 0 || height <= 0) return new NitroRectangle(0, 0, fallbackWidth, fallbackHeight);
-            const ALPHA_THRESHOLD = 8;
-
-            let minX = width;
-            let minY = height;
-            let maxX = -1;
-            let maxY = -1;
-
-            for (let y = 0; y < height; y++) {
-                const rowStart = y * width * 4;
-                for (let x = 0; x < width; x++) {
-                    if (pixels[rowStart + x * 4 + 3] > ALPHA_THRESHOLD) {
-                        if (x < minX) minX = x;
-                        if (x > maxX) maxX = x;
-                        if (y < minY) minY = y;
-                        if (y > maxY) maxY = y;
-                    }
-                }
-            }
-
-            if (maxX < minX || maxY < minY) return new NitroRectangle(0, 0, fallbackWidth, fallbackHeight);
-
-            return new NitroRectangle(minX, minY, maxX - minX + 1, maxY - minY + 1);
-        } catch {
-            return new NitroRectangle(0, 0, fallbackWidth, fallbackHeight);
-        }
+        return promise;
     }
 
     private static sortByDrawOrder(a: IFigurePart, b: IFigurePart): number {

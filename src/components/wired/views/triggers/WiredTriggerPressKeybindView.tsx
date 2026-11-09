@@ -1,8 +1,10 @@
 import { FC, KeyboardEvent, useEffect, useState } from 'react';
-import { WiredFurniType, localizeWithFallback } from '../../../../api';
+import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const WiredTriggerPressKeybindView: FC<{}> = () =>
 {
@@ -19,7 +21,7 @@ export const WiredTriggerPressKeybindView: FC<{}> = () =>
 
         setMatchEnabled(value > 0);
         setKeyCode(value);
-        setKeyLabel(value > 0 ? ('Key code ' + value) : '');
+        setKeyLabel(value > 0 ? (localizeWithFallback('octane.wired.key_code', 'Key code ') + value) : '');
     }, [ trigger ]);
 
     const captureKey = (event: KeyboardEvent<HTMLInputElement>) =>
@@ -33,28 +35,25 @@ export const WiredTriggerPressKeybindView: FC<{}> = () =>
     const save = () => setIntParams([ matchEnabled ? Math.max(0, keyCode) : 0 ]);
 
     return (
-        <WiredTriggerBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } save={ save }>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.presskeybind', 'Press keybind')}</Text>
-                <Text small>{localizeWithFallback('wiredfurni.params.presskeybind.info', 'Fires when a user presses a key in the room. Leave unchecked to match any key.')}</Text>
-                <div className="flex items-center gap-1">
-                    <input
-                        checked={ matchEnabled }
-                        className="form-check-input"
-                        id="keybindMatchEnabled"
-                        type="checkbox"
-                        onChange={ event => setMatchEnabled(event.target.checked) } />
-                    <Text>{localizeWithFallback('wiredfurni.params.presskeybind.specific', 'Only a specific key')}</Text>
+        <NativeTextTree>
+            <WiredTriggerBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } save={ save }>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.presskeybind', 'Press keybind')}</Text>
+                    <Text small>{localizeWithFallback('wiredfurni.params.presskeybind.info', 'Fires when a user presses a key in the room. Leave unchecked to match any key.')}</Text>
+                    <div className="flex items-center gap-1">
+                        <Checkbox checked={ matchEnabled } id="keybindMatchEnabled" onCheckedChange={(nextChecked) => setMatchEnabled(nextChecked)} />
+                        <Text>{localizeWithFallback('wiredfurni.params.presskeybind.specific', 'Only a specific key')}</Text>
+                    </div>
+                    { matchEnabled &&
+                        <input
+                            className="form-control form-control-sm"
+                            type="text"
+                            readOnly
+                            placeholder={ localizeWithFallback('wiredfurni.params.presskeybind.placeholder', 'Click here, then press a key') }
+                            value={ keyLabel }
+                            onKeyDown={ captureKey } /> }
                 </div>
-                { matchEnabled &&
-                    <input
-                        className="form-control form-control-sm"
-                        type="text"
-                        readOnly
-                        placeholder={ localizeWithFallback('wiredfurni.params.presskeybind.placeholder', 'Click here, then press a key') }
-                        value={ keyLabel }
-                        onKeyDown={ captureKey } /> }
-            </div>
-        </WiredTriggerBaseView>
+            </WiredTriggerBaseView>
+        </NativeTextTree>
     );
 };

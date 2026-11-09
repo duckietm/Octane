@@ -1,10 +1,14 @@
 import { Dispatch, FC, ReactElement, PointerEvent as ReactPointerEvent, useCallback, useEffect, useMemo, useRef, useState, WheelEvent } from 'react';
-import { FaCrosshairs, FaSearchMinus, FaSearchPlus, FaSyncAlt } from 'react-icons/fa';
+import { FaCrosshairs, FaExpand, FaMinus, FaPlus, FaSyncAlt } from 'react-icons/fa';
 import { tileToScreen, usePointerToTile } from '../hooks/usePointerToTile';
 import { useTool } from '../hooks/useTool';
 import { MAX_NUM_TILE_PER_AXIS, TILE_SIZE } from '../state/constants';
 import { FloorplanAction, FloorplanState } from '../state/types';
 import { FloorplanTile } from './FloorplanTile';
+import { BaseButton } from '../../../common/BaseButton';
+import { Hint } from '../../../common/Tooltip';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../../api';
 
 type Props = {
     state: FloorplanState;
@@ -19,6 +23,9 @@ const ZOOM_MIN = 0.4;
 const ZOOM_MAX = 6;
 const ZOOM_STEP = 0.2;
 const FIT_PADDING = TILE_SIZE * 2;
+
+const GRID_FILL = '#242424';
+const GRID_LINE = '#000000';
 
 const clampZoom = (z: number): number => Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z));
 
@@ -61,6 +68,28 @@ const computeRoomBounds = (state: FloorplanState): { x: number; y: number; w: nu
         w: maxX - minX + FIT_PADDING * 2,
         h: maxY - minY + FIT_PADDING * 2
     };
+};
+
+const GridPattern: FC<{ id: string }> = ({ id }) => {
+    const w = TILE_SIZE;
+    const h = TILE_SIZE / 2;
+    const [originX, originY] = tileToScreen(0, 0);
+    const diamond = (cx: number, cy: number) => `${cx},${cy - h / 2} ${cx + w / 2},${cy} ${cx},${cy + h / 2} ${cx - w / 2},${cy}`;
+
+    return (
+        <NativeTextTree>
+            <defs>
+                <pattern id={id} patternUnits="userSpaceOnUse" x={originX - w / 2} y={originY - h / 2} width={w} height={h}>
+                    <rect width={w} height={h} fill={GRID_LINE} />
+                    <polygon points={diamond(w / 2, h / 2)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
+                    <polygon points={diamond(0, 0)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
+                    <polygon points={diamond(w, 0)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
+                    <polygon points={diamond(0, h)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
+                    <polygon points={diamond(w, h)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
+                </pattern>
+            </defs>
+        </NativeTextTree>
+    );
 };
 
 export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
@@ -190,89 +219,72 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
     const cursorClass = isPanning ? 'cursor-grabbing' : panMode ? 'cursor-grab' : '';
 
     return (
-        <div className="relative w-full h-full">
-            <svg
-                ref={svgRef}
-                viewBox={viewBox}
-                style={flipped ? { transform: 'scaleX(-1)' } : undefined}
-                className={`w-full h-full select-none rounded-md border border-zinc-300 bg-[url('@/assets/images/floorplaneditor/canvas_floor_pattern.png')] bg-repeat [image-rendering:pixelated] transition-transform ${cursorClass}`}
-                onWheel={onWheel}
-                onPointerDown={(e) => {
-                    if (isPanGesture(e)) {
-                        e.preventDefault();
-                        panStartRef.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y };
-                        setIsPanning(true);
-                        return;
-                    }
-                    tool.onPointerDown(e);
-                }}
-                onPointerMove={(e) => {
-                    if (panStartRef.current) return;
-                    tool.onPointerMove(e);
-                }}
-                onPointerUp={(e) => {
-                    if (panStartRef.current) return;
-                    tool.onPointerUp(e);
-                }}
-            >
-                {rows}
-                {outOfBoundsOverlay}
-            </svg>
-            <div className="absolute bottom-2 left-2 flex items-center gap-1 rounded-md bg-white/95 border border-zinc-300 shadow-sm px-1 py-1 text-zinc-700">
-                <button
-                    type="button"
-                    data-testid="zoom-out"
-                    title="Zoom out (Ctrl+wheel)"
-                    className="w-7 h-7 flex items-center justify-center rounded hover:bg-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                    disabled={zoom <= ZOOM_MIN + 1e-3}
-                    onClick={zoomOut}
-                >
-                    <FaSearchMinus size={12} />
-                </button>
-                <button
-                    type="button"
-                    data-testid="zoom-reset"
-                    title="Fit room to view"
-                    className="px-2 h-7 min-w-[3rem] flex items-center justify-center rounded hover:bg-zinc-100 text-xs font-bold tabular-nums"
-                    onClick={resetView}
-                >
-                    {Math.round(zoom * 100)}%
-                </button>
-                <button
-                    type="button"
-                    data-testid="zoom-in"
-                    title="Zoom in (Ctrl+wheel)"
-                    className="w-7 h-7 flex items-center justify-center rounded hover:bg-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                    disabled={zoom >= ZOOM_MAX - 1e-3}
-                    onClick={zoomIn}
-                >
-                    <FaSearchPlus size={12} />
-                </button>
-                <span className="w-px h-5 bg-zinc-300 mx-1" />
-                <button
-                    type="button"
-                    data-testid="zoom-recenter"
-                    title="Recenter on room (keep zoom)"
-                    className="w-7 h-7 flex items-center justify-center rounded hover:bg-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                    disabled={!roomBounds}
-                    onClick={() => {
-                        const next = centerPanForRoom();
-                        if (next) setPan(next);
+        <NativeTextTree>
+            <div className="fp-stage" data-testid="floorplan-2d">
+                <svg
+                    ref={svgRef}
+                    viewBox={viewBox}
+                    style={flipped ? { transform: 'scaleX(-1)' } : undefined}
+                    className={`block w-full h-full select-none bg-black [shape-rendering:crispEdges] ${cursorClass}`}
+                    onWheel={onWheel}
+                    onPointerDown={(e) => {
+                        if (isPanGesture(e)) {
+                            e.preventDefault();
+                            panStartRef.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y };
+                            setIsPanning(true);
+                            return;
+                        }
+                        tool.onPointerDown(e);
+                    }}
+                    onPointerMove={(e) => {
+                        if (panStartRef.current) return;
+                        tool.onPointerMove(e);
+                    }}
+                    onPointerUp={(e) => {
+                        if (panStartRef.current) return;
+                        tool.onPointerUp(e);
                     }}
                 >
-                    <FaCrosshairs size={12} />
-                </button>
-                <button
-                    type="button"
-                    data-testid="zoom-flip"
-                    data-active={flipped ? 'true' : 'false'}
-                    title={flipped ? 'Original view' : 'View from the other side'}
-                    className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${flipped ? 'bg-amber-400 text-zinc-900 hover:bg-amber-500' : 'hover:bg-zinc-100'}`}
-                    onClick={() => setFlipped((v) => !v)}
-                >
-                    <FaSyncAlt size={12} />
-                </button>
+                    <GridPattern id="fp-grid" />
+                    <rect data-testid="floorplan-grid" x={viewX} y={viewY} width={visW} height={visH} fill="url(#fp-grid)" />
+                    {rows}
+                    {outOfBoundsOverlay}
+                </svg>
+                <div className="fp-stage-buttons">
+                    <Hint content={localizeWithFallback('octane.floorplan_editor.fit_room_to_view', 'Fit room to view')}><BaseButton aria-label={localizeWithFallback('octane.floorplan_editor.fit_room_to_view', 'Fit room to view')} type="button" data-testid="zoom-reset" className="fp-round-btn is-small" disabled={!roomBounds} onClick={resetView}>
+                        <FaExpand size={10} />
+                    </BaseButton></Hint>
+                    <Hint content={localizeWithFallback('octane.floorplan_editor.recenter_on_room_keep_zoom', 'Recenter on room (keep zoom)')}><BaseButton aria-label={localizeWithFallback('octane.floorplan_editor.recenter_on_room_keep_zoom', 'Recenter on room (keep zoom)')}
+                        type="button"
+                        data-testid="zoom-recenter"
+                        className="fp-round-btn is-small"
+                        disabled={!roomBounds}
+                        onClick={() => {
+                            const next = centerPanForRoom();
+                            if (next) setPan(next);
+                        }}
+                    >
+                        <FaCrosshairs size={10} />
+                    </BaseButton></Hint>
+                    <Hint content={flipped ? localizeWithFallback('octane.floorplan_editor.original_view', 'Original view') : localizeWithFallback('octane.floorplan_editor.view_from_the_other_side', 'View from the other side')}>
+                        <BaseButton aria-label={flipped ? localizeWithFallback('octane.floorplan_editor.original_view', 'Original view') : localizeWithFallback('octane.floorplan_editor.view_from_the_other_side', 'View from the other side')}
+                            type="button"
+                            data-testid="zoom-flip"
+                            data-active={flipped ? 'true' : 'false'}
+                            className={`fp-round-btn is-small ${flipped ? 'is-on' : ''}`}
+                            onClick={() => setFlipped((v) => !v)}
+                        >
+                            <FaSyncAlt size={10} />
+                        </BaseButton>
+                    </Hint>
+                    <Hint content={`Zoom in (Ctrl+wheel) · ${Math.round(zoom * 100)}%`}><BaseButton aria-label={`Zoom in (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} type="button" data-testid="zoom-in" className="fp-round-btn" disabled={zoom >= ZOOM_MAX - 1e-3} onClick={zoomIn}>
+                        <FaPlus size={13} />
+                    </BaseButton></Hint>
+                    <Hint content={`Zoom out (Ctrl+wheel) · ${Math.round(zoom * 100)}%`}><BaseButton aria-label={`Zoom out (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} type="button" data-testid="zoom-out" className="fp-round-btn" disabled={zoom <= ZOOM_MIN + 1e-3} onClick={zoomOut}>
+                        <FaMinus size={13} />
+                    </BaseButton></Hint>
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

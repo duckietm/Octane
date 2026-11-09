@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><layout name="user_info_frame" width="292" height="225" version="0.1" uid="C77F2197-3A40-CFAD-37D9-416050AA8C84">
+  <window>
+    <frame x="200" y="4" width="292" height="225" params="32769" style="0" caption="User%20info" color="0xff418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.34901960784313724" blurX="4" blurY="4"/>
+      </filters>
+    </frame>
+  </window>
+</layout>

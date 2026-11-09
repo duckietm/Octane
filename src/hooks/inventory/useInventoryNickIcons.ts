@@ -1,6 +1,6 @@
-import { RequestNickIconsComposer, SetActiveNickIconComposer, UserNickIconsEvent } from '@nitrots/nitro-renderer';
+import { RequestNickIconsComposer, SetActiveNickIconComposer, UserNickIconsEvent } from '@octane/renderer';
 import { useEffect, useState } from 'react';
-import { useBetween } from 'use-between';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { INickIconItem, SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';
 import { useSharedVisibility } from '../useSharedVisibility';
@@ -69,4 +69,6 @@ const useInventoryNickIconsState = () => {
     };
 };
 
-export const useInventoryNickIcons = () => useBetween(useInventoryNickIconsState);
+export const useInventoryNickIcons = () => useSharedHook(useInventoryNickIconsState);
+
+registerSharedHook(useInventoryNickIconsState);

@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+/* @vitest-environment jsdom */
+import { describe, expect, it, vi } from 'vitest';
 import { BuilderFurniPlaceableStatus } from '../../api/catalog/BuilderFurniPlaceableStatus';
 import { CatalogType } from '../../api/catalog/CatalogType';
 import {
@@ -6,10 +7,28 @@ import {
     findNodeById,
     findNodeByName,
     getNodesByOfferIdFromMap,
-    getOfferProductKeys,
     normalizeCatalogType,
-    resolveBuilderFurniPlaceableStatus
+    resolveBuilderFurniPlaceableStatus,
+    resolveOfferPageId,
+    restoreCatalogActivePath
 } from './useCatalog.helpers';
+
+describe('restoreCatalogActivePath', () => {
+    it('rebinds the active path to nodes from a refreshed catalog tree', () => {
+        const root: any = { pageId: -1, pageName: 'root', children: [] };
+        const parent: any = { pageId: 10, pageName: 'parent', parent: root, children: [], activate: vi.fn(), open: vi.fn() };
+        const child: any = { pageId: 11, pageName: 'child', parent, children: [], activate: vi.fn(), open: vi.fn() };
+        root.children = [parent];
+        parent.children = [child];
+
+        const restored = restoreCatalogActivePath(root, 11);
+
+        expect(restored).toEqual([parent, child]);
+        expect(parent.activate).toHaveBeenCalledOnce();
+        expect(child.activate).toHaveBeenCalledOnce();
+        expect(parent.open).toHaveBeenCalledOnce();
+    });
+});
 
 // ---------------------------------------------------------------------------
 // normalizeCatalogType
@@ -31,50 +50,6 @@ describe('normalizeCatalogType', () => {
     it('returns NORMAL for any unknown string', () => {
         expect(normalizeCatalogType('something_else')).toBe(CatalogType.NORMAL);
         expect(normalizeCatalogType('')).toBe(CatalogType.NORMAL);
-    });
-});
-
-// ---------------------------------------------------------------------------
-// getOfferProductKeys
-// ---------------------------------------------------------------------------
-
-describe('getOfferProductKeys', () => {
-    const makeOffer = (overrides: any = {}) =>
-        ({
-            product: {
-                productType: 'floor',
-                productClassId: 42,
-                furnitureData: { className: 'chair_basic' },
-                ...overrides
-            }
-        }) as any;
-
-    it('returns both id and className keys when the product has both', () => {
-        expect(getOfferProductKeys(makeOffer())).toEqual(['floor:id:42', 'floor:class:chair_basic']);
-    });
-
-    it('omits the id key when productClassId is negative', () => {
-        const offer = makeOffer({ productClassId: -1 });
-
-        expect(getOfferProductKeys(offer)).toEqual(['floor:class:chair_basic']);
-    });
-
-    it('omits the className key when furnitureData has no className', () => {
-        const offer = makeOffer({ furnitureData: { className: '' } });
-
-        expect(getOfferProductKeys(offer)).toEqual(['floor:id:42']);
-    });
-
-    it('returns an empty array when the offer has no product', () => {
-        expect(getOfferProductKeys(null)).toEqual([]);
-        expect(getOfferProductKeys(undefined)).toEqual([]);
-        expect(getOfferProductKeys({} as any)).toEqual([]);
-    });
-
-    it('returns an empty array when productType is missing', () => {
-        const offer = makeOffer({ productType: '' });
-
-        expect(getOfferProductKeys(offer)).toEqual([]);
     });
 });
 
@@ -136,6 +111,19 @@ describe('findNodeByName', () => {
         const root = makeNode({ pageName: 'root', children: [makeNode({ pageName: 'a' }) as any] }) as any;
 
         expect(findNodeByName('b', root, root)).toBeNull();
+    });
+
+    it('follows a page path when a name is used twice', () => {
+        const wiredEffects = makeNode({ pageName: 'effects' }) as any;
+        const clothingEffects = makeNode({ pageName: 'effects' }) as any;
+        const furni = makeNode({ pageName: 'furni', children: [makeNode({ pageName: 'wired', children: [wiredEffects] })] }) as any;
+        const clothing = makeNode({ pageName: 'clothing', children: [clothingEffects] }) as any;
+        const root = makeNode({ pageName: 'root', children: [furni, clothing] }) as any;
+
+        expect(findNodeByName('effects', root, root)).toBe(wiredEffects);
+        expect(findNodeByName('clothing/effects', root, root)).toBe(clothingEffects);
+        expect(findNodeByName('clothing/hats', root, root)).toBeNull();
+        expect(findNodeByName('clothing/clothing', root, root)).toBeNull();
     });
 });
 
@@ -264,6 +252,11 @@ describe('resolveBuilderFurniPlaceableStatus', () => {
         expect(resolveBuilderFurniPlaceableStatus({ ...baseInput, offer: null })).toBe(BuilderFurniPlaceableStatus.MISSING_OFFER);
     });
 
+    it('returns NOT_ROOM_OWNER for the room owner in playtest (the hotel rule beyond AIR)', () => {
+        expect(resolveBuilderFurniPlaceableStatus({ ...baseInput, playTestRestricted: true })).toBe(BuilderFurniPlaceableStatus.NOT_ROOM_OWNER);
+        expect(resolveBuilderFurniPlaceableStatus({ ...baseInput, playTestRestricted: false })).toBe(BuilderFurniPlaceableStatus.OKAY);
+    });
+
     it('returns NOT_IN_ROOM when roomSession is null', () => {
         expect(resolveBuilderFurniPlaceableStatus({ ...baseInput, roomSession: null })).toBe(BuilderFurniPlaceableStatus.NOT_IN_ROOM);
     });
@@ -329,5 +322,38 @@ describe('resolveBuilderFurniPlaceableStatus', () => {
         const input = { ...baseInput, secondsLeft: 0, visitorCount: 0 };
 
         expect(resolveBuilderFurniPlaceableStatus(input)).toBe(BuilderFurniPlaceableStatus.OKAY);
+    });
+});
+
+describe('resolveOfferPageId', () => {
+    const offersToNodes = new Map<number, any[]>([
+        [
+            42,
+            [
+                { pageId: 7, isVisible: false },
+                { pageId: 9, isVisible: true }
+            ]
+        ]
+    ]);
+
+    it("names the offer's own page, not the page on screen", () => {
+        expect(resolveOfferPageId({ offerId: 42, page: { pageId: 3 } } as any, offersToNodes)).toBe(3);
+    });
+
+    it('finds the page that holds an offer opened from a search or a link', () => {
+        expect(resolveOfferPageId({ offerId: 42, page: { pageId: -12345678 } } as any, offersToNodes)).toBe(9);
+        expect(resolveOfferPageId({ offerId: 42, page: { pageId: -1 } } as any, offersToNodes)).toBe(9);
+    });
+
+    it('answers -1 when no page holds the offer', () => {
+        expect(resolveOfferPageId({ offerId: 5, page: null } as any, offersToNodes)).toBe(-1);
+    });
+
+    it('is what a skip-confirm placement buys with', async () => {
+        const { readFileSync } = await import('node:fs');
+        const source = readFileSync('src/hooks/catalog/useCatalogEffects.ts', 'utf8');
+
+        expect(source).not.toContain('new PurchaseFromCatalogComposer(state.pageId,');
+        expect(source).toContain('resolveOfferPageId(purchasableOffer, readCatalogIndex(state.currentType)?.offersToNodes)');
     });
 });

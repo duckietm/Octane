@@ -1,17 +1,17 @@
 import { act, cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Capture handlers registered by useMessageEvent / useNitroEvent so we can fire fake events.
+// Capture handlers registered by useMessageEvent / useOctaneEvent so we can fire fake events.
 const messageHandlers = new Map<unknown, (event: unknown) => void>();
-const nitroHandlers = new Map<unknown, (event: unknown) => void>();
+const octaneHandlers = new Map<unknown, (event: unknown) => void>();
 
 vi.mock('../../hooks', async () => {
     return {
         useMessageEvent: (eventClass: unknown, handler: (event: unknown) => void) => {
             messageHandlers.set(eventClass, handler);
         },
-        useNitroEvent: (eventType: unknown, handler: (event: unknown) => void) => {
-            nitroHandlers.set(eventType, handler);
+        useOctaneEvent: (eventType: unknown, handler: (event: unknown) => void) => {
+            octaneHandlers.set(eventType, handler);
         }
     };
 });
@@ -39,21 +39,21 @@ import {
     RoomOccupiedTilesMessageEvent,
     RoomVisualizationSettingsEvent,
     UpdateFloorPropertiesMessageComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FloorplanEditorView } from './FloorplanEditorView';
 
 // The Button component in this codebase renders as a <div> (via Base), not <button>.
-// NitroCardView portals everything into #draggable-windows-container.
+// OctaneCardView portals everything into #draggable-windows-container.
 // Find a clickable element by its exact trimmed text content in the portal.
 const findByExactText = (text: string): Element | undefined => {
     const container = document.getElementById('draggable-windows-container') ?? document.body;
-    return Array.from(container.querySelectorAll('div')).find((el: Element) => el.textContent?.trim() === text);
+    return Array.from(container.querySelectorAll('button, div')).find((el: Element) => el.textContent?.trim() === text);
 };
 
 describe('FloorplanEditorView container', () => {
     beforeEach(() => {
         messageHandlers.clear();
-        nitroHandlers.clear();
+        octaneHandlers.clear();
         sendMessageComposer.mockClear();
         (AddLinkEventTracker as ReturnType<typeof vi.fn>).mockClear();
         (RemoveLinkEventTracker as ReturnType<typeof vi.fn>).mockClear();
@@ -100,7 +100,7 @@ describe('FloorplanEditorView container', () => {
         const rvsHandler = messageHandlers.get(RoomVisualizationSettingsEvent);
         act(() => rvsHandler!({ getParser: () => ({ thicknessWall: 1, thicknessFloor: 1 }) }));
         // With LocalizeText mocked to identity, the button text is literally the i18n key.
-        // Button renders as <div> (not <button>) — use findByExactText.
+        // findByExactText matches by exact label, whatever element renders it.
         const saveBtn = findByExactText('floor.plan.editor.save');
         expect(saveBtn).toBeTruthy();
         sendMessageComposer.mockClear();
@@ -169,16 +169,45 @@ describe('FloorplanEditorView container', () => {
         expect(composer.tilemap.split(/\r/)[0]).toBe('00');
     });
 
+    it('the pick-up switch reaches the save', () => {
+        openEditor();
+        const fhmHandler = messageHandlers.get(FloorHeightMapEvent);
+        act(() => fhmHandler!({ getParser: () => ({ model: '00', wallHeight: 0 }) }));
+        const saveBtn = findByExactText('floor.plan.editor.save');
+
+        sendMessageComposer.mockClear();
+        fireEvent.click(saveBtn!);
+        expect(sendMessageComposer.mock.calls[0][0].autoPickup).toBe(false);
+
+        const toggle = document.querySelector('[data-testid="floorplan-auto-pickup"]');
+        expect(toggle?.getAttribute('data-active')).toBe('false');
+        fireEvent.click(toggle!);
+        expect(toggle?.getAttribute('data-active')).toBe('true');
+
+        sendMessageComposer.mockClear();
+        fireEvent.click(saveBtn!);
+        expect(sendMessageComposer.mock.calls[0][0].autoPickup).toBe(true);
+    });
+
     it('RoomEngineEvent.DISPOSED hides the editor', () => {
         render(<FloorplanEditorView />);
         const tracker = (AddLinkEventTracker as ReturnType<typeof vi.fn>).mock.calls[0][0];
         act(() => tracker.linkReceived('floor-editor/show'));
-        // Editor should be visible — NitroCardHeaderView renders the title
+        // Editor should be visible — OctaneCardHeaderView renders the title
         expect(document.body.textContent).toContain('floor.plan.editor.title');
-        const disposeHandler = nitroHandlers.get(RoomEngineEvent.DISPOSED);
+        const disposeHandler = octaneHandlers.get(RoomEngineEvent.DISPOSED);
         expect(disposeHandler).toBeTruthy();
         act(() => disposeHandler!({}));
         expect(document.body.textContent).not.toContain('floor.plan.editor.title');
+    });
+
+    it('a closed inventory or catalog preview does not hide the editor', () => {
+        render(<FloorplanEditorView />);
+        const tracker = (AddLinkEventTracker as ReturnType<typeof vi.fn>).mock.calls[0][0];
+        act(() => tracker.linkReceived('floor-editor/show'));
+        const disposeHandler = octaneHandlers.get(RoomEngineEvent.DISPOSED);
+        act(() => disposeHandler!({ roomId: 0x7fff0001 }));
+        expect(document.body.textContent).toContain('floor.plan.editor.title');
     });
 
     it('cleans up the link tracker on unmount', () => {
@@ -186,5 +215,49 @@ describe('FloorplanEditorView container', () => {
         expect(RemoveLinkEventTracker).not.toHaveBeenCalled();
         unmount();
         expect(RemoveLinkEventTracker).toHaveBeenCalledTimes(1);
+    });
+
+    it('reuses the editor for an external arena floor plan without room messages', () => {
+        const onClose = vi.fn();
+        const onSave = vi.fn();
+
+        const { queryByTestId } = render(
+            <FloorplanEditorView
+                externalSession={{
+                    tilemap: '00\r0x',
+                    occupiedTiles: [[false, true], [false, false]],
+                    title: 'SnowStorm Floor Plan Editor',
+                    onClose,
+                    onSave
+                }}
+            />
+        );
+
+        expect(document.body.textContent).toContain('SnowStorm Floor Plan Editor');
+        expect(queryByTestId('tool-door')).toBeNull();
+        expect(AddLinkEventTracker).not.toHaveBeenCalled();
+        expect(sendMessageComposer).not.toHaveBeenCalled();
+
+        const saveBtn = findByExactText('floor.plan.editor.save');
+        expect(saveBtn).toBeTruthy();
+        fireEvent.click(saveBtn!);
+
+        expect(onSave).toHaveBeenCalledWith('00\r0x');
+        expect(onClose).toHaveBeenCalledTimes(1);
+        expect(sendMessageComposer).not.toHaveBeenCalled();
+    });
+
+    it('shows only the flat preview, with no 3D switch (WebGL is too heavy for some devices)', () => {
+        window.localStorage.setItem('octane.floorplan.preview3d', 'true');
+        try {
+            openEditor();
+            const container = document.getElementById('draggable-windows-container') ?? document.body;
+
+            expect(container.querySelector('[data-testid="floorplan-preview-2d"]')).toBeTruthy();
+            expect(container.querySelector('[data-testid="floorplan-3d"]')).toBeNull();
+            expect(container.querySelector('[data-testid="floorplan-view-switch"]')).toBeNull();
+        } finally {
+            window.localStorage.removeItem('octane.floorplan.preview3d');
+        }
     });
 });

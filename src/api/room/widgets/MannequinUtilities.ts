@@ -1,4 +1,4 @@
-import { AvatarFigurePartType, GetAvatarRenderManager, IAvatarFigureContainer } from '@nitrots/nitro-renderer';
+import { AvatarFigurePartType, GetAvatarRenderManager, IAvatarFigureContainer } from '@octane/renderer';
 
 export class MannequinUtilities {
     public static MANNEQUIN_FIGURE: [string, number, number[]] = ['hd', 99999, [99998]];

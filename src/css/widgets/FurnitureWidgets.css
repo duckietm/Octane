@@ -1,4 +1,4 @@
-.nitro-room-widgets {
+.octane-room-widgets {
     pointer-events: none;
 }
 
@@ -10,16 +10,26 @@
     max-height: 430px !important;
 }
 
-.nitro-widget-custom-stack-height {
-    width: 275px;
-    height: 220px;
+.octane-widget-custom-stack-height {
+    width: 320px;
+    min-height: 185px;
+
+    .octane-stack-height-arrow {
+        width: 19px;
+        min-height: 20px;
+        height: 20px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
-.nitro-room-widget-toner {
+.octane-room-widget-toner {
     width: 190px;
 }
 
-.nitro-room-widget-background-color {
+.octane-room-widget-background-color {
     width: 314px;
 
     .bgcolor-widget-content {
@@ -97,13 +107,13 @@
         pointer-events: none;
     }
 
-    .bgcolor-widget-slider-shell .nitro-slider-wrapper {
+    .bgcolor-widget-slider-shell .octane-slider-wrapper {
         position: relative;
         z-index: 1;
         gap: 0;
     }
 
-    .bgcolor-widget-slider-shell .nitro-slider {
+    .bgcolor-widget-slider-shell .octane-slider {
         height: 16px;
     }
 
@@ -150,7 +160,7 @@
     }
 }
 
-.nitro-room-widget-dimmer {
+.octane-room-widget-dimmer {
     width: min(275px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -174,7 +184,7 @@
     }
 }
 
-.nitro-widget-crafting {
+.octane-widget-crafting {
     width: min(500px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -191,7 +201,7 @@
     }
 }
 
-.nitro-widget-exchange-credit {
+.octane-widget-exchange-credit {
     width: min(375px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -206,34 +216,183 @@
     }
 }
 
-.nitro-external-image-widget {
-    width: min(340px, calc(100vw - 16px));
-    min-width: 0;
-    max-width: calc(100vw - 16px);
-    max-height: calc(100vh - 16px);
+/* AIR stories_image_widget at a 320px photo: ExternalImageWidget.drawImage geometry. */
+.octane-photo-viewer {
+    position: relative;
+    width: 490px;
+    height: 464px;
+    color: #ffffff;
+    /* id_regular / id_link_regular: Ubuntu 11, white, no filters. */
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 16px;
+    text-shadow: none;
+    user-select: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
 
-    .picture-preview {
-        width: min(320px, calc(100vw - 36px));
-        height: auto;
-        aspect-ratio: 1;
-    }
-    
-    .picture-preview-buttons {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        color: gray;
-    }
-
-    .picture-preview-buttons-previous,
-    .picture-preview-buttons-next {
-        color: #222;
-        padding: 10px;
-        border-radius: 50%;
+    button {
+        padding: 0;
+        border: 0;
+        background-color: transparent;
+        cursor: pointer;
     }
 }
 
-.nitro-gift-opening {
+.octane-photo-viewer__panel {
+    position: absolute;
+    inset: 0;
+    border: 6px solid transparent;
+    border-image: url('@/assets/images/camera/photo-viewer/panel.png') 6 fill / 6px stretch;
+    opacity: 0.65;
+}
+
+/* drawImage paints the photo black at four 1px offsets, leaving the corner pixels clear. */
+.octane-photo-viewer__photo {
+    position: absolute;
+    top: 71px;
+    left: 84px;
+    width: 322px;
+    height: 322px;
+    background:
+        linear-gradient(#000000, #000000) 1px 0 / 320px 322px no-repeat,
+        linear-gradient(#000000, #000000) 0 1px / 322px 320px no-repeat;
+
+    img {
+        position: absolute;
+        top: 1px;
+        left: 1px;
+        width: 320px;
+        height: 320px;
+    }
+}
+
+/* updateWindowPosition centres the arrows on the panel, or on the stage when the panel is taller. */
+.octane-photo-viewer__browse {
+    position: absolute;
+    top: min(200px, calc(50vh - 32px));
+    width: 64px;
+    height: 64px;
+    background: url('@/assets/images/camera/photo-viewer/browse-ffwd.png') 0 0 / 64px 64px no-repeat !important;
+}
+
+.octane-photo-viewer__browse--previous {
+    left: 10px;
+    transform: scaleX(-1);
+}
+
+.octane-photo-viewer__browse--next {
+    left: 416px;
+}
+
+.octane-photo-viewer__date,
+.octane-photo-viewer__creator {
+    position: absolute;
+    padding: 4px;
+    color: #ffffff;
+    font: inherit;
+    line-height: 16px;
+    white-space: nowrap;
+}
+
+.octane-photo-viewer__date {
+    top: 393px;
+    left: 87px;
+}
+
+/* senderName is right-aligned in a 129px region ending 3px inside the photo. */
+.octane-photo-viewer__creator {
+    top: 395px;
+    right: 87px;
+    text-decoration: underline;
+}
+
+/* Caption `m` under the date line, at most two lines across the photo width. */
+.octane-photo-viewer__caption {
+    position: absolute;
+    top: 419px;
+    left: 88px;
+    width: 314px;
+    max-height: 32px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-height: 16px;
+    overflow-wrap: anywhere;
+    user-select: text;
+}
+
+/* buttonContainer boxsizer: padding 8/5, spacing 5, pinned to the panel's top right. */
+.octane-photo-viewer__buttons {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    padding: 5px 8px 0;
+}
+
+.octane-photo-viewer__button {
+    position: relative;
+    width: 19px;
+    height: 20px;
+    border: 5px solid transparent !important;
+    border-image: url('@/assets/images/camera/photo-viewer/report-button-default.png') 5 fill / 5px stretch !important;
+
+    &:hover {
+        border-image-source: url('@/assets/images/camera/photo-viewer/report-button-hover.png') !important;
+    }
+
+    &:active {
+        border-image-source: url('@/assets/images/camera/photo-viewer/report-button-pressed.png') !important;
+    }
+
+    &::after {
+        position: absolute;
+        content: '';
+    }
+}
+
+/* reportButtonContainer is 20px wide around the 19px button. */
+.octane-photo-viewer__button--report {
+    margin-right: 1px;
+
+    &::after {
+        top: -1px;
+        left: -1px;
+        width: 11px;
+        height: 13px;
+        background: url('@/assets/images/camera/photo-viewer/flag.png') no-repeat;
+    }
+}
+
+/* common_trashcan_small with the #icon etching: 0x48000000 one pixel above. */
+.octane-photo-viewer__button--remove::after {
+    top: -1px;
+    left: 0;
+    width: 9px;
+    height: 10px;
+    background: url('@/assets/images/camera/photo-viewer/trashcan.png') no-repeat;
+    filter: drop-shadow(0 -1px 0 rgb(0 0 0 / 0.282));
+}
+
+.octane-photo-viewer__close {
+    width: 19px;
+    height: 20px;
+    background: url('@/assets/images/habbo-skin/slices/close-3-default.png') 0 0 / 19px 20px no-repeat !important;
+
+    &:hover {
+        background-image: url('@/assets/images/habbo-skin/slices/close-3-hover.png') !important;
+    }
+
+    &:active {
+        background-image: url('@/assets/images/habbo-skin/slices/close-3-pressed.png') !important;
+    }
+}
+
+.octane-gift-opening {
     width: min(340px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -241,7 +400,7 @@
     resize: none;
 }
 
-.nitro-mannequin {
+.octane-mannequin {
     width: 300px;
 
     .mannequin-preview {
@@ -260,7 +419,7 @@
     }
 }
 
-.nitro-stickie {
+.octane-stickie {
     position: relative;
     width: 185px;
     height: 178px;
@@ -361,7 +520,7 @@
     }
 }
 
-.nitro-stickie-image {
+.octane-stickie-image {
     &.stickie-christmas {
         background-image: url('@/assets/images/room-widgets/stickie-widget/stickie-christmas.png');
     }
@@ -395,7 +554,7 @@
     }
 }
 
-.nitro-engraving-lock {
+.octane-engraving-lock {
     width: 300px;
 
     .engraving-lock-stage-1 {
@@ -414,7 +573,7 @@
 }
 
 /* lovelock_engraving_xml.xml — 375×210, absolute layout */
-.nitro-engraving-lock-view {
+.octane-engraving-lock-view {
     position: relative;
     width: 375px;
     height: 210px;
@@ -422,7 +581,7 @@
     background-position: 0 0;
     background-repeat: no-repeat;
     background-size: 411px 630px;
-    image-rendering: pixelated;
+    image-rendering: var(--octane-pixel-art, pixelated);
     color: #59224a;
     font-family: UbuntuCondensed, Ubuntu, sans-serif;
     font-weight: 700;
@@ -432,18 +591,18 @@
     user-select: none;
 }
 
-.nitro-engraving-lock-view.engraving-lock-3 {
+.octane-engraving-lock-view.engraving-lock-3 {
     background-position: 0 -210px;
     color: #614110;
 }
 
-.nitro-engraving-lock-view.engraving-lock-4 {
+.octane-engraving-lock-view.engraving-lock-4 {
     background-position: 0 -420px;
     color: #f1dcc8;
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
 }
 
-.nitro-engraving-lock-view .engraving-lock-close {
+.octane-engraving-lock-view .engraving-lock-close {
     position: absolute;
     top: 33px;
     right: 24px;
@@ -455,7 +614,7 @@
     cursor: pointer;
 }
 
-.nitro-engraving-lock-view .engraving-lock-avatar {
+.octane-engraving-lock-view .engraving-lock-avatar {
     position: absolute;
     top: 7px;
     width: 70px;
@@ -464,7 +623,7 @@
     pointer-events: none;
 }
 
-.nitro-engraving-lock-view .engraving-lock-avatar .avatar-image {
+.octane-engraving-lock-view .engraving-lock-avatar .avatar-image {
     position: absolute !important;
     top: auto !important;
     bottom: 0 !important;
@@ -473,20 +632,20 @@
     height: 130px !important;
     margin: 0 !important;
     transform: translateX(-50%) !important;
-    image-rendering: pixelated;
+    image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.nitro-engraving-lock-view .engraving-lock-avatar--left {
+.octane-engraving-lock-view .engraving-lock-avatar--left {
     left: 115px;
 }
 
-.nitro-engraving-lock-view .engraving-lock-avatar--right {
+.octane-engraving-lock-view .engraving-lock-avatar--right {
     left: 186px;
 }
 
-.nitro-engraving-lock-view .engraving-lock-header,
-.nitro-engraving-lock-view .engraving-lock-date,
-.nitro-engraving-lock-view .engraving-lock-name {
+.octane-engraving-lock-view .engraving-lock-header,
+.octane-engraving-lock-view .engraving-lock-date,
+.octane-engraving-lock-view .engraving-lock-name {
     position: absolute;
     display: block;
     height: 17px;
@@ -498,37 +657,37 @@
     box-sizing: border-box;
 }
 
-.nitro-engraving-lock-view .engraving-lock-header {
+.octane-engraving-lock-view .engraving-lock-header {
     top: 126px;
     left: 82px;
     width: 217px;
     text-align: center;
 }
 
-.nitro-engraving-lock-view .engraving-lock-date {
+.octane-engraving-lock-view .engraving-lock-date {
     top: 151px;
     left: 143px;
     width: 97px;
     text-align: center;
 }
 
-.nitro-engraving-lock-view .engraving-lock-name {
+.octane-engraving-lock-view .engraving-lock-name {
     top: 175px;
 }
 
-.nitro-engraving-lock-view .engraving-lock-name--left {
+.octane-engraving-lock-view .engraving-lock-name--left {
     left: 19px;
     width: 150px;
     text-align: right;
 }
 
-.nitro-engraving-lock-view .engraving-lock-name--right {
+.octane-engraving-lock-view .engraving-lock-name--right {
     left: 199px;
     width: 87px;
     text-align: left;
 }
 
-.nitro-widget-high-score {
+.octane-widget-high-score {
     border-radius: 0.3rem;
     border: solid 1px #000;
 
@@ -609,7 +768,7 @@
     }
 }
 
-.nitro-playlist-editor-widget {
+.octane-playlist-editor-widget {
     width: min(625px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -725,7 +884,7 @@
 }
 
 @media (max-width: 640px), (max-height: 520px) {
-    .nitro-playlist-editor-widget {
+    .octane-playlist-editor-widget {
         .playlist-editor-layout {
             flex-direction: column;
         }
@@ -737,7 +896,7 @@
     }
 }
 
-.nitro-mysterybox-dialog {
+.octane-mysterybox-dialog {
     width: min(375px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -754,7 +913,7 @@
     }
 }
 
-.nitro-mysterytrophy-dialog {
+.octane-mysterytrophy-dialog {
     .mysterytrophy-dialog-top {
         width: 100%;
         min-height: 120px;
@@ -810,7 +969,7 @@
 }
 
 @media (max-width: 560px), (max-height: 460px) {
-    .nitro-widget-crafting {
+    .octane-widget-crafting {
         .crafting-widget-layout {
             flex-direction: column;
             overflow: auto;
@@ -822,7 +981,146 @@
         }
     }
 
-    .nitro-widget-exchange-credit {
+    .octane-widget-exchange-credit {
         height: auto;
+    }
+}
+
+/* Official ecotronbox_card (257 x 114): gift-card background, date at 12/9, 39 px preview at 7/38,
+   message at 49/39 and the buttons on the bottom row at y 90. */
+.octane-ecotronbox-card {
+    position: relative;
+    width: 257px;
+    height: 114px;
+    background-color: #f3f1e5;
+    background-repeat: no-repeat;
+    border-radius: 6px;
+    pointer-events: all;
+    cursor: move;
+    font-size: 11px;
+    color: #000;
+
+    .octane-ecotronbox-date {
+        position: absolute;
+        left: 12px;
+        top: 9px;
+        width: 104px;
+        height: 12px;
+        line-height: 12px;
+        overflow: hidden;
+    }
+
+    .octane-ecotronbox-preview {
+        position: absolute;
+        left: 7px;
+        top: 38px;
+        width: 39px;
+        height: 39px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            max-width: 39px;
+            max-height: 39px;
+            image-rendering: pixelated;
+        }
+    }
+
+    .octane-ecotronbox-msg {
+        position: absolute;
+        left: 49px;
+        top: 39px;
+        width: 139px;
+        height: 45px;
+        overflow: hidden;
+        word-wrap: break-word;
+    }
+
+    .octane-ecotronbox-open,
+    .octane-ecotronbox-close {
+        position: absolute;
+        top: 90px;
+        height: 22px;
+        padding: 0 8px;
+        border: 1px solid #000;
+        border-radius: 4px;
+        background: linear-gradient(#fff, #d6d6d6);
+        font-size: 11px;
+        cursor: pointer;
+    }
+
+    .octane-ecotronbox-open {
+        left: 47px;
+        width: 148px;
+        font-weight: bold;
+    }
+
+    .octane-ecotronbox-close {
+        left: 200px;
+        width: 50px;
+    }
+}
+
+/* Official niko_trophy (428 x 325): dark 169 px band (0xff36494e) with the 93 x 112 trophy at 26/30 and
+   the 249 px text column at 153, then the 320 x 92 app store banner. */
+.octane-niko-trophy {
+    width: 428px;
+
+    .octane-niko-trophy-content {
+        padding: 0;
+    }
+
+    .octane-niko-trophy-band {
+        display: flex;
+        gap: 34px;
+        height: 169px;
+        padding: 28px 26px 0;
+        background: #36494e;
+        color: #fff;
+    }
+
+    .octane-niko-trophy-preview {
+        width: 93px;
+        height: 112px;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+
+    .octane-niko-trophy-texts {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        width: 249px;
+    }
+
+    .octane-niko-trophy-description {
+        min-height: 64px;
+    }
+
+    .octane-niko-trophy-link {
+        align-self: flex-start;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: #9fd8ff;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    .octane-niko-trophy-store {
+        align-self: center;
+        width: 320px;
+        height: 92px;
+        margin: 14px 0;
+        padding: 0;
+        border: 0;
+        background: none;
+        cursor: pointer;
+
+        img {
+            width: 320px;
+            height: 92px;
+        }
     }
 }

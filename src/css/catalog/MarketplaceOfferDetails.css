@@ -1,0 +1,121 @@
+/* AIR marketplace_offer_details.xml: a 340px panel over the offer list. */
+.octane-marketplace-offer-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    max-width: 340px;
+    min-height: 0;
+    overflow: auto;
+
+    .marketplace-details-back {
+        align-self: flex-start;
+        min-width: min(235px, 100%);
+    }
+
+    .marketplace-details-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 7px;
+        min-height: 80px;
+    }
+
+    .marketplace-details-image {
+        position: relative;
+        flex: 0 0 66px;
+        width: 66px;
+        height: 62px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .marketplace-details-unique {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+    }
+
+    .marketplace-details-text {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        min-width: 0;
+        padding-top: 5px;
+
+        .marketplace-details-price {
+            margin-top: 8px;
+        }
+    }
+
+    .marketplace-details-buy {
+        flex: 0 0 auto;
+        margin-top: 7px;
+    }
+
+    /* selector: button_group_left + button_group_right, 160px each. */
+    .marketplace-details-chart-selector {
+        display: flex;
+
+        > * {
+            flex: 0 1 160px;
+            min-width: 0;
+        }
+    }
+
+    .marketplace-details-chart {
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 340px;
+        padding: 10px;
+        border: 1px solid #cccccc;
+        background: #ffffff;
+    }
+
+    .octane-marketplace-chart {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        image-rendering: pixelated;
+    }
+}
+
+/*
+ * marketplace_offer_details text: item_name u_bold 12, item_description u_italic 12, item_price / offer_count /
+ * average_price u_small 10 px, chart_title u_regular 12; back_button / buy_button / the chart selector draw
+ * button_shiny_regular, 12 px regular. The common Button carries an important 12.6 px bold Tailwind size, which
+ * only an important rule in the earlier base layer outranks.
+ */
+.octane-marketplace-offer-details .marketplace-details-small {
+    font-size: 10px;
+    line-height: 13px;
+}
+
+.octane-marketplace-offer-details .marketplace-details-chart-title {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+@layer base {
+    .octane-marketplace-offer-details :where(.marketplace-details-back, .marketplace-details-buy, .marketplace-details-chart-selector > button) {
+        font-size: 12px !important;
+        font-weight: 400 !important;
+    }
+
+    /* back_button and buy_button are grey `button`s (style 3, habbo_skin_button_shiny) with black text, and the
+       chart selector is AIR's grey button_group; the common Button would draw the green .habbo-btn-primary. */
+    .octane-marketplace-offer-details :where(.marketplace-details-back, .marketplace-details-buy, .marketplace-details-chart-selector > button).habbo-btn-primary {
+        border-image-source: var(--habbo-skin-shiny) !important;
+        color: #000000 !important;
+        text-shadow: none !important;
+    }
+
+    .octane-marketplace-offer-details :where(.marketplace-details-back, .marketplace-details-buy, .marketplace-details-chart-selector > button).habbo-btn-primary:hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    .octane-marketplace-offer-details :where(.marketplace-details-back, .marketplace-details-buy, .marketplace-details-chart-selector > button).habbo-btn-primary:is(:active, .active) {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+}

@@ -8,3 +8,4 @@ export * from './IGroupCustomize';
 export * from './IGroupData';
 export * from './ToggleFavoriteGroup';
 export * from './TryJoinGroup';
+export * from './GroupFailureTexts';

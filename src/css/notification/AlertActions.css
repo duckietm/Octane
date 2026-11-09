@@ -1,0 +1,185 @@
+/* Official habbo_window_confirm and habbo_window_alert_link: the secondary action ("cancel", or "ok" next to
+   a link) is an underlined link on the left of the one button, not a second button. */
+.octane-confirm-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.octane-confirm-actions .octane-confirm-actions__cancel,
+.octane-alert .octane-alert-link {
+    padding: 0 4px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-alert .octane-alert-link {
+    margin-top: 6px;
+}
+
+/* habbo_window_confirm: 300 px wide, _alert_description at (16, 14) 253 px wide, OK 28 px high, at least 50 px wide. */
+.octane-alert.octane-alert-alert.octane-confirm-window {
+    width: 300px;
+    min-height: 0;
+}
+
+.octane-alert.octane-confirm-window[style*="--octane-confirm-title-bar"] > .octane-card-header-shell {
+    background: var(--octane-confirm-title-bar);
+}
+
+.octane-confirm-window .octane-confirm-window__text {
+    flex: 1 1 auto;
+    max-width: 253px;
+    padding: 4px 6px 0;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+.octane-confirm-window .octane-confirm-actions {
+    margin-top: 12px;
+    padding: 0 10px 0 4px;
+}
+
+/* habbo_window_alert_link: the link button is button_thick at 24 px, the "ok" link sits under the text. */
+.octane-alert .octane-alert-link-actions {
+    margin-top: 12px;
+    padding: 0 4px;
+}
+
+.octane-confirm-actions .octane-confirm-actions__cancel:hover,
+.octane-alert .octane-alert-link:hover {
+    text-decoration: none;
+}
+
+/* Official motd_notification: a 436 px window, a list with a framed box for each message. */
+.octane-alert.octane-motd-alert {
+    width: 436px;
+    min-height: 227px;
+}
+
+.octane-motd-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    gap: 6px;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.octane-motd-item {
+    padding: 8px;
+    border: 1px solid #919191;
+    border-radius: 3px;
+    background: #ffffff;
+    color: #000000; /* motd_notification_item message_text: style 0, text_color 0x0 */
+    font-size: 9px;
+    line-height: 12px;
+    overflow-wrap: anywhere;
+}
+
+.octane-motd-actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+}
+
+/*
+ * Text as AIR draws the alerts. habbo_window_alert, habbo_window_alert_link and habbo_window_confirm are
+ * Ubuntu (style 3) frames: the text and the cancel link are u_regular 12 px black, the button is a grey
+ * button_thick with 12 px regular text. Regular Ubuntu, which in Octane is HabboAirUbuntu (our `Ubuntu` face is
+ * the condensed cut). The hotel event, Octane info and furnidata alerts are Octane's own designs and keep
+ * their faces; the MOTD is a style 0 window (below).
+ */
+.octane-alert:not(.octane-alert-hotel-event, .octane-alert-octane-info, .octane-alert-furnidata, .octane-motd-alert) .octane-card-content-shell {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    /* u_regular: 12 px black */
+    color: #000000;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+@layer base {
+    .octane-alert:not(.octane-alert-hotel-event, .octane-alert-octane-info, .octane-alert-furnidata, .octane-motd-alert)
+        .octane-card-content-shell
+        :where(*):not(svg, svg *, .notification-command-name, .notification-command-args) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    /* Button's size is an important utility (12.6 px); AIR's alert buttons are 12 px regular. */
+    .octane-alert:not(.octane-alert-hotel-event, .octane-alert-octane-info, .octane-alert-furnidata, .octane-motd-alert, .octane-abusive-alert)
+        .octane-card-content-shell
+        :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger) {
+        font-size: 12px !important;
+        font-weight: 400 !important;
+    }
+
+    /* The alert button is AIR's grey button_thick (habbo_skin_button_shiny_thick), 30 px high, black text. */
+    .octane-alert:not(.octane-alert-hotel-event, .octane-alert-octane-info, .octane-alert-furnidata, .octane-motd-alert, .octane-abusive-alert)
+        .octane-card-content-shell
+        .habbo-btn-primary {
+        min-height: 30px !important;
+        padding: 0 10px !important;
+        border-image-source: var(--habbo-skin-shiny-thick) !important;
+        color: #000000 !important;
+        text-shadow: none;
+    }
+
+    .octane-alert.octane-confirm-window .octane-card-content-shell .habbo-btn-primary {
+        min-width: 50px;
+        min-height: 28px !important;
+        height: 28px;
+    }
+
+    .octane-alert .octane-card-content-shell .octane-alert-link-actions .habbo-btn-primary {
+        min-height: 24px !important;
+        height: 24px;
+    }
+
+    .octane-alert:not(.octane-alert-hotel-event, .octane-alert-octane-info, .octane-alert-furnidata, .octane-motd-alert, .octane-abusive-alert)
+        .octane-card-content-shell
+        .habbo-btn-primary:hover {
+        border-image-source: var(--habbo-skin-shiny-thick-hover) !important;
+    }
+
+    .octane-alert:not(.octane-alert-hotel-event, .octane-alert-octane-info, .octane-alert-furnidata, .octane-motd-alert, .octane-abusive-alert)
+        .octane-card-content-shell
+        .habbo-btn-primary:active {
+        border-image-source: var(--habbo-skin-shiny-thick-pressed) !important;
+    }
+}
+
+/* AIR's alerts have no rule between the text and the button. */
+.octane-alert:not(.octane-alert-hotel-event, .octane-alert-octane-info, .octane-alert-furnidata, .octane-motd-alert) .octane-card-content-shell hr {
+    visibility: hidden;
+}
+
+/*
+ * motd_notification: a style 1 (classic black) frame whose messages (motd_notification_item, style 0 text) and
+ * OK button (style 0, button_regular) are Volter 9 px.
+ */
+.octane-alert.octane-motd-alert .octane-card-content-shell {
+    font-family: Volter, sans-serif;
+    font-size: 9px;
+    line-height: 12px;
+}
+
+@layer base {
+    .octane-alert.octane-motd-alert .octane-card-content-shell :where(*):not(svg, svg *) {
+        font-family: Volter, sans-serif !important;
+    }
+
+    .octane-alert.octane-motd-alert .octane-motd-actions :where(button) {
+        font-size: 9px !important;
+        font-weight: 400 !important;
+    }
+}
+
+/* Markup inside a message (p, li) would take the card's 12 px. */
+.octane-alert.octane-motd-alert .octane-motd-item :where(p, li, label, td) {
+    font-size: 9px;
+}

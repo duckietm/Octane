@@ -1,0 +1,145 @@
+import {
+    AvatarEffectActivatedComposer,
+    AvatarEffectSelectedComposer,
+    AvatarEffectActivatedEvent,
+    AvatarEffectAddedEvent,
+    AvatarEffectExpiredEvent,
+    AvatarEffectSelectedEvent,
+    AvatarEffectsEvent
+} from '@octane/renderer';
+import { useCallback, useState } from 'react';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
+import { SendMessageComposer } from '../../api';
+import { useMessageEvent } from '../events';
+
+/**
+ * One effect the user actually owns, as reported by the server.
+ *
+ * `secondsLeft` is only meaningful while the effect is running: the
+ * emulator sends `elapsed + duration` for the active one and 0 for the
+ * others, so it is stored verbatim and interpreted by the view.
+ */
+export interface OwnedAvatarEffect {
+    type: number;
+    subType: number;
+    duration: number;
+    inactiveCount: number;
+    secondsLeft: number;
+    isPermanent: boolean;
+}
+
+/**
+ * Applies an "effect added" push. An effect already owned keeps its running time: a timed copy adds
+ * one to the stock, a permanent one makes it permanent (official AvatarEffect.amountInInventory++).
+ */
+export const mergeAddedEffect = (effects: OwnedAvatarEffect[], added: OwnedAvatarEffect): OwnedAvatarEffect[] => {
+    const index = effects.findIndex(existing => existing.type === added.type);
+
+    if (index === -1) return [ ...effects, added ];
+
+    const existing = effects[index];
+    const next = [ ...effects ];
+
+    next[index] = added.isPermanent
+        ? { ...existing, isPermanent: true, duration: added.duration }
+        : { ...existing, inactiveCount: Math.min(99, existing.inactiveCount + 1) };
+
+    return next;
+};
+
+/**
+ * Whether choosing an owned effect has to start its timer. A timed effect already running keeps it: the server
+ * restarts the timer on every activation, so choosing it again handed back its full duration, for ever.
+ */
+export const needsActivation = (effect: OwnedAvatarEffect | undefined): boolean => !effect || effect.isPermanent || effect.secondsLeft <= 0;
+
+/**
+ * Tracks the avatar effects the user owns.
+ *
+ * The server pushes the full list once, right after login
+ * (`UserEffectsListComposer`, header 340), then deltas as effects are
+ * won, activated or expire. This hook is registered as a shared source
+ * so its subscriptions are alive from app start — a hook that only
+ * mounted with the effects window would miss the login packet entirely.
+ */
+const useAvatarEffectsState = () => {
+    const [effects, setEffects] = useState<OwnedAvatarEffect[]>([]);
+    const [activeEffectType, setActiveEffectType] = useState(0);
+
+    useMessageEvent<AvatarEffectsEvent>(AvatarEffectsEvent, event => {
+        const parsed = event.getParser().effects.map<OwnedAvatarEffect>(effect => ({
+            type: effect.type,
+            subType: effect.subType,
+            duration: effect.duration,
+            inactiveCount: effect.inactiveEffectsInInventory,
+            secondsLeft: effect.secondsLeftIfActive,
+            isPermanent: effect.isPermanent
+        }));
+
+        setEffects(parsed);
+
+        // A running effect is the only one the server reports time for.
+        const running = parsed.find(effect => !effect.isPermanent && effect.secondsLeft > 0);
+
+        setActiveEffectType(running ? running.type : 0);
+    });
+
+    useMessageEvent<AvatarEffectAddedEvent>(AvatarEffectAddedEvent, event => {
+        const parser = event.getParser();
+
+        setEffects(prev => mergeAddedEffect(prev, {
+            type: parser.type,
+            subType: parser.subType,
+            duration: parser.duration,
+            inactiveCount: 1,
+            secondsLeft: 0,
+            isPermanent: parser.isPermanent
+        }));
+    });
+
+    useMessageEvent<AvatarEffectExpiredEvent>(AvatarEffectExpiredEvent, event => {
+        const type = event.getParser().type;
+
+        setEffects(prev => prev.filter(effect => effect.type !== type));
+        setActiveEffectType(prev => (prev === type ? 0 : prev));
+    });
+
+    useMessageEvent<AvatarEffectActivatedEvent>(AvatarEffectActivatedEvent, event => {
+        const parser = event.getParser();
+
+        setActiveEffectType(parser.type);
+
+        setEffects(prev => prev.map(effect => (effect.type === parser.type
+            ? { ...effect, duration: parser.duration, secondsLeft: parser.duration, isPermanent: parser.isPermanent }
+            : effect)));
+    });
+
+    useMessageEvent<AvatarEffectSelectedEvent>(AvatarEffectSelectedEvent, event => {
+        setActiveEffectType(event.getParser().type);
+    });
+
+    // "Activated" only starts an owned effect's timer; "selected" is what puts it on the avatar.
+    const activateEffect = useCallback((type: number) => {
+        setActiveEffectType(type);
+
+        if (type <= 0) {
+            SendMessageComposer(new AvatarEffectSelectedComposer(-1));
+
+            return;
+        }
+
+        const owned = effects.find(effect => effect.type === type);
+
+        if (needsActivation(owned)) SendMessageComposer(new AvatarEffectActivatedComposer(type));
+
+        if (owned) SendMessageComposer(new AvatarEffectSelectedComposer(type));
+    }, [ effects ]);
+
+    const isOwned = useCallback((type: number) => effects.some(effect => effect.type === type), [ effects ]);
+
+    return { effects, activeEffectType, activateEffect, isOwned };
+};
+
+export const useAvatarEffects = () => useSharedHook(useAvatarEffectsState);
+
+registerSharedHook(useAvatarEffectsState);

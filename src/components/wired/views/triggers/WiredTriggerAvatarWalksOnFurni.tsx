@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
@@ -13,21 +14,27 @@ const FURNI_SOURCE_OPTIONS: WiredSourceOption[] = [
 const normalizeFurniSource = (value: number) => (FURNI_SOURCE_OPTIONS.some((option) => option.value === value) ? value : 100);
 
 export const WiredTriggerAvatarWalksOnFurniView: FC<{}> = () => {
-    const { trigger = null, setIntParams = null } = useWired();
+    const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
     const [furniSource, setFurniSource] = useState(100);
 
-    const save = () => setIntParams([furniSource]);
+    // Official: no int params; the furni source goes in the official source slot.
+    const save = () => {
+        setIntParams([]);
+        setSourceTypes({ furni: [furniSource], users: [] });
+    };
 
     useEffect(() => {
-        setFurniSource(trigger?.intData?.length > 0 ? normalizeFurniSource(trigger.intData[0]) : 100);
+        setFurniSource(normalizeFurniSource(trigger?.furniSourceTypes?.[0] ?? 100));
     }, [trigger]);
 
     return (
-        <WiredTriggerBaseView
-            hasSpecialInput={false}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} furniSources={FURNI_SOURCE_OPTIONS} onChangeFurni={setFurniSource} />}
-        />
+        <NativeTextTree>
+            <WiredTriggerBaseView
+                hasSpecialInput={false}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} furniSources={FURNI_SOURCE_OPTIONS} onChangeFurni={setFurniSource} />}
+            />
+        </NativeTextTree>
     );
 };

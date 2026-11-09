@@ -3,14 +3,18 @@ import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
+import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MIN_ALTITUDE = 0;
-const MAX_ALTITUDE = 40;
+/** AIR's slider runs to 80.00 (8000 hundredths); the server lets this box's moves go above the build ceiling. */
+export const MAX_ALTITUDE = 80;
 const ALTITUDE_STEP = 0.01;
 const ALTITUDE_PATTERN = /^\d*(\.\d{0,2})?$/;
 
-const clampAltitude = (value: number) => {
+export const clampAltitude = (value: number) => {
     if (isNaN(value)) return MIN_ALTITUDE;
 
     const clamped = Math.min(MAX_ALTITUDE, Math.max(MIN_ALTITUDE, value));
@@ -48,13 +52,10 @@ const normalizeOperator = (value: number) => {
 };
 
 export const WiredActionSetAltitudeView: FC<{}> = () => {
-    const { trigger = null, setIntParams = null, setStringParam = null } = useWired();
+    const { trigger = null, setIntParams = null, setStringParam = null, setSourceTypes = null } = useWired();
 
     const [operator, setOperator] = useState(2);
-    const [furniSource, setFurniSource] = useState<number>(() => {
-        if (trigger?.intData?.length > 1) return trigger.intData[1];
-        return (trigger?.selectedItems?.length ?? 0) > 0 ? 100 : 0;
-    });
+    const [furniSource, setFurniSource] = useState<number>(() => slotFurniSource(trigger));
     const [altitude, setAltitude] = useState(0);
     const [altitudeInput, setAltitudeInput] = useState('0');
 
@@ -63,10 +64,13 @@ export const WiredActionSetAltitudeView: FC<{}> = () => {
     useEffect(() => {
         if (!trigger) return;
 
-        setOperator(trigger.intData.length > 0 ? normalizeOperator(trigger.intData[0]) : 2);
-        setFurniSource(trigger.intData.length > 1 ? trigger.intData[1] : (trigger.selectedItems?.length ?? 0) > 0 ? 100 : 0);
+        // Official layout: [altitude in hundredths, operator]; the furni source is the official slot.
+        const official = (trigger.intData?.length ?? 0) > 1;
 
-        const nextAltitude = parseAltitude(trigger.stringData);
+        setOperator(normalizeOperator(official ? trigger.intData[1] : (trigger.intData?.[0] ?? 2)));
+        setFurniSource(slotFurniSource(trigger));
+
+        const nextAltitude = official ? clampAltitude(trigger.intData[0] / 100) : parseAltitude(trigger.stringData);
         setAltitude(nextAltitude);
         setAltitudeInput(formatAltitude(nextAltitude));
     }, [trigger]);
@@ -101,50 +105,46 @@ export const WiredActionSetAltitudeView: FC<{}> = () => {
     };
 
     const save = () => {
-        setIntParams([operator, furniSource]);
-
-        setStringParam(normalizedAltitudeText);
+        setIntParams([Math.round(clampAltitude(altitude) * 100), operator]);
+        setStringParam('');
+        setSourceTypes({ furni: [furniSource], users: [] });
     };
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
-        >
-            <div className="flex flex-col gap-2">
-                {OPERATOR_OPTIONS.map((option) => {
-                    return (
-                        <div key={option.value} className="flex items-center gap-1">
-                            <input
-                                checked={operator === option.value}
-                                className="form-check-input"
-                                id={`setAltitudeOperator${option.value}`}
-                                name="setAltitudeOperator"
-                                type="radio"
-                                onChange={() => setOperator(option.value)}
-                            />
-                            <Text>{LocalizeText(option.label)}</Text>
-                        </div>
-                    );
-                })}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.setaltitude')}</Text>
-                <input
-                    className="form-control form-control-sm"
-                    inputMode="decimal"
-                    type="text"
-                    value={altitudeInput}
-                    onBlur={() => setAltitudeInput(formatAltitude(altitude))}
-                    onChange={(event) => updateAltitudeInput(event.target.value)}
-                />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Slider max={MAX_ALTITUDE} min={MIN_ALTITUDE} step={ALTITUDE_STEP} value={altitude} onChange={(event) => updateAltitude(event as number)} />
-                <Text small>{normalizedAltitudeText}</Text>
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
+            >
+                <div className="flex flex-col gap-2">
+                    <Text bold>{LocalizeText('wiredfurni.params.choose_type')}</Text>
+                    {OPERATOR_OPTIONS.map((option) => {
+                        return (
+                            <div key={option.value} className="flex items-center gap-1">
+                                <Radio checked={operator === option.value} id={`setAltitudeOperator${option.value}`} name="setAltitudeOperator" onCheckedChange={() => setOperator(option.value)} />
+                                <Text>{LocalizeText(option.label)}</Text>
+                            </div>
+                        );
+                    })}
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.setaltitude')}</Text>
+                    <input
+                        className="form-control form-control-sm"
+                        inputMode="decimal"
+                        type="text"
+                        value={altitudeInput}
+                        onBlur={() => setAltitudeInput(formatAltitude(altitude))}
+                        onChange={(event) => updateAltitudeInput(event.target.value)}
+                    />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Slider max={MAX_ALTITUDE} min={MIN_ALTITUDE} step={ALTITUDE_STEP} value={altitude} onChange={(event) => updateAltitude(event as number)} />
+                    <Text small>{normalizedAltitudeText}</Text>
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

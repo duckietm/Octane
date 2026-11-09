@@ -19,6 +19,8 @@ export class AvatarInfoUser implements IAvatarInfo {
     public prefixFont: string = '';
     public displayOrder: string = 'icon-prefix-name';
     public achievementScore: number = 0;
+    /** Badges rank from the room user list, -1 when the server did not send one. */
+    public badgesRank: number = -1;
     public backgroundId: number = 0;
     public standId: number = 0;
     public overlayId: number = 0;

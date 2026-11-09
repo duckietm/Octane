@@ -1,0 +1,409 @@
+/* Official modal dialogs (buildModalDialogFromXML): dimmed desktop, centred frame, white titles above. */
+.octane-air-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
+}
+
+.octane-air-modal__window {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 16px);
+}
+
+.octane-air-modal__titles {
+    padding: 0 0 4px 2px;
+    color: #ffffff;
+    font-family: Ubuntu, sans-serif;
+    font-weight: 700;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* Both lines are AIR's il_frame_modal_title (Ubuntu bold, white); the layouts give the subtitle font_size 12. */
+.octane-air-modal__subtitle {
+    color: #ffffff;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.octane-air-modal__title {
+    font-size: 24px;
+    line-height: 30px;
+}
+
+.octane-air-modal__frame {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.octane-air-modal__frame.is-no-close .octane-card-close-button {
+    display: none;
+}
+
+.octane-air-modal__content {
+    color: #000000;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+/* ---- Habbo Way / safety booklet (habbo_way, safety_booklet layouts) ---- */
+
+.octane-habboway__indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 30px;
+}
+
+.octane-habboway__safety-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.octane-habboway__dots {
+    display: flex;
+    gap: 5px;
+}
+
+.octane-habboway__dots span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #c8c8c8;
+}
+
+.octane-habboway__dots span.is-active {
+    background: #555555;
+}
+
+.octane-habboway__page {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.octane-habboway__illustration {
+    align-self: center;
+    width: 460px;
+    max-width: 100%;
+    height: 220px;
+    object-fit: contain;
+}
+
+.octane-habboway__columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    min-height: 90px;
+}
+
+.octane-habboway__column + .octane-habboway__column {
+    border-left: 1px solid #dddddd;
+    padding-left: 20px;
+}
+
+.octane-habboway__heading {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.octane-habboway__text {
+    color: #000000; /* correct_description / wrong_description / description: no text_color, black */
+}
+
+.octane-habboway__buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px solid #dddddd;
+}
+
+.octane-habboway__nav,
+.octane-habboway__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 160px;
+    height: 45px;
+    padding: 0 14px;
+    border: 1px solid #bbbbbb;
+    border-radius: 6px;
+    background: linear-gradient(#ffffff, #e2e2e2);
+    color: #000000;
+    font-size: 10px; /* previous / next / back captions and the quiz / ok buttons: il_button, 10 px bold */
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.octane-habboway__action {
+    justify-content: center;
+}
+
+.octane-habboway__nav.is-next {
+    justify-content: flex-end;
+}
+
+.octane-habboway__nav:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.octane-habboway__nav-sep {
+    width: 2px;
+    height: 22px;
+    border-left: 1px solid #bbbbbb;
+    border-right: 1px solid #ffffff;
+}
+
+.octane-habboway__nav-caption {
+    flex: 1;
+    text-align: center;
+}
+
+.octane-habboway__page.is-final {
+    align-items: center;
+    text-align: center;
+}
+
+.octane-habboway__page.is-final .octane-habboway__buttons {
+    align-self: stretch;
+}
+
+.octane-habboway__final-title {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.octane-habboway__final-image {
+    width: 200px;
+    height: 210px;
+    object-fit: contain;
+}
+
+.octane-habboway__final-text {
+    max-width: 300px;
+}
+
+.octane-habboway__explanation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0 8px;
+    padding: 6px 20px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    background: #f2f2f2;
+    color: #222222;
+}
+
+.octane-habboway__booklet-row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.octane-habboway__booklet-image {
+    flex: none;
+    width: 250px;
+    height: 280px;
+    object-fit: contain;
+}
+
+.octane-habboway__booklet-copy {
+    flex: 1;
+    padding-left: 20px;
+    border-left: 1px solid #dddddd;
+}
+
+/* ---- Quiz (habbo_way_quiz layout) ---- */
+
+.octane-habboway-quiz__indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 25px;
+    border-bottom: 1px solid #dddddd;
+    color: #555555;
+    font-size: 10px; /* top_indicator: il_border, 10 px bold, 0x555555 */
+    font-weight: 700;
+}
+
+.octane-habboway-quiz__indicator img {
+    max-height: 18px;
+}
+
+.octane-habboway-quiz__body {
+    min-height: 300px;
+    padding-top: 8px;
+}
+
+.octane-habboway-quiz__question {
+    display: flex;
+    gap: 10px;
+}
+
+.octane-habboway-quiz__contents {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px 0 0 20px;
+}
+
+.octane-habboway-quiz__question-text {
+    color: #555555;
+    font-weight: 700;
+}
+
+.octane-habboway-quiz__answers {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.octane-habboway-quiz__answer {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.octane-habboway-quiz__question-image {
+    flex: none;
+    width: 122px;
+    height: 300px;
+    object-fit: contain;
+}
+
+.octane-habboway-quiz__result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding-top: 20px;
+    text-align: center;
+}
+
+.octane-habboway-quiz__result-title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.octane-habboway-quiz__result-advice {
+    max-width: 291px;
+}
+
+.octane-habboway-quiz__result-image {
+    width: 210px;
+    height: 210px;
+    object-fit: contain;
+}
+
+.octane-habboway-quiz__analysis {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 297px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.octane-habboway-quiz__analysis-question {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.octane-habboway-quiz__analysis-answer {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    margin: 6px 0;
+    color: #555555;
+}
+
+.octane-habboway-quiz__analysis-answer img {
+    margin-top: 2px;
+}
+
+.octane-habboway-quiz__analysis-explanation {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-left: 10px;
+    padding: 6px 10px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    background: #f2f2f2;
+}
+
+.octane-habboway-quiz__analysis-explanation img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.octane-habboway-quiz__analysis hr {
+    margin-top: 10px;
+    border: 0;
+    border-top: 1px solid #dddddd;
+}
+
+.octane-habboway-quiz__exit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding-top: 8px;
+    border-top: 1px solid #dddddd;
+}
+
+.octane-habboway-quiz__wait {
+    color: #555555;
+    font-size: 9px; /* retake_time_notice: il_small, 9 px */
+}
+
+/*
+ * Text as AIR draws habbo_way, safety_booklet and quiz_question: Illumina (style 101) frames in regular
+ * Ubuntu (our `Ubuntu` face is the condensed cut). Plain texts carry no text_style: il_regular 11 px.
+ * The modal titles above the frame are il_frame_modal_title, also regular Ubuntu.
+ */
+.octane-habboway,
+.octane-habboway-quiz {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+@layer base {
+    .octane-habboway :where(*):not(svg, svg *),
+    .octane-habboway-quiz :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
+
+.octane-habboway .octane-air-modal__content,
+.octane-habboway-quiz .octane-air-modal__content {
+    font-size: 11px;
+    line-height: 14px;
+}
+
+.octane-habboway-quiz .octane-air-modal__content label {
+    font-size: 11px;
+}
+
+/* The card's `button` rule (12 px) outranks the bare button classes, so the il_button size is scoped. */
+.octane-habboway :is(.octane-habboway__nav, .octane-habboway__action),
+.octane-habboway-quiz :is(.octane-habboway__nav, .octane-habboway__action) {
+    font-size: 10px;
+}

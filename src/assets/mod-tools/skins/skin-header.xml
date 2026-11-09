@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<skin name="header_skin" version="0.0">
+
+	<!-- shared variables -->
+
+	<variables>
+		<variable key="asset" value="habbo_blue_skin_png" type="String" />
+	</variables>
+
+	<!-- the following maps layouts for render states -->
+
+	<states>
+		<state name="default" layout="header" template="default_header_mode" />
+	</states>
+
+	<!-- templates defines regions in bitmap asset -->
+
+	<templates>
+		<template name="default_header_mode" asset="$asset">
+			<entities>
+				<entity name="header_center" type="bitmap"><region><Rectangle x="393" y="0" width="6" height="15" /></region></entity>
+                <entity name="header_shine" type="bitmap"><region><Rectangle x="401" y="16" width="6" height="15" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="passive_header_mode" asset="$asset">
+			<entities>
+				<entity name="header_center" type="bitmap"><region><Rectangle x="401" y="0" width="6" height="15" /></region></entity>
+                <entity name="header_shine" type="bitmap"><region><Rectangle x="401" y="16" width="6" height="15" /></region></entity>
+			</entities>
+		</template>
+	</templates>
+
+	<!-- markup for layout drawer -->
+
+	<layouts>
+		<layout name="header" transparent="false">
+			<entities>
+				<entity name="header_center" id="1">
+					<region><Rectangle x="0" y="0" width="24" height="15" /></region>
+					<scale horizontal="tiled" vertical="fixed" />
+				</entity>
+                <entity name="header_shine" id="0" colorize="false">
+					<region><Rectangle x="0" y="0" width="24" height="15" /></region>
+					<scale horizontal="tiled" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+	</layouts>
+</skin>

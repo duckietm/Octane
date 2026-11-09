@@ -1,16 +1,21 @@
 import {
     ControlYoutubeDisplayPlaybackMessageComposer,
+    RoomSessionEvent,
     YouTubeRoomBroadcastEvent,
     YouTubeRoomPlayComposer,
     YouTubeRoomSettingsEvent,
     YouTubeRoomWatchersEvent,
     YouTubeRoomWatchingComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
-import { CopyToClipboard, GetRoomSession, getYoutubeRoomEnabled, LocalizeText, SendMessageComposer, YoutubeVideoPlaybackStateEnum } from '../../api';
-import { LayoutAvatarImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
-import { useFurnitureYoutubeWidget, useHasPermission, useMessageEvent } from '../../hooks';
+import { CopyToClipboard, GetRoomSession, getYoutubeRoomEnabled, LocalizeText, SendMessageComposer, YoutubeVideoPlaybackStateEnum, localizeWithFallback } from '../../api';
+import { LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
+import { useFurnitureYoutubeWidget, useHasPermission, useMessageEvent, useOctaneEvent } from '../../hooks';
 import ReactPlayer from '../youtube/YoutubeReactPlayer';
+import { Checkbox } from '../../common/Checkbox';
+import { Slider } from '../../common/Slider';
+import { BaseButton } from '../../common/BaseButton';
+import { Hint } from '../../common/Tooltip';
 
 const CONTROL_COMMAND_PREVIOUS_VIDEO = 0;
 const CONTROL_COMMAND_NEXT_VIDEO = 1;
@@ -26,7 +31,30 @@ const extractVideoId = (input: string): string => {
         const match = input.match(pattern);
         if (match) return match[1];
     }
-    return input;
+    // Text that is no video id used to become one: it went into the history, the playlist and the room play packet.
+    return '';
+};
+
+const VIDEO_ID = /^[a-zA-Z0-9_-]{11}$/;
+
+/** A stored list of video ids; storage that is blocked, full or holds something else gives an empty list. */
+const readStoredIds = (key: string): string[] => {
+    try {
+        const parsed: unknown = JSON.parse(localStorage.getItem(key) ?? '[]');
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+            .map((entry: unknown) => (typeof entry === 'string' ? entry : (entry as { id?: unknown })?.id))
+            .filter((id): id is string => typeof id === 'string' && VIDEO_ID.test(id));
+    } catch {
+        return [];
+    }
+};
+
+/** Storage that is blocked or full must not take the toolbar down with it. */
+const writeStoredIds = (key: string, ids: string[]) => {
+    try {
+        localStorage.setItem(key, JSON.stringify(ids));
+    } catch {}
 };
 
 export const YouTubePlayerView: FC<{}> = () => {
@@ -95,6 +123,29 @@ export const YouTubePlayerView: FC<{}> = () => {
         }
     }, [isOpen, hasVideo]);
 
+    // The player belongs to the room: going straight to another room kept the last room's video playing, and its
+    // controls drove the last room's furni. Closing it also sends watching false through the effect above.
+    useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.ENDED, () => {
+        setIsOpen(false);
+        setInputValue('');
+        setBroadcastVideo('');
+        setBroadcastSender('');
+        setBroadcastPlaylist([]);
+        setWatcherIds(new Set());
+    });
+
+    useEffect(
+        () => () => {
+            if (!sentWatchingRef.current) return;
+
+            try {
+                SendMessageComposer(new YouTubeRoomWatchingComposer(false));
+            } catch (e) {}
+            sentWatchingRef.current = false;
+        },
+        []
+    );
+
     const loadRoomUsers = () => {
         try {
             const roomSession = GetRoomSession();
@@ -139,32 +190,16 @@ export const YouTubePlayerView: FC<{}> = () => {
     }, []);
 
     useEffect(() => {
-        const savedHistory = localStorage.getItem('youtube_history');
-        if (savedHistory) {
-            try {
-                const parsed = JSON.parse(savedHistory);
-                if (Array.isArray(parsed)) {
-                    setHistory(parsed.map((entry: any) => (typeof entry === 'string' ? entry : entry?.id)).filter(Boolean));
-                }
-            } catch (e) {}
-        }
-        const savedPlaylist = localStorage.getItem('youtube_playlist');
-        if (savedPlaylist) {
-            try {
-                const parsed = JSON.parse(savedPlaylist);
-                if (Array.isArray(parsed)) {
-                    setPlaylist(parsed.map((entry: any) => (typeof entry === 'string' ? entry : entry?.id)).filter(Boolean));
-                }
-            } catch (e) {}
-        }
+        setHistory(readStoredIds('youtube_history'));
+        setPlaylist(readStoredIds('youtube_playlist'));
     }, []);
 
     useEffect(() => {
-        localStorage.setItem('youtube_history', JSON.stringify(history.slice(0, 50)));
+        writeStoredIds('youtube_history', history.slice(0, 50));
     }, [history]);
 
     useEffect(() => {
-        localStorage.setItem('youtube_playlist', JSON.stringify(playlist));
+        writeStoredIds('youtube_playlist', playlist);
     }, [playlist]);
 
     const addToHistory = (id: string) => {
@@ -212,7 +247,7 @@ export const YouTubePlayerView: FC<{}> = () => {
     const isMyRoom = isModerator || (roomSession && roomSession.isRoomOwner);
 
     const QuickVolumeButton = ({ value, label }: { value: number; label: string }) => (
-        <button
+        <BaseButton
             onClick={() => {
                 setVolume(value);
                 setVolumePreset(value);
@@ -220,40 +255,40 @@ export const YouTubePlayerView: FC<{}> = () => {
             className={`px-2 py-1 rounded text-xs ${volumePreset === value ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
         >
             {label}
-        </button>
+        </BaseButton>
     );
 
     return (
-        <NitroCardView className={`youtube-player-modal ${isFullscreen ? '!fixed inset-0 w-full h-full z-[9999] rounded-none' : 'w-[550px]'}`}>
-            <NitroCardHeaderView headerText={isRoomMode ? '📺 YouTube TV' : '▶ YouTube'} onCloseClick={() => setIsOpen(false)} />
-            <NitroCardContentView>
+        <OctaneCardView className={`youtube-player-modal ${isFullscreen ? '!fixed inset-0 w-full h-full z-[9999] rounded-none' : 'w-[550px]'}`}>
+            <OctaneCardHeaderView headerText={isRoomMode ? '📺 YouTube TV' : '▶ YouTube'} onCloseClick={() => setIsOpen(false)} />
+            <OctaneCardContentView>
                 <div className="flex gap-1 mb-3 border-b border-gray-700 pb-2 flex-wrap">
-                    <button
+                    <BaseButton
                         onClick={() => setTab('player')}
                         className={`px-3 py-1 rounded text-sm ${tab === 'player' ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
                     >
                         ▶
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         onClick={() => setTab('playlist')}
                         className={`px-3 py-1 rounded text-sm ${tab === 'playlist' ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
                     >
                         📋 {playlist.length}
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         onClick={() => setTab('history')}
                         className={`px-3 py-1 rounded text-sm ${tab === 'history' ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
                     >
                         🕐 {history.length}
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         onClick={() => setTab('share')}
                         className={`px-3 py-1 rounded text-sm ${tab === 'share' ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
                     >
                         📤
-                    </button>
+                    </BaseButton>
                     {watcherIds.size > 0 && (
-                        <button
+                        <BaseButton
                             onClick={() => {
                                 setTab('spectators');
                                 loadRoomUsers();
@@ -261,21 +296,21 @@ export const YouTubePlayerView: FC<{}> = () => {
                             className={`px-3 py-1 rounded text-sm ${tab === 'spectators' ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
                         >
                             📺 {watcherIds.size}
-                        </button>
+                        </BaseButton>
                     )}
-                    <button
+                    <BaseButton
                         onClick={() => setTab('settings')}
                         className={`px-3 py-1 rounded text-sm ${tab === 'settings' ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
                     >
                         ⚙️
-                    </button>
+                    </BaseButton>
                 </div>
 
                 {tab === 'player' && (
                     <>
                         {isRoomMode && (
                             <div className="mb-2 p-2 bg-blue-900/50 rounded flex justify-between text-sm">
-                                <span className="text-blue-300">📺 Connected with YouTube TV</span>
+                                <span className="text-blue-300">{localizeWithFallback('octane.toolbar.connected_with_youtube_tv', '📺 Connected with YouTube TV')}</span>
                                 <div className="flex gap-2">
                                     {isPlaying && <span className="text-green-400">▶ {LocalizeText('connection.login.play')}</span>}
                                     {isPaused && <span className="text-yellow-400">⏸ {LocalizeText('wiredfurni.params.clock_control.3')}</span>}
@@ -309,15 +344,15 @@ export const YouTubePlayerView: FC<{}> = () => {
 
                         {isRoomMode && hasControl && (
                             <div className="mt-2 flex gap-2 justify-center">
-                                <button onClick={handlePrev} className="px-3 py-1 bg-gray-700 rounded text-white text-sm">
+                                <BaseButton onClick={handlePrev} className="px-3 py-1 bg-gray-700 rounded text-white text-sm">
                                     ◀◀
-                                </button>
-                                <button onClick={isPlaying ? handlePause : handlePlay} className="px-4 py-1 bg-amber-600 rounded text-white font-bold text-sm">
+                                </BaseButton>
+                                <BaseButton onClick={isPlaying ? handlePause : handlePlay} className="px-4 py-1 bg-amber-600 rounded text-white font-bold text-sm">
                                     {isPlaying ? '⏸' : '▶'}
-                                </button>
-                                <button onClick={handleNext} className="px-3 py-1 bg-gray-700 rounded text-white text-sm">
+                                </BaseButton>
+                                <BaseButton onClick={handleNext} className="px-3 py-1 bg-gray-700 rounded text-white text-sm">
                                     ▶▶
-                                </button>
+                                </BaseButton>
                             </div>
                         )}
 
@@ -325,7 +360,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                             <div className="mt-2 p-2 bg-purple-900/50 rounded text-sm flex justify-between items-center">
                                 <span className="text-purple-300">📡 {broadcastSender} broadcasting</span>
                                 {isMyRoom && (
-                                    <button
+                                    <BaseButton
                                         onClick={() => {
                                             try {
                                                 SendMessageComposer(new YouTubeRoomPlayComposer('', []));
@@ -337,7 +372,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                                         className="px-2 py-0.5 bg-red-700 hover:bg-red-600 rounded text-white text-xs"
                                     >
                                         ⏹ {LocalizeText('useproduct.widget.cancel')}
-                                    </button>
+                                    </BaseButton>
                                 )}
                             </div>
                         )}
@@ -349,20 +384,19 @@ export const YouTubePlayerView: FC<{}> = () => {
                                 onChange={(e) => setInputValue(e.target.value)}
                                 disabled={!!broadcastVideo && !isMyRoom}
                                 className={`flex-1 p-2 rounded text-white text-sm ${!!broadcastVideo && !isMyRoom ? 'bg-gray-800' : 'bg-gray-700'}`}
-                                placeholder="YouTube URL / video ID"
+                                placeholder={localizeWithFallback('octane.toolbar.youtube_url_video_id', 'YouTube URL / video ID')}
                             />
                             {isMyRoom && youtubeEnabled && videoId && (
-                                <button
+                                <Hint content={localizeWithFallback('octane.toolbar.play_this_video_for_everyone_in', 'Play this video for everyone in the room')}><BaseButton
                                     onClick={() => {
                                         try {
                                             SendMessageComposer(new YouTubeRoomPlayComposer(videoId, playlist));
                                         } catch (e) {}
                                     }}
                                     className="px-3 bg-purple-600 rounded text-white text-sm whitespace-nowrap"
-                                    title="Speel deze video voor iedereen in de kamer"
                                 >
                                     📡 {LocalizeText('wiredchests.logs.type.1')}
-                                </button>
+                                </BaseButton></Hint>
                             )}
                         </div>
                     </>
@@ -375,24 +409,24 @@ export const YouTubePlayerView: FC<{}> = () => {
                                 type="text"
                                 value={inputValue}
                                 onChange={(e) => setInputValue(e.target.value)}
-                                placeholder="Add video URL..."
+                                placeholder={localizeWithFallback('octane.toolbar.add_video_url', 'Add video URL...')}
                                 className="flex-1 p-2 bg-gray-700 text-white rounded text-sm"
                                 onKeyDown={(e) => e.key === 'Enter' && addToPlaylist()}
                             />
-                            <button onClick={addToPlaylist} className="px-4 bg-purple-600 rounded text-white">
+                            <BaseButton onClick={addToPlaylist} className="px-4 bg-purple-600 rounded text-white">
                                 +
-                            </button>
+                            </BaseButton>
                         </div>
                         <div className="flex gap-2">
-                            <button onClick={() => setInputValue('')} className="flex-1 px-3 py-2 bg-gray-700 rounded text-white text-sm">
-                                🔄 New video
-                            </button>
-                            <button onClick={() => setPlaylist([])} className="px-3 py-2 bg-red-900 rounded text-white text-sm">
-                                🗑 Clear
-                            </button>
+                            <BaseButton onClick={() => setInputValue('')} className="flex-1 px-3 py-2 bg-gray-700 rounded text-white text-sm">
+                                {localizeWithFallback('octane.toolbar.new_video', '🔄 New video')}
+                            </BaseButton>
+                            <BaseButton onClick={() => setPlaylist([])} className="px-3 py-2 bg-red-900 rounded text-white text-sm">
+                                {localizeWithFallback('octane.toolbar.clear', '🗑 Clear')}
+                            </BaseButton>
                         </div>
                         {playlist.length === 0 ? (
-                            <div className="p-4 text-center text-gray-500 text-sm">Playlist is empty</div>
+                            <div className="p-4 text-center text-gray-500 text-sm">{localizeWithFallback('octane.toolbar.playlist_is_empty', 'Playlist is empty')}</div>
                         ) : (
                             <div className="max-h-[250px] overflow-y-auto space-y-1">
                                 {playlist.map((id, i) => (
@@ -406,7 +440,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                                     >
                                         <span className="text-amber-500 text-sm w-6">{i + 1}.</span>
                                         <div className="flex-1 min-w-0 text-white text-sm truncate font-mono">{id}</div>
-                                        <button
+                                        <BaseButton
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setPlaylist((p) => p.filter((x) => x !== id));
@@ -414,7 +448,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                                             className="text-red-500 px-2"
                                         >
                                             ✕
-                                        </button>
+                                        </BaseButton>
                                     </div>
                                 ))}
                             </div>
@@ -426,12 +460,12 @@ export const YouTubePlayerView: FC<{}> = () => {
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
                             <div className="text-gray-400 text-sm">🕐 Watch history ({history.length})</div>
-                            <button onClick={() => setHistory([])} className="text-red-400 text-xs hover:text-red-300">
-                                🗑 Clear
-                            </button>
+                            <BaseButton onClick={() => setHistory([])} className="text-red-400 text-xs hover:text-red-300">
+                                {localizeWithFallback('octane.toolbar.clear', '🗑 Clear')}
+                            </BaseButton>
                         </div>
                         {history.length === 0 ? (
-                            <div className="p-4 text-center text-gray-500 text-sm">No videos watched yet</div>
+                            <div className="p-4 text-center text-gray-500 text-sm">{localizeWithFallback('octane.toolbar.no_videos_watched_yet', 'No videos watched yet')}</div>
                         ) : (
                             <div className="max-h-[300px] overflow-y-auto space-y-1">
                                 {history.map((id, i) => (
@@ -454,7 +488,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                 {tab === 'share' && (
                     <div className="space-y-3">
                         <div className="p-3 bg-gray-800 rounded">
-                            <div className="text-gray-400 text-sm mb-2">📤 Share video</div>
+                            <div className="text-gray-400 text-sm mb-2">{localizeWithFallback('octane.toolbar.share_video', '📤 Share video')}</div>
                             {videoId ? (
                                 <div className="space-y-2">
                                     <div className="flex gap-2">
@@ -464,24 +498,24 @@ export const YouTubePlayerView: FC<{}> = () => {
                                             readOnly
                                             className="flex-1 p-2 bg-gray-700 text-white rounded text-sm"
                                         />
-                                        <button
+                                        <BaseButton
                                             onClick={() => {
                                                 void CopyToClipboard(`https://youtube.com/watch?v=${videoId}`);
                                             }}
                                             className="px-3 bg-blue-600 rounded text-white text-sm"
                                         >
                                             📋
-                                        </button>
+                                        </BaseButton>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="text-gray-500 text-sm text-center py-4">Select a video first to share</div>
+                                <div className="text-gray-500 text-sm text-center py-4">{localizeWithFallback('octane.toolbar.select_a_video_first_to_share', 'Select a video first to share')}</div>
                             )}
                         </div>
                         <div className="p-3 bg-gray-800 rounded">
-                            <div className="text-gray-400 text-sm mb-2">📋 Quick share</div>
+                            <div className="text-gray-400 text-sm mb-2">{localizeWithFallback('octane.toolbar.quick_share', '📋 Quick share')}</div>
                             <div className="grid grid-cols-2 gap-2">
-                                <button
+                                <BaseButton
                                     onClick={() => {
                                         if (videoId) {
                                             const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
@@ -494,7 +528,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                                     className="px-3 py-2 bg-blue-600 rounded text-white text-sm disabled:opacity-50"
                                 >
                                     🐦 Twitter
-                                </button>
+                                </BaseButton>
                             </div>
                         </div>
                     </div>
@@ -516,12 +550,12 @@ export const YouTubePlayerView: FC<{}> = () => {
                             <div className="p-3 bg-gray-800 rounded">
                                 <div className="flex justify-between items-center mb-2">
                                     <div className="text-gray-400 text-sm">📺 {watchers.length} watching</div>
-                                    <button onClick={loadRoomUsers} className="text-gray-400 hover:text-white text-xs">
+                                    <BaseButton onClick={loadRoomUsers} className="text-gray-400 hover:text-white text-xs">
                                         🔄
-                                    </button>
+                                    </BaseButton>
                                 </div>
                                 {watchers.length === 0 ? (
-                                    <div className="text-gray-500 text-sm text-center py-4">No one is watching</div>
+                                    <div className="text-gray-500 text-sm text-center py-4">{localizeWithFallback('octane.toolbar.no_one_is_watching', 'No one is watching')}</div>
                                 ) : (
                                     <div className="max-h-[200px] overflow-y-auto space-y-1">
                                         {watchers.map((user) => (
@@ -550,21 +584,21 @@ export const YouTubePlayerView: FC<{}> = () => {
                         <div>
                             <div className="flex justify-between items-center mb-1">
                                 <label className="text-white text-sm">🔊 Volume: {volume}%</label>
-                                <button onClick={() => setShowVolumeSlider(!showVolumeSlider)} className="text-gray-400 text-xs">
+                                <BaseButton onClick={() => setShowVolumeSlider(!showVolumeSlider)} className="text-gray-400 text-xs">
                                     {showVolumeSlider ? '▼' : '▲'}
-                                </button>
+                                </BaseButton>
                             </div>
                             {showVolumeSlider && (
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="100"
+                                <Slider
+                                    disabledButton
+                                    className="octane-slider--compact"
+                                    min={0}
+                                    max={100}
                                     value={volume}
-                                    onChange={(e) => {
-                                        setVolume(parseInt(e.target.value));
-                                        setVolumePreset(parseInt(e.target.value));
+                                    onChange={(value) => {
+                                        setVolume(value);
+                                        setVolumePreset(value);
                                     }}
-                                    className="w-full"
                                 />
                             )}
                             <div className="flex gap-1 mt-2">
@@ -578,38 +612,38 @@ export const YouTubePlayerView: FC<{}> = () => {
 
                         <div className="flex flex-wrap gap-3">
                             <label className="flex items-center gap-2 text-white text-sm cursor-pointer">
-                                <input type="checkbox" checked={isMuted} onChange={(e) => setIsMuted(e.target.checked)} className="w-4 h-4" />🔇 Mute
+                                <Checkbox checked={isMuted} onCheckedChange={(nextChecked) => setIsMuted(nextChecked)} className="w-4 h-4" />{localizeWithFallback('octane.toolbar.mute', '🔇 Mute')}
                             </label>
                             <label className="flex items-center gap-2 text-white text-sm cursor-pointer">
-                                <input type="checkbox" checked={isLooping} onChange={(e) => setIsLooping(e.target.checked)} className="w-4 h-4" />🔁 Loop
+                                <Checkbox checked={isLooping} onCheckedChange={(nextChecked) => setIsLooping(nextChecked)} className="w-4 h-4" />{localizeWithFallback('octane.toolbar.loop', '🔁 Loop')}
                             </label>
                             <label className="flex items-center gap-2 text-white text-sm cursor-pointer">
-                                <input type="checkbox" checked={isFullscreen} onChange={(e) => setIsFullscreen(e.target.checked)} className="w-4 h-4" />
-                                🖥️ Fullscreen
+                                <Checkbox checked={isFullscreen} onCheckedChange={(nextChecked) => setIsFullscreen(nextChecked)} className="w-4 h-4" />
+                                {localizeWithFallback('octane.toolbar.fullscreen', '🖥️ Fullscreen')}
                             </label>
                         </div>
 
                         <div className="p-2 bg-gray-800 rounded text-xs text-gray-400">
-                            <div className="font-bold mb-1">ℹ️ Info</div>
+                            <div className="font-bold mb-1">{localizeWithFallback('octane.toolbar.info', 'ℹ️ Info')}</div>
                             <div>
                                 📡 Broadcast:{' '}
                                 {broadcastVideo ? (
                                     <span className="text-green-400">✓ Active ({broadcastSender} playing)</span>
                                 ) : (
-                                    <span className="text-gray-500">✕ No video</span>
+                                    <span className="text-gray-500">{localizeWithFallback('octane.toolbar.no_video', '✕ No video')}</span>
                                 )}
                             </div>
                             <div>
                                 🎮 Controle:{' '}
-                                {isMyRoom ? <span className="text-green-400">✓ You are the owner</span> : <span className="text-gray-500">✕ Viewing only</span>}
+                                {isMyRoom ? <span className="text-green-400">{localizeWithFallback('octane.toolbar.you_are_the_owner', '✓ You are the owner')}</span> : <span className="text-gray-500">{localizeWithFallback('octane.toolbar.viewing_only', '✕ Viewing only')}</span>}
                             </div>
                             <div>
-                                👁️ Viewers: <span className="text-amber-400">{watcherIds.size}</span>
+                                {localizeWithFallback('octane.toolbar.viewers', '👁️ Viewers:')} <span className="text-amber-400">{watcherIds.size}</span>
                             </div>
                         </div>
                     </div>
                 )}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

@@ -1,8 +1,639 @@
-.user-settings-window {
-    width: min(360px, calc(100vw - 16px));
+/*
+ * WIN63 AIR sources:
+ * - me_menu_settings_menu_xml: 180x140 menu, title/divider/buttons/Back
+ * - me_menu_sound_settings_xml: 312x170, extended to 198px for Soundboard
+ * - toolbar_chat_settings_xml: 257px wide
+ * - me_menu_other_settings_xml: 242x184, extended for Polaris catalog controls
+ *
+ * AIR uses border style 6 tinted #79756e, Ubuntu 12px text and fixed pixel
+ * controls. Every title, label and button in those layouts is u_regular:
+ * regular (not condensed) Ubuntu, 12 px, #ffffff. Our `Ubuntu` face is the
+ * condensed cut, so the windows name the regular one. Polaris-only controls follow the official widgets in each view.
+ */
+
+.user-settings-window.air-settings-window {
+    --air-settings-width: 180px;
+
+    position: relative;
+    box-sizing: border-box;
+    /* The chrome is a 9-slice border-image, so the frame can take any size.
+       Every part sits in the normal flow: the window is as wide as its widest
+       row (the AIR width is only a floor) and as tall as its content, so a
+       new row or a longer translation grows it instead of running under the
+       Back button or out of the frame. */
+    display: flex;
+    flex-direction: column;
+    width: max-content;
+    min-width: var(--air-settings-width);
+    height: auto;
+    max-width: 100vw;
+    max-height: calc(100vh - 8px);
+    margin: 0;
+    padding: 5px 10px 10px;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    color: #ffffff;
+    filter: drop-shadow(3px 3px 3px rgba(0, 0, 0, 0.35));
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 17px;
+    image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.user-settings-window .nitro-card-content {
-    min-height: 0;
+.user-settings-window.air-settings-window--audio {
+    --air-settings-width: 312px;
+}
+
+.user-settings-window.air-settings-window--chat {
+    --air-settings-width: 257px;
+}
+
+.user-settings-window.air-settings-window--other {
+    --air-settings-width: 242px;
+}
+
+.user-settings-window.air-settings-window--privacy {
+    --air-settings-width: 270px;
+}
+
+.air-settings-window__chrome {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    box-sizing: border-box;
+    border: 8px solid transparent;
+    border-image-source: url('../../assets/images/user-settings/air/border-ubuntu-6-79756e.png');
+    border-image-slice: 16 fill;
+    border-image-width: 8px;
+    border-image-repeat: stretch;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.air-settings-window > :not(.air-settings-window__chrome) {
+    position: relative;
+    z-index: 1;
+}
+
+.air-settings-window__title {
+    height: 17px;
+    margin: 0;
+    padding: 0 10px;
+    color: #ffffff;
+    cursor: move;
+    font: 400 12px/17px HabboAirUbuntu, UbuntuRegular, sans-serif;
+    text-align: left;
+    text-shadow: none;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.air-settings-window--audio .air-settings-window__title {
+    text-align: center;
+}
+
+.air-settings-window--chat .air-settings-window__title {
+    text-align: center;
+}
+
+.air-settings-window--other .air-settings-window__title {
+    text-align: center;
+}
+
+.air-settings-window--privacy .air-settings-window__title {
+    text-align: center;
+}
+
+/* The divider spans the content column; the "other" and word filter windows
+   keep the official short, centred rule. */
+.air-settings-window__divider {
+    flex: 0 0 1px;
+    align-self: stretch;
+    height: 1px;
+    margin: 2px 0 8px;
+    background: #2f2f2f;
+}
+
+.air-settings-window--other .air-settings-window__divider {
+    align-self: center;
+    width: 162px;
+}
+
+/* The menu, Back, add/remove word and apply buttons are AIR `button` style 3: habbo_skin_button_shiny_default
+   (the grey shiny skin, not the style 0 habbo_skin_button_default), black button_shiny_regular caption. */
+.air-settings-button {
+    box-sizing: border-box;
+    height: 22px;
+    min-height: 22px;
+    margin: 0;
+    padding: 0 3px;
+    overflow: hidden;
+    border: 5px solid transparent;
+    border-radius: 0;
+    border-image-source: var(--habbo-skin-shiny);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    background: transparent;
+    box-shadow: none;
+    color: #000000;
+    cursor: pointer;
+    font: 400 12px/16px HabboAirUbuntu, UbuntuRegular, sans-serif;
+    text-align: center;
+    text-overflow: ellipsis;
+    text-shadow: none;
+    white-space: nowrap;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.air-settings-button:hover {
+    border-image-source: var(--habbo-skin-shiny-hover);
+    filter: none;
+}
+
+.air-settings-button:active {
+    border-image-source: var(--habbo-skin-shiny-pressed);
+    filter: none;
+}
+
+.air-settings-button:focus-visible,
+.air-settings-checkbox:focus-visible,
+.air-settings-radio:focus-visible,
+.air-settings-volume-row__thumb:has(input:focus-visible),
+.air-settings-volume-row__speaker:focus-visible,
+.air-settings-select-row select:focus-visible,
+.air-settings-select-row .octane-select-trigger:focus-visible {
+    outline: 1px solid #fff27a;
+    outline-offset: 1px;
+}
+
+/* Back always follows the content, never on top of it. */
+.air-settings-window__back {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    width: 60px;
+    height: 28px;
+    min-height: 28px;
+    margin-top: 10px;
+}
+
+.air-settings-menu__items {
+    display: flex;
+    width: 160px;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.air-settings-menu__items .air-settings-button {
+    width: 160px;
+    flex: 0 0 22px;
+}
+
+.air-settings-audio__heading {
+    height: 17px;
+    color: #ffffff;
+    line-height: 17px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.air-settings-audio__rows {
+    margin-left: 4px;
+    /* One shared grid rather than four independent rows: the label column is
+       sized by the longest translation, so every slider stays in the same
+       column instead of drifting row by row. */
+    display: grid;
+    width: max-content;
+    min-width: 285px;
+    grid-auto-rows: 28px;
+    grid-template-columns: max-content 29px 144px 29px;
+    align-items: start;
+}
+
+.air-settings-volume-row {
+    display: contents;
+    color: #ffffff;
+}
+
+.air-settings-volume-row__label {
+    height: 18px;
+    margin-top: 6px;
+    /* 60px keeps the English layout pixel-identical to the AIR client; a
+       longer translation grows the column instead of being clipped. */
+    min-width: 60px;
+    padding-right: 4px;
+    color: #ffffff;
+    font: 400 12px/18px HabboAirUbuntu, UbuntuRegular, sans-serif;
+    white-space: nowrap;
+}
+
+.air-settings-volume-row__speaker {
+    width: 29px;
+    height: 30px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    background-position: 0 4px;
+    background-repeat: no-repeat;
+    box-shadow: none;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.air-settings-volume-row__speaker--off {
+    background-image: url('../../assets/images/user-settings/air/sounds-off-white.png');
+}
+
+.air-settings-volume-row__speaker--off:hover,
+.air-settings-volume-row__speaker--off:focus-visible {
+    background-image: url('../../assets/images/user-settings/air/sounds-off-color.png');
+}
+
+.air-settings-volume-row__speaker--on {
+    margin-left: 9px;
+    background-image: url('../../assets/images/user-settings/air/sounds-on-white.png');
+}
+
+.air-settings-volume-row__speaker--on:hover,
+.air-settings-volume-row__speaker--on:focus-visible {
+    background-image: url('../../assets/images/user-settings/air/sounds-on-color.png');
+}
+
+.air-settings-volume-row__slider {
+    position: relative;
+    width: 144px;
+    height: 24px;
+    margin-left: 9px;
+}
+
+.air-settings-volume-row__slider::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 2px;
+    width: 139px;
+    height: 20px;
+    background: url('../../assets/images/user-settings/air/slider-base.png') no-repeat 0 0;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* The thumb is centred on the value, so the control spans the thumb's travel (a native range kept
+   6px of padding on each side of its 144px box: centres run from 12px to 132px). */
+.air-settings-volume-row__control {
+    position: absolute;
+    top: 9px;
+    left: 12px;
+    width: 120px;
+    height: 15px;
+    margin: 0;
+}
+
+.air-settings-volume-row__control-area {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.air-settings-volume-row__track {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+}
+
+.air-settings-volume-row__thumb {
+    width: 12px;
+    height: 15px;
+    border: 0;
+    border-radius: 0;
+    background: url('../../assets/images/user-settings/air/slider-button.png') no-repeat 0 0;
+    box-shadow: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.air-settings-check-row,
+.air-settings-select-row {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    color: #ffffff;
+    font: 400 12px/17px HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.air-settings-check-row {
+    height: 16px;
+    min-height: 16px;
+    align-items: flex-start;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.air-settings-check-row > span {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.air-settings-checkbox {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    box-sizing: border-box !important;
+    width: 15px !important;
+    min-width: 15px !important;
+    height: 15px !important;
+    min-height: 15px !important;
+    margin: 1px 0 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15'%3E%3Crect x='0.5' y='0.5' width='14' height='14' fill='%23ffffff' stroke='%23000000' stroke-width='1'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.air-settings-checkbox:checked,
+.air-settings-checkbox[data-checked] {
+    /* One SVG per state. The skin sheet has no clean ticked box — its
+       (410,16) region is a dark slab that vanishes on this panel — and
+       layering a tick over the sprite left the box unpainted in the client. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15'%3E%3Crect x='0.5' y='0.5' width='14' height='14' fill='%23ffffff' stroke='%23000000' stroke-width='1'/%3E%3Cpath d='M3.5 8 L6 10.5 L11.5 4.5' fill='none' stroke='%23111111' stroke-width='2' stroke-linecap='square'/%3E%3C/svg%3E") !important;
+}
+
+.air-settings-other__list {
+    display: flex;
+    min-width: 222px;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.air-settings-select-row {
+    height: 24px;
+    min-height: 24px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+.air-settings-select-row > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.air-settings-select-row select,
+.air-settings-select-row .octane-select-trigger {
+    appearance: auto;
+    box-sizing: border-box;
+    width: 96px;
+    height: 24px;
+    min-height: 24px;
+    flex: 0 0 96px;
+    margin: 0;
+    padding: 0 4px;
+    border: 1px solid #2f2f2f;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #111111;
+    font: 400 12px/22px HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+/* Prose wraps to the width the controls give the window instead of
+   stretching it: inline-size containment keeps it out of max-content. */
+.air-settings-chat__info {
+    contain: inline-size;
+    margin: 0 0 5px;
+    color: #ffffff;
+    font: 400 12px/16px HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.air-settings-chat__list {
+    display: flex;
+    min-width: 237px;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.air-settings-privacy__content {
+    display: flex;
+    min-width: 250px;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.air-settings-privacy__content p {
+    contain: inline-size;
+}
+
+.air-settings-privacy__content fieldset {
+    display: flex;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.air-settings-privacy__content legend,
+.air-settings-privacy__content p {
+    margin: 0;
+    padding: 0;
+    color: #ffffff;
+    font: 400 12px/17px HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.air-settings-privacy__content legend {
+    font-weight: 700;
+}
+
+.air-settings-radio {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    box-sizing: border-box !important;
+    width: 15px !important;
+    min-width: 15px !important;
+    height: 15px !important;
+    min-height: 15px !important;
+    margin: 1px 0 0 !important;
+    padding: 0 !important;
+    border: 1px solid #2f2f2f !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    cursor: pointer;
+}
+
+.air-settings-radio:checked,
+.air-settings-radio[data-checked] {
+    background: radial-gradient(circle, #2f2f2f 0 3px, #ffffff 4px) !important;
+}
+
+@media (max-height: 257px) {
+    .air-settings-window {
+        overflow-y: auto;
+    }
+}
+
+/* Personal word filter (custom_word_filter_settings). */
+.user-settings-window.air-settings-window--wordfilter {
+    --air-settings-width: 257px;
+}
+
+.air-settings-window--wordfilter .air-settings-window__title {
+    text-align: center;
+}
+
+.air-settings-wordfilter {
+    display: flex;
+    min-width: 237px;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.air-settings-wordfilter__add {
+    display: flex;
+    gap: 5px;
+}
+
+.air-settings-wordfilter__add input {
+    box-sizing: border-box;
+    min-width: 0;
+    height: 22px;
+    flex: 1 1 auto;
+    padding: 0 4px;
+    border: 1px solid #2f2f2f;
+    border-radius: 3px;
+    background: #ffffff;
+    color: #111111;
+    font: 400 12px/20px HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.air-settings-wordfilter__error {
+    margin: 0;
+    color: #ffb4a8;
+}
+
+.air-settings-wordfilter__list {
+    max-height: 160px;
+    margin: 0;
+    padding: 2px 4px;
     overflow-y: auto;
+    border: 1px solid #2f2f2f;
+    background: rgba(0, 0, 0, 0.25);
+    list-style: none;
+}
+
+.air-settings-wordfilter__list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+.air-settings-wordfilter__list li > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.air-settings-wordfilter__empty {
+    color: #b8b8b8;
+}
+
+.air-settings-wordfilter__remove {
+    padding: 0 4px;
+    border: 0;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+    font: 700 13px/16px HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.air-settings-wordfilter__remove:hover,
+.air-settings-wordfilter__remove:focus-visible {
+    color: #ffb4a8;
+}
+
+/* The whole window is regular Ubuntu, including whatever a shared control
+   (Select trigger, Checkbox) brings along with its own font utilities. */
+@layer base {
+    .user-settings-window :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
+
+/*
+ * Account settings (user-account-settings) is an Octane extra with no AIR
+ * layout. It keeps its own layout and takes the AIR text conventions: regular
+ * Ubuntu, u_regular 12 px text, u_bold 12 px headings, 12 px regular buttons,
+ * u_headline_small 14 px bold for the user name and u_small 10 px for the fine
+ * print (password strength, username rules).
+ */
+.user-account-settings-window {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+@layer base {
+    .user-account-settings-window :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    .user-account-settings__hero :where(*):not(svg, svg *),
+    .user-account-settings__content :where(*):not(svg, svg *, .user-account-settings__fine-print) {
+        font-size: 12px !important;
+    }
+
+    .user-account-settings__hero .user-account-settings__name {
+        font-size: 14px !important;
+        font-weight: 700 !important;
+    }
+
+    .user-account-settings__content .user-account-settings__fine-print {
+        font-size: 10px !important;
+    }
+
+    .user-account-settings__content button {
+        font-weight: 400 !important;
+    }
+
+    /* No AIR layout, so its Cancel / Save / Rename buttons take AIR's grey `button` style 3
+       (habbo_skin_button_shiny) with black 12 px regular captions instead of the green buy skin. */
+    .user-account-settings__content :where(.habbo-btn-primary, .habbo-btn-secondary) {
+        border-width: 5px !important;
+        border-style: solid !important;
+        border-color: transparent !important;
+        border-image-source: var(--habbo-skin-shiny) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        border-image-repeat: stretch !important;
+        background: transparent !important;
+        color: #000000 !important;
+        text-shadow: none !important;
+    }
+
+    .user-account-settings__content :where(.habbo-btn-primary, .habbo-btn-secondary):hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    .user-account-settings__content :where(.habbo-btn-primary, .habbo-btn-secondary):active {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+
+    .user-account-settings__content :where(.habbo-btn-primary, .habbo-btn-secondary):is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-disabled) !important;
+        color: #777777 !important;
+    }
 }

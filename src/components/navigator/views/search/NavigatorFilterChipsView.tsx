@@ -1,5 +1,8 @@
-import { FC } from 'react';
+import { FC, useRef, useState } from 'react';
 import { LocalizeText, SearchFilterOptions } from '../../../../api';
+import dropmenuArrow from '../../../../assets/images/habbo-skin/slices/dropmenu-default-arrow.png';
+import { ListSelect } from '../../../../common/ListSelect';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface NavigatorFilterChipsViewProps {
     value: number;
@@ -8,23 +11,32 @@ interface NavigatorFilterChipsViewProps {
 
 export const NavigatorFilterChipsView: FC<NavigatorFilterChipsViewProps> = (props) => {
     const { value, onChange } = props;
+    const [open, setOpen] = useState(false);
+    const rootRef = useRef<HTMLDivElement>(null);
+    const selected = SearchFilterOptions[value] ? value : 0;
 
     return (
-        <div className="flex flex-wrap gap-1">
-            {SearchFilterOptions.map((filter, index) => {
-                const isActive = value === index;
-
-                return (
-                    <button
-                        key={index}
-                        type="button"
-                        onClick={() => onChange(index)}
-                        className={`px-2 py-0.5 rounded-full text-[11px] border cursor-pointer transition-colors ${isActive ? 'bg-primary text-white border-primary' : 'bg-card-grid-item text-gray-600 border-card-grid-item-border hover:bg-primary hover:text-white hover:border-primary'}`}
-                    >
-                        {LocalizeText('navigator.filter.' + filter.name)}
-                    </button>
-                );
-            })}
-        </div>
+        <NativeTextTree>
+            <div ref={rootRef} className={`octane-navigator-air__filter${open ? ' is-open' : ''}`}>
+                <ListSelect
+                    aria-label={LocalizeText('navigator.filter.anything')}
+                    container={rootRef}
+                    itemClassName="octane-navigator-air__filter-option"
+                    options={SearchFilterOptions.map((filter, index) => ({ value: String(index), label: LocalizeText('navigator.filter.' + filter.name) }))}
+                    popupClassName="octane-navigator-air__filter-list"
+                    sideOffset={-1}
+                    triggerClassName="octane-navigator-air__filter-button"
+                    value={String(selected)}
+                    renderTrigger={(current) => (
+                        <>
+                            <span>{current?.label}</span>
+                            <img src={dropmenuArrow} alt="" width={16} height={16} />
+                        </>
+                    )}
+                    onOpenChange={setOpen}
+                    onValueChange={(next) => onChange(Number(next))}
+                />
+            </div>
+        </NativeTextTree>
     );
 };

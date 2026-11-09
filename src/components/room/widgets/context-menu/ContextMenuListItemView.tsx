@@ -1,5 +1,6 @@
 import { FC, MouseEvent, useMemo } from 'react';
 import { Flex, FlexProps } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface ContextMenuListItemViewProps extends FlexProps {
     disabled?: boolean;
@@ -16,9 +17,8 @@ export const ContextMenuListItemView: FC<ContextMenuListItemViewProps> = (props)
 
     const getClassNames = useMemo(() => {
         const newClassNames: string[] = [
-            'nitro-context-menu-item',
-            'relative mb-[2px] p-[3px] overflow-hidden',
-            'h-[24px] max-h-[24px] p-[3px] bg-[repeating-linear-gradient(#131e25,#131e25_50%,#0d171d_50%,#0d171d_100%)] cursor-pointer'
+            'octane-context-menu-item',
+            'cursor-pointer'
         ];
 
         if (disabled) newClassNames.push('disabled');
@@ -28,5 +28,5 @@ export const ContextMenuListItemView: FC<ContextMenuListItemViewProps> = (props)
         return newClassNames;
     }, [disabled, classNames]);
 
-    return <Flex alignItems={alignItems} classNames={getClassNames} fullWidth={fullWidth} justifyContent={justifyContent} onClick={handleClick} {...rest} />;
+    return <Flex component={BaseButton} type="button" aria-disabled={disabled || undefined} alignItems={alignItems} classNames={getClassNames} fullWidth={fullWidth} justifyContent={justifyContent} onClick={handleClick} {...rest} />;
 };

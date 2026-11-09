@@ -1,4 +1,4 @@
-import { useBetween } from 'use-between';
+import { useSharedHook } from '@/state/useSharedHook';
 import { useWiredToolsStore } from './useWiredToolsStore';
 
 /**
@@ -14,29 +14,43 @@ import { useWiredToolsStore } from './useWiredToolsStore';
 export const useWiredToolsActions = () => {
     const {
         updateAccountPreferences,
+        setPlayTestMode,
+        togglePlayTestMode,
+        updateWiredWhisperDisabled,
         saveRoomSettings,
+        saveRoomTimezone,
+        reloadRoomWired,
+        rollbackRoomWired,
         requestUserVariables,
         assignUserVariable,
         removeUserVariable,
         updateUserVariableValue,
         assignFurniVariable,
         removeFurniVariable,
+        clearVariableForAllHolders,
         updateFurniVariableValue,
         updateRoomVariableValue,
         openMonitor,
         openInspectionForFurni,
         openInspectionForUser
-    } = useBetween(useWiredToolsStore);
+    } = useSharedHook(useWiredToolsStore);
 
     return {
         updateAccountPreferences,
+        setPlayTestMode,
+        togglePlayTestMode,
+        updateWiredWhisperDisabled,
         saveRoomSettings,
+        saveRoomTimezone,
+        reloadRoomWired,
+        rollbackRoomWired,
         requestUserVariables,
         assignUserVariable,
         removeUserVariable,
         updateUserVariableValue,
         assignFurniVariable,
         removeFurniVariable,
+        clearVariableForAllHolders,
         updateFurniVariableValue,
         updateRoomVariableValue,
         openMonitor,

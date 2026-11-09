@@ -1,54 +1,82 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredDateToString, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 
-export const WiredConditionDateRangeView: FC<{}> = (props) => {
+const DATE_PLACEHOLDER = 'YYYY/MM/DD HH:MM';
+const DATE_MAX_LENGTH = 1000;
+
+/** Unix seconds of a typed date, or null when it does not parse (AIR Date.parse). */
+const parseDateSeconds = (text: string): number | null => {
+    const trimmed = (text ?? '').trim();
+
+    if (!trimmed) return null;
+
+    const time = Date.parse(trimmed);
+
+    return isNaN(time) ? null : Math.floor(time / 1000);
+};
+
+/**
+ * AIR's date range params: [] when the start does not parse, [start] when the end does not, otherwise
+ * [start, end], all in Unix seconds.
+ */
+export const dateRangeParams = (startText: string, endText: string): number[] => {
+    const start = parseDateSeconds(startText);
+
+    if (start === null) return [];
+
+    const end = parseDateSeconds(endText);
+
+    return end === null ? [start] : [start, end];
+};
+
+/** A stored date as AIR shows it (yyyy/MM/dd HH:mm); empty when there is none. */
+const dateText = (seconds: number | undefined) => (seconds && seconds > 0 ? WiredDateToString(new Date(seconds * 1000)) : '');
+
+export const WiredConditionDateRangeView: FC<{}> = () => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const { trigger = null, setIntParams = null } = useWired();
 
-    const save = () => {
-        const startDateInstance = new Date(startDate);
-        const endDateInstance = new Date(endDate);
-
-        // new Date('garbage') is a truthy *Invalid Date*, not null — the old
-        // `if(startDateInstance && endDateInstance)` was always true, so an
-        // unparseable input wrote NaN as the int param. Guard on getTime().
-        const startDateMili = isNaN(startDateInstance.getTime()) ? 0 : Math.floor(startDateInstance.getTime() / 1000);
-        const endDateMili = isNaN(endDateInstance.getTime()) ? 0 : Math.floor(endDateInstance.getTime() / 1000);
-
-        setIntParams([startDateMili, endDateMili]);
-    };
+    const save = () => setIntParams(dateRangeParams(startDate, endDate));
 
     useEffect(() => {
-        // Seed both inputs (default "now") even for a never-configured furni so
-        // the first save can't send new Date('') → NaN.
-        let startDate = new Date();
-        let endDate = new Date();
+        const intData = trigger?.intData ?? [];
 
-        if (trigger.intData.length >= 2) {
-            if (trigger.intData[0] > 0) startDate = new Date(trigger.intData[0] * 1000);
-
-            if (trigger.intData[1] > 0) endDate = new Date(trigger.intData[1] * 1000);
-        }
-
-        setStartDate(WiredDateToString(startDate));
-        setEndDate(WiredDateToString(endDate));
+        setStartDate(dateText(intData[0]));
+        setEndDate(dateText(intData[1]));
     }, [trigger]);
 
     return (
-        <WiredConditionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.startdate')}</Text>
-                <NitroInput type="text" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.enddate')}</Text>
-                <NitroInput type="text" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-            </div>
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.startdate')}</Text>
+                    <OctaneInput
+                        aria-label={LocalizeText('wiredfurni.params.startdate')}
+                        maxLength={DATE_MAX_LENGTH}
+                        placeholder={DATE_PLACEHOLDER}
+                        type="text"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                    />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.enddate')}</Text>
+                    <OctaneInput
+                        aria-label={LocalizeText('wiredfurni.params.enddate')}
+                        maxLength={DATE_MAX_LENGTH}
+                        placeholder={DATE_PLACEHOLDER}
+                        type="text"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                    />
+                </div>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

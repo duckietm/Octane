@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="roomtool_frame" width="240" height="437" version="0.1" uid="07947BE8-6CA3-3187-856A-A480F85A8FBB">
+  <window>
+    <frame x="10" y="10" width="240" height="437" params="32769" style="0" caption="Room%20Info" color="0xff418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.34901960784313724" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <itemlist x="0" y="0" width="230" height="405" params="8388625" style="0" name="list_cont" caption="Room%20Info" background="true">
+          <children>
+            <border x="0" y="0" width="230" height="97" params="4194320" style="0" name="room_cont" caption="Room%20Info">
+              <children>
+                <container x="5" y="5" width="220" height="90" params="16" style="0" name="room_data" background="true">
+                  <children>
+                    <text x="0" y="0" width="220" height="30" params="144" style="0" name="name" caption="PH%20Room%20Name%3A%20Neque%20porro%20quisquam%20est%20que">
+                      <variables>
+                        <var key="font_face" value="Volter Bold" type="String"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                        <var key="sharpness" value="0" type="Number"/>
+                        <var key="thickness" value="0" type="Number"/>
+                        <var key="word_wrap" value="true" type="Boolean"/>
+                        <var key="kerning" value="false" type="Boolean"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                      </variables>
+                    </text>
+                    <text x="0" y="30" width="220" height="30" params="144" style="0" name="desc" caption="PH%20Room%20Desc%3A%20Neque%20porro%20quisquam%20est%20qui%20dolorem%20ipsum%20quia%20dolor%20sit%20amet%2C%20consectetur%2C%20adipisci%20velit">
+                      <variables>
+                        <var key="text_color" value="0x808080" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                        <var key="sharpness" value="0" type="Number"/>
+                        <var key="thickness" value="0" type="Number"/>
+                        <var key="word_wrap" value="true" type="Boolean"/>
+                        <var key="kerning" value="false" type="Boolean"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                      </variables>
+                    </text>
+                    <container x="0" y="60" width="220" height="30" params="16" style="0" name="tags_cont" caption="Room%20Info">
+                      <children>
+                        <text x="0" y="0" width="40" height="13" params="16" style="0" caption="Tags%3A">
+                          <variables>
+                            <var key="font_face" value="Volter Bold" type="String"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                            <var key="sharpness" value="0" type="Number"/>
+                            <var key="thickness" value="0" type="Number"/>
+                            <var key="kerning" value="false" type="Boolean"/>
+                            <var key="spacing" value="0" type="Number"/>
+                            <var key="leading" value="0" type="Number"/>
+                          </variables>
+                        </text>
+                        <text x="40" y="0" width="178" height="30" params="144" style="0" name="tags_txt" caption="PH%20Room%20Name%3A%20Neque%20porro%20quisquam%20est%20que">
+                          <variables>
+                            <var key="font_face" value="Volter Bold" type="String"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                            <var key="sharpness" value="0" type="Number"/>
+                            <var key="thickness" value="0" type="Number"/>
+                            <var key="word_wrap" value="true" type="Boolean"/>
+                            <var key="kerning" value="false" type="Boolean"/>
+                            <var key="spacing" value="0" type="Number"/>
+                            <var key="leading" value="0" type="Number"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </container>
+                  </children>
+                </container>
+              </children>
+            </border>
+            <container x="0" y="97" width="230" height="5" params="16" style="0" name="spacing" caption="Room%20Info"/>
+            <border x="0" y="102" width="230" height="74" params="16" style="0" name="info_cont" caption="Room%20Info">
+              <children>
+                <text x="5" y="2" width="80" height="13" params="16" style="0" caption="Room%20owner%3A">
+                  <variables>
+                    <var key="font_face" value="Volter Bold" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <text x="5" y="15" width="90" height="13" params="16" style="0" caption="Users%20in%20room%3A">
+                  <variables>
+                    <var key="font_face" value="Volter Bold" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <text x="5" y="28" width="90" height="13" params="16" style="0" caption="Owner%20in%20room%3A">
+                  <variables>
+                    <var key="font_face" value="Volter Bold" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <text x="5" y="41" width="90" height="13" params="16" style="0" caption="Has%20event%3A">
+                  <variables>
+                    <var key="font_face" value="Volter Bold" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <text x="85" y="2" width="71" height="13" params="17" style="0" name="owner_name_txt" caption="sulka" background="true">
+                  <variables>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="underline" value="true" type="Boolean"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <text x="100" y="28" width="40" height="13" params="16" style="0" name="owner_in_room_txt" caption="yes">
+                  <variables>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <text x="100" y="15" width="40" height="13" params="16" style="0" name="user_count_txt" caption="18">
+                  <variables>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <text x="100" y="41" width="40" height="13" params="16" style="0" name="has_event_txt" caption="no">
+                  <variables>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <button x="155" y="4" width="70" height="21" params="131089" style="0" name="enter_room_but" caption="Enter%20room" width_min="70" width_max="70"/>
+                <button x="155" y="26" width="70" height="21" params="131089" style="0" name="chatlog_but" caption="Chatlog" width_min="70" width_max="70"/>
+                <button x="155" y="48" width="70" height="21" params="131089" style="0" name="edit_in_hk_but" caption="Edit%20in%20HK" width_min="70" width_max="70"/>
+              </children>
+            </border>
+            <container x="0" y="176" width="230" height="5" params="16" style="0" name="event_spacing" caption="Room%20Info"/>
+            <border x="0" y="181" width="230" height="17" params="16" style="0" name="event_cont" caption="Room%20Info"/>
+            <container x="0" y="198" width="230" height="5" params="16" style="0" name="spacing" caption="Room%20Info"/>
+            <border x="0" y="203" width="230" height="76" params="16" style="0" name="act_cont" caption="Room%20Info">
+              <children>
+                <checkbox x="5" y="5" width="16" height="16" params="17" style="0" name="kick_check" caption="Room%20Info"/>
+                <checkbox x="5" y="30" width="16" height="16" params="17" style="0" name="lock_check" caption="Room%20Info"/>
+                <checkbox x="5" y="54" width="16" height="16" params="17" style="0" name="changename_check" caption="Room%20Info"/>
+                <text x="24" y="5" width="199" height="25" params="16" style="0" caption="Kick%20users%20out%20of%20the%20room%20%28automatically%20stops%20the%20event%29">
+                  <variables>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <text x="24" y="31" width="199" height="16" params="16" style="0" caption="Change%20room%20lock%20to%20doorbell">
+                  <variables>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <text x="24" y="48" width="199" height="25" params="16" style="0" caption="Change%20room%20name%20to%20%27Inappropriate%20to%20hotel%20management%27">
+                  <variables>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <container x="0" y="279" width="230" height="5" params="16" style="0" name="spacing" caption="Room%20Info"/>
+            <dropmenu x="0" y="284" width="227" height="20" params="1" style="0" name="msgTemplatesSelect" caption="Select%20from%20message%20templates"/>
+            <container x="0" y="304" width="230" height="5" params="16" style="0" name="spacing" caption="Room%20Info"/>
+            <input x="0" y="309" width="227" height="45" params="1" style="0" name="message_input" caption="Type%20a%20mandatory%20message%20to%20the%20users%20in%20this%20text%20box." color="0xffffffffff" background="true">
+              <variables>
+                <var key="always_show_selection" value="true" type="Boolean"/>
+                <var key="border" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                <var key="sharpness" value="0" type="Number"/>
+                <var key="thickness" value="0" type="Number"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="kerning" value="false" type="Boolean"/>
+                <var key="spacing" value="0" type="Number"/>
+                <var key="leading" value="0" type="Number"/>
+              </variables>
+            </input>
+            <container x="0" y="354" width="230" height="5" params="16" style="0" name="spacing" caption="Room%20Info"/>
+            <container x="0" y="359" width="230" height="5" params="16" style="0" name="spacing" caption="Room%20Info"/>
+            <container x="0" y="364" width="230" height="21" params="16" style="0" name="footer_cont" caption="Room%20Info">
+              <children>
+                <button x="0" y="0" width="97" height="21" params="131089" style="0" name="send_caution_but" caption="Send%20Caution" width_min="97" width_max="97"/>
+                <button x="131" y="0" width="97" height="21" params="131089" style="0" name="send_message_but" caption="Send%20message" width_min="97" width_max="97"/>
+              </children>
+            </container>
+          </children>
+          <variables>
+            <var key="scale_to_fit_items" value="true" type="Boolean"/>
+            <var key="resize_on_item_update" value="true" type="Boolean"/>
+          </variables>
+        </itemlist>
+      </children>
+    </frame>
+  </window>
+</layout>

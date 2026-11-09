@@ -1,8 +1,35 @@
-import { GetRoomEngine, SellablePetPaletteData } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, SellablePetPaletteData } from '@octane/renderer';
+import { getAvatarEffectIconUrl } from '../avatar/AvatarEditorEffects';
+import { GetConfigurationValue } from '../octane';
 import { ICatalogNode } from './ICatalogNode';
+import { IProduct } from './IProduct';
+import { IPurchasableOffer } from './IPurchasableOffer';
+import { ProductTypeEnum } from './ProductTypeEnum';
 
-export const GetPixelEffectIcon = (id: number) => {
-    return '';
+// Official getPixelEffectIcon: the fx_icon of the effect.
+export const GetPixelEffectIcon = (id: number) => getAvatarEffectIconUrl(id);
+
+export const GetProductIconUrl = (product: IProduct, offer: IPurchasableOffer = null): string => {
+    if (!product) return null;
+
+    if (product.productType === ProductTypeEnum.FLOOR || product.productType === ProductTypeEnum.WALL) {
+        const className = product.furnitureData?.className;
+
+        if (className?.length) {
+            let param = '';
+
+            if (product.productType === ProductTypeEnum.WALL && product.extraParam?.length) param = `_${product.extraParam}`;
+            else if (product.productType === ProductTypeEnum.FLOOR && product.furnitureData?.hasIndexedColor && product.furnitureData.colorIndex > 0) {
+                param = `_${product.furnitureData.colorIndex}`;
+            }
+
+            const configuredIconUrl = GetConfigurationValue<string>('furni.asset.icon.url', '');
+
+            if (configuredIconUrl?.length) return configuredIconUrl.replace('%libname%', className).replace('%param%', param);
+        }
+    }
+
+    return typeof product.getIconUrl === 'function' ? (product.getIconUrl(offer) ?? null) : null;
 };
 
 export const GetSubscriptionProductIcon = (id: number) => {
@@ -207,3 +234,10 @@ export function GetPetAvailableColors(petIndex: number, palettes: SellablePetPal
         }
     }
 }
+
+/**
+ * React key for a catalog node. Nodes without a page of their own (folder-only categories,
+ * search results) all carry pageId -1, so those fall back to their name and position.
+ */
+export const getCatalogNodeKey = (node: ICatalogNode, index: number): string =>
+    node.pageId > 0 ? String(node.pageId) : `${node.pageId}-${node.pageName}-${node.localization}-${index}`;

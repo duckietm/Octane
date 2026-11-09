@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<skin name="default_frame_3_skin" version="0.0">
+
+	<!-- shared variables -->
+
+	<variables>
+		<variable key="asset" value="habbo_skin_ubuntu_png" type="String" />
+	</variables>
+
+	<!-- the following maps states to layouts and templates -->
+
+	<states>
+		<state name="default" layout="frame_3" template="default_frame_3" />
+	</states>
+
+	<!-- templates defines regions in bitmap asset -->
+
+	<templates>
+		<template name="default_frame_3" asset="$asset">
+			<entities>
+				<entity name="top_left" type="bitmap"><region><Rectangle x="10" y= "10" width="10" height="33" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="20" y= "10" width="6" height="33" /></region></entity>
+				<entity name="top_right" type="bitmap"><region><Rectangle x="26" y= "10" width="10" height="33" /></region></entity>
+
+				<entity name="center_left" type="bitmap"><region><Rectangle x="10" y= "43" width="10" height="12" /></region></entity>
+				<entity name="center_center" type="bitmap"><region><Rectangle x="20" y= "43" width="6" height="12" /></region></entity>
+				<entity name="center_right" type="bitmap"><region><Rectangle x="26" y= "43" width="10" height="12" /></region></entity>
+
+				<entity name="bottom_left" type="bitmap"><region><Rectangle x="10" y= "55" width="10" height="10" /></region></entity>
+				<entity name="bottom_center" type="bitmap"><region><Rectangle x="20" y= "55" width="6" height="10" /></region></entity>
+				<entity name="bottom_right" type="bitmap"><region><Rectangle x="26" y= "55" width="10" height="10" /></region></entity>
+
+			</entities>
+		</template>
+	</templates>
+
+	<!-- markup for layout drawer -->
+
+	<layouts>
+
+		<layout name="null" transparent="true">
+			<entities>
+				<entity name="null" id="0">
+					<color>$color</color>
+					<blend>$blend</blend>
+					<region><Rectangle x="0" y="0" width="10" height="10" /></region>
+					<scale horizontal="strech" vertical="strech" />
+				</entity>
+			</entities>
+		</layout>
+
+		<layout name="frame_3" transparent="true">
+
+			<entities>
+
+				<!-- top line -->
+
+				<entity name="top_left" id="0">
+					<region><Rectangle x="0" y="0" width="10" height="33" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+
+				<entity name="top_center" id="0">
+					<region><Rectangle x="10"  y="0" width="44" height="33" /></region>
+					<scale horizontal="strech" vertical="fixed" />
+				</entity>
+
+				<entity name="top_right" id="0">
+					<region><Rectangle x="54" y="0" width="10" height="33" /></region>
+					<scale horizontal="move" vertical="fixed" />
+				</entity>
+
+				<!-- mid line -->
+
+				<entity name="center_left" id="0" colorize="false">
+					<region><Rectangle x="0" y="33" width="10" height="21" /></region>
+					<scale horizontal="fixed" vertical="strech" />
+				</entity>
+
+				<entity name="center_center" id="0" colorize="false">
+					<region><Rectangle x="10" y="33" width="44" height="21" /></region>
+					<scale horizontal="strech" vertical="strech" />
+				</entity>
+
+				<entity name="center_right" id="0" colorize="false">
+					<region><Rectangle x="54" y="33" width="10" height="21" /></region>
+					<scale horizontal="move" vertical="strech" />
+				</entity>
+
+				<!-- btm line -->
+
+				<entity name="bottom_left" id="0" colorize="false">
+					<region><Rectangle x="0" y="54" width="10" height="10" /></region>
+					<scale horizontal="fixed" vertical="move" />
+				</entity>
+				<entity name="bottom_center" id="0" colorize="false">
+					<region><Rectangle x="10" y="54" width="44" height="10" /></region>
+					<scale horizontal="strech" vertical="move" />
+				</entity>
+				<entity name="bottom_right" id="0" colorize="false">
+					<region><Rectangle x="54" y="54" width="10" height="10" /></region>
+					<scale horizontal="move" vertical="move" />
+				</entity>
+
+			</entities>
+		</layout>
+	</layouts>
+</skin>

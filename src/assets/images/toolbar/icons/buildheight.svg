@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="34" height="36" viewBox="0 0 34 36" fill="none">
+  <g stroke="#000" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+    <!-- up arrow: raise the build height -->
+    <path d="M17 3 L23 10 H19 V17 H15 V10 H11 Z" fill="#ffcc33" stroke="#8a5a00"/>
+    <!-- stacked isometric blocks -->
+    <path d="M17 19 L27 24 L17 29 L7 24 Z" fill="#6aa9ff" stroke="#1f5fbf"/>
+    <path d="M7 24 L17 29 V33 L7 28 Z" fill="#3f7fe0" stroke="#1f5fbf"/>
+    <path d="M27 24 L17 29 V33 L27 28 Z" fill="#5a97ec" stroke="#1f5fbf"/>
+  </g>
+</svg>

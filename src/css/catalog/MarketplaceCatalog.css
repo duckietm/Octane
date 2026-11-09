@@ -1,0 +1,738 @@
+/*
+ * AIR marketplace catalog pages (habbo-catalog-com): layout_marketplace (ctlg_marketplace, 360 wide) and
+ * layout_marketplace_own_items (ctlg_marketplace_own_items, 360x460). Positions below are the layouts' own
+ * x/y; the offer rows are 58 high with their children placed absolutely, as the XML does. The page fills the
+ * catalog's content area instead of AIR's 360px, so widths that grow with it are relative.
+ */
+.octane-marketplace-page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, Ubuntu, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-marketplace-page *,
+.octane-marketplace-page *::before {
+    box-sizing: border-box;
+}
+
+.octane-marketplace-main {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* search_selector: button_group_left 107, button_group_center 106, button_group_right 107, 25 high, il_button text. */
+.octane-marketplace-selector {
+    display: flex;
+    flex: 0 0 25px;
+    width: 100%;
+    height: 25px;
+}
+
+.octane-marketplace-group-button {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    height: 25px;
+    margin: 0;
+    padding: 0 10px;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 3px;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #000000;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 13px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-marketplace-group-button.is-left {
+    flex: 1 1 0;
+    min-width: 107px;
+    border-width: 3px 3px 3px 3px;
+    border-image: url('../../assets/images/catalog/air/marketplace/button-group-left-default.png') 3 3 3 3 fill / 3px 3px 3px 3px stretch;
+}
+
+.octane-marketplace-group-button.is-left:hover {
+    border-image-source: url('../../assets/images/catalog/air/marketplace/button-group-left-hover.png');
+}
+
+.octane-marketplace-group-button.is-left.is-selected,
+.octane-marketplace-group-button.is-left:active {
+    border-image-source: url('../../assets/images/catalog/air/marketplace/button-group-left-selected.png');
+}
+
+.octane-marketplace-group-button.is-center {
+    flex: 1 1 0;
+    min-width: 106px;
+    border-width: 3px 3px 3px 1px;
+    border-image: url('../../assets/images/catalog/air/marketplace/button-group-center-default.png') 3 3 3 1 fill / 3px 3px 3px 1px stretch;
+}
+
+.octane-marketplace-group-button.is-center:hover {
+    border-image-source: url('../../assets/images/catalog/air/marketplace/button-group-center-hover.png');
+}
+
+.octane-marketplace-group-button.is-center.is-selected,
+.octane-marketplace-group-button.is-center:active {
+    border-image-source: url('../../assets/images/catalog/air/marketplace/button-group-center-selected.png');
+}
+
+.octane-marketplace-group-button.is-right {
+    flex: 1 1 0;
+    min-width: 107px;
+    border-width: 3px 3px 3px 1px;
+    border-image: url('../../assets/images/catalog/air/marketplace/button-group-right-default.png') 3 3 3 1 fill / 3px 3px 3px 1px stretch;
+}
+
+/* The hovering right template has a 2px left column. */
+.octane-marketplace-group-button.is-right:hover {
+    border-width: 3px 3px 3px 2px;
+    border-image: url('../../assets/images/catalog/air/marketplace/button-group-right-hover.png') 3 3 3 2 fill / 3px 3px 3px 2px stretch;
+}
+
+.octane-marketplace-group-button.is-right.is-selected,
+.octane-marketplace-group-button.is-right:active {
+    border-width: 3px 3px 3px 1px;
+    border-image: url('../../assets/images/catalog/air/marketplace/button-group-right-selected.png') 3 3 3 1 fill / 3px 3px 3px 1px stretch;
+}
+
+.octane-marketplace-group-button:focus-visible {
+    outline: 1px solid #000000;
+    outline-offset: -3px;
+}
+
+/* search_container: border style 100 (illumina etched, 3px slices) at y30, 360x120. */
+.octane-marketplace-search-container {
+    position: relative;
+    flex: 0 0 120px;
+    width: 100%;
+    height: 120px;
+    margin-top: 5px;
+}
+
+.octane-marketplace-search-container::before,
+.octane-marketplace-row::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 3px solid transparent;
+    border-image: url('../../assets/images/catalog/air/marketplace/border-etched.png') 3 / 3px stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.octane-marketplace-search {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    color: #666666;
+}
+
+/* marketplace_search_simple: the centered caption at y23, the 220px sort menu at (70,50). */
+.marketplace-search-sort-title {
+    position: absolute;
+    top: 23px;
+    left: 0;
+    width: 100%;
+    height: 17px;
+    color: #666666;
+    line-height: 17px;
+    text-align: center;
+}
+
+.octane-marketplace-search .marketplace-search-sort {
+    position: absolute;
+    top: 50px;
+    left: calc(50% - 110px);
+    width: 220px;
+}
+
+/* marketplace_search_advanced: label column at x10, field column at x130. */
+.octane-marketplace-search.is-advanced .marketplace-search-sort {
+    top: 60px;
+    left: 130px;
+}
+
+.marketplace-search-label {
+    position: absolute;
+    left: 10px;
+    width: 116px;
+    height: 16px;
+    overflow: hidden;
+    color: #666666;
+    line-height: 16px;
+    white-space: nowrap;
+}
+
+.marketplace-search-label.is-name {
+    top: 13px;
+}
+
+.marketplace-search-label.is-price {
+    top: 38px;
+}
+
+.marketplace-search-label.is-sort {
+    top: 63px;
+}
+
+.marketplace-search-input,
+.marketplace-own-search-input {
+    position: absolute;
+    display: block;
+    height: 20px;
+}
+
+.marketplace-search-input::before,
+.marketplace-own-search-input::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border: 6px solid transparent;
+    border-image: url('../../assets/images/catalog/air/gift/image-border-f1f1f1.png') 6 fill / 6px stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.marketplace-search-input input,
+.marketplace-own-search-input input {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0 6px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #000000;
+    font: inherit;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.marketplace-search-input.is-name {
+    top: 10px;
+    left: 130px;
+    width: 220px;
+}
+
+.marketplace-search-input.is-min {
+    top: 35px;
+    left: 130px;
+    width: 70px;
+}
+
+.marketplace-search-input.is-max {
+    top: 35px;
+    left: 280px;
+    width: 70px;
+}
+
+/* combine_uniques_checkbox (10,92) 16x15 with its caption at (29,91). */
+.marketplace-search-combine {
+    position: absolute;
+    top: 91px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 17px;
+    color: #666666;
+    line-height: 17px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* search_button (250,90) 100x22. */
+.marketplace-search-button.octane-marketplace-button {
+    position: absolute;
+    top: 90px;
+    left: 250px;
+    width: 100px;
+    height: 22px;
+}
+
+/*
+ * AIR's Collectibles marketplace layout (build of 4 November 2026): a 150 high search_container with the "Type"
+ * menu (offer_source_dropmenu) above the sort, and the search selector 320 wide at x20.
+ */
+.octane-marketplace-page.has-offer-source .octane-marketplace-selector {
+    width: 320px;
+    margin-left: 20px;
+}
+
+.octane-marketplace-search-container.has-offer-source {
+    flex-basis: 150px;
+    height: 150px;
+}
+
+/* marketplace_search_simple: "Type" right-aligned at (20,38) 88 wide, its 220px menu at (118,35); the sort below. */
+.octane-marketplace-search .marketplace-search-offer-source-title,
+.octane-marketplace-search.is-simple.has-offer-source .marketplace-search-sort-title {
+    position: absolute;
+    left: 20px;
+    width: 88px;
+    height: 17px;
+    color: #666666;
+    line-height: 17px;
+    text-align: right;
+}
+
+.octane-marketplace-search .marketplace-search-offer-source-title {
+    top: 38px;
+}
+
+.octane-marketplace-search.is-simple.has-offer-source .marketplace-search-sort-title {
+    top: 73px;
+}
+
+.octane-marketplace-search .marketplace-search-offer-source {
+    position: absolute;
+    top: 35px;
+    left: 118px;
+    width: 220px;
+}
+
+.octane-marketplace-search.is-simple.has-offer-source .marketplace-search-sort {
+    top: 70px;
+    left: 118px;
+}
+
+/* marketplace_search_advanced: offer_source_container at y60, the sort container moved to y89. */
+.marketplace-search-label.is-offer-source {
+    top: 63px;
+}
+
+.octane-marketplace-search.is-advanced.has-offer-source .marketplace-search-offer-source {
+    top: 60px;
+    left: 130px;
+}
+
+.octane-marketplace-search.is-advanced.has-offer-source .marketplace-search-label.is-sort {
+    top: 92px;
+}
+
+.octane-marketplace-search.is-advanced.has-offer-source .marketplace-search-sort {
+    top: 89px;
+}
+
+.octane-marketplace-search.has-offer-source .marketplace-search-combine {
+    top: 121px;
+}
+
+.octane-marketplace-search.is-advanced.has-offer-source .marketplace-search-button.octane-marketplace-button {
+    top: 119px;
+}
+
+/* status_text (2,155), u_small. */
+.octane-marketplace-status {
+    display: block;
+    flex: 0 0 15px;
+    height: 15px;
+    margin-top: 5px;
+    padding-left: 2px;
+    overflow: hidden;
+    font-size: 10px;
+    line-height: 15px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* offer_list / item_list: scrollable_itemlist_vertical, 340 wide rows with 1px spacing. */
+.octane-marketplace-list {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+}
+
+.octane-marketplace-list-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+/* offer_item / ongoing_item / sold_item / expired_item: 340x58, border style 100 with the row colour. */
+.octane-marketplace-row {
+    position: relative;
+    flex: 0 0 58px;
+    width: calc(100% - 18px);
+    height: 58px;
+    background-color: #f6f6f3;
+    background-clip: padding-box;
+    border: 1px solid transparent;
+    border-radius: 3px;
+}
+
+.octane-marketplace-row.is-sold {
+    background-color: #e2f5d8;
+}
+
+.octane-marketplace-row.is-expired {
+    background-color: #f5d5d3;
+}
+
+.octane-marketplace-row::before {
+    inset: -1px;
+}
+
+/* image_container (9,9) 40x40: the unique label at (2,2), the furni icon centered, the overlays on top. */
+.marketplace-row-image {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.marketplace-row-image > img {
+    position: relative;
+    z-index: 1;
+    max-width: 40px;
+    max-height: 40px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.marketplace-row-unique-label {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    z-index: 0;
+    width: 36px;
+    height: 36px;
+    background: url('../../assets/images/catalog/air/marketplace/unique-item-label.png') no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.marketplace-row-unique-number {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    left: 2px;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.marketplace-row-image .marketplace-row-rarity {
+    position: absolute !important;
+    top: 2px;
+    left: 2px;
+    z-index: 2;
+}
+
+.marketplace-row-name,
+.marketplace-row-desc,
+.marketplace-row-price,
+.marketplace-row-count,
+.marketplace-row-state {
+    position: absolute;
+    left: 56px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* item_name (57,6) u_bold; the own rows put it at (58,5). */
+.marketplace-row-name {
+    top: 5px;
+    max-width: calc(100% - 106px);
+    height: 17px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 17px;
+}
+
+/* item_price (57,30), offer_count (57,42), u_small. */
+.marketplace-row-price,
+.marketplace-row-count,
+.marketplace-row-state,
+.marketplace-row-desc {
+    max-width: calc(100% - 64px);
+    height: 15px;
+    font-size: 10px;
+    line-height: 15px;
+}
+
+.marketplace-row-price {
+    top: 29px;
+}
+
+.marketplace-row-price.is-public {
+    max-width: calc(100% - 264px);
+}
+
+.marketplace-row-count {
+    top: 41px;
+    max-width: calc(100% - 264px);
+}
+
+.octane-marketplace-row.is-own .marketplace-row-name {
+    left: 57px;
+    top: 4px;
+    max-width: calc(100% - 64px);
+}
+
+.octane-marketplace-row.is-own .marketplace-row-desc {
+    top: 16px;
+    left: 57px;
+    font-style: italic;
+}
+
+.octane-marketplace-row.is-own .marketplace-row-price {
+    top: 28px;
+    left: 57px;
+    max-width: calc(100% - 255px);
+}
+
+.octane-marketplace-row.is-own .marketplace-row-state {
+    top: 40px;
+    left: 57px;
+    max-width: calc(100% - 255px);
+}
+
+.octane-marketplace-row.is-sold .marketplace-row-price,
+.octane-marketplace-row.is-sold .marketplace-row-state,
+.octane-marketplace-row.is-expired .marketplace-row-state {
+    max-width: calc(100% - 64px);
+}
+
+/* button style 3: button_shiny with button_shiny_regular text. */
+.octane-marketplace-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    margin: 0;
+    padding: 0 6px;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 5px;
+    border-radius: 0;
+    border-image: var(--habbo-skin-shiny) 5 fill / 5px stretch;
+    background: transparent;
+    box-shadow: none;
+    color: #000000;
+    font: inherit;
+    font-size: 12px;
+    line-height: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-marketplace-button:hover {
+    border-image-source: var(--habbo-skin-shiny-hover);
+}
+
+.octane-marketplace-button:active {
+    border-image-source: var(--habbo-skin-shiny-pressed);
+}
+
+.octane-marketplace-button:disabled {
+    border-image-source: var(--habbo-skin-shiny-disabled);
+    color: #777777;
+    cursor: default;
+}
+
+.octane-marketplace-button.is-red {
+    border-image-source: var(--habbo-skin-shiny-red);
+    color: #ffffff;
+    font-size: 11px;
+}
+
+.octane-marketplace-button.is-red:hover {
+    border-image-source: var(--habbo-skin-shiny-red-hover);
+}
+
+.octane-marketplace-button.is-red:active {
+    border-image-source: var(--habbo-skin-shiny-red-pressed);
+}
+
+.octane-marketplace-button.is-red:disabled {
+    border-image-source: var(--habbo-skin-shiny-red-disabled);
+    color: #eeeeee;
+}
+
+.octane-marketplace-button.is-green {
+    border-image-source: var(--habbo-skin-shiny-green);
+    color: #ffffff;
+}
+
+.octane-marketplace-button.is-green:hover {
+    border-image-source: var(--habbo-skin-shiny-green-hover);
+}
+
+.octane-marketplace-button.is-green:active {
+    border-image-source: var(--habbo-skin-shiny-green-pressed);
+}
+
+.octane-marketplace-button:focus-visible {
+    outline: 1px solid #000000;
+    outline-offset: 1px;
+}
+
+/* buy_button (295,6) 39x22, more_button (137,31) 197x22, pick_button (145,31) 189x22. */
+.marketplace-row-buy.octane-marketplace-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    min-width: 39px;
+    padding: 0 4px;
+}
+
+.marketplace-row-more.octane-marketplace-button {
+    position: absolute;
+    top: 30px;
+    right: 5px;
+    width: 197px;
+}
+
+.marketplace-row-pick.octane-marketplace-button {
+    position: absolute;
+    top: 30px;
+    right: 5px;
+    width: 189px;
+}
+
+/* layout_marketplace_own_items: redeem_info (10,0) 340 wide, u_italic (12 px), word wrap. */
+.octane-marketplace-own-info {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+    min-height: 34px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-style: italic;
+    line-height: 15px;
+}
+
+.octane-marketplace-own-info > span {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.marketplace-own-redeem.octane-marketplace-button {
+    flex: 0 0 auto;
+    height: 24px;
+    font-style: normal;
+}
+
+/* search_container (0,39): offer_category_dropmenu 90x25, the 160x26 input at x100, search_button 69x25 at x270. */
+.octane-marketplace-own-search {
+    position: relative;
+    flex: 0 0 26px;
+    width: 347px;
+    max-width: 100%;
+    height: 26px;
+    margin-top: 5px;
+}
+
+.octane-marketplace-own-search .marketplace-own-category {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 90px;
+}
+
+.marketplace-own-search-input {
+    top: 0;
+    left: 100px;
+    width: 160px;
+    height: 26px;
+}
+
+.marketplace-own-search-input input {
+    padding-right: 22px;
+    line-height: 19px;
+}
+
+/* search_placeholder: text_color 0x666666, no blend. */
+.marketplace-own-search-input input::placeholder {
+    color: #666666;
+    opacity: 1;
+}
+
+/* cancel_search_btn: a 19x19 region at (137,3) with icons_close at (5,4). */
+.marketplace-own-search-clear {
+    position: absolute;
+    top: 3px;
+    left: 137px;
+    z-index: 2;
+    width: 19px;
+    height: 19px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: url('../../assets/images/catalog/air/marketplace/icons-close.png') no-repeat 5px 4px;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.marketplace-own-search-button.octane-marketplace-button {
+    position: absolute;
+    top: 0;
+    left: 270px;
+    width: 69px;
+    height: 25px;
+}
+
+/* item_list (0,72) 360x352. */
+.octane-marketplace-list.is-own {
+    margin-top: 7px;
+}
+
+/* status_text (0,440) and recall_all_button (275,434) 64x24 / mark_as_seen_button (249,434) 90x24. */
+.octane-marketplace-own-bottom {
+    display: flex;
+    flex: 0 0 34px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    height: 34px;
+    padding-right: 21px;
+}
+
+.octane-marketplace-own-bottom .octane-marketplace-status {
+    flex: 1 1 auto;
+    margin-top: 6px;
+    padding-left: 0;
+}
+
+.marketplace-own-recall.octane-marketplace-button {
+    min-width: 64px;
+    height: 24px;
+}
+
+.marketplace-own-seen.octane-marketplace-button {
+    min-width: 90px;
+    height: 24px;
+}

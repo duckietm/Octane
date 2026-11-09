@@ -5,18 +5,30 @@ import {
     CatalogAdminDeletePageComposer,
     CatalogAdminLoadOfferComposer,
     CatalogAdminLoadPageComposer,
-    CatalogAdminMoveOfferComposer,
     CatalogAdminMovePageComposer,
     CatalogAdminOfferDetailsEvent,
     CatalogAdminPageDetailsEvent,
-    CatalogAdminPublishComposer,
+    CatalogAdminReorderOffersComposer,
     CatalogAdminResultEvent,
     CatalogAdminSaveOfferComposer,
-    CatalogAdminSavePageComposer
-} from '@nitrots/nitro-renderer';
+    CatalogAdminSavePageComposer,
+    CatalogAdminSetPageEnabledComposer,
+    CatalogAdminSetPageVisibleComposer
+} from '@octane/renderer';
 import { createContext, FC, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { ICatalogNode, IPurchasableOffer, NotificationAlertType, SendMessageComposer } from '../../api';
-import { useCatalogUiState, useMessageEvent, useNotification } from '../../hooks';
+import { ICatalogNode, IPurchasableOffer, NotificationAlertType, SendMessageComposer, localizeWithFallback } from '../../api';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useCatalogActions, useCatalogUiState, useMessageEvent, useNotification } from '../../hooks';
+import { nextCatalogStudioOperationId } from './admin/studio/CatalogStudioOperationId';
+import { CatalogStudioHistoryGroup, CatalogStudioOfferSnapshot, CatalogStudioPageSnapshot } from './admin/studio/CatalogStudioTypes';
+import { useCatalogStudio } from './admin/studio/useCatalogStudio';
+import { createCatalogAdminPageDetailsFromSnapshot } from './views/admin/CatalogAdminPageState';
+
+const toStudioCatalogType = (catalogType: string): 'NORMAL' | 'BUILDER' =>
+    catalogType === 'BUILDERS_CLUB' || catalogType === 'BUILDER' ? 'BUILDER' : 'NORMAL';
+
+const instantiateCompatibleComposer = <T,>(Composer: new (...args: never[]) => T, ...args: unknown[]): T =>
+    new (Composer as unknown as new (...args: unknown[]) => T)(...args);
 
 export interface IPageEditData {
     pageId?: number;
@@ -25,11 +37,13 @@ export interface IPageEditData {
     parentId: number;
     catalogMode: string;
     pageLayout: string;
+    iconColor: number;
     iconImage: number;
     enabled: string;
     visible: string;
     minRank: number;
     clubOnly?: string;
+    vipOnly?: string;
     orderNum: number;
     pageHeadline?: string;
     pageTeaser?: string;
@@ -38,6 +52,8 @@ export interface IPageEditData {
     pageText2?: string;
     pageTextDetails?: string;
     pageTextTeaser?: string;
+    roomId?: number;
+    includes?: string;
 }
 
 export interface IOfferEditData {
@@ -53,31 +69,72 @@ export interface IOfferEditData {
     extradata: string;
     haveOffer: string;
     offerId_group: number;
+    songId: number;
     limitedStack: number;
     orderNumber: number;
 }
 
 export interface IEditingOfferDetails {
     offerId: number;
+    pageId: number;
+    itemIds: string;
+    catalogName: string;
+    costCredits: number;
+    costPoints: number;
+    pointsType: number;
+    amount: number;
+    clubOnly: boolean;
+    extradata: string;
+    haveOffer: boolean;
     offerIdGroup: number;
+    songId: number;
     limitedStack: number;
+    limitedSells: number;
     orderNumber: number;
+    catalogMode: string;
 }
 
 export interface IEditingPageDetails {
     pageId: number;
     caption: string;
     captionSave: string;
+    parentId: number;
+    catalogMode: string;
+    layout: string;
+    iconColor: number;
+    iconImage: number;
     minRank: number;
     orderNum: number;
     visible: boolean;
     enabled: boolean;
+    clubOnly: boolean;
+    vipOnly: boolean;
+    headline: string;
+    teaser: string;
+    special: string;
+    textOne: string;
+    textTwo: string;
+    textDetails: string;
+    textTeaser: string;
+    roomId: number;
+    includes: string;
 }
 
-export interface ICatalogAdminPendingChange {
-    id: string;
-    summary: string;
-    at: number;
+type CatalogAdminMutationAction = 'createPage' | 'savePage' | 'createOffer' | 'saveOffer';
+
+export interface CatalogAdminMutationResult {
+    operationId: string;
+    action: CatalogAdminMutationAction;
+    success: boolean;
+    code: string;
+    message: string;
+    entityType: 'PAGE' | 'OFFER';
+    catalogType: 'NORMAL' | 'BUILDER';
+    entityId: number;
+    entity: CatalogStudioPageSnapshot | CatalogStudioOfferSnapshot | null;
+    historyGroup: CatalogStudioHistoryGroup | null;
+    fieldErrors: Record<string, string>;
+    acknowledgedAt: number;
 }
 
 interface ICatalogAdminContext {
@@ -94,34 +151,47 @@ interface ICatalogAdminContext {
     setEditingRootPage: (value: boolean) => void;
     editingPageNode: ICatalogNode | null;
     setEditingPageNode: (node: ICatalogNode | null) => void;
+    creatingPage: boolean;
+    setCreatingPage: (value: boolean) => void;
     loading: boolean;
     lastError: string | null;
-    savePage: (data: IPageEditData) => void;
-    createPage: (data: IPageEditData) => void;
+    lastMutationResult: CatalogAdminMutationResult | null;
+    studioSessionReady: boolean;
+    savePage: (data: IPageEditData) => string | null;
+    createPage: (data: IPageEditData) => string | null;
     deletePage: (pageId: number, summary?: string) => void;
-    saveOffer: (data: IOfferEditData) => void;
-    createOffer: (data: IOfferEditData) => void;
+    saveOffer: (data: IOfferEditData) => string | null;
+    createOffer: (data: IOfferEditData) => string | null;
     deleteOffer: (offerId: number, summary?: string) => void;
-    reorderOffers: (orders: { id: number; orderNumber: number }[], summary?: string) => void;
+    reorderOffers: (orders: { id: number; orderNumber: number }[], summary?: string, pageId?: number) => void;
     reorderPage: (pageId: number, newParentId: number, newIndex: number, summary?: string) => void;
-    togglePageEnabled: (pageId: number, summary?: string) => void;
-    togglePageVisible: (pageId: number, summary?: string) => void;
-    publishCatalog: () => void;
-    hasPendingChanges: boolean;
-    pendingChanges: ICatalogAdminPendingChange[];
+    togglePageEnabled: (pageId: number, enabled: boolean, summary?: string) => void;
+    togglePageVisible: (pageId: number, visible: boolean, summary?: string) => void;
 }
 
 const CatalogAdminContext = createContext<ICatalogAdminContext>(null);
 
 export const useCatalogAdmin = () => useContext(CatalogAdminContext);
 
-let pendingChangeCounter = 0;
+const PAGE_INDEX_REFRESH_ACTIONS = new Set(['deletePage', 'movePage', 'toggleVisible', 'toggleEnabled']);
+const OFFER_REFRESH_ACTIONS = new Set(['deleteOffer', 'reorder']);
 
-const PAGE_INDEX_REFRESH_ACTIONS = new Set(['savePage', 'createPage', 'deletePage', 'movePage', 'toggleVisible', 'toggleEnabled']);
-const OFFER_REFRESH_ACTIONS = new Set(['saveOffer', 'createOffer', 'deleteOffer', 'reorder']);
+type QueuedPageMutation =
+    | { kind: 'delete'; pageId: number; catalogType: string; summary: string }
+    | { kind: 'move'; pageId: number; catalogType: string; newParentId: number; newIndex: number; summary: string }
+    | { kind: 'toggleEnabled'; pageId: number; catalogType: string; enabled: boolean; summary: string }
+    | { kind: 'toggleVisible'; pageId: number; catalogType: string; visible: boolean; summary: string };
+
+interface PendingCatalogAdminMutation {
+    operationId: string;
+    action: CatalogAdminMutationAction;
+    submittedAt: number;
+}
 
 export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const { currentType } = useCatalogUiState();
+    const { refreshIndex, refreshCurrentPage } = useCatalogActions();
+    const studio = useCatalogStudio();
     const [adminMode, setAdminMode] = useState(false);
     const [editingOffer, setEditingOfferState] = useState<IPurchasableOffer | null>(null);
     const [editingOfferDetails, setEditingOfferDetails] = useState<IEditingOfferDetails | null>(null);
@@ -129,66 +199,113 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
     const [editingPageData, setEditingPageData] = useState(false);
     const [editingRootPage, setEditingRootPage] = useState(false);
     const [editingPageNode, setEditingPageNode] = useState<ICatalogNode | null>(null);
+    const [creatingPage, setCreatingPage] = useState(false);
     const [loading, setLoading] = useState(false);
     const [lastError, setLastError] = useState<string | null>(null);
-    const [hasPendingChanges, setHasPendingChanges] = useState(false);
-    const [pendingChanges, setPendingChanges] = useState<ICatalogAdminPendingChange[]>([]);
+    const [lastMutationResult, setLastMutationResult] = useState<CatalogAdminMutationResult | null>(null);
+    const queuedPageMutationRef = useRef<QueuedPageMutation | null>(null);
+    const requestedOfferKeyRef = useRef<string | null>(null);
     const pendingActionRef = useRef<string | null>(null);
-    const pendingChangeLabelRef = useRef<string | null>(null);
-    const pendingChangeRecordedForBatchRef = useRef(false);
-    const pendingReorderRef = useRef<{ remaining: number } | null>(null);
+    const pendingSmartSaveRef = useRef<Map<string, PendingCatalogAdminMutation>>(new Map());
+    const pendingSmartSaveOrderRef = useRef<string[]>([]);
     const { simpleAlert = null } = useNotification();
 
-    const beginAdminAction = useCallback((action: string, summary: string) => {
+    const beginAdminAction = useCallback((action: string, _summary: string) => {
+        if (pendingActionRef.current) return null;
+
         setLoading(true);
         setLastError(null);
         pendingActionRef.current = action;
-        pendingChangeLabelRef.current = summary;
-
-        if (action === 'reorder') pendingChangeRecordedForBatchRef.current = false;
+        return nextCatalogStudioOperationId(action);
     }, []);
 
-    const recordPendingChange = useCallback((action: string | null, summary: string | null) => {
-        if (!action || action === 'publish' || !summary?.length) return;
-
-        if (action === 'reorder') {
-            if (pendingChangeRecordedForBatchRef.current) return;
-            pendingChangeRecordedForBatchRef.current = true;
-        }
-
-        pendingChangeCounter += 1;
-
-        setPendingChanges((prev) => [
-            ...prev,
-            {
-                id: `pending-${pendingChangeCounter}`,
-                summary,
-                at: Date.now()
-            }
-        ]);
-        setHasPendingChanges(true);
+    const beginSmartSave = useCallback((action: CatalogAdminMutationAction) => {
+        const operationId = nextCatalogStudioOperationId(action);
+        pendingSmartSaveRef.current.set(operationId, { operationId, action, submittedAt: Date.now() });
+        pendingSmartSaveOrderRef.current.push(operationId);
+        setLoading(true);
+        setLastError(null);
+        setLastMutationResult(null);
+        return operationId;
     }, []);
 
     const setEditingOffer = useCallback(
         (offer: IPurchasableOffer | null) => {
             setEditingOfferState(offer);
             setEditingOfferDetails(null);
-
-            if (offer && offer.offerId !== -1) {
-                SendMessageComposer(new CatalogAdminLoadOfferComposer(offer.offerId, currentType));
-            }
+            requestedOfferKeyRef.current = null;
+            setLastError(null);
         },
-        [currentType]
+        []
     );
+
+    useEffect(() => {
+        if (!editingOffer || editingOffer.offerId === -1) return;
+        if (!studio.session) {
+            setLastError('Catalog Studio session is not ready');
+            studio.refresh();
+            return;
+        }
+
+        const requestKey = `${studio.session.draftVersionId}:${editingOffer.offerId}:${toStudioCatalogType(currentType)}`;
+        if (requestedOfferKeyRef.current === requestKey) return;
+        requestedOfferKeyRef.current = requestKey;
+
+        const catalogType = toStudioCatalogType(currentType);
+        const snapshot = studio.session.offers.find((offer) =>
+            offer.offerId === editingOffer.offerId && offer.catalogType === catalogType);
+        if (snapshot) {
+            setEditingOfferDetails({
+                offerId: snapshot.offerId,
+                pageId: snapshot.pageId,
+                itemIds: snapshot.itemIds,
+                catalogName: snapshot.catalogName,
+                costCredits: snapshot.costCredits,
+                costPoints: snapshot.costPoints,
+                pointsType: snapshot.pointsType,
+                amount: snapshot.amount,
+                clubOnly: snapshot.clubOnly,
+                extradata: snapshot.extradata,
+                haveOffer: snapshot.haveOffer,
+                offerIdGroup: snapshot.offerIdClient,
+                songId: snapshot.songId,
+                limitedStack: snapshot.limitedStack,
+                limitedSells: 0,
+                orderNumber: snapshot.orderNumber,
+                catalogMode: catalogType
+            });
+        }
+
+        setLastError(null);
+        SendMessageComposer(new CatalogAdminLoadOfferComposer(
+            editingOffer.offerId,
+            currentType,
+            studio.session.draftVersionId,
+            studio.revision
+        ));
+    }, [currentType, editingOffer, studio.refresh, studio.revision, studio.session]);
 
     useMessageEvent(CatalogAdminOfferDetailsEvent, (event: CatalogAdminOfferDetailsEvent) => {
         const parser = event.getParser();
 
         setEditingOfferDetails({
             offerId: parser.offerId,
+            pageId: parser.pageId,
+            itemIds: parser.itemIds,
+            catalogName: parser.catalogName,
+            costCredits: parser.costCredits,
+            costPoints: parser.costPoints,
+            pointsType: parser.pointsType,
+            amount: parser.amount,
+            clubOnly: parser.clubOnly,
+            extradata: parser.extradata,
+            haveOffer: parser.haveOffer,
             offerIdGroup: parser.offerIdGroup,
+            songId: parser.songId,
             limitedStack: parser.limitedStack,
-            orderNumber: parser.orderNumber
+            limitedSells: parser.limitedSells,
+            orderNumber: parser.orderNumber,
+            catalogMode: parser.catalogMode
         });
     });
 
@@ -199,10 +316,26 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
             pageId: parser.pageId,
             caption: parser.caption,
             captionSave: parser.captionSave,
+            parentId: parser.parentId,
+            catalogMode: parser.catalogMode,
+            layout: parser.layout,
+            iconColor: parser.iconColor,
+            iconImage: parser.iconImage,
             minRank: parser.minRank,
             orderNum: parser.orderNum,
             visible: parser.visible,
-            enabled: parser.enabled
+            enabled: parser.enabled,
+            clubOnly: parser.clubOnly,
+            vipOnly: parser.vipOnly,
+            headline: parser.headline,
+            teaser: parser.teaser,
+            special: parser.special,
+            textOne: parser.textOne,
+            textTwo: parser.textTwo,
+            textDetails: parser.textDetails,
+            textTeaser: parser.textTeaser,
+            roomId: parser.roomId,
+            includes: parser.includes
         });
     });
 
@@ -210,9 +343,25 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
         (pageId: number) => {
             setEditingPageDetails(null);
             if (pageId == null || pageId < 0) return;
-            SendMessageComposer(new CatalogAdminLoadPageComposer(pageId, currentType));
+            if (!studio.session) {
+                setLastError('Catalog Studio session is not ready');
+                return;
+            }
+
+            const catalogType = toStudioCatalogType(currentType);
+            const snapshot = studio.session.pages.find((page) =>
+                page.pageId === pageId && page.catalogType === catalogType);
+            if (snapshot) setEditingPageDetails(createCatalogAdminPageDetailsFromSnapshot(snapshot));
+
+            setLastError(null);
+            SendMessageComposer(new CatalogAdminLoadPageComposer(
+                pageId,
+                currentType,
+                studio.session.draftVersionId,
+                studio.revision
+            ));
         },
-        [currentType]
+        [currentType, studio.session, studio.revision]
     );
 
     useEffect(() => {
@@ -229,6 +378,7 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
                     setEditingPageData(false);
                     setEditingRootPage(false);
                     setEditingPageNode(null);
+                    setCreatingPage(false);
                     e.preventDefault();
                 }
             }
@@ -241,41 +391,98 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
 
     useMessageEvent(CatalogAdminResultEvent, (event: CatalogAdminResultEvent) => {
         const parser = event.getParser();
-        const action = pendingActionRef.current;
-        const summary = pendingChangeLabelRef.current;
+        const smartSaveResult = parser.smartSaveResult;
 
-        if (action === 'reorder' && pendingReorderRef.current) {
-            if (!parser.success) {
-                pendingReorderRef.current = null;
-                pendingActionRef.current = null;
-                pendingChangeLabelRef.current = null;
-                setLoading(false);
-                setLastError(parser.message || 'Operation failed');
+        if (smartSaveResult) {
+            const pending = pendingSmartSaveRef.current.get(smartSaveResult.operationId);
+            if (!pending || pending.action !== smartSaveResult.action) return;
 
-                if (simpleAlert) {
-                    simpleAlert(parser.message || 'Operation failed', NotificationAlertType.ALERT, null, null, 'Admin Error');
-                }
+            pendingSmartSaveRef.current.delete(smartSaveResult.operationId);
+            pendingSmartSaveOrderRef.current = pendingSmartSaveOrderRef.current
+                .filter(operationId => operationId !== smartSaveResult.operationId);
+            setLoading(pendingSmartSaveRef.current.size > 0 || !!pendingActionRef.current);
 
-                window.dispatchEvent(new Event('catalog-admin-refresh-current-page'));
+            const mutationResult: CatalogAdminMutationResult = {
+                operationId: smartSaveResult.operationId,
+                action: smartSaveResult.action,
+                success: parser.success,
+                code: smartSaveResult.code,
+                message: parser.message || smartSaveResult.code,
+                entityType: smartSaveResult.entityType,
+                catalogType: smartSaveResult.catalogType,
+                entityId: smartSaveResult.entityId,
+                entity: smartSaveResult.entity,
+                historyGroup: smartSaveResult.historyGroup,
+                fieldErrors: { ...smartSaveResult.fieldErrors },
+                acknowledgedAt: Date.now()
+            };
+            setLastMutationResult(mutationResult);
+
+            if (!parser.success || !smartSaveResult.entity || !smartSaveResult.historyGroup) {
+                setLastError(parser.message || smartSaveResult.code || 'Operation failed');
                 return;
             }
 
-            pendingReorderRef.current.remaining -= 1;
+            studio.applyMutation({
+                operationId: smartSaveResult.operationId,
+                action: smartSaveResult.action,
+                revision: smartSaveResult.revision,
+                entityType: smartSaveResult.entityType,
+                catalogType: smartSaveResult.catalogType,
+                entity: smartSaveResult.entity,
+                historyGroup: smartSaveResult.historyGroup
+            });
+            if (smartSaveResult.entityType === 'PAGE') {
+                setEditingPageDetails(createCatalogAdminPageDetailsFromSnapshot(
+                    smartSaveResult.entity as CatalogStudioPageSnapshot));
+            } else {
+                const offer = smartSaveResult.entity as CatalogStudioOfferSnapshot;
+                setEditingOfferDetails(current => ({
+                    offerId: offer.offerId,
+                    pageId: offer.pageId,
+                    itemIds: offer.itemIds,
+                    catalogName: offer.catalogName,
+                    costCredits: offer.costCredits,
+                    costPoints: offer.costPoints,
+                    pointsType: offer.pointsType,
+                    amount: offer.amount,
+                    clubOnly: offer.clubOnly,
+                    extradata: offer.extradata,
+                    haveOffer: offer.haveOffer,
+                    offerIdGroup: offer.offerIdClient,
+                    songId: offer.songId,
+                    limitedStack: offer.limitedStack,
+                    limitedSells: current?.limitedSells ?? 0,
+                    orderNumber: offer.orderNumber,
+                    catalogMode: offer.catalogType
+                }));
+            }
+            setLastError(null);
 
-            if (pendingReorderRef.current.remaining > 0) return;
+            if (smartSaveResult.entityType === 'OFFER') {
+                refreshCurrentPage();
+            }
 
-            pendingReorderRef.current = null;
+            return;
+        }
+
+        let action = pendingActionRef.current;
+        if (!action) {
+            const operationId = pendingSmartSaveOrderRef.current.shift();
+            if (operationId) {
+                action = pendingSmartSaveRef.current.get(operationId)?.action ?? null;
+                pendingSmartSaveRef.current.delete(operationId);
+            }
         }
 
         pendingActionRef.current = null;
-        pendingChangeLabelRef.current = null;
-        setLoading(false);
+        setLoading(pendingSmartSaveRef.current.size > 0);
 
         if (!parser.success) {
             setLastError(parser.message || 'Operation failed');
 
             if (simpleAlert) {
-                simpleAlert(parser.message || 'Operation failed', NotificationAlertType.ALERT, null, null, 'Admin Error');
+                simpleAlert(parser.message || 'Operation failed', NotificationAlertType.ALERT, null, null, localizeWithFallback('octane.catalog.admin_error', 'Admin Error'));
             }
         } else {
             setLastError(null);
@@ -283,27 +490,29 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
             setEditingPageData(false);
             setEditingRootPage(false);
             setEditingPageNode(null);
+            setCreatingPage(false);
 
-            if (action === 'publish') {
-                setHasPendingChanges(false);
-                setPendingChanges([]);
-            } else {
-                recordPendingChange(action, summary);
+            studio.refresh();
+            studio.loadHistory();
 
-                if (PAGE_INDEX_REFRESH_ACTIONS.has(action)) {
-                    window.dispatchEvent(new Event('catalog-admin-refresh-index'));
-                }
+            if (action && PAGE_INDEX_REFRESH_ACTIONS.has(action)) {
+                refreshIndex();
+            }
 
-                if (OFFER_REFRESH_ACTIONS.has(action)) {
-                    window.dispatchEvent(new Event('catalog-admin-refresh-current-page'));
-                }
+            if (action && OFFER_REFRESH_ACTIONS.has(action)) {
+                refreshCurrentPage();
             }
         }
     });
 
     const savePage = useCallback(
         (data: IPageEditData) => {
-            beginAdminAction('savePage', `Updated page: ${data.caption || `#${data.pageId}`}`);
+            const summary = localizeWithFallback('octane.catalog.updated_page', 'Updated page: %page%', ['page'], [data.caption || `#${data.pageId}`]);
+            if (!studio.session) {
+                setLastError('Catalog Manager is not ready');
+                return null;
+            }
+            const operationId = beginSmartSave('savePage');
 
             SendMessageComposer(
                 new CatalogAdminSavePageComposer(
@@ -322,16 +531,35 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
                     data.pageTextDetails || '',
                     currentType,
                     data.catalogMode,
-                    data.pageText1 || ''
+                    data.pageText1 || '',
+                    data.iconColor,
+                    data.clubOnly === '1',
+                    data.vipOnly === '1',
+                    data.pageSpecial || '',
+                    data.pageText2 || '',
+                    data.pageTextTeaser || '',
+                    data.roomId || 0,
+                    data.includes || '',
+                    studio.session.draftVersionId,
+                    studio.revision,
+                    '',
+                    summary,
+                    operationId
                 )
             );
+            return operationId;
         },
-        [currentType, beginAdminAction]
+        [currentType, beginSmartSave, studio]
     );
 
     const createPage = useCallback(
         (data: IPageEditData) => {
-            beginAdminAction('createPage', `Created page: ${data.caption || 'New page'}`);
+            const summary = `Created page: ${data.caption || 'New page'}`;
+            if (!studio.session) {
+                setLastError('Catalog Manager is not ready');
+                return null;
+            }
+            const operationId = beginSmartSave('createPage');
             SendMessageComposer(
                 new CatalogAdminCreatePageComposer(
                     data.caption,
@@ -344,24 +572,39 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
                     data.orderNum,
                     data.parentId,
                     currentType,
-                    data.catalogMode
+                    data.catalogMode,
+                    data.iconColor,
+                    data.clubOnly === '1',
+                    data.vipOnly === '1',
+                    data.pageHeadline || '',
+                    data.pageTeaser || '',
+                    data.pageSpecial || '',
+                    data.pageText1 || '',
+                    data.pageText2 || '',
+                    data.pageTextDetails || '',
+                    data.pageTextTeaser || '',
+                    data.roomId || 0,
+                    data.includes || '',
+                    studio.session.draftVersionId,
+                    studio.revision,
+                    '',
+                    summary,
+                    operationId
                 )
             );
+            return operationId;
         },
-        [currentType, beginAdminAction]
-    );
-
-    const deletePage = useCallback(
-        (pageId: number, summary?: string) => {
-            beginAdminAction('deletePage', summary || `Deleted page #${pageId}`);
-            SendMessageComposer(new CatalogAdminDeletePageComposer(pageId, currentType));
-        },
-        [currentType, beginAdminAction]
+        [currentType, beginSmartSave, studio]
     );
 
     const saveOffer = useCallback(
         (data: IOfferEditData) => {
-            beginAdminAction('saveOffer', `Updated offer: ${data.catalogName || `#${data.offerId}`}`);
+            const summary = localizeWithFallback('octane.catalog.updated_offer', 'Updated offer: %offer%', ['offer'], [data.catalogName || `#${data.offerId}`]);
+            if (!studio.session) {
+                setLastError('Catalog Manager is not ready');
+                return null;
+            }
+            const operationId = beginSmartSave('saveOffer');
             SendMessageComposer(
                 new CatalogAdminSaveOfferComposer(
                     data.offerId || 0,
@@ -378,16 +621,28 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
                     data.offerId_group,
                     data.limitedStack,
                     data.orderNumber,
-                    currentType
+                    data.songId,
+                    currentType,
+                    studio.session.draftVersionId,
+                    studio.revision,
+                    '',
+                    summary,
+                    operationId
                 )
             );
+            return operationId;
         },
-        [currentType, beginAdminAction]
+        [currentType, beginSmartSave, studio]
     );
 
     const createOffer = useCallback(
         (data: IOfferEditData) => {
-            beginAdminAction('createOffer', `Created offer: ${data.catalogName || 'New offer'}`);
+            const summary = `Created offer: ${data.catalogName || 'New offer'}`;
+            if (!studio.session) {
+                setLastError('Catalog Manager is not ready');
+                return null;
+            }
+            const operationId = beginSmartSave('createOffer');
             SendMessageComposer(
                 new CatalogAdminCreateOfferComposer(
                     data.pageId,
@@ -403,98 +658,192 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
                     data.offerId_group,
                     data.limitedStack,
                     data.orderNumber,
-                    currentType
+                    data.songId,
+                    currentType,
+                    studio.session.draftVersionId,
+                    studio.revision,
+                    '',
+                    summary,
+                    operationId
                 )
             );
+            return operationId;
         },
-        [currentType, beginAdminAction]
+        [currentType, beginSmartSave, studio]
     );
 
     const deleteOffer = useCallback(
         (offerId: number, summary?: string) => {
-            beginAdminAction('deleteOffer', summary || `Deleted offer #${offerId}`);
-            SendMessageComposer(new CatalogAdminDeleteOfferComposer(offerId, currentType));
+            const effectiveSummary = summary || `Deleted offer #${offerId}`;
+            if (!studio.session) {
+                setLastError('Catalog Manager is not ready');
+                return;
+            }
+            const operationId = beginAdminAction('deleteOffer', effectiveSummary);
+            if (!operationId) return;
+            SendMessageComposer(instantiateCompatibleComposer(CatalogAdminDeleteOfferComposer,
+                offerId, currentType, studio.session.draftVersionId, studio.revision, '', effectiveSummary, operationId));
         },
-        [currentType, beginAdminAction]
+        [currentType, beginAdminAction, studio]
     );
 
     const reorderOffers = useCallback(
-        (orders: { id: number; orderNumber: number }[], summary?: string) => {
+        (orders: { id: number; orderNumber: number }[], summary?: string, _pageId?: number) => {
             if (!orders.length) return;
+            const effectiveSummary = summary || 'Reordered offers';
+            if (!studio.session) {
+                setLastError('Catalog Manager is not ready');
+                return;
+            }
+            const operationId = beginAdminAction('reorder', effectiveSummary);
+            if (!operationId) return;
+            SendMessageComposer(instantiateCompatibleComposer(CatalogAdminReorderOffersComposer,
+                orders, currentType, studio.session.draftVersionId, studio.revision, '', effectiveSummary, operationId));
+        },
+        [currentType, beginAdminAction, studio]
+    );
 
-            beginAdminAction('reorder', summary || 'Reordered offers');
-            pendingReorderRef.current = { remaining: orders.length };
+    const performPageMutation = useCallback(
+        (mutation: QueuedPageMutation) => {
+            if (!studio.session) {
+                queuedPageMutationRef.current = mutation;
+                setLastError(null);
+                studio.refresh();
+                return;
+            }
 
-            for (const order of orders) {
-                SendMessageComposer(new CatalogAdminMoveOfferComposer(order.id, order.orderNumber, currentType));
+            const operationId = beginAdminAction(
+                mutation.kind === 'delete' ? 'deletePage' :
+                    mutation.kind === 'move' ? 'movePage' :
+                        mutation.kind === 'toggleEnabled' ? 'toggleEnabled' : 'toggleVisible',
+                mutation.summary
+            );
+            if (!operationId) return;
+
+            switch (mutation.kind) {
+                case 'delete':
+                    SendMessageComposer(instantiateCompatibleComposer(CatalogAdminDeletePageComposer,
+                        mutation.pageId, mutation.catalogType, studio.session.draftVersionId,
+                        studio.revision, '', mutation.summary, operationId));
+                    break;
+                case 'move':
+                    SendMessageComposer(instantiateCompatibleComposer(CatalogAdminMovePageComposer,
+                        mutation.pageId, mutation.newParentId, mutation.newIndex, mutation.catalogType,
+                        studio.session.draftVersionId, studio.revision, '', mutation.summary, operationId));
+                    break;
+                case 'toggleEnabled':
+                    SendMessageComposer(instantiateCompatibleComposer(CatalogAdminSetPageEnabledComposer,
+                        mutation.pageId, mutation.enabled, mutation.catalogType, studio.session.draftVersionId,
+                        studio.revision, '', mutation.summary, operationId));
+                    break;
+                case 'toggleVisible':
+                    SendMessageComposer(instantiateCompatibleComposer(CatalogAdminSetPageVisibleComposer,
+                        mutation.pageId, mutation.visible, mutation.catalogType, studio.session.draftVersionId,
+                        studio.revision, '', mutation.summary, operationId));
+                    break;
             }
         },
-        [currentType, beginAdminAction]
+        [beginAdminAction, studio.refresh, studio.revision, studio.session]
+    );
+
+    useEffect(() => {
+        const queued = queuedPageMutationRef.current;
+        if (!queued || !studio.session) return;
+
+        queuedPageMutationRef.current = null;
+        performPageMutation(queued);
+    }, [performPageMutation, studio.session]);
+
+    const deletePage = useCallback(
+        (pageId: number, summary?: string) => {
+            performPageMutation({
+                kind: 'delete',
+                pageId,
+                catalogType: currentType,
+                summary: summary || `Deleted page #${pageId}`
+            });
+        },
+        [currentType, performPageMutation]
     );
 
     const reorderPage = useCallback(
         (pageId: number, newParentId: number, newIndex: number, summary?: string) => {
-            beginAdminAction('movePage', summary || `Moved page #${pageId}`);
-            SendMessageComposer(new CatalogAdminMovePageComposer(pageId, newParentId, newIndex, currentType));
+            performPageMutation({
+                kind: 'move',
+                pageId,
+                catalogType: currentType,
+                newParentId,
+                newIndex,
+                summary: summary || `Moved page #${pageId}`
+            });
         },
-        [currentType, beginAdminAction]
+        [currentType, performPageMutation]
     );
 
     const togglePageEnabled = useCallback(
-        (pageId: number, summary?: string) => {
-            beginAdminAction('toggleEnabled', summary || `Toggled enabled state for page #${pageId}`);
-            SendMessageComposer(new CatalogAdminMovePageComposer(pageId, -1, -1, currentType));
+        (pageId: number, enabled: boolean, summary?: string) => {
+            performPageMutation({
+                kind: 'toggleEnabled',
+                pageId,
+                catalogType: currentType,
+                enabled,
+                summary: summary || `Toggled enabled state for page #${pageId}`
+            });
         },
-        [currentType, beginAdminAction]
+        [currentType, performPageMutation]
     );
 
     const togglePageVisible = useCallback(
-        (pageId: number, summary?: string) => {
-            beginAdminAction('toggleVisible', summary || `Toggled visibility for page #${pageId}`);
-            SendMessageComposer(new CatalogAdminMovePageComposer(pageId, -2, -1, currentType));
+        (pageId: number, visible: boolean, summary?: string) => {
+            performPageMutation({
+                kind: 'toggleVisible',
+                pageId,
+                catalogType: currentType,
+                visible,
+                summary: summary || `Toggled visibility for page #${pageId}`
+            });
         },
-        [currentType, beginAdminAction]
+        [currentType, performPageMutation]
     );
 
-    const publishCatalog = useCallback(() => {
-        beginAdminAction('publish', 'Published catalog');
-        SendMessageComposer(new CatalogAdminPublishComposer());
-    }, [beginAdminAction]);
 
     return (
-        <CatalogAdminContext
-            value={{
-                adminMode,
-                setAdminMode,
-                editingOffer,
-                setEditingOffer,
-                editingOfferDetails,
-                editingPageDetails,
-                requestPageDetails,
-                editingPageData,
-                setEditingPageData,
-                editingRootPage,
-                setEditingRootPage,
-                editingPageNode,
-                setEditingPageNode,
-                loading,
-                lastError,
-                hasPendingChanges,
-                pendingChanges,
-                savePage,
-                createPage,
-                deletePage,
-                saveOffer,
-                createOffer,
-                deleteOffer,
-                reorderOffers,
-                reorderPage,
-                togglePageEnabled,
-                togglePageVisible,
-                publishCatalog
-            }}
-        >
-            {children}
-        </CatalogAdminContext>
+        <NativeTextTree>
+            <CatalogAdminContext
+                value={{
+                    adminMode,
+                    setAdminMode,
+                    editingOffer,
+                    setEditingOffer,
+                    editingOfferDetails,
+                    editingPageDetails,
+                    requestPageDetails,
+                    editingPageData,
+                    setEditingPageData,
+                    editingRootPage,
+                    setEditingRootPage,
+                    editingPageNode,
+                    setEditingPageNode,
+                    creatingPage,
+                    setCreatingPage,
+                    loading,
+                    lastError: lastError || studio.lastError,
+                    lastMutationResult,
+                    studioSessionReady: !!studio.session,
+                    savePage,
+                    createPage,
+                    deletePage,
+                    saveOffer,
+                    createOffer,
+                    deleteOffer,
+                    reorderOffers,
+                    reorderPage,
+                    togglePageEnabled,
+                    togglePageVisible,
+                }}
+            >
+                {children}
+            </CatalogAdminContext>
+        </NativeTextTree>
     );
 };

@@ -1,0 +1,220 @@
+/*
+ * Text of the furni windows as AIR draws them: video_viewer (YouTube TV), playlisteditor_* (jukebox),
+ * craftingwidget, chest_generic / furni_chest_contents / coins_chest_contents / chest_upgrade /
+ * chest_wired_upgrade / transaction_overview (wired chests), boygirl (clothing change gate) and area_hide_ui.
+ * The recolour window and the reward popups have no AIR layout and follow the AIR conventions
+ * (u_regular / u_bold 12 px, 12 px buttons).
+ *
+ * The Ubuntu (style 3) windows are AIR's regular Ubuntu; our `Ubuntu` face is the condensed cut, so the
+ * content takes HabboAirUbuntu. boygirl is a style 0 frame and is set in Volter 9 px. The card headers keep
+ * the shared card styling. The common Button carries an important 12.6 px bold Tailwind size, which only an
+ * important rule in the earlier base layer outranks.
+ */
+
+/* ---- shared: regular Ubuntu for the content of every Ubuntu window here ---- */
+.youtube-tv-widget .octane-card-content-shell,
+.octane-playlist-editor-widget .octane-card-content-shell,
+.octane-widget-crafting .octane-card-content-shell,
+[class*='octane-widget-chest'] .octane-card-content-shell,
+.octane-wired-chest-reward .octane-card-content-shell,
+.octane-furni-recolor .octane-card-content-shell,
+.octane-room-widget-area-hide .octane-card-content-shell {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+@layer base {
+    .youtube-tv-widget .octane-card-content-shell :where(*):not(svg, svg *),
+    .octane-playlist-editor-widget .octane-card-content-shell :where(*):not(svg, svg *),
+    .octane-widget-crafting .octane-card-content-shell :where(*):not(svg, svg *),
+    [class*='octane-widget-chest'] .octane-card-content-shell :where(*):not(svg, svg *),
+    .octane-wired-chest-reward .octane-card-content-shell :where(*):not(svg, svg *),
+    .octane-furni-recolor .octane-card-content-shell :where(*):not(svg, svg *),
+    .octane-room-widget-area-hide .octane-card-content-shell :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    /* style 3 `button`: button_shiny_regular, 12 px. */
+    .youtube-tv-widget .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger),
+    .octane-furni-recolor .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger),
+    .octane-room-widget-area-hide .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger) {
+        font-size: 12px !important;
+    }
+
+    /* button_thick (button_shiny_bold, 12 px bold): play now, open catalogue, craft, the reward's OK. */
+    .octane-playlist-editor-widget .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger, .btn),
+    .octane-widget-crafting .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger),
+    .octane-wired-chest-reward .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger) {
+        font-size: 12px !important;
+        font-weight: 700 !important;
+    }
+
+    /* boygirl Boy / Girl: style 0 buttons, Volter bold 9 px. */
+    .octane-football-gate .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger) {
+        font-size: 9px !important;
+        font-weight: 700 !important;
+    }
+
+    /* boygirl is a style 0 (Volter) frame. */
+    .octane-football-gate .octane-card-content-shell :where(*):not(svg, svg *) {
+        font-family: Volter, monospace !important;
+    }
+}
+
+/* `Text small` is Tailwind's 14 px; the texts it stands for here are u_regular 12 px. */
+.youtube-tv-widget .octane-card-content-shell .text-sm,
+.octane-playlist-editor-widget .octane-card-content-shell .text-sm,
+[class*='octane-widget-chest'] .octane-card-content-shell .text-sm,
+.octane-wired-chest-reward .octane-card-content-shell .text-sm,
+.octane-furni-recolor .octane-card-content-shell .text-sm {
+    font-size: 12px;
+    line-height: 15px;
+}
+
+/* ---- video_viewer (YouTube TV) ---- */
+
+/* no_videos_label: il_regular_white, 11 px white. */
+.youtube-tv-widget .octane-card-content-shell .empty-video {
+    color: #ffffff;
+    font-size: 11px;
+}
+
+/* The "Playlists" label is a plain style 3 label (u_regular 12 px black); item_title is u_bold 12 px. */
+.youtube-tv-widget .octane-card-content-shell .playlist-container {
+    color: #000000;
+    font-size: 12px;
+}
+
+.youtube-tv-widget .octane-card-content-shell .playlist-container b {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* ---- playlisteditor_main_window and its subwindows (all Ubuntu, style 0 parts) ---- */
+
+/* "My music" / "Playlist": Ubuntu bold 20 px white on the coloured title band. */
+.octane-playlist-editor-widget .octane-card-content-shell .octane-playlist__title {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 24px;
+}
+
+/* get_more_music / add_songs / now_playing headings: Ubuntu bold 14 px. */
+.octane-playlist-editor-widget .octane-card-content-shell .octane-playlist__subtitle {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+}
+
+/* music_inventory_item song_title_text and playlist_item song_title_text: Ubuntu 12 px. */
+.octane-playlist-editor-widget .octane-card-content-shell .octane-playlist__song {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* ---- craftingwidget ---- */
+
+/* header_recipes / header_inventory: Ubuntu bold 14 px (on our light band the 0xcec7b6 tint is unreadable). */
+.octane-widget-crafting .octane-card-content-shell .octane-crafting__heading {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+}
+
+/* header_mixer / info_text1: Ubuntu bold 11 px. */
+.octane-widget-crafting .octane-card-content-shell .octane-crafting__info {
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 14px;
+}
+
+/* ---- wired chests ---- */
+
+/* style 3 `button` (withdraw, withdraw all, deposit, view logs, ready, cancel): button_shiny_regular 12 px. */
+[class*='octane-widget-chest'] .octane-card-content-shell .octane-chest__btn:not(.octane-chest__btn--icon) {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* chest_upgrade / chest_wired_upgrade buy_button: button_thick, 12 px bold. */
+[class*='octane-widget-chest'] .octane-card-content-shell .octane-chest__btn.octane-chest__btn--buy {
+    font-weight: 700;
+}
+
+/* furni_chest_contents search_placeholder / search_input: 12 px #666666. */
+[class*='octane-widget-chest'] .octane-card-content-shell .octane-chest__search-placeholder,
+[class*='octane-widget-chest'] .octane-card-content-shell .octane-chest__search-input {
+    color: #666666;
+    font-size: 12px;
+}
+
+/* withdraw_input / capacity_input: 12 px. */
+[class*='octane-widget-chest'] .octane-card-content-shell .octane-chest__input,
+[class*='octane-widget-chest'] .octane-card-content-shell .octane-chest__capacity-input {
+    font-size: 12px;
+}
+
+/* furni_name: u_regular 12 px bold. */
+[class*='octane-widget-chest'] .octane-card-content-shell .octane-chest__preview-name {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* furni_quantity: text_style regular, 0x2f6982. */
+[class*='octane-widget-chest'] .octane-card-content-shell .octane-chest__qty-badge span {
+    font-weight: 400;
+}
+
+/* chest_upgrade product_name, chest_wired_upgrade product_name, lock_info ctitle: 14 px u_bold. */
+[class*='octane-widget-chest'] .octane-card-content-shell .octane-chest__title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+}
+
+/* price_credits / price_diamonds / plus / free: 14 px bold. */
+[class*='octane-widget-chest'] .octane-card-content-shell .octane-chest__price {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* error_text: bold, 0xc42f3d. */
+[class*='octane-widget-chest'] .octane-card-content-shell .octane-chest__upgrade-error {
+    color: #c42f3d;
+    font-weight: 700;
+}
+
+/* ---- area_hide_ui: every text is u_small 10 px; the two titles bold, the info lines 0x999999. ---- */
+.octane-room-widget-area-hide .octane-card-content-shell {
+    font-size: 10px;
+    line-height: 13px;
+}
+
+.octane-room-widget-area-hide .octane-card-content-shell .octane-area-hide__info {
+    color: #999999;
+}
+
+/* ---- boygirl: info text Volter 9 px, 0x0. ---- */
+.octane-football-gate .octane-card-content-shell {
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+    color: #000000;
+}
+
+/* Chest settings appearance group: the preview note, and the preview amount greyed out while the preview is off. */
+.octane-chest-settings__note {
+    font-size: 11px;
+    opacity: 0.6;
+}
+
+.octane-chest-settings__amount {
+    display: grid;
+    gap: 5px;
+}
+
+.octane-chest-settings__amount.is-off {
+    opacity: 0.5;
+}

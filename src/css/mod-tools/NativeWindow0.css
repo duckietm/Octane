@@ -1,0 +1,82 @@
+@font-face {
+    font-family: Volter;
+    src: url("@/assets/webfonts/Volter.ttf") format("truetype");
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: Volter;
+    src: url("@/assets/webfonts/Volter-b.ttf") format("truetype");
+    font-weight: 700;
+}
+
+/* classic v75 window manager, legacy style 0 windows (blue frame 0xff418db0, Volter text) */
+.native0-frame { position: relative; margin: 0; padding: 0; pointer-events: auto; filter: drop-shadow(3px 3px 2px rgb(0 0 0 / 35%)); }
+.native0-frame *, .native0-frame *::before, .native0-frame *::after { box-sizing: border-box; }
+.native0-frame > .native-skin { position: absolute; left: 0; top: 0; }
+.native0-header, .native0-close, .native0-text__background, .native0-box, .native0-text, .native0-client { position: absolute; }
+.native0-header > .native-skin { position: absolute; left: 0; top: 0; }
+.native0-header__caption { will-change: transform; position: absolute; display: flex; align-items: center; padding: 0 9px 0 10px; pointer-events: none; }
+/* the caption box is drawn apart from its text: text on an opaque background is set with LCD subpixel fringes */
+.native0-header__caption-bg { position: absolute; background: #418db0; pointer-events: none; }
+.native0-header { cursor: move; user-select: none; }
+.native0-close { cursor: pointer; }
+.native0-box > .native-skin { position: absolute; left: 0; top: 0; }
+.native0-button { cursor: pointer; }
+.native0-button[data-native-enabled='false'] { cursor: default; }
+.native0-button__label { position: absolute; left: 0; top: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.native0-checkbox { cursor: pointer; }
+
+.native0-underline { position: absolute; height: 1px; pointer-events: none; }
+
+/* Volter text fields: 2px gutter, 10px line, pixel glyphs on whole pixels */
+.native0-text { padding: 2px; line-height: 10px; font: 400 9px/10px Volter, monospace; overflow: visible; }
+.native0-text__line { position: relative; left: 1px; font: 400 9px/10px Volter, monospace; white-space: nowrap; font-synthesis: none; }
+.native0-text__line.is-bold { font-weight: 700; }
+.native0-text__line.is-wrap { white-space: normal; overflow-wrap: break-word; display: block; }
+.native0-text__line.is-underline { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 1px; padding: 0 1px; margin: 0 -1px; }
+.native0-header__caption .native0-text__line, .native0-text__line.has-glow { color: #fff; text-shadow: 1px 0 rgba(255, 255, 255, var(--native0-glow, 0.16)), -1px 0 rgba(255, 255, 255, var(--native0-glow, 0.16)), 0 1px rgba(255, 255, 255, var(--native0-glow, 0.16)), 0 -1px rgba(255, 255, 255, var(--native0-glow, 0.16)); }
+.native0-text__line.has-glow { color: inherit; }
+
+.native0-input { position: absolute; margin: 0; padding: 1px 1px 1px 2px; border: 1px solid #000; border-radius: 0; background: transparent; color: #000; font: 400 9px/10px Volter, monospace; resize: none; outline: none; overflow: hidden; caret-color: #000; }
+.native0-input-bg { background: #fff; pointer-events: none; }
+.native0-input { will-change: transform; }
+.native0-input:focus, .native0-input:focus-visible { border-color: #000; box-shadow: none; outline: none; }
+.native0-dropmenu__region { position: absolute; inset: 0; box-sizing: border-box; margin: 0; padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.native0-dropmenu__region:focus-visible { outline: 1px dotted #000; outline-offset: -2px; }
+.native0-dropmenu__positioner { z-index: 9999; }
+.native0-dropmenu__list { position: relative; box-sizing: border-box; margin: 0; padding: 2px 3px 5px; overflow: visible; }
+.native0-dropmenu__list > .native-skin { position: absolute; left: 0; top: 0; }
+.native0-dropmenu__list > :not(.native-skin) { position: relative; z-index: 1; }
+.native0-dropmenu__item { position: relative; display: block; box-sizing: border-box; width: 100%; height: 16px; margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer; outline: 0; }
+.native0-dropmenu__item[data-highlighted] { background: #d9d9d9; }
+.native0-text { white-space: nowrap; }
+
+.native0-scaler { position: absolute; cursor: nwse-resize; }
+.native0-scrollbar__part { position: absolute; }
+.native0-scrollbar__part > .native-skin { position: absolute; left: 0; top: 0; }
+.native0-list { position: absolute; overflow: hidden; }
+
+/* dropmenu style 100 (Illumina light) inside style 0 windows */
+.native100-dropmenu { position: absolute; }
+.native100-dropmenu .native-skin, .native100-dropmenu__list > .native-skin, .native100-dropmenu__item .native-skin { position: absolute; left: 0; top: 0; }
+.native100-dropmenu__caption, .native100-dropmenu__text { position: absolute; display: block; overflow: hidden; font-size: 0; line-height: 0; pointer-events: none; }
+.native100-dropmenu__caption > canvas, .native100-dropmenu__text > canvas { display: block; }
+/* the face is the Base UI Select trigger: a bare button over the drawn frame */
+.native100-dropmenu__region { position: absolute; inset: 0; box-sizing: border-box; margin: 0; padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.native100-dropmenu__region:focus-visible { outline: 1px dotted #000; outline-offset: -2px; }
+.native100-dropmenu__region[data-disabled] { cursor: default; }
+.native100-dropmenu__positioner { z-index: 9999; }
+/* the open list covers the face: the drawn frame sits behind the items */
+.native100-dropmenu__list { position: relative; box-sizing: border-box; margin: 0; padding: 2px 6px 5px; overflow: visible; }
+.native100-dropmenu__list > :not(.native-skin) { position: relative; z-index: 1; }
+.native100-dropmenu__item { position: relative; display: block; box-sizing: border-box; width: 100%; height: 19px; margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer; outline: none; }
+.native100-dropmenu__face { position: absolute; top: 0; display: block; }
+.native100-dropmenu__state { position: absolute; inset: 0; display: block; }
+.native100-dropmenu__state[data-state='hover'] { display: none; }
+.native100-dropmenu__item[data-highlighted] .native100-dropmenu__state[data-state='base'] { display: none; }
+.native100-dropmenu__item[data-highlighted] .native100-dropmenu__state[data-state='hover'] { display: block; }
+
+.native0-tab { cursor: pointer; }
+.native0-tab > .native-skin { position: absolute; left: 0; top: 0; }
+.native0-tab__label { position: absolute; display: block; pointer-events: none; color: #000; white-space: nowrap; }

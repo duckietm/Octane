@@ -2,40 +2,42 @@
    Global (not an inline <style>) so it applies to BOTH the HelpView card and
    the separate SanctionStatusView card, regardless of which is mounted. */
 
+/* Official abusive_notice: 309 px, a red heading, the explanation and one button. */
+.octane-alert.octane-abusive-alert {
+    width: 309px;
+    min-height: 153px;
+}
+
+.octane-abusive-alert__heading {
+    margin-bottom: 4px;
+    color: #c30000;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.octane-abusive-alert__text {
+    flex: 1;
+    font-size: 11px; /* help.emergency.abusive.description: no text_style in an Illumina frame, il_regular 11 px */
+    line-height: 14px;
+    white-space: pre-line;
+}
+
+.octane-abusive-alert__actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+}
+
 /* Beveled Habbo green button (matches the reference screenshots — the flat
    Bootstrap 'success' variant did not). Reused by the Help action buttons and
    the Sanctions "Ho capito" button. */
 .habbo-btn-green {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     width: 100%;
     min-height: 34px;
     padding: 6px 14px;
-    border: 1px solid #4f7a22;
-    border-radius: 6px;
-    background: linear-gradient(180deg, #72b03a 0%, #5a8c2a 100%);
-    color: #ffffff;
-    font-size: 0.82rem;
+    font-size: 12px; /* sanction_info ok_button: button_thick, button_shiny_bold 12 px bold */
     font-weight: 700;
-    line-height: 1.1;
     text-align: center;
-    cursor: pointer;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.3),
-        inset 0 -2px 0 rgba(0, 0, 0, 0.16);
-    transition: filter 0.15s ease;
-}
-
-.habbo-btn-green:hover { filter: brightness(1.06); }
-.habbo-btn-green:active { filter: brightness(0.95); }
-
-.habbo-btn-green:disabled {
-    background: linear-gradient(180deg, #cfcfcf 0%, #b6b6b6 100%);
-    border-color: #9a9a9a;
-    color: #f0f0f0;
-    cursor: default;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* Auto-width variant for footer buttons (e.g. "Ho capito"). */
@@ -53,7 +55,7 @@
     border: 0;
     background: transparent;
     color: #2f2f2f;
-    font-size: 0.78rem;
+    font-size: 14px; /* sanction_info faq_link: u_bold with font_size 14, underlined */
     font-weight: 700;
     text-decoration: underline;
     text-align: left;
@@ -66,4 +68,319 @@
     flex: 0 0 auto;
     color: #46a01e;
     font-size: 0.95rem;
+}
+
+/* A row of the user list and the bar of the selected user, with the head of the user. */
+.octane-help-user {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.octane-help-user__avatar {
+    display: inline-flex;
+    flex: none;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.octane-help-selected-user {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    border: 1px solid #919191;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #000000;
+    font-size: 12px;
+}
+
+.octane-help-selected-user__text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 15px;
+}
+
+/*
+ * Text as AIR draws the help windows. The help page (main2) is an Illumina frame, the report steps
+ * (report), the sanction status (sanction_info) and the report status (my_reports) are Ubuntu (style 3)
+ * frames: all in regular Ubuntu, which in Octane is HabboAirUbuntu (our `Ubuntu` face is the condensed cut).
+ */
+.octane-help,
+.octane-change-username {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+@layer base {
+    .octane-help :where(*):not(svg, svg *),
+    .octane-change-username :where(*):not(svg, svg *),
+    .octane-abusive-alert :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
+
+/* report: the step texts carry no text_style, u_regular 12 px black. */
+.octane-help-report {
+    font-size: 12px;
+    line-height: 15px;
+}
+
+/* The step titles (message_phase_title, help.emergency.main.step.two.title, help.emergency.chat_report.subtitle,
+   help.cfh.button.send): u_headline_medium, 16 px bold. Text fontSize={4} renders as .fs-4. */
+.octane-help-report .fs-4 {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 20px;
+}
+
+/* user_prototype user_name: il_border, 10 px bold. */
+.octane-help-user__name {
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* The bar of the reported user (container "user"): a 0x8899a2 strip, user_info_title u_bold 12 px 0xefefef,
+   reported_user_name u_headline_big 18 px white and change_user id_link_strong 11 px bold 0xefefef. */
+.octane-help .octane-help-selected-user {
+    border-color: #6f7f88;
+    background: #8899a2;
+    color: #ffffff;
+}
+
+.octane-help .octane-help-selected-user__text {
+    line-height: normal;
+}
+
+.octane-help .octane-help-selected-user__text > span {
+    color: #efefef;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.octane-help .octane-help-selected-user__text > b {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 22px;
+}
+
+.octane-help .octane-help-selected-user .help-link {
+    color: #efefef;
+    font-size: 11px;
+}
+
+/* The card's `button` rule (12 px, condensed) outranks the bare .help-link, so the sizes are scoped. */
+.octane-help .help-link {
+    font-size: 14px;
+}
+
+.octane-help .habbo-btn-green {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* sanction_info: the sanction text is font_size 14. */
+.octane-sanction-info__body {
+    font-size: 14px;
+    line-height: 18px;
+}
+
+/* name_change: the texts sit in a style 100 container without a text_style: il_regular 11 px. */
+.octane-change-username .octane-card-content-shell {
+    font-size: 11px;
+    line-height: 14px;
+}
+
+@layer base {
+    /* The report step buttons (continue_button, back_button, submit_button, reason_prototype) are
+       container_buttons with a white u_headline_medium caption: 16 px bold. Button's own size is an
+       important utility, so this lives in the base layer. */
+    .octane-help-report :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger) {
+        font-size: 16px !important;
+        font-weight: 700 !important;
+    }
+
+    /* my_reports appeal_button: a plain style 3 button, button_shiny_regular 12 px. */
+    .octane-my-reports .octane-my-reports__appeal {
+        font-size: 12px !important;
+        font-weight: 400 !important;
+    }
+
+    /* abusive_notice close_button: button style 101, il_button 10 px bold. */
+    .octane-abusive-alert .octane-abusive-alert__actions :where(button) {
+        font-size: 10px !important;
+        font-weight: 700 !important;
+    }
+
+    .octane-change-username .octane-card-content-shell :where(p, span, label, button, input) {
+        font-size: 11px !important;
+    }
+}
+
+/*
+ * name_change change_name_button / keep_name_button and newuser_change_name check_name_button, select_name_button,
+ * cancel_selection_button, confirm_name_button, cancel_confirmation_button are all style 3 buttons (tinted
+ * 0xbbbbbb): grey habbo_skin_button_shiny with black text, never green, blue or red.
+ */
+@layer base {
+    .octane-change-username .octane-card-content-shell .habbo-btn-secondary {
+        border-width: 5px !important;
+        border-image-source: var(--habbo-skin-shiny) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        color: #000000 !important;
+    }
+
+    .octane-change-username .octane-card-content-shell .habbo-btn-secondary:hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    .octane-change-username .octane-card-content-shell .habbo-btn-secondary:active {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+
+    .octane-change-username .octane-card-content-shell .habbo-btn-secondary:disabled {
+        border-image-source: var(--habbo-skin-shiny-disabled) !important;
+        color: #777777 !important;
+    }
+}
+
+/*
+ * The other grey buttons of the help windows take AIR's skins instead of the flat 3 px button_default picture of
+ * the shared .habbo-btn-secondary (an unlayered important rule, which only a layered important rule outranks):
+ * - report back_button (container_button style 5, color 0xaaaaaa): drawn with the other report step buttons below.
+ * - my_reports appeal_button: the grey `button` (style 3), habbo_skin_button_shiny.
+ * - pending_bully_request / chat_review_reporter_feedback close_button: Illumina style 101 buttons, 48 px high,
+ *   drawn with the large shiny picture like the help page's buttons; il_button 10 px bold black.
+ */
+@layer base {
+    :is(.octane-help-report, .octane-my-reports) .habbo-btn-secondary {
+        border-width: 5px !important;
+        border-image-source: var(--habbo-skin-shiny) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        color: #000000 !important;
+    }
+
+    :is(.octane-help-report, .octane-my-reports) .habbo-btn-secondary:hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    :is(.octane-help-report, .octane-my-reports) .habbo-btn-secondary:active {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+
+    :is(.octane-help-report, .octane-my-reports) .habbo-btn-secondary:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-disabled) !important;
+        color: #777777 !important;
+    }
+
+    /* report steps: continue_button (0x00aa00), back_button (0xaaaaaa), submit_button and reason_prototype
+       (0xaa0000) are container_buttons style 5 (41 px high): habbo_skin_button_shiny_large multiplied by the colour,
+       with a white u_headline_medium (16 px bold) caption. */
+    .octane-help-report :is(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger) {
+        min-height: 41px !important;
+        border-width: 6px 6px 7px !important;
+        border-image-slice: 6 6 7 6 fill !important;
+        border-image-width: 6px 6px 7px !important;
+        border-image-repeat: stretch !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: #ffffff !important;
+    }
+
+    .octane-help-report .habbo-btn-primary {
+        border-image-source: var(--habbo-skin-shiny-large-tint-00aa00) !important;
+    }
+
+    .octane-help-report .habbo-btn-primary:hover {
+        border-image-source: var(--habbo-skin-shiny-large-tint-00aa00-hover) !important;
+    }
+
+    .octane-help-report .habbo-btn-primary:is(:active, .active) {
+        border-image-source: var(--habbo-skin-shiny-large-tint-00aa00-pressed) !important;
+    }
+
+    .octane-help-report .habbo-btn-primary:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-large-tint-00aa00-disabled) !important;
+        color: #dddddd !important;
+    }
+
+    .octane-help-report .habbo-btn-secondary {
+        border-image-source: var(--habbo-skin-shiny-large-tint-aaaaaa) !important;
+    }
+
+    .octane-help-report .habbo-btn-secondary:hover {
+        border-image-source: var(--habbo-skin-shiny-large-tint-aaaaaa-hover) !important;
+    }
+
+    .octane-help-report .habbo-btn-secondary:is(:active, .active) {
+        border-image-source: var(--habbo-skin-shiny-large-tint-aaaaaa-pressed) !important;
+    }
+
+    .octane-help-report .habbo-btn-secondary:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-large-tint-aaaaaa-disabled) !important;
+        color: #dddddd !important;
+    }
+
+    .octane-help-report .habbo-btn-danger {
+        border-image-source: var(--habbo-skin-shiny-large-tint-aa0000) !important;
+    }
+
+    .octane-help-report .habbo-btn-danger:hover {
+        border-image-source: var(--habbo-skin-shiny-large-tint-aa0000-hover) !important;
+    }
+
+    .octane-help-report .habbo-btn-danger:is(:active, .active) {
+        border-image-source: var(--habbo-skin-shiny-large-tint-aa0000-pressed) !important;
+    }
+
+    .octane-help-report .habbo-btn-danger:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-large-tint-aa0000-disabled) !important;
+        color: #dddddd !important;
+    }
+
+    :is(.octane-guardian-feedback, .octane-guardian-pending) .octane-card-content-shell .habbo-btn-secondary {
+        min-width: 140px;
+        min-height: 48px !important;
+        border-width: 6px 6px 7px !important;
+        border-image-source: var(--habbo-skin-shiny-large) !important;
+        border-image-slice: 6 6 7 6 fill !important;
+        border-image-width: 6px 6px 7px !important;
+        color: #000000 !important;
+        font-size: 10px !important;
+        font-weight: 700 !important;
+    }
+
+    :is(.octane-guardian-feedback, .octane-guardian-pending) .octane-card-content-shell .habbo-btn-secondary:hover {
+        border-image-source: var(--habbo-skin-shiny-large-hover) !important;
+    }
+
+    :is(.octane-guardian-feedback, .octane-guardian-pending) .octane-card-content-shell .habbo-btn-secondary:active {
+        border-image-source: var(--habbo-skin-shiny-large-pressed) !important;
+    }
+}
+
+/* sanction_info ok_button: button_thick style 5, color 0x009900: the grey shiny thick skin multiplied by 0x009900,
+   white button_shiny_bold caption. The shared .habbo-btn-green skin is an unlayered important rule. */
+@layer base {
+    .octane-sanction-info .habbo-btn-green {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-009900) !important;
+        color: #ffffff !important;
+    }
+
+    .octane-sanction-info .habbo-btn-green:hover {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-009900-hover) !important;
+    }
+
+    .octane-sanction-info .habbo-btn-green:is(:active, .active) {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-009900-pressed) !important;
+    }
 }

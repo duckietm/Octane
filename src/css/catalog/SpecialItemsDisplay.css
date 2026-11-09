@@ -1,0 +1,329 @@
+/* Special items display: the official special_items_display_xml layout (420x495 frame, a 33px
+   caption and a 420x462 content plane). Coordinates below are the XML's, relative to that plane. */
+.octane-card-shell.octane-special-items {
+    --octane-special-items-platform: url("../../assets/images/catalog/air/special-items/special_items_item_platform.png");
+    --octane-special-items-spotlight: url("../../assets/images/catalog/air/special-items/special_items_spotlight1.png");
+    --octane-special-items-spotlight-base: url("../../assets/images/catalog/air/special-items/special_items_spotlight2.png");
+    --octane-special-items-back: url("../../assets/images/catalog/air/special-items/icons_back.png");
+    --octane-special-items-forward: url("../../assets/images/catalog/air/special-items/icons_forward.png");
+    --octane-special-items-page: url("../../assets/images/catalog/air/special-items/progress_disk_etched.png");
+
+    box-sizing: border-box;
+    width: 420px !important;
+    min-width: 420px !important;
+    max-width: 420px !important;
+    height: 495px !important;
+    min-height: 495px !important;
+    max-height: 495px !important;
+    resize: none !important;
+}
+
+.draggable-window:has(> .octane-special-items) {
+    width: 420px !important;
+    height: 495px !important;
+}
+
+.octane-special-items,
+.octane-special-items * {
+    box-sizing: border-box;
+}
+
+.octane-special-items-content {
+    position: absolute;
+    top: 33px;
+    left: 0;
+    width: 420px;
+    height: 462px;
+    overflow: hidden;
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.octane-special-items-bg {
+    position: absolute;
+    top: 0;
+    left: 3px;
+    width: 414px;
+    height: 455px;
+    background: #bfbfbf;
+    border-radius: 0 0 6px 6px;
+}
+
+/* Header: etched border at 13,13 (394x94) with the set title and description centred. */
+.octane-special-items-header {
+    position: absolute;
+    top: 13px;
+    left: 13px;
+    width: 394px;
+    height: 94px;
+    border-radius: 4px;
+    background: #d9d9d9;
+    box-shadow: inset 1px 1px 0 #9a9a9a, inset -1px -1px 0 #f2f2f2;
+}
+
+.octane-special-items-header-scroll {
+    position: absolute;
+    top: 7px;
+    left: 7px;
+    width: 380px;
+    height: 80px;
+    overflow-y: auto;
+    text-align: center;
+}
+
+.octane-special-items-set-title {
+    padding: 0 7px;
+    font-weight: 700;
+}
+
+.octane-special-items-set-desc {
+    padding: 0 7px;
+    white-space: pre-line;
+}
+
+/* Centre: the rotating platform (item_viewer at 40,0 in the container at y=107). */
+.octane-special-items-center {
+    position: absolute;
+    top: 107px;
+    left: 0;
+    width: 420px;
+    height: 220px;
+}
+
+.octane-special-items-viewer {
+    position: absolute;
+    top: 0;
+    left: 40px;
+    width: 340px;
+    height: 197px;
+}
+
+.octane-special-items-platform {
+    position: absolute;
+    top: 41px;
+    left: 8px;
+    width: 323px;
+    height: 155px;
+    background: var(--octane-special-items-platform) no-repeat;
+}
+
+.octane-special-items-spotlight-base {
+    position: absolute;
+    top: 118px;
+    left: 124px;
+    width: 91px;
+    height: 51px;
+    background: var(--octane-special-items-spotlight-base) no-repeat;
+    background-size: 91.5px 51px;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.octane-special-items-rotation {
+    position: absolute;
+    inset: 0;
+}
+
+/* 200x200 product_image widget, pivot "bottom center". */
+.octane-special-items-product {
+    position: absolute;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 200px;
+    height: 200px;
+    pointer-events: none;
+}
+
+.octane-special-items-product > * {
+    flex: none;
+    background-position: center bottom !important;
+}
+
+.octane-special-items-spotlight {
+    position: absolute;
+    top: -100px;
+    left: 124px;
+    z-index: 200;
+    width: 91px;
+    height: 271px;
+    background: var(--octane-special-items-spotlight) no-repeat;
+    background-size: 91.5px 271.5px;
+    image-rendering: pixelated;
+    mix-blend-mode: plus-lighter;
+    pointer-events: none;
+}
+
+.octane-special-items-nav {
+    position: absolute;
+    top: 97px;
+    width: 33px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    background: transparent no-repeat 0 4px;
+    cursor: pointer;
+    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.28));
+}
+
+.octane-special-items-nav:hover {
+    filter: brightness(1.15) drop-shadow(0 1px 0 rgba(0, 0, 0, 0.28));
+}
+
+.octane-special-items-nav.is-previous {
+    left: 8px;
+    background-image: var(--octane-special-items-back);
+}
+
+.octane-special-items-nav.is-next {
+    left: 379px;
+    background-image: var(--octane-special-items-forward);
+}
+
+/* page_list: 10x11 disks, 7px apart, centred in the 342px page container at 39,207. */
+.octane-special-items-pages {
+    position: absolute;
+    top: 207px;
+    left: 39px;
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    width: 342px;
+    height: 11px;
+}
+
+.octane-special-items-page {
+    flex: none;
+    width: 10px;
+    height: 11px;
+    padding: 0;
+    border: 0;
+    background: var(--octane-special-items-page) no-repeat 0 0;
+    cursor: pointer;
+}
+
+.octane-special-items-page.is-selected {
+    background-position: -10px 0;
+}
+
+/* Claim: border at 55,115 (310x40, blend 0.8). */
+.octane-special-items-claim {
+    position: absolute;
+    top: 115px;
+    left: 55px;
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 310px;
+    height: 40px;
+    padding: 5px 16px;
+    border-radius: 4px;
+    background: rgba(217, 217, 217, 0.8);
+    box-shadow: inset 1px 1px 0 rgba(154, 154, 154, 0.8), inset -1px -1px 0 rgba(242, 242, 242, 0.8);
+}
+
+.octane-special-items-claim-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* claim_btn (55x30): button style 4, habbo_skin_button_shiny_black, white button_shiny_regular 12 px caption. */
+.octane-special-items-claim-button {
+    flex: none;
+    min-width: 55px;
+    height: 30px;
+    padding: 0 5px;
+    border: 5px solid transparent;
+    border-image-source: var(--habbo-skin-shiny-black);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    background: transparent;
+    color: #ffffff;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 400;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    cursor: pointer;
+}
+
+.octane-special-items-claim-button:hover:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-black-hover);
+}
+
+.octane-special-items-claim-button:active:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-black-pressed);
+}
+
+.octane-special-items-claim-button:disabled {
+    border-image-source: var(--habbo-skin-shiny-black-disabled);
+    color: #bbbbbb;
+    cursor: default;
+}
+
+/* Bottom plaque: three stacked dark borders, the face at 13,9 (394x110). */
+.octane-special-items-bottom {
+    position: absolute;
+    top: 327px;
+    left: 0;
+    width: 420px;
+    height: 135px;
+}
+
+.octane-special-items-plate {
+    position: absolute;
+    left: 13px;
+    width: 394px;
+    height: 110px;
+    border-radius: 4px;
+}
+
+.octane-special-items-plate.is-shadow {
+    top: 16px;
+    background: #000000;
+}
+
+.octane-special-items-plate.is-edge {
+    top: 10px;
+    background: #5a5a5a;
+}
+
+.octane-special-items-plate.is-face {
+    top: 9px;
+    background: #262626;
+}
+
+.octane-special-items-item-scroll {
+    position: absolute;
+    top: 7px;
+    left: 10px;
+    width: 374px;
+    height: 97px;
+    overflow-y: auto;
+    color: #ffffff;
+}
+
+.octane-special-items-item-title {
+    width: 300px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.octane-special-items-item-desc {
+    width: 300px;
+    white-space: pre-line;
+}
+
+.octane-special-items-item-icon {
+    position: absolute;
+    top: 9px;
+    left: 330px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}

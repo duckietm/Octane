@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--
+    The ad page for "ads.frame.url". Serve it from another origin than the client (for example
+    https://ads.example.net/ads-frame.html), so the ad script runs there and can read nothing of the client's session.
+    The client opens it in a sandboxed frame and passes the ad unit in the query: client, slot, format, responsive.
+    That origin also needs its own ads.txt.
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="referrer" content="strict-origin" />
+    <title>Sponsored</title>
+    <style>
+        html, body { margin: 0; width: 100%; height: 100%; background: #fff; overflow: hidden; }
+        ins { display: block; width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+    <script>
+        (function () {
+            var params = new URLSearchParams(window.location.search);
+            var client = params.get('client') || '';
+            var slot = params.get('slot') || '';
+            var format = params.get('format') || 'auto';
+            var responsive = params.get('responsive') === 'false' ? 'false' : 'true';
+
+            // Only a well-formed ad unit reaches the ad tag.
+            if (!/^ca-pub-\d+$/.test(client) || !/^\d+$/.test(slot) || !/^[a-z,]+$/.test(format)) return;
+
+            var ins = document.createElement('ins');
+            ins.className = 'adsbygoogle';
+            ins.setAttribute('data-ad-client', client);
+            ins.setAttribute('data-ad-slot', slot);
+            ins.setAttribute('data-ad-format', format);
+            ins.setAttribute('data-full-width-responsive', responsive);
+            document.body.appendChild(ins);
+
+            var script = document.createElement('script');
+            script.async = true;
+            script.crossOrigin = 'anonymous';
+            script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(client);
+            script.onload = function () {
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+            };
+            document.head.appendChild(script);
+        })();
+    </script>
+</body>
+</html>

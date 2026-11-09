@@ -4,7 +4,7 @@ type SecureSession = {
     fingerprint: string;
 };
 
-export type NitroClientMode = {
+export type OctaneClientMode = {
     distObfuscationEnabled: boolean;
     secureAssetsEnabled: boolean;
     secureApiEnabled: boolean;
@@ -13,15 +13,16 @@ export type NitroClientMode = {
     plainGamedataBaseUrl?: string;
 };
 
-const CLIENT_MODE_DEFAULTS: NitroClientMode = {
-    distObfuscationEnabled: true,
-    secureAssetsEnabled: true,
-    secureApiEnabled: true
+// The same defaults as asset-loader.js: without a client-mode the client asks for nothing encrypted.
+const CLIENT_MODE_DEFAULTS: OctaneClientMode = {
+    distObfuscationEnabled: false,
+    secureAssetsEnabled: false,
+    secureApiEnabled: false
 };
 
 const getDeployBaseUrl = (): string => {
     try {
-        const loaderBase = (window as any).__nitroLoaderBase;
+        const loaderBase = (window as any).__octaneLoaderBase;
         if (typeof loaderBase === 'string' && loaderBase.length) return new URL('..', loaderBase).toString();
     } catch {}
 
@@ -53,23 +54,23 @@ const isDebugEnabled = (): boolean => {
 
 const setDebugState = (message: string): void => {
     try {
-        (window as any).__nitroSecureDebug = message;
-        const log = Array.isArray((window as any).__nitroSecureDebugLog) ? (window as any).__nitroSecureDebugLog : [];
+        (window as any).__octaneSecureDebug = message;
+        const log = Array.isArray((window as any).__octaneSecureDebugLog) ? (window as any).__octaneSecureDebugLog : [];
 
         log.push(message);
-        (window as any).__nitroSecureDebugLog = log.slice(-50);
+        (window as any).__octaneSecureDebugLog = log.slice(-50);
 
         if (!isDebugEnabled()) return;
 
-        const existing = document.getElementById('nitro-secure-debug');
+        const existing = document.getElementById('octane-secure-debug');
 
         if (existing) {
-            existing.textContent = (window as any).__nitroSecureDebugLog.slice(-8).join('\n');
+            existing.textContent = (window as any).__octaneSecureDebugLog.slice(-8).join('\n');
             return;
         }
 
         const node = document.createElement('div');
-        node.id = 'nitro-secure-debug';
+        node.id = 'octane-secure-debug';
         node.style.position = 'fixed';
         node.style.left = '8px';
         node.style.bottom = '8px';
@@ -81,7 +82,7 @@ const setDebugState = (message: string): void => {
         node.style.font = '12px monospace';
         node.style.whiteSpace = 'pre-wrap';
         node.style.pointerEvents = 'none';
-        node.textContent = (window as any).__nitroSecureDebugLog.slice(-8).join('\n');
+        node.textContent = (window as any).__octaneSecureDebugLog.slice(-8).join('\n');
         document.body.appendChild(node);
     } catch {}
 };
@@ -94,16 +95,25 @@ let installed = false;
 const secureResponseCache = new Map<string, Promise<Response>>();
 const SECURE_RESPONSE_CACHE_LIMIT = 128;
 let secureSessionCreatedAt = 0;
-const SECURE_SESSION_TTL_MS = 5 * 60 * 1000;
+const DEFAULT_SECURE_SESSION_TTL_MS = 5 * 60 * 1000;
+const MIN_SECURE_SESSION_TTL_MS = 60 * 1000;
+const MAX_SECURE_SESSION_TTL_MS = 60 * 60 * 1000;
+// Renewed from the server's bootstrap answer (`ttl`, seconds); a server that sends none keeps the default.
+let secureSessionTtlMs = DEFAULT_SECURE_SESSION_TTL_MS;
+// After a failed bootstrap the client works in the clear until this time, then tries again.
+let secureUnavailableUntil = 0;
+// Set once a bootstrap succeeded: from then on the login endpoints never fall back to the clear.
+let secureSessionEstablished = false;
+const SECURE_RETRY_MS = 5 * 60 * 1000;
 const REKEY_ENDPOINTS = new Set(['/api/auth/login', '/api/auth/remember', '/api/auth/logout']);
 
-let clientModeCache: NitroClientMode | null = null;
+let clientModeCache: OctaneClientMode | null = null;
 
-export const getClientMode = (): NitroClientMode => {
+export const getClientMode = (): OctaneClientMode => {
     if (clientModeCache) return clientModeCache;
 
     try {
-        const configured = (window as any).__nitroClientMode;
+        const configured = (window as any).__octaneClientMode;
 
         if (configured && typeof configured === 'object') {
             clientModeCache = {
@@ -192,7 +202,7 @@ const getApiBase = (): string => {
     const mode = getClientMode();
     if (typeof mode.apiBaseUrl === 'string' && mode.apiBaseUrl.length) return mode.apiBaseUrl.replace(/\/$/, '');
 
-    const configured = (window as any).NitroSecureApiUrl;
+    const configured = (window as any).OctaneSecureApiUrl;
 
     if (typeof configured === 'string' && configured.length) return configured.replace(/\/$/, '');
 
@@ -207,7 +217,7 @@ const getPlainAssetBase = (kind: 'config' | 'gamedata'): string => {
 
     if (kind === 'config') return new URL('configuration/', getDeployBaseUrl()).toString();
 
-    return `${window.location.origin}/nitro/gamedata/`;
+    return `${window.location.origin}/octane/gamedata/`;
 };
 
 const mapSecureAssetRequestToPlainUrl = (requestUrl: string): string => {
@@ -267,11 +277,13 @@ const createSecureSession = async (): Promise<SecureSession> => {
 
     if (!serverKey) throw new Error('Secure bootstrap returned an invalid server key.');
 
-    setDebugState(`secure: bootstrap ok fp=${fingerprint}`);
+    secureSessionTtlMs = resolveSessionTtlMs(payload.ttl);
+    setDebugState(`secure: bootstrap ok fp=${fingerprint} ttl=${secureSessionTtlMs / 1000}s`);
 
     const derived = await deriveAesKey(pair.privateKey, serverKey);
 
     secureSessionCreatedAt = Date.now();
+    secureSessionEstablished = true;
 
     return { publicKey: clientPublicKey, key: derived.key, fingerprint: derived.fingerprint };
 };
@@ -282,8 +294,14 @@ const clearSecureSession = (clearCache = false): void => {
     if (clearCache) secureResponseCache.clear();
 };
 
+export const resolveSessionTtlMs = (ttlSeconds: unknown): number => {
+    if (typeof ttlSeconds !== 'number' || !Number.isFinite(ttlSeconds) || ttlSeconds <= 0) return DEFAULT_SECURE_SESSION_TTL_MS;
+
+    return Math.min(MAX_SECURE_SESSION_TTL_MS, Math.max(MIN_SECURE_SESSION_TTL_MS, Math.round(ttlSeconds * 1000)));
+};
+
 export const getSecureSession = (): Promise<SecureSession> => {
-    if (secureSessionPromise && secureSessionCreatedAt && Date.now() - secureSessionCreatedAt > SECURE_SESSION_TTL_MS) {
+    if (secureSessionPromise && secureSessionCreatedAt && Date.now() - secureSessionCreatedAt > secureSessionTtlMs) {
         setDebugState('secure: session expired, rotating');
         clearSecureSession();
     }
@@ -291,6 +309,26 @@ export const getSecureSession = (): Promise<SecureSession> => {
     if (!secureSessionPromise) secureSessionPromise = createSecureSession();
 
     return secureSessionPromise;
+};
+
+/**
+ * The secure session, or null when the server does not answer the bootstrap (secure mode off on the
+ * server, an old server, a network error). The caller then goes in the clear instead of failing every
+ * request, and the bootstrap is tried again after SECURE_RETRY_MS. A server that requires encryption
+ * still refuses those plain calls itself.
+ */
+const getSecureSessionOrPlain = async (): Promise<SecureSession | null> => {
+    if (Date.now() < secureUnavailableUntil) return null;
+
+    try {
+        return await getSecureSession();
+    } catch (error) {
+        clearSecureSession();
+        secureUnavailableUntil = Date.now() + SECURE_RETRY_MS;
+        setDebugState(`secure: bootstrap unavailable, plain until retry (${(error as Error)?.message || error})`);
+
+        return null;
+    }
 };
 
 const decryptResponse = async (session: SecureSession, response: Response): Promise<Response> => {
@@ -376,11 +414,22 @@ const encryptBytes = async (session: SecureSession, clear: ArrayBuffer): Promise
     return bytesToHex(out);
 };
 
+/** An /api/ call to the configured API server only: the session key and the envelope never go to another origin. */
 const isApiUrl = (requestUrl: string): boolean => {
     try {
-        return new URL(requestUrl, window.location.href).pathname.startsWith('/api/');
+        const url = new URL(requestUrl, window.location.href);
+
+        return url.origin === new URL(getApiBase(), window.location.href).origin && url.pathname.startsWith('/api/');
     } catch {
-        return requestUrl.startsWith('/api/');
+        return false;
+    }
+};
+
+const isAuthApiUrl = (requestUrl: string): boolean => {
+    try {
+        return new URL(requestUrl, window.location.href).pathname.startsWith('/api/auth/');
+    } catch {
+        return false;
     }
 };
 
@@ -444,7 +493,10 @@ export const installSecureFetch = (): void => {
             if (cacheKey && secureResponseCache.has(cacheKey)) return cloneCachedResponse(secureResponseCache.get(cacheKey));
 
             const responsePromise = (async () => {
-                const session = await getSecureSession();
+                const session = await getSecureSessionOrPlain();
+
+                if (!session) return nativeFetch(mapSecureAssetRequestToPlainUrl(requestUrl), init);
+
                 setDebugState(`secure: fetching ${requestUrl}`);
                 const headers = new Headers(init?.headers || (input instanceof Request ? input.headers : undefined));
 
@@ -478,7 +530,15 @@ export const installSecureFetch = (): void => {
 
         if (getClientMode().secureApiEnabled && isApiUrl(requestUrl)) {
             const method = (init?.method || (input instanceof Request ? input.method : 'GET')).toUpperCase();
-            const session = await getSecureSession();
+            const session = await getSecureSessionOrPlain();
+
+            if (!session) {
+                // The server spoke encrypted earlier in this page: credentials are not sent in the clear on a failure.
+                if (secureSessionEstablished && isAuthApiUrl(requestUrl)) throw new Error('Secure API unavailable: login request not sent in the clear.');
+
+                return nativeFetch(input, init);
+            }
+
             const headers = new Headers(init?.headers || (input instanceof Request ? input.headers : undefined));
             const clearBody = await readRequestBody(input, init, method);
             const secureBody = buildSecureApiEnvelope(requestUrl, method, clearBody);

@@ -19,12 +19,13 @@ import {
     NavigatorCategoryDataParser,
     NavigatorEventCategoryDataParser,
     NavigatorHomeRoomEvent,
+    NavigatorLiftedEvent,
     NavigatorMetadataEvent,
     NavigatorOpenRoomCreatorEvent,
     NavigatorSavedSearch,
     NavigatorSearchesEvent,
     NavigatorTopLevelContext,
-    NitroEventType,
+    OctaneEventType,
     RoomDataParser,
     RoomEnterErrorEvent,
     RoomEntryInfoMessageEvent,
@@ -35,23 +36,39 @@ import {
     UserFlatCatsEvent,
     UserInfoEvent,
     UserPermissionsEvent
-} from '@nitrots/nitro-renderer';
-import { useCallback, useState } from 'react';
+} from '@octane/renderer';
+import { useCallback, useRef, useState } from 'react';
 import {
     CreateRoomSession,
     GenericErrorCode,
     GetConfigurationValue,
     INavigatorData,
+    INavigatorLiftedRoom,
     LocalizeText,
     NotificationAlertType,
     SendMessageComposer,
+    toNavigatorLiftedRooms,
     TryVisitRoom,
-    VisitDesktop
+    VisitDesktop,
+    IsAnyRoomController
 } from '../../api';
-import { useMessageEvent, useNitroEvent } from '../events';
+import { useMessageEvent, useOctaneEvent } from '../events';
 import { useNotification } from '../notification';
+import { useRoomEnterOnce } from '../rooms/useRoomEnterOnce';
 import { useNavigatorFavouritesStore } from './navigatorFavouritesStore';
 import { useNavigatorUiStore } from './navigatorUiStore';
+
+/**
+ * Whether a {@link GetGuestRoomResultEvent} carrying roomEnter may become the current
+ * room's data.
+ *
+ * The server answers roomEnter for any request that is not exactly
+ * `(roomId, false, true)`, so an answer about a different room - the furni room link
+ * asking about the room it points at, say - used to point room info, settings, the word
+ * filter and favourites at a room the user is not in.
+ */
+export const adoptsEnteredRoom = (currentRoomId: number, answeredRoomId: number): boolean =>
+    !currentRoomId || currentRoomId === answeredRoomId;
 
 export const useNavigatorStore = () => {
     const [categories, setCategories] = useState<NavigatorCategoryDataParser[]>(null);
@@ -61,6 +78,7 @@ export const useNavigatorStore = () => {
     const [navigatorSearches, setNavigatorSearches] = useState<NavigatorSavedSearch[]>(null);
     const [categoryVisitorCounts, setCategoryVisitorCounts] = useState<Map<number, number>>(null);
     const [categoryMaxVisitorCounts, setCategoryMaxVisitorCounts] = useState<Map<number, number>>(null);
+    const [liftedRooms, setLiftedRooms] = useState<INavigatorLiftedRoom[]>([]);
     const [navigatorData, setNavigatorData] = useState<INavigatorData>({
         settingsReceived: false,
         homeRoomId: 0,
@@ -76,13 +94,16 @@ export const useNavigatorStore = () => {
         canRate: true
     });
 
+    // Whether the navigator settings of this connection have arrived; the first ones forward the user to a room.
+    const settingsReceivedRef = useRef(false);
+
     const { simpleAlert = null } = useNotification();
 
     useMessageEvent<FavouritesEvent>(
         FavouritesEvent,
         useCallback((event) => {
             const parser = event.getParser();
-            useNavigatorFavouritesStore.getState().setAll(parser.favoriteRoomIds || []);
+            useNavigatorFavouritesStore.getState().setAll(parser.favoriteRoomIds || [], parser.limit);
         }, [])
     );
 
@@ -127,7 +148,7 @@ export const useNavigatorStore = () => {
             setNavigatorData((prev) => ({
                 ...prev,
                 eventMod: parser.securityLevel >= SecurityLevel.MODERATOR,
-                roomPicker: parser.securityLevel >= SecurityLevel.COMMUNITY
+                roomPicker: parser.permissions.size ? parser.permissions.get('acc_staff_pick') === 1 : parser.securityLevel >= SecurityLevel.COMMUNITY
             }));
         }, [])
     );
@@ -155,17 +176,22 @@ export const useNavigatorStore = () => {
         }, [])
     );
 
+    const isFirstRoomEnter = useRoomEnterOnce();
+
     useMessageEvent<GetGuestRoomResultEvent>(
         GetGuestRoomResultEvent,
         useCallback((event) => {
             const parser = event.getParser();
             if (parser.roomEnter) {
                 setNavigatorData((prev) => {
+                    if (!adoptsEnteredRoom(prev.currentRoomId, parser.data.roomId)) return prev;
+
                     const next = { ...prev };
                     next.enteredGuestRoom = parser.data;
                     next.currentRoomIsStaffPick = parser.staffPick;
                     const isCreated = next.createdFlatId === parser.data.roomId;
-                    if (!isCreated && parser.data.displayRoomEntryAd) {
+                    // The data refreshes with every answer; the entry ad opens on the entry only, not on each refresh.
+                    if (!isCreated && parser.data.displayRoomEntryAd && isFirstRoomEnter(parser.data.roomId)) {
                         if (GetConfigurationValue<boolean>('roomenterad.habblet.enabled', false)) HabboWebTools.openRoomEnterAd();
                     }
                     next.createdFlatId = 0;
@@ -184,7 +210,7 @@ export const useNavigatorStore = () => {
                     parser.data.doorMode === RoomDataParser.NOOB_STATE &&
                     !GetSessionDataManager().isAmbassador &&
                     !GetSessionDataManager().isRealNoob &&
-                    !GetSessionDataManager().isModerator
+                    !IsAnyRoomController()
                 )
                     return;
                 CreateRoomSession(parser.data.roomId);
@@ -195,7 +221,7 @@ export const useNavigatorStore = () => {
                 enteredGuestRoom: parser.data,
                 currentRoomIsStaffPick: parser.staffPick
             }));
-        }, [])
+        }, [isFirstRoomEnter])
     );
 
     useMessageEvent<RoomScoreEvent>(
@@ -294,9 +320,10 @@ export const useNavigatorStore = () => {
         }, [])
     );
 
-    useNitroEvent(
-        NitroEventType.SOCKET_RECONNECTING,
+    useOctaneEvent(
+        OctaneEventType.SOCKET_RECONNECTING,
         useCallback(() => {
+            settingsReceivedRef.current = false;
             setNavigatorData((prev) => ({ ...prev, settingsReceived: false }));
         }, [])
     );
@@ -305,12 +332,11 @@ export const useNavigatorStore = () => {
         NavigatorHomeRoomEvent,
         useCallback((event) => {
             const parser = event.getParser();
-            let prevSettingsReceived = false;
-            setNavigatorData((prev) => {
-                prevSettingsReceived = prev.settingsReceived;
-                return { ...prev, homeRoomId: parser.homeRoomId, settingsReceived: true };
-            });
-            if (prevSettingsReceived) return;
+            // Read from a ref: a value copied out of an updater is stale when React runs the updater later.
+            const firstSettings = !settingsReceivedRef.current;
+            settingsReceivedRef.current = true;
+            setNavigatorData((prev) => ({ ...prev, homeRoomId: parser.homeRoomId, settingsReceived: true }));
+            if (!firstSettings) return;
             if (GetRoomSessionManager().viewerSession) return;
 
             let forwardType = -1;
@@ -397,6 +423,16 @@ export const useNavigatorStore = () => {
         }, [])
     );
 
+    // AIR HabboNewNavigator: NavigatorLifted replaces the LiftDataContainer's rooms and refreshes the view.
+    useMessageEvent<NavigatorLiftedEvent>(
+        NavigatorLiftedEvent,
+        useCallback((event) => {
+            const parser = event.getParser();
+            if (!parser) return;
+            setLiftedRooms(toNavigatorLiftedRooms(parser.rooms));
+        }, [])
+    );
+
     return {
         categories,
         eventCategories,
@@ -405,6 +441,7 @@ export const useNavigatorStore = () => {
         navigatorSearches,
         categoryVisitorCounts,
         categoryMaxVisitorCounts,
-        navigatorData
+        navigatorData,
+        liftedRooms
     };
 };

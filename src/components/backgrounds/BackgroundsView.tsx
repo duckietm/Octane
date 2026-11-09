@@ -1,8 +1,12 @@
 import { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
-import { GetOptionalConfigurationValue } from '../../api';
-import { Base, Flex, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView, Text } from '../../common';
+import { GetSessionDataManager } from '@octane/renderer';
+import { GetOptionalConfigurationValue, localizeWithFallback } from '../../api';
+import { Base, Flex, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView, Text } from '../../common';
 import { useRoom } from '../../hooks';
 import { configFileUrl } from '../../secure-assets';
+import { ProfilePreviewView } from './ProfilePreviewView';
+import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface ItemData {
     id: number;
@@ -24,6 +28,8 @@ interface BackgroundsViewProps {
 
 const TABS = ['backgrounds', 'stands', 'overlays', 'cards', 'borders'] as const;
 type TabType = (typeof TABS)[number];
+
+const PREVIEW_TABS: TabType[] = ['backgrounds', 'stands', 'overlays'];
 
 type RemoteData = Partial<Record<'backgrounds.data' | 'stands.data' | 'overlays.data' | 'cards.data' | 'borders.data', any[]>>;
 
@@ -155,9 +161,32 @@ export const BackgroundsView: FC<BackgroundsViewProps> = ({
         return tab.slice(0, -1);
     };
 
+    const figure = GetSessionDataManager()?.figure ?? '';
+
+    // Backgrounds, stands and overlays show the player's own avatar, with the other two
+    // layers as they are now, so a choice can be judged before it is picked.
+    const renderPreview = useCallback(
+        (item: ItemData) => {
+            const current = { backgrounds: selectedBackground, stands: selectedStand, overlays: selectedOverlay }[activeTab as 'backgrounds' | 'stands' | 'overlays'];
+
+            return (
+                <ProfilePreviewView
+                    key={item.id}
+                    figure={figure}
+                    backgroundId={activeTab === 'backgrounds' ? item.id : selectedBackground}
+                    standId={activeTab === 'stands' ? item.id : selectedStand}
+                    overlayId={activeTab === 'overlays' ? item.id : selectedOverlay}
+                    selected={item.id === current}
+                    onClick={() => handleSelection(item.id)}
+                />
+            );
+        },
+        [activeTab, figure, handleSelection, selectedBackground, selectedStand, selectedOverlay]
+    );
+
     const renderItem = useCallback(
         (item: ItemData, type: string) => (
-            <Flex pointer position="relative" key={item.id} onClick={() => handleSelection(item.id)}>
+            <Flex component={BaseButton} pointer position="relative" key={item.id} onClick={() => handleSelection(item.id)}>
                 <Base
                     className={`profile-${type} ${type}-${item.id}`}
                     style={
@@ -174,23 +203,25 @@ export const BackgroundsView: FC<BackgroundsViewProps> = ({
     );
 
     return (
-        <NitroCardView uniqueKey="backgrounds" className="absolute min-w-[535px] max-w-[535px] min-h-[389px] max-h-[389px]">
-            <NitroCardHeaderView headerText="Profile Background" onCloseClick={() => setIsVisible(false)} />
-            <NitroCardTabsView>
-                {TABS.map((tab) => (
-                    <NitroCardTabsItemView key={tab} isActive={activeTab === tab} onClick={() => setActiveTab(tab)}>
-                        {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                    </NitroCardTabsItemView>
-                ))}
-            </NitroCardTabsView>
-            <NitroCardContentView gap={1}>
-                <Text bold center>
-                    Select an Option
-                </Text>
-                <Grid gap={1} columnCount={7} overflow="auto">
-                    {allData[activeTab].map((item) => renderItem(item, itemTypeFor(activeTab)))}
-                </Grid>
-            </NitroCardContentView>
-        </NitroCardView>
+        <NativeTextTree>
+            <OctaneCardView uniqueKey="backgrounds" className="octane-backgrounds-window absolute min-w-[535px] max-w-[535px] min-h-[389px] max-h-[389px]">
+                <OctaneCardHeaderView headerText={localizeWithFallback('octane.backgrounds.profile_background', 'Profile Background')} onCloseClick={() => setIsVisible(false)} />
+                <OctaneCardTabsView>
+                    {TABS.map((tab) => (
+                        <OctaneCardTabsItemView key={tab} isActive={activeTab === tab} onClick={() => setActiveTab(tab)}>
+                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        </OctaneCardTabsItemView>
+                    ))}
+                </OctaneCardTabsView>
+                <OctaneCardContentView gap={1}>
+                    <Text bold center className="octane-backgrounds-window__prompt">
+                        {localizeWithFallback('octane.backgrounds.select_an_option', 'Select an Option')}
+                    </Text>
+                    <Grid gap={1} columnCount={7} overflow="auto">
+                        {allData[activeTab].map((item) => (PREVIEW_TABS.includes(activeTab) ? renderPreview(item) : renderItem(item, itemTypeFor(activeTab))))}
+                    </Grid>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

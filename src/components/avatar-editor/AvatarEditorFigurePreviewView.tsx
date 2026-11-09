@@ -1,36 +1,41 @@
-import { AvatarDirectionAngle } from '@nitrots/nitro-renderer';
+import { AvatarDirectionAngle } from '@octane/renderer';
 import { FC, useState } from 'react';
+import rotateSrc from '../../assets/images/avatareditor/air/rotate.png';
 import { LayoutAvatarImageView } from '../../common';
+import { AvatarEffectPreviewView } from '../avatar-effects/AvatarEffectPreviewView';
 import { useAvatarEditor } from '../../hooks';
-import { AvatarEditorIcon } from './AvatarEditorIcon';
+import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../api';
 
 const DEFAULT_DIRECTION: number = 4;
+const AVATAR_DIRECTIONS: number = 8;
 
-export const AvatarEditorFigurePreviewView: FC<{}> = (props) => {
+export const AvatarEditorFigurePreviewView: FC<{ effectType?: number }> = (props) => {
+    const { effectType = 0 } = props;
     const [direction, setDirection] = useState<number>(DEFAULT_DIRECTION);
     const { getFigureString = null, gender = 'M' } = useAvatarEditor();
 
-    const rotateFigure = (newDirection: number) => {
-        if (direction < AvatarDirectionAngle.MIN_DIRECTION) {
-            newDirection = AvatarDirectionAngle.MAX_DIRECTION + (direction + 1);
-        }
-
-        if (direction > AvatarDirectionAngle.MAX_DIRECTION) {
-            newDirection = direction - (AvatarDirectionAngle.MAX_DIRECTION + 1);
-        }
-
-        setDirection(newDirection);
+    const rotateFigure = () => {
+        setDirection(curr => (curr + 1) % AVATAR_DIRECTIONS);
     };
 
     return (
-        <div className="flex flex-col figure-preview-container overflow-hidden relative">
-            <LayoutAvatarImageView direction={direction} figure={getFigureString} gender={gender} scale={2} />
-            <AvatarEditorIcon className="avatar-spotlight" icon="spotlight" />
-            <div className="avatar-shadow" />
-            <div className="arrow-container">
-                <AvatarEditorIcon icon="arrow-left" onClick={(event) => rotateFigure(direction + 1)} />
-                <AvatarEditorIcon icon="arrow-right" onClick={(event) => rotateFigure(direction - 1)} />
+        <NativeTextTree>
+            <div className="octane-avatar-editor-preview-shell">
+                <div className="figure-preview-container">
+                    {effectType > 0 ? (
+                        <div className="octane-avatar-editor-effect-preview">
+                            <AvatarEffectPreviewView direction={direction} effect={effectType} figure={getFigureString} gender={gender} height={210} />
+                        </div>
+                    ) : (
+                        <LayoutAvatarImageView direction={direction} figure={getFigureString} gender={gender} />
+                    )}
+                </div>
+                <BaseButton type="button" className="octane-avatar-editor-rotate" aria-label={localizeWithFallback('octane.avatar_editor.rotate_avatar', 'Rotate avatar')} onClick={rotateFigure}>
+                    <img src={rotateSrc} alt="" draggable={false} />
+                </BaseButton>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

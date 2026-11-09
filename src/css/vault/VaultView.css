@@ -1,15 +1,108 @@
-.nitro-vault-content {
+.octane-vault-content {
     min-height: 0;
     overflow-y: auto;
 }
 
 @media (max-width: 460px) {
-    .nitro-vault-content > div {
+    .octane-vault-content > div {
         align-items: stretch;
         flex-wrap: wrap;
     }
 
-    .nitro-vault-content > div > button {
+    .octane-vault-content > div > button {
         margin-left: auto;
+    }
+}
+
+/*
+ * Text and buttons as AIR draws vault_view (the earnings window): a style 3 Ubuntu frame in regular Ubuntu (our
+ * `Ubuntu` face is the condensed cut). The labels are u_bold 12 black, the amounts u_bold with font_size 14.
+ * Each claim button is a plain style 3 `button` (the grey habbo_skin_button_shiny, 12 px regular black, 60 x 28)
+ * and claim_all_btn a style 3 `button_thick` (grey habbo_skin_button_shiny_thick, 12 px bold black, 73 x 30).
+ * AIR has no green here.
+ */
+.octane-vault .octane-card-content-shell {
+    color: #000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-vault .octane-vault__label {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.octane-vault .octane-vault__value {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.octane-vault .octane-vault__claim,
+.octane-vault .octane-vault__claim-all {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 5px solid transparent;
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    background: transparent;
+    color: #000;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 15px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-vault .octane-vault__claim {
+    min-width: 60px;
+    height: 28px;
+    padding: 0 3px;
+    border-image-source: var(--habbo-skin-shiny);
+    font-weight: 400;
+}
+
+.octane-vault .octane-vault__claim:hover {
+    border-image-source: var(--habbo-skin-shiny-hover);
+}
+
+.octane-vault .octane-vault__claim:active {
+    border-image-source: var(--habbo-skin-shiny-pressed);
+}
+
+.octane-vault .octane-vault__claim-all {
+    min-width: 73px;
+    height: 30px;
+    padding: 0 6px;
+    border-image-source: var(--habbo-skin-shiny-thick);
+    font-weight: 700;
+}
+
+.octane-vault .octane-vault__claim-all:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-hover);
+}
+
+.octane-vault .octane-vault__claim-all:active {
+    border-image-source: var(--habbo-skin-shiny-thick-pressed);
+}
+
+.octane-vault .octane-vault__claim:disabled {
+    border-image-source: var(--habbo-skin-shiny-disabled);
+}
+
+.octane-vault .octane-vault__claim-all:disabled {
+    border-image-source: var(--habbo-skin-shiny-thick-disabled);
+}
+
+.octane-vault .octane-vault__claim:disabled,
+.octane-vault .octane-vault__claim-all:disabled {
+    color: #777;
+    cursor: default;
+}
+
+@layer base {
+    .octane-vault .octane-card-content-shell :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
     }
 }

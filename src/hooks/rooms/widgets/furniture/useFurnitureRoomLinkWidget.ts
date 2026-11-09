@@ -1,14 +1,14 @@
-import { GetGuestRoomMessageComposer, GetGuestRoomResultEvent, GetRoomEngine, RoomEngineTriggerWidgetEvent, RoomObjectVariable } from '@nitrots/nitro-renderer';
+import { GetGuestRoomResultEvent, GetRoomEngine, RoomEngineTriggerWidgetEvent, RoomObjectVariable } from '@octane/renderer';
 import { useState } from 'react';
-import { SendMessageComposer } from '../../../../api';
-import { useMessageEvent, useNitroEvent } from '../../../events';
+import { TryVisitRoom } from '../../../../api';
+import { useMessageEvent, useOctaneEvent } from '../../../events';
 
 const INTERNALLINK = 'internalLink';
 
 const useFurnitureRoomLinkWidgetState = () => {
     const [roomIdToEnter, setRoomIdToEnter] = useState(0);
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_ROOM_LINK, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_ROOM_LINK, (event) => {
         const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
 
         if (!roomObject) return;
@@ -27,7 +27,13 @@ const useFurnitureRoomLinkWidgetState = () => {
 
         setRoomIdToEnter(roomId);
 
-        SendMessageComposer(new GetGuestRoomMessageComposer(roomId, false, false));
+        // TryVisitRoom, i.e. (roomId, false, true), as AIR does. The server reads
+        // enterRoom as `a != 0 || b != 1`, so (false, false) asked it to *enter* without
+        // the client ever entering: the navigator took the answer as "we are now in that
+        // room" and pointed room info, settings, the word filter and favourites at the
+        // linked room, while the user stayed where they were and the double click did
+        // nothing.
+        TryVisitRoom(roomId);
     });
 
     useMessageEvent<GetGuestRoomResultEvent>(GetGuestRoomResultEvent, (event) => {

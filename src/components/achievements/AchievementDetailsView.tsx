@@ -1,8 +1,10 @@
-import { AchievementData } from '@nitrots/nitro-renderer';
+import { AchievementData } from '@octane/renderer';
 import { FC } from 'react';
 import { AchievementUtilities, LocalizeBadgeDescription, LocalizeBadgeName, LocalizeText } from '../../api';
-import { Column, Flex, LayoutCurrencyIcon, LayoutProgressBar, Text } from '../../common';
+import { LayoutCurrencyIcon } from '../../common';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { AchievementBadgeView } from './AchievementBadgeView';
+import { AirAchievementProgressBar } from './AirAchievementProgressBar';
 
 interface AchievementDetailsViewProps {
     achievement: AchievementData;
@@ -13,55 +15,44 @@ export const AchievementDetailsView: FC<AchievementDetailsViewProps> = (props) =
 
     if (!achievement) return null;
 
+    const badgeCode = AchievementUtilities.getAchievementBadgeCode(achievement);
+    // Polaris also supports credit rewards with currency type -1.
+    const showReward = !achievement.finalLevel && achievement.levelRewardPointType >= -1 && achievement.levelRewardPoints > 0;
+    const showProgress = achievement.displayMethod !== AchievementData.DISPLAY_METHOD_NEVER_SHOW_PROGRESS && !achievement.finalLevel;
+
     return (
-        <Flex shrink className="bg-muted rounded p-2 text-black" gap={2} overflow="hidden">
-            <Column center gap={1}>
-                <AchievementBadgeView achievement={achievement} className="nitro-achievements-relative w-[40px] h-[40px] bg-no-repeat bg-center" scale={2} />
-                <Text fontWeight="bold">
+        <NativeTextTree>
+            <div className="air-achievement-details">
+                <div className="air-achievement-details-badge">
+                    <AchievementBadgeView achievement={achievement} className="air-achievement-details-badge-image" />
+                </div>
+                <div className="air-achievement-details-name">{LocalizeBadgeName(badgeCode)}</div>
+                <div className="air-achievement-details-description">{LocalizeBadgeDescription(badgeCode)}</div>
+                {showReward && (
+                    <div className="air-achievement-details-reward">
+                        <span>{LocalizeText('achievements.details.reward')}</span>
+                        <strong>{achievement.levelRewardPoints}</strong>
+                        <LayoutCurrencyIcon className="air-achievement-details-currency" type={achievement.levelRewardPointType} />
+                    </div>
+                )}
+                <div className="air-achievement-details-level">
                     {LocalizeText(
                         'achievements.details.level',
                         ['level', 'limit'],
                         [AchievementUtilities.getAchievementLevel(achievement).toString(), achievement.levelCount.toString()]
                     )}
-                </Text>
-            </Column>
-            <Column fullWidth justifyContent="center" overflow="hidden">
-                <div className="flex flex-col gap-1">
-                    <Text truncate fontWeight="bold">
-                        {LocalizeBadgeName(AchievementUtilities.getAchievementBadgeCode(achievement))}
-                    </Text>
-                    <Text textBreak>{LocalizeBadgeDescription(AchievementUtilities.getAchievementBadgeCode(achievement))}</Text>
                 </div>
-                {(achievement.levelRewardPoints > 0 || achievement.scoreLimit > 0) && (
-                    <div className="flex flex-col gap-1">
-                        {achievement.levelRewardPoints > 0 && (
-                            <div className="flex items-center gap-1">
-                                <Text truncate className="small">
-                                    {LocalizeText('achievements.details.reward')}
-                                </Text>
-                                <Flex center className="font-bold	 small" gap={1}>
-                                    {achievement.levelRewardPoints}
-                                    <LayoutCurrencyIcon type={achievement.levelRewardPointType} />
-                                </Flex>
-                            </div>
-                        )}
-                        {achievement.scoreLimit > 0 && (
-                            <LayoutProgressBar
-                                maxProgress={achievement.scoreLimit + achievement.scoreAtStartOfLevel}
-                                progress={achievement.currentPoints + achievement.scoreAtStartOfLevel}
-                                text={LocalizeText(
-                                    'achievements.details.progress',
-                                    ['progress', 'limit'],
-                                    [
-                                        (achievement.currentPoints + achievement.scoreAtStartOfLevel).toString(),
-                                        (achievement.scoreLimit + achievement.scoreAtStartOfLevel).toString()
-                                    ]
-                                )}
-                            />
-                        )}
-                    </div>
+                {showProgress && (
+                    <AirAchievementProgressBar
+                        className="air-achievement-details-progress"
+                        width={180}
+                        progress={achievement.currentPoints}
+                        maxProgress={achievement.scoreLimit}
+                        key={`${achievement.achievementId}:${achievement.level}:${achievement.scoreLimit}`}
+                        scoreAtStartOfLevel={achievement.scoreAtStartOfLevel}
+                    />
                 )}
-            </Column>
-        </Flex>
+            </div>
+        </NativeTextTree>
     );
 };

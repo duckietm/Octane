@@ -1,0 +1,228 @@
+:root {
+    --habbo-skin-button: url("../../assets/images/habbo-skin/slices/button-default.png");
+    --habbo-skin-checkbox: url("../../assets/images/habbo-skin/slices/checkbox-default.png");
+    --habbo-skin-checkbox-checked: url("../../assets/images/habbo-skin/slices/checkbox-checked.png");
+    --habbo-skin-radio: url("../../assets/images/habbo-skin/slices/radio-default.png");
+    --habbo-skin-radio-checked: url("../../assets/images/habbo-skin/slices/radio-checked.png");
+    --habbo-skin-button-hover: url("../../assets/images/habbo-skin/slices/button-hover.png");
+    --habbo-skin-button-pressed: url("../../assets/images/habbo-skin/slices/button-pressed.png");
+    --habbo-skin-button-disabled: url("../../assets/images/habbo-skin/slices/button-disabled.png");
+    --habbo-skin-shiny: url("../../assets/images/habbo-skin/slices/button-shiny-default.png");
+    --habbo-skin-shiny-hover: url("../../assets/images/habbo-skin/slices/button-shiny-hover.png");
+    --habbo-skin-shiny-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-pressed.png");
+    --habbo-skin-shiny-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-disabled.png");
+    --habbo-skin-shiny-green: url("../../assets/images/habbo-skin/slices/button-shiny-green-default.png");
+    --habbo-skin-shiny-green-hover: url("../../assets/images/habbo-skin/slices/button-shiny-green-hover.png");
+    --habbo-skin-shiny-green-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-green-pressed.png");
+    --habbo-skin-shiny-green-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-green-disabled.png");
+    --habbo-skin-shiny-thick: url("../../assets/images/habbo-skin/slices/button-shiny-thick-default.png");
+    --habbo-skin-shiny-thick-hover: url("../../assets/images/habbo-skin/slices/button-shiny-thick-hover.png");
+    --habbo-skin-shiny-thick-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-thick-pressed.png");
+    --habbo-skin-shiny-thick-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-thick-disabled.png");
+    --habbo-skin-shiny-large: url("../../assets/images/habbo-skin/slices/button-shiny-large-default.png");
+    --habbo-skin-shiny-large-hover: url("../../assets/images/habbo-skin/slices/button-shiny-large-hover.png");
+    --habbo-skin-shiny-large-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-large-pressed.png");
+    --habbo-skin-shiny-large-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-large-disabled.png");
+    --habbo-skin-shiny-thick-green: url("../../assets/images/habbo-skin/slices/button-shiny-thick-green-default.png");
+    --habbo-skin-shiny-thick-green-hover: url("../../assets/images/habbo-skin/slices/button-shiny-thick-green-hover.png");
+    --habbo-skin-shiny-thick-green-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-thick-green-pressed.png");
+    --habbo-skin-shiny-thick-green-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-thick-green-disabled.png");
+    --habbo-skin-shiny-red: url("../../assets/images/habbo-skin/slices/button-shiny-red-default.png");
+    --habbo-skin-shiny-red-hover: url("../../assets/images/habbo-skin/slices/button-shiny-red-hover.png");
+    --habbo-skin-shiny-red-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-red-pressed.png");
+    --habbo-skin-shiny-red-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-red-disabled.png");
+    /* AIR button style 5 / 6 draws the grey shiny skin multiplied per channel by the element colour
+       (channel x tint / 255). One set per tint the AIR layouts use; generated from the grey slices. */
+    --habbo-skin-shiny-thick-tint-3399cc: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-3399cc-default.png");
+    --habbo-skin-shiny-thick-tint-3399cc-hover: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-3399cc-hover.png");
+    --habbo-skin-shiny-thick-tint-3399cc-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-3399cc-pressed.png");
+    --habbo-skin-shiny-thick-tint-3399cc-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-3399cc-disabled.png");
+    --habbo-skin-shiny-thick-tint-54c32e: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-54c32e-default.png");
+    --habbo-skin-shiny-thick-tint-54c32e-hover: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-54c32e-hover.png");
+    --habbo-skin-shiny-thick-tint-54c32e-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-54c32e-pressed.png");
+    --habbo-skin-shiny-thick-tint-54c32e-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-54c32e-disabled.png");
+    --habbo-skin-shiny-thick-tint-dda100: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-dda100-default.png");
+    --habbo-skin-shiny-thick-tint-dda100-hover: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-dda100-hover.png");
+    --habbo-skin-shiny-thick-tint-dda100-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-dda100-pressed.png");
+    --habbo-skin-shiny-thick-tint-dda100-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-dda100-disabled.png");
+    --habbo-skin-shiny-thick-tint-0a9bc5: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-0a9bc5-default.png");
+    --habbo-skin-shiny-thick-tint-0a9bc5-hover: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-0a9bc5-hover.png");
+    --habbo-skin-shiny-thick-tint-0a9bc5-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-0a9bc5-pressed.png");
+    --habbo-skin-shiny-thick-tint-0a9bc5-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-0a9bc5-disabled.png");
+    --habbo-skin-shiny-tint-b265ce: url("../../assets/images/habbo-skin/slices/button-shiny-tint-b265ce-default.png");
+    --habbo-skin-shiny-tint-b265ce-hover: url("../../assets/images/habbo-skin/slices/button-shiny-tint-b265ce-hover.png");
+    --habbo-skin-shiny-tint-b265ce-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-tint-b265ce-pressed.png");
+    --habbo-skin-shiny-tint-b265ce-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-tint-b265ce-disabled.png");
+    --habbo-skin-shiny-tint-aaaaaa: url("../../assets/images/habbo-skin/slices/button-shiny-tint-aaaaaa-default.png");
+    --habbo-skin-shiny-tint-aaaaaa-hover: url("../../assets/images/habbo-skin/slices/button-shiny-tint-aaaaaa-hover.png");
+    --habbo-skin-shiny-tint-aaaaaa-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-tint-aaaaaa-pressed.png");
+    --habbo-skin-shiny-tint-aaaaaa-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-tint-aaaaaa-disabled.png");
+    --habbo-skin-shiny-tint-2095d4: url("../../assets/images/habbo-skin/slices/button-shiny-tint-2095d4-default.png");
+    --habbo-skin-shiny-tint-2095d4-hover: url("../../assets/images/habbo-skin/slices/button-shiny-tint-2095d4-hover.png");
+    --habbo-skin-shiny-tint-2095d4-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-tint-2095d4-pressed.png");
+    --habbo-skin-shiny-tint-2095d4-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-tint-2095d4-disabled.png");
+    --habbo-skin-shiny-tint-01a101: url("../../assets/images/habbo-skin/slices/button-shiny-tint-01a101-default.png");
+    --habbo-skin-shiny-tint-01a101-hover: url("../../assets/images/habbo-skin/slices/button-shiny-tint-01a101-hover.png");
+    --habbo-skin-shiny-tint-01a101-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-tint-01a101-pressed.png");
+    --habbo-skin-shiny-tint-01a101-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-tint-01a101-disabled.png");
+    --habbo-skin-shiny-tint-e33934: url("../../assets/images/habbo-skin/slices/button-shiny-tint-e33934-default.png");
+    --habbo-skin-shiny-tint-e33934-hover: url("../../assets/images/habbo-skin/slices/button-shiny-tint-e33934-hover.png");
+    --habbo-skin-shiny-tint-e33934-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-tint-e33934-pressed.png");
+    --habbo-skin-shiny-tint-e33934-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-tint-e33934-disabled.png");
+    --habbo-skin-shiny-tint-7cc561: url("../../assets/images/habbo-skin/slices/button-shiny-tint-7cc561-default.png");
+    --habbo-skin-shiny-tint-7cc561-hover: url("../../assets/images/habbo-skin/slices/button-shiny-tint-7cc561-hover.png");
+    --habbo-skin-shiny-tint-7cc561-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-tint-7cc561-pressed.png");
+    --habbo-skin-shiny-tint-7cc561-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-tint-7cc561-disabled.png");
+    --habbo-skin-shiny-thick-tint-4faf4f: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-4faf4f-default.png");
+    --habbo-skin-shiny-thick-tint-4faf4f-hover: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-4faf4f-hover.png");
+    --habbo-skin-shiny-thick-tint-4faf4f-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-4faf4f-pressed.png");
+    --habbo-skin-shiny-thick-tint-4faf4f-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-4faf4f-disabled.png");
+    --habbo-skin-shiny-thick-tint-77bf43: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-77bf43-default.png");
+    --habbo-skin-shiny-thick-tint-77bf43-hover: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-77bf43-hover.png");
+    --habbo-skin-shiny-thick-tint-77bf43-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-77bf43-pressed.png");
+    --habbo-skin-shiny-thick-tint-77bf43-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-77bf43-disabled.png");
+    --habbo-skin-shiny-thick-tint-009900: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-009900-default.png");
+    --habbo-skin-shiny-thick-tint-009900-hover: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-009900-hover.png");
+    --habbo-skin-shiny-thick-tint-009900-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-009900-pressed.png");
+    --habbo-skin-shiny-thick-tint-009900-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-009900-disabled.png");
+    --habbo-skin-shiny-thick-tint-01a101: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-01a101-default.png");
+    --habbo-skin-shiny-thick-tint-01a101-hover: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-01a101-hover.png");
+    --habbo-skin-shiny-thick-tint-01a101-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-01a101-pressed.png");
+    --habbo-skin-shiny-thick-tint-01a101-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-01a101-disabled.png");
+    --habbo-skin-shiny-thick-tint-00cc00: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-00cc00-default.png");
+    --habbo-skin-shiny-thick-tint-00cc00-hover: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-00cc00-hover.png");
+    --habbo-skin-shiny-thick-tint-00cc00-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-00cc00-pressed.png");
+    --habbo-skin-shiny-thick-tint-00cc00-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-thick-tint-00cc00-disabled.png");
+    --habbo-skin-shiny-large-tint-aaaaaa: url("../../assets/images/habbo-skin/slices/button-shiny-large-tint-aaaaaa-default.png");
+    --habbo-skin-shiny-large-tint-aaaaaa-hover: url("../../assets/images/habbo-skin/slices/button-shiny-large-tint-aaaaaa-hover.png");
+    --habbo-skin-shiny-large-tint-aaaaaa-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-large-tint-aaaaaa-pressed.png");
+    --habbo-skin-shiny-large-tint-aaaaaa-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-large-tint-aaaaaa-disabled.png");
+    --habbo-skin-shiny-large-tint-00aa00: url("../../assets/images/habbo-skin/slices/button-shiny-large-tint-00aa00-default.png");
+    --habbo-skin-shiny-large-tint-00aa00-hover: url("../../assets/images/habbo-skin/slices/button-shiny-large-tint-00aa00-hover.png");
+    --habbo-skin-shiny-large-tint-00aa00-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-large-tint-00aa00-pressed.png");
+    --habbo-skin-shiny-large-tint-00aa00-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-large-tint-00aa00-disabled.png");
+    --habbo-skin-shiny-large-tint-aa0000: url("../../assets/images/habbo-skin/slices/button-shiny-large-tint-aa0000-default.png");
+    --habbo-skin-shiny-large-tint-aa0000-hover: url("../../assets/images/habbo-skin/slices/button-shiny-large-tint-aa0000-hover.png");
+    --habbo-skin-shiny-large-tint-aa0000-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-large-tint-aa0000-pressed.png");
+    --habbo-skin-shiny-large-tint-aa0000-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-large-tint-aa0000-disabled.png");
+    /* AIR button style 4: habbo_skin_button_shiny_black (dark shiny skin, white caption). */
+    --habbo-skin-shiny-black: url("../../assets/images/habbo-skin/slices/button-shiny-black-default.png");
+    --habbo-skin-shiny-black-hover: url("../../assets/images/habbo-skin/slices/button-shiny-black-hover.png");
+    --habbo-skin-shiny-black-pressed: url("../../assets/images/habbo-skin/slices/button-shiny-black-pressed.png");
+    --habbo-skin-shiny-black-disabled: url("../../assets/images/habbo-skin/slices/button-shiny-black-disabled.png");
+    --habbo-skin-button-help: url("../../assets/images/habbo-skin/slices/button-help-default.png");
+    --habbo-skin-button-help-hover: url("../../assets/images/habbo-skin/slices/button-help-hover.png");
+    --habbo-skin-button-help-pressed: url("../../assets/images/habbo-skin/slices/button-help-pressed.png");
+    --habbo-skin-button-logout: url("../../assets/images/habbo-skin/slices/button-logout-default.png");
+    --habbo-skin-button-logout-hover: url("../../assets/images/habbo-skin/slices/button-logout-hover.png");
+    --habbo-skin-button-logout-pressed: url("../../assets/images/habbo-skin/slices/button-logout-pressed.png");
+    --habbo-skin-button-settings: url("../../assets/images/habbo-skin/slices/button-settings-default.png");
+    --habbo-skin-button-settings-hover: url("../../assets/images/habbo-skin/slices/button-settings-hover.png");
+    --habbo-skin-button-settings-pressed: url("../../assets/images/habbo-skin/slices/button-settings-pressed.png");
+    --habbo-skin-border-white: url("../../assets/images/habbo-skin/slices/border-white.png");
+}
+
+.octane-catalog-window .octane-catalog-swf-button,
+.octane-catalog-window .octane-catalog-swf-gift-button {
+    border: 3px solid transparent !important;
+    border-image-source: var(--habbo-skin-button) !important;
+    border-image-slice: 3 fill !important;
+    border-image-width: 3px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    color: #111111 !important;
+    text-shadow: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+
+.octane-catalog-window .octane-catalog-swf-button:hover,
+.octane-catalog-window .octane-catalog-swf-gift-button:hover {
+    border-image-source: var(--habbo-skin-button-hover) !important;
+    filter: none !important;
+}
+
+.octane-catalog-window .octane-catalog-swf-button:active,
+.octane-catalog-window .octane-catalog-swf-gift-button:active {
+    border-image-source: var(--habbo-skin-button-pressed) !important;
+    filter: none !important;
+}
+
+.octane-catalog-window .octane-catalog-swf-button:disabled,
+.octane-catalog-window .octane-catalog-swf-button.pointer-events-none,
+.octane-catalog-window .octane-catalog-swf-gift-button:disabled,
+.octane-catalog-window .octane-catalog-swf-gift-button.pointer-events-none {
+    border-image-source: var(--habbo-skin-button-disabled) !important;
+    color: #777777 !important;
+    opacity: 1 !important;
+}
+
+.octane-catalog-window .octane-catalog-standard-gift-button {
+    border: 5px solid transparent !important;
+    border-image-source: var(--habbo-skin-shiny) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    color: #111111 !important;
+    text-shadow: none !important;
+}
+
+.octane-catalog-window .octane-catalog-standard-gift-button:hover {
+    border-image-source: var(--habbo-skin-shiny-hover) !important;
+}
+
+.octane-catalog-window .octane-catalog-standard-gift-button:active {
+    border-image-source: var(--habbo-skin-shiny-pressed) !important;
+}
+
+.octane-catalog-window .octane-catalog-standard-gift-button:disabled,
+.octane-catalog-window .octane-catalog-standard-gift-button.pointer-events-none {
+    border-image-source: var(--habbo-skin-shiny-disabled) !important;
+    color: #777777 !important;
+}
+
+.octane-catalog-window .octane-catalog-swf-buy-button,
+.octane-catalog-window .octane-catalog-swf-confirm-button,
+.octane-catalog-window .octane-catalog-standard-buy-button {
+    border-width: 5px !important;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-image-source: var(--habbo-skin-shiny-thick-green) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35) !important;
+}
+
+.octane-catalog-window .octane-catalog-swf-buy-button:hover,
+.octane-catalog-window .octane-catalog-swf-confirm-button:hover,
+.octane-catalog-window .octane-catalog-standard-buy-button:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-green-hover) !important;
+    filter: none !important;
+}
+
+.octane-catalog-window .octane-catalog-swf-buy-button:active,
+.octane-catalog-window .octane-catalog-swf-confirm-button:active,
+.octane-catalog-window .octane-catalog-standard-buy-button:active {
+    border-image-source: var(--habbo-skin-shiny-thick-green-pressed) !important;
+    filter: none !important;
+}
+
+.octane-catalog-window .octane-catalog-swf-buy-button:disabled,
+.octane-catalog-window .octane-catalog-swf-buy-button.pointer-events-none,
+.octane-catalog-window .octane-catalog-swf-confirm-button:disabled,
+.octane-catalog-window .octane-catalog-swf-confirm-button.pointer-events-none,
+.octane-catalog-window .octane-catalog-standard-buy-button:disabled,
+.octane-catalog-window .octane-catalog-standard-buy-button.pointer-events-none {
+    border-image-source: var(--habbo-skin-shiny-thick-green-disabled) !important;
+    color: #e8f8e8 !important;
+    opacity: 1 !important;
+}

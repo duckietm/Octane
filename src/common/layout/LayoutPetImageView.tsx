@@ -1,6 +1,9 @@
-import { GetRoomEngine, IPetCustomPart, PetFigureData, TextureUtils, Vector3d } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, IPetCustomPart, PetFigureData, Vector3d } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Base, BaseProps } from '../Base';
+import { PIXEL_ART_RENDERING } from './PixelArtRendering';
+
+const EMPTY_CUSTOM_PARTS: IPetCustomPart[] = [];
 
 interface LayoutPetImageViewProps extends BaseProps<HTMLDivElement> {
     figure?: string;
@@ -20,7 +23,7 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = (props) => {
         typeId = -1,
         paletteId = -1,
         petColor = 0xffffff,
-        customParts = [],
+        customParts = EMPTY_CUSTOM_PARTS,
         posture = 'std',
         headOnly = false,
         direction = 0,
@@ -32,6 +35,7 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = (props) => {
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const isDisposed = useRef(false);
+    const imageRequestGeneration = useRef(0);
 
     const getStyle = useMemo(() => {
         let newStyle: CSSProperties = {};
@@ -41,7 +45,7 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = (props) => {
         if (scale !== 1) {
             newStyle.transform = `scale(${scale})`;
 
-            if (!(scale % 1)) newStyle.imageRendering = 'pixelated';
+            if (!(scale % 1)) newStyle.imageRendering = PIXEL_ART_RENDERING;
         }
 
         newStyle.width = width;
@@ -53,7 +57,8 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = (props) => {
     }, [petUrl, scale, style, width, height]);
 
     useEffect(() => {
-        let url = null;
+        const generation = ++imageRequestGeneration.current;
+        const isCurrentRequest = () => !isDisposed.current && imageRequestGeneration.current === generation;
 
         let petTypeId = typeId;
         let petPaletteId = paletteId;
@@ -80,7 +85,10 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = (props) => {
             64,
             {
                 imageReady: async (result) => {
-                    if (isDisposed.current) return;
+                    if (!isCurrentRequest()) {
+                        result.dispose();
+                        return;
+                    }
 
                     const { image, data: texture } = result;
 
@@ -89,9 +97,15 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = (props) => {
                         setWidth(image.width);
                         setHeight(image.height);
                     } else if (texture) {
-                        setPetUrl(await TextureUtils.generateImageUrl(texture));
-                        setWidth(texture.width);
-                        setHeight(texture.height);
+                        // Read the size first: getImage() releases the render texture.
+                        const { width, height } = texture;
+                        const generated = await result.getImage();
+
+                        if (!isCurrentRequest()) return;
+
+                        setPetUrl(generated?.src ?? null);
+                        setWidth(width);
+                        setHeight(height);
                     }
                 },
                 imageFailed: () => {
@@ -108,13 +122,17 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = (props) => {
             (async () => {
                 const image = await imageResult.getImage();
 
-                if (image) {
+                if (image && isCurrentRequest()) {
                     setPetUrl(image.src);
                     setWidth(image.width);
                     setHeight(image.height);
                 }
             })();
         }
+
+        return () => {
+            if (imageRequestGeneration.current === generation) imageRequestGeneration.current++;
+        };
     }, [figure, typeId, paletteId, petColor, customParts, posture, headOnly, direction]);
 
     useEffect(() => {
@@ -124,8 +142,6 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = (props) => {
             isDisposed.current = true;
         };
     }, []);
-
-    const url = `url('${petUrl}')`;
 
     return <Base classNames={['pet-image']} style={getStyle} {...rest} />;
 };

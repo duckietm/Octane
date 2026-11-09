@@ -1,5 +1,28 @@
+/*
+ * The radio is Octane's own floating player (no AIR layout). Its text takes the AIR face and sizes: regular
+ * Ubuntu (HabboAirUbuntu; Octane's `Ubuntu` is the condensed cut), u_bold 12 px for the station names, 11 px
+ * (il_regular / il_bold) as the floor for the title, live tag and genres. The dark glass surface keeps its white
+ * text: black would not read on it. Icon sizes (react-icons, set on the svg) are left alone.
+ */
 .radio-widget {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
     font-feature-settings: "tnum";
+}
+
+@layer base {
+    .radio-widget :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    .radio-widget :where(.text-\[9px\], .text-\[10px\]):not(svg, svg *) {
+        font-size: 11px !important;
+    }
+
+    /* The selected station's name (text-sm, 14 px) is u_bold 12 px like the list rows. */
+    .radio-widget :where(.text-sm):not(svg, svg *) {
+        font-size: 12px !important;
+        line-height: 15px !important;
+    }
 }
 
 .radio-eq {
@@ -45,19 +68,10 @@
     }
 }
 
-.radio-scroll::-webkit-scrollbar {
-    width: 6px;
+.radio-vol .track-0 {
+    background-color: #38bdf8;
 }
 
-.radio-scroll::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.18);
-    border-radius: 3px;
-}
-
-.radio-scroll::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.radio-vol {
-    accent-color: #38bdf8;
+.radio-vol .thumb {
+    background-color: #38bdf8;
 }

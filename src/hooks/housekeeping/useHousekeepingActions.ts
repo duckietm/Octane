@@ -3,14 +3,17 @@ import {
     GetRoomSession,
     HousekeepingApi,
     HousekeepingErrorKey,
+    HousekeepingReloadTarget,
     IHousekeepingActionResult,
+    IHousekeepingRoomSettingsInput,
     LocalizeText,
     NotificationBubbleType,
     validateAmount,
     validateBanHours,
     validatePositiveId,
     validateRank,
-    validateReason
+    validateReason,
+    validateRoomSettings
 } from '../../api';
 import { useNotification } from '../notification';
 import { useHousekeepingStore } from './useHousekeepingStore';
@@ -213,11 +216,11 @@ export const useHousekeepingActions = () => {
     );
 
     const setUserRank = useCallback(
-        async (userId: number, rank: number) => {
+        async (userId: number, rank: number, durationSeconds = 0) => {
             if (!validationOr(validatePositiveId(userId, 'user'), markActionDone)) return null;
             if (!validationOr(validateRank(rank), markActionDone)) return null;
 
-            const result = await runAction(() => HousekeepingApi.setUserRank(userId, rank), 'setUserRank');
+            const result = await runAction(() => HousekeepingApi.setUserRank(userId, rank, durationSeconds), 'setUserRank');
 
             if (result && result.ok !== false && selectedUser && selectedUser.id === userId) {
                 setSelectedUser({ ...selectedUser, rank });
@@ -247,7 +250,7 @@ export const useHousekeepingActions = () => {
             const result = await runAction(() => HousekeepingApi.openRoom(roomId), 'openRoom');
 
             if (result && result.ok !== false && selectedRoom && selectedRoom.id === roomId) {
-                setSelectedRoom({ ...selectedRoom, isLocked: false });
+                setSelectedRoom({ ...selectedRoom, isLocked: false, settings: selectedRoom.settings ? { ...selectedRoom.settings, state: 0 } : null });
             }
 
             return result;
@@ -262,7 +265,34 @@ export const useHousekeepingActions = () => {
             const result = await runAction(() => HousekeepingApi.closeRoom(roomId), 'closeRoom');
 
             if (result && result.ok !== false && selectedRoom && selectedRoom.id === roomId) {
-                setSelectedRoom({ ...selectedRoom, isLocked: true });
+                setSelectedRoom({ ...selectedRoom, isLocked: true, settings: selectedRoom.settings ? { ...selectedRoom.settings, state: 1 } : null });
+            }
+
+            return result;
+        },
+        [runAction, markActionDone, selectedRoom, setSelectedRoom]
+    );
+
+    const saveRoomSettings = useCallback(
+        async (roomId: number, input: IHousekeepingRoomSettingsInput) => {
+            if (!validationOr(validatePositiveId(roomId, 'room'), markActionDone)) return null;
+            if (!validationOr(validateRoomSettings(input), markActionDone)) return null;
+
+            const result = await runAction(() => HousekeepingApi.saveRoomSettings(roomId, input), 'saveRoomSettings');
+
+            if (result && result.ok !== false && selectedRoom && selectedRoom.id === roomId) {
+                setSelectedRoom({
+                    ...selectedRoom,
+                    name: input.name,
+                    description: input.description,
+                    maxUsers: input.maxUsers,
+                    settings: {
+                        state: selectedRoom.settings?.state ?? (selectedRoom.isLocked ? 1 : 0),
+                        categoryId: input.categoryId,
+                        tradeMode: input.tradeMode,
+                        tags: input.tags
+                    }
+                });
             }
 
             return result;
@@ -367,13 +397,55 @@ export const useHousekeepingActions = () => {
     );
 
     const sendHotelAlert = useCallback(
-        async (message: string) => {
+        async (message: string, recipient?: string) => {
             if (!validationOr(validateReason(message), markActionDone)) return null;
 
-            return runAction(() => HousekeepingApi.sendHotelAlert(message), 'sendHotelAlert');
+            return runAction(() => HousekeepingApi.sendHotelAlert(message, recipient), 'sendHotelAlert');
         },
         [runAction, markActionDone]
     );
+
+    const startMaintenance = useCallback(
+        (minutes: number, message: string) => runAction(() => HousekeepingApi.maintenance('start', message, minutes), 'startMaintenance'),
+        [runAction]
+    );
+
+    const cancelMaintenance = useCallback(() => runAction(() => HousekeepingApi.maintenance('cancel'), 'cancelMaintenance'), [runAction]);
+
+    const disableMaintenance = useCallback(() => runAction(() => HousekeepingApi.maintenance('disable'), 'disableMaintenance'), [runAction]);
+
+    const addFilterWord = useCallback(
+        (word: string, replacement: string) => runAction(() => HousekeepingApi.wordFilter('add', word, replacement), 'addFilterWord'),
+        [runAction]
+    );
+
+    const setLockdown = useCallback((enabled: boolean) => runAction(() => HousekeepingApi.setLockdown(enabled), 'setLockdown'), [runAction]);
+
+    const setPermission = useCallback(
+        (permissionKey: string, rankId: number, value: number) =>
+            runAction(() => HousekeepingApi.setPermission(permissionKey, rankId, value), 'setPermission'),
+        [runAction]
+    );
+
+    const addUserNote = useCallback((userId: number, note: string) => runAction(() => HousekeepingApi.userNote('add', userId, 0, note), 'addUserNote'), [runAction]);
+
+    const deleteUserNote = useCallback(
+        (userId: number, noteId: number) => runAction(() => HousekeepingApi.userNote('delete', userId, noteId), 'deleteUserNote'),
+        [runAction]
+    );
+
+    const removeFilterWord = useCallback((word: string) => runAction(() => HousekeepingApi.wordFilter('remove', word), 'removeFilterWord'), [runAction]);
+
+    const revokeBan = useCallback(
+        async (banId: number) => {
+            if (!Number.isInteger(banId) || banId <= 0) return null;
+
+            return runAction(() => HousekeepingApi.revokeBan(banId), 'revokeBan');
+        },
+        [runAction]
+    );
+
+    const reloadHotel = useCallback((target: HousekeepingReloadTarget) => runAction(() => HousekeepingApi.reload(target), `reload.${target}`), [runAction]);
 
     // -- LIVE IN-ROOM ACTIONS ---------------------------------------
     // These bridge directly to the active RoomSession so the
@@ -528,6 +600,7 @@ export const useHousekeepingActions = () => {
         tradeLockUser,
         openRoom,
         closeRoom,
+        saveRoomSettings,
         muteRoom,
         kickAllFromRoom,
         transferRoomOwnership,
@@ -538,6 +611,17 @@ export const useHousekeepingActions = () => {
         grantItem,
         setHcSubscription,
         sendHotelAlert,
+        startMaintenance,
+        cancelMaintenance,
+        disableMaintenance,
+        addFilterWord,
+        removeFilterWord,
+        setPermission,
+        setLockdown,
+        addUserNote,
+        deleteUserNote,
+        reloadHotel,
+        revokeBan,
         kickFromCurrentRoom,
         banFromCurrentRoom,
         muteInCurrentRoom,

@@ -1,0 +1,125 @@
+/* @vitest-environment jsdom */
+import { readFileSync } from 'node:fs';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { GetRememberLogin, SetRememberLogin } from '../utils/RememberLogin';
+import { getAccessToken, setAccessToken } from './accessToken';
+import { adoptLoginTokenFromUrl, confirmSignInFromLink, isFramedByOwnSite, signInFromLinkQuestion } from './urlToken';
+
+const at = (search: string) => ({
+    location: { href: `https://hotel.example/client/${search}` } as Location,
+    history: { state: null, replaceState: vi.fn() } as unknown as History
+});
+
+describe('adoptLoginTokenFromUrl', () => {
+    beforeEach(() => window.localStorage.clear());
+
+    it('replaces what this browser remembered with the token the CMS just issued', () => {
+        SetRememberLogin({ token: 'remember-of-the-previous-user', expiresAt: 4102444800, username: 'previous' });
+        setAccessToken('access-of-the-previous-user', 4102444800);
+        const { location, history } = at('?token=remember-of-the-new-user&token_exp=4102444800');
+
+        expect(adoptLoginTokenFromUrl(location, history)).toBe(true);
+
+        expect(GetRememberLogin()).toEqual({ token: 'remember-of-the-new-user', expiresAt: 4102444800 });
+        expect(getAccessToken()).toBe('');
+    });
+
+    it('leaves the remembered login alone when the address carries no token', () => {
+        SetRememberLogin({ token: 'remembered', expiresAt: 4102444800 });
+        const { location, history } = at('?room=7');
+
+        expect(adoptLoginTokenFromUrl(location, history)).toBe(false);
+        expect(GetRememberLogin()?.token).toBe('remembered');
+    });
+
+    it('runs at boot, before the first fetch', () => {
+        const source = readFileSync('src/bootstrap.ts', 'utf8');
+        const adopt = source.indexOf('adoptLoginTokenFromUrl();');
+        const ssoRemoved = source.indexOf("url.searchParams.delete('sso');");
+        const firstFetch = source.indexOf('await loadClientMode();');
+
+        expect(adopt).toBeGreaterThan(0);
+        expect(ssoRemoved).toBeGreaterThan(0);
+        expect(adopt).toBeLessThan(firstFetch);
+        expect(ssoRemoved).toBeLessThan(firstFetch);
+    });
+
+    it('keeps the address out of the Referer', () => {
+        expect(readFileSync('index.html', 'utf8')).toContain('<meta name="referrer" content="strict-origin" />');
+    });
+
+    // The server does not tie a remember token to the browser it was issued to: a link built with someone else's
+    // token switched the account silently.
+    const jwtFor = (sub: number) => `e30.${btoa(JSON.stringify({ sub })).replace(/=+$/, '')}.sig`;
+
+    it('adopts a token for the remembered account without asking', () => {
+        SetRememberLogin({ token: jwtFor(7), expiresAt: 4102444800 });
+        const confirmSwitch = vi.fn(() => false);
+        const { location, history } = at(`?token=${jwtFor(7)}`);
+
+        expect(adoptLoginTokenFromUrl(location, history, confirmSwitch)).toBe(true);
+        expect(confirmSwitch).not.toHaveBeenCalled();
+    });
+
+    it('asks before a link signs in a browser that remembers no login, and keeps it out on no', () => {
+        const refuse = vi.fn(() => false);
+
+        expect(adoptLoginTokenFromUrl(at(`?token=${jwtFor(9)}`).location, at('').history, refuse)).toBe(false);
+        expect(refuse).toHaveBeenCalledWith(signInFromLinkQuestion(9));
+        expect(GetRememberLogin()).toBeNull();
+
+        expect(adoptLoginTokenFromUrl(at(`?token=${jwtFor(9)}`).location, at('').history, () => true)).toBe(true);
+        expect(GetRememberLogin()?.token).toBe(jwtFor(9));
+    });
+
+    it('asks the same before an SSO ticket from the address is used', () => {
+        const source = readFileSync('src/bootstrap.ts', 'utf8');
+
+        expect(source).toContain('if (ssoTicket && !confirmSignInFromLink(null)) ssoTicket = null;');
+        expect(source).toContain("'sso.ticket': ssoTicket,");
+        expect(confirmSignInFromLink(null, () => false)).toBe(false);
+        SetRememberLogin({ token: jwtFor(7), expiresAt: 4102444800 });
+        expect(confirmSignInFromLink(null, () => false)).toBe(true);
+    });
+
+    // AtomCMS shows the client in a frame on its own /hotel page with a ticket it just issued for the visitor's session:
+    // that must not ask, while a link opened in a tab or a frame on another site still does.
+    it('does not ask when the client is framed by a page of its own site', () => {
+        const ask = vi.fn(() => false);
+
+        expect(confirmSignInFromLink(null, ask, () => true)).toBe(true);
+        expect(ask).not.toHaveBeenCalled();
+        expect(confirmSignInFromLink(null, ask, () => false)).toBe(false);
+        expect(ask).toHaveBeenCalledTimes(1);
+    });
+
+    it('knows a frame of its own site from a tab of its own and from a frame on another site', () => {
+        const own = { location: { origin: 'https://hotel.example' } } as unknown as Window;
+        const framed = (parent: unknown) => ({ location: { origin: 'https://hotel.example' }, parent }) as unknown as Window;
+        const foreign = {
+            get location(): Location {
+                throw new DOMException('Blocked a frame', 'SecurityError');
+            }
+        };
+        const tab = { location: { origin: 'https://hotel.example' } } as unknown as Window & { parent: Window };
+        tab.parent = tab;
+
+        expect(isFramedByOwnSite(framed(own))).toBe(true);
+        expect(isFramedByOwnSite(framed({ location: { origin: 'https://evil.example' } }))).toBe(false);
+        expect(isFramedByOwnSite(framed(foreign))).toBe(false);
+        expect(isFramedByOwnSite(tab)).toBe(false);
+        expect(isFramedByOwnSite()).toBe(false);
+    });
+
+    it('asks before switching to another account, and keeps the remembered one on no', () => {
+        SetRememberLogin({ token: jwtFor(7), expiresAt: 4102444800 });
+        const refuse = vi.fn(() => false);
+
+        expect(adoptLoginTokenFromUrl(at(`?token=${jwtFor(8)}`).location, at('').history, refuse)).toBe(false);
+        expect(refuse).toHaveBeenCalledTimes(1);
+        expect(GetRememberLogin()?.token).toBe(jwtFor(7));
+
+        expect(adoptLoginTokenFromUrl(at(`?token=${jwtFor(8)}`).location, at('').history, () => true)).toBe(true);
+        expect(GetRememberLogin()?.token).toBe(jwtFor(8));
+    });
+});

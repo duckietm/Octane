@@ -1,12 +1,11 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { LocalizeText, WiredFurniType } from '../../../../api';
+import { fromOfficialVariableTarget, LocalizeText, toOfficialVariableTarget, WiredFurniType, localizeWithFallback } from '../../../../api';
 import contextVariableIcon from '../../../../assets/images/wired/var/icon_source_context_clean.png';
 import furniVariableIcon from '../../../../assets/images/wired/var/icon_source_furni.png';
 import globalVariableIcon from '../../../../assets/images/wired/var/icon_source_global.png';
 import userVariableIcon from '../../../../assets/images/wired/var/icon_source_user.png';
 import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { FURNI_SOURCES, sortWiredSourceOptions, USER_SOURCES, useAvailableUserSources, WiredSourceOption } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
@@ -16,7 +15,13 @@ import {
     IWiredVariablePickerEntry,
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
+import { normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableField, wiredValueTargetKey } from '../WiredValueOrVariableField';
+import { readWiredVariableToken, toWiredVariableId, wiredVariableIdList } from '../WiredVariableIds';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 
@@ -37,8 +42,6 @@ const COMPARISON_LOWER_THAN = 0;
 const COMPARISON_HIGHER_THAN = 2;
 const SOURCE_TRIGGER = 0;
 const SOURCE_SELECTED = 100;
-const QUANTIFIER_ALL = 0;
-const QUANTIFIER_ANY = 1;
 
 const TARGET_BUTTONS: Array<{ key: VariableTargetType; icon: string; disabled?: boolean }> = [
     { key: 'furni', icon: furniVariableIcon },
@@ -48,7 +51,7 @@ const TARGET_BUTTONS: Array<{ key: VariableTargetType; icon: string; disabled?: 
 ];
 
 const GLOBAL_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'wiredfurni.params.sources.global' }];
-const CONTEXT_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'Current execution' }];
+const CONTEXT_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, get label() { return localizeWithFallback('octane.wired.current_execution', 'Current execution'); } }];
 const COMPARE_VALUE_OPTIONS = [COMPARE_VALUE_CREATED, COMPARE_VALUE_UPDATED];
 const COMPARISON_OPTIONS = [COMPARISON_LOWER_THAN, COMPARISON_HIGHER_THAN];
 const DURATION_UNITS = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -117,7 +120,13 @@ const buildCustomVariableEntries = (target: VariableTargetType, definitions: IVa
 const getSourceTitle = () => LocalizeText('wiredfurni.params.sources.merged.title.variables');
 
 export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
-    const { trigger = null, furniIds = [], setFurniIds = null, setIntParams = null, setStringParam = null } = useWired();
+    // Official layout: [target, comparison, useUpdate, durationHigh, durationLow, unit, fromVariable, durationTarget],
+    // "variable\tdurationVariable" in the string, the furni and users in the official slots; the quantifier is the
+    // base view's.
+    const { trigger = null, furniIds = [], setFurniIds = null, setIntParams = null, setStringParam = null, setSourceTypes = null, setVariableIds = null } = useWired();
+    const [fromVariable, setFromVariable] = useState(false);
+    const [durationTarget, setDurationTarget] = useState(-10);
+    const [durationToken, setDurationToken] = useState('');
     const { userVariableDefinitions = [], furniVariableDefinitions = [], roomVariableDefinitions = [], contextVariableDefinitions = [] } = useWiredTools();
     const [targetType, setTargetType] = useState<VariableTargetType>('user');
     const [variableToken, setVariableToken] = useState('');
@@ -127,7 +136,7 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
     const [durationUnit, setDurationUnit] = useState(1);
     const [userSource, setUserSource] = useState(SOURCE_TRIGGER);
     const [furniSource, setFurniSource] = useState(SOURCE_TRIGGER);
-    const [quantifier, setQuantifier] = useState(QUANTIFIER_ALL);
+    const [durationValid, setDurationValid] = useState(true);
 
     const availableUserSources = useAvailableUserSources(trigger, USER_SOURCES);
     const orderedUserSources = useMemo(() => sortWiredSourceOptions(availableUserSources, 'users'), [availableUserSources]);
@@ -166,17 +175,21 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
         if (!trigger) return;
 
         const intData = trigger.intData || [];
-        const nextTargetType = normalizeTargetType(intData.length > 0 ? intData[0] : TARGET_USER);
+        const nextTargetType = normalizeTargetType(intData.length > 0 ? fromOfficialVariableTarget(intData[0]) : TARGET_USER);
+        const [variableText = '', durationText = ''] = (trigger.stringData || '').split('\t');
 
         setTargetType(nextTargetType);
-        setVariableToken(normalizeVariableTokenFromWire(trigger.stringData || ''));
-        setCompareValue(intData.length > 1 && intData[1] === COMPARE_VALUE_UPDATED ? COMPARE_VALUE_UPDATED : COMPARE_VALUE_CREATED);
-        setComparison(intData.length > 2 && intData[2] === COMPARISON_HIGHER_THAN ? COMPARISON_HIGHER_THAN : COMPARISON_LOWER_THAN);
-        setDurationInput(String(intData.length > 3 ? intData[3] : 0));
-        setDurationUnit(intData.length > 4 ? intData[4] : 1);
-        setUserSource(intData.length > 5 ? intData[5] : SOURCE_TRIGGER);
-        setFurniSource(intData.length > 6 ? intData[6] : (trigger.selectedItems?.length ?? 0) > 0 ? SOURCE_SELECTED : SOURCE_TRIGGER);
-        setQuantifier(intData.length > 7 && intData[7] === QUANTIFIER_ANY ? QUANTIFIER_ANY : QUANTIFIER_ALL);
+        // AIR: variable ids [variable, duration variable]; an older server wrote both into the string.
+        setVariableToken(readWiredVariableToken(trigger.variableIds, 0, normalizeVariableTokenFromWire(variableText)));
+        setComparison(intData.length > 1 && intData[1] === COMPARISON_HIGHER_THAN ? COMPARISON_HIGHER_THAN : COMPARISON_LOWER_THAN);
+        setCompareValue(intData.length > 2 && intData[2] === COMPARE_VALUE_UPDATED ? COMPARE_VALUE_UPDATED : COMPARE_VALUE_CREATED);
+        setDurationInput(String(intData.length > 4 ? intData[4] : 0));
+        setDurationUnit(intData.length > 5 ? intData[5] : 1);
+        setFromVariable(intData[6] === 1);
+        setDurationTarget(normalizeWiredValueTarget(intData.length > 7 ? intData[7] : -10));
+        setDurationToken(readWiredVariableToken(trigger.variableIds, 1, variableTokenFromId(durationText)));
+        setUserSource(trigger.userSourceTypes?.[0] ?? SOURCE_TRIGGER);
+        setFurniSource(trigger.furniSourceTypes?.[0] ?? ((trigger.selectedItems?.length ?? 0) > 0 ? SOURCE_SELECTED : SOURCE_TRIGGER));
     }, [trigger]);
 
     useEffect(() => {
@@ -196,17 +209,26 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
     const save = () => {
         const parsedDuration = parseInt(durationInput.trim(), 10);
 
-        setStringParam(variableToken);
+        const durationFromVariable = fromVariable && !!durationToken;
+
+        setStringParam('');
+        setVariableIds(
+            wiredVariableIdList(
+                toWiredVariableId(targetType, variableToken),
+                durationFromVariable ? toWiredVariableId(wiredValueTargetKey(durationTarget), durationToken) : ''
+            )
+        );
         setIntParams([
-            getTargetValue(targetType),
-            compareValue,
+            toOfficialVariableTarget(getTargetValue(targetType)),
             comparison,
+            compareValue,
+            0,
             Number.isFinite(parsedDuration) ? Math.max(0, parsedDuration) : 0,
             durationUnit,
-            userSource,
-            furniSource,
-            quantifier
+            durationFromVariable ? 1 : 0,
+            durationTarget
         ]);
+        setSourceTypes({ furni: [furniSource], users: [userSource] });
 
         if (requiresFurni <= WiredFurniType.STUFF_SELECTION_OPTION_NONE) setFurniIds([]);
     };
@@ -214,6 +236,8 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
     const validate = () => {
         if (!variableToken.length) return false;
         if (targetType === 'global' && compareValue !== COMPARE_VALUE_UPDATED) return false;
+        if (!durationValid) return false;
+        if (fromVariable && !durationToken) return false;
 
         return true;
     };
@@ -226,143 +250,126 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
     };
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={requiresFurni}
-            save={save}
-            validate={validate}
-            cardStyle={{ width: 244 }}
-            footerCollapsible={false}
-            footer={
-                <div className="flex flex-col gap-2">
-                    <div className="flex flex-col gap-1">
-                        <Text bold>{LocalizeText('wiredfurni.params.quantifier_selection')}</Text>
-                        {[QUANTIFIER_ALL, QUANTIFIER_ANY].map((value) => (
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={requiresFurni}
+                save={save}
+                validate={validate}
+                cardStyle={{ width: 244 }}
+                footerCollapsible={false}
+                footer={
+                    <div className="flex flex-col gap-2">
+                        <WiredFurniSelectionSourceRow
+                            title={getSourceTitle()}
+                            titleIsLiteral={true}
+                            options={sourceOptions}
+                            value={sourceValue}
+                            selectionKind="primary"
+                            selectionActive={requiresFurni > WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                            selectionCount={furniIds.length}
+                            selectionLimit={selectionLimit}
+                            selectionEnabledValues={[SOURCE_SELECTED]}
+                            showSelectionToggle={false}
+                            onChange={(value) => {
+                                if (targetType === 'furni') {
+                                    setFurniSource(value);
+                                    return;
+                                }
+
+                                if (targetType === 'user') {
+                                    setUserSource(value);
+                                }
+                            }}
+                        />
+                    </div>
+                }
+            >
+                <div className="octane-wired__give-var">
+                    <div className="octane-wired__give-var-heading">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
+                        <div className="octane-wired__give-var-targets">
+                            {TARGET_BUTTONS.map((button) => (
+                                <BaseButton
+                                    key={button.key}
+                                    type="button"
+                                    disabled={button.disabled}
+                                    className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
+                                    onClick={() => handleTargetChange(button.key)}
+                                >
+                                    <img src={button.icon} alt={button.key} />
+                                </BaseButton>
+                            ))}
+                        </div>
+                    </div>
+
+                    <WiredVariablePicker
+                        entries={resolvedVariableEntries}
+                        recentScope="variable-conditions"
+                        selectedToken={variableToken}
+                        onSelect={(entry) => setVariableToken(entry.token)}
+                    />
+
+                    <div className="octane-wired__divider" />
+
+                    <div className="octane-wired__give-var-section">
+                        <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.compare_value')}</div>
+                        {COMPARE_VALUE_OPTIONS.map((value) => (
                             <label key={value} className="flex items-center gap-1">
-                                <input
-                                    checked={quantifier === value}
-                                    className="form-check-input"
-                                    name="wiredConditionVariableAgeQuantifier"
-                                    type="radio"
-                                    onChange={() => setQuantifier(value)}
-                                />
-                                <Text>{LocalizeText(`wiredfurni.params.quantifier.variables.${value}`)}</Text>
+                                <Radio checked={compareValue === value} disabled={targetType === 'global' && value === COMPARE_VALUE_CREATED} name="wiredConditionVariableAgeCompareValue" onCheckedChange={ () => setCompareValue(value) } />
+                                <Text>{LocalizeText(`wiredfurni.params.variables.compare_value.${value}`)}</Text>
                             </label>
                         ))}
                     </div>
-                    <WiredFurniSelectionSourceRow
-                        title={getSourceTitle()}
-                        titleIsLiteral={true}
-                        options={sourceOptions}
-                        value={sourceValue}
-                        selectionKind="primary"
-                        selectionActive={requiresFurni > WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-                        selectionCount={furniIds.length}
-                        selectionLimit={selectionLimit}
-                        selectionEnabledValues={[SOURCE_SELECTED]}
-                        showSelectionToggle={false}
-                        onChange={(value) => {
-                            if (targetType === 'furni') {
-                                setFurniSource(value);
-                                return;
-                            }
 
-                            if (targetType === 'user') {
-                                setUserSource(value);
-                            }
-                        }}
-                    />
-                </div>
-            }
-        >
-            <div className="nitro-wired__give-var">
-                <div className="nitro-wired__give-var-heading">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <div className="nitro-wired__give-var-targets">
-                        {TARGET_BUTTONS.map((button) => (
-                            <button
-                                key={button.key}
-                                type="button"
-                                disabled={button.disabled}
-                                className={`nitro-wired__give-var-target nitro-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
-                                onClick={() => handleTargetChange(button.key)}
-                            >
-                                <img src={button.icon} alt={button.key} />
-                            </button>
+                    <div className="octane-wired__divider" />
+
+                    <div className="octane-wired__give-var-section">
+                        <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.comparison_selection')}</div>
+                        {COMPARISON_OPTIONS.map((value) => (
+                            <label key={value} className="flex items-center gap-1">
+                                <Radio checked={comparison === value} name="wiredConditionVariableAgeComparison" onCheckedChange={ () => setComparison(value) } />
+                                <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
+                            </label>
                         ))}
                     </div>
-                </div>
 
-                <WiredVariablePicker
-                    entries={resolvedVariableEntries}
-                    recentScope="variable-conditions"
-                    selectedToken={variableToken}
-                    onSelect={(entry) => setVariableToken(entry.token)}
-                />
+                    <div className="octane-wired__divider" />
 
-                <div className="nitro-wired__divider" />
-
-                <div className="nitro-wired__give-var-section">
-                    <div className="nitro-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.compare_value')}</div>
-                    {COMPARE_VALUE_OPTIONS.map((value) => (
-                        <label key={value} className="flex items-center gap-1">
-                            <input
-                                checked={compareValue === value}
-                                className="form-check-input"
-                                disabled={targetType === 'global' && value === COMPARE_VALUE_CREATED}
-                                name="wiredConditionVariableAgeCompareValue"
-                                type="radio"
-                                onChange={() => setCompareValue(value)}
+                    <div className="octane-wired__give-var-section">
+                        <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.time_selection')}</div>
+                        {/* AIR VariableAge: createValueOrVariableSection(1, mergedSourceOptions(1), null, int min, int max, false, 0) in
+                            one row with the unit dropdown (90 wide). The server reads the duration variable on the condition's own
+                            holder, so the popup offers the type selector only. */}
+                        <div className="octane-wired__value-row">
+                            <WiredValueOrVariableField
+                                isVariable={fromVariable}
+                                label={LocalizeText('wiredfurni.params.variables.time_selection')}
+                                literal={durationInput}
+                                target={durationTarget}
+                                token={durationToken}
+                                onIsVariableChange={setFromVariable}
+                                onLiteralChange={setDurationInput}
+                                onTargetChange={setDurationTarget}
+                                onTokenChange={setDurationToken}
+                                onValidityChange={setDurationValid}
                             />
-                            <Text>{LocalizeText(`wiredfurni.params.variables.compare_value.${value}`)}</Text>
-                        </label>
-                    ))}
-                </div>
-
-                <div className="nitro-wired__divider" />
-
-                <div className="nitro-wired__give-var-section">
-                    <div className="nitro-wired__give-var-section-title">{LocalizeText('wiredfurni.params.choose_type')}</div>
-                    {COMPARISON_OPTIONS.map((value) => (
-                        <label key={value} className="flex items-center gap-1">
-                            <input
-                                checked={comparison === value}
-                                className="form-check-input"
-                                name="wiredConditionVariableAgeComparison"
-                                type="radio"
-                                onChange={() => setComparison(value)}
-                            />
-                            <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
-                        </label>
-                    ))}
-                </div>
-
-                <div className="nitro-wired__divider" />
-
-                <div className="nitro-wired__give-var-section">
-                    <div className="nitro-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.time_selection')}</div>
-                    <div className="flex items-center gap-2">
-                        <Text>{LocalizeText('wiredfurni.params.variables.duration')}</Text>
-                        <NitroInput
-                            className="nitro-wired__give-var-number"
-                            type="number"
-                            value={durationInput}
-                            onChange={(event) => setDurationInput(event.target.value)}
-                        />
-                        <select
-                            className="min-w-0 flex-1 rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px]"
-                            value={durationUnit}
-                            onChange={(event) => setDurationUnit(Number(event.target.value))}
-                        >
-                            {DURATION_UNITS.map((unit) => (
-                                <option key={unit} value={unit}>
-                                    {LocalizeText(`wiredfurni.params.variables.duration.${unit}`)}
-                                </option>
-                            ))}
-                        </select>
+                            <Select
+                                aria-label={LocalizeText('wiredfurni.params.variables.duration')}
+                                className="octane-wired__value-row-select rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px]"
+                                value={durationUnit}
+                                onChange={(event) => setDurationUnit(Number(event.target.value))}
+                            >
+                                {DURATION_UNITS.map((unit) => (
+                                    <option key={unit} value={unit}>
+                                        {LocalizeText(`wiredfurni.params.variables.duration.${unit}`)}
+                                    </option>
+                                ))}
+                            </Select>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </WiredConditionBaseView>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

@@ -1,11 +1,11 @@
-import { IRareValue, RareValuesEvent, RequestRareValuesComposer } from '@nitrots/nitro-renderer';
+import { IRareValue, RareValuesEvent, RequestRareValuesComposer } from '@octane/renderer';
 import { useCallback, useEffect, useState } from 'react';
-import { useBetween } from 'use-between';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';
 
 // spriteId -> catalog value, fetched once from the server (RareValuesComposer).
-// Shared across all consumers via useBetween so the request fires a single time.
+// Shared across all consumers via Zustand so the request fires a single time.
 // Read by both the furni infostand and the toolbar "Valore Rari" panel.
 const useRareValuesState = () => {
     const [values, setValues] = useState<Map<number, IRareValue>>(() => new Map());
@@ -25,4 +25,6 @@ const useRareValuesState = () => {
     return { values, loaded, getValue };
 };
 
-export const useRareValues = () => useBetween(useRareValuesState);
+export const useRareValues = () => useSharedHook(useRareValuesState);
+
+registerSharedHook(useRareValuesState);

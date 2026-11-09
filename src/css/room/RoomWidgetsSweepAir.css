@@ -1,0 +1,526 @@
+/*
+ * AIR text and buttons for the room widgets of sweep A: doorbell, room queue, event (promote) edit, room word
+ * filter, user / furni chooser, pet and monster plant breeding, New Year resolution, label settings, Wired Link
+ * (and its connections), build height, image position editor and the rentable space.
+ *
+ * Our `Ubuntu` face is the condensed cut; AIR's Ubuntu is the regular one, which in Octane is HabboAirUbuntu.
+ * AIR text styles: u_regular / u_bold 12 px, u_italic 12, u_small 10, u_headline_small 14, il_regular 11,
+ * il_heading_2 12 bold, il_heading_3 10 bold, il_heading_title 18 bold 0x333333, il_button / il_border 10 bold.
+ *
+ * Buttons: the shared Button's secondary variant is the old 3 px `button` skin. In these Ubuntu (style 3) frames
+ * AIR draws a grey `button` (habbo_skin_button_shiny, 12 px regular black) or a grey `button_thick`
+ * (habbo_skin_button_shiny_thick, 12 px bold black); the views pass variant="secondary" where AIR is grey and the
+ * rules below give it the right skin. Green stays where the layout is style 5 (button_shiny_thick_green).
+ * The Button carries an important 12.6 px Tailwind size (utilities layer); an important rule in the earlier
+ * base layer outranks it, so the button rules live in @layer base.
+ */
+
+/* ---------- Regular Ubuntu for every window here. ---------- */
+.octane-widget-doorbell,
+.octane-room-queue-widget,
+.octane-room-promote-edit,
+.octane-room-filter-words,
+.octane-chooser,
+.octane-pet-breeding,
+.octane-monsterplant-breeding,
+.octane-resolution,
+.octane-wired-label-settings,
+.octane-wired-link,
+.octane-wired-link-connections,
+.octane-build-height-widget,
+.octane-image-position-editor {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+@layer base {
+    :is(
+            .octane-widget-doorbell,
+            .octane-room-queue-widget,
+            .octane-room-promote-edit,
+            .octane-room-filter-words,
+            .octane-chooser,
+            .octane-pet-breeding,
+            .octane-monsterplant-breeding,
+            .octane-resolution,
+            .octane-wired-label-settings,
+            .octane-wired-link,
+            .octane-wired-link-connections,
+            .octane-build-height-widget,
+            .octane-image-position-editor
+        )
+        .octane-card-content-shell
+        :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
+
+/* ---------- Style 3 frames: body text u_regular 12 px black. ---------- */
+:is(
+        .octane-room-queue-widget,
+        .octane-room-promote-edit,
+        .octane-room-filter-words,
+        .octane-monsterplant-breeding,
+        .octane-wired-label-settings,
+        .octane-wired-link,
+        .octane-wired-link-connections,
+        .octane-build-height-widget,
+        .octane-image-position-editor
+    )
+    .octane-card-content-shell {
+    color: #000;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+/* ---------- doorbell: info is Ubuntu 12 in 0xff0000; user_name Ubuntu 12 black. ---------- */
+.octane-widget-doorbell .octane-doorbell-info {
+    color: #ff0000;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* ---------- room_queue: info_text u_bold 12; spectator_info regular 12; buttons are grey `button`. ---------- */
+.octane-room-queue-widget .octane-room-queue-info {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.octane-room-queue-widget .octane-room-queue-spectator-info {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* ---------- rev_room_event (event edit): labels u_bold 12, inputs u_regular 12. ---------- */
+.octane-room-promote-edit .octane-room-promote-edit__label {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.octane-room-promote-edit .octane-card-content-shell :where(input, textarea) {
+    color: #000;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* ---------- iro_room_filter_framed: the word input u_bold 12, the list (ros_badword) u_regular 12. ---------- */
+.octane-room-filter-words .octane-card-content-shell input {
+    color: #000;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.octane-room-filter-words .octane-card-content-shell :where(.truncate) {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* ---------- new_chooser_view: search_placeholder 0x666666. ---------- */
+.octane-chooser .octane-chooser-bar input[type='text']::placeholder {
+    color: #666666;
+}
+
+/* ---------- confirm_pet_breeding / nestBreedingSuccessDialog: Illumina (style 100) frames. ---------- */
+/* title, pet_description, the texts and the name input: il_regular 11 px black. */
+.octane-pet-breeding .octane-card-content-shell {
+    color: #000;
+    font-size: 11px;
+    line-height: 14px;
+}
+
+.octane-pet-breeding .octane-card-content-shell :where(.text-sm, input) {
+    font-size: 11px;
+    line-height: 14px;
+}
+
+/* pet_name: il_heading_2, 12 px bold. */
+.octane-pet-breeding .octane-pet-breeding__pet-name {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* pet_level, the baby name / breeding info labels and the success pet.name: il_heading_3, 10 px bold. */
+.octane-pet-breeding .octane-pet-breeding__pet-level,
+.octane-pet-breeding .octane-pet-breeding__heading {
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* ---------- breed_pets_confirmation / breed_pets_result (monster plants): style 3. ---------- */
+/* description / request: font_size 13 regular. */
+.octane-monsterplant-breeding .octane-card-content-shell > .text-sm {
+    color: #000;
+    font-size: 13px;
+    line-height: 16px;
+}
+
+/* info / info_mutate: u_italic at font_size 13. */
+.octane-monsterplant-breeding .octane-card-content-shell .octane-monsterplant-breeding__info {
+    color: #000;
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 16px;
+}
+
+/* plant_name / seed_name, rarity level and description: style 3 texts without a style, u_regular 12. */
+.octane-monsterplant-breeding .octane-monsterplant-breeding__plant :where(.text-sm, .font-bold) {
+    color: #000;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 15px;
+}
+
+/* ---------- AchievementResolutions / Progress / Completed: Illumina (style 100) frames. ---------- */
+/* title, achievement.description, level line: il_regular 11 px black. */
+.octane-resolution .octane-card-content-shell {
+    color: #000;
+    font-size: 11px;
+    line-height: 14px;
+}
+
+.octane-resolution .octane-card-content-shell :where(.text-sm) {
+    font-size: 11px;
+    line-height: 14px;
+}
+
+/* achievement.name and progress_text: il_heading_2, 12 px bold. */
+.octane-resolution .octane-resolution__name,
+.octane-resolution .octane-resolution__progress {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* disabled.reason: il_border, 10 px bold. */
+.octane-resolution .octane-resolution__disabled {
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* progress time label: u_headline_small, 14 px bold. */
+.octane-resolution .octane-resolution__time-left {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 17px;
+}
+
+/* resolution.completed.header: il_heading_title, 18 px bold 0x333333. */
+.octane-resolution .octane-resolution__title {
+    color: #333333;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 22px;
+}
+
+/* ---------- furniture_label_settings: headings u_small bold 10, always_open u_small at 11. ---------- */
+.octane-wired-label-settings .octane-wired-label-settings__heading {
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 13px;
+}
+
+.octane-wired-label-settings .octane-wired-label-settings__always-open {
+    font-size: 11px;
+    font-weight: 400;
+}
+
+/* ---------- wired_link: selected_text 13 bold 0x285568, clear_caption 12 underlined 0x365f70. ---------- */
+.octane-wired-link .octane-wired-link__selected {
+    color: #285568;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.octane-wired-link .octane-wired-link__summary :where(button) {
+    color: #365f70;
+    font-size: 12px;
+}
+
+/* create_btn / rename_btn: grey `button`, button_shiny_regular (12 px regular black). */
+:is(.octane-wired-link, .octane-wired-link-connections) .octane-wired-link__button.btn-primary {
+    min-height: 30px;
+    padding: 0 8px;
+    border-image-source: var(--habbo-skin-shiny);
+    color: #000;
+    font-size: 12px;
+    font-weight: 400;
+    text-shadow: none;
+}
+
+:is(.octane-wired-link, .octane-wired-link-connections) .octane-wired-link__button.btn-primary:hover {
+    border-image-source: var(--habbo-skin-shiny-hover);
+}
+
+:is(.octane-wired-link, .octane-wired-link-connections) .octane-wired-link__button.btn-primary:active {
+    border-image-source: var(--habbo-skin-shiny-pressed);
+}
+
+/* ---------- image position editor and build height (no AIR layout): u_regular 12 black. ---------- */
+.octane-image-position-editor .octane-card-content-shell :where(span, label, input) {
+    color: #000;
+    font-size: 12px;
+}
+
+.octane-build-height-widget .octane-card-content-shell :where(.text-sm) {
+    font-size: 12px;
+}
+
+/* ---------- Buttons ---------- */
+@layer base {
+    /* Grey `button` (style 3): habbo_skin_button_shiny, 12 px regular black. */
+    :is(
+            .octane-room-queue-widget,
+            .octane-room-promote-edit,
+            .octane-room-filter-words,
+            .octane-chooser,
+            .octane-monsterplant-breeding,
+            .octane-widget-rentablespace
+        )
+        .habbo-btn-secondary {
+        border-width: 5px !important;
+        border-image-source: var(--habbo-skin-shiny) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        color: #000 !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+    }
+
+    /* Grey `button_thick` (style 3): habbo_skin_button_shiny_thick, button_shiny_bold 12 px black. */
+    :is(.octane-wired-label-settings, .octane-image-position-editor) .habbo-btn-secondary,
+    .octane-widget-rentablespace .habbo-btn-secondary.rentablespace-rent-button {
+        border-width: 5px !important;
+        border-image-source: var(--habbo-skin-shiny-thick) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        color: #000 !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+    }
+
+    :is(
+            .octane-room-queue-widget,
+            .octane-room-promote-edit,
+            .octane-room-filter-words,
+            .octane-chooser,
+            .octane-monsterplant-breeding,
+            .octane-widget-rentablespace
+        )
+        .habbo-btn-secondary:hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    :is(
+            .octane-room-queue-widget,
+            .octane-room-promote-edit,
+            .octane-room-filter-words,
+            .octane-chooser,
+            .octane-monsterplant-breeding,
+            .octane-widget-rentablespace
+        )
+        .habbo-btn-secondary:active {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+
+    :is(
+            .octane-room-queue-widget,
+            .octane-room-promote-edit,
+            .octane-room-filter-words,
+            .octane-chooser,
+            .octane-monsterplant-breeding,
+            .octane-widget-rentablespace
+        )
+        :is(.habbo-btn-secondary:disabled, .habbo-btn-secondary.pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-disabled) !important;
+        color: #777777 !important;
+    }
+
+    :is(.octane-wired-label-settings, .octane-image-position-editor) .habbo-btn-secondary:hover,
+    .octane-widget-rentablespace .habbo-btn-secondary.rentablespace-rent-button:hover {
+        border-image-source: var(--habbo-skin-shiny-thick-hover) !important;
+    }
+
+    :is(.octane-wired-label-settings, .octane-image-position-editor) .habbo-btn-secondary:active,
+    .octane-widget-rentablespace .habbo-btn-secondary.rentablespace-rent-button:active {
+        border-image-source: var(--habbo-skin-shiny-thick-pressed) !important;
+    }
+
+    :is(.octane-wired-label-settings, .octane-image-position-editor)
+        :is(.habbo-btn-secondary:disabled, .habbo-btn-secondary.pointer-events-none),
+    .octane-widget-rentablespace .habbo-btn-secondary.rentablespace-rent-button:disabled {
+        border-image-source: var(--habbo-skin-shiny-thick-disabled) !important;
+        color: #777777 !important;
+    }
+
+    /* The rent button keeps its u_headline_medium price and label (RentableSpaceWidget.css). */
+    .octane-widget-rentablespace .habbo-btn-secondary.rentablespace-rent-button,
+    .octane-widget-rentablespace .habbo-btn-secondary.rentablespace-rent-button :where(span) {
+        font-size: 16px !important;
+    }
+
+    /* Green style 5 buttons (button_shiny_thick_green): 12 px bold. */
+    :is(.octane-monsterplant-breeding, .octane-wired-label-settings, .octane-image-position-editor) .habbo-btn-primary {
+        font-size: 12px !important;
+        font-weight: 700 !important;
+    }
+
+    /* Illumina `button` style 102 (breeding, resolution): the grey Illumina skin, il_button 10 px bold black. */
+    :is(.octane-pet-breeding, .octane-resolution) .habbo-btn-secondary {
+        font-size: 10px !important;
+        font-weight: 700 !important;
+    }
+}
+
+/* ---------- build height: a stepper with a typed field, AIR's slider (yellow knob over a ruled bar),
+   the underpass option and two default buttons. ---------- */
+.octane-build-height-widget {
+    width: 300px;
+    max-width: 96vw;
+}
+
+.octane-build-height-widget .build-height-content {
+    gap: 8px;
+}
+
+.octane-build-height-widget .build-height-description,
+.octane-build-height-widget .build-height-hint {
+    margin: 0;
+}
+
+.octane-build-height-widget .build-height-hint {
+    margin-top: -4px;
+    padding-left: 20px;
+    color: #666666;
+    font-size: 11px;
+    line-height: 13px;
+}
+
+.octane-build-height-widget .build-height-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.octane-build-height-widget .build-height-step {
+    width: 24px;
+    min-width: 24px;
+    padding: 0 !important;
+    font-size: 14px !important;
+    font-weight: 700;
+}
+
+.octane-build-height-widget .build-height-field {
+    width: 56px;
+    height: 24px;
+    box-sizing: border-box;
+    border: 1px solid #7f7f7f;
+    border-radius: 2px;
+    background: #ffffff;
+    box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.15);
+    color: #000000;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* The bar and its ruler share one box: the knob centre and the marks run over the same width. */
+.octane-build-height-widget .build-height-scale {
+    position: relative;
+    height: 40px;
+    margin: 0 8px;
+}
+
+.octane-build-height-widget .build-height-slider {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 20px;
+    touch-action: none;
+    user-select: none;
+}
+
+.octane-build-height-widget .build-height-slider .octane-slider-bare-control {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+/* AIR slider_base: a light grey bar over a dark base line. */
+.octane-build-height-widget .build-height-track {
+    position: absolute;
+    top: 8px;
+    left: -4px;
+    right: -4px;
+    height: 6px;
+    background: linear-gradient(#a8a8a8 0 3px, transparent 3px 4px, #555555 4px 6px);
+}
+
+/* AIR slider_button: the yellow knob. */
+.octane-build-height-widget .build-height-thumb {
+    top: 3px;
+    width: 12px;
+    height: 15px;
+    translate: -50% 0 !important;
+    background: url('../../assets/images/user-settings/air/slider-button.png') no-repeat 0 0;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    cursor: grab;
+}
+
+.octane-build-height-widget .build-height-thumb:has(input:focus-visible) {
+    outline: 1px solid #1e90ff;
+    outline-offset: 1px;
+}
+
+.octane-build-height-widget .build-height-marks {
+    position: absolute;
+    top: 21px;
+    left: 0;
+    right: 0;
+    height: 18px;
+    pointer-events: none;
+}
+
+.octane-build-height-widget .build-height-mark {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 2px;
+    background: #555555;
+    translate: -50% 0;
+}
+
+.octane-build-height-widget .build-height-mark.is-major {
+    height: 4px;
+}
+
+.octane-build-height-widget .build-height-mark-label {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    color: #000000;
+    font-size: 11px;
+    line-height: 12px;
+    white-space: nowrap;
+    translate: -50% 0;
+}
+
+.octane-build-height-widget .build-height-underpass {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.octane-build-height-widget .build-height-underpass.is-locked {
+    color: #777777;
+    cursor: default;
+}
+
+.octane-build-height-widget .build-height-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.octane-build-height-widget .build-height-actions > * {
+    flex: 1;
+}

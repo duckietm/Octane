@@ -1,6 +1,6 @@
 # Secure Runtime Production Setup
 
-Quick setup guide for running Nitro with:
+Quick setup guide for running Octane with:
 
 - configuration and gamedata served through `/nitro-sec/file`;
 - encrypted runtime `/api/*` calls;
@@ -11,9 +11,14 @@ Replace the example domains with your real domains:
 - `https://hotel.example.com`
 - `https://nitro.example.com:2096`
 
-## 1. Build Nitro
+Shortcut: `node install.mjs --secure=on --emulator-config=<path>/config.ini` sets the `client-mode.json` flags
+(section 2), generates `nitro.secure.master_key` and updates `config.ini` (section 5, with a backup).
+Without `--emulator-config` it prints the lines to paste. A master key that is already set is never replaced.
+`nitro.secure.config.root` and `nitro.secure.gamedata.root` still have to be set by hand.
 
-Inside the `Nitro-V3` repository:
+## 1. Build Octane
+
+Inside the `octane` repository:
 
 ```bash
 yarn build
@@ -40,7 +45,7 @@ src/
 File:
 
 ```txt
-Nitro-V3/dist/configuration/client-mode.json
+octane/dist/configuration/client-mode.json
 ```
 
 Secure production configuration:
@@ -52,7 +57,7 @@ Secure production configuration:
     "secureApiEnabled": true,
     "apiBaseUrl": "https://nitro.example.com:2096",
     "plainConfigBaseUrl": "https://hotel.example.com/configuration/",
-    "plainGamedataBaseUrl": "https://hotel.example.com/client/nitro/gamedata/"
+    "plainGamedataBaseUrl": "https://hotel.example.com/client/octane/gamedata/"
 }
 ```
 
@@ -63,13 +68,15 @@ Meaning:
 - `secureApiEnabled: true` automatically encrypts `/api/*` requests.
 - `apiBaseUrl` must point to the emulator/API.
 - `plainConfigBaseUrl` and `plainGamedataBaseUrl` are fallbacks when secure assets are disabled.
+- If `/nitro-sec/bootstrap` does not answer with a key (secure off on the server, an older emulator, a network error), the client loads config, gamedata and `/api` in the clear instead of failing, and tries the encrypted path again after 5 minutes. With `nitro.secure.api.required=true` the server still refuses plain calls to `/api/auth/*` and `/api/badges/*` with 403.
+- The client renews its key every `nitro.secure.session_ttl_sec` seconds of the server (between 60 and 3600; 300 when the server does not say).
 
 ## 3. `configuration/renderer-config.json`
 
 File:
 
 ```txt
-Nitro-V3/dist/configuration/renderer-config.json
+octane/dist/configuration/renderer-config.json
 ```
 
 Important values:
@@ -104,7 +111,7 @@ If you are not using WebSocket crypto yet, use:
 File:
 
 ```txt
-Nitro-V3/dist/configuration/ui-config.json
+octane/dist/configuration/ui-config.json
 ```
 
 Static image and camera URLs can remain plain:
@@ -139,8 +146,8 @@ crypto.ws.enabled=1
 
 nitro.secure.assets.enabled=true
 nitro.secure.api.enabled=true
-nitro.secure.config.root=C:/inetpub/wwwroot/hotel/nitro/configuration
-nitro.secure.gamedata.root=C:/inetpub/wwwroot/hotel/nitro/client/nitro/gamedata
+nitro.secure.config.root=C:/inetpub/wwwroot/hotel/octane/configuration
+nitro.secure.gamedata.root=C:/inetpub/wwwroot/hotel/octane/client/octane/gamedata
 nitro.secure.master_key=change-this-to-a-long-random-secret
 
 login.remember.enabled=true
@@ -212,7 +219,7 @@ For quick debugging, only change `client-mode.json`:
     "secureApiEnabled": false,
     "apiBaseUrl": "https://nitro.example.com:2096",
     "plainConfigBaseUrl": "https://hotel.example.com/configuration/",
-    "plainGamedataBaseUrl": "https://hotel.example.com/client/nitro/gamedata/"
+    "plainGamedataBaseUrl": "https://hotel.example.com/client/octane/gamedata/"
 }
 ```
 
@@ -223,7 +230,7 @@ Then hard refresh the browser.
 File:
 
 ```txt
-Nitro-V3/dist/configuration/bootstrap.js
+octane/dist/configuration/bootstrap.js
 ```
 
 This is the first loader when you use the external secure mode.
@@ -269,7 +276,7 @@ So `asset-loader.js` must always exist inside the `configuration` folder.
 File:
 
 ```txt
-Nitro-V3/dist/configuration/asset-loader.js
+octane/dist/configuration/asset-loader.js
 ```
 
 This loader loads the actual bundle:
@@ -359,7 +366,89 @@ https://nitro.example.com:2096/nitro-sec/file?kind=config&file=...
 The emulator reads them from:
 
 ```ini
-nitro.secure.config.root=C:/inetpub/wwwroot/hotel/nitro/configuration
+nitro.secure.config.root=C:/inetpub/wwwroot/hotel/octane/configuration
 ```
 
 If you add new JSON/JS files inside `configuration` and want to protect them, they must be requested through the secure endpoint or loaded through `bootstrap.js`.
+
+## 14. Content-Security-Policy
+
+A CSP tells the browser where the client may load scripts, frames and connections from: if a plugin, an ad or
+injected HTML tries to load anything else, the browser blocks it. `index.html` carries only the rules that hold for
+every hotel (`object-src 'none'; base-uri 'self'`); the full policy depends on the hotel's hosts and belongs in the web
+server's headers.
+
+A starting point to adapt (replace the example hosts with those of `client-mode.json`, `renderer-config.json` and
+`ui-config.json`):
+
+```txt
+default-src 'self';
+script-src 'self' blob: 'unsafe-eval' https://challenges.cloudflare.com;
+style-src 'self' 'unsafe-inline';
+img-src 'self' data: blob: https://assets.example.com https://images.example.com;
+media-src 'self' blob: https://radio.example.com;
+connect-src 'self' https://api.example.com wss://game.example.com https://assets.example.com;
+frame-src https://challenges.cloudflare.com https://player.vimeo.com https://www.youtube-nocookie.com https://ads.example.net;
+font-src 'self' data:;
+object-src 'none';
+base-uri 'self';
+form-action 'self';
+frame-ancestors 'self' https://cms.example.com
+```
+
+- **`'unsafe-eval'`** is needed today by PixiJS, which compiles its shader functions at run time. It can go once the
+  renderer loads `pixi.js/unsafe-eval`.
+- **`blob:`** in `script-src` is for `asset-loader.js`, which imports the unpacked bundle from a blob.
+- **External plugins**: every `external.plugins` host must be added to `script-src`, and should also be listed in
+  `external.plugins.allowed.hosts`.
+- **Ads**: with `ads.frame.url` (section 15) their origin in `frame-src` is enough; AdSense straight in the client
+  needs the Google domains in `script-src`, `img-src`, `connect-src` and `frame-src` instead.
+- **`frame-ancestors`**: list the CMS that embeds the client, or keep `'self'`.
+
+Before enforcing it, send it as `Content-Security-Policy-Report-Only`: the browser reports in the console what it
+would have blocked, without blocking it. Once the console is clean on login, hotel view, a room, the catalog and the
+games, switch to `Content-Security-Policy`.
+
+IIS (`web.config` in the client folder):
+
+```xml
+<system.webServer>
+  <httpProtocol>
+    <customHeaders>
+      <add name="Content-Security-Policy-Report-Only" value="default-src 'self'; ..." />
+    </customHeaders>
+  </httpProtocol>
+</system.webServer>
+```
+
+nginx:
+
+```nginx
+add_header Content-Security-Policy-Report-Only "default-src 'self'; ..." always;
+```
+
+### Remember token in a cookie
+
+With `"login.remember.cookie": true` in `ui-config.json` the client asks the emulator to keep the remember token in an
+HttpOnly cookie on `/api/auth`, which no script can read. In the emulator's `config.ini`:
+
+```ini
+login.remember.cookie.name=octane_remember
+# Strict when the client and the API are on the same site; None when they are on different sites (https only)
+login.remember.cookie.samesite=Strict
+login.remember.cookie.secure=true
+```
+
+An emulator that does not know cookie mode answers with the token in the JSON, and the client stores it as before.
+
+## 15. Ads on a separate origin
+
+The AdSense script, loaded in the client, runs on the same origin as the session. To keep it out:
+
+1. publish `configuration/ads-frame.html.example`, renamed to `ads-frame.html`, on another origin
+   (e.g. `https://ads.example.net/ads-frame.html`), with its own `ads.txt`;
+2. in `ui-config.json` set `"ads.frame.url": "https://ads.example.net/ads-frame.html"`.
+
+The client then shows the ad in a sandboxed frame that may open the advertiser in a new tab but cannot navigate the
+client, and passes the ad unit (from `ads.txt` and `adsense.json`) in the query. Without `ads.frame.url` the ad stays
+in the client as before.

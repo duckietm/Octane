@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><layout name="userclassification_frame" width="292" height="224" version="0.1" uid="CA3991D5-DF94-73E9-A4A1-11DED58D0855">
+  <window>
+    <frame x="60" y="4" width="292" height="224" params="98305" style="0" caption="User%20Classifications" color="0xff418db0" width_min="150" height_min="100">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.34901960784313724" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <container x="0" y="0" width="280" height="192" params="2192" style="0" name="classifications_cont" caption="User%20Classifications" color="0xffffffffff" background="true">
+          <children>
+            <itemlist x="0" y="0" width="263" height="192" params="2193" style="0" name="userclassification_list" caption="User%20Classifications" background="true">
+              <children>
+                <container x="0" y="0" width="263" height="14" params="144" style="0" name="classificationrow" background="true">
+                  <children>
+                    <text x="110" y="0" width="105" height="14" params="80" style="0" name="user_classification_txt">
+                      <variables>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                        <var key="sharpness" value="0" type="Number"/>
+                        <var key="thickness" value="0" type="Number"/>
+                        <var key="kerning" value="false" type="Boolean"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                      </variables>
+                    </text>
+                    <text x="5" y="0" width="100" height="14" params="145" style="0" name="user_name_txt" caption="whatwasit" background="true">
+                      <variables>
+                        <var key="font_face" value="Volter Bold" type="String"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                        <var key="sharpness" value="0" type="Number"/>
+                        <var key="thickness" value="0" type="Number"/>
+                        <var key="underline" value="true" type="Boolean"/>
+                        <var key="kerning" value="false" type="Boolean"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                      </variables>
+                    </text>
+                    <text x="223" y="0" width="39" height="14" params="81" style="0" name="visit_room_txt" caption="Visit" background="true">
+                      <variables>
+                        <var key="font_face" value="Volter Bold" type="String"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                        <var key="sharpness" value="0" type="Number"/>
+                        <var key="thickness" value="0" type="Number"/>
+                        <var key="underline" value="true" type="Boolean"/>
+                        <var key="kerning" value="false" type="Boolean"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+              </children>
+            </itemlist>
+            <scrollbar_vertical x="263" y="0" width="17" height="192" params="2129" style="0" name="scroller" caption="User%20Classifications">
+              <variables>
+                <var key="scrollable" value="userclassification_list" type="String"/>
+              </variables>
+            </scrollbar_vertical>
+          </children>
+        </container>
+      </children>
+    </frame>
+  </window>
+</layout>

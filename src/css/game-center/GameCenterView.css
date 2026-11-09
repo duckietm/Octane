@@ -1,0 +1,2431 @@
+@charset "UTF-8";
+/* Game center overlay + SnowWar arena styles.
+   Loaded via src/index.tsx like every other stylesheet. */
+.game-center-main {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 72px 24px 24px;
+  overflow-y: auto;
+  background: radial-gradient(circle at 50% 20%, #1d3247 0%, #0b141d 70%);
+  color: #fff;
+}
+
+.game-center-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(100%, 900px);
+}
+.game-center-header__title {
+  font-weight: 700;
+  font-size: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+.game-center-header__close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: #b9322a;
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+.game-center-header__close:hover {
+  background: #d24138;
+}
+
+.game-tile-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  width: min(100%, 900px);
+}
+
+.game-tile {
+  width: 275px;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #4b7ea1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #1c323f;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+.game-tile__banner {
+  height: 132px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+}
+.game-tile__logo {
+  max-width: 85%;
+  max-height: 112px;
+  object-fit: contain;
+}
+.game-tile__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 8px 12px 10px;
+  text-align: center;
+}
+.game-tile__title {
+  font-weight: 700;
+  font-size: 15px;
+}
+/* games_main mode_description: Ubuntu 13 px. */
+.game-tile__desc {
+  font-size: 13px;
+  line-height: 1.35;
+  opacity: 0.8;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.game-tile__play {
+  position: relative;
+}
+.game-tile__actions {
+  /* Play now and Build Custom Arena sit side by side; stacking them pushed
+     the green editor button off the card's bottom edge. */
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+.game-tile__queue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.game-tile__error {
+  color: #ff8d85;
+  font-size: 12px;
+}
+
+.game-center-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* SnowWar                                                             */
+/* ------------------------------------------------------------------ */
+.snowwar-leaderboard-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(11, 28, 42, 0.58);
+}
+.snowwar-leaderboard {
+  position: relative;
+  width: 431px;
+  height: 472px;
+  flex: 0 0 auto;
+  color: #1077ac;
+  font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+  image-rendering: var(--octane-pixel-art, pixelated);
+  filter: drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.34));
+}
+.snowwar-leaderboard button {
+  font-family: inherit;
+}
+.snowwar-leaderboard__close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  z-index: 4;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #f28a32;
+  color: #fff;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 15px;
+  text-shadow: 0 1px #9d490d;
+  cursor: pointer;
+}
+.snowwar-leaderboard__tabs {
+  position: absolute;
+  top: 0;
+  left: 107px;
+  z-index: 3;
+  display: flex;
+}
+.snowwar-leaderboard__tab {
+  width: 119px;
+  height: 28px;
+  border: 0;
+  padding: 0 4px 2px;
+  background-color: transparent;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+}
+.snowwar-leaderboard__tab:not(.is-active) {
+  color: #000;
+}
+.snowwar-leaderboard__list {
+  position: absolute;
+  top: 58px;
+  left: 37px;
+  width: 356px;
+  height: 336px;
+  overflow: hidden;
+}
+.snowwar-leaderboard__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 57px 44px minmax(0, 1fr) 72px;
+  align-items: center;
+  width: 356px;
+  height: 42px;
+  font-size: 15px;
+}
+.snowwar-leaderboard__highlight {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 356px;
+  height: 42px;
+}
+.snowwar-leaderboard__rank,
+.snowwar-leaderboard__avatar,
+.snowwar-leaderboard__name,
+.snowwar-leaderboard__score {
+  position: relative;
+  z-index: 1;
+}
+.snowwar-leaderboard__rank {
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.snowwar-leaderboard__avatar {
+  position: relative;
+  width: 44px;
+  height: 40px;
+  overflow: hidden;
+}
+.snowwar-leaderboard__avatar .avatar-image {
+  position: absolute;
+  top: -16px;
+  left: -14px;
+  transform-origin: top left;
+}
+.snowwar-leaderboard__name {
+  padding-left: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.snowwar-leaderboard__score {
+  padding-right: 14px;
+  text-align: right;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.snowwar-leaderboard__divider {
+  position: absolute;
+  bottom: 0;
+  left: 3px;
+  width: 350px;
+  height: 2px;
+}
+.snowwar-leaderboard__row:last-child .snowwar-leaderboard__divider {
+  display: none;
+}
+.snowwar-leaderboard__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0 28px;
+  /* Dark AIR row blue on the light ice, with a white glow so it stays
+     readable over the SnowStorm logo in the background art. */
+  color: #1077ac;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 2px #fff;
+}
+.snowwar-leaderboard__scroll {
+  position: absolute;
+  left: 186px;
+  z-index: 3;
+  width: 58px;
+  height: 28px;
+  border: 0;
+  padding: 0;
+  background-color: transparent;
+  cursor: pointer;
+}
+.snowwar-leaderboard__scroll {
+  background: var(--scroll-normal) center / 58px 28px no-repeat;
+}
+.snowwar-leaderboard__scroll:hover {
+  background-image: var(--scroll-hilite);
+}
+.snowwar-leaderboard__scroll:active {
+  background-image: var(--scroll-click);
+}
+.snowwar-leaderboard__scroll--up {
+  top: 31px;
+}
+.snowwar-leaderboard__scroll--down {
+  top: 391px;
+}
+.snowwar-leaderboard__scroll:disabled,
+.snowwar-leaderboard__week:disabled {
+  cursor: default;
+}
+.snowwar-leaderboard__week {
+  position: absolute;
+  top: 199px;
+  z-index: 3;
+  width: 14px;
+  height: 18px;
+  border: 0;
+  padding: 0;
+  background-color: transparent;
+  cursor: pointer;
+}
+.snowwar-leaderboard__week--previous {
+  left: 17px;
+}
+.snowwar-leaderboard__week--next {
+  left: 400px;
+}
+.snowwar-leaderboard__week:disabled {
+  visibility: hidden;
+}
+.snowwar-leaderboard__reset {
+  position: absolute;
+  top: 397px;
+  left: 251px;
+  z-index: 3;
+  max-width: 165px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  /* AIR reset_text: white with a 0x1077ac stroke (reset_text_stroke). */
+  text-shadow: -1px 0 #1077ac, 0 1px #1077ac, 1px 0 #1077ac, 0 -1px #1077ac,
+    -1px -1px #1077ac, 1px 1px #1077ac, -1px 1px #1077ac, 1px -1px #1077ac;
+  white-space: nowrap;
+}
+.snowwar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  background: radial-gradient(ellipse at center, #2c4a63 0%, #16283a 100%);
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.snowwar-toast {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1600;
+  background: #1c323f;
+  border: 2px solid #4b7ea1;
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+.snowwar-toast--error {
+  border-color: #b9322a;
+}
+.snowwar-toast__title {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* "Get ready!" pre-match splash. Light, icy look (overrides the dark overlay). */
+.snowwar-lobby {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 16px;
+  color: #2f6d95;
+  overflow: auto;
+}
+.snowwar-lobby__logo {
+  width: 230px;
+  max-width: 60%;
+  image-rendering: auto;
+  filter: drop-shadow(0 3px 6px rgba(40, 90, 130, 0.3));
+}
+.snowwar-lobby__ready {
+  font-size: 24px;
+  font-weight: 800;
+  color: #5aa6d8;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.7);
+  margin-top: -4px;
+}
+.snowwar-lobby__stage {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 900px;
+  margin-top: 6px;
+}
+.snowwar-lobby__column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  max-width: 260px;
+}
+.snowwar-lobby__column--right {
+  align-items: flex-end;
+}
+.snowwar-lobby__player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid #4577e6;
+  border-radius: 10px;
+  padding: 4px 10px 4px 4px;
+  min-width: 160px;
+  box-shadow: 0 2px 6px rgba(40, 90, 130, 0.18);
+}
+.snowwar-lobby__column--right .snowwar-lobby__player {
+  flex-direction: row-reverse;
+  padding: 4px 4px 4px 10px;
+}
+.snowwar-lobby__avatar {
+  position: relative;
+  width: 44px;
+  height: 56px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+/* The imager sets an inline transform: scale(0.5) but no origin, so pair it
+   with a top-left origin here and offset to crop head + torso into the box. */
+.snowwar-lobby__avatar .avatar-image {
+  position: absolute;
+  left: -14px;
+  top: -8px;
+  transform-origin: top left;
+}
+.snowwar-lobby__name {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.snowwar-lobby__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 240px;
+}
+.snowwar-lobby__status {
+  font-size: 16px;
+  font-weight: 700;
+  color: #5aa6d8;
+}
+.snowwar-lobby__preview {
+  background: linear-gradient(180deg, #5aa6e0 0%, #7cc0ee 100%);
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(40, 90, 130, 0.28);
+}
+.snowwar-lobby__arena-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: #2f6d95;
+}
+.snowwar-lobby__spinner {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 4px solid rgba(90, 166, 216, 0.3);
+  border-top-color: #5aa6d8;
+  animation: snowwar-spin 0.9s linear infinite;
+  margin-top: 4px;
+}
+@keyframes snowwar-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Pre-match "assembling teams" screen (lobby countdown). Same icy theme as
+   the splash, with a Red vs Blue face-off board. */
+.snowwar-teams {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 16px;
+  color: #2f6d95;
+  overflow: auto;
+}
+.snowwar-teams__title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #5aa6d8;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.7);
+  margin-top: -4px;
+}
+.snowwar-teams__countdown {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2f6d95;
+}
+.snowwar-teams__arenas {
+  width: 100%;
+  max-width: 620px;
+  text-align: center;
+}
+.snowwar-teams__arena-heading {
+  margin-bottom: 6px;
+  color: #2f6d95;
+  font-size: 13px;
+  font-weight: 700;
+}
+.snowwar-teams__arena-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.snowwar-teams__arena {
+  width: 132px;
+  padding: 5px;
+  border: 2px solid rgba(90, 166, 216, 0.45);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #2f6d95;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+.snowwar-teams__arena:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+.snowwar-teams__arena--selected {
+  border-color: #f4a025;
+  box-shadow: 0 0 0 2px rgba(244, 160, 37, 0.25);
+  opacity: 1 !important;
+}
+.snowwar-teams__arena img {
+  display: block;
+  width: 100%;
+  height: 68px;
+  object-fit: contain;
+}
+.snowwar-teams__arena small {
+  display: block;
+  color: #f08b22;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+.snowwar-teams__board {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 820px;
+  margin-top: 8px;
+}
+.snowwar-teams__panel {
+  flex: 1;
+  max-width: 360px;
+  min-width: 200px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 3px solid #4577e6;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.snowwar-teams__panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.snowwar-teams__count {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 0 9px;
+  font-size: 14px;
+}
+.snowwar-teams__roster {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+}
+.snowwar-teams__empty {
+  font-size: 13px;
+  font-style: italic;
+  color: #6b93ac;
+  padding: 10px 4px;
+  text-align: center;
+}
+.snowwar-teams__player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  padding: 4px 10px 4px 4px;
+  box-shadow: 0 2px 5px rgba(40, 90, 130, 0.16);
+}
+.snowwar-teams__avatar {
+  position: relative;
+  width: 44px;
+  height: 56px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.snowwar-teams__avatar .avatar-image {
+  position: absolute;
+  left: -14px;
+  top: -8px;
+  transform-origin: top left;
+}
+.snowwar-teams__name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #2f6d95;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.snowwar-teams__leave {
+  margin-top: 10px;
+}
+.snowwar-teams__topbar {
+  width: 100%;
+  max-width: 820px;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -6px;
+}
+
+.snowwar-arena {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.snowwar-arena--loading {
+  align-items: center;
+  justify-content: center;
+}
+
+.snowwar-hud {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 12px;
+  background: rgba(12, 24, 34, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  z-index: 520;
+}
+.snowwar-hud--editor {
+  justify-content: space-between;
+  min-height: 52px;
+  color: #2f6d95;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(221, 241, 251, 0.98)),
+    url('../../assets/images/snowstorm/original/bg_sky.png') top left / auto 100% repeat-x;
+  border-bottom: 3px solid #ef8a36;
+  box-shadow: 0 3px 0 rgba(255, 255, 255, 0.8), 0 5px 12px rgba(53, 111, 147, 0.28);
+}
+.snowwar-hud--editor .snowwar-hud__clock {
+  padding: 3px 12px;
+  color: #fff;
+  text-shadow: 0 1px 1px #9e561e;
+  background: linear-gradient(180deg, #f8aa4d, #e97924);
+  border: 2px solid #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 0 2px #ef8a36;
+}
+.snowwar-hud__clock {
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 56px;
+}
+.snowwar-hud__teams {
+  display: flex;
+  gap: 8px;
+}
+.snowwar-hud__team {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 2px solid;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-weight: 700;
+}
+.snowwar-hud__team-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.snowwar-hud__self {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-left: auto;
+  font-size: 13px;
+}
+.snowwar-hud__hearts-empty {
+  opacity: 0.25;
+}
+.snowwar-hud__actions {
+  display: flex;
+  gap: 8px;
+}
+.snowwar-hud__arena-name {
+  width: 180px;
+  border: 2px solid #7eb9d7;
+  border-radius: 8px;
+  padding: 5px 8px;
+  color: #315f7a;
+  background: #fff;
+  box-shadow: inset 0 1px 2px rgba(42, 93, 123, 0.18);
+}
+.snowwar-hud--editor .snowwar-button,
+.snowwar-editor .snowwar-button {
+  color: #fff;
+  text-shadow: 0 1px 1px #995019;
+  background: linear-gradient(180deg, #f7ab52 0%, #e97823 100%);
+  border: 2px solid #c85c18;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 2px 0 rgba(118, 74, 35, 0.22);
+}
+.snowwar-hud--editor .snowwar-button--danger,
+.snowwar-editor .snowwar-button--danger {
+  background: linear-gradient(180deg, #e86b62 0%, #b83a31 100%);
+  border-color: #8f2b25;
+  text-shadow: 0 1px 1px #6f1d18;
+}
+.snowwar-hud__make-ball {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  padding: 0;
+  margin: -6px 0;
+  background: url('../../assets/images/snowstorm/original/ui_make_balls_up.png') center / 34px 35px no-repeat;
+  cursor: pointer;
+}
+.snowwar-hud__make-ball:active:not(:disabled) {
+  background-image: url('../../assets/images/snowstorm/original/ui_make_balls_down.png');
+}
+.snowwar-hud__make-ball:disabled {
+  filter: grayscale(1);
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Native AIR SnowWar HUD. These are the bitmaps embedded in HabboAir.swf:
+   the vertical five-ball counter, scoop button, personal energy panel and
+   blue/red score-and-timer panel. Duckie's editor keeps its compact toolbar. */
+.snowwar-official-hud {
+  position: absolute;
+  inset: 0;
+  z-index: 520;
+  pointer-events: none;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+.snowwar-official-hud__quit {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 68px;
+  height: 50px;
+  padding: 0;
+  border: 0;
+  background: var(--exit-up) 0 0 / 68px 50px no-repeat;
+  pointer-events: auto;
+  cursor: pointer;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+.snowwar-official-hud__quit:active {
+  background-image: var(--exit-down);
+}
+.snowwar-official-hud__ammo {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 57px;
+  height: 266px;
+  transform: translateY(-50%);
+}
+.snowwar-official-hud__ammo-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 57px;
+  height: 202px;
+  pointer-events: none;
+}
+.snowwar-official-hud__ammo-ball {
+  position: absolute;
+  left: 14px;
+  width: 29px;
+  height: 29px;
+  pointer-events: none;
+}
+/* AIR snowwar_snowballs emptyFlashImage (57x202) and ballProgress (14,158 30x30). */
+.snowwar-official-hud__ammo-empty {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  width: 29px;
+  height: 173px;
+  pointer-events: none;
+}
+.snowwar-official-hud__ammo-loading {
+  position: absolute;
+  left: 14px;
+  top: 158px;
+  width: 29px;
+  height: 29px;
+  pointer-events: none;
+}
+.snowwar-official-hud__make-ball {
+  position: absolute;
+  left: 0;
+  top: 206px;
+  width: 57px;
+  height: 58px;
+  padding: 0;
+  border: 0;
+  background: url('../../assets/images/snowstorm/original/ui_make_balls_up.png') center / 57px 58px no-repeat;
+  pointer-events: auto;
+  cursor: pointer;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+.snowwar-official-hud__make-ball:active:not(:disabled) {
+  background-image: url('../../assets/images/snowstorm/original/ui_make_balls_down.png');
+}
+.snowwar-official-hud__make-ball:disabled {
+  filter: grayscale(0.65);
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+.snowwar-official-hud__personal {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  width: 171px;
+  height: 73px;
+}
+.snowwar-official-hud__personal-bg {
+  position: absolute;
+  inset: 0;
+  width: 171px;
+  height: 73px;
+  pointer-events: none;
+}
+.snowwar-official-hud__health {
+  position: absolute;
+  left: 69px;
+  top: 13px;
+  width: 8px;
+  height: 46px;
+  pointer-events: none;
+}
+.snowwar-official-hud__head {
+  position: absolute;
+  left: 105px;
+  top: 10px;
+  width: 53px;
+  height: 53px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+.snowwar-official-hud__head .avatar-image {
+  position: absolute;
+  inset: 0;
+  width: 53px;
+  height: 53px;
+  background-size: 52px 52px !important;
+  background-position: center !important;
+}
+/* AIR snowwar_own_stats backgroundFlashImage (100,8 57x57): ui_me_plus_/minus_. */
+.snowwar-official-hud__score-flash {
+  position: absolute;
+  left: 100px;
+  top: 8px;
+  width: 57px;
+  height: 57px;
+  pointer-events: none;
+}
+.snowwar-official-hud__personal-score {
+  position: absolute;
+  right: 3px;
+  bottom: -4px;
+  min-width: 23px;
+  height: 20px;
+  padding: 1px 5px;
+  color: #31566b;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  background: #fff;
+  border: 2px solid #78b9d5;
+  border-radius: 10px;
+}
+.snowwar-official-hud__scores {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  width: 188px;
+  height: 168px;
+  color: #fff;
+  text-align: center;
+}
+.snowwar-official-hud__scores-bg {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 188px;
+  height: 147px;
+  pointer-events: none;
+}
+.snowwar-official-hud__score {
+  position: absolute;
+  top: 42px;
+  width: 44px;
+  font-size: 20px;
+}
+.snowwar-official-hud__score--blue {
+  left: 33px;
+}
+.snowwar-official-hud__score--red {
+  right: 28px;
+}
+.snowwar-official-hud__timer {
+  position: absolute;
+  left: 55px;
+  top: 102px;
+  width: 82px;
+  font-size: 25px;
+  font-variant-numeric: tabular-nums;
+}
+.snowwar-official-hud__time-label {
+  position: absolute;
+  top: 146px;
+  right: 6px;
+  color: #e7782a;
+  font-size: 14px;
+  text-shadow: 0 1px #fff;
+}
+.snowwar-official-hud__edit {
+  position: absolute;
+  top: 168px;
+  right: 23px;
+  pointer-events: auto;
+}
+
+.snowwar-button {
+  background: linear-gradient(180deg, #5a9fd4 0%, #39759f 100%);
+  border: 1px solid #24567a;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 5px 12px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.snowwar-button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.snowwar-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.snowwar-button--danger {
+  background: linear-gradient(180deg, #c8564d 0%, #92251d 100%);
+  border-color: #6d1a14;
+}
+.snowwar-button--edit {
+  background: linear-gradient(180deg, #6fb56a 0%, #3f8a3c 100%);
+  border-color: #2c6b2a;
+}
+
+.snowwar-banner {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 530;
+  background: rgba(12, 24, 34, 0.9);
+  border: 2px solid #4b7ea1;
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-size: 18px;
+  font-weight: 700;
+}
+.snowwar-banner--countdown {
+  animation: snowwar-pulse 1s ease-in-out infinite;
+}
+
+@keyframes snowwar-pulse {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.06);
+  }
+}
+/* Centres the (capped) viewport in the space below the HUD. */
+.snowwar-viewport-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* The visible camera window is capped to the 1920x1080 design base: on a
+   larger screen it stays 1920x1080 centred, on a smaller screen it shrinks to
+   the screen and the camera follows the player. */
+.snowwar-viewport {
+  position: relative;
+  width: min(100%, 1920px);
+  height: min(100%, 1080px);
+  overflow: hidden;
+  background: #e7f7fb;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* The 1920x1080 (or larger, for big maps) stage the camera pans. */
+.snowwar-world {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: #e7f7fb;
+  will-change: transform;
+}
+
+/* Official room-ad backgrounds (Arctic Island, Dragon Top, Fight Night), drawn
+   1:1 with their painted field on the heightmap instead of cover-cropping
+   them; left/top/width/height are set inline (SnowWarArenaView,
+   SNOWWAR_OFFICIAL_BACKDROPS), and the stage is sized to the artwork so no
+   unpainted strip shows at its edges. */
+.snowwar-official-backdrop {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* The official room-ad already paints the snow field. Keep the logical canvas
+   for hit-testing, but do not draw a second isometric grid over the artwork. */
+.snowwar-floor--official-backdrop {
+  opacity: 0;
+}
+
+/* The isometric floor + pieces, scaled by zoom and centred on the stage. */
+.snowwar-floor-layer {
+  position: absolute;
+  will-change: transform;
+}
+
+.snowwar-floor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Classic floor-tile canvas: just above the ad backdrop overlay (z-index 1) but
+   below every hotel furni (walkable furni start at z 3), so the overlay hides
+   only the floor grid while the flat floor tiles stay visible - and any furni
+   placed on top of a floor tile always renders above it. */
+.snowwar-floor--props {
+  z-index: 2;
+}
+
+/* Tall classic props (trees/snowman/fences/blocks) as per-tile sprites - their
+   inline z-index depth-sorts them with the avatars. */
+.snowwar-classic-prop {
+  position: absolute;
+  pointer-events: none;
+}
+
+.snowwar-classic-prop-canvas {
+  display: block;
+}
+
+.snowwar-machine {
+  position: absolute;
+  width: 56px;
+  height: 70px;
+  z-index: 90;
+  cursor: pointer;
+  transform-origin: 0 0;
+}
+
+/* The machine is special game furni: AIR composes a count-dependent body,
+   blinking indicator and shadow around the shared RoomEngine anchor. */
+.snowwar-machine__official-body,
+.snowwar-machine__official-indicator,
+.snowwar-machine__official-shadow {
+  position: absolute;
+  image-rendering: var(--octane-pixel-art, pixelated);
+  pointer-events: none;
+}
+
+.snowwar-machine__official-body {
+  left: -26px;
+  top: -44px;
+  width: 41px;
+  height: 57px;
+}
+
+.snowwar-machine__official-indicator {
+  left: -2px;
+  top: -22px;
+  width: 32px;
+  height: 38px;
+}
+
+.snowwar-machine__official-shadow {
+  left: -28px;
+  top: -10px;
+  width: 56px;
+  height: 26px;
+}
+
+.snowwar-machine__count {
+  position: absolute;
+  left: -9px;
+  top: -70px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #eaf6ff 70%, #cfe6f4 100%);
+  color: #1c323f;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #9db4c4;
+  box-shadow: 0 1px 2px rgba(20, 50, 66, 0.3);
+}
+
+.snowwar-snowball {
+  position: absolute;
+  width: 0;
+  height: 0;
+  z-index: 400;
+  pointer-events: none;
+}
+.snowwar-snowball__shadow {
+  position: absolute;
+  left: -7px;
+  top: -2px;
+  width: 14px;
+  height: 6px;
+  /* Bootstrap's responsive img rule otherwise clamps this to the wrapper's
+     intentional zero width, making every authoritative flight invisible. */
+  max-width: none;
+  opacity: 0.392;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+.snowwar-snowball__ball {
+  position: absolute;
+  left: -7px;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  max-width: none;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* AIR keeps its exact three SNOW_SPLASH bitmaps alive for 500ms. */
+.snowwar-splash {
+  position: absolute;
+  width: 23px;
+  height: 22px;
+  z-index: 450;
+  pointer-events: none;
+  animation: snowwar-splash-life 500ms linear forwards;
+}
+.snowwar-splash__frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  image-rendering: var(--octane-pixel-art, pixelated);
+  opacity: 0;
+}
+.snowwar-splash__frame--1 { animation: snowwar-splash-frame-1 500ms step-end; }
+.snowwar-splash__frame--2 { animation: snowwar-splash-frame-2 500ms step-end; }
+.snowwar-splash__frame--3 { animation: snowwar-splash-frame-3 500ms step-end; }
+@keyframes snowwar-splash-frame-1 { 0%, 32% { opacity: 1; } 33%, 100% { opacity: 0; } }
+@keyframes snowwar-splash-frame-2 { 0%, 32% { opacity: 0; } 33%, 65% { opacity: 1; } 66%, 100% { opacity: 0; } }
+@keyframes snowwar-splash-frame-3 { 0%, 65% { opacity: 0; } 66%, 100% { opacity: 1; } }
+@keyframes snowwar-splash-life { from { opacity: 1; } to { opacity: 1; } }
+
+.snowwar-avatar {
+  position: absolute;
+  width: 0;
+  height: 0;
+  cursor: pointer;
+}
+.snowwar-avatar__hitbox {
+  position: absolute;
+  left: -22px;
+  top: -72px;
+  width: 44px;
+  height: 72px;
+}
+.snowwar-avatar .avatar-image {
+  position: absolute;
+  left: -45px;
+  top: -110px;
+  /* Scale around the feet (45,110 in the 90x130 render), so they stay on the
+     avatar's tile; scaling around the box bottom dropped them 15px below it. */
+  transform-origin: 45px 110px;
+}
+.snowwar-avatar--stunned .avatar-image {
+  left: -96px;
+  top: -100px;
+  width: 192px;
+  height: 120px;
+  transform-origin: 96px 100px;
+}
+/* Zero-size positioned box at the avatar's feet: keeps the absolutely-placed
+   avatar image in the same spot while letting us pivot it for the throw. */
+.snowwar-avatar__body {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.snowwar-avatar__name {
+  position: absolute;
+  left: 50%;
+  /* Pre-zoom coordinate: 2-3 screen pixels above the rendered avatar, whose
+     feet sit on the anchor and whose head is ~27px (110 x 0.25) above it. */
+  top: -37px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 5.5px;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+.snowwar-avatar__name--own {
+  text-decoration: underline;
+}
+.snowwar-chat-bubble {
+  --snowwar-chat-base: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADUAAAAjCAYAAAA0aUL2AAAD5UlEQVRYw92Zz28UZRjHP8/M7O5IDP6KMViqidGkttvWWwvZ9Q+oVw9NargRlAMevZTAgYMXvZAQxHCA2NhEDlzUGxFmFZpoYLctbazxYDUbQxAhoVk6887jYX643d0Wqut25Ekm7/x4Z/b97Pd5nveZd0RV2cpEpK2DqgoZNudhMGuuu+m1rMJZmwHdcl2+yee5D1TDEJranwsF1ly3o4pZMGl1vwToojEURViIrxclEmVBlbdtmwLgA081GplTzGoFuprPc9EYllVZUGW5Q8wtx4rdVs2kYqlSCdCFMGQgVmUu3n9GhJuq6fnEpmw73d+VIcXaYmpABC8MOej7jFkWPwUBP/p+G1BRhBlj0jjLnPslKi2o4jUN8qDvcxp4EbirylwYYgHLqtgiHV0zc0olgzxvDN4v66gqqsr7TX3ux4BXjOGuKt9mUClRVUREP83lUnW++1XZ1wdXf4N9fWkSIelTFOFVy2IxDHlJhFcePMhUBnSagRLXq1U9TDhOqT86X1n1ieE7PiRrKX1DRXHeGE5/eYWR0TK1qkepv5xeS8A++crb8IB333pzR1N6pz/USdzpQqySiFCregwNj0cwdZ9Sf47Kqk9l1WdoOFLwzNcVBt8Yi1J/Pr+tgZw0hlMzM92Jnw4lm5NUCUnKVtVIqZqHbZUp9UVAzVap+wyPlJi/UQHgB1UmLOuRBjEdBJy5dKlrSq1dvkxQryMimoBZAKOWlWY+EWG+VmGoOE6t6rUBARBEcZeZGNqzh3uzs6lqVnNeP2DbHJooo6rcXJgDwLZyLM5fA4cNrYhwaKLMMcfhsO8zl6HUbgFcbyqNErWUyA3nax4jo2UWr19LW4DBYhRPHzjOjkME9TpAqpYAest1+TAIUrBkrqpVvbY0PjxSAmD/XmHNddnVaHAunhIGZOvM/oII00HQtSTRyXZPTv6d0pMBeWHIx7kc+/dGx0srt7nzxLPpTcn5pIh9VKCez1PPNxocaKq4b4Rhevz6a89tuCGBaC2CM1f7fV8oAHAkjo8jjsOfqrxn2ync510Amg6C3ik1GA+suX1ahFHLAmMAWG8B2q46J43hM2O4Nzvbu4J2q05nXRcnhvsnrtZLoDRRqKqIiJ7L5QiaYqsbsdNLoE3ffB1j2rZiyzy2HTvhOLxj2xyemtoZqAGRjtu/sd9VORXHY6/ArF78yFIY9hTM6pVLLIUhJ3pUUvUMakeXyB4rKFWVsfX1/zXM7slJVFUeS6Wc1kUMEdEvOtR43bA/gAZwZ2Wl689++ejRdJ1COn10S8qm/wLuSRHOGsNHx493DaZ14UW2+pKY1e9PD1si+wsPi+sAuLvTGAAAAABJRU5ErkJggg==");
+  --snowwar-chat-pointer: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAGCAYAAAARx7TFAAAAUklEQVQI13XOMQqAQAwEwIlY2/uze6I/s7cW1kJP5MBUCTuwKeTYNuPM6+rcd0trJlha+wUwJakvHEGSkkQSyFOdvvesHgCq6j16A+6fxuAL4AKv0zYmb7lZXwAAAABJRU5ErkJggg==");
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 535;
+  min-width: 53px;
+  min-height: 35px;
+  box-sizing: border-box;
+  color: #000;
+  font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+  font-size: 12px;
+  line-height: 15px;
+  padding: 10px 15px 10px 32px;
+  white-space: nowrap;
+  pointer-events: none;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+.snowwar-chat-bubble--blue {
+  --snowwar-chat-base: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADUAAAAjCAYAAAA0aUL2AAAEQ0lEQVRYw92ZX2hbVRzHP+feJC2rdW1Ha10SRikYaNbUUqTtaKoPUqSFIQwFcT74YmU6X9wmolD2oGK3F8GBikMY/oHBHiy0vvhiE2ombrGpmeuw1jbJIsoMa9eY5iY5PtzlrknTuq1teu2BcMK9596cT76/3/f87rlCSsl6TQixaoCUUmDiZvkvmPoLyTXPmRXOshbQnq8SZOLz5NLLZP+8jtXRhBadxepoou6z66gP1iCEkGYEE8XhlwdKB32o9maysRkAVHszANnYDLaOJ1AsFnK5LDeeqTadYkoxUM0HYdJBH9nINNnYDNnI9KqLsn9E9Ny6tUj9hWTJvDOFUgZQYAzV6QJAmw6gOlpQHqghO/+LcTzfKjufNL7/dWiXaRRTig+oThdaeJzF4YNYXV1ko1dKAqn2ZlIXv0WLzprOKJSVKmVjM2jhcePk4vBBUl+/i6h7mNzSAtp0AISih6SiGqGZjmuYNqfyk0yNnsYX1ZBSIqVk6czhO4OWl8glE2hXf9T7a0FM6X5CCFl9YsRQ54d4hscaVb6PQbfdMBHyY1R7M2rDXjLxedTaev5+ca+pHNCyEigfepcvT7Dc2kWP0wqAP6KrJkTpeZvN0gsW39ToaT4aHcfT5iU06aPH6TXO5cE+HvMV3ODlgd5ttfRSf6glH07pwJgRZqFJH+7WLh0mrtHjtOKPaPgjGu7bCn7yjZ+WRztx7YH4a9/d00TSYT9vvHl8c/KnRMlmyVcJKy3b0+YlFPKhKl567DrQyuaPa7R6epj6yX97EU5gdXfd1SSSY2c5P3xi05Qa+V3jUkIWlGyKvjY9UlA5TIX8uPd3EZr0rQICIAOhSZ9pcqijVjAUTBuq6Zau6J2t+zCD/V6klFz5+aLudIqV8FQALBT0QggG+73Mdb/N4qmn0cIBc61T2bmrqE4XSl2jkVcSiafNy1TIh6fNSzgYMHqAlv2dAFQ8dXzbIS4ldJ/Kq2UBsLV7+WfkU6zuXqzuXgb7vUxEJaFJH0IIpkJ+o/e06Y54wCHY/eFNbr66m6oj58gtLZCZm17fave5Ciax5ZZuFLHhcaqOfskBh24mE9HCCeSPAwYQgPrQPnOtUzeeq6Vy4Nidcum3y1QOHCOl2QogAAOioLg1EZCRUzVnrumPEv0vGb1cTFAz8LwBW3Xk3IaBkmNny6eUtdFBqrivrsXqaCK1xoX3qk467Cd1/i2GgunyFbTrDVqp0P2EWjmBTrbbdKWklEIIIUuF10Zzp5xAaz75rgVzv2ZQ0dFH5bPv8P57p7YHKj/54s+GquhUkl19LwCUDUwpx49kYrNlBVPKFRKZ2CwVHX07R6lt3yLbUVBSSrEw9Pj/GuZkuw0ppdiRSlmKNzGEELLqlc+35MfUBicAv97Kbfq9v/BWGvsUotRLt3zZtBVwaoOTdNjPoaOvbxpM8caLWO9NotneZtztFtm/1u71q8FPDMwAAAAASUVORK5CYII=");
+  --snowwar-chat-pointer: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAGCAYAAAARx7TFAAAAXElEQVQI13XOsQ2AMAwF0TMFPaNEDIiyEnugrMAG9FAcBQmKkHBlfz9ZDsClnHxrnoLtkJxGBoCcxl8AgApgvei6Xy7ltGXqg76wBypRAQAR8Q5qtH7of2mLHgDchvQ/tmlTwKUAAAAASUVORK5CYII=");
+}
+.snowwar-chat-bubble::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 29px 18px 5px 34px;
+  border-image-source: var(--snowwar-chat-base);
+  border-image-slice: 29 18 5 34 fill;
+  border-image-repeat: stretch;
+}
+.snowwar-chat-bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: calc(100% - 1px);
+  width: 9px;
+  height: 6px;
+  transform: translateX(-50%);
+  background: var(--snowwar-chat-pointer) no-repeat;
+}
+.snowwar-chat-bubble__face {
+  position: absolute;
+  left: 6px;
+  top: 13px;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  overflow: hidden;
+}
+.snowwar-chat-bubble__text {
+  position: relative;
+  z-index: 1;
+  display: block;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.snowwar-avatar--invincible .avatar-image {
+  opacity: 0.392;
+}
+/* AIR RoomChatInputView in a game session: the 471x38 room chat bar centred at
+   desktop height - 104 (the room skin comes from RoomWidgets.css). */
+.snowwar-chat-input {
+  position: absolute;
+  left: 50%;
+  top: calc(100% - 104px);
+  z-index: 540;
+  width: 471px;
+  max-width: calc(100% - 24px);
+  height: 38px;
+  transform: translateX(-50%);
+}
+
+.snowwar-help {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 540;
+  width: max(0px, calc(50% - 225px));
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: right;
+  color: rgba(255, 255, 255, 0.65);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* AIR snowwar_ending: banner, two team columns of 289x62 player rows
+   (avatar 64px | name + HITS/K.O.'s | score), spotlights, button bar. */
+.snowwar-results {
+  position: absolute;
+  inset: 0;
+  z-index: 560;
+  background: rgba(10, 18, 26, 0.72);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10px;
+  overflow-y: auto;
+}
+@media (min-height: 686px) {
+  .snowwar-results {
+    padding-top: 115px;
+  }
+}
+.snowwar-results__card {
+  width: min(660px, calc(100% - 24px));
+  background: #1c323f;
+  border: 2px solid #4b7ea1;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
+}
+.snowwar-results__title {
+  text-align: center;
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 700;
+}
+.snowwar-results__teams {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.snowwar-results__team {
+  flex: 1 1 289px;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* snowwar_ending team1Score / team2Score: Ubuntu 24 px bold. */
+.snowwar-results__team-score {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+}
+.snowwar-results__team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.snowwar-results__player {
+  display: flex;
+  align-items: stretch;
+  height: 62px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #1c323f;
+  overflow: hidden;
+}
+.snowwar-results__player--team-2 {
+  flex-direction: row-reverse;
+}
+.snowwar-results__player-image {
+  position: relative;
+  width: 64px;
+  height: 62px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #1077ac;
+}
+.snowwar-results__player--team-2 .snowwar-results__player-image,
+.snowwar-results__player-image--team-2 {
+  background: #fd6859;
+}
+.snowwar-results__player-image .avatar-image {
+  position: absolute;
+  left: -4px;
+  top: -6px;
+  transform-origin: top left;
+}
+.snowwar-results__player-data {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  padding: 3px 8px;
+}
+/* playerName: Ubuntu 14 px bold. */
+.snowwar-results__player-name {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* playerHitsLabel / playerKillsLabel: 11 px bold; playerHits / playerKills: u_bold 12 px. */
+.snowwar-results__stat {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 14px;
+}
+.snowwar-results__stat span:last-child {
+  font-size: 12px;
+}
+.snowwar-results__player-score {
+  width: 60px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 8px;
+}
+/* AIR "rematch_" glow strip: the score pulses once the player asks to play again. */
+.snowwar-results__player-score--rematch {
+  animation: snowwar-results-rematch 0.6s ease-in-out infinite alternate;
+}
+@keyframes snowwar-results-rematch {
+  from { box-shadow: inset 0 0 0 0 rgba(127, 208, 138, 0); background: rgba(127, 208, 138, 0.15); }
+  to { box-shadow: inset 0 0 12px 2px rgba(127, 208, 138, 0.9); background: rgba(127, 208, 138, 0.45); }
+}
+.snowwar-results__spotlights {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+.snowwar-results__spotlight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-weight: 700;
+}
+/* mostHitsLabel / mostKillsLabel: Ubuntu 17 px bold; playerName: 14 px bold white. */
+.snowwar-results__spotlight-title {
+  font-size: 17px;
+}
+.snowwar-results__spotlight-name {
+  color: #fff;
+  font-size: 14px;
+}
+.snowwar-results__buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-top: 4px;
+}
+.snowwar-results__buttons .snowwar-button {
+  min-width: 190px;
+  min-height: 44px;
+  font-size: 15px;
+}
+.snowwar-results__status {
+  border: 0;
+  background: none;
+  color: #fff;
+  /* statusContainer: games_left Ubuntu 13 px. */
+  font-size: 13px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+}
+.snowwar-results__games-left {
+  font-size: 20px;
+  font-weight: 700;
+}
+.snowwar-results__games-left--blue {
+  color: #5fb6e8;
+}
+.snowwar-results__games-left--red {
+  color: #ff5a5a;
+}
+/* status.text_get_vip: Ubuntu 13 px underlined. */
+.snowwar-results__status-vip {
+  font-size: 13px;
+  color: #ffd75e;
+  text-decoration: underline;
+}
+.snowwar-results__leave {
+  align-self: center;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: #8ed5ff;
+  /* leave_link: u_bold 12 px underlined. */
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.snowwar-furni {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.snowwar-raygun-hitbox {
+  position: absolute;
+  left: -18px;
+  top: -38px;
+  width: 36px;
+  height: 38px;
+  z-index: 2;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.snowwar-furni__fallback {
+  position: absolute;
+  left: -8px;
+  top: -14px;
+  width: 16px;
+  height: 12px;
+  background: #cfd6dd;
+  border: 1px solid #9aa5b0;
+  border-radius: 2px;
+}
+
+.snowwar-hud__zoom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.snowwar-hud__zoom-level {
+  width: 24px;
+  height: 22px;
+  border: 1px solid #24567a;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cfe0ec;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.snowwar-hud__zoom-level:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+.snowwar-hud__zoom-level--active {
+  background: linear-gradient(180deg, #5a9fd4 0%, #39759f 100%);
+  color: #fff;
+}
+
+.snowwar-banner--warning {
+  top: 110px;
+  border-color: #b9322a;
+  font-size: 14px;
+}
+
+.snowwar-arena-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Backdrop overlaid on the floor tiles (offsetZ flag on): above the floor
+   canvas, below the furni/avatars (z-index 100+), so tiles hide but pieces
+   still show. Sits inside .snowwar-world so it pans/zooms with the arena. */
+.snowwar-arena-bg-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.snowwar-banner--saved {
+  top: 110px;
+  border-color: #2f7a43;
+  background: rgba(47, 122, 67, 0.92);
+  font-size: 14px;
+}
+
+/* In-arena WYSIWYG editor */
+.snowwar-editor {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  z-index: 540;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: min(360px, calc(100% - 16px));
+  max-height: calc(100% - 76px);
+  padding: 10px;
+  overflow-y: auto;
+  border: 3px solid #ef8a36;
+  border-radius: 13px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(225, 243, 252, 0.98)),
+    url('../../assets/images/snowstorm/original/bg_sky.png') top left / auto 132px repeat-x;
+  color: #315f7a;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 5px 16px rgba(41, 91, 123, 0.38);
+}
+
+.snowwar-editor__title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #e7782a;
+  font-size: 16px;
+  font-weight: 800;
+  text-shadow: 0 1px #fff;
+}
+
+.snowwar-editor__title-ball {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border: 1px solid #77b8d7;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff 0 27%, #d9f0f8 32% 68%, #83bed8 72% 100%);
+  box-shadow: 0 1px 1px rgba(48, 99, 128, 0.28);
+}
+
+.snowwar-editor__hint {
+  font-size: 11px;
+  line-height: 1.3;
+  color: #527f99;
+}
+
+.snowwar-editor__shortcuts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 6px;
+  border: 1px solid #9ac9df;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #4a7690;
+  font-size: 10px;
+}
+
+.snowwar-editor__shortcuts span {
+  display: flex;
+  flex-direction: column;
+}
+
+.snowwar-editor__shortcuts kbd {
+  width: max-content;
+  padding: 1px 5px;
+  border: 1px solid #e0822f;
+  border-radius: 5px;
+  color: #db7424;
+  background: #fffaf3;
+  font: inherit;
+  font-weight: 800;
+}
+
+.snowwar-editor__palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 148px;
+  overflow-y: auto;
+}
+
+.snowwar-editor__chip {
+  padding: 3px 7px;
+  border: 1px solid #82bad5;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #fff 0%, #e5f3fa 100%);
+  color: #376b89;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(66, 121, 152, 0.15);
+}
+
+.snowwar-editor__chip:hover {
+  border-color: #ef8a36;
+  background: #fff8ed;
+}
+
+.snowwar-editor__chip--active {
+  border-color: #cf641d;
+  background: linear-gradient(180deg, #f8ab51 0%, #e87a28 100%);
+  color: #ffffff;
+  text-shadow: 0 1px 1px #9f541e;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.48), 0 0 0 1px rgba(255, 255, 255, 0.8);
+}
+
+.snowwar-editor__floor-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 7px;
+  border: 1px solid #82bad5;
+  border-radius: 8px;
+  background: rgba(226, 244, 252, 0.88);
+}
+
+.snowwar-editor__floor-plan-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  color: #2c7193;
+  font-size: 11px;
+}
+
+.snowwar-editor__floor-plan-heading strong {
+  font-size: 12px;
+}
+
+.snowwar-editor__floor-plan-heading span {
+  color: #668ca1;
+  font-size: 10px;
+}
+
+.snowwar-editor__palette--furni {
+  max-height: 96px;
+}
+
+.snowwar-editor__search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 7px;
+  border: 1px solid #82bad5;
+  border-radius: 7px;
+  background: #fff;
+  color: #315f7a;
+  font-size: 11px;
+}
+
+.snowwar-editor__search::placeholder {
+  color: #87a8ba;
+}
+
+.snowwar-editor__tools {
+  display: flex;
+  gap: 6px;
+}
+
+/* Function controls (mode toggles + Clear all) - wrap and sit above the furni
+   palette, visually separated so they don't read as placeable furni. */
+.snowwar-editor__tools--modes {
+  flex-wrap: wrap;
+  align-items: center;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #a8cfdf;
+}
+
+.snowwar-editor__tools--modes .snowwar-button--danger {
+  margin-left: auto;
+}
+
+.snowwar-editor__state {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.snowwar-editor__state-value {
+  min-width: 18px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.snowwar-button--icon {
+  min-width: 22px;
+  padding: 2px 6px;
+  line-height: 1;
+}
+
+.snowwar-button--icon:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.snowwar-editor__preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 6px;
+  border: 1px solid #b3d5e4;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+}
+
+.snowwar-editor__preview-label {
+  opacity: 0.8;
+}
+
+.snowwar-editor__selected {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 5px;
+  border-top: 1px solid #a8cfdf;
+}
+
+.snowwar-editor__field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.snowwar-editor__field--stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.snowwar-editor__number {
+  width: 72px;
+  padding: 3px 6px;
+  border: 1px solid #82bad5;
+  border-radius: 7px;
+  background: #fff;
+  color: #315f7a;
+  font-size: 11px;
+}
+
+.snowwar-edit-admarker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+  pointer-events: none;
+  z-index: 92;
+}
+
+.snowwar-edit-selection {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 95;
+  filter: drop-shadow(0 0 5px rgba(127, 208, 255, 0.7));
+}
+
+.snowwar-edit-selection polygon {
+  fill: rgba(127, 208, 255, 0.15);
+  stroke: #7fd0ff;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.snowwar-edit-area {
+  position: absolute;
+  z-index: 94;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px rgba(238, 132, 44, 0.62));
+}
+
+.snowwar-edit-area polygon {
+  fill: rgba(95, 181, 222, 0.24);
+  stroke: #ef842c;
+  stroke-width: 2;
+  stroke-dasharray: 4 2;
+  stroke-linejoin: round;
+}
+
+/* AIR getSkillLevelImage: ten 15px star bitmaps; red (team 2) fills from the right. */
+.snowwar-stars {
+  display: flex;
+  width: 150px;
+  height: 13px;
+}
+.snowwar-stars--reverse {
+  flex-direction: row-reverse;
+}
+.snowwar-stars__star {
+  width: 14px;
+  height: 13px;
+  margin-right: 1px;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* AIR games_main footer + "How To Play" link on the SnowWar tile (AIR bitmaps bundled). */
+.game-tile--snowwar {
+  height: auto;
+  min-height: 250px;
+}
+.game-tile__links {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.game-tile__link {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: #8ed5ff;
+  /* instructions_link / leaderboard_link: Ubuntu 14 px bold underlined. */
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.game-tile__footer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.game-tile__games-left {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  /* games_left label: Ubuntu 14 px; the count: 20 px bold over its UbuntuThick stroke. */
+  font-size: 14px;
+}
+.game-tile__games-left-count {
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 700;
+}
+.game-tile__games-left-count--blue {
+  color: #1077ac;
+}
+.game-tile__games-left-count--red {
+  color: #ff0000;
+}
+.game-tile__tokens {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  /* games.lobby.get.games: Ubuntu 14 px. */
+  font-size: 14px;
+}
+.game-tile__token-buttons {
+  display: flex;
+  gap: 8px;
+}
+/* AIR btn_more_games_N, swapped for the _hi bitmap on hover. */
+.game-tile__token {
+  width: 52px;
+  height: 62px;
+  border: 0;
+  padding: 0;
+  background: var(--token-image) center / contain no-repeat;
+  cursor: pointer;
+}
+.game-tile__token:hover,
+.game-tile__token:focus-visible {
+  background-image: var(--token-image-hi);
+}
+.game-tile__vip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: #ffd75e;
+  /* games.lobby.get.vip: Ubuntu 14 px underlined. */
+  font-size: 14px;
+  line-height: 1.2;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.game-tile__hc-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+/* play_text: Ubuntu 20 px bold white. */
+.game-tile__actions .game-tile__play {
+  font-size: 20px;
+}
+.game-tile__play--blocked {
+  background: #cccccc;
+  color: #555;
+}
+
+/* AIR games_main instructions_container: 250x166 animation, arrows either
+   side, text below, five pagination balls, Back link. */
+.snowwar-instructions {
+  position: relative;
+  width: min(407px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0 16px;
+  background: #1c323f;
+  border: 2px solid #4b7ea1;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+.snowwar-instructions__image {
+  width: 250px;
+  height: 166px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.snowwar-instructions__image img {
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: pixelated;
+}
+.snowwar-instructions__arrow {
+  position: absolute;
+  top: 98px;
+  width: 50px;
+  height: 50px;
+  border: 0;
+  padding: 0;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.snowwar-instructions__arrow img {
+  image-rendering: pixelated;
+}
+.snowwar-instructions__arrow--prev {
+  left: 10px;
+}
+.snowwar-instructions__arrow--next {
+  right: 10px;
+}
+.snowwar-instructions__pages {
+  display: flex;
+  margin-top: 6px;
+}
+.snowwar-instructions__ball {
+  width: 25px;
+  height: 25px;
+  border: 0;
+  padding: 0;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.snowwar-instructions__text {
+  width: 280px;
+  min-height: 21px;
+  margin-top: 5px;
+  text-align: center;
+  /* instruction_text: Ubuntu 16 px bold. */
+  font-size: 16px;
+  font-weight: 700;
+}
+.snowwar-instructions__back {
+  align-self: flex-start;
+  margin: 14px 0 0 18px;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: #8ed5ff;
+  /* instructions_back: Ubuntu 13 px underlined. */
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* AIR counter.xml: a 164x164 box in the middle of the arena; each
+   explosion000N frame sits at minus its asset offset. */
+.snowwar-countdown {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 164px;
+  height: 164px;
+  margin: -82px 0 0 -82px;
+  z-index: 540;
+  pointer-events: none;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+.snowwar-countdown img {
+  position: absolute;
+}
+
+/* AIR BackgroundViewController (snowwar_loading_background_xml): #eefafc,
+   bg_sky tiled across the top, bg_sunshine centred, and the three vista
+   strips tiled at y 90 / 125 / 163. Shared by the lobby and loading screens. */
+.snowwar-air-backdrop {
+  background-color: #eefafc;
+  background-image:
+    url('../../assets/images/snowstorm/air/bg_vista_3.png'),
+    url('../../assets/images/snowstorm/air/bg_vista_2.png'),
+    url('../../assets/images/snowstorm/air/bg_vista_1.png'),
+    url('../../assets/images/snowstorm/air/bg_sunshine.png'),
+    url('../../assets/images/snowstorm/air/bg_sky.png');
+  background-repeat: repeat-x, repeat-x, repeat-x, no-repeat, repeat-x;
+  background-position: 0 163px, 0 125px, 0 90px, top center, 0 0;
+}
+
+/* Lobby additions: own row, skill stars, AIR load_ spinners, cancel link. */
+.snowwar-teams__player--own {
+  background: rgba(139, 215, 120, 0.55);
+}
+.snowwar-teams__player-data {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.snowwar-teams__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.snowwar-teams__spinner {
+  width: 29px;
+  height: 29px;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+.snowwar-teams__cancel {
+  margin-top: 6px;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: #2f6d95;
+  /* games_main cancel_link: Ubuntu 12 px underlined. */
+  font-size: 12px;
+  font-weight: 400;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* AIR GameLoadingViewController: the snowwar_ending window in loading mode. */
+.snowwar-lobby.snowwar-air-backdrop {
+  justify-content: flex-start;
+  padding-top: 10px;
+}
+@media (min-height: 686px) {
+  .snowwar-lobby.snowwar-air-backdrop {
+    padding-top: 115px;
+  }
+}
+.snowwar-loading {
+  color: #fff;
+}
+.snowwar-loading__arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.snowwar-loading__preview {
+  width: 191px;
+  height: 97px;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+/* loadingContainer arenaName: Ubuntu 14 px bold; loadingText: 17 px bold. */
+.snowwar-loading__arena-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+.snowwar-loading__spinner {
+  width: 29px;
+  height: 29px;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+.snowwar-loading__status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 17px;
+  font-weight: 700;
+}
+.snowwar-loading__status img {
+  width: 29px;
+  height: 29px;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+/* AIR green_square behind your own avatar. */
+.snowwar-results__player-image--own {
+  background: #6fbf3f !important;
+}
+
+/* AIR snowwar_leaderboard frame (437x511, 0x418db0) with its caption. */
+.snowwar-leaderboard-frame {
+  position: relative;
+  width: 437px;
+  padding: 0 3px 3px;
+  border-radius: 8px;
+  background: #418db0;
+  box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.34);
+}
+.snowwar-leaderboard-frame__title {
+  position: relative;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  /* The style 3 frame caption: 12 px bold white. */
+  font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-shadow: none;
+}
+.snowwar-leaderboard-frame .snowwar-leaderboard {
+  filter: none;
+}
+/* AIR links changeView / changeFriendsView / changeGroupView at y 445. */
+.snowwar-leaderboard__links {
+  position: absolute;
+  top: 445px;
+  left: 0;
+  z-index: 3;
+  width: 431px;
+  display: flex;
+  justify-content: space-around;
+}
+.snowwar-leaderboard__link {
+  width: 140px;
+  height: 18px;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: #1077ac;
+  font-size: 13px;
+  text-align: center;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.snowwar-leaderboard__link.is-active {
+  font-weight: 700;
+  text-decoration: none;
+}
+.snowwar-leaderboard__avatar {
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.snowwar-leaderboard__avatar .avatar-image {
+  position: relative;
+  top: auto;
+  left: auto;
+}
+
+/* AIR UbuntuThick (habbo-window-manager-com ubuntuThick_bold.ttf, the same
+   file as webfonts/Ubuntu-bt.ttf) behind white Ubuntu Bold: the outlined
+   SnowWar captions. See SnowWarStrokeText. */
+@font-face {
+  font-family: SnowWarUbuntuThick;
+  src: url('../../assets/webfonts/Ubuntu-bt.ttf') format('truetype');
+  font-display: block;
+}
+@font-face {
+  font-family: SnowWarUbuntuBold;
+  src: url('../../assets/webfonts/Ubuntu-b.ttf') format('truetype');
+  font-display: block;
+}
+.snowwar-stroke {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+  color: #fff;
+  font-family: SnowWarUbuntuBold, HabboAirUbuntu, UbuntuRegular, sans-serif;
+  font-weight: normal;
+  white-space: nowrap;
+  text-shadow: none;
+}
+.snowwar-stroke::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  color: var(--snowwar-stroke, #1077ac);
+  font-family: SnowWarUbuntuThick, HabboAirUbuntu, UbuntuRegular, sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* games_main, snowwar_ending, snowwar_leaderboard and the in-game HUD all name font_face=Ubuntu (the regular cut);
+   our `Ubuntu` face, which the body inherits, is the condensed one. The outlined captions keep their own faces. */
+.game-center-main,
+.snowwar-overlay,
+.snowwar-leaderboard-overlay,
+.snowwar-toast {
+  font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+@layer base {
+  :is(.game-center-main, .snowwar-overlay, .snowwar-leaderboard-overlay, .snowwar-toast) :where(*):not(svg, svg *, .snowwar-stroke) {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+  }
+}
+
+/* Button skins as AIR draws them: games_main play.button (container_button style 3 tinted 0x55cc00) and
+   snowwar_ending button_play_again / button_rematch / button_buy_games (button_thick style 5, 0x00ff00) are the
+   green shiny thick skin, white bold text; a blocked or waiting one is the grey disabled skin. */
+.game-tile__actions .game-tile__play,
+.snowwar-results__buttons .snowwar-button {
+  border: 5px solid transparent;
+  border-image-source: var(--habbo-skin-shiny-thick-green);
+  border-image-slice: 5 fill;
+  border-image-width: 5px;
+  border-image-repeat: stretch;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+.game-tile__actions .game-tile__play:hover:not(:disabled),
+.snowwar-results__buttons .snowwar-button:hover:not(:disabled) {
+  border-image-source: var(--habbo-skin-shiny-thick-green-hover);
+  filter: none;
+}
+.game-tile__actions .game-tile__play:active:not(:disabled),
+.snowwar-results__buttons .snowwar-button:active:not(:disabled) {
+  border-image-source: var(--habbo-skin-shiny-thick-green-pressed);
+}
+.game-tile__actions .game-tile__play.game-tile__play--blocked,
+.snowwar-results__buttons .snowwar-button:disabled {
+  border-image-source: var(--habbo-skin-shiny-thick-disabled);
+  background: transparent;
+  color: #555;
+  text-shadow: none;
+  opacity: 1;
+}

@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<skin name="close_button_skin" version="0.0">
+
+	<!-- shared variables -->
+
+	<variables>
+		<variable key="asset"	value="habbo_blue_skin_png"	type="String" />
+	</variables>
+
+	<!-- the following maps layouts for render states -->
+
+	<states>
+		<state name="default"  layout="button_close" template="default_button_mode" />
+		<state name="hovering" layout="button_close" template="hovering_button_mode" />
+		<state name="pressed"  layout="button_close" template="pressed_button_mode" />
+	</states>
+
+	<!-- templates defines regions in bitmap asset -->
+
+	<templates>
+
+		<template name="default_button_mode" asset="$asset">
+			<entities>
+				<entity name="button_close" type="bitmap"><region><Rectangle x="377" y="0"  width="15" height="15" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="hovering_button_mode" asset="$asset">
+			<entities>
+				<entity name="button_close" type="bitmap"><region><Rectangle x="377" y="16"  width="15" height="15" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="pressed_button_mode" asset="$asset">
+			<entities>
+				<entity name="button_close" type="bitmap"><region><Rectangle x="377"  y="32"  width="15" height="15" /></region></entity>
+			</entities>
+		</template>
+
+
+	</templates>
+
+	<!-- markup for layout drawer -->
+
+	<layouts>
+		<layout name="button_close" transparent="false">
+			<entities>
+				<entity name="button_close" id="0">
+					<region><Rectangle x="0" y="0" width="15" height="15" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+	</layouts>
+</skin>

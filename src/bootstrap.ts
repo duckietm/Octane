@@ -1,15 +1,15 @@
-import './pixiPatch';
-
-import { GetConfiguration } from '@nitrots/nitro-renderer';
-import JSON5 from 'json5';
+import { GetConfiguration } from '@octane/renderer';
+import { adoptLoginTokenFromUrl, confirmSignInFromLink, positiveIdFromSearch } from './api/auth/urlToken';
+import { derivePetConfig, DerivedPetConfig, PetDefinition } from './api/octane/PetData';
+import { parseJsonDocument, UiJsonMode } from './json/JsonDocumentParser';
 import { configFileUrl, getClientMode, installSecureFetch } from './secure-assets';
 
-declare const __NITRO_JSON_MODE__: 'legacy' | 'json5' | 'auto' | undefined;
+declare const __OCTANE_JSON_MODE__: UiJsonMode | undefined;
 
-const resolveJsonMode = (): 'legacy' | 'json5' | 'auto' => {
+const resolveJsonMode = (): UiJsonMode => {
     try {
-        if (typeof __NITRO_JSON_MODE__ !== 'undefined' && __NITRO_JSON_MODE__) {
-            if (__NITRO_JSON_MODE__ === 'legacy' || __NITRO_JSON_MODE__ === 'json5' || __NITRO_JSON_MODE__ === 'auto') return __NITRO_JSON_MODE__;
+        if (typeof __OCTANE_JSON_MODE__ !== 'undefined' && __OCTANE_JSON_MODE__) {
+            if (__OCTANE_JSON_MODE__ === 'legacy' || __OCTANE_JSON_MODE__ === 'jsonc' || __OCTANE_JSON_MODE__ === 'auto') return __OCTANE_JSON_MODE__;
         }
     } catch {}
 
@@ -32,8 +32,8 @@ ensureMobileViewport();
 
 const setBootDebug = (message: string) => {
     try {
-        (window as any).__nitroBootDebug = message;
-        const secureNode = document.getElementById('nitro-secure-debug');
+        (window as any).__octaneBootDebug = message;
+        const secureNode = document.getElementById('octane-secure-debug');
 
         if (secureNode) secureNode.textContent = `${secureNode.textContent}\n${message}`;
     } catch {}
@@ -41,7 +41,7 @@ const setBootDebug = (message: string) => {
 
 const deployBaseUrl = (): string => {
     try {
-        const loaderBase = (window as any).__nitroLoaderBase;
+        const loaderBase = (window as any).__octaneLoaderBase;
         if (typeof loaderBase === 'string' && loaderBase.length) return new URL('..', loaderBase).toString();
     } catch {}
 
@@ -63,7 +63,7 @@ const deployBaseUrl = (): string => {
 
 const loadClientMode = async () => {
     try {
-        if ((window as any).__nitroClientMode) return;
+        if ((window as any).__octaneClientMode) return;
 
         const url = new URL('configuration/client-mode.json', deployBaseUrl());
         url.searchParams.set('v', Date.now().toString(36));
@@ -75,57 +75,124 @@ const loadClientMode = async () => {
         const text = await response.text();
         const mode = resolveJsonMode();
 
-        if (mode === 'legacy') {
-            (window as any).__nitroClientMode = JSON.parse(text);
-        } else if (mode === 'json5') {
-            (window as any).__nitroClientMode = JSON5.parse(text);
-        } else {
-            try {
-                (window as any).__nitroClientMode = JSON.parse(text);
-            } catch {
-                (window as any).__nitroClientMode = JSON5.parse(text);
-            }
-        }
+        (window as any).__octaneClientMode = parseJsonDocument(text, mode, url.toString());
         setBootDebug(`boot: client-mode loaded (mode=${mode})`);
     } catch (error) {
         setBootDebug(`boot: client-mode fallback ${error?.message || error}`);
     }
 };
 
+const loadPetConfig = async (): Promise<DerivedPetConfig | null> => {
+    try {
+        const url = configFileUrl('pets.json', true);
+        const response = await fetch(url);
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const text = await response.text();
+        const parsed = parseJsonDocument(text, resolveJsonMode(), url) as { pets?: unknown } | unknown[];
+        const list = Array.isArray(parsed) ? parsed : (parsed as { pets?: unknown })?.pets;
+        const derived = derivePetConfig(list as PetDefinition[]);
+
+        setBootDebug(derived ? 'boot: pet config loaded' : 'boot: pets.json empty, using config pet.types');
+
+        return derived;
+    } catch (error) {
+        setBootDebug(`boot: pets.json fallback ${error?.message || error}`);
+
+        return null;
+    }
+};
+
+// The login secrets in the address - the SSO ticket and the CMS login token - come out of it before the first fetch,
+// so none of them reaches the history, a bookmark or the Referer of a request.
+const search = new URLSearchParams(window.location.search);
+
+// ?room= and ?friend= act once: left in the address they sent the user there again at every reload.
+const forwardRoomId = positiveIdFromSearch(search.get('room'));
+const friendId = positiveIdFromSearch(search.get('friend'));
+
+if (search.has('sso') || search.has('room') || search.has('friend')) {
+    try {
+        const url = new URL(window.location.href);
+
+        url.searchParams.delete('sso');
+        url.searchParams.delete('room');
+        url.searchParams.delete('friend');
+        window.history.replaceState(window.history.state, '', url.toString());
+    } catch {}
+}
+
+try {
+    adoptLoginTokenFromUrl();
+} catch (error) {
+    setBootDebug(`boot: login token from the address not kept ${error?.message || error}`);
+}
+
+// An SSO ticket from the address signs in only after the same question, when this browser remembers no login.
+let ssoTicket = search.get('sso') || null;
+
+if (ssoTicket && !confirmSignInFromLink(null)) ssoTicket = null;
+
 await loadClientMode();
 
 installSecureFetch();
 setBootDebug('boot: secure fetch installed');
 
-const search = new URLSearchParams(window.location.search);
 const clientMode = getClientMode();
+// The pet list, the configuration files and the UI bundle download together.
+const petConfigLoad = loadPetConfig();
 
-(window as any).NitroSecureApiUrl = clientMode.apiBaseUrl || window.location.origin;
-(window as any).NitroClientMode = clientMode;
-(window as any).NitroConfig = {
+(window as any).OctaneSecureApiUrl = clientMode.apiBaseUrl || window.location.origin;
+(window as any).OctaneClientMode = clientMode;
+(window as any).OctaneConfig = {
     'config.urls': [configFileUrl('renderer-config.json', true), configFileUrl('ui-config.json', true)],
-    'sso.ticket': search.get('sso') || null,
-    'forward.type': search.get('room') ? 2 : -1,
-    'forward.id': search.get('room') || 0,
-    'friend.id': search.get('friend') || 0
+    'sso.ticket': ssoTicket,
+    'forward.type': forwardRoomId ? 2 : -1,
+    'forward.id': forwardRoomId,
+    'friend.id': friendId
 };
 
-setBootDebug('boot: NitroConfig assigned');
+// Legacy aliases so external scripts written against the old Nitro globals keep working
+(window as any).NitroConfig = (window as any).OctaneConfig;
+(window as any).NitroClientMode = clientMode;
+(window as any).NitroSecureApiUrl = (window as any).OctaneSecureApiUrl;
+
+setBootDebug('boot: OctaneConfig assigned');
+
+const appModule = import('./index');
+
+appModule.catch(() => undefined);
 
 // Load renderer-config.json + ui-config.json BEFORE rendering React. Otherwise
 // the first paint triggers a flood of "Missing configuration key" warnings for
-// every key components read synchronously (asset.url, login.endpoint, …) until
-// prepare()'s deferred init() finally lands. Doing it here makes the config
-// already populated by the time index.tsx mounts <App/>.
+// every key components read synchronously (asset.url, login.endpoint, …).
+// The UI bundle is already downloading meanwhile; it only mounts below.
+const configLoad = GetConfiguration().init();
+
+configLoad.catch(() => undefined);
+
+const petConfig = await petConfigLoad;
+
+// As part of OctaneConfig the pet values win over the configuration files. A load still under way
+// re-reads OctaneConfig when its files are in; one that already finished gets them applied below.
+if (petConfig) Object.assign((window as any).OctaneConfig, petConfig);
+
 try {
-    await GetConfiguration().init();
+    await configLoad;
+
+    if (petConfig) GetConfiguration().parseConfiguration(petConfig, true);
+
     setBootDebug('boot: configuration init done');
 } catch (error) {
     setBootDebug(`boot: configuration init failed ${error?.message || error}`);
 }
 
-import('./index')
-    .then(() => setBootDebug('boot: app bundle imported'))
+appModule
+    .then(({ mountApp }) => {
+        mountApp();
+        setBootDebug('boot: app bundle imported');
+    })
     .catch((error) => {
         setBootDebug(`boot: import failed ${error?.message || error}`);
         throw error;

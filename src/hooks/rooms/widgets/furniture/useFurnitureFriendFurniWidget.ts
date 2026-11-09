@@ -6,10 +6,10 @@ import {
     LoveLockFurniStartEvent,
     RoomEngineTriggerWidgetEvent,
     RoomObjectVariable
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useState } from 'react';
 import { SendMessageComposer } from '../../../../api';
-import { useMessageEvent, useNitroEvent } from '../../../events';
+import { useMessageEvent, useOctaneEvent } from '../../../events';
 import { useFurniRemovedEvent } from '../../engine';
 
 const useFurnitureFriendFurniWidgetState = () => {
@@ -64,7 +64,7 @@ const useFurnitureFriendFurniWidgetState = () => {
         setStage(2);
     });
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_FRIEND_FURNITURE_ENGRAVING, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_FRIEND_FURNITURE_ENGRAVING, (event) => {
         const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
 
         if (!roomObject) return;

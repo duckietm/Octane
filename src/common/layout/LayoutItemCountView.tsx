@@ -10,6 +10,7 @@ export const LayoutItemCountView: FC<LayoutItemCountViewProps> = (props) => {
 
     const getClassNames = useMemo(() => {
         const newClassNames: string[] = [
+            'layout-item-count',
             'inline-block px-[.65em] py-[.35em] text-[.75em] font-bold leading-none text-[#fff] text-center whitespace-nowrap align-baseline rounded-[.25rem]',
             'border! border-[solid]! border-[#283F5D]!',
             'border-black',

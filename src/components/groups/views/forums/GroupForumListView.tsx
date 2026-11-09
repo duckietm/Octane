@@ -1,137 +1,103 @@
-import { ForumData, ForumsListMessageEvent, GetForumsListMessageComposer } from '@nitrots/nitro-renderer';
-import { FC, useEffect, useState } from 'react';
-import { GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../api';
-import { Column, Flex, LayoutBadgeImageView, Text } from '../../../../common';
-import { useMessageEvent } from '../../../../hooks';
+import { CreateLinkEvent, ForumData } from '@octane/renderer';
+import { FC } from 'react';
+import { GetGroupInformation, LocalizeText } from '../../../../api';
+import { ClassicScrollAreaView, LayoutBadgeImageView } from '../../../../common';
+import { flatText, GroupText } from '../GroupNativeLayout';
+import { FORUM_PAGE_SIZE, FORUM_SURFACE, stripTags, ForumButton, forumAge, ForumPager } from './GroupForumLayout';
+import { BaseButton } from '../../../../common/BaseButton';
 
-const FORUMS_PER_PAGE = 20;
+const ROW_WIDTH = 532;
 
-interface GroupForumListViewProps {
-    onOpenForum: (groupId: number) => void;
+/** ForumsListData: one answer to GetForumsList, as the forum window shows it. */
+export interface GroupForumsListData {
+    listCode: number;
+    totalAmount: number;
+    startIndex: number;
+    forums: ForumData[];
 }
 
-export const GroupForumListView: FC<GroupForumListViewProps> = (props) => {
-    const { onOpenForum = null } = props;
-    const [forums, setForums] = useState<ForumData[]>([]);
-    const [listMode, setListMode] = useState<number>(0); // 0 = most active
-    const [startIndex, setStartIndex] = useState<number>(0);
-    const [totalForums, setTotalForums] = useState<number>(0);
+interface GroupForumListViewProps {
+    list: GroupForumsListData;
+    onMarkAsRead: () => void;
+    onOpenForum: (groupId: number) => void;
+    onPage: (pageIndex: number) => void;
+}
 
-    useMessageEvent<ForumsListMessageEvent>(ForumsListMessageEvent, (event) => {
-        const parser = event.getParser();
+/** GroupForumView.openForumsList + ForumsListView: the page shown is the one the answer starts at, out of ceil(total / 20). */
+export const GroupForumListView: FC<GroupForumListViewProps> = ({ list, onMarkAsRead, onOpenForum, onPage }) => {
+    const { listCode, forums } = list;
+    const pageIndex = Math.ceil(list.startIndex / FORUM_PAGE_SIZE);
+    const pageCount = Math.ceil(list.totalAmount / FORUM_PAGE_SIZE);
 
-        setTotalForums(parser.totalAmount);
-
-        if (parser.startIndex === 0) {
-            setForums(parser.forums);
-        } else {
-            setForums((prev) => [...prev, ...parser.forums]);
-        }
-    });
-
-    useEffect(() => {
-        SendMessageComposer(new GetForumsListMessageComposer(listMode, startIndex, FORUMS_PER_PAGE));
-    }, [listMode, startIndex]);
-
-    const formatTimeAgo = (seconds: number): string => {
-        if (seconds < 60) return `${seconds}s ${LocalizeText('messageboard.time.ago')}`;
-        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${LocalizeText('messageboard.time.ago')}`;
-        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ${LocalizeText('messageboard.time.ago')}`;
-
-        return `${Math.floor(seconds / 86400)}d ${LocalizeText('messageboard.time.ago')}`;
-    };
+    // "Did you know? You can get your own group forum <u><a href=...>here</a></u>." keeps its link as a separate, working piece.
+    const status = LocalizeText('groupforum.view.forums_list.status');
+    const linkMatch = status.match(/^(.*?)<u><a[^>]*>(.*?)<\/a><\/u>(.*)$/);
+    const before = linkMatch ? stripTags(linkMatch[1]) : stripTags(status);
+    const linkText = linkMatch ? linkMatch[2] : '';
+    const after = linkMatch ? stripTags(linkMatch[3]) : '';
 
     return (
-        <Column className="h-full" gap={0}>
-            <Flex className="bg-muted p-2 border-b" gap={2} alignItems="center" justifyContent="between">
-                <Text bold>{LocalizeText('messageboard.all.threads.header')}</Text>
-                <Flex gap={1}>
-                    <select
-                        className="form-select form-select-sm"
-                        value={listMode}
-                        onChange={(e) => {
-                            setListMode(parseInt(e.target.value));
-                            setStartIndex(0);
-                        }}
-                    >
-                        <option value={0}>{LocalizeText('groupforum.list.tab.most_active')}</option>
-                        <option value={2}>{LocalizeText('groupforum.list.tab.my_forums')}</option>
-                    </select>
-                </Flex>
-            </Flex>
-            <Column className="overflow-auto flex-1 p-2" gap={1}>
-                {forums.map((forum, index) => {
-                    return (
-                        <Flex
-                            key={forum.groupId}
-                            className="p-2 rounded bg-white hover:bg-muted cursor-pointer border"
-                            gap={2}
-                            alignItems="center"
-                            onClick={() => onOpenForum(forum.groupId)}
-                        >
-                            <div className="flex-shrink-0">
-                                <LayoutBadgeImageView badgeCode={forum.icon} isGroup={true} />
+        <>
+            <GroupText background={FORUM_SURFACE} height={25} overrides={flatText(16, { bold: true, color: 0xa6a6a2 })} text={LocalizeText(`groupforum.view.forums_list.${listCode}`)} width={541} x={0} y={115} />
+            <div className="octane-forum__list">
+                <ClassicScrollAreaView className="octane-forum__scroll" contentClassName="octane-forum__scroll-content" minThumbSize={26} scrollStep={42}>
+                    {forums.map((forum, rowIndex) => {
+                        const isUnread = forum.unreadMessages > 0;
+                        const background = rowIndex % 2 === 1 ? 0xb2e6fa : 0xeefeff;
+                        const rowColor = '#' + background.toString(16).padStart(6, '0');
+                        const details = stripTags(
+                            LocalizeText(
+                                'groupforum.view.forum_details',
+                                ['RATING', 'LAST_AUTHOR_NAME', 'UPDATE_TIME'],
+                                [String(forum.leaderboardScore), forum.lastMessageAuthorName, forumAge(forum.lastMessageTimeAsSecondsAgo)]
+                            )
+                        );
+
+                        return (
+                            <div key={forum.groupId} className="octane-forum__forum">
+                                {/* group_icon: a group badge widget, its click asks for the group details (GetHabboGroupDetails, open). */}
+                                <BaseButton type="button" className="octane-forum__forum-badge" style={{ background: rowColor }} onClick={() => GetGroupInformation(forum.groupId)}>
+                                    <LayoutBadgeImageView badgeCode={forum.icon} isGroup={true} />
+                                </BaseButton>
+                                <div className="octane-forum__forum-body" style={{ left: 42, width: ROW_WIDTH - 42 - 1 - 100, background: rowColor }}>
+                                    <GroupText background={background} overrides={isUnread ? { bold: true } : undefined} text={forum.name} x={0} y={0} />
+                                    <GroupText background={background} overrides={flatText(10)} text={details} x={0} y={16} />
+                                    {/* header_region: the 280x17 strip over the group name opens the forum. */}
+                                    <BaseButton className="octane-forum__forum-header" type="button" onClick={() => onOpenForum(forum.groupId)} />
+                                </div>
+                                {/* unread_region: the message counts open the forum too. */}
+                                <BaseButton className="octane-forum__forum-counts" type="button" style={{ left: ROW_WIDTH - 100, background: rowColor }} onClick={() => onOpenForum(forum.groupId)}>
+                                    <GroupText
+                                        background={background}
+                                        overrides={flatText(10, { bold: isUnread })}
+                                        text={LocalizeText('groupforum.view.thread_details1', ['TOTAL_MESSAGES', 'total_messages'], [String(forum.totalMessages), String(forum.totalMessages)])}
+                                        x={0}
+                                        y={0}
+                                    />
+                                    <GroupText
+                                        background={background}
+                                        overrides={flatText(10, { bold: isUnread })}
+                                        text={LocalizeText('groupforum.view.thread_details2', ['NEW_MESSAGES', 'new_messages'], [String(forum.unreadMessages), String(forum.unreadMessages)])}
+                                        x={0}
+                                        y={15}
+                                    />
+                                </BaseButton>
                             </div>
-                            <Column className="flex-1 overflow-hidden" gap={0}>
-                                <Text bold className="truncate">
-                                    {forum.name}
-                                </Text>
-                                <Text small variant="muted" className="truncate">
-                                    {forum.description}
-                                </Text>
-                            </Column>
-                            <Column className="flex-shrink-0 text-end" gap={0}>
-                                <Text small>
-                                    {forum.totalThreads} {LocalizeText('groupforum.view.threads')}
-                                </Text>
-                                <Text small>
-                                    {forum.totalMessages} {LocalizeText('messageboard.messages')}
-                                </Text>
-                                {forum.unreadMessages > 0 && (
-                                    <Text small bold variant="danger">
-                                        {forum.unreadMessages} {LocalizeText('messageboard.unread')}
-                                    </Text>
-                                )}
-                            </Column>
-                            <Column className="flex-shrink-0 text-end min-w-[100px]" gap={0}>
-                                {forum.lastMessageAuthorId > 0 && (
-                                    <>
-                                        <Text small variant="muted">
-                                            {LocalizeText('messageboard.last.message')}
-                                        </Text>
-                                        <Text
-                                            small
-                                            pointer
-                                            underline
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                GetUserProfile(forum.lastMessageAuthorId);
-                                            }}
-                                        >
-                                            {forum.lastMessageAuthorName}
-                                        </Text>
-                                        <Text small variant="muted">
-                                            {formatTimeAgo(forum.lastMessageTimeAsSecondsAgo)}
-                                        </Text>
-                                    </>
-                                )}
-                            </Column>
-                        </Flex>
-                    );
-                })}
-                {forums.length === 0 && (
-                    <Flex className="p-4" justifyContent="center">
-                        <Text variant="muted">{LocalizeText('groupforum.list.no_forums')}</Text>
-                    </Flex>
+                        );
+                    })}
+                </ClassicScrollAreaView>
+            </div>
+            <div className="octane-forum__footer">
+                <ForumButton label={LocalizeText('groupforum.view.mark_read')} width={95} x={10} onClick={onMarkAsRead} />
+                <ForumPager pageCount={pageCount} pageIndex={pageIndex} onPage={onPage} />
+            </div>
+            <div className="octane-forum__status is-list">
+                <GroupText background={FORUM_SURFACE} className="is-static" overrides={flatText(11)} text={before} x={0} y={0} />
+                {linkText && (
+                    <GroupText background={FORUM_SURFACE} className="is-static is-link" overrides={flatText(11, { underline: true })} text={linkText} x={0} y={0} onClick={() => CreateLinkEvent('catalog/open/guild_forum')} />
                 )}
-                {forums.length < totalForums && (
-                    <Flex justifyContent="center" className="p-2">
-                        <Text pointer underline onClick={() => setStartIndex(forums.length)}>
-                            {LocalizeText('groupforum.list.load_more')}
-                        </Text>
-                    </Flex>
-                )}
-            </Column>
-        </Column>
+                {after && <GroupText background={FORUM_SURFACE} className="is-static" overrides={flatText(11)} text={after} x={0} y={0} />}
+            </div>
+        </>
     );
 };

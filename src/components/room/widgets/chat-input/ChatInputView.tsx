@@ -1,17 +1,29 @@
-import { GetSessionDataManager, HabboClubLevelEnum, RoomControllerLevel } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager, HabboClubLevelEnum, SecurityLevel } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, LocalizeText, RoomWidgetUpdateChatInputContentEvent } from '../../../../api';
+import {
+    ChatMessageTypeEnum,
+    ChatStyleConfigEntry,
+    GetClubMemberLevel,
+    GetConfigurationValue,
+    HasSessionPermission,
+    LocalizeText,
+    ResolveChatStyleIds,
+    RoomWidgetUpdateChatInputContentEvent
+} from '../../../../api';
 import { Text } from '../../../../common';
-import { useChatCommandSelector, useChatInputWidget, useChatMentions, useRoom, useSessionInfo, useUiEvent } from '../../../../hooks';
+import { useChatCommandSelector, useChatInputWidget, useChatMentions, useNuxChatReminder, usePurchasableChatStyles, useRoom, useSessionInfo, useUiEvent } from '../../../../hooks';
 import { ChatInputCommandSelectorView } from './ChatInputCommandSelectorView';
 import { ChatInputEmojiSelectorView } from './ChatInputEmojiSelectorView';
+import { ChatInputHabbiconSelectorView } from './ChatInputHabbiconSelectorView';
 import { ChatInputMentionSelectorView } from './ChatInputMentionSelectorView';
 import { ChatInputStyleSelectorView } from './ChatInputStyleSelectorView';
 
 export const ChatInputView: FC<{}> = (props) => {
     const [chatValue, setChatValue] = useState<string>('');
+    const [portalTarget, setPortalTarget] = useState<HTMLElement>(null);
     const { chatStyleId = 0, updateChatStyleId = null } = useSessionInfo();
+    const ownedPurchasableStyleIds = usePurchasableChatStyles();
     const {
         selectedUsername = '',
         floodBlocked = false,
@@ -34,6 +46,7 @@ export const ChatInputView: FC<{}> = (props) => {
     } = useChatCommandSelector(chatValue);
 
     const mention = useChatMentions(chatValue, setChatValue, inputRef, commandSelectorVisible);
+    const nuxReminder = useNuxChatReminder(chatValue.length > 0);
 
     const chatModeIdWhisper = useMemo(() => LocalizeText('widgets.chatinput.mode.whisper'), []);
     const chatModeIdShout = useMemo(() => LocalizeText('widgets.chatinput.mode.shout'), []);
@@ -257,48 +270,18 @@ export const ChatInputView: FC<{}> = (props) => {
         }
     });
 
-    const chatStyleIds = useMemo(() => {
-        let styleIds: number[] = [];
-
-        const styles =
-            GetConfigurationValue<{ styleId: number; minRank: number; isSystemStyle: boolean; isHcOnly: boolean; isAmbassadorOnly: boolean }[]>('chat.styles');
-
-        for (const style of styles) {
-            if (!style) continue;
-
-            if (style.minRank > 0) {
-                if (GetSessionDataManager().hasSecurity(style.minRank)) styleIds.push(style.styleId);
-
-                continue;
-            }
-
-            if (style.isSystemStyle) {
-                if (GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR)) {
-                    styleIds.push(style.styleId);
-
-                    continue;
-                }
-            }
-
-            if (GetConfigurationValue<number[]>('chat.styles.disabled').indexOf(style.styleId) >= 0) continue;
-
-            if (style.isHcOnly && GetClubMemberLevel() >= HabboClubLevelEnum.CLUB) {
-                styleIds.push(style.styleId);
-
-                continue;
-            }
-
-            if (style.isAmbassadorOnly && GetSessionDataManager().isAmbassador) {
-                styleIds.push(style.styleId);
-
-                continue;
-            }
-
-            if (!style.isHcOnly && !style.isAmbassadorOnly) styleIds.push(style.styleId);
-        }
-
-        return styleIds;
-    }, []);
+    const chatStyleIds = useMemo(
+        () =>
+            ResolveChatStyleIds(GetConfigurationValue<ChatStyleConfigEntry[]>('chat.styles'), {
+                hasSecurity: (rank) => GetSessionDataManager().hasSecurity(rank),
+                canUseSystemStyles: HasSessionPermission('acc_anychatcolor', SecurityLevel.MODERATOR),
+                disabledStyleIds: GetConfigurationValue<number[]>('chat.styles.disabled') ?? [],
+                isClubMember: GetClubMemberLevel() >= HabboClubLevelEnum.CLUB,
+                isAmbassador: GetSessionDataManager().isAmbassador,
+                ownedPurchasableStyleIds
+            }),
+        [ownedPurchasableStyleIds]
+    );
 
     useEffect(() => {
         document.body.addEventListener('keydown', onKeyDownEvent);
@@ -314,10 +297,38 @@ export const ChatInputView: FC<{}> = (props) => {
         inputRef.current.parentElement.dataset.value = chatValue;
     }, [chatValue]);
 
-    if (!roomSession || roomSession.isSpectator) return null;
+    useEffect(() => {
+        if (!roomSession) return;
+
+        if (portalTarget && portalTarget.isConnected) return;
+
+        let frame = 0;
+
+        const locate = () => {
+            const target = document.getElementById('toolbar-chat-input-container');
+
+            if (target) {
+                setPortalTarget(target);
+                return;
+            }
+
+            frame = window.requestAnimationFrame(locate);
+        };
+
+        locate();
+
+        return () => window.cancelAnimationFrame(frame);
+    }, [roomSession, portalTarget]);
+
+    if (!roomSession || roomSession.isSpectator || !portalTarget) return null;
 
     return createPortal(
-        <div className="nitro-chat-input-container relative flex h-[38px] w-full items-center justify-between gap-[6px] overflow-visible rounded-[12px] border-2 border-black bg-[#dcdcdc] pl-[8px] pr-[8px]">
+        // justify-start, not between: the style trigger overlaps the bubble's pointed
+        // left cap via a negative margin. With justify-between, hiding an optional
+        // trailing button (habbicons disabled) redistributes the slack between the
+        // trigger and the bubble, exposing the cap and opening a gap.
+        <div className={`octane-chat-input-container swf-chat-input relative flex w-full items-center justify-start overflow-visible ${nuxReminder.wiggling ? 'is-nux-reminder' : ''}`}>
+            {nuxReminder.wiggling && <div className="octane-nux-chat-hint">{LocalizeText('widgets.chatinput.mode.remind.noobie')}</div>}
             {commandSelectorVisible && (
                 <ChatInputCommandSelectorView
                     commands={filteredCommands}
@@ -339,28 +350,30 @@ export const ChatInputView: FC<{}> = (props) => {
             )}
             <ChatInputStyleSelectorView chatStyleId={chatStyleId} chatStyleIds={chatStyleIds} selectChatStyleId={updateChatStyleId} />
             {!floodBlocked && (
-                <div className="flex-1 items-center input-sizer">
+                <div className="flex-1 items-center input-sizer swf-chat-input-sizer">
                     <input
                         ref={inputRef}
-                        className="w-full border-none bg-transparent px-[10px] text-[0.86rem] text-black placeholder:text-[#6c757d] focus:border-current focus:shadow-none focus:ring-0"
+                        className="swf-chat-input-field w-full border-none bg-transparent"
                         maxLength={maxChatLength}
-                        placeholder={LocalizeText('widgets.chatinput.default')}
+                        placeholder={nuxReminder.reminding ? LocalizeText('widgets.chatinput.mode.remind.noobie') : LocalizeText('widgets.chatinput.default')}
                         type="text"
                         value={chatValue}
                         onChange={(event) => updateChatInput(event.target.value)}
+                        onFocus={() => nuxReminder.dismiss()}
                         onMouseDown={(event) => setInputFocus()}
                     />
                 </div>
             )}
             {floodBlocked && (
-                <div className="flex min-w-0 flex-1 items-center px-[10px]">
+                <div className="swf-chat-flood flex min-w-0 flex-1 items-center">
                     <Text variant="danger" className="w-full truncate whitespace-nowrap text-[0.8rem] font-bold leading-none">
                         {LocalizeText('chat.input.alert.flood', ['time'], [floodBlockedSeconds.toString()])}
                     </Text>
                 </div>
             )}
+            <ChatInputHabbiconSelectorView />
             <ChatInputEmojiSelectorView addChatEmoji={addChatEmoji} />
         </div>,
-        document.getElementById('toolbar-chat-input-container')
+        portalTarget
     );
 };

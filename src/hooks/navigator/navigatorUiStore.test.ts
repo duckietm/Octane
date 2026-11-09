@@ -1,5 +1,35 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+/* @vitest-environment jsdom */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useNavigatorUiStore } from './navigatorUiStore';
+
+vi.mock('@octane/renderer', async () => {
+    const actual = await vi.importActual<typeof import('@octane/renderer')>('@octane/renderer');
+
+    return {
+        ...actual,
+        NavigatorSearchCloseComposer: class {
+            constructor(_code?: string) {}
+        },
+        NavigatorSearchOpenComposer: class {
+            constructor(_code?: string) {}
+        },
+        NavigatorCategoryListModeComposer: class {
+            constructor(_code?: string, _mode?: number) {}
+        },
+        NavigatorSettingsSaveComposer: class {
+            constructor(_x?: number, _y?: number, _w?: number, _h?: number, _open?: boolean, _mode?: number) {}
+        }
+    };
+});
+
+vi.mock('../../api', async () => {
+    const actual = await vi.importActual<typeof import('../../api')>('../../api');
+
+    return {
+        ...actual,
+        SendMessageComposer: vi.fn()
+    };
+});
 
 const INITIAL = {
     isVisible: false,
@@ -12,7 +42,9 @@ const INITIAL = {
     needsInit: true,
     needsSearch: false,
     currentTabCode: '',
-    currentFilter: ''
+    currentFilter: '',
+    searchHistory: [],
+    searchHistoryOffset: -1
 };
 
 describe('useNavigatorUiStore', () => {
@@ -147,6 +179,52 @@ describe('useNavigatorUiStore', () => {
             useNavigatorUiStore.getState().setTab('public');
             expect(useNavigatorUiStore.getState().currentTabCode).toBe('public');
             expect(useNavigatorUiStore.getState().currentFilter).toBe('');
+        });
+    });
+
+    describe('search history', () => {
+        it('goes back and forward through searches without adding entries', () => {
+            const store = useNavigatorUiStore.getState();
+
+            store.setTab('hotel_view');
+            store.setFilter('tag:pool');
+            store.setSearch('myworld_view', '');
+
+            useNavigatorUiStore.getState().goBack();
+            expect(useNavigatorUiStore.getState().currentTabCode).toBe('hotel_view');
+            expect(useNavigatorUiStore.getState().currentFilter).toBe('tag:pool');
+
+            useNavigatorUiStore.getState().goBack();
+            expect(useNavigatorUiStore.getState().currentFilter).toBe('');
+
+            useNavigatorUiStore.getState().goForward();
+            expect(useNavigatorUiStore.getState().currentFilter).toBe('tag:pool');
+            expect(useNavigatorUiStore.getState().searchHistory).toHaveLength(3);
+        });
+
+        it('drops forward entries when a new search is made after going back', () => {
+            const store = useNavigatorUiStore.getState();
+
+            store.setTab('hotel_view');
+            store.setTab('myworld_view');
+            useNavigatorUiStore.getState().goBack();
+            useNavigatorUiStore.getState().setSearch('hotel_view', 'tag:music');
+
+            const { searchHistory, searchHistoryOffset } = useNavigatorUiStore.getState();
+
+            expect(searchHistory.map((entry) => entry.filter)).toEqual(['', 'tag:music']);
+            expect(searchHistoryOffset).toBe(1);
+        });
+
+        it('does not add the same search twice in a row and ignores back at the start', () => {
+            const store = useNavigatorUiStore.getState();
+
+            store.setTab('hotel_view');
+            store.setTab('hotel_view');
+            useNavigatorUiStore.getState().goBack();
+
+            expect(useNavigatorUiStore.getState().searchHistory).toHaveLength(1);
+            expect(useNavigatorUiStore.getState().currentTabCode).toBe('hotel_view');
         });
     });
 });

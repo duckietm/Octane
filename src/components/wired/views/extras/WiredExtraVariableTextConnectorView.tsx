@@ -1,20 +1,20 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
-import { WiredTextFormattingHelp } from '../common/WiredTextFormattingHelp';
+import { formatWiredTextCounter, WiredTextFormattingHelp } from '../common/WiredTextFormattingHelp';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
-const DEFAULT_CONNECTOR_PLACEHOLDER = '0=text 1\n1=text 2\n2 = text 3';
+const DEFAULT_CONNECTOR_PLACEHOLDER = '0=text 1\n1=text 2\n2 = text 3\n_=any other value';
 const MAX_CONNECTOR_LINES = 30;
 const MAX_CONNECTOR_CHARACTERS = 1000;
 
+// AIR's text area shows 30 lines but takes any number of them; the server refuses more than 1000 bytes.
 const truncateMappingsText = (value: string) => {
     const normalizedValue = (value ?? '').replace(/\r/g, '');
-    const lines = normalizedValue.split('\n');
-    const limitedByLines = lines.slice(0, MAX_CONNECTOR_LINES).join('\n');
 
-    return limitedByLines.length > MAX_CONNECTOR_CHARACTERS ? limitedByLines.slice(0, MAX_CONNECTOR_CHARACTERS) : limitedByLines;
+    return normalizedValue.length > MAX_CONNECTOR_CHARACTERS ? normalizedValue.slice(0, MAX_CONNECTOR_CHARACTERS) : normalizedValue;
 };
 
 const getLineCount = (value: string) => {
@@ -26,15 +26,19 @@ const getLineCount = (value: string) => {
 export const WiredExtraVariableTextConnectorView: FC<{}> = () => {
     const { trigger = null, setIntParams = null, setStringParam = null } = useWired();
     const [mappingsText, setMappingsText] = useState('');
+    const [fieldId, setFieldId] = useState(0);
 
     useEffect(() => {
         if (!trigger) return;
 
+        // Official: the "value=text" lines as plain text ("_=text" for any other value); ours
+        // follows: [array field id].
         setMappingsText(truncateMappingsText(trigger.stringData || ''));
+        setFieldId(trigger.intData?.[0] ?? 0);
     }, [trigger]);
 
     const save = () => {
-        setIntParams([]);
+        setIntParams(fieldId > 0 ? [fieldId] : []);
         setStringParam(mappingsText ?? '');
     };
 
@@ -53,19 +57,21 @@ export const WiredExtraVariableTextConnectorView: FC<{}> = () => {
     const characterCount = mappingsText.length;
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 400 }}>
-            <div className="flex flex-col gap-2">
-                <Text bold>{LocalizeText('wiredfurni.params.variables.connect_text.title')}</Text>
-                <textarea
-                    className="form-control form-control-sm nitro-wired__resizable-textarea"
-                    maxLength={MAX_CONNECTOR_CHARACTERS}
-                    placeholder={placeholderText}
-                    value={mappingsText}
-                    onChange={(event) => handleTextChange(event.target.value)}
-                />
-                <Text small>{`${lineCount}/${MAX_CONNECTOR_LINES} righe - ${characterCount}/${MAX_CONNECTOR_CHARACTERS} caratteri`}</Text>
-                <WiredTextFormattingHelp />
-            </div>
-        </WiredExtraBaseView>
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 400 }}>
+                <div className="flex flex-col gap-2">
+                    <Text bold>{LocalizeText('wiredfurni.params.variables.connect_text.title')}</Text>
+                    <textarea
+                        className="form-control form-control-sm octane-wired__resizable-textarea"
+                        maxLength={MAX_CONNECTOR_CHARACTERS}
+                        placeholder={placeholderText}
+                        value={mappingsText}
+                        onChange={(event) => handleTextChange(event.target.value)}
+                    />
+                    <Text small>{formatWiredTextCounter(lineCount, characterCount, MAX_CONNECTOR_CHARACTERS, MAX_CONNECTOR_LINES)}</Text>
+                    <WiredTextFormattingHelp />
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

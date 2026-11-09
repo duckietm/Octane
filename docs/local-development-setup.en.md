@@ -1,6 +1,6 @@
 # Local Development Setup with `yarn start`
 
-This guide explains how to run Nitro locally with Vite, using:
+This guide explains how to run Octane locally with Vite, using:
 
 - local UI on `http://localhost:5173`;
 - local API/emulator on `http://localhost:2096`;
@@ -39,7 +39,7 @@ This keeps debugging simple and avoids the secure runtime layer.
 File:
 
 ```txt
-Nitro-V3/public/configuration/client-mode.json
+octane/public/configuration/client-mode.json
 ```
 
 Recommended local config:
@@ -51,7 +51,7 @@ Recommended local config:
     "secureApiEnabled": false,
     "apiBaseUrl": "http://localhost:2096",
     "plainConfigBaseUrl": "http://localhost:5173/configuration/",
-    "plainGamedataBaseUrl": "https://hotel.example.com/client/nitro/gamedata/"
+    "plainGamedataBaseUrl": "https://hotel.example.com/client/octane/gamedata/"
 }
 ```
 
@@ -65,13 +65,13 @@ Notes:
 If you want everything local, use:
 
 ```json
-"plainGamedataBaseUrl": "http://localhost:5173/client/nitro/gamedata/"
+"plainGamedataBaseUrl": "http://localhost:5173/client/octane/gamedata/"
 ```
 
 but the files must really exist under:
 
 ```txt
-Nitro-V3/public/client/nitro/gamedata/
+octane/public/client/octane/gamedata/
 ```
 
 ## 3. `public/configuration/renderer-config.json`
@@ -79,7 +79,7 @@ Nitro-V3/public/client/nitro/gamedata/
 File:
 
 ```txt
-Nitro-V3/public/configuration/renderer-config.json
+octane/public/configuration/renderer-config.json
 ```
 
 Minimum local values:
@@ -89,7 +89,7 @@ Minimum local values:
     "socket.url": "ws://localhost:2096",
     "api.url": "http://localhost:2096",
     "crypto.ws.enabled": false,
-    "gamedata.url": "https://hotel.example.com/client/nitro/gamedata",
+    "gamedata.url": "https://hotel.example.com/client/octane/gamedata",
     "external.texts.url": [
         "${gamedata.url}/ExternalTexts.json",
         "${gamedata.url}/UITexts.json"
@@ -129,7 +129,7 @@ Important:
 File:
 
 ```txt
-Nitro-V3/public/configuration/ui-config.json
+octane/public/configuration/ui-config.json
 ```
 
 For the login view, you can use remote plain images:
@@ -138,11 +138,11 @@ For the login view, you can use remote plain images:
 {
     "loginview": {
         "images": {
-            "background": "https://hotel.example.com/client/nitro/images/reception/background_gradient_apr25.png",
+            "background": "https://hotel.example.com/client/octane/images/reception/background_gradient_apr25.png",
             "background.colour": "#6eadc8",
-            "drape": "https://hotel.example.com/client/nitro/images/reception/drape.png",
-            "left": "https://hotel.example.com/client/nitro/images/reception/mute_reception_backdrop_left.png",
-            "right": "https://hotel.example.com/client/nitro/images/reception/background_right.png"
+            "drape": "https://hotel.example.com/client/octane/images/reception/drape.png",
+            "left": "https://hotel.example.com/client/octane/images/reception/mute_reception_backdrop_left.png",
+            "right": "https://hotel.example.com/client/octane/images/reception/background_right.png"
         }
     }
 }
@@ -184,9 +184,9 @@ Main columns:
 
 `public/configuration/news.json` can stay as a mock/fallback only, but it is not the correct production flow.
 
-## 6. Start Nitro
+## 6. Start Octane
 
-Inside `Nitro-V3`:
+Inside `octane`:
 
 ```bash
 yarn start
@@ -223,13 +223,13 @@ The client requested JSON, but Vite returned HTML.
 This happens when a URL points to a file that does not exist, for example:
 
 ```txt
-http://localhost:5173/client/nitro/gamedata/ExternalTexts.json
+http://localhost:5173/client/octane/gamedata/ExternalTexts.json
 ```
 
 Fix:
 
 - use remote plain gamedata;
-- or copy the gamedata files into `public/client/nitro/gamedata`.
+- or copy the gamedata files into `public/client/octane/gamedata`.
 
 ### WebSocket `1006`
 
@@ -246,9 +246,69 @@ ws.enabled=true
 ws.port=2096
 ```
 
+### `/api/maintenance` (or any `/api/...`) `502 (Bad Gateway)`
+
+Vite could not reach the emulator. In development every `/api/...` call is
+forwarded by the Vite proxy (see `vite.config.mjs`) to the emulator's
+WebSocket port, and a 502 is Vite's answer when that connection fails. The
+real cause is printed in the `yarn start` terminal as:
+
+```txt
+[vite] http proxy error: /api/maintenance
+Error: connect ECONNREFUSED 127.0.0.1:2096
+```
+
+The proxy target is, in this order: the `AUTH_PROXY_TARGET` environment
+variable, then `"api.url"` from `public/configuration/renderer-config.json`,
+then `http://127.0.0.1:2096`. Every failed call also prints a one-line
+`[octane] /api proxy: ... failed (ECONNREFUSED)` diagnosis with the target.
+
+Check, in this order:
+
+- the emulator is running and its log shows
+  `WebSocket server started on 0.0.0.0:2096 (SSL: false)`;
+- `ws.host` is `0.0.0.0` (or `127.0.0.1`), not only the LAN IP;
+- `"api.url"` in `renderer-config.json` points at the emulator's real
+  address and port (the proxy follows it);
+- if that log line says `SSL: true` (an `ssl/cert.pem` + `privkey.pem` pair
+  next to the emulator), the port speaks TLS and the target must be
+  `https://...`.
+
+To override the target for one run:
+
+```sh
+# Windows cmd
+set AUTH_PROXY_TARGET=http://192.168.0.8:2096 && yarn start
+# PowerShell
+$env:AUTH_PROXY_TARGET='http://192.168.0.8:2096'; yarn start
+# Linux / macOS
+AUTH_PROXY_TARGET=http://192.168.0.8:2096 yarn start
+```
+
+`crypto.ws.enabled` and `crypto.ws.signing.enabled` only apply to the
+WebSocket session after the upgrade; they never affect these HTTP calls.
+The `net::ERR_ABORTED` next to the 502 is the login page cancelling the
+probe on unmount and is harmless.
+
+### Walking looks choppy or the speed seems to change
+
+`system.fps.max` in `renderer-config.json` caps the render loop, and the
+client used to default it to 24 when the key was missing. Pixi then ticks
+at an alternating 33/50 ms on a 60 Hz display, so avatars move in uneven
+steps and the walk animation is sampled irregularly. The default is now
+`0` (the display's refresh rate); set it explicitly if your config predates
+this:
+
+```json
+"system.fps.max": 0
+```
+
+Server-side, a room ticks every 500 ms and an avatar moves one tile per
+tick (two with `:fastwalk`), which the client interpolates over 500 ms.
+
 ### Custom badges `401 Unauthorized`
 
-This is normal if you are not logged in or if you open Nitro from a different host.
+This is normal if you are not logged in or if you open Octane from a different host.
 
 Use:
 

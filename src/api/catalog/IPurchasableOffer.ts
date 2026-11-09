@@ -17,6 +17,8 @@ export interface IPurchasableOffer {
     bundlePurchaseAllowed: boolean;
     isRentOffer: boolean;
     badgeCode: string;
+    chatStyleId?: string;
+    isChatStyleOffer?: boolean;
     localizationName: string;
     localizationDescription: string;
     isLazy: boolean;

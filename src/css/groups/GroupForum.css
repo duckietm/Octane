@@ -1,0 +1,578 @@
+/* Group forum windows (HabboFriendBarCom groupforum_*): frame 3, client origin 6px right of and 25px below the frame corner. */
+.octane-forum.octane-card-shell.octane-card-frame-3 {
+    box-sizing: border-box;
+    width: var(--forum-width);
+    min-width: var(--forum-min-width);
+    height: var(--forum-height);
+    min-height: var(--forum-min-height);
+    padding: 0 !important;
+    color: #000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 13px;
+    line-height: 1;
+    image-rendering: pixelated;
+}
+
+.octane-forum button {
+    appearance: none;
+    font-family: inherit;
+}
+
+.octane-forum img {
+    max-width: none;
+}
+
+.octane-forum__client {
+    position: absolute;
+    left: 6px;
+    top: 25px;
+    right: 6px;
+    bottom: 0;
+    z-index: 1;
+}
+
+/* The client is its own stacking context: multiplied labels need the window surface behind them to blend against. */
+.octane-forum__client::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 8px;
+    bottom: 0;
+    background: #e9e9e1;
+    z-index: -1;
+}
+
+.octane-forum__client > *,
+.octane-forum__header > *,
+.octane-forum__section > *,
+.octane-forum__section > div > * {
+    position: absolute;
+}
+
+.octane-forum__help {
+    position: absolute;
+    top: 2px;
+    right: 27px;
+    width: 19px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: url('../../assets/images/habbo-skin/slices/help-3-default.png') 0 0 / 19px 20px no-repeat;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.octane-forum__help:hover {
+    background-image: url('../../assets/images/habbo-skin/slices/help-3-hover.png');
+}
+
+.octane-forum__help:active {
+    background-image: url('../../assets/images/habbo-skin/slices/help-3-pressed.png');
+}
+
+/* top_part */
+.octane-forum__header {
+    left: -5px;
+    top: 8px;
+    width: calc(100% + 10px);
+    height: 80px;
+    background: #0e3f52;
+}
+
+.octane-forum__header-click {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.octane-forum__header-icon {
+    left: 0;
+    top: 0;
+    width: 80px;
+    height: 80px;
+    background: #000;
+}
+
+.octane-forum__header-icon > img {
+    position: absolute;
+}
+
+.octane-forum__header-badge {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+}
+
+.octane-forum__header .octane-group-native__text {
+    pointer-events: none;
+}
+
+.octane-forum__settings {
+    right: 1px;
+    top: 60px;
+    width: 86px;
+    height: 18px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 5px;
+    background: #000;
+    cursor: pointer;
+}
+
+.octane-forum__settings > img {
+    position: absolute;
+    left: 3px;
+    top: 2px;
+}
+
+/* shortcuts */
+.octane-forum__shortcuts {
+    left: -5px;
+    top: 88px;
+    width: calc(100% + 10px);
+    height: 25px;
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    padding-top: 3px;
+    box-sizing: border-box;
+    background: #fff;
+}
+
+.octane-forum__shortcuts > .octane-group-native__text {
+    position: static;
+    margin-left: 5px;
+}
+
+.octane-forum__shortcut:first-of-type {
+    margin-left: -3px;
+}
+
+.octane-forum__shortcut {
+    position: static;
+    margin-left: -1px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+/* list_border (style 7): black outline with chamfered corners, a white line and the grey surface */
+.octane-forum__list {
+    left: 0;
+    top: 140px;
+    right: 0;
+    bottom: 80px;
+}
+
+.octane-forum__list::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 5px solid transparent;
+    border-image: url('../../assets/images/groups/native/forum-list-border.png') 5 fill / 5px stretch;
+    pointer-events: none;
+}
+
+.octane-forum__scroll {
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
+}
+
+.octane-forum__scroll:has(> .octane-classic-scrollbar[data-visible='true']) > .octane-classic-scroll-area-viewport {
+    width: calc(100% - 17px);
+}
+
+.octane-forum__scroll-content {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+/* thread rows (groupforum_thread_list_item) and forum rows (groupforum_forum_list_item) */
+.octane-forum__thread,
+.octane-forum__forum {
+    position: relative;
+    flex: none;
+    width: 532px;
+    height: 40px;
+}
+
+.octane-forum__forum {
+    height: 41px;
+}
+
+/* Thread and forum rows only react on their header_region (280x17 over the subject or name), their unread_region and, for a forum, the group badge. */
+.octane-forum__thread-header,
+.octane-forum__forum-header {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 280px;
+    height: 17px;
+    cursor: pointer;
+}
+
+.octane-forum__thread-counts,
+.octane-forum__forum-counts {
+    cursor: pointer;
+}
+
+.octane-forum__thread > *,
+.octane-forum__forum > *,
+.octane-forum__thread-flags > *,
+.octane-forum__thread-actions > * {
+    position: absolute;
+}
+
+.octane-forum__thread-flags {
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 40px;
+}
+
+.octane-forum__flag {
+    left: 0;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+}
+
+.octane-forum__flag > img,
+.octane-forum__action > img {
+    position: absolute;
+}
+
+.octane-forum__flag:disabled {
+    cursor: default;
+}
+
+.octane-forum__flag:not(:disabled) {
+    cursor: pointer;
+}
+
+.octane-forum__thread-body,
+.octane-forum__thread-counts,
+.octane-forum__forum-body,
+.octane-forum__forum-counts {
+    top: 0;
+    height: 40px;
+    overflow: hidden;
+}
+
+.octane-forum__thread-counts {
+    width: 140px;
+}
+
+.octane-forum__forum-counts {
+    width: 100px;
+}
+
+.octane-forum__thread-body > .octane-group-native__text,
+.octane-forum__thread-counts > .octane-group-native__text,
+.octane-forum__forum-body > .octane-group-native__text,
+.octane-forum__forum-counts > .octane-group-native__text {
+    position: absolute;
+}
+
+.octane-forum__thread-actions {
+    top: 0;
+    height: 40px;
+}
+
+.octane-forum__action {
+    top: 0;
+    width: 25px;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+}
+
+.octane-forum__action.is-hide {
+    left: 0;
+    background: #de4537;
+}
+
+.octane-forum__action.is-report {
+    background: #ff9c65;
+}
+
+.octane-forum__action.is-reply {
+    background: #45a3d9;
+}
+
+.octane-forum__action:disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+.octane-forum__forum-badge {
+    left: 1px;
+    top: 1px;
+    width: 39px;
+    height: 39px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+/* messages (groupforum_message_list_item) */
+.octane-forum__message {
+    position: relative;
+    flex: none;
+    width: 515px;
+}
+
+.octane-forum__message-bar {
+    position: relative;
+    height: 26px;
+    background: #227aad;
+}
+
+.octane-forum__message-bar > .octane-group-native__text {
+    position: absolute;
+}
+
+.octane-forum__message-actions {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 26px;
+    display: flex;
+}
+
+.octane-forum__message-actions > .octane-forum__action {
+    position: relative;
+    flex: none;
+    width: 22px;
+    height: 26px;
+}
+
+.octane-forum__message-body {
+    position: relative;
+    display: flex;
+    min-height: 100px;
+}
+
+.octane-forum__message-author {
+    position: relative;
+    flex: none;
+    width: 130px;
+    min-height: 100px;
+    overflow: hidden;
+}
+
+.octane-forum__message-author > .octane-group-native__text {
+    position: absolute;
+    z-index: 1;
+}
+
+.octane-forum__message-avatar {
+    cursor: pointer;
+    position: absolute;
+    left: -18px;
+    top: 18px;
+    width: 90px;
+    height: 130px;
+}
+
+.octane-forum__message-text {
+    position: relative;
+    flex: 1;
+    min-height: 100px;
+}
+
+.octane-forum__message-text > .octane-group-native__text {
+    position: absolute;
+    white-space: normal;
+}
+
+/* footer: Back / Mark As Read, New Thread / Reply and the pager sit 37px above the bottom edge */
+.octane-forum__footer {
+    left: 0;
+    right: 0;
+    bottom: 37px;
+    height: 30px;
+}
+
+.octane-forum__footer > * {
+    position: absolute;
+}
+
+.octane-forum__pager {
+    right: 3px;
+    top: 0;
+    width: 165px;
+    height: 30px;
+}
+
+.octane-forum__pager > * {
+    position: absolute;
+}
+
+.octane-forum__status {
+    left: 180px;
+    bottom: 5px;
+    width: 300px;
+    height: 20px;
+}
+
+.octane-forum__status > .octane-group-native__text {
+    position: absolute;
+}
+
+.octane-forum__status.is-list {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.octane-forum__status.is-list > .octane-group-native__text {
+    position: static;
+}
+
+/* container_button: the shiny thick skin tinted 0xdddddd (grey) or 0x0a9bc5 (blue), or untinted for the pager. The skin sits on a pseudo-element under the label; the disabled skins carry their own 79% alpha. */
+.octane-forum__button {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 2px 0 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #000;
+    cursor: pointer;
+    image-rendering: pixelated;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.octane-forum__button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 5px solid transparent;
+    pointer-events: none;
+}
+
+.octane-forum__button > .octane-group-native__text {
+    position: relative;
+}
+
+.octane-forum__button > .octane-group-native__text.is-static {
+    position: relative;
+}
+
+.octane-forum__button:disabled {
+    cursor: default;
+}
+
+.octane-forum__button.is-grey::before {
+    border-image: url('../../assets/images/groups/native/forum-button-default-dddddd.png') 5 fill / 5px stretch;
+}
+
+.octane-forum__button.is-grey:hover:not(:disabled)::before {
+    border-image-source: url('../../assets/images/groups/native/forum-button-hover-dddddd.png');
+}
+
+.octane-forum__button.is-grey:active:not(:disabled)::before {
+    border-image-source: url('../../assets/images/groups/native/forum-button-pressed-dddddd.png');
+}
+
+.octane-forum__button.is-grey:disabled::before {
+    border-image-source: url('../../assets/images/groups/native/forum-button-disabled-dddddd.png');
+}
+
+.octane-forum__button.is-blue::before {
+    border-image: url('../../assets/images/groups/native/forum-button-default-0a9bc5.png') 5 fill / 5px stretch;
+}
+
+.octane-forum__button.is-blue:hover:not(:disabled)::before {
+    border-image-source: url('../../assets/images/groups/native/forum-button-hover-0a9bc5.png');
+}
+
+.octane-forum__button.is-blue:active:not(:disabled)::before {
+    border-image-source: url('../../assets/images/groups/native/forum-button-pressed-0a9bc5.png');
+}
+
+.octane-forum__button.is-blue:disabled::before {
+    border-image-source: url('../../assets/images/groups/native/forum-button-disabled-0a9bc5.png');
+}
+
+.octane-forum__button.is-plain::before {
+    border-image: var(--habbo-skin-shiny-thick) 5 fill / 5px stretch;
+}
+
+.octane-forum__button.is-plain:hover:not(:disabled)::before {
+    border-image-source: var(--habbo-skin-shiny-thick-hover);
+}
+
+.octane-forum__button.is-plain:active:not(:disabled)::before {
+    border-image-source: var(--habbo-skin-shiny-thick-pressed);
+}
+
+.octane-forum__button.is-plain:disabled::before {
+    border-image-source: var(--habbo-skin-shiny-thick-disabled);
+}
+
+/* compose window */
+.octane-forum__compose-bar {
+    left: 0;
+    width: 444px;
+    height: 21px;
+    background: #227aad;
+}
+
+.octane-forum__compose-bar > .octane-group-native__text {
+    position: absolute;
+}
+
+.octane-forum__compose-field {
+    background: #fff;
+}
+
+.octane-forum__help-link {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.octane-forum__help-link > .octane-group-native__text.is-static {
+    position: static;
+}
+
+/* settings window */
+.octane-forum__section {
+    left: 3px;
+    width: 444px;
+    height: 100px;
+}
+
+.octane-forum__section .octane-group-native__text {
+    position: absolute;
+}
+
+/* The frame draws its close button flush with the window edge; the forum windows keep it 3px inside. */
+.octane-forum.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button {
+    right: 3px !important;
+}

@@ -1,0 +1,298 @@
+/* Official ui_help_bubble / ui_help_modal: the new user tour's pointer bubbles. */
+.octane-help-bubbles {
+    position: fixed;
+    inset: 0;
+    z-index: 650;
+    pointer-events: none;
+}
+
+.octane-help-bubbles__dim {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.45);
+    pointer-events: auto;
+}
+
+.octane-help-bubble {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 8px 10px;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+    pointer-events: auto;
+}
+
+.octane-help-bubble::after {
+    position: absolute;
+    left: calc(var(--arrow-x, 90px) - 8px);
+    width: 0;
+    height: 0;
+    border: 8px solid transparent;
+    content: "";
+}
+
+.octane-help-bubble[data-direction="down"]::after {
+    top: 100%;
+    border-top-color: #000000;
+}
+
+.octane-help-bubble[data-direction="up"]::after {
+    bottom: 100%;
+    border-bottom-color: #000000;
+}
+
+.octane-help-bubble__text {
+    width: 100%;
+    color: #000000;
+    /* help_bubble_text: u_bold at font_size 15, regular (not condensed) Ubuntu. */
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 18px;
+}
+
+/* help_bubble_btn_ok: `button` style 5 tinted 0x33cc33, the green shiny skin. */
+.octane-help-bubble__ok {
+    min-width: 41px;
+    height: 28px;
+    padding: 0 5px;
+    border: 5px solid transparent;
+    border-image-source: var(--habbo-skin-shiny-green);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    border-radius: 0;
+    background: transparent;
+    color: #ffffff;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    /* help_bubble_btn_ok: shiny button caption, button_shiny_bold 12 px. */
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* ---- HabboNuxDialogs ---- */
+
+/* nux_offer_old_user / nux_gift_selection / nux_noob_room_offer are style-3 Ubuntu frames;
+   our `Ubuntu` face is the condensed cut, AIR's is the regular one. */
+.octane-nux-offer,
+.octane-nux-gifts,
+.octane-help-bubble {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+@layer base {
+    .octane-nux-offer :where(*):not(svg, svg *),
+    .octane-nux-gifts :where(*):not(svg, svg *),
+    .octane-help-bubble :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
+
+.octane-nux-offer.is-old-user {
+    width: min(456px, calc(100vw - 16px));
+}
+
+.octane-nux-offer.is-lobby {
+    width: min(382px, calc(100vw - 16px));
+}
+
+.octane-nux-gifts {
+    width: min(487px, calc(100vw - 16px));
+}
+
+.octane-nux-gifts__header .octane-card-close-button {
+    display: none;
+}
+
+.octane-nux-offer__banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 56px;
+    padding: 2px 12px;
+    border: 2px solid #3d6373;
+    border-radius: 4px;
+    background: #0f4052;
+    /* nux.offer.old.user.title / nux_gift_selection_choose_one: u_headline_big at font_size 22, white. */
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 28px;
+}
+
+.octane-nux-offer__banner img {
+    max-width: 56px;
+    max-height: 54px;
+}
+
+/* nux_offer_old_user txtBody: u_tool_tip (11 px) in 0x333333. */
+.octane-nux-offer__text {
+    color: #333333;
+    font-size: 11px;
+    font-weight: 400;
+}
+
+/* nux_noob_room_offer txtBody: no text_style, so the frame's u_regular 12 px in black. */
+.octane-nux-offer.is-lobby .octane-nux-offer__text {
+    color: #000000;
+    font-size: 12px;
+}
+
+.octane-nux-offer__buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.octane-nux-offer__link {
+    border: 0;
+    background: transparent;
+    /* btnSkip: link at font_size 11, 0x333333, bold + underline. */
+    color: #333333;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* btnGo: button_thick style 6 tinted 0x1da100, the green shiny thick skin. */
+.octane-nux-offer__go {
+    min-width: 110px;
+    height: 30px;
+    padding: 0 7px;
+    border: 5px solid transparent;
+    border-image-source: var(--habbo-skin-shiny-thick-green);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    border-radius: 0;
+    background: transparent;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    /* btnGo / option_button: shiny button caption, button_shiny_bold 12 px. */
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.octane-help-bubble__ok:hover {
+    border-image-source: var(--habbo-skin-shiny-green-hover);
+}
+
+.octane-help-bubble__ok:active {
+    border-image-source: var(--habbo-skin-shiny-green-pressed);
+}
+
+.octane-nux-offer__go:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-green-hover);
+}
+
+.octane-nux-offer__go:active {
+    border-image-source: var(--habbo-skin-shiny-thick-green-pressed);
+}
+
+/* nux_gift_selection option_button: a grey `button` style 3 (habbo_skin_button_shiny), black 12 px regular. */
+.octane-nux-offer__go.octane-nux-offer__get {
+    border-image-source: var(--habbo-skin-shiny);
+    color: #000000;
+    font-weight: 400;
+}
+
+.octane-nux-offer__go.octane-nux-offer__get:hover {
+    border-image-source: var(--habbo-skin-shiny-hover);
+}
+
+.octane-nux-offer__go.octane-nux-offer__get:active {
+    border-image-source: var(--habbo-skin-shiny-pressed);
+}
+
+.octane-nux-offer__lobby-image {
+    width: 100%;
+    height: 95px;
+    object-fit: contain;
+}
+
+.octane-nux-gifts__list {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.octane-nux-gifts__option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 118px;
+}
+
+.octane-nux-gifts__thumbnail {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 108px;
+    height: 108px;
+    border-radius: 4px;
+    background: #bfbfb8;
+}
+
+.octane-nux-gifts__thumbnail img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.octane-nux-gifts__name {
+    /* option_heading: u_bold at font_size 9. */
+    min-height: 24px;
+    font-size: 9px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* ---- RoomChatInputView.highlightChatInput ---- */
+
+.octane-chat-input-container.is-nux-reminder {
+    animation: octane-nux-chat-wiggle 0.5s steps(2) 10;
+}
+
+@keyframes octane-nux-chat-wiggle {
+    from {
+        transform: translateY(-1px);
+    }
+
+    to {
+        transform: translateY(1px);
+    }
+}
+
+.octane-nux-chat-hint {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 10px);
+    padding: 4px 10px;
+    border: 2px solid #000000;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.octane-nux-chat-hint::after {
+    position: absolute;
+    top: 100%;
+    left: calc(50% - 7px);
+    border: 7px solid transparent;
+    border-top-color: #000000;
+    content: "";
+}

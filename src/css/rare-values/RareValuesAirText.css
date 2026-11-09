@@ -1,0 +1,17 @@
+/*
+ * Rare values has no AIR layout (it is an Octane window), so it follows the AIR text conventions:
+ * regular Ubuntu (our `Ubuntu` face is the condensed cut), u_regular 12 px body, u_bold 12 px for the
+ * value, il_regular 11 px for the count / "loading more" meta lines. Sizes live on the Tailwind classes
+ * in RareValuesView.tsx; this sheet sets the face and the 12 px base.
+ */
+
+.octane-rare-values-window {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+}
+
+@layer base {
+    .octane-rare-values-window :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}

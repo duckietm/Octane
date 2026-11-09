@@ -8,12 +8,11 @@ import {
     RoomObjectCategory,
     RoomObjectVariable,
     RoomSessionPresentEvent,
-    TextureUtils,
     Vector3d
-} from '@nitrots/nitro-renderer';
-import { useMemo, useState } from 'react';
+} from '@octane/renderer';
+import { useMemo, useRef, useState } from 'react';
 import { IsOwnerOfFurniture, LocalizeText, ProductTypeEnum } from '../../../../api';
-import { useNitroEvent } from '../../../events';
+import { useOctaneEvent } from '../../../events';
 import { useFurniRemovedEvent } from '../../engine';
 import { useRoom } from '../../useRoom';
 
@@ -35,8 +34,14 @@ const useFurniturePresentWidgetState = () => {
     const [placedInRoom, setPlacedInRoom] = useState(false);
     const [imageUrl, setImageUrl] = useState<string>(null);
     const { roomSession = null } = useRoom();
+    // Official `PresentFurniWidget` only shows the contents of the present it is opening itself, so the
+    // `PresentOpened` answer to an Ecotron box (the same packet) stays with the Ecotron card.
+    const openingRef = useRef(false);
+    // The present whose image is awaited: an image for an earlier present that arrives late is dropped.
+    const imageRequestRef = useRef(0);
 
     const onClose = () => {
+        openingRef.current = false;
         setObjectId(-1);
         setClassId(-1);
         setItemType(null);
@@ -51,8 +56,10 @@ const useFurniturePresentWidgetState = () => {
     };
 
     const openPresent = () => {
-        if (objectId === -1) return;
+        // A second click while the first open is on its way opened it twice.
+        if (objectId === -1 || openingRef.current) return;
 
+        openingRef.current = true;
         roomSession.openGift(objectId);
 
         GetRoomEngine().changeObjectModelData(
@@ -68,14 +75,12 @@ const useFurniturePresentWidgetState = () => {
         // async fix image
         return {
             imageReady: (result) => {
+                const request = imageRequestRef.current;
+
                 (async () => {
-                    let image = result.image;
+                    const image = await result.getImage();
 
-                    if (!image && result.data) {
-                        image = await TextureUtils.generateImage(result.data);
-                    }
-
-                    if (image) setImageUrl(image.src);
+                    if (image && request === imageRequestRef.current) setImageUrl(image.src);
                 })();
             },
             imageFailed: () => {
@@ -84,7 +89,12 @@ const useFurniturePresentWidgetState = () => {
         };
     }, []);
 
-    useNitroEvent<RoomSessionPresentEvent>(RoomSessionPresentEvent.RSPE_PRESENT_OPENED, (event) => {
+    useOctaneEvent<RoomSessionPresentEvent>(RoomSessionPresentEvent.RSPE_PRESENT_OPENED, (event) => {
+        if (!openingRef.current) return;
+
+        openingRef.current = false;
+        const imageRequest = ++imageRequestRef.current;
+
         let furniData: IFurnitureData = null;
 
         if (event.itemType === ProductTypeEnum.FLOOR) {
@@ -147,7 +157,7 @@ const useFurniturePresentWidgetState = () => {
                             break;
                         }
                         default: {
-                            setText(furniData.name || null);
+                            setText(furniData?.name || null);
                             setImageUrl(GetRoomEngine().getFurnitureWallIconUrl(event.classId));
                             break;
                         }
@@ -180,20 +190,24 @@ const useFurniturePresentWidgetState = () => {
                                 petFigureData.customParts
                             );
 
-                            if (petImage) setImageUrl((await petImage.getImage()).src);
+                            // getImage can resolve null; it threw here before the widget was reset.
+                            const image = petImage ? await petImage.getImage() : null;
+                            if (image && imageRequest === imageRequestRef.current) setImageUrl(image.src);
                         })();
                     }
                 } else {
                     (async () => {
                         const furniImage = GetRoomEngine().getFurnitureFloorImage(event.classId, new Vector3d(90), 64, imageListener);
 
-                        if (furniImage) setImageUrl((await furniImage.getImage()).src);
+                        const image = furniImage ? await furniImage.getImage() : null;
+                        if (image && imageRequest === imageRequestRef.current) setImageUrl(image.src);
                     })();
                 }
 
                 const productData = GetSessionDataManager().getProductData(event.productCode);
 
-                setText((productData && productData.name) || furniData.name);
+                // A class missing from the furnidata (a known state after bulk imports) threw and left the widget open.
+                setText((productData && productData.name) || furniData?.name || null);
                 break;
             }
         }
@@ -207,7 +221,7 @@ const useFurniturePresentWidgetState = () => {
         setPlacedInRoom(event.placedInRoom);
     });
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_PRESENT, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_PRESENT, (event) => {
         const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
 
         if (!roomObject) return null;
@@ -223,7 +237,13 @@ const useFurniturePresentWidgetState = () => {
     });
 
     useFurniRemovedEvent(objectId !== -1, (event) => {
-        if (event.id === objectId) onClose();
+        if (event.id === objectId) {
+            // The server may remove the opened present before its `PresentOpened` arrives; keep waiting for it.
+            const wasOpening = openingRef.current;
+
+            onClose();
+            openingRef.current = wasOpening;
+        }
 
         if (event.id === placedItemId) {
             if (placedInRoom) setPlacedInRoom(false);

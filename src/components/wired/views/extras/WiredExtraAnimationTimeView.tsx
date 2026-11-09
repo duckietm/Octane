@@ -1,13 +1,14 @@
 import { FC, useEffect, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
-import { Slider, Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
+import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
 const MIN_DURATION = 50;
 const MAX_DURATION = 2000;
 const STEP_DURATION = 50;
-const DEFAULT_DURATION = 500;
+const DEFAULT_DURATION = MIN_DURATION;
 
 const normalizeDuration = (value: number) => {
     if (isNaN(value)) return DEFAULT_DURATION;
@@ -31,17 +32,19 @@ export const WiredExtraAnimationTimeView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
-            <div className="flex flex-col gap-2">
-                <Text bold>{localizeWithFallback('wiredfurni.params.setanimationtime2', `${duration} ms`)}</Text>
-                <Slider
-                    min={MIN_DURATION}
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
+                {/* Official: the setanimationtime2 slider section, with the header number input. */}
+                <WiredSliderSection
                     max={MAX_DURATION}
+                    min={MIN_DURATION}
                     step={STEP_DURATION}
+                    displayStep={STEP_DURATION}
+                    title={localizeWithFallback('wiredfurni.params.setanimationtime2', 'Animation time (ms):')}
                     value={duration}
-                    onChange={(value) => setDuration(normalizeDuration(Array.isArray(value) ? value[0] : Number(value)))}
+                    onChange={(value) => setDuration(normalizeDuration(value))}
                 />
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

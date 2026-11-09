@@ -1,5 +1,5 @@
-import { MessengerState } from './messengerReducer';
 import { MessengerIconState } from '../MessengerIconState';
+import { MessengerState } from './messengerReducer';
 
 export const selectMessages = (state: MessengerState, conversationId: number) =>
     (state.messageKeysByConversation[conversationId] || []).map(key => state.messagesByKey[key]).filter(Boolean);

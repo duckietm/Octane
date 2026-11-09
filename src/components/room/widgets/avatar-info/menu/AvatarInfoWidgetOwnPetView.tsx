@@ -6,13 +6,15 @@ import {
     RoomObjectType,
     RoomObjectVariable,
     RoomUnitGiveHandItemPetComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { AvatarInfoPet, GetConfigurationValue, GetOwnRoomObject, LocalizeText, SendMessageComposer } from '../../../../../api';
+import { AvatarInfoPet, GetConfigurationValue, GetConfigurationRecord, GetOwnRoomObject, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { useRoom, useSessionInfo } from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
+import { Checkbox } from '../../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 interface AvatarInfoWidgetOwnPetViewProps {
     avatarInfo: AvatarInfoPet;
@@ -27,11 +29,12 @@ const MODE_MONSTER_PLANT: number = 3;
 export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (props) => {
     const { avatarInfo = null, onClose = null } = props;
     const [mode, setMode] = useState(MODE_NORMAL);
-    const { roomSession = null, isHandItemBlocked = false } = useRoom();
-    const { petRespectRemaining = 0, respectPet = null } = useSessionInfo();
+    const { roomSession = null } = useRoom();
+    const { petRespectRemaining = 0, respectPet = null, chatStyleId = 0 } = useSessionInfo();
 
+    // AIR PetMenuView / OwnPetMenuView: only handitem.give.pet.enabled, not the room's hand-item flag.
     const canGiveHandItem = useMemo(() => {
-        if (isHandItemBlocked) return false;
+        if (!GetConfigurationValue('handitem.give.pet.enabled', true)) return false;
 
         let flag = false;
 
@@ -44,7 +47,7 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
         }
 
         return flag;
-    }, [isHandItemBlocked]);
+    }, []);
 
     const processAction = (name: string) => {
         let hideMenu = true;
@@ -85,12 +88,11 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                     break;
                 case 'breed':
                     if (mode === MODE_NORMAL) {
-                        // _local_7 = RoomWidgetPetCommandMessage._Str_16282;
-                        // _local_8 = ("pet.command." + _local_7);
-                        // _local_9 = _Str_2268.catalog.localization.getLocalization(_local_8);
-                        // _local_4 = new RoomWidgetPetCommandMessage(RoomWidgetPetCommandMessage.RWPCM_PET_COMMAND, this._Str_594.id, ((this._Str_594.name + " ") + _local_9));
+                        // Like Habbo: the breed command (46) sends the pet to a free breeding nest.
+                        roomSession.sendChatMessage(`${avatarInfo.name} ${LocalizeText('pet.command.46')}`, chatStyleId);
                     } else if (mode === MODE_MONSTER_PLANT) {
-                        // messageType = RoomWidgetUserActionMessage.REQUEST_BREED_PET;
+                        // Official REQUEST_BREED_PET: mark the plants this one can breed with.
+                        CreateLinkEvent(`monsterplant-breeding/request/${avatarInfo.roomIndex}`);
                     }
                     break;
                 case 'harvest':
@@ -103,7 +105,7 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                     roomSession.compostPlant(avatarInfo.id);
                     break;
                 case 'buy_saddle':
-                    CreateLinkEvent('catalog/open/' + GetConfigurationValue('catalog.links')['pets.buy_saddle']);
+                    CreateLinkEvent('catalog/open/' + GetConfigurationRecord('catalog.links')['pets.buy_saddle']);
                     break;
             }
         }
@@ -122,94 +124,107 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
     }, [avatarInfo]);
 
     return (
-        <ContextMenuView category={RoomObjectCategory.UNIT} collapsable={true} objectId={avatarInfo.roomIndex} userType={RoomObjectType.PET} onClose={onClose}>
-            <ContextMenuHeaderView>{avatarInfo.name}</ContextMenuHeaderView>
-            {mode === MODE_NORMAL && (
-                <>
-                    {petRespectRemaining > 0 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('respect')}>
-                            {LocalizeText('infostand.button.petrespect', ['count'], [petRespectRemaining.toString()])}
-                        </ContextMenuListItemView>
-                    )}
-                    <ContextMenuListItemView onClick={(event) => processAction('train')}>{LocalizeText('infostand.button.train')}</ContextMenuListItemView>
-                    <ContextMenuListItemView onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>
-                    {avatarInfo.petType === PetType.HORSE && (
-                        <ContextMenuListItemView onClick={(event) => processAction('buy_saddle')}>
-                            {LocalizeText('infostand.button.buy_saddle')}
-                        </ContextMenuListItemView>
-                    )}
-                    {[PetType.BEAR, PetType.TERRIER, PetType.CAT, PetType.DOG, PetType.PIG].indexOf(avatarInfo.petType) > -1 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('breed')}>{LocalizeText('infostand.button.breed')}</ContextMenuListItemView>
-                    )}
-                </>
-            )}
-            {mode === MODE_SADDLED_UP && (
-                <>
-                    <ContextMenuListItemView onClick={(event) => processAction('mount')}>{LocalizeText('infostand.button.mount')}</ContextMenuListItemView>
-                    <ContextMenuListItemView gap={1} onClick={(event) => processAction('toggle_riding_permission')}>
-                        <input checked={!!avatarInfo.publiclyRideable} readOnly={true} type="checkbox" />
-                        {LocalizeText('infostand.button.toggle_riding_permission')}
-                    </ContextMenuListItemView>
-                    {petRespectRemaining > 0 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('respect')}>
-                            {LocalizeText('infostand.button.petrespect', ['count'], [petRespectRemaining.toString()])}
-                        </ContextMenuListItemView>
-                    )}
-                    <ContextMenuListItemView onClick={(event) => processAction('train')}>{LocalizeText('infostand.button.train')}</ContextMenuListItemView>
-                    <ContextMenuListItemView onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>
-                    <ContextMenuListItemView onClick={(event) => processAction('saddle_off')}>
-                        {LocalizeText('infostand.button.saddleoff')}
-                    </ContextMenuListItemView>
-                </>
-            )}
-            {mode === MODE_RIDING && (
-                <>
-                    <ContextMenuListItemView onClick={(event) => processAction('dismount')}>
-                        {LocalizeText('infostand.button.dismount')}
-                    </ContextMenuListItemView>
-                    {petRespectRemaining > 0 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('respect')}>
-                            {LocalizeText('infostand.button.petrespect', ['count'], [petRespectRemaining.toString()])}
-                        </ContextMenuListItemView>
-                    )}
-                </>
-            )}
-            {mode === MODE_MONSTER_PLANT && (
-                <>
-                    <ContextMenuListItemView onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>
-                    {avatarInfo.dead && (
-                        <ContextMenuListItemView onClick={(event) => processAction('revive')}>
-                            {LocalizeText('infostand.button.revive')}
-                        </ContextMenuListItemView>
-                    )}
-                    {roomSession.isRoomOwner && (
-                        <ContextMenuListItemView onClick={(event) => processAction('compost')}>
-                            {LocalizeText('infostand.button.compost')}
-                        </ContextMenuListItemView>
-                    )}
-                    {!avatarInfo.dead && avatarInfo.energy / avatarInfo.maximumEnergy < 0.98 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('treat')}>
-                            {LocalizeText('infostand.button.pettreat')}
-                        </ContextMenuListItemView>
-                    )}
-                    {!avatarInfo.dead && avatarInfo.level === avatarInfo.maximumLevel && avatarInfo.breedable && (
+        <NativeTextTree>
+            <ContextMenuView
+                category={RoomObjectCategory.UNIT}
+                classNames={['octane-avatar-action-menu', 'octane-avatar-action-menu--own']}
+                collapsable={true}
+                freezePositionOnHover={true}
+                objectId={avatarInfo.roomIndex}
+                showCaretIcon={false}
+                userType={RoomObjectType.PET}
+                onClose={onClose}
+            >
+                <ContextMenuHeaderView>{avatarInfo.name}</ContextMenuHeaderView>
+                <div className="air-avatar-menu-buttons">
+                    {mode === MODE_NORMAL && (
                         <>
-                            <ContextMenuListItemView gap={1} onClick={(event) => processAction('toggle_breeding_permission')}>
-                                <input checked={avatarInfo.publiclyBreedable} readOnly={true} type="checkbox" />
-                                {LocalizeText('infostand.button.toggle_breeding_permission')}
+                            {petRespectRemaining > 0 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('respect')}>
+                                    {LocalizeText('infostand.button.petrespect', ['count'], [petRespectRemaining.toString()])}
+                                </ContextMenuListItemView>
+                            )}
+                            <ContextMenuListItemView onClick={(event) => processAction('train')}>{LocalizeText('infostand.button.train')}</ContextMenuListItemView>
+                            <ContextMenuListItemView onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>
+                            {avatarInfo.petType === PetType.HORSE && (
+                                <ContextMenuListItemView onClick={(event) => processAction('buy_saddle')}>
+                                    {LocalizeText('infostand.button.buy_saddle')}
+                                </ContextMenuListItemView>
+                            )}
+                            {[PetType.BEAR, PetType.TERRIER, PetType.CAT, PetType.DOG, PetType.PIG].indexOf(avatarInfo.petType) > -1 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('breed')}>{LocalizeText('infostand.button.breed')}</ContextMenuListItemView>
+                            )}
+                        </>
+                    )}
+                    {mode === MODE_SADDLED_UP && (
+                        <>
+                            <ContextMenuListItemView onClick={(event) => processAction('mount')}>{LocalizeText('infostand.button.mount')}</ContextMenuListItemView>
+                            <ContextMenuListItemView gap={1} onClick={(event) => processAction('toggle_riding_permission')}>
+                                <Checkbox checked={!!avatarInfo.publiclyRideable} readOnly={true} />
+                                {LocalizeText('infostand.button.toggle_riding_permission')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('breed')}>
-                                {LocalizeText('infostand.button.breed')}
+                            {petRespectRemaining > 0 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('respect')}>
+                                    {LocalizeText('infostand.button.petrespect', ['count'], [petRespectRemaining.toString()])}
+                                </ContextMenuListItemView>
+                            )}
+                            <ContextMenuListItemView onClick={(event) => processAction('train')}>{LocalizeText('infostand.button.train')}</ContextMenuListItemView>
+                            <ContextMenuListItemView onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>
+                            <ContextMenuListItemView onClick={(event) => processAction('saddle_off')}>
+                                {LocalizeText('infostand.button.saddleoff')}
                             </ContextMenuListItemView>
                         </>
                     )}
-                </>
-            )}
-            {canGiveHandItem && (
-                <ContextMenuListItemView onClick={(event) => processAction('pass_hand_item')}>
-                    {LocalizeText('infostand.button.pass_hand_item')}
-                </ContextMenuListItemView>
-            )}
-        </ContextMenuView>
+                    {mode === MODE_RIDING && (
+                        <>
+                            <ContextMenuListItemView onClick={(event) => processAction('dismount')}>
+                                {LocalizeText('infostand.button.dismount')}
+                            </ContextMenuListItemView>
+                            {petRespectRemaining > 0 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('respect')}>
+                                    {LocalizeText('infostand.button.petrespect', ['count'], [petRespectRemaining.toString()])}
+                                </ContextMenuListItemView>
+                            )}
+                        </>
+                    )}
+                    {mode === MODE_MONSTER_PLANT && (
+                        <>
+                            <ContextMenuListItemView onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>
+                            {avatarInfo.dead && (
+                                <ContextMenuListItemView onClick={(event) => processAction('revive')}>
+                                    {LocalizeText('infostand.button.revive')}
+                                </ContextMenuListItemView>
+                            )}
+                            {roomSession.isRoomOwner && (
+                                <ContextMenuListItemView onClick={(event) => processAction('compost')}>
+                                    {LocalizeText('infostand.button.compost')}
+                                </ContextMenuListItemView>
+                            )}
+                            {!avatarInfo.dead && avatarInfo.energy / avatarInfo.maximumEnergy < 0.98 && (
+                                <ContextMenuListItemView onClick={(event) => processAction('treat')}>
+                                    {LocalizeText('infostand.button.pettreat')}
+                                </ContextMenuListItemView>
+                            )}
+                            {!avatarInfo.dead && avatarInfo.level === avatarInfo.maximumLevel && avatarInfo.breedable && (
+                                <>
+                                    <ContextMenuListItemView gap={1} onClick={(event) => processAction('toggle_breeding_permission')}>
+                                        <Checkbox checked={avatarInfo.publiclyBreedable} readOnly={true} />
+                                        {LocalizeText('infostand.button.toggle_breeding_permission')}
+                                    </ContextMenuListItemView>
+                                    <ContextMenuListItemView onClick={(event) => processAction('breed')}>
+                                        {LocalizeText('infostand.button.breed')}
+                                    </ContextMenuListItemView>
+                                </>
+                            )}
+                        </>
+                    )}
+                    {canGiveHandItem && (
+                        <ContextMenuListItemView onClick={(event) => processAction('pass_hand_item')}>
+                            {LocalizeText('infostand.button.pass_hand_item')}
+                        </ContextMenuListItemView>
+                    )}
+                </div>
+            </ContextMenuView>
+        </NativeTextTree>
     );
 };

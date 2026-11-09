@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useBetween } from 'use-between';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
     emptySample,
     GetConfigurationValue,
     HousekeepingApi,
+    HousekeepingRoomSection,
     HousekeepingTabId,
+    HousekeepingUserSection,
     IHousekeepingActionLogEntry,
+    IHousekeepingDangerRequest,
     IHousekeepingDashboard,
     IHousekeepingRoom,
     IHousekeepingRoomSummary,
@@ -23,7 +26,8 @@ const AUDIT_POLL_DEFAULT_MS = 30000;
 const AUDIT_POLL_MIN_MS = 5000;
 
 const ACTION_LOG_LIMIT = 100;
-const AUTOCOMPLETE_DEBOUNCE_MS = 250;
+// At least the server's 500 ms rate limit on the searches, so typing does not queue a request per key.
+const AUTOCOMPLETE_DEBOUNCE_MS = 500;
 const AUTOCOMPLETE_MIN_PREFIX = 2;
 
 const useHousekeepingStoreInner = () => {
@@ -31,11 +35,16 @@ const useHousekeepingStoreInner = () => {
     // Last-tab is persisted per user (useLocalStorage auto-scopes the key
     // by userId from the URL) so reopening the panel lands on the same
     // tab the operator was using. HousekeepingView's auto-redirect
-    // effect handles the case where the persisted tab isn't available
-    // in the current `housekeeping.mode` (light bounces DASHBOARD → USERS).
+    // effect handles a persisted tab the operator may no longer open.
     const [activeTab, setActiveTab] = useLocalStorage<HousekeepingTabId>('nitro.housekeeping.last_tab', HousekeepingTabId.DASHBOARD);
     const [selectedUser, setSelectedUser] = useState<IHousekeepingUser | null>(null);
     const [selectedRoom, setSelectedRoom] = useState<IHousekeepingRoom | null>(null);
+    // Which sub-page of the user and room pages is open; kept here so a link
+    // (housekeeping/tab/economy) or the global search can land on a sub-page.
+    const [userSection, setUserSection] = useState<HousekeepingUserSection>(HousekeepingUserSection.SANCTIONS);
+    const [roomSection, setRoomSection] = useState<HousekeepingRoomSection>(HousekeepingRoomSection.SETTINGS);
+    // The dangerous action waiting for its typed confirmation, if any.
+    const [dangerRequest, setDangerRequest] = useState<IHousekeepingDangerRequest | null>(null);
     const [actionLog, setActionLog] = useState<IHousekeepingActionLogEntry[]>([]);
     const [isUserLoading, setIsUserLoading] = useState(false);
     const [isRoomLoading, setIsRoomLoading] = useState(false);
@@ -48,7 +57,7 @@ const useHousekeepingStoreInner = () => {
     const [roomSuggestions, setRoomSuggestions] = useState<IHousekeepingRoomSummary[]>([]);
     const [recentLookups, setRecentLookups] = useState<RecentLookupEntry[]>(() => loadRecentLookups());
     // Multi-select state for the Users tab. We use an array of ids
-    // rather than a Set because Zustand-style `useBetween` re-renders
+    // rather than a Set because the Zustand-backed snapshot re-renders
     // on referential equality — mutating a Set in place would miss
     // updates. Capped via the dedupe in toggleUserSelection.
     const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
@@ -261,7 +270,8 @@ const useHousekeepingStoreInner = () => {
                 ipLast: '',
                 isBanned: false,
                 isMuted: false,
-                isTradeLocked: false
+                isTradeLocked: false,
+                profile: null
             };
 
             setSelectedUser(hint);
@@ -445,6 +455,12 @@ const useHousekeepingStoreInner = () => {
         setSelectedUser,
         selectedRoom,
         setSelectedRoom,
+        userSection,
+        setUserSection,
+        roomSection,
+        setRoomSection,
+        dangerRequest,
+        setDangerRequest,
         actionLog,
         setActionLog,
         isUserLoading,
@@ -483,8 +499,10 @@ const useHousekeepingStoreInner = () => {
 /**
  * Singleton store backing the housekeeping panel. State, lookups,
  * dashboard/audit fetches, autocomplete + recent-lookups
- * persistence all live in one `useBetween` closure so every tab
+ * persistence all live in one shared source so every tab
  * shares the same view of the world — and reopening the panel
  * doesn't re-fetch state that's already in memory.
  */
-export const useHousekeepingStore = () => useBetween(useHousekeepingStoreInner);
+export const useHousekeepingStore = () => useSharedHook(useHousekeepingStoreInner);
+
+registerSharedHook(useHousekeepingStoreInner);

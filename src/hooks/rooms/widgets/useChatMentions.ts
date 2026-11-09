@@ -1,4 +1,4 @@
-import { GetSessionDataManager } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager } from '@octane/renderer';
 import { RefObject, useCallback, useMemo, useState } from 'react';
 import { GetConfigurationValue, LocalizeText } from '../../../api';
 import { useRoomUserListSnapshot } from '../../session/useSessionSnapshots';
@@ -26,7 +26,7 @@ export interface ChatMentionsState {
     /** Apply the highlighted suggestion (or the first). Returns true if one was applied. */
     applyCurrent: () => boolean;
     apply: (suggestion: MentionSuggestion) => void;
-    /** Escape: reset selection and strip the in-progress @query from the input. */
+    /** Escape: close the list for this @query and keep what was typed; typing on brings it back. */
     cancel: () => void;
 }
 
@@ -44,6 +44,7 @@ export const useChatMentions = (
 ): ChatMentionsState => {
     const roomUserList = useRoomUserListSnapshot();
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [dismissedKey, setDismissedKey] = useState<string | null>(null);
 
     const mentionContext = useMemo(() => computeMentionContext(chatValue, commandSelectorVisible), [chatValue, commandSelectorVisible]);
 
@@ -79,7 +80,8 @@ export const useChatMentions = (
         return buildChatMentionSuggestions(mentionContext.query, roomUserList, aliases, session?.userId ?? -1, session?.userName || '');
     }, [mentionContext, roomUserList, aliases]);
 
-    const visible = suggestions.length > 0;
+    const contextKey = mentionContext ? `${mentionContext.atIndex}:${mentionContext.query}` : null;
+    const visible = suggestions.length > 0 && dismissedKey !== contextKey;
     // Clamp the selection to the current list (derived, no effect) so a
     // shrinking list never leaves the highlight out of range.
     const safeIndex = selectedIndex < suggestions.length ? selectedIndex : 0;
@@ -123,14 +125,8 @@ export const useChatMentions = (
 
     const cancel = useCallback(() => {
         setSelectedIndex(0);
-
-        if (!mentionContext) return;
-
-        const before = chatValue.slice(0, mentionContext.replaceFrom);
-        const after = chatValue.slice(mentionContext.replaceTo);
-
-        setChatValue(before + after);
-    }, [mentionContext, chatValue, setChatValue]);
+        setDismissedKey(contextKey);
+    }, [contextKey]);
 
     return { visible, suggestions, selectedIndex: safeIndex, setSelectedIndex, moveUp, moveDown, applyCurrent, apply, cancel };
 };

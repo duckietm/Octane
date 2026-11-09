@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { ProductTypeEnum } from '../../api';
 import { LayoutBadgeImageView } from './LayoutBadgeImageView';
+import { LayoutChatStyleImageView } from './LayoutChatStyleImageView';
 import { LayoutCurrencyIcon } from './LayoutCurrencyIcon';
 import { LayoutFurniImageView } from './LayoutFurniImageView';
 
@@ -21,6 +22,9 @@ export const LayoutPrizeProductImageView: FC<LayoutPrizeProductImageViewProps> =
             return <LayoutBadgeImageView badgeCode={extraParam} />;
         case ProductTypeEnum.HABBO_CLUB:
             return <LayoutCurrencyIcon type="hc" />;
+        case ProductTypeEnum.CHAT_STYLE:
+            // AIR RecycleRewardDisplayWrapper / PrizeGridItem: the class id is the style id.
+            return <LayoutChatStyleImageView styleId={classId} />;
     }
 
     return null;

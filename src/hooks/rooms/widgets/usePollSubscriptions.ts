@@ -1,6 +1,6 @@
-import { RoomSessionPollEvent } from '@nitrots/nitro-renderer';
+import { RoomSessionPollEvent } from '@octane/renderer';
 import { DispatchUiEvent, RoomWidgetPollUpdateEvent } from '../../../api';
-import { useNitroEvent } from '../../events';
+import { useOctaneEvent } from '../../events';
 
 /**
  * Bridges the three poll-related renderer events (OFFER / ERROR / CONTENT)
@@ -11,7 +11,7 @@ import { useNitroEvent } from '../../events';
  * usePollWidget. The "actions" half is in usePollActions.
  */
 export const usePollSubscriptions = (): void => {
-    useNitroEvent<RoomSessionPollEvent>(RoomSessionPollEvent.OFFER, (event) => {
+    useOctaneEvent<RoomSessionPollEvent>(RoomSessionPollEvent.OFFER, (event) => {
         const pollEvent = new RoomWidgetPollUpdateEvent(RoomWidgetPollUpdateEvent.OFFER, event.id);
 
         pollEvent.summary = event.summary;
@@ -20,7 +20,7 @@ export const usePollSubscriptions = (): void => {
         DispatchUiEvent(pollEvent);
     });
 
-    useNitroEvent<RoomSessionPollEvent>(RoomSessionPollEvent.ERROR, (event) => {
+    useOctaneEvent<RoomSessionPollEvent>(RoomSessionPollEvent.ERROR, (event) => {
         const pollEvent = new RoomWidgetPollUpdateEvent(RoomWidgetPollUpdateEvent.ERROR, event.id);
 
         pollEvent.summary = event.summary;
@@ -29,7 +29,7 @@ export const usePollSubscriptions = (): void => {
         DispatchUiEvent(pollEvent);
     });
 
-    useNitroEvent<RoomSessionPollEvent>(RoomSessionPollEvent.CONTENT, (event) => {
+    useOctaneEvent<RoomSessionPollEvent>(RoomSessionPollEvent.CONTENT, (event) => {
         const pollEvent = new RoomWidgetPollUpdateEvent(RoomWidgetPollUpdateEvent.CONTENT, event.id);
 
         pollEvent.startMessage = event.startMessage;

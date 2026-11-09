@@ -1,12 +1,14 @@
-import { MarkMentionsReadComposer, RequestMentionsComposer } from '@nitrots/nitro-renderer';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { FaSearch, FaSync } from 'react-icons/fa';
-import { getMentionDateGroup, IMentionEntry, LocalizeText, MentionDateGroup, MentionType, SendMessageComposer } from '../../api';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
-import { useMentionActions, useMentionsSnapshot } from '../../hooks';
-import { markAllRead } from '../../hooks/mentions/mentionsStore';
+import { FC, useEffect, useMemo, useState } from 'react';
+import { FaSearch } from 'react-icons/fa';
+import { getMentionDateGroup, IMentionEntry, LocalizeText, localizeWithFallback, MentionDateGroup, MentionType } from '../../api';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
+import { requestMentions, requestMoreMentions, useMentionActions, useMentionsSnapshot } from '../../hooks';
+import { setMentionsPanelOpen } from '../../hooks/mentions/mentionsStore';
 import { useUserDataSnapshot } from '../../hooks/session/useSessionSnapshots';
 import { MentionRowView } from './MentionRowView';
+import { BaseButton } from '../../common/BaseButton';
+import { ToggleButton } from '../../common/ToggleButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface MentionsViewProps {
     onClose: () => void;
@@ -55,22 +57,23 @@ const matchesQuery = (mention: IMentionEntry, query: string): boolean => {
 
 export const MentionsView: FC<MentionsViewProps> = (props) => {
     const { onClose } = props;
-    const { mentions, unreadCount } = useMentionsSnapshot();
+    const { mentions, unreadCount, status, hasMore, loadingMore } = useMentionsSnapshot();
     const { userName: ownUsername = '' } = useUserDataSnapshot();
-    const { open, goto, remove } = useMentionActions();
+    const { open, goto, remove, markAll } = useMentionActions();
     const [filter, setFilter] = useState<MentionFilter>('all');
     const [query, setQuery] = useState('');
 
-    // Re-request from the server: once on open, and on the manual refresh button.
-    const refresh = useCallback(() => SendMessageComposer(new RequestMentionsComposer()), []);
-
+    // While the panel is open a new mention lands in the list, so it needs no toast.
     useEffect(() => {
-        refresh();
-    }, [refresh]);
+        setMentionsPanelOpen(true);
 
-    const onMarkAll = useCallback(() => {
-        markAllRead();
-        SendMessageComposer(new MarkMentionsReadComposer(0, 0));
+        return () => setMentionsPanelOpen(false);
+    }, []);
+
+    // The list is asked for once at startup; opening the panel only asks again when that never worked.
+    useEffect(() => {
+        if (status === 'idle' || status === 'error') requestMentions();
+        // Only the state at the moment it opens matters here.
     }, []);
 
     const groups = useMemo(() => {
@@ -85,69 +88,116 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
         return GROUP_ORDER.map((key) => ({ key, items: buckets[key] })).filter((group) => group.items.length > 0);
     }, [mentions, filter, query]);
 
+    const isLoading = status === 'loading';
     const hasAny = groups.length > 0;
+    const isFiltering = filter !== 'all' || query.length > 0;
     const title = `${LocalizeText('mentions.window.title')}${unreadCount > 0 ? ` (${unreadCount})` : ''}`;
 
-    return (
-        <NitroCardView
-            className="mentions-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] has-classic-scrollbar"
-            theme="primary-slim"
-            uniqueKey="mentions"
-        >
-            <NitroCardHeaderView headerText={title} onCloseClick={onClose} />
-            <NitroCardContentView gap={1}>
-                <div className="mentions-search">
-                    <FaSearch className="mentions-search-icon" />
-                    <input type="text" value={query} placeholder={LocalizeText('generic.search')} onChange={(event) => setQuery(event.target.value)} />
-                </div>
-                <div className="mentions-toolbar">
-                    <div className="mentions-filters">
-                        {FILTERS.map(({ key, label }) => {
-                            const active = filter === key;
-                            const showCount = key === 'unread' && unreadCount > 0;
+    const clearFilters = () => {
+        setFilter('all');
+        setQuery('');
+    };
 
-                            return (
-                                <button key={key} type="button" className={`mentions-filter ${active ? 'is-active' : ''}`} onClick={() => setFilter(key)}>
-                                    {LocalizeText(label)}
-                                    {showCount ? ` ${unreadCount}` : ''}
-                                </button>
-                            );
-                        })}
+    const renderEmpty = () => {
+        if (isLoading && mentions.length === 0) {
+            return <span className="mentions-empty-text">{localizeWithFallback('mentions.window.loading', 'Loading mentions...')}</span>;
+        }
+
+        if (status === 'error' && mentions.length === 0) {
+            return (
+                <NativeTextTree>
+                    <>
+                        <span className="mentions-empty-text">{localizeWithFallback('mentions.window.error', 'The mentions could not be loaded.')}</span>
+                        <BaseButton type="button" className="mentions-filter is-active" onClick={requestMentions}>
+                            {localizeWithFallback('mentions.window.retry', 'Try again')}
+                        </BaseButton>
+                    </>
+                </NativeTextTree>
+            );
+        }
+
+        if (mentions.length > 0 && isFiltering) {
+            return (
+                <NativeTextTree>
+                    <>
+                        <span className="mentions-empty-text">{localizeWithFallback('mentions.window.noresults', 'No mention matches.')}</span>
+                        <BaseButton type="button" className="mentions-filter is-active" onClick={clearFilters}>
+                            {localizeWithFallback('mentions.filter.clear', 'Clear the filters')}
+                        </BaseButton>
+                    </>
+                </NativeTextTree>
+            );
+        }
+
+        return <span className="mentions-empty-text">{LocalizeText('mentions.window.empty')}</span>;
+    };
+
+    return (
+        <NativeTextTree>
+            <OctaneCardView
+                className="mentions-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] has-classic-scrollbar"
+                theme="primary-slim"
+                uniqueKey="mentions"
+            >
+                <OctaneCardHeaderView headerText={title} onCloseClick={onClose} />
+                <OctaneCardContentView gap={1}>
+                    <div className="mentions-search">
+                        <FaSearch className="mentions-search-icon" />
+                        <input
+                            type="text"
+                            value={query}
+                            aria-label={LocalizeText('generic.search')}
+                            placeholder={LocalizeText('generic.search')}
+                            onChange={(event) => setQuery(event.target.value)}
+                        />
                     </div>
-                    <button type="button" className="mentions-refresh" title="Aggiorna" onClick={refresh}>
-                        <FaSync />
-                    </button>
-                </div>
-                <div className="mentions-list">
-                    {!hasAny && (
-                        <div className="mentions-empty">
-                            <span className="mentions-empty-glyph">@</span>
-                            <span className="mentions-empty-text">{LocalizeText('mentions.window.empty')}</span>
+                    <div className="mentions-toolbar">
+                        <div className="mentions-filters" role="group" aria-label={LocalizeText('mentions.window.title')}>
+                            {FILTERS.map(({ key, label }) => {
+                                const active = filter === key;
+                                const showCount = key === 'unread' && unreadCount > 0;
+
+                                return (
+                                    <ToggleButton key={key} type="button" pressed={active} className={`mentions-filter ${active ? 'is-active' : ''}`} onClick={() => setFilter(key)}>
+                                        {LocalizeText(label)}
+                                        {showCount ? ` ${unreadCount}` : ''}
+                                    </ToggleButton>
+                                );
+                            })}
                         </div>
-                    )}
-                    {hasAny &&
-                        groups.map((group) => (
-                            <div key={group.key} className="mentions-group">
-                                <div className="mentions-group-label">{LocalizeText(GROUP_LABEL[group.key])}</div>
-                                {group.items.map((mention) => (
-                                    <MentionRowView
-                                        key={mention.mentionId}
-                                        mention={mention}
-                                        onGoto={goto}
-                                        onOpen={open}
-                                        onRemove={remove}
-                                        ownUsername={ownUsername}
-                                    />
-                                ))}
+                        <BaseButton type="button" className="mentions-refresh" disabled={isLoading} aria-busy={isLoading} onClick={requestMentions}>
+                            {localizeWithFallback('mentions.action.refresh', 'Refresh')}
+                        </BaseButton>
+                    </div>
+                    <div className="mentions-list" role="list" aria-busy={isLoading}>
+                        {!hasAny && (
+                            <div className="mentions-empty">
+                                <span className="mentions-empty-glyph" aria-hidden />
+                                {renderEmpty()}
                             </div>
-                        ))}
-                </div>
-                {unreadCount > 0 && (
-                    <Button variant="primary" onClick={onMarkAll}>
-                        {LocalizeText('mentions.window.markall')}
-                    </Button>
-                )}
-            </NitroCardContentView>
-        </NitroCardView>
+                        )}
+                        {hasAny &&
+                            groups.map((group) => (
+                                <div key={group.key} className="mentions-group">
+                                    <div className="mentions-group-label">{LocalizeText(GROUP_LABEL[group.key])}</div>
+                                    {group.items.map((mention) => (
+                                        <MentionRowView key={`${mention.mentionId}-${mention.timestamp}`} mention={mention} onGoto={goto} onOpen={open} onRemove={remove} ownUsername={ownUsername} />
+                                    ))}
+                                </div>
+                            ))}
+                    </div>
+                    {hasMore && (
+                        <BaseButton type="button" className="mentions-refresh" disabled={loadingMore} aria-busy={loadingMore} onClick={requestMoreMentions}>
+                            {loadingMore ? localizeWithFallback('mentions.window.loadingmore', 'Loading...') : localizeWithFallback('mentions.window.loadmore', 'Load older mentions')}
+                        </BaseButton>
+                    )}
+                    {unreadCount > 0 && (
+                        <Button className="mentions-markall" variant="primary" onClick={markAll}>
+                            {LocalizeText('mentions.window.markall')}
+                        </Button>
+                    )}
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

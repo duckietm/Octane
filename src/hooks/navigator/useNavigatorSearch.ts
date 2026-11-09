@@ -1,29 +1,32 @@
-import { FlatCreatedEvent, NavigatorSearchComposer, NavigatorSearchEvent, NavigatorSearchResultSet } from '@nitrots/nitro-renderer';
+import { FlatCreatedEvent, NavigatorSearchComposer, NavigatorSearchEvent, NavigatorSearchResultSet, RoomSettingsSavedEvent } from '@octane/renderer';
 import { useEffect, useState } from 'react';
 import { SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';
 import { useNavigatorUiStore } from './navigatorUiStore';
 
 const NAVIGATOR_USER_COUNT_REFRESH_MS = 15000;
+const MY_ROOMS_TAB_CODE = 'myworld_view';
+/** The server keeps the first 64 characters of a search and echoes those back. */
+const SERVER_MAX_QUERY_LENGTH = 64;
 
 /**
- * Navigator search hook.
- *
- * Fires NavigatorSearchComposer(tabCode, filter) whenever the active tab
- * or filter changes (skipped when tabCode is '' — initial state, before
- * metadata arrives). Holds the latest NavigatorSearchResultSet that
- * matches the active tab.
- *
- * The TanStack Query variant (see useNitroQuery) was tried earlier but
- * its one-shot listener doesn't always reach NavigatorSearchEvent in
- * production builds with older renderer SDKs; the persistent
- * useMessageEvent listener used here matches the rest of the codebase
- * and reliably catches every server push.
+ * Whether a search reply answers the search on screen: same tab and same filter. Only the tab was compared, so while
+ * typing a reply for an older filter (or a poll sent before the change) could replace the newer results.
  */
+export const isReplyForSearch = (code: string, data: string, tabCode: string, filter: string): boolean => {
+    if (!tabCode || code !== tabCode) return false;
+
+    const expected = (filter ?? '').slice(0, SERVER_MAX_QUERY_LENGTH);
+
+    return (data ?? '') === expected;
+};
+
 export const useNavigatorSearch = () => {
     const tabCode = useNavigatorUiStore((s) => s.currentTabCode);
     const filter = useNavigatorUiStore((s) => s.currentFilter);
     const isVisible = useNavigatorUiStore((s) => s.isVisible);
+    const needsSearch = useNavigatorUiStore((s) => s.needsSearch);
+    const consumeSearchRequest = useNavigatorUiStore((s) => s.consumeSearchRequest);
 
     const [searchResult, setSearchResult] = useState<NavigatorSearchResultSet | null>(null);
     const [isFetching, setIsFetching] = useState(false);
@@ -35,7 +38,14 @@ export const useNavigatorSearch = () => {
         SendMessageComposer(new NavigatorSearchComposer(tabCode, filter));
     }, [tabCode, filter]);
 
-    // Keep room user counts fresh while the navigator stays open (official refreshes search periodically).
+    useEffect(() => {
+        if (!needsSearch || !tabCode) return;
+
+        consumeSearchRequest();
+        setIsFetching(true);
+        SendMessageComposer(new NavigatorSearchComposer(tabCode, filter));
+    }, [needsSearch, tabCode, filter, consumeSearchRequest]);
+
     useEffect(() => {
         if (!isVisible || !tabCode) return;
 
@@ -50,17 +60,22 @@ export const useNavigatorSearch = () => {
         const result = event.getParser()?.result;
         if (!result) return;
 
-        // No active tab → the search query is disabled, ignore any event.
-        // Otherwise only accept the event whose code matches the active tab.
-        if (!tabCode || result.code !== tabCode) return;
+        if (!isReplyForSearch(result.code, result.data, tabCode, filter)) return;
 
         setSearchResult(result);
         setIsFetching(false);
     });
 
-    // A newly created room refetches the current search.
     useMessageEvent<FlatCreatedEvent>(FlatCreatedEvent, () => {
         if (!tabCode) return;
+
+        setIsFetching(true);
+        SendMessageComposer(new NavigatorSearchComposer(tabCode, filter));
+    });
+
+    // AIR (navigator IncomingMessages.onRoomSettingsSaved) reloads the own rooms list, so a renamed room shows its new name.
+    useMessageEvent<RoomSettingsSavedEvent>(RoomSettingsSavedEvent, () => {
+        if (tabCode !== MY_ROOMS_TAB_CODE) return;
 
         setIsFetching(true);
         SendMessageComposer(new NavigatorSearchComposer(tabCode, filter));

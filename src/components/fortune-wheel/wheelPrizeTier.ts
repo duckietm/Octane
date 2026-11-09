@@ -1,4 +1,4 @@
-import { IWheelPrize } from '@nitrots/nitro-renderer';
+import { IWheelPrize } from '@octane/renderer';
 
 // Group A is client-only: the player-facing prize payload (WheelDataEvent /
 // IWheelPrize) carries no `weight`, so we can't read the server's real spin

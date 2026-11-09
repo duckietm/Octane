@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="start_panel" width="383" height="295" version="0.1" uid="A4CC1CAE-0A3C-A258-A10C-2A8BCC90B3D0">
+    <window>
+        <frame x="60" y="4" width="383" height="295" params="32769" style="0" caption="Mod%20action%20on%3A" color="0xff418db0">
+            <filters>
+                <DropShadowFilter distance="4" alpha="0.34901960784313724" blurX="4" blurY="4"/>
+            </filters>
+            <children>
+                <dropmenu x="20" y="15" width="320" height="20" params="17" style="100" name="cfh_topics" caption="CFH%20topic%3A"/>
+
+                <dropmenu x="20" y="45" width="320" height="20" params="17" style="100" name="sanction_type" caption="Sanction%20type%3A"/>
+
+                <text x="20" y="80" width="320" height="20" params="16" style="3" name="message_info" caption="Optional message to user, overrides default text:" width_max="320" height_max="20">
+                    <variables>
+                        <var key="text_color" value="0xffffff" type="hex"/>
+                        <var key="font_size" value="11" type="Number"/>
+                    </variables>
+                </text>
+                <input x="20" y="105" width="320" height="45" params="1025" style="0" name="message_input" color="0xffffff" background="true">
+                    <variables>
+                        <var key="always_show_selection" value="true" type="Boolean"/>
+                        <var key="border" value="true" type="Boolean"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                        <var key="sharpness" value="0" type="Number"/>
+                        <var key="thickness" value="0" type="Number"/>
+                        <var key="word_wrap" value="true" type="Boolean"/>
+                        <var key="kerning" value="false" type="Boolean"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                    </variables>
+                </input>
+
+                <button x="20" y="165" width="100" height="21" params="131089" style="0" name="default_sanction_button" caption="Default%20sanction" width_min="100" width_max="100"/>
+                <text x="125" y="167" width="240" height="20" params="16" style="3" name="default_sanction_label" caption="(not available)" width_max="240" height_max="20">
+                    <variables>
+                        <var key="text_color" value="0xffffff" type="hex"/>
+                        <var key="font_size" value="11" type="Number"/>
+                    </variables>
+                </text>
+
+                <button x="20" y="205" width="100" height="21" params="131089" style="0" name="custom_sanction_button" caption="Custom%20sanction" width_min="100" width_max="100"/>
+            </children>
+        </frame>
+    </window>
+</layout>

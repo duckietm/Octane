@@ -1,269 +1,279 @@
-.nitro-room-tools-container {
+.octane-room-tools-container {
     position: absolute;
-    bottom: 118px;
+    bottom: 69px;
     left: 0;
     display: flex;
-    align-items: stretch;
-    gap: 0;
+    align-items: flex-end;
+    gap: 8px;
     z-index: 71;
 
-    .nitro-room-tools-rail {
-        display: flex;
-        align-items: center;
+    .octane-room-tools {
         position: relative;
+        width: 158px;
+        min-height: 177px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 8px 10px 7px 22px;
+        border-radius: 0 6px 6px 0;
+        background: rgba(34, 34, 30, 0.86);
+        box-shadow: inset -1px 0 rgba(255, 255, 255, 0.05), 0 2px 0 rgba(0, 0, 0, 0.45);
+        color: #c9c9c9;
+        image-rendering: var(--octane-pixel-art, pixelated);
     }
 
-    &.is-collapsed .nitro-room-tools-rail {
-        width: 0;
-        min-width: 0;
-        height: 110px;
-    }
-
-    &.is-collapsed .nitro-room-tools-toggle {
-        left: 0;
-    }
-
-    &.is-collapsed .nitro-room-tools {
-        transform: translate3d(-100%, 0, 0);
-        pointer-events: none;
-    }
-
-    .nitro-room-tools-toggle {
+    .room-tools-collapse-toggle {
         position: absolute;
-        left: calc(100% - 1px);
+        left: 0;
         top: 50%;
-        width: 15px;
-        height: 110px;
+        width: 13px;
+        height: 31px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        border-top-right-radius: 6px;
-        border-bottom-right-radius: 6px;
-        background: rgba(43, 42, 38, 0.96);
-        color: rgba(255, 255, 255, 0.8);
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-        transition: background .2s ease, border-color .2s ease;
-        padding: 0;
         transform: translateY(-50%);
-        z-index: 72;
-
-        svg {
-            width: 8px;
-            height: 8px;
-        }
-
-        &:hover {
-            background: rgba(18, 18, 22, 0.72);
-            border-color: rgba(255, 255, 255, 0.12);
-        }
-
-        &.is-open {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
-        }
+        border-radius: 0 4px 4px 0;
+        background: rgba(42, 42, 38, 0.9);
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 20px;
+        line-height: 1;
+        text-shadow: 0 1px #000000;
+        padding: 0;
+        border: 0;
+        cursor: pointer;
+        z-index: 2;
     }
 
-    .room-tool-row {
-        width: 100%;
-        min-height: 23px;
-        padding: 1px 4px;
+    &.is-collapsed {
+        bottom: 69px;
+        width: 158px;
+        height: 177px;
+    }
 
-        .room-tool-label {
-            color: rgba(255, 255, 255, 0.82);
-        }
-
-        &:hover .room-tool-label {
-            color: #fff;
-            text-decoration: underline;
-        }
+    &.is-collapsed .room-tools-collapse-toggle {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
     }
 
     .room-tools-zoom-row {
+        height: 23px;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        min-height: 25px;
-        padding: 0 4px 3px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        gap: 4px;
+        padding-bottom: 4px;
+        margin-bottom: 3px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+        color: #d7d7d7;
+        font-family: Ubuntu, sans-serif;
+        font-size: 11px;
+        line-height: 18px;
     }
 
-    .room-tools-zoom-level {
-        color: rgba(255, 255, 255, 0.78);
+    .room-tools-zoom-row span {
+        flex: 1 1 auto;
+        white-space: nowrap;
     }
 
-    .room-tools-zoom-buttons {
-        display: flex;
-        gap: 3px;
-    }
-
+    /* room_tools_toolbar: zoom_in_btn and zoom_out_btn are 18x19 regions 2px apart, each drawing the roomtools_zoom_in/out bitmap with the
+       "button" dynamic style: brighter on hover (x1.1 +15), darker and 1px lower when pressed (x0.8), half alpha when disabled. */
     .room-tools-zoom-button {
+        width: 18px;
+        height: 19px;
+        flex: 0 0 auto;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent no-repeat 0 0 / 18px 18px;
+        cursor: pointer;
+        image-rendering: var(--octane-pixel-art, pixelated);
+    }
+
+    .room-tools-zoom-button.is-zoom-in {
+        background-image: url('@/assets/images/room-widgets/room-tools/zoom-in.png');
+    }
+
+    .room-tools-zoom-button.is-zoom-out {
+        margin-left: -2px;
+        background-image: url('@/assets/images/room-widgets/room-tools/zoom-out.png');
+    }
+
+    .room-tools-zoom-button:hover {
+        filter: brightness(1.17);
+    }
+
+    .room-tools-zoom-button:active {
+        background-position: 0 1px;
+        filter: brightness(0.8);
+    }
+
+    .room-tools-zoom-button:disabled {
+        opacity: 0.5;
+        filter: none;
+        background-position: 0 0;
+        cursor: default;
+    }
+
+    .room-tool-row {
+        height: 20px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        width: 18px;
-        height: 18px;
-        padding: 0;
-        border: 1px solid rgba(0, 0, 0, 0.65);
-        border-radius: 50%;
-        color: #e8e8e8;
-        background: linear-gradient(180deg, #585a55, #292a27);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        gap: 8px;
+        color: #c7c7c7;
+        cursor: pointer;
+        font-family: Ubuntu, sans-serif;
+        font-size: 11px;
+        line-height: 20px;
+    }
 
-        svg {
-            width: 9px;
-            height: 9px;
-        }
+    .room-tool-row.is-disabled {
+        opacity: 0.45;
+        cursor: default;
+    }
 
-        &:hover:not(:disabled) {
-            filter: brightness(1.15);
-        }
+    .room-tool-row.is-disabled .room-tool-label {
+        color: #9a9a9a;
+    }
 
-        &:disabled {
-            color: rgba(255, 255, 255, 0.22);
-            filter: brightness(0.65);
-            cursor: default;
-        }
+    .room-tool-row.is-disabled:hover .room-tool-label {
+        color: #9a9a9a;
+    }
+
+    .room-tool-row .octane-icon {
+        flex: 0 0 22px;
+        background-repeat: no-repeat !important;
+        background-position: center center !important;
+        background-size: auto !important;
+        filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.65));
+    }
+
+    .room-tool-label {
+        color: #bfbfbf;
+        text-decoration: underline;
+        text-shadow: 0 1px #000000;
+        white-space: nowrap;
+    }
+
+    .room-tool-row:hover .room-tool-label {
+        color: #ffffff;
     }
 
     .room-history-controls {
+        height: 35px;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 4px;
-        min-height: 31px;
-        margin-top: 2px;
-        padding-top: 5px;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        margin-top: 3px;
     }
 
-    .room-history-fold-toggle {
-        width: 34px;
-        height: 16px;
-        color: rgba(255, 255, 255, 0.85);
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 6px;
-
-        .fa-icon {
-            width: 12px;
-            height: 12px;
-        }
-
-        &:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.16);
-        }
+    .room-history-controls .octane-icon {
+        background-repeat: no-repeat !important;
+        background-position: center center !important;
+        background-size: auto !important;
     }
 
-    .nitro-room-tools {
-        background: rgba(43, 42, 38, 0.96);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        border-top-right-radius: 7px;
-        border-bottom-right-radius: 7px;
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
-        transform: translate3d(0, 0, 0);
-        transition: transform .14s ease-out;
-        will-change: transform;
-        z-index: 71;
-        margin-left: 0;
-        gap: 1px;
-        padding: 6px 6px 5px;
-        width: 158px;
-        min-height: 110px;
-
-        .list-group-item {
-            background: transparent;
-            padding: 3px 0px;
-            color: #FFF;
-            border-color: rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-
-            &:hover {
-                text-decoration: underline;
-            }
-
-            &:first-child {
-                padding-top: 8px;
-            }
-
-            &:last-child {
-                border-bottom: none;
-                padding-bottom: 8px;
-            }
-
-            .tools-item {
-                .icon {
-                    width: 22px;
-                    background-repeat: no-repeat;
-                    background-position: center;
-                }
-
-                &:hover {
-                    text-decoration: underline;
-                }
-            }
-        }
-    }
-
-    .nitro-room-tools-side-container {
+    .octane-room-tools-side-container {
         display: flex;
         flex-direction: column;
-        margin-left: 26px;
-        gap: 10px;
+        margin-left: 0;
+        margin-bottom: 0;
+        gap: 8px;
     }
 
-    .nitro-room-history {
-        background: rgba(10, 10, 12, 0.58);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
-        transition: all .2s ease;
-        width: 150px;
+    .octane-room-history {
+        width: 160px;
         max-height: calc(100vh - 140px);
         overflow-y: auto;
         overflow-x: hidden;
         z-index: 3;
-        border-radius: 14px;
-        scrollbar-width: thin;
-        scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
-
-        &::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.25);
-            border-radius: 3px;
-        }
-
-        .room-history-item {
-            color: rgba(255, 255, 255, 0.72);
-
-            &:hover {
-                color: #fff;
-                text-decoration: underline;
-            }
-        }
-
-        .room-history-item--current {
-            color: #fff;
-        }
+        padding: 8px;
+        border-radius: 6px;
+        background: rgba(34, 34, 30, 0.9);
+        box-shadow: 0 2px 0 rgba(0, 0, 0, 0.55);
+        color: #ffffff;
     }
 
-    .nitro-room-tools-info {
-        background: rgba(10, 10, 12, 0.58);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
-        transition: all .2s ease;
+    .octane-room-history .room-history-item {
+        color: rgba(255, 255, 255, 0.76);
+    }
+
+    .octane-room-history .room-history-item:hover,
+    .octane-room-history .room-history-item--current {
+        color: #ffffff;
+        text-decoration: underline;
+    }
+
+    .octane-room-tools-info {
         max-width: 250px;
-        border-radius: 14px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        background: rgba(34, 34, 30, 0.9);
+        box-shadow: 0 2px 0 rgba(0, 0, 0, 0.55);
     }
 }
 
-.nitro-room-tools-history {
+/* AIR room_tools_info: a 255x77 box (wider for a long name, up to 320) in 0x24231E at 80%, the name in the condensed
+   title style, the owner in 0x999999 under it, then up to two tags in 10px 0x1B79AB (0x47A8E6 on hover) inside a thin
+   0x1C2935 border. Scoped under the container so it outranks the shared .octane-room-tools-info rule above. */
+.octane-room-tools-container .octane-room-tools-info.octane-room-tools-info--enter {
+    position: absolute;
+    bottom: 0;
+    left: calc(100% + 12px);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: max-content;
+    min-width: 255px;
+    max-width: 320px;
+    min-height: 77px;
+    padding: 6px 10px 6px;
+    border-radius: 6px;
+    background: rgba(36, 35, 30, 0.8);
+    pointer-events: auto;
+    cursor: pointer;
+
+    .octane-room-tools-info__name {
+        display: block;
+        color: #ffffff;
+        font-family: 'Ubuntu Condensed', Ubuntu, Arial, sans-serif;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 24px;
+    }
+
+    .octane-room-tools-info__owner {
+        display: block;
+        margin-top: 3px;
+        color: #999999;
+        font-family: Ubuntu, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 18px;
+    }
+
+    .octane-room-tools-info__tags {
+        display: flex;
+        gap: 4px;
+        margin-top: 4px;
+    }
+
+    .octane-room-tools-info__tag {
+        padding: 0 2px;
+        border: 1px solid #1c2935;
+        background: transparent;
+        color: #1b79ab;
+        font-size: 10px;
+        line-height: 13px;
+        cursor: pointer;
+
+        &:hover {
+            color: #47a8e6;
+        }
+    }
+}
+
+.octane-room-tools-history {
     position: absolute;
     bottom: 0;
     top: auto;
@@ -313,9 +323,90 @@
     width: 22px;
 }
 
-.nitro-widget-doorbell {
+.octane-widget-doorbell {
+    width: 249px;
+    min-height: 165px;
+}
+
+.octane-doorbell-info {
+    color: #c30000;
+    font-size: 12px;
+    line-height: 14px;
+}
+
+.octane-doorbell-list {
+    max-height: 100px;
+    overflow-y: auto;
+    border: 1px solid #919191;
+    background: #ffffff;
+}
+
+.octane-doorbell-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 20px;
+    padding: 0 4px;
+    color: #000000;
+    font-size: 12px;
+}
+
+.octane-doorbell-row:nth-child(even) {
+    background: #eeeeee;
+}
+
+.octane-doorbell-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.octane-doorbell-row button {
+    width: 20px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    cursor: pointer;
+}
+
+.octane-doorbell-accept {
+    color: #0aa000;
+}
+
+.octane-doorbell-deny {
+    color: #c30000;
+}
+
+.octane-widget-rent-confirm {
     width: 300px;
-    height: 200px;
+    min-height: 180px;
+}
+
+.octane-resolution {
+    width: 320px;
+    min-height: 220px;
+}
+
+.octane-resolution--picker {
+    width: 360px;
+    min-height: 360px;
+}
+
+.octane-pet-breeding {
+    width: 340px;
+    min-height: 200px;
+}
+
+.octane-widget-poll {
+    width: 340px;
+    min-height: 220px;
+    max-height: 420px;
 }
 
 .toggle-roomtool {
@@ -363,7 +454,7 @@
     }
 }
 
-.nitro-chat-input-container {
+.octane-chat-input-container {
     .input-sizer {
         display: inline-grid;
         vertical-align: top;
@@ -391,7 +482,381 @@
     }
 }
 
-.nitro-mobile-furni-infostand-trigger {
+.octane-chat-input-container.swf-chat-input {
+    /* chatinput_window_new: 471 wide, input_border 400x38 at x=11, styles 57x38 at x=0. */
+    width: 100% !important;
+    max-width: 466px;
+    height: 38px !important;
+    min-height: 38px;
+    gap: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.swf-chat-input .swf-chat-style-trigger {
+    position: relative;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    flex: 0 0 57px;
+    width: 57px;
+    min-width: 57px;
+    height: 38px;
+    margin: 0;
+    padding: 0;
+    background: url('@/assets/images/chat-input-swf/chat_style_block.png') 0 0 / 57px 38px no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.swf-chat-input .swf-chat-style-arrow {
+    position: absolute;
+    left: 10px;
+    top: 17px;
+    width: 10px;
+    height: 6px;
+    color: #4c4c4c;
+    filter: drop-shadow(1px 1px 0 rgba(255, 255, 255, 0.65));
+}
+
+.swf-chat-input .swf-chat-style-icon {
+    position: absolute;
+    left: 25px;
+    top: 10px;
+    width: 17px;
+    height: 19px;
+    background: url('@/assets/images/chat-input-swf/chat_styles.png') center / auto no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.bubble-container.chat-text-size .chat-bubble,
+.bubble-container.chat-text-size .chat-content,
+.bubble-container.chat-text-size .message,
+.bubble-container.chat-text-size .username,
+.bubble-container.chat-text-size .prefix {
+    font-size: var(--chat-text-size) !important;
+}
+
+.bubble-container.chat-text-size .chat-content {
+    line-height: 1 !important;
+}
+
+.bubble-container.chat-text-size .username,
+.bubble-container.chat-text-size .message,
+.bubble-container.chat-text-size .prefix,
+.bubble-container.chat-text-size .prefix span {
+    line-height: 1 !important;
+}
+
+.swf-chat-style-menu {
+    z-index: 1070;
+    width: 304px;
+    padding: 9px 9px 7px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 7px;
+    background: rgba(31, 31, 31, 0.92);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 2px 0 rgba(0, 0, 0, 0.9),
+        4px 4px 0 rgba(0, 0, 0, 0.45);
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.swf-chat-style-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 41px);
+    grid-auto-rows: 25px;
+    gap: 8px 7px;
+    width: 281px;
+    overflow: visible;
+}
+
+.swf-chat-style-option {
+    position: relative;
+    width: 41px;
+    height: 25px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.swf-chat-style-option::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.swf-chat-style-option:hover::before,
+.swf-chat-style-option.is-active::before {
+    border-color: #ffffff;
+    box-shadow:
+        inset 0 0 0 1px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(255, 255, 255, 0.45);
+}
+
+.swf-chat-style-preview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 41px;
+    height: 25px;
+    transform: none;
+    transition: none;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.swf-chat-style-preview .chat-bubble {
+    display: block;
+    width: 38px;
+    min-width: 38px;
+    max-width: 38px;
+    min-height: 17px;
+    margin: 3px auto 0;
+    border-image-width: 12px 5px 5px 20px;
+    border-image-slice: 17 6 6 29 fill;
+    border-image-outset: 1px 0 0 0;
+    border-image-repeat: repeat repeat;
+}
+
+/* bubble_18 carries a wide horizontal border-image-outset for room chat (Chats.css), which
+   outranks the rule above and pushed its preview out of the 41px cell. */
+.swf-chat-style-preview.bubble-container .chat-bubble.bubble-18 {
+    border-image-outset: 1px 0 0 0;
+}
+
+.swf-chat-font-row {
+    display: flex;
+    align-items: center;
+    height: 22px;
+    margin-top: 8px;
+    padding: 0 4px 0 8px;
+    border-radius: 4px;
+    background: rgba(44, 44, 44, 0.92);
+    color: #b8b8b8;
+    font-family: Ubuntu, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 18px;
+}
+
+.swf-chat-font-label {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.swf-chat-font-option {
+    width: 22px;
+    height: 18px;
+    margin-left: 3px;
+    padding: 0;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: #d2d2d2;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+}
+
+.swf-chat-font-option.is-active {
+    background: #ffffff;
+    color: #242424;
+}
+
+/* input_border: style-8 ubuntu 9-slice color 0xe5e5e5, 400x38 at x=11.
+   Style cap is 57px; pull the field under it so the border starts at x=11. */
+.swf-chat-input .swf-chat-input-sizer {
+    position: relative;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0;
+    margin: 0 0 0 -46px;
+    padding: 7px 8px 7px 50px !important;
+    align-self: center;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    box-sizing: border-box;
+    background: transparent !important;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.swf-chat-input .swf-chat-input-sizer::before,
+.swf-chat-input .swf-chat-flood::before {
+    content: '';
+    display: block;
+    visibility: visible !important;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    box-sizing: border-box;
+    border: 10px solid transparent;
+    border-image-source: url('../../assets/images/habbo-skin/slices/border-ubuntu-8.png');
+    border-image-slice: 20 fill;
+    border-image-width: 10px;
+    border-image-repeat: stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.swf-chat-input .swf-chat-input-sizer::after,
+.swf-chat-input .swf-chat-flood::after {
+    content: none;
+}
+
+.swf-chat-input .swf-chat-input-field {
+    position: relative;
+    z-index: 1;
+    height: 24px !important;
+    min-height: 24px !important;
+    max-height: 24px !important;
+    padding: 0 !important;
+    color: #777777 !important;
+    font-family: Ubuntu, sans-serif;
+    font-size: 17px !important;
+    line-height: 24px !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    box-sizing: border-box;
+}
+
+.swf-chat-input .swf-chat-input-field::placeholder {
+    color: #777777 !important;
+    opacity: 1;
+}
+
+.swf-chat-input .swf-chat-flood {
+    position: relative;
+    height: 38px;
+    min-height: 38px;
+    max-height: 38px;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0;
+    margin: 0 0 0 -46px;
+    padding: 7px 8px 7px 50px !important;
+    align-self: center;
+    overflow: visible;
+    border-radius: 0;
+    box-sizing: border-box;
+    background: transparent !important;
+}
+
+.swf-chat-input .swf-chat-flood > * {
+    position: relative;
+    z-index: 1;
+}
+
+.swf-chat-input .habbicon-chat-trigger {
+    position: relative;
+    width: 41px;
+    min-width: 41px;
+    height: 38px;
+    margin: 0;
+    background: transparent url('@/assets/images/chat-input-swf/sticky_note.png') 0 0 / auto no-repeat;
+}
+
+.swf-chat-input .habbicon-chat-trigger:hover {
+    transform: translateY(-1px);
+}
+
+.swf-chat-input .habbicon-chat-trigger img {
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    width: auto;
+    height: auto;
+    max-width: 30px;
+    max-height: 30px;
+}
+
+.swf-chat-input .habbicon-chat-trigger::before {
+    content: '';
+    position: absolute;
+    left: 23px;
+    top: 2px;
+    width: 18px;
+    height: 15px;
+    background: url('@/assets/images/chat-input-swf/clip.png') center / auto no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.swf-chat-input .habbicon-chat-trigger::after {
+    content: '';
+    position: absolute;
+    left: 24px;
+    top: 26px;
+    width: 12px;
+    height: 12px;
+    background: url('@/assets/images/chat-input-swf/sticky_note2.png') center / auto no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.swf-chat-input .swf-chat-emoji-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 26px;
+    min-width: 26px;
+    height: 38px;
+    margin: 0 4px 0 2px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 19px;
+    line-height: 1;
+    filter: drop-shadow(1px 1px 0 rgba(255, 255, 255, 0.7));
+}
+
+.swf-chat-input .swf-chat-emoji-trigger:hover {
+    transform: translateY(-1px);
+}
+
+/* Same surface as .swf-chat-style-menu; the picker keeps its own layout and takes the colours through its variables. */
+.swf-chat-emoji-popover {
+    outline: 0;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 7px;
+    background: #1f1f1f;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 2px 0 rgba(0, 0, 0, 0.9),
+        4px 4px 0 rgba(0, 0, 0, 0.45);
+}
+
+.swf-chat-emoji-popover em-emoji-picker {
+    --rgb-background: 31, 31, 31;
+    --rgb-input: 20, 20, 20;
+    --rgb-color: 210, 210, 210;
+    --rgb-accent: 255, 255, 255;
+    --color-border: rgba(255, 255, 255, 0.08);
+    --color-border-over: rgba(255, 255, 255, 0.16);
+    --border-radius: 6px;
+    --shadow: none;
+    --font-family: inherit;
+    --font-size: 12px;
+}
+
+.octane-mobile-furni-infostand-trigger {
     pointer-events: auto;
     display: flex;
     align-items: center;
@@ -407,16 +872,16 @@
         0 4px 10px rgba(0, 0, 0, 0.24);
 }
 
-.nitro-mobile-furni-infostand-trigger .object-preview {
+.octane-mobile-furni-infostand-trigger .object-preview {
     width: 32px;
     height: 32px;
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
-    image-rendering: pixelated;
+    image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.nitro-mobile-user-infostand-avatar {
+.octane-mobile-user-infostand-avatar {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -431,19 +896,19 @@
     transform-origin: center center;
 }
 
-.nitro-mobile-user-infostand-avatar-image {
+.octane-mobile-user-infostand-avatar-image {
     display: block;
     width: auto !important;
     height: auto !important;
     max-width: 54px;
     max-height: 62px;
     object-fit: contain;
-    image-rendering: pixelated;
+    image-rendering: var(--octane-pixel-art, pixelated);
     margin: 0;
     pointer-events: none;
 }
 
-.nitro-mobile-user-infostand-trigger {
+.octane-mobile-user-infostand-trigger {
     position: relative;
     width: 42px;
     height: 42px;
@@ -451,66 +916,982 @@
     overflow: hidden;
 }
 
-.nitro-avatar-action-menu {
-    min-width: 132px;
-    padding: 4px !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 12px;
-    background: rgba(10, 10, 12, 0.58) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+.octane-avatar-action-menu {
+    min-width: 151px;
+}
+
+.octane-context-menu {
+    position: absolute;
+    z-index: 40;
+    width: 151px;
+    min-width: 151px;
+    padding: 7px 4px 5px;
     overflow: hidden;
+    border: 1px solid #1c1b1a;
+    border-radius: 4px;
+    background: #6e6b67;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    font-family: Ubuntu, Arial, sans-serif;
+    font-size: 11px;
+    line-height: 16px;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+    pointer-events: auto;
 }
 
-.nitro-avatar-action-menu .nitro-context-menu-header {
+.octane-context-menu .octane-context-menu-header {
     min-width: 0;
-    height: 28px;
-    max-height: 28px;
-    margin-bottom: 4px;
-    padding: 0 10px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 9px;
-    background: rgba(10, 10, 12, 0.58);
-    color: #fff;
-    font-size: 14px;
-    font-weight: 700;
-    text-shadow: none;
-}
-
-.nitro-avatar-action-menu .nitro-context-menu-item {
-    min-height: 26px;
-    max-height: none;
-    margin-bottom: 2px;
-    padding: 0 10px;
-    border: 1px solid transparent;
-    border-radius: 8px;
+    height: 16px;
+    margin: 0 0 4px;
+    padding: 0 6px 0 26px;
+    overflow: hidden;
+    border: 0;
+    border-bottom: 1px solid #171717;
+    border-radius: 0;
     background: transparent;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 15px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.85);
+}
+
+.octane-context-menu .octane-context-menu-item {
+    position: relative;
+    height: 26px;
+    min-height: 26px;
+    margin: 0;
+    padding: 0 4px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: #2d2a27;
     color: #fff;
-    font-size: 13px;
-    line-height: 1;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 26px;
     text-decoration: none;
+    text-align: center;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.85);
+}
+
+.octane-context-menu .octane-context-menu-item + .octane-context-menu-item {
+    border-top: 1px solid #151515;
+}
+
+.octane-context-menu .octane-context-menu-item:hover {
+    background: #45413d;
+}
+
+.octane-context-menu .octane-context-menu-item.disabled {
+    color: #9a9895;
+    cursor: default;
+    opacity: 1;
+}
+
+.octane-context-menu .octane-context-menu-item .right.fa-icon,
+.octane-context-menu .octane-context-menu-item .left.fa-icon {
+    position: absolute;
+    top: 7px;
+    font-size: 11px;
+}
+
+.octane-context-menu .octane-context-menu-item .right.fa-icon {
+    right: 7px;
+}
+
+.octane-context-menu .octane-context-menu-item .left.fa-icon {
+    left: 7px;
+}
+
+.octane-context-menu .octane-context-menu-footer {
+    position: relative;
+    height: 18px;
+    margin: 0;
+    border-radius: 0 0 2px 2px;
+    background: #45413d;
+    color: #fff;
+    cursor: pointer;
+}
+
+.octane-context-menu .octane-context-menu-footer .fa-icon {
+    font-size: 12px;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.85);
+}
+
+@font-face {
+    font-family: AirAvatarMenuUbuntu;
+    src: url('../../assets/webfonts/Ubuntu.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: AirAvatarMenuUbuntu;
+    src: url('../../assets/webfonts/Ubuntu-b.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 700;
+}
+
+/* WIN63 own_avatar_menu_xml. Keep this variant scoped: avatar_menu_widget is 151px wide. */
+.octane-avatar-action-menu--own {
+    isolation: isolate;
+    box-sizing: border-box;
+    width: 115px;
+    min-width: 115px;
+    max-width: 115px;
+    min-height: 0;
+    padding: 11px 0 10px;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #ffffff;
+    font-family: AirAvatarMenuUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px;
+    line-height: 16px;
+    text-shadow: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    -webkit-font-smoothing: antialiased;
+}
+
+.octane-avatar-action-menu--own::before {
+    position: absolute;
+    inset: 6px;
+    z-index: -2;
+    box-sizing: border-box;
+    content: '';
+    border: solid transparent;
+    border-width: 5px 5px 6px;
+    border-image-source: url('../../assets/images/avatar-menu/air/bubble.png');
+    border-image-slice: 20 20 24 20 fill;
+    border-image-width: 5px 5px 6px;
+    border-image-repeat: stretch;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-avatar-action-menu--own::after {
+    position: absolute;
+    bottom: 0;
+    left: calc(50% - 6px);
+    width: 13px;
+    height: 9px;
+    content: '';
+    background: url('../../assets/images/avatar-menu/air/bubble-pointer-down.png') no-repeat;
+    pointer-events: none;
+}
+
+.octane-avatar-action-menu--own .octane-context-menu-header {
+    position: relative;
+    box-sizing: border-box;
+    width: 107px;
+    min-width: 107px;
+    height: 16px;
+    min-height: 16px;
+    margin: 0 0 5px 4px;
+    padding: 0 14px 0 13px;
+    overflow: visible;
+    flex: 0 0 16px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #ffffff;
+    font-family: AirAvatarMenuUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    text-shadow: none;
+    white-space: nowrap;
+    justify-content: center !important;
+}
+
+.octane-avatar-action-menu--own .octane-context-menu-header::after {
+    position: absolute;
+    top: 20px;
+    left: 2px;
+    width: 103px;
+    height: 1px;
+    content: '';
+    background: #000000;
+    pointer-events: none;
+}
+
+.octane-avatar-action-menu--own .octane-context-menu-header:hover {
+    color: #91c2ff;
+}
+
+.air-avatar-menu-buttons {
+    display: flex;
+    width: 105px;
+    margin-left: 5px;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.air-avatar-menu-buttons > .octane-context-menu-item {
+    position: relative;
+    isolation: isolate;
+    box-sizing: border-box;
+    width: 103px;
+    min-width: 103px;
+    max-width: 103px;
+    height: 26px;
+    min-height: 26px;
+    margin: 0 0 0 1px;
+    padding: 0 3px;
+    overflow: hidden;
+    flex: 0 0 26px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #ffffff;
+    font-family: AirAvatarMenuUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 16px;
+    text-align: center;
     text-shadow: none;
 }
 
-.nitro-avatar-action-menu .nitro-context-menu-item:hover {
-    background: rgba(18, 18, 22, 0.72);
-    border-color: rgba(255, 255, 255, 0.08);
+.air-avatar-menu-buttons > .octane-context-menu-item::before {
+    position: absolute;
+    top: -4px;
+    left: -3px;
+    z-index: -1;
+    box-sizing: border-box;
+    width: 109px;
+    height: 35px;
+    content: '';
+    border: 5px solid transparent;
+    border-image-source: url('../../assets/images/avatar-menu/air/button-thick-default.png');
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.nitro-avatar-action-menu .nitro-context-menu-item.disabled {
-    opacity: 0.55;
+.air-avatar-menu-buttons > .octane-context-menu-item + .octane-context-menu-item {
+    border-top: 0;
 }
 
-.nitro-avatar-action-menu .nitro-context-menu-item .right.fa-icon,
-.nitro-avatar-action-menu .nitro-context-menu-item .left.fa-icon {
+.air-avatar-menu-buttons > .octane-context-menu-item:hover {
+    background: transparent;
+}
+
+.air-avatar-menu-buttons > .octane-context-menu-item:hover::before {
+    border-image-source: url('../../assets/images/avatar-menu/air/button-thick-hover.png');
+}
+
+/* WIN63 own_avatar_decorating: no name row, one 101px button in a 103px list. */
+.octane-avatar-action-menu--decorate {
+    padding: 11px 0 12px;
+}
+
+.octane-avatar-action-menu--decorate .air-avatar-menu-buttons {
+    width: 103px;
+    margin-left: 6px;
+}
+
+.octane-avatar-action-menu--decorate .air-avatar-menu-buttons > .octane-context-menu-item {
+    width: 101px;
+    min-width: 101px;
+    max-width: 101px;
+    margin: 0;
+}
+
+.octane-avatar-action-menu--decorate .air-avatar-menu-buttons > .octane-context-menu-item::before {
+    width: 107px;
+}
+
+/* WIN63 use_product_menu: 102px buttons in a 104px list. */
+.octane-avatar-action-menu--use-product .air-avatar-menu-buttons {
+    width: 104px;
+}
+
+.octane-avatar-action-menu--use-product .air-avatar-menu-buttons > .octane-context-menu-item {
+    width: 102px;
+    min-width: 102px;
+    max-width: 102px;
+}
+
+.octane-avatar-action-menu--use-product .air-avatar-menu-buttons > .octane-context-menu-item::before {
+    width: 108px;
+}
+
+.air-avatar-menu-buttons > .octane-context-menu-item:active::before {
+    border-image-source: url('../../assets/images/avatar-menu/air/button-thick-pressed.png');
+}
+
+.air-avatar-menu-buttons > .octane-context-menu-item.disabled,
+.air-avatar-menu-buttons > .octane-context-menu-item.disabled:hover {
+    background: transparent;
+    color: #585553;
+}
+
+.air-avatar-menu-buttons > .octane-context-menu-item.disabled::before,
+.air-avatar-menu-buttons > .octane-context-menu-item.disabled:hover::before,
+.air-avatar-menu-buttons > .octane-context-menu-item.disabled:active::before {
+    border-image-source: url('../../assets/images/avatar-menu/air/button-thick-disabled.png');
+}
+
+.air-avatar-menu-buttons > .octane-context-menu-item.air-avatar-menu-item--locked {
+    color: #585553;
+}
+
+.air-avatar-menu-buttons > .octane-context-menu-item.air-avatar-menu-item--locked::before,
+.air-avatar-menu-buttons > .octane-context-menu-item.air-avatar-menu-item--locked:hover::before,
+.air-avatar-menu-buttons > .octane-context-menu-item.air-avatar-menu-item--locked:active::before {
+    border-image-source: url('../../assets/images/avatar-menu/air/button-thick-disabled.png');
+}
+
+.air-avatar-menu-buttons > .octane-context-menu-item.air-avatar-menu-item--link {
+    text-decoration: underline;
+}
+
+.air-avatar-menu-buttons > .octane-context-menu-item.air-avatar-menu-item--link:hover {
+    color: #91c2ff;
+}
+
+.air-avatar-menu-extra-label {
+    display: block;
+    max-width: 97px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.air-avatar-menu-vip {
+    position: absolute;
+    top: 6px;
+    left: 85px;
+    display: block;
+    width: 15px;
+    height: 15px;
+    background: url('../../assets/images/avatar-menu/air/vip.png') 0 0 / 15px 15px no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.air-avatar-menu-signs-grid {
+    display: grid;
+    box-sizing: border-box;
+    width: 103px;
+    min-width: 103px;
+    height: 152px;
+    margin-left: 1px;
+    overflow: hidden;
+    flex: 0 0 152px;
+    grid-template-columns: 34px 33px 33px;
+    grid-template-rows: repeat(6, 25px);
+    gap: 1px;
+}
+
+.octane-avatar-action-menu--own .air-avatar-menu-sign-cell {
+    position: relative;
+    isolation: isolate;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: 25px;
+    min-height: 25px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #ffffff;
+    font-family: AirAvatarMenuUbuntu, UbuntuRegular, sans-serif;
     font-size: 12px;
+    font-weight: 700;
+    line-height: 17px;
+    text-align: center;
+    text-shadow: none;
 }
 
-.nitro-avatar-action-menu .nitro-context-menu-footer {
+.octane-avatar-action-menu--own .air-avatar-menu-sign-cell:hover {
+    background: transparent;
+}
+
+.octane-avatar-action-menu--own .air-avatar-menu-sign-cell::before {
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    z-index: -1;
+    box-sizing: border-box;
+    width: 39px;
+    height: 29px;
+    content: '';
+    border: 3px solid transparent;
+    border-image-source: url('../../assets/images/avatar-menu/air/button-grid-default.png');
+    border-image-slice: 3 fill;
+    border-image-width: 3px;
+    border-image-repeat: stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-avatar-action-menu--own .air-avatar-menu-sign-cell:hover::before {
+    border-image-source: url('../../assets/images/avatar-menu/air/button-grid-hover.png');
+}
+
+.octane-avatar-action-menu--own .air-avatar-menu-sign-cell:active::before {
+    border-image-source: url('../../assets/images/avatar-menu/air/button-grid-pressed.png');
+}
+
+.octane-avatar-action-menu--own .air-avatar-menu-sign-cell + .air-avatar-menu-sign-cell {
+    border: 0;
+}
+
+.air-avatar-menu-sign-icon {
+    position: absolute;
+    display: block;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.air-avatar-menu-sign-icon--heart {
+    top: 5px;
+    left: 9px;
+    width: 15px;
+    height: 13px;
+    background-image: url('../../assets/images/avatar-menu/air/sign-heart.png');
+}
+
+.air-avatar-menu-sign-icon--skull {
+    top: 5px;
+    left: 10px;
+    width: 12px;
+    height: 12px;
+    background-image: url('../../assets/images/avatar-menu/air/sign-skull.png');
+}
+
+.air-avatar-menu-sign-icon--exclamation {
+    top: 3px;
+    left: 13px;
+    width: 7px;
+    height: 17px;
+    background-image: url('../../assets/images/avatar-menu/air/sign-exclamation.png');
+}
+
+.air-avatar-menu-sign-icon--smile {
+    top: 4px;
+    left: 13px;
+    width: 7px;
+    height: 14px;
+    background-image: url('../../assets/images/avatar-menu/air/sign-smile.png');
+}
+
+.air-avatar-menu-sign-icon--soccer {
+    top: 1px;
+    left: 6px;
+    width: 20px;
     height: 20px;
-    margin-top: 2px;
-    border-radius: 8px;
-    background: rgba(10, 10, 12, 0.58);
-    color: #fff;
+    background-image: url('../../assets/images/avatar-menu/air/sign-soccer.png');
+}
+
+.air-avatar-menu-sign-icon--yellow,
+.air-avatar-menu-sign-icon--red {
+    top: 2px;
+    left: 11px;
+    width: 11px;
+    height: 19px;
+}
+
+.air-avatar-menu-sign-icon--yellow {
+    background-image: url('../../assets/images/avatar-menu/air/sign-yellow.png');
+}
+
+.air-avatar-menu-sign-icon--red {
+    background-image: url('../../assets/images/avatar-menu/air/sign-red.png');
+}
+
+.octane-avatar-action-menu--own .octane-context-menu-footer {
+    position: relative;
+    width: 100px;
+    min-width: 100px;
+    height: 18px;
+    min-height: 18px;
+    margin: 0 0 0 8px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: transparent;
+}
+
+.octane-avatar-action-menu--own .octane-context-menu-footer::before {
+    position: absolute;
+    top: 7px;
+    left: 45px;
+    width: 13px;
+    height: 10px;
+    content: '';
+    /* The icon-set arrows are 10x5 bitmaps drawn from the top-left of their icon box
+       (habbo_skin_icon_set_xml icon_6 / icon_7), not centred in it. */
+    background: url('../../assets/images/avatar-menu/air/arrow-down.png') left top / 10px 5px no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-avatar-action-menu--own .octane-context-menu-footer:hover::before {
+    background-image: url('../../assets/images/avatar-menu/air/arrow-down-hover.png');
+}
+
+.octane-avatar-action-menu--own .octane-context-menu-footer .fa-icon {
+    display: none;
+}
+
+.octane-avatar-action-menu--own.menu-hidden {
+    width: 45px;
+    min-width: 45px;
+    max-width: 45px;
+    height: 35px;
+    min-height: 35px;
+    padding: 0;
+}
+
+.octane-avatar-action-menu--own.menu-hidden .octane-context-menu-footer {
+    width: 38px;
+    min-width: 38px;
+    height: 30px;
+    min-height: 30px;
+    margin: 4px 0 0 4px;
+    background: transparent;
+}
+
+.octane-avatar-action-menu--own.menu-hidden .octane-context-menu-footer::before {
+    top: 11px;
+    left: 14px;
+    width: 15px;
+    height: 15px;
+    background-image: url('../../assets/images/avatar-menu/air/arrow-up.png');
+}
+
+.octane-avatar-action-menu--own.menu-hidden .octane-context-menu-footer:hover::before {
+    background-image: url('../../assets/images/avatar-menu/air/arrow-up-hover.png');
+}
+
+/* WIN63 avatar_menu_widget (AvatarMenuView, RentableBotMenuView): the same bubble as own_avatar_menu_xml, 36px wider. */
+.octane-avatar-action-menu--own.octane-avatar-action-menu--widget:not(.menu-hidden) {
+    width: 151px;
+    min-width: 151px;
+    max-width: 151px;
+}
+
+.octane-avatar-action-menu--widget .octane-context-menu-header {
+    width: 143px;
+    min-width: 143px;
+    padding: 0 32px 0 31px;
+}
+
+.octane-avatar-action-menu--widget .octane-context-menu-header::after {
+    width: 139px;
+}
+
+.octane-avatar-action-menu--widget .air-avatar-menu-buttons {
+    width: 139px;
+    margin-left: 6px;
+}
+
+.octane-avatar-action-menu--widget .air-avatar-menu-buttons > .octane-context-menu-item {
+    width: 137px;
+    min-width: 137px;
+    max-width: 137px;
+    white-space: nowrap;
+}
+
+.octane-avatar-action-menu--widget .air-avatar-menu-buttons > .octane-context-menu-item::before {
+    width: 143px;
+}
+
+.octane-avatar-action-menu--widget .air-avatar-menu-extra-label {
+    max-width: 131px;
+}
+
+.octane-avatar-action-menu--widget .octane-context-menu-footer {
+    width: 136px;
+    min-width: 136px;
+    margin-left: 7px;
+}
+
+.octane-avatar-action-menu--widget .octane-context-menu-footer::before {
+    left: 62px;
+}
+
+.octane-context-menu.name-only {
+    width: auto;
+    min-width: 72px;
+    height: 28px;
+    min-height: 28px;
+    padding: 1px 8px;
+    border: 1px solid #050505;
+    border-radius: 4px;
+    background: #292a27;
+    box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.58);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 24px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.octane-context-menu.name-only::after {
+    position: absolute;
+    bottom: -6px;
+    left: calc(50% - 6px);
+    width: 0;
+    height: 0;
+    content: '';
+    border-top: 6px solid #292a27;
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+    filter: drop-shadow(0 1px 0 #050505);
+    pointer-events: none;
+}
+
+.octane-camera-viewfinder {
+    display: block;
+    background: #000;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-pet-package-preview {
+    align-self: stretch;
+    min-height: 110px;
+    border: 1px solid #6f6f6f;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #aee0f2 0%, #cfeef8 48%, #eaf8fc 100%);
+    box-shadow: inset 0 0 0 2px #ffffff, inset 0 3px 5px rgba(0, 0, 0, 0.12);
+}
+
+/* Monster plant breeding: confirm, request and result windows. */
+.octane-monsterplant-breeding {
+    width: 360px;
+}
+
+.octane-monsterplant-breeding__plant {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    padding: 6px;
+    border-radius: 4px;
+    background: rgb(0 0 0 / 0.1);
+}
+
+.octane-monsterplant-breeding__preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 90px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* chatter_configuration_xml (278x369) and name_configuration_xml (209x119): a style-0 bubble (drawn 6px in),
+   a black 20px title strip (layout width - 18px) and right-aligned 60-120px button_thick pairs. */
+.air-bot-skill-window {
+    position: relative;
+    isolation: isolate;
+    box-sizing: border-box;
+    padding: 6px 0 0 6px;
+    color: #ffffff;
+    font-family: AirAvatarMenuUbuntu, UbuntuRegular, sans-serif;
+    font-size: 10px;
+    line-height: 15px;
+    text-shadow: none;
+    pointer-events: auto;
+    -webkit-font-smoothing: antialiased;
+}
+
+.air-bot-skill-window--chatter {
+    width: 278px;
+    min-height: 369px;
+}
+
+.air-bot-skill-window--name {
+    width: 209px;
+    min-height: 119px;
+}
+
+.air-bot-skill-window::before {
+    position: absolute;
+    inset: 6px;
+    z-index: -2;
+    box-sizing: border-box;
+    content: '';
+    border: solid transparent;
+    border-width: 5px 5px 6px;
+    border-image-source: url('../../assets/images/avatar-menu/air/bubble.png');
+    border-image-slice: 20 20 24 20 fill;
+    border-image-width: 5px 5px 6px;
+    border-image-repeat: stretch;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.air-bot-skill-window::after {
+    position: absolute;
+    bottom: 0;
+    left: calc(50% - 6px);
+    width: 13px;
+    height: 9px;
+    content: '';
+    background: url('../../assets/images/avatar-menu/air/bubble-pointer-down.png') no-repeat;
+    pointer-events: none;
+}
+
+.air-bot-skill-window-title {
+    display: flex;
+    box-sizing: border-box;
+    /* Inside the bubble's 5px frame, so the frame's top edge stays visible above the strip. */
+    width: calc(100% - 16px);
+    height: 20px;
+    margin: 5px 0 0 5px;
+    padding: 2px 1px 1px;
+    align-items: center;
+    justify-content: center;
+    background: #000000;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 17px;
+    cursor: move;
+    user-select: none;
+}
+
+.air-bot-skill-window-title > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.air-bot-skill-window-items {
+    display: flex;
+    box-sizing: border-box;
+    margin: 0 0 0 7px;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.air-bot-skill-window--chatter .air-bot-skill-window-items {
+    width: 247px;
+}
+
+.air-bot-skill-window--name .air-bot-skill-window-items {
+    width: 183px;
+}
+
+.air-bot-skill-label {
+    display: block;
+    min-width: 0;
+    height: 15px;
+    overflow: hidden;
+    color: #ffffff;
+    font-size: 10px;
+    line-height: 15px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.air-bot-skill-label--name {
+    color: #eeeeee;
+}
+
+.air-bot-skill-input {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0 2px;
+    border: 1px solid #ffffff;
+    border-radius: 0;
+    outline: none;
+    background: transparent;
+    color: #ffffff;
+    font-family: AirAvatarMenuUbuntu, UbuntuRegular, sans-serif;
+    font-weight: 400;
+}
+
+.air-bot-skill-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.air-bot-skill-name-input {
+    width: 180px;
+    height: 18px;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.air-bot-skill-chat-text {
+    display: block;
+    width: 246px;
+    height: 178px;
+    padding: 1px 2px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-size: 10px;
+    line-height: 12px;
+    resize: none;
+}
+
+.air-bot-skill-row {
+    position: relative;
+    display: block;
+    box-sizing: border-box;
+    width: 248px;
+    height: 22px;
+    padding: 4px 0 0;
+    cursor: pointer;
+}
+
+.air-bot-skill-row > .air-bot-skill-label {
+    width: 207px;
+}
+
+/* chatter_configuration draws its two checkboxes as style 100, which habbo_element_description skins with
+   illumina_light_skin_switch: a 38x21 switch, off from y=22 of the sheet, on (selected) from y=0. */
+.air-bot-skill-row .air-bot-skill-checkbox {
+    position: absolute;
+    top: 1px;
+    left: 209px;
+    width: 38px;
+    min-width: 38px;
+    height: 21px;
+    margin: 0;
+    appearance: none;
+    background: url('../../assets/images/avatar-menu/air/switch.png') 0 -22px / 38px 43px no-repeat;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.air-bot-skill-row .air-bot-skill-checkbox:checked,
+.air-bot-skill-row .air-bot-skill-checkbox[data-checked] {
+    /* the image again: the theme's checked rule swaps in the plain checkbox art */
+    background-image: url('../../assets/images/avatar-menu/air/switch.png');
+    background-position: 0 0;
+}
+
+.air-bot-skill-chat-delay {
+    position: absolute;
+    top: 3px;
+    left: 215px;
+    width: 31px;
+    height: 15px;
+    padding: 0 1px;
+    font-size: 10px;
+    line-height: 13px;
+    text-align: right;
+}
+
+.air-bot-skill-help-link {
+    display: block;
+    width: 250px;
+    max-width: 100%;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    color: #bfbfff;
+    font-family: AirAvatarMenuUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: left;
+    text-decoration: underline;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.air-bot-skill-help-link:disabled {
+    visibility: hidden;
+}
+
+.air-bot-skill-buttons {
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    height: 28px;
+    margin: 7px 0 1px;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+.air-bot-skill-button {
+    display: flex;
+    box-sizing: border-box;
+    min-width: 60px;
+    max-width: 120px;
+    height: 28px;
+    margin: 0;
+    padding: 0 3px;
+    overflow: hidden;
+    flex: 0 1 auto;
+    align-items: center;
+    justify-content: center;
+    border: 5px solid transparent;
+    border-image-source: var(--habbo-skin-shiny-thick);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    border-radius: 0;
+    background: transparent;
+    color: #000000;
+    font-family: AirAvatarMenuUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+    text-shadow: none;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.air-bot-skill-button > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.air-bot-skill-button:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-hover);
+}
+
+.air-bot-skill-button:active {
+    border-image-source: var(--habbo-skin-shiny-thick-pressed);
+}
+
+.air-bot-skill-button--save {
+    border-image-source: var(--habbo-skin-shiny-thick-green);
+    color: #ffffff;
+}
+
+.air-bot-skill-button--save:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-green-hover);
+}
+
+.air-bot-skill-button--save:active {
+    border-image-source: var(--habbo-skin-shiny-thick-green-pressed);
+}
+
+/* Official RoomQueueWidget (room_queue layout): 229 px frame, bold centred position, 154 px exit button. */
+.octane-room-queue-widget {
+    width: 229px;
+
+    .octane-room-queue-info {
+        width: 100%;
+    }
+
+    .octane-room-queue-button {
+        width: 154px;
+    }
 }

@@ -1,6 +1,9 @@
 import { FC } from 'react';
 import { NotificationBubbleItem, OpenUrl, SanitizeHtml } from '../../../../api';
-import { Flex, LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps, Text } from '../../../../common';
+import { LayoutNotificationBubbleViewProps } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { getBubbleIcon, getBubbleLink } from './bubbleDefaults';
+import { NotificationItemLayoutView } from './NotificationItemLayoutView';
 
 export interface NotificationDefaultBubbleViewProps extends LayoutNotificationBubbleViewProps {
     item: NotificationBubbleItem;
@@ -12,17 +15,15 @@ export const NotificationDefaultBubbleView: FC<NotificationDefaultBubbleViewProp
     const htmlText = item.message.replace(/\r\n|\r|\n/g, '<br />');
 
     return (
-        <LayoutNotificationBubbleView
-            alignItems="center"
-            gap={2}
-            onClick={(event) => item.linkUrl && item.linkUrl.length && OpenUrl(item.linkUrl)}
-            onClose={onClose}
-            {...rest}
-        >
-            <Flex center className="w-[50px] h-[50px]">
-                {item.iconUrl && item.iconUrl.length && <img alt="" className="no-select" src={item.iconUrl} />}
-            </Flex>
-            <Text wrap dangerouslySetInnerHTML={{ __html: SanitizeHtml(htmlText) }} variant="white" />
-        </LayoutNotificationBubbleView>
+        <NativeTextTree>
+            <NotificationItemLayoutView
+                iconUrl={getBubbleIcon(item.notificationType, item.iconUrl)}
+                onClick={() => OpenUrl(getBubbleLink(item.notificationType, item.linkUrl))}
+                onClose={onClose}
+                {...rest}
+            >
+                <span dangerouslySetInnerHTML={{ __html: SanitizeHtml(htmlText) }} />
+            </NotificationItemLayoutView>
+        </NativeTextTree>
     );
 };

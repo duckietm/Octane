@@ -1,3 +1,4 @@
+import { convertEmojiShortcodes } from './emojiShortcodes';
 import { LocalizeText } from './LocalizeText';
 
 const allowedColours: Map<string, string> = new Map();
@@ -25,15 +26,7 @@ allowedColours.set('purple', 'purple');
 allowedColours.set('pink', 'pink');
 
 const encodeHTML = (str: string) => {
-    return str.replace(/([\u00A0-\u9999<>&])(.|$)/g, (full, char, next) => {
-        if (char !== '&' || next !== '#') {
-            if (/[\u00A0-\u9999<>&]/.test(next)) next = '&#' + next.charCodeAt(0) + ';';
-
-            return '&#' + char.charCodeAt(0) + ';' + next;
-        }
-
-        return full;
-    });
+    return str.replace(/&#\d+;|[\u00A0-\u9999<>&]/gu, (match) => (match.length > 1 ? match : `&#${match.codePointAt(0)};`));
 };
 
 const formatTag = (content: string, tag: string, replacement: (value: string) => string) => {
@@ -172,10 +165,10 @@ const applyFontMarkup = (content: string) => {
 export const RoomChatFormatter = (content: string) => {
     let result = '';
 
+    content = convertEmojiShortcodes(content);
     content = encodeHTML(content);
     content = applyFontMarkup(content);
     content = applyWiredTextMarkup(content);
-    //content = (joypixels.shortnameToUnicode(content) as string)
 
     if (content.startsWith('@') && content.indexOf('@', 1) > -1) {
         let match = null;

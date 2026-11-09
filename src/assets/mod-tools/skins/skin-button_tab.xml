@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<skin name="tab_button_skin" version="0.0">
+
+	<!-- shared variables -->
+
+	<variables>
+		<variable key="asset"	value="habbo_blue_skin_png"	type="String" />
+	</variables>
+
+	<!-- the following maps layouts for render states -->
+
+	<states>
+		<state name="default"  layout="button_tab" template="default_button" />
+		<!-- <state name="active"   layout="button_tab" template="default_button" /> -->
+		<state name="pressed"  layout="button_tab" template="selected_button" />
+		<state name="selected" layout="button_tab" template="selected_button" />
+		<state name="hovering" layout="button_tab" template="hovering_button" />
+	</states>
+
+	<!-- templates defines regions in bitmap asset -->
+
+	<templates>
+		<template name="default_button" asset="$asset">
+			<entities>
+				<entity name="top_left"	  type="bitmap"><region><Rectangle x="457" y="0" width="5" height="5" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="462" y="0" width="1" height="5" /></region></entity>
+				<entity name="top_right"  type="bitmap"><region><Rectangle x="463" y="0" width="5" height="5" /></region></entity>
+				<entity name="btm_left"	  type="bitmap"><region><Rectangle x="457" y="6" width="5" height="16" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="462" y="6" width="1" height="16" /></region></entity>
+				<entity name="btm_right"  type="bitmap"><region><Rectangle x="463" y="6" width="5" height="16" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="selected_button" asset="$asset">
+			<entities>
+				<entity name="top_left"	  type="bitmap"><region><Rectangle x="444" y="0" width="5" height="5" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="449" y="0" width="1" height="5" /></region></entity>
+				<entity name="top_right"  type="bitmap"><region><Rectangle x="450" y="0" width="5" height="5" /></region></entity>
+				<entity name="btm_left"	  type="bitmap"><region><Rectangle x="444" y="6" width="5" height="16" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="449" y="6" width="1" height="16" /></region></entity>
+				<entity name="btm_right"  type="bitmap"><region><Rectangle x="450" y="6" width="5" height="16" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="hovering_button" asset="$asset">
+			<entities>
+				<entity name="top_left"	  type="bitmap"><region><Rectangle x="444" y="23" width="5" height="5" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="449" y="23" width="1" height="5" /></region></entity>
+				<entity name="top_right"  type="bitmap"><region><Rectangle x="450" y="23" width="5" height="5" /></region></entity>
+				<entity name="btm_left"	  type="bitmap"><region><Rectangle x="444" y="29" width="5" height="16" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="449" y="29" width="1" height="16" /></region></entity>
+				<entity name="btm_right"  type="bitmap"><region><Rectangle x="450" y="29" width="5" height="16" /></region></entity>
+			</entities>
+		</template>
+	</templates>
+
+	<!-- markup for layout drawer -->
+
+	<layouts>
+		<layout name="button_tab" transparent="true">
+			<entities>
+
+				<!-- left -->
+
+				<entity name="top_left" id="0">
+					<region><Rectangle x="0" y="0" width="5" height="5" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+
+				<entity name="btm_left" id="0">
+					<region><Rectangle x="0" y="5" width="5" height="16" /></region>
+					<scale horizontal="fixed" vertical="strech" />
+				</entity>
+
+				<!-- center -->
+
+				<entity name="top_center" id="0">
+					<region><Rectangle x="5"  y="0" width="20" height="5" /></region>
+					<scale horizontal="strech" vertical="fixed" />
+				</entity>
+
+				<entity name="btm_center" id="0">
+					<region><Rectangle x="5"  y="5" width="20" height="16" /></region>
+					<scale horizontal="strech" vertical="strech" />
+				</entity>
+
+				<!-- right -->
+
+				<entity name="top_right" id="0">
+					<region><Rectangle x="25" y="0" width="5" height="5" /></region>
+					<scale horizontal="move" vertical="fixed" />
+				</entity>
+
+				<entity name="btm_right" id="0">
+					<region><Rectangle x="25" y="5" width="5" height="16" /></region>
+					<scale horizontal="move" vertical="strech" />
+				</entity>
+
+			</entities>
+		</layout>
+	</layouts>
+</skin>

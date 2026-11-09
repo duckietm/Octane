@@ -2,16 +2,15 @@ import {
     AddLinkEventTracker,
     AvatarExpressionEnum,
     FigureUpdateEvent,
+    FurnitureFloorAddEvent,
     FurnitureFloorUpdateEvent,
     FurnitureMultiStateComposer,
     FurnitureWallMultiStateComposer,
     FurnitureWallUpdateComposer,
     FurnitureWallUpdateEvent,
-    GetLocalizationManager,
     GetRoomEngine,
     GetSessionDataManager,
     GetStage,
-    GetTicker,
     ILinkEventTracker,
     RemoveLinkEventTracker,
     RoomControllerLevel,
@@ -26,20 +25,41 @@ import {
     RoomUnitStatusEvent,
     UpdateFurniturePositionComposer,
     Vector3d,
+    WiredErrorLogsClearComposer,
+    WiredErrorLogsEvent,
+    WiredErrorLogsRequestComposer,
+    WiredFurniRuntimeStateEvent,
+    WiredFurniRuntimeStateRequestComposer,
     WiredMonitorDataEvent,
     WiredMonitorRequestComposer,
+    WiredRoomStatsEvent,
+    WiredRoomStatsRequestComposer,
     WiredUserInspectMoveComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+    AddAnimationTickerCallback,
     AvatarInfoUtilities,
+    createPacketCooldownGate,
     GetRoomObjectBounds,
     GetRoomObjectScreenLocation,
+    IsOwnerOfFloorFurniture,
     LocalizeText,
+    localizeWithFallback,
     NotificationAlertType,
+    NotificationBubbleType,
+    canHighlightWiredBoxesFor,
+    decodeUserVariableHolder,
+    findUserVariableHolderData,
+    getWiredObjectInspectionRequest,
+    getWiredObjectInspectionValues,
     SendMessageComposer,
+    toWiredInspectionAssignments,
+    userVariableHolderKey,
     WiredSelectionVisualizer
 } from '../../api';
+import { NotificationConfirmItem } from '../../api/notification/NotificationConfirmItem';
+import { IsBuildersClubFurniId, IsTemporaryFurniId } from '../../api/utils/FurniIdBand';
 import wiredGlobalPlaceholderImage from '../../assets/images/wiredtools/wired_global_placeholder.png';
 import wiredMonitorImage from '../../assets/images/wiredtools/wired_monitor.png';
 import {
@@ -48,16 +68,21 @@ import {
     LayoutAvatarImageView,
     LayoutPetImageView,
     LayoutRoomObjectImageView,
-    NitroCardContentView,
-    NitroCardHeaderView,
-    NitroCardTabsItemView,
-    NitroCardTabsView,
-    NitroCardView,
+    OctaneCardContentView,
+    OctaneCardHeaderView,
+    OctaneCardTabsItemView,
+    OctaneCardTabsView,
+    OctaneCardView,
     Text
 } from '../../common';
-import { useInventoryTrade, useMessageEvent, useNotification, useObjectSelectedEvent, useRoom, useWiredTools } from '../../hooks';
+import { useInventoryTrade, useMessageEvent, useNotification, useObjectSelectedEvent, useRoom, useWiredObjectInspection, useWiredTools, useWiredVariableCatalog, useWiredVariableHolders, WIRED_VARIABLE_HOLDERS_POLL_MS } from '../../hooks';
+import { isPersistedWiredVariable, WIRED_VARIABLE_TYPE_CREATED, WIRED_VARIABLE_TYPE_INTERNAL, wiredVariablePickerRows } from '../../api/wired/WiredVariableCatalog';
+import { WIRED_OFFICIAL_TARGET_FURNI, WIRED_OFFICIAL_TARGET_USER } from '../../api/wired/WiredVariableTargets';
+import { VARIABLES_TYPE_TARGET, wiredVariablePropertyRows, wiredVariableToDefinition } from './WiredVariableCatalog.helpers';
+import { WiredChestsTabView } from './WiredChestsTabView';
+import { WiredShareTabView } from './WiredShareTabView';
+import { isRecolorableFurniKey, parseRecolorableFurniValue, recolorableFurniVariables } from './WiredRecolorableFurni.helpers';
 import {
-    DIRECTION_NAMES,
     EDITABLE_FURNI_VARIABLES,
     EDITABLE_USER_VARIABLES,
     INSPECTION_ELEMENTS,
@@ -66,25 +91,41 @@ import {
     MONTH_NAMES,
     TABS,
     TEAM_COLOR_NAMES,
-    VARIABLE_DEFINITIONS,
     VARIABLES_ELEMENTS,
     WEEKDAY_NAMES,
     WIRED_CLOCK_REFRESH_MS,
     WIRED_FREEZE_EFFECT_IDS,
+    WIRED_FURNI_RUNTIME_ACTION_READ,
+    WIRED_FURNI_RUNTIME_ACTION_WRITE,
+    getBuiltinTextConnectorLabel,
     WIRED_INSPECTION_REFRESH_MS,
-    WIRED_MONITOR_ACTION_CLEAR_LOGS,
     WIRED_MONITOR_ACTION_FETCH,
     WIRED_MONITOR_POLL_MS,
+    WIRED_MONITOR_ROOM_STATS_POLL_MS,
+    WIRED_VARIABLES_IDLE_POLL_MS,
+    WIRED_VARIABLES_LIVE_TABS,
     WIRED_VARIABLES_POLL_MS
 } from './WiredCreatorTools.constants';
 import {
+    buildMonitorLogs,
+    clampWiredVariableValue,
+    exceedsVariableHighlightLimit,
     formatMonitorHistoryOccurrence,
-    formatMonitorLatestOccurrence,
     formatMonitorSource,
     formatVariableTimestamp,
     getHotelDateTimeParts,
     getHotelTimeFormatter,
-    normalizeMonitorReason
+    isStackOnlyVariable,
+    normalizeMonitorReason,
+    parseWiredVariableValue,
+    resolveMonitorErrorDescription,
+    resolveMonitorRoomCounters,
+    splitMonitorStatLine,
+    toMonitorErrorLogs,
+    WIRED_MONITOR_CLEAR_LOGS_TIMEOUT_MS,
+    WIRED_MONITOR_COLOR,
+    WIRED_MONITOR_THRESHOLDS,
+    wiredMonitorColor
 } from './WiredCreatorTools.helpers';
 import {
     HotelDateTimeParts,
@@ -105,7 +146,6 @@ import {
     VariableDefinition,
     VariableHighlightOverlay,
     VariableHighlightTarget,
-    VariableManageEntry,
     VariablesElementButton,
     VariablesElementType,
     VariableTextValue,
@@ -113,11 +153,25 @@ import {
 } from './WiredCreatorTools.types';
 import { WiredInspectionTabView } from './WiredInspectionTabView';
 import { WiredMonitorTabView } from './WiredMonitorTabView';
+import { WiredRoomLogsView } from './WiredRoomLogsView';
+import { WiredSelfDonationView } from './WiredSelfDonationView';
 import { WiredToolsSettingsTabView } from './WiredToolsSettingsTabView';
+import { WiredArrayInspectorView, wiredArrayVariableTypeOf } from './WiredArrayInspectorView';
+import { HOLDER_TYPE_FURNI, HOLDER_TYPE_USER, WiredHolderDescription, WiredVariableOwnersView } from './WiredVariableOwnersView';
+import { useVariablesExplorerStore } from '../../state/variablesExplorer';
+import { WiredVariableHolderPanelView } from './WiredVariableHolderPanelView';
 import { WiredVariablesTabView } from './WiredVariablesTabView';
+import { translateWiredMenuLink, wiredMenuTabKey } from './WiredMenuLinks';
 import { useWiredCreatorToolsUiStore } from './wiredCreatorToolsUiStore';
+import { Select } from '../../common/Select';
+import { BaseButton } from '../../common/BaseButton';
+import { isDerivedVariableItemId } from '../wired/views/WiredVariablePickerData';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
+const WIRED_FURNI_GRAVITY_MODEL_KEY = 'wired_furni_gravity';
+/** Our variable types as the official idtype (0 made with a box, 1 internal). */
 export const WiredCreatorToolsView: FC<{}> = () => {
+    const openVariablesExplorer = useVariablesExplorerStore((s) => s.open);
     const isVisible = useWiredCreatorToolsUiStore((s) => s.isVisible);
     const setIsVisible = useWiredCreatorToolsUiStore((s) => s.setIsVisible);
     const activeTab = useWiredCreatorToolsUiStore((s) => s.activeTab);
@@ -125,11 +179,20 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const inspectionType = useWiredCreatorToolsUiStore((s) => s.inspectionType);
     const setInspectionType = useWiredCreatorToolsUiStore((s) => s.setInspectionType);
     const variablesType = useWiredCreatorToolsUiStore((s) => s.variablesType);
+    const setVariablesType = useWiredCreatorToolsUiStore((s) => s.setVariablesType);
+    // AIR WiredMenuOverviewTab: a `variable_overview/<name>` link selects that variable once it is known.
+    const [pendingVariableName, setPendingVariableName] = useState('');
     const [keepSelected, setKeepSelected] = useState(false);
     const selectedFurni = useWiredCreatorToolsUiStore((s) => s.selectedFurni);
     const setSelectedFurni = useWiredCreatorToolsUiStore((s) => s.setSelectedFurni);
     const selectedFurniLiveState = useWiredCreatorToolsUiStore((s) => s.selectedFurniLiveState);
     const setSelectedFurniLiveState = useWiredCreatorToolsUiStore((s) => s.setSelectedFurniLiveState);
+    const [selectedFurniRuntimeState, setSelectedFurniRuntimeState] = useState<{
+        itemId: number;
+        key: string;
+        value: number;
+        supported: boolean;
+    }>(null);
     const selectedUser = useWiredCreatorToolsUiStore((s) => s.selectedUser);
     const setSelectedUser = useWiredCreatorToolsUiStore((s) => s.setSelectedUser);
     const selectedUserLiveState = useWiredCreatorToolsUiStore((s) => s.selectedUserLiveState);
@@ -137,14 +200,23 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const selectedUserActionVersion = useWiredCreatorToolsUiStore((s) => s.selectedUserActionVersion);
     const setSelectedUserActionVersion = useWiredCreatorToolsUiStore((s) => s.setSelectedUserActionVersion);
     const [globalClock, setGlobalClock] = useState(Date.now());
+    const [furniInternalRevision, setFurniInternalRevision] = useState(0);
     const [roomEnteredAt, setRoomEnteredAt] = useState(Date.now());
     const monitorSnapshot = useWiredCreatorToolsUiStore((s) => s.monitorSnapshot);
     const setMonitorSnapshot = useWiredCreatorToolsUiStore((s) => s.setMonitorSnapshot);
     const resetMonitorSnapshot = useWiredCreatorToolsUiStore((s) => s.resetMonitorSnapshot);
+    const setMonitorRoomStats = useWiredCreatorToolsUiStore((s) => s.setMonitorRoomStats);
+    const setMonitorErrorLogs = useWiredCreatorToolsUiStore((s) => s.setMonitorErrorLogs);
     const [selectedMonitorErrorType, setSelectedMonitorErrorType] = useState<string>(null);
+    // AIR WiredMenuMonitorTab: "Clear all" stays disabled for CLEAR_LOGS_TIMEOUT after a clear.
+    const [isMonitorClearCoolingDown, setIsMonitorClearCoolingDown] = useState(false);
     const [selectedMonitorLogDetails, setSelectedMonitorLogDetails] = useState<MonitorLogDetails>(null);
     const isMonitorHistoryOpen = useWiredCreatorToolsUiStore((s) => s.isMonitorHistoryOpen);
     const setIsMonitorHistoryOpen = useWiredCreatorToolsUiStore((s) => s.setIsMonitorHistoryOpen);
+    const isRoomLogsOpen = useWiredCreatorToolsUiStore((s) => s.isRoomLogsOpen);
+    const isSelfDonationOpen = useWiredCreatorToolsUiStore((s) => s.isSelfDonationOpen);
+    const setIsSelfDonationOpen = useWiredCreatorToolsUiStore((s) => s.setIsSelfDonationOpen);
+    const setIsRoomLogsOpen = useWiredCreatorToolsUiStore((s) => s.setIsRoomLogsOpen);
     const isMonitorInfoOpen = useWiredCreatorToolsUiStore((s) => s.isMonitorInfoOpen);
     const setIsMonitorInfoOpen = useWiredCreatorToolsUiStore((s) => s.setIsMonitorInfoOpen);
     const monitorHistorySeverityFilter = useWiredCreatorToolsUiStore((s) => s.monitorHistorySeverityFilter);
@@ -165,12 +237,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const setInspectionGiveValue = useWiredCreatorToolsUiStore((s) => s.setInspectionGiveValue);
     const isVariableManageOpen = useWiredCreatorToolsUiStore((s) => s.isVariableManageOpen);
     const setIsVariableManageOpen = useWiredCreatorToolsUiStore((s) => s.setIsVariableManageOpen);
-    const variableManageTypeFilter = useWiredCreatorToolsUiStore((s) => s.variableManageTypeFilter);
-    const setVariableManageTypeFilter = useWiredCreatorToolsUiStore((s) => s.setVariableManageTypeFilter);
-    const variableManageSort = useWiredCreatorToolsUiStore((s) => s.variableManageSort);
-    const setVariableManageSort = useWiredCreatorToolsUiStore((s) => s.setVariableManageSort);
-    const variableManagePage = useWiredCreatorToolsUiStore((s) => s.variableManagePage);
-    const setVariableManagePage = useWiredCreatorToolsUiStore((s) => s.setVariableManagePage);
+    const isArrayInspectorOpen = useWiredCreatorToolsUiStore((s) => s.isArrayInspectorOpen);
+    const setIsArrayInspectorOpen = useWiredCreatorToolsUiStore((s) => s.setIsArrayInspectorOpen);
     const selectedManagedVariableEntry = useWiredCreatorToolsUiStore((s) => s.selectedManagedVariableEntry);
     const setSelectedManagedVariableEntry = useWiredCreatorToolsUiStore((s) => s.setSelectedManagedVariableEntry);
     const selectedManagedHolderVariableId = useWiredCreatorToolsUiStore((s) => s.selectedManagedHolderVariableId);
@@ -190,6 +258,13 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const variableHighlightOverlays = useWiredCreatorToolsUiStore((s) => s.variableHighlightOverlays);
     const setVariableHighlightOverlays = useWiredCreatorToolsUiStore((s) => s.setVariableHighlightOverlays);
     const variableHighlightObjectsRef = useRef<Array<{ category: number; objectId: number }>>([]);
+    const canInspectRef = useRef(false);
+    const monitorRequestGateRef = useRef<ReturnType<typeof createPacketCooldownGate> | null>(null);
+
+    if (!monitorRequestGateRef.current) {
+        monitorRequestGateRef.current = createPacketCooldownGate();
+    }
+
     const shouldPauseVariableSnapshotRefresh = !!editingVariable || !!editingManagedHolderVariableId || isInspectionGiveOpen || isManagedGiveOpen;
     const selectedVariableKeys = useWiredCreatorToolsUiStore((s) => s.selectedVariableKeys);
     const setSelectedVariableKeys = useWiredCreatorToolsUiStore((s) => s.setSelectedVariableKeys);
@@ -197,6 +272,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const { ownUser: tradeOwnUser = null, otherUser: tradeOtherUser = null, isTrading = false } = useInventoryTrade();
     const {
         roomSettings,
+        clearVariableForAllHolders,
         userVariableDefinitions,
         userVariableAssignments,
         furniVariableDefinitions,
@@ -213,7 +289,44 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         updateFurniVariableValue,
         updateRoomVariableValue
     } = useWiredTools();
-    const { simpleAlert = null } = useNotification();
+    const { catalog: variableCatalog, ready: variableCatalogReady, refresh: refreshVariableCatalog } = useWiredVariableCatalog();
+    // AIR's inspection tab reads the inspected object's variables from the server (and re-reads them while open).
+    const objectInspectionRequest = useMemo(
+        () => getWiredObjectInspectionRequest(inspectionType, selectedFurni, selectedUser),
+        [inspectionType, selectedFurni?.objectId, selectedUser?.roomIndex]
+    );
+    const { data: objectInspection, refresh: refreshObjectInspection } = useWiredObjectInspection({
+        active: isVisible && activeTab === 'inspection' && !!roomSession?.roomId && roomSettings.canInspect,
+        request: objectInspectionRequest
+    });
+    const [isHighlightingConfiguredWireds, setIsHighlightingConfiguredWireds] = useState(false);
+    const canHighlightConfiguredWireds = canHighlightWiredBoxesFor(objectInspection);
+    const configuredWiredsKey = canHighlightConfiguredWireds ? objectInspection.configuredInWireds.join(',') : '';
+
+    useEffect(() => {
+        if (!isMonitorClearCoolingDown) return;
+
+        const timeout = window.setTimeout(() => setIsMonitorClearCoolingDown(false), WIRED_MONITOR_CLEAR_LOGS_TIMEOUT_MS);
+
+        return () => window.clearTimeout(timeout);
+    }, [isMonitorClearCoolingDown]);
+
+    // AIR clears the box highlight when another object is inspected or the tab is left.
+    useEffect(() => {
+        setIsHighlightingConfiguredWireds(false);
+    }, [objectInspectionRequest?.type, objectInspectionRequest?.objectId, activeTab, isVisible]);
+
+    // AIR `onHighlightWiredsClicked`: the wired boxes that have the inspected furni in their furni picks.
+    useEffect(() => {
+        if (!isHighlightingConfiguredWireds || !configuredWiredsKey) return;
+
+        const objects = configuredWiredsKey.split(',').map((id) => ({ category: RoomObjectCategory.FLOOR, objectId: Number(id) }));
+
+        WiredSelectionVisualizer.applyVariableHighlightToObjects(objects);
+
+        return () => WiredSelectionVisualizer.clearVariableHighlightFromObjects(objects);
+    }, [isHighlightingConfiguredWireds, configuredWiredsKey]);
+    const { simpleAlert = null, showConfirm = null, showSingleBubble = null } = useNotification();
 
     const getFurniLiveState = useCallback(
         (objectId: number, category: number): InspectionFurniLiveState => {
@@ -261,7 +374,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         if (localizedName && localizedName !== localizationKey) return localizedName;
 
-        return `Sign ${value}`;
+        return localizeWithFallback('octane.wired_tools.sign_value', 'Sign %value%', ['value'], [String(value)]);
     };
 
     const getDanceDisplayName = (value: number): string => {
@@ -272,7 +385,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         if (localizedName && localizedName !== localizationKey) return localizedName;
 
-        return `Dance ${value}`;
+        return localizeWithFallback('octane.wired_tools.dance_value', 'Dance %value%', ['value'], [String(value)]);
     };
 
     const getHandItemDisplayName = (value: number): string => {
@@ -283,7 +396,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         if (localizedName && localizedName !== localizationKey) return localizedName;
 
-        return `Item ${value}`;
+        return localizeWithFallback('octane.wired_tools.item_value', 'Item %value%', ['value'], [String(value)]);
     };
 
     const getEffectDisplayName = (value: number): string => {
@@ -294,7 +407,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         if (localizedName && localizedName !== localizationKey) return localizedName;
 
-        return `Effect ${value}`;
+        return localizeWithFallback('octane.wired_tools.effect_value', 'Effect %value%', ['value'], [String(value)]);
     };
 
     const getRoomEntryMethodNumericValue = (value: string): number => {
@@ -335,17 +448,14 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     };
 
     const getVariableAvailabilityLabel = (value: number, targetType: 'user' | 'furni' | 'global' | 'context'): string => {
-        if (targetType === 'context') return 'Current wired execution';
+        if (targetType === 'context') return localizeWithFallback('octane.wired_tools.current_wired_execution', 'Current wired execution');
+        if (value === 11) return localizeWithFallback('wiredfurni.params.variables.availability.11', 'Permanent, shared between rooms');
+        if (value === 10) return localizeWithFallback('wiredfurni.params.variables.availability.10', 'Permanent');
 
-        if (value === 11) {
-            const localizedValue = LocalizeText('wiredfurni.params.variables.availability.11');
-
-            return localizedValue && localizedValue !== 'wiredfurni.params.variables.availability.11' ? localizedValue : 'Permanent, shared between rooms';
-        }
-
-        if (value === 10) return 'Permanent';
-
-        return targetType === 'furni' || targetType === 'global' ? 'While the room is active' : 'While the user is in the room';
+        // Official availability 0 (user in the room) and 1 (room active).
+        return targetType === 'furni' || targetType === 'global'
+            ? localizeWithFallback('wiredfurni.params.variables.availability.1', 'While the room is active')
+            : localizeWithFallback('wiredfurni.params.variables.availability.0', 'While the user is in the room');
     };
 
     const getTeamColorDisplayName = (value: number): string => {
@@ -356,7 +466,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         if (localizedName && localizedName !== localizationKey) return localizedName;
 
-        return TEAM_COLOR_NAMES[value] ?? `Team ${value}`;
+        return TEAM_COLOR_NAMES[value] ?? localizeWithFallback('octane.wired_tools.team_value', 'Team %value%', ['value'], [String(value)]);
     };
 
     const getTeamTypeDisplayName = (value: number): string => {
@@ -658,7 +768,34 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             overloadConsecutiveWindowsThreshold: Number(parser.overloadConsecutiveWindowsThreshold ?? 0),
             heavyDelayedThresholdPercent: Number(parser.heavyDelayedThresholdPercent ?? 0),
             logs: [...(parser.logs ?? [])],
-            history: [...(parser.history ?? [])]
+            history: [...(parser.history ?? [])],
+            // The room stats (1891) and the error list (15) come in their own packets; the store keeps the last ones.
+            roomStats: null,
+            errors: []
+        });
+    });
+
+    useMessageEvent<WiredRoomStatsEvent>(WiredRoomStatsEvent, (event) => {
+        const roomStats = event.getParser().roomStats;
+
+        setMonitorRoomStats(roomStats ? { ...roomStats } : null);
+    });
+
+    // AIR's error list (15): the answer to 1132 and to "Clear all" (1632).
+    useMessageEvent<WiredErrorLogsEvent>(WiredErrorLogsEvent, (event) => {
+        setMonitorErrorLogs(toMonitorErrorLogs(event.getParser().errors, Date.now()));
+    });
+
+    useMessageEvent<WiredFurniRuntimeStateEvent>(WiredFurniRuntimeStateEvent, (event) => {
+        const parser = event.getParser();
+
+        if (parser.key !== '@gravity' || parser.itemId !== selectedFurni?.objectId) return;
+
+        setSelectedFurniRuntimeState({
+            itemId: parser.itemId,
+            key: parser.key,
+            value: parser.value,
+            supported: parser.supported
         });
     });
 
@@ -670,6 +807,16 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         if (parser.item.itemId !== selectedFurni.objectId) return;
 
         refreshSelectedFurni(selectedFurni.objectId, selectedFurni.category);
+    });
+
+    // A recolor re-adds the furni with another type: look at the new room object.
+    useMessageEvent<FurnitureFloorAddEvent>(FurnitureFloorAddEvent, (event) => {
+        if (!selectedFurni || selectedFurni.category !== RoomObjectCategory.FLOOR) return;
+
+        if (event.getParser()?.item?.itemId !== selectedFurni.objectId) return;
+
+        refreshSelectedFurni(selectedFurni.objectId, selectedFurni.category);
+        setFurniInternalRevision((previousValue) => previousValue + 1);
     });
 
     useMessageEvent<FurnitureFloorUpdateEvent>(FurnitureFloorUpdateEvent, () => {
@@ -818,27 +965,55 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         setSelectedMonitorLogDetails(null);
     }, [selectedMonitorErrorType]);
 
+    const requestMonitorSnapshot = useCallback(() => {
+        monitorRequestGateRef.current?.request(() => {
+            SendMessageComposer(new WiredMonitorRequestComposer(WIRED_MONITOR_ACTION_FETCH));
+        });
+    }, []);
+
     useEffect(() => {
         if (!isVisible || activeTab !== 'monitor' || !roomSession?.roomId) return;
 
-        const requestSnapshot = () => SendMessageComposer(new WiredMonitorRequestComposer(WIRED_MONITOR_ACTION_FETCH));
+        requestMonitorSnapshot();
 
-        requestSnapshot();
+        const interval = window.setInterval(requestMonitorSnapshot, WIRED_MONITOR_POLL_MS);
 
-        const interval = window.setInterval(requestSnapshot, WIRED_MONITOR_POLL_MS);
+        return () => window.clearInterval(interval);
+    }, [isVisible, activeTab, roomSession?.roomId, requestMonitorSnapshot]);
+
+    // AIR WiredMenuMonitorTab.requestData(): the room stats (1957) and error list (1132) requests go out every POLL_MONITOR_MS.
+    useEffect(() => {
+        if (!isVisible || activeTab !== 'monitor' || !roomSession?.roomId) return;
+
+        const requestRoomStats = () => {
+            SendMessageComposer(new WiredRoomStatsRequestComposer());
+            SendMessageComposer(new WiredErrorLogsRequestComposer());
+        };
+
+        requestRoomStats();
+
+        const interval = window.setInterval(requestRoomStats, WIRED_MONITOR_ROOM_STATS_POLL_MS);
 
         return () => window.clearInterval(interval);
     }, [isVisible, activeTab, roomSession?.roomId]);
+
+    const isLiveVariablesTab = WIRED_VARIABLES_LIVE_TABS.includes(activeTab);
 
     useEffect(() => {
         if (!isVisible || !roomSession?.roomId || !roomSettings.canInspect || shouldPauseVariableSnapshotRefresh) return;
 
         requestUserVariables();
 
-        const interval = window.setInterval(requestUserVariables, WIRED_VARIABLES_POLL_MS);
+        // Live values only on the tabs that show them; nothing while the browser tab is hidden.
+        const interval = window.setInterval(
+            () => {
+                if (!document.hidden) requestUserVariables();
+            },
+            isLiveVariablesTab ? WIRED_VARIABLES_POLL_MS : WIRED_VARIABLES_IDLE_POLL_MS
+        );
 
         return () => window.clearInterval(interval);
-    }, [isVisible, roomSession?.roomId, roomSettings.canInspect, requestUserVariables, shouldPauseVariableSnapshotRefresh]);
+    }, [isVisible, roomSession?.roomId, roomSettings.canInspect, requestUserVariables, shouldPauseVariableSnapshotRefresh, isLiveVariablesTab]);
 
     useEffect(() => {
         if (!isVisible || activeTab !== 'inspection') return;
@@ -901,6 +1076,10 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                         setActiveTab('monitor');
                         setIsVisible(true);
                         return;
+                    case 'open':
+                        // wiredmenu/open: the menu on its current tab.
+                        setIsVisible(true);
+                        return;
                     case 'hide':
                         setIsVisible(false);
                         return;
@@ -920,7 +1099,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                 NotificationAlertType.ALERT,
                                 null,
                                 null,
-                                LocalizeText('generic.alert.title')
+                                LocalizeText('wiredmenu.invalid_room.title')
                             );
                         return;
                     case 'inspection':
@@ -952,11 +1131,16 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                             }
                         }
                         return;
+                    case 'logs':
+                        // The log action's header button: the room log window.
+                        setIsRoomLogsOpen(true);
+                        return;
                     case 'tab':
                         if (parts.length > 2) {
                             const tab = parts[2] as WiredToolsTab;
 
                             if (TABS.some((entry) => entry.key === tab)) setActiveTab(tab);
+                            if (tab === 'variables' && parts.length > 3) setPendingVariableName(parts.slice(3).join('/'));
                         }
                         setIsVisible(true);
                         return;
@@ -967,8 +1151,33 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         AddLinkEventTracker(linkTracker);
 
-        return () => RemoveLinkEventTracker(linkTracker);
-    }, [refreshSelectedFurni, refreshSelectedUser, simpleAlert]);
+        // The official wired menu links (notifications, other windows) land on the same handler.
+        const wiredMenuTracker: ILinkEventTracker = {
+            linkReceived: (url: string) => {
+                // Without read permission every wired menu link only alerts.
+                if (!canInspectRef.current) {
+                    linkTracker.linkReceived('wired-tools/invalid');
+                    return;
+                }
+
+                const translated = translateWiredMenuLink(url);
+
+                if (translated) linkTracker.linkReceived(translated);
+            },
+            eventUrlPrefix: 'wiredmenu/'
+        };
+
+        AddLinkEventTracker(wiredMenuTracker);
+
+        return () => {
+            RemoveLinkEventTracker(linkTracker);
+            RemoveLinkEventTracker(wiredMenuTracker);
+        };
+    }, [refreshSelectedFurni, refreshSelectedUser, simpleAlert, setIsRoomLogsOpen]);
+
+    useEffect(() => {
+        canInspectRef.current = !!roomSettings.canInspect;
+    }, [roomSettings.canInspect]);
 
     useEffect(() => {
         if (!isVisible || !roomSession?.roomId || !roomSettings.isLoaded || roomSettings.canInspect) return;
@@ -976,35 +1185,49 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         setIsVisible(false);
     }, [isVisible, roomSession?.roomId, roomSettings.isLoaded, roomSettings.canInspect]);
 
-    const selectedRoomObject =
-        roomSession && selectedFurni ? GetRoomEngine().getRoomObject(roomSession.roomId, selectedFurni.objectId, selectedFurni.category) : null;
-    const selectedUserRoomObject =
-        roomSession && selectedUser ? GetRoomEngine().getRoomObject(roomSession.roomId, selectedUser.roomIndex, RoomObjectCategory.UNIT) : null;
+    const [selectedRoomObject, setSelectedRoomObject] = useState<ReturnType<ReturnType<typeof GetRoomEngine>['getRoomObject']> | null>(null);
+    const [selectedUserRoomObject, setSelectedUserRoomObject] = useState<ReturnType<ReturnType<typeof GetRoomEngine>['getRoomObject']> | null>(null);
 
-    const currentTabLabel = useMemo(() => TABS.find((tab) => tab.key === activeTab)?.label ?? 'Monitor', [activeTab]);
+    useEffect(() => {
+        setSelectedRoomObject(
+            roomSession && selectedFurni ? GetRoomEngine().getRoomObject(roomSession.roomId, selectedFurni.objectId, selectedFurni.category) : null
+        );
+    }, [roomSession, selectedFurni, furniInternalRevision]);
+
+    useEffect(() => {
+        setSelectedUserRoomObject(
+            roomSession && selectedUser ? GetRoomEngine().getRoomObject(roomSession.roomId, selectedUser.roomIndex, RoomObjectCategory.UNIT) : null
+        );
+    }, [roomSession, selectedUser, selectedUserActionVersion]);
+
+    // AIR WiredErrorInfoView: the name, then the text `wiredmenu.error_info.<id>`; our own rows (and an id without a text) use ours.
     const selectedMonitorErrorInfo = useMemo(() => {
         if (!selectedMonitorErrorType) return null;
 
-        return MONITOR_ERROR_INFO[selectedMonitorErrorType] ?? null;
-    }, [selectedMonitorErrorType]);
+        const ours = MONITOR_ERROR_INFO[selectedMonitorErrorType];
+        const errorId = selectedMonitorLogDetails?.errorId;
+        const official = errorId === undefined ? '' : localizeWithFallback(`wiredmenu.error_info.${errorId}`, '');
+        const description = resolveMonitorErrorDescription(official, ours?.description ?? []);
+
+        if (!ours && !description.length) return null;
+
+        return {
+            title: ours?.title ?? selectedMonitorErrorType,
+            severity: ours?.severity ?? 'ERROR',
+            description
+        };
+    }, [selectedMonitorErrorType, selectedMonitorLogDetails?.errorId]);
     const monitorRoomStats = useMemo(() => {
-        if (!roomSession) {
-            return {
-                roomFurniCount: 0,
-                roomItemLimit: 0,
-                wallFurniCount: 0,
-                permanentFurniVariables: 0
-            };
-        }
+        if (!roomSession) return resolveMonitorRoomCounters(null, { floorCount: 0, wallCount: 0, itemLimit: 0, permanentFurniVariables: 0 });
 
         const roomId = roomSession.roomId;
         const floorObjects = GetRoomEngine().getRoomObjects(roomId, RoomObjectCategory.FLOOR);
         const wallObjects = GetRoomEngine().getRoomObjects(roomId, RoomObjectCategory.WALL);
 
-        return {
-            roomFurniCount: floorObjects.length + wallObjects.length,
-            roomItemLimit: Number(roomSession.roomItemLimit ?? 0),
-            wallFurniCount: wallObjects.length,
+        return resolveMonitorRoomCounters(monitorSnapshot.roomStats, {
+            floorCount: floorObjects.length,
+            wallCount: wallObjects.length,
+            itemLimit: Number(roomSession.roomItemLimit ?? 0),
             permanentFurniVariables: [...floorObjects, ...wallObjects].reduce((total, roomObject) => {
                 if (!roomObject) return total;
 
@@ -1012,8 +1235,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
                 return total + (customVariables?.length ?? 0);
             }, 0)
-        };
-    }, [roomSession, globalClock]);
+        });
+    }, [roomSession, globalClock, monitorSnapshot.roomStats]);
     const selectedMonitorDetailSource = useMemo(() => {
         if (!selectedMonitorLogDetails) return '';
 
@@ -1022,73 +1245,104 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const monitorHistoryTypeOptions = useMemo(() => {
         return ['ALL', ...Array.from(new Set([...MONITOR_LOG_ORDER, ...monitorSnapshot.history.map((entry) => entry.type)]))];
     }, [monitorSnapshot.history]);
+    // Official VariableHolderPreviewer: preview_instruction_furni / preview_instruction_user.
     const previewPlaceholder = useMemo(() => {
         switch (inspectionType) {
             case 'furni':
-                return 'Select a furni';
+                return localizeWithFallback('wiredmenu.inspection.preview_furni_instruction', 'Select a furni');
             case 'user':
-                return 'Select a user';
+                return localizeWithFallback('wiredmenu.inspection.preview_user_instruction', 'Select a user');
             default:
-                return 'Nothing to display';
+                return localizeWithFallback('wiredmenu.table.empty', 'Nothing to display');
         }
     }, [inspectionType]);
     const monitorStats = useMemo<MonitorStat[]>(() => {
+        // Official statistics lines: localized HTML with the colour, amount and limit (WiredMenuMonitorTab).
+        const officialLine = (key: string, fallbackLabel: string, color: string, value: string, parameters: string[], replacements: string[]): MonitorStat => {
+            const line = localizeWithFallback(key, `${fallbackLabel}: <font color="#${color}">${value}</font>`, ['color', ...parameters], [color, ...replacements]);
+            const { label, value: shown } = splitMonitorStatLine(line);
+
+            return { label, value: shown || value, color: `#${color}` };
+        };
+        const amountLine = (key: string, fallbackLabel: string, amount: number, limit: number, thresholds: readonly [number, number]) =>
+            officialLine(key, fallbackLabel, wiredMonitorColor(amount, limit, thresholds), `${amount}/${limit}`, ['amount', 'limit'], [String(amount), String(limit)]);
+        const yesNo = (value: boolean) => (value ? localizeWithFallback('wiredmenu.bool.yes', 'Yes') : localizeWithFallback('wiredmenu.bool.no', 'No'));
+        const official = (usage: number, usageLimit: number, isHeavy: boolean, counters: ReturnType<typeof resolveMonitorRoomCounters>) => [
+            amountLine('wiredmenu.monitor.statistics.usage', localizeWithFallback('octane.wired_tools.wired_usage', 'Wired usage'), usage, usageLimit, WIRED_MONITOR_THRESHOLDS.usage),
+            officialLine(
+                'wiredmenu.monitor.statistics.is_heavy',
+                localizeWithFallback('octane.wired_tools.is_heavy', 'Is heavy'),
+                isHeavy ? WIRED_MONITOR_COLOR.ORANGE : WIRED_MONITOR_COLOR.GREEN,
+                yesNo(isHeavy),
+                ['bool'],
+                [yesNo(isHeavy)]
+            ),
+            amountLine('wiredmenu.monitor.statistics.floorfurni', localizeWithFallback('octane.wired_tools.floor_furni', 'Floor furni'), counters.floorCount, counters.floorLimit, WIRED_MONITOR_THRESHOLDS.furni),
+            amountLine('wiredmenu.monitor.statistics.wallfurni', localizeWithFallback('octane.wired_tools.wall_furni', 'Wall furni'), counters.wallCount, counters.wallLimit, WIRED_MONITOR_THRESHOLDS.furni),
+            amountLine(
+                'wiredmenu.monitor.statistics.perm_furni_vars',
+                localizeWithFallback('octane.wired_tools.permanent_furni_vars', 'Permanent furni vars'),
+                counters.permanentFurniVariables,
+                counters.permanentFurniVariablesLimit,
+                WIRED_MONITOR_THRESHOLDS.variables
+            ),
+            // The user and global lines need the server's totals; an older server does not send them.
+            ...(counters.hasVariableTotals
+                ? [
+                      amountLine(
+                          'wiredmenu.monitor.statistics.perm_user_vars',
+                          localizeWithFallback('octane.wired_tools.permanent_user_vars', 'Permanent user vars'),
+                          counters.permanentUserVariables,
+                          counters.permanentUserVariablesLimit,
+                          WIRED_MONITOR_THRESHOLDS.variables
+                      ),
+                      amountLine(
+                          'wiredmenu.monitor.statistics.perm_global_vars',
+                          localizeWithFallback('octane.wired_tools.permanent_global_vars', 'Permanent global vars'),
+                          counters.permanentGlobalVariables,
+                          counters.permanentGlobalVariablesLimit,
+                          WIRED_MONITOR_THRESHOLDS.variables
+                      )
+                  ]
+                : [])
+        ];
+
         if (!roomSession) {
             return [
-                { label: 'Wired usage', value: '0/0' },
-                { label: 'Is heavy', value: 'No' },
-                { label: 'Room furni', value: '0/0' },
-                { label: 'Wall furni', value: '0/0' },
-                { label: 'Delayed events', value: '0/0' },
-                { label: 'Average execution', value: '0ms' },
-                { label: 'Peak execution', value: '0ms' },
+                ...official(0, 0, false, monitorRoomStats),
+                { label: localizeWithFallback('octane.wired_tools.delayed_events', 'Delayed events'), value: '0/0' },
+                { label: localizeWithFallback('octane.wired_tools.average_execution', 'Average execution'), value: '0ms' },
+                { label: localizeWithFallback('octane.wired_tools.peak_execution', 'Peak execution'), value: '0ms' },
                 { label: 'Recursion', value: '0/0' },
-                { label: 'Killed remaining', value: '0s' },
-                { label: 'Permanent furni vars', value: '0/60' }
+                { label: localizeWithFallback('octane.wired_tools.killed_remaining', 'Killed remaining'), value: '0s' }
             ];
         }
 
-        const roomFurniValue =
-            monitorRoomStats.roomItemLimit > 0
-                ? `${monitorRoomStats.roomFurniCount}/${monitorRoomStats.roomItemLimit}`
-                : String(monitorRoomStats.roomFurniCount);
-        const wallFurniValue =
-            monitorRoomStats.roomItemLimit > 0
-                ? `${monitorRoomStats.wallFurniCount}/${monitorRoomStats.roomItemLimit}`
-                : String(monitorRoomStats.wallFurniCount);
-        const usageValue = `${monitorSnapshot.usageCurrentWindow}/${Math.max(0, monitorSnapshot.usageLimitPerWindow)}`;
         const delayedValue = `${monitorSnapshot.delayedEventsPending}/${Math.max(0, monitorSnapshot.delayedEventsLimit)}`;
 
+        // AIR reads usage and heavy from its room stats packet; until one arrives our monitor packet's are shown.
+        const roomStats = monitorSnapshot.roomStats;
+
+        // The official lines first; the rows after them are ours (the official tab has no such rows).
         return [
-            { label: 'Wired usage', value: usageValue },
-            { label: 'Is heavy', value: monitorSnapshot.isHeavy ? 'Yes' : 'No' },
-            { label: 'Room furni', value: roomFurniValue },
-            { label: 'Wall furni', value: wallFurniValue },
-            { label: 'Delayed events', value: delayedValue },
-            { label: 'Average execution', value: `${monitorSnapshot.averageExecutionMs}ms` },
-            { label: 'Peak execution', value: `${monitorSnapshot.peakExecutionMs}ms` },
+            ...official(
+                roomStats ? Math.round(roomStats.usage) : monitorSnapshot.usageCurrentWindow,
+                Math.max(0, roomStats ? Math.round(roomStats.usageLimit) : monitorSnapshot.usageLimitPerWindow),
+                roomStats ? roomStats.isHeavy : monitorSnapshot.isHeavy,
+                monitorRoomStats
+            ),
+            { label: localizeWithFallback('octane.wired_tools.delayed_events', 'Delayed events'), value: delayedValue },
+            { label: localizeWithFallback('octane.wired_tools.average_execution', 'Average execution'), value: `${monitorSnapshot.averageExecutionMs}ms` },
+            { label: localizeWithFallback('octane.wired_tools.peak_execution', 'Peak execution'), value: `${monitorSnapshot.peakExecutionMs}ms` },
             { label: 'Recursion', value: `${monitorSnapshot.recursionDepthCurrent}/${Math.max(0, monitorSnapshot.recursionDepthLimit)}` },
-            { label: 'Killed remaining', value: `${Math.max(0, monitorSnapshot.killedRemainingSeconds)}s` },
-            { label: 'Permanent furni vars', value: `${monitorRoomStats.permanentFurniVariables}/60` }
+            { label: localizeWithFallback('octane.wired_tools.killed_remaining', 'Killed remaining'), value: `${Math.max(0, monitorSnapshot.killedRemainingSeconds)}s` }
         ];
     }, [roomSession, monitorRoomStats, monitorSnapshot]);
-    const monitorLogs = useMemo<MonitorLog[]>(() => {
-        return MONITOR_LOG_ORDER.map((type) => {
-            const log = monitorSnapshot.logs.find((entry) => entry.type === type);
-            const fallbackInfo = MONITOR_ERROR_INFO[type];
-            const amount = Number(log?.amount ?? 0);
-
-            return {
-                type,
-                category: String(log?.severity ?? fallbackInfo?.severity ?? 'ERROR'),
-                amount: String(amount),
-                latest: amount > 0 ? formatMonitorLatestOccurrence(Number(log?.latestOccurrenceSeconds ?? 0), globalClock) : '/',
-                latestReason: normalizeMonitorReason(log?.latestReason),
-                latestSourceLabel: String(log?.latestSourceLabel ?? ''),
-                latestSourceId: Number(log?.latestSourceId ?? 0)
-            };
-        });
-    }, [monitorSnapshot.logs, globalClock]);
+    // AIR's error list (15) in the server's order, with the latest detail of each row from our monitor packet (5101).
+    const monitorLogs = useMemo<MonitorLog[]>(
+        () => buildMonitorLogs(monitorSnapshot.errors, monitorSnapshot.logs, globalClock),
+        [monitorSnapshot.errors, monitorSnapshot.logs, globalClock]
+    );
     const monitorHistoryRows = useMemo(() => {
         return monitorSnapshot.history.map((entry, index) => ({
             id: `${entry.type}-${entry.occurredAtSeconds}-${index}`,
@@ -1112,15 +1366,15 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const monitorInfoSections = useMemo(() => {
         return [
             {
-                title: 'Wired usage',
+                title: localizeWithFallback('octane.wired_tools.wired_usage', 'Wired usage'),
                 lines: [
                     `Current value: ${monitorSnapshot.usageCurrentWindow}/${Math.max(0, monitorSnapshot.usageLimitPerWindow)}`,
                     `This is the room execution budget used inside a ${Math.max(0, monitorSnapshot.usageWindowMs)}ms server window.`,
-                    'Each triggered stack consumes cost based on conditions, selectors, effects, delayed effects, and recursion depth.'
+                    localizeWithFallback('octane.wired_tools.each_triggered_stack_consumes_cost_based', 'Each triggered stack consumes cost based on conditions, selectors, effects, delayed effects, and recursion depth.')
                 ]
             },
             {
-                title: 'Heavy / overload',
+                title: localizeWithFallback('octane.wired_tools.heavy_overload', 'Heavy / overload'),
                 lines: [
                     `Heavy warning starts when usage stays above ${Math.max(0, monitorSnapshot.heavyUsageThresholdPercent)}% for ${Math.max(0, monitorSnapshot.heavyConsecutiveWindowsThreshold)} consecutive window(s).`,
                     `Delayed pressure also contributes when the queue stays above ${Math.max(0, monitorSnapshot.heavyDelayedThresholdPercent)}% of its limit.`,
@@ -1128,15 +1382,15 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 ]
             },
             {
-                title: 'Execution times',
+                title: localizeWithFallback('octane.wired_tools.execution_times', 'Execution times'),
                 lines: [
                     `Average execution: ${monitorSnapshot.averageExecutionMs}ms (threshold ${Math.max(0, monitorSnapshot.overloadAverageThresholdMs)}ms)`,
                     `Peak execution: ${monitorSnapshot.peakExecutionMs}ms (threshold ${Math.max(0, monitorSnapshot.overloadPeakThresholdMs)}ms)`,
-                    'These values reset with each server usage window.'
+                    localizeWithFallback('octane.wired_tools.these_values_reset_with_each_server', 'These values reset with each server usage window.')
                 ]
             },
             {
-                title: 'Other numbers',
+                title: localizeWithFallback('octane.wired_tools.other_numbers', 'Other numbers'),
                 lines: [
                     `Delayed events: ${monitorSnapshot.delayedEventsPending}/${Math.max(0, monitorSnapshot.delayedEventsLimit)} pending scheduled execution(s).`,
                     `Recursion: ${monitorSnapshot.recursionDepthCurrent}/${Math.max(0, monitorSnapshot.recursionDepthLimit)} nested wired call(s).`,
@@ -1144,11 +1398,17 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 ]
             },
             {
-                title: 'Room counters',
+                title: localizeWithFallback('octane.wired_tools.room_counters', 'Room counters'),
                 lines: [
-                    `Room furni: ${monitorRoomStats.roomFurniCount}/${Math.max(0, monitorRoomStats.roomItemLimit) || 0}`,
-                    `Wall furni: ${monitorRoomStats.wallFurniCount}/${Math.max(0, monitorRoomStats.roomItemLimit) || 0}`,
-                    `Permanent furni vars: ${monitorRoomStats.permanentFurniVariables}/60 renderer-side custom variable entries currently attached to room items.`
+                    localizeWithFallback('octane.wired_tools.floor_furni_floor_count_floor_limit', 'Floor furni: %floor_count%/%floor_limit%', ['floor_count', 'floor_limit'], [String(monitorRoomStats.floorCount), String(monitorRoomStats.floorLimit)]),
+                    localizeWithFallback('octane.wired_tools.wall_furni_wall_count_wall_limit', 'Wall furni: %wall_count%/%wall_limit%', ['wall_count', 'wall_limit'], [String(monitorRoomStats.wallCount), String(monitorRoomStats.wallLimit)]),
+                    localizeWithFallback('octane.wired_tools.permanent_furni_vars_permanent_furni_variables', 'Permanent furni vars: %permanent_furni_variables%/%permanent_furni_variables_limit%', ['permanent_furni_variables', 'permanent_furni_variables_limit'], [String(monitorRoomStats.permanentFurniVariables), String(monitorRoomStats.permanentFurniVariablesLimit)]),
+                    ...(monitorRoomStats.hasVariableTotals
+                        ? [
+                              localizeWithFallback('octane.wired_tools.permanent_user_vars_permanent_user_variables', 'Permanent user vars: %permanent_user_variables%/%permanent_user_variables_limit%', ['permanent_user_variables', 'permanent_user_variables_limit'], [String(monitorRoomStats.permanentUserVariables), String(monitorRoomStats.permanentUserVariablesLimit)]),
+                              localizeWithFallback('octane.wired_tools.permanent_global_vars_permanent_global_variables', 'Permanent global vars: %permanent_global_variables%/%permanent_global_variables_limit%', ['permanent_global_variables', 'permanent_global_variables_limit'], [String(monitorRoomStats.permanentGlobalVariables), String(monitorRoomStats.permanentGlobalVariablesLimit)])
+                          ]
+                        : [])
                 ]
             }
         ];
@@ -1191,11 +1451,12 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const roomCustomVariableDefinitionMap = useMemo(() => {
         return new Map(roomCustomVariableDefinitions.map((definition) => [definition.name, definition]));
     }, [roomCustomVariableDefinitions]);
+    const inspectedRoomValues = useMemo(() => getWiredObjectInspectionValues(objectInspection, 'room'), [objectInspection]);
     const selectedFurniAssignments = useMemo(() => {
         if (!selectedFurni) return [];
 
-        return furniVariableAssignments[selectedFurni.objectId] ?? [];
-    }, [selectedFurni, furniVariableAssignments]);
+        return toWiredInspectionAssignments(getWiredObjectInspectionValues(objectInspection, 'furni'));
+    }, [selectedFurni, objectInspection]);
     const selectedFurniAssignmentMap = useMemo(() => {
         return new Map(selectedFurniAssignments.map((assignment) => [assignment.variableItemId, assignment]));
     }, [selectedFurniAssignments]);
@@ -1215,6 +1476,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         const classId = selectedRoomObject.model.getValue<number>(RoomObjectVariable.FURNITURE_TYPE_ID);
         const tileSizeZ = Number(selectedFurnitureData?.tileSizeZ ?? 0);
         const liveState = selectedFurniLiveState ?? getFurniLiveState(selectedFurni.objectId, selectedFurni.category);
+        const opacity = Math.round(Math.max(0, Math.min(1, selectedRoomObject.model.getValue<number>(RoomObjectVariable.FURNITURE_ALPHA_MULTIPLIER) ?? 1)) * 100);
+        const gravity = Math.max(0, Math.min(1, selectedRoomObject.model.getValue<number>(WIRED_FURNI_GRAVITY_MODEL_KEY) ?? 0));
 
         const dynamicFlags: InspectionVariable[] = [];
 
@@ -1233,11 +1496,18 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             };
         });
 
+        // Official furni @type: 0 normal, 1 Builders Club, 2 a temporary (Wired) copy.
+        const selectedFurniTypeValue = IsTemporaryFurniId(selectedFurni.objectId)
+            ? 2
+            : IsBuildersClubFurniId(selectedFurni.objectId) || selectedFurnitureData?.availableForBuildersClub
+              ? 1
+              : 0;
         const variables: InspectionVariable[] = [
             ...customVariables,
             ...(Number(selectedFurni.info?.teleportTargetId ?? 0) > 0
                 ? [{ key: '~teleport.target_id', value: String(selectedFurni.info.teleportTargetId) }]
                 : []),
+            ...recolorableFurniVariables(selectedFurnitureData, canEditInspection && selectedFurni.category === RoomObjectCategory.FLOOR),
             { key: '@id', value: String(selectedFurni.objectId) },
             { key: '@class_id', value: String(classId) },
             { key: '@height', value: String(Math.round(tileSizeZ * 100)) },
@@ -1246,11 +1516,22 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             { key: '@position_y', value: String(liveState?.positionY ?? 0), editable: canEditInspection },
             { key: '@rotation', value: String(liveState?.rotation ?? 0), editable: canEditInspection },
             { key: '@altitude', value: String(liveState?.altitude ?? 0), editable: canEditInspection },
+            { key: '@opacity', value: String(opacity), editable: canEditInspection },
+            {
+                key: '@gravity',
+                value: String(
+                    selectedFurniRuntimeState?.itemId === selectedFurni.objectId && selectedFurniRuntimeState.supported
+                        ? selectedFurniRuntimeState.value
+                        : gravity
+                ),
+                editable: canEditInspection
+            },
             { key: '@is_invisible', value: '0' },
             ...(wallItemOffset ? [{ key: '@wallitem_offset', value: wallItemOffset, editable: canEditInspection }] : []),
             {
                 key: '@type',
-                value: `${selectedFurnitureData?.availableForBuildersClub ? 1 : 0}${selectedFurnitureData?.availableForBuildersClub ? ' (BC)' : ' (Normal)'}`
+                value: String(selectedFurniTypeValue),
+                label: getBuiltinTextConnectorLabel('furni', '@type', selectedFurniTypeValue)
             },
             ...dynamicFlags,
             { key: '@dimensions.x', value: String(selectedFurni.info?.tileSizeX ?? 0) },
@@ -1267,16 +1548,19 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         wallItemOffset,
         canEditInspection,
         selectedFurniCustomVariableDefinitions,
-        selectedFurniAssignmentMap
+        selectedFurniAssignmentMap,
+        selectedFurniRuntimeState,
+        furniInternalRevision
     ]);
     const canEditSelectedUser = useMemo(() => {
         return !!selectedUser && !!roomSession && roomSettings.canModify;
     }, [selectedUser, roomSession, roomSettings.canModify]);
+    const selectedUserHolderKey = selectedUser ? userVariableHolderKey(selectedUser.kind, selectedUser.userId) : 0;
     const selectedUserAssignments = useMemo(() => {
-        if (!selectedUser) return [];
+        if (!selectedUserHolderKey) return [];
 
-        return userVariableAssignments[selectedUser.userId] ?? [];
-    }, [selectedUser, userVariableAssignments]);
+        return toWiredInspectionAssignments(getWiredObjectInspectionValues(objectInspection, 'user'));
+    }, [selectedUserHolderKey, objectInspection]);
     const selectedUserAssignmentMap = useMemo(() => {
         return new Map(selectedUserAssignments.map((assignment) => [assignment.variableItemId, assignment]));
     }, [selectedUserAssignments]);
@@ -1320,6 +1604,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         const identityKey =
             selectedUser.kind === 'pet' ? '@pet_id' : selectedUser.kind === 'bot' || selectedUser.kind === 'rentable_bot' ? '@bot_id' : '@user_id';
         const teamData = getSelectedUserTeamData(effectValue);
+        const selectedUserTypeValue = selectedUser.kind === 'user' ? 1 : selectedUser.kind === 'pet' ? 2 : 4;
+        const selectedUserGenderValue = selectedUser.gender === 'F' ? 1 : selectedUser.gender === 'M' ? 0 : -1;
         const dynamicUserFlags: InspectionVariable[] = [];
         const dynamicUserActions: InspectionVariable[] = [];
 
@@ -1352,15 +1638,20 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         return [
             ...customVariables,
             { key: '@index', value: String(selectedUser.roomIndex) },
-            { key: '@type', value: `${selectedUser.kind === 'user' ? 1 : selectedUser.kind === 'pet' ? 2 : 4} (${selectedUser.kind})` },
-            { key: '@gender', value: `${selectedUser.gender === 'F' ? 1 : selectedUser.gender === 'M' ? 0 : -1} (${selectedUser.gender || 'U'})` },
+            { key: '@type', value: String(selectedUserTypeValue), label: getBuiltinTextConnectorLabel('user', '@type', selectedUserTypeValue) },
+            { key: '@gender', value: String(selectedUserGenderValue), label: getBuiltinTextConnectorLabel('user', '@gender', selectedUserGenderValue) },
             { key: '@level', value: String(currentControllerLevel) },
             { key: '@achievement_score', value: String(selectedUser.achievementScore ?? 0) },
             ...dynamicUserFlags,
             ...dynamicUserActions,
             { key: '@position_x', value: String(liveState?.positionX ?? 0), editable: canEditSelectedUser },
             { key: '@position_y', value: String(liveState?.positionY ?? 0), editable: canEditSelectedUser },
-            { key: '@direction', value: String(liveState?.direction ?? 0), editable: canEditSelectedUser },
+            {
+                key: '@direction',
+                value: String(liveState?.direction ?? 0),
+                label: getBuiltinTextConnectorLabel('user', '@direction', liveState?.direction ?? 0),
+                editable: canEditSelectedUser
+            },
             { key: '@altitude', value: String(liveState?.altitude ?? 0) },
             ...(Number(selectedUser.favouriteGroupId ?? 0) > 0 ? [{ key: '@favourite_group_id', value: String(selectedUser.favouriteGroupId) }] : []),
             ...(selectedUser.roomEntryMethod && selectedUser.roomEntryMethod !== 'unknown'
@@ -1369,7 +1660,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             ...(selectedUser.roomEntryMethod === 'teleport' && Number(selectedUser.roomEntryTeleportId ?? 0) > 0
                 ? [{ key: '@room_entry.teleport_id', value: String(selectedUser.roomEntryTeleportId) }]
                 : []),
-            { key: identityKey, value: String(selectedUser.userId ?? 0) },
+            { key: identityKey, value: String(selectedUser.kind === 'bot' || selectedUser.kind === 'rentable_bot' ? Math.abs(selectedUser.userId ?? 0) : (selectedUser.userId ?? 0)) },
             ...(petOwnerId > 0 ? [{ key: '@pet_owner_id', value: String(petOwnerId) }] : [])
         ];
     }, [
@@ -1430,15 +1721,14 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         const clientTimeZoneOffsetMinutes = getTimeZoneOffsetMinutes(hotelCurrentTimeMs, clientTimeZone);
         const weekdayIndex = getMondayBasedWeekday(hotelNow);
         const monthIndex = hotelNow.month;
-        const customVariables: InspectionVariable[] = roomCustomVariableDefinitions.map((definition) => {
-            const assignment = roomVariableAssignmentMap.get(definition.itemId);
-
-            return {
+        // Only the variables the server reported for the room, as AIR lists the reply's values.
+        const customVariables: InspectionVariable[] = roomCustomVariableDefinitions
+            .filter((definition) => inspectedRoomValues.has(definition.itemId))
+            .map((definition) => ({
                 key: definition.name,
-                value: String(assignment?.value ?? 0),
+                value: String(inspectedRoomValues.get(definition.itemId) ?? 0),
                 editable: canEditInspection
-            };
-        });
+            }));
 
         return [
             ...customVariables,
@@ -1458,7 +1748,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             { key: '@timezone_server', value: `${hotelTimeZoneOffsetMinutes} (${hotelTimeZone})` },
             { key: '@timezone_client', value: `${clientTimeZoneOffsetMinutes} (${clientTimeZone})` },
             { key: '@current_time', value: String(Math.floor(hotelCurrentTimeMs / 1000)) },
-            { key: '@current_time.millisecond_of_second', value: String(hotelNow.millisecond) },
+            { key: '@current_time.milliseconds_of_seconds', value: String(hotelNow.millisecond) },
             { key: '@current_time.seconds_of_minute', value: String(hotelNow.second) },
             { key: '@current_time.minute_of_hour', value: String(hotelNow.minute) },
             { key: '@current_time.hour_of_day', value: String(hotelNow.hour) },
@@ -1469,17 +1759,9 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             { key: '@current_time.month_of_year', value: `${monthIndex} (${MONTH_NAMES[monthIndex - 1]})` },
             { key: '@current_time.year', value: String(hotelNow.year) }
         ];
-    }, [roomSession, globalClock, roomEnteredAt, roomCustomVariableDefinitions, roomVariableAssignmentMap, canEditInspection]);
+    }, [roomSession, globalClock, roomEnteredAt, roomCustomVariableDefinitions, inspectedRoomValues, canEditInspection]);
     const displayedVariables = inspectionType === 'user' ? userVariables : inspectionType === 'global' ? globalVariables : furniVariables;
     const selectedInspectionVariableKey = selectedInspectionVariableKeys[inspectionType] ?? '';
-    const currentVariableMaps = useMemo(
-        () => ({
-            furni: new Map<string, InspectionVariable>(furniVariables.map((variable) => [variable.key, variable])),
-            user: new Map<string, InspectionVariable>(userVariables.map((variable) => [variable.key, variable])),
-            global: new Map<string, InspectionVariable>(globalVariables.map((variable) => [variable.key, variable]))
-        }),
-        [furniVariables, userVariables, globalVariables]
-    );
     const selectedInspectionCustomDefinition = useMemo(() => {
         if (!selectedInspectionVariableKey) return null;
 
@@ -1508,7 +1790,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         const assignedIds = new Set(assignments.map((assignment) => assignment.variableItemId));
 
         return definitions
-            .filter((definition) => !assignedIds.has(definition.itemId) && !definition.isReadOnly)
+            .filter((definition) => !assignedIds.has(definition.itemId) && !definition.isReadOnly && !isDerivedVariableItemId(definition.itemId))
             .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }) || left.itemId - right.itemId);
     }, [inspectionType, selectedUser, selectedFurni, userVariableDefinitions, furniVariableDefinitions, selectedUserAssignments, selectedFurniAssignments]);
     const selectedInspectionGiveDefinition = useMemo(() => {
@@ -1525,92 +1807,32 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         return false;
     }, [roomSettings.canModify, inspectionType, selectedUser, selectedFurni]);
     const canRemoveInspectionVariable =
-        canManageInspectionVariableAssignments && !!selectedInspectionCustomDefinition && !selectedInspectionCustomDefinition.isReadOnly;
+        canManageInspectionVariableAssignments &&
+        !!selectedInspectionCustomDefinition &&
+        !selectedInspectionCustomDefinition.isReadOnly &&
+        !isDerivedVariableItemId(selectedInspectionCustomDefinition.itemId);
     const canGiveInspectionVariable = canManageInspectionVariableAssignments && !!availableInspectionDefinitions.length;
+    // AIR WiredMenuOverviewTab: the picker lists the room's variable catalogue as the server sends it.
     const variableDefinitionsByType = useMemo<Record<VariablesElementType, VariableDefinition[]>>(() => {
-        const customUserDefinitions: VariableDefinition[] = userVariableDefinitions
-            .map((definition) => ({
-                key: definition.name,
-                itemId: definition.itemId,
-                target: 'User' as const,
-                type: 'Custom',
-                hasValue: definition.hasValue,
-                isReadOnly: !!definition.isReadOnly,
-                availability: getVariableAvailabilityLabel(definition.availability, 'user'),
-                canWriteTo: definition.hasValue && !definition.isReadOnly,
-                canCreateDelete: false,
-                canIntercept: false,
-                hasCreationTime: true,
-                hasUpdateTime: true,
-                isTextConnected: definition.isTextConnected,
-                isAlwaysAvailable: false
-            }))
-            .sort((left, right) => left.key.localeCompare(right.key, undefined, { sensitivity: 'base' }));
-        const customFurniDefinitions: VariableDefinition[] = furniVariableDefinitions
-            .map((definition) => ({
-                key: definition.name,
-                itemId: definition.itemId,
-                target: 'Furni' as const,
-                type: 'Custom',
-                hasValue: definition.hasValue,
-                isReadOnly: !!definition.isReadOnly,
-                availability: getVariableAvailabilityLabel(definition.availability, 'furni'),
-                canWriteTo: definition.hasValue && !definition.isReadOnly,
-                canCreateDelete: false,
-                canIntercept: false,
-                hasCreationTime: true,
-                hasUpdateTime: true,
-                isTextConnected: definition.isTextConnected,
-                isAlwaysAvailable: false
-            }))
-            .sort((left, right) => left.key.localeCompare(right.key, undefined, { sensitivity: 'base' }));
-        const customRoomDefinitions: VariableDefinition[] = roomVariableDefinitions
-            .map((definition) => ({
-                key: definition.name,
-                itemId: definition.itemId,
-                target: 'Global' as const,
-                type: 'Custom',
-                hasValue: definition.hasValue,
-                isReadOnly: !!definition.isReadOnly,
-                availability: getVariableAvailabilityLabel(definition.availability, 'global'),
-                canWriteTo: !definition.isReadOnly,
-                canCreateDelete: false,
-                canIntercept: false,
-                hasCreationTime: false,
-                hasUpdateTime: true,
-                isTextConnected: definition.isTextConnected,
-                isAlwaysAvailable: false
-            }))
-            .sort((left, right) => left.key.localeCompare(right.key, undefined, { sensitivity: 'base' }));
-        const customContextDefinitions: VariableDefinition[] = contextVariableDefinitions
-            .map((definition) => ({
-                key: definition.name,
-                itemId: definition.itemId,
-                target: 'Context' as const,
-                type: 'Custom',
-                hasValue: definition.hasValue,
-                isReadOnly: !!definition.isReadOnly,
-                availability: getVariableAvailabilityLabel(definition.availability, 'context'),
-                canWriteTo: definition.hasValue && !definition.isReadOnly,
-                canCreateDelete: true,
-                canIntercept: !!definition.hasValue,
-                hasCreationTime: true,
-                hasUpdateTime: true,
-                isTextConnected: definition.isTextConnected,
-                isAlwaysAvailable: false
-            }))
-            .sort((left, right) => left.key.localeCompare(right.key, undefined, { sensitivity: 'base' }));
+        const rows = (type: VariablesElementType) => wiredVariablePickerRows(variableCatalog, VARIABLES_TYPE_TARGET[type]).map(wiredVariableToDefinition);
 
-        return {
-            furni: [...customFurniDefinitions, ...VARIABLE_DEFINITIONS.furni],
-            user: [...customUserDefinitions, ...VARIABLE_DEFINITIONS.user],
-            global: [...customRoomDefinitions, ...VARIABLE_DEFINITIONS.global],
-            context: [...customContextDefinitions, ...VARIABLE_DEFINITIONS.context]
-        };
-    }, [contextVariableDefinitions, userVariableDefinitions, furniVariableDefinitions, roomVariableDefinitions]);
+        return { furni: rows('furni'), user: rows('user'), global: rows('global'), context: rows('context') };
+    }, [variableCatalog]);
+    // The catalogue is asked for again every 500 ms while the tab is open (at most once per 800 ms).
+    useEffect(() => {
+        if (!isVisible || activeTab !== 'variables') return;
+
+        refreshVariableCatalog();
+
+        const interval = window.setInterval(refreshVariableCatalog, WIRED_VARIABLE_HOLDERS_POLL_MS);
+
+        return () => window.clearInterval(interval);
+    }, [activeTab, isVisible, refreshVariableCatalog]);
     const variablePickerDefinitions = variableDefinitionsByType[variablesType];
 
     useEffect(() => {
+        if (!variableCatalogReady) return;
+
         setSelectedVariableKeys((prevValue) => {
             let didChange = false;
             const nextValue = { ...prevValue };
@@ -1635,11 +1857,38 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
             return didChange ? nextValue : prevValue;
         });
-    }, [variableDefinitionsByType]);
+    }, [variableCatalogReady, variableDefinitionsByType]);
+    // AIR: a variable_overview link waits for the catalogue, then picks the exact name or else the first "<name>." one.
     useEffect(() => {
-        setVariableManageTypeFilter('ALL');
-        setVariableManageSort('highest_value');
-        setVariableManagePage(1);
+        if (!pendingVariableName || !variableCatalogReady) return;
+
+        const types = ['furni', 'user', 'global', 'context'] as VariablesElementType[];
+        const find = (match: (key: string) => boolean) => {
+            for (const type of types) {
+                const definition = variableDefinitionsByType[type].find((entry) => match(entry.key));
+
+                if (definition) return { type, key: definition.key };
+            }
+
+            return null;
+        };
+        const found = find((key) => key === pendingVariableName) ?? find((key) => key.startsWith(`${pendingVariableName}.`));
+
+        if (found) {
+            setVariablesType(found.type);
+            setSelectedVariableKeys((prev) => ({ ...prev, [found.type]: found.key }));
+        }
+
+        setPendingVariableName('');
+    }, [pendingVariableName, variableCatalogReady, variableDefinitionsByType]);
+    // A link still waiting is dropped with the room or the menu.
+    useEffect(() => {
+        setPendingVariableName('');
+    }, [roomSession?.roomId]);
+    useEffect(() => {
+        if (!isVisible) setPendingVariableName('');
+    }, [isVisible]);
+    useEffect(() => {
         setSelectedManagedVariableEntry(null);
     }, [variablesType, selectedVariableKeys[variablesType]]);
     useEffect(() => {
@@ -1653,332 +1902,110 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         return variablePickerDefinitions.find((variable) => variable.key === selectedKey) ?? variablePickerDefinitions[0] ?? null;
     }, [variablesType, selectedVariableKeys, variablePickerDefinitions]);
-    const selectedVariableHasInspectionValue = useMemo(() => {
-        if (!selectedVariableDefinition) return false;
+    const selectedVariableProperties = useMemo(() => wiredVariablePropertyRows(selectedVariableDefinition), [selectedVariableDefinition]);
+    const selectedVariableTextValues = useMemo((): VariableTextValue[] => selectedVariableDefinition?.textConnector ?? [], [selectedVariableDefinition]);
+    const describeVariableHolder = useCallback(
+        (entityType: number, entityId: number, entityName: string): WiredHolderDescription => {
+            if (entityType === HOLDER_TYPE_USER) {
+                const userData = findUserVariableHolderData(roomSession?.userDataManager, entityId);
+                let categoryLabel = 'Habbo';
 
-        if (variablesType === 'context') return !!selectedVariableDefinition.hasValue;
-
-        return currentVariableMaps[variablesType].has(selectedVariableDefinition.key);
-    }, [selectedVariableDefinition, currentVariableMaps, variablesType]);
-    const selectedVariableProperties = useMemo(() => {
-        if (!selectedVariableDefinition) return [];
-
-        return [
-            { key: 'Name', value: selectedVariableDefinition.key },
-            { key: 'Type', value: selectedVariableDefinition.type },
-            { key: 'Target', value: selectedVariableDefinition.target },
-            { key: 'Availability', value: selectedVariableDefinition.availability },
-            { key: 'Has value', value: selectedVariableHasInspectionValue ? 'Yes' : 'No' },
-            { key: 'Can write to', value: selectedVariableDefinition.canWriteTo && roomSettings.canModify ? 'Yes' : 'No' },
-            { key: 'Can create/delete', value: selectedVariableDefinition.canCreateDelete ? 'Yes' : 'No' },
-            { key: 'Can intercept', value: selectedVariableDefinition.canIntercept ? 'Yes' : 'No' },
-            { key: 'Is always available', value: selectedVariableDefinition.isAlwaysAvailable ? 'Yes' : 'No' },
-            { key: 'Has creation time', value: selectedVariableDefinition.hasCreationTime ? 'Yes' : 'No' },
-            { key: 'Has update time', value: selectedVariableDefinition.hasUpdateTime ? 'Yes' : 'No' },
-            { key: 'Is text connected', value: selectedVariableDefinition.isTextConnected ? 'Yes' : 'No' }
-        ];
-    }, [selectedVariableDefinition, selectedVariableHasInspectionValue, roomSettings.canModify]);
-    const selectedVariableTextValues = useMemo((): VariableTextValue[] => {
-        if (!selectedVariableDefinition) return [];
-
-        const localization = GetLocalizationManager();
-        const variableKey = selectedVariableDefinition.key;
-        const textValues: VariableTextValue[] = [];
-        const pushIfLocalized = (value: string, localizationKey: string, fallback: string = null) => {
-            if (localization?.hasValue(localizationKey)) {
-                textValues.push({ value, text: localization.getValue(localizationKey) });
-                return;
-            }
-
-            if (fallback) textValues.push({ value, text: fallback });
-        };
-
-        switch (variableKey) {
-            case '@gender':
-                return [
-                    { value: '-1', text: 'Unknown' },
-                    { value: '0', text: 'M' },
-                    { value: '1', text: 'F' }
-                ];
-            case '@type':
-                if (variablesType === 'furni') {
-                    return [
-                        { value: '1', text: 'floor' },
-                        { value: '2', text: 'wall' }
-                    ];
+                switch (userData?.type) {
+                    case RoomObjectType.BOT:
+                        categoryLabel = 'Bot';
+                        break;
+                    case RoomObjectType.RENTABLE_BOT:
+                        categoryLabel = localizeWithFallback('octane.wired_tools.rentable_bot', 'Rentable bot');
+                        break;
+                    case RoomObjectType.PET:
+                        categoryLabel = 'Pet';
+                        break;
                 }
 
-                if (variablesType === 'user') {
-                    return [
-                        { value: 'user', text: 'User' },
-                        { value: 'bot', text: 'Bot' },
-                        { value: 'rentable_bot', text: 'Rentable bot' },
-                        { value: 'pet', text: 'Pet' }
-                    ];
-                }
-
-                return [];
-            case '@direction':
-                return DIRECTION_NAMES.map((name, index) => ({ value: index.toString(), text: name }));
-            case '@room_entry.method':
-                return [
-                    { value: 'door', text: 'Door' },
-                    { value: 'teleport', text: 'Teleport' }
-                ];
-            case '@team_color':
-                return [1, 2, 3, 4].map((value) => ({
-                    value: value.toString(),
-                    text: getTeamColorDisplayName(value)
-                }));
-            case '@team_type':
-                return [0, 1, 2].map((value) => ({
-                    value: value.toString(),
-                    text: getTeamTypeDisplayName(value)
-                }));
-            case '@sign':
-                for (let value = 0; value <= 17; value++) {
-                    textValues.push({
-                        value: value.toString(),
-                        text: getSignDisplayName(value)
-                    });
-                }
-
-                return textValues;
-            case '@dance':
-                pushIfLocalized('0', 'widget.memenu.dance.stop', 'Stop');
-
-                for (let value = 1; value <= 4; value++) {
-                    textValues.push({
-                        value: value.toString(),
-                        text: getDanceDisplayName(value)
-                    });
-                }
-
-                return textValues;
-            case '@handitem_id':
-                for (let value = 1; value <= 5000; value++) {
-                    const localizationKey = `handitem${value}`;
-
-                    if (!localization?.hasValue(localizationKey)) continue;
-
-                    textValues.push({
-                        value: value.toString(),
-                        text: localization.getValue(localizationKey)
-                    });
-                }
-
-                return textValues;
-            case '@effect_id':
-                for (let value = 1; value <= 500; value++) {
-                    const localizationKey = `fx_${value}`;
-
-                    if (!localization?.hasValue(localizationKey)) continue;
-
-                    textValues.push({
-                        value: value.toString(),
-                        text: localization.getValue(localizationKey)
-                    });
-                }
-
-                return textValues;
-            case '@current_time.day_of_week':
-                return WEEKDAY_NAMES.map((name, index) => ({
-                    value: (index + 1).toString(),
-                    text: name
-                }));
-            case '@current_time.month_of_year':
-                return MONTH_NAMES.map((name, index) => ({
-                    value: (index + 1).toString(),
-                    text: name
-                }));
-            case '@chat_type':
-                return [
-                    { value: '0', text: 'Talk' },
-                    { value: '1', text: 'Shout' },
-                    { value: '2', text: 'Whisper' }
-                ];
-            default:
-                return [];
-        }
-    }, [selectedVariableDefinition, variablesType]);
-    const variableManageEntries = useMemo((): VariableManageEntry[] => {
-        if (!selectedVariableDefinition?.itemId || selectedVariableDefinition.type !== 'Custom' || !roomSession) return [];
-        if (variablesType === 'context') return [];
-
-        if (variablesType === 'user') {
-            const entries: VariableManageEntry[] = [];
-
-            for (const [userIdString, assignments] of Object.entries(userVariableAssignments)) {
-                const userId = Number(userIdString);
-                const assignment = assignments.find((entry) => entry.variableItemId === selectedVariableDefinition.itemId);
-
-                if (!assignment) continue;
-
-                const userData =
-                    roomSession.userDataManager.getUserData(userId) ??
-                    roomSession.userDataManager.getBotData(userId) ??
-                    roomSession.userDataManager.getRentableBotData(userId) ??
-                    roomSession.userDataManager.getPetData(userId);
-
-                let categoryLabel = 'Unknown';
-                let entityName = `#${userId}`;
-
-                if (userData) {
-                    entityName = userData.name || entityName;
-
-                    switch (userData.type) {
-                        case RoomObjectType.USER:
-                            categoryLabel = 'Habbo';
-                            break;
-                        case RoomObjectType.BOT:
-                            categoryLabel = 'Bot';
-                            break;
-                        case RoomObjectType.RENTABLE_BOT:
-                            categoryLabel = 'Rentable bot';
-                            break;
-                        case RoomObjectType.PET:
-                            categoryLabel = 'Pet';
-                            break;
-                    }
-                }
-
-                entries.push({
-                    entityId: userId,
-                    entityName,
+                return {
                     categoryLabel,
-                    createdAt: Number(assignment.createdAt ?? 0),
-                    updatedAt: Number(assignment.updatedAt ?? 0),
-                    value: assignment.value,
-                    manageLabel: 'Manage'
-                });
+                    entityName: userData?.name || entityName || `#${decodeUserVariableHolder(entityId)?.id ?? entityId}`
+                };
             }
 
-            return entries;
-        }
-
-        if (variablesType === 'furni') {
-            const entries: VariableManageEntry[] = [];
-
-            for (const [furniIdString, assignments] of Object.entries(furniVariableAssignments)) {
-                const furniId = Number(furniIdString);
-                const assignment = assignments.find((entry) => entry.variableItemId === selectedVariableDefinition.itemId);
-
-                if (!assignment) continue;
-
-                const floorObject = GetRoomEngine().getRoomObject(roomSession.roomId, furniId, RoomObjectCategory.FLOOR);
-                const wallObject = floorObject ? null : GetRoomEngine().getRoomObject(roomSession.roomId, furniId, RoomObjectCategory.WALL);
+            if (entityType === HOLDER_TYPE_FURNI) {
+                const roomId = roomSession?.roomId ?? -1;
+                const floorObject = roomSession ? GetRoomEngine().getRoomObject(roomId, entityId, RoomObjectCategory.FLOOR) : null;
+                const wallObject = floorObject || !roomSession ? null : GetRoomEngine().getRoomObject(roomId, entityId, RoomObjectCategory.WALL);
                 const roomObject = floorObject ?? wallObject;
-                const category = floorObject ? RoomObjectCategory.FLOOR : wallObject ? RoomObjectCategory.WALL : -1;
                 const typeId = roomObject?.model?.getValue<number>(RoomObjectVariable.FURNITURE_TYPE_ID);
-                const furnitureData =
-                    category === RoomObjectCategory.WALL ? GetSessionDataManager().getWallItemData(typeId) : GetSessionDataManager().getFloorItemData(typeId);
+                const furnitureData = !roomObject
+                    ? null
+                    : wallObject
+                      ? GetSessionDataManager().getWallItemData(typeId)
+                      : GetSessionDataManager().getFloorItemData(typeId);
 
-                entries.push({
-                    entityId: furniId,
-                    entityName: furnitureData?.name || furnitureData?.className || `#${furniId}`,
-                    categoryLabel: category === RoomObjectCategory.WALL ? 'Wall furni' : 'Floor furni',
-                    createdAt: Number(assignment.createdAt ?? 0),
-                    updatedAt: Number(assignment.updatedAt ?? 0),
-                    value: assignment.value,
-                    manageLabel: 'Manage'
-                });
+                return {
+                    categoryLabel: wallObject ? localizeWithFallback('octane.wired_tools.wall_furni', 'Wall furni') : localizeWithFallback('octane.wired_tools.floor_furni', 'Floor furni'),
+                    entityName: furnitureData?.name || furnitureData?.className || entityName || `#${entityId}`
+                };
             }
 
-            return entries;
-        }
-
-        const assignment = roomVariableAssignmentMap.get(selectedVariableDefinition.itemId);
-
-        return [
-            {
-                entityId: roomSession.roomId,
-                entityName: `Room #${roomSession.roomId}`,
-                categoryLabel: 'Global',
-                createdAt: 0,
-                updatedAt: Number(assignment?.updatedAt ?? 0),
-                value: assignment?.value ?? 0,
-                manageLabel: 'Manage'
-            }
-        ];
-    }, [selectedVariableDefinition, variablesType, roomSession, userVariableAssignments, furniVariableAssignments, roomVariableAssignmentMap]);
+            return { categoryLabel: 'Global', entityName: entityName || `Room #${entityId}` };
+        },
+        [roomSession]
+    );
+    // AIR canHighlightCurrentVariable: not a pointer, not internal, and held by users or furni.
     const canVariableHighlight =
-        !!selectedVariableDefinition?.itemId &&
-        selectedVariableDefinition.type === 'Custom' &&
-        (variablesType === 'user' || variablesType === 'furni') &&
+        !!selectedVariableDefinition?.variableId &&
+        !isStackOnlyVariable(selectedVariableDefinition) &&
+        selectedVariableDefinition.variableType !== WIRED_VARIABLE_TYPE_INTERNAL &&
+        (selectedVariableDefinition.variableTarget === WIRED_OFFICIAL_TARGET_USER || selectedVariableDefinition.variableTarget === WIRED_OFFICIAL_TARGET_FURNI) &&
         !!roomSession;
+    // The holders come from the server (requestHolders), polled while the highlight is on.
+    const variableHolders = useWiredVariableHolders(
+        isVariableHighlightActive && canVariableHighlight ? selectedVariableDefinition.variableId : null,
+        roomSession?.roomId ?? 0
+    );
     const variableHighlightTargets = useMemo((): VariableHighlightTarget[] => {
-        if (!isVariableHighlightActive || !canVariableHighlight || !roomSession || !selectedVariableDefinition?.itemId) return [];
+        if (!isVariableHighlightActive || !canVariableHighlight || !roomSession || !variableHolders) return [];
 
-        if (variablesType === 'user') {
-            const targets: VariableHighlightTarget[] = [];
+        const hasValue = !!selectedVariableDefinition.hasValue;
+        const targets: VariableHighlightTarget[] = [];
 
-            for (const [userIdString, assignments] of Object.entries(userVariableAssignments)) {
-                const assignment = assignments.find((entry) => entry.variableItemId === selectedVariableDefinition.itemId);
-
-                if (!assignment) continue;
-
-                const userId = Number(userIdString);
-                const userData =
-                    roomSession.userDataManager.getUserData(userId) ??
-                    roomSession.userDataManager.getBotData(userId) ??
-                    roomSession.userDataManager.getRentableBotData(userId) ??
-                    roomSession.userDataManager.getPetData(userId);
+        for (const holder of variableHolders) {
+            if (selectedVariableDefinition.variableTarget === WIRED_OFFICIAL_TARGET_USER) {
+                // A user holder is a user id; only the ones in the room can be drawn.
+                const userData = findUserVariableHolderData(roomSession.userDataManager, holder.objectId);
                 const roomIndex = Number(userData?.roomIndex ?? -1);
 
                 if (roomIndex < 0) continue;
 
-                targets.push({
-                    category: RoomObjectCategory.UNIT,
-                    objectId: roomIndex,
-                    hasValue: !!assignment.hasValue && !!selectedVariableDefinition.hasValue && assignment.value !== null && assignment.value !== undefined,
-                    value: assignment.value
-                });
+                targets.push({ category: RoomObjectCategory.UNIT, objectId: roomIndex, hasValue, value: holder.value });
+                continue;
             }
 
-            return targets;
+            const floorObject = GetRoomEngine().getRoomObject(roomSession.roomId, holder.objectId, RoomObjectCategory.FLOOR);
+            const wallObject = floorObject ? null : GetRoomEngine().getRoomObject(roomSession.roomId, holder.objectId, RoomObjectCategory.WALL);
+            const category = floorObject ? RoomObjectCategory.FLOOR : wallObject ? RoomObjectCategory.WALL : -1;
+
+            if (category < 0) continue;
+
+            targets.push({ category, objectId: holder.objectId, hasValue, value: holder.value });
         }
 
-        if (variablesType === 'furni') {
-            const targets: VariableHighlightTarget[] = [];
-
-            for (const [furniIdString, assignments] of Object.entries(furniVariableAssignments)) {
-                const assignment = assignments.find((entry) => entry.variableItemId === selectedVariableDefinition.itemId);
-
-                if (!assignment) continue;
-
-                const furniId = Number(furniIdString);
-                const floorObject = GetRoomEngine().getRoomObject(roomSession.roomId, furniId, RoomObjectCategory.FLOOR);
-                const wallObject = floorObject ? null : GetRoomEngine().getRoomObject(roomSession.roomId, furniId, RoomObjectCategory.WALL);
-                const category = floorObject ? RoomObjectCategory.FLOOR : wallObject ? RoomObjectCategory.WALL : -1;
-
-                if (category < 0) continue;
-
-                targets.push({
-                    category,
-                    objectId: furniId,
-                    hasValue: !!assignment.hasValue && !!selectedVariableDefinition.hasValue && assignment.value !== null && assignment.value !== undefined,
-                    value: assignment.value
-                });
-            }
-
-            return targets;
-        }
-
-        return [];
-    }, [
-        canVariableHighlight,
-        furniVariableAssignments,
-        isVariableHighlightActive,
-        roomSession,
-        selectedVariableDefinition,
-        userVariableAssignments,
-        variablesType
-    ]);
+        return targets;
+    }, [canVariableHighlight, isVariableHighlightActive, roomSession, selectedVariableDefinition, variableHolders]);
     useEffect(() => {
         if (isVisible && activeTab === 'variables' && canVariableHighlight) return;
 
         setIsVariableHighlightActive(false);
     }, [activeTab, canVariableHighlight, isVisible]);
+    // Official onAllVariableHolders: a variable with too many holders is not highlighted; a notification says so.
+    useEffect(() => {
+        if (!isVariableHighlightActive || !exceedsVariableHighlightLimit(variableHighlightTargets.length, !!selectedVariableDefinition?.hasValue)) return;
+
+        showSingleBubble?.(
+            localizeWithFallback('wiredmenu.variable_overview.highlight.error.too_many', 'Can not highlight this variable, it has too many holders'),
+            NotificationBubbleType.INFO
+        );
+        setIsVariableHighlightActive(false);
+    }, [isVariableHighlightActive, selectedVariableDefinition?.hasValue, showSingleBubble, variableHighlightTargets.length]);
     useEffect(() => {
         if (variableHighlightObjectsRef.current.length) {
             WiredSelectionVisualizer.clearVariableHighlightFromObjects(variableHighlightObjectsRef.current);
@@ -2039,54 +2066,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         updateOverlays();
 
-        const ticker = GetTicker();
-
-        ticker.add(updateOverlays);
-
-        return () => {
-            ticker.remove(updateOverlays);
-        };
+        return AddAnimationTickerCallback(updateOverlays);
     }, [isVariableHighlightActive, roomSession?.roomId, variableHighlightTargets]);
-    const variableManageTypeOptions = useMemo(() => {
-        switch (variablesType) {
-            case 'user':
-                return ['ALL', 'Habbo', 'Bot', 'Rentable bot', 'Pet'];
-            case 'furni':
-                return ['ALL', 'Floor furni', 'Wall furni'];
-            case 'context':
-                return ['ALL', 'Execution'];
-            default:
-                return ['ALL', 'Global'];
-        }
-    }, [variablesType]);
-    const filteredVariableManageEntries = useMemo(() => {
-        const filtered = variableManageEntries.filter((entry) => {
-            if (variableManageTypeFilter !== 'ALL' && entry.categoryLabel !== variableManageTypeFilter) return false;
-
-            return true;
-        });
-
-        filtered.sort((left, right) => {
-            switch (variableManageSort) {
-                case 'lowest_value':
-                    return Number(left.value ?? 0) - Number(right.value ?? 0);
-                case 'newest_update':
-                    return Number(right.updatedAt ?? 0) - Number(left.updatedAt ?? 0);
-                case 'oldest_update':
-                    return Number(left.updatedAt ?? 0) - Number(right.updatedAt ?? 0);
-                case 'newest_creation':
-                    return Number(right.createdAt ?? 0) - Number(left.createdAt ?? 0);
-                case 'oldest_creation':
-                    return Number(left.createdAt ?? 0) - Number(right.createdAt ?? 0);
-                case 'name':
-                    return left.entityName.localeCompare(right.entityName, undefined, { sensitivity: 'base' });
-                default:
-                    return Number(right.value ?? 0) - Number(left.value ?? 0);
-            }
-        });
-
-        return filtered;
-    }, [variableManageEntries, variableManageTypeFilter, variableManageSort]);
     const userVariableDefinitionsById = useMemo(
         () => new Map(userVariableDefinitions.map((definition) => [definition.itemId, definition])),
         [userVariableDefinitions]
@@ -2181,7 +2162,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         const definitions = variablesType === 'user' ? userVariableDefinitions : furniVariableDefinitions;
 
         return definitions
-            .filter((definition) => !assignedIds.has(definition.itemId) && !definition.isReadOnly)
+            .filter((definition) => !assignedIds.has(definition.itemId) && !definition.isReadOnly && !isDerivedVariableItemId(definition.itemId))
             .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }));
     }, [selectedManagedVariableEntry, variablesType, managedHolderVariableEntries, userVariableDefinitions, furniVariableDefinitions]);
     const selectedManagedGiveDefinition = useMemo(() => {
@@ -2189,99 +2170,88 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         return availableManagedHolderDefinitions.find((definition) => definition.itemId === managedGiveVariableItemId) ?? availableManagedHolderDefinitions[0];
     }, [availableManagedHolderDefinitions, managedGiveVariableItemId]);
-    const variableManageTypeLabel = useMemo(() => {
-        switch (variablesType) {
-            case 'furni':
-                return 'Furni type';
-            case 'global':
-                return 'Scope';
-            case 'context':
-                return 'Execution scope';
-            default:
-                return 'User type';
-        }
-    }, [variablesType]);
     const variableManageCategoryHeader = useMemo(() => {
         switch (variablesType) {
             case 'furni':
-                return 'Furni type';
+                return localizeWithFallback('octane.wired_tools.furni_type', 'Furni type');
             case 'global':
                 return 'Scope';
             case 'context':
-                return 'Execution scope';
+                return localizeWithFallback('octane.wired_tools.execution_scope', 'Execution scope');
             default:
-                return 'User type';
+                return localizeWithFallback('octane.wired_tools.user_type', 'User type');
         }
     }, [variablesType]);
     const managedHolderPanelTitle = useMemo(() => {
         switch (variablesType) {
             case 'furni':
-                return 'Manage Furni Variables';
+                return localizeWithFallback('octane.wired_tools.manage_furni_variables', 'Manage Furni Variables');
             case 'global':
-                return 'Manage Global Variables';
+                return localizeWithFallback('octane.wired_tools.manage_global_variables', 'Manage Global Variables');
             case 'context':
-                return 'Manage Context Variables';
+                return localizeWithFallback('octane.wired_tools.manage_context_variables', 'Manage Context Variables');
             default:
-                return 'Manage User Variables';
+                return localizeWithFallback('octane.wired_tools.manage_user_variables', 'Manage User Variables');
         }
     }, [variablesType]);
     const managedHolderInfoLines = useMemo(() => {
         if (!selectedManagedVariableEntry || !roomSession) return [];
 
         if (variablesType === 'user') {
-            const userData =
-                roomSession.userDataManager.getUserData(selectedManagedVariableEntry.entityId) ??
-                roomSession.userDataManager.getBotData(selectedManagedVariableEntry.entityId) ??
-                roomSession.userDataManager.getRentableBotData(selectedManagedVariableEntry.entityId) ??
-                roomSession.userDataManager.getPetData(selectedManagedVariableEntry.entityId);
+            const userData = findUserVariableHolderData(roomSession.userDataManager, selectedManagedVariableEntry.entityId);
+            const holder = decodeUserVariableHolder(selectedManagedVariableEntry.entityId);
+            const idLabel = holder?.kind === 'pet' ? localizeWithFallback('octane.wired_tools.pet_id', 'Pet id') : holder?.kind === 'bot' ? localizeWithFallback('octane.wired_tools.bot_id', 'Bot id') : localizeWithFallback('octane.wired_tools.user_id', 'User id');
 
             return [
                 `${variableManageCategoryHeader}: ${selectedManagedVariableEntry.categoryLabel}`,
-                `Name: ${selectedManagedVariableEntry.entityName}`,
-                `User id: ${selectedManagedVariableEntry.entityId}`,
+                localizeWithFallback('octane.wired_tools.name_entity_name', 'Name: %entity_name%', ['entity_name'], [String(selectedManagedVariableEntry.entityName)]),
+                ...(holder?.kind !== 'user' && userData?.ownerName ? [localizeWithFallback('octane.wired_tools.owner_owner_name', 'Owner: %owner_name%', ['owner_name'], [String(userData.ownerName)])] : []),
+                `${idLabel}: ${holder?.id ?? selectedManagedVariableEntry.entityId}`,
                 ...(userData?.type === RoomObjectType.PET ? [`Pet level: ${Number(userData.petLevel ?? 0)}`] : [])
             ];
         }
 
         if (variablesType === 'furni') {
+            const category = selectedManagedVariableEntry.categoryLabel === 'Wall furni' ? RoomObjectCategory.WALL : RoomObjectCategory.FLOOR;
+            const owner =
+                GetRoomEngine()
+                    .getRoomObject(roomSession.roomId, selectedManagedVariableEntry.entityId, category)
+                    ?.model?.getValue<string>(RoomObjectVariable.FURNITURE_OWNER_NAME) || '';
+
             return [
                 `${variableManageCategoryHeader}: ${selectedManagedVariableEntry.categoryLabel}`,
-                `Name: ${selectedManagedVariableEntry.entityName}`,
-                `Furni id: ${selectedManagedVariableEntry.entityId}`
+                localizeWithFallback('octane.wired_tools.name_entity_name', 'Name: %entity_name%', ['entity_name'], [String(selectedManagedVariableEntry.entityName)]),
+                ...(owner ? [localizeWithFallback('octane.wired_tools.owner_owner', 'Owner: %owner%', ['owner'], [String(owner)])] : []),
+                localizeWithFallback('octane.wired_tools.furni_id_entity_id', 'Furni id: %entity_id%', ['entity_id'], [String(selectedManagedVariableEntry.entityId)])
             ];
         }
 
         if (variablesType === 'context') {
             return [
                 `${variableManageCategoryHeader}: Current execution`,
-                `Name: ${selectedManagedVariableEntry.entityName}`,
-                `Context id: ${selectedManagedVariableEntry.entityId}`
+                localizeWithFallback('octane.wired_tools.name_entity_name', 'Name: %entity_name%', ['entity_name'], [String(selectedManagedVariableEntry.entityName)]),
+                localizeWithFallback('octane.wired_tools.context_id_entity_id', 'Context id: %entity_id%', ['entity_id'], [String(selectedManagedVariableEntry.entityId)])
             ];
         }
 
-        return [`${variableManageCategoryHeader}: Room`, `Name: Room #${roomSession.roomId}`, `Room id: ${roomSession.roomId}`];
+        return [`${variableManageCategoryHeader}: Room`, localizeWithFallback('octane.wired_tools.name_room_room_id', 'Name: Room #%room_id%', ['room_id'], [String(roomSession.roomId)]), localizeWithFallback('octane.wired_tools.room_id_room_id', 'Room id: %room_id%', ['room_id'], [String(roomSession.roomId)])];
     }, [selectedManagedVariableEntry, roomSession, variablesType, variableManageCategoryHeader]);
     const managedHolderWarningText = useMemo(() => {
         switch (variablesType) {
             case 'furni':
-                return 'Use this tool only for furni that are currently loaded in the room. Reload the panel after major room changes.';
+                return localizeWithFallback('octane.wired_tools.use_this_tool_only_for_furni', 'Use this tool only for furni that are currently loaded in the room. Reload the panel after major room changes.');
             case 'global':
-                return 'Global variables are room-scoped. Only the latest update time is tracked for these values.';
+                return localizeWithFallback('octane.wired_tools.global_variables_are_room_scoped_only', 'Global variables are room-scoped. Only the latest update time is tracked for these values.');
             case 'context':
-                return 'Context variables only live inside the current wired execution. They are shared through the signal chain until a branch overrides them.';
+                return localizeWithFallback('octane.wired_tools.context_variables_only_live_inside_the', 'Context variables only live inside the current wired execution. They are shared through the signal chain until a branch overrides them.');
             default:
-                return 'Do not use this tool for users who are currently in the room/using the changed variable in another room.';
+                return localizeWithFallback('octane.wired_tools.do_not_use_this_tool_for', 'Do not use this tool for users who are currently in the room/using the changed variable in another room.');
         }
     }, [variablesType]);
     const managedHolderUserData = useMemo(() => {
         if (variablesType !== 'user' || !selectedManagedVariableEntry || !roomSession) return null;
 
-        return (
-            roomSession.userDataManager.getUserData(selectedManagedVariableEntry.entityId) ??
-            roomSession.userDataManager.getBotData(selectedManagedVariableEntry.entityId) ??
-            roomSession.userDataManager.getRentableBotData(selectedManagedVariableEntry.entityId) ??
-            roomSession.userDataManager.getPetData(selectedManagedVariableEntry.entityId)
-        );
+        return findUserVariableHolderData(roomSession.userDataManager, selectedManagedVariableEntry.entityId);
     }, [variablesType, selectedManagedVariableEntry, roomSession]);
     const managedHolderFurniCategory = useMemo(() => {
         if (variablesType !== 'furni' || !selectedManagedVariableEntry) return RoomObjectCategory.FLOOR;
@@ -2294,7 +2264,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         variablesType !== 'global' &&
         variablesType !== 'context' &&
         !!selectedManagedHolderVariableEntry &&
-        !selectedManagedHolderVariableEntry.isReadOnly;
+        !selectedManagedHolderVariableEntry.isReadOnly &&
+        !isDerivedVariableItemId(selectedManagedHolderVariableEntry.variableItemId);
     const canGiveManagedHolderVariable =
         canManageHolderVariables && variablesType !== 'global' && variablesType !== 'context' && !!availableManagedHolderDefinitions.length;
     useEffect(() => {
@@ -2340,48 +2311,43 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         setEditingManagedHolderValue(String(selectedManagedHolderVariableEntry.value ?? 0));
     }, [selectedManagedHolderVariableEntry, editingManagedHolderVariableId]);
-    const variableManageDescription = useMemo(() => {
-        switch (variablesType) {
-            case 'furni':
-                return 'This tool lists every furni in the room that currently holds the selected variable.';
-            case 'global':
-                return 'This tool shows the current room-level state for the selected global variable.';
-            case 'context':
-                return 'Context variables live only inside a wired execution. Use the Variables tab to inspect their definitions, text mappings and execution-only behavior.';
-            default:
-                return 'This tool lists every user in the room that currently holds the selected variable.';
-        }
-    }, [variablesType]);
-    const variableManageSortOptions = useMemo(() => {
-        const options = [
-            { value: 'highest_value', label: 'Highest value' },
-            { value: 'lowest_value', label: 'Lowest value' },
-            { value: 'newest_update', label: 'Most recently updated' },
-            { value: 'oldest_update', label: 'Least recently updated' },
-            { value: 'name', label: 'Name' }
-        ];
+    // Manage opens on a variable made with a box (AIR allows only persisted user variables; furni and global
+    // variables keep the owners window here).
+    const variableManageCanOpen =
+        !!selectedVariableDefinition?.itemId &&
+        variablesType !== 'context' &&
+        !isStackOnlyVariable(selectedVariableDefinition);
+    // Clearing reaches holders outside the room, so only the owner of the definition box gets the
+    // button; the server enforces the same rule.
+    const canVariableClear =
+        variableManageCanOpen &&
+        (variablesType === 'user' || variablesType === 'furni') &&
+        roomSettings.canModify &&
+        // AIR canDeleteCurrentVariable: a created, persisted variable the server lets be deleted.
+        !!selectedVariableDefinition?.canCreateDelete &&
+        selectedVariableDefinition.variableType === WIRED_VARIABLE_TYPE_CREATED &&
+        isPersistedWiredVariable(selectedVariableDefinition) &&
+        !!selectedVariableDefinition?.itemId &&
+        IsOwnerOfFloorFurniture(selectedVariableDefinition.itemId);
+    const confirmClearVariable = () => {
+        if (!canVariableClear || !showConfirm || !selectedVariableDefinition?.itemId) return;
+        const scope = variablesType === 'furni' ? 'furni' : 'user';
+        const itemId = selectedVariableDefinition.itemId;
 
-        if (selectedVariableDefinition?.hasCreationTime) {
-            options.splice(4, 0, { value: 'newest_creation', label: 'Newest creation' }, { value: 'oldest_creation', label: 'Oldest creation' });
-        }
-
-        return options;
-    }, [selectedVariableDefinition?.hasCreationTime]);
-    const variableManagePageSize = 12;
-    const variableManagePageCount = Math.max(1, Math.ceil(filteredVariableManageEntries.length / variableManagePageSize));
-    const clampedVariableManagePage = Math.min(variableManagePage, variableManagePageCount);
-    useEffect(() => {
-        if (variableManagePage <= variableManagePageCount) return;
-
-        setVariableManagePage(variableManagePageCount);
-    }, [variableManagePage, variableManagePageCount]);
-    const pagedVariableManageEntries = useMemo(() => {
-        const startIndex = (clampedVariableManagePage - 1) * variableManagePageSize;
-
-        return filteredVariableManageEntries.slice(startIndex, startIndex + variableManagePageSize);
-    }, [clampedVariableManagePage, filteredVariableManageEntries]);
-    const variableManageNoValueLabel = selectedVariableDefinition?.hasValue ? '/' : 'Not supported';
-    const variableManageCanOpen = !!selectedVariableDefinition && selectedVariableDefinition.type === 'Custom' && variablesType !== 'context';
+        showConfirm(
+            localizeWithFallback(
+                'wiredmenu.variable_overview.delete_all.desc',
+                'Are you sure you want to clear this variable? All users/furni that hold this variable will lose it. This action cannot be undone'
+            ),
+            () => clearVariableForAllHolders(scope, itemId),
+            null,
+            LocalizeText('generic.ok'),
+            LocalizeText('generic.cancel'),
+            localizeWithFallback('wiredmenu.variable_overview.delete_all.title', 'Clear this variable'),
+            null,
+            NotificationConfirmItem.TITLE_BAR_DANGER
+        );
+    };
     const commitManagedHolderValueEdit = useCallback(() => {
         if (!selectedManagedVariableEntry || !selectedManagedHolderVariableEntry || !roomSettings.canModify || selectedManagedHolderVariableEntry.isReadOnly)
             return;
@@ -2389,7 +2355,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         if (variablesType === 'context') return;
 
         const parsedValue = Number(editingManagedHolderValue.trim());
-        const nextValue = Number.isFinite(parsedValue) ? Math.trunc(parsedValue) : 0;
+        const nextValue = clampWiredVariableValue(parsedValue);
 
         switch (variablesType) {
             case 'user':
@@ -2419,7 +2385,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         if (variablesType === 'global' || variablesType === 'context') return;
 
         const parsedValue = Number(managedGiveValue.trim());
-        const nextValue = Number.isFinite(parsedValue) ? Math.trunc(parsedValue) : 0;
+        const nextValue = clampWiredVariableValue(parsedValue);
 
         if (variablesType === 'user') assignUserVariable(selectedManagedVariableEntry.entityId, selectedManagedGiveDefinition.itemId, nextValue);
         else assignFurniVariable(selectedManagedVariableEntry.entityId, selectedManagedGiveDefinition.itemId, nextValue);
@@ -2448,16 +2414,21 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     }, [selectedManagedVariableEntry, selectedManagedHolderVariableEntry, roomSettings.canModify, variablesType, removeUserVariable, removeFurniVariable]);
 
     const clearMonitorLogs = () => {
+        if (isMonitorClearCoolingDown) return;
+
+        setIsMonitorClearCoolingDown(true);
         setSelectedMonitorErrorType(null);
         setSelectedMonitorLogDetails(null);
         setIsMonitorHistoryOpen(false);
         setIsMonitorInfoOpen(false);
-        SendMessageComposer(new WiredMonitorRequestComposer(WIRED_MONITOR_ACTION_CLEAR_LOGS));
+        // AIR's "Clear all" (1632); the server answers with the cleared error list (15).
+        SendMessageComposer(new WiredErrorLogsClearComposer());
     };
 
     const openMonitorLogDetails = (type: string, details: Partial<MonitorLogDetails>) => {
         setSelectedMonitorErrorType(type);
         setSelectedMonitorLogDetails({
+            errorId: details.errorId,
             type,
             severity: String(details.severity ?? MONITOR_ERROR_INFO[type]?.severity ?? 'ERROR'),
             reason: normalizeMonitorReason(details.reason),
@@ -2506,14 +2477,14 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 return;
             }
 
-            const parsed = parseInt(editingValue.trim(), 10);
+            const parsed = parseWiredVariableValue(editingValue);
 
             if (Number.isNaN(parsed)) {
                 cancelVariableEdit();
                 return;
             }
 
-            const currentValue = roomVariableAssignmentMap.get(customDefinition.itemId)?.value ?? 0;
+            const currentValue = inspectedRoomValues.get(customDefinition.itemId) ?? 0;
 
             if (currentValue === parsed) {
                 cancelVariableEdit();
@@ -2521,6 +2492,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             }
 
             updateRoomVariableValue(customDefinition.itemId, parsed);
+            refreshObjectInspection();
             setEditingVariable(null);
             setEditingValue('');
             return;
@@ -2530,7 +2502,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             const customDefinition = selectedUserCustomVariableDefinitionMap.get(editingVariable);
 
             if (customDefinition?.hasValue && !customDefinition.isReadOnly) {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     cancelVariableEdit();
@@ -2544,7 +2516,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     return;
                 }
 
-                updateUserVariableValue(selectedUser.userId, customDefinition.itemId, parsed);
+                updateUserVariableValue(selectedUserHolderKey, customDefinition.itemId, parsed);
+                refreshObjectInspection();
                 setEditingVariable(null);
                 setEditingValue('');
                 return;
@@ -2569,7 +2542,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
             switch (editingVariable) {
                 case '@position_x': {
-                    const parsed = parseInt(editingValue.trim(), 10);
+                    const parsed = parseWiredVariableValue(editingValue);
 
                     if (Number.isNaN(parsed)) {
                         isValid = false;
@@ -2580,7 +2553,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     break;
                 }
                 case '@position_y': {
-                    const parsed = parseInt(editingValue.trim(), 10);
+                    const parsed = parseWiredVariableValue(editingValue);
 
                     if (Number.isNaN(parsed)) {
                         isValid = false;
@@ -2591,7 +2564,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     break;
                 }
                 case '@direction': {
-                    const parsed = parseInt(editingValue.trim(), 10);
+                    const parsed = parseWiredVariableValue(editingValue);
 
                     if (Number.isNaN(parsed)) {
                         isValid = false;
@@ -2652,7 +2625,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         const customFurniDefinition = selectedFurniCustomVariableDefinitionMap.get(editingVariable);
 
         if (customFurniDefinition?.hasValue && !customFurniDefinition.isReadOnly) {
-            const parsed = parseInt(editingValue.trim(), 10);
+            const parsed = parseWiredVariableValue(editingValue);
 
             if (Number.isNaN(parsed)) {
                 cancelVariableEdit();
@@ -2667,6 +2640,39 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             }
 
             updateFurniVariableValue(selectedFurni.objectId, customFurniDefinition.itemId, parsed);
+            refreshObjectInspection();
+            setEditingVariable(null);
+            setEditingValue('');
+            return;
+        }
+
+        // The server swaps the furni to the nearest colour of its Builders Club palette.
+        if (isRecolorableFurniKey(editingVariable)) {
+            const parsed = parseRecolorableFurniValue(editingVariable, editingValue);
+
+            if (parsed === null || !selectedFurni || !roomSession) {
+                cancelVariableEdit();
+                return;
+            }
+
+            SendMessageComposer(new WiredFurniRuntimeStateRequestComposer(selectedFurni.objectId, WIRED_FURNI_RUNTIME_ACTION_WRITE, editingVariable, parsed));
+            setEditingVariable(null);
+            setEditingValue('');
+            return;
+        }
+
+        if (editingVariable === '@gravity') {
+            const parsed = parseWiredVariableValue(editingValue);
+            if (!selectedFurni || !roomSession || (parsed !== 0 && parsed !== 1)) {
+                cancelVariableEdit();
+                return;
+            }
+            if (selectedFurniRuntimeState?.itemId === selectedFurni.objectId && selectedFurniRuntimeState.value === parsed) {
+                cancelVariableEdit();
+                return;
+            }
+
+            SendMessageComposer(new WiredFurniRuntimeStateRequestComposer(selectedFurni.objectId, WIRED_FURNI_RUNTIME_ACTION_WRITE, '@gravity', parsed));
             setEditingVariable(null);
             setEditingValue('');
             return;
@@ -2686,13 +2692,15 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         let nextZ = currentLiveState.altitude / 100;
         let nextRotation = currentLiveState.rotation;
         let nextState: number = null;
+        let nextOpacity: number = null;
+        let nextGravity: number = null;
         let nextWallOffsetX: number = null;
         let nextWallOffsetY: number = null;
         let isValid = true;
 
         switch (editingVariable) {
             case '@position_x': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2703,7 +2711,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@position_y': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2714,7 +2722,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@rotation': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2725,7 +2733,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@altitude': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2736,7 +2744,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@state': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2744,6 +2752,28 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 }
 
                 nextState = parsed;
+                break;
+            }
+            case '@opacity': {
+                const parsed = parseWiredVariableValue(editingValue);
+
+                if (Number.isNaN(parsed)) {
+                    isValid = false;
+                    break;
+                }
+
+                nextOpacity = Math.max(0, Math.min(100, parsed));
+                break;
+            }
+            case '@gravity': {
+                const parsed = parseWiredVariableValue(editingValue);
+
+                if (Number.isNaN(parsed)) {
+                    isValid = false;
+                    break;
+                }
+
+                nextGravity = parsed > 0 ? 1 : 0;
                 break;
             }
             case '@wallitem_offset': {
@@ -2767,6 +2797,39 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         if (!isValid) {
             cancelVariableEdit();
+            return;
+        }
+
+        if (editingVariable === '@opacity') {
+            const currentOpacity = Math.round(
+                Math.max(0, Math.min(1, selectedRoomObject.model.getValue<number>(RoomObjectVariable.FURNITURE_ALPHA_MULTIPLIER) ?? 1)) * 100
+            );
+
+            if (nextOpacity === currentOpacity) {
+                cancelVariableEdit();
+                return;
+            }
+
+            selectedRoomObject.model.setValue(RoomObjectVariable.FURNITURE_ALPHA_MULTIPLIER, nextOpacity / 100);
+            SendMessageComposer(new WiredFurniRuntimeStateRequestComposer(selectedFurni.objectId, WIRED_FURNI_RUNTIME_ACTION_WRITE, '@opacity', nextOpacity));
+            setEditingVariable(null);
+            setEditingValue('');
+            return;
+        }
+
+        if (editingVariable === '@gravity') {
+            const currentGravity = Math.max(0, Math.min(1, selectedRoomObject.model.getValue<number>(WIRED_FURNI_GRAVITY_MODEL_KEY) ?? 0));
+
+            if (nextGravity === currentGravity) {
+                cancelVariableEdit();
+                return;
+            }
+
+            selectedRoomObject.model.setValue(WIRED_FURNI_GRAVITY_MODEL_KEY, nextGravity);
+            setFurniInternalRevision((previousValue) => previousValue + 1);
+            SendMessageComposer(new WiredFurniRuntimeStateRequestComposer(selectedFurni.objectId, WIRED_FURNI_RUNTIME_ACTION_WRITE, '@gravity', nextGravity));
+            setEditingVariable(null);
+            setEditingValue('');
             return;
         }
 
@@ -2935,16 +2998,17 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         if (!canManageInspectionVariableAssignments || !selectedInspectionGiveDefinition) return;
 
         const parsedValue = Number(inspectionGiveValue.trim());
-        const nextValue = Number.isFinite(parsedValue) ? parsedValue : 0;
+        const nextValue = clampWiredVariableValue(parsedValue);
 
         if (inspectionType === 'user' && selectedUser) {
-            assignUserVariable(selectedUser.userId, selectedInspectionGiveDefinition.itemId, nextValue);
+            assignUserVariable(selectedUserHolderKey, selectedInspectionGiveDefinition.itemId, nextValue);
             setSelectedInspectionVariableKeys((prev) => ({ ...prev, user: selectedInspectionGiveDefinition.name }));
         } else if (inspectionType === 'furni' && selectedFurni) {
             assignFurniVariable(selectedFurni.objectId, selectedInspectionGiveDefinition.itemId, nextValue);
             setSelectedInspectionVariableKeys((prev) => ({ ...prev, furni: selectedInspectionGiveDefinition.name }));
         }
 
+        refreshObjectInspection();
         setInspectionGiveValue('0');
         setIsInspectionGiveOpen(false);
     }, [
@@ -2953,9 +3017,11 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         inspectionGiveValue,
         inspectionType,
         selectedUser,
+        selectedUserHolderKey,
         assignUserVariable,
         selectedFurni,
-        assignFurniVariable
+        assignFurniVariable,
+        refreshObjectInspection
     ]);
     const removeInspectionVariable = useCallback(() => {
         if (!canManageInspectionVariableAssignments || !selectedInspectionCustomDefinition || selectedInspectionCustomDefinition.isReadOnly) return;
@@ -2963,13 +3029,14 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         cancelVariableEdit();
 
         if (inspectionType === 'user' && selectedUser) {
-            removeUserVariable(selectedUser.userId, selectedInspectionCustomDefinition.itemId);
+            removeUserVariable(selectedUserHolderKey, selectedInspectionCustomDefinition.itemId);
             setSelectedInspectionVariableKeys((prev) => ({ ...prev, user: '' }));
         } else if (inspectionType === 'furni' && selectedFurni) {
             removeFurniVariable(selectedFurni.objectId, selectedInspectionCustomDefinition.itemId);
             setSelectedInspectionVariableKeys((prev) => ({ ...prev, furni: '' }));
         }
 
+        refreshObjectInspection();
         setIsInspectionGiveOpen(false);
     }, [
         canManageInspectionVariableAssignments,
@@ -2978,40 +3045,44 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         selectedUser,
         removeUserVariable,
         selectedFurni,
-        removeFurniVariable
+        removeFurniVariable,
+        refreshObjectInspection
     ]);
 
     const onVariableInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         event.stopPropagation();
+        // React clears currentTarget once the event is handled, so keep the input for the next frame.
+        const input = event.currentTarget;
 
         switch (event.key) {
             case 'Enter':
             case 'NumpadEnter':
                 event.preventDefault();
                 commitVariableEdit();
-                window.requestAnimationFrame(() => event.currentTarget.blur());
+                window.requestAnimationFrame(() => input?.blur());
                 return;
             case 'Escape':
                 event.preventDefault();
                 cancelVariableEdit();
-                window.requestAnimationFrame(() => event.currentTarget.blur());
+                window.requestAnimationFrame(() => input?.blur());
                 return;
         }
     };
     const onManagedHolderValueInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         event.stopPropagation();
+        const input = event.currentTarget;
 
         switch (event.key) {
             case 'Enter':
             case 'NumpadEnter':
                 event.preventDefault();
                 commitManagedHolderValueEdit();
-                window.requestAnimationFrame(() => event.currentTarget.blur());
+                window.requestAnimationFrame(() => input?.blur());
                 return;
             case 'Escape':
                 event.preventDefault();
                 setEditingManagedHolderVariableId(0);
-                window.requestAnimationFrame(() => event.currentTarget.blur());
+                window.requestAnimationFrame(() => input?.blur());
                 return;
         }
     };
@@ -3059,6 +3130,14 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     }, [inspectionType, selectedFurni?.objectId, selectedFurni?.category]);
 
     useEffect(() => {
+        setSelectedFurniRuntimeState(null);
+        if (!isVisible || inspectionType !== 'furni' || !roomSettings.canInspect || !selectedFurni || selectedFurni.category !== RoomObjectCategory.FLOOR)
+            return;
+
+        SendMessageComposer(new WiredFurniRuntimeStateRequestComposer(selectedFurni.objectId, WIRED_FURNI_RUNTIME_ACTION_READ, '@gravity', 0));
+    }, [isVisible, inspectionType, roomSettings.canInspect, selectedFurni?.objectId, selectedFurni?.category]);
+
+    useEffect(() => {
         if (inspectionType !== 'user' || !selectedUser) {
             setSelectedUserLiveState(null);
 
@@ -3071,599 +3150,373 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     if (!isVisible) return null;
 
     return (
-        <>
-            {isVariableHighlightActive && !!variableHighlightOverlays.length && (
-                <div className="pointer-events-none absolute left-0 top-0 z-30">
-                    {variableHighlightOverlays.map((overlay) => (
-                        <div
-                            key={overlay.key}
-                            className="pointer-events-none absolute"
-                            style={{
-                                left: overlay.x,
-                                top: overlay.y,
-                                transform: 'translateX(-50%)'
-                            }}
-                        >
-                            {overlay.hasValue && (
-                                <div className="absolute left-1/2 top-[-30px] -translate-x-1/2">
-                                    <div className="relative min-w-[24px] rounded-[8px] bg-[#86aebccc] px-[8px] py-[4px] text-center text-[12px] font-bold leading-none text-white shadow-[inset_0_0_0_1px_rgba(176,211,225,.7)]">
-                                        {overlay.value ?? 0}
-                                        <span className="absolute left-1/2 bottom-[-7px] z-10 h-0 w-0 -translate-x-1/2 border-x-[6px] border-t-[7px] border-x-transparent border-t-[#86aebccc]" />
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            )}
-            <NitroCardView
-                className="min-w-[520px] max-w-[520px]"
-                theme="primary-slim"
-                uniqueKey="wired-creator-tools"
-                windowPosition={DraggableWindowPosition.TOP_LEFT}
-            >
-                <NitroCardHeaderView headerText="Wired Creator Tools (:wired)" onCloseClick={() => setIsVisible(false)} />
-                <NitroCardTabsView justifyContent="start">
-                    {TABS.map((tab) => (
-                        <NitroCardTabsItemView key={tab.key} isActive={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>
-                            <Text>{tab.label}</Text>
-                        </NitroCardTabsItemView>
-                    ))}
-                </NitroCardTabsView>
-                <NitroCardContentView className="text-black bg-[#e9e6d9]" gap={3}>
-                    {activeTab === 'monitor' && (
-                        <WiredMonitorTabView
-                            monitorStats={monitorStats}
-                            monitorLogs={monitorLogs}
-                            monitorHistoryRows={monitorHistoryRows}
-                            onOpenMonitorInfo={() => setIsMonitorInfoOpen(true)}
-                            onOpenMonitorHistory={() => setIsMonitorHistoryOpen(true)}
-                            onClearMonitorLogs={clearMonitorLogs}
-                            onOpenMonitorLogDetails={openMonitorLogDetails}
-                        />
-                    )}
-                    {activeTab === 'inspection' && (
-                        <WiredInspectionTabView
-                            selectedFurni={selectedFurni}
-                            selectedUser={selectedUser}
-                            roomId={roomSession?.roomId ?? null}
-                            previewPlaceholder={previewPlaceholder}
-                            keepSelected={keepSelected}
-                            onKeepSelectedChange={setKeepSelected}
-                            displayedVariables={displayedVariables}
-                            selectedInspectionVariableKey={selectedInspectionVariableKey}
-                            onSelectInspectionVariable={(variable) => {
-                                setSelectedInspectionVariableKeys((prev) => ({ ...prev, [inspectionType]: variable.key }));
-                                beginVariableEdit(variable);
-                            }}
-                            onCancelVariableEdit={cancelVariableEdit}
-                            onVariableInputKeyDown={onVariableInputKeyDown}
-                            onBeginVariableEdit={(variable) => {
-                                setSelectedInspectionVariableKeys((prev) => ({ ...prev, [inspectionType]: variable.key }));
-                                beginVariableEdit(variable);
-                            }}
-                            selectedInspectionGiveDefinition={selectedInspectionGiveDefinition}
-                            onSelectGiveVariable={setInspectionGiveVariableItemId}
-                            availableInspectionDefinitions={availableInspectionDefinitions}
-                            inspectionGiveValue={inspectionGiveValue}
-                            onInspectionGiveValueChange={setInspectionGiveValue}
-                            canGiveInspectionVariable={canGiveInspectionVariable}
-                            onGiveInspectionVariable={() => giveInspectionVariable()}
-                            canRemoveInspectionVariable={canRemoveInspectionVariable}
-                            onRemoveInspectionVariable={() => removeInspectionVariable()}
-                        />
-                    )}
-                    {activeTab === 'variables' && (
-                        <WiredVariablesTabView
-                            variablePickerDefinitions={variablePickerDefinitions}
-                            selectedVariableDefinition={selectedVariableDefinition}
-                            onPickVariable={(key) => setSelectedVariableKeys((prev) => ({ ...prev, [variablesType]: key }))}
-                            canVariableHighlight={canVariableHighlight}
-                            variableManageCanOpen={variableManageCanOpen}
-                            onOpenManagePanel={() => {
-                                requestUserVariables();
-                                setVariableManagePage(1);
-                                setSelectedManagedVariableEntry(null);
-                                setIsVariableManageOpen(true);
-                            }}
-                            selectedVariableProperties={selectedVariableProperties}
-                            selectedVariableTextValues={selectedVariableTextValues}
-                        />
-                    )}
-                    {activeTab === 'settings' && <WiredToolsSettingsTabView />}
-                    {activeTab !== 'monitor' && activeTab !== 'inspection' && activeTab !== 'variables' && activeTab !== 'settings' && (
-                        <div className="p-4 min-h-[360px] flex items-center justify-center text-center text-[#555]">
-                            <div className="max-w-[320px]">
-                                <Text bold>{currentTabLabel}</Text>
-                                <div className="mt-2 text-[12px]">This tab is now ready to be wired into the new `:wired` tools flow.</div>
-                            </div>
-                        </div>
-                    )}
-                </NitroCardContentView>
-            </NitroCardView>
-            {isMonitorHistoryOpen && (
-                <NitroCardView
-                    className="min-w-[760px] max-w-[760px] max-h-[520px]"
-                    theme="primary-slim"
-                    uniqueKey="wired-monitor-history"
-                    windowPosition={DraggableWindowPosition.TOP_LEFT}
-                    offsetLeft={560}
-                    offsetTop={40}
-                >
-                    <NitroCardHeaderView headerText="Wired Monitor Logs" onCloseClick={() => setIsMonitorHistoryOpen(false)} />
-                    <NitroCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
-                        <div className="flex flex-wrap items-center gap-2 text-[12px]">
-                            <span className="text-[#555]">Severity:</span>
-                            {['ALL', 'WARNING', 'ERROR'].map((severity) => (
-                                <button
-                                    key={severity}
-                                    className={`rounded border px-2 py-[2px] ${monitorHistorySeverityFilter === severity ? 'border-[#4d7892] bg-[#dbeaf4] text-[#1a4d68]' : 'border-[#b8b2a4] bg-white text-[#555]'}`}
-                                    type="button"
-                                    onClick={() => setMonitorHistorySeverityFilter(severity as 'ALL' | 'ERROR' | 'WARNING')}
-                                >
-                                    {severity}
-                                </button>
-                            ))}
-                            <span className="ml-2 text-[#555]">Type:</span>
-                            <select
-                                className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                                value={monitorHistoryTypeFilter}
-                                onChange={(event) => setMonitorHistoryTypeFilter(event.target.value)}
+        <NativeTextTree>
+            <>
+                {isVariableHighlightActive && !!variableHighlightOverlays.length && (
+                    <div className="pointer-events-none absolute left-0 top-0 z-30">
+                        {variableHighlightOverlays.map((overlay) => (
+                            <div
+                                key={overlay.key}
+                                className="pointer-events-none absolute"
+                                style={{
+                                    left: overlay.x,
+                                    top: overlay.y,
+                                    transform: 'translateX(-50%)'
+                                }}
                             >
-                                {monitorHistoryTypeOptions.map((type) => (
-                                    <option key={type} value={type}>
-                                        {type}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="grow overflow-y-auto border border-[#d1ccbf] rounded bg-white">
-                            <table className="w-full text-[12px]">
-                                <thead className="bg-[#efede5] sticky top-0">
-                                    <tr>
-                                        <th className="text-left px-2 py-1">Type</th>
-                                        <th className="text-left px-2 py-1">Severity</th>
-                                        <th className="text-left px-2 py-1">Trigger</th>
-                                        <th className="text-left px-2 py-1">Motivation</th>
-                                        <th className="text-left px-2 py-1">Occurred at</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {!filteredMonitorHistoryRows.length && (
-                                        <tr>
-                                            <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={5}>
-                                                No log history for the current filters
-                                            </td>
-                                        </tr>
-                                    )}
-                                    {filteredMonitorHistoryRows.map((row, index) => (
-                                        <tr
-                                            key={row.id}
-                                            className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#f8f6f0]'} cursor-pointer hover:bg-[#e8eefc]`}
-                                            onClick={() =>
-                                                openMonitorLogDetails(row.type, {
-                                                    severity: row.category,
-                                                    occurredAt: row.occurredAt,
-                                                    reason: row.reason,
-                                                    sourceLabel: row.sourceLabel,
-                                                    sourceId: row.sourceId
-                                                })
-                                            }
-                                        >
-                                            <td className="px-2 py-1 text-[#1b57b2]">{row.type}</td>
-                                            <td className="px-2 py-1">{row.category}</td>
-                                            <td className="px-2 py-1">{formatMonitorSource(row.sourceLabel, row.sourceId)}</td>
-                                            <td className="px-2 py-1 text-[#555]">{row.reason}</td>
-                                            <td className="px-2 py-1">{row.occurredAt}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </NitroCardContentView>
-                </NitroCardView>
-            )}
-            {isMonitorInfoOpen && (
-                <NitroCardView
-                    className="min-w-[560px] max-w-[560px] max-h-[520px]"
-                    theme="primary-slim"
-                    uniqueKey="wired-monitor-info"
-                    windowPosition={DraggableWindowPosition.TOP_LEFT}
-                    offsetLeft={610}
-                    offsetTop={80}
-                >
-                    <NitroCardHeaderView headerText="Wired Monitor Information" onCloseClick={() => setIsMonitorInfoOpen(false)} />
-                    <NitroCardContentView className="text-black bg-[#f4efe3] p-4 flex flex-col gap-4 overflow-y-auto">
-                        {monitorInfoSections.map((section) => (
-                            <div key={section.title} className="flex flex-col gap-1">
-                                <Text bold>{section.title}</Text>
-                                {section.lines.map((line, index) => (
-                                    <Text key={`${section.title}-${index}`}>{line}</Text>
-                                ))}
+                                {overlay.hasValue && (
+                                    <div className="absolute left-1/2 top-[-30px] -translate-x-1/2">
+                                        <div className="relative min-w-[24px] rounded-[8px] bg-[#86aebccc] px-[8px] py-[4px] text-center text-[12px] font-bold leading-none text-white shadow-[inset_0_0_0_1px_rgba(176,211,225,.7)]">
+                                            {overlay.value ?? 0}
+                                            <span className="absolute left-1/2 bottom-[-7px] z-10 h-0 w-0 -translate-x-1/2 border-x-[6px] border-t-[7px] border-x-transparent border-t-[#86aebccc]" />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         ))}
-                    </NitroCardContentView>
-                </NitroCardView>
-            )}
-            {isVariableManageOpen && !!selectedVariableDefinition && (
-                <NitroCardView
-                    className="min-w-[860px] max-w-[860px] max-h-[620px]"
+                    </div>
+                )}
+                <OctaneCardView
+                    className="octane-wired-menu min-w-[520px] max-w-[520px]"
                     theme="primary-slim"
-                    uniqueKey="wired-variable-management"
+                    uniqueKey="wired-creator-tools"
                     windowPosition={DraggableWindowPosition.TOP_LEFT}
-                    offsetLeft={540}
-                    offsetTop={60}
                 >
-                    <NitroCardHeaderView headerText="Variable Management" onCloseClick={() => setIsVariableManageOpen(false)} />
-                    <NitroCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
-                        <div className="rounded border border-[#c8c2b2] bg-white p-3 flex items-center justify-between gap-3">
-                            <div className="grow flex flex-col items-center text-center">
-                                <Text>{variableManageDescription}</Text>
-                                <Text>
-                                    <b>Variable name:</b> {selectedVariableDefinition.key}
-                                </Text>
-                            </div>
-                            <Button variant="secondary" onClick={() => requestUserVariables()}>
-                                Refresh
-                            </Button>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-4 text-[12px]">
-                            <div className="flex items-center gap-2">
-                                <Text>{variableManageTypeLabel}:</Text>
-                                <select
+                    <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.title', 'Wired Creator Tools (:wired)')} onCloseClick={() => setIsVisible(false)} />
+                    <OctaneCardTabsView justifyContent="start">
+                        {TABS.map((tab) => (
+                            <OctaneCardTabsItemView key={tab.key} isActive={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>
+                                <Text>{localizeWithFallback(wiredMenuTabKey(tab.key), tab.label)}</Text>
+                            </OctaneCardTabsItemView>
+                        ))}
+                    </OctaneCardTabsView>
+                    <OctaneCardContentView className="text-black bg-[#e9e6d9]" gap={3}>
+                        {activeTab === 'monitor' && (
+                            <WiredMonitorTabView
+                                monitorStats={monitorStats}
+                                monitorLogs={monitorLogs}
+                                monitorHistoryRows={monitorHistoryRows}
+                                onOpenMonitorInfo={() => setIsMonitorInfoOpen(true)}
+                                onOpenMonitorHistory={() => setIsMonitorHistoryOpen(true)}
+                                onOpenRoomLogs={() => setIsRoomLogsOpen(true)}
+                                isClearCoolingDown={isMonitorClearCoolingDown}
+                                canClearLogs={!!roomSettings.canModify}
+                                onClearMonitorLogs={clearMonitorLogs}
+                                onOpenMonitorLogDetails={openMonitorLogDetails}
+                            />
+                        )}
+                        {activeTab === 'inspection' && (
+                            <WiredInspectionTabView
+                                selectedFurni={selectedFurni}
+                                selectedUser={selectedUser}
+                                roomId={roomSession?.roomId ?? null}
+                                previewRevision={furniInternalRevision}
+                                previewPlaceholder={previewPlaceholder}
+                                keepSelected={keepSelected}
+                                onKeepSelectedChange={setKeepSelected}
+                                displayedVariables={displayedVariables}
+                                selectedInspectionVariableKey={selectedInspectionVariableKey}
+                                onSelectInspectionVariable={(variable) => {
+                                    setSelectedInspectionVariableKeys((prev) => ({ ...prev, [inspectionType]: variable.key }));
+                                    beginVariableEdit(variable);
+                                }}
+                                onCancelVariableEdit={cancelVariableEdit}
+                                onVariableInputKeyDown={onVariableInputKeyDown}
+                                onBeginVariableEdit={(variable) => {
+                                    setSelectedInspectionVariableKeys((prev) => ({ ...prev, [inspectionType]: variable.key }));
+                                    beginVariableEdit(variable);
+                                }}
+                                selectedInspectionGiveDefinition={selectedInspectionGiveDefinition}
+                                onSelectGiveVariable={setInspectionGiveVariableItemId}
+                                availableInspectionDefinitions={availableInspectionDefinitions}
+                                inspectionGiveValue={inspectionGiveValue}
+                                onInspectionGiveValueChange={setInspectionGiveValue}
+                                canGiveInspectionVariable={canGiveInspectionVariable}
+                                onGiveInspectionVariable={() => giveInspectionVariable()}
+                                canRemoveInspectionVariable={canRemoveInspectionVariable}
+                                onRemoveInspectionVariable={() => removeInspectionVariable()}
+                                canHighlightWireds={canHighlightConfiguredWireds}
+                                isHighlightingWireds={isHighlightingConfiguredWireds && canHighlightConfiguredWireds}
+                                onToggleHighlightWireds={() => setIsHighlightingConfiguredWireds((value) => !value)}
+                            />
+                        )}
+                        {activeTab === 'variables' && (
+                            <WiredVariablesTabView
+                                variablePickerDefinitions={variablePickerDefinitions}
+                                selectedVariableDefinition={selectedVariableDefinition}
+                                onPickVariable={(key) => setSelectedVariableKeys((prev) => ({ ...prev, [variablesType]: key }))}
+                                canVariableHighlight={canVariableHighlight}
+                                variableManageCanOpen={variableManageCanOpen}
+                                canVariableClear={canVariableClear}
+                                onClearVariable={confirmClearVariable}
+                                onOpenManagePanel={() => {
+                                    requestUserVariables();
+                                    setSelectedManagedVariableEntry(null);
+                                    setIsVariableManageOpen(true);
+                                }}
+                                arrayInspectorCanOpen={!!selectedVariableDefinition?.itemId}
+                                onOpenArrayInspector={() => setIsArrayInspectorOpen(true)}
+                                selectedVariableProperties={selectedVariableProperties}
+                                selectedVariableTextValues={selectedVariableTextValues}
+                                onOpenWebApiExplorer={() => openVariablesExplorer({ roomId: roomSession?.roomId })}
+                            />
+                        )}
+                        {activeTab === 'settings' && <WiredToolsSettingsTabView onOpenSelfDonation={() => setIsSelfDonationOpen(true)} />}
+                        {activeTab === 'chests' && <WiredChestsTabView />}
+                        {activeTab === 'share' && <WiredShareTabView />}
+                    </OctaneCardContentView>
+                </OctaneCardView>
+                {isMonitorHistoryOpen && (
+                    <OctaneCardView
+                        className="octane-wired-menu min-w-[760px] max-w-[760px] max-h-[520px]"
+                        theme="primary-slim"
+                        uniqueKey="wired-monitor-history"
+                        windowPosition={DraggableWindowPosition.TOP_LEFT}
+                        offsetLeft={560}
+                        offsetTop={40}
+                    >
+                        <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.monitor.history.title', 'Wired Monitor Logs')} onCloseClick={() => setIsMonitorHistoryOpen(false)} />
+                        <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
+                            <div className="flex flex-wrap items-center gap-2 text-[12px]">
+                                <span className="text-[#555]">{localizeWithFallback('octane.wired_tools.severity', 'Severity:')}</span>
+                                {['ALL', 'WARNING', 'ERROR'].map((severity) => (
+                                    <BaseButton
+                                        key={severity}
+                                        className={`rounded border px-2 py-[2px] ${monitorHistorySeverityFilter === severity ? 'border-[#4d7892] bg-[#dbeaf4] text-[#1a4d68]' : 'border-[#b8b2a4] bg-white text-[#555]'}`}
+                                        type="button"
+                                        onClick={() => setMonitorHistorySeverityFilter(severity as 'ALL' | 'ERROR' | 'WARNING')}
+                                    >
+                                        {severity}
+                                    </BaseButton>
+                                ))}
+                                <span className="ml-2 text-[#555]">{localizeWithFallback('octane.wired_tools.type', 'Type:')}</span>
+                                <Select
                                     className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                                    value={variableManageTypeFilter}
-                                    onChange={(event) => {
-                                        setVariableManageTypeFilter(event.target.value);
-                                        setVariableManagePage(1);
-                                    }}
+                                    value={monitorHistoryTypeFilter}
+                                    onChange={(event) => setMonitorHistoryTypeFilter(event.target.value)}
                                 >
-                                    {variableManageTypeOptions.map((type) => (
+                                    {monitorHistoryTypeOptions.map((type) => (
                                         <option key={type} value={type}>
-                                            {type === 'ALL' ? (variablesType === 'global' ? 'All entries' : 'All types') : type}
+                                            {type}
                                         </option>
                                     ))}
-                                </select>
+                                </Select>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Text>Sort by:</Text>
-                                <select
-                                    className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                                    value={variableManageSort}
-                                    onChange={(event) => {
-                                        setVariableManageSort(event.target.value);
-                                        setVariableManagePage(1);
-                                    }}
-                                >
-                                    {variableManageSortOptions.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                        <div className="grow overflow-y-auto border border-[#d1ccbf] rounded bg-white">
-                            <table className="w-full text-[12px]">
-                                <thead className="bg-[#efede5] sticky top-0">
-                                    <tr>
-                                        <th className="text-left px-2 py-1">{variableManageCategoryHeader}</th>
-                                        <th className="text-left px-2 py-1">Name</th>
-                                        {!!selectedVariableDefinition.hasCreationTime && <th className="text-left px-2 py-1">Creation time</th>}
-                                        {!!selectedVariableDefinition.hasUpdateTime && <th className="text-left px-2 py-1">Last update time</th>}
-                                        <th className="text-left px-2 py-1">Value</th>
-                                        <th className="text-left px-2 py-1">Manage</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {!pagedVariableManageEntries.length && (
-                                        <tr>
-                                            <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={selectedVariableDefinition.hasCreationTime ? 6 : 5}>
-                                                No entries found for the current filters
-                                            </td>
-                                        </tr>
-                                    )}
-                                    {pagedVariableManageEntries.map((entry, index) => (
-                                        <tr key={`${entry.entityId}-${index}`} className={index % 2 === 0 ? 'bg-white' : 'bg-[#f8f6f0]'}>
-                                            <td className="px-2 py-1">{entry.categoryLabel}</td>
-                                            <td className="px-2 py-1 text-[#1b57b2] underline underline-offset-2">{entry.entityName}</td>
-                                            {!!selectedVariableDefinition.hasCreationTime && (
-                                                <td className="px-2 py-1">{formatVariableTimestamp(entry.createdAt)}</td>
-                                            )}
-                                            {!!selectedVariableDefinition.hasUpdateTime && (
-                                                <td className="px-2 py-1">{formatVariableTimestamp(entry.updatedAt)}</td>
-                                            )}
-                                            <td className="px-2 py-1">{entry.value ?? variableManageNoValueLabel}</td>
-                                            <td className="px-2 py-1">
-                                                <button
-                                                    className="text-[#1b57b2] underline underline-offset-2"
-                                                    type="button"
-                                                    onClick={() => setSelectedManagedVariableEntry(entry)}
-                                                >
-                                                    {entry.manageLabel}
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className="flex items-center justify-between gap-3">
-                            <div className="flex gap-2">
-                                <button
-                                    className="min-w-[36px] rounded border border-[#b8b2a4] bg-white px-2 py-1 text-[12px] disabled:opacity-40"
-                                    disabled={clampedVariableManagePage <= 1}
-                                    type="button"
-                                    onClick={() => setVariableManagePage(1)}
-                                >
-                                    &laquo;
-                                </button>
-                                <button
-                                    className="min-w-[36px] rounded border border-[#b8b2a4] bg-white px-2 py-1 text-[12px] disabled:opacity-40"
-                                    disabled={clampedVariableManagePage <= 1}
-                                    type="button"
-                                    onClick={() => setVariableManagePage((value) => Math.max(1, value - 1))}
-                                >
-                                    &lsaquo;
-                                </button>
-                            </div>
-                            <div className="flex items-center gap-2 text-[12px] text-[#555]">
-                                <span>{`${filteredVariableManageEntries.length} entr${filteredVariableManageEntries.length === 1 ? 'y' : 'ies'} found. Showing page`}</span>
-                                <input
-                                    className="w-[42px] rounded border border-[#b8b2a4] bg-white px-1 py-[2px] text-center text-[12px]"
-                                    type="number"
-                                    min={1}
-                                    max={variableManagePageCount}
-                                    value={clampedVariableManagePage}
-                                    onChange={(event) => {
-                                        const nextPage = Number(event.target.value || 1);
-
-                                        setVariableManagePage(Math.min(variableManagePageCount, Math.max(1, nextPage)));
-                                    }}
-                                />
-                                <span>{`of ${variableManagePageCount}`}</span>
-                            </div>
-                            <div className="flex gap-2">
-                                <button
-                                    className="min-w-[36px] rounded border border-[#b8b2a4] bg-white px-2 py-1 text-[12px] disabled:opacity-40"
-                                    disabled={clampedVariableManagePage >= variableManagePageCount}
-                                    type="button"
-                                    onClick={() => setVariableManagePage((value) => Math.min(variableManagePageCount, value + 1))}
-                                >
-                                    &rsaquo;
-                                </button>
-                                <button
-                                    className="min-w-[36px] rounded border border-[#b8b2a4] bg-white px-2 py-1 text-[12px] disabled:opacity-40"
-                                    disabled={clampedVariableManagePage >= variableManagePageCount}
-                                    type="button"
-                                    onClick={() => setVariableManagePage(variableManagePageCount)}
-                                >
-                                    &raquo;
-                                </button>
-                            </div>
-                        </div>
-                    </NitroCardContentView>
-                </NitroCardView>
-            )}
-            {!!selectedManagedVariableEntry && !!selectedVariableDefinition && (
-                <NitroCardView
-                    className="min-w-[430px] max-w-[430px] max-h-[620px]"
-                    theme="primary-slim"
-                    uniqueKey="wired-variable-management-entry"
-                    windowPosition={DraggableWindowPosition.TOP_LEFT}
-                    offsetLeft={890}
-                    offsetTop={110}
-                >
-                    <NitroCardHeaderView headerText={managedHolderPanelTitle} onCloseClick={() => setSelectedManagedVariableEntry(null)} />
-                    <NitroCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3 relative" overflow="hidden">
-                        <div className="rounded border border-[#c8c2b2] bg-white p-3 flex items-center justify-between gap-3">
-                            <div className="grow text-center">
-                                <Text>{managedHolderWarningText}</Text>
-                            </div>
-                            <Button variant="secondary" onClick={() => requestUserVariables()}>
-                                Refresh
-                            </Button>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <Text bold>Holder info:</Text>
-                            <div className="flex gap-4">
-                                <div className="w-[140px] h-[110px] rounded border border-[#d8d2c3] bg-[#dedede] flex items-center justify-center overflow-hidden">
-                                    {variablesType === 'furni' && roomSession && (
-                                        <LayoutRoomObjectImageView
-                                            category={managedHolderFurniCategory}
-                                            objectId={selectedManagedVariableEntry.entityId}
-                                            roomId={roomSession.roomId}
-                                        />
-                                    )}
-                                    {variablesType === 'user' && managedHolderUserData && (
-                                        <>
-                                            {managedHolderUserData.type === RoomObjectType.PET ? (
-                                                <LayoutPetImageView direction={2} figure={managedHolderUserData.figure} />
-                                            ) : (
-                                                <LayoutAvatarImageView direction={2} figure={managedHolderUserData.figure} />
-                                            )}
-                                        </>
-                                    )}
-                                    {variablesType === 'global' && (
-                                        <img alt="Global placeholder" className="max-w-full max-h-full object-contain p-3" src={wiredGlobalPlaceholderImage} />
-                                    )}
-                                </div>
-                                <div className="grow rounded border border-[#d8d2c3] bg-white p-3 flex flex-col gap-1 text-[12px]">
-                                    {managedHolderInfoLines.map((line, index) => (
-                                        <Text key={`${line}-${index}`}>{line}</Text>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-2 min-h-0 grow">
-                            <Text bold>{variablesType === 'global' ? 'Room variables:' : 'Assigned variables:'}</Text>
-                            <div className="grow rounded border border-[#d1ccbf] bg-white overflow-y-auto">
+                            <div className="grow overflow-y-auto border border-[#d1ccbf] rounded bg-white">
                                 <table className="w-full text-[12px]">
                                     <thead className="bg-[#efede5] sticky top-0">
                                         <tr>
-                                            <th className="text-left px-2 py-1">Variable</th>
-                                            <th className="text-left px-2 py-1">Value</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.type_2', 'Type')}</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.severity_2', 'Severity')}</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.trigger', 'Trigger')}</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.motivation', 'Motivation')}</th>
+                                            <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.occurred_at', 'Occurred at')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {!managedHolderVariableEntries.length && (
+                                        {!filteredMonitorHistoryRows.length && (
                                             <tr>
-                                                <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={2}>
-                                                    No variables currently assigned
+                                                <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={5}>
+                                                    {localizeWithFallback('octane.wired_tools.no_log_history_for_the_current', 'No log history for the current filters')}
                                                 </td>
                                             </tr>
                                         )}
-                                        {managedHolderVariableEntries.map((entry, index) => {
-                                            const isSelected = selectedManagedHolderVariableEntry?.variableItemId === entry.variableItemId;
-                                            const isEditing = editingManagedHolderVariableId === entry.variableItemId;
-
-                                            return (
-                                                <tr
-                                                    key={entry.variableItemId}
-                                                    className={`${isSelected ? 'bg-[#d7dfea]' : index % 2 === 0 ? 'bg-white' : 'bg-[#f8f6f0]'} cursor-pointer hover:bg-[#e8eefc]`}
-                                                    onClick={() => setSelectedManagedHolderVariableId(entry.variableItemId)}
-                                                >
-                                                    <td className="px-2 py-1">
-                                                        <div className="flex flex-col">
-                                                            <span>{entry.name}</span>
-                                                            <span className="text-[10px] text-[#8a8476]">{entry.availability}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-2 py-1">
-                                                        {!entry.hasValue && <span className="text-[#8a8476]">/</span>}
-                                                        {!!entry.hasValue && !isEditing && (
-                                                            <button
-                                                                className={`rounded px-1 py-[1px] ${roomSettings.canModify && !entry.isReadOnly ? 'text-[#1b57b2] underline underline-offset-2' : 'text-[#222]'}`}
-                                                                disabled={!roomSettings.canModify || entry.isReadOnly}
-                                                                type="button"
-                                                                onClick={(event) => {
-                                                                    event.stopPropagation();
-
-                                                                    if (!roomSettings.canModify || entry.isReadOnly) return;
-
-                                                                    setSelectedManagedHolderVariableId(entry.variableItemId);
-                                                                    setEditingManagedHolderVariableId(entry.variableItemId);
-                                                                    setEditingManagedHolderValue(String(entry.value ?? 0));
-                                                                }}
-                                                            >
-                                                                {entry.value ?? 0}
-                                                            </button>
-                                                        )}
-                                                        {!!entry.hasValue && isEditing && (
-                                                            <input
-                                                                autoFocus
-                                                                className="w-[72px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                                                                type="number"
-                                                                value={editingManagedHolderValue}
-                                                                onBlur={() => setEditingManagedHolderVariableId(0)}
-                                                                onChange={(event) => setEditingManagedHolderValue(event.target.value)}
-                                                                onClick={(event) => event.stopPropagation()}
-                                                                onKeyDownCapture={onManagedHolderValueInputKeyDown}
-                                                            />
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
+                                        {filteredMonitorHistoryRows.map((row, index) => (
+                                            <tr
+                                                key={row.id}
+                                                className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#f8f6f0]'} cursor-pointer hover:bg-[#e8eefc]`}
+                                                onClick={() =>
+                                                    openMonitorLogDetails(row.type, {
+                                                        severity: row.category,
+                                                        occurredAt: row.occurredAt,
+                                                        reason: row.reason,
+                                                        sourceLabel: row.sourceLabel,
+                                                        sourceId: row.sourceId
+                                                    })
+                                                }
+                                            >
+                                                <td className="px-2 py-1 text-[#1b57b2]">{row.type}</td>
+                                                <td className="px-2 py-1">{row.category}</td>
+                                                <td className="px-2 py-1">{formatMonitorSource(row.sourceLabel, row.sourceId)}</td>
+                                                <td className="px-2 py-1 text-[#555]">{row.reason}</td>
+                                                <td className="px-2 py-1">{row.occurredAt}</td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                        <div className="relative flex items-center justify-between gap-3 pt-1">
-                            {isManagedGiveOpen && (
-                                <div className="absolute right-0 bottom-full mb-2 w-[210px] rounded border border-[#8d887a] bg-[#efede5] p-3 shadow-[0_2px_8px_rgba(0,0,0,.25)] z-10 flex flex-col gap-2">
-                                    <Text bold>Variable:</Text>
-                                    <select
-                                        className="rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px]"
-                                        value={selectedManagedGiveDefinition?.itemId ?? 0}
-                                        onChange={(event) => setManagedGiveVariableItemId(Number(event.target.value))}
-                                    >
-                                        {!availableManagedHolderDefinitions.length && <option value={0}>No variables available</option>}
-                                        {availableManagedHolderDefinitions.map((definition) => (
-                                            <option key={definition.itemId} value={definition.itemId}>
-                                                {definition.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <Text bold>Value:</Text>
-                                    <input
-                                        className="w-[96px] rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px] disabled:opacity-60"
-                                        disabled={!selectedManagedGiveDefinition?.hasValue}
-                                        type="number"
-                                        value={managedGiveValue}
-                                        onChange={(event) => setManagedGiveValue(event.target.value)}
+                        </OctaneCardContentView>
+                    </OctaneCardView>
+                )}
+                {isMonitorInfoOpen && (
+                    <OctaneCardView
+                        className="octane-wired-menu min-w-[560px] max-w-[560px] max-h-[520px]"
+                        theme="primary-slim"
+                        uniqueKey="wired-monitor-info"
+                        windowPosition={DraggableWindowPosition.TOP_LEFT}
+                        offsetLeft={610}
+                        offsetTop={80}
+                    >
+                        <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.monitor.info.title', 'Wired Monitor Information')} onCloseClick={() => setIsMonitorInfoOpen(false)} />
+                        <OctaneCardContentView className="text-black bg-[#f4efe3] p-4 flex flex-col gap-4 overflow-y-auto">
+                            {monitorInfoSections.map((section) => (
+                                <div key={section.title} className="flex flex-col gap-1">
+                                    <Text bold>{section.title}</Text>
+                                    {section.lines.map((line, index) => (
+                                        <Text key={`${section.title}-${index}`}>{line}</Text>
+                                    ))}
+                                </div>
+                            ))}
+                        </OctaneCardContentView>
+                    </OctaneCardView>
+                )}
+                {isVariableManageOpen && !!selectedVariableDefinition?.itemId && variablesType !== 'context' && (
+                    <WiredVariableOwnersView
+                        variableId={selectedVariableDefinition.variableId}
+                        variableName={selectedVariableDefinition.key}
+                        variablesType={variablesType}
+                        hasValue={!!selectedVariableDefinition.hasValue}
+                        describeHolder={describeVariableHolder}
+                        onManage={setSelectedManagedVariableEntry}
+                        onClose={() => setIsVariableManageOpen(false)}
+                    />
+                )}
+                {isArrayInspectorOpen && !!selectedVariableDefinition?.itemId && (
+                    <WiredArrayInspectorView
+                        definitionItemId={selectedVariableDefinition.itemId}
+                        variableName={selectedVariableDefinition.key}
+                        variableType={wiredArrayVariableTypeOf(variablesType)}
+                        onClose={() => setIsArrayInspectorOpen(false)}
+                    />
+                )}
+                {isRoomLogsOpen && <WiredRoomLogsView onClose={() => setIsRoomLogsOpen(false)} />}
+                {isSelfDonationOpen && <WiredSelfDonationView onClose={() => setIsSelfDonationOpen(false)} />}
+                {!!selectedManagedVariableEntry && !!selectedVariableDefinition && (
+                    <WiredVariableHolderPanelView
+                        title={managedHolderPanelTitle}
+                        warningText={managedHolderWarningText}
+                        onRefresh={() => requestUserVariables()}
+                        onClose={() => setSelectedManagedVariableEntry(null)}
+                        preview={
+                            <>
+                                {variablesType === 'furni' && roomSession && (
+                                    <LayoutRoomObjectImageView
+                                        category={managedHolderFurniCategory}
+                                        objectId={selectedManagedVariableEntry.entityId}
+                                        roomId={roomSession.roomId}
                                     />
-                                    <Button disabled={!canGiveManagedHolderVariable} variant="secondary" onClick={() => giveManagedHolderVariable()}>
-                                        Create
-                                    </Button>
+                                )}
+                                {variablesType === 'user' && managedHolderUserData && (
+                                    <>
+                                        {managedHolderUserData.type === RoomObjectType.PET ? (
+                                            <LayoutPetImageView direction={2} figure={managedHolderUserData.figure} />
+                                        ) : (
+                                            <LayoutAvatarImageView direction={2} figure={managedHolderUserData.figure} />
+                                        )}
+                                    </>
+                                )}
+                                {variablesType === 'global' && (
+                                    <img alt={localizeWithFallback('octane.wired_tools.global_placeholder', 'Global placeholder')} className="max-w-full max-h-full object-contain p-3" src={wiredGlobalPlaceholderImage} />
+                                )}
+                            </>
+                        }
+                        infoLines={managedHolderInfoLines}
+                        variablesTitle={variablesType === 'global' ? localizeWithFallback('octane.wired_tools.room_variables', 'Room variables:') : localizeWithFallback('octane.wired_tools.assigned_variables', 'Assigned variables:')}
+                        entries={managedHolderVariableEntries.map((entry) => ({
+                            id: String(entry.variableItemId),
+                            name: entry.name,
+                            availability: entry.availability,
+                            hasValue: entry.hasValue,
+                            value: entry.value,
+                            isReadOnly: entry.isReadOnly
+                        }))}
+                        selectedId={selectedManagedHolderVariableEntry ? String(selectedManagedHolderVariableEntry.variableItemId) : null}
+                        onSelect={(id) => setSelectedManagedHolderVariableId(Number(id))}
+                        canEdit={roomSettings.canModify}
+                        editingId={editingManagedHolderVariableId ? String(editingManagedHolderVariableId) : null}
+                        editingValue={editingManagedHolderValue}
+                        onBeginEdit={(entry) => {
+                            setSelectedManagedHolderVariableId(Number(entry.id));
+                            setEditingManagedHolderVariableId(Number(entry.id));
+                            setEditingManagedHolderValue(String(entry.value ?? 0));
+                        }}
+                        onEditingValueChange={setEditingManagedHolderValue}
+                        onEditBlur={() => setEditingManagedHolderVariableId(0)}
+                        onEditKeyDown={onManagedHolderValueInputKeyDown}
+                        isGiveOpen={isManagedGiveOpen}
+                        onToggleGive={() => setIsManagedGiveOpen((value) => !value)}
+                        giveOptions={availableManagedHolderDefinitions.map((definition) => ({
+                            id: String(definition.itemId),
+                            name: definition.name,
+                            hasValue: !!definition.hasValue
+                        }))}
+                        giveSelectedId={selectedManagedGiveDefinition ? String(selectedManagedGiveDefinition.itemId) : ''}
+                        onGiveSelect={(id) => setManagedGiveVariableItemId(Number(id))}
+                        giveValue={managedGiveValue}
+                        onGiveValueChange={setManagedGiveValue}
+                        canGive={canGiveManagedHolderVariable}
+                        onGive={() => giveManagedHolderVariable()}
+                        canRemove={canRemoveManagedHolderVariable}
+                        onRemove={() => removeManagedHolderVariable()}
+                    />
+                )}
+                {!!selectedMonitorErrorInfo && (
+                    <OctaneCardView
+                        className="octane-wired-menu min-w-[470px] max-w-[470px] max-h-[500px]"
+                        theme="primary-slim"
+                        uniqueKey="wired-monitor-error-info"
+                        windowPosition={DraggableWindowPosition.TOP_LEFT}
+                        offsetLeft={660}
+                        offsetTop={120}
+                    >
+                        <OctaneCardHeaderView
+                            headerText={localizeWithFallback('wiredmenu.error_info.title', 'Wired Error Information')}
+                            onCloseClick={() => {
+                                setSelectedMonitorErrorType(null);
+                                setSelectedMonitorLogDetails(null);
+                            }}
+                        />
+                        <OctaneCardContentView className="text-black bg-[#f4efe3] p-4 flex flex-col gap-3 overflow-y-auto">
+                            <div className="flex items-start justify-between gap-3">
+                                <Text bold>{selectedMonitorErrorInfo.title}</Text>
+                                <span
+                                    className={`rounded px-2 py-[2px] text-[10px] font-semibold ${(selectedMonitorLogDetails?.severity ?? selectedMonitorErrorInfo.severity) === 'WARNING' ? 'bg-[#d4f0d0] text-[#2a6a24]' : 'bg-[#f6d7d7] text-[#8c2424]'}`}
+                                >
+                                    {selectedMonitorLogDetails?.severity ?? selectedMonitorErrorInfo.severity}
+                                </span>
+                            </div>
+                            {!!selectedMonitorLogDetails && (
+                                <div className="rounded border border-[#d8d2c3] bg-white/60 p-3 flex flex-col gap-1">
+                                    <Text>
+                                        <b>{localizeWithFallback('octane.wired_tools.trigger_2', 'Trigger:')}</b> {selectedMonitorDetailSource}
+                                    </Text>
+                                    <Text>
+                                        <b>{localizeWithFallback('octane.wired_tools.motivation_2', 'Motivation:')}</b> {selectedMonitorLogDetails.reason}
+                                    </Text>
+                                    {!!selectedMonitorLogDetails.amount && (
+                                        <Text>
+                                            <b>{localizeWithFallback('octane.wired_tools.amount_2', 'Amount:')}</b> {selectedMonitorLogDetails.amount}
+                                        </Text>
+                                    )}
+                                    {!!selectedMonitorLogDetails.latest && (
+                                        <Text>
+                                            <b>{localizeWithFallback('octane.wired_tools.latest_occurrence', 'Latest occurrence:')}</b> {selectedMonitorLogDetails.latest}
+                                        </Text>
+                                    )}
+                                    {!!selectedMonitorLogDetails.occurredAt && (
+                                        <Text>
+                                            <b>{localizeWithFallback('octane.wired_tools.occurred_at_2', 'Occurred at:')}</b> {selectedMonitorLogDetails.occurredAt}
+                                        </Text>
+                                    )}
                                 </div>
                             )}
-                            <Button disabled={!canRemoveManagedHolderVariable} variant="secondary" onClick={() => removeManagedHolderVariable()}>
-                                Remove variable
-                            </Button>
-                            <Button disabled={!canGiveManagedHolderVariable} variant="secondary" onClick={() => setIsManagedGiveOpen((value) => !value)}>
-                                Give variable
-                            </Button>
-                        </div>
-                    </NitroCardContentView>
-                </NitroCardView>
-            )}
-            {!!selectedMonitorErrorInfo && (
-                <NitroCardView
-                    className="min-w-[470px] max-w-[470px] max-h-[500px]"
-                    theme="primary-slim"
-                    uniqueKey="wired-monitor-error-info"
-                    windowPosition={DraggableWindowPosition.TOP_LEFT}
-                    offsetLeft={660}
-                    offsetTop={120}
-                >
-                    <NitroCardHeaderView
-                        headerText="Wired Error Information"
-                        onCloseClick={() => {
-                            setSelectedMonitorErrorType(null);
-                            setSelectedMonitorLogDetails(null);
-                        }}
-                    />
-                    <NitroCardContentView className="text-black bg-[#f4efe3] p-4 flex flex-col gap-3 overflow-y-auto">
-                        <div className="flex items-start justify-between gap-3">
-                            <Text bold>{selectedMonitorErrorInfo.title}</Text>
-                            <span
-                                className={`rounded px-2 py-[2px] text-[10px] font-semibold ${(selectedMonitorLogDetails?.severity ?? selectedMonitorErrorInfo.severity) === 'WARNING' ? 'bg-[#d4f0d0] text-[#2a6a24]' : 'bg-[#f6d7d7] text-[#8c2424]'}`}
-                            >
-                                {selectedMonitorLogDetails?.severity ?? selectedMonitorErrorInfo.severity}
-                            </span>
-                        </div>
-                        {!!selectedMonitorLogDetails && (
-                            <div className="rounded border border-[#d8d2c3] bg-white/60 p-3 flex flex-col gap-1">
-                                <Text>
-                                    <b>Trigger:</b> {selectedMonitorDetailSource}
-                                </Text>
-                                <Text>
-                                    <b>Motivation:</b> {selectedMonitorLogDetails.reason}
-                                </Text>
-                                {!!selectedMonitorLogDetails.amount && (
-                                    <Text>
-                                        <b>Amount:</b> {selectedMonitorLogDetails.amount}
-                                    </Text>
-                                )}
-                                {!!selectedMonitorLogDetails.latest && (
-                                    <Text>
-                                        <b>Latest occurrence:</b> {selectedMonitorLogDetails.latest}
-                                    </Text>
-                                )}
-                                {!!selectedMonitorLogDetails.occurredAt && (
-                                    <Text>
-                                        <b>Occurred at:</b> {selectedMonitorLogDetails.occurredAt}
-                                    </Text>
-                                )}
-                            </div>
-                        )}
-                        {selectedMonitorErrorInfo.description.map((paragraph, index) => (
-                            <Text key={index}>{paragraph}</Text>
-                        ))}
-                    </NitroCardContentView>
-                </NitroCardView>
-            )}
-        </>
+                            {selectedMonitorErrorInfo.description.map((paragraph, index) => (
+                                <Text key={index}>{paragraph}</Text>
+                            ))}
+                        </OctaneCardContentView>
+                    </OctaneCardView>
+                )}
+            </>
+        </NativeTextTree>
     );
 };

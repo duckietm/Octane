@@ -1,0 +1,235 @@
+/*
+ * The catalogue's text as AIR draws it (catalog_ubuntu_with_tabs, layout_default_ubuntu, gridItem_with_price,
+ * purchaseWidget). Loaded after the other catalogue sheets.
+ *
+ * AIR's catalogue is set in Ubuntu: u_regular 12 px for text, u_bold 12 px for the navigation, u_italic 12 px
+ * #666666 for hints, u_headline_big 18 px for the page title, u_headline_small 14 px for "Select an item".
+ * Our `Ubuntu` face is the condensed cut (Ubuntu-C), so the whole window takes the regular one; the few places
+ * that are condensed or Volter in AIR too keep their own face.
+ */
+
+.octane-catalog-window {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.octane-catalog-window
+    :where(*):not(svg, svg *, .layout-item-count, .octane-catalog-air-frontpage__title, .octane-catalog-air-bc__item-head, .octane-catalog-air-info__recycler-title, .octane-catalog-air-info__recycler-title *) {
+    font-family: inherit !important;
+}
+
+/* Tabs: u_button_tab, 12 px regular. */
+.octane-catalog-window .octane-card-tab-item,
+.octane-catalog-window .octane-catalog-tab-label {
+    font-size: 12px !important;
+}
+
+/* search.helper / search.input: 12 px, #666666. */
+.octane-catalog-window .octane-catalog-search-shell input {
+    color: #666666 !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+}
+
+.octane-catalog-window .octane-catalog-search-shell input::placeholder {
+    color: #666666;
+    opacity: 1;
+}
+
+/* normal_topitem_template: u_bold 12 px #666666 etched #b4b4ae; normal_subitem_template: bold italic #52819a. */
+.octane-catalog-window .octane-catalog-navigation-item {
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.octane-catalog-window .octane-catalog-navigation-label {
+    color: inherit !important;
+}
+
+/* The highlighted row (item_hilight_inner #63c5e9) carries white text. */
+.octane-catalog-window .octane-catalog-navigation-item.is-active {
+    color: #ffffff;
+    text-shadow: none;
+}
+
+/* layout_default: the page text and the "select a product" hint are u_regular / u_italic 12 px. */
+.octane-catalog-window .octane-catalog-welcome,
+.octane-catalog-window .octane-catalog-welcome > * {
+    font-size: 12px !important;
+    line-height: 16px;
+}
+
+/* ctlg_text: AIR draws the page text black, not muted. */
+.octane-catalog-window .octane-catalog-welcome > :not(img) {
+    color: #000000 !important;
+}
+
+/* gridItem_with_price: the price is 12 px bold. */
+.octane-catalog-window .octane-catalog-grid-price,
+.octane-catalog-window .octane-catalog-grid-price-entry {
+    font-size: 12px !important;
+    font-weight: 700;
+}
+
+/* purchaseWidget selection_information: u_headline_small, 14 px bold #666666. */
+.octane-catalog-window .octane-catalog-purchase-selection-prompt {
+    color: #666666;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+}
+
+/*
+ * Buttons as AIR skins them. Only the purchase widget's buy_button (container_button tinted 0x00aa00), the
+ * recycler's recycler_recycle (button style 6) and the VIP / confirmation buy buttons are green; everything else
+ * is the grey button (style 3, habbo_skin_button_shiny, button_shiny_regular 12 px black) or button_thick
+ * (habbo_skin_button_shiny_thick, button_shiny_bold 12 px black).
+ */
+
+/* purchaseWidget buy_button: purchase_label 12 px bold white. gift_button: button_shiny_regular, 12 px black. */
+.octane-catalog-window .octane-catalog-standard-buy-button {
+    font-size: 12px !important;
+}
+
+.octane-catalog-window .octane-catalog-standard-gift-button {
+    color: #000000 !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+/* purchaseWidgetBuyVipStub: ctlg_widget_get_club_text u_regular 12 px black and the grey button_thick
+   ctlg_buy_club_button (122 x 24), not the green buy button. */
+.octane-catalog-window .octane-catalog-club-upgrade-caption {
+    color: #000000;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.octane-catalog-window .octane-catalog-club-upgrade-button {
+    min-width: 122px;
+    height: 24px !important;
+    border-width: 5px !important;
+    border-image-source: var(--habbo-skin-shiny-thick) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    color: #000000 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+}
+
+.octane-catalog-window .octane-catalog-club-upgrade-button:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-hover) !important;
+}
+
+.octane-catalog-window .octane-catalog-club-upgrade-button:active {
+    border-image-source: var(--habbo-skin-shiny-thick-pressed) !important;
+}
+
+/* recyclerWidget recycler_recycle: button style 6 tinted 0x00aa00, button_shiny_regular in white. */
+.octane-catalog-window .octane-catalog-air-recycler .octane-catalog-air-recycler__recycle {
+    border-width: 5px !important;
+    border-image-source: var(--habbo-skin-shiny-green) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    color: #ffffff !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+.octane-catalog-window .octane-catalog-air-recycler .octane-catalog-air-recycler__recycle:hover {
+    border-image-source: var(--habbo-skin-shiny-green-hover) !important;
+}
+
+.octane-catalog-window .octane-catalog-air-recycler .octane-catalog-air-recycler__recycle:active {
+    border-image-source: var(--habbo-skin-shiny-green-pressed) !important;
+}
+
+.octane-catalog-window .octane-catalog-air-recycler .octane-catalog-air-recycler__recycle:disabled {
+    border-image-source: var(--habbo-skin-shiny-green-disabled) !important;
+    color: #e8f8e8 !important;
+}
+
+/* ctlg_soundmachine listen: grey button (66 x 22), button_shiny_regular 12 px black. */
+.octane-catalog-window .octane-catalog-sound-listen-button {
+    border: 5px solid transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 12px !important;
+    text-shadow: none !important;
+}
+
+.octane-catalog-window .octane-catalog-sound-listen-button:hover:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-hover) !important;
+    background: transparent !important;
+}
+
+.octane-catalog-window .octane-catalog-sound-listen-button:active:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/*
+ * redeemItemCodeWidget redeem, ctlg_guild_frontpage start_guild_purchase and guildSelectorWidget find_groups_button
+ * are grey `button`s (style 3), but the common Button renders the green .habbo-btn-primary. Its skin and the
+ * Button's 12.6 px bold size are important rules, which only an important rule in the earlier base layer outranks.
+ */
+@layer base {
+    .octane-catalog-window .octane-catalog-guild-join-btn.habbo-btn-primary {
+        border-width: 5px !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .octane-catalog-window :where(.octane-catalog-redeem-button, .octane-catalog-air-info__guild-buy, .octane-catalog-guild-join-btn).habbo-btn-primary {
+        border-image-source: var(--habbo-skin-shiny) !important;
+        color: #000000 !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        text-shadow: none !important;
+    }
+
+    .octane-catalog-window :where(.octane-catalog-redeem-button, .octane-catalog-air-info__guild-buy, .octane-catalog-guild-join-btn).habbo-btn-primary:hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    .octane-catalog-window :where(.octane-catalog-redeem-button, .octane-catalog-air-info__guild-buy, .octane-catalog-guild-join-btn).habbo-btn-primary:active {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+
+    .octane-catalog-window :where(.octane-catalog-redeem-button, .octane-catalog-air-info__guild-buy, .octane-catalog-guild-join-btn).habbo-btn-primary:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-disabled) !important;
+        color: #777777 !important;
+    }
+}
+
+/* targeted_offer_window btn_buy: button_thick style 6 with color 0x4faf4f (not the theme's 0x00aa00): the grey
+   habbo_skin_button_shiny_thick multiplied by 0x4faf4f, white button_shiny_bold 12 px caption. */
+@layer base {
+    .octane-targeted-offer .octane-targeted-offer__buy.habbo-btn-primary {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-4faf4f) !important;
+        color: #ffffff !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+    }
+
+    .octane-targeted-offer .octane-targeted-offer__buy.habbo-btn-primary:hover {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-4faf4f-hover) !important;
+    }
+
+    .octane-targeted-offer .octane-targeted-offer__buy.habbo-btn-primary:is(:active, .active) {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-4faf4f-pressed) !important;
+    }
+
+    .octane-targeted-offer .octane-targeted-offer__buy.habbo-btn-primary:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-4faf4f-disabled) !important;
+    }
+}

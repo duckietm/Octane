@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveLocalized } from './localizeWithFallback';
+import { fillPlaceholders, resolveLocalized } from './localizeWithFallback';
 
 /**
  * The localization manager returns the KEY itself when a translation is missing
@@ -21,5 +21,16 @@ describe('resolveLocalized', () => {
     it('returns the fallback for empty / null text', () => {
         expect(resolveLocalized('', 'some.key', 'FB')).toBe('FB');
         expect(resolveLocalized(null as unknown as string, 'some.key', 'FB')).toBe('FB');
+    });
+});
+
+describe('fillPlaceholders', () => {
+    it('fills every placeholder of the fallback, case-insensitive', () => {
+        expect(fillPlaceholders('%count% of %Total% (%count%)', ['count', 'total'], ['3', '10'])).toBe('3 of 10 (3)');
+    });
+
+    it('leaves the text alone without parameters and keeps a replacement with $ as typed', () => {
+        expect(fillPlaceholders('%count% items')).toBe('%count% items');
+        expect(fillPlaceholders('Price %price%', ['price'], ['$&5'])).toBe('Price $&5');
     });
 });

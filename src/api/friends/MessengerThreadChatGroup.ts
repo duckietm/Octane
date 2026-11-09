@@ -12,6 +12,15 @@ export class MessengerThreadChatGroup {
         this._type = type;
     }
 
+    /** A copy with its own list of copied lines. */
+    public clone(): MessengerThreadChatGroup {
+        const copy = new MessengerThreadChatGroup(this._userId, this._type);
+
+        copy._chats = this._chats.map((chat) => chat.clone());
+
+        return copy;
+    }
+
     public addChat(message: MessengerThreadChat): void {
         this._chats.push(message);
     }

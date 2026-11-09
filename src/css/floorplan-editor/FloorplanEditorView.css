@@ -1,0 +1,638 @@
+/*
+ * Floor plan editor in the AIR layout (floor_plan_editor_bc, 662x600): an Ubuntu (style 3) frame tinted 0xff8d00, the
+ * subtitle strip (0x4e4844 / 0x2d2724), two 0xbdbdb5 panels (plan 344x448, preview 289x449) and 120x35 button_thick
+ * buttons with button_shiny_bold captions. Texts are u_regular 12 px black; our `Ubuntu` face is the condensed cut, so
+ * the window takes the regular one.
+ */
+.octane-floorplan-window {
+    --fp-text: #000000;
+    --fp-panel: #bdbdb5;
+    --fp-tool: #dbdbd6;
+    --fp-tool-top: #ffffff;
+    --fp-tool-bottom: #9a9a92;
+    --fp-tool-active: #8fa3b0;
+    --fp-select: #f0f0ec;
+    --fp-blue: #0bb3e3;
+    --fp-blue-dark: #077d9f;
+    --fp-frame: #262626;
+
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    color: var(--fp-text);
+    background: #ece8dc !important;
+}
+
+/* The frame caption bar in the editor's orange (frame colour 0xff8d00), at the standard frame height. */
+.octane-floorplan-window .octane-card-header-shell {
+    background: linear-gradient(#ffa52e 0 50%, #ff8d00 50% 100%);
+    border-bottom: 1px solid #1a1a1a;
+    box-shadow: none;
+}
+
+.octane-floorplan-window .octane-card-title {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    /* The shared card rules set 13 px with a longer selector. */
+    font-size: 12px !important;
+    font-weight: 700;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.octane-floorplan-window .octane-card-content-shell {
+    padding: 0 !important;
+}
+
+.fp-body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+}
+
+/* The subtitle strip: 0x4e4844 with a 0x2d2724 inner box, u_small 10 px white subtitle. */
+.fp-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+    height: 46px;
+    margin: 2px 3px 0;
+    padding: 0 10px;
+    border: 3px solid #4e4844;
+    border-radius: 3px;
+    background: #2d2724;
+    box-sizing: border-box;
+}
+
+.fp-banner-logo {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    background: url("@/assets/images/floorplaneditor/icon-tile-set.png") center / contain no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-floorplan-window .fp-banner-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    color: #ffffff !important;
+    font-size: 10px;
+    line-height: 12px;
+}
+
+.fp-banner-toggles {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.fp-panels {
+    display: grid;
+    grid-template-columns: 344px 289px;
+    gap: 12px;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 7px 10px 0;
+}
+
+.fp-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    min-height: 0;
+    padding: 4px 6px 6px;
+    border-radius: 3px;
+    background: var(--fp-panel);
+    box-sizing: border-box;
+}
+
+.fp-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.fp-control-group.is-centered {
+    align-items: center;
+}
+
+/* draw.mode, enter.direction, room.options: u_regular 12 px. */
+.fp-group-label {
+    font-size: 12px;
+    line-height: 17px;
+    color: var(--fp-text);
+    white-space: nowrap;
+}
+
+.fp-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 4px 6px;
+}
+
+/* buttons_itemlist: 51x42 container buttons with the 40x40 tool icons. */
+.fp-tool {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 51px;
+    height: 42px;
+    padding: 0;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: 1px solid #8b8b84;
+    border-radius: 4px;
+    background: linear-gradient(var(--fp-tool-top), var(--fp-tool));
+    color: #4a4a4a;
+    user-select: none;
+}
+
+.fp-tool.is-gap {
+    margin-left: 6px;
+}
+
+.fp-tool:hover {
+    background: #ffffff;
+}
+
+.fp-tool.is-active {
+    background: var(--fp-tool-active);
+    border-color: #4d6270;
+    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.3);
+    color: #1d2a36;
+}
+
+.fp-tool.is-disabled {
+    cursor: not-allowed;
+    color: #a0a0a0;
+    opacity: 0.6;
+}
+
+.fp-tool .octane-icon {
+    display: block;
+    flex: 0 0 auto;
+}
+
+/* Octane's extra tools (select all, rectangle, hand, undo, redo) sit in a smaller second row. */
+.fp-tools.is-extra {
+    gap: 4px;
+}
+
+.fp-tool.is-extra {
+    width: 32px;
+    height: 28px;
+}
+
+/* The 40x40 icons drawn at 24x24: a smooth scale, since a transform of pixel-art left them jagged. */
+.fp-tool.is-extra .octane-icon {
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    background-position: center;
+    image-rendering: auto;
+}
+
+.fp-orientation {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 72px;
+}
+
+/* enterdirection_ghost_avatar: a 45x72 small avatar facing the door direction. */
+/* position: relative, because the fit avatar image fills its nearest positioned ancestor. */
+.fp-orientation-avatar {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 45px;
+    height: 72px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+/* The small fit avatar sits at the bottom of its box by default; centre it on the arrows instead. */
+.fp-orientation-avatar img {
+    object-position: center;
+}
+
+
+.fp-orientation-step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 1px solid #8b8b84;
+    border-radius: 4px;
+    background: linear-gradient(#ffffff, #dbdbd6);
+    cursor: pointer;
+    color: #3a3a3a;
+}
+
+.fp-orientation-step:hover {
+    background: #ffffff;
+}
+
+.fp-orientation .octane-icon {
+    cursor: pointer;
+}
+
+/* wall_thickness_drop / floor_thickness_drop: 114x25 dropmenus, u_regular 12 px. */
+.fp-select {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 114px;
+    height: 25px;
+    box-sizing: border-box;
+    padding: 0 20px 0 6px;
+    border: 1px solid #8b8b84;
+    border-radius: 3px;
+    background: var(--fp-select);
+    font-size: 12px;
+    color: var(--fp-text);
+    user-select: none;
+    white-space: nowrap;
+}
+
+.fp-select > button {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fp-select-arrows {
+    position: absolute;
+    right: 5px;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+}
+
+.fp-select-arrow {
+    width: 0;
+    height: 0;
+    padding: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    cursor: pointer;
+}
+
+.fp-select-arrow.is-up {
+    border-bottom: 5px solid #3a3a3a;
+}
+
+.fp-select-arrow.is-down {
+    border-top: 5px solid #3a3a3a;
+}
+
+.fp-select-arrow.is-disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+/* room_controls_itemlist: enter direction on the left, room options on the right. */
+.fp-options {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #a3a39b;
+}
+
+.fp-options .fp-control-group.is-right {
+    align-items: flex-start;
+}
+
+.fp-panel-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 22px;
+    flex: 0 0 auto;
+}
+
+/* wall_height_number: u_bold 12 px 0x5f5f5f; the brush height uses the same look. */
+.fp-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 3px;
+    border-radius: 3px;
+    background: #ffffff;
+    color: #5f5f5f;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    box-sizing: border-box;
+}
+
+.fp-badge.is-brush {
+    box-shadow: inset 0 0 0 1px var(--fp-blue);
+}
+
+/* tile_height_text / wall_height_text: u_regular 12 px. */
+.fp-panel-title {
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.fp-panel-info {
+    margin-left: auto;
+    font-size: 12px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.fp-panel-body {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+/* The shared card content rules set buttons to 11.5 px; the editor's controls are u_regular / button_shiny_bold 12 px. */
+.octane-floorplan-window .octane-card-content-shell :is(.fp-btn, .fp-select button) {
+    font-size: 12px;
+}
+
+.octane-floorplan-window .octane-card-content-shell .fp-toggle {
+    font-size: 10px;
+}
+
+/* Horizontal sliders: tile_height_colormap (315x19) and the wall height slider (111 wide). The control spans the
+   segment centres (half a segment in from each end), the track the full bar. */
+.fp-hslider {
+    position: relative;
+    flex: 0 0 auto;
+    height: 26px;
+    touch-action: none;
+    user-select: none;
+}
+
+.fp-hslider.is-ladder {
+    flex: 1 1 auto;
+    min-width: 80px;
+    height: 22px;
+}
+
+.fp-hslider .octane-slider-bare-control {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(100% / var(--fp-count) / 2);
+    right: calc(100% / var(--fp-count) / 2);
+}
+
+.fp-hslider-track {
+    position: absolute;
+    top: 0;
+    height: 19px;
+    left: calc(-100% / (2 * (var(--fp-count) - 1)));
+    right: calc(-100% / (2 * (var(--fp-count) - 1)));
+    border: 1px solid #5f5f5f;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.fp-hslider.is-ladder .fp-hslider-track {
+    top: 8px;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(#5f5f5f, #8a8a84);
+}
+
+/* The pointer under the bar (AIR's arrow icon turned up). */
+.fp-hslider-thumb {
+    top: 17px;
+    width: 12px;
+    height: 9px;
+    translate: -50% 0 !important;
+    cursor: pointer;
+}
+
+.fp-hslider-thumb::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 9px solid #1a1a1a;
+}
+
+.fp-hslider.is-ladder .fp-hslider-thumb {
+    top: 3px;
+    width: 12px;
+    height: 16px;
+    border: 1px solid #1a1a1a;
+    border-radius: 2px;
+    background: linear-gradient(#ffffff, #cfcfc8);
+    box-sizing: border-box;
+}
+
+.fp-hslider.is-ladder .fp-hslider-thumb::before {
+    content: none;
+}
+
+.fp-hslider-thumb:focus-within {
+    outline: 2px solid #1e90ff;
+    outline-offset: 1px;
+}
+
+.fp-stage {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    background: #000000;
+    border: 2px solid #ffffff;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.fp-stage-buttons {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.fp-round-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #ffffff;
+    background: var(--fp-blue);
+    box-shadow: 0 0 0 2px #ffffff, inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.fp-round-btn:hover:not(:disabled) {
+    background: #2a96e6;
+}
+
+.fp-round-btn:disabled {
+    cursor: default;
+    background: #7d7d7d;
+    box-shadow: 0 0 0 2px #cfcfcf, inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.fp-round-btn.is-on {
+    background: #2fa04f;
+}
+
+.fp-round-btn.is-small {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+}
+
+/* main_buttons: reload on the left, import/export, cancel and save on the right; 120x35 button_thick, 12 px bold. */
+.fp-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex: 0 0 auto;
+    padding: 9px 12px 9px;
+}
+
+.fp-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    height: 35px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    border: 1px solid #5d5d57;
+    border-radius: 5px;
+    background: linear-gradient(#ffffff 0 45%, #e2e2dc 55% 100%);
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.fp-btn:hover {
+    background: linear-gradient(#ffffff, #efefe9);
+}
+
+/* save: the button tinted 0x0bb3e3. */
+.fp-btn.is-blue {
+    border-color: var(--fp-blue-dark);
+    background: linear-gradient(#3fc8ef 0 45%, var(--fp-blue) 55% 100%);
+    color: #ffffff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.fp-btn.is-blue:hover {
+    background: linear-gradient(#5ad3f3, #23bde8);
+}
+
+.fp-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 20px;
+    padding: 0 8px 0 4px;
+    border-radius: 10px;
+    cursor: pointer;
+    /* Octane's switches, on the subtitle strip. */
+    background: #4e4844;
+    border: 1px solid #6b635e;
+    color: #d7d2cc;
+    font-size: 10px;
+    font-weight: 700;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.fp-toggle-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #9b9b9b;
+    box-shadow: inset 0 0 0 2px #ffffff;
+}
+
+.fp-toggle.is-on {
+    color: #000000;
+    background: #d3e6f6;
+    border-color: var(--fp-blue);
+}
+
+.fp-toggle.is-on .fp-toggle-dot {
+    background: var(--fp-blue);
+}
+
+.fp-toggle.is-warm.is-on {
+    background: #fbe7c8;
+    border-color: #e59a2a;
+}
+
+.fp-toggle.is-warm.is-on .fp-toggle-dot {
+    background: #e59a2a;
+}
+
+@layer base {
+    .octane-floorplan-window :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
+
+/* preview_wrapper: AIR's flat preview bitmap on white, scrolling when the room is bigger than the panel. */
+.fp-air-preview {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    border: 1px solid #8b8b84;
+    background: #ffffff;
+}
+
+/* margin: auto centres a small room and still lets a big one scroll from its top-left corner. */
+.fp-air-preview-canvas {
+    display: block;
+    flex: 0 0 auto;
+    margin: auto;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}

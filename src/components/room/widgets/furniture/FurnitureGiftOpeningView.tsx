@@ -1,8 +1,10 @@
-import { CreateLinkEvent } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
-import { attemptItemPlacement, LocalizeText } from '../../../../api';
-import { Button, Column, LayoutGiftTagView, LayoutImage, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
-import { useFurniturePresentWidget, useInventoryFurni } from '../../../../hooks';
+import { attemptItemPlacement, CatalogPageName, LocalizeText } from '../../../../api';
+import { Button, Column, LayoutGiftTagView, LayoutImage, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
+import { useCatalogUiState, useFurniturePresentWidget, useInventoryFurni } from '../../../../hooks';
+import '../../../../css/room/FurniWindowsBAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const FurnitureGiftOpeningView: FC<{}> = (props) => {
     const {
@@ -21,6 +23,7 @@ export const FurnitureGiftOpeningView: FC<{}> = (props) => {
         onClose = null
     } = useFurniturePresentWidget();
     const { groupItems = [] } = useInventoryFurni();
+    const { setGiftReceiver = null } = useCatalogUiState();
 
     if (objectId === -1) return null;
 
@@ -32,67 +35,78 @@ export const FurnitureGiftOpeningView: FC<{}> = (props) => {
         onClose();
     };
 
+    const giveGiftBack = () => {
+        setGiftReceiver?.(senderName);
+        CreateLinkEvent(`catalog/open/${CatalogPageName.GIFT_SHOP}`);
+    };
+
     return (
-        <NitroCardView className="nitro-gift-opening" theme="primary-slim">
-            <NitroCardHeaderView
-                headerText={LocalizeText(senderName ? 'widget.furni.present.window.title_from' : 'widget.furni.present.window.title', ['name'], [senderName])}
-                onCloseClick={onClose}
-            />
-            <NitroCardContentView>
-                {placedItemId === -1 && (
-                    <Column overflow="hidden">
-                        <div className="flex justify-center items-center overflow-auto">
-                            <LayoutGiftTagView figure={senderFigure} message={text} userName={senderName} />
-                        </div>
-                        {isOwnerOfFurniture && (
-                            <div className="flex gap-1">
-                                {senderName && (
-                                    <Button fullWidth onClick={(event) => CreateLinkEvent('catalog/open')}>
-                                        {LocalizeText('widget.furni.present.give_gift', ['name'], [senderName])}
-                                    </Button>
-                                )}
-                                <Button fullWidth variant="success" onClick={openPresent}>
-                                    {LocalizeText('widget.furni.present.open_gift')}
-                                </Button>
+        <NativeTextTree>
+            <OctaneCardView className="octane-gift-opening octane-furni-gift-opening" theme="primary-slim">
+                <OctaneCardHeaderView
+                    headerText={LocalizeText(
+                        senderName ? 'widget.furni.present.window.title_from' : 'widget.furni.present.window.title',
+                        ['name'],
+                        [senderName]
+                    )}
+                    onCloseClick={onClose}
+                />
+                <OctaneCardContentView>
+                    {placedItemId === -1 && (
+                        <Column overflow="hidden">
+                            <div className="flex justify-center items-center overflow-auto">
+                                <LayoutGiftTagView figure={senderFigure} message={text} userName={senderName} />
                             </div>
-                        )}
-                    </Column>
-                )}
-                {placedItemId > -1 && (
-                    <div className="flex gap-2 overflow-hidden">
-                        <Column center className="p-2">
-                            <LayoutImage imageUrl={imageUrl} />
-                        </Column>
-                        <Column grow>
-                            <Column center gap={1}>
-                                <Text small wrap>
-                                    {LocalizeText('widget.furni.present.message_opened')}
-                                </Text>
-                                <Text bold fontSize={5}>
-                                    {text}
-                                </Text>
-                            </Column>
-                            <Column grow gap={1}>
+                            {isOwnerOfFurniture && (
                                 <div className="flex gap-1">
-                                    {placedInRoom && (
-                                        <Button fullWidth onClick={null}>
-                                            {LocalizeText('widget.furni.present.put_in_inventory')}
+                                    {senderName && (
+                                        <Button fullWidth onClick={giveGiftBack}>
+                                            {LocalizeText('widget.furni.present.give_gift', ['name'], [senderName])}
                                         </Button>
                                     )}
-                                    <Button fullWidth variant="success" onClick={(event) => place(placedItemId)}>
-                                        {LocalizeText(placedInRoom ? 'widget.furni.present.keep_in_room' : 'widget.furni.present.place_in_room')}
+                                    <Button fullWidth variant="success" onClick={openPresent}>
+                                        {LocalizeText('widget.furni.present.open_gift')}
                                     </Button>
                                 </div>
-                                {senderName && senderName.length && (
-                                    <Button fullWidth onClick={(event) => CreateLinkEvent('catalog/open')}>
-                                        {LocalizeText('widget.furni.present.give_gift', ['name'], [senderName])}
-                                    </Button>
-                                )}
-                            </Column>
+                            )}
                         </Column>
-                    </div>
-                )}
-            </NitroCardContentView>
-        </NitroCardView>
+                    )}
+                    {placedItemId > -1 && (
+                        <div className="flex gap-2 overflow-hidden">
+                            <Column center className="p-2">
+                                <LayoutImage imageUrl={imageUrl} />
+                            </Column>
+                            <Column grow>
+                                <Column center gap={1}>
+                                    <Text wrap className="octane-furni-gift-opening__message">
+                                        {LocalizeText('widget.furni.present.message_opened')}
+                                    </Text>
+                                    <Text bold className="octane-furni-gift-opening__name">
+                                        {text}
+                                    </Text>
+                                </Column>
+                                <Column grow gap={1}>
+                                    <div className="flex gap-1">
+                                        {placedInRoom && (
+                                            <Button fullWidth onClick={null}>
+                                                {LocalizeText('widget.furni.present.put_in_inventory')}
+                                            </Button>
+                                        )}
+                                        <Button fullWidth variant="success" onClick={(event) => place(placedItemId)}>
+                                            {LocalizeText(placedInRoom ? 'widget.furni.present.keep_in_room' : 'widget.furni.present.place_in_room')}
+                                        </Button>
+                                    </div>
+                                    {senderName && senderName.length && (
+                                        <Button fullWidth onClick={giveGiftBack}>
+                                            {LocalizeText('widget.furni.present.give_gift', ['name'], [senderName])}
+                                        </Button>
+                                    )}
+                                </Column>
+                            </Column>
+                        </div>
+                    )}
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

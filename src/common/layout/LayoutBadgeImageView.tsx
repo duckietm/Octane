@@ -1,6 +1,5 @@
-import { BadgeImageReadyEvent, GetEventDispatcher, GetSessionDataManager, NitroSprite, TextureUtils } from '@nitrots/nitro-renderer';
+import { BadgeImageReadyEvent, GetEventDispatcher, GetSessionDataManager, OctaneSprite, TextureUtils } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import {
     BadgeLeaderboardStat,
     ensureBadgeLeaderboardLoaded,
@@ -10,11 +9,16 @@ import {
     LocalizeBadgeName,
     LocalizeText
 } from '../../api';
+import { getBadgeRarityFromPacket, getBadgeRarityGlowColor, getBadgeRarityTier, isBadgeRarityStandaloneTier } from '../../api/badges/badgeRarity';
 import { Base, BaseProps } from '../Base';
+import { BadgeDetailsTooltip } from './BadgeDetailsTooltip';
+import { PIXEL_ART_RENDERING } from './PixelArtRendering';
 
 export interface LayoutBadgeImageViewProps extends BaseProps<HTMLDivElement> {
     badgeCode: string;
     isGroup?: boolean;
+    /** A group badge being edited: always drawn by the client, never asked from the badge imager. */
+    isPreview?: boolean;
     showInfo?: boolean;
     customTitle?: string;
     isGrayscale?: boolean;
@@ -23,19 +27,26 @@ export interface LayoutBadgeImageViewProps extends BaseProps<HTMLDivElement> {
     highlightRarity?: boolean;
 }
 
-const BADGE_RARITY_COLORS: Record<string, { glow: string; pillBackground: string; pillBorder: string; pillText: string }> = {
-    common: { glow: 'rgba(148, 163, 184, 0.55)', pillBackground: 'rgba(71, 85, 105, 0.16)', pillBorder: 'rgba(100, 116, 139, 0.45)', pillText: '#475569' },
-    rare: { glow: 'rgba(59, 130, 246, 0.7)', pillBackground: 'rgba(59, 130, 246, 0.12)', pillBorder: 'rgba(37, 99, 235, 0.38)', pillText: '#1d4ed8' },
-    epic: { glow: 'rgba(168, 85, 247, 0.72)', pillBackground: 'rgba(168, 85, 247, 0.14)', pillBorder: 'rgba(147, 51, 234, 0.4)', pillText: '#7e22ce' },
-    legendary: { glow: 'rgba(249, 115, 22, 0.76)', pillBackground: 'rgba(249, 115, 22, 0.16)', pillBorder: 'rgba(234, 88, 12, 0.4)', pillText: '#c2410c' },
-    mythical: { glow: 'rgba(236, 72, 153, 0.76)', pillBackground: 'rgba(236, 72, 153, 0.15)', pillBorder: 'rgba(219, 39, 119, 0.4)', pillText: '#be185d' },
-    unique: { glow: 'rgba(34, 197, 94, 0.76)', pillBackground: 'rgba(34, 197, 94, 0.14)', pillBorder: 'rgba(22, 163, 74, 0.4)', pillText: '#15803d' }
+/* Glow on the badge itself (highlightRarity), after the official BadgeImageWidget.playGlow:
+   nothing is drawn at rest; when the badge is set and again on mouse-over a 500ms run
+   raises the glow strength from 0 to 1 with an ease-in-out cubic and then clears it. The
+   filters are an outer glow, an inner glow and a tint towards the tier colour. Only
+   standalone tiers glow - rare and above, plus uncommon when `badge_rarity.uncommon` is on. */
+const BADGE_GLOW_DURATION_MS = 500;
+
+const glowCss = (color: number): string => {
+    const red = (color >> 16) & 0xff;
+    const green = (color >> 8) & 0xff;
+    const blue = color & 0xff;
+
+    return `rgb(${red}, ${green}, ${blue})`;
 };
 
 export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
     const {
         badgeCode = null,
         isGroup = false,
+        isPreview = false,
         showInfo = false,
         customTitle = null,
         isGrayscale = false,
@@ -48,26 +59,18 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
         ...rest
     } = props;
     const [imageElement, setImageElement] = useState<HTMLImageElement>(null);
-    const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | null>(null);
     const [badgeRarityStat, setBadgeRarityStat] = useState<BadgeLeaderboardStat>(null);
+    // The badges packet (1087) carries the official tier per worn slot; it
+    // wins over the leaderboard classification when the server sent it.
+    const packetRarity = !isGroup && badgeCode && (showRarityInfo || highlightRarity) ? getBadgeRarityFromPacket(badgeCode) : null;
     const badgeRef = useRef<HTMLDivElement>(null);
+    const [glowRun, setGlowRun] = useState(0);
+    const [glowBreathing, setGlowBreathing] = useState(false);
 
     const tooltipsEnabled = showInfo && GetConfigurationValue<boolean>('badge.descriptions.enabled', true);
-
-    const showTooltip = () => {
-        if (!tooltipsEnabled || !badgeRef.current) return;
-
-        const rect = badgeRef.current.getBoundingClientRect();
-        const tooltipWidth = 210;
-        const gap = 10;
-        let left = rect.left - tooltipWidth - gap;
-
-        if (left < gap) left = rect.right + gap;
-
-        setTooltipPosition({ top: rect.top, left });
-    };
-
-    const hideTooltip = () => setTooltipPosition(null);
+    const uncommonRarityEnabled = GetConfigurationValue<boolean>('badge_rarity.uncommon', false) === true;
+    const rarityTier = packetRarity ? packetRarity.tier : badgeRarityStat ? getBadgeRarityTier(badgeRarityStat.rarity) : null;
+    const ownerCount = packetRarity ? packetRarity.ownerCount : badgeRarityStat ? badgeRarityStat.ownerCount : 0;
 
     const getClassNames = useMemo(() => {
         const newClassNames: string[] = ['relative w-[40px] h-[40px] bg-no-repeat bg-center'];
@@ -92,43 +95,71 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
             if (scale !== 1) {
                 newStyle.transform = `scale(${scale})`;
 
-                if (!(scale % 1)) newStyle.imageRendering = 'pixelated';
+                if (!(scale % 1)) newStyle.imageRendering = PIXEL_ART_RENDERING;
 
                 newStyle.width = imageElement.width * scale;
                 newStyle.height = imageElement.height * scale;
             }
         }
 
-        if (highlightRarity && badgeRarityStat) {
-            const colors = BADGE_RARITY_COLORS[badgeRarityStat.rarity];
-
-            if (colors) {
-                newStyle.borderRadius = 8;
-                newStyle.boxShadow = `0 0 0 1px ${colors.glow}, 0 0 14px ${colors.glow}`;
-            }
+        if (highlightRarity && rarityTier !== null && isBadgeRarityStandaloneTier(rarityTier, uncommonRarityEnabled)) {
+            (newStyle as Record<string, string>)['--badge-glow'] = glowCss(getBadgeRarityGlowColor(rarityTier, uncommonRarityEnabled));
         }
 
         if (Object.keys(style).length) newStyle = { ...newStyle, ...style };
 
         return newStyle;
-    }, [badgeCode, badgeRarityStat, highlightRarity, isGroup, imageElement, scale, style]);
+    }, [badgeCode, rarityTier, highlightRarity, isGroup, imageElement, scale, style, uncommonRarityEnabled]);
 
     useEffect(() => {
         if (!badgeCode || !badgeCode.length) return;
 
         let didSetBadge = false;
+        let cancelled = false;
+        // Only the newest image counts: the loading icon read back from the GPU can finish after the real badge.
+        let latestRequest = 0;
+        const allowServerImage = !isPreview;
+
+        const showImage = (element: HTMLImageElement, request: number) => {
+            const apply = () => {
+                if (!cancelled && request === latestRequest) setImageElement(element);
+            };
+
+            if (element.complete && element.naturalWidth) apply();
+            else element.onload = apply;
+        };
+
+        // A group badge has one image URL, made once by the renderer and shared by every view. Only a renderer
+        // without it (or a badge it could not draw on a canvas) still reads the texture back from the GPU.
+        const showGroupBadge = async (texture: BadgeImageReadyEvent['image']) => {
+            const request = ++latestRequest;
+            const url = GetSessionDataManager().getGroupBadgeImageUrl?.(badgeCode, allowServerImage);
+
+            if (url) {
+                const element = new Image();
+
+                element.src = url;
+                showImage(element, request);
+
+                return;
+            }
+
+            if (!texture) return;
+
+            const sprite = new OctaneSprite(texture);
+            const element = await TextureUtils.generateImage({ target: sprite, resolution: 1 });
+
+            // Drop the wrapper only; the badge texture stays with the session data manager.
+            sprite.destroy();
+
+            if (element) showImage(element, request);
+        };
 
         const onBadgeImageReadyEvent = async (event: BadgeImageReadyEvent) => {
             if (event.badgeId !== badgeCode) return;
 
             if (isGroup) {
-                const element = await TextureUtils.generateImage(new NitroSprite(event.image));
-
-                // The generated image carries an already-decoded data-URL, so
-                // `onload` may have fired before we attach it and never run.
-                // Set immediately when complete; otherwise wait for load.
-                if (element.complete && element.naturalWidth) setImageElement(element);
-                else element.onload = () => setImageElement(element);
+                await showGroupBadge(event.image);
             } else {
                 const badgeUrl = GetConfigurationValue<string>('badge.asset.url').replace('%badgename%', badgeCode.toString());
                 const img = new Image();
@@ -144,16 +175,11 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
 
         GetEventDispatcher().addEventListener(BadgeImageReadyEvent.IMAGE_READY, onBadgeImageReadyEvent);
 
-        const texture = isGroup ? GetSessionDataManager().getGroupBadgeImage(badgeCode) : GetSessionDataManager().getBadgeImage(badgeCode);
+        const texture = isGroup ? GetSessionDataManager().getGroupBadgeImage(badgeCode, allowServerImage) : GetSessionDataManager().getBadgeImage(badgeCode);
 
         if (texture && !didSetBadge) {
             if (isGroup) {
-                (async () => {
-                    const element = await TextureUtils.generateImage(new NitroSprite(texture));
-
-                    if (element.complete && element.naturalWidth) setImageElement(element);
-                    else element.onload = () => setImageElement(element);
-                })();
+                void showGroupBadge(texture);
             } else {
                 const badgeUrl = GetConfigurationValue<string>('badge.asset.url').replace('%badgename%', badgeCode.toString());
                 const img = new Image();
@@ -163,11 +189,14 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
             }
         }
 
-        return () => GetEventDispatcher().removeEventListener(BadgeImageReadyEvent.IMAGE_READY, onBadgeImageReadyEvent);
-    }, [badgeCode, isGroup]);
+        return () => {
+            cancelled = true;
+            GetEventDispatcher().removeEventListener(BadgeImageReadyEvent.IMAGE_READY, onBadgeImageReadyEvent);
+        };
+    }, [badgeCode, isGroup, isPreview]);
 
     useEffect(() => {
-        if (isGroup || !badgeCode || (!showRarityInfo && !highlightRarity)) {
+        if (isGroup || !badgeCode || (!showRarityInfo && !highlightRarity) || getBadgeRarityFromPacket(badgeCode)) {
             setBadgeRarityStat(null);
             return;
         }
@@ -198,47 +227,72 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
         };
     }, [badgeCode, highlightRarity, isGroup, showRarityInfo]);
 
-    const rarityColors = badgeRarityStat ? BADGE_RARITY_COLORS[badgeRarityStat.rarity] : null;
-    const rarityLabel = badgeRarityStat ? LocalizeText(`badge.rarity.${badgeRarityStat.rarity}`) : '';
-    const rarityText = badgeRarityStat ? LocalizeText('badge.rarity.badge', ['rarity'], [rarityLabel]) : '';
-    const ownersText = badgeRarityStat ? LocalizeText('badge.owner_count', ['count'], [badgeRarityStat.ownerCount.toString()]) : '';
+    const canGlow = highlightRarity && rarityTier !== null && isBadgeRarityStandaloneTier(rarityTier, uncommonRarityEnabled);
+
+    // Official ExtendedProfileWindowCtrl.setSelectedBadge / showBadgeInfo: play the glow once
+    // the badge is set, and again on every mouse-over.
+    useEffect(() => {
+        if (canGlow && imageElement) setGlowRun((run) => run + 1);
+    }, [canGlow, imageElement]);
+
+    // While the pointer rests on the badge the run keeps breathing: the same curve, played
+    // back and forth, instead of the official single run.
+    const startBreathing = () => {
+        if (canGlow) setGlowBreathing(true);
+    };
+
+    const stopBreathing = () => setGlowBreathing(false);
+
+    const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+    const glowAnimation: CSSProperties = glowBreathing
+        ? { animationDuration: `${BADGE_GLOW_DURATION_MS * 2}ms`, animationIterationCount: 'infinite', animationDirection: 'alternate' }
+        : { animationDuration: `${BADGE_GLOW_DURATION_MS}ms` };
 
     return (
         <Base
             innerRef={badgeRef}
             classNames={getClassNames}
             style={getStyle}
-            onMouseEnter={tooltipsEnabled ? showTooltip : undefined}
-            onMouseLeave={tooltipsEnabled ? hideTooltip : undefined}
             {...rest}
+            onMouseEnter={() => {
+                if (tooltipsEnabled) setIsTooltipVisible(true);
+                startBreathing();
+            }}
+            onMouseLeave={() => {
+                setIsTooltipVisible(false);
+                stopBreathing();
+            }}
         >
-            {tooltipsEnabled &&
-                tooltipPosition &&
-                createPortal(
-                    <div
-                        className="fixed z-[9999] pointer-events-none select-none w-[210px] rounded-[.25rem] bg-[#fff] text-black py-1 px-2 small"
-                        style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
-                    >
-                        <div className="font-bold mb-1">{isGroup ? customTitle : LocalizeBadgeName(badgeCode)}</div>
-                        {showRarityInfo && badgeRarityStat && (
-                            <div className="flex flex-col gap-1 mb-1">
-                                <div
-                                    className="inline-flex items-center self-start rounded-full px-2 py-[2px] text-[10px] font-bold uppercase tracking-[0.04em]"
-                                    style={{
-                                        background: rarityColors.pillBackground,
-                                        border: `1px solid ${rarityColors.pillBorder}`,
-                                        color: rarityColors.pillText
-                                    }}
-                                >
-                                    {rarityText}
-                                </div>
-                                <div className="text-[10px] text-[#5f5f5f]">{ownersText}</div>
-                            </div>
-                        )}
-                        <div>{isGroup ? LocalizeText('group.badgepopup.body') : LocalizeBadgeDescription(badgeCode)}</div>
-                    </div>,
-                    document.body
-                )}
+            {canGlow && (glowRun > 0 || glowBreathing) && (
+                <span key={glowBreathing ? 'breathing' : glowRun} className="badge-glow" aria-hidden="true">
+                    {/* Breathing touches only the outline: the badge pixels stay as they are. */}
+                    <span
+                        className={`badge-glow-run${glowBreathing ? ' badge-glow-run--outline' : ''}`}
+                        style={{ ...glowAnimation, backgroundImage: getStyle.backgroundImage as string }}
+                    />
+                    {!glowBreathing && (
+                        <span
+                            className="badge-glow-tint"
+                            style={{
+                                ...glowAnimation,
+                                maskImage: getStyle.backgroundImage as string,
+                                WebkitMaskImage: getStyle.backgroundImage as string
+                            }}
+                        />
+                    )}
+                </span>
+            )}
+            {tooltipsEnabled && isTooltipVisible && (
+                <BadgeDetailsTooltip
+                    key={badgeCode}
+                    anchor={badgeRef}
+                    name={isGroup ? (customTitle ?? '') : LocalizeBadgeName(badgeCode)}
+                    description={isGroup ? LocalizeText('group.badgepopup.body') : LocalizeBadgeDescription(badgeCode)}
+                    rarityTier={showRarityInfo ? rarityTier : null}
+                    ownerCount={ownerCount}
+                    uncommonEnabled={uncommonRarityEnabled}
+                />
+            )}
             {children}
         </Base>
     );

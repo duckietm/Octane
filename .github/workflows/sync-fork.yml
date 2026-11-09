@@ -1,4 +1,4 @@
-name: Safe Sync - Nitro-V3
+name: Safe Sync - Octane
 
 on:
   schedule:
@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout Fork
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -37,8 +37,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          git remote add upstream https://github.com/duckietm/Nitro-V3.git 2>/dev/null || \
-            git remote set-url upstream https://github.com/duckietm/Nitro-V3.git
+          git remote add upstream https://github.com/duckietm/Octane.git 2>/dev/null || \
+            git remote set-url upstream https://github.com/duckietm/Octane.git
           git fetch upstream --prune
 
           for branch in $(git branch -r | grep 'upstream/' | grep -v 'HEAD'); do

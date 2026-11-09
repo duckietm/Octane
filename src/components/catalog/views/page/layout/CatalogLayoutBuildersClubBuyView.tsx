@@ -1,231 +1,229 @@
-import { ClubOfferData, PurchaseFromCatalogComposer } from '@nitrots/nitro-renderer';
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CatalogPurchaseState, LocalizeText, SanitizeHtml, SendMessageComposer } from '../../../../../api';
-import { Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, LayoutLoadingSpinnerView, Text } from '../../../../../common';
-import { CatalogEvent, CatalogPurchasedEvent, CatalogPurchaseFailureEvent } from '../../../../../events';
+import { ClubOfferData, PurchaseFromCatalogComposer } from '@octane/renderer';
+import { FC, useCallback, useRef, useState } from 'react';
+import {
+    CatalogPurchaseState,
+    GetConfigurationValue,
+    handleInternalLinkClick,
+    LocalizeText,
+    localizeWithFallback,
+    SanitizeHtmlWithInternalLinks,
+    SendMessageComposer
+} from '../../../../../api';
+import { LayoutCurrencyIcon, LayoutLoadingSpinnerView } from '../../../../../common';
+import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
+import {
+    CatalogEvent,
+    CatalogPurchasedEvent,
+    CatalogPurchaseFailureEvent,
+    CatalogPurchaseNotAllowedEvent,
+    CatalogPurchaseSoldOutEvent
+} from '../../../../../events';
 import { useCatalogData, useCatalogSkipPurchaseConfirmation, useClubOffers, usePurse, useUiEvent } from '../../../../../hooks';
-import { CatalogHeaderView } from '../../catalog-header/CatalogHeaderView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
 const BUILDERS_CLUB_WINDOW_ID = 2;
 const BUILDERS_CLUB_ADDONS_WINDOW_ID = 3;
 
-export const CatalogLayoutBuildersClubBuyView: FC<CatalogLayoutProps> = () => {
+const offerName = (offer: ClubOfferData) => {
+    const localized = LocalizeText(offer.productCode);
+
+    return localized && localized !== offer.productCode ? localized : offer.productCode.replace(/_/g, ' ');
+};
+
+/** What an offer gives: months and days of membership, or furni slots on the add-ons page. */
+const offerMeta = (offer: ClubOfferData, isAddon: boolean) => {
+    if (isAddon) {
+        const units = offer.months * 31 + offer.extraDays;
+
+        return units > 0 ? `+${units}` : '';
+    }
+
+    const parts: string[] = [];
+
+    if (offer.months > 0) parts.push(LocalizeText('catalog.vip.item.header.months', ['num_months'], [offer.months.toString()]));
+    if (offer.extraDays > 0) parts.push(LocalizeText('catalog.vip.item.header.days', ['num_days'], [offer.extraDays.toString()]));
+
+    return parts.join(' ');
+};
+
+/**
+ * AIR layout_builders_club_frontpage / _addons / _loyalty with the BuilderSubscription / BuilderAddons / BuilderLoyalty
+ * widgets, stretched over the catalog page: the description (`ctlg_description`, text 0) on top, the Builders Club art
+ * (catalogue/bc_top.png, bc_bottom.png) on the right of the add-ons and loyalty pages, and one row per offer: a header
+ * bar with the Builders Club icon and the offer's name, its price, and the buy button. AIR's front page sends players
+ * to the web shop; this hotel sells the membership in the client, so the front page lists those offers in the same
+ * rows. On the add-ons page buying needs a running membership (AIR's trial warning).
+ */
+export const CatalogLayoutBuildersClubBuyView: FC<CatalogLayoutProps> = (props) => {
+    const { page = null } = props;
+    const { secondsLeft = 0 } = useCatalogData();
+    const layout = page?.layoutCode ?? 'builders_club_frontpage';
+    const isAddon = layout === 'builders_club_addons';
+    const showArt = layout !== 'builders_club_frontpage';
+    const { data: offers = null } = useClubOffers(isAddon ? BUILDERS_CLUB_ADDONS_WINDOW_ID : BUILDERS_CLUB_WINDOW_ID);
+    const { getCurrencyAmount = null } = usePurse();
+    const [catalogSkipPurchaseConfirmation] = useCatalogSkipPurchaseConfirmation();
     const [pendingOffer, setPendingOffer] = useState<ClubOfferData>(null);
     const [purchaseState, setPurchaseState] = useState(CatalogPurchaseState.NONE);
-    const [catalogSkipPurchaseConfirmation] = useCatalogSkipPurchaseConfirmation();
-    const { currentPage = null } = useCatalogData();
-    const { getCurrencyAmount = null } = usePurse();
     const isPurchasingRef = useRef(false);
-    const isAddonLayout = currentPage?.layoutCode === 'builders_club_addons';
-    const windowId = isAddonLayout ? BUILDERS_CLUB_ADDONS_WINDOW_ID : BUILDERS_CLUB_WINDOW_ID;
-    const { data: offers = null } = useClubOffers(windowId);
+    const imageLibraryUrl = GetConfigurationValue<string>('image.library.url', '');
+    const isMember = secondsLeft > 0;
+    const description = page?.localization?.getText(0) || page?.localization?.getText(1) || '';
 
     const onCatalogEvent = useCallback((event: CatalogEvent) => {
-        switch (event.type) {
-            case CatalogPurchasedEvent.PURCHASE_SUCCESS:
-                isPurchasingRef.current = false;
-                setPurchaseState(CatalogPurchaseState.NONE);
-                return;
-            case CatalogPurchaseFailureEvent.PURCHASE_FAILED:
-                isPurchasingRef.current = false;
-                setPurchaseState(CatalogPurchaseState.FAILED);
-                return;
-        }
+        if (!isPurchasingRef.current) return;
+
+        isPurchasingRef.current = false;
+        setPurchaseState(event.type === CatalogPurchasedEvent.PURCHASE_SUCCESS ? CatalogPurchaseState.NONE : CatalogPurchaseState.FAILED);
     }, []);
 
     useUiEvent(CatalogPurchasedEvent.PURCHASE_SUCCESS, onCatalogEvent);
     useUiEvent(CatalogPurchaseFailureEvent.PURCHASE_FAILED, onCatalogEvent);
+    // "Not allowed" and "sold out" end the purchase too: they used to leave it pending until the catalog closed.
+    useUiEvent(CatalogPurchaseNotAllowedEvent.NOT_ALLOWED, onCatalogEvent);
+    useUiEvent(CatalogPurchaseSoldOutEvent.SOLD_OUT, onCatalogEvent);
 
-    const getOfferTotalUnits = useCallback((offer: ClubOfferData) => {
-        if (!offer) return 0;
-
-        return offer.months * 31 + offer.extraDays;
-    }, []);
-
-    const getOfferName = useCallback((offer: ClubOfferData) => {
-        if (!offer) return '';
-
-        const localized = LocalizeText(offer.productCode);
-
-        if (localized && localized !== offer.productCode) return localized;
-
-        return offer.productCode.replace(/_/g, ' ');
-    }, []);
-
-    const getOfferMeta = useCallback(
-        (offer: ClubOfferData) => {
-            if (!offer) return '';
-
-            if (isAddonLayout) {
-                const units = getOfferTotalUnits(offer);
-
-                return units > 0 ? `+${units}` : '';
-            }
-
-            const parts: string[] = [];
-
-            if (offer.months > 0) parts.push(LocalizeText('catalog.vip.item.header.months', ['num_months'], [offer.months.toString()]));
-            if (offer.extraDays > 0) parts.push(LocalizeText('catalog.vip.item.header.days', ['num_days'], [offer.extraDays.toString()]));
-
-            return parts.join(' ');
-        },
-        [getOfferTotalUnits, isAddonLayout]
-    );
-
-    const purchaseOffer = useCallback(() => {
-        if (!pendingOffer || !currentPage || isPurchasingRef.current) return;
+    const purchase = (offer: ClubOfferData) => {
+        if (!page || isPurchasingRef.current) return;
 
         isPurchasingRef.current = true;
+        setPendingOffer(offer);
         setPurchaseState(CatalogPurchaseState.PURCHASE);
-        SendMessageComposer(new PurchaseFromCatalogComposer(currentPage.pageId, pendingOffer.offerId, null, 1));
-    }, [pendingOffer, currentPage]);
+        SendMessageComposer(new PurchaseFromCatalogComposer(page.pageId, offer.offerId, null, 1));
+    };
 
-    const getPurchaseButton = useCallback(() => {
-        if (!pendingOffer) return null;
+    const canAfford = (offer: ClubOfferData) =>
+        offer.priceCredits <= (getCurrencyAmount?.(-1) ?? 0) && offer.priceActivityPoints <= (getCurrencyAmount?.(offer.priceActivityPointsType) ?? 0);
 
-        if (pendingOffer.priceCredits > getCurrencyAmount(-1)) {
+    const buyButton = (offer: ClubOfferData) => {
+        const isPending = pendingOffer?.offerId === offer.offerId;
+        const state = isPending ? purchaseState : CatalogPurchaseState.NONE;
+
+        if (isAddon && !isMember) {
             return (
-                <Button fullWidth variant="danger">
-                    {LocalizeText('catalog.alert.notenough.title')}
-                </Button>
+                <NativeTextTree>
+                    <BaseButton disabled className="octane-catalog-air-bc__buy">
+                        {LocalizeText('buy')}
+                    </BaseButton>
+                </NativeTextTree>
             );
         }
 
-        if (pendingOffer.priceActivityPoints > getCurrencyAmount(pendingOffer.priceActivityPointsType)) {
+        if (!canAfford(offer)) {
             return (
-                <Button fullWidth variant="danger">
-                    {LocalizeText(`catalog.alert.notenough.activitypoints.title.${pendingOffer.priceActivityPointsType}`)}
-                </Button>
+                <NativeTextTree>
+                    <BaseButton disabled className="octane-catalog-air-bc__buy is-short">
+                        {offer.priceCredits > (getCurrencyAmount?.(-1) ?? 0)
+                            ? LocalizeText('catalog.alert.notenough.title')
+                            : LocalizeText(`catalog.alert.notenough.activitypoints.title.${offer.priceActivityPointsType}`)}
+                    </BaseButton>
+                </NativeTextTree>
             );
         }
 
-        switch (purchaseState) {
+        switch (state) {
             case CatalogPurchaseState.CONFIRM:
                 return (
-                    <Button fullWidth variant="warning" onClick={purchaseOffer}>
-                        {LocalizeText('catalog.marketplace.confirm_title')}
-                    </Button>
+                    <NativeTextTree>
+                        <BaseButton className="octane-catalog-air-bc__buy is-confirm" onClick={() => purchase(offer)}>
+                            {LocalizeText('catalog.marketplace.confirm_title')}
+                        </BaseButton>
+                    </NativeTextTree>
                 );
             case CatalogPurchaseState.PURCHASE:
                 return (
-                    <Button disabled fullWidth variant="primary">
-                        <LayoutLoadingSpinnerView />
-                    </Button>
+                    <NativeTextTree>
+                        <BaseButton disabled className="octane-catalog-air-bc__buy">
+                            <LayoutLoadingSpinnerView />
+                        </BaseButton>
+                    </NativeTextTree>
                 );
             case CatalogPurchaseState.FAILED:
                 return (
-                    <Button disabled fullWidth variant="danger">
-                        {LocalizeText('generic.failed')}
-                    </Button>
+                    <NativeTextTree>
+                        <BaseButton disabled className="octane-catalog-air-bc__buy is-short">
+                            {LocalizeText('generic.failed')}
+                        </BaseButton>
+                    </NativeTextTree>
                 );
-            case CatalogPurchaseState.NONE:
             default:
                 return (
-                    <Button fullWidth variant="success" onClick={() => (catalogSkipPurchaseConfirmation ? purchaseOffer() : setPurchaseState(CatalogPurchaseState.CONFIRM))}>
-                        {LocalizeText('buy')}
-                    </Button>
+                    <NativeTextTree>
+                        <BaseButton
+                            className="octane-catalog-air-bc__buy"
+                            onClick={() => {
+                                if (catalogSkipPurchaseConfirmation) {
+                                    purchase(offer);
+                                    return;
+                                }
+
+                                setPendingOffer(offer);
+                                setPurchaseState(CatalogPurchaseState.CONFIRM);
+                            }}
+                        >
+                            {LocalizeText('buy')}
+                        </BaseButton>
+                    </NativeTextTree>
                 );
         }
-    }, [getCurrencyAmount, pendingOffer, purchaseOffer, purchaseState, catalogSkipPurchaseConfirmation]);
-
-    const pageDescription = useMemo(() => {
-        if (!currentPage) return '';
-
-        return currentPage.localization.getText(1) || currentPage.localization.getText(2) || currentPage.localization.getText(0) || '';
-    }, [currentPage]);
-
-    useEffect(() => {
-        if (!offers || !offers.length) return;
-
-        setPendingOffer((prevValue) => {
-            if (prevValue && offers.some((offer) => offer.offerId === prevValue.offerId)) return prevValue;
-
-            return offers[0];
-        });
-    }, [offers]);
+    };
 
     return (
-        <div className="flex h-full flex-col gap-2">
-            {currentPage?.localization?.getImage(0) && <CatalogHeaderView imageUrl={currentPage.localization.getImage(0)} />}
-            <Grid>
-                <Column fullHeight justifyContent="between" overflow="hidden" size={7}>
-                    <Column gap={1} overflow="auto">
-                        {offers &&
-                            offers.length > 0 &&
-                            offers.map((offer, index) => {
-                                const meta = getOfferMeta(offer);
+        <NativeTextTree>
+            <div className={`octane-catalog-air-bc is-${layout.replace('builders_club_', '')}`}>
+                {!!description && (
+                    <div
+                        className="octane-catalog-air-bc__description"
+                        onClick={handleInternalLinkClick}
+                        dangerouslySetInnerHTML={{ __html: SanitizeHtmlWithInternalLinks(description) }}
+                    />
+                )}
+                <div className="octane-catalog-air-bc__list">
+                    {!offers && <LayoutLoadingSpinnerView />}
+                    {offers?.map((offer) => {
+                        const meta = offerMeta(offer, isAddon);
 
-                                return (
-                                    <LayoutGridItem
-                                        key={index}
-                                        alignItems="center"
-                                        center={false}
-                                        className="p-2"
-                                        column={false}
-                                        itemActive={pendingOffer?.offerId === offer.offerId}
-                                        justifyContent="between"
-                                        onClick={() => {
-                                            setPurchaseState(CatalogPurchaseState.NONE);
-                                            setPendingOffer(offer);
-                                        }}
-                                    >
-                                        <Column gap={0}>
-                                            <Text fontWeight="bold">{getOfferName(offer)}</Text>
-                                            {meta.length > 0 && <Text small>{meta}</Text>}
-                                        </Column>
-                                        <div className="flex flex-col gap-1">
-                                            {offer.priceCredits > 0 && (
-                                                <Flex alignItems="center" gap={1} justifyContent="end">
-                                                    <Text>{offer.priceCredits}</Text>
-                                                    <LayoutCurrencyIcon type={-1} />
-                                                </Flex>
-                                            )}
-                                            {offer.priceActivityPoints > 0 && (
-                                                <Flex alignItems="center" gap={1} justifyContent="end">
-                                                    <Text>{offer.priceActivityPoints}</Text>
-                                                    <LayoutCurrencyIcon type={offer.priceActivityPointsType} />
-                                                </Flex>
-                                            )}
-                                        </div>
-                                    </LayoutGridItem>
-                                );
-                            })}
-                    </Column>
-                </Column>
-                <Column gap={2} overflow="hidden" size={5}>
-                    <Column center grow overflow="hidden">
-                        {currentPage?.localization.getImage(1) && <img alt="" src={currentPage.localization.getImage(1)} />}
-                        {pageDescription.length > 0 && <Text center dangerouslySetInnerHTML={{ __html: SanitizeHtml(pageDescription) }} overflow="auto" />}
-                    </Column>
-                    {pendingOffer && (
-                        <Column fullWidth gap={1}>
-                            <Text fontWeight="bold">{getOfferName(pendingOffer)}</Text>
-                            {getOfferMeta(pendingOffer).length > 0 && <Text>{getOfferMeta(pendingOffer)}</Text>}
-                            <Flex alignItems="end">
-                                <Column grow gap={0}>
-                                    <Text>{currentPage?.localization.getText(0) || ''}</Text>
-                                </Column>
-                                <div className="flex flex-col gap-1">
-                                    {pendingOffer.priceCredits > 0 && (
-                                        <Flex alignItems="center" gap={1} justifyContent="end">
-                                            <Text>{pendingOffer.priceCredits}</Text>
-                                            <LayoutCurrencyIcon type={-1} />
-                                        </Flex>
-                                    )}
-                                    {pendingOffer.priceActivityPoints > 0 && (
-                                        <Flex alignItems="center" gap={1} justifyContent="end">
-                                            <Text>{pendingOffer.priceActivityPoints}</Text>
-                                            <LayoutCurrencyIcon type={pendingOffer.priceActivityPointsType} />
-                                        </Flex>
-                                    )}
+                        return (
+                            <div key={offer.offerId} className="octane-catalog-air-bc__item">
+                                <div className="octane-catalog-air-bc__item-head">
+                                    {!!imageLibraryUrl && <img alt="" draggable={false} src={`${imageLibraryUrl}catalogue/icon_193.png`} />}
+                                    <span>{offerName(offer)}</span>
                                 </div>
-                            </Flex>
-                            {getPurchaseButton()}
-                        </Column>
+                                <div className="octane-catalog-air-bc__item-body">
+                                    <div className="octane-catalog-air-bc__price">
+                                        {offer.priceCredits > 0 && (
+                                            <>
+                                                <span>{offer.priceCredits}</span>
+                                                <LayoutCurrencyIcon type={-1} />
+                                            </>
+                                        )}
+                                        {offer.priceActivityPoints > 0 && (
+                                            <>
+                                                <span>{offer.priceActivityPoints}</span>
+                                                <LayoutCurrencyIcon type={offer.priceActivityPointsType} />
+                                            </>
+                                        )}
+                                        {!!meta && <small>{meta}</small>}
+                                    </div>
+                                    {buyButton(offer)}
+                                </div>
+                            </div>
+                        );
+                    })}
+                    {isAddon && !isMember && (
+                        <div className="octane-catalog-air-bc__warning" role="status">
+                            {localizeWithFallback('builder.addon_page.warning.trial', 'You need a Builders Club membership to buy add-ons.')}
+                        </div>
                     )}
-                </Column>
-            </Grid>
-        </div>
+                </div>
+                {showArt && !!imageLibraryUrl && (
+                    <div aria-hidden="true" className="octane-catalog-air-bc__art">
+                        <img alt="" draggable={false} src={`${imageLibraryUrl}catalogue/bc_top.png`} />
+                        <img alt="" draggable={false} src={`${imageLibraryUrl}catalogue/bc_bottom.png`} />
+                    </div>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

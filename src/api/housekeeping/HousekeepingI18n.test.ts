@@ -44,7 +44,7 @@ const collectReferencedKeys = (): Set<string> => {
 
             // Skip config keys (they live in renderer config, not in
             // the localization dict).
-            const CONFIG_KEYS = new Set(['housekeeping.enabled', 'housekeeping.mode', 'housekeeping.telemetry.enabled', 'housekeeping.audit.poll_interval_ms']);
+            const CONFIG_KEYS = new Set(['housekeeping.enabled', 'housekeeping.telemetry.enabled', 'housekeeping.audit.poll_interval_ms', 'housekeeping.sanction_templates', 'housekeeping.ticket_replies', 'housekeeping.escalation', 'housekeeping.denied']);
 
             if (CONFIG_KEYS.has(cleaned)) continue;
 

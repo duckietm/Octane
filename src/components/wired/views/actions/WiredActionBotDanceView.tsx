@@ -2,11 +2,13 @@ import { FC, useEffect, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const DANCE_TYPES = [
-    { value: 0, key: null, label: 'Stop dancing' },
+    { value: 0, key: null, get label() { return localizeWithFallback('octane.wired.stop_dancing', 'Stop dancing'); } },
     { value: 1, key: 'wiredfurni.params.action.dance.1', label: 'Hap Hop' },
     { value: 2, key: 'wiredfurni.params.action.dance.2', label: 'Pogo Mogo' },
     { value: 3, key: 'wiredfurni.params.action.dance.3', label: 'Duck Funk' },
@@ -34,25 +36,27 @@ export const WiredActionBotDanceView: FC<{}> = props =>
     };
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={ true }
-            requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE }
-            save={ save }>
-            <div className="flex flex-col gap-1">
-                <Text bold>{ localizeWithFallback('wiredfurni.params.bot.name', 'Bot name') }</Text>
-                <NitroInput maxLength={ 32 } type="text" value={ botName } onChange={ event => setBotName(event.target.value) } />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>Dance</Text>
-                <select
-                    className="form-select form-select-sm"
-                    value={ danceType }
-                    onChange={ event => setDanceType(parseInt(event.target.value, 10) || 0) }>
-                    { DANCE_TYPES.map(option => (
-                        <option key={ option.value } value={ option.value }>{ option.key ? localizeWithFallback(option.key, option.label) : option.label }</option>
-                    )) }
-                </select>
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={ true }
+                requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE }
+                save={ save }>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{ localizeWithFallback('wiredfurni.params.bot.name', 'Bot name') }</Text>
+                    <OctaneInput maxLength={ 32 } type="text" value={ botName } onChange={ event => setBotName(event.target.value) } />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('octane.wired.dance', 'Dance')}</Text>
+                    <Select
+                        className="form-select form-select-sm"
+                        value={ danceType }
+                        onChange={ event => setDanceType(parseInt(event.target.value, 10) || 0) }>
+                        { DANCE_TYPES.map(option => (
+                            <option key={ option.value } value={ option.value }>{ option.key ? localizeWithFallback(option.key, option.label) : option.label }</option>
+                        )) }
+                    </Select>
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

@@ -1,10 +1,10 @@
-.nitro-use-product-confirmation {
+.octane-use-product-confirmation {
   width: min(350px, calc(100vw - 16px));
   min-width: 0;
   max-width: calc(100vw - 16px);
   max-height: calc(100vh - 16px);
 
-  .nitro-card-content-shell {
+  .octane-card-content-shell {
     max-height: calc(100vh - 72px);
     overflow: auto;
   }
@@ -31,27 +31,61 @@
 }
 
 @media (max-width: 420px) {
-  .nitro-use-product-confirmation .nitro-card-content-shell > .flex {
+  .octane-use-product-confirmation .octane-card-content-shell > .flex {
     flex-direction: column;
   }
 }
 
-.nitro-infostand {
+/* AIR user_view: border style-1 black 190px, list x=10 y=10 w=170. */
+.octane-infostand {
   position: relative;
-  width: clamp(160px, 20vw, 190px); /* Responsive width */
+  box-sizing: border-box;
+  width: 190px;
+  min-width: 190px;
+  max-width: 190px;
   z-index: 30;
   pointer-events: auto;
-  background: #212131;
-  box-shadow: inset 0 5px rgba(38, 38, 57, 0.6), inset 0 -4px rgba(25, 25, 37, 0.6);
-  border-radius: 0.5rem;
-  padding: 10px;
+  padding: 4px;
+  border: 6px solid transparent;
+  border-radius: 6px;
+  border-image-source: url('../../assets/images/habbo-skin/slices/border-black.png');
+  border-image-slice: 24;
+  border-image-width: 6px;
+  border-image-repeat: stretch;
+  background-color: #3d3d3d;
+  background-clip: padding-box;
+  box-shadow: none;
+  color: #ffffff;
+  font-family: Ubuntu, sans-serif;
+  font-size: 11px;
+  image-rendering: var(--octane-pixel-art, pixelated);
 
   @media (max-width: 576px) {
-    top: -67px;
-    padding: 8px;
-    .text {
-      font-size: 0.85rem;
-    }
+    top: 0;
+    padding: 4px;
+  }
+
+  &:has(.octane-infostand__header) {
+    width: fit-content;
+    min-width: 190px;
+    max-width: 280px;
+  }
+
+  /* A custom card background or a coloured border replaces the black AIR frame: the frame stayed as a grey ring
+     inside the border and around the background, which filled only the padding box. Without either, the frame stays. */
+  &.profile-card-background[class*='card-background-']:not(.card-background-0),
+  &:has(> .infostand-border) {
+    border-image-source: none;
+    border-color: transparent;
+    background-clip: border-box;
+  }
+
+  /* Without the frame the background reached the outer edge with square corners: the card has no border and rounds
+     its background instead, at the same outer size (10px padding = 6px frame + 4px padding). */
+  &.profile-card-background[class*='card-background-']:not(.card-background-0) {
+    padding: 10px;
+    border-width: 0;
+    border-radius: 8px;
   }
 
   .form-control-sm {
@@ -70,13 +104,279 @@
     color: inherit;
   }
 
+  .octane-infostand__close {
+    position: absolute;
+    top: 0;
+    right: -2px;
+    z-index: 2;
+    width: 18px;
+    height: 16px;
+    padding: 0;
+    border: 0;
+    background: transparent url('../../assets/images/habbo-skin/slices/close-black.png') left top / 15px 15px no-repeat;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+  }
+
+  .octane-infostand__header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-sizing: border-box;
+    min-width: 170px;
+    height: 24px;
+    padding-right: 14px;
+  }
+
+  .octane-infostand__home {
+    flex: 0 0 auto;
+    margin-left: -2px;
+    width: 16px;
+    height: 15px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+
+    img {
+      display: block;
+      width: 11px;
+      height: 10px;
+      image-rendering: var(--octane-pixel-art, pixelated);
+    }
+  }
+
+  .octane-infostand__profile-link {
+    display: flex;
+    align-items: center;
+    flex: 0 1 auto;
+    min-width: 0;
+    height: 24px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    color: #ffffff;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover .octane-infostand__identity,
+    &:hover .octane-infostand__identity .text-white {
+      color: #91c9ff;
+    }
+  }
+
+  /* AIR relationship_<type>: a 16px row with a 17x14 icon slot, a bold underlined link and the regular "others". */
+  .octane-infostand__relationship {
+    display: flex;
+    align-items: flex-start;
+    height: 16px;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 14px;
+    white-space: pre;
+    -webkit-font-smoothing: none;
+  }
+
+  .octane-infostand__relationship-icon {
+    display: flex;
+    flex: none;
+    width: 17px;
+    height: 14px;
+  }
+
+  .octane-infostand__relationship-name {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .octane-infostand__identity {
+    background: #3d3d3d;
+    color: #ffffff;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    font-weight: bold;
+    line-height: 12px;
+    -webkit-font-smoothing: none;
+  }
+
+  .octane-infostand__rule {
+    height: 1px;
+    margin: 3px 0;
+    background: #333333;
+  }
+
+  .octane-infostand__rule--footer {
+    margin-bottom: 0;
+  }
+
+  .octane-infostand__figure-row {
+    position: relative;
+    display: flex;
+    gap: 5px;
+    min-width: 170px;
+    min-height: 132px;
+  }
+
+  .octane-infostand__avatar-well {
+    position: relative;
+    display: flex;
+    flex: 0 0 67px;
+    align-items: flex-end;
+    justify-content: center;
+    width: 67px;
+    height: 130px;
+    overflow: hidden;
+    border-radius: 0;
+    background-color: transparent;
+    cursor: pointer;
+    z-index: 1;
+
+    /*
+     * The avatar is drawn with its feet 17px above the bottom of the well, while the
+     * centre of a stand's platform sits about 8px higher than that: without this the feet sink
+     * into the platform. Stands 0 (no platform), 19 and 20 (full-height pictures) keep
+     * the plain position.
+     */
+    .profile-stand:is(.stand-1, .stand-2, .stand-3, .stand-4, .stand-5, .stand-6, .stand-7, .stand-8, .stand-9, .stand-10, .stand-11, .stand-12, .stand-13, .stand-14, .stand-15, .stand-16, .stand-17, .stand-18, .stand-21) ~ .avatar-image {
+      transform: translateY(-8px);
+    }
+  }
+
+  .octane-infostand__badges {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 42px 42px;
+    grid-auto-rows: 42px;
+    gap: 1px 1px;
+    width: 85px;
+    margin-top: 1px;
+  }
+
+  .octane-infostand__badge-slot {
+    box-sizing: border-box;
+    transition: opacity 150ms ease, background-color 150ms ease;
+
+    &.is-empty {
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      opacity: 0.4;
+
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+
+    &.is-drag-over {
+      background: rgba(255, 255, 255, 0.1);
+      opacity: 1;
+    }
+  }
+
+  .octane-infostand__badge-slot-plus {
+    color: rgba(255, 255, 255, 0.75);
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 1;
+  }
+
+  .octane-infostand__motto {
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    contain: inline-size;
+    min-width: 170px;
+    min-height: 26px;
+    max-height: 53px;
+    align-items: flex-start;
+    gap: 0;
+    padding: 2px 10px 2px 20px;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .octane-infostand__motto-text {
+    box-sizing: border-box;
+    max-height: 50px;
+    padding-top: 6px;
+    overflow: hidden;
+    color: #ffffff;
+    font-size: 11px;
+    line-height: 15px;
+
+    &.is-placeholder {
+      color: #aaaaaa;
+    }
+  }
+
+  .octane-infostand__pen {
+    position: absolute;
+    top: 4px;
+    left: 3px;
+    width: 17px;
+    height: 18px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+  }
+
+  /* Achievement score: one Volter line, label and value. */
+  .octane-infostand__score {
+    display: block;
+    min-width: 170px;
+    height: 15px;
+    color: #ffffff;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    font-weight: bold;
+    line-height: 15px;
+    -webkit-font-smoothing: none;
+  }
+
+  .octane-infostand__score-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      color: #91c9ff;
+    }
+  }
+
+  /* Characters left in the motto while it is edited, in the score's Volter. */
+  .octane-infostand__motto-count {
+    flex: 0 0 auto;
+    align-self: center;
+    margin-left: 4px;
+    color: #aaaaaa;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    font-weight: bold;
+    -webkit-font-smoothing: none;
+  }
+
+  /* A user-picked prefix colour can be as dark as the card; the pixel outline
+     keeps it readable. A prefix effect sets its own shadow inline and wins. */
+  .octane-infostand__identity .prefix {
+    text-shadow: 1px 1px 0 #000000;
+  }
+
   .body-image {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    max-width: 68px;
-    border-radius: 0.5rem;
+    width: 67px;
+    max-width: 67px;
+    height: 130px;
+    border-radius: 0;
 
     &.pet {
       max-width: 75px;
@@ -115,10 +415,13 @@
   }
 
   .motto-input {
+    box-sizing: border-box;
     width: 100%;
-    height: 100%;
-    font-size: 12px;
-    padding: 0;
+    height: 23px;
+    min-height: 23px;
+    font-size: 11px;
+    line-height: 15px;
+    padding: 6px 0 0;
     outline: 0;
     border: 0;
     color: rgba(255, 255, 255, 1);
@@ -155,15 +458,88 @@
   }
 }
 
-.nitro-rarity-level {
+.octane-infostand.profile-card-background {
+  background-clip: padding-box;
+}
+
+.octane-rarity-level {
     width: 36px;
     height: 28px;
     background: url('@/assets/images/infostand/rarity-level.png');
 
     div {
+        /* AIR rarity_item_overlay_preview_xml: the level text is u_bold 0x333300, centred at y 5. */
         line-height: 28px;
         text-align: center;
-        color: #000;
+        color: #333300;
         font-weight: bold;
     }
+}
+
+/* A chosen card background replaces the flat #3d3d3d the infostand is drawn
+   for: the name loses its grey patch, text gets the one-pixel black shadow the
+   client uses for text over images, and the rules stay visible. The default
+   card is untouched. */
+.octane-infostand.profile-card-background[class*="card-background-"] {
+  .octane-infostand__identity {
+    background: transparent;
+  }
+
+  .octane-infostand__identity,
+  .octane-infostand__motto-text,
+  .octane-infostand__score,
+  .text-white {
+    text-shadow: 1px 1px 0 #000000;
+  }
+
+  .octane-infostand__rule {
+    background: rgba(0, 0, 0, 0.45);
+  }
+
+  /* The faint dashed outline drawn for the grey card vanished on a light background. */
+  .octane-infostand__badge-slot.is-empty {
+    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(0, 0, 0, 0.25);
+    opacity: 0.85;
+  }
+}
+
+/* A temporary (Wired) copy: the official spacers 0x2F4C6B on the blue panel. */
+.octane-infostand-furni--temporary hr {
+    background: #2f4c6b;
+    opacity: 1;
+}
+
+/*
+ * AIR's infostands (userview, furni_view, bot_view, pet_view) are style-0 windows: every text, input and
+ * button is Volter 9 px white, the names Volter Bold. Panels built from the shared Text/Button parts used to
+ * come out in the condensed Ubuntu at 12-13 px.
+ */
+.octane-infostand-area {
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+}
+
+.octane-infostand-area :where(*):not(svg, svg *) {
+    font-family: Volter, monospace !important;
+    font-size: 9px !important;
+}
+
+/* The infostand buttons carry an important Tailwind size; an important rule in an earlier layer (base)
+   outranks one in the utilities layer, so the AIR size is set there too. */
+@layer base {
+    .octane-infostand-area :where(*):not(svg, svg *) {
+        font-family: Volter, monospace !important;
+        font-size: 9px !important;
+    }
+}
+
+.octane-infostand-area :where(.text-sm, p, span, div, button, input, textarea) {
+    line-height: 12px;
+}
+
+.octane-infostand-area .octane-infostand__name,
+.octane-infostand-area .octane-infostand__identity {
+    font-weight: 700 !important;
 }

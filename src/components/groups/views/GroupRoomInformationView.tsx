@@ -5,16 +5,16 @@ import {
     GroupInformationComposer,
     GroupInformationEvent,
     GroupInformationParser,
-    GroupRemoveMemberComposer,
     HabboGroupDeactivatedMessageEvent,
     RoomEntryInfoMessageEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
-import { FaChevronDown } from 'react-icons/fa';
 import { GetGroupInformation, GetGroupManager, GroupMembershipType, GroupType, LocalizeText, SendMessageComposer, TryJoinGroup } from '../../../api';
-import groupIcon from '../../../assets/images/rightside/group.png';
+import groupBaseIcon from '../../../assets/images/groups/swf/group_base_icon.png';
 import { Button, Flex, LayoutBadgeImageView, Text } from '../../../common';
-import { useMessageEvent, useNotification } from '../../../hooks';
+import { useGroupLeave, useMessageEvent, useRoomEnterOnce } from '../../../hooks';
+import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 export const GroupRoomInformationView: FC<{}> = (props) => {
     const expectedGroupIdRef = useRef<number>(0);
@@ -22,8 +22,6 @@ export const GroupRoomInformationView: FC<{}> = (props) => {
     const requestRetryTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
     const [groupInformation, setGroupInformation] = useState<GroupInformationParser>(null);
     const [isOpen, setIsOpen] = useState<boolean>(true);
-    const [isCompact, setIsCompact] = useState(false);
-    const { showConfirm = null } = useNotification();
 
     const clearRequestRetryTimeout = () => {
         if (!requestRetryTimeoutRef.current) return;
@@ -78,10 +76,13 @@ export const GroupRoomInformationView: FC<{}> = (props) => {
         resetGroupState();
     });
 
+    const isFirstRoomEnter = useRoomEnterOnce();
+
     useMessageEvent<GetGuestRoomResultEvent>(GetGuestRoomResultEvent, (event) => {
         const parser = event.getParser();
 
-        if (!parser.roomEnter) return;
+        // A room info refresh is not an entry: the group was looked up again at each refresh.
+        if (!parser.roomEnter || !isFirstRoomEnter(parser.data.roomId)) return;
 
         if (parser.data.habboGroupId > 0) {
             setRequestedGroupId(parser.data.habboGroupId);
@@ -110,28 +111,14 @@ export const GroupRoomInformationView: FC<{}> = (props) => {
 
     useEffect(() => () => clearRequestRetryTimeout(), []);
 
-    useEffect(() => {
-        if (isOpen) {
-            setIsCompact(false);
-            return;
-        }
+    // The official leave: ask the server what leaving costs, then confirm (shared with the group windows).
+    const leaveGroup = useGroupLeave(groupInformation?.id ?? 0);
 
-        const timeout = window.setTimeout(() => setIsCompact(true), 220);
+    // Bail out before the handlers below: the React Compiler caches them on groupInformation's fields and reads
+    // those fields where the handlers are created, so a check further down came too late in a room without a group.
+    if (!groupInformation) return null;
 
-        return () => window.clearTimeout(timeout);
-    }, [isOpen]);
-
-    const leaveGroup = () => {
-        showConfirm(
-            LocalizeText('group.leaveconfirm.desc'),
-            () => {
-                SendMessageComposer(new GroupRemoveMemberComposer(groupInformation.id, GetSessionDataManager().userId));
-            },
-            null
-        );
-    };
-
-    const isRealOwner = groupInformation && groupInformation.ownerName === GetSessionDataManager().userName;
+    const isRealOwner = groupInformation.ownerName === GetSessionDataManager().userName;
 
     const getButtonText = () => {
         if (isRealOwner) return 'group.manage';
@@ -162,78 +149,39 @@ export const GroupRoomInformationView: FC<{}> = (props) => {
         TryJoinGroup(groupInformation.id);
     };
 
-    if (!groupInformation) return null;
-
     return (
-        <div
-            className={`pointer-events-auto mt-[6px] overflow-hidden rounded-[10px] border border-white/6 bg-[rgba(10,10,12,0.58)] text-sm shadow-[0_8px_18px_rgba(0,0,0,0.12)] transition-[width,max-width] duration-200 ease-out ${isCompact ? 'ml-auto w-[52px] max-w-[52px]' : 'w-full max-w-[230px]'}`}
-        >
-            <div className="flex flex-col">
-                <Flex
-                    pointer
-                    alignItems="center"
-                    justifyContent={isCompact ? 'end' : 'between'}
-                    className={`border-b border-white/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] px-[7px] py-[5px] max-[420px]:px-[6px] max-[420px]:py-[4px] ${isCompact ? 'gap-[5px] px-[6px] py-[5px]' : ''}`}
-                    onClick={(event) => setIsOpen((value) => !value)}
-                >
-                    <Flex alignItems="center" gap={1} className={isCompact ? 'mr-[0]' : ''}>
-                        <div className="flex h-[18px] w-[18px] items-center justify-center">
-                            <img src={groupIcon} alt="" className="h-[14px] w-auto object-contain" />
+        <NativeTextTree>
+            <div className={`octane-group-room-info pointer-events-auto ml-auto mt-[6px] overflow-hidden ${isOpen ? 'is-open' : 'is-closed'}`}>
+                <BaseButton type="button" className="octane-group-room-info__contracted" onClick={() => setIsOpen((value) => !value)}>
+                    <img src={groupBaseIcon} alt="" className="octane-group-room-info__base-icon" draggable={false} />
+                    <Text variant="white" className="octane-group-room-info__title">
+                        {LocalizeText('group.homeroominfo.title')}
+                    </Text>
+                    <span className="octane-group-room-info__toggle" />
+                </BaseButton>
+                <div className="octane-group-room-info__content">
+                    <Flex component={BaseButton} type="button" pointer alignItems="center" className="octane-group-room-info__main" onClick={() => GetGroupInformation(groupInformation.id)}>
+                        <div className="octane-group-room-info__badge">
+                            <LayoutBadgeImageView badgeCode={groupInformation.badge} isGroup={true} />
                         </div>
-                        {!isCompact && (
-                            <Text variant="white" className="text-[0.78rem] font-bold leading-none text-white/90 max-[420px]:text-[0.74rem]">
-                                {LocalizeText('group.homeroominfo.title')}
-                            </Text>
-                        )}
+                        <Text wrap variant="white" className="octane-group-room-info__group-name">
+                            {groupInformation.title}
+                        </Text>
                     </Flex>
-                    <div
-                        className={`flex h-[20px] w-[20px] items-center justify-center rounded-[6px] border border-white/8 bg-white/6 text-white/80 transition-transform duration-300 ease-out ${isOpen ? 'rotate-180' : 'rotate-0'}`}
-                    >
-                        <FaChevronDown className="fa-icon text-[10px]" />
-                    </div>
-                </Flex>
-                <div
-                    className={`overflow-hidden transition-all duration-[580ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? 'max-h-[280px] opacity-100 translate-y-0 scale-y-100' : 'max-h-0 opacity-0 -translate-y-[8px] scale-y-95'} origin-top`}
-                >
-                    <>
-                        <Flex
-                            pointer
-                            alignItems="center"
-                            gap={2}
-                            className={`px-[10px] py-[10px] max-[420px]:px-[8px] max-[420px]:py-[8px] transition-all duration-[480ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? 'translate-y-0 opacity-100 delay-[80ms]' : '-translate-y-[6px] opacity-0 delay-0'}`}
-                            onClick={(event) => GetGroupInformation(groupInformation.id)}
-                        >
-                            <div className="group-badge flex h-[42px] w-[42px] shrink-0 items-center justify-center overflow-hidden max-[420px]:h-[38px] max-[420px]:w-[38px]">
-                                <LayoutBadgeImageView
-                                    badgeCode={groupInformation.badge}
-                                    isGroup={true}
-                                    classNames={['w-full!', 'h-full!', 'bg-contain!']}
-                                    style={{ width: '100%', height: '100%', backgroundSize: 'contain' }}
-                                />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                                <Text truncate variant="white" className="text-[0.82rem] font-bold leading-tight text-white/92 max-[420px]:text-[0.76rem]">
-                                    {groupInformation.title}
-                                </Text>
-                            </div>
-                        </Flex>
-                        {(groupInformation.type !== GroupType.PRIVATE || isRealOwner) && (
-                            <div
-                                className={`px-[9px] pb-[9px] max-[420px]:px-[8px] max-[420px]:pb-[8px] transition-all duration-[480ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? 'translate-y-0 opacity-100 delay-[160ms]' : '-translate-y-[6px] opacity-0 delay-0'}`}
+                    {(groupInformation.type !== GroupType.PRIVATE || isRealOwner) && (
+                        <div className="octane-group-room-info__button-wrap">
+                            <Button
+                                fullWidth
+                                disabled={groupInformation.membershipType === GroupMembershipType.REQUEST_PENDING}
+                                className="octane-groups-button octane-group-room-info__button"
+                                onClick={handleButtonClick}
                             >
-                                <Button
-                                    fullWidth
-                                    disabled={groupInformation.membershipType === GroupMembershipType.REQUEST_PENDING}
-                                    className="h-[30px] rounded-[6px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(214,214,214,0.76))] !text-black text-[0.82rem] font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_1px_0_rgba(0,0,0,0.18)] hover:brightness-100 max-[420px]:h-[28px] max-[420px]:text-[0.78rem]"
-                                    onClick={handleButtonClick}
-                                >
-                                    {LocalizeText(getButtonText())}
-                                </Button>
-                            </div>
-                        )}
-                    </>
+                                {LocalizeText(getButtonText())}
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

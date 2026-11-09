@@ -1,0 +1,173 @@
+import { FC, useEffect, useState } from 'react';
+import { localizeWithFallback, WiredFurniType } from '../../../../api';
+import { Text } from '../../../../common';
+import { useWired } from '../../../../hooks';
+import { WiredSourcesSelector } from '../WiredSourcesSelector';
+import { getCustomVariableItemId } from '../WiredVariablePickerData';
+import { variableTokenFromId, WIRED_FIXED_HOLDER_SOURCE, WiredValueOrVariableField } from '../WiredValueOrVariableField';
+import { toWiredVariableIdOnTarget } from '../WiredVariableIds';
+import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
+import { CollapsibleSection } from '../../../../common/CollapsibleSection';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+
+export const CHEST_REWARD_MODE_AMOUNT = 0;
+export const CHEST_REWARD_MODE_EVERYTHING = 1;
+export const CHEST_POPUP_MAX_LENGTH = 200;
+export const CHEST_POPUP_MAX_LINES = 3;
+const GLOBAL_TARGET = -10;
+const CONTEXT_TARGET = -20;
+
+export const normalizeChestPopup = (text: string) => (text ?? '').replace(/\r/g, '').split('\n').slice(0, CHEST_POPUP_MAX_LINES).join('\n').slice(0, CHEST_POPUP_MAX_LENGTH);
+
+interface ChestRewardExtra {
+    /** The collapsed section's title key and fallback. */
+    titleKey: string;
+    title: string;
+    /** The sixth int's choices: value, text key and fallback. */
+    options: { value: number; key: string; label: string }[];
+    defaultValue: number;
+    /** A dropdown (earnings category) or radios (iteration order). */
+    dropdown?: boolean;
+    /** Official: the iteration order has nothing to choose when the box gives everything. */
+    disabledWhenEverything?: boolean;
+}
+
+/**
+ * The official chest reward editor (`?_-b1s?`) both chest boxes share: rewarding mode, the amount
+ * (a value or a global/context variable), the reward popup and a box-specific sixth setting.
+ * Ints `[mode, amount, from a variable, target, show popup by default, extra]`, the popup text as the
+ * string, the variable id as the definition's variable id; furni slot 0 the chests, user slot 0 the
+ * rewarded users.
+ */
+export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = ({ extra }) => {
+    const { trigger = null, setIntParams = null, setStringParam = null, setSourceTypes = null, setVariableIds = null } = useWired();
+    const [mode, setMode] = useState(CHEST_REWARD_MODE_AMOUNT);
+    const [amount, setAmount] = useState('1');
+    const [isVariable, setIsVariable] = useState(false);
+    const [target, setTarget] = useState(GLOBAL_TARGET);
+    const [token, setToken] = useState('');
+    const [showByDefault, setShowByDefault] = useState(false);
+    const [popupText, setPopupText] = useState('');
+    const [extraValue, setExtraValue] = useState(extra.defaultValue);
+    const [userSource, setUserSource] = useState(0);
+    const [amountValid, setAmountValid] = useState(true);
+
+    useEffect(() => {
+        if (!trigger) return;
+
+        const data = trigger.intData ?? [];
+
+        setMode(data[0] === CHEST_REWARD_MODE_EVERYTHING ? CHEST_REWARD_MODE_EVERYTHING : CHEST_REWARD_MODE_AMOUNT);
+        setAmount(String(Math.max(1, data[1] ?? 1)));
+        setIsVariable(data[2] === 1);
+        setTarget(data[3] === CONTEXT_TARGET ? CONTEXT_TARGET : GLOBAL_TARGET);
+        setShowByDefault(data[4] === 1);
+        setExtraValue(extra.options.some((option) => option.value === data[5]) ? data[5] : extra.defaultValue);
+        setToken(variableTokenFromId(trigger.variableIds?.[0] ?? ''));
+        setPopupText(normalizeChestPopup(trigger.stringData ?? ''));
+        setUserSource(trigger.userSourceTypes?.[0] ?? 0);
+    }, [trigger, extra]);
+
+    const save = () => {
+        const variableId = isVariable ? getCustomVariableItemId(token) : 0;
+
+        setIntParams([mode, Math.max(1, parseInt(amount, 10) || 1), isVariable ? 1 : 0, target, showByDefault ? 1 : 0, extraValue]);
+        setStringParam(normalizeChestPopup(popupText));
+        // The variable list's id (room:12 / ctx:12), as AIR sends it.
+        setVariableIds(variableId > 0 ? [toWiredVariableIdOnTarget(target, token)] : []);
+        setSourceTypes({ furni: [100], users: [userSource] });
+    };
+
+    const validate = () => mode === CHEST_REWARD_MODE_EVERYTHING || (amountValid && (!isVariable || getCustomVariableItemId(token) > 0));
+    const extraDisabled = extra.disabledWhenEverything && mode === CHEST_REWARD_MODE_EVERYTHING;
+
+    return (
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
+                save={save}
+                validate={validate}
+                footerCollapsible={false}
+                footer={
+                    <WiredSourcesSelector
+                        showUsers={true}
+                        userSource={userSource}
+                        usersTitle="wiredfurni.params.sources.users.title.reward_user"
+                        onChangeUsers={setUserSource}
+                    />
+                }
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.rewarding_mode', 'Rewarding mode')}</Text>
+                    {[CHEST_REWARD_MODE_AMOUNT, CHEST_REWARD_MODE_EVERYTHING].map((value) => (
+                        <label key={value} className="flex items-center gap-1">
+                            <Radio name="chestRewardMode" checked={mode === value} onCheckedChange={() => setMode(value)} />
+                            <Text>{localizeWithFallback(`wiredfurni.params.rewarding_mode.${value}`, value === 0 ? localizeWithFallback('octane.wired.give_a_specific_amount', 'Give a specific amount') : localizeWithFallback('octane.wired.give_everything', 'Give everything'))}</Text>
+                        </label>
+                    ))}
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.amount_to_give', 'Amount to give:')}</Text>
+                    {/* AIR ?_-b1s?: createValueOrVariableSection(0, mergedSourceOptions(0), amount_to_give, 1, int max), disabled
+                        when the box gives everything (onModeChange). The server reads the variable on a room or context holder. */}
+                    <WiredValueOrVariableField
+                        disabled={mode === CHEST_REWARD_MODE_EVERYTHING}
+                        holderSource={WIRED_FIXED_HOLDER_SOURCE}
+                        isVariable={isVariable}
+                        label={localizeWithFallback('wiredfurni.params.amount_to_give', 'Amount to give:')}
+                        literal={amount}
+                        min={1}
+                        target={target}
+                        targets={[GLOBAL_TARGET, CONTEXT_TARGET]}
+                        token={token}
+                        onIsVariableChange={setIsVariable}
+                        onLiteralChange={setAmount}
+                        onTargetChange={setTarget}
+                        onTokenChange={setToken}
+                        onValidityChange={setAmountValid}
+                    />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.reward_contract.reward_popup', 'Reward popup')}</Text>
+                    <textarea
+                        aria-label={localizeWithFallback('octane.wired.reward_popup', 'reward popup')}
+                        className="form-control form-control-sm"
+                        maxLength={CHEST_POPUP_MAX_LENGTH}
+                        rows={CHEST_POPUP_MAX_LINES}
+                        title={localizeWithFallback('wiredfurni.reward_contract.reward_popup.text.tooltip', 'The text shown to the rewarded user')}
+                        value={popupText}
+                        onChange={(event) => setPopupText(normalizeChestPopup(event.target.value))}
+                    />
+                    <label className="flex items-center gap-1">
+                        <Checkbox checked={showByDefault} onCheckedChange={(nextChecked) => setShowByDefault(nextChecked)} />
+                        <Text>{localizeWithFallback('wiredfurni.reward_contract.reward_popup.show_by_default', 'Show the popup by default')}</Text>
+                    </label>
+                </div>
+                <CollapsibleSection title={<Text bold>{localizeWithFallback(extra.titleKey, extra.title)}</Text>}>
+                    <fieldset className="flex flex-col gap-1 pt-1" disabled={extraDisabled}>
+                        {extra.dropdown ? (
+                            <Select aria-label={localizeWithFallback('octane.wired.chest_extra', 'chest extra')} className="form-select form-select-sm" value={extraValue} onChange={(event) => setExtraValue(Number(event.target.value))}>
+                                {extra.options.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {localizeWithFallback(option.key, option.label)}
+                                    </option>
+                                ))}
+                            </Select>
+                        ) : (
+                            extra.options.map((option) => (
+                                <label key={option.value} className="flex items-center gap-1">
+                                    <Radio name="chestRewardExtra" checked={extraValue === option.value} onCheckedChange={() => setExtraValue(option.value)} />
+                                    <Text>{localizeWithFallback(option.key, option.label)}</Text>
+                                </label>
+                            ))
+                        )}
+                    </fieldset>
+                </CollapsibleSection>
+            </WiredActionBaseView>
+        </NativeTextTree>
+    );
+};

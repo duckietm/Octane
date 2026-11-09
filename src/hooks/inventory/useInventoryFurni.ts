@@ -4,18 +4,20 @@ import {
     FurnitureListEvent,
     FurnitureListInvalidateEvent,
     FurnitureListItemParser,
-    FurnitureListRemovedEvent
-} from '@nitrots/nitro-renderer';
-import { useEffect, useRef, useState } from 'react';
-import { useBetween } from 'use-between';
-import { DispatchUiEvent, GroupItem, SendMessageComposer, UnseenItemCategory } from '../../api';
+    FurnitureListRemovedEvent,
+    FurnitureListRemoveMultipleEvent
+} from '@octane/renderer';
+import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
+import { DispatchUiEvent, GroupItem, getGroupItemKey, mergeFurniFragments, SendMessageComposer, UnseenItemCategory } from '../../api';
 import { InventoryFurniAddedEvent } from '../../events';
 import { useMessageEvent } from '../events';
 import { useSharedVisibility } from '../useSharedVisibility';
 import {
-    applyFurnitureList,
     applyFurnitureListAddOrUpdate,
     applyFurnitureListRemoved,
+    applyFurnitureListRemovedMany,
+    applyMergedFurnitureList,
     clearUnseenFlags,
     FurniReducerContext,
     refreshGroupItemsLocalization
@@ -60,18 +62,49 @@ const useInventoryFurniState = () => {
         return null;
     };
 
+    // The reducers queue side effects (placement cancel, "furni added" events). They run on the latest list here, in
+    // the event handler, and the result is committed once: inside a state updater React may run them twice.
+    const groupItemsRef = useRef(groupItems);
+    groupItemsRef.current = groupItems;
+
+    // Every change goes through the list the packets read. A functional update queued with React's own setter
+    // reached the ref only at the next render, so a packet in the same turn (a trade lock, then an inventory
+    // update) was applied to the list before it and the lock was lost.
+    const updateGroupItems = useCallback((next: SetStateAction<GroupItem[]>) => {
+        const value = typeof next === 'function' ? next(groupItemsRef.current) : next;
+
+        if (value === groupItemsRef.current) return;
+
+        groupItemsRef.current = value;
+        setGroupItems(value);
+    }, []);
+
     const buildContext = (): FurniReducerContext => ({
         isUnseen,
-        dispatchAdded: (id, type, category) => DispatchUiEvent(new InventoryFurniAddedEvent(id, type, category)),
-        fragments: fragmentsRef
+        dispatchAdded: (id, type, category) => queueMicrotask(() => DispatchUiEvent(new InventoryFurniAddedEvent(id, type, category)))
     });
 
     useMessageEvent<FurnitureListAddOrUpdateEvent>(FurnitureListAddOrUpdateEvent, (event) => {
-        setGroupItems((prev) => applyFurnitureListAddOrUpdate(prev, event, buildContext()));
+        updateGroupItems(applyFurnitureListAddOrUpdate(groupItemsRef.current, event, buildContext()));
     });
 
     useMessageEvent<FurnitureListEvent>(FurnitureListEvent, (event) => {
-        setGroupItems((prev) => applyFurnitureList(prev, event, buildContext()));
+        const parser = event.getParser();
+
+        // Accumulate multi-fragment inventories HERE, in the event handler (runs once per packet),
+        // not inside the setState updater (React double-invokes updaters). Only when the last
+        // fragment completes the merge do we hand the finished map to the pure reducer.
+        if (!fragmentsRef.current) fragmentsRef.current = new Array(parser.totalFragments);
+
+        const merged = mergeFurniFragments(parser.fragment, parser.totalFragments, parser.fragmentNumber, fragmentsRef.current);
+
+        if (!merged) return;
+
+        fragmentsRef.current = null;
+
+        const context = buildContext();
+
+        updateGroupItems(applyMergedFurnitureList(groupItemsRef.current, merged, context));
     });
 
     useMessageEvent<FurnitureListInvalidateEvent>(FurnitureListInvalidateEvent, () => {
@@ -79,20 +112,31 @@ const useInventoryFurniState = () => {
     });
 
     useMessageEvent<FurnitureListRemovedEvent>(FurnitureListRemovedEvent, (event) => {
-        setGroupItems((prev) => applyFurnitureListRemoved(prev, event));
+        updateGroupItems(applyFurnitureListRemoved(groupItemsRef.current, event));
+    });
+
+    useMessageEvent<FurnitureListRemoveMultipleEvent>(FurnitureListRemoveMultipleEvent, (event) => {
+        const itemIds = event.getParser().stripIds;
+
+        updateGroupItems(applyFurnitureListRemovedMany(groupItemsRef.current, itemIds));
     });
 
     useEffect(() => {
         if (!groupItems || !groupItems.length) return;
 
         setSelectedItem((prevValue) => {
-            let newValue = prevValue;
+            if (!prevValue) return groupItems[0];
 
-            if (newValue && groupItems.indexOf(newValue) === -1) newValue = null;
+            // Same reference still present - keep it.
+            if (groupItems.indexOf(prevValue) !== -1) return prevValue;
 
-            if (!newValue) newValue = groupItems[0];
+            // The reducers replace touched groups with clones, so the old reference goes stale on
+            // any inventory change. Reconcile by stable identity instead of dropping to groupItems[0],
+            // so the selection (and preview panel) doesn't jump to the first tile on every update.
+            const key = getGroupItemKey(prevValue);
+            const match = groupItems.find((group) => getGroupItemKey(group) === key);
 
-            return newValue;
+            return match ?? groupItems[0];
         });
     }, [groupItems]);
 
@@ -101,10 +145,10 @@ const useInventoryFurniState = () => {
 
         return () => {
             if (resetCategory(UnseenItemCategory.FURNI)) {
-                setGroupItems((prev) => clearUnseenFlags(prev));
+                updateGroupItems((prev) => clearUnseenFlags(prev));
             }
         };
-    }, [isVisible, resetCategory]);
+    }, [isVisible, resetCategory, updateGroupItems]);
 
     useEffect(() => {
         if (!isVisible || !needsUpdate) return;
@@ -116,7 +160,7 @@ const useInventoryFurniState = () => {
 
     useEffect(() => {
         const refreshFurnitureLocalization = () => {
-            setGroupItems((prev) => refreshGroupItemsLocalization(prev));
+            updateGroupItems((prev) => refreshGroupItemsLocalization(prev));
 
             setSelectedItem((prevValue) => {
                 if (!prevValue) return prevValue;
@@ -129,12 +173,25 @@ const useInventoryFurniState = () => {
             });
         };
 
-        window.addEventListener('nitro-localization-updated', refreshFurnitureLocalization);
+        window.addEventListener('octane-localization-updated', refreshFurnitureLocalization);
 
-        return () => window.removeEventListener('nitro-localization-updated', refreshFurnitureLocalization);
-    }, []);
+        return () => window.removeEventListener('octane-localization-updated', refreshFurnitureLocalization);
+    }, [updateGroupItems]);
 
-    return { isVisible, groupItems, setGroupItems, selectedItem, setSelectedItem, activate, deactivate, getWallItemById, getFloorItemById, getItemsByType };
+    return {
+        isVisible,
+        groupItems,
+        setGroupItems: updateGroupItems,
+        selectedItem,
+        setSelectedItem,
+        activate,
+        deactivate,
+        getWallItemById,
+        getFloorItemById,
+        getItemsByType
+    };
 };
 
-export const useInventoryFurni = () => useBetween(useInventoryFurniState);
+export const useInventoryFurni = () => useSharedHook(useInventoryFurniState);
+
+registerSharedHook(useInventoryFurniState);

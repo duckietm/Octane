@@ -7,6 +7,9 @@ import { useWired } from '../../../../hooks';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { sortWiredSourceOptions, useAvailableUserSources } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const SOURCE_GROUP_USERS = 0;
 const SOURCE_GROUP_FURNI = 1;
@@ -52,7 +55,8 @@ const normalizeSourceType = (value: number, allowed: number[]) => {
 };
 
 export const WiredConditionSelectionQuantityView: FC<{}> = () => {
-    const { trigger = null, furniIds = [], setFurniIds = null, setIntParams = null, setStringParam = null } = useWired();
+    // Official layout: [merged, amount, comparison], what is counted in the official furni or user source slot.
+    const { trigger = null, furniIds = [], setFurniIds = null, setIntParams = null, setStringParam = null, setSourceTypes = null } = useWired();
     const rawAvailableUserSources = useAvailableUserSources(trigger, USER_SOURCES);
     const availableUserSources = useMemo(() => sortWiredSourceOptions(rawAvailableUserSources, 'users'), [rawAvailableUserSources]);
     const [comparison, setComparison] = useState(1);
@@ -65,10 +69,10 @@ export const WiredConditionSelectionQuantityView: FC<{}> = () => {
     useEffect(() => {
         if (!trigger) return;
 
-        const nextComparison = trigger.intData.length > 0 ? trigger.intData[0] : 1;
+        const nextComparison = trigger.intData.length > 2 ? trigger.intData[2] : 1;
         const nextQuantity = clampQuantity(trigger.intData.length > 1 ? trigger.intData[1] : 0);
-        const nextSourceGroup = trigger.intData.length > 2 && trigger.intData[2] === SOURCE_GROUP_FURNI ? SOURCE_GROUP_FURNI : SOURCE_GROUP_USERS;
-        const nextSourceType = trigger.intData.length > 3 ? trigger.intData[3] : SOURCE_TRIGGER;
+        const nextSourceGroup = (trigger.furniSourceTypes?.length ?? 0) > 0 ? SOURCE_GROUP_FURNI : SOURCE_GROUP_USERS;
+        const nextSourceType = (nextSourceGroup === SOURCE_GROUP_FURNI ? trigger.furniSourceTypes?.[0] : trigger.userSourceTypes?.[0]) ?? SOURCE_TRIGGER;
 
         setComparison(COMPARISON_OPTIONS.includes(nextComparison) ? nextComparison : 1);
         setQuantity(nextQuantity);
@@ -146,74 +150,71 @@ export const WiredConditionSelectionQuantityView: FC<{}> = () => {
     };
 
     const save = () => {
-        setIntParams([comparison, clampQuantity(quantity), sourceGroup, isUserGroup ? userSource : furniSource]);
+        setIntParams([0, clampQuantity(quantity), comparison]);
         setStringParam('');
+        setSourceTypes(isUserGroup ? { furni: [], users: [userSource] } : { furni: [furniSource], users: [] });
 
         if (requiresFurni <= WiredFurniType.STUFF_SELECTION_OPTION_NONE) setFurniIds([]);
     };
 
     return (
-        <WiredConditionBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save}>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
-                {COMPARISON_OPTIONS.map((value) => {
-                    return (
-                        <label key={value} className="flex items-center gap-1">
-                            <input
-                                checked={comparison === value}
-                                className="form-check-input"
-                                name="selectionQuantityComparison"
-                                type="radio"
-                                onChange={() => setComparison(value)}
-                            />
-                            <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
-                        </label>
-                    );
-                })}
-            </div>
-            <div className="flex flex-col gap-2">
-                <input
-                    className="form-control form-control-sm"
-                    inputMode="numeric"
-                    max={MAX_QUANTITY}
-                    min={MIN_QUANTITY}
-                    type="text"
-                    value={quantityInput}
-                    onBlur={() => setQuantityInput(clampQuantity(quantity).toString())}
-                    onChange={(event) => updateQuantityInput(event.target.value)}
+        <NativeTextTree>
+            <WiredConditionBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save}>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
+                    {COMPARISON_OPTIONS.map((value) => {
+                        return (
+                            <label key={value} className="flex items-center gap-1">
+                                <Radio checked={comparison === value} name="selectionQuantityComparison" onCheckedChange={() => setComparison(value)} />
+                                <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
+                            </label>
+                        );
+                    })}
+                </div>
+                <div className="flex flex-col gap-2">
+                    <input
+                        className="form-control form-control-sm"
+                        inputMode="numeric"
+                        max={MAX_QUANTITY}
+                        min={MIN_QUANTITY}
+                        type="text"
+                        value={quantityInput}
+                        onBlur={() => setQuantityInput(clampQuantity(quantity).toString())}
+                        onChange={(event) => updateQuantityInput(event.target.value)}
+                    />
+                    <Slider max={MAX_QUANTITY} min={MIN_QUANTITY} step={1} value={quantity} onChange={(event) => updateQuantity(event as number)} />
+                    <Text small>{quantity}</Text>
+                </div>
+                <WiredFurniSelectionSourceRow
+                    title="wiredfurni.params.sources.merged.title"
+                    options={activeSources}
+                    value={activeSource}
+                    selectionKind={isUserGroup ? 'primary' : 'secondary'}
+                    selectionActive={!isUserGroup && furniSource === SOURCE_SELECTED}
+                    selectionCount={furniIds.length}
+                    selectionLimit={trigger?.maximumItemSelectionCount ?? 20}
+                    selectionEnabledValues={[SOURCE_SELECTED]}
+                    showSelectionToggle={false}
+                    headerContent={
+                        <div className="octane-wired__give-var-targets">
+                            {SOURCE_GROUP_BUTTONS.map((button) => (
+                                <BaseButton
+                                    key={button.key}
+                                    type="button"
+                                    className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${isUserGroup === button.isUserGroup ? 'is-active' : ''}`}
+                                    onClick={() => changeGroup(button.isUserGroup)}
+                                >
+                                    <img src={button.icon} alt={button.key} />
+                                </BaseButton>
+                            ))}
+                        </div>
+                    }
+                    onChange={(value) => {
+                        if (isUserGroup) setUserSource(value);
+                        else setFurniSource(value);
+                    }}
                 />
-                <Slider max={MAX_QUANTITY} min={MIN_QUANTITY} step={1} value={quantity} onChange={(event) => updateQuantity(event as number)} />
-                <Text small>{quantity}</Text>
-            </div>
-            <WiredFurniSelectionSourceRow
-                title="wiredfurni.params.sources.merged.title"
-                options={activeSources}
-                value={activeSource}
-                selectionKind={isUserGroup ? 'primary' : 'secondary'}
-                selectionActive={!isUserGroup && furniSource === SOURCE_SELECTED}
-                selectionCount={furniIds.length}
-                selectionLimit={trigger?.maximumItemSelectionCount ?? 20}
-                selectionEnabledValues={[SOURCE_SELECTED]}
-                showSelectionToggle={false}
-                headerContent={
-                    <div className="nitro-wired__give-var-targets">
-                        {SOURCE_GROUP_BUTTONS.map((button) => (
-                            <button
-                                key={button.key}
-                                type="button"
-                                className={`nitro-wired__give-var-target nitro-wired__give-var-target--${button.key} ${isUserGroup === button.isUserGroup ? 'is-active' : ''}`}
-                                onClick={() => changeGroup(button.isUserGroup)}
-                            >
-                                <img src={button.icon} alt={button.key} />
-                            </button>
-                        ))}
-                    </div>
-                }
-                onChange={(value) => {
-                    if (isUserGroup) setUserSource(value);
-                    else setFurniSource(value);
-                }}
-            />
-        </WiredConditionBaseView>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

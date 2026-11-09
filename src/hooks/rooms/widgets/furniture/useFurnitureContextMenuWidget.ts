@@ -6,10 +6,11 @@ import {
     RoomEngineTriggerWidgetEvent,
     RoomObjectCategory,
     RoomObjectVariable
-} from '@nitrots/nitro-renderer';
-import { useState } from 'react';
-import { IsOwnerOfFurniture, TryJoinGroup, TryVisitRoom } from '../../../../api';
-import { useMessageEvent, useNitroEvent } from '../../../events';
+} from '@octane/renderer';
+import { useRef, useState } from 'react';
+import { CreateLinkEvent, IsOwnerOfFurniture, TryJoinGroup, TryVisitRoom } from '../../../../api';
+import { useMessageEvent, useOctaneEvent } from '../../../events';
+import { useFurniRemovedEvent, useObjectDeselectedEvent, useObjectSelectedEvent } from '../../engine';
 import { useRoom } from '../../useRoom';
 
 export const MONSTERPLANT_SEED_CONFIRMATION: string = 'MONSTERPLANT_SEED_CONFIRMATION';
@@ -26,6 +27,9 @@ const useFurnitureContextMenuWidgetState = () => {
     const [groupData, setGroupData] = useState<GroupFurniContextMenuInfoMessageParser>(null);
     const [isGroupMember, setIsGroupMember] = useState(false);
     const [objectOwnerId, setObjectOwnerId] = useState(-1);
+    // The furni selected now. The group menu reply carries no request id, so a late reply for a furni the user has
+    // left used to turn the next furni's menu into its group menu, or reopen a menu already closed.
+    const selectedFurniIdRef = useRef(-1);
     const { roomSession = null } = useRoom();
 
     const onClose = () => {
@@ -71,13 +75,17 @@ const useFurnitureContextMenuWidgetState = () => {
                 case 'go_to_group_homeroom':
                     if (groupData) TryVisitRoom(groupData.guildHomeRoomId);
                     break;
+                case 'open_forum':
+                    // The "Open forum" button on group furni was drawn but did nothing.
+                    if (groupData) CreateLinkEvent('groupforum/' + groupData.guildId);
+                    break;
             }
         }
 
         onClose();
     };
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(
         [
             RoomEngineTriggerWidgetEvent.OPEN_FURNI_CONTEXT_MENU,
             RoomEngineTriggerWidgetEvent.CLOSE_FURNI_CONTEXT_MENU,
@@ -133,6 +141,10 @@ const useFurnitureContextMenuWidgetState = () => {
                     onClose();
                     return;
                 case RoomEngineTriggerWidgetEvent.OPEN_FURNI_CONTEXT_MENU:
+                    // A group menu left open must not lend its mode and group to this furni.
+                    setGroupData(null);
+                    setIsGroupMember(false);
+                    setMode(null);
                     setObjectId(object.id);
 
                     switch (event.contextMenu) {
@@ -164,8 +176,24 @@ const useFurnitureContextMenuWidgetState = () => {
         }
     );
 
+    useObjectSelectedEvent((event) => {
+        selectedFurniIdRef.current = event.category === RoomObjectCategory.FLOOR || event.category === RoomObjectCategory.WALL ? event.id : -1;
+    });
+
+    useObjectDeselectedEvent(() => {
+        selectedFurniIdRef.current = -1;
+    });
+
+    // A confirm for a furni that is picked up or deleted meanwhile would act on an object that is gone.
+    useFurniRemovedEvent(confirmingObjectId !== -1 || objectId !== -1, (event) => {
+        if (event.id === confirmingObjectId) closeConfirm();
+        if (event.id === objectId) onClose();
+    });
+
     useMessageEvent<GroupFurniContextMenuInfoMessageEvent>(GroupFurniContextMenuInfoMessageEvent, (event) => {
         const parser = event.getParser();
+
+        if (parser.objectId !== selectedFurniIdRef.current) return;
 
         setObjectId(parser.objectId);
         setGroupData(parser);

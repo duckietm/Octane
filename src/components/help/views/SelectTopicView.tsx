@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import { LocalizeText, ReportState } from '../../../api';
 import { Button, Column, Flex, Text } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useHelp, useModTools } from '../../../hooks';
 
 export const SelectTopicView: FC<{}> = (props) => {
@@ -29,33 +30,35 @@ export const SelectTopicView: FC<{}> = (props) => {
     };
 
     return (
-        <>
-            <div className="flex flex-col gap-1">
-                <Text fontSize={4}>{LocalizeText('help.emergency.chat_report.subtitle')}</Text>
-                <Text>{LocalizeText('help.cfh.pick.topic')}</Text>
-            </div>
-            <Column gap={1} overflow="auto">
-                {selectedCategory < 0 &&
-                    cfhCategories.map((category, index) => (
-                        <Button key={index} variant="danger" onClick={(event) => setSelectedCategory(index)}>
-                            {LocalizeText(`help.cfh.reason.${category.name}`)}
-                        </Button>
-                    ))}
-                {selectedCategory >= 0 &&
-                    cfhCategories[selectedCategory].topics.map((topic, index) => (
-                        <Button key={index} active={selectedTopic === index} variant="danger" onClick={(event) => setSelectedTopic(index)}>
-                            {LocalizeText(`help.cfh.topic.${topic.id}`)}
-                        </Button>
-                    ))}
-            </Column>
-            <Flex gap={2} justifyContent="between">
-                <Button variant="secondary" onClick={back}>
-                    {LocalizeText('generic.back')}
-                </Button>
-                <Button disabled={selectedTopic < 0} onClick={submitTopic}>
-                    {LocalizeText('help.emergency.main.submit.button')}
-                </Button>
-            </Flex>
-        </>
+        <NativeTextTree>
+            <>
+                <div className="flex flex-col gap-1">
+                    <Text fontSize={4}>{LocalizeText('help.emergency.chat_report.subtitle')}</Text>
+                    <Text>{LocalizeText('help.cfh.pick.topic')}</Text>
+                </div>
+                <Column gap={1} overflow="auto">
+                    {selectedCategory < 0 &&
+                        cfhCategories.map((category, index) => (
+                            <Button key={index} variant="danger" onClick={(event) => setSelectedCategory(index)}>
+                                {LocalizeText(`help.cfh.reason.${category.name}`)}
+                            </Button>
+                        ))}
+                    {selectedCategory >= 0 &&
+                        cfhCategories[selectedCategory].topics.map((topic, index) => (
+                            <Button key={index} active={selectedTopic === index} variant="danger" onClick={(event) => setSelectedTopic(index)}>
+                                {LocalizeText(`help.cfh.topic.${topic.id}`)}
+                            </Button>
+                        ))}
+                </Column>
+                <Flex gap={2} justifyContent="between">
+                    <Button variant="secondary" onClick={back}>
+                        {LocalizeText('generic.back')}
+                    </Button>
+                    <Button disabled={selectedTopic < 0} onClick={submitTopic}>
+                        {LocalizeText('help.emergency.main.submit.button')}
+                    </Button>
+                </Flex>
+            </>
+        </NativeTextTree>
     );
 };

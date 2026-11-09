@@ -1,65 +1,56 @@
 import { FC, useEffect, useState } from 'react';
-import { WiredFurniType } from '../../../../api';
+import { WiredFurniType, localizeWithFallback } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import {
     CONTRACT_DIR_PAY,
     CONTRACT_DIR_RECEIVE,
-    CONTRACT_KIND_CURRENCY,
     ContractTermRow,
-    parseContractTerms,
-    serializeContractTerms,
+    emptyRow,
+    parseContractRules,
+    serializeContractRules,
 } from './contractTermWire';
-import { WiredContractTermRow } from './WiredContractTermRow';
+import { WiredContractRulesEditor } from './WiredContractRulesEditor';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
+/** Trade: both halves matter, so this is the contract that opens the full negotiation window. */
 export const WiredContractTradeView: FC<{}> = () => {
     const { trigger = null, setIntParams = null, setStringParam = null } = useWired();
-    const [payRow, setPayRow] = useState<ContractTermRow>({
-        direction: CONTRACT_DIR_PAY,
-        kind: CONTRACT_KIND_CURRENCY,
-        currencyType: -1,
-        wallItem: false,
-        baseItemId: 0,
-        amount: 0,
-    });
-    const [receiveRow, setReceiveRow] = useState<ContractTermRow>({
-        direction: CONTRACT_DIR_RECEIVE,
-        kind: CONTRACT_KIND_CURRENCY,
-        currencyType: 0,
-        wallItem: false,
-        baseItemId: 0,
-        amount: 0,
-    });
+    const [giveRules, setGiveRules] = useState<ContractTermRow[][]>([[emptyRow(CONTRACT_DIR_PAY)]]);
+    const [getRule, setGetRule] = useState<ContractTermRow[]>([emptyRow(CONTRACT_DIR_RECEIVE)]);
 
     useEffect(() => {
         if (!trigger) return;
-        const parsed = parseContractTerms(trigger.intData ?? [], trigger.stringData ?? '');
-        for (const row of parsed) {
-            if (row.direction === CONTRACT_DIR_PAY) setPayRow(row);
-            else setReceiveRow(row);
-        }
+
+        const parsed = parseContractRules(trigger.intData ?? [], trigger.stringData ?? '');
+        setGiveRules(parsed.giveRules.length ? parsed.giveRules : [[emptyRow(CONTRACT_DIR_PAY)]]);
+        setGetRule(parsed.getRule.length ? parsed.getRule : [emptyRow(CONTRACT_DIR_RECEIVE)]);
     }, [trigger]);
 
     const save = () => {
-        const payload = serializeContractTerms([
-            { ...payRow, direction: CONTRACT_DIR_PAY },
-            { ...receiveRow, direction: CONTRACT_DIR_RECEIVE },
-        ]);
+        const payload = serializeContractRules({ giveRules, getRule });
         setIntParams(payload.intParams);
         setStringParam(payload.stringParam);
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID} save={save} cardStyle={{ width: 400 }}>
-            <div className="flex flex-col gap-2">
-                <Text bold>The user PAYS:</Text>
-                <WiredContractTermRow row={payRow} onChange={(patch) => setPayRow((prev) => ({ ...prev, ...patch }))} />
-                <div className="nitro-wired__divider" />
-                <Text bold>The user RECEIVES:</Text>
-                <WiredContractTermRow row={receiveRow} onChange={(patch) => setReceiveRow((prev) => ({ ...prev, ...patch }))} />
-                <Text small>Pick a chest above: payment is deposited and the reward sourced from its pool.</Text>
-            </div>
-        </WiredExtraBaseView>
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID} save={save} cardStyle={{ width: 420 }}>
+                <div className="flex flex-col gap-2">
+                    <Text bold>{localizeWithFallback('octane.wired.the_user_pays', 'The user PAYS:')}</Text>
+                    <WiredContractRulesEditor direction={CONTRACT_DIR_PAY} rules={giveRules} onChange={setGiveRules} />
+                    <div className="octane-wired__divider" />
+                    <Text bold>{localizeWithFallback('octane.wired.the_user_receives', 'The user RECEIVES:')}</Text>
+                    <WiredContractRulesEditor
+                        allowAlternatives={false}
+                        direction={CONTRACT_DIR_RECEIVE}
+                        rules={[getRule]}
+                        onChange={(rules) => setGetRule(rules[0] ?? [])}
+                    />
+                    <Text small>{localizeWithFallback('octane.wired.pick_a_chest_above_payment_is', 'Pick a chest above: payment is deposited and the reward sourced from its pool.')}</Text>
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

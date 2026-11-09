@@ -4,13 +4,15 @@ export class CatalogInitGiftEvent extends CatalogEvent {
     private _pageId: number;
     private _offerId: number;
     private _extraData: string;
+    private _receiverName: string;
 
-    constructor(pageId: number, offerId: number, extraData: string) {
+    constructor(pageId: number, offerId: number, extraData: string, receiverName: string = '') {
         super(CatalogEvent.INIT_GIFT);
 
         this._pageId = pageId;
         this._offerId = offerId;
         this._extraData = extraData;
+        this._receiverName = receiverName;
     }
 
     public get pageId(): number {
@@ -23,5 +25,9 @@ export class CatalogInitGiftEvent extends CatalogEvent {
 
     public get extraData(): string {
         return this._extraData;
+    }
+
+    public get receiverName(): string {
+        return this._receiverName;
     }
 }

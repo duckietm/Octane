@@ -1,4 +1,4 @@
-import { RoomObjectCategory, RoomObjectType } from '@nitrots/nitro-renderer';
+import { RoomObjectCategory, RoomObjectType } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FurniCategory, GetFurnitureDataForRoomObject, LocalizeText, UseProductItem } from '../../../../api';
 import { useRoom } from '../../../../hooks';
@@ -81,8 +81,20 @@ export const AvatarInfoUseProductView: FC<AvatarInfoUseProductViewProps> = (prop
     }, [roomSession, item]);
 
     return (
-        <ContextMenuView category={RoomObjectCategory.UNIT} collapsable={true} objectId={item.id} userType={RoomObjectType.PET} onClose={onClose}>
+        // AIR UseProductView (use_product_menu): the own-menu skin, AIR rows, 4 px above a pet.
+        <ContextMenuView
+            anchorGap={-4}
+            category={RoomObjectCategory.UNIT}
+            classNames={['octane-avatar-action-menu', 'octane-avatar-action-menu--own', 'octane-avatar-action-menu--use-product']}
+            collapsable={true}
+            freezePositionOnHover={true}
+            objectId={item.id}
+            showCaretIcon={false}
+            userType={RoomObjectType.PET}
+            onClose={onClose}
+        >
             <ContextMenuHeaderView>{item.name}</ContextMenuHeaderView>
+            <div className="air-avatar-menu-buttons">
             {mode === PRODUCT_PAGE_UKNOWN && (
                 <ContextMenuListItemView onClick={(event) => processAction('use_product')}>
                     {LocalizeText('infostand.button.useproduct')}
@@ -132,6 +144,7 @@ export const AvatarInfoUseProductView: FC<AvatarInfoUseProductViewProps> = (prop
                     {LocalizeText('infostand.button.fertilize_monsterplant')}
                 </ContextMenuListItemView>
             )}
+            </div>
         </ContextMenuView>
     );
 };

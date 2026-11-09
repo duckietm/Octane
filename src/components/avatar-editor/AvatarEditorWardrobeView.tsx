@@ -1,32 +1,67 @@
-import { GetAvatarRenderManager, IAvatarFigureContainer, SaveWardrobeOutfitMessageComposer } from '@nitrots/nitro-renderer';
-import { FC, useCallback } from 'react';
+import { GetAvatarRenderManager, HabboClubLevelEnum, IAvatarFigureContainer, SaveWardrobeOutfitMessageComposer } from '@octane/renderer';
+import { FC, useCallback, useMemo } from 'react';
 import { GetClubMemberLevel, GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../api';
-import { Button, LayoutAvatarImageView, LayoutCurrencyIcon } from '../../common';
+import hcIconSrc from '../../assets/images/avatareditor/air/wardrobe-hc.png';
+import emptySlotSrc from '../../assets/images/avatareditor/wardrobe-empty-slot.png';
+import { LayoutAvatarImageView } from '../../common';
 import { useAvatarEditor } from '../../hooks';
-import { InfiniteGrid } from '../../layout';
+import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
-export const AvatarEditorWardrobeView: FC<{}> = (props) => {
+const SLOTS_PER_COL = 7;
+const HC_SLOT_LIMIT = 5;
+const DEFAULT_SLOT_COUNT = 10;
+
+const isWardrobeSlotEnabled = (slotId: number): boolean => {
+    const level = GetClubMemberLevel();
+
+    if (slotId <= HC_SLOT_LIMIT) return level >= HabboClubLevelEnum.CLUB;
+
+    return level >= HabboClubLevelEnum.VIP;
+};
+
+export const AvatarEditorWardrobeView: FC<{}> = () => {
     const { savedFigures = [], setSavedFigures = null, loadAvatarData = null, getFigureString = null, gender = null } = useAvatarEditor();
+    const maxSlots = GetConfigurationValue<number>('avatar.wardrobe.max.slots', DEFAULT_SLOT_COUNT);
 
-    const hcDisabled = GetConfigurationValue<boolean>('hc.disabled', false);
+    const slots = useMemo(() => {
+        return Array.from({ length: maxSlots }, (_, index) => {
+            const entry = savedFigures?.[index];
+
+            if (!entry || !Array.isArray(entry)) return [null, null] as [IAvatarFigureContainer, string];
+
+            return entry;
+        });
+    }, [maxSlots, savedFigures]);
+
+    const columns = useMemo(() => {
+        const next: [IAvatarFigureContainer, string][][] = [];
+
+        for (let index = 0; index < slots.length; index += SLOTS_PER_COL) {
+            next.push(slots.slice(index, index + SLOTS_PER_COL));
+        }
+
+        return next;
+    }, [slots]);
 
     const wearFigureAtIndex = useCallback(
         (index: number) => {
-            if (index >= savedFigures.length || index < 0) return;
+            if (!isWardrobeSlotEnabled(index + 1) || index >= slots.length) return;
 
-            const [figure, gender] = savedFigures[index];
+            const [figure] = slots[index];
 
-            loadAvatarData(figure.getFigureString(), gender);
+            if (!figure) return;
+
+            loadAvatarData(figure.getFigureString(), slots[index][1]);
         },
-        [savedFigures, loadAvatarData]
+        [loadAvatarData, slots]
     );
 
     const saveFigureAtWardrobeIndex = useCallback(
         (index: number) => {
-            if (index >= savedFigures.length || index < 0) return;
+            if (!isWardrobeSlotEnabled(index + 1) || index >= slots.length) return;
 
-            const newFigures = [...savedFigures];
-
+            const newFigures = [...slots];
             const figure = getFigureString;
 
             newFigures[index] = [GetAvatarRenderManager().createFigureContainer(figure), gender];
@@ -34,40 +69,64 @@ export const AvatarEditorWardrobeView: FC<{}> = (props) => {
             setSavedFigures(newFigures);
             SendMessageComposer(new SaveWardrobeOutfitMessageComposer(index + 1, figure, gender));
         },
-        [getFigureString, gender, savedFigures, setSavedFigures]
+        [gender, getFigureString, setSavedFigures, slots]
     );
 
     return (
-        <InfiniteGrid
-            columnCount={5}
-            estimateSize={140}
-            itemRender={(item: [IAvatarFigureContainer, string], index: number) => {
-                const [figureContainer, gender] = item;
+        <NativeTextTree>
+            <aside className="octane-avatar-editor-wardrobe" aria-label={LocalizeText('avatareditor.wardrobe.title')}>
+                <div className="octane-avatar-editor-wardrobe-header">
+                    <span className="octane-avatar-editor-wardrobe-title">{LocalizeText('avatareditor.wardrobe.title')}</span>
+                    <img src={hcIconSrc} alt="" draggable={false} className="octane-avatar-editor-wardrobe-hc" />
+                </div>
+                <div className="octane-avatar-editor-wardrobe-slots">
+                    {columns.map((column, columnIndex) => (
+                        <div className="octane-avatar-editor-wardrobe-column" key={`wardrobe-col-${columnIndex}`}>
+                            {column.map((item, rowIndex) => {
+                                const index = columnIndex * SLOTS_PER_COL + rowIndex;
+                                const [figureContainer, slotGender] = item;
+                                const enabled = isWardrobeSlotEnabled(index + 1);
+                                const figureString = figureContainer?.getFigureString() ?? '';
 
-                let clubLevel = 0;
-
-                if (figureContainer) clubLevel = GetAvatarRenderManager().getFigureClubLevel(figureContainer, gender);
-
-                return (
-                    <InfiniteGrid.Item className="nitro-avatar-editor-wardrobe-figure-preview">
-                        {figureContainer && <LayoutAvatarImageView direction={2} figure={figureContainer.getFigureString()} gender={gender} />}
-                        <div className="avatar-shadow" />
-                        {!hcDisabled && clubLevel > 0 && <LayoutCurrencyIcon className="absolute top-1 inset-s-1" type="hc" />}
-                        <div className="flex gap-1 button-container">
-                            <Button fullWidth variant="link" onClick={(event) => saveFigureAtWardrobeIndex(index)}>
-                                {LocalizeText('avatareditor.wardrobe.save')}
-                            </Button>
-                            {figureContainer && (
-                                <Button fullWidth disabled={clubLevel > GetClubMemberLevel()} variant="link" onClick={(event) => wearFigureAtIndex(index)}>
-                                    {LocalizeText('widget.generic_usable.button.use')}
-                                </Button>
-                            )}
+                                return (
+                                    <div className={`octane-avatar-editor-wardrobe-slot${enabled ? '' : ' is-locked'}`} key={`wardrobe-slot-${index}`}>
+                                        <div className="octane-avatar-editor-wardrobe-slot-shade" />
+                                        {enabled && (
+                                            <BaseButton
+                                                type="button"
+                                                className="octane-avatar-editor-wardrobe-slot-set"
+                                                aria-label={LocalizeText('avatareditor.wardrobe.save')}
+                                                onClick={() => saveFigureAtWardrobeIndex(index)}
+                                            />
+                                        )}
+                                        {enabled && figureContainer && (
+                                            <BaseButton
+                                                type="button"
+                                                className="octane-avatar-editor-wardrobe-slot-get"
+                                                aria-label={LocalizeText('widget.generic_usable.button.use')}
+                                                onClick={() => wearFigureAtIndex(index)}
+                                            />
+                                        )}
+                                        <BaseButton
+                                            type="button"
+                                            className="octane-avatar-editor-wardrobe-slot-figure"
+                                            disabled={!enabled || !figureContainer}
+                                            aria-label={LocalizeText('widget.generic_usable.button.use')}
+                                            onClick={() => wearFigureAtIndex(index)}
+                                        >
+                                            {figureContainer ? (
+                                                <LayoutAvatarImageView direction={4} figure={figureString} gender={slotGender} fit small />
+                                            ) : (
+                                                <img src={emptySlotSrc} alt="" draggable={false} className="octane-avatar-editor-wardrobe-empty" />
+                                            )}
+                                        </BaseButton>
+                                    </div>
+                                );
+                            })}
                         </div>
-                    </InfiniteGrid.Item>
-                );
-            }}
-            items={savedFigures}
-            overscan={5}
-        />
+                    ))}
+                </div>
+            </aside>
+        </NativeTextTree>
     );
 };

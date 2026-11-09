@@ -1,14 +1,14 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { localizeWithFallback, LocalizeText, WiredFurniType } from '../../../../api';
+import { fromOfficialComparison, fromOfficialVariableTarget, LocalizeText, localizeWithFallback, toOfficialComparison, toOfficialVariableTarget, WiredFurniType } from '../../../../api';
 import contextVariableIcon from '../../../../assets/images/wired/var/icon_source_context_clean.png';
 import furniVariableIcon from '../../../../assets/images/wired/var/icon_source_furni.png';
 import globalVariableIcon from '../../../../assets/images/wired/var/icon_source_global.png';
 import userVariableIcon from '../../../../assets/images/wired/var/icon_source_user.png';
 import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { CLICKED_USER_SOURCE, FURNI_SOURCES, sortWiredSourceOptions, USER_SOURCES, useAvailableUserSources, WiredSourceOption } from '../WiredSourcesSelector';
+import { isWiredSameHolderEligible, WiredValueOrVariableInput } from '../WiredValueOrVariableInput';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import {
     buildWiredVariablePickerEntries,
@@ -17,7 +17,11 @@ import {
     normalizeVariableTokenFromWire,
     WiredVariablePickerTarget
 } from '../WiredVariablePickerData';
+import { readWiredVariableToken, toWiredVariableId, wiredVariableIdList } from '../WiredVariableIds';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type ReferenceMode = 'constant' | 'variable';
@@ -37,8 +41,6 @@ const TARGET_USER = 0;
 const TARGET_FURNI = 1;
 const TARGET_CONTEXT = 2;
 const TARGET_GLOBAL = 3;
-const REFERENCE_CONSTANT = 0;
-const REFERENCE_VARIABLE = 1;
 const SOURCE_TRIGGER = 0;
 const SOURCE_SECONDARY_SELECTED = 101;
 
@@ -48,6 +50,8 @@ const TARGET_BUTTONS: Array<{ key: VariableTargetType; icon: string; disabled?: 
     { key: 'global', icon: globalVariableIcon },
     { key: 'context', icon: contextVariableIcon }
 ];
+
+const REFERENCE_TARGETS: VariableTargetType[] = ['furni', 'user', 'global', 'context'];
 
 const COMPARISON_OPTIONS = [
     { value: 0, label: '>' },
@@ -128,7 +132,11 @@ const resolveSourceOptions = (baseOptions: WiredSourceOption[], selectedValue: n
 };
 
 export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProps> = ({ selectorTarget }) => {
-    const { trigger = null, furniIds = [], setFurniIds = null, setIntParams = null, setStringParam = null } = useWired();
+    // Official layout: [comparison, reference (0 none, 1 value, 2 variable), value high, value low, reference
+    // target, same holder]; the reference is read on the official source slots, filter / invert are the
+    // official selector fields.
+    const { trigger = null, furniIds = [], setFurniIds = null, setIntParams = null, setStringParam = null, setSourceTypes = null, setVariableIds = null } = useWired();
+    const [sameHolder, setSameHolder] = useState(false);
     const { userVariableDefinitions = [], furniVariableDefinitions = [], roomVariableDefinitions = [], contextVariableDefinitions = [] } = useWiredTools();
     const [variableToken, setVariableToken] = useState('');
     const [selectByValue, setSelectByValue] = useState(false);
@@ -140,8 +148,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
     const [referenceUserSource, setReferenceUserSource] = useState(SOURCE_TRIGGER);
     const [referenceFurniSource, setReferenceFurniSource] = useState(SOURCE_TRIGGER);
     const [referenceFurniIds, setReferenceFurniIds] = useState<number[]>([]);
-    const [filterExisting, setFilterExisting] = useState(false);
-    const [invert, setInvert] = useState(false);
+    const [referenceValid, setReferenceValid] = useState(true);
 
     const availableUserSources = useAvailableUserSources(trigger, USER_SOURCES);
     const orderedUserSources = useMemo(() => sortWiredSourceOptions(availableUserSources, 'users'), [availableUserSources]);
@@ -213,17 +220,20 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
         const stringParts = parseStringData(trigger.stringData);
         const nextReferenceFurniIds = [...(trigger.selectedItems ?? [])];
 
-        setVariableToken(normalizeVariableTokenFromWire(stringParts.length > 0 ? stringParts[0] : ''));
-        setReferenceVariableToken(normalizeVariableTokenFromWire(stringParts.length > 1 ? stringParts[1] : ''));
-        setSelectByValue(trigger.intData.length > 0 ? trigger.intData[0] === 1 : false);
-        setComparison(trigger.intData.length > 1 ? trigger.intData[1] : 2);
-        setReferenceMode((trigger.intData.length > 2 ? trigger.intData[2] : REFERENCE_CONSTANT) === REFERENCE_VARIABLE ? 'variable' : 'constant');
-        setReferenceConstantValueInput((trigger.intData.length > 3 ? trigger.intData[3] : 0).toString());
-        setReferenceTargetType(normalizeTargetType(trigger.intData.length > 4 ? trigger.intData[4] : TARGET_USER));
-        setReferenceUserSource(trigger.intData.length > 5 ? trigger.intData[5] : SOURCE_TRIGGER);
-        setReferenceFurniSource(trigger.intData.length > 6 ? trigger.intData[6] : nextReferenceFurniIds.length ? SOURCE_SECONDARY_SELECTED : SOURCE_TRIGGER);
-        setFilterExisting(trigger.intData.length > 7 ? trigger.intData[7] === 1 : false);
-        setInvert(trigger.intData.length > 8 ? trigger.intData[8] === 1 : false);
+        // AIR: variable ids [variable, reference variable]; an older server wrote both into the string.
+        setVariableToken(readWiredVariableToken(trigger.variableIds, 0, normalizeVariableTokenFromWire(stringParts.length > 0 ? stringParts[0] : '')));
+        setReferenceVariableToken(readWiredVariableToken(trigger.variableIds, 1, normalizeVariableTokenFromWire(stringParts.length > 1 ? stringParts[1] : '')));
+        const d = trigger.intData;
+        const reference = d.length > 1 ? d[1] : 0;
+
+        setComparison(d.length > 0 ? fromOfficialComparison(d[0]) : 2);
+        setSelectByValue(reference === 1 || reference === 2);
+        setReferenceMode(reference === 2 ? 'variable' : 'constant');
+        setReferenceConstantValueInput((d.length > 3 ? d[3] : 0).toString());
+        setReferenceTargetType(normalizeTargetType(d.length > 4 ? fromOfficialVariableTarget(d[4]) : TARGET_USER));
+        setSameHolder(d[5] === 1);
+        setReferenceUserSource(trigger.userSourceTypes?.[0] ?? SOURCE_TRIGGER);
+        setReferenceFurniSource(trigger.furniSourceTypes?.[0] ?? (nextReferenceFurniIds.length ? SOURCE_SECONDARY_SELECTED : SOURCE_TRIGGER));
         setReferenceFurniIds(nextReferenceFurniIds);
         setFurniIds(nextReferenceFurniIds);
     }, [setFurniIds, trigger]);
@@ -243,23 +253,35 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
         setReferenceUserSource(SOURCE_TRIGGER);
     }, [orderedUserSources, referenceTargetType, referenceUserSource]);
 
+    // AIR WithVariable.setValueSelectionVisibility: the comparison and the reference value need a variable with a value
+    // and "select by value". The same holder only counts for a variable reference on the selector's own holder type
+    // (variableSource is the primary target; readIntParamsFromForm), and then the reference source is locked.
+    const valueSelectionDisabled = !selectByValue || !canSelectByValue;
+    const sameHolderActive = selectByValue && referenceMode === 'variable' && sameHolder && isWiredSameHolderEligible(selectorTarget, referenceTargetType);
+
     const save = () => {
         const nextReferenceFurniIds = referenceSelectionEnabled ? [...furniIds] : [...referenceFurniIds];
         const parsedReferenceConstantValue = parseInt(referenceConstantValueInput.trim(), 10);
 
         setReferenceFurniIds(nextReferenceFurniIds);
-        setStringParam(`${variableToken || ''}\t${selectByValue && referenceMode === 'variable' ? referenceVariableToken : ''}`);
+        setStringParam('');
+        setVariableIds(
+            wiredVariableIdList(
+                toWiredVariableId(selectorTarget, variableToken),
+                selectByValue && referenceMode === 'variable' ? toWiredVariableId(referenceTargetType, referenceVariableToken) : ''
+            )
+        );
+        const constantValue = Number.isFinite(parsedReferenceConstantValue) ? parsedReferenceConstantValue : 0;
+
         setIntParams([
-            selectByValue ? 1 : 0,
-            comparison,
-            referenceMode === 'variable' ? REFERENCE_VARIABLE : REFERENCE_CONSTANT,
-            Number.isFinite(parsedReferenceConstantValue) ? parsedReferenceConstantValue : 0,
-            getTargetValue(referenceTargetType),
-            referenceUserSource,
-            referenceFurniSource,
-            filterExisting ? 1 : 0,
-            invert ? 1 : 0
+            toOfficialComparison(comparison),
+            !selectByValue ? 0 : referenceMode === 'variable' ? 2 : 1,
+            constantValue < 0 ? -1 : 0,
+            constantValue,
+            toOfficialVariableTarget(getTargetValue(referenceTargetType)),
+            sameHolderActive ? 1 : 0
         ]);
+        setSourceTypes({ furni: [referenceFurniSource], users: [referenceUserSource] });
         setFurniIds(referenceSelectionEnabled ? nextReferenceFurniIds : []);
     };
 
@@ -267,6 +289,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
         if (!variableToken) return false;
         if (selectByValue && !canSelectByValue) return false;
         if (selectByValue && referenceMode === 'variable' && !referenceVariableToken) return false;
+        if (selectByValue && !referenceValid) return false;
 
         return true;
     };
@@ -282,154 +305,95 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
     };
 
     return (
-        <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} validate={validate} hideDelay={true} cardStyle={{ width: 260 }}>
-            <div className="nitro-wired__give-var">
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <WiredVariablePicker
-                        entries={resolvedMainEntries}
-                        recentScope={`variable-selectors-${selectorTarget}`}
-                        selectedToken={variableToken}
-                        onSelect={(entry) => setVariableToken(entry.token)}
-                    />
-                </div>
-
-                <div className="nitro-wired__divider" />
-
-                <label className="flex items-center gap-2">
-                    <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={selectByValue}
-                        disabled={!canSelectByValue}
-                        onChange={(event) => setSelectByValue(event.target.checked)}
-                    />
-                    <Text small>{LocalizeText('wiredfurni.params.variables.value_settings.select_by_value')}</Text>
-                </label>
-
-                <div className={`flex flex-col gap-2 ${!selectByValue ? 'opacity-60' : ''}`}>
-                    <div className="nitro-wired__divider" />
+        <NativeTextTree>
+            <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} validate={validate} hideDelay={true} cardStyle={{ width: 260 }}>
+                <div className="octane-wired__give-var">
                     <div className="flex flex-col gap-1">
-                        <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
-                        <div className="flex flex-wrap items-center gap-2">
-                            {COMPARISON_OPTIONS.map((option) => (
-                                <label key={option.value} className="flex items-center gap-1">
-                                    <input
-                                        checked={comparison === option.value}
-                                        className="form-check-input"
-                                        type="radio"
-                                        disabled={!selectByValue}
-                                        onChange={() => setComparison(option.value)}
-                                    />
-                                    <Text>{option.label}</Text>
-                                </label>
-                            ))}
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
+                        <WiredVariablePicker
+                            entries={resolvedMainEntries}
+                            recentScope={`variable-selectors-${selectorTarget}`}
+                            selectedToken={variableToken}
+                            onSelect={(entry) => setVariableToken(entry.token)}
+                        />
+                    </div>
+
+                    <div className="octane-wired__divider" />
+
+                    <label className="flex items-center gap-2">
+                        <Checkbox checked={selectByValue} disabled={!canSelectByValue} onCheckedChange={ nextChecked => setSelectByValue(nextChecked) } />
+                        <Text small>{LocalizeText('wiredfurni.params.variables.value_settings.select_by_value')}</Text>
+                    </label>
+
+                    <div className={`flex flex-col gap-2 ${valueSelectionDisabled ? 'opacity-60' : ''}`}>
+                        <div className="octane-wired__divider" />
+                        <div className="flex flex-col gap-1">
+                            <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
+                            <div className="flex flex-wrap items-center gap-2">
+                                {COMPARISON_OPTIONS.map((option) => (
+                                    <label key={option.value} className="flex items-center gap-1">
+                                        <Radio checked={comparison === option.value} disabled={valueSelectionDisabled} onCheckedChange={ () => setComparison(option.value) } />
+                                        <Text>{option.label}</Text>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="octane-wired__divider" />
+                        <div className="octane-wired__give-var-section">
+                            <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
+                            <WiredValueOrVariableInput
+                                disabled={valueSelectionDisabled}
+                                entries={resolvedReferenceEntries}
+                                isVariable={referenceMode === 'variable'}
+                                label={LocalizeText('wiredfurni.params.variables.reference_value')}
+                                literal={referenceConstantValueInput}
+                                primaryTarget={selectorTarget}
+                                sameHolder={sameHolder}
+                                target={referenceTargetType}
+                                targets={REFERENCE_TARGETS}
+                                token={referenceVariableToken}
+                                renderSource={({ typeSelector, locked }) => (
+                                    // AIR WithVariable: the reference value section claims merged slot 0 (isInputSourceDisabled: a
+                                    // disabled section or the same holder locks it).
+                                    <fieldset className="octane-wired__value-popup-locked" disabled={locked || valueSelectionDisabled}>
+                                        <WiredFurniSelectionSourceRow
+                                            headerContent={typeSelector}
+                                            options={referenceSourceOptions}
+                                            selectionActive={true}
+                                            selectionCount={referenceSelectionEnabled ? furniIds.length : referenceFurniIds.length}
+                                            selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
+                                            selectionKind="primary"
+                                            selectionLimit={selectionLimit}
+                                            showSelectionToggle={false}
+                                            title="wiredfurni.params.sources.merged.title.variables"
+                                            value={selectedReferenceSourceValue}
+                                            onChange={(value) => {
+                                                if (referenceTargetType === 'furni') {
+                                                    if (referenceFurniSource === SOURCE_SECONDARY_SELECTED) setReferenceFurniIds([...furniIds]);
+
+                                                    setReferenceFurniSource(value);
+                                                    setFurniIds(value === SOURCE_SECONDARY_SELECTED ? [...referenceFurniIds] : []);
+                                                    return;
+                                                }
+
+                                                if (referenceTargetType === 'user') setReferenceUserSource(value);
+                                            }}
+                                        />
+                                    </fieldset>
+                                )}
+                                onIsVariableChange={(isVariable) => setReferenceMode(isVariable ? 'variable' : 'constant')}
+                                onLiteralChange={setReferenceConstantValueInput}
+                                onSameHolderChange={setSameHolder}
+                                onTargetChange={handleReferenceTargetChange}
+                                onTokenChange={setReferenceVariableToken}
+                                onValidityChange={setReferenceValid}
+                            />
                         </div>
                     </div>
 
-                    <div className="nitro-wired__divider" />
-                    <div className="nitro-wired__give-var-section">
-                        <div className="nitro-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
-                        <label className="nitro-wired__change-var-radio">
-                            <input
-                                checked={referenceMode === 'constant'}
-                                type="radio"
-                                disabled={!selectByValue}
-                                onChange={() => setReferenceMode('constant')}
-                            />
-                            <Text>{LocalizeText('wiredfurni.params.operator.2')}</Text>
-                            <NitroInput
-                                className="nitro-wired__give-var-number"
-                                type="number"
-                                value={referenceConstantValueInput}
-                                disabled={!selectByValue}
-                                onChange={(event) => setReferenceConstantValueInput(event.target.value)}
-                            />
-                        </label>
-
-                        <div className="nitro-wired__change-var-reference-block">
-                            <label className="nitro-wired__change-var-radio">
-                                <input
-                                    checked={referenceMode === 'variable'}
-                                    type="radio"
-                                    disabled={!selectByValue}
-                                    onChange={() => setReferenceMode('variable')}
-                                />
-                                <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
-                                <div className="nitro-wired__give-var-targets">
-                                    {TARGET_BUTTONS.map((button) => (
-                                        <button
-                                            key={`reference-${button.key}`}
-                                            type="button"
-                                            disabled={button.disabled || !selectByValue || referenceMode !== 'variable'}
-                                            className={`nitro-wired__give-var-target nitro-wired__give-var-target--${button.key} ${referenceTargetType === button.key ? 'is-active' : ''}`}
-                                            onClick={() => handleReferenceTargetChange(button.key)}
-                                        >
-                                            <img src={button.icon} alt={button.key} />
-                                        </button>
-                                    ))}
-                                </div>
-                            </label>
-
-                            {selectByValue && referenceMode === 'variable' && (
-                                <WiredVariablePicker
-                                    entries={resolvedReferenceEntries}
-                                    recentScope="variable-selectors-reference"
-                                    selectedToken={referenceVariableToken}
-                                    onSelect={(entry) => setReferenceVariableToken(entry.token)}
-                                />
-                            )}
-                        </div>
-                    </div>
-
-                    {selectByValue && referenceMode === 'variable' && (
-                        <>
-                            <div className="nitro-wired__divider" />
-                            <WiredFurniSelectionSourceRow
-                                title="wiredfurni.params.sources.merged.title.variables_reference"
-                                options={referenceSourceOptions}
-                                value={selectedReferenceSourceValue}
-                                selectionKind="primary"
-                                selectionActive={true}
-                                selectionCount={referenceSelectionEnabled ? furniIds.length : referenceFurniIds.length}
-                                selectionLimit={selectionLimit}
-                                selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
-                                showSelectionToggle={false}
-                                onChange={(value) => {
-                                    if (referenceTargetType === 'furni') {
-                                        if (referenceFurniSource === SOURCE_SECONDARY_SELECTED) setReferenceFurniIds([...furniIds]);
-
-                                        setReferenceFurniSource(value);
-                                        setFurniIds(value === SOURCE_SECONDARY_SELECTED ? [...referenceFurniIds] : []);
-                                        return;
-                                    }
-
-                                    if (referenceTargetType === 'user') setReferenceUserSource(value);
-                                }}
-                            />
-                        </>
-                    )}
                 </div>
-
-                <div className="nitro-wired__divider" />
-
-                <Text bold>{LocalizeText('wiredfurni.params.selector_options_selector')}</Text>
-
-                <label className="flex items-center gap-2">
-                    <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={filterExisting}
-                        onChange={(event) => setFilterExisting(event.target.checked)}
-                    />
-                    <Text small>{LocalizeText('wiredfurni.params.selector_option.0')}</Text>
-                </label>
-
-                <label className="flex items-center gap-2">
-                    <input className="form-check-input" type="checkbox" checked={invert} onChange={(event) => setInvert(event.target.checked)} />
-                    <Text small>{LocalizeText('wiredfurni.params.selector_option.1')}</Text>
-                </label>
-            </div>
-        </WiredSelectorBaseView>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

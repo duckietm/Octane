@@ -1,0 +1,280 @@
+/*
+ * Furni windows as AIR draws their text (habbo-room-ui-com / habbo-catalog-com layouts): rent_confirmation,
+ * quiz_question / quiz_result, petpackage_new, credit_redeem, packagecard_new(_opened), mystery_box_open_dialog /
+ * mystery_box_reward, mysterytrophy, ecotron_box_card, lock_confirm, lovelock_engraving and high_score_display.
+ *
+ * Our `Ubuntu` face is the condensed cut (Ubuntu-C); AIR's style 3 / 100 windows are in the regular one
+ * (HabboAirUbuntu). Style 0 windows (credit_redeem, ecotron_box_card) are Volter 9 px. The shared Button
+ * carries an important 12.6 px size in the utilities layer, so the button sizes are set by important rules
+ * in the base layer, which outrank it.
+ */
+
+/* Regular Ubuntu windows. */
+.octane-furni-rent-confirm,
+.octane-furni-petpackage,
+.octane-furni-gift-opening,
+.octane-furni-mysterybox,
+.octane-furni-mysterytrophy,
+.octane-furni-lock-confirm,
+.octane-furni-highscore {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+@layer base {
+    .octane-furni-rent-confirm :where(*):not(svg, svg *),
+    .octane-furni-petpackage :where(*):not(svg, svg *),
+    .octane-furni-gift-opening :where(*):not(svg, svg *),
+    .octane-furni-mysterybox :where(*):not(svg, svg *),
+    .octane-furni-mysterytrophy :where(*):not(svg, svg *),
+    .octane-furni-lock-confirm :where(*):not(svg, svg *),
+    .octane-furni-highscore :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    /* Ubuntu (style 3) buttons and button_thick: 12 px bold. */
+    .octane-furni-rent-confirm :where(button),
+    .octane-furni-petpackage :where(button),
+    .octane-furni-gift-opening :where(button),
+    .octane-furni-mysterytrophy :where(button) {
+        font-size: 12px !important;
+    }
+
+    /* Illumina buttons (style 101): il_button, 10 px bold. */
+    .octane-furni-mysterybox :where(button),
+    .octane-furni-lock-confirm :where(button) {
+        font-size: 10px !important;
+        font-weight: 700 !important;
+    }
+
+    /* Volter windows (style 0): every text and button is Volter 9 px. */
+    .octane-furni-exchange-credit .octane-card-content-shell :where(*):not(svg, svg *),
+    .octane-furni-ecotronbox.octane-ecotronbox-card :where(*):not(svg, svg *) {
+        font-family: Volter, monospace !important;
+        font-size: 9px !important;
+    }
+
+    /* The cancel links and the pet-package / trophy link: u_regular 12 px #333333, underlined. */
+    .octane-furni-petpackage .text-decoration,
+    .octane-furni-mysterytrophy .text-decoration {
+        color: #333333 !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        text-decoration: underline;
+    }
+}
+
+/* rent_confirmation: rental_description u_regular 12, furni_name u_bold 12, the price u_regular 12. */
+.octane-furni-rent-confirm .octane-card-content-shell {
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.octane-furni-rent-confirm .octane-furni-rent-confirm__name {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.octane-furni-rent-confirm .octane-furni-rent-confirm__description,
+.octane-furni-rent-confirm .octane-furni-rent-confirm__price {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* rent_confirmation ok_button: button_thick style 5, color 0x00cc00: the grey habbo_skin_button_shiny_thick
+   multiplied by 0x00cc00, white button_shiny_bold 12 px caption. cancel_button: the grey `button` (style 3),
+   habbo_skin_button_shiny, 12 px regular black. The shared skins are unlayered important rules. */
+@layer base {
+    .octane-furni-rent-confirm :is(.octane-furni-rent-confirm__ok, .octane-furni-rent-confirm__cancel) {
+        border-width: 5px !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        border-image-repeat: stretch !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    .octane-furni-rent-confirm .octane-furni-rent-confirm__ok.habbo-btn-primary {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-00cc00) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+    }
+
+    .octane-furni-rent-confirm .octane-furni-rent-confirm__ok.habbo-btn-primary:hover {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-00cc00-hover) !important;
+    }
+
+    .octane-furni-rent-confirm .octane-furni-rent-confirm__ok.habbo-btn-primary:is(:active, .active) {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-00cc00-pressed) !important;
+    }
+
+    .octane-furni-rent-confirm .octane-furni-rent-confirm__ok.habbo-btn-primary:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-00cc00-disabled) !important;
+    }
+
+    .octane-furni-rent-confirm .octane-furni-rent-confirm__cancel.habbo-btn-secondary {
+        border-image-source: var(--habbo-skin-shiny) !important;
+        color: #000000 !important;
+        font-weight: 400 !important;
+    }
+
+    .octane-furni-rent-confirm .octane-furni-rent-confirm__cancel.habbo-btn-secondary:hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    .octane-furni-rent-confirm .octane-furni-rent-confirm__cancel.habbo-btn-secondary:is(:active, .active) {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+}
+
+/* quiz_question quiz_topic: ubuntu_condensed_regular at 28 px, white (our `Ubuntu` face is that cut);
+   quiz_result quiz_topic 24 px, the vote counts u_headline_small 14 px bold white. */
+.wordquiz-question.octane-furni-wordquiz {
+    font-family: Ubuntu, UbuntuCondensed, sans-serif;
+    color: #ffffff;
+}
+
+.wordquiz-question.octane-furni-wordquiz .wordquiz-question__topic {
+    font-family: Ubuntu, UbuntuCondensed, sans-serif;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 32px;
+}
+
+.wordquiz-question.octane-furni-wordquiz.is-result .wordquiz-question__topic {
+    font-size: 24px;
+    line-height: 28px;
+}
+
+.wordquiz-question.octane-furni-wordquiz .wordquiz-question__count {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 19px;
+}
+
+/* petpackage_new: header title u_headline_big at font_size 24 bold, the name input u_headline_medium
+   16 px bold #888888. The dark header band is not drawn here, so the title keeps its black colour. */
+.octane-furni-petpackage .octane-card-content-shell {
+    font-size: 12px;
+}
+
+.octane-furni-petpackage .package-text-big {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 28px;
+}
+
+.octane-furni-petpackage .octane-card-content-shell .input-pet-package {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+/* credit_redeem: exchange_text in Volter Bold, the rest Volter. */
+.octane-furni-exchange-credit .octane-card-content-shell {
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+}
+
+/* packagecard_new: message_text u_regular 12, message_from u_italic 12; packagecard_new_opened gift_message
+   u_regular 12 (the item name stays 12 px bold). */
+.octane-furni-gift-opening .octane-card-content-shell {
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.octane-furni-gift-opening .gift-message,
+.octane-furni-gift-opening .octane-gift-card .italic,
+.octane-furni-gift-opening .octane-furni-gift-opening__message {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.octane-furni-gift-opening .octane-furni-gift-opening__name {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* mystery_box_open_dialog (style 100): subtitle_text il_heading_2, 12 px bold black; waiting_text and
+   mystery_box_reward's label il_regular 11 px. */
+.octane-furni-mysterybox .octane-card-content-shell {
+    color: #000000;
+    font-size: 11px;
+    line-height: 14px;
+}
+
+.octane-furni-mysterybox .octane-furni-mysterybox__subtitle {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* mysterytrophy: header.title u_headline_big at 24 px bold white, header.description 12 px white,
+   the input u_regular 12. */
+.octane-furni-mysterytrophy .octane-card-content-shell {
+    font-size: 12px;
+}
+
+.octane-furni-mysterytrophy.octane-mysterytrophy-dialog .mysterytrophy-dialog-top .mysterytrophy-text-big {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 30px;
+}
+
+.octane-furni-mysterytrophy.octane-mysterytrophy-dialog .mysterytrophy-dialog-top .octane-furni-mysterytrophy__description {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+}
+
+.octane-furni-mysterytrophy .octane-card-content-shell .input-mysterytrophy {
+    color: #000000;
+    font-size: 12px;
+}
+
+/* ecotron_box_card (style 0): message, date and both buttons Volter 9 px; the thick Open button bold. */
+.octane-furni-ecotronbox.octane-ecotronbox-card {
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+}
+
+.octane-furni-ecotronbox.octane-ecotronbox-card .octane-ecotronbox-open {
+    font-weight: 700;
+}
+
+.octane-furni-ecotronbox.octane-ecotronbox-card .octane-ecotronbox-close {
+    font-weight: 400;
+}
+
+/* lock_confirm (style 100): subtitle il_heading_1 14 px bold, message il_regular 11 px. */
+.octane-furni-lock-confirm .octane-card-content-shell .octane-furni-lock-confirm__subtitle {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 17px;
+}
+
+.octane-furni-lock-confirm .octane-furni-lock-confirm__message {
+    font-size: 11px;
+    line-height: 14px;
+}
+
+/* lovelock_engraving: header, date and names u_bold 12 px (regular Ubuntu, not the condensed cut). */
+.octane-furni-lovelock.octane-engraving-lock-view {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* high_score_display: caption u_bold 12 px white, the column heads and entries il_regular 11 px white. */
+.octane-furni-highscore.octane-context-menu .octane-furni-highscore__caption {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.octane-furni-highscore.octane-context-menu .octane-furni-highscore__head,
+.octane-furni-highscore.octane-context-menu .octane-furni-highscore__entry {
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 16px;
+}

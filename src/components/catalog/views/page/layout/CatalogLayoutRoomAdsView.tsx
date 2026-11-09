@@ -4,16 +4,16 @@ import {
     PurchaseRoomAdMessageComposer,
     RoomAdPurchaseInfoEvent,
     RoomEntryData
-} from '@nitrots/nitro-renderer';
-import { FC, useEffect, useState } from 'react';
+} from '@octane/renderer';
+import { FC, useEffect, useRef, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../../api';
-import { useNitroQuery } from '../../../../../api/nitro-query';
-import { Button, Column, Text } from '../../../../../common';
-import { useCatalogUiState, useNavigatorData, useRoomPromote } from '../../../../../hooks';
-import { NitroInput } from '../../../../../layout';
+import { Button } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
+import { Select } from '../../../../../common/Select';
+import { useCatalogUiState, useMessageEvent, useNavigatorData, useRoomPromote } from '../../../../../hooks';
+import { OctaneInput } from '../../../../../layout';
+import { CatalogPriceDisplayWidgetView } from '../widgets/CatalogPriceDisplayWidgetView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
-
-let isPurchasingAd = false;
 
 export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
     const { page = null } = props;
@@ -27,13 +27,21 @@ export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
     const { promoteInformation, isExtended, setIsExtended } = useRoomPromote();
     const promoteData = promoteInformation?.data ?? null;
 
-    const { data: availableRooms = [] } = useNitroQuery<RoomAdPurchaseInfoEvent, RoomEntryData[]>({
-        key: ['nitro', 'catalog', 'room-ad-purchase-info'],
-        request: () => new GetRoomAdPurchaseInfoComposer(),
-        parser: RoomAdPurchaseInfoEvent,
-        select: (e) => e.getParser()?.rooms ?? [],
-        staleTime: 60_000
+    const [availableRooms, setAvailableRooms] = useState<RoomEntryData[]>([]);
+
+    const isPurchasingAd = useRef(false);
+
+    useMessageEvent<RoomAdPurchaseInfoEvent>(RoomAdPurchaseInfoEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser) return;
+
+        setAvailableRooms(parser.rooms ?? []);
     });
+
+    useEffect(() => {
+        SendMessageComposer(new GetRoomAdPurchaseInfoComposer());
+    }, []);
 
     useEffect(() => {
         if (isExtended && promoteData) {
@@ -41,8 +49,8 @@ export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
             setEventName(promoteData.eventName);
             setEventDesc(promoteData.eventDescription);
             setCategoryId(promoteData.categoryId);
-            setExtended(isExtended); // This is for sending to packet
-            setIsExtended(false); // This is from hook useRoomPromotte
+            setExtended(isExtended);
+            setIsExtended(false);
         }
     }, [isExtended, promoteData, setIsExtended]);
 
@@ -53,12 +61,13 @@ export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
         setCategoryId(1);
         setIsExtended(false);
         setIsVisible(false);
+        isPurchasingAd.current = false;
     };
 
     const purchaseAd = () => {
-        if (isPurchasingAd) return;
+        if (isPurchasingAd.current) return;
 
-        isPurchasingAd = true;
+        isPurchasingAd.current = true;
 
         const pageId = page.pageId;
         const offerId = page.offers.length >= 1 ? page.offers[0].offerId : -1;
@@ -76,75 +85,87 @@ export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
         SendMessageComposer(new GetUserEventCatsMessageComposer());
     }, []);
 
+    const invalid = !eventName || !eventDesc || roomId === -1;
+    const offer = page?.offers?.[0] ?? null;
+
+    // AIR layout_roomads_xml, in AIR's order but stretched over the whole catalog page: the text (u_headline_small),
+    // the category menu, the name box, the description box (takes the free height), the room menu, then the price
+    // and the purchase button.
     return (
-        <>
-            <Text bold center>
-                {LocalizeText('roomad.catalog_header')}
-            </Text>
-            <Column className="text-black" overflow="hidden" size={12}>
-                <div>{LocalizeText('roomad.catalog_text', ['duration'], ['120'])}</div>
-                <div className="p-1 rounded bg-muted">
-                    <Column gap={2}>
-                        <Text bold>{LocalizeText('navigator.category')}</Text>
-                        <select
-                            className="form-select form-select-sm"
-                            disabled={extended}
-                            value={categoryId}
-                            onChange={(event) => setCategoryId(parseInt(event.target.value))}
-                        >
-                            {categories &&
-                                categories.map((cat, index) => (
-                                    <option key={index} value={cat.id}>
-                                        {LocalizeText(cat.name)}
-                                    </option>
-                                ))}
-                        </select>
-                    </Column>
-                    <div className="flex flex-col gap-1">
-                        <Text bold>{LocalizeText('roomad.catalog_name')}</Text>
-                        <NitroInput maxLength={64} readOnly={extended} value={eventName} onChange={(event) => setEventName(event.target.value)} />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <Text bold>{LocalizeText('roomad.catalog_description')}</Text>
-                        <textarea
-                            className="min-h-[calc(1.5em+ .5rem+2px)] px-[.5rem] py-[.25rem]  rounded-[.2rem] form-control-sm"
-                            maxLength={64}
-                            readOnly={extended}
-                            value={eventDesc}
-                            onChange={(event) => setEventDesc(event.target.value)}
-                        />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <Text bold>{LocalizeText('roomad.catalog_roomname')}</Text>
-                        <select
-                            className="form-select form-select-sm"
-                            disabled={extended}
-                            value={roomId}
-                            onChange={(event) => setRoomId(parseInt(event.target.value))}
-                        >
-                            <option disabled value={-1}>
-                                {LocalizeText('roomad.catalog_roomname')}
-                            </option>
-                            {availableRooms &&
-                                availableRooms.map((room, index) => (
-                                    <option key={index} value={room.roomId}>
-                                        {room.roomName}
-                                    </option>
-                                ))}
-                        </select>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <Button
-                            disabled={!eventName || !eventDesc || roomId === -1}
-                            variant={!eventName || !eventDesc || roomId === -1 ? 'danger' : 'success'}
-                            onClick={purchaseAd}
-                        >
-                            {extended ? LocalizeText('roomad.extend.event') : LocalizeText('buy')}
-                        </Button>
-                    </div>
+        <NativeTextTree>
+            <div className="octane-catalog-air-roomads">
+                <div className="octane-catalog-air-roomads__text">{LocalizeText('roomad.catalog_text', ['duration'], ['120'])}</div>
+                <div className="octane-catalog-air-roomads__categories">
+                    <Select
+                        aria-label={LocalizeText('navigator.category')}
+                        className="form-select form-select-sm"
+                        disabled={extended}
+                        value={categoryId}
+                        onChange={(event) => setCategoryId(parseInt(event.target.value))}
+                    >
+                        {categories &&
+                            categories.map((cat, index) => (
+                                <option key={index} value={cat.id}>
+                                    {LocalizeText(cat.name)}
+                                </option>
+                            ))}
+                    </Select>
                 </div>
-            </Column>
-        </>
+                <label className="octane-catalog-air-roomads__label is-name" htmlFor="octane-roomad-name">
+                    {LocalizeText('roomad.catalog_name')}
+                </label>
+                <div className="octane-catalog-air-roomads__name">
+                    <OctaneInput
+                        id="octane-roomad-name"
+                        maxLength={64}
+                        readOnly={extended}
+                        value={eventName}
+                        onChange={(event) => setEventName(event.target.value)}
+                    />
+                </div>
+                <label className="octane-catalog-air-roomads__label is-description" htmlFor="octane-roomad-description">
+                    {LocalizeText('roomad.catalog_description')}
+                </label>
+                <textarea
+                    id="octane-roomad-description"
+                    className="octane-catalog-air-roomads__description"
+                    maxLength={64}
+                    readOnly={extended}
+                    value={eventDesc}
+                    onChange={(event) => setEventDesc(event.target.value)}
+                />
+                <span className="octane-catalog-air-roomads__label is-room">{LocalizeText('roomad.catalog_roomname')}</span>
+                <div className="octane-catalog-air-roomads__rooms">
+                    <Select
+                        aria-label={LocalizeText('roomad.catalog_roomname')}
+                        className="form-select form-select-sm"
+                        disabled={extended}
+                        value={roomId}
+                        onChange={(event) => setRoomId(parseInt(event.target.value))}
+                    >
+                        <option disabled value={-1}>
+                            {LocalizeText('roomad.catalog_roomname')}
+                        </option>
+                        {availableRooms &&
+                            availableRooms.map((room, index) => (
+                                <option key={index} value={room.roomId}>
+                                    {room.roomName}
+                                </option>
+                            ))}
+                    </Select>
+                </div>
+                {!!offer && (
+                    <div className="octane-catalog-air-roomads__price">
+                        <CatalogPriceDisplayWidgetView offer={offer} />
+                    </div>
+                )}
+                <div className="octane-catalog-air-roomads__purchase">
+                    <Button disabled={invalid} variant="success" onClick={purchaseAd}>
+                        {extended ? LocalizeText('roomad.extend.event') : LocalizeText('buy')}
+                    </Button>
+                </div>
+            </div>
+        </NativeTextTree>
     );
 };
 

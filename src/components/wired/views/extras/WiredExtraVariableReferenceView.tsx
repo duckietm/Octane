@@ -2,35 +2,27 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
-const TARGET_USER = 0;
-const TARGET_ROOM = 3;
 const MAX_NAME_LENGTH = 40;
+/** AIR wired context SHARED_VARIABLE_LIST: the shared variables of the owner's other rooms. */
+const SHARED_VARIABLE_LIST_CONTEXT = 4;
 
-interface IVariableReferenceEditorVariable {
-    hasValue: boolean;
-    itemId: number;
-    name: string;
-    targetType: number;
-}
-
-interface IVariableReferenceEditorRoom {
+export interface IReferenceSharedVariable {
     roomId: number;
     roomName: string;
-    variables: IVariableReferenceEditorVariable[];
+    variableId: string;
+    variableName: string;
 }
 
-interface IVariableReferenceEditorData {
-    readOnly?: boolean;
-    rooms?: IVariableReferenceEditorRoom[];
-    sourceRoomId?: number;
-    sourceRoomName?: string;
-    sourceTargetType?: number;
-    sourceVariableItemId?: number;
-    sourceVariableName?: string;
-    variableName?: string;
+interface IReferenceRoom {
+    roomId: number;
+    roomName: string;
+    variables: IReferenceSharedVariable[];
 }
 
 const normalizeVariableName = (value: string) => {
@@ -63,194 +55,173 @@ const handleVariableNameKeyDown = (event: React.KeyboardEvent<HTMLInputElement>,
     window.requestAnimationFrame(() => input.setSelectionRange(Math.min(start + 1, input.value.length + 1), Math.min(start + 1, input.value.length + 1)));
 };
 
-const parseEditorData = (value: string): IVariableReferenceEditorData => {
-    if (!value?.trim().startsWith('{')) return {};
-
+/** Our earlier editor's JSON string: the shared variable as room, item id and target (0 user, 3 global). */
+const readLegacyEditor = (stringData: string) => {
     try {
-        return (JSON.parse(value) as IVariableReferenceEditorData) || {};
+        const legacy = JSON.parse(stringData) as { variableName?: string; sourceVariableItemId?: number; sourceTargetType?: number; readOnly?: boolean };
+        const itemId = legacy.sourceVariableItemId ?? 0;
+
+        return {
+            name: legacy.variableName ?? '',
+            readOnly: legacy.readOnly !== false,
+            variableId: itemId > 0 ? `${legacy.sourceTargetType === 3 ? 'room' : 'user'}:${itemId}` : ''
+        };
     } catch {
-        return {};
+        return { name: '', readOnly: true, variableId: '' };
     }
 };
 
+/** The editor state as AIR's ReferenceVariable reads it: name, [readOnly], the shared variable's id and the shared list. */
+export const readReferenceEditor = (trigger: {
+    stringData?: string;
+    intData?: number[];
+    variableIds?: string[];
+    contexts?: Array<{ type: number; sharedVariables?: Array<{ roomId: number; roomName: string; variable: { variableId: string; variableName: string } }> }>;
+}) => {
+    const shared: IReferenceSharedVariable[] = (trigger.contexts ?? [])
+        .filter((context) => context.type === SHARED_VARIABLE_LIST_CONTEXT)
+        .flatMap((context) => context.sharedVariables ?? [])
+        .map((entry) => ({ roomId: entry.roomId, roomName: entry.roomName, variableId: entry.variable.variableId, variableName: entry.variable.variableName }));
+    const stringData = trigger.stringData ?? '';
+
+    if (stringData.trim().startsWith('{')) return { ...readLegacyEditor(stringData), shared };
+
+    return { name: stringData, readOnly: (trigger.intData?.[0] ?? 1) !== 0, variableId: trigger.variableIds?.[0] ?? '', shared };
+};
+
+/** AIR's rooms, sorted by name, each with its shared variables. */
+const groupByRoom = (shared: IReferenceSharedVariable[]): IReferenceRoom[] => {
+    const rooms = new Map<number, IReferenceRoom>();
+
+    for (const variable of shared) {
+        if (!rooms.has(variable.roomId)) rooms.set(variable.roomId, { roomId: variable.roomId, roomName: variable.roomName, variables: [] });
+
+        rooms.get(variable.roomId).variables.push(variable);
+    }
+
+    return [...rooms.values()].sort((a, b) => a.roomName.localeCompare(b.roomName));
+};
+
+/**
+ * AIR's reference variable (ReferenceVariable): the name, the room of the owner and its shared variable, and read only.
+ * Ints `[readOnly]`, string the name, variable ids `[shared variable]`. The name follows the chosen variable while it was
+ * empty or still the previous variable's name.
+ */
 export const WiredExtraVariableReferenceView: FC<{}> = () => {
-    const { trigger = null, setIntParams = null, setStringParam = null } = useWired();
+    const { trigger = null, setIntParams = null, setStringParam = null, setVariableIds = null } = useWired();
     const [variableName, setVariableName] = useState('');
-    const [sourceRoomId, setSourceRoomId] = useState(0);
-    const [sourceVariableItemId, setSourceVariableItemId] = useState(0);
-    const [sourceTargetType, setSourceTargetType] = useState(TARGET_USER);
     const [readOnly, setReadOnly] = useState(true);
-    const [roomOptions, setRoomOptions] = useState<IVariableReferenceEditorRoom[]>([]);
-    const [fallbackRoomName, setFallbackRoomName] = useState('');
-    const [fallbackVariableName, setFallbackVariableName] = useState('');
+    const [variableId, setVariableId] = useState('');
+    const [roomId, setRoomId] = useState(-1);
+    const [shared, setShared] = useState<IReferenceSharedVariable[]>([]);
 
     useEffect(() => {
-        if (!trigger) {
-            setVariableName('');
-            setSourceRoomId(0);
-            setSourceVariableItemId(0);
-            setSourceTargetType(TARGET_USER);
-            setReadOnly(true);
-            setRoomOptions([]);
-            setFallbackRoomName('');
-            setFallbackVariableName('');
-            return;
-        }
+        if (!trigger) return;
 
-        const editorData = parseEditorData(trigger.stringData);
+        const state = readReferenceEditor(trigger);
 
-        setVariableName(normalizeVariableName(editorData.variableName || ''));
-        setSourceRoomId(editorData.sourceRoomId || 0);
-        setSourceVariableItemId(editorData.sourceVariableItemId || 0);
-        setSourceTargetType(editorData.sourceTargetType === TARGET_ROOM ? TARGET_ROOM : TARGET_USER);
-        setReadOnly(editorData.readOnly !== false);
-        setRoomOptions([...(editorData.rooms || [])]);
-        setFallbackRoomName((editorData.sourceRoomName || '').trim());
-        setFallbackVariableName((editorData.sourceVariableName || '').trim());
+        setVariableName(normalizeVariableName(state.name));
+        setReadOnly(state.readOnly);
+        setVariableId(state.variableId);
+        setShared(state.shared);
+        setRoomId(state.shared.find((variable) => variable.variableId === state.variableId)?.roomId ?? -1);
     }, [trigger]);
 
-    const mergedRoomOptions = useMemo(() => {
-        const nextValue = [...roomOptions];
+    const rooms = useMemo(() => groupByRoom(shared), [shared]);
+    const roomVariables = rooms.find((room) => room.roomId === roomId)?.variables ?? [];
+    const disabled = !shared.length;
 
-        if (sourceRoomId <= 0) return nextValue;
-        if (nextValue.some((room) => room.roomId === sourceRoomId)) return nextValue;
+    const selectVariable = (nextId: string) => {
+        const previous = shared.find((variable) => variable.variableId === variableId);
+        const next = roomVariables.find((variable) => variable.variableId === nextId);
 
-        nextValue.push({
-            roomId: sourceRoomId,
-            roomName: fallbackRoomName || `#${sourceRoomId}`,
-            variables:
-                sourceVariableItemId > 0
-                    ? [
-                          {
-                              itemId: sourceVariableItemId,
-                              name: fallbackVariableName || `#${sourceVariableItemId}`,
-                              targetType: sourceTargetType,
-                              hasValue: true
-                          }
-                      ]
-                    : []
-        });
+        if (!variableName || (previous && previous.variableName === variableName)) setVariableName(normalizeVariableName(next?.variableName ?? ''));
 
-        return nextValue;
-    }, [fallbackRoomName, fallbackVariableName, roomOptions, sourceRoomId, sourceTargetType, sourceVariableItemId]);
+        setVariableId(next ? nextId : '');
+    };
 
-    const selectedRoom = useMemo(() => mergedRoomOptions.find((option) => option.roomId === sourceRoomId) ?? null, [mergedRoomOptions, sourceRoomId]);
-    const selectedRoomVariables = selectedRoom?.variables || [];
+    const selectRoom = (nextRoomId: number) => {
+        if (nextRoomId === roomId) return;
 
-    useEffect(() => {
-        if (!selectedRoom) {
-            if (!sourceRoomId && mergedRoomOptions.length) setSourceRoomId(mergedRoomOptions[0].roomId);
-            return;
-        }
-
-        const hasSelectedVariable = selectedRoomVariables.some(
-            (variable) => variable.itemId === sourceVariableItemId && variable.targetType === sourceTargetType
-        );
-
-        if (hasSelectedVariable) return;
-
-        const fallbackVariable = selectedRoomVariables[0];
-
-        if (!fallbackVariable) {
-            setSourceVariableItemId(0);
-            setSourceTargetType(TARGET_USER);
-            return;
-        }
-
-        setSourceVariableItemId(fallbackVariable.itemId);
-        setSourceTargetType(fallbackVariable.targetType);
-    }, [mergedRoomOptions, selectedRoom, selectedRoomVariables, sourceRoomId, sourceTargetType, sourceVariableItemId]);
+        setRoomId(nextRoomId);
+        selectVariable('');
+    };
 
     const save = () => {
-        setIntParams([]);
-        setStringParam(
-            JSON.stringify({
-                variableName: normalizeVariableName(variableName),
-                sourceRoomId,
-                sourceVariableItemId,
-                sourceTargetType,
-                readOnly
-            })
-        );
+        setIntParams([readOnly ? 1 : 0]);
+        setStringParam(normalizeVariableName(variableName));
+        setVariableIds(variableId ? [variableId] : []);
     };
 
-    const validate = () => !!normalizeVariableName(variableName).length && sourceRoomId > 0 && sourceVariableItemId > 0;
-
-    const getTargetLabel = (targetType: number) => {
-        if (targetType === TARGET_ROOM) {
-            const globalLabel = LocalizeText('wiredfurni.params.sources.global');
-
-            return globalLabel && globalLabel !== 'wiredfurni.params.sources.global' ? globalLabel : 'Global';
-        }
-
-        return 'User';
-    };
+    const validate = () => !!normalizeVariableName(variableName).length && !!variableId;
 
     return (
-        <WiredExtraBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            validate={validate}
-            cardStyle={{ width: 400 }}
-        >
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
-                    <NitroInput
-                        maxLength={MAX_NAME_LENGTH}
-                        type="text"
-                        value={variableName}
-                        onChange={(event) => setVariableName(normalizeVariableName(event.target.value))}
-                        onKeyDown={(event) => handleVariableNameKeyDown(event, setVariableName)}
-                    />
-                </div>
+        <NativeTextTree>
+            <WiredExtraBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                validate={validate}
+                cardStyle={{ width: 400 }}
+            >
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
+                        <OctaneInput
+                            disabled={disabled}
+                            maxLength={MAX_NAME_LENGTH}
+                            type="text"
+                            value={variableName}
+                            onChange={(event) => setVariableName(normalizeVariableName(event.target.value))}
+                            onKeyDown={(event) => handleVariableNameKeyDown(event, setVariableName)}
+                        />
+                    </div>
 
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.room_selection')}</Text>
-                    <select
-                        className="form-select form-select-sm"
-                        value={sourceRoomId}
-                        onChange={(event) => setSourceRoomId(parseInt(event.target.value, 10) || 0)}
-                    >
-                        <option value={0}>{LocalizeText('wiredfurni.variable_picker.search')}</option>
-                        {mergedRoomOptions.map((option) => (
-                            <option key={option.roomId} value={option.roomId}>
-                                {option.roomName}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.room_selection')}</Text>
+                        <Select
+                            aria-label={LocalizeText('wiredfurni.params.variables.room_selection.tooltip')}
+                            className="form-select form-select-sm"
+                            disabled={disabled}
+                            value={roomId}
+                            onChange={(event) => selectRoom(parseInt(event.target.value, 10))}
+                        >
+                            <option value={-1}>{LocalizeText('wiredfurni.params.variables.room_selection.tooltip')}</option>
+                            {rooms.map((room) => (
+                                <option key={room.roomId} value={room.roomId}>
+                                    {room.roomName}
+                                </option>
+                            ))}
+                        </Select>
+                    </div>
 
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_ref_selection')}</Text>
-                    <select
-                        className="form-select form-select-sm"
-                        value={`${sourceVariableItemId}:${sourceTargetType}`}
-                        onChange={(event) => {
-                            const [nextItemId, nextTargetType] = event.target.value.split(':').map((value) => parseInt(value, 10) || 0);
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_ref_selection')}</Text>
+                        <Select
+                            aria-label={LocalizeText('wiredfurni.params.variables.variable_selection.tooltip')}
+                            className="form-select form-select-sm"
+                            disabled={disabled}
+                            value={variableId}
+                            onChange={(event) => selectVariable(event.target.value)}
+                        >
+                            <option value="">{LocalizeText('wiredfurni.params.variables.variable_selection.tooltip')}</option>
+                            {roomVariables.map((variable) => (
+                                <option key={variable.variableId} value={variable.variableId}>
+                                    {variable.variableName}
+                                </option>
+                            ))}
+                        </Select>
+                    </div>
 
-                            setSourceVariableItemId(nextItemId);
-                            setSourceTargetType(nextTargetType === TARGET_ROOM ? TARGET_ROOM : TARGET_USER);
-                        }}
-                    >
-                        <option value="0:0">{LocalizeText('wiredfurni.variable_picker.search')}</option>
-                        {selectedRoomVariables.map((variable) => (
-                            <option key={`${variable.itemId}:${variable.targetType}`} value={`${variable.itemId}:${variable.targetType}`}>
-                                {`${variable.name} (${getTargetLabel(variable.targetType)})`}
-                            </option>
-                        ))}
-                    </select>
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.settings')}</Text>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Checkbox checked={readOnly} disabled={disabled} onCheckedChange={(nextChecked) => setReadOnly(nextChecked)} />
+                            <Text>{LocalizeText('wiredfurni.params.variables.settings.read_only')}</Text>
+                        </label>
+                    </div>
                 </div>
-
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.settings')}</Text>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <input checked={readOnly} className="form-check-input" type="checkbox" onChange={(event) => setReadOnly(event.target.checked)} />
-                        <Text>{LocalizeText('wiredfurni.params.variables.settings.read_only')}</Text>
-                    </label>
-                </div>
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

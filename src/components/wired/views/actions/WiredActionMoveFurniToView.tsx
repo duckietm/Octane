@@ -1,9 +1,13 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
-import { Slider, Text } from '../../../../common';
+import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
+import { WiredSliderSection } from '../WiredSliderSection';
+import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const directionOptions: { value: number; icon: string }[] = [
     {
@@ -25,27 +29,22 @@ const directionOptions: { value: number; icon: string }[] = [
 ];
 
 export const WiredActionMoveFurniToView: FC<{}> = (props) => {
-    const [spacing, setSpacing] = useState(-1);
-    const [movement, setMovement] = useState(-1);
-    const { trigger = null, setIntParams = null } = useWired();
-    const [furniSource, setFurniSource] = useState<number>(() => {
-        if (trigger?.intData?.length > 2) return trigger.intData[2];
-        return (trigger?.selectedItems?.length ?? 0) > 0 ? 100 : 0;
-    });
+    const [spacing, setSpacing] = useState(1);
+    const [movement, setMovement] = useState(0);
+    const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
+    const [furniSource, setFurniSource] = useState<number>(() => slotFurniSource(trigger));
 
-    const save = () => setIntParams([movement, spacing, furniSource]);
+    // Official layout: [direction (0 by default), empty tiles (1 by default)]; the furni source is the
+    // official slot.
+    const save = () => {
+        setIntParams([movement, spacing]);
+        setSourceTypes({ furni: [furniSource], users: [] });
+    };
 
     useEffect(() => {
-        if (trigger.intData.length >= 2) {
-            setSpacing(trigger.intData[1]);
-            setMovement(trigger.intData[0]);
-        } else {
-            setSpacing(-1);
-            setMovement(-1);
-        }
-
-        if (trigger.intData.length > 2) setFurniSource(trigger.intData[2]);
-        else setFurniSource((trigger.selectedItems?.length ?? 0) > 0 ? 100 : 0);
+        setMovement(trigger?.intData?.[0] ?? 0);
+        setSpacing(Math.max(1, trigger?.intData?.[1] ?? 1));
+        setFurniSource(slotFurniSource(trigger));
     }, [trigger]);
 
     const onChangeFurniSource = (next: number) => setFurniSource(next);
@@ -53,38 +52,33 @@ export const WiredActionMoveFurniToView: FC<{}> = (props) => {
     const requiresFurni = WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_OR_BY_TYPE;
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={requiresFurni}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.emptytiles', ['tiles'], [spacing.toString()])}</Text>
-                <Slider max={5} min={1} value={spacing} onChange={(event) => setSpacing(event)} />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.movefurni', LocalizeText('wiredfurni.params.startdir'))}</Text>
-                <div className="flex gap-1">
-                    {directionOptions.map((value) => {
-                        return (
-                            <div key={value.value} className="flex items-center gap-1">
-                                <input
-                                    checked={movement === value.value}
-                                    className="form-check-input"
-                                    id={`movement${value.value}`}
-                                    name="movement"
-                                    type="radio"
-                                    onChange={(event) => setMovement(value.value)}
-                                />
-                                <Text>
-                                    <i className={`icon icon-${value.icon}`} />
-                                </Text>
-                            </div>
-                        );
-                    })}
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={requiresFurni}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.movefurni', LocalizeText('wiredfurni.params.startdir'))}</Text>
+                    <div className="flex flex-col gap-1">
+                        {directionOptions.map((value) => (
+                            <label key={value.value} className="flex items-center gap-1">
+                                <Radio checked={movement === value.value} name="movement" onCheckedChange={() => setMovement(value.value)} />
+                                <i className={`icon icon-${value.icon}`} />
+                                <Text>{localizeWithFallback(`wiredfurni.params.movefurni.${value.value}`, value.icon.toUpperCase())}</Text>
+                            </label>
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </WiredActionBaseView>
+                <WiredSliderSection
+                    max={5}
+                    min={1}
+                    title={LocalizeText('wiredfurni.params.emptytiles', ['tiles'], [spacing.toString()])}
+                    value={spacing}
+                    onChange={setSpacing}
+                />
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

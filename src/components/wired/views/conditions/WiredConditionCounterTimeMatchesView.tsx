@@ -4,8 +4,9 @@ import { Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
-const COUNTER_INTERACTION_TYPES = ['game_upcounter'];
 const MINUTES_MIN = 0;
 const MINUTES_MAX = 99;
 const HALF_SECONDS_MIN = 0;
@@ -34,101 +35,68 @@ const formatSeconds = (halfSeconds: number) => {
 };
 
 export const WiredConditionCounterTimeMatchesView: FC<{}> = () => {
-    const { trigger = null, setIntParams = null, setAllowedInteractionTypes = null, setAllowedInteractionErrorKey = null } = useWired();
+    // Official layout: [seconds, minutes, half second, comparison], the counters in the official source slot; the
+    // quantifier is the base view's.
+    const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
     const [comparison, setComparison] = useState(1);
-    const [furniSource, setFurniSource] = useState<number>(() => {
-        if (trigger?.intData?.length > 3) return trigger.intData[3];
-        return (trigger?.selectedItems?.length ?? 0) > 0 ? 100 : 0;
-    });
+    const [furniSource, setFurniSource] = useState<number>(() => trigger?.furniSourceTypes?.[0] ?? ((trigger?.selectedItems?.length ?? 0) > 0 ? 100 : 0));
     const [minutes, setMinutes] = useState(0);
     const [halfSeconds, setHalfSeconds] = useState(0);
-    const [quantifier, setQuantifier] = useState(0);
 
     const secondsLabel = useMemo(() => formatSeconds(halfSeconds), [halfSeconds]);
 
     const save = () => {
-        setIntParams([normalizeComparison(comparison), normalizeMinutes(minutes), normalizeHalfSeconds(halfSeconds), furniSource, quantifier]);
+        const steps = normalizeHalfSeconds(halfSeconds);
+
+        setIntParams([Math.floor(steps / 2), normalizeMinutes(minutes), steps % 2, normalizeComparison(comparison)]);
+        setSourceTypes({ furni: [furniSource], users: [] });
     };
 
     useEffect(() => {
         if (!trigger) return;
 
-        setComparison(trigger.intData.length > 0 ? normalizeComparison(trigger.intData[0]) : 1);
+        setHalfSeconds(normalizeHalfSeconds((trigger.intData[0] ?? 0) * 2 + (trigger.intData[2] ?? 0)));
         setMinutes(trigger.intData.length > 1 ? normalizeMinutes(trigger.intData[1]) : 0);
-        setHalfSeconds(trigger.intData.length > 2 ? normalizeHalfSeconds(trigger.intData[2]) : 0);
-        setFurniSource(trigger.intData.length > 3 ? trigger.intData[3] : (trigger.selectedItems?.length ?? 0) > 0 ? 100 : 0);
-        setQuantifier(trigger.intData.length > 4 && trigger.intData[4] === 1 ? 1 : 0);
+        setComparison(trigger.intData.length > 3 ? normalizeComparison(trigger.intData[3]) : 1);
+        setFurniSource(trigger.furniSourceTypes?.[0] ?? ((trigger.selectedItems?.length ?? 0) > 0 ? 100 : 0));
     }, [trigger]);
 
-    useEffect(() => {
-        setAllowedInteractionTypes(COUNTER_INTERACTION_TYPES);
-        setAllowedInteractionErrorKey('wiredfurni.error.require_counter_furni');
-
-        return () => {
-            setAllowedInteractionTypes(null);
-            setAllowedInteractionErrorKey(null);
-        };
-    }, [setAllowedInteractionErrorKey, setAllowedInteractionTypes]);
-
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            footer={
-                <div className="flex flex-col gap-2">
-                    <div className="flex flex-col gap-1">
-                        <Text bold>{LocalizeText('wiredfurni.params.quantifier_selection')}</Text>
-                        {[0, 1].map((value) => (
-                            <label key={value} className="flex items-center gap-1">
-                                <input
-                                    checked={quantifier === value}
-                                    className="form-check-input"
-                                    name="counterTimeQuantifier"
-                                    type="radio"
-                                    onChange={() => setQuantifier(value)}
-                                />
-                                <Text>{LocalizeText(`wiredfurni.params.quantifier.furni.${value}`)}</Text>
-                            </label>
-                        ))}
-                    </div>
-                    <WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
+                    {COMPARISON_OPTIONS.map((option) => {
+                        return (
+                            <div key={option.value} className="flex items-center gap-1">
+                                <Radio checked={comparison === option.value} id={`counterComparison${option.value}`} name="counterComparison" onCheckedChange={() => setComparison(option.value)} />
+                                <Text>{LocalizeText(option.label)}</Text>
+                            </div>
+                        );
+                    })}
                 </div>
-            }
-        >
-            <div className="flex flex-col gap-2">
-                {COMPARISON_OPTIONS.map((option) => {
-                    return (
-                        <div key={option.value} className="flex items-center gap-1">
-                            <input
-                                checked={comparison === option.value}
-                                className="form-check-input"
-                                id={`counterComparison${option.value}`}
-                                name="counterComparison"
-                                type="radio"
-                                onChange={() => setComparison(option.value)}
-                            />
-                            <Text>{LocalizeText(option.label)}</Text>
-                        </div>
-                    );
-                })}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.clock_minutes_elapsed', ['minutes'], [minutes.toString()])}</Text>
-                <Slider max={MINUTES_MAX} min={MINUTES_MIN} step={1} value={minutes} onChange={(event) => setMinutes(normalizeMinutes(event as number))} />
-                <Text small>{minutes}</Text>
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.clock_seconds_elapsed', ['seconds'], [secondsLabel])}</Text>
-                <Slider
-                    max={HALF_SECONDS_MAX}
-                    min={HALF_SECONDS_MIN}
-                    step={1}
-                    value={halfSeconds}
-                    onChange={(event) => setHalfSeconds(normalizeHalfSeconds(event as number))}
-                />
-                <Text small>{secondsLabel}</Text>
-            </div>
-        </WiredConditionBaseView>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.clock_minutes_elapsed', ['minutes'], [minutes.toString()])}</Text>
+                    <Slider max={MINUTES_MAX} min={MINUTES_MIN} step={1} value={minutes} onChange={(event) => setMinutes(normalizeMinutes(event as number))} />
+                    <Text small>{minutes}</Text>
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.clock_seconds_elapsed', ['seconds'], [secondsLabel])}</Text>
+                    <Slider
+                        max={HALF_SECONDS_MAX}
+                        min={HALF_SECONDS_MIN}
+                        step={1}
+                        value={halfSeconds}
+                        onChange={(event) => setHalfSeconds(normalizeHalfSeconds(event as number))}
+                    />
+                    <Text small>{secondsLabel}</Text>
+                </div>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

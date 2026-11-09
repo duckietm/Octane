@@ -1,24 +1,49 @@
 import {
     CreateLinkEvent,
     GetSessionDataManager,
+    RoomRightsEvent,
+    WiredMenuPermissionsSaveComposer,
     WiredRoomSettingsDataEvent,
     WiredRoomSettingsRequestComposer,
-    WiredRoomSettingsSaveComposer,
+    WiredRoomStateActionComposer,
     WiredUserVariableManageComposer,
     WiredUserVariablesDataEvent,
     WiredUserVariablesRequestComposer,
+    UserSettingsEvent,
+    WiredMenuSettingsComposer,
     WiredUserVariableUpdateComposer
-} from '@nitrots/nitro-renderer';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { LocalizeText, NotificationAlertType, SendMessageComposer } from '../../api';
+} from '@octane/renderer';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { registerSharedHook } from '@/state/useSharedHook';
+import {
+    createPacketCooldownGate,
+    decodeWiredMenuPreferences,
+    LocalizeText,
+    localizeWithFallback,
+    NotificationAlertType,
+    NotificationBubbleType,
+    normalizeWiredStyle,
+    SendMessageComposer,
+    WIRED_STYLE_DEFAULT,
+    WiredStyleName,
+    wiredPlayTestNotificationKey
+} from '../../api';
 import { useMessageEvent } from '../events';
+import { useWiredPlayTest } from './useWiredPlayTest';
 import { useNotification } from '../notification';
 import { useRoom } from '../rooms';
 
 export interface IWiredAccountPreferences {
+    /**
+     * Official playtest mode: kept on the server with the other wired menu preferences
+     * (WiredMenuSettingsComposer playTestMode).
+     */
+    playTestMode: boolean;
     showInspectButton: boolean;
     showSystemNotifications: boolean;
     showToolbarButton: boolean;
+    /** The look of the wired box windows: "" (default, illumina) or one of WIRED_STYLE_OPTIONS. */
+    wiredStyle: WiredStyleName;
 }
 
 export interface IWiredRoomSettings {
@@ -29,6 +54,8 @@ export interface IWiredRoomSettings {
     isLoaded: boolean;
     modifyMask: number;
     roomId: number;
+    /** The room's wired timezone as the server keeps it; empty when the hotel's own applies. */
+    timezone: string;
 }
 
 export interface IWiredUserVariableDefinition {
@@ -38,6 +65,10 @@ export interface IWiredUserVariableDefinition {
     isTextConnected: boolean;
     itemId: number;
     name: string;
+    /** The value-to-text table of a text connected definition, when the server sent one. */
+    textConnector?: Array<{ key: number; value: string }>;
+    /** AIR WiredVariable.requiresExecutionContext: a pointer, which only exists while a stack runs. */
+    requiresExecutionContext?: boolean;
 }
 
 export interface IWiredUserVariableAssignment {
@@ -55,6 +86,10 @@ export interface IWiredFurniVariableDefinition {
     isTextConnected: boolean;
     itemId: number;
     name: string;
+    /** The value-to-text table of a text connected definition, when the server sent one. */
+    textConnector?: Array<{ key: number; value: string }>;
+    /** AIR WiredVariable.requiresExecutionContext: a pointer, which only exists while a stack runs. */
+    requiresExecutionContext?: boolean;
 }
 
 export interface IWiredFurniVariableAssignment {
@@ -72,6 +107,10 @@ export interface IWiredRoomVariableDefinition {
     isTextConnected: boolean;
     itemId: number;
     name: string;
+    /** The value-to-text table of a text connected definition, when the server sent one. */
+    textConnector?: Array<{ key: number; value: string }>;
+    /** AIR WiredVariable.requiresExecutionContext: a pointer, which only exists while a stack runs. */
+    requiresExecutionContext?: boolean;
 }
 
 export interface IWiredRoomVariableAssignment {
@@ -89,6 +128,10 @@ export interface IWiredContextVariableDefinition {
     isTextConnected: boolean;
     itemId: number;
     name: string;
+    /** The value-to-text table of a text connected definition, when the server sent one. */
+    textConnector?: Array<{ key: number; value: string }>;
+    /** AIR WiredVariable.requiresExecutionContext: a pointer, which only exists while a stack runs. */
+    requiresExecutionContext?: boolean;
 }
 
 const WIRED_VARIABLE_TARGET_USER = 0;
@@ -96,13 +139,16 @@ const WIRED_VARIABLE_TARGET_FURNI = 1;
 const WIRED_VARIABLE_TARGET_ROOM = 3;
 const WIRED_VARIABLE_MANAGE_ACTION_ASSIGN = 0;
 const WIRED_VARIABLE_MANAGE_ACTION_REMOVE = 1;
+const WIRED_VARIABLE_MANAGE_ACTION_CLEAR_ALL = 2;
 
 const WIRED_TOOLS_STORAGE_PREFIX = 'nitro.wired.tools.preferences';
 const getCurrentUnixTime = () => Math.floor(Date.now() / 1000);
 const DEFAULT_ACCOUNT_PREFERENCES: IWiredAccountPreferences = {
+    playTestMode: false,
     showToolbarButton: false,
     showInspectButton: false,
-    showSystemNotifications: false
+    showSystemNotifications: false,
+    wiredStyle: WIRED_STYLE_DEFAULT
 };
 
 const DEFAULT_ROOM_SETTINGS: IWiredRoomSettings = {
@@ -112,7 +158,8 @@ const DEFAULT_ROOM_SETTINGS: IWiredRoomSettings = {
     canInspect: false,
     canModify: false,
     canManageSettings: false,
-    isLoaded: false
+    isLoaded: false,
+    timezone: ''
 };
 
 /**
@@ -122,14 +169,21 @@ const DEFAULT_ROOM_SETTINGS: IWiredRoomSettings = {
  * (imperative slice). useWiredTools is the legacy shim that composes
  * both into the original shape.
  *
- * Wrapped in useBetween at the public-hook layer so every consumer in
+ * Wrapped by the Zustand bridge at the public-hook layer so every consumer in
  * the tree sees the same instance (matches the previous
- * useBetween(useWiredToolsState) wiring).
+ * shared-store wiring).
  */
 export const useWiredToolsStore = () => {
     const { roomSession = null } = useRoom();
-    const { simpleAlert = null } = useNotification();
+    const { simpleAlert = null, showSingleBubble = null } = useNotification();
     const [accountPreferences, setAccountPreferences] = useState<IWiredAccountPreferences>(DEFAULT_ACCOUNT_PREFERENCES);
+    const accountPreferencesRef = useRef<IWiredAccountPreferences>(DEFAULT_ACCOUNT_PREFERENCES);
+    // Once the server sent stored preferences, the local copy no longer overrides them.
+    const serverPreferencesAppliedRef = useRef(false);
+
+    useEffect(() => {
+        accountPreferencesRef.current = accountPreferences;
+    }, [accountPreferences]);
     const [roomSettings, setRoomSettings] = useState<IWiredRoomSettings>(DEFAULT_ROOM_SETTINGS);
     const [userVariableDefinitions, setUserVariableDefinitions] = useState<IWiredUserVariableDefinition[]>([]);
     const [userVariableAssignments, setUserVariableAssignments] = useState<Record<number, IWiredUserVariableAssignment[]>>({});
@@ -139,6 +193,19 @@ export const useWiredToolsStore = () => {
     const [roomVariableAssignments, setRoomVariableAssignments] = useState<IWiredRoomVariableAssignment[]>([]);
     const [contextVariableDefinitions, setContextVariableDefinitions] = useState<IWiredContextVariableDefinition[]>([]);
     const [areUserVariablesLoaded, setAreUserVariablesLoaded] = useState(false);
+    const userVariablesRequestGateRef = useRef<ReturnType<typeof createPacketCooldownGate> | null>(null);
+
+    if (!userVariablesRequestGateRef.current) {
+        userVariablesRequestGateRef.current = createPacketCooldownGate();
+    }
+
+    const requestUserVariables = useCallback(() => {
+        if (!roomSettings.canInspect) return;
+
+        userVariablesRequestGateRef.current?.request(() => {
+            SendMessageComposer(new WiredUserVariablesRequestComposer());
+        });
+    }, [roomSettings.canInspect]);
 
     const storageKey = useMemo(() => {
         const userId = GetSessionDataManager().userId;
@@ -147,6 +214,8 @@ export const useWiredToolsStore = () => {
     }, []);
 
     useEffect(() => {
+        if (serverPreferencesAppliedRef.current) return;
+
         try {
             const rawValue = window.localStorage.getItem(storageKey);
 
@@ -159,7 +228,8 @@ export const useWiredToolsStore = () => {
 
             setAccountPreferences({
                 ...DEFAULT_ACCOUNT_PREFERENCES,
-                ...(parsedValue || {})
+                ...(parsedValue || {}),
+                wiredStyle: normalizeWiredStyle(parsedValue?.wiredStyle)
             });
         } catch {
             setAccountPreferences(DEFAULT_ACCOUNT_PREFERENCES);
@@ -210,8 +280,8 @@ export const useWiredToolsStore = () => {
             return;
         }
 
-        SendMessageComposer(new WiredUserVariablesRequestComposer());
-    }, [roomSession?.roomId, roomSettings.canInspect]);
+        requestUserVariables();
+    }, [roomSession?.roomId, roomSettings.canInspect, requestUserVariables]);
 
     useMessageEvent<WiredRoomSettingsDataEvent>(WiredRoomSettingsDataEvent, (event) => {
         const parser = event.getParser();
@@ -225,7 +295,8 @@ export const useWiredToolsStore = () => {
             canInspect: parser.canInspect,
             canModify: parser.canModify,
             canManageSettings: parser.canManageSettings,
-            isLoaded: true
+            isLoaded: true,
+            timezone: parser.timezone ?? ''
         });
     });
 
@@ -255,33 +326,139 @@ export const useWiredToolsStore = () => {
         setAreUserVariablesLoaded(true);
     });
 
-    const updateAccountPreferences = useCallback((partialPreferences: Partial<IWiredAccountPreferences>) => {
+    // The official client keeps the wired menu preferences on the server; the whisper switch rides
+    // along in the same packet, so the last value the server sent is kept here.
+    const wiredWhisperDisabledRef = useRef(false);
+
+    // Official onControllerMessageEvent: while playtest mode is on, every rights update in a room
+    // reminds the user, linked to the wired menu settings.
+    useMessageEvent<RoomRightsEvent>(RoomRightsEvent, () => {
+        if (!accountPreferencesRef.current.playTestMode) return;
+
+        showSingleBubble?.(
+            localizeWithFallback(
+                'wiredmenu.settings.preferences.notification.playtest',
+                'Info: you are currently in playtest mode. Disable in the Wired Menu (click)'
+            ),
+            NotificationBubbleType.INFO,
+            null,
+            'wiredmenu/open/settings'
+        );
+    });
+
+    useMessageEvent<UserSettingsEvent>(UserSettingsEvent, (event) => {
+        const parser = event.getParser();
+
+        wiredWhisperDisabledRef.current = !!parser.wiredWhisperDisabled;
+
+        const stored = decodeWiredMenuPreferences(parser.wiredMenuPreferences ?? '');
+
+        if (!stored) return;
+
+        serverPreferencesAppliedRef.current = true;
         setAccountPreferences((prevValue) => ({
             ...prevValue,
-            ...partialPreferences
+            playTestMode: stored.playTestMode,
+            showToolbarButton: stored.showToolbarButton,
+            showInspectButton: stored.showInspectButton,
+            showSystemNotifications: stored.showSystemNotifications,
+            wiredStyle: stored.wiredStyle
         }));
+    });
+
+    const sendWiredMenuSettings = useCallback((preferences: IWiredAccountPreferences) => {
+        SendMessageComposer(
+            new WiredMenuSettingsComposer(
+                preferences.showToolbarButton,
+                preferences.showInspectButton,
+                preferences.playTestMode,
+                wiredWhisperDisabledRef.current,
+                preferences.showSystemNotifications,
+                preferences.wiredStyle
+            )
+        );
     }, []);
 
+    const updateAccountPreferences = useCallback(
+        (partialPreferences: Partial<IWiredAccountPreferences>) => {
+            const next = { ...accountPreferencesRef.current, ...partialPreferences };
+
+            accountPreferencesRef.current = next;
+            setAccountPreferences(next);
+            sendWiredMenuSettings(next);
+        },
+        [sendWiredMenuSettings]
+    );
+
+    // Official setPlayTestMode(on, notify): the switch is saved with the other preferences and a
+    // notification, linked to the wired menu settings, says which way it went.
+    const setPlayTestMode = useCallback(
+        (playTestMode: boolean) => {
+            if (playTestMode === accountPreferencesRef.current.playTestMode) return;
+
+            updateAccountPreferences({ playTestMode });
+            showSingleBubble?.(
+                localizeWithFallback(wiredPlayTestNotificationKey(playTestMode), playTestMode ? localizeWithFallback('octane.wired_tools.playtest_mode_enabled', 'Playtest mode enabled') : localizeWithFallback('octane.wired_tools.playtest_mode_disabled', 'Playtest mode disabled')),
+                NotificationBubbleType.INFO,
+                null,
+                'wiredmenu/open/settings'
+            );
+        },
+        [updateAccountPreferences, showSingleBubble]
+    );
+
+    const togglePlayTestMode = useCallback(() => setPlayTestMode(!accountPreferencesRef.current.playTestMode), [setPlayTestMode]);
+
+    useWiredPlayTest(accountPreferences.playTestMode, togglePlayTestMode);
+
+    /**
+     * The whisper switch of the user settings travels in the same packet as the wired menu
+     * preferences, so it is saved here with the stored ones and is not lost by the next save.
+     */
+    const updateWiredWhisperDisabled = useCallback(
+        (disabled: boolean) => {
+            wiredWhisperDisabledRef.current = disabled;
+            sendWiredMenuSettings(accountPreferencesRef.current);
+        },
+        [sendWiredMenuSettings]
+    );
+
+    // The official permissions packet carries the timezone too, so every save sends all three and
+    // the server answers with the settings it kept.
     const saveRoomSettings = useCallback(
-        (inspectMask: number, modifyMask: number) => {
+        (inspectMask: number, modifyMask: number, timezone: string = roomSettings.timezone) => {
             if (!roomSettings.canManageSettings) return;
 
             setRoomSettings((prevValue) => ({
                 ...prevValue,
                 inspectMask,
-                modifyMask
+                modifyMask,
+                timezone
             }));
 
-            SendMessageComposer(new WiredRoomSettingsSaveComposer(inspectMask, modifyMask));
+            SendMessageComposer(new WiredMenuPermissionsSaveComposer(modifyMask, inspectMask, timezone));
         },
-        [roomSettings.canManageSettings]
+        [roomSettings.canManageSettings, roomSettings.timezone]
     );
 
-    const requestUserVariables = useCallback(() => {
-        if (!roomSettings.canInspect) return;
+    const saveRoomTimezone = useCallback(
+        (timezone: string) => saveRoomSettings(roomSettings.inspectMask, roomSettings.modifyMask, timezone),
+        [saveRoomSettings, roomSettings.inspectMask, roomSettings.modifyMask]
+    );
 
-        SendMessageComposer(new WiredUserVariablesRequestComposer());
-    }, [roomSettings.canInspect]);
+    /** Drops the room's cached wired stacks so its boxes are wired up again from the furniture as it stands. */
+    const reloadRoomWired = useCallback(() => {
+        if (!roomSettings.canModify) return;
+
+        SendMessageComposer(new WiredRoomStateActionComposer(false));
+    }, [roomSettings.canModify]);
+
+    /** Re-reads every box from storage, discarding edits that were never saved, then rebuilds the stacks. */
+    const rollbackRoomWired = useCallback(() => {
+        if (!roomSettings.canModify) return;
+
+        SendMessageComposer(new WiredRoomStateActionComposer(true));
+    }, [roomSettings.canModify]);
 
     const updateUserVariableValue = useCallback(
         (userId: number, variableItemId: number, value: number) => {
@@ -556,10 +733,47 @@ export const useWiredToolsStore = () => {
         [roomSettings.canModify]
     );
 
+    /**
+     * Takes a variable away from every holder at once, the official "clear this variable". The
+     * server decides who may (the owner of the definition box); the room is told through the next
+     * snapshot, but the local copy drops the holders straight away so the tab does not lag behind.
+     */
+    const clearVariableForAllHolders = useCallback(
+        (scope: 'user' | 'furni', variableItemId: number) => {
+            if (!roomSettings.canModify || !variableItemId) return;
+
+            const strip = (prevValue: Record<number, { variableItemId: number }[]>) => {
+                const nextValue: typeof prevValue = {};
+
+                for (const [holderId, assignments] of Object.entries(prevValue)) {
+                    const remaining = assignments.filter((assignment) => assignment.variableItemId !== variableItemId);
+
+                    if (remaining.length) nextValue[Number(holderId)] = remaining;
+                }
+
+                return nextValue;
+            };
+
+            if (scope === 'furni') setFurniVariableAssignments((prevValue) => strip(prevValue) as typeof prevValue);
+            else setUserVariableAssignments((prevValue) => strip(prevValue) as typeof prevValue);
+
+            SendMessageComposer(
+                new WiredUserVariableManageComposer(
+                    WIRED_VARIABLE_MANAGE_ACTION_CLEAR_ALL,
+                    scope === 'furni' ? WIRED_VARIABLE_TARGET_FURNI : WIRED_VARIABLE_TARGET_USER,
+                    0,
+                    variableItemId,
+                    0
+                )
+            );
+        },
+        [roomSettings.canModify]
+    );
+
     const showInvalidRoomAlert = useCallback(() => {
         if (!simpleAlert) return;
 
-        simpleAlert(LocalizeText('wiredmenu.invalid_room.desc'), NotificationAlertType.ALERT, null, null, LocalizeText('generic.alert.title'));
+        simpleAlert(LocalizeText('wiredmenu.invalid_room.desc'), NotificationAlertType.ALERT, null, null, LocalizeText('wiredmenu.invalid_room.title'));
     }, [simpleAlert]);
 
     const openMonitor = useCallback(() => {
@@ -612,13 +826,20 @@ export const useWiredToolsStore = () => {
         contextVariableDefinitions,
         areUserVariablesLoaded,
         updateAccountPreferences,
+        setPlayTestMode,
+        togglePlayTestMode,
+        updateWiredWhisperDisabled,
         saveRoomSettings,
+        saveRoomTimezone,
+        reloadRoomWired,
+        rollbackRoomWired,
         requestUserVariables,
         assignUserVariable,
         removeUserVariable,
         updateUserVariableValue,
         assignFurniVariable,
         removeFurniVariable,
+        clearVariableForAllHolders,
         updateFurniVariableValue,
         updateRoomVariableValue,
         openMonitor,
@@ -626,3 +847,5 @@ export const useWiredToolsStore = () => {
         openInspectionForUser
     };
 };
+
+registerSharedHook(useWiredToolsStore);

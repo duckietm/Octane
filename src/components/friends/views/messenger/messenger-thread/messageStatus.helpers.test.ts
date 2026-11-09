@@ -1,3 +1,4 @@
+/* @vitest-environment jsdom */
 import { describe, expect, it } from 'vitest';
 import { MessengerThreadChat } from '../../../../../api';
 import { getMessageStatusPresentation } from './messageStatus.helpers';

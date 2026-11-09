@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<skin name="button_shiny_skin" version="0.0">
+
+	<!-- shared variables -->
+	
+	<variables>
+		<variable key="asset"	value="habbo_blue_skin_png"	type="String" />
+	</variables>
+	
+	<!-- the following maps layouts for render states -->
+
+	<states>
+		<state name="default"  layout="button_shiny" template="default_button_shiny" />
+		<state name="disabled" layout="button_shiny" template="disabled_button_shiny" />
+		<state name="pressed"  layout="button_shiny" template="pressed_button_shiny" />
+		<state name="hovering" layout="button_shiny" template="hovering_button_shiny" />
+	</states>
+
+	<!-- templates defines regions in bitmap asset -->
+	
+	<templates>
+		<template name="default_button_shiny" asset="$asset">
+			<entities>
+				<entity name="top_left"	  type="bitmap"><region><Rectangle x="32" y="75"  width="5" height="5" /></region></entity>
+				<entity name="mid_left"	  type="bitmap"><region><Rectangle x="32" y="80"  width="5" height="12" /></region></entity>
+				<entity name="btm_left"   type="bitmap"><region><Rectangle x="32" y="92" width="5" height="5" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="37" y="75"  width="1" height="5" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="37" y="80"  width="1" height="12" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="37" y="92" width="1" height="5" /></region></entity>
+				<entity name="top_right"  type="bitmap"><region><Rectangle x="38" y="75"  width="5" height="5" /></region></entity>
+				<entity name="mid_right"  type="bitmap"><region><Rectangle x="38" y="80"  width="5" height="12" /></region></entity>
+				<entity name="btm_right"  type="bitmap"><region><Rectangle x="38" y="92" width="5" height="5" /></region></entity>
+			</entities>
+		</template>
+		
+		<template name="disabled_button_shiny" asset="$asset">
+			<entities>
+				<entity name="top_left"	  type="bitmap"><region><Rectangle x="69" y="75"  width="5" height="5" /></region></entity>
+				<entity name="mid_left"	  type="bitmap"><region><Rectangle x="69" y="80"  width="5" height="12" /></region></entity>
+				<entity name="btm_left"   type="bitmap"><region><Rectangle x="69" y="92" width="5" height="5" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="74" y="75"  width="1" height="5" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="74" y="80"  width="1" height="12" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="74" y="92" width="1" height="5" /></region></entity>
+				<entity name="top_right"  type="bitmap"><region><Rectangle x="75" y="75"  width="5" height="5" /></region></entity>
+				<entity name="mid_right"  type="bitmap"><region><Rectangle x="75" y="80"  width="5" height="12" /></region></entity>
+				<entity name="btm_right"  type="bitmap"><region><Rectangle x="75" y="92" width="5" height="5" /></region></entity>
+			</entities>
+		</template>
+		
+		<template name="pressed_button_shiny" asset="$asset">
+			<entities>
+				<entity name="top_left"	  type="bitmap"><region><Rectangle x="57" y="75"  width="5" height="5" /></region></entity>
+				<entity name="mid_left"	  type="bitmap"><region><Rectangle x="57" y="80"  width="5" height="12" /></region></entity>
+				<entity name="btm_left"   type="bitmap"><region><Rectangle x="57" y="92" width="5" height="5" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="62" y="75"  width="1" height="5" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="62" y="80"  width="1" height="12" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="62" y="92" width="1" height="5" /></region></entity>
+				<entity name="top_right"  type="bitmap"><region><Rectangle x="63" y="75"  width="5" height="5" /></region></entity>
+				<entity name="mid_right"  type="bitmap"><region><Rectangle x="63" y="80"  width="5" height="12" /></region></entity>
+				<entity name="btm_right"  type="bitmap"><region><Rectangle x="63" y="92" width="5" height="5" /></region></entity>
+			</entities>
+		</template>
+		
+		<template name="hovering_button_shiny" asset="$asset">
+			<entities>
+				<entity name="top_left"	  type="bitmap"><region><Rectangle x="44" y="75"  width="5" height="5" /></region></entity>
+				<entity name="mid_left"	  type="bitmap"><region><Rectangle x="44" y="80"  width="5" height="12" /></region></entity>
+				<entity name="btm_left"   type="bitmap"><region><Rectangle x="44" y="92" width="5" height="5" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="49" y="75"  width="1" height="5" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="49" y="80"  width="1" height="12" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="49" y="92" width="1" height="5" /></region></entity>
+				<entity name="top_right"  type="bitmap"><region><Rectangle x="51" y="75"  width="5" height="5" /></region></entity>
+				<entity name="mid_right"  type="bitmap"><region><Rectangle x="51" y="80"  width="5" height="12" /></region></entity>
+				<entity name="btm_right"  type="bitmap"><region><Rectangle x="51" y="92" width="5" height="5" /></region></entity>
+			</entities>
+		</template>
+	</templates>
+	
+	<!-- markup for layout drawer -->
+	
+	<layouts>
+		<layout name="button_shiny" transparent="true">
+			<entities>
+
+				<!-- left -->
+				
+				<entity name="top_left" id="0">
+					<region><Rectangle x="0" y="0" width="5" height="5" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+
+				<entity name="mid_left" id="0">
+					<region><Rectangle x="0" y="5" width="5" height="12" /></region>
+					<scale horizontal="fixed" vertical="strech" />
+				</entity>
+				
+				<entity name="btm_left" id="0">
+					<region><Rectangle x="0" y="17" width="5" height="5" /></region>
+					<scale horizontal="fixed" vertical="move" />
+				</entity>
+				
+				<!-- center -->
+				
+				<entity name="top_center" id="1">
+					<region><Rectangle x="5"  y="0" width="1" height="5" /></region>
+					<scale horizontal="strech" vertical="fixed" />
+				</entity>
+				
+				<entity name="mid_center" id="1">
+					<region><Rectangle x="5"  y="5" width="1" height="12" /></region>
+					<scale horizontal="strech" vertical="strech" />
+				</entity>
+				
+				<entity name="btm_center" id="1">
+					<region><Rectangle x="5"  y="17" width="1" height="5" /></region>
+					<scale horizontal="strech" vertical="move" />
+				</entity>
+				
+				<!-- right -->
+				
+				<entity name="top_right" id="2">
+					<region><Rectangle x="6" y="0" width="5" height="5" /></region>
+					<scale horizontal="move" vertical="fixed" />
+				</entity>
+	
+				<entity name="mid_right" id="2">
+					<region><Rectangle x="6" y="5" width="5" height="12" /></region>
+					<scale horizontal="move" vertical="strech" />
+				</entity>
+				
+				<entity name="btm_right" id="2">
+					<region><Rectangle x="6" y="17" width="5" height="5" /></region>
+					<scale horizontal="move" vertical="move" />
+				</entity>
+				
+			</entities>
+		</layout>
+	</layouts>
+</skin>

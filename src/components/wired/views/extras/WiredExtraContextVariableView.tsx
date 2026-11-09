@@ -2,8 +2,10 @@ import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MAX_NAME_LENGTH = 40;
 
@@ -55,27 +57,29 @@ export const WiredExtraContextVariableView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 400 }}>
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
-                    <NitroInput
-                        maxLength={MAX_NAME_LENGTH}
-                        type="text"
-                        value={variableName}
-                        onChange={(event) => setVariableName(normalizeVariableName(event.target.value))}
-                        onKeyDown={(event) => handleVariableNameKeyDown(event, setVariableName)}
-                    />
-                </div>
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 400 }}>
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
+                        <OctaneInput
+                            maxLength={MAX_NAME_LENGTH}
+                            type="text"
+                            value={variableName}
+                            onChange={(event) => setVariableName(normalizeVariableName(event.target.value))}
+                            onKeyDown={(event) => handleVariableNameKeyDown(event, setVariableName)}
+                        />
+                    </div>
 
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.settings')}</Text>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <input checked={hasValue} className="form-check-input" type="checkbox" onChange={(event) => setHasValue(event.target.checked)} />
-                        <Text>{LocalizeText('wiredfurni.params.variables.settings.has_value')}</Text>
-                    </label>
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.settings')}</Text>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Checkbox checked={hasValue} onCheckedChange={(nextChecked) => setHasValue(nextChecked)} />
+                            <Text>{LocalizeText('wiredfurni.params.variables.settings.has_value')}</Text>
+                        </label>
+                    </div>
                 </div>
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

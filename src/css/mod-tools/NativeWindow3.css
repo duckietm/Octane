@@ -1,0 +1,13 @@
+/* classic v75 window manager, style 3 windows (Ubuntu skin, frame colour 0xff418db0) */
+.native3-frame { position: relative; margin: 0; padding: 0; pointer-events: auto; filter: drop-shadow(2.828px 2.828px 2px rgb(0 0 0 / 35%)); }
+.native3-frame *, .native3-frame *::before, .native3-frame *::after { box-sizing: border-box; }
+.native3-frame > .native-skin { position: absolute; left: 0; top: 0; }
+.native3-title, .native3-close, .native3-client, .native3-box { position: absolute; }
+.native3-title { display: flex; align-items: center; justify-content: center; cursor: move; user-select: none; }
+.native3-title > canvas, .native3-button__label > canvas { display: block; }
+.native3-close { cursor: pointer; }
+.native3-box > .native-skin { position: absolute; left: 0; top: 0; }
+.native3-button { cursor: pointer; }
+.native3-button__label { position: absolute; pointer-events: none; }
+.native3-button__band { position: absolute; left: 0; overflow: hidden; pointer-events: none; }
+.native3-button:disabled { cursor: default; }

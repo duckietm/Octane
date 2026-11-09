@@ -1,10 +1,9 @@
 import {
     CreateLinkEvent,
     FurnitureListAddOrUpdateEvent,
-    FurnitureListEvent,
     FurnitureListItemParser,
     FurnitureListRemovedEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import {
     addFurnitureItem,
     attemptItemPlacement,
@@ -14,26 +13,12 @@ import {
     GroupItem,
     getAllItemIds,
     getPlacingItemId,
-    mergeFurniFragments,
     UnseenItemCategory
 } from '../../api';
-
-/**
- * Pure reducers for furniture inventory state. Each takes the current
- * GroupItem[] state plus the inbound event plus a context object carrying
- * the cross-cutting helpers (unseen tracker, ui-event dispatcher).
- *
- * Side effects (CreateLinkEvent, attemptItemPlacement, dispatchAdded,
- * cancelRoomObjectPlacement) are intentionally kept here to preserve the
- * exact behavior of the original useInventoryFurni — they fire when the
- * state transition demands them. The original code embedded them inside
- * setGroupItems(prev => ...) and we mirror that.
- */
 
 export interface FurniReducerContext {
     isUnseen: (category: number, id: number) => boolean;
     dispatchAdded: (id: number, type: number, category: number) => void;
-    fragments: { current: Map<number, FurnitureListItemParser>[] | null };
 }
 
 export const applyFurnitureListAddOrUpdate = (state: GroupItem[], event: FurnitureListAddOrUpdateEvent, ctx: FurniReducerContext): GroupItem[] => {
@@ -42,7 +27,7 @@ export const applyFurnitureListAddOrUpdate = (state: GroupItem[], event: Furnitu
 
     for (const item of parser.items) {
         let i = 0;
-        let groupItem: GroupItem = null;
+        let matched = false;
 
         while (i < newValue.length) {
             const group = newValue[i];
@@ -53,15 +38,25 @@ export const applyFurnitureListAddOrUpdate = (state: GroupItem[], event: Furnitu
                 const furniture = group.items[j];
 
                 if (furniture.id === item.itemId) {
-                    furniture.update(item);
+                    // Clone the group AND the item before mutating, so the input state's objects
+                    // are never touched. React may invoke this updater twice (StrictMode /
+                    // React-Compiler purity checks); mutating the input makes the second pass
+                    // diverge. Mirrors applyFurnitureListRemoved.
+                    const clonedGroup = group.clone();
+                    const clonedFurniture = furniture.clone();
 
-                    const newFurniture = [...group.items];
+                    clonedFurniture.update(item);
 
-                    newFurniture[j] = furniture;
+                    const newFurniture = [...clonedGroup.items];
 
-                    group.items = newFurniture;
+                    newFurniture[j] = clonedFurniture;
 
-                    groupItem = group;
+                    clonedGroup.items = newFurniture;
+                    clonedGroup.hasUnseenItems = true;
+
+                    newValue[i] = clonedGroup;
+
+                    matched = true;
 
                     break;
                 }
@@ -69,16 +64,12 @@ export const applyFurnitureListAddOrUpdate = (state: GroupItem[], event: Furnitu
                 j++;
             }
 
-            if (groupItem) break;
+            if (matched) break;
 
             i++;
         }
 
-        if (groupItem) {
-            groupItem.hasUnseenItems = true;
-
-            newValue[i] = CloneObject(groupItem);
-        } else {
+        if (!matched) {
             const furniture = new FurnitureItem(item);
 
             addFurnitureItem(newValue, furniture, ctx.isUnseen(UnseenItemCategory.FURNI, item.itemId));
@@ -90,17 +81,15 @@ export const applyFurnitureListAddOrUpdate = (state: GroupItem[], event: Furnitu
     return newValue;
 };
 
-export const applyFurnitureList = (state: GroupItem[], event: FurnitureListEvent, ctx: FurniReducerContext): GroupItem[] => {
-    const parser = event.getParser();
-
-    if (!ctx.fragments.current) ctx.fragments.current = new Array(parser.totalFragments);
-
-    const fragment = mergeFurniFragments(parser.fragment, parser.totalFragments, parser.fragmentNumber, ctx.fragments.current);
-
-    if (!fragment) return state;
-
+// Pure reducer over an ALREADY-MERGED fragment map. Fragment accumulation is I/O-ordering
+// state, not derived render state, so it lives in the event handler (useInventoryFurni.ts) and
+// must NOT run inside a setState updater: React double-invokes updaters (StrictMode /
+// React-Compiler), and the previous in-updater state machine cleared the accumulator on the
+// first pass, so the second pass discarded a fully-assembled multi-fragment inventory.
+export const applyMergedFurnitureList = (state: GroupItem[], fragment: Map<number, FurnitureListItemParser>, ctx: FurniReducerContext): GroupItem[] => {
     const newValue = [...state];
     const existingIds = getAllItemIds(newValue);
+    const existingIdSet = new Set(existingIds);
 
     for (const existingId of existingIds) {
         if (fragment.get(existingId)) continue;
@@ -108,27 +97,32 @@ export const applyFurnitureList = (state: GroupItem[], event: FurnitureListEvent
         let index = 0;
 
         while (index < newValue.length) {
-            const group = newValue[index];
-            const item = group.remove(existingId);
+            const originalGroup = newValue[index];
 
-            if (!item) {
+            if (!originalGroup.getItemById(existingId)) {
                 index++;
 
                 continue;
             }
 
-            if (getPlacingItemId() === item.ref) {
-                cancelRoomObjectPlacement();
+            // Clone before removing so the input state's GroupItem is left untouched.
+            const group = originalGroup.clone();
+            const item = group.remove(existingId);
 
-                if (!attemptItemPlacement(group)) {
-                    CreateLinkEvent('inventory/show');
-                }
+            if (item && getPlacingItemId() === item.ref) {
+                queueMicrotask(() => {
+                    cancelRoomObjectPlacement();
+
+                    if (!attemptItemPlacement(group)) {
+                        CreateLinkEvent('inventory/show');
+                    }
+                });
             }
 
             if (group.getTotalCount() <= 0) {
                 newValue.splice(index, 1);
-
-                group.dispose();
+            } else {
+                newValue[index] = group;
             }
 
             break;
@@ -136,7 +130,7 @@ export const applyFurnitureList = (state: GroupItem[], event: FurnitureListEvent
     }
 
     for (const itemId of fragment.keys()) {
-        if (existingIds.indexOf(itemId) >= 0) continue;
+        if (existingIdSet.has(itemId)) continue;
 
         const parserItem = fragment.get(itemId);
 
@@ -149,37 +143,55 @@ export const applyFurnitureList = (state: GroupItem[], event: FurnitureListEvent
         ctx.dispatchAdded(item.id, item.type, item.category);
     }
 
-    ctx.fragments.current = null;
-
     return newValue;
 };
 
-export const applyFurnitureListRemoved = (state: GroupItem[], event: FurnitureListRemovedEvent): GroupItem[] => {
-    const parser = event.getParser();
+export const applyFurnitureListRemoved = (state: GroupItem[], event: FurnitureListRemovedEvent): GroupItem[] =>
+    removeFurnitureItem(state, event.getParser().itemId);
+
+/**
+ * Drops several items at once (`FurnitureListRemoveMultipleEvent`, sent after a recycle). Nothing listened for it,
+ * so the recycler kept offering the furni it had just destroyed, and recycling them again failed.
+ */
+export const applyFurnitureListRemovedMany = (state: GroupItem[], itemIds: readonly number[]): GroupItem[] =>
+    (itemIds ?? []).reduce((current, itemId) => removeFurnitureItem(current, itemId), state);
+
+const removeFurnitureItem = (state: GroupItem[], itemId: number): GroupItem[] => {
     const newValue = [...state];
 
     let index = 0;
 
     while (index < newValue.length) {
-        const group = newValue[index];
-        const item = group.remove(parser.itemId);
+        const originalGroup = newValue[index];
 
-        if (!item) {
+        // Pure existence check first - must NOT mutate the input state. React can invoke
+        // this state updater twice (StrictMode / React Compiler purity checks). GroupItem.remove
+        // reassigns the group's internal items, so mutating the input directly makes the second
+        // pass a no-op (item already gone), React keeps that result, and the furni lingers.
+        if (!originalGroup.getItemById(itemId)) {
             index++;
 
             continue;
         }
 
-        if (getPlacingItemId() === item.ref) {
-            cancelRoomObjectPlacement();
+        // Clone before removing so the incoming state's GroupItem is left untouched. remove()
+        // reassigns the clone's own _items array (CloneObject shares the reference, but remove
+        // copies-then-reassigns), so the original group keeps its items across a re-invocation.
+        const group = CloneObject(originalGroup);
+        const item = group.remove(itemId);
 
-            if (!attemptItemPlacement(group)) CreateLinkEvent('inventory/show');
+        if (item && getPlacingItemId() === item.ref) {
+            queueMicrotask(() => {
+                cancelRoomObjectPlacement();
+
+                if (!attemptItemPlacement(group)) CreateLinkEvent('inventory/show');
+            });
         }
 
         if (group.getTotalCount() <= 0) {
             newValue.splice(index, 1);
-
-            group.dispose();
+        } else {
+            newValue[index] = group;
         }
 
         break;
@@ -189,11 +201,17 @@ export const applyFurnitureListRemoved = (state: GroupItem[], event: FurnitureLi
 };
 
 export const clearUnseenFlags = (state: GroupItem[]): GroupItem[] => {
-    const newValue = [...state];
+    if (!state?.length) return state;
 
-    for (const newGroup of newValue) newGroup.hasUnseenItems = false;
+    // Pure: clone each group instead of mutating the input state's GroupItems, so a
+    // StrictMode / React-Compiler double-invoke of the updater stays deterministic.
+    return state.map((groupItem) => {
+        const nextGroupItem = groupItem.clone();
 
-    return newValue;
+        nextGroupItem.hasUnseenItems = false;
+
+        return nextGroupItem;
+    });
 };
 
 export const refreshGroupItemsLocalization = (state: GroupItem[]): GroupItem[] => {

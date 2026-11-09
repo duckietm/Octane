@@ -1,0 +1,1230 @@
+/*
+ * Reward track window, laid out 1:1 on AIR's reward_track_main_xml (frame 1103x722, margins
+ * 12/44/12/11, so a 1079x667 stage: header 243 high, body 418 high at y 249). Every left/top below is
+ * the layout's x/y of that element inside its parent. The theme (RewardTrackTheme.resolve) recolours
+ * the RECOLORABLE_LIGHT / _MEDIUM / _DARK elements through the --rt-* variables.
+ *
+ * AIR's border style 15 (the hsv-layered rounded panel) is drawn as a 5px rounded box in its colour
+ * with a 20% darker 1px stroke; --rt-panel sets the colour of each such panel.
+ */
+
+.octane-reward-track {
+    width: 1103px;
+    max-width: calc(100vw - 16px);
+    --rt-dark: #3576b9;
+    --rt-medium: #cfe2f9;
+    --rt-light: #ddebf9;
+    --rt-active: #bdd6ef;
+}
+
+.octane-reward-track-content.octane-card-content-shell {
+    position: relative;
+    padding: 6px 12px 11px;
+    color: #000;
+    font-size: 12px;
+}
+
+.octane-reward-track-stage {
+    position: relative;
+    flex: none;
+    width: 1079px;
+    height: 667px;
+}
+
+.octane-reward-track-stage img {
+    display: block;
+    max-width: none;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+/* border style 15 */
+.octane-reward-track-rewards,
+.octane-reward-track-profile,
+.octane-reward-track-points,
+.octane-reward-track-points-band,
+.octane-reward-track-tasks,
+.octane-reward-track-task,
+.octane-reward-track-task-reward,
+.octane-reward-track-tip,
+.octane-reward-track-task-info,
+.octane-reward-track-level {
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--rt-panel) 80%, #000);
+    border-radius: 5px;
+    background-color: var(--rt-panel);
+}
+
+/* ---------------------------------------------------------------- header */
+
+.octane-reward-track-header {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1079px;
+    height: 243px;
+}
+
+/* rewards (232,0 847x243, RECOLORABLE_LIGHT) */
+.octane-reward-track-rewards {
+    --rt-panel: var(--rt-light);
+    left: 232px;
+    top: 0;
+    width: 847px;
+    height: 243px;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.octane-reward-track-rewards > * {
+    position: absolute;
+}
+
+/* reward_track_prizes_background, tinted RECOLORABLE_DARK at blend 0.05 */
+.octane-reward-track-rewards-background {
+    left: 1px;
+    top: -3px;
+    width: 843px;
+    height: 243px;
+    background-color: var(--rt-dark);
+    -webkit-mask: var(--rt-prizes-background) no-repeat 0 0;
+    mask: var(--rt-prizes-background) no-repeat 0 0;
+    opacity: 0.05;
+}
+
+/* the sky gradient (0xff569bd3 -> 0xff0023d6, blend 0.1) */
+.octane-reward-track-rewards-sky {
+    left: 1px;
+    top: 1px;
+    width: 843px;
+    height: 239px;
+    background: linear-gradient(to bottom, #569bd3, #0023d6);
+    opacity: 0.1;
+}
+
+/* reward_track_prizes_background_stars (843x226) */
+.octane-reward-track-rewards-stars {
+    left: 0;
+    top: -1px;
+}
+
+/* free_tier_cont (96,6) / premium_tier_cont (96,115), 700x80 at blend 0.5 */
+.octane-reward-track-band {
+    left: 95px;
+    width: 700px;
+    height: 80px;
+}
+
+.octane-reward-track-band-free {
+    --rt-band: #f9efe0;
+    top: 5px;
+}
+
+.octane-reward-track-band-premium {
+    --rt-band: #f1def7;
+    top: 114px;
+}
+
+.octane-reward-track-band::before,
+.octane-reward-track-band-cut {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--rt-band) 80%, #000);
+    border-radius: 5px;
+    background: var(--rt-band);
+    opacity: 0.5;
+}
+
+.octane-reward-track-band-info {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100px;
+    height: 80px;
+}
+
+.octane-reward-track-band-cut {
+    right: 2px;
+    border-right: 0;
+    border-radius: 5px 0 0 5px;
+}
+
+.octane-reward-track-band-split {
+    position: absolute;
+    left: 98px;
+    top: 0;
+    width: 2px;
+    height: 80px;
+    background: color-mix(in srgb, var(--rt-band) 80%, #000);
+    opacity: 0.5;
+}
+
+.octane-reward-track-band-icon {
+    position: absolute;
+}
+
+.octane-reward-track-band-free .octane-reward-track-band-icon {
+    left: 26px;
+    top: 9px;
+}
+
+.octane-reward-track-band-premium .octane-reward-track-band-icon {
+    left: 24px;
+    top: 4px;
+}
+
+.octane-reward-track-band-texts {
+    position: absolute;
+    left: 6px;
+    width: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    opacity: 0.7;
+    line-height: 15px;
+}
+
+.octane-reward-track-band-free .octane-reward-track-band-texts {
+    top: 57px;
+}
+
+.octane-reward-track-band-premium .octane-reward-track-band-texts {
+    top: 47px;
+}
+
+.octane-reward-track-band-title {
+    font-weight: bold;
+}
+
+.octane-reward-track-band-desc {
+    font-size: 11px;
+}
+
+/* track/loading_bar (194,94 602x13): grey track, green fill 4px past the progress, additive gloss */
+.octane-reward-track-bar {
+    left: 193px;
+    top: 93px;
+    width: 602px;
+    height: 13px;
+    box-sizing: border-box;
+    border: 1px solid #5f5f5f;
+    border-radius: 6px;
+    background: #888;
+}
+
+.octane-reward-track-bar-progress {
+    position: absolute;
+    left: -1px;
+    top: -1px;
+    height: 13px;
+}
+
+.octane-reward-track-bar-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 13px;
+    box-sizing: border-box;
+    border: 1px solid #4f7a19;
+    border-radius: 6px;
+    background: #71af24;
+}
+
+.octane-reward-track-bar-gloss {
+    position: absolute;
+    left: 1px;
+    top: 1px;
+    right: 0;
+    height: 11px;
+    border-radius: 5px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0));
+    opacity: 0.45;
+}
+
+/* the points band under the track (6,206 in points_indicator_container, RECOLORABLE_MEDIUM at 0.7) */
+.octane-reward-track-rewards > .octane-reward-track-points-band {
+    position: absolute;
+    --rt-panel: var(--rt-medium);
+    left: 7px;
+    top: 207px;
+    width: 844px;
+    height: 44px;
+    opacity: 0.7;
+}
+
+/* points_indicator (196,2 598x239) and prize_content (196,2 598x239) */
+.octane-reward-track-indicators,
+.octane-reward-track-prizes {
+    left: 195px;
+    top: 1px;
+    width: 598px;
+    height: 239px;
+}
+
+/* point_indicator_template (y 82, 80x157) */
+.octane-reward-track-indicator {
+    position: absolute;
+    top: 82px;
+    width: 80px;
+    height: 157px;
+    pointer-events: none;
+}
+
+.octane-reward-track-indicator > * {
+    position: absolute;
+}
+
+.octane-reward-track-indicator-icon {
+    left: 30px;
+    top: 7px;
+}
+
+/* the 1px shapes are drawn with a 3px stroke */
+.octane-reward-track-indicator-connector {
+    left: 39px;
+    top: 113px;
+    width: 3px;
+    height: 9px;
+    background: color-mix(in srgb, var(--rt-medium) 80%, #000);
+    opacity: 0.5;
+}
+
+.octane-reward-track-indicator-dot {
+    left: 36px;
+    top: 120px;
+    width: 9px;
+    height: 9px;
+    box-sizing: border-box;
+    border: 2px solid color-mix(in srgb, var(--rt-medium) 64%, #000);
+    border-radius: 50%;
+    background: var(--rt-medium);
+}
+
+.octane-reward-track-indicator-stem {
+    left: 39px;
+    top: 127px;
+    width: 3px;
+    height: 8px;
+    background: color-mix(in srgb, var(--rt-medium) 64%, #000);
+}
+
+.octane-reward-track-indicator-points {
+    left: 0;
+    top: 136px;
+    width: 80px;
+    height: 17px;
+    line-height: 17px;
+    text-align: center;
+}
+
+/* prize_template (y 4, 80x105) / prize_template_premium (y 89, 80x104) */
+.octane-reward-track-prize {
+    position: absolute;
+    top: 4px;
+    width: 80px;
+    height: 105px;
+    --rt-plate: #f9efe0;
+}
+
+.octane-reward-track-prize[data-premium='true'] {
+    top: 89px;
+    height: 104px;
+    --rt-plate: #f1def7;
+}
+
+/* WindowUtils.disableSection(window, !enoughPoints, 0.75): dimmed, the shadow (INVIS_ON_DISABLE) hidden */
+.octane-reward-track-prize[data-disabled='true'] {
+    opacity: 0.75;
+}
+
+.octane-reward-track-prize[data-disabled='true'] .octane-reward-track-prize-shadow {
+    visibility: hidden;
+}
+
+.octane-reward-track-prize > * {
+    position: absolute;
+}
+
+/* click_region (12,10 / 12,34 56x60), dynamic style reward_track_item on its #icon plate */
+.octane-reward-track-prize-hit {
+    left: 12px;
+    top: 10px;
+    width: 56px;
+    height: 60px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.octane-reward-track-prize[data-premium='true'] .octane-reward-track-prize-hit {
+    top: 34px;
+}
+
+.octane-reward-track-prize[data-state='claimed'] .octane-reward-track-prize-hit {
+    cursor: default;
+}
+
+.octane-reward-track-prize-shadow {
+    position: absolute;
+    left: 0;
+    top: 44px;
+    width: 56px;
+    height: 16px;
+    border-radius: 50%;
+    background: #000;
+    opacity: 0.25;
+}
+
+/* border style 16 (56x56) */
+.octane-reward-track-prize-plate {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 56px;
+    height: 56px;
+    box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--rt-plate) 62%, #000);
+    border-radius: 8px;
+    background: var(--rt-plate);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.7), inset 0 -2px 0 color-mix(in srgb, var(--rt-plate) 85%, #000);
+    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.28));
+}
+
+.octane-reward-track-prize-hit:hover .octane-reward-track-prize-plate {
+    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.28)) brightness(1.15);
+}
+
+.octane-reward-track-prize-hit:active .octane-reward-track-prize-plate {
+    top: 3px;
+    filter: drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.5)) brightness(0.8);
+}
+
+/* product_icon (8,8 40x40), 3px higher when the quantity chip shows */
+.octane-reward-track-prize-product {
+    position: absolute;
+    left: 7px;
+    top: 7px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.octane-reward-track-prize-product[data-shifted='true'] {
+    top: 4px;
+}
+
+.octane-reward-track-prize-product > * {
+    max-width: 40px;
+    max-height: 40px;
+}
+
+.octane-reward-track-prize-currency {
+    transform: scale(1.5);
+}
+
+/* quantity_container (18,37 20x14) */
+.octane-reward-track-prize-quantity {
+    position: absolute;
+    left: 17px;
+    top: 36px;
+    min-width: 20px;
+    height: 14px;
+    padding: 0 3px;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--rt-plate) 80%, transparent);
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 12px;
+    text-align: center;
+}
+
+/* connector (39,66 / 39,19 2x19, 0x33000000) */
+.octane-reward-track-prize-stem {
+    left: 39px;
+    top: 66px;
+    width: 2px;
+    height: 19px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.octane-reward-track-prize[data-premium='true'] .octane-reward-track-prize-stem {
+    top: 19px;
+}
+
+.octane-reward-track-prize-lock {
+    left: 53px;
+    top: 54px;
+    opacity: 0.7;
+}
+
+.octane-reward-track-prize[data-premium='true'] .octane-reward-track-prize-lock {
+    top: 78px;
+}
+
+.octane-reward-track-prize-check {
+    left: 54px;
+    top: 4px;
+}
+
+.octane-reward-track-prize[data-premium='true'] .octane-reward-track-prize-check {
+    top: 28px;
+}
+
+/* previous_btn (54,84) / next_btn (805,84), 33x34, dynamic style button */
+.octane-reward-track-page {
+    top: 83px;
+    width: 33px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    filter: drop-shadow(0 0 0 rgba(0, 0, 0, 0.28));
+}
+
+.octane-reward-track-page[data-side='previous'] {
+    left: 53px;
+}
+
+.octane-reward-track-page[data-side='next'] {
+    left: 804px;
+}
+
+.octane-reward-track-page:hover:not(:disabled) {
+    filter: brightness(1.15);
+}
+
+.octane-reward-track-page:active:not(:disabled) {
+    transform: translateY(1px);
+    filter: brightness(0.8);
+}
+
+.octane-reward-track-page:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* previous_unclaimed_indicator (74,77) / next_unclaimed_indicator (827,77), 17x18 0xee2924 */
+.octane-reward-track-unclaimed {
+    top: 76px;
+    min-width: 17px;
+    height: 18px;
+    padding: 0 4px;
+    box-sizing: border-box;
+    border: 1px solid #a51a17;
+    border-radius: 9px;
+    background: #ee2924;
+    /* previous/next_unclaimed_count: il_regular_white, bold (11 px). */
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 16px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.octane-reward-track-unclaimed[data-side='previous'] {
+    left: 73px;
+}
+
+.octane-reward-track-unclaimed[data-side='next'] {
+    left: 826px;
+}
+
+/* cutout (0,0 245x243): the bulge, then the profile over it, both over the rewards panel */
+.octane-reward-track-cutout {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 245px;
+    height: 243px;
+    z-index: 1;
+}
+
+.octane-reward-track-bulge {
+    position: absolute;
+    left: 242px;
+    top: 2px;
+    width: 35px;
+    height: 241px;
+    overflow: hidden;
+}
+
+.octane-reward-track-bulge::before {
+    content: '';
+    position: absolute;
+    left: -35px;
+    top: -59px;
+    width: 70px;
+    height: 300px;
+    box-sizing: border-box;
+    border: 2px solid color-mix(in srgb, var(--rt-light) 80%, #000);
+    border-radius: 50%;
+    background: var(--rt-light);
+}
+
+/* profile (0,0 264x243, RECOLORABLE_LIGHT) */
+.octane-reward-track-profile {
+    --rt-panel: var(--rt-light);
+    left: 0;
+    top: 0;
+    width: 264px;
+    height: 243px;
+}
+
+.octane-reward-track-profile > * {
+    position: absolute;
+}
+
+.octane-reward-track-avatar {
+    left: -4px;
+    top: -16px;
+    width: 90px !important;
+    height: 130px !important;
+}
+
+/* track_info itemlist (87+0, -1+26, 160 wide) */
+.octane-reward-track-info {
+    left: 86px;
+    top: 24px;
+    width: 160px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.octane-reward-track-title {
+    min-height: 24px;
+    margin-bottom: 3px;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 22px;
+}
+
+/*
+ * track_title_region / task_info_name_region: for staff (security 4+) a click copies the track / task id;
+ * AIR turns the region's interactive cursor on for them and gives no other hover feedback.
+ */
+.octane-reward-track-copy-region {
+    display: block;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.octane-reward-track-desc,
+.octane-reward-track-instructions {
+    font-size: 11px;
+    line-height: 14px;
+}
+
+.octane-reward-track-instructions {
+    width: 157px;
+}
+
+/* points_total_border (43,122 179x62, RECOLORABLE_MEDIUM) */
+.octane-reward-track-profile > .octane-reward-track-points {
+    position: absolute;
+    --rt-panel: var(--rt-medium);
+    left: 42px;
+    top: 121px;
+    width: 179px;
+    height: 62px;
+}
+
+.octane-reward-track-points > * {
+    position: absolute;
+}
+
+.octane-reward-track-points-value {
+    left: 0;
+    right: 0;
+    top: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 28px;
+}
+
+.octane-reward-track-points-label {
+    left: 9px;
+    top: 35px;
+    width: 160px;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 18px;
+    text-align: center;
+}
+
+/* splitter (16,196 231x2) */
+.octane-reward-track-splitter {
+    left: 15px;
+    top: 195px;
+    width: 231px;
+    height: 2px;
+    background: color-mix(in srgb, var(--rt-light) 85%, #000);
+}
+
+/* rewards collected (9,204): checkmark + rewards_collected_txt, etched */
+.octane-reward-track-collected {
+    left: 8px;
+    top: 203px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* ---------------------------------------------------------------- body */
+
+.octane-reward-track-body {
+    position: absolute;
+    left: 0;
+    top: 249px;
+    width: 1079px;
+    height: 418px;
+}
+
+/* task_list (0,0 444x418, 0xf0f0f0) */
+.octane-reward-track-tasks {
+    --rt-panel: #f0f0f0;
+    left: 0;
+    top: 0;
+    width: 444px;
+    height: 418px;
+}
+
+.octane-reward-track-tasks > * {
+    position: absolute;
+}
+
+.octane-reward-track-tasks-icon {
+    left: 18px;
+    top: 16px;
+}
+
+.octane-reward-track-tasks-title {
+    left: 45px;
+    top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 19px;
+}
+
+.octane-reward-track-tasks-progress {
+    left: 45px;
+    top: 30px;
+    color: #3c3c3c;
+    line-height: 17px;
+}
+
+/* tab_selection (14,58): three 88x29 tabs, 7px apart */
+.octane-reward-track-filters {
+    left: 13px;
+    top: 57px;
+    display: flex;
+    gap: 7px;
+}
+
+.octane-reward-track-filter {
+    width: 88px;
+    height: 29px;
+    padding: 0 4px;
+    box-sizing: border-box;
+    border: 2px solid #b7b7b7;
+    border-radius: 4px;
+    background: #dddcdc;
+    color: #444;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.octane-reward-track-filter:hover {
+    border-color: var(--rt-dark);
+    background: var(--rt-light);
+}
+
+/* selected_view: a shiny button in RECOLORABLE_DARK */
+.octane-reward-track-filter[data-active='true'] {
+    border: 1px solid color-mix(in srgb, var(--rt-dark) 70%, #000);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.08) 50%, rgba(0, 0, 0, 0) 51%), var(--rt-dark);
+    color: #fff;
+    cursor: default;
+}
+
+/* tasks (14,94 422x259): 406x61 rows every 66px */
+.octane-reward-track-task-list {
+    left: 13px;
+    top: 93px;
+    width: 422px;
+    height: 259px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.octane-reward-track-task-list > .octane-reward-track-task {
+    position: relative;
+    display: block;
+    width: 406px;
+    height: 61px;
+    margin-bottom: 5px;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+}
+
+.octane-reward-track-task {
+    --rt-panel: #f0f0f0;
+}
+
+.octane-reward-track-task:hover {
+    --rt-panel: var(--rt-light);
+}
+
+.octane-reward-track-task[data-selected='true'] {
+    --rt-panel: var(--rt-active);
+}
+
+.octane-reward-track-task > * {
+    position: absolute;
+}
+
+/* task_image (9,6 52x50, pivot center) */
+.octane-reward-track-task-glyph {
+    left: 8px;
+    top: 5px;
+    width: 52px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.octane-reward-track-task-name,
+.octane-reward-track-task-desc {
+    left: 66px;
+    width: 202px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.octane-reward-track-task-name {
+    top: 6px;
+    font-weight: bold;
+    line-height: 17px;
+}
+
+.octane-reward-track-task-desc {
+    top: 22px;
+    font-size: 11px;
+    line-height: 16px;
+}
+
+.octane-reward-track-task-bar {
+    left: 67px;
+    top: 43px;
+}
+
+.octane-reward-track-task-count {
+    left: 279px;
+    top: 37px;
+    font-size: 11px;
+    line-height: 16px;
+    white-space: nowrap;
+}
+
+/* the reward box (331,15 62x31, 0xf0f0f0) */
+.octane-reward-track-task > .octane-reward-track-task-reward {
+    position: absolute;
+    --rt-panel: #f0f0f0;
+    left: 330px;
+    top: 14px;
+    width: 62px;
+    height: 31px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.octane-reward-track-points-reward {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 19px;
+}
+
+/* loading_bar of a task / level: 0xcccccc track stroked 0x777777, 7px high */
+.octane-reward-track-mini-bar {
+    position: relative;
+    height: 7px;
+    box-sizing: border-box;
+    border: 1px solid #777;
+    border-radius: 5px;
+    background: #ccc;
+}
+
+.octane-reward-track-mini-bar-progress {
+    position: absolute;
+    left: -1px;
+    top: -1px;
+    height: 7px;
+    overflow: hidden;
+    border-radius: 5px;
+}
+
+.octane-reward-track-mini-bar-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: 5px;
+}
+
+.octane-reward-track-mini-bar-gloss {
+    position: absolute;
+    left: 1px;
+    top: 1px;
+    right: 1px;
+    height: 5px;
+    border-radius: 3px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.1));
+    opacity: 0.3;
+}
+
+/* reward_info (9,361 426x48, 0xf5e1b9) / reward_info_not_premium (0xf1def7) */
+.octane-reward-track-tasks > .octane-reward-track-tip {
+    position: absolute;
+    --rt-panel: #f5e1b9;
+    left: 8px;
+    top: 360px;
+    width: 426px;
+    height: 48px;
+}
+
+.octane-reward-track-tasks > .octane-reward-track-tip-premium {
+    --rt-panel: #f1def7;
+}
+
+.octane-reward-track-tip > * {
+    position: absolute;
+}
+
+.octane-reward-track-tip-gift {
+    left: 7px;
+    top: 6px;
+}
+
+.octane-reward-track-tip-text {
+    left: 56px;
+    top: 8px;
+    width: 265px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    line-height: 14px;
+}
+
+.octane-reward-track-tip-premium .octane-reward-track-tip-text {
+    width: 227px;
+}
+
+.octane-reward-track-tip-frank {
+    left: 328px;
+    top: 6px;
+}
+
+/* the shiny buttons (get_premium_btn, hint_redirect_btn) */
+.octane-reward-track-button {
+    height: 30px;
+    padding: 0 8px;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.55);
+    border-radius: 5px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.2) 50%, rgba(0, 0, 0, 0) 51%, rgba(0, 0, 0, 0.06)), var(--rt-button, #e2e2e2);
+    color: #000;
+    line-height: 14px;
+    cursor: pointer;
+}
+
+.octane-reward-track-button:hover {
+    filter: brightness(1.1);
+}
+
+.octane-reward-track-button:active {
+    filter: brightness(0.85);
+}
+
+.octane-reward-track-get-premium {
+    --rt-button: #b265ce;
+    left: 322px;
+    top: 8px;
+    width: 91px;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* task_info (451,0 628x418, 0xf0f0f0) */
+.octane-reward-track-task-info {
+    --rt-panel: #f0f0f0;
+    left: 451px;
+    top: 0;
+    width: 628px;
+    height: 418px;
+}
+
+.octane-reward-track-task-info > * {
+    position: absolute;
+}
+
+/* task_info_img (23,23 104x100): the task picture at zoom 2, pivot center */
+.octane-reward-track-detail-glyph {
+    left: 22px;
+    top: 22px;
+    width: 104px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.octane-reward-track-detail-glyph > img {
+    transform: scale(2);
+}
+
+.octane-reward-track-task-info-name {
+    left: 136px;
+    top: 34px;
+    font-size: 17px;
+    font-weight: bold;
+    line-height: 22px;
+}
+
+.octane-reward-track-task-info-desc {
+    left: 136px;
+    top: 58px;
+    width: 469px;
+    height: 63px;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 16px;
+}
+
+/* task_levels (y 127): the rule (22,20 582x2) and the "Levels" title on it (37,7) */
+.octane-reward-track-levels-rule {
+    left: 21px;
+    top: 146px;
+    width: 582px;
+    height: 2px;
+    background: #d6d5d3;
+}
+
+.octane-reward-track-levels-title {
+    left: 36px;
+    top: 133px;
+    min-width: 53px;
+    height: 18px;
+    padding: 0 6px 0 3px;
+    box-sizing: border-box;
+    background: #f0f0f0;
+    color: #124b8b;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 18px;
+    text-shadow: 1px 1px 0 #fff;
+}
+
+/* levels (22,35 598x150): 582x44 levels every 53px */
+.octane-reward-track-levels {
+    left: 21px;
+    top: 161px;
+    width: 598px;
+    height: 150px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.octane-reward-track-levels > .octane-reward-track-level {
+    position: relative;
+    width: 582px;
+    height: 44px;
+    margin-bottom: 9px;
+}
+
+.octane-reward-track-level {
+    --rt-panel: #e3e3e3;
+}
+
+.octane-reward-track-level[data-active='true'] {
+    --rt-panel: var(--rt-active);
+}
+
+.octane-reward-track-level > * {
+    position: absolute;
+}
+
+.octane-reward-track-level-name {
+    left: 17px;
+    top: 13px;
+    width: 85px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: bold;
+    line-height: 17px;
+}
+
+.octane-reward-track-level-bar {
+    left: 93px;
+    top: 18px;
+}
+
+.octane-reward-track-level-count {
+    left: 376px;
+    top: 13px;
+    font-size: 11px;
+    line-height: 16px;
+    white-space: nowrap;
+}
+
+/* the level's end (470,7 94x30): checkmark + reward, right-aligned */
+.octane-reward-track-level-end {
+    left: 469px;
+    top: 6px;
+    width: 94px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* completed_icon (17x15) */
+.octane-reward-track-level-check {
+    flex: none;
+}
+
+/* task_hint_border (16,331 596x74, style 14 0xe9e9e9) */
+.octane-reward-track-hint {
+    left: 15px;
+    top: 330px;
+    width: 596px;
+    height: 74px;
+    box-sizing: border-box;
+    border: 1px solid #c4c4c4;
+    border-radius: 6px;
+    background: #e9e9e9;
+    box-shadow: inset 0 1px 0 #fff;
+}
+
+.octane-reward-track-hint > * {
+    position: absolute;
+}
+
+/* reward_track_frank_tips (52x88) shown in its 52x66 slot */
+.octane-reward-track-hint-frank {
+    left: 14px;
+    top: 6px;
+    width: 52px;
+    height: 66px;
+    overflow: hidden;
+}
+
+.octane-reward-track-hint-title {
+    left: 75px;
+    top: 9px;
+    color: #124b8b;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 18px;
+    text-shadow: 1px 1px 0 #fff;
+}
+
+.octane-reward-track-hint-text {
+    left: 75px;
+    top: 28px;
+    width: 333px;
+    height: 42px;
+    overflow: hidden;
+    font-size: 11px;
+    line-height: 14px;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.octane-reward-track-hint-button {
+    left: 470px;
+    top: 15px;
+    width: 109px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* hint_redirect_btn is AIR's grey button (style 3, habbo_skin_button_shiny) with button_shiny_regular, 12 px
+   regular black; get_premium_btn is that skin tinted 0xb265ce, so it keeps the tinted gradient above. */
+.octane-reward-track-button.octane-reward-track-hint-button {
+    padding: 0 3px;
+    border: 5px solid transparent;
+    border-image-source: var(--habbo-skin-shiny);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    border-radius: 0;
+    background: transparent;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 400;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-reward-track-button.octane-reward-track-hint-button:hover {
+    border-image-source: var(--habbo-skin-shiny-hover);
+    filter: none;
+}
+
+.octane-reward-track-button.octane-reward-track-hint-button:active {
+    border-image-source: var(--habbo-skin-shiny-pressed);
+    filter: none;
+}
+
+/* the staff gear sits over the top right of the rewards panel */
+.octane-reward-track-content > .octane-reward-track-admin-toggle {
+    top: 12px;
+    right: 18px;
+}
+
+/* AIR text pass: reward_track_main_xml (also the Introduction track) is an Ubuntu (style 3) frame whose texts
+   are the regular Ubuntu cut; our `Ubuntu` face is the condensed one. */
+.octane-reward-track {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+@layer base {
+    .octane-reward-track :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}

@@ -12,11 +12,10 @@ const INITIAL = {
     isInspectionGiveOpen: false,
     isVariableManageOpen: false,
     isManagedGiveOpen: false,
+    isRoomLogsOpen: false,
+    isSelfDonationOpen: false,
     monitorHistorySeverityFilter: 'ALL' as const,
     monitorHistoryTypeFilter: 'ALL',
-    variableManageTypeFilter: 'ALL',
-    variableManageSort: 'highest_value',
-    variableManagePage: 1,
     monitorSnapshot: createEmptyMonitorSnapshot(),
     selectedFurni: null,
     selectedFurniLiveState: null,
@@ -58,9 +57,8 @@ describe('useWiredCreatorToolsUiStore', () => {
         expect(state.isManagedGiveOpen).toBe(false);
         expect(state.monitorHistorySeverityFilter).toBe('ALL');
         expect(state.monitorHistoryTypeFilter).toBe('ALL');
-        expect(state.variableManageTypeFilter).toBe('ALL');
-        expect(state.variableManageSort).toBe('highest_value');
-        expect(state.variableManagePage).toBe(1);
+        expect(state.isRoomLogsOpen).toBe(false);
+        expect(state.isSelfDonationOpen).toBe(false);
         expect(state.monitorSnapshot).toEqual(createEmptyMonitorSnapshot());
         expect(state.selectedFurni).toBeNull();
         expect(state.selectedFurniLiveState).toBeNull();
@@ -172,26 +170,9 @@ describe('useWiredCreatorToolsUiStore', () => {
     });
 
     describe('variable manage UI', () => {
-        it('setVariableManageTypeFilter / setVariableManageSort store string filters', () => {
-            useWiredCreatorToolsUiStore.getState().setVariableManageTypeFilter('Number');
-            useWiredCreatorToolsUiStore.getState().setVariableManageSort('lowest_value');
-
-            expect(useWiredCreatorToolsUiStore.getState().variableManageTypeFilter).toBe('Number');
-            expect(useWiredCreatorToolsUiStore.getState().variableManageSort).toBe('lowest_value');
-        });
-
-        it('setVariableManagePage accepts a direct value', () => {
-            useWiredCreatorToolsUiStore.getState().setVariableManagePage(4);
-            expect(useWiredCreatorToolsUiStore.getState().variableManagePage).toBe(4);
-        });
-
-        it('setVariableManagePage accepts a functional updater (next/prev pagination)', () => {
-            useWiredCreatorToolsUiStore.getState().setVariableManagePage(2);
-            useWiredCreatorToolsUiStore.getState().setVariableManagePage((prev) => prev + 1);
-            expect(useWiredCreatorToolsUiStore.getState().variableManagePage).toBe(3);
-
-            useWiredCreatorToolsUiStore.getState().setVariableManagePage((prev) => Math.max(1, prev - 1));
-            expect(useWiredCreatorToolsUiStore.getState().variableManagePage).toBe(2);
+        it('setIsRoomLogsOpen takes a direct boolean', () => {
+            useWiredCreatorToolsUiStore.getState().setIsRoomLogsOpen(true);
+            expect(useWiredCreatorToolsUiStore.getState().isRoomLogsOpen).toBe(true);
         });
     });
 
@@ -215,7 +196,7 @@ describe('useWiredCreatorToolsUiStore', () => {
             const populated = {
                 ...createEmptyMonitorSnapshot(),
                 usageCurrentWindow: 5,
-                logs: [{ amount: 1, latestOccurrenceSeconds: 0, latestReason: '', latestSourceId: 0, latestSourceLabel: '', severity: 'ERROR', type: 'foo' }],
+                logs: [{ latestReason: '', latestSourceId: 0, latestSourceLabel: '', type: 'foo' }],
                 history: [{ occurredAtSeconds: 0, reason: '', sourceId: 0, sourceLabel: '', severity: 'ERROR', type: 'foo' }]
             };
             useWiredCreatorToolsUiStore.getState().setMonitorSnapshot(populated);
@@ -227,6 +208,48 @@ describe('useWiredCreatorToolsUiStore', () => {
             expect(cleared).not.toBe(populated);
             expect(cleared.logs).toEqual([]);
             expect(cleared.history).toEqual([]);
+        });
+
+        it('AIR room stats (1891) arrive on their own and survive the next monitor packet', () => {
+            const roomStats = {
+                usage: 120,
+                usageLimit: 500,
+                isHeavy: false,
+                floorCount: 12,
+                floorLimit: 2500,
+                wallCount: 3,
+                wallLimit: 4000,
+                permanentFurniVariables: 1,
+                permanentFurniVariablesLimit: 23,
+                permanentUserVariables: 2,
+                permanentUserVariablesLimit: 93,
+                permanentGlobalVariables: 3,
+                permanentGlobalVariablesLimit: 70
+            };
+
+            useWiredCreatorToolsUiStore.getState().setMonitorRoomStats(roomStats);
+            useWiredCreatorToolsUiStore.getState().setMonitorSnapshot({ ...createEmptyMonitorSnapshot(), usageCurrentWindow: 9 });
+
+            expect(useWiredCreatorToolsUiStore.getState().monitorSnapshot.usageCurrentWindow).toBe(9);
+            expect(useWiredCreatorToolsUiStore.getState().monitorSnapshot.roomStats).toEqual(roomStats);
+
+            useWiredCreatorToolsUiStore.getState().resetMonitorSnapshot();
+
+            expect(useWiredCreatorToolsUiStore.getState().monitorSnapshot.roomStats).toBeNull();
+        });
+
+        it('AIR error list (15) arrives on its own and survives the next monitor packet', () => {
+            const errors = [{ errorId: 4, name: 'KILLED', category: 'ERROR', amount: 2, latestOccurredAtMs: 1000 }];
+
+            useWiredCreatorToolsUiStore.getState().setMonitorErrorLogs(errors);
+            useWiredCreatorToolsUiStore.getState().setMonitorSnapshot({ ...createEmptyMonitorSnapshot(), usageCurrentWindow: 4 });
+
+            expect(useWiredCreatorToolsUiStore.getState().monitorSnapshot.usageCurrentWindow).toBe(4);
+            expect(useWiredCreatorToolsUiStore.getState().monitorSnapshot.errors).toEqual(errors);
+
+            useWiredCreatorToolsUiStore.getState().resetMonitorSnapshot();
+
+            expect(useWiredCreatorToolsUiStore.getState().monitorSnapshot.errors).toEqual([]);
         });
 
         it('the snapshot persists across the panel close/reopen lifecycle (UI flag flip)', () => {

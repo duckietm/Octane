@@ -7,7 +7,7 @@
   };
 
   const LOADER_BASE = getBase();
-  window.__nitroLoaderBase = LOADER_BASE.href;
+  window.__octaneLoaderBase = LOADER_BASE.href;
 
   const withCacheBust = (url) => {
     url.searchParams.set("v", Date.now().toString(36));
@@ -79,11 +79,11 @@
       if(!response.ok) throw new Error("HTTP " + response.status);
       const payload = await response.json();
       if(payload && typeof payload === "object") {
-        window.__nitroClientMode = payload;
+        window.__octaneClientMode = payload;
         return payload;
       }
     } catch(error) {
-      console.warn("[Nitro] client-mode fetch failed:", error?.message || error);
+      console.warn("[Octane] client-mode fetch failed:", error?.message || error);
     }
     return null;
   };
@@ -132,7 +132,7 @@
     };
 
     const modeText = await fetchSecureConfig("client-mode.json");
-    window.__nitroClientMode = JSON.parse(modeText);
+    window.__octaneClientMode = JSON.parse(modeText);
 
     const loaderText = await fetchSecureConfig("asset-loader.js");
     await importTextModule(loaderText);
@@ -148,7 +148,10 @@
         await loadSecureBootstrap(apiBase);
         return;
       } catch(error) {
-        console.warn("[Nitro] Secure bootstrap fallback:", error?.message || error);
+        console.warn("[Octane] Secure bootstrap fallback:", error?.message || error);
+        // The loader now comes in the clear: the rest of the page goes in the clear too, instead of
+        // asking an unreachable /nitro-sec for every file.
+        window.__octaneClientMode = Object.assign({}, mode, { secureAssetsEnabled: false, secureApiEnabled: false });
       }
     }
 

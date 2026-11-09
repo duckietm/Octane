@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { initialState } from '../state/reducer';
-import { FloorplanPreviewSVG } from './FloorplanPreviewSVG';
+import { fitViewBox, FloorplanPreviewSVG } from './FloorplanPreviewSVG';
 
 describe('FloorplanPreviewSVG', () => {
     it('renders nothing for empty tilemap', () => {
@@ -54,5 +54,38 @@ describe('FloorplanPreviewSVG', () => {
         };
         const { container } = render(<FloorplanPreviewSVG state={state} />);
         expect(container.querySelectorAll('[data-role="wall"]')).toHaveLength(0);
+    });
+
+    it('frames the drawn room instead of the whole canvas', () => {
+        const small = { ...initialState, wallHeight: 0, tiles: [[{ h: 0, blocked: false }]] };
+        const wide = {
+            ...initialState,
+            wallHeight: 0,
+            tiles: [[{ h: 0, blocked: false }, { h: 0, blocked: false }, { h: 0, blocked: false }, { h: 0, blocked: false }]]
+        };
+
+        const [, , smallWidth, smallHeight] = fitViewBox(small).split(' ').map(Number);
+        const [, , wideWidth] = fitViewBox(wide).split(' ').map(Number);
+
+        expect(smallWidth).toBeGreaterThan(0);
+        expect(smallHeight).toBeGreaterThan(0);
+        expect(smallWidth).toBeLessThan(2048);
+        expect(wideWidth).toBeGreaterThan(smallWidth);
+
+        const { container } = render(<FloorplanPreviewSVG state={small} />);
+        expect(container.querySelector('svg')?.getAttribute('viewBox')).toBe(fitViewBox(small));
+        expect(container.querySelector('svg')?.getAttribute('preserveAspectRatio')).toBe('xMidYMid meet');
+    });
+
+    it('grows the frame upward for walls and falls back to the full canvas when empty', () => {
+        const flat = { ...initialState, wallHeight: 0, tiles: [[{ h: 0, blocked: false }]] };
+        const walled = { ...flat, wallHeight: 4 };
+
+        const [, flatY, , flatHeight] = fitViewBox(flat).split(' ').map(Number);
+        const [, walledY, , walledHeight] = fitViewBox(walled).split(' ').map(Number);
+
+        expect(walledY).toBeLessThan(flatY);
+        expect(walledHeight).toBeGreaterThan(flatHeight);
+        expect(fitViewBox(initialState)).toBe('0 0 2048 1024');
     });
 });

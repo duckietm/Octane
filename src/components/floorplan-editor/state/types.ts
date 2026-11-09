@@ -1,6 +1,7 @@
 // `blocked` = void tile (no floor, serialized as 'x'). `occupied` = a tile that
 // currently has furniture on it (reported by the server); kept separate so it
-// stays visible and is NOT voided on save — it just can't be edited.
+// stays visible and is NOT voided on save — it can't be edited unless
+// `pickUpBlocking` is on, in which case the save picks that furniture up.
 export type Tile = { h: number; blocked: boolean; occupied?: boolean };
 
 export type EntryDir = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -28,6 +29,7 @@ export type FloorplanState = {
     brush: Brush;
     selection: Selection;
     squareSelect: boolean;
+    pickUpBlocking: boolean;
     lease: Lease;
     seq: number;
 };
@@ -49,6 +51,7 @@ export type FloorplanAction =
     | { type: 'CLEAR_SELECTION' }
     | { type: 'APPLY_BRUSH_TO_SELECTION'; source: LocalSource }
     | { type: 'SQUARE_SELECT_TOGGLE' }
+    | { type: 'SET_PICK_UP_BLOCKING'; value: boolean }
     | { type: 'IMPORT_STRING'; raw: string; door?: Door; thickness?: { wall: ThicknessLevel; floor: ThicknessLevel }; wallHeight?: number; source: LocalSource }
     | {
           type: 'APPLY_REMOTE_DIFF';

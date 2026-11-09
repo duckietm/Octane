@@ -1,4 +1,4 @@
-import { ChooserSelectionFilter, GetRoomEngine, IRoomObjectSpriteVisualization, RoomObjectCategory } from '@nitrots/nitro-renderer';
+import { ChooserSelectionFilter, GetRoomEngine, IRoomObjectSpriteVisualization, RoomObjectCategory } from '@octane/renderer';
 
 export class chooserSelectionVisualizer {
     private static activeFilters: Map<string, ChooserSelectionFilter> = new Map();

@@ -1,7 +1,7 @@
-import { GetTicker } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useRef, useState } from 'react';
-import { GetRoomObjectBounds, GetRoomSession } from '../../../../api';
+import { AddAnimationTickerCallback, GetRoomObjectBounds, GetRoomSession } from '../../../../api';
 import { BaseProps } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface ObjectLocationViewProps extends BaseProps<HTMLDivElement> {
     objectId: number;
@@ -15,10 +15,13 @@ export const ObjectLocationView: FC<ObjectLocationViewProps> = (props) => {
     const elementRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        let remove = false;
+        let remove: () => void = null;
 
         const getObjectLocation = () => {
             const roomSession = GetRoomSession();
+
+            if (!roomSession) return null;
+
             const objectBounds = GetRoomObjectBounds(roomSession.roomId, objectId, category, 1);
 
             return objectBounds;
@@ -29,31 +32,32 @@ export const ObjectLocationView: FC<ObjectLocationViewProps> = (props) => {
 
             if (!bounds || !elementRef.current) return;
 
-            setPos({
-                x: Math.round(bounds.left + bounds.width / 2 - elementRef.current.offsetWidth / 2),
-                y: Math.round(bounds.top - elementRef.current.offsetHeight + 10)
-            });
+            const x = Math.round(bounds.left + bounds.width / 2 - elementRef.current.offsetWidth / 2);
+            const y = Math.round(bounds.top - elementRef.current.offsetHeight + 10);
+
+            // Runs every ticker frame: keep the old object when nothing moved so React skips the render.
+            setPos((previous) => (previous.x === x && previous.y === y ? previous : { x, y }));
         };
 
         if (noFollow) {
             updatePosition();
         } else {
-            remove = true;
-
-            GetTicker().add(updatePosition);
+            remove = AddAnimationTickerCallback(updatePosition);
         }
 
         return () => {
-            if (remove) GetTicker().remove(updatePosition);
+            if (remove) remove();
         };
     }, [objectId, category, noFollow]);
 
     return (
-        <div
-            ref={elementRef}
-            className="object-location absolute"
-            style={{ left: pos.x, top: pos.y, visibility: pos.x + (elementRef.current ? elementRef.current.offsetWidth : 0) > -1 ? 'visible' : 'hidden' }}
-            {...rest}
-        />
+        <NativeTextTree>
+            <div
+                ref={elementRef}
+                className="object-location absolute"
+                style={{ left: pos.x, top: pos.y, visibility: pos.x + (elementRef.current ? elementRef.current.offsetWidth : 0) > -1 ? 'visible' : 'hidden' }}
+                {...rest}
+            />
+        </NativeTextTree>
     );
 };

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<skin name="illumina_light_skin_border_sunk" version="0.0">
+
+	<!-- shared variables -->
+	<variables>
+		<variable key="asset" value="illumina_light_border_sunk_png" type="String"/>
+	</variables>
+
+	<!-- the following maps states to layouts and templates -->
+	<states>
+		<state name="default" layout="illumina_light_border_sunk" template="illumina_light_border_sunk_template"/>
+	</states>
+
+	<!-- templates defines regions in bitmap asset -->
+	<templates>
+		<template name="illumina_light_border_sunk_template" asset="$asset">
+			<entities>
+				<entity name="top_left" type="bitmap"><region><Rectangle x="0" y="0" width="12" height="14"/></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="12" y="0" width="12" height="14"/></region></entity>
+				<entity name="top_right" type="bitmap"><region><Rectangle x="24" y="0" width="6" height="14"/></region></entity>
+				<entity name="center_left" type="bitmap"><region><Rectangle x="0" y="14" width="8" height="12"/></region></entity>
+				<entity name="center_center" type="bitmap"><region><Rectangle x="8" y="14" width="21" height="12"/></region></entity>
+				<entity name="center_right" type="bitmap"><region><Rectangle x="29" y="14" width="1" height="12"/></region></entity>
+				<entity name="bottom_left" type="bitmap"><region><Rectangle x="0" y="26" width="8" height="4"/></region></entity>
+				<entity name="bottom_center" type="bitmap"><region><Rectangle x="8" y="26" width="18" height="4"/></region></entity>
+				<entity name="bottom_right" type="bitmap"><region><Rectangle x="26" y="26" width="4" height="4"/></region></entity>
+			</entities>
+		</template>
+	</templates>
+
+	<!-- markup for layout drawer -->
+	<layouts>
+		<layout name="illumina_light_border_sunk" transparent="true">
+			<entities>
+				<entity name="top_left" id="0" colorize="false"><region><Rectangle x="0" y="0" width="12" height="14"/></region><scale horizontal="fixed" vertical="fixed"/></entity>
+				<entity name="top_center" id="0" colorize="false"><region><Rectangle x="12" y="0" width="12" height="14"/></region><scale horizontal="strech" vertical="fixed"/></entity>
+				<entity name="top_right" id="0" colorize="false"><region><Rectangle x="24" y="0" width="6" height="14"/></region><scale horizontal="move" vertical="fixed"/></entity>
+				<entity name="center_left" id="0" colorize="false"><region><Rectangle x="0" y="14" width="8" height="12"/></region><scale horizontal="fixed" vertical="strech"/></entity>
+				<entity name="center_center" id="0" colorize="false"><region><Rectangle x="8" y="14" width="21" height="12"/></region><scale horizontal="strech" vertical="strech"/></entity>
+				<entity name="center_right" id="0" colorize="false"><region><Rectangle x="29" y="14" width="1" height="12"/></region><scale horizontal="move" vertical="strech"/></entity>
+				<entity name="bottom_left" id="0" colorize="false"><region><Rectangle x="0" y="26" width="8" height="4"/></region><scale horizontal="fixed" vertical="move"/></entity>
+				<entity name="bottom_center" id="0" colorize="false"><region><Rectangle x="8" y="26" width="18" height="4"/></region><scale horizontal="strech" vertical="move"/></entity>
+				<entity name="bottom_right" id="0" colorize="false"><region><Rectangle x="26" y="26" width="4" height="4"/></region><scale horizontal="move" vertical="move"/></entity>
+			</entities>
+		</layout>
+	</layouts>
+</skin>

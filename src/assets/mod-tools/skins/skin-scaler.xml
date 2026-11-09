@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<skin name="default_scaler_skin" version="0.0">
+
+	<!-- shared variables -->
+
+	<variables>
+		<variable key="asset" value="habbo_blue_skin_png" type="String" />
+	</variables>
+
+	<!-- the following maps layouts for render states -->
+
+	<states>
+		<state name="default" layout="scaler" template="default_scaler" />
+	</states>
+
+	<!-- templates defines regions in bitmap asset -->
+
+	<templates>
+		<template name="default_scaler" asset="$asset">
+			<entities>
+				<entity name="scaler" type="bitmap"><region><Rectangle x="41" y="32" width="15" height="15" /></region></entity>
+                <entity name="shine" type="bitmap"><region><Rectangle x="59" y="32" width="14" height="14" /></region></entity>
+			</entities>
+		</template>
+	</templates>
+
+	<!-- markup for layout drawer -->
+
+	<layouts>
+		<layout name="scaler" transparent="true">
+			<entities>
+				<entity name="scaler" id="0">
+					<region><Rectangle x="0" y="0" width="15" height="15" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+                <entity name="shine" id="0" colorize="false">
+					<region><Rectangle x="0" y="0" width="14" height="14" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+	</layouts>
+</skin>

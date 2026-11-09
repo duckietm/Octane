@@ -11,6 +11,12 @@ export interface IRoomData {
     tradeState: number;
     allowWalkthrough: boolean;
     allowUnderpass: boolean;
+    muteAllPets: boolean;
+    leaveOnDoorTileEnabled: boolean;
+    idleSleepEnabled: boolean;
+    idleSleepTimeoutSeconds: number;
+    idleAutokickEnabled: boolean;
+    idleAutokickTimeoutSeconds: number;
     lockState: number;
     password: string;
     allowPets: boolean;
@@ -20,4 +26,6 @@ export interface IRoomData {
     floorThickness: number;
     chatSettings: IRoomChatSettings;
     moderationSettings: IRoomModerationSettings;
+    /** Hidden because it holds Builders Club furni while the owner has no membership. */
+    hiddenByBc?: boolean;
 }

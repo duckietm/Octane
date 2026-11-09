@@ -1,0 +1,10 @@
+Interface Sounds 1.0
+
+Created and distributed by Kenney (https://www.kenney.nl/).
+Creation date: 2020-02-11.
+
+License: Creative Commons Zero (CC0 1.0 Universal)
+https://creativecommons.org/publicdomain/zero/1.0/
+
+The bundled OGG test sounds are free to use in personal, educational, and
+commercial projects. Attribution is not required.

@@ -1,5 +1,5 @@
-import { GetRoomEngine, GetSessionDataManager, IFurnitureData, IObjectData, IProductData } from '@nitrots/nitro-renderer';
-import { GetConfigurationValue } from '../nitro';
+import { GetRoomEngine, GetSessionDataManager, IFurnitureData, IObjectData, IProductData } from '@octane/renderer';
+import { GetConfigurationValue } from '../octane';
 import { GetPixelEffectIcon, GetSubscriptionProductIcon } from './CatalogUtilities';
 import { IProduct } from './IProduct';
 import { IPurchasableOffer } from './IPurchasableOffer';
@@ -47,6 +47,7 @@ export class Product implements IProduct {
             (product) =>
                 product.productType !== ProductTypeEnum.BADGE &&
                 product.productType !== ProductTypeEnum.EFFECT &&
+                product.productType !== ProductTypeEnum.CHAT_STYLE &&
                 product.productClassId !== Product.EFFECT_CLASSID_NINJA_DISAPPEAR
         );
     }

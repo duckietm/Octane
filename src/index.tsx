@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { StrictMode, Suspense } from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ErrorBoundary } from 'react-error-boundary';
 import { App } from './App';
@@ -18,27 +18,56 @@ const queryClient = new QueryClient({
 import './css/habbo/HabboTheme.css';
 import './css/index.css';
 
+import './css/avatar-editor/AvatarEditorView.css';
 import './css/backgrounds/BackgroundsView.css';
 import './css/badges/BadgeLeaderboardView.css';
 import './css/catalog/CatalogView.css';
+import './css/catalog/BuildersBlocks.css';
+import './css/catalog/CatalogExperience.css';
+import './css/catalog/CatalogVipBuyView.css';
+import './css/catalog/MarketplaceCatalog.css';
+import './css/catalog/MarketplaceOfferDetails.css';
 import './css/emustats/EmuStatsView.css';
+import './css/floorplan-editor/FloorplanEditorView.css';
 
 import './css/chat/Chats.css';
 import './css/chat/ChatHistoryView.css';
 import './css/chat/ChatInputMentionSelectorView.css';
+import './css/chat/ChatInputHabbiconSelectorView.css';
 import './css/mentions/MentionToasts.css';
+import './css/room/FriendRequest.css';
 import './css/mentions/MentionsPanel.css';
+import './css/soundboard/Soundboard.css';
 
 import './css/common/Buttons.css';
-import './css/common/ClassicScrollbar.css';
+import './css/common/UbuntuDropmenu.css';
+import './css/habbo/HabboSkin.css';
 import './css/common/PrefixEffects.css';
 
 import './css/forms/form_select.css';
+import './css/forms/base-ui-autocomplete.css';
+import './css/forms/base-ui-disclosure.css';
+import './css/forms/base-ui-menus.css';
 
 import './css/friends/FriendsView.css';
+import './css/friends/FriendBarActivity.css';
+import './css/friends/FriendBarRequests.css';
 import './css/fortune-wheel/FortuneWheelView.css';
+import './css/groups/GroupView.css';
+import './css/groups/GroupManagement.css';
+import './css/groups/GroupForum.css';
 
+import './css/game-center/GameCenterView.css';
+
+import './css/help/MyReports.css';
 import './css/help/HelpView.css';
+import './css/help/HelpIndex.css';
+import './css/help/HabboWay.css';
+import './css/talent/TalentTrack.css';
+import './css/nux/Nux.css';
+import './css/guide-tool/GuideTool.css';
+import './css/guide-tool/GuardianChatReview.css';
+import './css/housekeeping/HousekeepingView.css';
 
 import './css/hotelview/HotelView.css';
 
@@ -47,19 +76,39 @@ import './css/login/LoginView.css';
 import './css/icons/icons.css';
 
 import './css/inventory/InventoryView.css';
+import './css/inventory/InventoryAnimals.css';
+import './css/inventory/InventoryPrefixes.css';
+import './css/inventory/InventoryBadges.css';
+import './css/inventory/InventoryFilters.css';
+import './css/inventory/InventoryWiredTrade.css';
 
 import './css/layout/LayoutTrophy.css';
 
-import './css/nitrocard/NitroCardView.css';
+import './css/octanecard/OctaneCardView.css';
+import './css/achievements/AchievementsView.css';
 
 import './css/notification/NotificationCenterView.css';
+import './css/notification/HotelAlertToast.css';
+import './css/notification/CaptionNotification.css';
+import './css/notification/AlertActions.css';
 
 import './css/purse/PurseView.css';
+import './css/quests/QuestsView.css';
+import './css/quests/RewardTrackView.css';
+import './css/quests/SeasonalCalendarView.css';
 import './css/radio/RadioView.css';
 
 import './css/room/InfoStand.css';
+import './css/room/NavigatorRoomInfo.css';
 import './css/room/NavigatorRoomSettings.css';
 import './css/room/RoomWidgets.css';
+import './css/room/RentableSpaceWidget.css';
+import './css/room/Poll.css';
+import './css/room/Chooser.css';
+import './css/room/WiredVariableFx.css';
+import './css/room/WiredLeaderboard.css';
+import './css/room/WiredLabel.css';
+import './css/room/WiredContract.css';
 
 import './css/slider.css';
 
@@ -70,8 +119,25 @@ import './css/user-settings/UserSettingsView.css';
 import './css/vault/VaultView.css';
 import './css/widgets/FurnitureWidgets.css';
 import './css/WiredView.css';
+import './css/camera/CameraWidget.css';
+import './css/catalog/CatalogGiftView.css';
+import './css/catalog/MarketplacePostOfferView.css';
+import './css/catalog/MarketplaceTokenDialogs.css';
+import './css/catalog/VipBenefitsView.css';
+import './css/room/VipRequired.css';
+import './css/catalog/SpecialItemsDisplay.css';
+import './css/catalog/CatalogAirText.css';
+import './css/collectibles/Collectibles.css';
+import './css/room/VimeoDisplay.css';
+import './css/navigator/NavigatorView.css';
+import './css/navigator/RaidProtection.css';
+import './css/common/ClassicScrollbar.css';
 
-createRoot(document.getElementById('root')).render(
+document.documentElement.classList.add('has-classic-scrollbar');
+
+// Mounted by bootstrap once the configuration is in; importing this module only loads the UI.
+export const mountApp = (): void => {
+    createRoot(document.getElementById('root')).render(
     <StrictMode>
         <QueryClientProvider client={queryClient}>
             <ErrorBoundary
@@ -83,10 +149,9 @@ createRoot(document.getElementById('root')).render(
                     />
                 )}
             >
-                <Suspense fallback={<LoadingView message="Loading…" />}>
-                    <App />
-                </Suspense>
+                <App />
             </ErrorBoundary>
         </QueryClientProvider>
     </StrictMode>
 );
+};

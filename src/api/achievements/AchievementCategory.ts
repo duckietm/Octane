@@ -1,4 +1,4 @@
-import { AchievementData } from '@nitrots/nitro-renderer';
+import { AchievementData } from '@octane/renderer';
 import { AchievementUtilities } from './AchievementUtilities';
 import { IAchievementCategory } from './IAchievementCategory';
 

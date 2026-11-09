@@ -1,6 +1,7 @@
-import { GetRoomEngine, TextureUtils, Vector3d } from '@nitrots/nitro-renderer';
-import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from 'react';
+import { GetRoomEngine, IImageResult, Vector3d } from '@octane/renderer';
+import { CSSProperties, FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Base, BaseProps } from '../Base';
+import { PIXEL_ART_RENDERING } from './PixelArtRendering';
 
 interface LayoutRoomObjectImageViewProps extends BaseProps<HTMLDivElement> {
     roomId: number;
@@ -14,6 +15,7 @@ export const LayoutRoomObjectImageView: FC<LayoutRoomObjectImageViewProps> = (pr
     const { roomId = -1, objectId = 1, category = -1, direction = 2, scale = 1, style = {}, ...rest } = props;
     const [imageElement, setImageElement] = useState<HTMLImageElement>(null);
     const isMounted = useRef(true);
+    const requestIdRef = useRef(0);
 
     useEffect(() => {
         isMounted.current = true;
@@ -35,7 +37,7 @@ export const LayoutRoomObjectImageView: FC<LayoutRoomObjectImageViewProps> = (pr
         if (scale !== 1) {
             newStyle.transform = `scale(${scale})`;
 
-            if (!(scale % 1)) newStyle.imageRendering = 'pixelated';
+            if (!(scale % 1)) newStyle.imageRendering = PIXEL_ART_RENDERING;
         }
 
         if (Object.keys(style).length) newStyle = { ...newStyle, ...style };
@@ -43,13 +45,21 @@ export const LayoutRoomObjectImageView: FC<LayoutRoomObjectImageViewProps> = (pr
         return newStyle;
     }, [imageElement, scale, style]);
 
-    useEffect(() => {
-        const imageResult = GetRoomEngine().getRoomObjectImage(roomId, objectId, category, new Vector3d(direction * 45), 64, {
-            imageReady: async (result) => {
-                const img = await TextureUtils.generateImage(result.data);
+    // A late image for a previous roomId/objectId/direction must not overwrite the
+    // current one: every request carries its id and only the latest one may commit.
+    const updateImage = useCallback(async (result: IImageResult | null, requestId: number) => {
+        if (!result) return;
 
-                if (img && isMounted.current) setImageElement(img);
-            },
+        const img = await result.getImage();
+
+        if (img && isMounted.current && requestIdRef.current === requestId) setImageElement(img);
+    }, []);
+
+    useEffect(() => {
+        const requestId = ++requestIdRef.current;
+
+        const imageResult = GetRoomEngine().getRoomObjectImage(roomId, objectId, category, new Vector3d(direction * 45), 64, {
+            imageReady: (result) => updateImage(result, requestId),
             imageFailed: () => {
                 // no-op
             }
@@ -57,12 +67,8 @@ export const LayoutRoomObjectImageView: FC<LayoutRoomObjectImageViewProps> = (pr
 
         if (!imageResult) return;
 
-        (async () => {
-            const img = await TextureUtils.generateImage(imageResult.data);
-
-            if (img && isMounted.current) setImageElement(img);
-        })();
-    }, [roomId, objectId, category, direction, scale]);
+        updateImage(imageResult, requestId);
+    }, [roomId, objectId, category, direction, scale, updateImage]);
 
     if (!imageElement) return null;
 

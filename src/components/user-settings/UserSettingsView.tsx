@@ -1,42 +1,100 @@
-import { AddLinkEventTracker, CreateLinkEvent, ILinkEventTracker, NitroSettingsEvent, RemoveLinkEventTracker, UserSettingsCameraFollowComposer, UserSettingsEvent, UserSettingsOldChatComposer, UserSettingsRoomInvitesComposer, UserSettingsSoundComposer } from '@nitrots/nitro-renderer';
-import { FC, useEffect, useState } from 'react';
-import { FaUserCog, FaVolumeDown, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
-import { DispatchMainEvent, DispatchUiEvent, LocalizeText, SendMessageComposer } from '../../api';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
-import { useCatalogPlaceMultipleItems, useCatalogSkipPurchaseConfirmation, useChatWindow, useMessageEvent } from '../../hooks';
-import { classNames } from '../../layout';
+import {
+    AddLinkEventTracker,
+    CreateLinkEvent,
+    ILinkEventTracker,
+    OctaneSettingsEvent,
+    RemoveLinkEventTracker,
+    RoomChatSettings,
+    SoundboardSaveVolumeComposer,
+    UserSettingsCameraFollowComposer,
+    UserSettingsChatPreferencesComposer,
+    UserSettingsEvent,
+    UserSettingsOldChatComposer,
+    UserSettingsPrivacyComposer,
+    UserSettingsRoomInvitesComposer,
+    UserSettingsSoundComposer
+} from '@octane/renderer';
+import { useUserChatPreferencesStore } from '@/state/userChatPreferences';
+import { FC, ReactNode, useEffect, useState } from 'react';
+import { DispatchMainEvent, DispatchUiEvent, localizeWithFallback, SendMessageComposer } from '../../api';
+import { DraggableWindow } from '../../common';
+import {
+    useCatalogDisplayPreferences,
+    useCatalogPlaceMultipleItems,
+    useCatalogSkipPurchaseConfirmation,
+    useChatWindow,
+    useKeyboardMovement,
+    useMessageEvent,
+    useWiredToolsActions
+} from '../../hooks';
+import { AirSettingsVolumeRow } from './AirSettingsVolumeRow';
+import { SoundboardVolumeControl } from './SoundboardVolumeControl';
+import { WordFilterSettingsView } from './WordFilterSettingsView';
+import { Checkbox } from '../../common/Checkbox';
+import { Radio } from '../../common/Radio';
+import { Select } from '../../common/Select';
+import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
-const localizeWithFallback = (key: string, fallback: string) =>
-{
-    const text = LocalizeText(key);
-    return (text && text !== key) ? text : fallback;
-};
+type SettingsSection = null | 'audio' | 'chat' | 'other' | 'privacy' | 'wordfilter';
+type VolumeAction = 'system_volume' | 'furni_volume' | 'trax_volume' | 'soundboard_volume';
 
-// null = full window (legacy). 'audio' | 'chat' | 'other' = focused section
-// opened from the purse gear dropdown.
-type SettingsSection = null | 'audio' | 'chat' | 'other';
+interface AirSettingsFrameProps {
+    backLabel: string;
+    children: ReactNode;
+    onBack: () => void;
+    title: string;
+    variant: 'menu' | Exclude<SettingsSection, null>;
+}
 
-export const UserSettingsView: FC<{}> = props =>
-{
-    const [ isVisible, setIsVisible ] = useState(false);
-    const [ section, setSection ] = useState<SettingsSection>(null);
-    const [ userSettings, setUserSettings ] = useState<NitroSettingsEvent>(null);
-    const [ catalogPlaceMultipleObjects, setCatalogPlaceMultipleObjects ] = useCatalogPlaceMultipleItems();
-    const [ catalogSkipPurchaseConfirmation, setCatalogSkipPurchaseConfirmation ] = useCatalogSkipPurchaseConfirmation();
-    const [ chatWindowEnabled, setChatWindowEnabled ] = useChatWindow();
+const AirSettingsFrame: FC<AirSettingsFrameProps> = ({ backLabel, children, onBack, title, variant }) => (
+    <NativeTextTree>
+        <DraggableWindow handleSelector=".air-settings-window__title" uniqueKey="user-settings">
+            <section
+                aria-label={title}
+                className={`user-settings-window air-settings-window air-settings-window--${variant} max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]`}
+                role="dialog"
+            >
+                <div aria-hidden="true" className="air-settings-window__chrome" />
+                <h2 className="air-settings-window__title">{title}</h2>
+                <div aria-hidden="true" className="air-settings-window__divider" />
+                {children}
+                <BaseButton className="air-settings-button air-settings-window__back" onClick={onBack} type="button">
+                    {backLabel}
+                </BaseButton>
+            </section>
+        </DraggableWindow>
+    </NativeTextTree>
+);
 
-    const processAction = (type: string, value?: boolean | number | string) =>
-    {
-        let doUpdate = true;
+const clampVolume = (value: number) => Math.max(0, Math.min(100, Number(value)));
+
+export const UserSettingsView: FC<{}> = () => {
+    const [isVisible, setIsVisible] = useState(false);
+    const [section, setSection] = useState<SettingsSection>(null);
+    const [returnToMenu, setReturnToMenu] = useState(false);
+    const [userSettings, setUserSettings] = useState<OctaneSettingsEvent>(null);
+    const [catalogPlaceMultipleObjects, setCatalogPlaceMultipleObjects] = useCatalogPlaceMultipleItems();
+    const [catalogSkipPurchaseConfirmation, setCatalogSkipPurchaseConfirmation] = useCatalogSkipPurchaseConfirmation();
+    const { density: catalogGridDensity, setDensity: setCatalogGridDensity, showTilePrices, setShowTilePrices } = useCatalogDisplayPreferences();
+    const [chatWindowEnabled, setChatWindowEnabled] = useChatWindow();
+    const [keyboardMovement, setKeyboardMovement] = useKeyboardMovement();
+    const { updateWiredWhisperDisabled } = useWiredToolsActions();
+
+    const closeView = () => {
+        setIsVisible(false);
+        setReturnToMenu(false);
+    };
+
+    const processAction = (type: string, value?: boolean | number) => {
+        if (type === 'close_view') {
+            closeView();
+            return;
+        }
 
         const clone = userSettings.clone();
 
-        switch(type)
-        {
-            case 'close_view':
-                setIsVisible(false);
-                doUpdate = false;
-                return;
+        switch (type) {
             case 'oldchat':
                 clone.oldChat = value as boolean;
                 SendMessageComposer(new UserSettingsOldChatComposer(clone.oldChat));
@@ -49,77 +107,119 @@ export const UserSettingsView: FC<{}> = props =>
                 clone.cameraFollow = value as boolean;
                 SendMessageComposer(new UserSettingsCameraFollowComposer(clone.cameraFollow));
                 break;
+            case 'online_status_visible':
+                clone.onlineStatusVisible = value as boolean;
+                SendMessageComposer(new UserSettingsPrivacyComposer(clone.onlineStatusVisible, clone.friendsCanFollow, clone.friendRequestsAllowed));
+                break;
+            case 'friends_can_follow':
+                clone.friendsCanFollow = value as boolean;
+                SendMessageComposer(new UserSettingsPrivacyComposer(clone.onlineStatusVisible, clone.friendsCanFollow, clone.friendRequestsAllowed));
+                break;
+            case 'friend_requests_allowed':
+                clone.friendRequestsAllowed = value as boolean;
+                SendMessageComposer(new UserSettingsPrivacyComposer(clone.onlineStatusVisible, clone.friendsCanFollow, clone.friendRequestsAllowed));
+                break;
             case 'system_volume':
-                clone.volumeSystem = value as number;
-                clone.volumeSystem = Math.max(0, clone.volumeSystem);
-                clone.volumeSystem = Math.min(100, clone.volumeSystem);
+                clone.volumeSystem = clampVolume(value as number);
                 break;
             case 'furni_volume':
-                clone.volumeFurni = value as number;
-                clone.volumeFurni = Math.max(0, clone.volumeFurni);
-                clone.volumeFurni = Math.min(100, clone.volumeFurni);
+                clone.volumeFurni = clampVolume(value as number);
                 break;
             case 'trax_volume':
-                clone.volumeTrax = value as number;
-                clone.volumeTrax = Math.max(0, clone.volumeTrax);
-                clone.volumeTrax = Math.min(100, clone.volumeTrax);
+                clone.volumeTrax = clampVolume(value as number);
+                break;
+            case 'soundboard_volume':
+                clone.volumeSoundboard = clampVolume(value as number);
+                break;
+            case 'chat_mode':
+            case 'chat_bubble_width':
+            case 'chat_scroll_speed':
+                if (type === 'chat_mode') clone.chatMode = value as number;
+                else if (type === 'chat_bubble_width') clone.chatBubbleWidth = value as number;
+                else clone.chatScrollSpeed = value as number;
+                SendMessageComposer(new UserSettingsChatPreferencesComposer(clone.chatMode, clone.chatBubbleWidth, clone.chatScrollSpeed));
+                useUserChatPreferencesStore.getState().setPreferences({ chatMode: clone.chatMode, bubbleWidth: clone.chatBubbleWidth, scrollSpeed: clone.chatScrollSpeed });
+                break;
+            case 'wired_whisper_disabled':
+                clone.wiredWhisperDisabled = value as boolean;
+                // The official wired menu preferences travel together: the store sends the stored ones
+                // (playtest mode included) along, and keeps the switch for its own next save.
+                updateWiredWhisperDisabled(clone.wiredWhisperDisabled);
                 break;
         }
 
-        if(doUpdate) setUserSettings(clone);
-
+        setUserSettings(clone);
         DispatchMainEvent(clone);
     };
 
-    const saveRangeSlider = (type: string) =>
-    {
-        switch(type)
-        {
-            case 'volume':
-                SendMessageComposer(new UserSettingsSoundComposer(Math.round(userSettings.volumeSystem), Math.round(userSettings.volumeFurni), Math.round(userSettings.volumeTrax)));
-                break;
+    const saveVolume = (type: VolumeAction, value: number) => {
+        const committedValue = Math.round(clampVolume(value));
+
+        if (type === 'soundboard_volume') {
+            SendMessageComposer(new SoundboardSaveVolumeComposer(committedValue));
+            return;
         }
+
+        SendMessageComposer(
+            new UserSettingsSoundComposer(
+                type === 'system_volume' ? committedValue : Math.round(userSettings.volumeSystem),
+                type === 'furni_volume' ? committedValue : Math.round(userSettings.volumeFurni),
+                type === 'trax_volume' ? committedValue : Math.round(userSettings.volumeTrax)
+            )
+        );
     };
 
-    useMessageEvent<UserSettingsEvent>(UserSettingsEvent, event =>
-    {
+    useMessageEvent<UserSettingsEvent>(UserSettingsEvent, (event) => {
         const parser = event.getParser();
-        const settingsEvent = new NitroSettingsEvent();
+        const settingsEvent = new OctaneSettingsEvent();
 
         settingsEvent.volumeSystem = parser.volumeSystem;
         settingsEvent.volumeFurni = parser.volumeFurni;
         settingsEvent.volumeTrax = parser.volumeTrax;
+        settingsEvent.volumeSoundboard = parser.volumeSoundboard;
         settingsEvent.oldChat = parser.oldChat;
         settingsEvent.roomInvites = parser.roomInvites;
         settingsEvent.cameraFollow = parser.cameraFollow;
         settingsEvent.flags = parser.flags;
         settingsEvent.chatType = parser.chatType;
+        settingsEvent.onlineStatusVisible = parser.onlineStatusVisible;
+        settingsEvent.friendsCanFollow = parser.friendsCanFollow;
+        settingsEvent.friendRequestsAllowed = parser.friendRequestsAllowed;
+        settingsEvent.wiredWhisperDisabled = parser.wiredWhisperDisabled;
+        settingsEvent.chatMode = parser.chatMode;
+        settingsEvent.chatBubbleWidth = parser.chatBubbleWidth;
+        settingsEvent.chatScrollSpeed = parser.chatScrollSpeed;
+
+        useUserChatPreferencesStore.getState().setPreferences({
+            chatMode: parser.chatMode,
+            bubbleWidth: parser.chatBubbleWidth,
+            scrollSpeed: parser.chatScrollSpeed
+        });
 
         setUserSettings(settingsEvent);
         DispatchMainEvent(settingsEvent);
     });
 
-    useEffect(() =>
-    {
+    useEffect(() => {
         const linkTracker: ILinkEventTracker = {
-            linkReceived: (url: string) =>
-            {
+            linkReceived: (url: string) => {
                 const parts = url.split('/');
 
-                if(parts.length < 2) return;
+                if (parts.length < 2) return;
 
-                switch(parts[1])
-                {
+                switch (parts[1]) {
                     case 'show':
                         setSection((parts[2] as SettingsSection) || null);
+                        setReturnToMenu(false);
                         setIsVisible(true);
                         return;
                     case 'hide':
-                        setIsVisible(false);
+                        closeView();
                         return;
                     case 'toggle':
                         setSection((parts[2] as SettingsSection) || null);
-                        setIsVisible(prevValue => !prevValue);
+                        setReturnToMenu(false);
+                        setIsVisible((previousValue) => !previousValue);
                         return;
                 }
             },
@@ -131,114 +231,295 @@ export const UserSettingsView: FC<{}> = props =>
         return () => RemoveLinkEventTracker(linkTracker);
     }, []);
 
-    useEffect(() =>
-    {
-        if(!userSettings) return;
+    useEffect(() => {
+        if (userSettings) DispatchUiEvent(userSettings);
+    }, [userSettings]);
 
-        DispatchUiEvent(userSettings);
-    }, [ userSettings ]);
+    if (!isVisible || !userSettings) return null;
 
-    if(!isVisible || !userSettings) return null;
+    const backLabel = localizeWithFallback('widget.memenu.back', localizeWithFallback('generic.back', 'Back'));
+    const muteLabel = localizeWithFallback('widget.memenu.settings.volume.mute', 'Mute');
+    const maximumLabel = localizeWithFallback('widget.memenu.settings.volume.maximum', 'Maximum volume');
+    const openMenuSection = (nextSection: Exclude<SettingsSection, null>) => {
+        setSection(nextSection);
+        setReturnToMenu(true);
+    };
+    const handleBack = () => {
+        if (section === 'wordfilter') {
+            setSection('chat');
+            return;
+        }
 
-    const showChat = (section === null || section === 'chat');
-    const showOther = (section === null || section === 'other');
-    const showAudio = (section === null || section === 'audio');
-    const showAccountLink = (section === null);
+        if (section && returnToMenu) {
+            setSection(null);
+            setReturnToMenu(false);
+            return;
+        }
 
-    const headerText = (section === 'audio')
-        ? localizeWithFallback('widget.memenu.settings.volume', 'Audio settings')
-        : (section === 'chat')
-            ? localizeWithFallback('room.chat.settings.title', 'Chat settings')
-            : (section === 'other')
-                ? localizeWithFallback('memenu.settings.other', 'Other settings')
-                : LocalizeText('widget.memenu.settings.title');
+        closeView();
+    };
+
+    if (section === null) {
+        return (
+            <NativeTextTree>
+                <AirSettingsFrame backLabel={backLabel} onBack={closeView} title={localizeWithFallback('widget.memenu.settings', 'Settings')} variant="menu">
+                    <div className="air-settings-menu__items">
+                        <BaseButton className="air-settings-button" onClick={() => openMenuSection('audio')} type="button">
+                            {localizeWithFallback('widget.memenu.settings.audio', 'Sound settings')}
+                        </BaseButton>
+                        <BaseButton
+                            className="air-settings-button"
+                            onClick={() => {
+                                CreateLinkEvent('avatar-editor/show');
+                                closeView();
+                            }}
+                            type="button"
+                        >
+                            {localizeWithFallback('widget.memenu.settings.character', 'Character settings')}
+                        </BaseButton>
+                        <BaseButton className="air-settings-button" onClick={() => openMenuSection('chat')} type="button">
+                            {localizeWithFallback('widget.memenu.settings.chat', 'Chat settings')}
+                        </BaseButton>
+                        <BaseButton className="air-settings-button" onClick={() => openMenuSection('other')} type="button">
+                            {localizeWithFallback('widget.memenu.settings.other', 'Other settings')}
+                        </BaseButton>
+                        <BaseButton className="air-settings-button" onClick={() => openMenuSection('privacy')} type="button">
+                            {localizeWithFallback('privacy.settings.title', 'Game Privacy')}
+                        </BaseButton>
+                        <BaseButton className="air-settings-button" onClick={() => CreateLinkEvent('user-account-settings/show')} type="button">
+                            {localizeWithFallback('usersettings.open.title', 'User Settings')}
+                        </BaseButton>
+                        <BaseButton
+                            className="air-settings-button"
+                            onClick={() => {
+                                CreateLinkEvent('translation-settings/toggle');
+                                closeView();
+                            }}
+                            type="button"
+                        >
+                            {localizeWithFallback('purse.settings.translate', 'Translate')}
+                        </BaseButton>
+                    </div>
+                </AirSettingsFrame>
+            </NativeTextTree>
+        );
+    }
+
+    if (section === 'audio') {
+        return (
+            <NativeTextTree>
+                <AirSettingsFrame
+                    backLabel={backLabel}
+                    onBack={handleBack}
+                    title={localizeWithFallback('widget.memenu.settings.title', 'Settings')}
+                    variant="audio"
+                >
+                    <div className="air-settings-audio__heading">{localizeWithFallback('widget.memenu.settings.volume', 'Adjust the sound volume')}</div>
+                    <div className="air-settings-audio__rows">
+                        <AirSettingsVolumeRow
+                            id="volumeSystem"
+                            label={localizeWithFallback('widget.memenu.settings.volume.ui', 'System')}
+                            maximumLabel={maximumLabel}
+                            muteLabel={muteLabel}
+                            value={userSettings.volumeSystem}
+                            onChange={(value) => processAction('system_volume', value)}
+                            onCommit={(value) => saveVolume('system_volume', value)}
+                        />
+                        <AirSettingsVolumeRow
+                            id="volumeFurni"
+                            label={localizeWithFallback('widget.memenu.settings.volume.furni', 'Furni')}
+                            maximumLabel={maximumLabel}
+                            muteLabel={muteLabel}
+                            value={userSettings.volumeFurni}
+                            onChange={(value) => processAction('furni_volume', value)}
+                            onCommit={(value) => saveVolume('furni_volume', value)}
+                        />
+                        <AirSettingsVolumeRow
+                            id="volumeTrax"
+                            label={localizeWithFallback('widget.memenu.settings.volume.trax', 'Trax')}
+                            maximumLabel={maximumLabel}
+                            muteLabel={muteLabel}
+                            value={userSettings.volumeTrax}
+                            onChange={(value) => processAction('trax_volume', value)}
+                            onCommit={(value) => saveVolume('trax_volume', value)}
+                        />
+                        <SoundboardVolumeControl
+                            value={userSettings.volumeSoundboard}
+                            onChange={(value) => processAction('soundboard_volume', value)}
+                            onCommit={(value) => saveVolume('soundboard_volume', value)}
+                        />
+                    </div>
+                </AirSettingsFrame>
+            </NativeTextTree>
+        );
+    }
+
+    if (section === 'chat') {
+        return (
+            <NativeTextTree>
+                <AirSettingsFrame
+                    backLabel={backLabel}
+                    onBack={handleBack}
+                    title={localizeWithFallback('room.chat.settings.title', 'Chat settings')}
+                    variant="chat"
+                >
+                    <p className="air-settings-chat__info">{localizeWithFallback('toolbar.chat.settings.info', 'Choose how chat appears for you.')}</p>
+                    <div className="air-settings-chat__list">
+                        <label className="air-settings-check-row">
+                            <Checkbox checked={userSettings.oldChat} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('oldchat', nextChecked)} />
+                            <span>{localizeWithFallback('memenu.settings.chat.prefer.old.chat', 'Prefer old chat')}</span>
+                        </label>
+                        <label className="air-settings-check-row">
+                            <Checkbox checked={chatWindowEnabled} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setChatWindowEnabled(nextChecked)} />
+                            <span>{localizeWithFallback('memenu.settings.other.enable.chat.window', 'Enable chat window')}</span>
+                        </label>
+                        <label className="air-settings-select-row">
+                            <span>{localizeWithFallback('toolbar.chat.settings.mode', 'Chat mode')}</span>
+                            <Select
+                                aria-label={localizeWithFallback('toolbar.chat.settings.mode', 'Chat mode')}
+                                value={userSettings.chatMode === RoomChatSettings.CHAT_MODE_LINE_BY_LINE ? RoomChatSettings.CHAT_MODE_LINE_BY_LINE : RoomChatSettings.CHAT_MODE_FREE_FLOW}
+                                onChange={(event) => processAction('chat_mode', Number(event.target.value))}
+                            >
+                                <option value={RoomChatSettings.CHAT_MODE_FREE_FLOW}>{localizeWithFallback('toolbar.chat.settings.room_default', 'Room default')}</option>
+                                <option value={RoomChatSettings.CHAT_MODE_LINE_BY_LINE}>{localizeWithFallback('navigator.roomsettings.chat.mode.line.by.line', 'Line-by-Line Mode')}</option>
+                            </Select>
+                        </label>
+                        <label className="air-settings-select-row">
+                            <span>{localizeWithFallback('toolbar.chat.settings.bubble_width', 'Bubble width')}</span>
+                            <Select
+                                aria-label={localizeWithFallback('toolbar.chat.settings.bubble_width', 'Bubble width')}
+                                value={userSettings.chatBubbleWidth}
+                                onChange={(event) => processAction('chat_bubble_width', Number(event.target.value))}
+                            >
+                                <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_NORMAL}>{localizeWithFallback('toolbar.chat.settings.room_default', 'Room default')}</option>
+                                <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_THIN}>{localizeWithFallback('navigator.roomsettings.chat.bubbles.width.thin', 'Thin')}</option>
+                                <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_WIDE}>{localizeWithFallback('navigator.roomsettings.chat.bubbles.width.wide', 'Wide')}</option>
+                            </Select>
+                        </label>
+                        <label className="air-settings-select-row">
+                            <span>{localizeWithFallback('toolbar.chat.settings.scroll_speed', 'Scroll speed')}</span>
+                            <Select
+                                aria-label={localizeWithFallback('toolbar.chat.settings.scroll_speed', 'Scroll speed')}
+                                value={userSettings.chatScrollSpeed}
+                                onChange={(event) => processAction('chat_scroll_speed', Number(event.target.value))}
+                            >
+                                <option value={RoomChatSettings.CHAT_SCROLL_SPEED_NORMAL}>{localizeWithFallback('toolbar.chat.settings.room_default', 'Room default')}</option>
+                                <option value={RoomChatSettings.CHAT_SCROLL_SPEED_SLOW}>{localizeWithFallback('navigator.roomsettings.chat.speed.slow', 'Slow')}</option>
+                                <option value={RoomChatSettings.CHAT_SCROLL_SPEED_FAST}>{localizeWithFallback('navigator.roomsettings.chat.speed.fast', 'Fast')}</option>
+                            </Select>
+                        </label>
+                        <BaseButton className="air-settings-button" onClick={() => setSection('wordfilter')} type="button">
+                            {localizeWithFallback('memenu.settings.wordfilter', 'Word filter')}
+                        </BaseButton>
+                    </div>
+                </AirSettingsFrame>
+            </NativeTextTree>
+        );
+    }
+
+    if (section === 'wordfilter') {
+        return (
+            <NativeTextTree>
+                <AirSettingsFrame
+                    backLabel={backLabel}
+                    onBack={handleBack}
+                    title={localizeWithFallback('memenu.settings.wordfilter.title', 'Word filter')}
+                    variant="wordfilter"
+                >
+                    <WordFilterSettingsView />
+                </AirSettingsFrame>
+            </NativeTextTree>
+        );
+    }
+
+    if (section === 'other') {
+        return (
+            <NativeTextTree>
+                <AirSettingsFrame
+                    backLabel={backLabel}
+                    onBack={handleBack}
+                    title={localizeWithFallback('widget.memenu.other.settings.title', 'Other settings')}
+                    variant="other"
+                >
+                    <div className="air-settings-other__list">
+                        <label className="air-settings-check-row">
+                            <Checkbox checked={userSettings.roomInvites} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('room_invites', nextChecked)} />
+                            <span>{localizeWithFallback('memenu.settings.other.ignore.room.invites', 'Ignore room invites')}</span>
+                        </label>
+                        <label className="air-settings-check-row">
+                            <Checkbox checked={userSettings.cameraFollow} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('camera_follow', nextChecked)} />
+                            <span>{localizeWithFallback('memenu.settings.other.disable.room.camera.follow', "Don't focus on own avatar")}</span>
+                        </label>
+                        <label className="air-settings-check-row">
+                            <Checkbox checked={userSettings.wiredWhisperDisabled} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('wired_whisper_disabled', nextChecked)} />
+                            <span>{localizeWithFallback('memenu.settings.other.disable.wired.whisper', 'Hide wired whisper messages')}</span>
+                        </label>
+                        <label className="air-settings-check-row">
+                            <Checkbox checked={catalogPlaceMultipleObjects} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setCatalogPlaceMultipleObjects(nextChecked)} />
+                            <span>{localizeWithFallback('memenu.settings.other.place.multiple.objects', 'Place multiple catalog items')}</span>
+                        </label>
+                        <label className="air-settings-check-row">
+                            <Checkbox checked={catalogSkipPurchaseConfirmation} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setCatalogSkipPurchaseConfirmation(nextChecked)} />
+                            <span>{localizeWithFallback('memenu.settings.other.skip.purchase.confirmation', 'Skip catalog purchase confirmation')}</span>
+                        </label>
+                        <label className="air-settings-select-row">
+                            <span>{localizeWithFallback('memenu.settings.other.catalog.grid.density', 'Catalog item size')}</span>
+                            <Select
+                                aria-label={localizeWithFallback('memenu.settings.other.catalog.grid.density', 'Catalog item size')}
+                                value={catalogGridDensity}
+                                onChange={(event) => setCatalogGridDensity(event.target.value as 'compact' | 'standard' | 'large')}
+                            >
+                                <option value="compact">{localizeWithFallback('generic.compact', 'Compact')}</option>
+                                <option value="standard">{localizeWithFallback('generic.standard', 'Standard')}</option>
+                                <option value="large">{localizeWithFallback('generic.large', 'Large')}</option>
+                            </Select>
+                        </label>
+                        <label className="air-settings-check-row">
+                            <Checkbox checked={showTilePrices} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setShowTilePrices(nextChecked)} />
+                            <span>{localizeWithFallback('memenu.settings.other.catalog.show.prices', 'Show prices on catalog items')}</span>
+                        </label>
+                        <label className="air-settings-check-row">
+                            <Checkbox checked={keyboardMovement} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setKeyboardMovement(nextChecked)} />
+                            <span>{localizeWithFallback('memenu.settings.other.keyboard.movement', 'Move with the arrow keys')}</span>
+                        </label>
+                    </div>
+                </AirSettingsFrame>
+            </NativeTextTree>
+        );
+    }
 
     return (
-        <NitroCardView className="user-settings-window min-w-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" theme="primary-slim" uniqueKey="user-settings">
-            <NitroCardHeaderView headerText={ headerText } onCloseClick={ event => processAction('close_view') } />
-            <NitroCardContentView className="text-black">
-                { showChat &&
-                    <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-1">
-                            <input checked={ userSettings.oldChat } className="form-check-input" type="checkbox" onChange={ event => processAction('oldchat', event.target.checked) } />
-                            <Text>{ LocalizeText('memenu.settings.chat.prefer.old.chat') }</Text>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <input checked={ chatWindowEnabled } className="form-check-input" type="checkbox" onChange={ event => setChatWindowEnabled(event.target.checked) } />
-                            <Text>{ LocalizeText('memenu.settings.other.enable.chat.window') }</Text>
-                        </div>
-                    </div> }
-                { showOther &&
-                    <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-1">
-                            <input checked={ userSettings.roomInvites } className="form-check-input" type="checkbox" onChange={ event => processAction('room_invites', event.target.checked) } />
-                            <Text>{ LocalizeText('memenu.settings.other.ignore.room.invites') }</Text>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <input checked={ userSettings.cameraFollow } className="form-check-input" type="checkbox" onChange={ event => processAction('camera_follow', event.target.checked) } />
-                            <Text>{ LocalizeText('memenu.settings.other.disable.room.camera.follow') }</Text>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <input checked={ catalogPlaceMultipleObjects } className="form-check-input" type="checkbox" onChange={ event => setCatalogPlaceMultipleObjects(event.target.checked) } />
-                            <Text>{ LocalizeText('memenu.settings.other.place.multiple.objects') }</Text>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <input checked={ catalogSkipPurchaseConfirmation } className="form-check-input" type="checkbox" onChange={ event => setCatalogSkipPurchaseConfirmation(event.target.checked) } />
-                            <Text>{ LocalizeText('memenu.settings.other.skip.purchase.confirmation') }</Text>
-                        </div>
-                    </div> }
-                { showAudio &&
-                    <div className="flex flex-col">
-                        <Text bold>{ LocalizeText('widget.memenu.settings.volume') }</Text>
-                        <div className="flex flex-col gap-1">
-                            <Text>{ LocalizeText('widget.memenu.settings.volume.ui') }</Text>
-                            <div className="flex items-center gap-1">
-                                { (userSettings.volumeSystem === 0) && <FaVolumeMute className={ classNames((userSettings.volumeSystem >= 50) && 'text-muted', 'fa-icon') } /> }
-                                { (userSettings.volumeSystem > 0) && <FaVolumeDown className={ classNames((userSettings.volumeSystem >= 50) && 'text-muted', 'fa-icon') } /> }
-                                <input className="custom-range w-full" id="volumeSystem" max="100" min="0" step="1" type="range" value={ userSettings.volumeSystem } onChange={ event => processAction('system_volume', event.target.value) } onMouseUp={ () => saveRangeSlider('volume') } />
-                                <FaVolumeUp className={ classNames((userSettings.volumeSystem < 50) && 'text-muted', 'fa-icon') } />
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <Text>{ LocalizeText('widget.memenu.settings.volume.furni') }</Text>
-                            <div className="flex items-center gap-1">
-                                { (userSettings.volumeFurni === 0) && <FaVolumeMute className={ classNames((userSettings.volumeFurni >= 50) && 'text-muted', 'fa-icon') } /> }
-                                { (userSettings.volumeFurni > 0) && <FaVolumeDown className={ classNames((userSettings.volumeFurni >= 50) && 'text-muted', 'fa-icon') } /> }
-                                <input className="custom-range w-full" id="volumeFurni" max="100" min="0" step="1" type="range" value={ userSettings.volumeFurni } onChange={ event => processAction('furni_volume', event.target.value) } onMouseUp={ () => saveRangeSlider('volume') } />
-                                <FaVolumeUp className={ classNames((userSettings.volumeFurni < 50) && 'text-muted', 'fa-icon') } />
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <Text>{ LocalizeText('widget.memenu.settings.volume.trax') }</Text>
-                            <div className="flex items-center gap-1">
-                                { (userSettings.volumeTrax === 0) && <FaVolumeMute className={ classNames((userSettings.volumeTrax >= 50) && 'text-muted', 'fa-icon') } /> }
-                                { (userSettings.volumeTrax > 0) && <FaVolumeDown className={ classNames((userSettings.volumeTrax >= 50) && 'text-muted', 'fa-icon') } /> }
-                                <input className="custom-range w-full" id="volumeTrax" max="100" min="0" step="1" type="range" value={ userSettings.volumeTrax } onChange={ event => processAction('trax_volume', event.target.value) } onMouseUp={ () => saveRangeSlider('volume') } />
-                                <FaVolumeUp className={ classNames((userSettings.volumeTrax < 50) && 'text-muted', 'fa-icon') } />
-                            </div>
-                        </div>
-                    </div> }
-                { showAccountLink &&
-                    <div className="flex flex-col pt-2 mt-1 border-t border-black/10">
-                        <button
-                            type="button"
-                            onClick={ () => CreateLinkEvent('user-account-settings/show') }
-                            className="group flex items-center gap-2 rounded-md border border-black/10 bg-white px-2 py-1.5 hover:bg-[#f5fbfd] hover:border-[#418db0] transition-colors cursor-pointer text-left">
-                            <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#418db0] text-white shadow-[inset_0_2px_#ffffff26,inset_0_-2px_#0000001a]">
-                                <FaUserCog size={ 12 } />
-                            </div>
-                            <div className="flex flex-col flex-1 leading-tight">
-                                <Text bold>{ localizeWithFallback('usersettings.open.title', "User Settings") }</Text>
-                                <Text small className="text-black/60">{ localizeWithFallback('usersettings.open.subtitle', "Password and account") }</Text>
-                            </div>
-                            <span className="text-black/30 group-hover:text-[#418db0] text-[10px]">›</span>
-                        </button>
-                    </div> }
-                { (section !== null) &&
-                    <div className="flex pt-2 mt-1 border-t border-black/10">
-                        <Button variant="secondary" onClick={ event => processAction('close_view') }>{ localizeWithFallback('generic.back', 'Indietro') }</Button>
-                    </div> }
-            </NitroCardContentView>
-        </NitroCardView>
+        <NativeTextTree>
+            <AirSettingsFrame backLabel={backLabel} onBack={handleBack} title={localizeWithFallback('privacy.settings.title', 'Game Privacy')} variant="privacy">
+                <div className="air-settings-privacy__content">
+                    <fieldset>
+                        <legend>{localizeWithFallback('privacy.settings.online.title', 'Online status')}</legend>
+                        <p>{localizeWithFallback('settings.privacy.online_status_description', 'Who can see your online status:')}</p>
+                        <label className="air-settings-check-row">
+                            <Radio checked={userSettings.onlineStatusVisible} className="air-settings-radio" name="online-status-visibility" onCheckedChange={() => processAction('online_status_visible', true)} />
+                            <span>{localizeWithFallback('settings.privacy.everyone', 'Everyone')}</span>
+                        </label>
+                        <label className="air-settings-check-row">
+                            <Radio checked={!userSettings.onlineStatusVisible} className="air-settings-radio" name="online-status-visibility" onCheckedChange={() => processAction('online_status_visible', false)} />
+                            <span>{localizeWithFallback('settings.privacy.noone', 'Nobody')}</span>
+                        </label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>{localizeWithFallback('privacy.settings.follow.title', 'Follow settings')}</legend>
+                        <label className="air-settings-check-row">
+                            <Checkbox checked={userSettings.friendsCanFollow} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('friends_can_follow', nextChecked)} />
+                            <span>{localizeWithFallback('settings.privacy.follow_description', 'My friends can follow me from one room to another')}</span>
+                        </label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>{localizeWithFallback('privacy.settings.friend_requests.title', 'Friend requests')}</legend>
+                        <label className="air-settings-check-row">
+                            <Checkbox checked={userSettings.friendRequestsAllowed} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('friend_requests_allowed', nextChecked)} />
+                            <span>{localizeWithFallback('settings.privacy.friend_requests_description', 'Other Habbos can send me a friend request')}</span>
+                        </label>
+                    </fieldset>
+                </div>
+            </AirSettingsFrame>
+        </NativeTextTree>
     );
 };

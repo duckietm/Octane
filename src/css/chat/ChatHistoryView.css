@@ -1,20 +1,147 @@
-.nitro-chat-history-content {
-    display: flex;
-    height: calc(100% - 40px);
-    min-height: 0;
-    flex-direction: column;
+.octane-chat-history {
+    position: absolute;
+    inset: 0 auto 54px 0;
+    width: min(413px, calc(100vw - 18px));
+    z-index: 70;
+    pointer-events: auto;
+    animation: octane-chat-history-open 140ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.nitro-chat-history-scroll {
-    flex: 1 1 auto;
-    min-height: 0;
+.octane-chat-history-tray-bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 21px;
+    background: rgba(30, 31, 28, 0.82);
+    box-shadow: inset -1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.octane-chat-history-content {
+    position: absolute;
+    inset: 0 21px 0 21px;
+    background: rgba(34, 35, 32, 0.72);
+}
+
+.octane-chat-history-scroll {
+    position: absolute;
+    inset: 0;
+    overflow-x: hidden;
     overflow-y: auto;
-    background: inherit;
+    padding: 10px 8px 18px 8px;
 }
 
-.nitro-chat-history-bubble-wrap {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
+.octane-chat-history-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 7px;
+    margin: 0 0 6px 0;
+}
+
+.octane-chat-history-time {
+    flex: 0 0 54px;
+    margin: 6px 0 0 0;
+    /* AIR ChatHistory TEXT_FORMAT_TIMESTAMP: Ubuntu (regular cut) 12, 0xa0a0a0, italic, no filter. */
+    color: #a0a0a0;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 15px;
+}
+
+.octane-chat-history-message {
+    display: flex;
+    align-items: flex-start;
     max-width: 100%;
+    min-width: 0;
+}
+
+/* The live chat bubble (ChatWidgetMessageView layout="history"), in the flow of the list. */
+.octane-chat-history-bubble {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.octane-chat-history-bubble .chat-bubble {
+    margin: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.octane-chat-history-bubble .chat-content {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.octane-chat-history-bubble .message {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.octane-chat-history-room-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 24px;
+    margin: 0 0 3px 0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.82);
+    /* AIR ChatHistoryRoomChangeEntry: Ubuntu (regular cut) 12. The colour stays dark on our white pill. */
+    color: #222222;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+}
+
+.octane-chat-history-handle {
+    position: absolute;
+    right: 0;
+    bottom: 165px;
+    width: 21px;
+    height: 42px;
+    padding: 0;
+    border: 0;
+    border-radius: 0 5px 5px 0;
+    background: rgba(30, 31, 28, 0.9);
+    box-shadow: inset 1px 0 rgba(255, 255, 255, 0.12), 1px 1px 0 rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+}
+
+.octane-chat-history-handle::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 15px;
+    width: 9px;
+    height: 9px;
+    border-left: 2px solid rgba(255, 255, 255, 0.85);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.85);
+    transform: rotate(45deg);
+}
+
+.octane-chat-history-handle:hover {
+    filter: brightness(1.15);
+}
+
+@keyframes octane-chat-history-open {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: min(413px, calc(100vw - 18px));
+    }
+}
+
+@media (max-width: 768px) {
+    .octane-chat-history {
+        bottom: 48px;
+    }
 }

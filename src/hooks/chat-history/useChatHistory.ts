@@ -1,9 +1,9 @@
-import { GetGuestRoomResultEvent, NewConsoleMessageEvent, RoomInviteEvent, RoomSessionEvent } from '@nitrots/nitro-renderer';
-import { useState } from 'react';
-import { useBetween } from 'use-between';
+import { GetGuestRoomResultEvent, NewConsoleMessageEvent, RoomInviteEvent, RoomSessionEvent } from '@octane/renderer';
+import { useMemo, useState } from 'react';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { ChatEntryType, ChatHistoryCurrentDate, IChatEntry, IRoomHistoryEntry, MessengerHistoryCurrentDate } from '../../api';
-import { useMessageEvent, useNitroEvent } from '../events';
-import { useLocalStorage } from '../useLocalStorage';
+import { useMessageEvent, useOctaneEvent } from '../events';
+import { discardLocalStorage, useLocalStorage } from '../useLocalStorage';
 
 const ROOM_HISTORY_MAX = 10;
 const CHAT_HISTORY_MAX = 1000;
@@ -11,6 +11,15 @@ const MESSENGER_HISTORY_MAX = 1000;
 
 let CHAT_HISTORY_COUNTER: number = 0;
 let MESSENGER_HISTORY_COUNTER: number = 0;
+
+export const ClearStoredChatHistory = () => {
+    CHAT_HISTORY_COUNTER = 0;
+    MESSENGER_HISTORY_COUNTER = 0;
+
+    // Through the hook's own keys (per user id when one is set) and its live state: removing the bare keys missed the
+    // per-user ones, and the in-memory history was written back by the next pending write.
+    discardLocalStorage(['chatHistory', 'roomHistory', 'messengerHistory', 'needsRoomInsert']);
+};
 
 /**
  * Project a list of chat entries to the slim shape we want to persist in
@@ -33,7 +42,18 @@ const useChatHistoryState = () => {
     const [messengerHistory, setMessengerHistory] = useLocalStorage<IChatEntry[]>('messengerHistory', [], { toStorage: slimChatEntriesForStorage });
     const [needsRoomInsert, setNeedsRoomInsert] = useLocalStorage('needsRoomInsert', false);
 
+    // Stored entries survive a reload; the module counter does not. New ids go above the restored range, so an
+    // update (translation, avatar image) never lands on an older entry that has the same id.
+    const nextChatId = useMemo(() => chatHistory.reduce((next, entry) => Math.max(next, (entry.id ?? -1) + 1), 0), [chatHistory]);
+    // The stored messenger entries keep their ids across a reload: counting from 0 again gave new entries ids the
+    // stored ones already had, and the report list keyed by id mixed them up.
+    const nextMessengerId = useMemo(
+        () => messengerHistory.reduce((next, entry) => Math.max(next, (entry.id ?? -1) + 1), 0),
+        [messengerHistory]
+    );
+
     const addChatEntry = (entry: IChatEntry) => {
+        CHAT_HISTORY_COUNTER = Math.max(CHAT_HISTORY_COUNTER, nextChatId);
         entry.id = CHAT_HISTORY_COUNTER++;
 
         setChatHistory((prevValue) => {
@@ -80,6 +100,7 @@ const useChatHistoryState = () => {
     };
 
     const addMessengerEntry = (entry: IChatEntry) => {
+        MESSENGER_HISTORY_COUNTER = Math.max(MESSENGER_HISTORY_COUNTER, nextMessengerId);
         entry.id = MESSENGER_HISTORY_COUNTER++;
 
         setMessengerHistory((prevValue) => {
@@ -93,7 +114,7 @@ const useChatHistoryState = () => {
         });
     };
 
-    useNitroEvent<RoomSessionEvent>(RoomSessionEvent.STARTED, (event) => setNeedsRoomInsert(true));
+    useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.STARTED, (event) => setNeedsRoomInsert(true));
 
     useMessageEvent<GetGuestRoomResultEvent>(GetGuestRoomResultEvent, (event) => {
         if (!needsRoomInsert) return;
@@ -152,4 +173,6 @@ const useChatHistoryState = () => {
     return { addChatEntry, updateChatEntry, clearChatHistory, chatHistory, roomHistory, messengerHistory };
 };
 
-export const useChatHistory = () => useBetween(useChatHistoryState);
+export const useChatHistory = () => useSharedHook(useChatHistoryState);
+
+registerSharedHook(useChatHistoryState);

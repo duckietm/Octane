@@ -1,8 +1,7 @@
-import { IPartColor } from '@nitrots/nitro-renderer';
-import { FC } from 'react';
+import { IPartColor } from '@octane/renderer';
+import { CSSProperties, FC } from 'react';
 import { IAvatarEditorCategory } from '../../../api';
 import { useAvatarEditor } from '../../../hooks';
-import { InfiniteGrid } from '../../../layout';
 import { AvatarEditorPaletteSetItem } from './AvatarEditorPaletteSetItemView';
 
 export const AvatarEditorPaletteSetView: FC<{
@@ -29,23 +28,15 @@ export const AvatarEditorPaletteSetView: FC<{
     };
 
     return (
-        <InfiniteGrid<IPartColor>
-            columnCount={columnCount}
-            estimateSize={18}
-            squareItems
-            itemRender={(item: IPartColor) => {
-                if (!item) return null;
-
-                return (
-                    <AvatarEditorPaletteSetItem
-                        isSelected={isPartColorSelected(item)}
-                        partColor={item}
-                        onClick={(event) => selectEditorColor(category.setType, paletteIndex, item.id)}
-                    />
-                );
-            }}
-            items={category.colorItems[paletteIndex]}
-            overscan={columnCount}
-        />
+        <div className="avatar-editor-palette-grid" style={{ '--avatar-editor-palette-columns': columnCount } as CSSProperties}>
+            {category.colorItems[paletteIndex].map((item) => (
+                <AvatarEditorPaletteSetItem
+                    key={item.id}
+                    isSelected={isPartColorSelected(item)}
+                    partColor={item}
+                    onClick={() => selectEditorColor(category.setType, paletteIndex, item.id)}
+                />
+            ))}
+        </div>
     );
 };

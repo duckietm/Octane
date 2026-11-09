@@ -28,6 +28,7 @@ const isNonHistoryAction = (action: FloorplanAction): boolean => {
         case 'CLEAR_SELECTION':
         case 'SELECT_RECT':
         case 'SQUARE_SELECT_TOGGLE':
+        case 'SET_PICK_UP_BLOCKING':
             return true;
         default:
             return false;

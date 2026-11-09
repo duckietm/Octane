@@ -1,4 +1,4 @@
-import { RoomObjectCategory, RoomObjectUserType } from '@nitrots/nitro-renderer';
+import { RoomObjectCategory, RoomObjectUserType } from '@octane/renderer';
 import { useEffect, useMemo, useState } from 'react';
 import { GetRoomSession, MessengerRequest } from '../../../api';
 import { useFriends } from '../../friends';

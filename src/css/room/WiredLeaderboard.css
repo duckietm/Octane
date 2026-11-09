@@ -1,0 +1,234 @@
+/* Official AIR variable leaderboard panels (wf_xtra_var_leaderboard), drawn over room tiles. */
+.octane-wired-leaderboard-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Light outer frame around a dark sheet, as in AIR. */
+.octane-wired-leaderboard {
+    position: absolute;
+    transform-origin: bottom center;
+    pointer-events: auto;
+    padding: 3px;
+    background: #e8e8e8;
+    border: 1px solid #7a7a7a;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font-size: 11px;
+    user-select: none;
+}
+
+.octane-wired-leaderboard--dimmed {
+    opacity: 0.35;
+}
+
+.octane-wired-leaderboard--editing {
+    border-color: #f5c542;
+    box-shadow: 0 0 0 2px #f5c542, 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+.octane-wired-leaderboard--editing .octane-wired-leaderboard__head {
+    cursor: move;
+}
+
+/* Title, description and the variable toggle */
+.octane-wired-leaderboard__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 6px 8px 5px;
+    background: #1d1d1d;
+    border-radius: 4px 4px 0 0;
+}
+
+.octane-wired-leaderboard__heading {
+    flex: 1;
+    min-width: 0;
+}
+
+.octane-wired-leaderboard__title {
+    font-weight: bold;
+    font-size: 13px;
+    line-height: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.octane-wired-leaderboard__title.is-placeholder {
+    color: #8a8a8a;
+    font-style: italic;
+}
+
+.octane-wired-leaderboard__description {
+    margin-top: 1px;
+    color: #b5b5b5;
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.octane-wired-leaderboard__drag {
+    color: #f5c542;
+    font-size: 13px;
+    line-height: 16px;
+}
+
+.octane-wired-leaderboard__choice-toggle {
+    background: none;
+    border: 0;
+    color: #fff;
+    font-size: 12px;
+    line-height: 16px;
+    padding: 0 2px;
+    cursor: pointer;
+}
+
+.octane-wired-leaderboard__choices {
+    background: #eee;
+    color: #111;
+}
+
+.octane-wired-leaderboard__choice {
+    padding: 3px 8px;
+    cursor: pointer;
+}
+
+.octane-wired-leaderboard__choice:hover {
+    background: #d7d7d7;
+}
+
+.octane-wired-leaderboard__choice.is-selected {
+    font-weight: bold;
+}
+
+/* Column headers and rows */
+.octane-wired-leaderboard__headers,
+.octane-wired-leaderboard__row {
+    display: flex;
+    align-items: center;
+}
+
+.octane-wired-leaderboard__headers {
+    height: 20px;
+    background: #4a4a4a;
+    color: #e6e6e6;
+    font-weight: bold;
+}
+
+.octane-wired-leaderboard__headers > div,
+.octane-wired-leaderboard__cell {
+    padding: 0 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+.octane-wired-leaderboard .is-left {
+    text-align: left;
+}
+
+.octane-wired-leaderboard .is-right {
+    text-align: right;
+}
+
+.octane-wired-leaderboard .is-center {
+    text-align: center;
+}
+
+.octane-wired-leaderboard__rows {
+    position: relative;
+    overflow: hidden;
+    background: #1c1c1c;
+}
+
+.octane-wired-leaderboard__row {
+    height: 20px;
+    background: #1c1c1c;
+}
+
+.octane-wired-leaderboard__row.is-odd {
+    background: #242424;
+}
+
+.octane-wired-leaderboard__rank {
+    text-align: center;
+    color: #d0d0d0;
+}
+
+.octane-wired-leaderboard__user {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-left: 2px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.octane-wired-leaderboard__user span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.octane-wired-leaderboard__user:hover span {
+    text-decoration: underline;
+}
+
+.octane-wired-leaderboard__face {
+    width: 18px;
+    height: 18px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.octane-wired-leaderboard__state {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    color: #9a9a9a;
+    white-space: nowrap;
+}
+
+/* Pager: light buttons either side of the page text */
+.octane-wired-leaderboard__pager {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 6px;
+    background: #2a2a2a;
+    border-top: 1px solid #111;
+    border-radius: 0 0 4px 4px;
+    color: #e6e6e6;
+}
+
+.octane-wired-leaderboard__pager button {
+    width: 20px;
+    height: 18px;
+    padding: 0;
+    line-height: 14px;
+    background: linear-gradient(to bottom, #fafafa, #cfcfcf);
+    border: 1px solid #5a5a5a;
+    border-radius: 3px;
+    color: #222;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.octane-wired-leaderboard__pager button:hover:not(:disabled) {
+    background: linear-gradient(to bottom, #fff, #e0e0e0);
+}
+
+.octane-wired-leaderboard__pager button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}

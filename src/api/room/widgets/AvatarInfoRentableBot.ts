@@ -1,5 +1,10 @@
 import { IAvatarInfo } from './IAvatarInfo';
 
+export interface IRentableBotSkillCommand {
+    id: number;
+    data: string;
+}
+
 export class AvatarInfoRentableBot implements IAvatarInfo {
     public static RENTABLE_BOT: string = 'IRBI_RENTABLE_BOT';
 
@@ -16,6 +21,8 @@ export class AvatarInfoRentableBot implements IAvatarInfo {
     public ownerId: number = -1;
     public ownerName: string = '';
     public botSkills: number[] = [];
+    /** Skills pushed by BotSkillListUpdate with their data (AIR class_2504 skillsWithCommands). */
+    public botSkillsWithCommands: IRentableBotSkillCommand[] = [];
 
     constructor(public readonly type: string) {}
 }

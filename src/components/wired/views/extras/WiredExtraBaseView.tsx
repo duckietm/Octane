@@ -1,6 +1,7 @@
-import { WiredActionDefinition } from '@nitrots/nitro-renderer';
+import { WiredActionDefinition } from '@octane/renderer';
 import { CSSProperties, FC, PropsWithChildren, ReactNode, useEffect } from 'react';
 import { WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredBaseView } from '../WiredBaseView';
 
@@ -8,11 +9,17 @@ export interface WiredExtraBaseViewProps {
     hasSpecialInput: boolean;
     requiresFurni: number;
     save: () => void;
-    validate?: () => boolean;
+    validate?: () => boolean | string | void;
     cardStyle?: CSSProperties;
     footer?: ReactNode;
     footerCollapsible?: boolean;
     selectionPreview?: ReactNode;
+    /** Official: some elements open wider. */
+    widthModifier?: number;
+    /** Official allowScrolling: the sections scroll between a fixed header and footer. */
+    allowScrolling?: boolean;
+    showSelection?: boolean;
+    confirmSave?: () => { title: string; body: string } | null;
 }
 
 export const WiredExtraBaseView: FC<PropsWithChildren<WiredExtraBaseViewProps>> = (props) => {
@@ -25,7 +32,11 @@ export const WiredExtraBaseView: FC<PropsWithChildren<WiredExtraBaseViewProps>> 
         cardStyle = undefined,
         footer = null,
         footerCollapsible = true,
-        selectionPreview = null
+        selectionPreview = null,
+        widthModifier = 1,
+        allowScrolling = false,
+        showSelection = true,
+        confirmSave = null
     } = props;
     const { trigger = null, setActionDelay = null } = useWired();
 
@@ -34,18 +45,24 @@ export const WiredExtraBaseView: FC<PropsWithChildren<WiredExtraBaseViewProps>> 
     }, [trigger, setActionDelay]);
 
     return (
-        <WiredBaseView
-            hasSpecialInput={hasSpecialInput}
-            requiresFurni={requiresFurni}
-            save={save}
-            validate={validate}
-            wiredType="extra"
-            cardStyle={cardStyle}
-            footer={footer}
-            footerCollapsible={footerCollapsible}
-            selectionPreview={selectionPreview}
-        >
-            {children}
-        </WiredBaseView>
+        <NativeTextTree>
+            <WiredBaseView
+                hasSpecialInput={hasSpecialInput}
+                requiresFurni={requiresFurni}
+                save={save}
+                validate={validate}
+                wiredType="extra"
+                cardStyle={cardStyle}
+                footer={footer}
+                footerCollapsible={footerCollapsible}
+                selectionPreview={selectionPreview}
+                widthModifier={widthModifier}
+                allowScrolling={allowScrolling}
+                showSelection={showSelection}
+                confirmSave={confirmSave}
+            >
+                {children}
+            </WiredBaseView>
+        </NativeTextTree>
     );
 };

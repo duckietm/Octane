@@ -1,0 +1,794 @@
+/* group_management_window (HabboGroupsCom): 392x497 frame, children addressed in client coordinates. */
+.octane-group-native.octane-card-shell.octane-card-frame-3 {
+    box-sizing: border-box;
+    width: 392px !important;
+    min-width: 392px !important;
+    max-width: 392px !important;
+    height: 497px !important;
+    min-height: 497px !important;
+    max-height: 497px !important;
+    padding: 0 !important;
+    color: #000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 13px;
+    line-height: 1;
+    image-rendering: pixelated;
+}
+
+.octane-group-native button {
+    appearance: none;
+    font-family: inherit;
+}
+
+.octane-group-native img {
+    max-width: none;
+}
+
+.octane-group-native__client {
+    position: absolute;
+    top: 33px;
+    left: 0;
+    width: 392px;
+    height: 464px;
+    z-index: 1;
+}
+
+.octane-group-native__client > *,
+.octane-group-native__step-body > * {
+    position: absolute;
+}
+
+.octane-group-native__step-body {
+    position: absolute;
+    left: 0;
+    width: 392px;
+    height: 360px;
+}
+
+.octane-group-native__header {
+    left: 1px;
+    top: 0;
+    width: 390px;
+    height: 110px;
+    background: #b3b099;
+}
+
+.octane-group-native__steps {
+    left: 16px;
+    top: 5px;
+    width: 360px;
+    height: 33px;
+}
+
+.octane-group-native__step-tab {
+    position: absolute;
+    top: 0;
+    height: 33px;
+}
+
+.octane-group-native__step-tab > img {
+    display: block;
+    image-rendering: pixelated;
+}
+
+.octane-group-native__step-tab > .octane-group-native__credit {
+    position: absolute;
+    left: 108px;
+}
+
+.octane-group-native__header-image {
+    left: 0;
+    top: 36px;
+    width: 114px;
+    height: 62px;
+}
+
+.octane-group-native__text {
+    position: absolute;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.octane-group-native__text.is-clipped {
+    overflow: hidden;
+}
+
+.octane-group-native__text.is-link {
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.octane-group-native__box {
+    position: absolute;
+    box-sizing: border-box;
+    image-rendering: pixelated;
+}
+
+.octane-group-native__box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: solid transparent;
+    pointer-events: none;
+}
+
+.octane-group-native__box.is-white::before {
+    border-width: 6px;
+    border-image: url('../../assets/images/habbo-skin/slices/border-white.png') 6 fill / 6px stretch;
+}
+
+.octane-group-native__box.is-outline::before {
+    border-width: 5px;
+    border-image: url('../../assets/images/habbo-skin/slices/border-5.png') 5 fill / 5px stretch;
+}
+
+.octane-group-native__box.is-yellow::before {
+    border-width: 6px;
+    border-image: url('../../assets/images/groups/native/border-white-ffc300.png') 6 fill / 6px stretch;
+}
+
+.octane-group-native__box.is-red::before {
+    border-width: 6px;
+    border-image: url('../../assets/images/groups/native/border-white-cc0000.png') 6 fill / 6px stretch;
+}
+
+.octane-group-native__box.is-cc::before {
+    border-width: 6px;
+    border-image: url('../../assets/images/groups/native/border-white-cccccc.png') 6 fill / 6px stretch;
+}
+
+.octane-group-native__box.is-gray::before {
+    border-width: 6px;
+    border-image: url('../../assets/images/groups/native/border-white-aaaaaa.png') 6 fill / 6px stretch;
+}
+
+/* border style 3 (border_slot) is a white nine-slice; the group layouts tint it per element. */
+.octane-group-native__box.is-slot::before {
+    border-width: 3px;
+    border-image: url('../../assets/images/groups/native/border-slot.png') 3 fill / 3px stretch;
+}
+
+.octane-group-native__box.is-tan::before {
+    border-width: 3px;
+    border-image: url('../../assets/images/groups/native/border-slot-e9e9e1.png') 3 fill / 3px stretch;
+}
+
+.octane-group-native__box.is-dark::before {
+    border-width: 3px;
+    border-image: url('../../assets/images/groups/native/border-slot-bebba5.png') 3 fill / 3px stretch;
+}
+
+.octane-group-native__footer {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.octane-group-native__buy-icon {
+    position: absolute;
+    top: 11px;
+    left: 9px;
+    display: block;
+}
+
+.octane-group-native__box > * {
+    position: absolute;
+}
+
+.octane-group-native__button {
+    position: absolute;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 5px solid transparent;
+    border-image: var(--habbo-skin-shiny-thick) 5 fill / 5px stretch;
+    border-radius: 0;
+    background: transparent;
+    color: #000;
+    cursor: pointer;
+    image-rendering: pixelated;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 2px;
+}
+
+.octane-group-native__text.is-static {
+    position: static;
+}
+
+.octane-group-native__button:hover:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-thick-hover);
+}
+
+.octane-group-native__button:active:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-thick-pressed);
+}
+
+.octane-group-native__button:disabled {
+    border-image-source: var(--habbo-skin-shiny-thick-disabled);
+    cursor: default;
+}
+
+
+/* input TextField: 1px black border on white; the glyphs come from the overlay while the input only owns focus, caret and selection. */
+.octane-group-native__field {
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px solid #000;
+    background: #fff;
+    overflow: hidden;
+}
+
+.octane-group-native__field.is-plain {
+    border: 0;
+}
+
+/* The forum compose fields only draw their white field once they hold text. */
+.octane-group-native__field.is-plain.is-empty {
+    background: transparent;
+}
+
+.octane-group-native__input {
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 2px 1px;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000 !important;
+    caret-color: #000;
+    font: 400 13px/16px Ubuntu, sans-serif;
+    outline: 0 !important;
+    resize: none;
+    overflow: hidden;
+}
+
+textarea.octane-group-native__input {
+    overflow-y: auto;
+    scroll-padding: 2px;
+}
+
+.octane-group-native__input.is-raster {
+    color: transparent !important;
+    -webkit-text-fill-color: transparent;
+}
+
+.octane-group-native__field-text {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    pointer-events: none;
+}
+
+/* Still measured while hidden so the fit decision can flip back. */
+.octane-group-native__field-text.is-hidden {
+    visibility: hidden;
+}
+
+/* badge editor */
+.octane-group-native__layer {
+    position: absolute;
+    width: 247px;
+    height: 49px;
+}
+
+.octane-group-native__layer-part {
+    position: absolute;
+    top: 0;
+    left: 3px;
+    width: 49px;
+    height: 49px;
+}
+
+.octane-group-native__layer-position {
+    position: absolute;
+    top: 3px;
+    left: 67px;
+    width: 43px;
+    height: 43px;
+    cursor: pointer;
+}
+
+.octane-group-native__layer-position > img {
+    position: absolute;
+    display: block;
+    image-rendering: pixelated;
+}
+
+.octane-group-native__layer-colors {
+    position: absolute;
+    top: 2px;
+    left: 124px;
+    width: 120px;
+    height: 45px;
+    display: grid;
+    grid-template-columns: repeat(8, 15px);
+    grid-auto-rows: 15px;
+}
+
+.octane-group-native__color {
+    position: relative;
+    display: block;
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.octane-group-native__color > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 15px;
+    height: 15px;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.octane-group-native__color-fill {
+    background-color: var(--group-color);
+    -webkit-mask: url('../../assets/images/groups/native/color_chooser_fg.png') 0 0 / 15px 15px no-repeat;
+    mask: url('../../assets/images/groups/native/color_chooser_fg.png') 0 0 / 15px 15px no-repeat;
+}
+
+.octane-group-native__part-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 41px);
+    grid-auto-rows: 41px;
+    gap: 2px;
+}
+
+.octane-group-native__part-item {
+    position: relative;
+    width: 41px;
+    height: 41px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.octane-group-native__part-clip {
+    left: 0;
+    top: 0;
+    width: 41px;
+    height: 41px;
+    overflow: hidden;
+}
+
+.octane-group-native__part-item > .octane-group-native__part-selected {
+    top: 0;
+    left: 0;
+    width: 41px;
+    height: 41px;
+}
+
+.octane-group-native__part-item > * {
+    position: absolute;
+    display: block;
+    pointer-events: none;
+    image-rendering: pixelated;
+}
+
+.octane-group-native__swatch {
+    position: absolute;
+    width: 36px;
+    height: 30px;
+}
+
+.octane-group-native__swatch > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 36px;
+    height: 30px;
+    image-rendering: pixelated;
+}
+
+.octane-group-native__swatch-fill {
+    background-color: var(--group-color);
+    -webkit-mask: url('../../assets/images/groups/native/group_guild_color_top.png') 0 0 / 36px 30px no-repeat;
+    mask: url('../../assets/images/groups/native/group_guild_color_top.png') 0 0 / 36px 30px no-repeat;
+}
+
+.octane-group-native__color-grid {
+    position: absolute;
+    display: grid;
+    grid-auto-rows: 15px;
+}
+
+.octane-group-native__badge {
+    position: absolute;
+    width: 39px;
+    height: 39px;
+}
+
+.octane-group-native__layer-part {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 5px solid transparent;
+    border-image: var(--habbo-skin-shiny-thick) 5 fill / 5px stretch;
+    background: transparent;
+    cursor: pointer;
+    image-rendering: pixelated;
+}
+
+.octane-group-native__layer-part > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.octane-group-native__part-scroll {
+    position: absolute;
+    top: 4px;
+    left: 3px;
+    width: 233px;
+    height: 258px;
+}
+
+.octane-group-native__part-scroll > .octane-classic-scroll-area-viewport {
+    width: 214px;
+}
+
+.octane-group-native__part-scroll-content {
+    padding: 0;
+}
+
+/* habbo_window_alert_xml */
+.octane-group-alert.octane-card-shell.octane-card-frame-3 {
+    box-sizing: border-box;
+    width: 278px !important;
+    min-width: 278px !important;
+    max-width: 278px !important;
+    height: 141px !important;
+    min-height: 141px !important;
+    max-height: 141px !important;
+    padding: 0 !important;
+    line-height: 1;
+    image-rendering: pixelated;
+}
+
+.octane-group-alert .octane-group-alert__ok {
+    left: 114px;
+    top: 106px;
+    width: 50px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.octane-group-alert .octane-group-alert__ok > .octane-group-native__text {
+    position: static;
+}
+
+.octane-group-native__vip-icon {
+    position: absolute;
+    top: 11px;
+    left: 14px;
+    display: block;
+}
+
+/* group_created_window */
+.octane-group-created.octane-card-shell.octane-card-frame-3 {
+    box-sizing: border-box;
+    width: 358px !important;
+    min-width: 358px !important;
+    max-width: 358px !important;
+    height: 381px !important;
+    min-height: 381px !important;
+    max-height: 381px !important;
+    padding: 0 !important;
+    line-height: 1;
+    image-rendering: pixelated;
+}
+
+.octane-group-created__image {
+    position: absolute;
+    top: 173px;
+    left: 20px;
+    max-width: none;
+}
+
+/* Native scrollbar (style 0): 17px track, 16px arrow buttons and a thumb of top, body, bottom and a centred grip. */
+.octane-group-native__part-scroll > .octane-classic-scrollbar .octane-classic-scrollbar-button.is-up {
+    background-image: url('../../assets/images/habbo-skin/slices/scroll-up.png');
+}
+
+.octane-group-native__part-scroll > .octane-classic-scrollbar .octane-classic-scrollbar-button.is-up:active {
+    background-image: url('../../assets/images/habbo-skin/slices/scroll-up-pressed.png');
+}
+
+.octane-group-native__part-scroll > .octane-classic-scrollbar .octane-classic-scrollbar-button.is-down {
+    background-image: url('../../assets/images/habbo-skin/slices/scroll-down.png');
+}
+
+.octane-group-native__part-scroll > .octane-classic-scrollbar .octane-classic-scrollbar-button.is-down:active {
+    background-image: url('../../assets/images/habbo-skin/slices/scroll-down-pressed.png');
+}
+
+.octane-group-native__part-scroll > .octane-classic-scrollbar .octane-classic-scrollbar-track {
+    background-image: url('../../assets/images/habbo-skin/slices/scroll-track-v.png');
+}
+
+.octane-group-native__part-scroll > .octane-classic-scrollbar .octane-classic-scrollbar-thumb {
+    min-height: 0;
+    background:
+        url('../../assets/images/groups/native/scroll-thumb-grip.png') center no-repeat,
+        url('../../assets/images/groups/native/scroll-thumb-top.png') top no-repeat,
+        url('../../assets/images/groups/native/scroll-thumb-bottom.png') bottom no-repeat,
+        url('../../assets/images/groups/native/scroll-thumb-body.png') repeat-y;
+}
+
+.octane-group-native__part-scroll > .octane-classic-scrollbar .octane-classic-scrollbar-thumb::before,
+.octane-group-native__part-scroll > .octane-classic-scrollbar .octane-classic-scrollbar-thumb::after {
+    display: none;
+}
+
+.octane-group-native__part-scroll > .octane-classic-scrollbar .octane-classic-scrollbar-thumb:active {
+    background:
+        url('../../assets/images/groups/native/scroll-thumb-grip-pressed.png') center no-repeat,
+        url('../../assets/images/groups/native/scroll-thumb-top-pressed.png') top no-repeat,
+        url('../../assets/images/groups/native/scroll-thumb-bottom-pressed.png') bottom no-repeat,
+        url('../../assets/images/groups/native/scroll-thumb-body-pressed.png') repeat-y;
+}
+
+.octane-group-native__text.is-title {
+    pointer-events: none;
+}
+
+/* The frame draws its close button flush with the window edge; the group windows keep it 3px inside. */
+.octane-group-native.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button,
+.octane-group-alert.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button,
+.octane-group-created.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button {
+    right: 3px !important;
+}
+
+/* edit mode: edit_guild_tab_context (tab_button style 0 over the header band) */
+.octane-group-native__tabs {
+    left: 0;
+    top: 89px;
+    width: 391px;
+    height: 21px;
+    overflow: hidden;
+}
+
+.octane-group-native__tab {
+    position: absolute;
+    top: 0;
+    box-sizing: border-box;
+    height: 21px;
+    margin: 0;
+    padding: 0 0 4px;
+    border: 0;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.octane-group-native__tab::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: solid transparent;
+    border-width: 5px 5px 16px;
+    border-image: url('../../assets/images/groups/native/tab-default.png') 5 5 16 5 fill / 5px 5px 16px 5px stretch;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.octane-group-native__tab:hover::before {
+    border-image-source: url('../../assets/images/groups/native/tab-hover.png');
+}
+
+.octane-group-native__tab.is-selected::before {
+    border-image-source: url('../../assets/images/groups/native/tab-selected.png');
+}
+
+.octane-group-native__tab > .octane-group-native__text {
+    position: relative;
+}
+
+/* radio / checkbox skins (habbo_skin_button_radio / habbo_skin_button_checkbox) */
+.octane-group-native__check {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none no-repeat;
+    image-rendering: pixelated;
+    cursor: pointer;
+}
+
+.octane-group-native__check.is-radio {
+    width: 16px;
+    height: 16px;
+    background-image: url('../../assets/images/groups/native/radio-default.png');
+}
+
+.octane-group-native__check.is-radio.is-checked {
+    background-image: url('../../assets/images/groups/native/radio-checked.png');
+}
+
+.octane-group-native__check.is-checkbox {
+    width: 15px;
+    height: 15px;
+    background-image: url('../../assets/images/groups/native/checkbox-default.png');
+}
+
+.octane-group-native__check.is-checkbox.is-checked {
+    background-image: url('../../assets/images/groups/native/checkbox-checked.png');
+}
+
+.octane-group-native__type-icon {
+    position: absolute;
+    display: block;
+}
+
+/* groups_info_window */
+.octane-group-info.octane-card-shell.octane-card-frame-3 {
+    box-sizing: border-box;
+    width: 363px !important;
+    min-width: 363px !important;
+    max-width: 363px !important;
+    height: 268px !important;
+    min-height: 268px !important;
+    max-height: 268px !important;
+    padding: 0 !important;
+    line-height: 1;
+    image-rendering: pixelated;
+}
+
+.octane-group-info.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button {
+    right: 3px !important;
+}
+
+.octane-group-info .octane-group-native__box,
+.octane-group-info .octane-group-native__text:not(.is-static),
+.octane-group-info .octane-group-native__button,
+.octane-group-info__badge,
+.octane-group-info__icon {
+    position: absolute;
+    z-index: 1;
+}
+
+.octane-group-info .octane-group-native__button {
+    z-index: 2;
+}
+
+.octane-group-info__badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 85px;
+    height: 85px;
+}
+
+.octane-group-info__icon {
+    max-width: none;
+    display: block;
+}
+
+/* The home room drop menu (dropmenu skin): a caption field over the default skin and its list on the 6px popup skin below it. */
+.octane-group-native__dropmenu {
+    position: absolute;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 3px solid transparent;
+    border-image: url('../../assets/images/habbo-skin/slices/dropmenu-default.png') 3 fill / 3px stretch;
+    background: transparent;
+    cursor: pointer;
+    image-rendering: pixelated;
+}
+
+.octane-group-native__dropmenu-root > .octane-group-native__dropmenu {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.octane-group-native__dropmenu:focus-visible {
+    outline: 0;
+}
+
+.octane-group-native__dropmenu > .octane-group-native__text {
+    left: 8px;
+    top: 3px;
+}
+
+.octane-group-native__dropmenu > img {
+    position: absolute;
+    top: 2px;
+    right: 3px;
+    display: block;
+}
+
+.octane-group-native__dropmenu-positioner {
+    z-index: 9999;
+}
+
+.octane-group-native__dropmenu-list {
+    box-sizing: border-box;
+    width: var(--anchor-width);
+    max-height: 168px;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    border: 6px solid transparent;
+    border-image: url('../../assets/images/habbo-skin/slices/dropmenu-3.png') 6 fill / 6px stretch;
+    image-rendering: pixelated;
+}
+
+.octane-group-native__dropmenu-item {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 18px;
+    margin: 0;
+    padding: 0 0 0 3px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+.octane-group-native__dropmenu-item:hover,
+.octane-group-native__dropmenu-item[data-highlighted],
+.octane-group-native__dropmenu-item[data-selected],
+.octane-group-native__dropmenu-item.is-selected {
+    background: #d2e8ef;
+}
+
+.octane-group-native__dropmenu-item .octane-group-native__text {
+    position: static;
+}
+
+/* Habbo Club required (join failure 4): the alert frame with the VIP icon, the explanation, the club link and the join button. */
+.octane-group-hc.octane-card-shell.octane-card-frame-3 {
+    box-sizing: border-box;
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important;
+    height: 154px !important;
+    min-height: 154px !important;
+    max-height: 154px !important;
+    padding: 0 !important;
+    line-height: 1;
+    image-rendering: pixelated;
+}
+
+.octane-group-hc.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button {
+    right: 3px !important;
+}
+
+.octane-group-hc__icon {
+    position: absolute;
+    top: 45px;
+    left: 18px;
+    max-width: none;
+    image-rendering: pixelated;
+}
+
+.octane-group-hc .octane-group-native__text:not(.is-static),
+.octane-group-hc .octane-group-native__button {
+    position: absolute;
+    z-index: 1;
+}

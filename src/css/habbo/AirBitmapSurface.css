@@ -1,0 +1,19 @@
+/* Shared AIR nine-slice surface. Keep the bitmap on its own paint layer so
+   layout padding and scroll children do not distort the source corner caps. */
+.air-bitmap-surface {
+    position: relative;
+    isolation: isolate;
+}
+
+.air-bitmap-surface::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-image-source: var(--air-surface-image);
+    border-image-slice: var(--air-surface-slice, 6) fill;
+    border-image-width: var(--air-surface-width, 6px);
+    border-image-repeat: stretch;
+    image-rendering: pixelated;
+    pointer-events: none;
+}

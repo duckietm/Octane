@@ -1,0 +1,202 @@
+/* AIR friend bar activity (new_friend_entity_xml "icons" + message_piece_xml) and the epic popup
+   (epic_popup_frame_xml). Coordinates are the layouts'. */
+
+/* Token icons: itemlist_horizontal "icons" at 117,-13 of the 127x36 tab, 25x25 each, 2px apart,
+   newest first, growing to the left. */
+.friend-bar .friend-bar-friend .friend-bar-notification-icons {
+    position: absolute;
+    top: -13px;
+    right: 10px;
+    z-index: 95;
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    height: 25px;
+    pointer-events: none;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-notification-icons {
+    top: calc(-47px - var(--friend-bar-pieces-height, 0px));
+}
+
+.friend-bar .friend-bar-notification-icon-slot {
+    width: 25px;
+    height: 25px;
+    pointer-events: auto;
+}
+
+.friend-bar .friend-bar-notification-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.friend-bar .friend-bar-notification-icon img {
+    display: block;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+/* Open tab: the pieces list grows upwards by one 37px message piece per notification, between the
+   header (name and avatar) and the controls. */
+.friend-bar .friend-bar-friend.is-selected.has-notifications .friend-bar-actions {
+    height: calc(70px + var(--friend-bar-pieces-height, 0px));
+    min-height: calc(70px + var(--friend-bar-pieces-height, 0px));
+}
+
+.friend-bar .friend-bar-friend.is-selected.has-notifications .friend-bar-tab {
+    top: calc(-34px - var(--friend-bar-pieces-height, 0px));
+}
+
+.friend-bar .friend-bar-friend.is-selected.has-notifications .friend-bar-item-head.avatar {
+    top: calc(-39px - var(--friend-bar-pieces-height, 0px)) !important;
+}
+
+.friend-bar .friend-bar-friend.is-selected.has-notifications .friend-bar-actions-buttons {
+    top: calc(35px + var(--friend-bar-pieces-height, 0px));
+}
+
+.friend-bar .friend-bar-notification-pieces {
+    position: absolute;
+    top: 35px;
+    left: 3px;
+    display: flex;
+    flex-direction: column;
+    width: 121px;
+}
+
+.friend-bar .friend-bar-notification-piece {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: 121px;
+    height: 37px;
+    padding: 0 0 0 2px;
+    overflow: hidden;
+    background: #4c5832;
+    color: #ffffff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 11px;
+    line-height: 15px;
+    text-align: left;
+}
+
+.friend-bar .friend-bar-notification-title {
+    overflow: hidden;
+    font-style: italic;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.friend-bar .friend-bar-notification-message {
+    display: -webkit-box;
+    overflow: hidden;
+    font-weight: 700;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    word-break: break-word;
+}
+
+/* Epic popup: 215x275 frame, 200x200 bitmap at 6,2, separator at 7,195 (199x14, line at the bottom),
+   close button centred under it. */
+.octane-card-shell.octane-epic-popup {
+    box-sizing: border-box;
+    width: 215px !important;
+    min-width: 215px !important;
+    max-width: 215px !important;
+    height: 275px !important;
+    min-height: 275px !important;
+    max-height: 275px !important;
+    resize: none !important;
+}
+
+.draggable-window:has(> .octane-epic-popup) {
+    width: 215px !important;
+    height: 275px !important;
+}
+
+.octane-epic-popup-content {
+    position: relative;
+    flex: 1 1 auto;
+    width: 215px;
+    min-height: 0;
+    /* epic_popup_frame is an Illumina (style 100) frame: regular Ubuntu (our `Ubuntu` is the condensed cut). */
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.octane-epic-popup-image {
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+}
+
+.octane-epic-popup-image img {
+    display: block;
+    max-width: 200px;
+    max-height: 200px;
+    image-rendering: pixelated;
+    pointer-events: none;
+    user-select: none;
+}
+
+.octane-epic-popup-separator {
+    position: absolute;
+    top: 207px;
+    left: 7px;
+    width: 199px;
+    height: 2px;
+    background: url("../../assets/images/friends/air/illumina_horizontal_separator.png") center / 100% 2px no-repeat;
+}
+
+.octane-epic-popup-close {
+    position: absolute;
+    top: 213px;
+    left: 50%;
+    min-width: 60px;
+    height: 24px;
+    padding: 0 10px;
+    border: 2px solid #000000;
+    border-radius: 4px;
+    background: linear-gradient(#ffffff, #d5d5d5);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.9);
+    color: #000000;
+    cursor: pointer;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 10px; /* close_button: style 101 Illumina button, il_button 10 px bold */
+    font-weight: 700;
+    transform: translateX(-50%);
+}
+
+.octane-epic-popup-close:hover {
+    background: linear-gradient(#ffffff, #ececec);
+}
+
+/* new_friend_entity region_profile: the head of a closed tab is a 33 x 35 link to the profile. */
+.friend-bar .friend-bar-friend .friend-bar-profile-region {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 11;
+    width: 33px;
+    height: 35px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-profile-region {
+    display: none;
+}

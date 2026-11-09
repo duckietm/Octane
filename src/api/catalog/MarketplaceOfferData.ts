@@ -1,8 +1,10 @@
-import { IObjectData } from '@nitrots/nitro-renderer';
+import { IObjectData } from '@octane/renderer';
 
 export class MarketplaceOfferData {
     public static readonly TYPE_FLOOR: number = 1;
     public static readonly TYPE_WALL: number = 2;
+    /** AIR's offer type of a collectible: an nft_* furni sold for emeralds. */
+    public static readonly TYPE_NFT: number = 5;
 
     private _offerId: number;
     private _furniId: number;
@@ -16,6 +18,8 @@ export class MarketplaceOfferData {
     private _timeLeftMinutes: number = -1;
     private _offerCount: number;
     private _image: string;
+    private _productCode: string;
+    private _nftFurniType: number;
 
     constructor(
         offerId: number,
@@ -26,8 +30,12 @@ export class MarketplaceOfferData {
         price: number,
         status: number,
         averagePrice: number,
-        offerCount: number = -1
+        offerCount: number = -1,
+        productCode: string = null,
+        nftFurniType: number = 0
     ) {
+        this._productCode = productCode;
+        this._nftFurniType = nftFurniType;
         this._offerId = offerId;
         this._furniId = furniId;
         this._furniType = furniType;
@@ -111,7 +119,33 @@ export class MarketplaceOfferData {
         this._offerCount = count;
     }
 
+    /** A collectible (AIR's Collectibles marketplace): priced in emeralds, bought by its product code. */
+    public get isNft(): boolean {
+        return this._furniType === MarketplaceOfferData.TYPE_NFT;
+    }
+
+    /** The collectible's product code: its furni class name. */
+    public get productCode(): string {
+        return this._productCode;
+    }
+
+    /** The collectible's furni kind: 1 floor, 2 wall. */
+    public get nftFurniType(): number {
+        return this._nftFurniType;
+    }
+
+    /** A wall furni, whether a furni offer or a collectible. */
+    public get isWallItem(): boolean {
+        return isMarketplaceWallOffer(this);
+    }
+
     public get isUniqueLimitedItem(): boolean {
         return this.stuffData && this.stuffData.uniqueSeries > 0;
     }
 }
+
+/** A wall furni: a furni offer of the wall type, or a collectible whose kind is wall. */
+export const isMarketplaceWallOffer = (offer: { furniType: number; nftFurniType?: number }): boolean =>
+    offer.furniType === MarketplaceOfferData.TYPE_NFT
+        ? offer.nftFurniType === MarketplaceOfferData.TYPE_WALL
+        : offer.furniType === MarketplaceOfferData.TYPE_WALL;

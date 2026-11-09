@@ -1,7 +1,9 @@
 import { FC, useMemo, useState } from 'react';
 import { FaCheck, FaCopy } from 'react-icons/fa';
-import { LocalizeText, NotificationAlertItem } from '../../../../api';
+import { LocalizeText, NotificationAlertItem, localizeWithFallback } from '../../../../api';
 import { Button, Column, LayoutNotificationAlertView, LayoutNotificationAlertViewProps } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface NotificationFurniDataAlertViewProps extends LayoutNotificationAlertViewProps {
     item: NotificationAlertItem;
@@ -114,44 +116,46 @@ export const NotificationFurniDataAlertView: FC<NotificationFurniDataAlertViewPr
     };
 
     return (
-        <LayoutNotificationAlertView title={title} onClose={onClose} classNames={[...classNames, 'nitro-alert-furnidata']} {...rest} type={item.alertType}>
-            <div className="furnidata-item-banner">
-                <span className="furnidata-item-icon">🛋️</span>
-                <span className="furnidata-item-name">{itemName || 'Unknown item'}</span>
-            </div>
-            <Column fullHeight gap={2} overflow="auto" className="furnidata-body">
-                {sections.map((section) => (
-                    <div key={section.title} className={`furnidata-section furnidata-section-${section.kind}`}>
-                        <div className="furnidata-section-header">
-                            <span className="furnidata-section-icon">{section.kind === 'base' ? '📦' : '📍'}</span>
-                            <span className="furnidata-section-title">{section.title}</span>
-                            <button className="furnidata-copy-btn" type="button" onClick={() => copySection(section)}>
-                                {copiedSection === section.title ? (
-                                    <>
-                                        <FaCheck size={10} /> Copied!
-                                    </>
-                                ) : (
-                                    <>
-                                        <FaCopy size={10} /> Copy
-                                    </>
-                                )}
-                            </button>
+        <NativeTextTree>
+            <LayoutNotificationAlertView title={title} onClose={onClose} classNames={[...classNames, 'octane-alert-furnidata']} {...rest} type={item.alertType}>
+                <div className="furnidata-item-banner">
+                    <span className="furnidata-item-icon">🛋️</span>
+                    <span className="furnidata-item-name">{itemName || 'Unknown item'}</span>
+                </div>
+                <Column fullHeight gap={2} overflow="auto" className="furnidata-body">
+                    {sections.map((section) => (
+                        <div key={section.title} className={`furnidata-section furnidata-section-${section.kind}`}>
+                            <div className="furnidata-section-header">
+                                <span className="furnidata-section-icon">{section.kind === 'base' ? '📦' : '📍'}</span>
+                                <span className="furnidata-section-title">{section.title}</span>
+                                <BaseButton className="furnidata-copy-btn" type="button" onClick={() => copySection(section)}>
+                                    {copiedSection === section.title ? (
+                                        <>
+                                            <FaCheck size={10} /> {localizeWithFallback('octane.notification_center.copied', 'Copied!')}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FaCopy size={10} /> {localizeWithFallback('octane.notification_center.copy', 'Copy')}
+                                        </>
+                                    )}
+                                </BaseButton>
+                            </div>
+                            <ul className="furnidata-rows">
+                                {section.rows.map((row, index) => (
+                                    <li key={index}>
+                                        {row.label && <span className="furnidata-row-label">{row.label}</span>}
+                                        <span className="furnidata-row-value">{row.value}</span>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
-                        <ul className="furnidata-rows">
-                            {section.rows.map((row, index) => (
-                                <li key={index}>
-                                    {row.label && <span className="furnidata-row-label">{row.label}</span>}
-                                    <span className="furnidata-row-value">{row.value}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ))}
-            </Column>
-            <Column center alignItems="center" gap={0}>
-                <hr className="my-2 w-full" />
-                <Button onClick={onClose}>{LocalizeText('generic.close')}</Button>
-            </Column>
-        </LayoutNotificationAlertView>
+                    ))}
+                </Column>
+                <Column center alignItems="center" gap={0}>
+                    <hr className="my-2 w-full" />
+                    <Button onClick={onClose}>{LocalizeText('generic.close')}</Button>
+                </Column>
+            </LayoutNotificationAlertView>
+        </NativeTextTree>
     );
 };

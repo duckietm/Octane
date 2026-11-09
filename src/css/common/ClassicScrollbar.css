@@ -1,127 +1,297 @@
 .has-classic-scrollbar {
     scrollbar-color: auto !important;
-    scrollbar-width: auto;
+    scrollbar-width: auto !important;
+}
+
+.has-classic-scrollbar * {
+    scrollbar-color: auto !important;
+    scrollbar-width: auto !important;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+    .has-classic-scrollbar,
+    .has-classic-scrollbar * {
+        scrollbar-color: #d9d9d9 #bdbbb3 !important;
+    }
 }
 
 .has-classic-scrollbar *::-webkit-scrollbar,
 .has-classic-scrollbar::-webkit-scrollbar {
-    width: 18px !important;
-    height: 18px !important;
-    background-color: #bdbbb3 !important;
+    width: 17px !important;
+    height: 17px !important;
+    background-color: transparent !important;
 }
 
-.has-classic-scrollbar *::-webkit-scrollbar-track,
-.has-classic-scrollbar::-webkit-scrollbar-track {
-    background-color: #bdbbb3 !important;
-    box-shadow: inset 1px 0 0 #000000 !important;
+.has-classic-scrollbar *::-webkit-scrollbar-track:vertical,
+.has-classic-scrollbar::-webkit-scrollbar-track:vertical {
+    background-image: url("../../assets/images/scrollbar/background.png") !important;
+    background-repeat: repeat-y !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
     border: 0 !important;
+    border-radius: 0 !important;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
 }
 
-.has-classic-scrollbar *::-webkit-scrollbar-thumb,
-.has-classic-scrollbar::-webkit-scrollbar-thumb {
-    min-height: 24px !important;
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5'><rect x='0' y='0' width='8' height='2' fill='%23a0a0a0'/></svg>") center top / 8px 5px repeat-y,
-        #d9d9d9 !important;
-    border: 1px solid #000000 !important;
-    border-radius: 3px !important;
-    box-shadow: inset 0 0 0 2px #ffffff !important;
+.has-classic-scrollbar *::-webkit-scrollbar-thumb:vertical,
+.has-classic-scrollbar::-webkit-scrollbar-thumb:vertical {
+    min-height: 12px !important;
+    background-image: url("../../assets/images/scrollbar/thumb_top.png"),
+        url("../../assets/images/scrollbar/thumb_bottom.png"),
+        url("../../assets/images/scrollbar/thumb_middle.png") !important;
+    background-repeat: no-repeat, no-repeat, repeat-y !important;
+    background-position: center top, center bottom, center !important;
+    background-color: transparent !important;
+    background-clip: border-box !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
 }
 
-.has-classic-scrollbar *::-webkit-scrollbar-thumb:hover,
-.has-classic-scrollbar::-webkit-scrollbar-thumb:hover {
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5'><rect x='0' y='0' width='8' height='2' fill='%23ababab'/></svg>") center top / 8px 5px repeat-y,
-        #e3e3e3 !important;
+.has-classic-scrollbar *::-webkit-scrollbar-thumb:vertical:hover,
+.has-classic-scrollbar::-webkit-scrollbar-thumb:vertical:hover {
+    background-image: url("../../assets/images/scrollbar/thumb_top.png"),
+        url("../../assets/images/scrollbar/thumb_bottom.png"),
+        url("../../assets/images/scrollbar/thumb_middle_hover.png") !important;
 }
 
-.has-classic-scrollbar *::-webkit-scrollbar-thumb:active,
-.has-classic-scrollbar::-webkit-scrollbar-thumb:active {
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5'><rect x='0' y='0' width='8' height='2' fill='%23606060'/></svg>") center top / 8px 5px repeat-y,
-        #bcbcbc !important;
+.has-classic-scrollbar *::-webkit-scrollbar-thumb:vertical:active,
+.has-classic-scrollbar::-webkit-scrollbar-thumb:vertical:active {
+    background-image: url("../../assets/images/scrollbar/thumb_top_active.png"),
+        url("../../assets/images/scrollbar/thumb_bottom_active.png"),
+        url("../../assets/images/scrollbar/thumb_middle_active.png") !important;
 }
 
 .has-classic-scrollbar *::-webkit-scrollbar-button:single-button:vertical:decrement,
 .has-classic-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement {
     display: block !important;
-    width: 18px !important;
-    height: 18px !important;
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='6'><polygon points='4.5,0 9,6 0,6' fill='%23222'/></svg>") center center / 9px 6px no-repeat,
-        #d9d9d9 !important;
-    border: 1px solid #000000 !important;
-    border-radius: 3px 3px 0 0 !important;
-    box-shadow:
-        inset 0 1px 0 #ffffff,
-        inset 1px 0 0 rgba(255, 255, 255, 0.6) !important;
+    width: 17px !important;
+    height: 16px !important;
+    background: url("../../assets/images/scrollbar/up.png") no-repeat center !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+.has-classic-scrollbar *::-webkit-scrollbar-button:single-button:vertical:decrement:hover,
+.has-classic-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement:hover {
+    background: url("../../assets/images/scrollbar/up_hover.png") no-repeat center !important;
 }
 .has-classic-scrollbar *::-webkit-scrollbar-button:single-button:vertical:decrement:active,
 .has-classic-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement:active {
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='6'><polygon points='4.5,0 9,6 0,6' fill='%23000'/></svg>") center center / 9px 6px no-repeat,
-        #bcbcbc !important;
+    background: url("../../assets/images/scrollbar/up_active.png") no-repeat center !important;
 }
 
 .has-classic-scrollbar *::-webkit-scrollbar-button:single-button:vertical:increment,
 .has-classic-scrollbar::-webkit-scrollbar-button:single-button:vertical:increment {
     display: block !important;
-    width: 18px !important;
-    height: 18px !important;
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='6'><polygon points='0,0 9,0 4.5,6' fill='%23222'/></svg>") center center / 9px 6px no-repeat,
-        #d9d9d9 !important;
-    border: 1px solid #000000 !important;
-    border-radius: 0 0 3px 3px !important;
-    box-shadow:
-        inset 0 1px 0 #ffffff,
-        inset 1px 0 0 rgba(255, 255, 255, 0.6) !important;
+    width: 17px !important;
+    height: 16px !important;
+    background: url("../../assets/images/scrollbar/down.png") no-repeat center !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+.has-classic-scrollbar *::-webkit-scrollbar-button:single-button:vertical:increment:hover,
+.has-classic-scrollbar::-webkit-scrollbar-button:single-button:vertical:increment:hover {
+    background: url("../../assets/images/scrollbar/down_hover.png") no-repeat center !important;
 }
 .has-classic-scrollbar *::-webkit-scrollbar-button:single-button:vertical:increment:active,
 .has-classic-scrollbar::-webkit-scrollbar-button:single-button:vertical:increment:active {
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='6'><polygon points='0,0 9,0 4.5,6' fill='%23000'/></svg>") center center / 9px 6px no-repeat,
-        #bcbcbc !important;
+    background: url("../../assets/images/scrollbar/down_active.png") no-repeat center !important;
+}
+
+.has-classic-scrollbar *::-webkit-scrollbar-track:horizontal,
+.has-classic-scrollbar::-webkit-scrollbar-track:horizontal {
+    background-image: url("../../assets/images/scrollbar/background_horizontal.png") !important;
+    background-repeat: repeat-x !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+
+.has-classic-scrollbar *::-webkit-scrollbar-thumb:horizontal,
+.has-classic-scrollbar::-webkit-scrollbar-thumb:horizontal {
+    min-width: 12px !important;
+    background-image: url("../../assets/images/scrollbar/thumb_left.png"),
+        url("../../assets/images/scrollbar/thumb_right.png"),
+        url("../../assets/images/scrollbar/thumb_middle_horizontal.png") !important;
+    background-repeat: no-repeat, no-repeat, repeat-x !important;
+    background-position: left center, right center, center !important;
+    background-color: transparent !important;
+    background-clip: border-box !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+
+.has-classic-scrollbar *::-webkit-scrollbar-thumb:horizontal:hover,
+.has-classic-scrollbar::-webkit-scrollbar-thumb:horizontal:hover {
+    background-image: url("../../assets/images/scrollbar/thumb_left.png"),
+        url("../../assets/images/scrollbar/thumb_right.png"),
+        url("../../assets/images/scrollbar/thumb_middle_horizontal_hover.png") !important;
+}
+
+.has-classic-scrollbar *::-webkit-scrollbar-thumb:horizontal:active,
+.has-classic-scrollbar::-webkit-scrollbar-thumb:horizontal:active {
+    background-image: url("../../assets/images/scrollbar/thumb_left_active.png"),
+        url("../../assets/images/scrollbar/thumb_right_active.png"),
+        url("../../assets/images/scrollbar/thumb_middle_horizontal_active.png") !important;
 }
 
 .has-classic-scrollbar *::-webkit-scrollbar-button:single-button:horizontal:decrement,
 .has-classic-scrollbar::-webkit-scrollbar-button:single-button:horizontal:decrement {
     display: block !important;
-    width: 18px !important;
-    height: 18px !important;
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='9'><polygon points='0,4.5 6,0 6,9' fill='%23222'/></svg>") center center / 6px 9px no-repeat,
-        #d9d9d9 !important;
-    border: 1px solid #000000 !important;
-    border-radius: 3px 0 0 3px !important;
-    box-shadow:
-        inset 0 1px 0 #ffffff,
-        inset 1px 0 0 rgba(255, 255, 255, 0.6) !important;
+    width: 16px !important;
+    height: 17px !important;
+    background: url("../../assets/images/scrollbar/left.png") no-repeat center !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+.has-classic-scrollbar *::-webkit-scrollbar-button:single-button:horizontal:decrement:hover,
+.has-classic-scrollbar::-webkit-scrollbar-button:single-button:horizontal:decrement:hover {
+    background: url("../../assets/images/scrollbar/left_hover.png") no-repeat center !important;
 }
 .has-classic-scrollbar *::-webkit-scrollbar-button:single-button:horizontal:decrement:active,
 .has-classic-scrollbar::-webkit-scrollbar-button:single-button:horizontal:decrement:active {
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='9'><polygon points='0,4.5 6,0 6,9' fill='%23000'/></svg>") center center / 6px 9px no-repeat,
-        #bcbcbc !important;
+    background: url("../../assets/images/scrollbar/left_active.png") no-repeat center !important;
 }
 
 .has-classic-scrollbar *::-webkit-scrollbar-button:single-button:horizontal:increment,
 .has-classic-scrollbar::-webkit-scrollbar-button:single-button:horizontal:increment {
     display: block !important;
-    width: 18px !important;
-    height: 18px !important;
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='9'><polygon points='6,4.5 0,0 0,9' fill='%23222'/></svg>") center center / 6px 9px no-repeat,
-        #d9d9d9 !important;
-    border: 1px solid #000000 !important;
-    border-radius: 0 3px 3px 0 !important;
-    box-shadow:
-        inset 0 1px 0 #ffffff,
-        inset 1px 0 0 rgba(255, 255, 255, 0.6) !important;
+    width: 16px !important;
+    height: 17px !important;
+    background: url("../../assets/images/scrollbar/right.png") no-repeat center !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+.has-classic-scrollbar *::-webkit-scrollbar-button:single-button:horizontal:increment:hover,
+.has-classic-scrollbar::-webkit-scrollbar-button:single-button:horizontal:increment:hover {
+    background: url("../../assets/images/scrollbar/right_hover.png") no-repeat center !important;
 }
 .has-classic-scrollbar *::-webkit-scrollbar-button:single-button:horizontal:increment:active,
 .has-classic-scrollbar::-webkit-scrollbar-button:single-button:horizontal:increment:active {
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='9'><polygon points='6,4.5 0,0 0,9' fill='%23000'/></svg>") center center / 6px 9px no-repeat,
-        #bcbcbc !important;
+    background: url("../../assets/images/scrollbar/right_active.png") no-repeat center !important;
+}
+
+.has-classic-scrollbar *::-webkit-scrollbar-corner,
+.has-classic-scrollbar::-webkit-scrollbar-corner {
+    background: transparent !important;
+}
+
+/* The catalogue tab strip scrolls sideways on phones (swiped, like AIR's tab_context it has no bar). */
+.has-classic-scrollbar .octane-classic-scroll-area-viewport,
+.has-classic-scrollbar .octane-avatar-editor .octane-avatar-editor-subcategories,
+.has-classic-scrollbar .octane-catalog-window .octane-catalog-tabs-shell {
+    scrollbar-width: none !important;
+}
+
+.has-classic-scrollbar .octane-classic-scroll-area-viewport::-webkit-scrollbar,
+.has-classic-scrollbar .octane-avatar-editor .octane-avatar-editor-subcategories::-webkit-scrollbar,
+.has-classic-scrollbar .octane-catalog-window .octane-catalog-tabs-shell::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* OctaneCardView classicScrollbar={false}: the window drops the 17px skin for
+   the slim native scrollbar. The standard properties win over the WebKit
+   pseudo-elements in current engines, so one rule undoes the whole theme. */
+.has-classic-scrollbar .octane-scrollbar-native,
+.has-classic-scrollbar .octane-scrollbar-native * {
+    scrollbar-width: thin !important;
+    scrollbar-color: #8d8d8d transparent !important;
+}
+
+/* AIR opt-in scrollbar skin (navigator results etc.) */
+.has-air-scrollbar {
+    scrollbar-color: auto;
+    scrollbar-width: auto;
+}
+
+.has-air-scrollbar::-webkit-scrollbar {
+    width: 17px;
+    height: 17px;
+}
+
+.has-air-scrollbar::-webkit-scrollbar-track:vertical {
+    background: url("../../assets/images/habbo-skin/slices/scroll-track-3.png") repeat-y;
+}
+
+.has-air-scrollbar::-webkit-scrollbar-thumb:vertical {
+    min-height: 26px;
+    border: 0 solid transparent;
+    border-image: url("../../assets/images/habbo-skin/slices/scroll-thumb-3-default.png") 5 0 / 5px 0 stretch;
+    background: url("../../assets/images/habbo-skin/slices/scroll-grip-3-default.png") center no-repeat,
+        url("../../assets/images/habbo-skin/slices/scroll-mid-3-default.png") repeat-y;
+}
+
+.has-air-scrollbar::-webkit-scrollbar-thumb:vertical:active {
+    border-image-source: url("../../assets/images/habbo-skin/slices/scroll-thumb-3-pressed.png");
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-grip-3-pressed.png"), url("../../assets/images/habbo-skin/slices/scroll-mid-3-pressed.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical {
+    display: block;
+    height: 16px;
+    background: center / 17px 16px no-repeat;
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-up-3-default.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:increment {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-down-3-default.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement:active {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-up-3-pressed.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:increment:active {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-down-3-pressed.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement:disabled {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-up-3-disabled.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:increment:disabled {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-down-3-disabled.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-thumb:vertical:hover:not(:active) {
+    border-image-source: url("../../assets/images/habbo-skin/slices/scroll-thumb-3-hover.png");
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-grip-3-hover.png"), url("../../assets/images/habbo-skin/slices/scroll-mid-3-hover.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement:hover:not(:active) {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-up-3-hover.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:increment:hover:not(:active) {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-down-3-hover.png");
+}
+
+.has-air-scrollbar[data-scrollable="false"]::-webkit-scrollbar-track:vertical {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-track-v-disabled.png");
+}
+
+.has-air-scrollbar[data-scrollable="false"]::-webkit-scrollbar-button:single-button:vertical:decrement {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-up-3-disabled.png");
+}
+
+.has-air-scrollbar[data-scrollable="false"]::-webkit-scrollbar-button:single-button:vertical:increment {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-down-3-disabled.png");
 }

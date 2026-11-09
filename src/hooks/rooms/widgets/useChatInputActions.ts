@@ -11,10 +11,11 @@ import {
     RoomSettingsComposer,
     RoomShakingEffect,
     RoomZoomEvent,
-    TextureUtils
-} from '@nitrots/nitro-renderer';
-import { useCallback } from 'react';
-import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../../api';
+    TextureUtils,
+    TriggerHabbiconComposer
+} from '@octane/renderer';
+import { useCallback, useRef } from 'react';
+import { CanOpenFurniChooser, CanOpenUserChooser,ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, IsAnyRoomController, LocalizeText, parseSignId, SendMessageComposer, WIRED_PLAYTEST_TOGGLE_LINK } from '../../../api';
 import { useNotification } from '../../notification';
 import { useTranslation } from '../../translation';
 import { useRoom } from '../useRoom';
@@ -35,9 +36,14 @@ import { useRoom } from '../useRoom';
  * to useChatInputState.
  */
 export const useChatInputActions = () => {
-    const { showNitroAlert = null, showConfirm = null } = useNotification();
+    const { showOctaneAlert = null, showConfirm = null } = useNotification();
     const { settings, translateOutgoing, enqueueOutgoingTranslation } = useTranslation();
     const { roomSession = null } = useRoom();
+    // Translated lines leave in the order they were typed and only in the room they were typed in: each waits for
+    // the one before it, and one whose room has changed meanwhile is dropped.
+    const roomSessionRef = useRef(roomSession);
+    roomSessionRef.current = roomSession;
+    const translatedSendsRef = useRef<Promise<void>>(Promise.resolve());
 
     const sendChat = useCallback(
         (text: string, chatType: number, recipientName: string = '', styleId: number = 0) => {
@@ -96,6 +102,14 @@ export const useChatInputActions = () => {
                         }
 
                         break;
+                    case ':67':
+                        if (GetConfigurationValue('avatar.expression.67.enabled', false) && GetClubMemberLevel() === HabboClubLevelEnum.VIP) {
+                            roomSession?.sendExpressionMessage(AvatarExpressionEnum.EXPRESSION_67.ordinal);
+
+                            return null;
+                        }
+
+                        break;
                     case ':jump':
                         if (GetClubMemberLevel() === HabboClubLevelEnum.VIP) {
                             roomSession?.sendExpressionMessage(AvatarExpressionEnum.JUMP.ordinal);
@@ -112,19 +126,32 @@ export const useChatInputActions = () => {
                         roomSession?.sendExpressionMessage(AvatarExpressionEnum.RESPECT.ordinal);
 
                         return null;
-                    case ':sign':
-                        roomSession?.sendSignMessage(parseInt(secondPart));
+                    case ':sign': {
+                        const signId = parseSignId(secondPart);
+
+                        if (signId !== null) roomSession?.sendSignMessage(signId);
 
                         return null;
+                    }
+                    case ':habbicon': {
+                        const habbiconId = parseInt(secondPart);
+
+                        if(Number.isFinite(habbiconId) && habbiconId > 0) SendMessageComposer(new TriggerHabbiconComposer(habbiconId));
+
+                        return null;
+                    }
                     case ':iddqd':
                     case ':flip':
                         if (roomSession) GetEventDispatcher().dispatchEvent(new RoomZoomEvent(roomSession.roomId, -1, true));
 
                         return null;
-                    case ':zoom':
-                        if (roomSession) GetEventDispatcher().dispatchEvent(new RoomZoomEvent(roomSession.roomId, parseInt(secondPart)));
+                    case ':zoom': {
+                        const zoomLevel = parseInt(secondPart);
+
+                        if (roomSession && Number.isFinite(zoomLevel)) GetEventDispatcher().dispatchEvent(new RoomZoomEvent(roomSession.roomId, zoomLevel));
 
                         return null;
+                    }
                     case ':screenshot':
                         if (!roomSession) return null;
 
@@ -133,7 +160,13 @@ export const useChatInputActions = () => {
 
                             (async () => {
                                 try {
-                                    const imageUrl = await TextureUtils.generateImageUrl(texture);
+                                    let imageUrl: string = null;
+                                    try {
+                                        imageUrl = await TextureUtils.generateImageUrl(texture);
+                                    } finally {
+                                        // A whole-room texture: freed even when the image could not be made.
+                                        texture?.destroy?.(true);
+                                    }
                                     if (!imageUrl) return;
 
                                     const link = document.createElement('a');
@@ -149,7 +182,7 @@ export const useChatInputActions = () => {
                         }
                         return null;
                     case ':pickall':
-                        if (roomSession?.isRoomOwner || GetSessionDataManager().isModerator) {
+                        if (roomSession?.isRoomOwner || IsAnyRoomController()) {
                             showConfirm(
                                 LocalizeText('room.confirm.pick_all'),
                                 () => {
@@ -163,10 +196,29 @@ export const useChatInputActions = () => {
                         }
 
                         return null;
+                    case ':pickallbc':
+                        if (
+                            roomSession?.isRoomOwner ||
+                            IsAnyRoomController() ||
+                            (roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.GUEST
+                        ) {
+                            showConfirm(
+                                LocalizeText('room.confirm.pick_all_bc'),
+                                () => {
+                                    GetSessionDataManager().sendSpecialCommandMessage(':pickallbc');
+                                },
+                                null,
+                                null,
+                                null,
+                                LocalizeText('generic.alert.title')
+                            );
+                        }
+
+                        return null;
                     case ':ejectall':
                         if (
                             roomSession?.isRoomOwner ||
-                            GetSessionDataManager().isModerator ||
+                            IsAnyRoomController() ||
                             (roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.GUEST
                         ) {
                             showConfirm(
@@ -182,29 +234,46 @@ export const useChatInputActions = () => {
                         }
                         return null;
                     case ':furni':
-                        CreateLinkEvent('furni-chooser/');
+                        // AIR: rights holders, security level 2+ and ambassadors only; anyone else is swallowed silently.
+                        if (CanOpenFurniChooser(roomSession)) CreateLinkEvent('furni-chooser/');
                         return null;
                     case ':chooser':
-                        CreateLinkEvent('user-chooser/');
+                        // AIR: swallowed silently for visitors below rights while the room's :chooser disabler is on.
+                        if (CanOpenUserChooser(roomSession)) CreateLinkEvent('user-chooser/');
                         return null;
                     case ':floor':
                     case ':bcfloor':
                         if ((roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.ROOM_OWNER) CreateLinkEvent('floor-editor/show');
 
                         return null;
+                    case ':wf':
+                    case ':wired':
+                        CreateLinkEvent('wiredmenu/open');
+                        return null;
+                    case ':var':
+                    case ':variables':
+                        CreateLinkEvent('wiredmenu/open/variable_overview');
+                        return null;
+                    case ':inspect':
+                    case ':inspection':
+                        CreateLinkEvent('wiredmenu/open/inspection');
+                        return null;
+                    case ':playtest':
+                        // AIR ChatInputWidgetHandler: flips the wired menu playtest preference, with its notification.
+                        CreateLinkEvent(WIRED_PLAYTEST_TOGGLE_LINK);
+                        return null;
                     case ':togglefps': {
                         if (GetTicker().maxFPS > 0) GetTicker().maxFPS = 0;
-                        else GetTicker().maxFPS = GetConfigurationValue('system.animation.fps');
+                        else GetTicker().maxFPS = GetConfigurationValue<number>('system.fps.animation', 24);
 
                         return null;
                     }
                     case ':client':
-                    case ':nitro':
-                    case ':billsonnn':
-                        showNitroAlert();
+                    case ':octane':
+                        showOctaneAlert();
                         return null;
                     case ':settings':
-                        if (roomSession && (roomSession.isRoomOwner || GetSessionDataManager().isModerator)) {
+                        if (roomSession && (roomSession.isRoomOwner || IsAnyRoomController())) {
                             SendMessageComposer(new RoomSettingsComposer(roomSession.roomId));
                         }
 
@@ -247,8 +316,13 @@ export const useChatInputActions = () => {
                 return null;
             }
 
-            void (async () => {
-                const translation = await translateOutgoing(text);
+            const sessionAtSend = roomSession;
+            const translating = translateOutgoing(text).catch(() => null);
+
+            translatedSendsRef.current = translatedSendsRef.current.then(async () => {
+                const translation = await translating;
+
+                if (roomSessionRef.current !== sessionAtSend) return;
 
                 if (translation) {
                     enqueueOutgoingTranslation(translation);
@@ -257,11 +331,11 @@ export const useChatInputActions = () => {
                 }
 
                 dispatchChatMessage(text);
-            })();
+            });
 
             return null;
         },
-        [roomSession, settings, translateOutgoing, enqueueOutgoingTranslation, showConfirm, showNitroAlert]
+        [roomSession, settings, translateOutgoing, enqueueOutgoingTranslation, showConfirm, showOctaneAlert]
     );
 
     return { sendChat };

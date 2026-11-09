@@ -1,45 +1,88 @@
-import { NitroCard } from '@layout/NitroCard';
 import {
     AddLinkEventTracker,
     ConvertGlobalRoomIdMessageComposer,
-    FindNewFriendsMessageComposer,
+    ForwardToSomeRoomMessageComposer,
     GetCategoriesWithUserCountMessageComposer,
     HabboWebTools,
     ILinkEventTracker,
     LegacyExternalInterface,
     NavigatorInitComposer,
+    NavigatorSettingsEvent,
     RemoveLinkEventTracker,
     RoomSessionEvent
-} from '@nitrots/nitro-renderer';
-import { FC, useEffect, useRef } from 'react';
-import { FaPlus } from 'react-icons/fa';
-import { CreateLinkEvent, LocalizeText, SendMessageComposer, TryVisitRoom } from '../../api';
-import createRoomImg from '../../assets/images/navigator/create_room.png';
-import promoteRoomImg from '../../assets/images/navigator/promote_room.png';
-import randomRoomImg from '../../assets/images/navigator/random_room.png';
-import savesSearchIcon from '../../assets/images/navigator/saves-search/search_save.png';
-import { Flex, Text, WidgetErrorBoundary } from '../../common';
-import { useNavigatorData, useNavigatorSearch, useNavigatorUiState, useNavigatorUiStore, useNitroEvent } from '../../hooks';
+} from '@octane/renderer';
+import { CSSProperties, FC, PointerEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { CreateLinkEvent, LocalizeText, localizeWithFallback, NAVIGATOR_LIFTED_VIEW_CODE, SendMessageComposer, TryVisitRoom } from '../../api';
+import createRoomImg from '../../assets/images/navigator/air/create-room.png';
+import promoteRoomImg from '../../assets/images/navigator/air/promote-room.png';
+import quicklinkAdd from '../../assets/images/navigator/air/quicklink-add.png';
+import randomRoomImg from '../../assets/images/navigator/air/random-room.png';
+import { DraggableWindow, WidgetErrorBoundary } from '../../common';
+import {
+    useMessageEvent,
+    useNavigatorData,
+    useNavigatorRoomInfoPopupStore,
+    useNavigatorSearch,
+    useNavigatorUiState,
+    useNavigatorUiStore,
+    useOctaneEvent,
+    requestRaidProtectionSettings
+} from '../../hooks';
 import { NavigatorDoorStateView } from './views/NavigatorDoorStateView';
 import { NavigatorRoomCreatorView } from './views/NavigatorRoomCreatorView';
 import { NavigatorRoomInfoView } from './views/NavigatorRoomInfoView';
 import { NavigatorRoomLinkView } from './views/NavigatorRoomLinkView';
 import { NavigatorRoomSettingsView } from './views/room-settings/NavigatorRoomSettingsView';
+import { NavigatorRaidProtectionView } from './views/raid-protection/NavigatorRaidProtectionView';
+import { NavigatorEnforceCategoryView } from './views/NavigatorEnforceCategoryView';
 import { NavigatorEmptyStateView } from './views/search/NavigatorEmptyStateView';
+import { NavigatorLiftedRoomsView } from './views/search/NavigatorLiftedRoomsView';
+import { NavigatorRoomInfoPopupView } from './views/search/NavigatorRoomInfoPopupView';
 import { NavigatorSearchResultView } from './views/search/NavigatorSearchResultView';
 import { NavigatorSearchSavesResultView } from './views/search/NavigatorSearchSavesResultView';
-import { NavigatorSearchSkeletonView } from './views/search/NavigatorSearchSkeletonView';
 import { NavigatorSearchView } from './views/search/NavigatorSearchView';
+import { TabBar, TabBarTab } from '../../common/TabBar';
+import { BaseButton } from '../../common/BaseButton';
+import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
-export const NavigatorView: FC<{}> = (props) => {
-    const { topLevelContext, topLevelContexts, navigatorData, navigatorSearches } = useNavigatorData();
+const persistNavigatorBounds = (element: HTMLElement | null) => {
+    if (!element) return;
+    const rect = element.getBoundingClientRect();
+    useNavigatorUiStore.getState().persistWindowSettings({
+        x: Math.round(rect.left),
+        y: Math.round(rect.top),
+        width: element.offsetWidth,
+        height: element.offsetHeight
+    });
+};
+
+export const NavigatorView: FC<{}> = () => {
+    const { topLevelContext, topLevelContexts, navigatorData, navigatorSearches, liftedRooms } = useNavigatorData();
     const { searchResult, isFetching } = useNavigatorSearch();
-    const { isVisible, isCreatorOpen, isRoomInfoOpen, isRoomLinkOpen, isOpenSavesSearches, needsInit, currentTabCode } = useNavigatorUiState();
+    const { isVisible, isCreatorOpen, isRoomInfoOpen, isRoomLinkOpen, isOpenSavesSearches, needsInit, currentTabCode, windowHeight } = useNavigatorUiState();
+    const canGoBack = useNavigatorUiStore((state) => state.searchHistoryOffset > 0);
+    const canGoForward = useNavigatorUiStore((state) => state.searchHistoryOffset < state.searchHistory.length - 1);
     const elementRef = useRef<HTMLDivElement>(null);
+    const [resultsScrollable, setResultsScrollable] = useState(false);
+    const frameRef = useRef<HTMLDivElement>(null);
+    const tabsRef = useRef<HTMLDivElement>(null);
+    const resizeRef = useRef<{ y: number; height: number; scale: number } | null>(null);
 
-    useNitroEvent<RoomSessionEvent>(RoomSessionEvent.CREATED, (event) => {
+    useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.CREATED, () => {
         useNavigatorUiStore.getState().hide();
         useNavigatorUiStore.getState().closeCreator();
+        useNavigatorRoomInfoPopupStore.getState().hide();
+    });
+
+    useMessageEvent<NavigatorSettingsEvent>(NavigatorSettingsEvent, (event) => {
+        const parser = event.getParser();
+        useNavigatorUiStore.getState().applyServerSettings({
+            openSearches: parser.leftPanelHidden,
+            windowX: parser.windowX,
+            windowY: parser.windowY,
+            windowHeight: parser.windowHeight
+        });
     });
 
     useEffect(() => {
@@ -53,6 +96,7 @@ export const NavigatorView: FC<{}> = (props) => {
                         store.show();
                         return;
                     case 'hide':
+                    case 'close':
                         store.hide();
                         return;
                     case 'toggle':
@@ -64,25 +108,48 @@ export const NavigatorView: FC<{}> = (props) => {
                     case 'toggle-room-link':
                         store.toggleRoomLink();
                         return;
-                    case 'goto':
+                    case 'goto': {
                         if (parts.length <= 2) return;
-                        if (parts[2] === 'home') {
-                            if (navigatorData.homeRoomId <= 0) return;
-                            TryVisitRoom(navigatorData.homeRoomId);
+                        const target = parts.slice(2).join('/');
+                        if (target === 'home') {
+                            const homeRoomId = navigatorData?.homeRoomId ?? 0;
+                            if (homeRoomId <= 0) return;
+                            TryVisitRoom(homeRoomId);
                             return;
                         }
-                        TryVisitRoom(parseInt(parts[2]));
+                        if (target === 'random_friending_room') {
+                            SendMessageComposer(new ForwardToSomeRoomMessageComposer('random_friending_room'));
+                            return;
+                        }
+                        const roomId = Number.parseInt(target, 10);
+                        if (!Number.isNaN(roomId) && String(roomId) === target) {
+                            TryVisitRoom(roomId);
+                            return;
+                        }
+                        SendMessageComposer(new ConvertGlobalRoomIdMessageComposer(target));
                         return;
+                    }
                     case 'create':
                         store.openCreator();
                         return;
                     case 'search':
-                        if (parts.length <= 2) return;
-                        const code = parts[2];
-                        const value = parts.length > 3 ? parts[3] : '';
-                        store.setTab(code);
-                        if (value) store.setFilter(value);
+                        store.setSearch('hotel_view', parts.slice(2).join('/'));
                         store.show();
+                        return;
+                    case 'tag':
+                        store.setSearch('hotel_view', `tag:${parts.slice(2).join('/')}`);
+                        store.show();
+                        return;
+                    case 'tab':
+                        if (parts[2]) store.setTab(parts[2]);
+                        store.show();
+                        return;
+                    case 'me':
+                        store.setTab('myworld_view');
+                        store.show();
+                        return;
+                    case 'raidprotection':
+                        requestRaidProtectionSettings(parts.length === 3 ? parts[2] : null, navigatorData?.enteredGuestRoom?.roomId ?? 0);
                         return;
                 }
             },
@@ -95,6 +162,7 @@ export const NavigatorView: FC<{}> = (props) => {
     useEffect(() => {
         if (!searchResult) return;
         if (elementRef.current) elementRef.current.scrollTop = 0;
+        useNavigatorRoomInfoPopupStore.getState().hide();
     }, [searchResult]);
 
     useEffect(() => {
@@ -106,132 +174,315 @@ export const NavigatorView: FC<{}> = (props) => {
 
     useEffect(() => {
         LegacyExternalInterface.addCallback(HabboWebTools.OPENROOM, (k: string) => SendMessageComposer(new ConvertGlobalRoomIdMessageComposer(k)));
+        return () => {
+            LegacyExternalInterface.removeCallback(HabboWebTools.OPENROOM);
+        };
     }, []);
 
+    useEffect(() => {
+        useNavigatorUiStore.getState().hydrateAirPreferences();
+    }, []);
+
+    useEffect(() => {
+        if (!isVisible) useNavigatorRoomInfoPopupStore.getState().hide();
+    }, [isVisible]);
+
+    useLayoutEffect(() => {
+        const tabs = tabsRef.current;
+        if (!tabs) return;
+
+        const labels = tabs.querySelectorAll<HTMLElement>('.octane-navigator-air__tab-label');
+
+        const sizeTabs = () => {
+            for (const label of labels) {
+                const labelWidth = Math.ceil(label.getBoundingClientRect().width);
+                label.parentElement.style.setProperty('--navigator-tab-width', `${Math.max(70, labelWidth + 24)}px`);
+            }
+        };
+
+        const observer = new ResizeObserver(sizeTabs);
+        labels.forEach((label) => observer.observe(label));
+        sizeTabs();
+
+        return () => observer.disconnect();
+    }, [isVisible, topLevelContexts]);
+
+    useLayoutEffect(() => {
+        const results = elementRef.current;
+        if (!results) return;
+
+        const updateScrollState = () => setResultsScrollable(results.scrollHeight > results.clientHeight);
+        const observer = new ResizeObserver(updateScrollState);
+        observer.observe(results);
+        Array.from(results.children).forEach((child) => observer.observe(child));
+        updateScrollState();
+
+        return () => observer.disconnect();
+    }, [isVisible, isCreatorOpen, searchResult]);
+
+    const quickLinksLabel = localizeWithFallback('navigator.quick.links.title', 'Quick links');
+    const navigatorLabel = localizeWithFallback('navigator.title', 'Navigator');
+    const quickLinksToggleLabel = localizeWithFallback('navigator.tooltip.left.show.hide', 'Show or hide quick links');
+    const showPromote = searchResult?.code === 'myworld_view' || searchResult?.code === 'roomads_view';
+    const headerText = isCreatorOpen
+        ? LocalizeText('navigator.createroom.title')
+        : isFetching
+          ? LocalizeText('navigator.title.is.busy')
+          : LocalizeText('navigator.title');
+
+    const onToggleQuickLinks = () => {
+        useNavigatorRoomInfoPopupStore.getState().hide();
+        useNavigatorUiStore.getState().toggleSavesSearches();
+        persistNavigatorBounds(document.querySelector('.octane-navigator-air') as HTMLElement | null);
+    };
+
+    const onCreateRoom = () => {
+        useNavigatorRoomInfoPopupStore.getState().hide();
+        useNavigatorUiStore.getState().openCreator();
+    };
+
+    const onRandomRoom = () => {
+        useNavigatorRoomInfoPopupStore.getState().hide();
+        CreateLinkEvent('navigator/goto/random_friending_room');
+        useNavigatorUiStore.getState().hide();
+    };
+
+    const onPromoteRoom = () => {
+        useNavigatorRoomInfoPopupStore.getState().hide();
+        CreateLinkEvent('catalog/open/room_event');
+    };
+
+    const onResizeStart = (event: PointerEvent<HTMLButtonElement>) => {
+        if (event.button !== 0 || !frameRef.current) return;
+
+        event.stopPropagation();
+        event.currentTarget.setPointerCapture(event.pointerId);
+        resizeRef.current = {
+            y: event.clientY,
+            height: windowHeight || 628,
+            scale: frameRef.current.getBoundingClientRect().height / frameRef.current.offsetHeight
+        };
+    };
+
+    const onResizeMove = (event: PointerEvent<HTMLButtonElement>) => {
+        const start = resizeRef.current;
+        if (!start) return;
+
+        const height = Math.max(500, Math.round(start.height + (event.clientY - start.y) / start.scale));
+        useNavigatorUiStore.setState({ windowHeight: height });
+    };
+
+    const onResizeEnd = () => {
+        if (!resizeRef.current) return;
+
+        resizeRef.current = null;
+        persistNavigatorBounds(frameRef.current);
+    };
+
     return (
-        <>
-            {isVisible && (
-                <NitroCard
-                    className={`${isOpenSavesSearches ? 'w-[min(600px,calc(100vw-16px))]' : 'w-[min(var(--navigator-width,480px),calc(100vw-16px))]'} min-w-0 max-w-[calc(100vw-16px)] h-[min(var(--navigator-height,600px),calc(100vh-16px))] min-h-0 max-h-[calc(100vh-16px)] has-classic-scrollbar`}
-                    uniqueKey="navigator"
-                >
-                    <NitroCard.Header
-                        headerText={LocalizeText(isCreatorOpen ? 'navigator.createroom.title' : 'navigator.title')}
-                        onCloseClick={() => useNavigatorUiStore.getState().hide()}
-                    />
-                    <NitroCard.Tabs>
-                        <NitroCard.TabItem
-                            isActive={isOpenSavesSearches}
-                            title={LocalizeText('navigator.tooltip.left.show.hide')}
-                            onClick={() => useNavigatorUiStore.getState().toggleSavesSearches()}
+        <NativeTextTree>
+            <>
+                {isVisible && (
+                    <DraggableWindow uniqueKey="navigator" handleSelector=".octane-navigator-air__caption">
+                        <div
+                            ref={frameRef}
+                            className={`octane-navigator-air max-w-[calc(100vw-16px)]${isOpenSavesSearches ? ' is-quick-links' : ''}`}
+                            data-air-frame="ubuntu-3"
+                            style={{ '--navigator-height': `${windowHeight || 628}px` } as CSSProperties}
                         >
-                            <img src={savesSearchIcon} alt="" style={{ width: 18, height: 18 }} />
-                        </NitroCard.TabItem>
-                        {topLevelContexts &&
-                            topLevelContexts.length > 0 &&
-                            topLevelContexts.map((context, index) => (
-                                <NitroCard.TabItem
-                                    key={index}
-                                    isActive={(currentTabCode ? currentTabCode === context.code : topLevelContext === context) && !isCreatorOpen}
-                                    onClick={() => useNavigatorUiStore.getState().setTab(context.code)}
-                                >
-                                    {LocalizeText('navigator.toplevelview.' + context.code)}
-                                </NitroCard.TabItem>
-                            ))}
-                        <NitroCard.TabItem isActive={isCreatorOpen} onClick={() => useNavigatorUiStore.getState().openCreator()}>
-                            <FaPlus className="fa-icon" />
-                        </NitroCard.TabItem>
-                    </NitroCard.Tabs>
-                    <NitroCard.Content>
-                        {!isCreatorOpen && (
-                            <div className="flex flex-col sm:flex-row h-full overflow-hidden gap-2">
-                                {isOpenSavesSearches && (
-                                    <div className="overflow-hidden pr-1 shrink-0 w-full sm:w-auto max-h-40 sm:max-h-none">
-                                        <NavigatorSearchSavesResultView searches={navigatorSearches || []} />
+                            <div className="octane-navigator-air__skin" aria-hidden="true" />
+                            <div className="octane-navigator-air__tab-shelf" aria-hidden="true" />
+                            <div className="octane-navigator-air__caption">
+                                <div className="octane-navigator-air__history">
+                                    <Hint content={localizeWithFallback('navigator.back', 'back')}><BaseButton
+                                        type="button"
+                                        className="octane-navigator-air__history-button"
+                                        aria-label={localizeWithFallback('navigator.back', 'back')}
+                                        disabled={!canGoBack}
+                                        onClick={() => useNavigatorUiStore.getState().goBack()}
+                                    >
+                                        ‹
+                                    </BaseButton></Hint>
+                                    <Hint content={localizeWithFallback('navigator.forward', 'forward')}><BaseButton
+                                        type="button"
+                                        className="octane-navigator-air__history-button"
+                                        aria-label={localizeWithFallback('navigator.forward', 'forward')}
+                                        disabled={!canGoForward}
+                                        onClick={() => useNavigatorUiStore.getState().goForward()}
+                                    >
+                                        ›
+                                    </BaseButton></Hint>
+                                </div>
+                                <span className="octane-navigator-air__title">{headerText}</span>
+                                <BaseButton
+                                    type="button"
+                                    className="octane-navigator-air__close octane-navigator-air__help"
+                                    aria-label={LocalizeText('generic.help')}
+                                    onClick={() => CreateLinkEvent('habbopages/navigator')}
+                                />
+                                <BaseButton
+                                    type="button"
+                                    className="octane-navigator-air__close"
+                                    aria-label={LocalizeText('generic.close')}
+                                    onClick={() => useNavigatorUiStore.getState().hide()}
+                                />
+                            </div>
+                            <BaseButton
+                                type="button"
+                                className="octane-navigator-air__quick-toggle"
+                                aria-label={quickLinksToggleLabel}
+                                aria-expanded={isOpenSavesSearches}
+                                onClick={onToggleQuickLinks}
+                            >
+                                <img src={quicklinkAdd} alt="" width={18} height={18} />
+                            </BaseButton>
+                            <TabBar
+                                ref={tabsRef}
+                                className="octane-navigator-air__tabs"
+                                value={isCreatorOpen ? null : ((currentTabCode ? currentTabCode : topLevelContext?.code) ?? null)}
+                            >
+                                {topLevelContexts &&
+                                    topLevelContexts.length > 0 &&
+                                    topLevelContexts.map((context) => {
+                                        const active = (currentTabCode ? currentTabCode === context.code : topLevelContext === context) && !isCreatorOpen;
+
+                                        return (
+                                            <TabBarTab
+                                                key={context.code}
+                                                value={context.code}
+                                                className={`octane-navigator-air__tab${active ? ' is-active' : ''}`}
+                                                onClick={() => {
+                                                    useNavigatorRoomInfoPopupStore.getState().hide();
+                                                    useNavigatorUiStore.getState().setTab(context.code);
+                                                }}
+                                            >
+                                                <span className="octane-navigator-air__tab-label">{LocalizeText('navigator.toplevelview.' + context.code)}</span>
+                                            </TabBarTab>
+                                        );
+                                    })}
+                            </TabBar>
+                            <div className="octane-navigator-air__body">
+                                {!isCreatorOpen && (
+                                    <div className="octane-navigator-air__workspace">
+                                        {isOpenSavesSearches && (
+                                            <nav className="octane-navigator-air__quick-links" aria-label={quickLinksLabel}>
+                                                <NavigatorSearchSavesResultView searches={navigatorSearches || []} />
+                                            </nav>
+                                        )}
+                                        <main className="octane-navigator-air__main" aria-label={navigatorLabel}>
+                                            <NavigatorSearchView searchResult={searchResult} />
+                                            <div ref={elementRef} className="octane-navigator-air__results has-air-scrollbar" data-scrollable={resultsScrollable}>
+                                                {isFetching && <div className="octane-navigator-air__busy-mask" aria-hidden="true" />}
+                                                {searchResult?.code === NAVIGATOR_LIFTED_VIEW_CODE && !searchResult.data && <NavigatorLiftedRoomsView rooms={liftedRooms} />}
+                                                {searchResult &&
+                                                    searchResult.results.map((result, index) => (
+                                                        <NavigatorSearchResultView
+                                                            key={result.code || index}
+                                                            searchResult={result}
+                                                            parentCode={searchResult.code}
+                                                            parentFilter={searchResult.data}
+                                                            forceOpen={searchResult.results.length === 1}
+                                                        />
+                                                    ))}
+                                                {searchResult && (!searchResult.results || searchResult.results.length === 0) && (
+                                                    <NavigatorEmptyStateView code={searchResult.code} />
+                                                )}
+                                            </div>
+                                            <div className="octane-navigator-air__actions">
+                                                <BaseButton
+                                                    type="button"
+                                                    className="octane-navigator-air__action octane-navigator-air__action--create"
+                                                    onClick={onCreateRoom}
+                                                >
+                                                    <div className="octane-navigator-air__action-content">
+                                                        <img src={createRoomImg} alt="" />
+                                                        <span>{localizeWithFallback('navigator.create.room', LocalizeText('navigator.createroom.create'))}</span>
+                                                    </div>
+                                                    <i className="octane-navigator-air__action-border" aria-hidden="true" />
+                                                </BaseButton>
+                                                {!showPromote && (
+                                                    <BaseButton
+                                                        type="button"
+                                                        className="octane-navigator-air__action octane-navigator-air__action--random"
+                                                        onClick={onRandomRoom}
+                                                    >
+                                                        <div className="octane-navigator-air__action-content">
+                                                            <img src={randomRoomImg} alt="" />
+                                                            <span>{LocalizeText('navigator.random.room')}</span>
+                                                        </div>
+                                                        <i className="octane-navigator-air__action-border" aria-hidden="true" />
+                                                    </BaseButton>
+                                                )}
+                                                {showPromote && (
+                                                    <BaseButton
+                                                        type="button"
+                                                        className="octane-navigator-air__action octane-navigator-air__action--promote"
+                                                        onClick={onPromoteRoom}
+                                                    >
+                                                        <div className="octane-navigator-air__action-content">
+                                                            <img src={promoteRoomImg} alt="" />
+                                                            <span>{LocalizeText('navigator.promote.room')}</span>
+                                                        </div>
+                                                        <i className="octane-navigator-air__action-border" aria-hidden="true" />
+                                                    </BaseButton>
+                                                )}
+                                            </div>
+                                        </main>
                                     </div>
                                 )}
-                                <div className="flex flex-col w-full min-h-0 overflow-hidden gap-2">
-                                    <NavigatorSearchView searchResult={searchResult} />
-                                    <div ref={elementRef} className="flex flex-col flex-1 min-h-0 overflow-auto gap-2">
-                                        {isFetching && !searchResult && <NavigatorSearchSkeletonView />}
-                                        {searchResult &&
-                                            searchResult.results.map((result, index) => <NavigatorSearchResultView key={index} searchResult={result} />)}
-                                        {searchResult && (!searchResult.results || searchResult.results.length === 0) && (
-                                            <NavigatorEmptyStateView
-                                                code={searchResult.code}
-                                                onCreateRoom={() => useNavigatorUiStore.getState().openCreator()}
-                                            />
-                                        )}
-                                    </div>
-                                    <Flex className="nitro-card-divider pt-2 border-t gap-2">
-                                        <Flex
-                                            pointer
-                                            alignItems="center"
-                                            justifyContent="center"
-                                            className="flex-1 h-[60px] cursor-pointer bg-no-repeat pl-16"
-                                            style={{ backgroundImage: `url(${createRoomImg})`, backgroundSize: '100% 100%' }}
-                                            onClick={() => useNavigatorUiStore.getState().openCreator()}
-                                        >
-                                            <Text variant="white" bold className="text-xs drop-shadow">
-                                                {LocalizeText('navigator.createroom.create')}
-                                            </Text>
-                                        </Flex>
-                                        {searchResult?.code !== 'myworld_view' && searchResult?.code !== 'roomads_view' && (
-                                            <Flex
-                                                pointer
-                                                alignItems="center"
-                                                justifyContent="center"
-                                                className="flex-1 h-[60px] cursor-pointer bg-no-repeat pl-16"
-                                                style={{ backgroundImage: `url(${randomRoomImg})`, backgroundSize: '100% 100%' }}
-                                                onClick={() => SendMessageComposer(new FindNewFriendsMessageComposer())}
-                                            >
-                                                <Text variant="white" bold className="text-xs drop-shadow">
-                                                    {LocalizeText('navigator.random.room')}
-                                                </Text>
-                                            </Flex>
-                                        )}
-                                        {(searchResult?.code === 'myworld_view' || searchResult?.code === 'roomads_view') && (
-                                            <Flex
-                                                pointer
-                                                alignItems="center"
-                                                justifyContent="center"
-                                                className="flex-1 h-[60px] cursor-pointer bg-no-repeat pl-16"
-                                                style={{ backgroundImage: `url(${promoteRoomImg})`, backgroundSize: '100% 100%' }}
-                                                onClick={() => CreateLinkEvent('catalog/open/room_event')}
-                                            >
-                                                <Text variant="white" bold className="text-xs drop-shadow">
-                                                    {LocalizeText('navigator.promote.room')}
-                                                </Text>
-                                            </Flex>
-                                        )}
-                                    </Flex>
-                                </div>
+                                {isCreatorOpen && (
+                                    <WidgetErrorBoundary name="NavigatorRoomCreator">
+                                        <NavigatorRoomCreatorView />
+                                    </WidgetErrorBoundary>
+                                )}
                             </div>
-                        )}
-                        {isCreatorOpen && (
-                            <WidgetErrorBoundary name="NavigatorRoomCreator">
-                                <NavigatorRoomCreatorView />
-                            </WidgetErrorBoundary>
-                        )}
-                    </NitroCard.Content>
-                </NitroCard>
-            )}
-            <WidgetErrorBoundary name="NavigatorDoorState">
-                <NavigatorDoorStateView />
-            </WidgetErrorBoundary>
-            {isRoomInfoOpen && (
-                <WidgetErrorBoundary name="NavigatorRoomInfo">
-                    <NavigatorRoomInfoView onCloseClick={() => useNavigatorUiStore.getState().setRoomInfoOpen(false)} />
+                            <BaseButton
+                                type="button"
+                                className="octane-navigator-air__resize"
+                                aria-label={localizeWithFallback('navigator.resize', 'Resize Navigator')}
+                                onPointerDown={onResizeStart}
+                                onPointerMove={onResizeMove}
+                                onPointerUp={onResizeEnd}
+                                onPointerCancel={onResizeEnd}
+                                onLostPointerCapture={onResizeEnd}
+                                onKeyDown={(event) => {
+                                    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+
+                                    event.preventDefault();
+                                    const height = Math.max(500, (windowHeight || 628) + (event.key === 'ArrowUp' ? -10 : 10));
+                                    useNavigatorUiStore.setState({ windowHeight: height });
+                                }}
+                                onKeyUp={(event) => {
+                                    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') persistNavigatorBounds(frameRef.current);
+                                }}
+                            />
+                        </div>
+                    </DraggableWindow>
+                )}
+                <NavigatorRoomInfoPopupView />
+                <WidgetErrorBoundary name="NavigatorDoorState">
+                    <NavigatorDoorStateView />
                 </WidgetErrorBoundary>
-            )}
-            {isRoomLinkOpen && (
-                <WidgetErrorBoundary name="NavigatorRoomLink">
-                    <NavigatorRoomLinkView onCloseClick={() => useNavigatorUiStore.getState().setRoomLinkOpen(false)} />
+                {isRoomInfoOpen && (
+                    <WidgetErrorBoundary name="NavigatorRoomInfo">
+                        <NavigatorRoomInfoView onCloseClick={() => useNavigatorUiStore.getState().setRoomInfoOpen(false)} />
+                    </WidgetErrorBoundary>
+                )}
+                {isRoomLinkOpen && (
+                    <WidgetErrorBoundary name="NavigatorRoomLink">
+                        <NavigatorRoomLinkView onCloseClick={() => useNavigatorUiStore.getState().setRoomLinkOpen(false)} />
+                    </WidgetErrorBoundary>
+                )}
+                <WidgetErrorBoundary name="NavigatorRoomSettings">
+                    <NavigatorRoomSettingsView />
                 </WidgetErrorBoundary>
-            )}
-            <WidgetErrorBoundary name="NavigatorRoomSettings">
-                <NavigatorRoomSettingsView />
-            </WidgetErrorBoundary>
-        </>
+                <WidgetErrorBoundary name="NavigatorRaidProtection">
+                    <NavigatorRaidProtectionView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="NavigatorEnforceCategory">
+                    <NavigatorEnforceCategoryView />
+                </WidgetErrorBoundary>
+            </>
+        </NativeTextTree>
     );
 };

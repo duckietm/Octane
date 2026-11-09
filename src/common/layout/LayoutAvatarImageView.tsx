@@ -1,10 +1,13 @@
-import { AvatarScaleType, AvatarSetType, GetAvatarRenderManager } from '@nitrots/nitro-renderer';
+import { AvatarScaleType, AvatarSetType, GetAvatarRenderManager, IAvatarImageListener } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Base, BaseProps } from '../Base';
-import { cropTransparentImageUrl } from './avatarImageCrop';
+import { cropAirMeMenuFaceImageUrl, cropOpaqueBoundsImageUrl, cropTransparentImageUrl, dataUrlToBlob } from './avatarImageCrop';
+import { PIXEL_ART_RENDERING } from './PixelArtRendering';
 
 const AVATAR_CACHE_MAX_SIZE = 200;
-const AVATAR_IMAGE_CACHE: Map<string, string> = new Map();
+// Holds the encoded PNG bytes; every mounted view makes (and revokes) its own
+// object url, so evicting an entry never breaks an image still on screen.
+const AVATAR_IMAGE_CACHE: Map<string, Blob> = new Map();
 
 export interface LayoutAvatarImageViewProps extends BaseProps<HTMLDivElement> {
     figure: string;
@@ -13,23 +16,48 @@ export interface LayoutAvatarImageViewProps extends BaseProps<HTMLDivElement> {
     direction?: number;
     scale?: number;
     fit?: boolean;
+    /** With `fit`: Habbo's small avatar shown at its own pixel size, for tiny slots like the wardrobe. */
+    small?: boolean;
     compactHead?: boolean;
     compactHeadSize?: number;
     compactHeadPadding?: number;
+    airMeMenu?: boolean;
+    nativeCroppedHead?: boolean;
 }
 
 export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => {
-    const { figure = '', gender = '', headOnly = false, direction = 0, scale = 1, fit = false, compactHead = false, compactHeadSize = 22, compactHeadPadding = 1, classNames = [], style = {}, ...rest } = props;
+    const {
+        figure = '',
+        gender = '',
+        headOnly = false,
+        direction = 0,
+        scale = 1,
+        fit = false,
+        small = false,
+        compactHead = false,
+        compactHeadSize = 22,
+        compactHeadPadding = 1,
+        airMeMenu = false,
+        nativeCroppedHead = false,
+        classNames = [],
+        style = {},
+        ...rest
+    } = props;
     const [avatarUrl, setAvatarUrl] = useState<string>(null);
     const [isReady, setIsReady] = useState<boolean>(false);
     const isDisposed = useRef(false);
     const requestIdRef = useRef(0);
+    const objectUrlRef = useRef<string>(null);
 
     const getClassNames = useMemo(() => {
         let newClassNames: string[];
 
-        if (fit) {
-            newClassNames = ['avatar-image absolute inset-0 pointer-events-none'];
+        if (airMeMenu) {
+            newClassNames = ['tb-memenu-face pointer-events-none'];
+        } else if (nativeCroppedHead) {
+            newClassNames = ['avatar-image relative pointer-events-none'];
+        } else if (fit) {
+            newClassNames = ['avatar-image avatar-image-fit absolute inset-0 pointer-events-none'];
         } else if (headOnly) {
             newClassNames = ['avatar-image absolute inset-0 bg-no-repeat pointer-events-none'];
         } else {
@@ -40,77 +68,118 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
         if (compactHead) newClassNames.push('compact-head');
 
         return newClassNames;
-    }, [classNames, headOnly, fit, compactHead]);
+    }, [classNames, headOnly, fit, compactHead, airMeMenu, nativeCroppedHead]);
 
     const getStyle = useMemo(() => {
         let newStyle: CSSProperties = {};
 
-        if (!fit && avatarUrl && avatarUrl.length) newStyle.backgroundImage = `url('${avatarUrl}')`;
+        if (!fit && !nativeCroppedHead && !airMeMenu && avatarUrl && avatarUrl.length) newStyle.backgroundImage = `url('${avatarUrl}')`;
 
-        if (headOnly && !fit) {
-            newStyle.backgroundSize = compactHead ? `${ compactHeadSize }px ${ compactHeadSize }px` : '130px auto';
+        if (headOnly && !fit && !nativeCroppedHead && !airMeMenu) {
+            newStyle.backgroundSize = compactHead ? `${compactHeadSize}px ${compactHeadSize}px` : '130px auto';
             newStyle.backgroundPosition = compactHead ? 'center' : '51% 40%';
-            newStyle.imageRendering = compactHead ? 'auto' : 'pixelated';
+            newStyle.imageRendering = compactHead ? 'auto' : PIXEL_ART_RENDERING;
         }
 
         if (scale !== 1) {
             newStyle.transform = `scale(${scale})`;
 
-            if (!(scale % 1)) newStyle.imageRendering = 'pixelated';
+            if (!(scale % 1)) newStyle.imageRendering = PIXEL_ART_RENDERING;
         }
 
         if (Object.keys(style).length) newStyle = { ...newStyle, ...style };
 
         return newStyle;
-    }, [avatarUrl, scale, style, headOnly, fit, compactHead, compactHeadSize]);
+    }, [avatarUrl, scale, style, headOnly, fit, compactHead, compactHeadSize, airMeMenu, nativeCroppedHead]);
 
     useEffect(() => {
         if (!isReady) return;
 
         const requestId = ++requestIdRef.current;
-        const figureKey = [figure, gender, direction, headOnly, compactHead, compactHeadSize, compactHeadPadding].join('-');
+        const figureKey = [figure, gender, direction, headOnly, compactHead, compactHeadSize, compactHeadPadding, fit, small, airMeMenu, nativeCroppedHead].join('-');
+
+        const applyImage = (image: Blob | string) => {
+            if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+
+            objectUrlRef.current = typeof image === 'string' ? null : URL.createObjectURL(image);
+
+            setAvatarUrl(objectUrlRef.current ?? (image as string));
+        };
 
         if (AVATAR_IMAGE_CACHE.has(figureKey)) {
-            setAvatarUrl(AVATAR_IMAGE_CACHE.get(figureKey));
-        } else {
-            const resetFigure = async (_figure: string) => {
-                if (isDisposed.current || requestIdRef.current !== requestId) return;
+            applyImage(AVATAR_IMAGE_CACHE.get(figureKey));
 
-                const avatarImage = GetAvatarRenderManager().createAvatarImage(_figure, AvatarScaleType.LARGE, gender, {
-                    resetFigure: (figure: string) => resetFigure(figure),
-                    dispose: null,
-                    disposed: false
-                });
+            return;
+        }
 
+        // One listener per request: the download manager keeps it until the
+        // figure's assets arrive, and skips it once disposed, so a view that
+        // changed figure or unmounted never renders a late download again.
+        const listener: IAvatarImageListener = {
+            resetFigure: null,
+            disposed: false,
+            dispose: () => {
+                listener.disposed = true;
+            }
+        };
+
+        const resetFigure = async (_figure: string) => {
+            if (listener.disposed || isDisposed.current || requestIdRef.current !== requestId) return;
+
+            const avatarImage = GetAvatarRenderManager().createAvatarImage(_figure, (small && fit) ? AvatarScaleType.SMALL : AvatarScaleType.LARGE, gender, listener);
+
+            if (!avatarImage) return;
+
+            try {
                 let setType = AvatarSetType.FULL;
 
-                if (headOnly) setType = AvatarSetType.HEAD;
+                if (headOnly && !airMeMenu) setType = AvatarSetType.HEAD;
 
                 avatarImage.setDirection(setType, direction);
 
-                let imageUrl = avatarImage.processAsImageUrl(setType);
+                let imageUrl = nativeCroppedHead ? avatarImage.processAsCroppedImageUrl(setType) : avatarImage.processAsImageUrl(setType);
 
-                if(imageUrl && headOnly && compactHead) imageUrl = await cropTransparentImageUrl(imageUrl, compactHeadSize, compactHeadPadding);
+                if (imageUrl && airMeMenu) imageUrl = await cropAirMeMenuFaceImageUrl(imageUrl);
 
-                if (imageUrl && !isDisposed.current && requestIdRef.current === requestId) {
-                    if (!avatarImage.isPlaceholder()) {
+                if (imageUrl && headOnly && compactHead && !airMeMenu && !nativeCroppedHead)
+                    imageUrl = await cropTransparentImageUrl(imageUrl, compactHeadSize, compactHeadPadding);
+
+                // The full-body canvas is 90x130 with the figure occupying
+                // only part of it, off-center for some figures. Fit consumers
+                // (grid tiles) object-contain the image, so crop the
+                // transparent border first — otherwise the figure renders
+                // tiny and drifts sideways inside the tile.
+                if (imageUrl && fit && !nativeCroppedHead) imageUrl = await cropOpaqueBoundsImageUrl(imageUrl);
+
+                if (imageUrl && !listener.disposed && !isDisposed.current && requestIdRef.current === requestId) {
+                    const blob = dataUrlToBlob(imageUrl);
+
+                    if (blob && !avatarImage.isPlaceholder()) {
                         if (AVATAR_IMAGE_CACHE.size >= AVATAR_CACHE_MAX_SIZE) {
                             const firstKey = AVATAR_IMAGE_CACHE.keys().next().value;
                             AVATAR_IMAGE_CACHE.delete(firstKey);
                         }
 
-                        AVATAR_IMAGE_CACHE.set(figureKey, imageUrl);
+                        AVATAR_IMAGE_CACHE.set(figureKey, blob);
                     }
 
-                    setAvatarUrl(imageUrl);
+                    applyImage(blob ?? imageUrl);
                 }
-
+            } finally {
                 avatarImage.dispose();
-            };
+            }
+        };
 
-            resetFigure(figure);
-        }
-    }, [figure, gender, direction, headOnly, compactHead, compactHeadSize, compactHeadPadding, isReady]);
+        listener.resetFigure = (figure: string) => void resetFigure(figure);
+
+        void resetFigure(figure);
+
+        return () => {
+            listener.dispose();
+
+            if (requestIdRef.current === requestId) requestIdRef.current++;
+        };
+    }, [figure, gender, direction, headOnly, compactHead, compactHeadSize, compactHeadPadding, fit, small, airMeMenu, nativeCroppedHead, isReady]);
 
     useEffect(() => {
         isDisposed.current = false;
@@ -119,18 +188,33 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
 
         return () => {
             isDisposed.current = true;
+
+            if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+
+            objectUrlRef.current = null;
         };
     }, []);
 
     return (
         <Base classNames={getClassNames} style={getStyle} {...rest}>
-            {fit && avatarUrl && avatarUrl.length > 0 && (
+            {airMeMenu && avatarUrl && avatarUrl.length > 0 && (
+                <img src={avatarUrl} alt="" draggable={false} className="tb-memenu-face-img" />
+            )}
+            {nativeCroppedHead && avatarUrl && avatarUrl.length > 0 && (
                 <img
                     src={avatarUrl}
                     alt=""
                     draggable={false}
-                    className="absolute inset-0 w-full h-full object-contain"
-                    style={{ imageRendering: 'pixelated', transform: 'translateY(-20%)' }}
+                    style={{ display: 'block', width: 'auto', maxWidth: 'none', height: 'auto', imageRendering: PIXEL_ART_RENDERING }}
+                />
+            )}
+            {fit && !nativeCroppedHead && !airMeMenu && avatarUrl && avatarUrl.length > 0 && (
+                <img
+                    src={avatarUrl}
+                    alt=""
+                    draggable={false}
+                    className={`absolute inset-0 w-full h-full ${small ? 'object-none object-bottom' : 'object-contain'}`}
+                    style={{ imageRendering: PIXEL_ART_RENDERING }}
                 />
             )}
         </Base>

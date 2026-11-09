@@ -1,0 +1,172 @@
+/*
+ * AIR buy_marketplace_tokens (frame 283x175, margins 6/30/6/6, container 271x139) and
+ * marketplace_no_credits (frame 252x153, margins 6/30/6/7, container 240x116), both in
+ * habbo-inventory-com. Positions below are the layouts' own x/y inside the container.
+ */
+.octane-card-shell.octane-marketplace-token-dialog,
+.draggable-window:has(> .octane-marketplace-token-dialog) {
+    box-sizing: border-box;
+    width: 283px !important;
+    min-width: 283px !important;
+    max-width: 283px !important;
+    height: 175px !important;
+    min-height: 175px !important;
+    max-height: 175px !important;
+}
+
+.octane-card-shell.octane-marketplace-token-dialog.is-no-credits,
+.draggable-window:has(> .octane-marketplace-token-dialog.is-no-credits) {
+    width: 252px !important;
+    min-width: 252px !important;
+    max-width: 252px !important;
+    height: 153px !important;
+    min-height: 153px !important;
+    max-height: 153px !important;
+}
+
+.octane-card-shell.octane-marketplace-token-dialog {
+    resize: none !important;
+}
+
+.octane-marketplace-token-dialog,
+.octane-marketplace-token-dialog * {
+    box-sizing: border-box;
+}
+
+.octane-card-shell.octane-marketplace-token-dialog .octane-marketplace-token-dialog-content.container-fluid {
+    position: absolute !important;
+    /* margin_top 30 / margin_left 6 through the 1px frame box, as in the make-offer window. */
+    top: 37px !important;
+    left: 5px !important;
+    z-index: 1;
+    display: block !important;
+    width: 271px !important;
+    min-width: 271px !important;
+    max-width: 271px !important;
+    height: 139px !important;
+    min-height: 139px !important;
+    max-height: 139px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-card-shell.octane-marketplace-token-dialog.is-no-credits .octane-marketplace-token-dialog-content.container-fluid {
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    height: 116px !important;
+    min-height: 116px !important;
+    max-height: 116px !important;
+}
+
+/* text: x6 y6 255x69 (buy tokens), x7 y12 223x65 (no credits), word wrapped. */
+.octane-marketplace-token-dialog-info {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 255px;
+    height: 69px;
+    overflow: hidden;
+    color: #000000;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+.is-no-credits .octane-marketplace-token-dialog-info {
+    top: 12px;
+    left: 7px;
+    width: 223px;
+    height: 65px;
+}
+
+.octane-marketplace-token-dialog-button {
+    position: absolute !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 28px !important;
+    margin: 0 !important;
+    padding: 0 6px !important;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-width: 5px !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px !important;
+    line-height: 17px !important;
+    white-space: nowrap;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+
+.octane-marketplace-token-dialog-button:hover {
+    border-image-source: var(--habbo-skin-shiny-hover) !important;
+}
+
+.octane-marketplace-token-dialog-button:active {
+    border-image-source: var(--habbo-skin-shiny-pressed) !important;
+}
+
+.octane-marketplace-token-dialog-button:focus-visible {
+    outline: 1px solid #000000;
+    outline-offset: 1px;
+}
+
+/* buy_tokens_button: x9 y107 157x28, button style 6 tinted green (0x00aa00). */
+.octane-marketplace-token-dialog-button.is-buy {
+    top: 107px;
+    left: 9px;
+    width: 157px !important;
+    border-image-source: var(--habbo-skin-shiny-green) !important;
+    color: #ffffff !important;
+}
+
+.octane-marketplace-token-dialog-button.is-buy:hover {
+    border-image-source: var(--habbo-skin-shiny-green-hover) !important;
+}
+
+.octane-marketplace-token-dialog-button.is-buy:active {
+    border-image-source: var(--habbo-skin-shiny-green-pressed) !important;
+}
+
+/* cancel_buy_tokens_button: x205 y106 56x28. */
+.is-buy-tokens .octane-marketplace-token-dialog-button.is-cancel {
+    top: 106px;
+    left: 205px;
+    min-width: 56px;
+}
+
+/* get_credits_button: x10 y82 81x28 (max 105); cancel_no_credits_button: x180 y82 50x28 (max 105). */
+.octane-marketplace-token-dialog-button.is-get-credits {
+    top: 82px;
+    left: 10px;
+    min-width: 81px;
+    max-width: 105px;
+}
+
+.is-no-credits .octane-marketplace-token-dialog-button.is-cancel {
+    top: 82px;
+    left: 180px;
+    min-width: 50px;
+    max-width: 105px;
+}
+
+/* The card shell hands its condensed `Ubuntu` to the info span and the buttons with a higher specificity than the
+   rules above; AIR's frames are the regular Ubuntu, so an important rule in the base layer puts it back. */
+@layer base {
+    .octane-marketplace-token-dialog-content :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}

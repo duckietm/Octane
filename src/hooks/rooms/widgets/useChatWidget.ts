@@ -12,22 +12,29 @@ import {
     RoomSessionChatEvent,
     RoomUserData,
     SystemChatStyleEnum
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useUserChatPreferencesStore } from '@/state/userChatPreferences';
 import {
+    applyUserChatPreferences,
+    CHAT_MODE_FREE_FLOW,
     ChatBubbleMessage,
     ChatBubbleUtilities,
     ChatEntryType,
     ChatHistoryCurrentDate,
+    GetConfigurationRecord,
     GetConfigurationValue,
     GetRoomObjectScreenLocation,
     IRoomChatSettings,
+    loadEmojiShortcodes,
     LocalizeText,
     PlaySound,
+    resolveChatMode,
     RoomChatFormatter
 } from '../../../api';
+import { getStoredChatTextSize } from '../../../components/room/widgets/chat-input/chatTextSize';
 import { useChatHistory } from './../../chat-history';
-import { useMessageEvent, useNitroEvent } from '../../events';
+import { useMessageEvent, useOctaneEvent } from '../../events';
 import { useUserDataSnapshot } from '../../session/useSessionSnapshots';
 import { useTranslation } from '../../translation';
 import { useRoom } from '../useRoom';
@@ -49,7 +56,7 @@ const useChatWidgetState = () => {
     const isDisposed = useRef(false);
     // Reactive: re-renders if the session-data snapshot flips (e.g.
     // reconnect under a different user id). Safe to call here —
-    // useChatWidget is NOT wrapped in useBetween (see export below),
+    // useChatWidget is not singleton-backed (see export below),
     // so the real React dispatcher is in scope and
     // useSyncExternalStore installs correctly.
     const ownUserId = useUserDataSnapshot().userId || -1;
@@ -91,10 +98,16 @@ const useChatWidgetState = () => {
     const applyAsyncTranslation = useCallback(
         (bubbleId: number, chatEntryId: number, originalText: string, translatedText: string, detectedLanguage: string, targetLanguage: string) => {
             setChatMessages((prevValue) => {
-                const newValue = [...prevValue];
-                const bubble = newValue.find((chat) => chat.id === bubbleId);
+                const index = prevValue.findIndex((chat) => chat.id === bubbleId);
 
-                if (bubble) applyTranslationToBubble(bubble, originalText, translatedText, detectedLanguage, targetLanguage);
+                if (index === -1) return prevValue;
+
+                // A new object, so the memoized bubble view sees the translation.
+                const bubble = Object.assign(Object.create(Object.getPrototypeOf(prevValue[index])), prevValue[index]);
+                const newValue = [...prevValue];
+
+                applyTranslationToBubble(bubble, originalText, translatedText, detectedLanguage, targetLanguage);
+                newValue[index] = bubble;
 
                 return newValue;
             });
@@ -104,10 +117,19 @@ const useChatWidgetState = () => {
         [applyTranslationToBubble, buildTranslatedEntryPatch, updateChatEntry]
     );
 
-    const getScrollSpeed = useMemo(() => {
-        if (!chatSettings) return 6000;
+    const userBubbleWidth = useUserChatPreferencesStore((state) => state.bubbleWidth);
+    const userScrollSpeed = useUserChatPreferencesStore((state) => state.scrollSpeed);
+    const userChatMode = useUserChatPreferencesStore((state) => state.chatMode);
+    const chatMode = resolveChatMode(chatSettings?.mode ?? CHAT_MODE_FREE_FLOW, userChatMode);
+    const effectiveChatSettings = useMemo(
+        () => applyUserChatPreferences(chatSettings, userBubbleWidth, userScrollSpeed),
+        [chatSettings, userBubbleWidth, userScrollSpeed]
+    );
 
-        switch (chatSettings.speed) {
+    const getScrollSpeed = useMemo(() => {
+        if (!effectiveChatSettings) return 6000;
+
+        switch (effectiveChatSettings.speed) {
             case RoomChatSettings.CHAT_SCROLL_SPEED_FAST:
                 return 3000;
             case RoomChatSettings.CHAT_SCROLL_SPEED_NORMAL:
@@ -115,16 +137,23 @@ const useChatWidgetState = () => {
             case RoomChatSettings.CHAT_SCROLL_SPEED_SLOW:
                 return 12000;
         }
-    }, [chatSettings]);
+    }, [effectiveChatSettings]);
 
-    useNitroEvent<RoomSessionChatEvent>(RoomSessionChatEvent.CHAT_EVENT, async (event) => {
+    // Synchronous on purpose: the bubble and the history entry go in the order the messages arrived. The head image
+    // is downloaded afterwards and put on the bubble when it is ready; awaiting it first let a message from a user
+    // whose figure was cached overtake an earlier one.
+    useOctaneEvent<RoomSessionChatEvent>(RoomSessionChatEvent.CHAT_EVENT, (event) => {
         const roomObject = GetRoomEngine().getRoomObject(roomSession.roomId, event.objectId, RoomObjectCategory.UNIT);
         const bubbleLocation = roomObject ? GetRoomObjectScreenLocation(roomSession.roomId, roomObject?.id, RoomObjectCategory.UNIT) : { x: 0, y: 0 };
         const userData = roomObject ? roomSession.userDataManager.getUserDataByIndex(event.objectId) : new RoomUserData(-1);
 
+        // The unit is in the room but its user data is not (yet): there is no one to put the bubble on.
+        if (!userData) return;
+
         let username = '';
         let avatarColor = 0;
-        let imageUrl: string = null;
+        const imageUrl: string = null;
+        let imageRequest: Promise<string> = null;
         let chatType = event.chatType;
         let styleId = event.style;
         let userType = 0;
@@ -138,11 +167,11 @@ const useChatWidgetState = () => {
 
             switch (userType) {
                 case RoomObjectType.PET:
-                    imageUrl = await ChatBubbleUtilities.getPetImage(figure, 2, true, 64, roomObject.model.getValue<string>(RoomObjectVariable.FIGURE_POSTURE));
+                    imageRequest = ChatBubbleUtilities.getPetImage(figure, 2, true, 64, roomObject.model.getValue<string>(RoomObjectVariable.FIGURE_POSTURE));
                     petType = new PetFigureData(figure).typeId;
                     break;
                 case RoomObjectType.USER:
-                    imageUrl = await ChatBubbleUtilities.getUserImage(figure);
+                    imageRequest = ChatBubbleUtilities.getUserImage(figure);
                     break;
                 case RoomObjectType.RENTABLE_BOT:
                 case RoomObjectType.BOT:
@@ -158,7 +187,7 @@ const useChatWidgetState = () => {
             case RoomSessionChatEvent.CHAT_TYPE_RESPECT:
                 text = LocalizeText('widgets.chatbubble.respect', ['username'], [username]);
 
-                if (GetConfigurationValue('respect.options')['enabled']) PlaySound(GetConfigurationValue('respect.options')['sound']);
+                if (GetConfigurationRecord('respect.options')['enabled']) PlaySound(GetConfigurationRecord('respect.options')['sound']);
 
                 break;
             case RoomSessionChatEvent.CHAT_TYPE_PETREVIVE:
@@ -227,6 +256,11 @@ const useChatWidgetState = () => {
             imageUrl,
             color
         );
+        // The renderer adds bubbleWidthOverride to the chat event in Octane-Renderer#212; until that
+        // lands the published event has no such field, so it is read as optional.
+        chatMessage.textSize = getStoredChatTextSize();
+        chatMessage.bubbleWidthOverride = (event as RoomSessionChatEvent & { bubbleWidthOverride?: number }).bubbleWidthOverride ?? -1;
+        chatMessage.hideUsername = event.hideUsername === true;
 
         if (outgoingTranslation) {
             applyTranslationToBubble(
@@ -267,11 +301,14 @@ const useChatWidgetState = () => {
                       webId: userData.webID,
                       entityId: userData.roomIndex,
                       name: username,
+                      look: userData.figure,
                       imageUrl,
+                      textSize: chatMessage.textSize,
                       style: styleId,
                       chatType: chatType,
                       entityType: userData.type,
                       message: formattedText,
+                      text: originalText,
                       timestamp: ChatHistoryCurrentDate(),
                       type: ChatEntryType.TYPE_CHAT,
                       roomId: roomSession.roomId,
@@ -286,6 +323,32 @@ const useChatWidgetState = () => {
                           : {})
                   })
                 : -1;
+
+        if (imageRequest) {
+            const bubbleId = chatMessage.id;
+
+            void imageRequest
+                .then((url) => {
+                    if (!url || isDisposed.current) return;
+
+                    setChatMessages((prevValue) => {
+                        const index = prevValue.findIndex((chat) => chat.id === bubbleId);
+
+                        if (index === -1) return prevValue;
+
+                        // A new object, so the bubble view sees the change.
+                        const bubble = Object.assign(Object.create(Object.getPrototypeOf(prevValue[index])), prevValue[index], { imageUrl: url });
+                        const newValue = [...prevValue];
+
+                        newValue[index] = bubble;
+
+                        return newValue;
+                    });
+
+                    updateChatEntry(chatEntryId, { imageUrl: url });
+                })
+                .catch(() => undefined);
+        }
 
         if (!settings.enabled || outgoingTranslation || !isTranslatableChatType || !text.trim().length) return;
 
@@ -303,12 +366,18 @@ const useChatWidgetState = () => {
         });
     });
 
-    useNitroEvent<RoomDragEvent>(RoomDragEvent.ROOM_DRAG, (event) => {
+    useOctaneEvent<RoomDragEvent>(RoomDragEvent.ROOM_DRAG, (event) => {
         if (!chatMessages.length || event.roomId !== roomSession.roomId) return;
 
         const offsetX = event.offsetX;
 
-        chatMessages.forEach((chat) => chat.elementRef && (chat.left += offsetX));
+        chatMessages.forEach((chat) => {
+            if (!chat.elementRef) return;
+
+            chat.left += offsetX;
+
+            if (chat.location) chat.location = { ...chat.location, x: chat.location.x + offsetX };
+        });
     });
 
     useMessageEvent<GetGuestRoomResultEvent>(GetGuestRoomResultEvent, (event) => {
@@ -328,12 +397,14 @@ const useChatWidgetState = () => {
     useEffect(() => {
         isDisposed.current = false;
 
+        if (GetConfigurationValue<boolean>('chat.emoji.enabled', true)) loadEmojiShortcodes();
+
         return () => {
             isDisposed.current = true;
         };
     }, []);
 
-    return { chatMessages, setChatMessages, chatSettings, getScrollSpeed };
+    return { chatMessages, setChatMessages, chatSettings: effectiveChatSettings, getScrollSpeed, chatMode };
 };
 
 export const useChatWidget = useChatWidgetState;

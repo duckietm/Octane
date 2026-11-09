@@ -1,78 +1,55 @@
-.nitro-inventory-window {
-    --inv-blue: #418db0;
+.octane-inventory-window {
+    --inv-surface: #e9e9e1;
     --inv-beige: #dfdfdf;
-    --inv-tab: #b6bec5;
-    --inv-line: #b6bec5;
+    --inv-line: #6b6f73;
     --inv-accent: #418db0;
-    --inv-place: #5ca843;
-    --inv-place-dark: #397025;
-    --inv-place-light: #8ee374;
+    --inv-empty-title: #dd0000;
+    --inv-place: #ececec;
     --inv-sell: #d13e31;
-    --inv-sell-dark: #881e15;
-    --inv-sell-light: #f07e74;
-    --inv-border: #6b6f73;
+    --inv-border: #0f1b22;
 
-    background: var(--inv-beige) !important;
+    position: relative;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 560px !important;
+    min-width: 560px !important;
+    max-width: 560px !important;
+    height: 342px !important;
+    min-height: 300px !important;
+    max-height: min(90vh, 720px) !important;
+    /* Frame-3 titlebar is absolutely positioned; keep content below it. */
+    padding: 35px 6px 6px !important;
+    resize: none !important;
+    /* Surface + pixel corners come from frame-ubuntu-3 9-slice. Never paint
+       an opaque shell background or rectangular overflow clip here. */
+    background: transparent !important;
 }
 
-.nitro-inventory-window .nitro-inventory-tabs-shell {
-    gap: 4px;
-}
-
-.nitro-inventory-window .nitro-inventory-tab-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 5px;
-    font-size: 14px;
-    line-height: 1;
-}
-
-.nitro-inventory-window .nitro-inventory-body {
-    background: var(--inv-beige);
-}
-
-.nitro-inventory-window .nitro-inventory-filter-bar {
-    width: 100%;
-    background: #fff;
-    border: 2px solid var(--inv-border);
-    border-radius: 4px;
-}
-
-.nitro-inventory-window .nitro-inventory-filter-bar.is-badges {
+/* Dev chrome-ownership scopes kept alongside AIR inventory skins */
+.octane-inventory-window .octane-inventory-filter-bar.is-badges {
     width: min(320px, 100%);
 }
 
-.nitro-inventory-window .nitro-inventory-filter-bar select {
-    background: var(--inv-beige);
-    border: 2px solid var(--inv-border) !important;
-    border-radius: 4px;
-    font-weight: 700;
-}
-
-.nitro-inventory-window :where(.bg-card-grid-item, .bg-white, .bg-light, .bg-muted) {
+.octane-inventory-window :where(.bg-card-grid-item, .bg-white, .bg-light, .bg-muted) {
     background-color: var(--inv-beige) !important;
     color: #111 !important;
 }
 
-.nitro-inventory-window :where(.border-card-grid-item-border, .border-muted, .border-gray-400) {
+.octane-inventory-window :where(.border-card-grid-item-border, .border-muted, .border-gray-400) {
     border-color: var(--inv-line) !important;
 }
 
-.nitro-inventory-window .bg-card-grid-item-active {
+.octane-inventory-window .bg-card-grid-item-active {
     background-color: #fff !important;
 }
 
-.nitro-inventory-window .border-card-grid-item-active {
+.octane-inventory-window .border-card-grid-item-active {
     border-color: var(--inv-border) !important;
     box-shadow: 0 0 0 2px var(--inv-accent);
 }
 
-.nitro-inventory-window :where(.text-muted, .text-dark) {
-    color: #55544e !important;
-}
-
-.nitro-inventory-window :where(input, select, textarea) {
+.octane-inventory-window :where(input, select, .octane-select-trigger, textarea) {
     min-height: 22px;
     border: 1px solid var(--inv-border) !important;
     border-radius: 3px !important;
@@ -82,125 +59,758 @@
     font-size: 11px !important;
 }
 
-.nitro-inventory-window :where(input:focus, select:focus, textarea:focus) {
-    border-color: var(--inv-accent) !important;
-    box-shadow: 0 0 0 2px rgba(74, 125, 140, 0.28), inset 0 1px 0 rgba(0, 0, 0, 0.16) !important;
-    outline: none !important;
+
+.octane-inventory-window .octane-inventory-tabs-shell {
+    flex: 0 0 35px !important;
+    gap: 0 !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: var(--inv-surface) !important;
+    position: relative;
+    border-bottom: 0 !important;
 }
 
-.nitro-inventory-window .bg-red-700 {
-    background-color: #fff !important;
-    color: var(--inv-accent) !important;
+.octane-inventory-window .octane-inventory-tabs-shell .octane-card-tab-item {
+    min-width: 0 !important;
+    flex: 0 1 auto; /* seven tabs share the width: the labels give way only when even this is short */
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    /* 9px of the side padding is the tab's cap bitmap. */
+    padding: 7px 10px 10px !important;
+    /* tab_container_button label: u_button_tab, 12 px. */
+    font-size: 12px !important;
+    line-height: 17px !important;
+    overflow: hidden;
+    border-radius: 0 !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+}
+
+.octane-inventory-window .octane-inventory-tab-label {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    width: 100%;
+    line-height: 17px;
+}
+
+.octane-inventory-window .octane-inventory-body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 0;
+    min-height: 0;
+    height: auto !important;
+    padding: 0 5px 5px;
+    overflow: hidden;
+    background: transparent;
+}
+
+.octane-inventory-window .octane-inventory-body.is-trade {
+    padding: 8px;
+}
+
+.octane-inventory-window .octane-inventory-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.octane-inventory-window :where(.bg-card-grid-item, .bg-white, .bg-light, .bg-muted) {
+    background-color: #ececec !important;
+    color: #111 !important;
+}
+
+.octane-inventory-window :where(.border-card-grid-item-border, .border-muted, .border-gray-400) {
     border-color: #75746e !important;
 }
 
-.nitro-inventory-window .shadow-room-previewer {
-    background-color: #fff;
-    border: 2px solid var(--inv-line);
+.octane-inventory-window .bg-card-grid-item-active {
+    background-color: #c6e2f7 !important;
 }
 
-.nitro-inventory-window .nitro-inventory-btn-place,
-.nitro-inventory-window .nitro-inventory-btn-sell {
+.octane-inventory-window .border-card-grid-item-active {
+    border-color: #2e6f8a !important;
+    box-shadow: none !important;
+}
+
+.octane-inventory-window .rounded-md.border-2 {
+    border-radius: 3px !important;
+    border-width: 1px !important;
+}
+
+.octane-inventory-empty {
+    position: relative;
+    height: 100%;
+    min-height: 278px;
+    margin-left: -5px;
+    margin-top: -15px;
+    width: 478px;
+    background: transparent;
+}
+
+.octane-inventory-empty-image {
+    position: absolute;
+    left: 46px;
+    top: 42px;
+    width: 180px;
+    height: 180px;
+    background: url('@/assets/images/inventory/air/inventory-empty-state.png') center no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-inventory-empty-copy {
+    position: absolute;
+    left: 287px;
+    top: 64px;
+    width: 176px;
+}
+
+.octane-inventory-empty-title {
+    color: var(--inv-empty-title);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 17px;
+    margin-bottom: 8px;
+}
+
+.octane-inventory-empty-desc {
+    color: #111;
+    font-size: 11px;
+    line-height: 14px;
+}
+
+.octane-inventory-empty-shop {
+    position: absolute !important;
+    left: 241px;
+    top: 225px;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 149px !important;
+    height: 51px !important;
+    min-height: 51px !important;
+    /* Ubuntu metrics sit low in the em-box; bias caption up inside shiny chrome. */
+    padding: 0 8px 3px !important;
+    border: solid transparent !important;
+    border-width: 6px 6px 7px !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny-large) !important;
+    border-image-slice: 6 6 7 6 fill !important;
+    border-image-width: 6px 6px 7px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #111 !important;
+    font-weight: 700 !important;
+    line-height: 14px !important;
+    text-align: center !important;
+    box-shadow: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* The hover and pressed pictures of the large shiny button are sliced like the default one; without
+   these the generic button hover swaps in a 3 px picture and only its corners are drawn. */
+.octane-inventory-empty-shop:hover {
+    border-image-source: var(--habbo-skin-shiny-large-hover) !important;
+    border-image-slice: 6 6 7 6 fill !important;
+    border-image-width: 6px 6px 7px !important;
+}
+
+.octane-inventory-empty-shop:active {
+    border-image-source: var(--habbo-skin-shiny-large-pressed) !important;
+    border-image-slice: 6 6 7 6 fill !important;
+    border-image-width: 6px 6px 7px !important;
+}
+
+.octane-inventory-furni {
+    display: grid;
+    grid-template-columns: 284px 180px;
+    gap: 6px;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.octane-inventory-furni-grid {
+    width: 284px;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.octane-inventory-furni-grid > * {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.octane-inventory-furni-preview {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 180px;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.octane-inventory-furni-preview-stage {
+    position: absolute;
+    top: 0;
+    left: 5px;
+    width: 170px;
+    height: calc(100% - 107px);
+    min-height: 50px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.octane-inventory-furni-status {
+    position: absolute;
+    top: 0;
+    left: -5px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    z-index: 2;
+}
+
+.octane-inventory-furni-status-icon {
+    position: relative;
+    width: 52px;
+    height: 16px;
+    background-repeat: no-repeat;
+    background-position: left top;
+    background-size: auto;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-inventory-furni-status-icon.is-trade {
+    background-image: url('@/assets/images/inventory/air/furniture-trade-available.png');
+}
+
+.octane-inventory-furni-status-icon.is-no-trade {
+    background-image: url('@/assets/images/inventory/air/furniture-trade-unavailable.png');
+}
+
+.octane-inventory-furni-status-icon.is-recycle {
+    background-image: url('@/assets/images/inventory/air/furniture-recycle-available.png');
+}
+
+.octane-inventory-furni-status-icon.is-no-recycle {
+    background-image: url('@/assets/images/inventory/air/furniture-recycle-unavailable.png');
+}
+
+.octane-inventory-furni-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-top: auto;
+    padding-top: 6px;
+    min-height: 0;
+}
+
+.octane-inventory-furni-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #111;
+    word-break: break-word;
+}
+
+/* furni_description: u_regular, 12 px black. */
+.octane-inventory-furni-desc {
+    font-size: 12px;
+    color: #000;
+    word-break: break-word;
+}
+
+.octane-inventory-furni-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    margin-top: 12px;
+    width: 180px;
+}
+
+.octane-inventory-window .octane-inventory-btn-place {
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 180px !important;
+    max-width: 100% !important;
+    height: 22px !important;
+    min-height: 22px !important;
+    max-height: 22px !important;
+    /* 1px bottom bias — Ubuntu glyph box sits low inside 12px content. */
+    padding: 0 8px 1px !important;
+    border: 5px solid transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #111 !important;
+    font-family: HabboAirUbuntu, Ubuntu, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 11px !important;
+    text-align: center !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-inventory-window .octane-inventory-btn-place:hover {
+    border-image-source: var(--habbo-skin-shiny-hover) !important;
+    background: transparent !important;
+    filter: none !important;
+}
+
+.octane-inventory-window .octane-inventory-btn-place:active {
+    border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.octane-inventory-window .octane-inventory-btn-sell {
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 180px !important;
+    max-width: 100% !important;
+    height: 22px !important;
+    min-height: 22px !important;
+    padding: 0 8px 1px !important;
+    border: 5px solid transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #111 !important;
+    font-weight: 700 !important;
+    line-height: 11px !important;
+    text-align: center !important;
+    box-shadow: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-inventory-window .octane-inventory-btn-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 180px !important;
+    max-width: 100% !important;
+    min-height: 22px !important;
+    padding: 0 8px !important;
+    border: 5px solid transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #881e15 !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-inventory-furni-grid .grid {
+    grid-template-columns: repeat(6, 42px);
+    gap: 2px !important;
+}
+
+.octane-inventory-window .octane-inventory-thumb {
+    position: relative;
+    flex: 0 0 42px;
+    width: 42px !important;
+    height: 42px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-size: auto !important;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow: none !important;
+    isolation: isolate;
+    animation: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-inventory-thumb::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    background: url('../../assets/images/inventory/air/inventory-item-background.png') no-repeat;
+    pointer-events: none;
+}
+
+.octane-inventory-thumb.is-unseen::before {
+    background-image: url('../../assets/images/inventory/air/inventory-item-unseen-background.png');
+}
+
+.octane-inventory-thumb.is-selected::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('../../assets/images/inventory/air/inventory-item-selected-outline.png') no-repeat;
+    pointer-events: none;
+}
+
+.octane-inventory-thumb > .bg-red-700 {
+    background: white;
+    border: 1px solid #2f6982;
+    color: #2f6982;
+    border-radius: 0;
+}
+
+.octane-inventory-window {
+    font-family: HabboAirUbuntu, sans-serif;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.octane-inventory-window .octane-inventory-tabs-shell {
+    align-items: flex-start;
+}
+
+
+
+.octane-inventory-window .octane-inventory-tabs-shell .octane-card-tab-item-label {
+    width: auto;
+}
+
+.octane-inventory-furni-preview {
+    padding-bottom: 2px;
+}
+
+.octane-inventory-furni-details {
+    flex-shrink: 0;
+}
+
+.octane-inventory-window .octane-inventory-btn-place,
+.octane-inventory-window .octane-inventory-btn-sell,
+.octane-inventory-window .octane-inventory-btn-delete {
+    width: fit-content !important;
+    font-family: HabboAirUbuntu, sans-serif;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    padding: 0 5px !important;
+}
+
+.octane-inventory-furni-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.octane-inventory-furni-grid > :first-child {
+    flex: 1;
+    min-height: 0;
+}
+
+.octane-inventory-furni-grid > .octane-inventory-pages {
+    flex: 0 0 14px;
+    height: 14px !important;
+    display: flex;
+    gap: 2px;
+    font-size: 9px;
+}
+
+.octane-inventory-pages button {
+    padding: 0 2px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-inventory-pages button[aria-current='page'] { font-weight: bold; }
+
+.octane-inventory-window.has-badge-controls { height: 364px !important; min-height: 322px !important; }
+
+.octane-inventory-thumb-image {
+    position: absolute;
+    inset: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.octane-inventory-thumb-image img {
+    max-width: none;
+    flex: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-inventory-thumb.is-selected::after { z-index: 3; }
+
+.octane-inventory-window .octane-inventory-tabs-shell { justify-content: flex-start !important; padding-left: 8px !important; }
+.octane-inventory-furni-preview-stage { overflow: visible; }
+.octane-inventory-furni-preview-stage > div:first-child { border-radius: 0 !important; }
+
+.octane-inventory-preview-controls { display: none; }
+@media (max-width: 640px) {
+    .octane-inventory-preview-controls { display: flex; gap: 8px; }
+}
+
+@media (max-width: 489px) {
+    .octane-inventory-window {
+        width: calc(100vw - 16px) !important;
+        min-width: 0 !important;
+        max-width: calc(100vw - 16px) !important;
+        max-height: calc(100dvh - 64px) !important;
+    }
+
+    .octane-inventory-window .octane-inventory-tabs-shell {
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .octane-inventory-window .octane-inventory-body {
+        overflow: auto;
+    }
+
+    .octane-inventory-window .octane-inventory-content { min-width: 468px; overflow: visible; }
+    .octane-inventory-window .octane-inventory-filter-bar { flex-shrink: 0; }
+}
+
+.octane-inventory-furni-preview-stage .shadow-room-previewer {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+.octane-inventory-window .octane-inventory-btn-place,
+.octane-inventory-window .octane-inventory-btn-sell {
+    padding: 0 5px 1px !important;
+    line-height: 17px !important;
+}
+
+.octane-inventory-window .octane-inventory-btn-place:disabled {
+    border-image-source: url('@/assets/images/habbo-skin/slices/button-shiny-disabled.png') !important;
+    opacity: 1;
+}
+
+.octane-inventory-preview-delete {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    isolation: isolate;
+}
+
+.octane-inventory-preview-delete::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border: 5px solid transparent;
+    border-image: var(--habbo-skin-shiny-red) 5 fill / 5px stretch;
+    /* Requested darker upper half and lighter lower half. */
+    transform: scaleY(-1);
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-inventory-preview-delete:hover::before { border-image-source: var(--habbo-skin-shiny-red-hover); }
+.octane-inventory-preview-delete:active::before { border-image-source: var(--habbo-skin-shiny-red-pressed); }
+.octane-inventory-preview-delete:focus-visible { outline: 1px dotted #fff; outline-offset: -4px; }
+.octane-inventory-preview-delete svg { width: 8px; height: 9px; }
+
+.octane-inventory-tabs-shell::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 31px;
+    height: 1px;
+    background: #000;
+    pointer-events: none;
+}
+
+.octane-inventory-content.is-furniture { overflow: visible; }
+.octane-inventory-furni-grid { margin-top: 2px; height: calc(100% - 5px); }
+.octane-inventory-furni-preview { margin-top: 2px; height: calc(100% + 1px); }
+
+.octane-inventory-furni-status-count {
+    position: absolute;
+    top: 1px;
+    font-size: 12px;
+    line-height: 14px;
+    font-weight: normal;
+    color: #000;
+    text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff;
+}
+.octane-inventory-furni-status-count.is-trade-count { left: 33px; }
+.octane-inventory-furni-status-count.is-recycle-count { left: 18px; }
+
+/* Dev overlay / rent / chest / rarity styles retained for AIR inventory */
+
+.octane-inventory-preview-btn {
+    display: none;
+}
+
+
+/* AIR inventory_thumb + RarityItemGridOverlayWidget (rarity_item_overlay_griditem_xml, GroupItem.updateItemImageVisual):
+   a seed tile with a MapStuffData "rarity" shows rarity_item_rarity_item_plaque (36x9 at 0,27 of the 36x36 overlay, the
+   overlay at 2,2) with the level in the plaque glyphs (24x5 at 6,29, centred). */
+.octane-inventory-window .octane-inventory-thumb-rarity {
+    position: absolute;
+    top: 29px;
+    left: 2px;
+    z-index: 1;
+    width: 36px;
+    height: 9px;
+    background: url('../../assets/images/inventory/rarity/rarity_item_plaque.png') no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.octane-inventory-window .octane-inventory-thumb-rarity-count {
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    display: flex;
+    justify-content: center;
+    width: 24px;
+    height: 5px;
+    line-height: 0;
+}
+
+
+/* AIR inventory_thumb + ChestItemGridOverlayWidget (GroupItem.updateItemImageVisual): a chest tile gets
+   chest_overlay_<colour>_background (36x36 at 2,2) under the furni image, then the chest_overlay_<colour>_plaque
+   with the contents count (24x5 at 6,28, centred glyphs) and chest_overlay_shine at 0.6 on top. Gold for a
+   coins chest, brown for a furni chest. */
+.octane-inventory-window .octane-inventory-thumb-chest-background,
+.octane-inventory-window .octane-inventory-thumb-chest {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 36px;
+    height: 36px;
+    background-repeat: no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest-background.is-brown {
+    background-image: url('../../assets/images/inventory/chest/chest_overlay_brown_background.png');
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest-background.is-gold {
+    background-image: url('../../assets/images/inventory/chest/chest_overlay_gold_background.png');
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest {
+    z-index: 1;
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest.is-brown {
+    background-image: url('../../assets/images/inventory/chest/chest_overlay_brown_plaque.png');
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest.is-gold {
+    background-image: url('../../assets/images/inventory/chest/chest_overlay_gold_plaque.png');
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest-count {
+    position: absolute;
+    top: 28px;
+    left: 6px;
+    display: flex;
+    justify-content: center;
+    width: 24px;
+    height: 5px;
+    line-height: 0;
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('../../assets/images/inventory/chest/chest_overlay_shine.png') no-repeat;
+    opacity: 0.6;
+}
+
+
+.octane-inventory-window .octane-inventory-thumb-rent {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+    z-index: 1;
+    pointer-events: none;
+}
+
+
+.octane-inventory-window .octane-inventory-thumb-rent.is-not_started {
+    background: #9a9a9a;
+}
+
+
+.octane-inventory-window .octane-inventory-thumb-rent.is-started {
+    background: #5ca843;
+}
+
+
+.octane-inventory-window .octane-inventory-thumb-rent.is-ending {
+    background: #d13e31;
+}
+
+
+.octane-inventory-window .octane-inventory-preview-extra {
+    color: #55544e;
+}
+
+
+.octane-inventory-window .octane-inventory-btn-goto,
+.octane-inventory-window .octane-inventory-btn-rent {
     border: 2px solid var(--inv-border) !important;
     border-radius: 4px;
     color: #fff !important;
     font-weight: 700;
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    background: var(--inv-blue) !important;
+    box-shadow: inset -2px -2px 0 #2b6a88, inset 2px 2px 0 #7fbcd8;
 }
 
-.nitro-inventory-window .nitro-inventory-btn-place {
-    background: var(--inv-place) !important;
-    box-shadow: inset -2px -2px 0 var(--inv-place-dark), inset 2px 2px 0 var(--inv-place-light);
+
+.octane-inventory-window .octane-inventory-btn-goto:hover,
+.octane-inventory-window .octane-inventory-btn-rent:hover {
+    background: #4f9dc2 !important;
 }
 
-.nitro-inventory-window .nitro-inventory-btn-place:hover {
-    background: #67b94e !important;
-}
 
-.nitro-inventory-window .nitro-inventory-btn-sell {
-    background: var(--inv-sell) !important;
-    box-shadow: inset -2px -2px 0 var(--inv-sell-dark), inset 2px 2px 0 var(--inv-sell-light);
-}
-
-.nitro-inventory-window .nitro-inventory-btn-sell:hover {
-    background: #db4d40 !important;
-}
-
-.nitro-inventory-preview-btn {
-    display: none;
-}
-
-@media (max-width: 1024px) and (min-width: 641px) {
-    .nitro-inventory-window {
-        width: min(calc(100vw - 24px), 640px) !important;
-        min-width: 0 !important;
-        max-width: calc(100vw - 24px) !important;
-        height: min(calc(100vh - 24px), 560px) !important;
-        min-height: 0 !important;
-        max-height: calc(100vh - 24px) !important;
-    }
-}
-
-@media (max-width: 640px) {
-    .draggable-window:has(> .nitro-inventory-window) {
-        inset: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        top: 0 !important;
-        bottom: 0 !important;
-        width: auto !important;
-        height: auto !important;
-        transform: none !important;
-    }
-
-    .nitro-card-shell.nitro-inventory-window {
-        width: calc(100% - 40px) !important;
-        min-width: 0 !important;
-        max-width: calc(100% - 40px) !important;
-        height: calc(100% - 76px) !important;
-        min-height: 0 !important;
-        max-height: calc(100% - 76px) !important;
-        margin: 8px auto 0 auto !important;
-    }
-
-    .nitro-inventory-window .nitro-inventory-tabs-shell {
-        flex-wrap: nowrap;
-        overflow: hidden;
-    }
-
-    .nitro-inventory-window .nitro-inventory-tabs-shell .nitro-card-tab-item {
-        flex: 1 1 0;
-        min-width: 0;
-        padding: 8px 0;
-        justify-content: center;
-    }
-
-    .nitro-inventory-window .nitro-inventory-tab-label {
-        display: none;
-    }
-
-    .nitro-inventory-window .nitro-inventory-tab-icon {
-        margin-right: 0;
-        font-size: 17px;
-    }
-
-    .nitro-inventory-window .grid.grid-cols-12 {
-        grid-template-columns: minmax(0, 1fr) !important;
-        grid-template-rows: minmax(0, 1fr) auto !important;
-    }
-
-    .nitro-inventory-window .grid.grid-cols-12 > .col-span-7,
-    .nitro-inventory-window .grid.grid-cols-12 > .col-span-5 {
-        grid-column: 1 / -1 !important;
-    }
-
-    .nitro-inventory-window .nitro-inventory-btn-place,
-    .nitro-inventory-window .nitro-inventory-btn-sell {
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-    }
-
-    .nitro-inventory-window .nitro-inventory-preview-btn {
+    .octane-inventory-window .octane-inventory-preview-btn {
         position: absolute;
         top: 6px;
         z-index: 4;
@@ -217,15 +827,63 @@
         cursor: pointer;
     }
 
-    .nitro-inventory-window .nitro-inventory-preview-btn:active {
+
+    .octane-inventory-window .octane-inventory-preview-btn:active {
         background: rgba(0, 0, 0, 0.85);
     }
 
-    .nitro-inventory-window .nitro-inventory-preview-rotate {
+
+    .octane-inventory-window .octane-inventory-preview-rotate {
         left: 6px;
     }
 
-    .nitro-inventory-window .nitro-inventory-preview-state {
+
+    .octane-inventory-window .octane-inventory-preview-state {
         right: 6px;
+    }
+
+/*
+ * AIR inventory buttons (open_catalog_btn, placeinroom_btn, sell_btn, the pet / bot place_button, wearBadge_button)
+ * are all the grey `button` (style 3) with text_style button_shiny_regular: 12 px regular, black. The shared
+ * .habbo-btn-secondary paints #111 and the empty-shop button was bold.
+ */
+.octane-inventory-window :is(.octane-inventory-btn-place, .octane-inventory-btn-sell, .octane-inventory-animal-place, .octane-inventory-btn-wear, .octane-inventory-empty-shop):not(:disabled) {
+    color: #000000 !important;
+}
+
+.octane-inventory-window .octane-inventory-empty-shop {
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+/*
+ * Every other grey button of the inventory and the trade (OctaneButton's default, Button variant="secondary": the
+ * furni search, the delete and edit icons, the prefix and wired trade offer buttons) takes AIR's grey `button`
+ * (style 3, habbo_skin_button_shiny) instead of the flat 3 px button_default picture the shared
+ * .habbo-btn-secondary draws. That skin is an unlayered important rule, which only an important rule in a layer
+ * outranks. The empty-shop button keeps its large shiny picture.
+ */
+@layer base {
+    .octane-inventory-window .habbo-btn-secondary:not(.octane-inventory-empty-shop) {
+        border-width: 5px !important;
+        border-image-source: var(--habbo-skin-shiny) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+    }
+
+    .octane-inventory-window .habbo-btn-secondary:not(.octane-inventory-empty-shop, .octane-inventory-btn-delete, :disabled) {
+        color: #000000 !important;
+    }
+
+    .octane-inventory-window .habbo-btn-secondary:not(.octane-inventory-empty-shop):hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    .octane-inventory-window .habbo-btn-secondary:not(.octane-inventory-empty-shop):active {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+
+    .octane-inventory-window .habbo-btn-secondary:not(.octane-inventory-empty-shop):is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-disabled) !important;
     }
 }

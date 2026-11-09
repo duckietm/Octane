@@ -1,5 +1,7 @@
 import { FC } from 'react';
-import { FaBolt } from 'react-icons/fa';
+import quicklinkAdd from '../../assets/images/navigator/air/quicklink-add.png';
+import { BaseButton } from '../BaseButton';
+import { Hint } from '../Tooltip';
 
 export interface LayoutSearchSavesViewProps {
     title: string;
@@ -10,22 +12,10 @@ export const LayoutSearchSavesView: FC<LayoutSearchSavesViewProps> = (props) => 
     const { title = null, onClick = null } = props;
 
     return (
-        <div
-            title={title}
-            onClick={onClick}
-            style={{
-                backgroundColor: '#FAA700',
-                borderRadius: 4,
-                padding: '2px 4px',
-                fontSize: 10,
-                height: 17,
-                display: 'flex',
-                alignItems: 'center',
-                cursor: 'pointer',
-                color: 'white'
-            }}
-        >
-            <FaBolt />
-        </div>
+        <Hint content={title}>
+            <BaseButton aria-label={title} type="button" className="octane-navigator-search-save" onClick={onClick}>
+                <img src={quicklinkAdd} alt="" />
+            </BaseButton>
+        </Hint>
     );
 };

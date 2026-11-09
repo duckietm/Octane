@@ -1,40 +1,46 @@
 import { FC } from 'react';
 import { LocalizeText, MessengerRequest } from '../../../../../api';
-import { Button, LayoutAvatarImageView, NitroCardAccordionItemView, UserProfileIconView } from '../../../../../common';
-import { useFriends } from '../../../../../hooks';
-import { resolveAvatarFigure } from '../resolveAvatarFigure';
-import { resolveAvatarGender } from '../resolveAvatarGender';
+import { UserProfileIconView } from '../../../../../common';
+import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
+import { Hint } from '../../../../../common/Tooltip';
 
-export const FriendsListRequestItemView: FC<{ request: MessengerRequest }> = (props) => {
-    const { request = null } = props;
-    const { requestResponse = null } = useFriends();
+/** AIR FriendRequest states: open, accepted, declined. */
+export type FriendRequestRowState = 'open' | 'accepted' | 'declined';
+
+interface FriendsListRequestItemViewProps {
+    request: MessengerRequest;
+    state?: FriendRequestRowState;
+    odd?: boolean;
+    onAccept: (request: MessengerRequest) => void;
+    onDecline: (request: MessengerRequest) => void;
+}
+
+export const FriendsListRequestItemView: FC<FriendsListRequestItemViewProps> = (props) => {
+    const { request = null, state = 'open', odd = false, onAccept = null, onDecline = null } = props;
 
     if (!request) return null;
 
     return (
-        <NitroCardAccordionItemView className="friends-list-item px-2 py-1" justifyContent="between">
-            <div className="friends-list-user">
-                <div className="friends-list-avatar">
-                    <LayoutAvatarImageView
-                        figure={resolveAvatarFigure(request.figureString)}
-                        gender={resolveAvatarGender(undefined)}
-                        headOnly={true}
-                        direction={2}
-                    />
-                </div>
-                <div>
+        <NativeTextTree>
+            <div className={`hfl-request${odd ? ' hfl-row-odd' : ''}`}>
+                <div className="hfl-request-profile">
                     <UserProfileIconView userId={request.requesterUserId} />
                 </div>
-                <div className="friends-list-name">{request.name}</div>
+                <span className="hfl-request-name">{request.name}</span>
+                {state === 'open' ? (
+                    <div className="hfl-request-actions">
+                        <Hint content={LocalizeText('friendlist.request_accept')}>
+                            <BaseButton aria-label={LocalizeText('friendlist.request_accept')} type="button" className="accept" onClick={() => onAccept(request)} />
+                        </Hint>
+                        <Hint content={LocalizeText('friendlist.request_decline')}>
+                            <BaseButton aria-label={LocalizeText('friendlist.request_decline')} type="button" className="decline" onClick={() => onDecline(request)} />
+                        </Hint>
+                    </div>
+                ) : (
+                    <span className="hfl-request-info">{LocalizeText(state === 'accepted' ? 'friendlist.request.accepted' : 'friendlist.request.declined')}</span>
+                )}
             </div>
-            <div className="flex items-center gap-1">
-                <Button size="sm" onClick={(event) => requestResponse(request.id, true)}>
-                    {LocalizeText('friendlist.request_accept')}
-                </Button>
-                <Button size="sm" variant="danger" onClick={(event) => requestResponse(request.id, false)}>
-                    {LocalizeText('friendlist.request_decline')}
-                </Button>
-            </div>
-        </NitroCardAccordionItemView>
+        </NativeTextTree>
     );
 };

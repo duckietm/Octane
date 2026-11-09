@@ -1,6 +1,6 @@
-# Nitro V3 — Cold-load performance
+# Octane V3 — Cold-load performance
 
-Practical recipe to take a Nitro V3 cold load from the typical
+Practical recipe to take a Octane V3 cold load from the typical
 60-90 s (and intermittent "Session expired") baseline down to ~4 s.
 The wins compound: each section below has measurable impact, in
 roughly the order of cost vs benefit.
@@ -15,7 +15,7 @@ CMS contract.
 
 ---
 
-## 1. The three Nitro-side changes that matter
+## 1. The three Octane-side changes that matter
 
 1. **Granular code split** (`vite.config.mjs`) — a 1 MB vendor bundle
    is replaced by ~12 smaller chunks the browser fetches in parallel
@@ -40,9 +40,9 @@ baseline.
 Default `yarn build` ships:
 
 - `vendor` ~1 MB (react + tanstack-query + framer-motion + jodit +
-  emoji-mart + react-icons + howler + zustand + json5 — everything
+  emoji-mart + react-icons + howler + zustand + jsonc — everything
   merged)
-- `nitro-renderer` ~2.5 MB (renderer source + pixi.js inlined)
+- `octane-renderer` ~2.5 MB (renderer source + pixi.js inlined)
 - `src` ~1.7 MB (app code)
 
 The vendor blob forces the browser to wait on the slowest dependency
@@ -55,30 +55,30 @@ manualChunks: id => {
     const norm = id.replace(/\\/g, '/');
 
     // Vendors first — pixi.js / howler / emoji-mart / jodit are aliased
-    // to ../Nitro_Render_V3/node_modules, so they would otherwise be
-    // swallowed by the `Nitro_Render_V3` branch lower down and pulled
+    // to ../octane-renderer/node_modules, so they would otherwise be
+    // swallowed by the `octane-renderer` branch lower down and pulled
     // into the renderer chunk.
     if(norm.includes('pixi.js') || norm.includes('pixi-filters')) return 'vendor-pixi';
     if(norm.includes('howler'))      return 'vendor-audio';
     if(norm.includes('@emoji-mart')) return 'vendor-emoji';
     if(norm.includes('jodit') || norm.includes('@react-page')) return 'vendor-editor';
 
-    if(id.includes('Nitro_Render_V3') || id.includes(`${ rendererRoot }`)) {
-        if(id.includes('/packages/avatar/'))        return 'nitro-renderer-avatar';
-        if(id.includes('/packages/communication/')) return 'nitro-renderer-comm';
-        if(id.includes('/packages/room/'))          return 'nitro-renderer-room';
-        if(id.includes('/packages/assets/'))        return 'nitro-renderer-assets';
-        return 'nitro-renderer';
+    if(id.includes('octane-renderer') || id.includes(`${ rendererRoot }`)) {
+        if(id.includes('/packages/avatar/'))        return 'octane-renderer-avatar';
+        if(id.includes('/packages/communication/')) return 'octane-renderer-comm';
+        if(id.includes('/packages/room/'))          return 'octane-renderer-room';
+        if(id.includes('/packages/assets/'))        return 'octane-renderer-assets';
+        return 'octane-renderer';
     }
 
     if(id.includes('node_modules')) {
-        if(id.includes('@nitrots/nitro-renderer') || id.includes('renderer3')) return 'nitro-renderer';
+        if(id.includes('@octane/renderer') || id.includes('renderer3')) return 'octane-renderer';
         if(id.match(/\/react(-dom)?\/|\/scheduler\//) || id.includes('react-error-boundary')) return 'vendor-react';
         if(id.includes('framer-motion')) return 'vendor-motion';
         if(id.includes('@tanstack'))     return 'vendor-query';
-        if(id.includes('zustand') || id.includes('use-between')) return 'vendor-state';
+        if(id.includes('zustand')) return 'vendor-state';
         if(id.includes('react-icons'))   return 'vendor-icons';
-        if(id.includes('json5'))         return 'vendor-json5';
+        if(id.includes('jsonc'))         return 'vendor-jsonc';
         return 'vendor';
     }
 }
@@ -87,14 +87,14 @@ manualChunks: id => {
 Two practical points the comments don't make obvious:
 
 - **Vendor checks come first.** Pixi.js, howler, emoji-mart and jodit
-  are pulled in via an alias to `../Nitro_Render_V3/node_modules`,
-  so their `id` matches `Nitro_Render_V3`. If the renderer branch
+  are pulled in via an alias to `../octane-renderer/node_modules`,
+  so their `id` matches `octane-renderer`. If the renderer branch
   runs before the vendor one, those modules end up bundled into the
   renderer chunk instead of their own — defeating the whole point.
 
 - **Pixi often stays inlined.** Rollup keeps a module in the chunk
   of its sole importer, and `pixi.js` is consumed only through the
-  `@nitrots/nitro-renderer` umbrella. Expect `vendor-pixi` to be
+  `@octane/renderer` umbrella. Expect `vendor-pixi` to be
   near-empty until something *outside* the renderer also imports
   pixi. This is fine — pixi gets the renderer chunk's cache lifetime
   anyway.
@@ -102,7 +102,7 @@ Two practical points the comments don't make obvious:
 Verify after `yarn build`:
 
 ```
-dist/assets/nitro-renderer-*.js          ~2.5 MB raw, ~765 KB gzip
+dist/assets/octane-renderer-*.js          ~2.5 MB raw, ~765 KB gzip
 dist/assets/vendor-*.js                  ~12 chunks, 4-430 KB each
 dist/assets/src-*.js                     ~1.7 MB raw, ~550 KB gzip
 ```
@@ -152,7 +152,7 @@ const bumpProgress = useCallback((value: number, task?: string) => {
 | % | Stage | Default label |
 |---|---|---|
 | 5 | App start | `Avvio in corso...` |
-| 10 | NitroConfig validated | `Verifica sessione` |
+| 10 | OctaneConfig validated | `Verifica sessione` |
 | 20 | Renderer constructed | `Inizializzazione renderer` |
 | 25 | Config init done | `Caricamento contenuti...` |
 | 36, 47, 58, 70 | each warmup task resolves | per-task (`Sto caricando il guardaroba`, …) |
@@ -170,7 +170,7 @@ file for the full list).
 
 Logo and background are also configurable via the same mechanism —
 `loading.logo.url`, `loading.background`, `loading.progress.color`.
-Leaving them empty keeps the shipped dark-blue radial + Nitro V3
+Leaving them empty keeps the shipped dark-blue radial + Octane V3
 logo top-left.
 
 ### 3.1 The pre-React shell (asset-loader.js)
@@ -196,7 +196,7 @@ the same (now empty) ticket and falls through to "Session expired"
 after 2-7 attempts.
 
 The CMS issues a UUID family token when it serves `/client`, and
-passes it on the iframe URL as `&token=<uuid>&token_exp=<unix>`. Nitro
+passes it on the iframe URL as `&token=<uuid>&token_exp=<unix>`. Octane
 captures it on first boot:
 
 ```ts
@@ -243,7 +243,7 @@ the CMS isn't passing `token=` on the iframe URL. Check
 
 ## 5. Server-side: nginx gzip + long cache (the single biggest win)
 
-The Nitro client ships ~4.3 MB raw across the main bundle, renderer
+The Octane client ships ~4.3 MB raw across the main bundle, renderer
 chunk and vendor splits. If the server doesn't compress and doesn't
 let the browser cache, every visitor pays the full price on every
 load — that's exactly the 60-90 s baseline you avoid by configuring
@@ -269,6 +269,7 @@ gzip_types
     application/javascript
     application/x-javascript
     application/json
+    application/jsonc
     application/xml
     application/rss+xml
     application/atom+xml
@@ -287,37 +288,43 @@ nginx -t                # validate syntax first
 systemctl reload nginx
 ```
 
-The impact is *enormous* — `palettes.json5` drops from 330 KB to 18 KB
+The impact is *enormous* — `palettes.jsonc` drops from 330 KB to 18 KB
 on the wire (~17×), and the renderer JS bundle from 2.5 MB to 765 KB
 (~3.3×). Verify:
 
 ```bash
 curl -sI -H 'Accept-Encoding: gzip' \
-  'https://<your-domain>/nitro/assets/nitro-renderer-XXXXX.js' \
+  'https://<your-domain>/octane/assets/octane-renderer-XXXXX.js' \
   | grep -i 'content-encoding'
 # expected: content-encoding: gzip
 ```
 
-If you forget `application/json` from `gzip_types` you lose the
+If you forget `application/json` and `application/jsonc` from `gzip_types` you lose the
 gamedata compression — that's the one that matters the most because
 the gamedata files are by far the heaviest payload.
 
 ### 5.2 Long Cache-Control on gamedata
 
 Inside the `/nitro-assets/` or `/nitro-assets/` location
-block, the gamedata `.json5` files deserve a 30-day cache because
+block, the gamedata `.jsonc` files deserve a 30-day cache because
 they only change on deploy:
 
 ```nginx
 location /nitro-assets/ {
     alias /var/www/cmsjs/public/nitro-assets/;
-    try_files $uri ${uri}manifest.json5 ${uri}manifest.json =404;
+    try_files $uri ${uri}manifest.jsonc ${uri}manifest.json =404;
     autoindex off;
     default_type application/json;
     expires 7d;
     add_header Cache-Control "public, max-age=604800, immutable";
 
-    location ~ \.json5?$ {
+    location ~ \.jsonc$ {
+        types {} default_type application/jsonc;
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000";
+    }
+
+    location ~ \.json$ {
         types {} default_type application/json;
         expires 30d;
         add_header Cache-Control "public, max-age=2592000";
@@ -326,26 +333,26 @@ location /nitro-assets/ {
 ```
 
 The outer 7-day cache covers PNG / nitro / mp3 files. The inner
-location block raises the JSON5 lifetime to 30 days because the
+location block raises the JSONC lifetime to 30 days because the
 content is effectively immutable per deploy. Cloudflare honours
 `Last-Modified` so revalidation still works — you don't need to
 cache-bust by filename.
 
 For the JS / CSS chunks the filenames are content-hashed by Vite, so
 a long cache is safe — apply the same `Cache-Control: max-age=2592000`
-to the `/nitro/assets/` location.
+to the `/octane/assets/` location.
 
-### 5.3 The `try_files → manifest.json5` fallback
+### 5.3 The `try_files → manifest.jsonc` fallback
 
 `loadGamedata(url)` in the renderer SDK can be pointed at either a
-single JSON file or a directory containing `manifest.json5` + tier
+single JSON file or a directory containing `manifest.jsonc` + tier
 sub-directories. The directory pattern is what we use in production,
 so requests like `/nitro-assets/gamedata/figuremap/` (note the
 trailing slash) need to resolve to the directory's manifest.
 
-The `try_files $uri ${uri}manifest.json5 ${uri}manifest.json =404;`
+The `try_files $uri ${uri}manifest.jsonc ${uri}manifest.json =404;`
 above does exactly that — try the URI as-is, fall back to the
-`manifest.json5` inside the directory, fall back to `.json` for
+`manifest.jsonc` inside the directory, fall back to `.json` for
 legacy deploys, then 404. Without it nginx returns 403 (autoindex
 off) on directory URLs and the loader cascades into the manifest 404
 path.
@@ -355,7 +362,7 @@ path.
 ## 6. Server-side: Windows + IIS deployment
 
 You can reach the same 4 s cold load on Windows Server with IIS. The
-same three wins (gzip, long cache, JSON5 fallback) are replicable —
+same three wins (gzip, long cache, JSONC fallback) are replicable —
 syntax changes, performance ceiling doesn't.
 
 ### 6.1 Don't host Node inside IIS
@@ -393,7 +400,7 @@ compression". Equivalent of nginx's `gzip on;`.
 
 Without ticking both you ship raw bytes. Static covers JS / CSS /
 JSON files, Dynamic covers Node responses (HTML from the Inertia
-render). Add `application/json` to the compressor (and `.json5` to
+render). Add `application/json` to the compressor (and `.jsonc` to
 its MIME map) in `applicationHost.config` or the site's `web.config`:
 
 ```xml
@@ -426,7 +433,7 @@ its MIME map) in `applicationHost.config` or the site's `web.config`:
 Verify with PowerShell:
 
 ```powershell
-Invoke-WebRequest -Uri 'https://<your-domain>/nitro-assets/gamedata/figuredata/core/palettes.json5' `
+Invoke-WebRequest -Uri 'https://<your-domain>/nitro-assets/gamedata/figuredata/core/palettes.jsonc' `
                   -Headers @{ 'Accept-Encoding' = 'gzip' } `
                   -MaximumRedirection 0 | Select-Object -ExpandProperty Headers
 # expected: Content-Encoding = gzip
@@ -442,7 +449,7 @@ directory (or nest under `<location>`):
   <system.webServer>
     <staticContent>
       <clientCache cacheControlMode="UseMaxAge" cacheControlMaxAge="30.00:00:00" />
-      <mimeMap fileExtension=".json5" mimeType="application/json" />
+      <mimeMap fileExtension=".jsonc" mimeType="application/jsonc" />
       <mimeMap fileExtension=".nitro" mimeType="application/octet-stream" />
     </staticContent>
   </system.webServer>
@@ -455,9 +462,9 @@ directory (or nest under `<location>`):
 Set a separate, shorter cache (e.g. 5 minutes) on `index.html` so
 deploys propagate without forcing visitors to clear their cache.
 
-### 6.4 Directory → manifest.json5 fallback
+### 6.4 Directory → manifest.jsonc fallback
 
-nginx's `try_files $uri ${uri}manifest.json5 ${uri}manifest.json =404;`
+nginx's `try_files $uri ${uri}manifest.jsonc ${uri}manifest.json =404;`
 has no native IIS equivalent. Use **URL Rewrite** to chain two rules
 inside the same `<location>`:
 
@@ -465,12 +472,12 @@ inside the same `<location>`:
 <system.webServer>
   <rewrite>
     <rules>
-      <rule name="gamedata-dir-to-manifest-json5" stopProcessing="true">
+      <rule name="gamedata-dir-to-manifest-jsonc" stopProcessing="true">
         <match url="^(nitro-assets/gamedata/[^?]+)/$" />
         <conditions>
-          <add input="{REQUEST_FILENAME}/manifest.json5" matchType="IsFile" />
+          <add input="{REQUEST_FILENAME}/manifest.jsonc" matchType="IsFile" />
         </conditions>
-        <action type="Rewrite" url="{R:1}/manifest.json5" />
+        <action type="Rewrite" url="{R:1}/manifest.jsonc" />
       </rule>
       <rule name="gamedata-dir-to-manifest-json" stopProcessing="true">
         <match url="^(nitro-assets/gamedata/[^?]+)/$" />
@@ -553,18 +560,18 @@ correctly tuned.
 ```bash
 # 1. Build artefact has the granular chunks
 yarn build
-ls dist/assets/ | grep -E '^(vendor|nitro-renderer)-' | wc -l
+ls dist/assets/ | grep -E '^(vendor|octane-renderer)-' | wc -l
 # expected: ~12-14 chunks
 
-# 2. Server is compressing JSON5 (or JS — pick either)
+# 2. Server is compressing JSONC (or JS — pick either)
 curl -sI -H 'Accept-Encoding: gzip' \
-  'https://<your-domain>/nitro-assets/gamedata/figuredata/core/palettes.json5' \
+  'https://<your-domain>/nitro-assets/gamedata/figuredata/core/palettes.jsonc' \
   | grep -iE 'content-encoding|cache-control'
 # expected:
 # content-encoding: gzip
 # cache-control: public, max-age=2592000
 
-# 3. Directory → manifest.json5 fallback
+# 3. Directory → manifest.jsonc fallback
 curl -sI 'https://<your-domain>/nitro-assets/gamedata/figuremap/' \
   | head -1
 # expected: HTTP/2 200 (not 403 or 404)

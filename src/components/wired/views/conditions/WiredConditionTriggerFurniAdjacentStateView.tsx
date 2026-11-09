@@ -1,8 +1,9 @@
 import { FC, useEffect, useState } from 'react';
-import { WiredFurniType } from '../../../../api';
+import { WiredFurniType, localizeWithFallback } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 
 export const WiredConditionTriggerFurniAdjacentStateView: FC<{}> = () =>
@@ -24,14 +25,16 @@ export const WiredConditionTriggerFurniAdjacentStateView: FC<{}> = () =>
     };
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={ true }
-            requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID }
-            save={ save }>
-            <div className="flex flex-col gap-1">
-                <Text bold>Required state</Text>
-                <NitroInput maxLength={ 64 } type="text" value={ requiredState } onChange={ event => setRequiredState(event.target.value) } />
-            </div>
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={ true }
+                requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID }
+                save={ save }>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('octane.wired.required_state', 'Required state')}</Text>
+                    <OctaneInput maxLength={ 64 } type="text" value={ requiredState } onChange={ event => setRequiredState(event.target.value) } />
+                </div>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

@@ -1,10 +1,15 @@
-import { RoomObjectCategory } from '@nitrots/nitro-renderer';
+import { RoomObjectCategory } from '@octane/renderer';
 import { FC } from 'react';
-import { FaTimes } from 'react-icons/fa';
-import { LocalizeText, MessengerRequest } from '../../../../api';
-import { Button, Text } from '../../../../common';
+import { GetUserProfile, LocalizeText, MessengerRequest } from '../../../../api';
+import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { ObjectLocationView } from '../object-location/ObjectLocationView';
 
+/**
+ * AIR instant_friend_request, over the head of the sender: a yellow (#fac919) bubble pointing down at them, the profile
+ * icon and "friend request from" as a profile link, the red close button, "decline" as an underlined link and the shiny
+ * thick accept button with the green check.
+ */
 export const FriendRequestDialogView: FC<{
     roomIndex: number;
     request: MessengerRequest;
@@ -14,25 +19,28 @@ export const FriendRequestDialogView: FC<{
     const { roomIndex = -1, request = null, hideFriendRequest = null, requestResponse = null } = props;
 
     return (
-        <ObjectLocationView category={RoomObjectCategory.UNIT} objectId={roomIndex}>
-            <div className="nitro-friend-request-dialog nitro-context-menu p-2 bg-[#1C323F] border-2 border-white/50 rounded-[10px] max-w-[200px]">
-                <div className="flex flex-col">
-                    <div className="flex items-center gap-2 justify-between">
-                        <Text fontSize={6} variant="white">
-                            {LocalizeText('widget.friendrequest.from', ['username'], [request.name])}
-                        </Text>
-                        <FaTimes className="cursor-pointer fa-icon" onClick={(event) => hideFriendRequest(request.requesterUserId)} />
-                    </div>
-                    <div className="flex justify-end gap-1">
-                        <Button variant="danger" onClick={(event) => requestResponse(request.requesterUserId, false)}>
-                            {LocalizeText('widget.friendrequest.decline')}
-                        </Button>
-                        <Button variant="success" onClick={(event) => requestResponse(request.requesterUserId, true)}>
-                            {LocalizeText('widget.friendrequest.accept')}
-                        </Button>
-                    </div>
+        <NativeTextTree>
+            <ObjectLocationView category={RoomObjectCategory.UNIT} objectId={roomIndex}>
+                <div className="octane-friend-request">
+                    <BaseButton className="octane-friend-request__profile" type="button" onClick={() => GetUserProfile(request.requesterUserId)}>
+                        <span aria-hidden="true" className="octane-friend-request__icon" />
+                        <span className="octane-friend-request__text">{LocalizeText('widget.friendrequest.from', ['username'], [request.name])}</span>
+                    </BaseButton>
+                    <BaseButton
+                        aria-label={LocalizeText('generic.close')}
+                        className="octane-friend-request__close"
+                        type="button"
+                        onClick={() => hideFriendRequest(request.requesterUserId)}
+                    />
+                    <BaseButton className="octane-friend-request__decline" type="button" onClick={() => requestResponse(request.id, false)}>
+                        {LocalizeText('widget.friendrequest.decline')}
+                    </BaseButton>
+                    <BaseButton className="octane-friend-request__accept" type="button" onClick={() => requestResponse(request.id, true)}>
+                        <span aria-hidden="true" className="octane-friend-request__check" />
+                        {LocalizeText('widget.friendrequest.accept')}
+                    </BaseButton>
                 </div>
-            </div>
-        </ObjectLocationView>
+            </ObjectLocationView>
+        </NativeTextTree>
     );
 };

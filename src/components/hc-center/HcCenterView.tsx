@@ -8,9 +8,9 @@ import {
     ScrGetKickbackInfoMessageComposer,
     ScrKickbackData,
     ScrSendKickbackInfoMessageEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { ClubStatus, FriendlyTime, GetClubBadge, GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../api';
+import { ClubStatus, FriendlyTime, GetClubBadge, GetConfigurationRecord, LocalizeText, SanitizeHtml, SendMessageComposer } from '../../api';
 import benefitsBg from '../../assets/images/hc-center/benefits.png';
 import clockIcon from '../../assets/images/hc-center/clock.png';
 import hcLogo from '../../assets/images/hc-center/hc_logo.gif';
@@ -21,12 +21,15 @@ import {
     Flex,
     LayoutAvatarImageView,
     LayoutBadgeImageView,
-    NitroCardContentView,
-    NitroCardHeaderView,
-    NitroCardView,
+    OctaneCardContentView,
+    OctaneCardHeaderView,
+    OctaneCardView,
     Text
 } from '../../common';
 import { useInventoryBadges, useMessageEvent, usePurse, useSessionInfo } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
+import '../../css/hc-center/HcCenterView.css';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export const HcCenterView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -147,131 +150,134 @@ export const HcCenterView: FC<{}> = (props) => {
                     ]
                 )}
             </div>
-            <div
+            <BaseButton type="button"
                 className="btn btn-link text-primary p-0"
-                onClick={() => CreateLinkEvent('habbopages/' + GetConfigurationValue('hc.center')['payday.habbopage'])}
+                onClick={() => CreateLinkEvent('habbopages/' + GetConfigurationRecord('hc.center')['payday.habbopage'])}
             >
                 {LocalizeText('hccenter.special.infolink')}
-            </div>
+            </BaseButton>
         </>
     );
 
     return (
-        <NitroCardView className="min-w-0 w-[min(430px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] resize-none" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('generic.hccenter')} onCloseClick={() => setIsVisible(false)} />
-            <Flex className="bg-muted/50 p-3" position="relative">
-                <Column gap={2}>
-                    <div className="w-[213px] h-[37px] bg-contain bg-no-repeat" style={{ backgroundImage: `url(${hcLogo})` }} />
-                    <Button variant="success" onClick={(event) => CreateLinkEvent('catalog/open/' + GetConfigurationValue('catalog.links')['hc.buy_hc'])}>
-                        {LocalizeText(clubStatus === ClubStatus.ACTIVE ? 'hccenter.btn.extend' : 'hccenter.btn.buy')}
-                    </Button>
-                </Column>
-                <div className="absolute right-0 top-0 p-2 z-[4]">
-                    <LayoutAvatarImageView direction={4} figure={userFigure} scale={2} />
-                </div>
-            </Flex>
-            <NitroCardContentView>
-                <Flex gap={2} alignItems="center" className="p-2 rounded bg-card-grid-item/30">
-                    <LayoutBadgeImageView badgeCode={badgeCode} className="shrink-0" />
-                    <Column gap={0} className="min-h-[48px] leading-4">
-                        <Text bold>{LocalizeText('hccenter.status.' + clubStatus)}</Text>
-                        <Text small className="text-gray-700" dangerouslySetInnerHTML={{ __html: getInfoText() }} />
-                    </Column>
-                </Flex>
-                {GetConfigurationValue('hc.center')['payday.info'] && (
-                    <Flex className="rounded overflow-hidden border border-card-grid-item-border">
-                        <Column className="bg-primary p-3 flex-1 text-white" gap={1}>
-                            <Text bold className="text-white">
-                                {LocalizeText('hccenter.special.title')}
-                            </Text>
-                            <Text small className="text-white/80">
-                                {LocalizeText('hccenter.special.info')}
-                            </Text>
-                            <div className="mt-auto">
-                                <span
-                                    className="text-white/90 text-sm cursor-pointer hover:underline"
-                                    onClick={() => CreateLinkEvent('habbopages/' + GetConfigurationValue('hc.center')['payday.habbopage'])}
-                                >
-                                    {LocalizeText('hccenter.special.infolink')}
-                                </span>
-                            </div>
-                        </Column>
-                        <Column
-                            className="w-[200px] shrink-0 p-3 bg-contain bg-no-repeat bg-center text-[#6b3502]"
-                            gap={1}
-                            style={{ backgroundImage: `url(${paydayBg})` }}
-                        >
-                            <Text bold small>
-                                {LocalizeText('hccenter.special.time.title')}
-                            </Text>
-                            <Flex gap={1} alignItems="center">
-                                <div className="w-5 h-5 shrink-0 bg-contain bg-no-repeat bg-center" style={{ backgroundImage: `url(${clockIcon})` }} />
-                                <Text bold>{getHcPaydayTime()}</Text>
-                            </Flex>
-                            {clubStatus === ClubStatus.ACTIVE && (
-                                <Column gap={0} className="mt-1">
-                                    <Text bold small>
-                                        {LocalizeText('hccenter.special.amount.title')}
-                                    </Text>
-                                    <Text bold className="text-center">
-                                        {getHcPaydayAmount()}
-                                    </Text>
-                                    <span
-                                        className="text-primary text-sm cursor-pointer hover:underline self-end"
-                                        onClick={() => CreateLinkEvent('habbopages/' + GetConfigurationValue('hc.center')['payday.habbopage'])}
-                                    >
-                                        {LocalizeText('hccenter.breakdown.infolink')}
-                                    </span>
-                                </Column>
-                            )}
-                        </Column>
-                    </Flex>
-                )}
-                {GetConfigurationValue('hc.center')['gift.info'] && (
-                    <Flex className="rounded bg-success/90 p-3" alignItems="center" gap={2}>
-                        <Column gap={0} className="flex-1">
-                            <Text bold className="text-white">
-                                {LocalizeText('hccenter.gift.title')}
-                            </Text>
-                            <Text
-                                small
-                                className="text-white/80"
-                                dangerouslySetInnerHTML={{
-                                    __html:
-                                        unclaimedGifts > 0
-                                            ? LocalizeText('hccenter.unclaimedgifts', ['unclaimedgifts'], [unclaimedGifts.toString()])
-                                            : LocalizeText('hccenter.gift.info')
-                                }}
-                            />
-                        </Column>
-                        <Button
-                            variant="primary"
-                            className="shrink-0"
-                            onClick={() => CreateLinkEvent('catalog/open/' + GetConfigurationValue('catalog.links')['hc.hc_gifts'])}
-                        >
-                            {LocalizeText(clubStatus === ClubStatus.ACTIVE ? 'hccenter.btn.gifts.redeem' : 'hccenter.btn.gifts.view')}
+        <NativeTextTree>
+            <OctaneCardView className="octane-hc-center-window min-w-0 w-[min(430px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] resize-none" theme="primary-slim">
+                <OctaneCardHeaderView headerText={LocalizeText('generic.hccenter')} onCloseClick={() => setIsVisible(false)} />
+                <Flex className="bg-muted/50 p-3" position="relative">
+                    <Column gap={2}>
+                        <div className="w-[213px] h-[37px] bg-contain bg-no-repeat" style={{ backgroundImage: `url(${hcLogo})` }} />
+                        <Button variant="success" className="octane-hc-center__buy" onClick={(event) => CreateLinkEvent('catalog/open/' + GetConfigurationRecord('catalog.links')['hc.buy_hc'])}>
+                            {LocalizeText(clubStatus === ClubStatus.ACTIVE ? 'hccenter.btn.extend' : 'hccenter.btn.buy')}
                         </Button>
-                    </Flex>
-                )}
-                {GetConfigurationValue('hc.center')['benefits.info'] && (
-                    <Column
-                        className="rounded p-3 bg-no-repeat bg-right-top border border-card-grid-item-border"
-                        gap={1}
-                        style={{ backgroundImage: `url(${benefitsBg})` }}
-                    >
-                        <Text bold variant="primary">
-                            {LocalizeText('hccenter.general.title')}
-                        </Text>
-                        <Text small className="text-gray-700" dangerouslySetInnerHTML={{ __html: LocalizeText('hccenter.general.info') }} />
-                        <span
-                            className="text-primary text-sm cursor-pointer hover:underline mt-1"
-                            onClick={() => CreateLinkEvent('habbopages/' + GetConfigurationValue('hc.center')['benefits.habbopage'])}
-                        >
-                            {LocalizeText('hccenter.general.infolink')}
-                        </span>
                     </Column>
-                )}
-            </NitroCardContentView>
-        </NitroCardView>
+                    <div className="absolute right-0 top-0 p-2 z-[4]">
+                        <LayoutAvatarImageView direction={4} figure={userFigure} scale={2} />
+                    </div>
+                </Flex>
+                <OctaneCardContentView>
+                    <Flex gap={2} alignItems="center" className="p-2 rounded bg-card-grid-item/30">
+                        <LayoutBadgeImageView badgeCode={badgeCode} className="shrink-0" />
+                        <Column gap={0} className="min-h-[48px] leading-4">
+                            <Text bold className="octane-hc-center__status-title">{LocalizeText('hccenter.status.' + clubStatus)}</Text>
+                            <Text className="octane-hc-center__status-info" dangerouslySetInnerHTML={{ __html: SanitizeHtml(getInfoText()) }} />
+                        </Column>
+                    </Flex>
+                    {GetConfigurationRecord('hc.center')['payday.info'] && (
+                        <Flex className="rounded overflow-hidden border border-card-grid-item-border">
+                            <Column className="bg-primary p-3 flex-1 text-white" gap={1}>
+                                <Text bold variant="white" className="octane-hc-center__title">
+                                    {LocalizeText('hccenter.special.title')}
+                                </Text>
+                                <Text variant="white" className="octane-hc-center__info">
+                                    {LocalizeText('hccenter.special.info')}
+                                </Text>
+                                <div className="mt-auto">
+                                    <BaseButton type="button"
+                                        className="octane-hc-center__link octane-hc-center__link--white cursor-pointer"
+                                        onClick={() => CreateLinkEvent('habbopages/' + GetConfigurationRecord('hc.center')['payday.habbopage'])}
+                                    >
+                                        {LocalizeText('hccenter.special.infolink')}
+                                    </BaseButton>
+                                </div>
+                            </Column>
+                            <Column
+                                className="octane-hc-center__postit w-[200px] shrink-0 p-3 bg-contain bg-no-repeat bg-center"
+                                gap={1}
+                                style={{ backgroundImage: `url(${paydayBg})` }}
+                            >
+                                <Text bold variant={null} className="octane-hc-center__postit-title">
+                                    {LocalizeText('hccenter.special.time.title')}
+                                </Text>
+                                <Flex gap={1} alignItems="center">
+                                    <div className="w-5 h-5 shrink-0 bg-contain bg-no-repeat bg-center" style={{ backgroundImage: `url(${clockIcon})` }} />
+                                    <Text variant={null} className="octane-hc-center__postit-content">{getHcPaydayTime()}</Text>
+                                </Flex>
+                                {clubStatus === ClubStatus.ACTIVE && (
+                                    <Column gap={0} className="mt-1">
+                                        <Text bold variant={null} className="octane-hc-center__postit-title">
+                                            {LocalizeText('hccenter.special.amount.title')}
+                                        </Text>
+                                        <Text variant={null} className="octane-hc-center__postit-content text-center">
+                                            {getHcPaydayAmount()}
+                                        </Text>
+                                        <BaseButton type="button"
+                                            className="octane-hc-center__link octane-hc-center__link--blue cursor-pointer self-end"
+                                            onClick={() => CreateLinkEvent('habbopages/' + GetConfigurationRecord('hc.center')['payday.habbopage'])}
+                                        >
+                                            {LocalizeText('hccenter.breakdown.infolink')}
+                                        </BaseButton>
+                                    </Column>
+                                )}
+                            </Column>
+                        </Flex>
+                    )}
+                    {GetConfigurationRecord('hc.center')['gift.info'] && (
+                        <Flex className="rounded bg-success/90 p-3" alignItems="center" gap={2}>
+                            <Column gap={0} className="flex-1">
+                                <Text bold variant="white" className="octane-hc-center__title">
+                                    {LocalizeText('hccenter.gift.title')}
+                                </Text>
+                                <Text
+                                    variant="white"
+                                    className="octane-hc-center__info"
+                                    dangerouslySetInnerHTML={{
+                                        __html: SanitizeHtml(
+                                            unclaimedGifts > 0
+                                                ? LocalizeText('hccenter.unclaimedgifts', ['unclaimedgifts'], [unclaimedGifts.toString()])
+                                                : LocalizeText('hccenter.gift.info')
+                                        )
+                                    }}
+                                />
+                            </Column>
+                            <Button
+                                variant="primary"
+                                className="octane-hc-center__gifts shrink-0"
+                                onClick={() => CreateLinkEvent('catalog/open/' + GetConfigurationRecord('catalog.links')['hc.hc_gifts'])}
+                            >
+                                {LocalizeText(clubStatus === ClubStatus.ACTIVE ? 'hccenter.btn.gifts.redeem' : 'hccenter.btn.gifts.view')}
+                            </Button>
+                        </Flex>
+                    )}
+                    {GetConfigurationRecord('hc.center')['benefits.info'] && (
+                        <Column
+                            className="rounded p-3 bg-no-repeat bg-right-top border border-card-grid-item-border"
+                            gap={1}
+                            style={{ backgroundImage: `url(${benefitsBg})` }}
+                        >
+                            <Text bold variant={null} className="octane-hc-center__title octane-hc-center__title--blue">
+                                {LocalizeText('hccenter.general.title')}
+                            </Text>
+                            <Text className="octane-hc-center__info" dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('hccenter.general.info')) }} />
+                            <BaseButton type="button"
+                                className="octane-hc-center__link octane-hc-center__link--blue cursor-pointer mt-1"
+                                onClick={() => CreateLinkEvent('habbopages/' + GetConfigurationRecord('hc.center')['benefits.habbopage'])}
+                            >
+                                {LocalizeText('hccenter.general.infolink')}
+                            </BaseButton>
+                        </Column>
+                    )}
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

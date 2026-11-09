@@ -4,64 +4,67 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WIRED_DIRECTION_GRID, WiredDirectionIcon } from '../WiredDirectionIcon';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
+import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 // Server WiredEffectMoveFurniAsGroup: intParams = [direction (0-7, N/NE/E/SE/S/SW/W/NW), furniSource].
 // directionDeltaX/Y handle all 8 compass points, so expose the full grid (was only 0/2/4/6).
 export const WiredActionMoveFurniAsGroupView: FC<{}> = () => {
-    const { trigger = null, setIntParams = null } = useWired();
+    const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
     const [direction, setDirection] = useState(-1);
-    const [furniSource, setFurniSource] = useState<number>(() => {
-        if (trigger?.intData?.length > 1) return trigger.intData[1];
-        return (trigger?.selectedItems?.length ?? 0) > 0 ? 100 : 0;
-    });
+    const [furniSource, setFurniSource] = useState<number>(() => slotFurniSource(trigger));
 
     useEffect(() => {
         if (!trigger) return;
 
         setDirection(trigger.intData.length > 0 ? trigger.intData[0] : -1);
 
-        if (trigger.intData.length > 1) setFurniSource(trigger.intData[1]);
-        else setFurniSource((trigger.selectedItems?.length ?? 0) > 0 ? 100 : 0);
+        setFurniSource(slotFurniSource(trigger));
     }, [trigger]);
 
-    const save = () => setIntParams([direction, furniSource]);
+    // Ours: [direction]; the furni source is the official source slot.
+    const save = () => {
+        setIntParams([direction]);
+        setSourceTypes({ furni: [furniSource], users: [] });
+    };
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_OR_BY_TYPE}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.startdir')}</Text>
-                <div className="grid grid-cols-4 gap-2 max-w-[240px]">
-                    {WIRED_DIRECTION_GRID.flatMap((row, rowIndex) =>
-                        row.map((value, columnIndex) => {
-                            if (value === null) {
-                                return <div key={`group-dir-empty-${rowIndex}-${columnIndex}`} />;
-                            }
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_OR_BY_TYPE}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.startdir')}</Text>
+                    <div className="grid grid-cols-4 gap-2 max-w-[240px]">
+                        {WIRED_DIRECTION_GRID.flatMap((row, rowIndex) =>
+                            row.map((value, columnIndex) => {
+                                if (value === null) {
+                                    return <div key={`group-dir-empty-${rowIndex}-${columnIndex}`} />;
+                                }
 
-                            return (
-                                <label key={`group-dir-${value}`} className="flex items-center justify-center gap-[2px] cursor-pointer">
-                                    <input
-                                        checked={direction === value}
-                                        className="form-check-input"
-                                        id={`groupdir${value}`}
-                                        name="groupdir"
-                                        type="radio"
-                                        onChange={() => setDirection(value)}
-                                    />
-                                    <span className="inline-flex items-center justify-center">
-                                        <WiredDirectionIcon direction={value} selected={direction === value} />
-                                    </span>
-                                </label>
-                            );
-                        })
-                    )}
+                                return (
+                                    <label key={`group-dir-${value}`} className="flex items-center justify-center gap-[2px] cursor-pointer">
+                                        <Radio
+                                            checked={direction === value}
+                                            id={`groupdir${value}`}
+                                            name="groupdir"
+                                            onCheckedChange={() => setDirection(value)}
+                                        />
+                                        <span className="inline-flex items-center justify-center">
+                                            <WiredDirectionIcon direction={value} selected={direction === value} />
+                                        </span>
+                                    </label>
+                                );
+                            })
+                        )}
+                    </div>
                 </div>
-            </div>
-        </WiredActionBaseView>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

@@ -3,13 +3,18 @@ import {
     HK_MAX_BAN_HOURS,
     HK_MAX_GIVE_AMOUNT,
     HK_MAX_RANK,
+    HK_ROOM_DESCRIPTION_MAX,
+    HK_ROOM_NAME_MAX,
     HK_MIN_RANK,
     HousekeepingErrorKey,
+    matchesDangerConfirmation,
+    parseRoomTags,
     validateAmount,
     validateBanHours,
     validatePositiveId,
     validateRank,
     validateReason,
+    validateRoomSettings,
     validateUsername
 } from './HousekeepingValidation';
 
@@ -109,5 +114,45 @@ describe('validateRank', () => {
         expect(validateRank(HK_MIN_RANK)).toBe(HousekeepingErrorKey.NONE);
         expect(validateRank(HK_MAX_RANK)).toBe(HousekeepingErrorKey.NONE);
         expect(validateRank(5)).toBe(HousekeepingErrorKey.NONE);
+    });
+});
+
+describe('parseRoomTags', () => {
+    it('splits on commas, semicolons and spaces and drops blanks and duplicates', () => {
+        expect(parseRoomTags('games, chill')).toEqual(['games', 'chill']);
+        expect(parseRoomTags(' games;games  party ')).toEqual(['games', 'party']);
+        expect(parseRoomTags('')).toEqual([]);
+    });
+});
+
+describe('validateRoomSettings', () => {
+    const valid = { name: 'Lobby', description: '', maxUsers: 25, categoryId: 1, tradeMode: 2, tags: ['games'] };
+
+    it('accepts settings the emulator accepts', () => {
+        expect(validateRoomSettings(valid)).toBe(HousekeepingErrorKey.NONE);
+    });
+
+    it('rejects each field outside the emulator limits', () => {
+        expect(validateRoomSettings({ ...valid, name: ' ' })).toBe(HousekeepingErrorKey.INVALID_ROOM_NAME);
+        expect(validateRoomSettings({ ...valid, name: 'x'.repeat(HK_ROOM_NAME_MAX + 1) })).toBe(HousekeepingErrorKey.INVALID_ROOM_NAME);
+        expect(validateRoomSettings({ ...valid, description: 'x'.repeat(HK_ROOM_DESCRIPTION_MAX + 1) })).toBe(HousekeepingErrorKey.INVALID_ROOM_DESCRIPTION);
+        expect(validateRoomSettings({ ...valid, maxUsers: 0 })).toBe(HousekeepingErrorKey.INVALID_MAX_USERS);
+        expect(validateRoomSettings({ ...valid, maxUsers: 201 })).toBe(HousekeepingErrorKey.INVALID_MAX_USERS);
+        expect(validateRoomSettings({ ...valid, categoryId: 0 })).toBe(HousekeepingErrorKey.INVALID_CATEGORY);
+        expect(validateRoomSettings({ ...valid, tradeMode: 3 })).toBe(HousekeepingErrorKey.INVALID_TRADE_MODE);
+        expect(validateRoomSettings({ ...valid, tags: ['a', 'b', 'c'] })).toBe(HousekeepingErrorKey.INVALID_TAGS);
+        expect(validateRoomSettings({ ...valid, tags: ['x'.repeat(16)] })).toBe(HousekeepingErrorKey.INVALID_TAGS);
+    });
+});
+
+describe('matchesDangerConfirmation', () => {
+    it('matches the expected target ignoring case and outer spaces', () => {
+        expect(matchesDangerConfirmation(' Tester ', 'tester')).toBe(true);
+        expect(matchesDangerConfirmation('411', '411')).toBe(true);
+    });
+
+    it('refuses anything else, and an empty target', () => {
+        expect(matchesDangerConfirmation('41', '411')).toBe(false);
+        expect(matchesDangerConfirmation('', '')).toBe(false);
     });
 });

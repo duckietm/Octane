@@ -1,4 +1,4 @@
-import { useBetween } from 'use-between';
+import { useSharedHook } from '@/state/useSharedHook';
 import { useWiredToolsStore } from './useWiredToolsStore';
 
 /**
@@ -24,7 +24,7 @@ export const useWiredToolsState = () => {
         roomVariableAssignments,
         contextVariableDefinitions,
         areUserVariablesLoaded
-    } = useBetween(useWiredToolsStore);
+    } = useSharedHook(useWiredToolsStore);
 
     return {
         accountPreferences,

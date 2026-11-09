@@ -1,47 +1,48 @@
-import { CreateLinkEvent, GroupDeleteComposer, GroupSaveInformationComposer } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, GroupSaveInformationComposer } from '@octane/renderer';
 import { Dispatch, FC, SetStateAction, useCallback, useEffect, useState } from 'react';
-import { IGroupData, LocalizeText, SendMessageComposer } from '../../../../api';
-import { Button, Column, Text } from '../../../../common';
-import { useNotification } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { GetGroupMembers, IGroupData, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../api';
+import { LayoutBadgeImageView } from '../../../../common';
+import { useGroupAlert } from '../GroupNativeAlertView';
+import { flatText, GroupBox, GroupDropMenu, GroupInput, GroupText } from '../GroupNativeLayout';
 
 interface GroupTabIdentityViewProps {
     groupData: IGroupData;
     setGroupData: Dispatch<SetStateAction<IGroupData>>;
     setCloseAction: Dispatch<SetStateAction<{ action: () => boolean }>>;
-    onClose: () => void;
     isCreator?: boolean;
     availableRooms?: { id: number; name: string }[];
 }
 
+// step_cont_1 sits at client y=128; every rectangle below is the layout rectangle inside it.
+const STEP_Y = 128;
+
 export const GroupTabIdentityView: FC<GroupTabIdentityViewProps> = (props) => {
-    const { groupData = null, setGroupData = null, setCloseAction = null, onClose = null, isCreator = false, availableRooms = [] } = props;
+    const { groupData = null, setGroupData = null, setCloseAction = null, isCreator = false, availableRooms = [] } = props;
     const [groupName, setGroupName] = useState<string>('');
     const [groupDescription, setGroupDescription] = useState<string>('');
     const [groupHomeroomId, setGroupHomeroomId] = useState<number>(-1);
-    const { showConfirm = null } = useNotification();
-
-    const deleteGroup = () => {
-        if (!groupData || groupData.groupId <= 0) return;
-
-        showConfirm(
-            LocalizeText('group.deleteconfirm.desc'),
-            () => {
-                SendMessageComposer(new GroupDeleteComposer(groupData.groupId));
-
-                if (onClose) onClose();
-            },
-            null,
-            null,
-            null,
-            LocalizeText('group.deleteconfirm.title')
-        );
-    };
+    const showAlert = useGroupAlert();
 
     const saveIdentity = useCallback(() => {
-        if (!groupData || !groupName || !groupName.length) return false;
+        if (!groupData) return false;
+        if (isCreator && (!groupName.length || groupHomeroomId <= 0))
+        {
+            showAlert({ title: LocalizeText('group.edit.error.title'), message: LocalizeText('group.edit.error.no.name.or.room.selected') });
+            return false;
+        }
+        if (groupName.length > 30 || groupDescription.length >= 255)
+        {
+            const message = groupName.length > 30
+                ? localizeWithFallback('group.edit.error.name.length', 'Group names can contain up to 30 characters.')
+                : localizeWithFallback('group.edit.error.desc.length', 'Group descriptions can contain up to 254 characters.');
+            showAlert({ title: LocalizeText('group.edit.error.title'), message: message });
+            return false;
+        }
 
-        if (groupName === groupData.groupName && groupDescription === groupData.groupDescription) return true;
+        // A new group also carries the chosen home room, so a room-only change still has to be stored.
+        const isRoomChanged = groupData.groupId <= 0 && groupHomeroomId !== groupData.groupHomeroomId;
+
+        if (!isRoomChanged && groupName === groupData.groupName && groupDescription === groupData.groupDescription) return true;
 
         if (groupData.groupId <= 0) {
             if (groupHomeroomId <= 0) return false;
@@ -60,15 +61,16 @@ export const GroupTabIdentityView: FC<GroupTabIdentityViewProps> = (props) => {
         }
 
         SendMessageComposer(new GroupSaveInformationComposer(groupData.groupId, groupName, groupDescription || ''));
+        setGroupData(prevValue => ({ ...prevValue, groupName, groupDescription }));
 
         return true;
-    }, [groupData, groupName, groupDescription, groupHomeroomId, setGroupData]);
+    }, [groupData, groupName, groupDescription, groupHomeroomId, setGroupData, showAlert, isCreator]);
 
     useEffect(() => {
         setGroupName(groupData.groupName || '');
         setGroupDescription(groupData.groupDescription || '');
         setGroupHomeroomId(groupData.groupHomeroomId);
-    }, [groupData]);
+    }, [groupData.groupId, groupData.groupName, groupData.groupDescription, groupData.groupHomeroomId]);
 
     useEffect(() => {
         setCloseAction({ action: saveIdentity });
@@ -79,66 +81,61 @@ export const GroupTabIdentityView: FC<GroupTabIdentityViewProps> = (props) => {
     if (!groupData) return null;
 
     return (
-        <Column justifyContent="between" overflow="auto">
-            <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-1">
-                    <Text center className="col-span-3">
-                        {LocalizeText('group.edit.name')}
-                    </Text>
-                    <NitroInput maxLength={29} type="text" value={groupName} onChange={(event) => setGroupName(event.target.value)} />
-                </div>
-                <div className="flex items-center gap-1">
-                    <Text center className="col-span-3">
-                        {LocalizeText('group.edit.desc')}
-                    </Text>
-                    <textarea
-                        className="min-h-[calc(1.5em+ .5rem+2px)] px-[.5rem] py-[.25rem]  rounded-[.2rem] form-control-sm"
-                        maxLength={254}
-                        value={groupDescription}
-                        onChange={(event) => setGroupDescription(event.target.value)}
-                    />
-                </div>
-                {isCreator && (
-                    <>
-                        <div className="flex items-center gap-1">
-                            <Text center className="col-span-3">
-                                {LocalizeText('group.edit.base')}
-                            </Text>
-                            <Column fullWidth gap={1}>
-                                <select
-                                    className="form-select form-select-sm"
-                                    value={groupHomeroomId}
-                                    onChange={(event) => setGroupHomeroomId(parseInt(event.target.value))}
-                                >
-                                    <option disabled value={-1}>
-                                        {LocalizeText('group.edit.base.select.room')}
-                                    </option>
-                                    {availableRooms &&
-                                        availableRooms.map((room, index) => (
-                                            <option key={index} value={room.id}>
-                                                {room.name}
-                                            </option>
-                                        ))}
-                                </select>
-                            </Column>
-                        </div>
-                        <div className="flex gap-1">
-                            <div className="col-span-3">&nbsp;</div>
-                            <Text small>{LocalizeText('group.edit.base.warning')}</Text>
-                        </div>
-                    </>
-                )}
-            </div>
+        <div className="octane-group-native__step-body" style={{ top: STEP_Y }}>
             {!isCreator && (
-                <Button variant="danger" onClick={deleteGroup}>
-                    {LocalizeText('group.delete')}
-                </Button>
+                <>
+                    <GroupBox height={94} kind="white" width={94} x={17} y={11}>
+                        <GroupBox height={86} kind="tan" width={86} x={4} y={4} />
+                        <div className="octane-group-native__badge" style={{ left: 27, top: 27 }}>
+                            <LayoutBadgeImageView badgeCode={groupData.groupBadgeParts.map((part) => part.previewCode || '').join('')} isGroup={true} isPreview={true} />
+                        </div>
+                    </GroupBox>
+                    <GroupText
+                        align="center"
+                        className="is-link"
+                        overrides={{ underline: true }}
+                        textStyle="u_bold"
+                        text={LocalizeText('group.membercount', ['totalMembers'], [String(groupData.groupMembersCount ?? 0)])}
+                        width={94}
+                        x={17}
+                        y={110}
+                        onClick={() => {
+                            if (saveIdentity()) GetGroupMembers(groupData.groupId);
+                        }}
+                    />
+                </>
             )}
+            <GroupText overrides={flatText(13, { bold: true })} text={LocalizeText('group.edit.name')} width={107} x={126} y={-8} />
+            <GroupInput height={26} label={LocalizeText('group.edit.name')} maxLength={29} value={groupName} width={247} x={126} y={14} onChange={setGroupName} />
+            <GroupText overrides={flatText(13, { bold: true })} text={LocalizeText('group.edit.desc')} width={100} x={126} y={52} />
+            <GroupInput height={80} label={LocalizeText('group.edit.desc')} maxLength={254} multiline value={groupDescription} width={247} x={126} y={74} onChange={setGroupDescription} />
             {isCreator && (
-                <Text center fullWidth pointer underline onClick={(event) => CreateLinkEvent('navigator/create')}>
-                    {LocalizeText('group.createroom')}
-                </Text>
+                <>
+                    <GroupText overrides={flatText(13, { bold: true })} text={LocalizeText('group.edit.base')} width={101} x={126} y={166} />
+                    <GroupDropMenu
+                        height={26}
+                        label={LocalizeText('group.edit.base')}
+                        options={[{ value: -1, label: LocalizeText('group.edit.base.select.room') }, ...(availableRooms ?? []).map((room) => ({ value: room.id, label: room.name }))]}
+                        value={groupHomeroomId > 0 ? groupHomeroomId : -1}
+                        width={247}
+                        x={126}
+                        y={188}
+                        onSelect={(value) => setGroupHomeroomId(value)}
+                    />
+                    <GroupText height={38} overrides={{ size: 13, italic: true }} wrap text={LocalizeText('group.edit.base.warning')} width={247} x={126} y={214} />
+                    <GroupText
+                        className="is-link"
+                        height={38}
+                        wrap
+                        overrides={{ size: 13, underline: true }}
+                        text={LocalizeText('group.createroom')}
+                        width={247}
+                        x={126}
+                        y={252}
+                        onClick={() => CreateLinkEvent('navigator/create')}
+                    />
+                </>
             )}
-        </Column>
+        </div>
     );
 };

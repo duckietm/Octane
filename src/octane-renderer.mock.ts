@@ -1,0 +1,1358 @@
+/**
+ * Stub of `@octane/renderer` for Vitest.
+ *
+ * The real package eagerly loads Pixi v8 + a few hundred Habbo message
+ * parsers/composers at module import time, which jsdom cannot host:
+ * any `tests/**` file that transitively pulls a renderer symbol throws
+ * before a single assertion runs.
+ *
+ * This module replaces it via `resolve.alias` in `vitest.config.mts`.
+ * We provide explicit named exports for the symbols a test currently
+ * needs (logger, event dispatcher, doorbell event class); everything
+ * else mentioned in the comments below is a generic stub kept just to
+ * keep the side-effectful imports happy as `src/api/index.ts` and
+ * friends are pulled in transitively by the barrel cascade.
+ *
+ * Grow this file as new tests require additional symbols. Prefer adding
+ * a real (deterministic) stub over wiring `vi.fn()` — it keeps the
+ * mocks readable and avoids state bleed between cases.
+ */
+
+import { vi } from 'vitest';
+
+// ---------------------------------------------------------------------------
+// Logger
+// ---------------------------------------------------------------------------
+
+export const OctaneLogger = {
+    log: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    enableContexts: vi.fn(),
+    setDebug: vi.fn()
+};
+
+// ---------------------------------------------------------------------------
+// Event dispatcher
+// ---------------------------------------------------------------------------
+//
+// `GetEventDispatcher()` in the real SDK returns the renderer-wide event
+// bus. Tests use `mockEventDispatcher.dispatchEvent(event)` to simulate
+// a server push. `clearMockEventDispatcher()` resets the listener map
+// between cases so subscriptions from a previous test don't leak.
+
+type Listener = (event: any) => void;
+
+// OctaneEvent listeners — registered via GetEventDispatcher() / useOctaneEvent.
+// Cleared by clearMockEventDispatcher() between test cases.
+const listeners = new Map<string, Set<Listener>>();
+
+// MessageEvent listeners — registered via GetCommunication().registerMessageEvent
+// (i.e. useMessageEvent). NOT cleared by clearMockEventDispatcher() so that
+// Zustand-backed shared hooks (which register effects once and persist the
+// source host across tests) keep their subscriptions alive throughout the
+// suite. State isolation between tests is maintained by the shared source
+// preserving initial values across renders (each test's renderHook
+// reads the same Zustand store — tests that check a specific
+// post-dispatch state rely on the event changing it, not on a reset).
+const msgListeners = new Map<string, Set<Listener>>();
+
+export const mockEventDispatcher = {
+    addEventListener(type: string, handler: Listener) {
+        let bucket = listeners.get(type);
+
+        if (!bucket) {
+            bucket = new Set();
+            listeners.set(type, bucket);
+        }
+
+        bucket.add(handler);
+    },
+    removeEventListener(type: string, handler: Listener) {
+        listeners.get(type)?.delete(handler);
+    },
+    dispatchEvent(event: { type: string }) {
+        // Fire OctaneEvent listeners first, then MessageEvent listeners.
+        const bucket = listeners.get(event.type);
+        if (bucket) for (const handler of bucket) handler(event);
+
+        const msgBucket = msgListeners.get(event.type);
+        if (msgBucket) for (const handler of msgBucket) handler(event);
+    },
+    hasListeners(type: string) {
+        return (listeners.get(type)?.size ?? 0) > 0 || (msgListeners.get(type)?.size ?? 0) > 0;
+    }
+};
+
+// Clears only the OctaneEvent listener map (GetEventDispatcher / useOctaneEvent
+// registrations). MessageEvent listeners (useMessageEvent / GetCommunication)
+// are intentionally preserved so shared source hooks stay subscribed.
+export const clearMockEventDispatcher = () => {
+    listeners.clear();
+};
+
+export const GetEventDispatcher = vi.fn(() => mockEventDispatcher);
+
+// ---------------------------------------------------------------------------
+// Event type enums (string-keyed Proxies)
+// ---------------------------------------------------------------------------
+//
+// The real `*EventType` is a `class { static readonly FOO = '...'; … }`
+// with stable wire strings. Tests only need each constant to be a
+// unique string so dispatch + listener agree.
+
+const makeEnumProxy = (label: string) =>
+    new Proxy(
+        {},
+        {
+            get: (_, prop) => (typeof prop === 'string' ? `mock:${label}:${prop}` : undefined)
+        }
+    ) as Record<string, string>;
+
+export const OctaneEventType = makeEnumProxy('OctaneEventType');
+export const MouseEventType = makeEnumProxy('MouseEventType');
+export const TouchEventType = makeEnumProxy('TouchEventType');
+export const RoomObjectPlacementSource = makeEnumProxy('RoomObjectPlacementSource');
+export const RoomObjectType = makeEnumProxy('RoomObjectType');
+export const RoomObjectVariable = makeEnumProxy('RoomObjectVariable');
+export const RoomTradingLevelEnum = makeEnumProxy('RoomTradingLevelEnum');
+export const HabboClubLevelEnum = makeEnumProxy('HabboClubLevelEnum');
+export const FurnitureType = makeEnumProxy('FurnitureType');
+export const PetType = makeEnumProxy('PetType');
+export const AvatarFigurePartType = makeEnumProxy('AvatarFigurePartType');
+export const AvatarScaleType = makeEnumProxy('AvatarScaleType');
+export const AvatarSetType = makeEnumProxy('AvatarSetType');
+export const AvatarAction = makeEnumProxy('AvatarAction');
+export const RoomWidgetEnumItemExtradataParameter = makeEnumProxy('RoomWidgetEnumItemExtradataParameter');
+
+// Numeric enums — values mirror the real renderer SDK so comparisons
+// (`controllerLevel >= GUILD_ADMIN`, category branching) keep working.
+
+// Mirrors `packages/communication/src/messages/parser/roomsettings/RoomChatSettings.ts`.
+export class RoomChatSettings {
+    static readonly CHAT_MODE_FREE_FLOW = 0;
+    static readonly CHAT_MODE_LINE_BY_LINE = 1;
+    static readonly CHAT_BUBBLE_WIDTH_WIDE = 0;
+    static readonly CHAT_BUBBLE_WIDTH_NORMAL = 1;
+    static readonly CHAT_BUBBLE_WIDTH_THIN = 2;
+}
+
+export class RoomControllerLevel {
+    static readonly NONE = 0;
+    static readonly GUEST = 1;
+    static readonly GUILD_MEMBER = 2;
+    static readonly GUILD_ADMIN = 3;
+    static readonly ROOM_OWNER = 4;
+    static readonly MODERATOR = 5;
+}
+
+// Mirrors the perk codes of `packages/communication/.../perk/common/PerkEnum.ts` that the client checks.
+export class PerkEnum {
+    static readonly USE_GUIDE_TOOL = 'USE_GUIDE_TOOL';
+    static readonly JUDGE_CHAT_REVIEWS = 'JUDGE_CHAT_REVIEWS';
+    static readonly NAVIGATOR_ROOM_THUMBNAIL_CAMERA = 'NAVIGATOR_ROOM_THUMBNAIL_CAMERA';
+}
+
+export class PerkAllowancesMessageEvent {}
+
+// Mirrors `packages/api/src/octane/session/enum/SecurityLevel.ts`. Kept
+// around so any consumer that still imports the renderer enum
+// (non-deprecated code path) compiles cleanly under the mock.
+export class SecurityLevel {
+    static readonly NONE = 0;
+    static readonly CELEBRITY = 1;
+    static readonly PARTNER = 2;
+    static readonly BUS_PARTNER = 3;
+    static readonly EMPLOYEE = 4;
+    static readonly MODERATOR = 5;
+    static readonly PLAYER_SUPPORT = 6;
+    static readonly COMMUNITY = 7;
+    static readonly ADMINISTRATOR = 8;
+    static readonly SUPER_USER = 9;
+}
+
+export class RoomObjectCategory {
+    static readonly MINIMUM = 0;
+    static readonly ROOM = 10;
+    static readonly UNIT = 20;
+    static readonly FLOOR = 30;
+    static readonly WALL = 40;
+    static readonly MAXIMUM = 50;
+}
+
+// ---------------------------------------------------------------------------
+// Doorbell event class
+// ---------------------------------------------------------------------------
+
+export class RoomSessionDoorbellEvent {
+    // Wire strings copied from the real class so any consumer that
+    // ignores the indirection through the `.DOORBELL` static still
+    // matches.
+    static readonly DOORBELL = 'RSDE_DOORBELL';
+    static readonly RSDE_ACCEPTED = 'RSDE_ACCEPTED';
+    static readonly RSDE_REJECTED = 'RSDE_REJECTED';
+
+    // Mirrors the real constructor signature `(type, session, userName)`
+    // so `tsgo` is happy. Tests can pass `null` for the session: the
+    // SUT only reads `.userName` and `.type`.
+    constructor(
+        public readonly type: string,
+        public readonly _session: unknown,
+        public readonly userName: string
+    ) {}
+}
+
+// ---------------------------------------------------------------------------
+// Generic classes — placeholders for symbols that need to exist as
+// constructors so module-level `new X(...)` calls don't crash during
+// the barrel cascade, but whose behavior tests don't yet exercise.
+// ---------------------------------------------------------------------------
+
+class StubClass {
+    constructor(..._args: unknown[]) {}
+}
+
+export class OctaneAlphaFilter extends StubClass {}
+export class OctaneContainer extends StubClass {}
+export class OctaneRectangle {
+    constructor(
+        public x = 0,
+        public y = 0,
+        public width = 0,
+        public height = 0
+    ) {}
+}
+export class OctaneSprite extends StubClass {}
+export class OctaneRenderTexture extends StubClass {}
+export class OctaneTexture extends StubClass {}
+export class OctaneSoundEvent extends StubClass {}
+// OctaneEvent — stores the `type` string passed to `super(type)` by every
+// concrete subclass so EventDispatcher below can route it to listeners
+// registered under that same type.
+export class OctaneEvent {
+    public readonly type: string;
+
+    constructor(type: string) {
+        this.type = type;
+    }
+}
+
+// MessageEvent — stores the handler so GetCommunication (below) can
+// route dispatches through mockEventDispatcher. Each concrete subclass
+// exposes a `.type` equal to its constructor name so dispatchEvent
+// can match registered listeners.
+export class MessageEvent {
+    private _callBack: Function | null;
+
+    constructor(callBack?: Function) {
+        this._callBack = callBack ?? null;
+    }
+
+    public get callBack(): Function | null {
+        return this._callBack;
+    }
+
+    // Each concrete subclass is identified by its class name.
+    public get type(): string {
+        return this.constructor.name;
+    }
+
+    // Concrete subclasses override this; the no-arg construction path used
+    // by makeParserlessEvent in tests leaves it returning null — tests
+    // override it with (ev as any).getParser = () => parser.
+    public getParser(): any {
+        return null;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// IMessageEvent-based event classes used by useDoorState
+//
+// The real renderer classes take a `callBack` constructor arg and store it
+// in MessageEvent._callBack. The communication manager later calls
+// `event.callBack(event)` when the matching packet arrives.
+//
+// In tests we construct them with NO args (makeParserlessEvent does
+// `new klass()`) and override `getParser`. GetCommunication (below)
+// registers `event.callBack` on mockEventDispatcher under `event.type`
+// (the class name). When the test calls
+// `mockEventDispatcher.dispatchEvent(ev)`, listeners for that class name
+// fire, receiving `ev` — and the implementation reads `ev.getParser()`.
+// ---------------------------------------------------------------------------
+
+export class DoorbellMessageEvent extends MessageEvent {}
+export class RoomDoorbellAcceptedEvent extends MessageEvent {}
+export class FlatAccessDeniedMessageEvent extends MessageEvent {}
+export class GenericErrorEvent extends MessageEvent {}
+export class GetGuestRoomResultEvent extends MessageEvent {}
+export class ThumbnailStatusMessageEvent extends MessageEvent {}
+
+// Shared hooks mounted by the registry subscribe even when their feature is
+// disabled. Keep these on the same dispatchable event bus as the room events.
+export class UnseenItemsEvent extends MessageEvent {}
+export class HabboClubExtendOfferMessageEvent extends MessageEvent {}
+export class AuthenticatedEvent extends MessageEvent {}
+export class GoToBreedingNestFailureEvent extends MessageEvent {}
+export class UserHabbiconsEvent extends MessageEvent {}
+export class UserHabbiconStatusChangedEvent extends MessageEvent {}
+export class HabbiconShopDataEvent extends MessageEvent {}
+export class HabbiconInfoEvent extends MessageEvent {}
+export class PurchaseOKMessageEvent extends MessageEvent {}
+export class PurchaseErrorMessageEvent extends MessageEvent {}
+export class PurchaseNotAllowedMessageEvent extends MessageEvent {}
+
+export const MessengerMessageType = {
+    Habbicon: 4
+} satisfies Pick<typeof import('@octane/renderer').MessengerMessageType, 'Habbicon'>;
+
+// An empty asset catalogue for jsdom: construction must not fetch images or
+// create Pixi textures. Check the browser boundary against the real SDK types.
+const emptyHabbiconAssets = {
+    preload: async () => {},
+    getNameKey: (_id: number) => '',
+    getDirection: (_id: number) => 0,
+    getCollectionIconUrl: (_id: number, _outlined = false) => '',
+    getPreviewUrl: (_id: number) => ''
+} satisfies Pick<import('@octane/renderer').HabbiconAssetManager, 'preload' | 'getNameKey' | 'getDirection' | 'getCollectionIconUrl' | 'getPreviewUrl'>;
+
+export class HabbiconAssetManager {
+    public static getInstance() {
+        return emptyHabbiconAssets;
+    }
+}
+
+// Mentions system — incoming events extend MessageEvent (they expose
+// getParser()); the request/mark composers are symbol-only constructors.
+export class MentionReceivedEvent extends MessageEvent {}
+export class FurnitureStackHeightEvent extends MessageEvent {}
+export class MentionsListEvent extends MessageEvent {}
+export class MentionsPageEvent extends MessageEvent {}
+
+// ---------------------------------------------------------------------------
+// Navigator event classes — MessageEvent subclasses needed by useNavigatorStore
+// ---------------------------------------------------------------------------
+
+export class CanCreateRoomEvent extends MessageEvent {}
+export class CanCreateRoomEventEvent extends MessageEvent {}
+export class CategoriesWithVisitorCountEvent extends MessageEvent {}
+export class FavouriteChangedEvent extends MessageEvent {}
+export class FavouritesEvent extends MessageEvent {}
+export class FlatCreatedEvent extends MessageEvent {}
+export class RoomSettingsSavedEvent extends MessageEvent {}
+export class NavigatorHomeRoomEvent extends MessageEvent {}
+export class NavigatorLiftedEvent extends MessageEvent {}
+export class NavigatorMetadataEvent extends MessageEvent {}
+export class AvatarEffectsEvent extends MessageEvent {}
+export class AvatarEffectAddedEvent extends MessageEvent {}
+export class AvatarEffectExpiredEvent extends MessageEvent {}
+export class AvatarEffectActivatedEvent extends MessageEvent {}
+export class AvatarEffectSelectedEvent extends MessageEvent {}
+export class IsFirstLoginOfDayEvent extends MessageEvent {}
+export class NavigatorOpenRoomCreatorEvent extends MessageEvent {}
+export class NavigatorSearchesEvent extends MessageEvent {}
+export class NavigatorSearchEvent extends MessageEvent {}
+export class RoomEnterErrorEvent extends MessageEvent {}
+export class RoomEntryInfoMessageEvent extends MessageEvent {}
+export class RoomForwardEvent extends MessageEvent {}
+export class RoomScoreEvent extends MessageEvent {}
+export class RoomSettingsUpdatedEvent extends MessageEvent {}
+export class UserEventCatsEvent extends MessageEvent {}
+export class UserFlatCatsEvent extends MessageEvent {}
+export class UserInfoEvent extends MessageEvent {}
+export class UserPermissionsEvent extends MessageEvent {}
+
+// ---------------------------------------------------------------------------
+// Notification event classes — MessageEvent subclasses needed by
+// useNotificationStore (called via useNotification() inside useNavigatorStore).
+// The real renderer classes take a `callBack` constructor arg; the pattern
+// here is the same as the Navigator event stubs above.
+// ---------------------------------------------------------------------------
+
+export class AchievementNotificationMessageEvent extends MessageEvent {}
+export class ActivityPointNotificationMessageEvent extends MessageEvent {}
+export class BadgeReceivedEvent extends MessageEvent {}
+export class ChestNotificationEvent extends MessageEvent {}
+export class WiredTransactionFailEvent extends MessageEvent {}
+export class WiredTradeErrorEvent extends MessageEvent {}
+export class LtdRaffleEnteredMessageEvent extends MessageEvent {}
+export class LtdRaffleResultMessageEvent extends MessageEvent {}
+
+// Wired trade constants with the renderer's real values (WiredTradeOpenMessageParser / WiredTradeRuleParser).
+export const WIRED_TRADE_REQUIREMENT_ANY_COINS = 0;
+export const WIRED_TRADE_REQUIREMENT_ANY_FURNI = 1;
+export const WIRED_TRADE_REQUIREMENT_ANY = 2;
+export const WIRED_TRADE_REQUIREMENT_RULES = 4;
+export const WIRED_TRADE_RULES_NORMAL = 0;
+export const WIRED_TRADE_RULES_MULTIPLIER = 1;
+export const WIRED_TRADE_RULES_AUTO = 2;
+export const WIRED_TRADE_NODE_COINS = 0;
+export const WIRED_TRADE_NODE_FURNI = 1;
+export const WIRED_TRANSACTION_SUCCESS_REWARD = 2;
+export class WiredTransactionSuccessEvent extends MessageEvent {}
+export class FurnitureFloorRemoveEvent extends MessageEvent {}
+export class FurnitureWallRemoveEvent extends MessageEvent {}
+export class RoomRightsEvent extends MessageEvent {}
+export class ClubGiftNotificationEvent extends MessageEvent {}
+export class ClubGiftInfoEvent extends MessageEvent {}
+export class AccountSafetyLockStatusChangeMessageEvent extends MessageEvent {}
+export class HabboClubExtendConfirmMessageComposer {
+    getMessageArray() {
+        return [];
+    }
+}
+export class GetClubGiftInfo {
+    getMessageArray() {
+        return [];
+    }
+}
+export class ClubGiftSelectedEvent extends MessageEvent {}
+export class ConnectionErrorEvent extends MessageEvent {}
+export class HabboBroadcastMessageEvent extends MessageEvent {}
+export class HotelClosedAndOpensEvent extends MessageEvent {}
+export class HotelClosesAndWillOpenAtEvent extends MessageEvent {}
+export class HotelWillCloseInMinutesEvent extends MessageEvent {}
+export class InfoFeedEnableMessageEvent extends MessageEvent {}
+export class MaintenanceStatusMessageEvent extends MessageEvent {}
+export class ModeratorCautionEvent extends MessageEvent {}
+export class ModeratorMessageEvent extends MessageEvent {}
+export class MOTDNotificationEvent extends MessageEvent {}
+export class NotificationDialogMessageEvent extends MessageEvent {}
+export class PetLevelNotificationEvent extends MessageEvent {}
+export class PetReceivedMessageEvent extends MessageEvent {}
+export class RespectReceivedEvent extends MessageEvent {}
+export class RoomEnterEvent extends MessageEvent {}
+export class SimpleAlertMessageEvent extends MessageEvent {}
+export class UserBannedMessageEvent extends MessageEvent {}
+export class WiredRewardResultMessageEvent extends MessageEvent {
+    static readonly PRODUCT_DONATED_CODE = 6;
+    static readonly BADGE_DONATED_CODE = 7;
+}
+
+// RoomEnterEffect — used by useNotificationStore to check if the room-enter
+// animation is still running before showing the mod disclaimer bubble.
+export const RoomEnterEffect = {
+    isRunning: () => false,
+    totalRunningTime: 0
+};
+
+export class RoomEngineTriggerWidgetEvent extends StubClass {
+    static readonly REQUEST_STACK_HEIGHT = 'RETWE_REQUEST_STACK_HEIGHT';
+    static readonly REQUEST_DIMMER = 'RETWE_REQUEST_DIMMER';
+    static readonly REQUEST_BACKGROUND_COLOR = 'RETWE_REQUEST_BACKGROUND_COLOR';
+    static readonly REQUEST_AREA_HIDE = 'RETWE_REQUEST_AREA_HIDE';
+}
+
+export class RoomEngineAreaHideStateEvent extends StubClass {
+    static readonly UPDATE_STATE_AREA_HIDE = 'RETWE_UPDATE_STATE_AREA_HIDE';
+}
+
+export class RoomAreaSelectionManager extends StubClass {
+    static readonly HIGHLIGHT_DARKEN = 'highlight_darken';
+}
+
+// Composers that keep their constructor arguments, so a test can read what was sent.
+export class SetObjectDataMessageComposer {
+    constructor(
+        public readonly objectId: number,
+        public readonly data: Map<string, string>
+    ) {}
+}
+export class GetSecondsUntilMessageComposer {
+    constructor(public readonly timingCode: string) {}
+}
+export class GuideSessionIsTypingMessageComposer {
+    constructor(public readonly isTyping: boolean) {}
+}
+export class FurnitureMultiStateComposer {
+    constructor(
+        public readonly itemId: number,
+        public readonly state: number = 0
+    ) {}
+}
+
+export class RoomEngineObjectEvent extends StubClass {
+    static readonly MOUSE_ENTER = 'REOE_MOUSE_ENTER';
+    static readonly MOUSE_LEAVE = 'REOE_MOUSE_LEAVE';
+    static readonly ADDED = 'REOE_ADDED';
+    static readonly REMOVED = 'REOE_REMOVED';
+}
+export const CreateLinkEvent = vi.fn();
+// EventDispatcher — real listener storage. UI_EVENT_DISPATCHER (`../../api`)
+// is a module-level `new EventDispatcher()` singleton, so hooks that dispatch
+// OctaneEvent subclasses through it (DispatchUiEvent / useUiEvent) need a
+// working addEventListener/removeEventListener/dispatchEvent, not a no-op
+// stub.
+export class EventDispatcher {
+    private listeners = new Map<string, Set<Function>>();
+
+    addEventListener(type: string, handler: Function): void {
+        let bucket = this.listeners.get(type);
+
+        if (!bucket) {
+            bucket = new Set();
+            this.listeners.set(type, bucket);
+        }
+
+        bucket.add(handler);
+    }
+
+    removeEventListener(type: string, handler: Function): void {
+        this.listeners.get(type)?.delete(handler);
+    }
+
+    dispatchEvent(event: { type: string }): void {
+        const bucket = this.listeners.get(event.type);
+
+        if (bucket) for (const handler of bucket) handler(event);
+    }
+}
+export class AdvancedMap extends StubClass {}
+export class AvatarFigureContainer extends StubClass {}
+export class Vector3d extends StubClass {}
+export class ObjectDataFactory extends StubClass {}
+
+// RoomDataParser — real static constants needed by useDoorState and its tests.
+export class RoomDataParser {
+    static readonly DOORBELL_STATE = 1;
+    static readonly PASSWORD_STATE = 2;
+}
+
+export class RoomModerationSettings extends StubClass {}
+export class StringDataType extends StubClass {}
+
+// Navigator data/parser stubs
+export class NavigatorCategoryDataParser extends StubClass {}
+export class NavigatorEventCategoryDataParser extends StubClass {}
+export class NavigatorSavedSearch extends StubClass {}
+export class NavigatorSearchResultSet extends StubClass {}
+export class NavigatorTopLevelContext extends StubClass {}
+export class CantConnectMessageParser extends StubClass {
+    static readonly REASON_FULL = 1;
+    static readonly REASON_QUEUE_ERROR = 2;
+    static readonly REASON_BANNED = 3;
+}
+
+export class LegacyExternalInterface {
+    static readonly available = false;
+    static call(..._args: unknown[]): void {}
+}
+export class SellablePetPaletteData extends StubClass {}
+export class PetFigureData extends StubClass {}
+export class PetData extends StubClass {}
+export class NodeData extends StubClass {}
+export class ItemDataStructure extends StubClass {}
+export class HabboGroupEntryData extends StubClass {}
+export class FriendParser extends StubClass {}
+export class FriendCategoryData extends StubClass {}
+export class FriendRequestData extends StubClass {}
+export class FurnitureListItemParser extends StubClass {}
+export class BotData extends StubClass {}
+export class AchievementData extends StubClass {}
+export class CatalogPageMessageProductData extends StubClass {}
+export class GiftWrappingConfigurationParser extends StubClass {}
+export class WiredFilter extends StubClass {}
+export class HabboWebTools extends StubClass {
+    static setExternalUrlConfirm(): void {}
+    static openWebPage(): void {}
+}
+
+// Composers — symbol-only constructors; only their identity matters in the
+// codebase ("did the SUT call SendMessageComposer(new FooComposer(args))").
+export class JoinQueueMessageComposer extends StubClass {}
+export class PurchaseSnowWarGameTokensOfferComposer extends StubClass {}
+export class Game2GetAccountGameStatusMessageComposer extends StubClass {}
+export class AddFavouriteRoomMessageComposer extends StubClass {}
+export class FurnitureStackHeightComposer extends StubClass {}
+export class FurnitureAdjacentStackHeightComposer extends StubClass {}
+export class AvatarEffectActivatedComposer extends StubClass {}
+export class AvatarEffectSelectedComposer extends StubClass {}
+export class DeleteFavouriteRoomMessageComposer extends StubClass {}
+export class FollowFriendMessageComposer extends StubClass {}
+export class GetUserEventCatsMessageComposer extends StubClass {}
+export class GetUserFlatCatsMessageComposer extends StubClass {}
+export class NavigatorSearchComposer extends StubClass {}
+export class RequestMentionsComposer extends StubClass {}
+export class RequestMentionsPageComposer extends StubClass {}
+export class MarkMentionsReadComposer extends StubClass {}
+export class DeleteMentionComposer extends StubClass {}
+export class DesktopViewComposer extends StubClass {}
+export class FurniturePlacePaintComposer extends StubClass {}
+export class GetGuestRoomMessageComposer extends StubClass {}
+export class GetProductOfferComposer extends StubClass {}
+export class GroupFavoriteComposer extends StubClass {}
+export class GroupInformationComposer extends StubClass {}
+export class GroupJoinComposer extends StubClass {}
+export class GroupUnfavoriteComposer extends StubClass {}
+export class UserProfileComposer extends StubClass {}
+
+// Catalog Studio — keep request arguments observable so provider tests can
+// verify the renderer/emulator field order without loading Pixi.
+class CatalogStudioComposerStub {
+    private readonly data: unknown[];
+    constructor(...args: unknown[]) {
+        this.data = args;
+    }
+    public getMessageArray() {
+        return this.data;
+    }
+}
+
+export class CatalogStudioOpenSessionComposer extends CatalogStudioComposerStub {}
+export class CatalogStudioAcquireLockComposer extends CatalogStudioComposerStub {}
+export class CatalogStudioRenewLockComposer extends CatalogStudioComposerStub {}
+export class CatalogStudioReleaseLockComposer extends CatalogStudioComposerStub {}
+export class CatalogStudioHistoryComposer extends CatalogStudioComposerStub {}
+export class CatalogStudioUndoComposer extends CatalogStudioComposerStub {}
+export class CatalogStudioValidateComposer extends CatalogStudioComposerStub {}
+export class CatalogStudioPublishComposer extends CatalogStudioComposerStub {}
+export class CatalogStudioDiscardComposer extends CatalogStudioComposerStub {}
+export class CatalogStudioRestoreComposer extends CatalogStudioComposerStub {}
+export class CatalogStudioPreviewComposer extends CatalogStudioComposerStub {}
+export class CatalogStudioExportComposer extends CatalogStudioComposerStub {}
+export class CatalogStudioDocumentDryRunComposer extends CatalogStudioComposerStub {}
+export class CatalogStudioDocumentApplyComposer extends CatalogStudioComposerStub {}
+export class CatalogAdminDeletePageComposer extends CatalogStudioComposerStub {}
+export class CatalogAdminMovePageComposer extends CatalogStudioComposerStub {}
+export class CatalogAdminSetPageEnabledComposer extends CatalogStudioComposerStub {}
+export class CatalogAdminSetPageVisibleComposer extends CatalogStudioComposerStub {}
+export class CatalogAdminLoadOfferComposer extends CatalogStudioComposerStub {}
+export class CatalogAdminLoadPageComposer extends CatalogStudioComposerStub {}
+export class CatalogAdminSaveOfferComposer extends CatalogStudioComposerStub {}
+export class CatalogAdminCreateOfferComposer extends CatalogStudioComposerStub {}
+export class CatalogAdminDeleteOfferComposer extends CatalogStudioComposerStub {}
+export class CatalogAdminReorderOffersComposer extends CatalogStudioComposerStub {}
+export class CatalogAdminSavePageComposer extends CatalogStudioComposerStub {}
+export class CatalogAdminCreatePageComposer extends CatalogStudioComposerStub {}
+
+export class CatalogStudioSessionEvent extends MessageEvent {}
+export class CatalogStudioAcquireLockEvent extends MessageEvent {}
+export class CatalogStudioRenewLockEvent extends MessageEvent {}
+export class CatalogStudioReleaseLockEvent extends MessageEvent {}
+export class CatalogStudioHistoryEvent extends MessageEvent {}
+export class CatalogStudioUndoEvent extends MessageEvent {}
+export class CatalogStudioValidationEvent extends MessageEvent {}
+export class CatalogStudioPublishEvent extends MessageEvent {}
+export class CatalogStudioDiscardEvent extends MessageEvent {}
+export class CatalogStudioRestoreEvent extends MessageEvent {}
+export class CatalogStudioPreviewEvent extends MessageEvent {}
+export class CatalogStudioDocumentResultEvent extends MessageEvent {}
+// `ChooserSelectionFilter` is used as a string enum in some call sites.
+export const ChooserSelectionFilter = makeEnumProxy('ChooserSelectionFilter');
+
+// ---------------------------------------------------------------------------
+// Floor plan constants
+// ---------------------------------------------------------------------------
+
+export const FloorAction = makeEnumProxy('FloorAction');
+
+export const TILE_SIZE = 32;
+
+export const HEIGHT_SCHEME = 'x0123456789abcdefghijklmnopq';
+
+export const MAX_NUM_TILE_PER_AXIS = 64;
+
+export const COLORMAP: object = {
+    x: '101010',
+    '0': '0065ff',
+    '1': '0091ff',
+    '2': '00bcff',
+    '3': '00e8ff',
+    '4': '00ffea',
+    '5': '00ffbf',
+    '6': '00ff93',
+    '7': '00ff68',
+    '8': '00ff3d',
+    '9': '19ff00',
+    a: '44ff00',
+    b: '70ff00',
+    c: '9bff00',
+    d: 'f2ff00',
+    e: 'ffe000',
+    f: 'ffb500',
+    g: 'ff8900',
+    h: 'ff5e00',
+    i: 'ff3200',
+    j: 'ff0700',
+    k: 'ff0023',
+    l: 'ff007a',
+    m: 'ff00a5',
+    n: 'ff00d1',
+    o: 'ff00fc',
+    p: 'd600ff',
+    q: 'aa00ff'
+};
+
+// ---------------------------------------------------------------------------
+// Floor plan editor — composer stubs and event classes
+// ---------------------------------------------------------------------------
+
+// Composer stubs for floor-plan-editor message events
+export class GetRoomEntryTileMessageComposer extends StubClass {}
+export class GetOccupiedTilesMessageComposer extends StubClass {}
+export class UpdateFloorPropertiesMessageComposer extends StubClass {
+    public tilemap: string;
+    public doorX: number;
+    public doorY: number;
+    public dir: number;
+    public thicknessWall: number;
+    public thicknessFloor: number;
+    public wallHeight: number;
+    public autoPickup: boolean;
+    constructor(
+        tilemap: string,
+        doorX: number,
+        doorY: number,
+        dir: number,
+        thicknessWall: number,
+        thicknessFloor: number,
+        wallHeight: number,
+        autoPickup: boolean = false
+    ) {
+        super();
+        this.tilemap = tilemap;
+        this.doorX = doorX;
+        this.doorY = doorY;
+        this.dir = dir;
+        this.thicknessWall = thicknessWall;
+        this.thicknessFloor = thicknessFloor;
+        this.wallHeight = wallHeight;
+        this.autoPickup = autoPickup;
+    }
+}
+
+// Event class stubs for useMessageEvent registration
+export class FloorHeightMapEvent extends StubClass {}
+export class RoomVisualizationSettingsEvent extends StubClass {}
+export class RoomEntryTileMessageEvent extends StubClass {}
+export class RoomOccupiedTilesMessageEvent extends StubClass {}
+export const RoomEngineEvent = makeEnumProxy('RoomEngineEvent');
+export const RoomSessionEvent = makeEnumProxy('RoomSessionEvent');
+
+// Link tracker stubs
+export type ILinkEventTracker = { linkReceived: (url: string) => void; eventUrlPrefix: string };
+export const AddLinkEventTracker = vi.fn();
+export const RemoveLinkEventTracker = vi.fn();
+
+// Thickness conversion helpers — mirror the renderer's real mapping
+export const convertNumbersForSaving = (v: number): number => {
+    switch (v) {
+        case 0:
+            return -2;
+        case 1:
+            return -1;
+        case 3:
+            return 1;
+        default:
+            return 0;
+    }
+};
+
+export const convertSettingToNumber = (v: number): number => {
+    switch (v) {
+        case 0.25:
+            return 0;
+        case 0.5:
+            return 1;
+        case 2:
+            return 3;
+        default:
+            return 2;
+    }
+};
+
+// ---------------------------------------------------------------------------
+// Singleton getters
+// ---------------------------------------------------------------------------
+
+const stubManager = () => {
+    const sentinel = new Proxy(() => undefined, {
+        get(target, prop) {
+            if (prop === 'then') return undefined;
+            const cached = (target as any)[prop];
+            if (cached !== undefined) return cached;
+            // Most fields read from a real manager are either methods
+            // (return functions) or sub-objects (return proxies). We
+            // return another callable proxy so chained access works.
+            const value = stubManager();
+            (target as any)[prop] = value;
+            return value;
+        },
+        apply() {
+            return undefined;
+        }
+    });
+
+    return sentinel;
+};
+
+export const GetAssetManager = vi.fn(stubManager);
+export const GetAvatarRenderManager = vi.fn(stubManager);
+// GetCommunication — routes IMessageEvent registration through the
+// msgListeners map (separate from the OctaneEvent listeners map) so that
+// clearMockEventDispatcher() does NOT wipe these subscriptions. This
+// keeps shared source hooks (like useDoorState) subscribed across
+// test cases without recreating the Zustand-backed source host.
+//
+// A WeakMap stores the wrapper fn keyed by the MessageEvent instance so
+// that removeMessageEvent can remove the exact listener added by
+// registerMessageEvent.
+const _msgEventWrappers = new WeakMap<MessageEvent, (ev: any) => void>();
+
+export const GetCommunication = vi.fn(() => ({
+    registerMessageEvent(event: MessageEvent) {
+        if (!event.callBack) return;
+        const wrapper = (ev: any) => event.callBack!(ev);
+        _msgEventWrappers.set(event, wrapper);
+        let bucket = msgListeners.get(event.type);
+        if (!bucket) {
+            bucket = new Set();
+            msgListeners.set(event.type, bucket);
+        }
+        bucket.add(wrapper);
+    },
+    removeMessageEvent(event: MessageEvent) {
+        const wrapper = _msgEventWrappers.get(event);
+        if (wrapper) msgListeners.get(event.type)?.delete(wrapper);
+    },
+    // Stub for SendMessageComposer and renderer-owned connection snapshots.
+    connection: {
+        send: vi.fn(),
+        connectionState: Object.freeze({
+            phase: 'disconnected',
+            reconnectAttempt: 0,
+            maxReconnectAttempts: 7,
+            authenticated: false,
+            closeCode: null,
+            closeReason: ''
+        })
+    }
+}));
+export const GetConfiguration = vi.fn(stubManager);
+export const GetLocalizationManager = vi.fn(stubManager);
+export const GetRoomEngine = vi.fn(stubManager);
+export const GetRoomMessageHandler = vi.fn(stubManager);
+export const GetRoomSessionManager = vi.fn(stubManager);
+export const GetRoomContentLoader = vi.fn(stubManager);
+export const GetRoomObjectVisualizationFactory = vi.fn(stubManager);
+
+// RoomGeometry — only the discrete zoom scale constants the room-zoom helper
+// reads (SCALE_ZOOMED_IN = 64, SCALE_ZOOMED_OUT = 32).
+export class RoomGeometry {
+    static readonly SCALE_ZOOMED_IN = 64;
+    static readonly SCALE_ZOOMED_OUT = 32;
+}
+
+// RoomPreviewer — only the bits the editor's FloorplanRoomPreview
+// component touches. PREVIEW_COUNTER is a static field that the
+// real renderer increments to allocate unique preview-room IDs;
+// keeping it as a mutable static lets the editor mount/unmount
+// repeatedly across tests without colliding.
+export class RoomPreviewer {
+    static PREVIEW_COUNTER = 0;
+
+    constructor(
+        public readonly _engine: unknown,
+        public readonly _id: number
+    ) {}
+
+    public updatePreviewModel(_model: string, _wallHeight: number, _scale?: boolean): void {}
+    public modifyRoomCanvas(_w: number, _h: number): void {}
+    public getRoomCanvas(_w: number, _h: number): unknown {
+        return null;
+    }
+    public getRenderingCanvas(): unknown {
+        return null;
+    }
+    public updatePreviewRoomView(): void {}
+    public changeRoomObjectDirection(): void {}
+    public changeRoomObjectState(): void {}
+    public dispose(): void {}
+}
+export const GetSessionDataManager = vi.fn(stubManager);
+export const GetTickerTime = vi.fn(() => 0);
+export const GetTicker = vi.fn(stubManager);
+export const GetRenderer = vi.fn(stubManager);
+export const GetDesiredResolution = vi.fn(() => 1);
+export class OctaneTicker {}
+// TextureUtils — a real-enough stub of the createRenderTexture
+// roundtrip. Tests that mount LayoutRoomPreviewerView allocate a
+// texture on mount and destroy it on unmount; without a real
+// `.destroy` method the unmount cleanup throws.
+export const TextureUtils = {
+    createRenderTexture: (_w: number, _h: number) => ({
+        destroy: (_options?: unknown) => undefined
+    }),
+    generateImage: () => null,
+    generateTexture: () => ({
+        destroy: (_options?: unknown) => undefined
+    }),
+    generateCanvas: () => null,
+    writeToTexture: (container: unknown, target: unknown) => target
+};
+export const OctaneVersion = stubManager();
+
+// ---------------------------------------------------------------------------
+// Type-only re-exports (interfaces erase at compile time, but listing them
+// here documents what the codebase imports through the type channel).
+//
+//   IAvatarFigureContainer · IEventDispatcher · IFigurePart · IFigurePartSet ·
+//   IFurnitureData · IFurnitureItemData · IGraphicAsset · IMessageComposer ·
+//   IMessageEvent · IObjectData · IPartColor · IPollQuestion · IProductData ·
+//   IRoomEngine · IRoomModerationSettings · IRoomObject · IRoomObjectController ·
+//   IRoomObjectSpriteVisualization · IRoomPetData · IRoomSession · IRoomUserData
+//
+// No need to alias them — TypeScript only consults them in the type
+// system, and the production `tsconfig.json` resolves them against the
+// real renderer via `node_modules/@octane/renderer/src`.
+
+// ---------------------------------------------------------------------------
+// Catch-all
+// ---------------------------------------------------------------------------
+//
+// Anything else still resolves to `undefined`. If a test fails with
+// "X is not a constructor" / "X.SOMETHING is not a function", add the
+// missing symbol above with a real stub. Avoid the temptation to
+// blanket-mock everything — explicit stubs surface intent and let
+// failing tests pinpoint what behavior they actually rely on.
+
+// ---------------------------------------------------------------------------
+// SnowWar (SnowStorm) — events consumed by useSnowWar, composers sent by it.
+// ---------------------------------------------------------------------------
+
+export class SnowWarQueuePositionEvent extends MessageEvent {}
+export class SnowWarStartLobbyCounterEvent extends MessageEvent {}
+export class SnowWarGameEndedEvent extends MessageEvent {}
+export class SnowWarGamesLeftEvent extends MessageEvent {}
+export class SnowWarGamesInformationEvent extends MessageEvent {}
+export class SnowWarGameStatusEvent extends MessageEvent {}
+export class SnowWarFullGameStatusEvent extends MessageEvent {}
+export class SnowWarOnStageStartEvent extends MessageEvent {}
+export class SnowWarInitArenaEvent extends MessageEvent {}
+export class SnowWarRejoinPreviousRoomEvent extends MessageEvent {}
+export class SnowWarLevelDataEvent extends MessageEvent {}
+export class SnowWarOnGameEndingEvent extends MessageEvent {}
+export class SnowWarUserChatEvent extends MessageEvent {}
+export class SnowWarOnStageRunningEvent extends MessageEvent {}
+export class SnowWarOnStageEndingEvent extends MessageEvent {}
+export class SnowWarPlayerExitedArenaEvent extends MessageEvent {}
+export class SnowWarGenericErrorEvent extends MessageEvent {}
+export class SnowWarUserRematchedEvent extends MessageEvent {}
+
+export class SnowWarLoadStageReadyComposer extends StubClass {}
+export class SnowWarEditRoomComposer extends StubClass {}
+export class SnowWarExitGameComposer extends StubClass {}
+export class SnowWarWalkComposer extends StubClass {}
+export class SnowWarThrowAtLocationComposer extends StubClass {}
+export class SnowWarThrowAtPlayerComposer extends StubClass {}
+export class SnowWarCreateSnowballComposer extends StubClass {}
+export class SnowWarRequestFullGameStatusComposer extends StubClass {}
+export class SnowWarPlayAgainComposer extends StubClass {}
+export class SnowWarGameChatComposer extends StubClass {}
+export class SnowWarJoinQueueComposer extends StubClass {}
+export class SnowWarLeaveQueueComposer extends StubClass {}
+
+// ---------------------------------------------------------------------------
+// Habbicons and inventory unseen tracking. useHabbiconCatalog and
+// useInventoryUnseenTracker register themselves as shared hooks, so every
+// test that renders inside SharedHookRegistry mounts them and needs these
+// symbols to exist.
+// ---------------------------------------------------------------------------
+
+export class BuyHabbiconCollectionComposer extends StubClass {}
+export class BuyHabbiconComposer extends StubClass {}
+export class ClaimHabbiconComposer extends StubClass {}
+export class FavoriteHabbiconComposer extends StubClass {}
+export class GetHabbiconInfoComposer extends StubClass {}
+export class GetHabbiconShopDataComposer extends StubClass {}
+export class UnfavoriteHabbiconComposer extends StubClass {}
+
+export class HabbiconData extends StubClass {}
+export class HabbiconCollectionData extends StubClass {}
+
+export enum HabbiconState {
+    NotOwned = 0,
+    Claimable = 1,
+    Owned = 2,
+    Favorite = 3,
+    Unavailable = 4,
+    Reward = 5
+}
+
+export enum HabbiconAction {
+    Buy = 0,
+    BuyCollection = 1,
+    Claim = 2,
+    Favorite = 3,
+    Unfavorite = 4
+}
+
+// Quest engine (AIR 13 quests, daily tasks, reward track) — the hooks under
+// src/hooks/quests register these events and send these composers.
+// ---------------------------------------------------------------------------
+
+export class QuestsMessageEvent extends MessageEvent {}
+export class QuestMessageEvent extends MessageEvent {}
+export class QuestCompletedMessageEvent extends MessageEvent {}
+export class QuestCancelledMessageEvent extends MessageEvent {}
+export class QuestDailyMessageEvent extends MessageEvent {}
+export class ActiveDailyTasksMessageEvent extends MessageEvent {}
+export class DailyTasksAddedMessageEvent extends MessageEvent {}
+export class DailyTaskUpdatedMessageEvent extends MessageEvent {}
+export class RewardTracksMessageEvent extends MessageEvent {}
+export class RewardTrackClaimResultMessageEvent extends MessageEvent {}
+export class RewardTrackProgressMessageEvent extends MessageEvent {}
+export class RewardTrackPremiumPurchaseResultMessageEvent extends MessageEvent {}
+export class SecondsUntilMessageEvent extends MessageEvent {}
+export class QuestMessageData extends StubClass {}
+export class DailyTaskData extends StubClass {
+    public static STATUS_IN_PROGRESS = 0;
+    public static STATUS_COMPLETED = 1;
+    public static STATUS_CLAIMED = 2;
+}
+export class DailyTaskRewardData extends StubClass {}
+
+// Reward track staff editor (hooks/quests/useRewardTrackAdmin). The composers keep their
+// payload so a test can read what would go on the wire.
+class RewardTrackEditorComposer {
+    private readonly _data: unknown[];
+
+    constructor(...args: unknown[]) {
+        this._data = args;
+    }
+
+    public getMessageArray(): unknown[] {
+        return this._data;
+    }
+
+    public dispose(): void {}
+}
+export class RewardTrackAdminDataMessageEvent extends MessageEvent {}
+export class RewardTrackAdminResultMessageEvent extends MessageEvent {}
+export class RewardTrackFurniSearchResultMessageEvent extends MessageEvent {}
+export class RewardTrackTextsMessageEvent extends MessageEvent {}
+export class GetRewardTrackAdminDataMessageComposer extends RewardTrackEditorComposer {}
+export class SaveRewardTrackMessageComposer extends RewardTrackEditorComposer {}
+export class SaveRewardTrackTaskMessageComposer extends RewardTrackEditorComposer {
+    constructor(
+        trackId: string,
+        id: string,
+        actionType: string,
+        parameter: string,
+        premium: boolean,
+        sortOrder: number,
+        levels: { requiredCount: number; pointsReward: number; premium: boolean }[]
+    ) {
+        super(
+            trackId,
+            id,
+            actionType,
+            parameter,
+            premium,
+            sortOrder,
+            levels.length,
+            ...levels.flatMap((level) => [level.requiredCount, level.pointsReward, level.premium])
+        );
+    }
+}
+export class SaveRewardTrackPrizeMessageComposer extends RewardTrackEditorComposer {}
+export class DeleteRewardTrackEntityMessageComposer extends RewardTrackEditorComposer {}
+export class SearchRewardTrackFurniMessageComposer extends RewardTrackEditorComposer {}
+export class SaveRewardTrackTextsMessageComposer extends RewardTrackEditorComposer {
+    constructor(trackId: string, texts: { key: string; value: string }[]) {
+        super(trackId, texts.length, ...texts.flatMap((text) => [text.key, text.value]));
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Wired creator tools — paged windows (room logs, variable owners)
+// ---------------------------------------------------------------------------
+
+class RecordingComposer {
+    private _data: unknown[];
+    constructor(...args: unknown[]) {
+        this._data = args;
+    }
+    getMessageArray() {
+        return this._data;
+    }
+    dispose() {}
+}
+
+export class WiredRoomLogsPageComposer extends RecordingComposer {}
+export class WiredArrayInspectionRequestComposer extends RecordingComposer {}
+export class WiredArrayInspectionUpdateComposer extends RecordingComposer {}
+export class WiredArrayInspectionDataEvent extends StubClass {}
+export class WiredGetVariablesForObjectComposer extends RecordingComposer {}
+export class WiredVariablesForObjectEvent extends StubClass {}
+export class WiredSetupExportComposer extends RecordingComposer {}
+export class WiredSetupImportComposer extends RecordingComposer {}
+export class WiredSetupExportResultEvent extends StubClass {}
+export class WiredSetupImportResultEvent extends StubClass {}
+export interface IWiredSetupImportEntry {
+    index: number;
+    type: string;
+    holder: string;
+    x: number;
+    y: number;
+    status: number;
+    itemId: number;
+    reason: string;
+}
+export interface IWiredSetupImportReport {
+    confirmed: boolean;
+    status: number;
+    anchorX: number;
+    anchorY: number;
+    total: number;
+    configured: number;
+    placed: number;
+    missing: number;
+    refused: number;
+    entries: IWiredSetupImportEntry[];
+}
+export interface IWiredArrayInspectionData {
+    definition: {
+        arrayFormat: 'simple' | 'record';
+        arrayMode: 'list' | 'slots';
+        fields: Array<{ id: number; name: string; order: number; textConnected: boolean }>;
+        itemId: number;
+        maxEntries: number;
+        name: string;
+        variableType: number;
+        writable: boolean;
+    } | null;
+    entries: Array<{ connectedText: Record<string, string>; index: number; occupied: boolean; values: Record<string, string> }>;
+    hasArray: boolean;
+    occupiedCount: number;
+    page: number;
+    pageCount: number;
+    totalIndexes: number;
+}
+
+export class WiredVariableHoldersPageComposer extends RecordingComposer {}
+export class WiredLogPageEvent extends StubClass {}
+export class WiredVariableHoldersPageEvent extends StubClass {}
+export class WiredGenerateWebApiKeyComposer extends RecordingComposer {}
+export class WiredAddonShareSynchronizeComposer extends RecordingComposer {}
+export class WiredWebApiKeyResultEvent extends StubClass {}
+export class WiredClickSettingsEvent extends StubClass {}
+export class WiredVariableFxConfigsEvent extends StubClass {}
+export class WiredVariableFxConfigsRemovedEvent extends StubClass {}
+export class WiredLeaderboardSnapshotEvent extends StubClass {}
+export class WiredLeaderboardChunkEvent extends StubClass {}
+export class WiredLeaderboardSubscribeComposer extends RecordingComposer {}
+export class WiredLabelsEvent extends StubClass {}
+export class WiredLabelsUpdateEvent extends StubClass {}
+export class WiredLabelSaveTextComposer extends RecordingComposer {}
+export class WiredLabelSaveSettingsComposer extends RecordingComposer {}
+export const WIRED_LABEL_COLORS = [ 4278912, 2651759, 4157508, 8416562, 8409402, 8404554, 6834048, 5592405 ];
+export const WIRED_LABEL_VISIBILITY_EVERYONE = 0;
+export const WIRED_LABEL_VISIBILITY_WIRED_INSPECTORS = 1;
+export class WiredVariableFxStatusEvent extends StubClass {}
+export class WiredVariableFxStatusRemovedEvent extends StubClass {}
+export const wiredVariableFxStatusKey = (status: { configId: number; variableId: string; userEntity: boolean; entityId: number }) =>
+    `${status.configId}|${status.variableId}|${status.userEntity ? 'u' : 'f'}|${status.entityId}`;
+/** The renderer's port of AIR's variable fx painters: a deterministic stand-in that draws nothing. */
+export class VariableFxStatusData {
+    constructor(
+        public readonly value: number,
+        public readonly overrideMinValue: number | null = null,
+        public readonly overrideMaxValue: number | null = null,
+        public readonly extra: Record<string, string> = {},
+        public readonly isInitialize = false
+    ) {}
+
+    public static fromWire(status: { value: number; overrideMinValue: number | null; overrideMaxValue: number | null; extra: Record<string, string> }, initialize = false) {
+        return new VariableFxStatusData(status.value, status.overrideMinValue, status.overrideMaxValue, { ...status.extra }, initialize);
+    }
+}
+export class VariableFxVisualizer {
+    public frame: null = null;
+    public readonly statuses: VariableFxStatusData[] = [];
+
+    constructor(
+        public readonly config: unknown,
+        status: VariableFxStatusData
+    ) {
+        this.statuses.push(status);
+    }
+
+    public static fromWire(config: unknown, status: { value: number; overrideMinValue: number | null; overrideMaxValue: number | null; extra: Record<string, string> }, _now: number, initialize = false) {
+        return new VariableFxVisualizer(config, VariableFxStatusData.fromWire(status, initialize));
+    }
+
+    public updateData(status: VariableFxStatusData): void {
+        this.statuses.push(status);
+    }
+
+    public needsUpdate(): boolean {
+        return false;
+    }
+
+    public update(): boolean {
+        return false;
+    }
+}
+export class WiredMenuPermissionsSaveComposer extends RecordingComposer {}
+export class WiredRoomStateActionComposer extends RecordingComposer {}
+export class SelfDonationMessageComposer extends RecordingComposer {}
+export class SelfDonationResultMessageEvent extends StubClass {}
+
+// Wired setup definitions (the box a wired window edits); stubs with the private fields the
+// clipboard helpers copy, so instanceof and the getters behave like the renderer's classes.
+export class Triggerable {
+    _intParams: number[] = [];
+    _stringParam = '';
+    _stuffIds: number[] = [];
+    _id = 0;
+    _stuffTypeId = 0;
+    _furniLimit = 0;
+    _stuffTypeSelectionCode = 0;
+    constructor(..._args: unknown[]) {}
+    get id() {
+        return this._id;
+    }
+    get intData() {
+        return this._intParams;
+    }
+    get stringData() {
+        return this._stringParam;
+    }
+    get selectedItems() {
+        return this._stuffIds;
+    }
+    get spriteId() {
+        return this._stuffTypeId;
+    }
+    get maximumItemSelectionCount() {
+        return this._furniLimit;
+    }
+    get stuffTypeSelectionCode() {
+        return this._stuffTypeSelectionCode;
+    }
+    get code() {
+        return 0;
+    }
+}
+export class WiredActionDefinition extends Triggerable {
+    _type = 0;
+    _delayInPulses = 0;
+    get code() {
+        return this._type;
+    }
+    get type() {
+        return this._type;
+    }
+    get delayInPulses() {
+        return this._delayInPulses;
+    }
+}
+export class WiredAddonDefinition extends Triggerable {}
+export class WiredSelectorDefinition extends Triggerable {}
+export class WiredVariableDefinition extends Triggerable {}
+export class WiredFurniAddonEvent extends StubClass {}
+export class WiredFurniSelectorEvent extends StubClass {}
+export class WiredFurniVariableEvent extends StubClass {}
+export class UpdateAddonMessageComposer extends StubClass {}
+export class UpdateSelectorMessageComposer extends StubClass {}
+export class UpdateVariableMessageComposer extends StubClass {}
+export class TriggerDefinition extends Triggerable {
+    _triggerConf = 0;
+    get code() {
+        return this._triggerConf;
+    }
+}
+export class ConditionDefinition extends Triggerable {
+    _type = 0;
+    get code() {
+        return this._type;
+    }
+    get type() {
+        return this._type;
+    }
+}
+
+// Club gifts: the selection composer carries the chosen gift's localization id.
+export class SelectClubGiftComposer extends RecordingComposer {}
+
+// Recycler catalog page (CatalogLayoutRecyclerView).
+export class CatalogRuntimeConfigurationComposer extends RecordingComposer {}
+export class CatalogRuntimeConfigurationEvent extends MessageEvent {}
+export class FurnitureListComposer extends RecordingComposer {}
+export class GetRecyclerStatusMessageComposer extends RecordingComposer {}
+export class RecycleItemsEntry {
+    constructor(public readonly itemId: number) {}
+}
+export class RecycleItemsMessageComposer extends RecordingComposer {}
+export class GetRecyclerPrizesMessageComposer extends RecordingComposer {}
+export class RecyclerPrizesMessageEvent extends MessageEvent {}
+export class RecyclerPrizeLevel extends StubClass {}
+export class RecyclerFinishedMessageEvent extends MessageEvent {
+    public static FINISHED_OK = 1;
+    public static FINISHED_FAIL = 2;
+}
+export class RecyclerStatusMessageEvent extends MessageEvent {
+    public static SYSTEM_STATUS_ENABLED = 1;
+    public static SYSTEM_STATUS_DISABLED = 2;
+    public static SYSTEM_STATUS_TIMEOUT = 3;
+}
+
+// Room ads catalog page (CatalogLayoutRoomAdsView).
+export class GetRoomAdPurchaseInfoComposer extends RecordingComposer {}
+export class PurchaseRoomAdMessageComposer extends RecordingComposer {}
+export class RoomAdPurchaseInfoEvent extends MessageEvent {}
+export class RoomEntryData extends StubClass {}
+
+// Catalog store, queries and effects hook: the events they subscribe to and
+// the composers they send.
+export class BuildersClubFurniCountMessageEvent extends MessageEvent {}
+export class BuildersClubPlacementWarningMessageEvent extends MessageEvent {}
+export class BuildersClubPlaceRoomItemMessageComposer extends StubClass {}
+export class BuildersClubPlaceWallItemMessageComposer extends StubClass {}
+export class BuildersClubQueryFurniCountMessageComposer extends StubClass {}
+export class BuildersClubSubscriptionStatusMessageEvent extends MessageEvent {}
+export class CatalogPageMessageEvent extends MessageEvent {}
+export class CatalogPagesListEvent extends MessageEvent {}
+export class CatalogPublishedMessageEvent extends MessageEvent {}
+export class FrontPageItem extends StubClass {}
+export class FurniturePlaceComposer extends StubClass {}
+export class GetCatalogIndexComposer extends StubClass {}
+export class GetCatalogPageComposer extends StubClass {}
+export class LegacyDataType extends StubClass {}
+export class MapDataType {
+    private _data: Record<string, string> = {};
+    public setValue(key: string, value: string): void {
+        this._data = { ...this._data, [key]: value };
+    }
+    public getValue(key: string): string {
+        return this._data[key];
+    }
+    public get data(): Record<string, string> {
+        return this._data;
+    }
+}
+export class RecolorFurniComposer extends StubClass {}
+export class LimitedEditionSoldOutEvent extends MessageEvent {}
+export class MarketplaceMakeOfferResult extends MessageEvent {}
+export class NftMarketplaceMakeOfferResultEvent extends MessageEvent {}
+export class NftMarketplaceBuyResultEvent extends MessageEvent {}
+export class NftMarketplaceItemStatsEvent extends MessageEvent {}
+export class MakeNftMarketplaceOfferComposer extends RecordingComposer {}
+export class BuyNftMarketplaceOfferComposer extends RecordingComposer {}
+export class GetNftMarketplaceItemStatsComposer extends RecordingComposer {}
+export class ProductOfferEvent extends MessageEvent {}
+export class PurchaseFromCatalogComposer extends RecordingComposer {}
+export class RoomEngineObjectPlacedEvent extends StubClass {
+    static PLACED = 'REOPE_PLACED';
+}
+
+/** The real RoomId (packages/utils/src/RoomId.ts): preview rooms live at 0x7FFF0000 and up. */
+export class RoomId {
+    public static makeRoomPreviewerId(roomId: number): number {
+        return (roomId & 0xffff) + 0x7fff0000;
+    }
+
+    public static isRoomPreviewerId(roomId: number): boolean {
+        return roomId >= 0x7fff0000;
+    }
+}

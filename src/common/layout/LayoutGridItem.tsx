@@ -1,5 +1,6 @@
 import { FC, useMemo } from 'react';
 import { Base } from '../Base';
+import { BaseButton } from '../BaseButton';
 import { Column, ColumnProps } from '../Column';
 import { LayoutItemCountView } from './LayoutItemCountView';
 import { LayoutLimitedEditionStyledNumberView } from './limited-edition';
@@ -36,8 +37,16 @@ export const LayoutGridItem: FC<LayoutGridItemProps> = (props) => {
         position = 'relative',
         overflow = 'hidden',
         children = null,
+        component = undefined,
         ...rest
     } = props;
+
+    // A clickable item is a real button, so it takes Tab focus and Enter / Space. Pass component="div" for items that
+    // hold their own interactive children (a button in a button is invalid) or are drawn by a wrapper that owns the role.
+    const isClickable = !!(rest.onClick || rest.onMouseDown || rest.onMouseUp || rest.onDoubleClick);
+    const itemComponent = component ?? (isClickable ? BaseButton : 'div');
+    const isButton = itemComponent === BaseButton;
+    const hasOwnSemantics = rest['aria-pressed'] !== undefined || rest['aria-selected'] !== undefined || rest.role !== undefined;
 
     const getClassNames = useMemo(() => {
         const newClassNames: string[] = ['layout-grid-item'];
@@ -74,7 +83,19 @@ export const LayoutGridItem: FC<LayoutGridItemProps> = (props) => {
     }, [style, itemImage, itemColor, itemUniqueSoldout, itemUniqueNumber]);
 
     return (
-        <Column pointer center={center} classNames={getClassNames} column={column} overflow={overflow} position={position} style={getStyle} {...rest}>
+        <Column
+            pointer
+            aria-pressed={isButton && !hasOwnSemantics ? itemActive : undefined}
+            center={center}
+            classNames={getClassNames}
+            column={column}
+            component={itemComponent}
+            disabled={isButton && disabled ? true : undefined}
+            overflow={overflow}
+            position={position}
+            style={getStyle}
+            {...rest}
+        >
             {itemCount > itemCountMinimum && <LayoutItemCountView count={itemCount} />}
             {itemUniqueNumber > 0 && (
                 <>

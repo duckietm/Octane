@@ -1,0 +1,98 @@
+/* The on / off switch of the guide tool: one 38x43 sprite, the on frame on top, the off frame 22 px below. */
+.octane-guide-tool .octane-guide-duty-switch {
+    flex: none;
+    box-sizing: border-box;
+    width: 38px;
+    height: 21px;
+    min-height: 0 !important;
+    margin: 0;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    appearance: none;
+    background: url('../../assets/images/guide-tool/duty-switch.png') no-repeat 0 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    cursor: pointer;
+}
+
+.octane-guide-tool .octane-guide-duty-switch[aria-checked='false'] {
+    background-position: 0 -22px !important;
+}
+
+.octane-guide-tool .octane-guide-duty-switch:focus-visible {
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
+}
+
+/*
+ * Text as AIR draws the guide tool windows (guide_tool_threeway, guide_accept, guide_ongoing, user_create,
+ * user_pending, user_ongoing, user_feedback, user_thanks, user_error, request_report_user): Illumina (style 100)
+ * frames in regular Ubuntu (our `Ubuntu` face is the condensed cut). Plain texts, checkbox captions and inputs are
+ * il_regular 11 px black; button captions il_button 10 px bold.
+ */
+.octane-guide-tool .octane-card-content-shell {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px;
+    line-height: 14px;
+}
+
+/* guide_tool_threeway status_caption_txt: font_size 10, 0x666666, not bold. */
+.octane-guide-tool__status-caption {
+    color: #666666;
+    font-size: 10px;
+    font-weight: 400;
+}
+
+/* il_heading_1 14 px bold (user_pending info title, error_window heading). */
+.octane-guide-tool__heading-1 {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 17px;
+}
+
+/* il_heading_2 12 px bold (request_title, guide_name_link, feedback / thanks titles, the feedback question). */
+.octane-guide-tool__heading-2 {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* il_heading_3 10 px bold (tickettypeselection caption). */
+.octane-guide-tool__heading-3 {
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* the "is typing" label of guide_ongoing / user_ongoing: 0x555555. */
+.octane-guide-tool__typing {
+    color: #555555;
+}
+
+/* request_report_user report_error / user_create create_error: 0xff0000, regular. */
+.octane-guide-tool__error {
+    color: #ff0000;
+    font-weight: 400;
+}
+
+/* request_report_user: the emergency help title is font_size 12 bold (white on AIR's red box, which we do not draw). */
+.octane-guide-tool__urgent-title {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* The family wins over every face set by a child; buttons and inputs carry important Tailwind sizes, which an
+   important rule in the earlier base layer outranks. */
+@layer base {
+    .octane-guide-tool .octane-card-content-shell :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    .octane-guide-tool .octane-card-content-shell :where(input, textarea) {
+        font-size: 11px !important;
+    }
+
+    .octane-guide-tool .octane-card-content-shell button.font-bold,
+    .octane-guide-tool .octane-card-content-shell button.font-bold * {
+        font-size: 10px !important;
+    }
+}

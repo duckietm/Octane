@@ -1,0 +1,216 @@
+/* @vitest-environment jsdom */
+import { describe, expect, it } from 'vitest';
+import {
+    filterRewardTrackTasks,
+    formatFriendlySeconds,
+    getCampaignCounterStyle,
+    getDailyTaskProgressPercent,
+    getDailyTaskRewardIcon,
+    getDailyTaskStyle,
+    getFriendlyTimeParts,
+    getPremiumBoostPercent,
+    getQuestDelayedMessageKey,
+    getQuestImageName,
+    getQuestProgressPercent,
+    getQuestWaitSecondsLeft,
+    getRewardTrackPrizeState,
+    isQuestRewardVisible,
+    paginatePrizes,
+    paginatePrizeTiers,
+    getRewardTrackTaskHintLink,
+    resolveRewardTrackTheme,
+    sortDailyTasks
+} from './QuestUtilities';
+
+describe('quest image names', () => {
+    it('lower-cases campaign, code and version', () => {
+        expect(getQuestImageName('Chat', 'chat_1', '2')).toBe('chat_chat_12');
+    });
+
+    it('uses the plain image for the quests the official client animates', () => {
+        expect(getQuestImageName('room_builder', 'MOVEITEM', '')).toBe('room_builder_moveitem');
+        expect(getQuestImageName('social', 'ENTEROTHERSROOM', '')).toBe('social_enterothersroom');
+    });
+
+    it('shows the hourglass while the quest waits', () => {
+        expect(getQuestImageName('chat', 'chat_1', '1', true)).toBe('quest_timer_questionmark');
+    });
+});
+
+describe('quest progress and counters', () => {
+    it('rounds the tracker percentage up and clamps it', () => {
+        expect(getQuestProgressPercent(1, 3)).toBe(34);
+        expect(getQuestProgressPercent(5, 3)).toBe(100);
+        expect(getQuestProgressPercent(0, 0)).toBe(0);
+    });
+
+    it('picks the counter background like the official campaign block', () => {
+        expect(getCampaignCounterStyle(0, false)).toBe('red');
+        expect(getCampaignCounterStyle(2, false)).toBe('blue');
+        expect(getCampaignCounterStyle(3, true)).toBe('green');
+    });
+
+    it('hides empty or unknown rewards', () => {
+        expect(isQuestRewardVisible(0, 20)).toBe(true);
+        expect(isQuestRewardVisible(-1, 5)).toBe(true);
+        expect(isQuestRewardVisible(0, 0)).toBe(false);
+        expect(isQuestRewardVisible(-2, 10)).toBe(false);
+    });
+});
+
+describe('daily tasks', () => {
+    it('colours rows by status and keeps bonus rows yellow', () => {
+        expect(getDailyTaskStyle(0, false)).toBe('orange');
+        expect(getDailyTaskStyle(1, false)).toBe('green');
+        expect(getDailyTaskStyle(2, false)).toBe('green');
+        expect(getDailyTaskStyle(0, true)).toBe('yellow');
+    });
+
+    it('floors the progress percentage', () => {
+        expect(getDailyTaskProgressPercent(2, 3)).toBe(66);
+        expect(getDailyTaskProgressPercent(4, 3)).toBe(100);
+    });
+
+    it('puts bonus tasks last', () => {
+        const tasks = [
+            { isBonus: true, taskId: 1 },
+            { isBonus: false, taskId: 2 },
+            { isBonus: false, taskId: 3 }
+        ] as never[];
+
+        expect(sortDailyTasks(tasks).map((task: { taskId: number }) => task.taskId)).toEqual([2, 3, 1]);
+    });
+
+    it('formats countdowns', () => {
+        expect(formatFriendlySeconds(59)).toBe('59s');
+        expect(formatFriendlySeconds(3725)).toBe('1h 2m');
+        expect(formatFriendlySeconds(90000)).toBe('1d 1h');
+    });
+});
+
+describe('reward track', () => {
+    const track = (points: number, premium: boolean) => ({ points, premium }) as never;
+    const prize = (requiredPoints: number, premium: boolean, claimed: boolean) =>
+        ({
+            requiredPoints,
+            premium,
+            claimed,
+            isPremiumLocked: (t: { premium: boolean }) => premium && !t.premium,
+            hasEnoughPoints: (t: { points: number }) => t.points >= requiredPoints
+        }) as never;
+
+    it('resolves the four prize states in the official order', () => {
+        expect(getRewardTrackPrizeState(prize(10, false, true), track(50, false))).toBe('claimed');
+        expect(getRewardTrackPrizeState(prize(10, true, false), track(50, false))).toBe('premium_locked');
+        expect(getRewardTrackPrizeState(prize(100, false, false), track(50, false))).toBe('not_enough_points');
+        expect(getRewardTrackPrizeState(prize(10, false, false), track(50, false))).toBe('claimable');
+        expect(getRewardTrackPrizeState(prize(10, true, false), track(50, true))).toBe('claimable');
+    });
+
+    it('falls back to the blue theme', () => {
+        expect(resolveRewardTrackTheme('unknown').dark).toBe('#3576B9');
+        // RewardTrackTheme.resolve(): red is 12077899 / 15846604 / 16309725 / 15186104.
+        expect(resolveRewardTrackTheme('red')).toEqual({ dark: '#B84B4B', medium: '#F1CCCC', light: '#F8DDDD', active: '#E7B8B8' });
+        expect(resolveRewardTrackTheme('cyan').dark).toBe('#1F9EB3');
+    });
+
+    it('filters tasks by the three tabs', () => {
+        const tasks = [
+            { id: 'a', hasProgress: false, isComplete: false },
+            { id: 'b', hasProgress: true, isComplete: false },
+            { id: 'c', hasProgress: true, isComplete: true }
+        ];
+
+        expect(filterRewardTrackTasks(tasks, 'all').length).toBe(3);
+        expect(filterRewardTrackTasks(tasks, 'in_progress').map((task) => task.id)).toEqual(['b']);
+        expect(filterRewardTrackTasks(tasks, 'completed').map((task) => task.id)).toEqual(['c']);
+    });
+
+    it('paginates prizes by required points', () => {
+        const pages = paginatePrizes([{ requiredPoints: 60 }, { requiredPoints: 20 }, { requiredPoints: 120 }], 2);
+
+        expect(pages.length).toBe(2);
+        expect(pages[0].map((p) => p.requiredPoints)).toEqual([20, 60]);
+        expect(paginatePrizes([], 4)).toEqual([[]]);
+    });
+
+    it('keeps the two tiers column-aligned when a milestone rewards only one of them', () => {
+        const prizes = [
+            { premium: false, requiredPoints: 20 },
+            { premium: true, requiredPoints: 20 },
+            { premium: true, requiredPoints: 60 },
+            { premium: false, requiredPoints: 120 },
+            { premium: true, requiredPoints: 120 }
+        ];
+
+        const pages = paginatePrizeTiers(prizes, 2);
+
+        // Page 0 spans milestones 20 and 60; only the premium tier rewards 60,
+        // so the free row keeps one prize instead of pulling 120 forward.
+        expect(pages.free[0].map((prize) => prize.requiredPoints)).toEqual([20]);
+        expect(pages.premium[0].map((prize) => prize.requiredPoints)).toEqual([20, 60]);
+        expect(pages.free[1].map((prize) => prize.requiredPoints)).toEqual([120]);
+        expect(pages.premium[1].map((prize) => prize.requiredPoints)).toEqual([120]);
+        expect(pages.free.length).toBe(pages.premium.length);
+        expect(pages.milestones).toEqual([[20, 60], [120]]);
+        expect(paginatePrizeTiers([], 4)).toEqual({ free: [[]], milestones: [[]], premium: [[]] });
+    });
+
+    it('opens a window from the hint only for the official actions that have a button', () => {
+        expect(getRewardTrackTaskHintLink('enter_other_users_room')?.link).toBe('navigator/show');
+        expect(getRewardTrackTaskHintLink('CHAT_WITH_SOMEONE')?.link).toBe('navigator/show');
+        expect(getRewardTrackTaskHintLink('place_item')?.link).toBe('inventory/show');
+        expect(getRewardTrackTaskHintLink('wear_badge')?.link).toBe('inventory/show/badges');
+        expect(getRewardTrackTaskHintLink('give_respect')).toBeNull();
+        // The official internal_link property wins over the action default.
+        expect(getRewardTrackTaskHintLink('give_respect', 'habbopages/respect')?.link).toBe('habbopages/respect');
+        expect(getRewardTrackTaskHintLink('')).toBeNull();
+    });
+
+    it('turns the boost multiplier into a percentage', () => {
+        expect(getPremiumBoostPercent(1.5)).toBe(50);
+        expect(getPremiumBoostPercent(1)).toBe(0);
+    });
+});
+
+describe('next quest timer', () => {
+    it('picks the FriendlyTime unit the wait exceeds three times', () => {
+        expect(getFriendlyTimeParts(45)).toMatchObject({ key: 'friendlytime.seconds', amount: 45 });
+        expect(getFriendlyTimeParts(180)).toMatchObject({ key: 'friendlytime.seconds', amount: 180 });
+        expect(getFriendlyTimeParts(181)).toMatchObject({ key: 'friendlytime.minutes', amount: 3 });
+        expect(getFriendlyTimeParts(4 * 3600)).toMatchObject({ key: 'friendlytime.hours', amount: 4 });
+        expect(getFriendlyTimeParts(4 * 86400)).toMatchObject({ key: 'friendlytime.days', amount: 4 });
+    });
+
+    it('reads the delayed message of the campaign', () => {
+        expect(getQuestDelayedMessageKey({ campaignCode: 'room_builder' } as never)).toBe('quests.room_builder.delayedmsg');
+    });
+
+    it('never reports a negative wait', () => {
+        expect(getQuestWaitSecondsLeft({ waitPeriodSeconds: 12 } as never, 1)).toBe(12);
+        expect(getQuestWaitSecondsLeft({ waitPeriodSeconds: -4 } as never, 1)).toBe(0);
+        expect(getQuestWaitSecondsLeft(null, 1)).toBe(0);
+    });
+});
+
+describe('getDailyTaskRewardIcon (AIR ProductIconWidget)', () => {
+    const reward = (productItemTypeId: number, rewardTypeId: string, extraParams = '') => ({ productItemTypeId, rewardTypeId, extraParams });
+
+    it('reads the product type the server sends', () => {
+        expect(getDailyTaskRewardIcon(reward(8, '0'))).toEqual({ kind: 'currency', type: 0 });
+        expect(getDailyTaskRewardIcon(reward(8, '-1'))).toEqual({ kind: 'currency', type: -1 });
+        expect(getDailyTaskRewardIcon(reward(4, 'ACH_Daily1'))).toEqual({ kind: 'badge', code: 'ACH_Daily1' });
+        expect(getDailyTaskRewardIcon(reward(1, '230'))).toEqual({ kind: 'furni', productType: 's', classId: 230 });
+        expect(getDailyTaskRewardIcon(reward(11, '230'))).toEqual({ kind: 'furni', productType: 's', classId: 230 });
+        expect(getDailyTaskRewardIcon(reward(0, '4001'))).toEqual({ kind: 'furni', productType: 'i', classId: 4001 });
+        expect(getDailyTaskRewardIcon(reward(8, 'credits'))).toBeNull();
+        expect(getDailyTaskRewardIcon(reward(-1, 'furni'))).toBeNull();
+    });
+
+    it('still reads a reward an older server sends by name', () => {
+        expect(getDailyTaskRewardIcon(reward(0, 'duckets'))).toEqual({ kind: 'currency', type: 0 });
+        expect(getDailyTaskRewardIcon(reward(0, 'Diamonds'))).toEqual({ kind: 'currency', type: 5 });
+        expect(getDailyTaskRewardIcon(reward(0, 'badge', 'ACH_X'))).toEqual({ kind: 'badge', code: 'ACH_X' });
+        expect(getDailyTaskRewardIcon(reward(0, 'pixels'))).toBeNull();
+    });
+});

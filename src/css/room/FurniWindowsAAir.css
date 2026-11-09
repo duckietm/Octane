@@ -1,0 +1,418 @@
+/*
+ * AIR text for the furni windows: dimmer, background toner, stickies, trophies (general, badge display, Niko),
+ * mannequin and custom stack height. Our `Ubuntu` face is the condensed cut; AIR's Ubuntu is the regular one,
+ * which in Octane is HabboAirUbuntu. Style 0 texts are Volter 9 px (text_styles: regular / button_regular /
+ * button_tab Volter, bold Volter Bold).
+ *
+ * The shared Button carries an important 12.6 px Tailwind size (utilities layer). An important rule in an
+ * earlier layer (base) outranks it, so the AIR button sizes are set in @layer base.
+ */
+
+/* ---------- dimmer_ui: a style 0 frame. off_text, type_text, tabs and buttons are Volter 9 px black. ---------- */
+.octane-room-widget-dimmer :is(.octane-card-tabs-shell, .octane-card-content-shell) {
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+    color: #000;
+}
+
+/* button / tab_button style 0: button_regular / button_tab, Volter 9 px regular. */
+.octane-room-widget-dimmer .octane-card-content-shell :where(button) {
+    font-weight: 400;
+}
+
+@layer base {
+    .octane-room-widget-dimmer :is(.octane-card-tabs-shell, .octane-card-content-shell) :where(*):not(svg, svg *) {
+        font-family: Volter, monospace !important;
+        font-size: 9px !important;
+    }
+}
+
+/* ---------- background_color_ui: a style 3 (Ubuntu) frame. ---------- */
+.octane-room-widget-background-color {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+/* dimmer_info: u_small, 10 px regular. */
+.octane-room-widget-background-color .bgcolor-widget-panel .bgcolor-widget-info {
+    color: #000;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 12px;
+}
+
+/* parameter (hue / saturation / lightness): u_small bold, 10 px. */
+.octane-room-widget-background-color .bgcolor-widget-panel .bgcolor-widget-label {
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 12px;
+}
+
+@layer base {
+    .octane-room-widget-background-color :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    /* apply_button / on_off_button are style 0 buttons: button_regular, Volter 9 px regular. */
+    .octane-room-widget-background-color .bgcolor-widget-actions .bgcolor-widget-button {
+        font-family: Volter, monospace !important;
+        font-size: 9px !important;
+        font-weight: 400 !important;
+    }
+}
+
+/* ---------- stickie: a style 0 container; the `text` input has no text style, so Volter 9 px black. ---------- */
+.octane-stickie .stickie-context .context-text,
+.octane-stickie .stickie-context textarea.context-text {
+    color: #000;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 12px;
+}
+
+/* ---------- trophy_general (trophies and badge displays): Ubuntu 12 px, date / name / title bold. ---------- */
+.octane-layout-trophy {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+/* greeting: regular 12 px; date, name and title: bold 12 px. */
+.octane-layout-trophy .trophy-content,
+.octane-layout-trophy .trophy-footer,
+.octane-layout-trophy .trophy-header {
+    color: #000;
+    font-size: 12px;
+}
+
+@layer base {
+    .octane-layout-trophy :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
+
+/* ---------- niko_trophy: html_textbox, store_link and date are Ubuntu 12 px white, the link underlined. ---------- */
+.octane-niko-trophy {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.octane-niko-trophy .octane-niko-trophy-band {
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-niko-trophy .octane-niko-trophy-texts .octane-niko-trophy-link {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 400;
+    text-decoration: underline;
+}
+
+@layer base {
+    .octane-niko-trophy :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
+
+/* ---------- mannequin_widget: a style 3 frame; the texts carry font_size 13 over their u_* style. ---------- */
+.octane-mannequin {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+/* outfit_name_set: u_regular at 13 px. */
+.octane-mannequin .octane-mannequin__name-input {
+    font-size: 13px;
+    font-weight: 400;
+}
+
+/* outfit_name_show (owner save): u_bold 13 px. */
+.octane-mannequin .octane-mannequin__name {
+    color: #000;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* outfit_name_show (peer wear): u_italic 13 px. */
+.octane-mannequin .octane-mannequin__name.octane-mannequin__name--peer {
+    font-style: italic;
+    font-weight: 400;
+}
+
+/* description: u_regular 13 px; back_text: u_regular 13 px underlined. */
+.octane-mannequin .octane-mannequin__text,
+.octane-mannequin .octane-mannequin__back {
+    color: #000;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+/* mannequin_peer_no_club description: u_regular without a size override, 12 px. */
+.octane-mannequin .octane-mannequin__notice {
+    color: #000;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+@layer base {
+    .octane-mannequin :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    /* configure / wear / save buttons: button_thick style 3, button_shiny_bold 12 px. */
+    .octane-mannequin :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger) {
+        font-size: 12px !important;
+        font-weight: 700 !important;
+    }
+}
+
+/* ---------- custom_stack_height: an Illumina (style 100) frame. ---------- */
+.octane-widget-custom-stack-height {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+/* height_text, the multiwalk text and input_height: il_regular 11 px black. */
+.octane-widget-custom-stack-height .octane-card-content-shell {
+    color: #000;
+    font-size: 11px;
+    line-height: 14px;
+}
+
+.octane-widget-custom-stack-height .octane-card-content-shell input {
+    font-size: 11px;
+}
+
+@layer base {
+    .octane-widget-custom-stack-height :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    /* button_above_stack / button_floor_level: button style 102, il_button 10 px bold. */
+    .octane-widget-custom-stack-height :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger) {
+        font-size: 10px !important;
+        font-weight: 700 !important;
+    }
+}
+
+/* ---------- dimmer_ui layout (277 x 225). Positions are AIR's, relative to the tab pane (tab_context at client 4, 21). ---------- */
+.octane-room-widget-dimmer.octane-dimmer {
+    width: 277px;
+    min-width: 277px;
+    max-width: 277px;
+    resize: none !important;
+}
+
+/* tab_1..3: 60, 63 and 63 px wide, from the pane's left edge. */
+.octane-dimmer .octane-dimmer__tabs {
+    justify-content: flex-start !important;
+    gap: 0 !important;
+    padding-left: 8px !important;
+}
+
+/* tab_button: 60 / 63 px in the layout, growing with its caption up to width_max 100. */
+.octane-dimmer .octane-dimmer__tabs > .octane-card-tab-item {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 63px;
+    max-width: 100px;
+}
+
+.octane-dimmer .octane-dimmer__tabs > .octane-card-tab-item:first-child {
+    min-width: 60px;
+}
+
+.octane-dimmer .octane-dimmer__tabs.is-hidden {
+    visibility: hidden;
+}
+
+.octane-dimmer .octane-dimmer__content {
+    position: relative;
+    flex: 0 0 auto;
+    height: 177px;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.octane-dimmer__pane,
+.octane-dimmer__off {
+    position: absolute;
+    left: 8px;
+    top: 0;
+    width: 258px;
+    height: 142px;
+}
+
+/* color_grid: seven 27 x 22 cells over 210 px at (17, 13). A cell is the frame, the colour button multiplied by the colour (AIR's
+   ColorTransform) and, when chosen, the chosen overlay. */
+.octane-dimmer__colors {
+    position: absolute;
+    left: 17px;
+    top: 13px;
+    width: 210px;
+    height: 22px;
+}
+
+.octane-dimmer__color {
+    position: absolute;
+    top: 0;
+    width: 27px;
+    height: 22px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--dimmer-frame) no-repeat;
+    cursor: pointer;
+    image-rendering: pixelated;
+}
+
+.octane-dimmer__color-tint,
+.octane-dimmer__color-chosen {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.octane-dimmer__color-tint {
+    background: var(--dimmer-button) no-repeat, var(--dimmer-color);
+    background-blend-mode: multiply;
+    -webkit-mask: var(--dimmer-button) no-repeat;
+    mask: var(--dimmer-button) no-repeat;
+}
+
+.octane-dimmer__color-chosen {
+    background: var(--dimmer-chosen) no-repeat;
+}
+
+.octane-dimmer__color-input {
+    position: absolute;
+    left: 17px;
+    top: 13px;
+    width: 210px;
+    height: 22px;
+}
+
+/* brightness_container at (19, 47): slider_base (201 x 12) at (2, 0); slider_button (12 x 17) moves in the 206 px area at (0, 1), 7 down. */
+.octane-dimmer__brightness {
+    position: absolute;
+    left: 19px;
+    top: 47px;
+    width: 206px;
+    height: 25px;
+}
+
+.octane-dimmer__slider-base {
+    position: absolute;
+    left: 2px;
+    top: 0;
+    width: 201px;
+    height: 12px;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.octane-dimmer__slider-area {
+    position: absolute;
+    left: 0;
+    top: 1px;
+    width: 206px;
+    height: 24px;
+}
+
+.octane-dimmer__slider-button {
+    position: absolute;
+    top: 7px;
+    width: 12px;
+    height: 17px;
+    background: no-repeat;
+    image-rendering: pixelated;
+    cursor: pointer;
+    touch-action: none;
+    outline: none;
+}
+
+.octane-dimmer__slider-button:focus-visible {
+    outline: 1px dotted #000;
+    outline-offset: 1px;
+}
+
+/* type_checkbox at (18, 72) and type_text at (37, 73); dimmer_info (222 x 46, 0x999999) at (19, 92). */
+.octane-dimmer__type {
+    position: absolute;
+    left: 18px;
+    top: 72px;
+    display: flex;
+    align-items: center;
+    gap: 1px;
+}
+
+.octane-dimmer .octane-dimmer__info {
+    position: absolute;
+    left: 19px;
+    top: 92px;
+    width: 222px;
+    color: #999999 !important;
+    white-space: normal;
+}
+
+/* off_border (254 x 133) at (2, 6): dimmer_info picture at (96, 11), off_text (219 wide) at (19, 93). */
+.octane-dimmer__off {
+    left: 10px;
+    top: 6px;
+    width: 254px;
+    height: 133px;
+    box-sizing: border-box;
+    border: 1px solid #9c9c9c;
+    border-radius: 5px;
+    background: #ffffff;
+}
+
+.octane-dimmer__off-image {
+    position: absolute;
+    left: 95px;
+    top: 10px;
+    width: 56px;
+    height: 79px;
+    image-rendering: pixelated;
+}
+
+.octane-dimmer .octane-dimmer__off-text {
+    position: absolute;
+    left: 18px;
+    top: 92px;
+    width: 219px;
+    white-space: normal;
+}
+
+/* apply_button (89 x 24) at (0, 145) and on_off_button (58 x 22) at (199, 146). */
+.octane-dimmer__actions {
+    position: absolute;
+    left: 8px;
+    top: 145px;
+    width: 258px;
+    height: 24px;
+}
+
+@layer base {
+    .octane-dimmer .octane-dimmer__actions .octane-dimmer__apply,
+    .octane-dimmer .octane-dimmer__actions .octane-dimmer__on-off {
+        position: absolute;
+        min-height: 0 !important;
+        padding: 0 4px !important;
+    }
+
+    .octane-dimmer .octane-dimmer__actions .octane-dimmer__apply {
+        left: 0;
+        top: 0;
+        width: 89px;
+        height: 24px;
+    }
+
+    .octane-dimmer .octane-dimmer__actions .octane-dimmer__on-off {
+        left: 199px;
+        top: 1px;
+        width: 58px;
+        height: 22px;
+    }
+}

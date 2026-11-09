@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findTemplateById, HK_SANCTION_TEMPLATES, HousekeepingSanctionType, templatesByType } from './HousekeepingSanctionTemplates';
+import { findTemplateById, HK_SANCTION_TEMPLATES, HousekeepingSanctionType, resolveSanctionTemplates, templatesByType } from './HousekeepingSanctionTemplates';
 
 describe('HK_SANCTION_TEMPLATES', () => {
     it('has a unique id for every template', () => {
@@ -54,5 +54,26 @@ describe('templatesByType', () => {
 
     it('returns an empty list for unknown types (defensive)', () => {
         expect(templatesByType('unknown' as never)).toEqual([]);
+    });
+});
+
+describe('resolveSanctionTemplates', () => {
+    it('falls back to the defaults for a missing or invalid value', () => {
+        expect(resolveSanctionTemplates(undefined)).toBe(HK_SANCTION_TEMPLATES);
+        expect(resolveSanctionTemplates('nope')).toBe(HK_SANCTION_TEMPLATES);
+        expect(resolveSanctionTemplates([{ id: 'x', type: 'unknown', durationValue: 1 }])).toBe(HK_SANCTION_TEMPLATES);
+    });
+
+    it('keeps valid configured entries and drops duplicates and bad durations', () => {
+        const templates = resolveSanctionTemplates([
+            { id: 'spam', type: 'mute', durationValue: 15, defaultReason: 'Spam' },
+            { id: 'spam', type: 'ban', durationValue: 1 },
+            { id: 'kick_bad', type: 'kick', durationValue: 5 },
+            { id: 'ban_bad', type: 'ban', durationValue: 0 },
+            { id: 'go', type: 'kick', durationValue: 0 }
+        ]);
+
+        expect(templates.map((t) => t.id)).toEqual(['spam', 'go']);
+        expect(templates[0]).toMatchObject({ type: HousekeepingSanctionType.MUTE, durationValue: 15, defaultReason: 'Spam', name: 'spam' });
     });
 });

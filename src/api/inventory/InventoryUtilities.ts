@@ -3,11 +3,12 @@ import {
     FurniturePlacePaintComposer,
     GetRoomEngine,
     GetRoomSessionManager,
+    PetType,
     RoomObjectCategory,
     RoomObjectPlacementSource,
     RoomObjectType
-} from '@nitrots/nitro-renderer';
-import { SendMessageComposer } from '../nitro';
+} from '@octane/renderer';
+import { IsPlayTestRestricted, SendMessageComposer } from '../octane';
 import { FurniCategory } from './FurniCategory';
 import { GroupItem } from './GroupItem';
 import { IBotItem } from './IBotItem';
@@ -40,11 +41,14 @@ export const attemptPetPlacement = (petItem: IPetItem, flag: boolean = false) =>
 
     const session = GetRoomSessionManager().getSession(1);
 
-    if (!session) return false;
+    if (!session || IsPlayTestRestricted(session)) return false;
 
     if (!session.isRoomOwner && !session.allowPets) return false;
 
     CreateLinkEvent('inventory/hide');
+
+    // A monster plant previews at its own growth stage instead of fully grown.
+    const posture = petData.typeId === PetType.MONSTERPLANT ? (petData.level >= 7 ? 'std' : `grw${petData.level}`) : null;
 
     if (
         GetRoomEngine().processRoomObjectPlacement(
@@ -52,7 +56,11 @@ export const attemptPetPlacement = (petItem: IPetItem, flag: boolean = false) =>
             -petData.id,
             RoomObjectCategory.UNIT,
             RoomObjectType.PET,
-            petData.figureData.figuredata
+            petData.figureData.figuredata,
+            null,
+            -1,
+            -1,
+            posture
         )
     ) {
         setPlacingItemId(petData.id);
@@ -64,6 +72,9 @@ export const attemptPetPlacement = (petItem: IPetItem, flag: boolean = false) =>
 
 export const attemptItemPlacement = (groupItem: GroupItem, flag: boolean = false) => {
     if (!groupItem || !groupItem.getUnlockedCount()) return false;
+
+    // Playtest: nothing is placed from the inventory (the hotel's own rule beyond AIR), as the server refuses it.
+    if (IsPlayTestRestricted(GetRoomSessionManager().getSession(-1))) return false;
 
     const item = groupItem.getLastItem();
 
@@ -120,7 +131,7 @@ export const attemptBotPlacement = (botItem: IBotItem, flag: boolean = false) =>
 
     const session = GetRoomSessionManager().getSession(1);
 
-    if (!session || !session.isRoomOwner) return false;
+    if (!session || !session.isRoomOwner || IsPlayTestRestricted(session)) return false;
 
     CreateLinkEvent('inventory/hide');
 

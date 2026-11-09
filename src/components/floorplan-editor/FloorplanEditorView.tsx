@@ -9,26 +9,45 @@ import {
     RemoveLinkEventTracker,
     RoomEngineEvent,
     RoomEntryTileMessageEvent,
+    RoomId,
     RoomOccupiedTilesMessageEvent,
     RoomVisualizationSettingsEvent,
     UpdateFloorPropertiesMessageComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
-import { FaBolt, FaBoxOpen, FaCaretLeft, FaCaretRight } from 'react-icons/fa';
-import { LocalizeText, SendMessageComposer } from '../../api';
-import { Button, ButtonGroup, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
-import { useMessageEvent, useNitroEvent } from '../../hooks';
+import { LocalizeText, SendMessageComposer, localizeWithFallback } from '../../api';
+import { Base, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
+import { useMessageEvent, useOctaneEvent } from '../../hooks';
+import { isTextEntryTarget } from '../../hooks/rooms/useRoomKeyboardMovement';
 import { useFloorplanLiveSync } from '../../hooks/rooms/widgets/useFloorplanLiveSync';
 import { useFloorplanReducer } from './hooks/useFloorplanReducer';
 import { MAX_WALL_HEIGHT, MIN_WALL_HEIGHT } from './state/constants';
 import { serializeTilemap } from './state/encoding';
+import { localizeOr } from './state/localize';
 import { areaCount } from './state/selectors';
 import { EntryDir, ThicknessLevel } from './state/types';
 import { FloorplanCanvasSVG } from './views/FloorplanCanvasSVG';
 import { FloorplanHeightPicker } from './views/FloorplanHeightPicker';
 import { FloorplanImportExport } from './views/FloorplanImportExport';
 import { FloorplanOptionsPanel } from './views/FloorplanOptionsPanel';
+import { FloorplanAirPreview } from './views/FloorplanAirPreview';
 import { FloorplanToolbar } from './views/FloorplanToolbar';
+import { FloorplanWallHeightSlider } from './views/FloorplanWallHeightSlider';
+import { BaseButton } from '../../common/BaseButton';
+import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+
+export type FloorplanEditorExternalSession = {
+    tilemap: string;
+    occupiedTiles?: boolean[][];
+    title?: string;
+    onClose: () => void;
+    onSave: (tilemap: string) => void;
+};
+
+type Props = {
+    externalSession?: FloorplanEditorExternalSession;
+};
 
 const clampThickness = (v: number): ThicknessLevel => {
     if (v <= 0) return 0;
@@ -36,13 +55,14 @@ const clampThickness = (v: number): ThicknessLevel => {
     return (v | 0) as ThicknessLevel;
 };
 
-export const FloorplanEditorView: FC = () => {
-    const [isVisible, setIsVisible] = useState(false);
+export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
+    const [roomVisible, setRoomVisible] = useState(false);
     const [importExportVisible, setImportExportVisible] = useState(false);
     const [liveSync, setLiveSync] = useState(true);
     const [panMode, setPanMode] = useState(false);
-    const [autoPickup, setAutoPickup] = useState(false);
     const { state, dispatch, loadFromServer, undo, redo, canUndo, canRedo } = useFloorplanReducer();
+    const isExternal = !!externalSession;
+    const isVisible = isExternal || roomVisible;
     const originalRef = useRef<{
         tilemap: string;
         entryPoint: [number, number];
@@ -54,23 +74,53 @@ export const FloorplanEditorView: FC = () => {
 
     const area = useMemo(() => areaCount(state.tiles), [state.tiles]);
 
-    const { setBaseline, mergeBaseline, revert: revertLivePreview } = useFloorplanLiveSync({ enabled: liveSync && isVisible, state });
+    const { setBaseline, mergeBaseline, revert: revertLivePreview } = useFloorplanLiveSync({ enabled: !isExternal && liveSync && isVisible, state });
 
-    useNitroEvent<RoomEngineEvent>(RoomEngineEvent.DISPOSED, () => setIsVisible(false));
+    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.DISPOSED, (event) => {
+        // A closed inventory/catalog preview disposes its own room; only leaving the real room hides the editor.
+        if (RoomId.isRoomPreviewerId(event.roomId)) return;
+        if (!isExternal) setRoomVisible(false);
+    });
 
     useEffect(() => {
-        if (!isVisible) return;
+        if (!externalSession) return;
+
+        const rows = externalSession.tilemap.split(/\r\n|\r|\n/).filter((row) => row.length > 0);
+        let entryPoint: [number, number] = [0, 0];
+        outer: for (let y = 0; y < rows.length; y++) {
+            for (let x = 0; x < rows[y].length; x++) {
+                if (rows[y].charAt(x).toLowerCase() === 'x') continue;
+                entryPoint = [x, y];
+                break outer;
+            }
+        }
+
+        const settings = {
+            tilemap: externalSession.tilemap,
+            entryPoint,
+            entryPointDir: 2,
+            thicknessWall: 1 as ThicknessLevel,
+            thicknessFloor: 1 as ThicknessLevel,
+            wallHeight: MIN_WALL_HEIGHT
+        };
+        originalRef.current = settings;
+        loadFromServer(settings);
+        if (externalSession.occupiedTiles) dispatch({ type: 'SET_OCCUPIED_TILES', map: externalSession.occupiedTiles });
+    }, [dispatch, externalSession?.occupiedTiles, externalSession?.tilemap, loadFromServer]);
+
+    useEffect(() => {
+        if (!isVisible || isExternal) return;
         SendMessageComposer(new GetRoomEntryTileMessageComposer());
-        // Ask the server which tiles currently hold furniture so they can be
-        // shown (and protected from editing) in the grid.
         SendMessageComposer(new GetOccupiedTilesMessageComposer());
-    }, [isVisible]);
+    }, [isExternal, isVisible]);
 
     useMessageEvent<RoomOccupiedTilesMessageEvent>(RoomOccupiedTilesMessageEvent, (event) => {
+        if (isExternal) return;
         dispatch({ type: 'SET_OCCUPIED_TILES', map: event.getParser().blockedTilesMap });
     });
 
     useMessageEvent<RoomEntryTileMessageEvent>(RoomEntryTileMessageEvent, (event) => {
+        if (isExternal) return;
         const parser = event.getParser();
         originalRef.current = {
             tilemap: originalRef.current?.tilemap ?? '',
@@ -86,6 +136,7 @@ export const FloorplanEditorView: FC = () => {
     });
 
     useMessageEvent<FloorHeightMapEvent>(FloorHeightMapEvent, (event) => {
+        if (isExternal) return;
         const parser = event.getParser();
         originalRef.current = {
             tilemap: parser.model,
@@ -115,6 +166,7 @@ export const FloorplanEditorView: FC = () => {
     });
 
     useMessageEvent<RoomVisualizationSettingsEvent>(RoomVisualizationSettingsEvent, (event) => {
+        if (isExternal) return;
         const parser = event.getParser();
         const wall = clampThickness(convertSettingToNumber(parser.thicknessWall));
         const floor = clampThickness(convertSettingToNumber(parser.thicknessFloor));
@@ -134,9 +186,7 @@ export const FloorplanEditorView: FC = () => {
         if (!isVisible) return;
         const handler = (e: KeyboardEvent) => {
             if (!(e.ctrlKey || e.metaKey)) return;
-            const target = e.target as HTMLElement | null;
-            const tag = target?.tagName;
-            if (tag === 'INPUT' || tag === 'TEXTAREA' || target?.isContentEditable) return;
+            if (isTextEntryTarget(e.target)) return;
             const key = e.key.toLowerCase();
             if (key === 'z' && !e.shiftKey) {
                 e.preventDefault();
@@ -151,19 +201,20 @@ export const FloorplanEditorView: FC = () => {
     }, [isVisible, undo, redo]);
 
     useEffect(() => {
+        if (isExternal) return;
         const linkTracker: ILinkEventTracker = {
             linkReceived: (url: string) => {
                 const parts = url.split('/');
                 if (parts.length < 2) return;
                 switch (parts[1]) {
                     case 'show':
-                        setIsVisible(true);
+                        setRoomVisible(true);
                         return;
                     case 'hide':
-                        setIsVisible(false);
+                        setRoomVisible(false);
                         return;
                     case 'toggle':
-                        setIsVisible((v) => !v);
+                        setRoomVisible((v) => !v);
                         return;
                 }
             },
@@ -171,7 +222,7 @@ export const FloorplanEditorView: FC = () => {
         };
         AddLinkEventTracker(linkTracker);
         return () => RemoveLinkEventTracker(linkTracker);
-    }, []);
+    }, [isExternal]);
 
     const onWallHeightChange = (value: number) => {
         if (isNaN(value) || value <= 0) value = MIN_WALL_HEIGHT;
@@ -180,6 +231,12 @@ export const FloorplanEditorView: FC = () => {
     };
 
     const saveFloorChanges = () => {
+        if (externalSession) {
+            externalSession.onSave(serializeTilemap(state.tiles));
+            externalSession.onClose();
+            return;
+        }
+
         SendMessageComposer(
             new UpdateFloorPropertiesMessageComposer(
                 serializeTilemap(state.tiles),
@@ -189,7 +246,7 @@ export const FloorplanEditorView: FC = () => {
                 convertNumbersForSaving(state.thickness.wall),
                 convertNumbersForSaving(state.thickness.floor),
                 state.wallHeight - 1,
-                autoPickup
+                state.pickUpBlocking
             )
         );
     };
@@ -198,106 +255,162 @@ export const FloorplanEditorView: FC = () => {
         const o = originalRef.current;
         if (!o) return;
         loadFromServer(o);
-        if (liveSync) revertLivePreview();
+        if (!isExternal && liveSync) revertLivePreview();
+    };
+
+    const closeEditor = () => {
+        setImportExportVisible(false);
+        if (externalSession) externalSession.onClose();
+        else setRoomVisible(false);
     };
 
     return (
-        <>
-            {isVisible && (
-                <NitroCardView uniqueKey="floorpan-editor" className="w-[820px] h-[620px]" theme="primary-slim">
-                    <NitroCardHeaderView headerText={LocalizeText('floor.plan.editor.title')} onCloseClick={() => setIsVisible(false)} />
-                    <NitroCardContentView overflow="hidden" className="flex flex-col gap-2">
-                        <FloorplanToolbar
-                            state={state}
-                            dispatch={dispatch}
-                            canUndo={canUndo}
-                            canRedo={canRedo}
-                            onUndo={undo}
-                            onRedo={redo}
-                            panMode={panMode}
-                            setPanMode={setPanMode}
-                        />
-                        <FloorplanOptionsPanel state={state} dispatch={dispatch} />
-                        <Flex gap={2} className="flex-1 min-h-0">
-                            <FloorplanHeightPicker selectedH={state.brush.h} onSelect={(h) => dispatch({ type: 'BRUSH_SET', h })} />
-                            <FloorplanCanvasSVG state={state} dispatch={dispatch} panMode={panMode} />
-                        </Flex>
-                        <Flex gap={3} alignItems="center" className="px-1">
-                            <Flex gap={1} alignItems="center">
-                                <Text bold small className="text-zinc-700">
-                                    {LocalizeText('floor.editor.wall.height')}
-                                </Text>
-                                <FaCaretLeft className="cursor-pointer fa-icon text-zinc-600" onClick={() => onWallHeightChange(state.wallHeight - 1)} />
-                                <input
-                                    type="number"
-                                    className="form-control form-control-sm w-[49px] text-center"
-                                    value={state.wallHeight}
-                                    onChange={(e) => onWallHeightChange(e.target.valueAsNumber)}
-                                />
-                                <FaCaretRight className="cursor-pointer fa-icon text-zinc-600" onClick={() => onWallHeightChange(state.wallHeight + 1)} />
-                            </Flex>
-                            <Text bold small className="text-zinc-700">
-                                Area: <span className="tabular-nums">{area.total}</span> ({area.walkable} tiles)
-                            </Text>
-                            <Flex
-                                alignItems="center"
-                                gap={1}
-                                className={`ml-auto border rounded px-2 py-1 cursor-pointer select-none ${autoPickup ? 'bg-amber-500/15 border-amber-500 text-amber-700' : 'border-zinc-400 text-zinc-600'}`}
-                                onClick={() => setAutoPickup((v) => !v)}
-                                title="On save: pick up furniture blocking the new floor plan and return it to its owner's inventory"
-                            >
-                                <FaBoxOpen className={autoPickup ? 'text-amber-600' : 'text-zinc-500'} />
-                                <Text bold small>
-                                    {autoPickup ? 'Pick up blocking furni ON' : 'Pick up blocking furni OFF'}
-                                </Text>
-                            </Flex>
-                            <Flex
-                                alignItems="center"
-                                gap={1}
-                                className={`border rounded px-2 py-1 cursor-pointer select-none ${liveSync ? 'bg-emerald-500/15 border-emerald-500 text-emerald-700' : 'border-zinc-400 text-zinc-600'}`}
-                                onClick={() => setLiveSync((v) => !v)}
-                                title="Local in-room preview while drawing (does not save to server)"
-                            >
-                                <FaBolt className={liveSync ? 'text-emerald-600' : 'text-zinc-500'} />
-                                <Text bold small>
-                                    {liveSync ? 'Live preview ON' : 'Live preview OFF'}
-                                </Text>
-                            </Flex>
-                        </Flex>
-                        <Flex justifyContent="between">
-                            <Button variant="danger" onClick={revertChanges}>
-                                {LocalizeText('floor.plan.editor.reload')}
-                            </Button>
-                            <ButtonGroup>
-                                <Button onClick={() => setImportExportVisible(true)}>{LocalizeText('floor.plan.editor.import.export')}</Button>
-                                <Button onClick={saveFloorChanges}>{LocalizeText('floor.plan.editor.save')}</Button>
-                            </ButtonGroup>
-                        </Flex>
-                    </NitroCardContentView>
-                </NitroCardView>
-            )}
-            {importExportVisible && (
-                <FloorplanImportExport
-                    state={state}
-                    dispatch={dispatch}
-                    onClose={() => setImportExportVisible(false)}
-                    onSaveFromText={(raw) => {
-                        SendMessageComposer(
-                            new UpdateFloorPropertiesMessageComposer(
-                                raw,
-                                state.door.x,
-                                state.door.y,
-                                state.door.dir,
-                                convertNumbersForSaving(state.thickness.wall),
-                                convertNumbersForSaving(state.thickness.floor),
-                                state.wallHeight - 1,
-                                autoPickup
-                            )
-                        );
-                    }}
-                    onRevertText={() => originalRef.current?.tilemap ?? serializeTilemap(state.tiles)}
-                />
-            )}
-        </>
+        <NativeTextTree>
+            <>
+                {isVisible && (
+                    // AIR floor_plan_editor_bc: a 662x600 frame with the subtitle strip, the plan panel (draw mode, tile height,
+                    // heightmap) on the left, the preview panel (enter direction, room options, wall height, preview) on the
+                    // right and the reload / import-export / cancel / save buttons at the bottom.
+                    <OctaneCardView
+                        uniqueKey="floorpan-editor"
+                        className="w-[662px] h-[600px] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+                        classNames={['octane-floorplan-window']}
+                        theme="primary-slim"
+                        isResizable={false}
+                    >
+                        <OctaneCardHeaderView headerText={externalSession?.title ?? LocalizeText('floor.plan.editor.title')} onCloseClick={closeEditor} />
+                        <OctaneCardContentView overflow="hidden" className="flex flex-col">
+                            <div className="fp-body">
+                                <div className="fp-banner">
+                                    <span className="fp-banner-logo" />
+                                    <span className="fp-banner-text">
+                                        {localizeOr('floor.plan.editor.subtitle', localizeWithFallback('octane.floorplan_editor.edit_the_floor_plan_of_your', 'Edit the floor plan of your room to build more complex rooms and games.'))}
+                                    </span>
+                                    {!isExternal && (
+                                        <div className="fp-banner-toggles">
+                                            <Base component={BaseButton} type="button"
+                                                pointer
+                                                data-testid="floorplan-live-sync"
+                                                data-active={liveSync ? 'true' : 'false'}
+                                                className={`fp-toggle ${liveSync ? 'is-on' : ''}`}
+                                                onClick={() => setLiveSync((v) => !v)}
+                                                title={localizeWithFallback('octane.floorplan_editor.local_in_room_preview_while_drawing', 'Local in-room preview while drawing (does not save to server)')}
+                                            >
+                                                <span className="fp-toggle-dot" />
+                                                {liveSync ? localizeWithFallback('octane.floorplan_editor.live_preview_on', 'Live preview ON') : localizeWithFallback('octane.floorplan_editor.live_preview_off', 'Live preview OFF')}
+                                            </Base>
+                                            <Base component={BaseButton} type="button"
+                                                pointer
+                                                data-testid="floorplan-auto-pickup"
+                                                data-active={state.pickUpBlocking ? 'true' : 'false'}
+                                                className={`fp-toggle is-warm ${state.pickUpBlocking ? 'is-on' : ''}`}
+                                                onClick={() => dispatch({ type: 'SET_PICK_UP_BLOCKING', value: !state.pickUpBlocking })}
+                                                title={localizeWithFallback('octane.floorplan_editor.on_save_pick_up_furniture_blocking', 'On save: pick up furniture blocking the new floor plan and return it to its owner\'s inventory')}
+                                            >
+                                                <span className="fp-toggle-dot" />
+                                                {state.pickUpBlocking ? localizeWithFallback('octane.floorplan_editor.pick_up_blocking_furni_on', 'Pick up blocking furni ON') : localizeWithFallback('octane.floorplan_editor.pick_up_blocking_furni_off', 'Pick up blocking furni OFF')}
+                                            </Base>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="fp-panels">
+                                    <div className="fp-panel is-plan" data-testid="floorplan-plan-panel">
+                                        <FloorplanToolbar
+                                            state={state}
+                                            dispatch={dispatch}
+                                            canUndo={canUndo}
+                                            canRedo={canRedo}
+                                            onUndo={undo}
+                                            onRedo={redo}
+                                            panMode={panMode}
+                                            setPanMode={setPanMode}
+                                            includeDoor={!isExternal}
+                                        />
+                                        <div className="fp-panel-head">
+                                            <span className="fp-panel-title">{localizeOr('floor.plan.editor.tile.height', localizeWithFallback('octane.floorplan_editor.set_height', 'Set height'))}</span>
+                                            <Hint content={localizeWithFallback('octane.floorplan_editor.brush_height', 'Brush height')}>
+                                                <div aria-label={localizeWithFallback('octane.floorplan_editor.brush_height_h', 'Brush height %h%', ['h'], [String(state.brush.h)])} className="fp-badge is-brush" data-testid="brush-height-badge" role="img">
+                                                    {state.brush.h}
+                                                </div>
+                                            </Hint>
+                                            <span className="fp-panel-info" data-testid="floorplan-area">
+                                                {localizeOr('floor.plan.editor.area', localizeWithFallback('octane.floorplan_editor.area_total_walkable_tiles', 'Area: %total% (%walkable% tiles)', ['total', 'walkable'], [String(area.total), String(area.walkable)]), ['total', 'walkable'], [String(area.total), String(area.walkable)])}
+                                            </span>
+                                        </div>
+                                        <FloorplanHeightPicker selectedH={state.brush.h} onSelect={(h) => dispatch({ type: 'BRUSH_SET', h })} />
+                                        <div className="fp-panel-body">
+                                            <FloorplanCanvasSVG state={state} dispatch={dispatch} panMode={panMode} />
+                                        </div>
+                                    </div>
+                                    <div className="fp-panel is-preview" data-testid="floorplan-preview-panel">
+                                        {!isExternal && (
+                                            <div className="fp-options">
+                                                <FloorplanOptionsPanel state={state} dispatch={dispatch} />
+                                            </div>
+                                        )}
+                                        <div className="fp-panel-head">
+                                            <span className="fp-panel-title">{LocalizeText('floor.editor.wall.height')}</span>
+                                            <Hint content={localizeWithFallback('octane.floorplan_editor.wall_height', 'Wall height')}>
+                                                <div aria-label={localizeWithFallback('octane.floorplan_editor.wall_height_wall_height', 'Wall height %wall_height%', ['wall_height'], [String(state.wallHeight)])} className="fp-badge" data-testid="wall-height-badge" role="img">
+                                                    {state.wallHeight}
+                                                </div>
+                                            </Hint>
+                                            <FloorplanWallHeightSlider value={state.wallHeight} onChange={onWallHeightChange} />
+                                        </div>
+                                        <div className="fp-panel-body">
+                                            <FloorplanAirPreview state={state} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="fp-footer">
+                                    <Base component={BaseButton} type="button" pointer className="fp-btn" data-testid="floorplan-revert" onClick={revertChanges}>
+                                        {LocalizeText('floor.plan.editor.reload')}
+                                    </Base>
+                                    <div className="fp-footer-right">
+                                        <Base component={BaseButton} type="button" pointer className="fp-btn" data-testid="floorplan-import-export" onClick={() => setImportExportVisible(true)}>
+                                            {LocalizeText('floor.plan.editor.import.export')}
+                                        </Base>
+                                        <Base component={BaseButton} type="button" pointer className="fp-btn" data-testid="floorplan-cancel" onClick={closeEditor}>
+                                            {localizeOr('floor.plan.editor.cancel', 'Cancel')}
+                                        </Base>
+                                        <Base component={BaseButton} type="button" pointer className="fp-btn is-blue" data-testid="floorplan-save" onClick={saveFloorChanges}>
+                                            {LocalizeText('floor.plan.editor.save')}
+                                        </Base>
+                                    </div>
+                                </div>
+                            </div>
+                        </OctaneCardContentView>
+                    </OctaneCardView>
+                )}
+                {importExportVisible && (
+                    <FloorplanImportExport
+                        state={state}
+                        dispatch={dispatch}
+                        onClose={() => setImportExportVisible(false)}
+                        onSaveFromText={(raw) => {
+                            if (externalSession) {
+                                externalSession.onSave(raw);
+                                setImportExportVisible(false);
+                                externalSession.onClose();
+                                return;
+                            }
+                            SendMessageComposer(
+                                new UpdateFloorPropertiesMessageComposer(
+                                    raw,
+                                    state.door.x,
+                                    state.door.y,
+                                    state.door.dir,
+                                    convertNumbersForSaving(state.thickness.wall),
+                                    convertNumbersForSaving(state.thickness.floor),
+                                    state.wallHeight - 1,
+                                    state.pickUpBlocking
+                                )
+                            );
+                        }}
+                        onRevertText={() => originalRef.current?.tilemap ?? serializeTilemap(state.tiles)}
+                    />
+                )}
+            </>
+        </NativeTextTree>
     );
 };

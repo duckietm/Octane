@@ -1,211 +1,109 @@
 import {
     CallForHelpCategoryData,
     CfhSanctionMessageEvent,
+    CfhSanctionTypeData,
     CfhTopicsInitEvent,
+    GetModeratorUserInfoMessageComposer,
     IssueDeletedMessageEvent,
     IssueInfoMessageEvent,
     IssueMessageData,
-    IssuePickFailedMessageEvent,
     ModeratorActionResultMessageEvent,
     ModeratorInitData,
-    ModeratorInitMessageEvent,
-    ModeratorToolPreferencesEvent
-} from '@nitrots/nitro-renderer';
-import { useState } from 'react';
-import { useBetween } from 'use-between';
-import { NotificationAlertType, PlaySound, SoundNames } from '../../api';
+    ModeratorInitMessageEvent
+} from '@octane/renderer';
+import { useCallback, useState } from 'react';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
+import { NotificationAlertType, SendMessageComposer, localizeWithFallback } from '../../api';
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
+import { showModAlert } from './modAlertStore';
 
+export interface ModToolsSanctionEntry {
+    label: string;
+    at: number;
+}
+
+/**
+ * Moderator state shared by the mod tools, the toolbar and housekeeping: the init data (permissions and message templates), the flat
+ * issue list, the CFH topics, the sanction the server proposes per issue and what this moderator applied to whom this session. The
+ * windows themselves are placed by `useModWindowTrackerStore` and the issues are bundled by `useIssueManagerStore`.
+ */
 const useModToolsState = () => {
     const [settings, setSettings] = useState<ModeratorInitData>(null);
-    const [openRooms, setOpenRooms] = useState<number[]>([]);
-    const [openRoomChatlogs, setOpenRoomChatlogs] = useState<number[]>([]);
-    const [openUserInfos, setOpenUserInfos] = useState<number[]>([]);
-    const [openUserChatlogs, setOpenUserChatlogs] = useState<number[]>([]);
     const [tickets, setTickets] = useState<IssueMessageData[]>([]);
     const [cfhCategories, setCfhCategories] = useState<CallForHelpCategoryData[]>([]);
+    // What this moderator has already applied to whom, for as long as the client is open.
+    // Two panels on the same person is the easy way to sanction twice for one thing.
+    const [sanctionLog, setSanctionLog] = useState<Record<number, ModToolsSanctionEntry[]>>({});
+    // The sanction the server proposes for an issue's topic; it arrives when the issue is picked.
+    const [issueSanctions, setIssueSanctions] = useState<Record<number, CfhSanctionTypeData>>({});
     const { simpleAlert = null } = useNotification();
 
-    const openRoomInfo = (roomId: number) => {
-        if (openRooms.indexOf(roomId) >= 0) return;
-
-        setOpenRooms((prevValue) => [...prevValue, roomId]);
-    };
-
-    const closeRoomInfo = (roomId: number) => {
-        setOpenRooms((prevValue) => {
-            const newValue = [...prevValue];
-            const existingIndex = newValue.indexOf(roomId);
-
-            if (existingIndex >= 0) newValue.splice(existingIndex, 1);
-
-            return newValue;
-        });
-    };
-
-    const toggleRoomInfo = (roomId: number) => {
-        if (openRooms.indexOf(roomId) >= 0) closeRoomInfo(roomId);
-        else openRoomInfo(roomId);
-    };
-
-    const openRoomChatlog = (roomId: number) => {
-        if (openRoomChatlogs.indexOf(roomId) >= 0) return;
-
-        setOpenRoomChatlogs((prevValue) => [...prevValue, roomId]);
-    };
-
-    const closeRoomChatlog = (roomId: number) => {
-        setOpenRoomChatlogs((prevValue) => {
-            const newValue = [...prevValue];
-            const existingIndex = newValue.indexOf(roomId);
-
-            if (existingIndex >= 0) newValue.splice(existingIndex, 1);
-
-            return newValue;
-        });
-    };
-
-    const toggleRoomChatlog = (roomId: number) => {
-        if (openRoomChatlogs.indexOf(roomId) >= 0) closeRoomChatlog(roomId);
-        else openRoomChatlog(roomId);
-    };
-
-    const openUserInfo = (userId: number) => {
-        if (openUserInfos.indexOf(userId) >= 0) return;
-
-        setOpenUserInfos((prevValue) => [...prevValue, userId]);
-    };
-
-    const closeUserInfo = (userId: number) => {
-        setOpenUserInfos((prevValue) => {
-            const newValue = [...prevValue];
-            const existingIndex = newValue.indexOf(userId);
-
-            if (existingIndex >= 0) newValue.splice(existingIndex, 1);
-
-            return newValue;
-        });
-    };
-
-    const toggleUserInfo = (userId: number) => {
-        if (openUserInfos.indexOf(userId) >= 0) closeUserInfo(userId);
-        else openUserInfo(userId);
-    };
-
-    const openUserChatlog = (userId: number) => {
-        if (openUserChatlogs.indexOf(userId) >= 0) return;
-
-        setOpenUserChatlogs((prevValue) => [...prevValue, userId]);
-    };
-
-    const closeUserChatlog = (userId: number) => {
-        setOpenUserChatlogs((prevValue) => {
-            const newValue = [...prevValue];
-            const existingIndex = newValue.indexOf(userId);
-
-            if (existingIndex >= 0) newValue.splice(existingIndex, 1);
-
-            return newValue;
-        });
-    };
-
-    const toggleUserChatlog = (userId: number) => {
-        if (openUserChatlogs.indexOf(userId) >= 0) closeUserChatlog(userId);
-        else openUserChatlog(userId);
-    };
-
     useMessageEvent<ModeratorInitMessageEvent>(ModeratorInitMessageEvent, (event) => {
-        const parser = event.getParser();
-        const data = parser.data;
+        const data = event.getParser().data;
 
         setSettings(data);
         setTickets(data.issues);
     });
 
     useMessageEvent<IssueInfoMessageEvent>(IssueInfoMessageEvent, (event) => {
-        const parser = event.getParser();
+        const issue = event.getParser().issueData;
 
         setTickets((prevValue) => {
             const newValue = [...prevValue];
-            const existingIndex = newValue.findIndex((ticket) => ticket.issueId === parser.issueData.issueId);
+            const existingIndex = newValue.findIndex((ticket) => ticket.issueId === issue.issueId);
 
-            if (existingIndex >= 0) newValue[existingIndex] = parser.issueData;
-            else {
-                newValue.push(parser.issueData);
-
-                PlaySound(SoundNames.MODTOOLS_NEW_TICKET);
-            }
+            if (existingIndex >= 0) newValue[existingIndex] = issue;
+            else newValue.push(issue);
 
             return newValue;
         });
-    });
-
-    useMessageEvent<ModeratorToolPreferencesEvent>(ModeratorToolPreferencesEvent, (event) => {
-        const parser = event.getParser();
-    });
-
-    useMessageEvent<IssuePickFailedMessageEvent>(IssuePickFailedMessageEvent, (event) => {
-        const parser = event.getParser();
-
-        if (!parser) return;
-
-        simpleAlert('Failed to pick issue', NotificationAlertType.DEFAULT, null, null, 'Error');
     });
 
     useMessageEvent<IssueDeletedMessageEvent>(IssueDeletedMessageEvent, (event) => {
-        const parser = event.getParser();
+        const issueId = event.getParser().issueId;
 
-        setTickets((prevValue) => {
-            const newValue = [...prevValue];
-            const existingIndex = newValue.findIndex((ticket) => ticket.issueId === parser.issueId);
-
-            if (existingIndex >= 0) newValue.splice(existingIndex, 1);
-
-            return newValue;
-        });
+        setTickets((prevValue) => prevValue.filter((ticket) => ticket.issueId !== issueId));
     });
 
+    // AIR ModerationMessageHandler action result: a success asks for the user's info again (the open user info windows refresh) and
+    // a failure raises the alert. The success notification is kept from the earlier mod tools.
     useMessageEvent<ModeratorActionResultMessageEvent>(ModeratorActionResultMessageEvent, (event) => {
         const parser = event.getParser();
 
-        if (parser.success) simpleAlert('Moderation action was successful', NotificationAlertType.MODERATION, null, null, 'Success');
-        else simpleAlert('There was a problem applying the moderation action', NotificationAlertType.MODERATION, null, null, 'Error');
+        if (parser.success) {
+            if (parser.userId > 0) SendMessageComposer(new GetModeratorUserInfoMessageComposer(parser.userId));
+
+            simpleAlert?.(localizeWithFallback('octane.mod_tools.moderation_action_was_successful', 'Moderation action was successful'), NotificationAlertType.MODERATION, null, null, 'Success');
+        } else showModAlert(localizeWithFallback('octane.mod_tools.moderation_action_failed_if_you_tried', 'Moderation action failed. If you tried to ban a user, please check if the user is already banned.'));
     });
 
     useMessageEvent<CfhTopicsInitEvent>(CfhTopicsInitEvent, (event) => {
-        const parser = event.getParser();
-
-        setCfhCategories(parser.callForHelpCategories);
+        setCfhCategories(event.getParser().callForHelpCategories);
     });
 
     useMessageEvent<CfhSanctionMessageEvent>(CfhSanctionMessageEvent, (event) => {
         const parser = event.getParser();
 
-        // todo: update sanction data
+        if (!parser?.sanctionType || parser.issueId <= 0) return;
+
+        setIssueSanctions((prevValue) => ({ ...prevValue, [parser.issueId]: parser.sanctionType }));
     });
+
+    const recordSanction = useCallback((userId: number, label: string) => {
+        setSanctionLog((prev) => ({ ...prev, [userId]: [...(prev[userId] ?? []), { label, at: Date.now() }] }));
+    }, []);
 
     return {
         settings,
-        openRooms,
-        openRoomChatlogs,
-        openUserChatlogs,
-        openUserInfos,
+        sanctionLog,
+        recordSanction,
         cfhCategories,
-        tickets,
-        openRoomInfo,
-        closeRoomInfo,
-        toggleRoomInfo,
-        openRoomChatlog,
-        closeRoomChatlog,
-        toggleRoomChatlog,
-        openUserInfo,
-        closeUserInfo,
-        toggleUserInfo,
-        openUserChatlog,
-        closeUserChatlog,
-        toggleUserChatlog
+        issueSanctions,
+        tickets
     };
 };
 
-export const useModTools = () => useBetween(useModToolsState);
+export const useModTools = () => useSharedHook(useModToolsState);
+
+registerSharedHook(useModToolsState);

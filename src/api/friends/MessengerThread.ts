@@ -7,7 +7,9 @@ import { MessengerThreadChatGroup } from './MessengerThreadChatGroup';
 export class MessengerThread {
     public static MESSAGE_RECEIVED: string = 'MT_MESSAGE_RECEIVED';
     public static THREAD_ID: number = 0;
-    private static MAX_CHATS: number = 250;
+    private static MAX_CHATS: number = 500;
+    /** AIR MainView.shouldCombineWithPreviousEntry: messages combine into one block within 10 minutes. */
+    public static COMBINE_WINDOW_MS: number = 600000;
 
     private _threadId: number;
     private _participant: MessengerFriend;
@@ -23,26 +25,94 @@ export class MessengerThread {
         this._unreadCount = 0;
     }
 
-    public addMessage(senderId: number, message: string, secondsSinceSent: number = 0, extraData: string = null, type: number = 0): MessengerThreadChat {
-        const isGroupChat = senderId < 0 && extraData;
-        const userId = isGroupChat ? GetGroupChatData(extraData).userId : senderId;
+    /**
+     * A copy to change in a state update: its own groups, lines and participant. A shallow copy shared the lists with
+     * the previous state, so an update React runs twice (StrictMode, or a replayed render) added every line twice.
+     */
+    public clone(): MessengerThread {
+        const copy: MessengerThread = Object.assign(Object.create(MessengerThread.prototype), this);
 
-        const group = this.getLastGroup(userId);
+        copy._groups = this._groups.map((group) => group.clone());
+        copy._participant = this._participant ? Object.assign(Object.create(Object.getPrototypeOf(this._participant)), this._participant) : this._participant;
 
-        if (!group) return;
+        return copy;
+    }
 
-        if (isGroupChat) group.type = MessengerGroupType.GROUP_CHAT;
+    public addMessage(
+        senderId: number,
+        message: string,
+        secondsSinceSent: number = 0,
+        extraData: string = null,
+        type: number = 0,
+        chatId: number = 0
+    ): MessengerThreadChat {
+        const chat = MessengerThread.appendChat(this._groups, senderId, message, secondsSinceSent, extraData, type, chatId);
 
-        const chat = new MessengerThreadChat(senderId, message, secondsSinceSent, extraData, type);
-
-        group.addChat(chat);
         this.pruneChats();
 
         this._lastUpdated = new Date();
 
-        this._unreadCount++;
+        // AIR MainView.recordChatEntry: only a chat line or a room invite lights the conversation; online / offline
+        // lines and warnings do not.
+        if (MessengerThread.countsAsUnread(type)) this._unreadCount++;
 
         return chat;
+    }
+
+    /**
+     * AIR MainView loadMessageHistory: older messages go above the ones already shown. `messages` run oldest first,
+     * and none of them lights the conversation.
+     */
+    public addHistoryMessages(messages: { senderId: number; message: string; secondsSinceSent: number; extraData: string; type: number }[]): void {
+        if (!messages.length) return;
+
+        const historyGroups: MessengerThreadChatGroup[] = [];
+
+        for (const message of messages) {
+            MessengerThread.appendChat(historyGroups, message.senderId, message.message, message.secondsSinceSent, message.extraData, message.type);
+        }
+
+        this._groups = [...historyGroups, ...this._groups];
+        this.pruneChats();
+    }
+
+    public static countsAsUnread(type: number): boolean {
+        return type !== MessengerThreadChat.STATUS_NOTIFICATION && type !== MessengerThreadChat.SECURITY_NOTIFICATION;
+    }
+
+    private static appendChat(
+        groups: MessengerThreadChatGroup[],
+        senderId: number,
+        message: string,
+        secondsSinceSent: number,
+        extraData: string,
+        type: number,
+        chatId: number = 0
+    ): MessengerThreadChat {
+        const isGroupChat = senderId < 0 && extraData;
+        const userId = isGroupChat ? GetGroupChatData(extraData).userId : senderId;
+        const chat = new MessengerThreadChat(senderId, message, secondsSinceSent, extraData, type, chatId);
+        const group = MessengerThread.groupFor(groups, userId, chat);
+
+        if (isGroupChat) group.type = MessengerGroupType.GROUP_CHAT;
+
+        group.addChat(chat);
+
+        return chat;
+    }
+
+    /** The last block when the line is from the same sender within the combine window, otherwise a new block. */
+    private static groupFor(groups: MessengerThreadChatGroup[], userId: number, chat: MessengerThreadChat): MessengerThreadChatGroup {
+        const last = groups[groups.length - 1];
+        const lastChat = last?.chats[last.chats.length - 1];
+
+        if (last && last.userId === userId && (!lastChat || chat.date.getTime() < lastChat.date.getTime() + MessengerThread.COMBINE_WINDOW_MS)) return last;
+
+        const group = new MessengerThreadChatGroup(userId);
+
+        groups.push(group);
+
+        return group;
     }
 
     public getChat(chatId: number): MessengerThreadChat {
@@ -73,16 +143,29 @@ export class MessengerThread {
         }
     }
 
-    private getLastGroup(userId: number): MessengerThreadChatGroup {
-        let group = this._groups[this._groups.length - 1];
+    /**
+     * Marks the newest own chat line with this text as failed, as the server reports refused
+     * messages by their text. Returns the marked line, or null when none matches.
+     */
+    public markOwnMessageFailed(senderId: number, message: string, failureText: string): MessengerThreadChat {
+        const text = (message ?? '').trim();
 
-        if (group && group.userId === userId) return group;
+        for (let groupIndex = this._groups.length - 1; groupIndex >= 0; groupIndex--) {
+            const chats = this._groups[groupIndex].chats;
 
-        group = new MessengerThreadChatGroup(userId);
+            for (let chatIndex = chats.length - 1; chatIndex >= 0; chatIndex--) {
+                const chat = chats[chatIndex];
 
-        this._groups.push(group);
+                if (chat.senderId !== senderId || chat.type !== MessengerThreadChat.CHAT || chat.failed) continue;
+                if ((chat.message ?? '').trim() !== text) continue;
 
-        return group;
+                chat.setFailed(failureText);
+
+                return chat;
+            }
+        }
+
+        return null;
     }
 
     public setRead(): void {

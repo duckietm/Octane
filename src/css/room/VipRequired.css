@@ -1,0 +1,118 @@
+/*
+ * AIR viprequired_xml (habbo-room-ui-com): frame 310 wide, a 290px vertical list at x10 with the
+ * title (il_heading_1, #c30000), the body text, a separator, the green "Get HC" thick button
+ * (133x32 at x79) and the underlined benefits link (262x21 at x14, centered). The list grows with
+ * the body text, so the window height follows it.
+ */
+.octane-card-shell.octane-vip-required,
+.draggable-window:has(> .octane-vip-required) {
+    box-sizing: border-box;
+    width: 310px !important;
+    min-width: 310px !important;
+    max-width: 310px !important;
+    min-height: 149px !important;
+}
+
+.octane-card-shell.octane-vip-required {
+    resize: none !important;
+}
+
+.octane-vip-required,
+.octane-vip-required * {
+    box-sizing: border-box;
+}
+
+.octane-card-shell.octane-vip-required .octane-vip-required-content.container-fluid {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0;
+    width: 310px !important;
+    margin: 0 !important;
+    padding: 0 10px 6px !important;
+    background: transparent !important;
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+/* title: label 19px high, il_heading_1 in red. */
+.octane-vip-required-title {
+    height: 19px;
+    color: #c30000 !important;
+    font-family: HabboAirUbuntuBold, UbuntuBold, HabboAirUbuntu, sans-serif !important;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 19px;
+}
+
+/* bodytext: 291 wide, auto height, margin_bottom 8. */
+.octane-vip-required-body {
+    width: 291px;
+    margin-bottom: 8px;
+    color: #000000;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+/* list_top/list_bottom spacing 3, then illumina_horizontal_separator (291x3) and the 4px spacer. */
+.octane-vip-required-separator {
+    width: 291px;
+    height: 3px;
+    margin: 3px 0 5px;
+    border-top: 1px solid #b6b6b6;
+    border-bottom: 1px solid #ffffff;
+}
+
+.octane-vip-required-buy {
+    display: inline-flex !important;
+    align-self: flex-start;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 133px !important;
+    height: 32px !important;
+    margin: 1px 0 1px 79px !important;
+    padding: 0 8px !important;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-width: 5px !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny-thick-green) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #ffffff !important;
+    font-family: HabboAirUbuntuBold, UbuntuBold, HabboAirUbuntu, sans-serif;
+    font-size: 12px !important;
+    font-weight: bold;
+    white-space: nowrap;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+
+.octane-vip-required-buy:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-green-hover) !important;
+}
+
+.octane-vip-required-buy:active {
+    border-image-source: var(--habbo-skin-shiny-thick-green-pressed) !important;
+}
+
+.octane-vip-required-benefits {
+    width: 262px;
+    min-height: 21px;
+    margin: 0 0 0 14px;
+    padding: 0 0 5px;
+    border: 0;
+    background: transparent;
+    color: #000000;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: underline;
+    line-height: 16px;
+}
+
+.octane-vip-required-benefits:hover {
+    color: #075c86;
+}

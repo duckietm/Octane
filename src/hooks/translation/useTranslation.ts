@@ -1,9 +1,11 @@
-import { GetConfiguration, GetLocalizationManager, GetSessionDataManager, TranslationLanguagesEvent, TranslationLanguagesRequestComposer, TranslationResultEvent, TranslationTextRequestComposer } from '@nitrots/nitro-renderer';
+import { GetConfiguration, GetLocalizationManager, GetSessionDataManager, TranslationLanguagesEvent, TranslationLanguagesRequestComposer, TranslationResultEvent, TranslationTextRequestComposer } from '@octane/renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useBetween } from 'use-between';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { LocalStorageKeys, SendMessageComposer } from '../../api';
+import { parseJsonDocument } from '../../json/JsonDocumentParser';
 import { useMessageEvent } from '../events';
 import { useLocalStorage } from '../useLocalStorage';
+import { TranslationCache } from './translationCache';
 
 const REQUEST_TIMEOUT_MS = 8000;
 const OUTGOING_QUEUE_TTL_MS = 30000;
@@ -66,6 +68,7 @@ const TEXT_TRANSLATION_LOCALES: ITranslationTextLocale[] = [
     { code: 'en', name: 'English', file: 'en' },
     { code: 'it', name: 'Italian', file: 'it' },
     { code: 'nl', name: 'Dutch', file: 'nl' },
+    { code: 'de', name: 'German', file: 'de' },
     { code: 'fr', name: 'French', file: 'fr' },
     { code: 'es', name: 'Spanish', file: 'es' },
     { code: 'ar', name: 'Arabic', file: 'ar' }
@@ -121,6 +124,43 @@ const getTextTranslationUrl = (file: string) =>
     return `${ basePath }/text_translate/ExternalTexts_${ file }.json`;
 };
 
+const getBundledTextTranslationUrl = (file: string) =>
+{
+    const relativeUrl = `configuration/UITexts_${ file }.jsonc.example`;
+
+    if(typeof document === 'undefined') return `/${ relativeUrl }`;
+
+    return new URL(relativeUrl, document.baseURI).toString();
+};
+
+const loadTextTranslationData = async (file: string, configuredUrl: string): Promise<Record<string, string>> =>
+{
+    const urls = Array.from(new Set([ configuredUrl, getBundledTextTranslationUrl(file) ].filter(Boolean)));
+    let lastError: unknown = null;
+
+    for(const url of urls)
+    {
+        try
+        {
+            const response = await fetch(url);
+
+            if(!response.ok) throw new Error(`Unable to load ${ url }`);
+
+            const data = parseJsonDocument<Record<string, unknown>>(await response.text(), 'jsonc', url);
+
+            if(!data || (typeof data !== 'object') || Array.isArray(data)) throw new Error(`Invalid translation data from ${ url }`);
+
+            return Object.fromEntries(Object.entries(data).filter((entry): entry is [string, string] => (typeof entry[1] === 'string')));
+        }
+        catch(error)
+        {
+            lastError = error;
+        }
+    }
+
+    throw lastError instanceof Error ? lastError : new Error(`Unable to load translations for ${ file }`);
+};
+
 const getFurnitureTranslationUrl = (file: string) =>
 {
     const configuredTranslationUrl = GetConfiguration().getValue<string>('furnidata.translation.url') || '';
@@ -147,7 +187,7 @@ const dispatchLocalizationUpdated = () =>
 {
     if(typeof window === 'undefined') return;
 
-    window.dispatchEvent(new CustomEvent('nitro-localization-updated'));
+    window.dispatchEvent(new CustomEvent('octane-localization-updated'));
 };
 
 export const applyTextTranslationLocale = async (languageCode: string): Promise<void> =>
@@ -164,28 +204,31 @@ export const applyTextTranslationLocale = async (languageCode: string): Promise<
         return;
     }
 
+      // The base ExternalTexts/UITexts files are already written in one language,
+    // so loading an override pack for that same language would be redundant.
+    // Which language that is depends on the hotel: set `base.locale` in
+    // renderer-config.json (defaults to English).
+    const baseLocale = normalizeLanguageCode(GetConfiguration().getValue<string>('base.locale') || 'en') || 'en';
+
+    if(selectedLocale.file === baseLocale)
+    {
+        localizationManager.clearOverrideValues();
+        sessionDataManager.clearFurnitureDataOverrides();
+        dispatchLocalizationUpdated();
+        return;
+    }
+
     const textUrl = getTextTranslationUrl(selectedLocale.file);
     const furnitureUrl = getFurnitureTranslationUrl(selectedLocale.file);
-    const response = await fetch(textUrl);
-
-    if(response.status !== 200) throw new Error(`Unable to load ${ textUrl }`);
-
-    const data = await response.json();
+    const data = await loadTextTranslationData(selectedLocale.file, textUrl);
     const overrideValues = new Map<string, string>();
 
     Object.keys(data || {}).forEach(key => overrideValues.set(key, data[key]));
     localizationManager.setOverrideValues(overrideValues);
 
-    try
-    {
-        await sessionDataManager.applyFurnitureDataOverrides(furnitureUrl);
-    }
-    catch
-    {
-        sessionDataManager.clearFurnitureDataOverrides();
-    }
-
     dispatchLocalizationUpdated();
+
+    void sessionDataManager.applyFurnitureDataOverrides(furnitureUrl).catch(() => sessionDataManager.clearFurnitureDataOverrides());
 };
 
 const getBrowserLanguageCode = () =>
@@ -248,7 +291,7 @@ const useTranslationStore = () =>
     const requestIdRef = useRef(0);
     const languagesTimeoutRef = useRef(0);
     const pendingRequestsRef = useRef(new Map<number, IPendingTranslationRequest>());
-    const translationCacheRef = useRef(new Map<string, IResolvedTranslation>());
+    const translationCacheRef = useRef(new TranslationCache<IResolvedTranslation>());
     const outgoingQueueRef = useRef(new Map<string, IQueuedOutgoingTranslation[]>());
     const localizationRequestRef = useRef(0);
 
@@ -611,7 +654,7 @@ export const useTranslationState = () =>
         lastOutgoingLanguage,
         lastError,
         getLanguageName
-    } = useBetween(useTranslationStore);
+    } = useSharedHook(useTranslationStore);
 
     return {
         settings,
@@ -638,7 +681,7 @@ export const useTranslationActions = () =>
         translateOutgoing,
         enqueueOutgoingTranslation,
         consumeOutgoingTranslation
-    } = useBetween(useTranslationStore);
+    } = useSharedHook(useTranslationStore);
 
     return {
         settings,
@@ -652,4 +695,6 @@ export const useTranslationActions = () =>
     };
 };
 
-export const useTranslation = () => useBetween(useTranslationStore);
+export const useTranslation = () => useSharedHook(useTranslationStore);
+
+registerSharedHook(useTranslationStore);

@@ -1,20 +1,45 @@
+import { Autocomplete } from '@base-ui/react/autocomplete';
+import { Dialog } from '@base-ui/react/dialog';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { CopyToClipboard } from '../../../api';
-import { Button, Column, Flex, LayoutFurniIconImageView, Text } from '../../../common';
-import { FurniDetail } from '../../../hooks/furni-editor';
+import { CopyToClipboard, localizeWithFallback } from '../../../api';
+import { Button, Flex, LayoutFurniIconImageView, LayoutFurniImageView, Text } from '../../../common';
+import { CatalogRef, FurniDetail, FurniItem } from '../../../hooks/furni-editor';
+import { readAssetStateCount } from '../furniAssetStates';
+import { AssetPresence, AssetPresenceReport, checkAssetPresence } from '../furniAssetPresence';
+import {
+    Suggestion,
+    expectationsForType,
+    multiheightMismatch,
+    relateRows,
+    RelatedRow,
+    spriteIdMismatch,
+    suggestFromFurnidata,
+    suggestFromSiblings,
+    suggestInteractionType
+} from '../furniEditorSuggestions';
+import { NumberInput } from '../../../common/NumberInput';
+import { TabBar, TabBarTab } from '../../../common/TabBar';
+import { BaseButton } from '../../../common/BaseButton';
+import { SuggestInput } from '../../../common/SuggestInput';
+import { ToggleButton } from '../../../common/ToggleButton';
+import { Hint } from '../../../common/Tooltip';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 interface FurniEditorEditViewProps {
     item: FurniDetail;
+    catalogItems: CatalogRef[];
     furniDataEntry: Record<string, unknown> | null;
     furniDataDiagnostic: Record<string, unknown> | null;
     interactions: string[];
+    relatedItems: FurniItem[];
     loading: boolean;
     onUpdate: (id: number, fields: Record<string, unknown>) => void;
     onDelete: (id: number) => void;
     onBack: () => void;
     onUpdateFurnidata: (id: number, name: string, description: string) => void;
     onRevertFurnidata: (id: number) => void;
+    onUpdateFurnidataStructure: (id: number, structure: Record<string, number | boolean>) => void;
     onSyncPublicName: (id: number, name: string) => void;
     onImportText: (id: number) => void;
     importResult: { found: boolean; name: string; description: string; classname: string; nonce: number } | null;
@@ -24,13 +49,379 @@ const FIELD_TIPS: Record<string, string> = {
     stackHeight: 'Visual height when items are stacked on top of this furniture',
     interactionType: 'Defines behavior when user interacts (e.g. default, gate, teleport, vendingmachine)',
     customparams: 'Extra parameters for the interaction type (format depends on interaction)',
-    interactionModesCount: 'Number of visual states/animations this furniture has'
+    interactionModesCount: 'Number of visual states/animations this furniture has',
+    vendingIds: 'Handitem ids a vending machine hands out, comma separated',
+    multiheight: 'Comma separated stack heights, one per state, for adjustable-height furniture',
+    effectIdMale: 'Avatar effect applied to male avatars on use (0 = none)',
+    effectIdFemale: 'Avatar effect applied to female avatars on use (0 = none)',
+    clothingOnWalk: 'Figure parts worn while walking on this furniture (clothing items)'
 };
 
-const PERM_GROUPS = [
+// The editable subset of items_base. Identity columns (id, classname, sprite,
+// type) are deliberately absent: the server drops them from an update, so
+// keeping them in the form would only make the dirty check lie.
+const editableForm = (item: FurniDetail) => ({
+    width: item.width || 1,
+    length: item.length || 1,
+    stackHeight: item.stackHeight || 0,
+    allowStack: !!item.allowStack,
+    allowWalk: !!item.allowWalk,
+    allowSit: !!item.allowSit,
+    allowLay: !!item.allowLay,
+    allowGift: !!item.allowGift,
+    allowTrade: !!item.allowTrade,
+    allowRecycle: !!item.allowRecycle,
+    allowMarketplaceSell: !!item.allowMarketplaceSell,
+    allowInventoryStack: !!item.allowInventoryStack,
+    interactionType: item.interactionType || '',
+    interactionModesCount: item.interactionModesCount || 0,
+    customparams: item.customparams || '',
+    vendingIds: item.vendingIds || '',
+    multiheight: item.multiheight || '',
+    effectIdMale: item.effectIdMale || 0,
+    effectIdFemale: item.effectIdFemale || 0,
+    clothingOnWalk: item.clothingOnWalk || ''
+});
+
+type EditForm = ReturnType<typeof editableForm>;
+type EditField = keyof EditForm;
+
+const FIELD_LABELS: Record<EditField, string> = {
+    width: 'Width',
+    length: 'Length',
+    stackHeight: 'Stack Height',
+    allowStack: 'Stack',
+    allowWalk: 'Walk',
+    allowSit: 'Sit',
+    allowLay: 'Lay',
+    allowGift: 'Gift',
+    allowTrade: 'Trade',
+    allowRecycle: 'Recycle',
+    allowMarketplaceSell: 'MarketplaceSell',
+    allowInventoryStack: 'InventoryStack',
+    interactionType: 'Interaction type',
+    interactionModesCount: 'Modes',
+    customparams: 'Custom Params',
+    vendingIds: 'Vending IDs',
+    multiheight: 'Multiheight',
+    effectIdMale: 'Effect ID (male)',
+    effectIdFemale: 'Effect ID (female)',
+    clothingOnWalk: 'Clothing on walk'
+};
+
+const JUMP_FIELD_LABELS = Object.values(FIELD_LABELS);
+
+// Mirrors FurniEditorUpdatePayload.validateValue on the emulator: a value the
+// server would reject is flagged here instead of failing silently after Save.
+const validateForm = (form: EditForm): Partial<Record<EditField, string>> => {
+    const errors: Partial<Record<EditField, string>> = {};
+    const maxLen = (field: EditField, max: number) => {
+        if (String(form[field]).length > max) errors[field] = localizeWithFallback('octane.furni_editor.max_max_chars', 'Max %max% chars', ['max'], [String(max)]);
+    };
+
+    if (form.width < 1 || form.width > 64) errors.width = '1 to 64';
+    if (form.length < 1 || form.length > 64) errors.length = '1 to 64';
+    if (form.stackHeight < 0 || form.stackHeight > 99.99) errors.stackHeight = '0 to 99.99';
+    if (form.interactionModesCount < 0 || form.interactionModesCount > 100) errors.interactionModesCount = '0 to 100';
+    if (form.effectIdMale < 0) errors.effectIdMale = localizeWithFallback('octane.furni_editor.min_0', 'Min 0');
+    if (form.effectIdFemale < 0) errors.effectIdFemale = localizeWithFallback('octane.furni_editor.min_0', 'Min 0');
+    maxLen('interactionType', 500);
+    maxLen('customparams', 256);
+    maxLen('vendingIds', 255);
+    maxLen('clothingOnWalk', 255);
+    maxLen('multiheight', 50);
+
+    return errors;
+};
+
+const formatValue = (value: unknown) => {
+    if (typeof value === 'boolean') return value ? 'on' : 'off';
+    const text = String(value);
+    return text === '' ? '(empty)' : text;
+};
+
+const formatPrice = (ref: CatalogRef) => {
+    const parts: string[] = [];
+    if (ref.costCredits > 0) parts.push(`${ref.costCredits} credits`);
+    if (ref.costPoints > 0) parts.push(`${ref.costPoints} points (type ${ref.pointsType})`);
+    return parts.length ? parts.join(' + ') : 'free';
+};
+
+const PERM_GROUPS: { label: string; keys: EditField[] }[] = [
     { label: 'Gameplay', keys: ['allowStack', 'allowWalk', 'allowSit', 'allowLay', 'allowInventoryStack'] },
     { label: 'Trading', keys: ['allowGift', 'allowTrade', 'allowRecycle', 'allowMarketplaceSell'] }
 ];
+
+// The right-hand pane shows one group of fields at a time. Every editable field
+// belongs to exactly one group so the chips can count unsaved changes per group.
+type GroupId = 'names' | 'behaviour' | 'placement' | 'catalogue' | 'data';
+
+const GROUPS: { id: GroupId; label: string }[] = [
+    { id: 'names', label: 'Names' },
+    { id: 'behaviour', label: 'Behaviour' },
+    { id: 'placement', label: 'Placement' },
+    { id: 'catalogue', label: 'Catalogue' },
+    { id: 'data', label: 'Data' }
+];
+
+const FIELD_GROUP: Record<EditField, GroupId> = {
+    width: 'placement',
+    length: 'placement',
+    stackHeight: 'placement',
+    allowStack: 'placement',
+    allowWalk: 'placement',
+    allowSit: 'placement',
+    allowLay: 'placement',
+    allowGift: 'placement',
+    allowTrade: 'placement',
+    allowRecycle: 'placement',
+    allowMarketplaceSell: 'placement',
+    allowInventoryStack: 'placement',
+    interactionType: 'behaviour',
+    interactionModesCount: 'behaviour',
+    customparams: 'behaviour',
+    vendingIds: 'behaviour',
+    multiheight: 'behaviour',
+    effectIdMale: 'behaviour',
+    effectIdFemale: 'behaviour',
+    clothingOnWalk: 'behaviour'
+};
+
+interface InteractionTypePickerProps {
+    id: string;
+    value: string;
+    options: string[];
+    className: string;
+    onChange: (value: string) => void;
+}
+
+// A text field with a filtered list underneath: typing narrows the registered
+// types, Enter takes the first match, Escape closes. The stored value is kept
+// as typed even when nothing matches, so an unregistered type stays visible.
+const InteractionTypePicker: FC<InteractionTypePickerProps> = ({ id, value, options, className, onChange }) => {
+    const [open, setOpen] = useState(false);
+    const [query, setQuery] = useState<string | null>(null);
+    // The row the arrow keys / pointer put the highlight on; Enter takes it, else the first match.
+    const highlighted = useRef<string | undefined>(undefined);
+    const shown = query ?? value;
+    const needle = shown.trim().toLowerCase();
+    const matches = useMemo(() => {
+        const list = needle ? options.filter((type) => type.toLowerCase().includes(needle)) : options;
+        return list.slice(0, 12);
+    }, [options, needle]);
+    // '' is the "none" row: only offered while nothing is typed.
+    const items = useMemo(() => (needle ? matches : ['', ...matches]), [matches, needle]);
+
+    const pick = (type: string) => {
+        onChange(type);
+        setQuery(null);
+        setOpen(false);
+    };
+
+    return (
+        <NativeTextTree>
+            <div className="relative">
+                <Autocomplete.Root
+                    filter={null}
+                    items={items}
+                    mode="list"
+                    open={open}
+                    value={shown}
+                    onItemHighlighted={(item) => {
+                        highlighted.current = item;
+                    }}
+                    onOpenChange={setOpen}
+                    onValueChange={(next, details) => {
+                        if (details.reason === 'item-press') {
+                            pick(next);
+                            return;
+                        }
+
+                        setQuery(next);
+                        setOpen(true);
+                    }}
+                >
+                    <Autocomplete.Input
+                        id={id}
+                        aria-label={FIELD_LABELS.interactionType}
+                        className={`${className} font-mono pr-7`}
+                        placeholder="none"
+                        spellCheck={false}
+                        onFocus={() => setOpen(true)}
+                        onBlur={() => {
+                            if (query !== null) onChange(query.trim());
+                            setQuery(null);
+                            setOpen(false);
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && open && matches.length && highlighted.current === undefined) {
+                                e.preventDefault();
+                                pick(matches[0]);
+                            } else if (e.key === 'Escape' && open) {
+                                e.stopPropagation();
+                                setQuery(null);
+                                setOpen(false);
+                            }
+                        }}
+                    />
+                    <span aria-hidden="true" className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none">
+                        ▾
+                    </span>
+                    <Autocomplete.Portal>
+                        <Autocomplete.Positioner align="start" className="octane-select-positioner" sideOffset={2}>
+                            <Autocomplete.Popup className="w-[var(--anchor-width)] max-h-40 overflow-y-auto rounded-lg border border-slate-200 bg-[#ffffff] shadow-lg text-[11px] font-mono py-0.5">
+                                <Autocomplete.List>
+                                    {(type: string) => (
+                                        <Autocomplete.Item
+                                            key={type || 'none'}
+                                            className={`px-2 py-1 cursor-pointer data-[highlighted]:bg-slate-100 ${type === '' ? 'text-slate-400' : type === value ? 'text-primary font-semibold' : 'text-slate-700'}`}
+                                            value={type}
+                                        >
+                                            {type === '' ? 'none (default behaviour)' : type}
+                                        </Autocomplete.Item>
+                                    )}
+                                </Autocomplete.List>
+                                <Autocomplete.Empty>
+                                    <div className="px-2 py-1 text-amber-700">{localizeWithFallback('octane.furni_editor.no_registered_type_matches', 'No registered type matches')}</div>
+                                </Autocomplete.Empty>
+                            </Autocomplete.Popup>
+                        </Autocomplete.Positioner>
+                    </Autocomplete.Portal>
+                </Autocomplete.Root>
+            </div>
+        </NativeTextTree>
+    );
+};
+
+interface FurniPreviewProps {
+    item: FurniDetail;
+    width: number;
+    length: number;
+    modes: number;
+}
+
+// Rendered through the room engine, so what shows here is what a room shows:
+// rotation walks the four floor directions (two for wall items), the state
+// stepper drives the visualization state the way a click in the room would,
+// and the footprint grid draws width × length as stored in items_base.
+const FurniPreview: FC<FurniPreviewProps> = ({ item, width, length, modes }) => {
+    const directions = item.type === 'i' ? [2, 4] : [0, 2, 4, 6];
+    const [directionIndex, setDirectionIndex] = useState(1);
+    const [state, setState] = useState(-1);
+    const direction = directions[directionIndex % directions.length];
+    const stateCount = Math.max(0, modes);
+    const cols = Math.min(Math.max(width, 1), 8);
+    const rows = Math.min(Math.max(length, 1), 8);
+    const clipped = width > 8 || length > 8;
+
+    useEffect(() => {
+        setDirectionIndex(1);
+        setState(-1);
+    }, [item.id]);
+
+    const nextState = () => setState((prev) => (stateCount === 0 ? -1 : prev + 1 >= stateCount ? -1 : prev + 1));
+
+    return (
+        <NativeTextTree>
+            <div
+                className="relative h-28 rounded-lg border border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center"
+                data-testid="furni-editor-preview"
+            >
+                <LayoutFurniIconImageView productType={item.type} productClassId={item.spriteId} className="absolute opacity-20" />
+                <LayoutFurniImageView productType={item.type} productClassId={item.spriteId} direction={direction} state={state} className="relative" />
+                <div
+                    className="absolute top-1 right-1 grid gap-px"
+                    style={{ gridTemplateColumns: `repeat(${cols}, 6px)` }}
+                    aria-label={localizeWithFallback('octane.furni_editor.footprint_width_by_length', 'Footprint %width% by %length%', ['width', 'length'], [String(width), String(length)])}
+                    title={`Footprint ${width}×${length}${clipped ? ' (clipped)' : ''}`}
+                >
+                    {Array.from({ length: cols * rows }, (_, i) => (
+                        <span key={i} className="h-1.5 w-1.5 bg-[#418db0] opacity-60" />
+                    ))}
+                </div>
+                <span className="absolute bottom-1 right-1 text-[9px] font-mono text-slate-500">
+                    {width}×{length}
+                </span>
+                <div className="absolute bottom-1 left-1 flex gap-1">
+                    <Hint content={localizeWithFallback('octane.furni_editor.rotate', 'Rotate')}><BaseButton
+                        type="button"
+                        onClick={() => setDirectionIndex((prev) => prev + 1)}
+                        aria-label={localizeWithFallback('octane.furni_editor.rotate_facing_direction', 'Rotate, facing %direction%', ['direction'], [String(direction)])}
+                        className="inline-flex items-center gap-0.5 text-[9px] rounded-full border border-slate-200 bg-[#ffffff] px-1.5 py-px text-slate-600 hover:border-slate-300"
+                    >
+                        <span aria-hidden="true">⟳</span> {direction}
+                    </BaseButton></Hint>
+                    {stateCount > 1 && (
+                        <Hint content={localizeWithFallback('octane.furni_editor.next_state', 'Next state')}><BaseButton
+                            type="button"
+                            onClick={nextState}
+                            aria-label={`Next state, showing ${state < 0 ? 'base' : state + 1} of ${stateCount}`}
+                            className="inline-flex items-center gap-0.5 text-[9px] rounded-full border border-slate-200 bg-[#ffffff] px-1.5 py-px text-slate-600 hover:border-slate-300"
+                        >
+                            <span aria-hidden="true">▸</span> {state < 0 ? 'base' : `${state + 1}/${stateCount}`}
+                        </BaseButton></Hint>
+                    )}
+                </div>
+            </div>
+        </NativeTextTree>
+    );
+};
+
+interface ConfirmModalProps {
+    title: string;
+    confirmLabel: string;
+    confirmVariant: 'success' | 'danger';
+    onConfirm: () => void;
+    onCancel: () => void;
+    children: React.ReactNode;
+}
+
+const ConfirmModal: FC<ConfirmModalProps> = ({ title, confirmLabel, confirmVariant, onConfirm, onCancel, children }) => {
+    useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                onCancel();
+            }
+        };
+
+        window.addEventListener('keydown', handler, true);
+
+        return () => window.removeEventListener('keydown', handler, true);
+    }, [onCancel]);
+
+    return (
+        <NativeTextTree>
+            <Dialog.Root
+                open
+                onOpenChange={(open) => {
+                    if (!open) onCancel();
+                }}
+            >
+                <Dialog.Portal>
+                    <Dialog.Backdrop className="fixed inset-0 bg-[#00000080] z-[60]" />
+                    <Dialog.Popup
+                        aria-label={title}
+                        className="fixed left-1/2 top-1/2 z-[61] -translate-x-1/2 -translate-y-1/2 bg-[#ffffff] rounded-lg shadow-xl p-4 w-[340px]"
+                    >
+                        <Text bold className="text-[14px] mb-2 block">
+                            {title}
+                        </Text>
+                        <div className="mb-3">{children}</div>
+                        <Flex gap={1} justifyContent="end">
+                            <Button variant="secondary" onClick={onCancel}>
+                                {localizeWithFallback('octane.furni_editor.cancel', 'Cancel')}
+                            </Button>
+                            <Button variant={confirmVariant} onClick={onConfirm}>
+                                {confirmLabel}
+                            </Button>
+                        </Flex>
+                    </Dialog.Popup>
+                </Dialog.Portal>
+            </Dialog.Root>
+        </NativeTextTree>
+    );
+};
 
 interface SectionProps {
     title: string;
@@ -42,19 +433,21 @@ const Section: FC<SectionProps> = ({ title, children, defaultOpen = true }) => {
     const [open, setOpen] = useState(defaultOpen);
 
     return (
-        <div className="bg-[#ffffff] rounded-xl border border-slate-200 shadow-sm">
-            <button
-                type="button"
-                className={`w-full flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-slate-50 transition-colors rounded-t-xl ${open ? '' : 'rounded-b-xl'}`}
-                onClick={() => setOpen((p) => !p)}
-            >
-                <Text className="text-[12px] font-semibold text-slate-700">{title}</Text>
-                <span className="text-[11px] text-slate-400 transition-transform duration-200" style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)' }}>
-                    ▾
-                </span>
-            </button>
-            {open && <div className="px-3 pb-2.5 pt-0.5">{children}</div>}
-        </div>
+        <NativeTextTree>
+            <div className="bg-[#ffffff] rounded-xl border border-slate-200 shadow-sm">
+                <BaseButton
+                    type="button"
+                    className={`w-full flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-slate-50 transition-colors rounded-t-xl ${open ? '' : 'rounded-b-xl'}`}
+                    onClick={() => setOpen((p) => !p)}
+                >
+                    <Text className="octane-furni-editor__section-title text-[14px] font-bold text-black">{title}</Text>
+                    <span className="text-[11px] text-slate-400 transition-transform duration-200" style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)' }}>
+                        ▾
+                    </span>
+                </BaseButton>
+                {open && <div className="px-3 pb-2.5 pt-0.5">{children}</div>}
+            </div>
+        </NativeTextTree>
     );
 };
 
@@ -72,28 +465,30 @@ const Tip: FC<{ field: string }> = ({ field }) => {
     if (!tip) return null;
 
     return (
-        <span
-            ref={ref}
-            onMouseEnter={show}
-            onMouseLeave={hide}
-            className="ml-0.5 inline-flex w-3 h-3 rounded-full bg-[#418db0] text-white text-[8px] items-center justify-center cursor-help font-bold align-middle"
-        >
-            ?
-            {pos &&
-                createPortal(
-                    <span
-                        style={{ position: 'fixed', left: pos.left, top: pos.top, transform: 'translate(-50%, -100%)', zIndex: 9999 }}
-                        className="px-2 py-1 bg-[#333] text-white text-[10px] rounded w-44 whitespace-normal text-center leading-snug shadow-lg pointer-events-none"
-                    >
-                        {tip}
-                    </span>,
-                    document.body
-                )}
-        </span>
+        <NativeTextTree>
+            <span
+                ref={ref}
+                onMouseEnter={show}
+                onMouseLeave={hide}
+                className="ml-0.5 inline-flex w-3 h-3 rounded-full bg-[#418db0] text-white text-[8px] items-center justify-center cursor-help font-bold align-middle"
+            >
+                ?
+                {pos &&
+                    createPortal(
+                        <span
+                            style={{ position: 'fixed', left: pos.left, top: pos.top, transform: 'translate(-50%, -100%)', zIndex: 9999 }}
+                            className="px-2 py-1 bg-[#333] text-white text-[10px] rounded w-44 whitespace-normal text-center leading-snug shadow-lg pointer-events-none"
+                        >
+                            {tip}
+                        </span>,
+                        document.body
+                    )}
+            </span>
+        </NativeTextTree>
     );
 };
 
-const CopyValue: FC<{ value: string | number }> = ({ value }) => {
+const CopyValue: FC<{ value: string | number; compact?: boolean }> = ({ value, compact = false }) => {
     const [copied, setCopied] = useState(false);
 
     const copy = useCallback(() => {
@@ -109,63 +504,51 @@ const CopyValue: FC<{ value: string | number }> = ({ value }) => {
     }, [copied]);
 
     return (
-        <div
-            role="button"
-            title="Click to copy"
-            onClick={copy}
-            className={`group relative cursor-pointer w-full px-3 py-1.5 text-sm font-mono rounded-lg border transition ${copied ? 'border-primary/50 bg-primary/5 text-primary' : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-slate-100'}`}
-        >
-            <span className="block truncate pr-12">{String(value)}</span>
-            <span
-                className={`absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-semibold uppercase tracking-wide pointer-events-none ${copied ? 'text-primary' : 'text-slate-300 group-hover:text-slate-400'}`}
+        <NativeTextTree>
+            <Hint content={localizeWithFallback('octane.furni_editor.click_to_copy', 'Click to copy')}><BaseButton
+                type="button"
+                onClick={copy}
+                className={`group relative cursor-pointer w-full text-left font-mono rounded-lg border transition ${compact ? 'px-1.5 py-0.5 text-[10px]' : 'px-3 py-1.5 text-sm'} ${copied ? 'border-primary/50 bg-primary/5 text-primary' : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-slate-100'}`}
             >
-                {copied ? 'copied!' : 'copy'}
-            </span>
-        </div>
+                <span className={`block truncate ${compact ? 'pr-8' : 'pr-12'}`}>{String(value)}</span>
+                <span
+                    className={`absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-semibold uppercase tracking-wide pointer-events-none ${copied ? 'text-primary' : 'text-slate-300 group-hover:text-slate-400'}`}
+                >
+                    {copied ? 'copied!' : 'copy'}
+                </span>
+            </BaseButton></Hint>
+        </NativeTextTree>
     );
 };
 
 export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
     const {
         item,
+        catalogItems,
         furniDataEntry,
         furniDataDiagnostic,
         interactions,
+        relatedItems,
         loading,
         onUpdate,
         onDelete,
         onBack,
         onUpdateFurnidata,
         onRevertFurnidata,
+        onUpdateFurnidataStructure,
         onSyncPublicName,
         onImportText,
         importResult
     } = props;
     const saveRef = useRef<() => void>(null);
 
-    const [form, setForm] = useState({
-        itemName: '',
-        publicName: '',
-        spriteId: 0,
-        type: 's',
-        width: 1,
-        length: 1,
-        stackHeight: 0,
-        allowStack: true,
-        allowWalk: false,
-        allowSit: false,
-        allowLay: false,
-        allowGift: true,
-        allowTrade: true,
-        allowRecycle: true,
-        allowMarketplaceSell: true,
-        allowInventoryStack: true,
-        interactionType: '',
-        interactionModesCount: 0,
-        customparams: ''
-    });
+    const stored = useMemo(() => editableForm(item), [item]);
+    const [form, setForm] = useState<EditForm>(stored);
 
+    const [group, setGroup] = useState<GroupId>('names');
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [confirmSave, setConfirmSave] = useState(false);
+    const [confirmBack, setConfirmBack] = useState(false);
     const [furniName, setFurniName] = useState('');
     const [furniDescription, setFurniDescription] = useState('');
     const [confirmFurnidata, setConfirmFurnidata] = useState(false);
@@ -175,78 +558,55 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
     useEffect(() => {
         if (!item) return;
 
-        setForm({
-            itemName: item.itemName || '',
-            publicName: item.publicName || '',
-            spriteId: item.spriteId || 0,
-            type: item.type || 's',
-            width: item.width || 1,
-            length: item.length || 1,
-            stackHeight: item.stackHeight || 0,
-            allowStack: !!item.allowStack,
-            allowWalk: !!item.allowWalk,
-            allowSit: !!item.allowSit,
-            allowLay: !!item.allowLay,
-            allowGift: !!item.allowGift,
-            allowTrade: !!item.allowTrade,
-            allowRecycle: !!item.allowRecycle,
-            allowMarketplaceSell: !!item.allowMarketplaceSell,
-            allowInventoryStack: !!item.allowInventoryStack,
-            interactionType: item.interactionType || '',
-            interactionModesCount: item.interactionModesCount || 0,
-            customparams: item.customparams || ''
-        });
-
+        setForm(stored);
         setShowDeleteDialog(false);
+        setConfirmSave(false);
+        setConfirmBack(false);
         setFurniName(String(furniDataEntry?.name ?? ''));
         setFurniDescription(String(furniDataEntry?.description ?? ''));
         setConfirmFurnidata(false);
         setImportNote('');
-    }, [item, furniDataEntry]);
+    }, [item, stored, furniDataEntry]);
 
-    const setField = useCallback((key: string, value: unknown) => {
+    const setField = useCallback(<K extends EditField>(key: K, value: EditForm[K]) => {
         setForm((prev) => ({ ...prev, [key]: value }));
     }, []);
 
-    const isDirty = useMemo(() => {
-        if (!item) return false;
+    const changedFields = useMemo(() => (Object.keys(stored) as EditField[]).filter((key) => form[key] !== stored[key]), [form, stored]);
+    const isDirty = changedFields.length > 0;
+    const isChanged = useCallback((field: EditField) => form[field] !== stored[field], [form, stored]);
 
-        return (
-            form.itemName !== (item.itemName || '') ||
-            form.publicName !== (item.publicName || '') ||
-            form.spriteId !== (item.spriteId || 0) ||
-            form.type !== (item.type || 's') ||
-            form.width !== (item.width || 1) ||
-            form.length !== (item.length || 1) ||
-            form.stackHeight !== (item.stackHeight || 0) ||
-            form.allowStack !== !!item.allowStack ||
-            form.allowWalk !== !!item.allowWalk ||
-            form.allowSit !== !!item.allowSit ||
-            form.allowLay !== !!item.allowLay ||
-            form.allowGift !== !!item.allowGift ||
-            form.allowTrade !== !!item.allowTrade ||
-            form.allowRecycle !== !!item.allowRecycle ||
-            form.allowMarketplaceSell !== !!item.allowMarketplaceSell ||
-            form.allowInventoryStack !== !!item.allowInventoryStack ||
-            form.interactionType !== (item.interactionType || '') ||
-            form.interactionModesCount !== (item.interactionModesCount || 0) ||
-            form.customparams !== (item.customparams || '')
-        );
-    }, [form, item]);
+    const validation = useMemo(() => validateForm(form), [form]);
 
-    const validation = useMemo(() => {
-        const errors: Record<string, string> = {};
-
-        if (!form.itemName.trim()) errors.itemName = 'Required';
-        if (!form.publicName.trim()) errors.publicName = 'Required';
-        if (form.width < 1) errors.width = 'Min 1';
-        if (form.length < 1) errors.length = 'Min 1';
-        if (form.stackHeight < 0) errors.stackHeight = 'Min 0';
-
-        return errors;
-    }, [form]);
-
+    // The server lists the interaction types it has a class for; a stored type
+    // outside that list is one the item manager silently maps to default, and
+    // one the server now refuses to save, so the select keeps it visible and flags it.
+    const interactionUnregistered = useMemo(() => {
+        const type = form.interactionType.trim().toLowerCase();
+        return type !== '' && !interactions.some((known) => known.toLowerCase() === type);
+    }, [form.interactionType, interactions]);
     const isValid = useMemo(() => Object.keys(validation).length === 0, [validation]);
+
+    // Most classnames carry their interaction type: wired boxes are named after
+    // it, and many furni start with or contain a registered type. Offer that as
+    // a one-click suggestion whenever it differs from what is stored.
+    const suggestedType = useMemo(() => {
+        const match = suggestInteractionType(item.itemName, interactions);
+        if (!match || match.type.toLowerCase() === form.interactionType.trim().toLowerCase()) return null;
+        return match;
+    }, [item.itemName, interactions, form.interactionType]);
+
+    const changedByGroup = useMemo(() => {
+        const counts: Record<GroupId, number> = { names: 0, behaviour: 0, placement: 0, catalogue: 0, data: 0 };
+        for (const field of changedFields) counts[FIELD_GROUP[field]] += 1;
+        return counts;
+    }, [changedFields]);
+
+    const invalidByGroup = useMemo(() => {
+        const flags: Record<GroupId, boolean> = { names: false, behaviour: false, placement: false, catalogue: false, data: false };
+        for (const field of Object.keys(validation) as EditField[]) flags[FIELD_GROUP[field]] = true;
+        return flags;
+    }, [validation]);
 
     // Furnidata name editing only works when the furni has a matching furnidata
     // entry: the server writer is edit-only and refuses classnames absent from
@@ -274,8 +634,8 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
     // furnidata entry already has a name — fills items_base.public_name from the
     // stored furnidata name so the DB fallback stops being blank.
     const canSyncPublicName = useMemo(
-        () => furnidataEditable && !String(form.publicName ?? '').trim() && !!String(furniDataEntry?.name ?? '').trim(),
-        [furnidataEditable, form.publicName, furniDataEntry]
+        () => furnidataEditable && !String(item.publicName ?? '').trim() && !!String(furniDataEntry?.name ?? '').trim(),
+        [furnidataEditable, item.publicName, furniDataEntry]
     );
 
     // True only when the name/description actually differ from the stored furnidata
@@ -286,6 +646,88 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
         () => furniName !== String(furniDataEntry?.name ?? '') || furniDescription !== String(furniDataEntry?.description ?? ''),
         [furniName, furniDescription, furniDataEntry]
     );
+
+    // Rows the line probe brought back, split into the furni of the same line
+    // and the rows that duplicate this classname or sprite id.
+    const related = useMemo(() => relateRows(relatedItems, item), [relatedItems, item]);
+    const duplicates = useMemo(() => {
+        const byId = new Map<number, RelatedRow>();
+        for (const row of [...related.duplicateNames, ...related.duplicateSprites]) byId.set(row.id, row);
+        return [...byId.values()];
+    }, [related]);
+    const openFurni = useCallback((spriteId: number) => window.dispatchEvent(new CustomEvent('furni-editor:open', { detail: { spriteId } })), []);
+
+    // The asset's own state count, read once the room engine has the furni
+    // loaded (the preview triggers that). Retried a few times because the load
+    // is asynchronous and the loader has no completion hook the client can use.
+    const [assetStates, setAssetStates] = useState<number | null>(null);
+    useEffect(() => {
+        setAssetStates(null);
+        let tries = 0;
+        let handle = 0;
+        const attempt = () => {
+            const count = readAssetStateCount(item.itemName);
+            if (count !== null) {
+                setAssetStates(count);
+                return;
+            }
+            if (++tries < 8) handle = window.setTimeout(attempt, 700);
+        };
+        attempt();
+        return () => window.clearTimeout(handle);
+    }, [item.itemName]);
+
+    // Everything the editor can propose from data it already has. Furnidata is
+    // trusted only when its entry matches this classname; the type table and
+    // the asset count apply to whatever type is in the form right now.
+    const { suggestions, warnings } = useMemo(() => {
+        const all: Suggestion[] = furnidataEditable ? suggestFromFurnidata(furniDataEntry, form) : [];
+        const typed = expectationsForType(form);
+        all.push(...typed.suggestions);
+        for (const s of suggestFromSiblings(related.siblings, form)) {
+            if (!all.some((existing) => existing.field === s.field)) all.push(s);
+        }
+        if (assetStates !== null && assetStates > 0 && assetStates !== form.interactionModesCount) {
+            const alreadyFromType = typed.suggestions.some((s) => s.field === 'interactionModesCount' && s.value === assetStates);
+            if (!alreadyFromType) all.push({ field: 'interactionModesCount', value: assetStates, reason: `asset defines ${assetStates} states` });
+        }
+        const warnings = [...typed.warnings];
+        const mh = multiheightMismatch(form, assetStates);
+        if (mh) warnings.push(mh);
+        return { suggestions: all, warnings };
+    }, [furnidataEditable, furniDataEntry, form, assetStates, related.siblings]);
+
+    // A furnidata entry found by classname but carrying another id: the room
+    // resolves the sprite through that id, so it draws a different furni.
+    const furnidataIdMismatch = useMemo(
+        () => (furnidataEditable ? spriteIdMismatch(furniDataEntry, item.spriteId) : null),
+        [furnidataEditable, furniDataEntry, item.spriteId]
+    );
+
+    // Whether the icon and the bundle actually exist where the renderer looks.
+    const [assets, setAssets] = useState<AssetPresenceReport | null>(null);
+    useEffect(() => {
+        setAssets(null);
+        const controller = new AbortController();
+        checkAssetPresence(item.itemName, controller.signal).then((report) => {
+            if (!controller.signal.aborted) setAssets(report);
+        });
+        return () => controller.abort();
+    }, [item.itemName]);
+
+    // The values a save replaced, kept so one click can put them back into
+    // the form while the sheet stays open. Cleared when another furni opens.
+    const [lastSave, setLastSave] = useState<{ id: number; previous: EditForm } | null>(null);
+    const undoAvailable = lastSave !== null && lastSave.id === item.id && (Object.keys(stored) as EditField[]).some((k) => stored[k] !== lastSave.previous[k]);
+    const undoLastSave = useCallback(() => {
+        if (lastSave) setForm(lastSave.previous);
+    }, [lastSave]);
+
+    // Fields whose change reshapes furni already standing in rooms.
+    const placementFields: EditField[] = ['width', 'length', 'stackHeight', 'allowWalk', 'allowStack', 'allowSit', 'allowLay'];
+
+    const applySuggestion = useCallback((s: Suggestion) => setForm((prev) => ({ ...prev, [s.field]: s.value })), []);
+    const applyAllSuggestions = useCallback(() => setForm((prev) => suggestions.reduce((next, s) => ({ ...next, [s.field]: s.value }), prev)), [suggestions]);
 
     const furnidataMissReason = useMemo(() => {
         const reason = String(furniDataDiagnostic?.reason ?? '');
@@ -312,26 +754,68 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
         if (importResult.found) {
             setFurniName(importResult.name);
             setFurniDescription(importResult.description);
-            setImportNote('Imported from Habbo — review and Save');
+            setImportNote(localizeWithFallback('octane.furni_editor.imported_from_habbo_review_and_save', 'Imported from Habbo — review and Save'));
         } else {
-            setImportNote('Not found on Habbo for this classname');
+            setImportNote(localizeWithFallback('octane.furni_editor.not_found_on_habbo_for_this', 'Not found on Habbo for this classname'));
         }
     }, [importResult, item]);
 
+    // Save opens a diff of the changed fields; the packet only fires on Confirm.
     const handleSave = useCallback(() => {
-        if (!isValid) return;
+        if (!isValid || !isDirty) return;
 
+        setConfirmSave(true);
+    }, [isValid, isDirty]);
+
+    const handleSaveConfirm = useCallback(() => {
+        setConfirmSave(false);
+        setLastSave({ id: item.id, previous: stored });
         onUpdate(item.id, form);
-    }, [item, form, isValid, onUpdate]);
+    }, [item, form, stored, onUpdate]);
 
     // Expose save for keyboard shortcut
     saveRef.current = handleSave;
 
     const handleBack = useCallback(() => {
-        if (isDirty && !window.confirm('You have unsaved changes. Discard and go back?')) return;
+        if (isDirty) {
+            setConfirmBack(true);
+            return;
+        }
 
         onBack();
     }, [isDirty, onBack]);
+
+    const handleDiscard = useCallback(() => setForm(stored), [stored]);
+    const closeSave = useCallback(() => setConfirmSave(false), []);
+    const closeBack = useCallback(() => setConfirmBack(false), []);
+    const closeDelete = useCallback(() => setShowDeleteDialog(false), []);
+    const closeFurnidata = useCallback(() => setConfirmFurnidata(false), []);
+
+    // The reverse of the furnidata chips: when items_base is right and the entry
+    // is wrong, push the DB values into the entry. Only fields the entry carries
+    // and that differ are offered; the save is confirmed like every other write.
+    const [confirmStructure, setConfirmStructure] = useState(false);
+    const structureDiff = useMemo(() => {
+        if (!furnidataEditable || !furniDataEntry) return [] as { key: string; label: string; from: unknown; to: number | boolean }[];
+        const rows: { key: string; label: string; from: unknown; to: number | boolean }[] = [];
+        const consider = (key: string, label: string, to: number | boolean) => {
+            if (!(key in furniDataEntry)) return;
+            const from = furniDataEntry[key];
+            if (String(from) !== String(to)) rows.push({ key, label, from, to });
+        };
+        consider('xdim', 'xdim', stored.width);
+        consider('ydim', 'ydim', stored.length);
+        consider('height', 'height', stored.stackHeight);
+        consider('canstandon', 'canstandon', stored.allowWalk);
+        consider('cansiton', 'cansiton', stored.allowSit);
+        consider('canlayon', 'canlayon', stored.allowLay);
+        return rows;
+    }, [furnidataEditable, furniDataEntry, stored]);
+    const closeStructure = useCallback(() => setConfirmStructure(false), []);
+    const writeStructure = useCallback(() => {
+        setConfirmStructure(false);
+        onUpdateFurnidataStructure(item.id, Object.fromEntries(structureDiff.map((row) => [row.key, row.to])));
+    }, [item.id, structureDiff, onUpdateFurnidataStructure]);
 
     const handleDeleteConfirm = useCallback(() => {
         onDelete(item.id);
@@ -352,373 +836,880 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
         return () => window.removeEventListener('keydown', handler);
     }, []);
 
-    const inputClass = (field?: string) =>
-        `w-full px-3 py-1.5 text-sm leading-normal rounded-lg border border-slate-300 bg-[#ffffff] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 transition${field && validation[field] ? ' border-red-400 bg-red-50' : ''}`;
+    // A changed field carries an amber edge until it is saved or discarded, an
+    // invalid one a red edge; red wins because it blocks the save.
+    const inputClass = (field?: EditField) => {
+        const state = field && validation[field] ? ' border-red-400 bg-red-50' : field && isChanged(field) ? ' border-amber-400 bg-amber-50/40' : '';
+        return `w-full px-3 py-1.5 text-sm leading-normal rounded-lg border border-slate-300 bg-[#ffffff] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 transition${state}`;
+    };
     const labelClass = 'text-[11px] font-medium text-slate-500 mb-1 flex items-center gap-0.5';
+    const fieldError = (field: EditField) => validation[field] && <span className="text-[9px] text-red-500">{validation[field]}</span>;
+
+    // Groups stay mounted and only toggle visibility, so a field can be focused
+    // right after its group is switched in.
+    const jumpToField = useCallback((field: EditField) => {
+        setGroup(FIELD_GROUP[field]);
+        window.setTimeout(() => document.getElementById(`furni-editor-${field}`)?.focus(), 0);
+    }, []);
+
+    const [jumpQuery, setJumpQuery] = useState('');
+    const handleJump = useCallback(
+        (query: string) => {
+            setJumpQuery(query);
+            const needle = query.trim().toLowerCase();
+            if (!needle) return;
+            const fields = Object.keys(FIELD_LABELS) as EditField[];
+            const match = fields.find((f) => FIELD_LABELS[f].toLowerCase() === needle) ?? fields.find((f) => FIELD_LABELS[f].toLowerCase().startsWith(needle));
+            if (!match) return;
+            setJumpQuery('');
+            jumpToField(match);
+        },
+        [jumpToField]
+    );
+
+    // "was X" next to a changed field's label: one click puts the stored value back.
+    const revert = (field: EditField) =>
+        isChanged(field) && (
+            <Hint content={localizeWithFallback('octane.furni_editor.put_the_stored_value_back', 'Put the stored value back')}><BaseButton
+                type="button"
+                onClick={() => setField(field, stored[field])}
+                aria-label={`Revert ${FIELD_LABELS[field]}`}
+                className="ml-auto inline-flex items-center gap-0.5 text-[9px] font-normal text-amber-600 hover:text-amber-800 transition"
+            >
+                <span aria-hidden="true">↺</span> was {formatValue(stored[field])}
+            </BaseButton></Hint>
+        );
+
+    const chipClass = 'mt-1 inline-flex items-center gap-1 text-[10px] font-medium rounded-md px-2 py-0.5 transition';
+    const suggestionChip = (s: Suggestion) => (
+        <Hint key={`${s.field}:${String(s.value)}`} content={s.reason}><BaseButton
+            type="button"
+            onClick={() => applySuggestion(s)}
+            aria-label={`Apply ${FIELD_LABELS[s.field]} ${formatValue(s.value)}`}
+            className={`${chipClass} text-primary bg-primary/10 border border-primary/20 hover:bg-primary/15 mr-1`}
+        >
+            <span aria-hidden="true">✦</span> {localizeWithFallback('octane.furni_editor.suggested', 'Suggested:')} <span className="font-mono">{formatValue(s.value)}</span>
+            <span className="text-primary/70 font-normal">· {s.reason}</span>
+        </BaseButton></Hint>
+    );
+    const warningChip = (w: { field: EditField; message: string }) => (
+        <span key={w.field} role="note" className={`${chipClass} text-amber-700 bg-amber-100 border border-amber-200`}>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" /> {w.message}
+        </span>
+    );
+    const chipsFor = (field: EditField) => (
+        <>
+            {suggestions.filter((s) => s.field === field).map(suggestionChip)}
+            {warnings.filter((w) => w.field === field).map(warningChip)}
+        </>
+    );
+    const permissionSuggestions = suggestions.filter((s) => s.field.startsWith('allow'));
+    const permissionChips = permissionSuggestions.length > 0 && (
+        <div className="flex flex-wrap items-center gap-0.5">
+            {permissionSuggestions.map((s) => (
+                <Hint key={s.field} content={s.reason}><BaseButton
+                    type="button"
+                    onClick={() => applySuggestion(s)}
+                    aria-label={`Apply ${FIELD_LABELS[s.field]} ${formatValue(s.value)}`}
+                    className={`${chipClass} mt-0 text-primary bg-primary/10 border border-primary/20 hover:bg-primary/15`}
+                >
+                    <span aria-hidden="true">✦</span> {FIELD_LABELS[s.field]} {formatValue(s.value)}
+                    <span className="text-primary/70 font-normal">· {s.reason}</span>
+                </BaseButton></Hint>
+            ))}
+        </div>
+    );
+
+    const groupClass = (id: GroupId) => (group === id ? 'flex flex-col gap-1' : 'hidden');
+    const statusRow = 'flex items-center justify-between gap-1 text-[10px] py-1 border-t border-slate-200';
+    const statusLink = 'text-primary hover:underline cursor-pointer whitespace-nowrap';
 
     return (
-        <Column gap={1}>
-            {/* Header */}
-            <Flex alignItems="center" gap={2} className="px-1">
-                <div className="shrink-0 w-14 h-14 rounded-xl bg-[#ffffff] border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden">
-                    <LayoutFurniIconImageView productType={item.type} productClassId={item.spriteId} className="scale-[1.6]" />
-                </div>
-                <Flex column gap={0} className="min-w-0 flex-1">
-                    <Text bold className="truncate text-slate-800 text-[15px] leading-tight">
-                        {furniName || form.publicName || form.itemName}
-                    </Text>
-                    <Text className="truncate text-slate-400 text-[11px] font-mono">{form.itemName}</Text>
-                    <Flex alignItems="center" gap={1} className="mt-1 flex-wrap">
-                        <span className="inline-flex items-center gap-1 text-[10px] rounded-md border border-slate-200 bg-slate-50 pl-1.5 pr-2 py-0.5">
-                            <span className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">ID</span>
-                            <span className="font-mono text-slate-600">{item.id}</span>
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-[10px] rounded-md border border-slate-200 bg-slate-50 pl-1.5 pr-2 py-0.5">
-                            <span className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">Sprite</span>
-                            <span className="font-mono text-slate-600">{item.spriteId}</span>
-                        </span>
-                        <span
-                            className={`inline-flex items-center gap-1 text-[10px] rounded-md border px-2 py-0.5 ${item.usageCount > 0 ? 'border-[#a7f3d0] bg-[#ecfdf5] text-[#047857]' : 'border-slate-200 bg-slate-50 text-slate-500'}`}
-                        >
-                            <span className={`w-1.5 h-1.5 rounded-full ${item.usageCount > 0 ? 'bg-[#10b981]' : 'bg-slate-300'}`} />
-                            {item.usageCount} in use
-                        </span>
-                        {isDirty && (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-100 border border-amber-200 rounded-md px-2 py-0.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />
-                                Unsaved
-                            </span>
-                        )}
-                    </Flex>
-                </Flex>
-                <Button variant="secondary" onClick={handleBack} className="shrink-0">
-                    Back
-                </Button>
-            </Flex>
-
-            {/* Primary edit surface: furnidata display name + description (server-authoritative, live) */}
-            <div className="bg-[#ffffff] rounded-xl border border-slate-200 shadow-sm p-2.5">
-                <div className="flex items-center gap-2 mb-1.5">
-                    <Text className="text-[12px] font-semibold text-slate-700">Display name &amp; description</Text>
-                    {furnidataEditable ? (
-                        <span className="text-[9px] font-semibold text-primary bg-primary/10 rounded-md px-1.5 py-0.5">LIVE</span>
-                    ) : furnidataCreatable ? (
-                        <span className="text-[9px] font-semibold text-emerald-700 bg-emerald-100 rounded-md px-1.5 py-0.5">NEW</span>
-                    ) : (
-                        <span className="text-[9px] font-semibold text-amber-700 bg-amber-100 rounded-md px-1.5 py-0.5">NO FURNIDATA</span>
-                    )}
-                    {furnidataEditable && furnidataDirty && <span className="ml-auto text-[10px] text-amber-600 font-medium">Unsaved</span>}
-                </div>
-                {furnidataEditable || furnidataCreatable ? (
-                    <>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>
-                                <label className={labelClass}>Display Name (furnidata)</label>
-                                <input
-                                    className={inputClass()}
-                                    value={furniName}
-                                    onChange={(e) => setFurniName(e.target.value)}
-                                    maxLength={256}
-                                    placeholder={furnidataCreatable ? form.publicName || form.itemName : undefined}
-                                />
-                            </div>
-                            <div>
-                                <label className={labelClass}>Description</label>
-                                <input
-                                    className={inputClass()}
-                                    value={furniDescription}
-                                    onChange={(e) => setFurniDescription(e.target.value)}
-                                    maxLength={256}
-                                />
-                            </div>
-                        </div>
-                        <Flex gap={1} className="mt-1.5" alignItems="center">
-                            <Button
-                                variant="success"
-                                disabled={furnidataEditable ? loading || !furnidataDirty : loading}
-                                onClick={() => setConfirmFurnidata(true)}
-                            >
-                                {furnidataEditable ? 'Save name/desc' : 'Create entry'}
-                            </Button>
-                            {furnidataEditable && (
-                                <>
-                                    <Button variant="secondary" disabled={loading} onClick={() => onRevertFurnidata(item.id)}>
-                                        Revert
-                                    </Button>
-                                    <button
-                                        type="button"
-                                        disabled={loading}
-                                        onClick={() => onImportText(item.id)}
-                                        title="Fetch the official name &amp; description from Habbo"
-                                        className="ml-auto inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#ffffff] text-slate-600 hover:bg-slate-50 hover:border-slate-400 disabled:opacity-50 transition"
-                                    >
-                                        <svg
-                                            className="w-3.5 h-3.5"
-                                            viewBox="0 0 20 20"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="1.8"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            <path d="M10 3v9" />
-                                            <path d="m6.5 8.5 3.5 3.5 3.5-3.5" />
-                                            <path d="M4 16h12" />
-                                        </svg>
-                                        Import from Habbo
-                                    </button>
-                                </>
-                            )}
-                        </Flex>
-                        {furnidataCreatable && (
-                            <Text className="mt-1 text-[10px] text-emerald-600">
-                                No furnidata entry yet — saving creates a complete one from the item data.
+        <NativeTextTree>
+            <div className="h-full min-h-0 grid grid-cols-[176px_minmax(0,1fr)] gap-2">
+                {/* Sidebar: who this furni is, what state it is in, and the actions. Never scrolls away. */}
+                <aside className="min-h-0 flex flex-col gap-2 bg-[#ffffff] rounded-xl border border-slate-200 shadow-sm p-2 overflow-y-auto">
+                    <BaseButton
+                        type="button"
+                        onClick={handleBack}
+                        className="self-start inline-flex items-center gap-1 text-[10px] font-medium text-slate-500 hover:text-slate-800 transition"
+                    >
+                        <span aria-hidden="true">‹</span> {localizeWithFallback('octane.furni_editor.back', 'Back')}
+                    </BaseButton>
+                    <FurniPreview item={item} width={form.width} length={form.length} modes={form.interactionModesCount} />
+                    <div className="min-w-0">
+                        <div className="flex items-center gap-1">
+                            <Text bold className="truncate text-slate-800 text-[13px] leading-tight flex-1 min-w-0">
+                                {furniName || item.publicName || item.itemName}
                             </Text>
-                        )}
-                        {importNote && (
-                            <Text className={`mt-1 text-[10px] ${importNote.startsWith('Not found') ? 'text-amber-600' : 'text-primary'}`}>{importNote}</Text>
-                        )}
-                    </>
-                ) : (
-                    <div className="flex items-start gap-2 text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 leading-snug">
-                        <span className="text-[#f59e0b] text-sm leading-none mt-px">⚠</span>
-                        <span>
-                            A furnidata entry resolved by id but for a <b>different classname</b> ({furnidataMissReason.replace(/_/g, ' ')}) — name editing is
-                            locked to avoid an id collision. Clients fall back to the DB <b>Public Name</b> below.
-                        </span>
-                    </div>
-                )}
-            </div>
-
-            <Section title="Basic Info">
-                <div className="grid grid-cols-2 gap-2">
-                    <div>
-                        <label className={labelClass}>Classname</label>
-                        <CopyValue value={form.itemName} />
+                            {furnidataEditable ? (
+                                <span className="text-[8px] font-semibold text-primary bg-primary/10 rounded px-1 py-px">LIVE</span>
+                            ) : furnidataCreatable ? (
+                                <span className="text-[8px] font-semibold text-emerald-700 bg-emerald-100 rounded px-1 py-px">NEW</span>
+                            ) : (
+                                <span className="text-[8px] font-semibold text-amber-700 bg-amber-100 rounded px-1 py-px">LOCKED</span>
+                            )}
+                        </div>
+                        <CopyValue value={`${item.itemName} · #${item.id} · s${item.spriteId}`} compact />
                     </div>
                     <div>
-                        <label className={labelClass}>Public Name (DB fallback)</label>
-                        <CopyValue value={form.publicName} />
-                        {canSyncPublicName && (
+                        <div className={statusRow}>
+                            <span className="text-slate-500">{localizeWithFallback('octane.furni_editor.type', 'Type')}</span>
+                            <span className="text-slate-700">{item.type === 's' ? 'Floor' : 'Wall'}</span>
+                        </div>
+                        <div className={statusRow}>
+                            <span className="text-slate-500">{localizeWithFallback('octane.furni_editor.catalogue', 'Catalogue')}</span>
+                            <BaseButton type="button" className={statusLink} onClick={() => setGroup('catalogue')}>
+                                {catalogItems.length === 0 ? 'not listed' : `${catalogItems.length} offer${catalogItems.length === 1 ? '' : 's'}`} ›
+                            </BaseButton>
+                        </div>
+                        <div className={statusRow}>
+                            <span className="text-slate-500">{localizeWithFallback('octane.furni_editor.placed_in_rooms', 'Placed in rooms')}</span>
+                            <span className={item.usageCount > 0 ? 'text-emerald-700' : 'text-slate-400'}>{item.usageCount}</span>
+                        </div>
+                        {(suggestions.length > 0 || warnings.length > 0) && (
+                            <div className={`${statusRow} text-primary`}>
+                                <BaseButton type="button" className={statusLink} onClick={() => jumpToField((suggestions[0] ?? warnings[0]).field)}>
+                                    {suggestions.length > 0
+                                        ? `${suggestions.length} suggestion${suggestions.length === 1 ? '' : 's'}`
+                                        : `${warnings.length} warning${warnings.length === 1 ? '' : 's'}`}{' '}
+                                    ›
+                                </BaseButton>
+                                {suggestions.length > 1 && (
+                                    <BaseButton type="button" className={statusLink} onClick={applyAllSuggestions}>
+                                        {localizeWithFallback('octane.furni_editor.apply_all', 'apply all')}
+                                    </BaseButton>
+                                )}
+                            </div>
+                        )}
+                        {duplicates.length > 0 && (
+                            <div className={`${statusRow} text-amber-700`} role="note">
+                                <span>
+                                    {duplicates.length} duplicate{duplicates.length === 1 ? '' : 's'}
+                                </span>
+                                <BaseButton type="button" className={statusLink} onClick={() => setGroup('data')}>
+                                    {localizeWithFallback('octane.furni_editor.see', 'see ›')}
+                                </BaseButton>
+                            </div>
+                        )}
+                        {related.siblings.length > 0 && (
+                            <div className={statusRow}>
+                                <span className="text-slate-500">{localizeWithFallback('octane.furni_editor.same_line', 'Same line')}</span>
+                                <BaseButton type="button" className={statusLink} onClick={() => setGroup('data')}>
+                                    {related.siblings.length} furni ›
+                                </BaseButton>
+                            </div>
+                        )}
+                        {furnidataIdMismatch !== null && (
+                            <div className={`${statusRow} text-amber-700`} role="note">
+                                <span
+                                    title={`furnidata id ${furnidataIdMismatch}, sprite id ${item.spriteId}: rooms draw the furni that owns id ${furnidataIdMismatch}`}
+                                >
+                                    {localizeWithFallback('octane.furni_editor.furnidata_id_differs_from_sprite', 'Furnidata id %id% ≠ sprite', ['id'], [String(furnidataIdMismatch)])}
+                                </span>
+                                <BaseButton type="button" className={statusLink} onClick={() => setGroup('data')}>
+                                    {localizeWithFallback('octane.furni_editor.see', 'see ›')}
+                                </BaseButton>
+                            </div>
+                        )}
+                        <div className={statusRow}>
+                            <span className="text-slate-500">{localizeWithFallback('octane.furni_editor.assets', 'Assets')}</span>
+                            <span className="flex items-center gap-1.5" aria-label={assets ? `icon ${assets.icon}, bundle ${assets.bundle}` : 'checking assets'}>
+                                {(['icon', 'bundle'] as const).map((kind) => {
+                                    const state: AssetPresence | 'checking' = assets ? assets[kind] : 'checking';
+                                    const tone = state === 'present' ? 'bg-[#10b981]' : state === 'missing' ? 'bg-[#ef4444]' : 'bg-slate-300';
+                                    const url = assets ? (kind === 'icon' ? assets.iconUrl : assets.bundleUrl) : '';
+                                    return (
+                                        <span key={kind} className="inline-flex items-center gap-0.5" title={url ? `${kind} ${state}: ${url}` : `${kind} ${state}`}>
+                                            <span className={`w-1.5 h-1.5 rounded-full ${tone}`} />
+                                            <span className={state === 'missing' ? 'text-red-600' : 'text-slate-600'}>{kind}</span>
+                                        </span>
+                                    );
+                                })}
+                            </span>
+                        </div>
+                        {interactionUnregistered && (
+                            <div className={`${statusRow} text-amber-700`}>
+                                <span>{localizeWithFallback('octane.furni_editor.type_has_no_class', 'Type has no class')}</span>
+                                <BaseButton type="button" className={statusLink} onClick={() => setGroup('behaviour')}>
+                                    {localizeWithFallback('octane.furni_editor.fix', 'fix ›')}
+                                </BaseButton>
+                            </div>
+                        )}
+                        <div className={`${statusRow} border-b`}>
+                            <span className="text-slate-500">{localizeWithFallback('octane.furni_editor.furnidata', 'Furnidata')}</span>
+                            <BaseButton type="button" className={statusLink} onClick={() => setGroup('data')}>
+                                {furnidataMissReason === 'not_found' && !furniDataEntry
+                                    ? 'missing'
+                                    : furnidataEditable
+                                      ? 'resolved'
+                                      : furnidataMissReason.replace(/_/g, ' ')}{' '}
+                                ›
+                            </BaseButton>
+                        </div>
+                    </div>
+                    {isDirty && (
+                        <div className="rounded-lg bg-amber-50 border border-amber-200 px-2 py-1.5 text-[10px] text-amber-800">
+                            <div className="font-medium">
+                                {changedFields.length} unsaved change{changedFields.length === 1 ? '' : 's'}
+                            </div>
+                            <ul className="mt-0.5 space-y-px leading-snug">
+                                {changedFields.map((field) => (
+                                    <li key={field} className="truncate">
+                                        <BaseButton type="button" className="text-amber-700 hover:underline" onClick={() => jumpToField(field)}>
+                                            {FIELD_LABELS[field]}
+                                        </BaseButton>{' '}
+                                        · {formatValue(stored[field])} → {formatValue(form[field])}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                    <div className="mt-auto flex flex-col gap-1">
+                        <Button variant="success" disabled={loading || !isValid || !isDirty} onClick={handleSave} className="w-full">
+                            {loading ? 'Saving...' : isDirty ? localizeWithFallback('octane.furni_editor.save_changed_fields', 'Save (%changed_fields%)', ['changed_fields'], [String(changedFields.length)]) : 'Save'}
+                        </Button>
+                        <div className="flex gap-1">
+                            {isDirty && (
+                                <Button variant="secondary" disabled={loading} onClick={handleDiscard} className="flex-1">
+                                    {localizeWithFallback('octane.furni_editor.discard_changes', 'Discard changes')}
+                                </Button>
+                            )}
+                            <Button
+                                variant="danger"
+                                disabled={loading || item.usageCount > 0}
+                                onClick={() => setShowDeleteDialog(true)}
+                                className="flex-1"
+                                title={item.usageCount > 0 ? localizeWithFallback('octane.furni_editor.placed_furni_cannot_be_deleted', 'Placed furni cannot be deleted') : undefined}
+                            >
+                                Delete
+                            </Button>
+                        </div>
+                        {undoAvailable && (
                             <Button
                                 variant="secondary"
                                 disabled={loading}
-                                className="mt-1 w-full"
-                                onClick={() => onSyncPublicName(item.id, String(furniDataEntry?.name ?? ''))}
+                                onClick={undoLastSave}
+                                className="w-full"
+                                title={localizeWithFallback('octane.furni_editor.put_the_values_the_last_save', 'Put the values the last save replaced back into the form')}
                             >
-                                Sync from furnidata
+                                Undo last save
                             </Button>
                         )}
+                        <span className="text-[9px] text-slate-400 text-center">{localizeWithFallback('octane.furni_editor.ctrl_s_saves', 'Ctrl+S saves')}</span>
                     </div>
-                    <div>
-                        <label className={labelClass}>Sprite ID</label>
-                        <CopyValue value={form.spriteId} />
-                    </div>
-                    <div>
-                        <label className={labelClass}>Type</label>
-                        <CopyValue value={form.type === 's' ? 'Floor (s)' : 'Wall (i)'} />
-                    </div>
-                </div>
-            </Section>
+                </aside>
 
-            {furniDataEntry && (
-                <Section title="FurniData.json" defaultOpen={false}>
-                    <Text className="text-[10px] text-slate-400 mb-1 block">
-                        Read-only — how this furni resolves from the furnidata JSON (source of truth for the display name).
-                    </Text>
-                    <pre className="text-[10px] leading-snug text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-2 overflow-auto max-h-52 whitespace-pre-wrap break-all font-mono">
-                        {JSON.stringify(furniDataEntry, null, 2)}
-                    </pre>
-                </Section>
-            )}
-
-            <Section title="Furnidata Debug" defaultOpen={false}>
-                <div className="grid grid-cols-2 gap-2 mb-2">
-                    <div>
-                        <label className={labelClass}>Resolution</label>
-                        <CopyValue value={furnidataMissReason} />
-                    </div>
-                    <div>
-                        <label className={labelClass}>Source</label>
-                        <CopyValue value={furnidataSourcePath || 'unresolved'} />
-                    </div>
-                </div>
-                <pre className="text-[10px] leading-snug text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-2 overflow-auto max-h-40 whitespace-pre-wrap break-all font-mono">
-                    {JSON.stringify(furniDataDiagnostic ?? {}, null, 2)}
-                </pre>
-            </Section>
-
-            <Section title="Dimensions">
-                <div className="grid grid-cols-3 gap-2">
-                    <div>
-                        <label className={labelClass}>Width</label>
-                        <input type="number" className={inputClass('width')} value={form.width} onChange={(e) => setField('width', Number(e.target.value))} />
-                        {validation.width && <span className="text-[9px] text-red-500">{validation.width}</span>}
-                    </div>
-                    <div>
-                        <label className={labelClass}>Length</label>
-                        <input
-                            type="number"
-                            className={inputClass('length')}
-                            value={form.length}
-                            onChange={(e) => setField('length', Number(e.target.value))}
-                        />
-                        {validation.length && <span className="text-[9px] text-red-500">{validation.length}</span>}
-                    </div>
-                    <div>
-                        <label className={labelClass}>
-                            Stack Height
-                            <Tip field="stackHeight" />
-                        </label>
-                        <input
-                            type="number"
-                            step="0.01"
-                            className={inputClass('stackHeight')}
-                            value={form.stackHeight}
-                            onChange={(e) => setField('stackHeight', Number(e.target.value))}
-                        />
-                        {validation.stackHeight && <span className="text-[9px] text-red-500">{validation.stackHeight}</span>}
-                    </div>
-                </div>
-            </Section>
-
-            <Section title="Permissions">
-                <div className="flex flex-col gap-2">
-                    {PERM_GROUPS.map((group) => (
-                        <div key={group.label}>
-                            <Text className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5 block">{group.label}</Text>
-                            <div className="flex flex-wrap gap-1.5">
-                                {group.keys.map((key) => {
-                                    const on = (form as any)[key];
-                                    return (
-                                        <button
-                                            key={key}
-                                            type="button"
-                                            onClick={() => setField(key, !on)}
-                                            aria-pressed={on}
-                                            title={on ? 'Enabled — click to disable' : 'Disabled — click to enable'}
-                                            className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-lg border font-medium transition ${on ? 'bg-[#418db0] border-[#418db0] text-[#ffffff] shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-400 hover:bg-slate-200 hover:text-slate-600'}`}
-                                        >
+                {/* Field groups: one at a time, chips carry a dot when a group holds unsaved changes. */}
+                <div className="min-h-0 flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                        <TabBar className="inline-flex items-center gap-0.5 rounded-lg bg-slate-100 border border-slate-200 p-0.5" aria-label={localizeWithFallback('octane.furni_editor.field_groups', 'Field groups')} value={group}>
+                            {GROUPS.map(({ id, label }) => {
+                                const changed = changedByGroup[id];
+                                const invalid = invalidByGroup[id];
+                                return (
+                                    <TabBarTab
+                                        key={id}
+                                        value={id}
+                                        onClick={() => setGroup(id)}
+                                        className={`relative inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-md transition ${group === id ? 'bg-[#ffffff] text-slate-800 font-semibold shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/60'}`}
+                                    >
+                                        {label}
+                                        {(changed > 0 || invalid) && (
                                             <span
-                                                className={`inline-block w-2 h-2 rounded-full ring-1 ${on ? 'bg-[#22c55e] ring-[#ffffff]/70' : 'bg-[#ef4444] ring-[#00000014]'}`}
+                                                aria-label={invalid ? 'has invalid fields' : `${changed} unsaved`}
+                                                className={`w-1.5 h-1.5 rounded-full ring-2 ring-[#ffffff] ${invalid ? 'bg-[#ef4444]' : 'bg-[#f59e0b]'}`}
                                             />
-                                            {key.replace('allow', '')}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </Section>
-
-            <Section title="Interaction">
-                <div className="grid grid-cols-3 gap-2">
-                    <div className="col-span-2">
-                        <label className={labelClass}>
-                            Type
-                            <Tip field="interactionType" />
-                        </label>
-                        <select
-                            className="w-full px-2 py-1 text-sm leading-normal rounded-sm border border-[#bbb] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40 pr-8"
-                            value={form.interactionType}
-                            onChange={(e) => setField('interactionType', e.target.value)}
-                        >
-                            <option value="">none</option>
-                            {interactions.map((i) => (
-                                <option key={i} value={i}>
-                                    {i}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className={labelClass}>
-                            Modes
-                            <Tip field="interactionModesCount" />
-                        </label>
-                        <input
-                            type="number"
-                            className={inputClass()}
-                            value={form.interactionModesCount}
-                            onChange={(e) => setField('interactionModesCount', Number(e.target.value))}
+                                        )}
+                                    </TabBarTab>
+                                );
+                            })}
+                        </TabBar>
+                        <SuggestInput
+                            options={JUMP_FIELD_LABELS}
+                            value={jumpQuery}
+                            onChange={handleJump}
+                            placeholder={localizeWithFallback('octane.furni_editor.jump_to_field', 'Jump to field')}
+                            aria-label={localizeWithFallback('octane.furni_editor.jump_to_field', 'Jump to field')}
+                            className="ml-auto w-28 px-2.5 py-1 text-[11px] rounded-lg border border-slate-200 bg-[#ffffff] text-slate-700 placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 transition"
                         />
                     </div>
-                </div>
-                <div className="mt-1">
-                    <label className={labelClass}>
-                        Custom Params
-                        <Tip field="customparams" />
-                    </label>
-                    <input className={inputClass()} value={form.customparams} onChange={(e) => setField('customparams', e.target.value)} />
-                </div>
-            </Section>
+                    <div className="min-h-0 flex-1 overflow-y-auto pr-0.5">
+                        <div className={groupClass('names')}>
+                            {/* Primary edit surface: furnidata display name + description (server-authoritative, live) */}
+                            <div className="bg-[#ffffff] rounded-xl border border-slate-200 shadow-sm p-2.5">
+                                <div className="flex items-center gap-2 mb-1.5">
+                                    <Text className="octane-furni-editor__section-title text-[14px] font-bold text-black">Display name &amp; description</Text>
+                                    {furnidataEditable ? (
+                                        <span className="text-[9px] font-semibold text-primary bg-primary/10 rounded-md px-1.5 py-0.5">LIVE</span>
+                                    ) : furnidataCreatable ? (
+                                        <span className="text-[9px] font-semibold text-emerald-700 bg-emerald-100 rounded-md px-1.5 py-0.5">NEW</span>
+                                    ) : (
+                                        <span className="text-[9px] font-semibold text-amber-700 bg-amber-100 rounded-md px-1.5 py-0.5">NO FURNIDATA</span>
+                                    )}
+                                    {furnidataEditable && furnidataDirty && <span className="ml-auto text-[10px] text-amber-600 font-medium">{localizeWithFallback('octane.furni_editor.unsaved', 'Unsaved')}</span>}
+                                </div>
+                                {furnidataEditable || furnidataCreatable ? (
+                                    <>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label className={labelClass}>Display Name (furnidata)</label>
+                                                <input
+                                                    className={inputClass()}
+                                                    value={furniName}
+                                                    onChange={(e) => setFurniName(e.target.value)}
+                                                    maxLength={256}
+                                                    placeholder={furnidataCreatable ? item.publicName || item.itemName : undefined}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className={labelClass}>{localizeWithFallback('octane.furni_editor.description', 'Description')}</label>
+                                                <input
+                                                    className={inputClass()}
+                                                    value={furniDescription}
+                                                    onChange={(e) => setFurniDescription(e.target.value)}
+                                                    maxLength={256}
+                                                />
+                                            </div>
+                                        </div>
+                                        <Flex gap={1} className="mt-1.5" alignItems="center">
+                                            <Button
+                                                variant="success"
+                                                disabled={furnidataEditable ? loading || !furnidataDirty : loading}
+                                                onClick={() => setConfirmFurnidata(true)}
+                                            >
+                                                {furnidataEditable ? localizeWithFallback('octane.furni_editor.save_name_desc', 'Save name/desc') : localizeWithFallback('octane.furni_editor.create_entry', 'Create entry')}
+                                            </Button>
+                                            {furnidataEditable && (
+                                                <>
+                                                    <Button variant="secondary" disabled={loading} onClick={() => onRevertFurnidata(item.id)}>
+                                                        {localizeWithFallback('octane.furni_editor.revert', 'Revert')}
+                                                    </Button>
+                                                    <Hint content={localizeWithFallback('octane.furni_editor.fetch_the_official_name_description_from', 'Fetch the official name & description from Habbo')}><BaseButton
+                                                        type="button"
+                                                        disabled={loading}
+                                                        onClick={() => onImportText(item.id)}
+                                                        className="ml-auto inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#ffffff] text-slate-600 hover:bg-slate-50 hover:border-slate-400 disabled:opacity-50 transition"
+                                                    >
+                                                        <svg
+                                                            className="w-3.5 h-3.5"
+                                                            viewBox="0 0 20 20"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="1.8"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                        >
+                                                            <path d="M10 3v9" />
+                                                            <path d="m6.5 8.5 3.5 3.5 3.5-3.5" />
+                                                            <path d="M4 16h12" />
+                                                        </svg>
+                                                        {localizeWithFallback('octane.furni_editor.import_from_habbo', 'Import from Habbo')}
+                                                    </BaseButton></Hint>
+                                                </>
+                                            )}
+                                        </Flex>
+                                        {furnidataCreatable && (
+                                            <Text className="mt-1 text-[10px] text-emerald-600">
+                                                {localizeWithFallback('octane.furni_editor.no_furnidata_entry_yet_saving_creates', 'No furnidata entry yet — saving creates a complete one from the item data.')}
+                                            </Text>
+                                        )}
+                                        {importNote && (
+                                            <Text className={`mt-1 text-[10px] ${importNote.startsWith('Not found') ? 'text-amber-600' : 'text-primary'}`}>
+                                                {importNote}
+                                            </Text>
+                                        )}
+                                    </>
+                                ) : (
+                                    <div className="flex items-start gap-2 text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 leading-snug">
+                                        <span className="text-[#f59e0b] text-sm leading-none mt-px">⚠</span>
+                                        <span>
+                                            A furnidata entry resolved by id but for a <b>different classname</b> ({furnidataMissReason.replace(/_/g, ' ')}) — name
+                                            editing is locked to avoid an id collision. Clients fall back to the DB <b>{localizeWithFallback('octane.furni_editor.public_name', 'Public Name')}</b> below.
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
 
-            {/* Actions */}
-            <Flex gap={1} justifyContent="between" alignItems="center" className="mt-1">
-                <Flex gap={1} alignItems="center">
-                    <Button variant="success" disabled={loading || !isValid || !isDirty} onClick={handleSave}>
-                        {loading ? 'Saving...' : 'Save'}
-                    </Button>
-                    <span className="text-[9px] text-[#999]">Ctrl+S</span>
-                </Flex>
-                <Button variant="danger" disabled={loading || item.usageCount > 0} onClick={() => setShowDeleteDialog(true)}>
-                    Delete
-                </Button>
-            </Flex>
+                            <Section title={localizeWithFallback('octane.furni_editor.basic_info', 'Basic Info')}>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label className={labelClass}>{localizeWithFallback('octane.furni_editor.classname', 'Classname')}</label>
+                                        <CopyValue value={item.itemName} />
+                                    </div>
+                                    <div>
+                                        <label className={labelClass}>Public Name (DB fallback)</label>
+                                        <CopyValue value={item.publicName} />
+                                        {canSyncPublicName && (
+                                            <Button
+                                                variant="secondary"
+                                                disabled={loading}
+                                                className="mt-1 w-full"
+                                                onClick={() => onSyncPublicName(item.id, String(furniDataEntry?.name ?? ''))}
+                                            >
+                                                Sync from furnidata
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className={labelClass}>{localizeWithFallback('octane.furni_editor.sprite_id', 'Sprite ID')}</label>
+                                        <CopyValue value={item.spriteId} />
+                                    </div>
+                                    <div>
+                                        <label className={labelClass}>{localizeWithFallback('octane.furni_editor.type', 'Type')}</label>
+                                        <CopyValue value={item.type === 's' ? localizeWithFallback('octane.furni_editor.floor_s', 'Floor (s)') : localizeWithFallback('octane.furni_editor.wall_i', 'Wall (i)')} />
+                                    </div>
+                                </div>
+                            </Section>
+                        </div>
 
-            {/* Delete Confirmation Dialog */}
-            {showDeleteDialog && (
-                <div className="fixed inset-0 bg-[#00000080] flex items-center justify-center z-[60]" onClick={() => setShowDeleteDialog(false)}>
-                    <div className="bg-[#ffffff] rounded-lg shadow-xl p-4 w-[320px]" onClick={(e) => e.stopPropagation()}>
-                        <Text bold className="text-[14px] mb-2 block">
-                            Delete Item?
+                        <div className={groupClass('catalogue')}>
+                            <Section title={localizeWithFallback('octane.furni_editor.catalogue_catalog_items', 'Catalogue (%catalog_items%)', ['catalog_items'], [String(catalogItems.length)])}>
+                                <div data-testid="furni-editor-catalog">
+                                    {catalogItems.length === 0 ? (
+                                        <Text className="text-[11px] text-slate-400">{localizeWithFallback('octane.furni_editor.not_in_the_catalogue', 'Not in the catalogue')}</Text>
+                                    ) : (
+                                        <table className="w-full text-[11px]">
+                                            <thead>
+                                                <tr className="text-left text-[9px] uppercase tracking-wide text-slate-400">
+                                                    <th className="font-semibold pb-1">{localizeWithFallback('octane.furni_editor.page', 'Page')}</th>
+                                                    <th className="font-semibold pb-1">{localizeWithFallback('octane.furni_editor.offer', 'Offer')}</th>
+                                                    <th className="font-semibold pb-1 text-right">{localizeWithFallback('octane.furni_editor.price', 'Price')}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {catalogItems.map((ref) => (
+                                                    <tr key={ref.id} className="border-t border-slate-100">
+                                                        <td className="py-1 pr-2 text-slate-700">
+                                                            <span>{ref.pageName}</span>
+                                                            <span className="ml-1 font-mono text-slate-400">#{ref.pageId}</span>
+                                                        </td>
+                                                        <td className="py-1 pr-2 font-mono text-slate-600 truncate max-w-[180px]">
+                                                            {ref.catalogName}
+                                                            <span className="ml-1 text-slate-400">#{ref.id}</span>
+                                                        </td>
+                                                        <td className="py-1 text-right text-slate-700 whitespace-nowrap">{formatPrice(ref)}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    )}
+                                </div>
+                            </Section>
+                        </div>
+
+                        <div className={groupClass('data')}>
+                            {furniDataEntry && (
+                                <>
+                                    <Section title={localizeWithFallback('octane.furni_editor.furnidata_structure', 'Furnidata structure')}>
+                                        {structureDiff.length === 0 ? (
+                                            <Text className="text-[11px] text-slate-400">
+                                                {furnidataEditable
+                                                    ? localizeWithFallback('octane.furni_editor.footprint_height_and_walk_sit_lay', 'Footprint, height and walk, sit, lay flags agree with the DB.')
+                                                    : localizeWithFallback('octane.furni_editor.no_matching_entry_to_compare', 'No matching entry to compare.')}
+                                            </Text>
+                                        ) : (
+                                            <>
+                                                <Text className="text-[10px] text-slate-400 mb-1 block">
+                                                    Where the entry disagrees with items_base. The chips under the fields take the furnidata side; this takes the DB
+                                                    side and rewrites the entry for every client.
+                                                </Text>
+                                                <div data-testid="furni-editor-structure" className="flex flex-col gap-0.5 mb-1.5">
+                                                    {structureDiff.map((row) => (
+                                                        <div
+                                                            key={row.key}
+                                                            className="text-[11px] grid grid-cols-[1fr_auto_1fr] items-center gap-1 bg-slate-50 border border-slate-200 rounded-md px-2 py-1"
+                                                        >
+                                                            <span className="font-mono text-slate-700">{row.label}</span>
+                                                            <span className="text-slate-400">→</span>
+                                                            <span className="font-mono text-right">
+                                                                <span className="text-slate-400 line-through mr-1">{formatValue(row.from)}</span>
+                                                                <span className="text-slate-800">{formatValue(row.to)}</span>
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <Button variant="secondary" disabled={loading} onClick={() => setConfirmStructure(true)}>
+                                                    {localizeWithFallback('octane.furni_editor.write_db_values_into_furnidata', 'Write DB values into furnidata')}
+                                                </Button>
+                                            </>
+                                        )}
+                                    </Section>
+                                    <Section title="FurniData.json" defaultOpen={false}>
+                                        <Text className="text-[10px] text-slate-400 mb-1 block">
+                                            Read-only — how this furni resolves from the furnidata JSON (source of truth for the display name).
+                                        </Text>
+                                        <pre className="text-[10px] leading-snug text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-2 overflow-auto max-h-52 whitespace-pre-wrap break-all font-mono">
+                                            {JSON.stringify(furniDataEntry, null, 2)}
+                                        </pre>
+                                    </Section>
+                                </>
+                            )}
+
+                            {duplicates.length > 0 && (
+                                <Section title={localizeWithFallback('octane.furni_editor.duplicates_duplicates', 'Duplicates (%duplicates%)', ['duplicates'], [String(duplicates.length)])}>
+                                    <Text className="text-[10px] text-amber-700 mb-1 block">
+                                        Other items_base rows with this classname or sprite id. Two rows for one furni usually means an import ran twice; keep the
+                                        one placed in rooms.
+                                    </Text>
+                                    <div data-testid="furni-editor-duplicates" className="flex flex-col gap-0.5">
+                                        {duplicates.map((row) => (
+                                            <BaseButton
+                                                key={row.id}
+                                                type="button"
+                                                onClick={() => openFurni(row.spriteId)}
+                                                className="flex items-center justify-between text-[11px] px-2 py-1 rounded-md border border-amber-200 bg-amber-50 hover:bg-amber-100 text-left"
+                                            >
+                                                <span className="font-mono text-slate-700">{row.itemName}</span>
+                                                <span className="font-mono text-slate-500">
+                                                    #{row.id} · s{row.spriteId}
+                                                </span>
+                                            </BaseButton>
+                                        ))}
+                                    </div>
+                                </Section>
+                            )}
+                            {related.siblings.length > 0 && (
+                                <Section title={localizeWithFallback('octane.furni_editor.same_line_siblings', 'Same line (%siblings%)', ['siblings'], [String(related.siblings.length)])}>
+                                    <Text className="text-[10px] text-slate-400 mb-1 block">
+                                        {localizeWithFallback('octane.furni_editor.furni_sharing_the_classname_prefix_when', 'Furni sharing the classname prefix. When most of them agree on a value, it is offered under the matching field.')}
+                                    </Text>
+                                    <div data-testid="furni-editor-siblings" className="flex flex-col gap-0.5">
+                                        {related.siblings.map((row) => (
+                                            <BaseButton
+                                                key={row.id}
+                                                type="button"
+                                                onClick={() => openFurni(row.spriteId)}
+                                                className="flex items-center gap-2 text-[11px] px-2 py-1 rounded-md border border-slate-200 bg-slate-50 hover:bg-slate-100 text-left"
+                                            >
+                                                <span className="font-mono text-slate-700 truncate flex-1">{row.itemName}</span>
+                                                <span className="text-slate-500">
+                                                    {row.width}×{row.length}
+                                                </span>
+                                                <span className="font-mono text-slate-400">{row.interactionType || 'none'}</span>
+                                            </BaseButton>
+                                        ))}
+                                    </div>
+                                </Section>
+                            )}
+                            {furnidataIdMismatch !== null && (
+                                <div className="flex items-start gap-2 text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-2 leading-snug">
+                                    <span className="text-[#f59e0b] text-sm leading-none mt-px">⚠</span>
+                                    <span>
+                                        This entry was matched by classname but carries id <b>{furnidataIdMismatch}</b>, while the DB sprite id is{' '}
+                                        <b>{item.spriteId}</b>. Rooms resolve the sprite through the furnidata id, so they draw whichever furni owns{' '}
+                                        {furnidataIdMismatch}. Fix by repointing the furnidata id to the sprite id, or the sprite id to the entry.
+                                    </span>
+                                </div>
+                            )}
+                            <Section title={localizeWithFallback('octane.furni_editor.furnidata_debug', 'Furnidata Debug')} defaultOpen={false}>
+                                <div className="grid grid-cols-2 gap-2 mb-2">
+                                    <div>
+                                        <label className={labelClass}>{localizeWithFallback('octane.furni_editor.resolution', 'Resolution')}</label>
+                                        <CopyValue value={furnidataMissReason} />
+                                    </div>
+                                    <div>
+                                        <label className={labelClass}>{localizeWithFallback('octane.furni_editor.source', 'Source')}</label>
+                                        <CopyValue value={furnidataSourcePath || 'unresolved'} />
+                                    </div>
+                                </div>
+                                <pre className="text-[10px] leading-snug text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-2 overflow-auto max-h-40 whitespace-pre-wrap break-all font-mono">
+                                    {JSON.stringify(furniDataDiagnostic ?? {}, null, 2)}
+                                </pre>
+                            </Section>
+                        </div>
+
+                        <div className={groupClass('placement')}>
+                            <Section title={localizeWithFallback('octane.furni_editor.dimensions', 'Dimensions')}>
+                                <div className="grid grid-cols-3 gap-2">
+                                    <div>
+                                        <label className={labelClass} htmlFor="furni-editor-width">
+                                            Width{revert('width')}
+                                        </label>
+                                        <NumberInput id="furni-editor-width" aria-label={FIELD_LABELS.width} className={inputClass('width')} value={form.width} onChange={(e) => setField('width', Number(e.target.value))} />
+                                        {validation.width && <span className="text-[9px] text-red-500">{validation.width}</span>}
+                                        {chipsFor('width')}
+                                    </div>
+                                    <div>
+                                        <label className={labelClass} htmlFor="furni-editor-length">
+                                            Length{revert('length')}
+                                        </label>
+                                        <NumberInput id="furni-editor-length" aria-label={FIELD_LABELS.length} className={inputClass('length')} value={form.length} onChange={(e) => setField('length', Number(e.target.value))} />
+                                        {validation.length && <span className="text-[9px] text-red-500">{validation.length}</span>}
+                                        {chipsFor('length')}
+                                    </div>
+                                    <div>
+                                        <label className={labelClass}>
+                                            {localizeWithFallback('octane.furni_editor.stack_height', 'Stack Height')}
+                                            <Tip field="stackHeight" />
+                                            {revert('stackHeight')}
+                                        </label>
+                                        <NumberInput id="furni-editor-stackHeight" aria-label={FIELD_LABELS.stackHeight} step="0.01" className={inputClass('stackHeight')} value={form.stackHeight} onChange={(e) => setField('stackHeight', Number(e.target.value))} />
+                                        {validation.stackHeight && <span className="text-[9px] text-red-500">{validation.stackHeight}</span>}
+                                        {chipsFor('stackHeight')}
+                                    </div>
+                                </div>
+                            </Section>
+
+                            <Section title={localizeWithFallback('octane.furni_editor.permissions', 'Permissions')}>
+                                <div className="flex flex-col gap-2">
+                                    {PERM_GROUPS.map((group) => (
+                                        <div key={group.label}>
+                                            <Text className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5 block">{group.label}</Text>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {group.keys.map((key) => {
+                                                    const on = form[key] === true;
+                                                    return (
+                                                        <Hint key={key} content={on ? localizeWithFallback('octane.furni_editor.enabled_click_to_disable', 'Enabled — click to disable') : localizeWithFallback('octane.furni_editor.disabled_click_to_enable', 'Disabled — click to enable')}><ToggleButton
+                                                            type="button"
+                                                            pressed={on}
+                                                            onClick={() => setField(key, !on)}
+                                                            className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-lg border font-medium transition ${on ? 'bg-[#418db0] border-[#418db0] text-[#ffffff] shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-400 hover:bg-slate-200 hover:text-slate-600'}${isChanged(key) ? ' ring-2 ring-amber-300' : ''}`}
+                                                        >
+                                                            <span
+                                                                className={`inline-block w-2 h-2 rounded-full ring-1 ${on ? 'bg-[#22c55e] ring-[#ffffff]/70' : 'bg-[#ef4444] ring-[#00000014]'}`}
+                                                            />
+                                                            {key.replace('allow', '')}
+                                                        </ToggleButton></Hint>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </Section>
+                        </div>
+
+                        <div className={groupClass('behaviour')}>
+                            <Section title={localizeWithFallback('octane.furni_editor.interaction', 'Interaction')}>
+                                <div className="grid grid-cols-3 gap-2">
+                                    <div className="col-span-2">
+                                        <label className={labelClass}>
+                                            {localizeWithFallback('octane.furni_editor.type', 'Type')}
+                                            <Tip field="interactionType" />
+                                            {revert('interactionType')}
+                                        </label>
+                                        <InteractionTypePicker
+                                            id="furni-editor-interactionType"
+                                            value={form.interactionType}
+                                            options={interactions}
+                                            className={inputClass('interactionType')}
+                                            onChange={(value) => setField('interactionType', value)}
+                                        />
+                                        {suggestedType && (
+                                            <Hint content={suggestedType.reason}><BaseButton
+                                                type="button"
+                                                onClick={() => setField('interactionType', suggestedType.type)}
+                                                className="mt-1 inline-flex items-center gap-1 text-[10px] font-medium text-primary bg-primary/10 border border-primary/20 rounded-md px-2 py-0.5 hover:bg-primary/15 transition"
+                                            >
+                                                <span aria-hidden="true">✦</span> {localizeWithFallback('octane.furni_editor.suggested', 'Suggested:')} <span className="font-mono">{suggestedType.type}</span>
+                                                <span className="text-primary/70 font-normal">· {suggestedType.reason}</span>
+                                            </BaseButton></Hint>
+                                        )}
+                                        {interactionUnregistered && (
+                                            <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-100 border border-amber-200 rounded-md px-2 py-0.5">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />
+                                                {localizeWithFallback('octane.furni_editor.no_class_registered_for_this_type', 'No class registered for this type: the furni behaves as default')}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className={labelClass} htmlFor="furni-editor-interactionModesCount">
+                                            {localizeWithFallback('octane.furni_editor.modes', 'Modes')}
+                                            <Tip field="interactionModesCount" />
+                                            {revert('interactionModesCount')}
+                                        </label>
+                                        <NumberInput id="furni-editor-interactionModesCount" aria-label={FIELD_LABELS.interactionModesCount} className={inputClass('interactionModesCount')} value={form.interactionModesCount} onChange={(e) => setField('interactionModesCount', Number(e.target.value))} />
+                                        {fieldError('interactionModesCount')}
+                                        {chipsFor('interactionModesCount')}
+                                    </div>
+                                </div>
+                                <div className="mt-1">
+                                    <label className={labelClass} htmlFor="furni-editor-customparams">
+                                        {localizeWithFallback('octane.furni_editor.custom_params', 'Custom Params')}
+                                        <Tip field="customparams" />
+                                        {revert('customparams')}
+                                    </label>
+                                    <input
+                                        id="furni-editor-customparams"
+                                        aria-label={FIELD_LABELS.customparams}
+                                        className={inputClass('customparams')}
+                                        value={form.customparams}
+                                        onChange={(e) => setField('customparams', e.target.value)}
+                                    />
+                                    {fieldError('customparams')}
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 mt-1">
+                                    <div>
+                                        <label className={labelClass} htmlFor="furni-editor-vendingIds">
+                                            {localizeWithFallback('octane.furni_editor.vending_ids', 'Vending IDs')}
+                                            <Tip field="vendingIds" />
+                                            {revert('vendingIds')}
+                                        </label>
+                                        <input
+                                            id="furni-editor-vendingIds"
+                                            aria-label={FIELD_LABELS.vendingIds}
+                                            className={inputClass('vendingIds')}
+                                            value={form.vendingIds}
+                                            onChange={(e) => setField('vendingIds', e.target.value)}
+                                        />
+                                        {fieldError('vendingIds')}
+                                        {chipsFor('vendingIds')}
+                                    </div>
+                                    <div>
+                                        <label className={labelClass} htmlFor="furni-editor-multiheight">
+                                            {localizeWithFallback('octane.furni_editor.multiheight', 'Multiheight')}
+                                            <Tip field="multiheight" />
+                                            {revert('multiheight')}
+                                        </label>
+                                        <input
+                                            id="furni-editor-multiheight"
+                                            aria-label={FIELD_LABELS.multiheight}
+                                            className={inputClass('multiheight')}
+                                            value={form.multiheight}
+                                            onChange={(e) => setField('multiheight', e.target.value)}
+                                        />
+                                        {fieldError('multiheight')}
+                                        {chipsFor('multiheight')}
+                                    </div>
+                                </div>
+                            </Section>
+
+                            <Section title={localizeWithFallback('octane.furni_editor.effects_clothing', 'Effects & clothing')}>
+                                <div className="grid grid-cols-3 gap-2">
+                                    <div>
+                                        <label className={labelClass} htmlFor="furni-editor-effectIdMale">
+                                            Effect ID (male)
+                                            <Tip field="effectIdMale" />
+                                            {revert('effectIdMale')}
+                                        </label>
+                                        <NumberInput id="furni-editor-effectIdMale" aria-label={FIELD_LABELS.effectIdMale} min={0} className={inputClass('effectIdMale')} value={form.effectIdMale} onChange={(e) => setField('effectIdMale', Number(e.target.value))} />
+                                        {fieldError('effectIdMale')}
+                                    </div>
+                                    <div>
+                                        <label className={labelClass} htmlFor="furni-editor-effectIdFemale">
+                                            Effect ID (female)
+                                            <Tip field="effectIdFemale" />
+                                            {revert('effectIdFemale')}
+                                        </label>
+                                        <NumberInput id="furni-editor-effectIdFemale" aria-label={FIELD_LABELS.effectIdFemale} min={0} className={inputClass('effectIdFemale')} value={form.effectIdFemale} onChange={(e) => setField('effectIdFemale', Number(e.target.value))} />
+                                        {fieldError('effectIdFemale')}
+                                    </div>
+                                    <div>
+                                        <label className={labelClass} htmlFor="furni-editor-clothingOnWalk">
+                                            {localizeWithFallback('octane.furni_editor.clothing_on_walk', 'Clothing on walk')}
+                                            <Tip field="clothingOnWalk" />
+                                            {revert('clothingOnWalk')}
+                                        </label>
+                                        <input
+                                            id="furni-editor-clothingOnWalk"
+                                            aria-label={FIELD_LABELS.clothingOnWalk}
+                                            className={inputClass('clothingOnWalk')}
+                                            value={form.clothingOnWalk}
+                                            onChange={(e) => setField('clothingOnWalk', e.target.value)}
+                                        />
+                                        {fieldError('clothingOnWalk')}
+                                    </div>
+                                </div>
+                            </Section>
+                        </div>
+                    </div>
+                </div>
+
+                {confirmSave && (
+                    <ConfirmModal title={localizeWithFallback('octane.furni_editor.confirm_changes', 'Confirm changes')} confirmLabel="Confirm" confirmVariant="success" onConfirm={handleSaveConfirm} onCancel={closeSave}>
+                        <Text small className="mb-2 block text-[#666]">
+                            {changedFields.length} field{changedFields.length === 1 ? '' : 's'} of <strong>{item.publicName || item.itemName}</strong> (ID:{' '}
+                            {item.id}) will change. Rooms pick the new values up on their next reload.
                         </Text>
-                        <Text small className="mb-3 block text-[#666]">
+                        {item.usageCount > 0 && changedFields.some((f) => placementFields.includes(f)) && (
+                            <div
+                                role="note"
+                                className="mb-2 flex items-start gap-1.5 text-[10px] text-amber-800 bg-amber-50 border border-amber-200 rounded-md px-2 py-1 leading-snug"
+                            >
+                                <span className="text-[#f59e0b] leading-none mt-px">⚠</span>
+                                <span>
+                                    {item.usageCount} placed furni will take the new footprint or walk rules when their room reloads. Check for overlaps and blocked
+                                    paths afterwards.
+                                </span>
+                            </div>
+                        )}
+                        <div className="max-h-48 overflow-auto flex flex-col gap-1">
+                            {changedFields.map((field) => (
+                                <div
+                                    key={field}
+                                    className="text-xs grid grid-cols-[1fr_auto_1fr] items-center gap-1 bg-slate-50 border border-slate-200 rounded-md px-2 py-1"
+                                >
+                                    <span className="font-medium text-slate-700 truncate">{FIELD_LABELS[field]}</span>
+                                    <span className="text-slate-400">→</span>
+                                    <span className="font-mono text-right truncate">
+                                        <span className="text-slate-400 line-through mr-1">{formatValue(stored[field])}</span>
+                                        <span className="text-slate-800">{formatValue(form[field])}</span>
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </ConfirmModal>
+                )}
+
+                {confirmBack && (
+                    <ConfirmModal title={localizeWithFallback('octane.furni_editor.unsaved_changes', 'Unsaved changes')} confirmLabel="Discard" confirmVariant="danger" onConfirm={onBack} onCancel={closeBack}>
+                        <Text small className="block text-[#666]">
+                            {changedFields.length} unsaved change{changedFields.length === 1 ? '' : 's'} will be lost if you go back now.
+                        </Text>
+                    </ConfirmModal>
+                )}
+
+                {showDeleteDialog && (
+                    <ConfirmModal title={localizeWithFallback('octane.furni_editor.delete_item', 'Delete Item?')} confirmLabel="Delete" confirmVariant="danger" onConfirm={handleDeleteConfirm} onCancel={closeDelete}>
+                        <Text small className="block text-[#666]">
                             Are you sure you want to delete <strong>{item.publicName || item.itemName}</strong> (ID: {item.id})? This action cannot be undone.
                         </Text>
-                        <Flex gap={1} justifyContent="end">
-                            <Button variant="secondary" onClick={() => setShowDeleteDialog(false)}>
-                                Cancel
-                            </Button>
-                            <Button variant="danger" onClick={handleDeleteConfirm}>
-                                Delete
-                            </Button>
-                        </Flex>
-                    </div>
-                </div>
-            )}
+                    </ConfirmModal>
+                )}
 
-            {/* Furnidata Confirmation Dialog */}
-            {confirmFurnidata && (
-                <div className="fixed inset-0 bg-[#00000080] flex items-center justify-center z-[60]" onClick={() => setConfirmFurnidata(false)}>
-                    <div className="bg-[#ffffff] rounded-lg shadow-xl p-4 w-[320px]" onClick={(e) => e.stopPropagation()}>
-                        <Text bold className="text-[14px] mb-2 block">
-                            Apply furnidata change to ALL clients?
+                {confirmStructure && (
+                    <ConfirmModal
+                        title={localizeWithFallback('octane.furni_editor.rewrite_furnidata_structure', 'Rewrite furnidata structure?')}
+                        confirmLabel="Write"
+                        confirmVariant="success"
+                        onConfirm={writeStructure}
+                        onCancel={closeStructure}
+                    >
+                        <Text small className="mb-2 block text-[#666]">
+                            {structureDiff.length} field{structureDiff.length === 1 ? '' : 's'} of the furnidata entry for <strong>{item.itemName}</strong> will
+                            take the DB values. Every client reloads its furnidata afterwards.
                         </Text>
+                        <div className="flex flex-col gap-1">
+                            {structureDiff.map((row) => (
+                                <div key={row.key} className="text-xs font-mono">
+                                    <b>{row.label}:</b> {formatValue(row.from)} → {formatValue(row.to)}
+                                </div>
+                            ))}
+                        </div>
+                    </ConfirmModal>
+                )}
+
+                {confirmFurnidata && (
+                    <ConfirmModal
+                        title={localizeWithFallback('octane.furni_editor.apply_furnidata_change_to_all_clients', 'Apply furnidata change to ALL clients?')}
+                        confirmLabel="Confirm"
+                        confirmVariant="success"
+                        onConfirm={() => {
+                            onUpdateFurnidata(item.id, furniName, furniDescription);
+                            setConfirmFurnidata(false);
+                        }}
+                        onCancel={closeFurnidata}
+                    >
                         <div className="text-xs mb-1">
-                            <b>Name:</b> {String(furniDataEntry?.name ?? '')} → {furniName}
+                            <b>{localizeWithFallback('octane.furni_editor.name', 'Name:')}</b> {String(furniDataEntry?.name ?? '')} → {furniName}
                         </div>
-                        <div className="text-xs mb-3">
-                            <b>Desc:</b> {String(furniDataEntry?.description ?? '')} → {furniDescription}
+                        <div className="text-xs">
+                            <b>{localizeWithFallback('octane.furni_editor.desc', 'Desc:')}</b> {String(furniDataEntry?.description ?? '')} → {furniDescription}
                         </div>
-                        <Flex gap={1} justifyContent="end">
-                            <Button variant="secondary" onClick={() => setConfirmFurnidata(false)}>
-                                Cancel
-                            </Button>
-                            <Button
-                                variant="success"
-                                onClick={() => {
-                                    onUpdateFurnidata(item.id, furniName, furniDescription);
-                                    setConfirmFurnidata(false);
-                                }}
-                            >
-                                Confirm
-                            </Button>
-                        </Flex>
-                    </div>
-                </div>
-            )}
-        </Column>
+                    </ConfirmModal>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

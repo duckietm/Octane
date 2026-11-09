@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<skin name="checkbox_button_skin" version="0.0">
+
+	<!-- shared variables -->
+
+	<variables>
+		<variable key="asset"	value="habbo_blue_skin_png"	type="String" />
+	</variables>
+
+	<!-- the following maps layouts for render states -->
+
+	<states>
+		<state name="default"  layout="button_checkbox" template="default_btn_mode" />
+		<state name="active"   layout="button_checkbox" template="default_btn_mode" />
+		<state name="pressed"  layout="button_checkbox" template="default_btn_mode" />
+		<state name="selected" layout="button_checkbox" template="pressed_btn_mode" />
+	</states>
+
+	<!-- templates defines regions in bitmap asset -->
+
+	<templates>
+		<template name="default_btn_mode" asset="$asset">
+			<entities>
+				<entity name="checkbox" type="bitmap"><region><Rectangle x="410" y="0"  width="15" height="15" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="pressed_btn_mode" asset="$asset">
+			<entities>
+				<entity name="checkbox" type="bitmap"><region><Rectangle x="410" y="16"  width="15" height="15" /></region></entity>
+			</entities>
+		</template>
+	</templates>
+
+	<!-- markup for layout drawer -->
+
+	<layouts>
+		<layout name="button_checkbox" transparent="false">
+			<entities>
+				<entity name="checkbox" id="0">
+					<region><Rectangle x="0" y="0" width="15" height="15" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+	</layouts>
+</skin>

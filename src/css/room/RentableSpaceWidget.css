@@ -1,0 +1,115 @@
+/* AIR rentablespace_xml: a 256x224 frame (style 3), one of three item lists shown at a time. */
+.octane-widget-rentablespace {
+    width: min(256px, calc(100vw - 16px));
+    min-width: 0;
+    min-height: 224px;
+    max-height: calc(100vh - 16px);
+    /* rentablespace is a style 3 frame: regular Ubuntu, text u_regular 12 px. */
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+
+    .rentablespace-rent-view,
+    .rentablespace-rented-view,
+    .rentablespace-error-view {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .rentablespace-rent-view {
+        gap: 10px;
+    }
+
+    .rentablespace-rented-view {
+        gap: 5px;
+        padding: 10px 5px 0 10px;
+    }
+
+    .rentablespace-instructions {
+        padding: 5px 5px 0;
+        white-space: normal;
+    }
+
+    /* container_button 44px high: "<price> x", the 27x24 coin, "Rent" in u_headline_medium. */
+    .rentablespace-rent-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        height: 44px;
+        padding: 0 10px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .rentablespace-coin {
+        display: inline-block;
+        flex: 0 0 auto;
+        width: 27px;
+        height: 24px;
+        background: url('@/assets/images/room-widgets/rentablespace-widget/coin.png') no-repeat center;
+    }
+
+    .rentablespace-rent-footer {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 4px;
+    }
+
+    .rentablespace-cant-rent {
+        padding-left: 5px;
+        color: #ff0000;
+        font-weight: bold;
+        white-space: normal;
+    }
+
+    .rentablespace-habboclub {
+        display: inline-block;
+        flex: 0 0 auto;
+        width: 37px;
+        height: 37px;
+        background: url('@/assets/images/room-widgets/rentablespace-widget/habboclub.png') no-repeat center;
+    }
+
+    /* rented_to_label / time_label: u_headline_small, 14 px bold. */
+    .rentablespace-headline {
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 19px;
+    }
+
+    .rentablespace-cancel-button {
+        margin: 5px 10px 0;
+    }
+
+    .rentablespace-error-view {
+        gap: 10px;
+        padding: 10px 5px 0;
+    }
+
+    .rentablespace-error-message {
+        min-height: 100px;
+        color: #ff0000;
+        white-space: normal;
+    }
+}
+
+/* The shared Button carries an important 12.6 px size (utilities layer) and the card shell sets condensed
+   Ubuntu; important rules in the base layer outrank both. Buttons are 12 px, the rent button's price and
+   label u_headline_medium 16 px bold. */
+@layer base {
+    .octane-widget-rentablespace :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    .octane-widget-rentablespace :where(button) {
+        font-size: 12px !important;
+    }
+
+    .octane-widget-rentablespace .rentablespace-rent-button,
+    .octane-widget-rentablespace .rentablespace-rent-button :where(span) {
+        font-size: 16px !important;
+        font-weight: 700 !important;
+    }
+}

@@ -1,5 +1,30 @@
 .tb-frame {
-    transition: background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease, border-radius 220ms ease;
+    transition: bottom 140ms ease-out, background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease, border-radius 220ms ease;
+}
+
+.octane-toolbar-hobba {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 70;
+    width: 100%;
+    height: 46px;
+    pointer-events: all;
+    /* AIR bottom bar: a see-through dark strip with a lighter line along its top edge. */
+    border-top: 1px solid rgba(96, 94, 95, 0.7);
+    background: rgba(43, 42, 44, 0.7);
+    background-clip: padding-box;
+}
+
+.octane-toolbar-mobile-hobba {
+    min-height: 44px;
+    border: 1px solid rgba(0, 0, 0, 0.50);
+    border-radius: 7px;
+    background: rgba(46, 45, 44, 0.76);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+        0 2px 0 rgba(0, 0, 0, 0.22);
 }
 
 .tb-nav-clip {
@@ -9,41 +34,170 @@
 .tb-icon {
     opacity: 1;
     cursor: pointer;
-    transition: transform 0.15s ease;
-
-    &:hover {
-        transform: translateY(-2px);
-    }
-
-    &:active {
-        transform: translateY(0);
-    }
+    image-rendering: var(--octane-pixel-art, pixelated);
+    filter: drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.28));
 }
 
-.tb-avatar-head {
-    /* LayoutAvatarImageView(headOnly) writes background-size/-position inline, so the toolbar head-crop only applies with !important. */
-    background-size: auto !important;
-    background-position: -25px -38px !important;
+.tb-nav-clip .octane-icon:hover,
+.tb-nav-clip .octane-icon:active {
+    transform: none;
+    filter: drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.28));
 }
 
-.tb-collapse {
+.tb-nav-clip .tb-slot:hover {
+    transform: translate(-1px, -1px);
+}
+
+.tb-nav-clip .tb-slot:active {
+    transform: translate(1px, 0);
+}
+
+.tb-nav-clip .tb-slot:active .tb-icon {
+    filter: brightness(0.7) drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.28));
+}
+
+.tb-avatar-head,
+.tb-memenu-face,
+.tb-memenu-face-img {
+    width: 50px !important;
+    height: 50px !important;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+
+.tb-memenu-face {
+    position: relative !important;
+    display: block;
+    overflow: hidden;
+    background: none !important;
+}
+
+.tb-memenu-face-img {
+    display: block;
+    pointer-events: none;
+}
+
+.tb-slot {
+    position: relative;
     display: flex;
-    width: 15px;
-    height: 34px;
+    width: 45px;
+    height: 41px;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    border-radius: 6px;
-    background: rgba(85, 85, 85, 0.92);
-    border: 1px solid rgba(61, 61, 61, 0.85);
-    color: rgba(255, 255, 255, 0.70);
-    transition: color 0.15s, background 0.15s;
+    overflow: visible;
+}
 
-    &:hover {
-        color: #fff;
-        background: rgba(80, 82, 90, 0.65);
-    }
+.tb-slot-tall {
+    height: 45px;
+}
+
+.tb-slot-inventory {
+    height: 43px;
+}
+
+/* The tool icons after the divider are narrower than the 45px slot the AIR icons fill, and their images carry
+   transparent edges. Their slot takes the width of the drawing itself plus 4px a side: with the shell's 8px
+   gap that leaves 16px between two drawings, the 14-19px the icons before the divider are apart. */
+.tb-slot-fit {
+    width: auto;
+    padding: 0 4px;
+}
+
+.tb-slot-fit .icon-soundboard { margin: 0 -4px 0 -3px; }
+.tb-slot-fit .icon-modtools { margin: 0 -1px; }
+.tb-slot-fit .icon-buildheight { margin: 0 -6px; }
+.tb-slot-fit .icon-housekeeping { margin: 0 -3px 0 -5px; }
+
+.tb-slot-messenger {
+    width: 31px;
+    margin-left: -6px;
+}
+
+.tb-nav-clip .tb-slot .icon-habbo { position: absolute; left: 8px; top: 5px; width: 28px; height: 28px; }
+.tb-nav-clip .tb-slot .icon-house { position: absolute; left: 6px; top: 5px; width: 32px; height: 30px; }
+.tb-nav-clip .tb-slot .icon-rooms { position: absolute; left: 0; top: 5px; width: 44px; height: 30px; }
+.tb-nav-clip .tb-slot .icon-progression { position: absolute; left: 0; top: 0; width: 44px; height: 37px; background-position: 6px 1px; }
+.tb-nav-clip .tb-slot .icon-game { position: absolute; left: 6px; top: 0; width: 33px; height: 43px; background-position: 4px 3px; }
+.tb-nav-clip .tb-slot .icon-stories { position: absolute; left: 5px; top: 1px; width: 35px; height: 37px; background-position: 0 -1px; }
+.tb-nav-clip .tb-slot .icon-catalog { position: absolute; left: 4px; top: 1px; width: 37px; height: 37px; }
+.tb-nav-clip .tb-slot .icon-buildersclub { position: absolute; left: 5px; top: 1px; width: 35px; height: 37px; background-position: 1px 2px; }
+.tb-nav-clip .tb-slot .icon-inventory { position: absolute; left: 0; top: 0; width: 44px; height: 41px; }
+.tb-nav-clip .tb-slot .icon-wired-tools { position: absolute; left: 3px; top: 0; width: 38px; height: 45px; background-position: -1px 2px; }
+.tb-nav-clip .tb-slot .icon-camera { position: absolute; left: 3px; top: 0; width: 38px; height: 45px; }
+.tb-nav-clip .tb-slot .icon-friendall { position: absolute; left: 0; top: 4px; width: 32px; height: 33px; }
+.tb-nav-clip .tb-slot .icon-friendsearch { position: absolute; left: 0; top: 4px; width: 29px; height: 33px; }
+.tb-nav-clip .tb-slot .icon-message { position: absolute; left: 0; top: 4px; width: 26px; height: 32px; }
+
+.tb-memenu-bg,
+.tb-memenu-circle {
+    position: absolute;
+    left: 0;
+    top: -1px;
+    width: 45px;
+    height: 45px;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.tb-memenu-bg {
+    z-index: 0;
+}
+
+.tb-memenu-avatar {
+    position: absolute;
+    left: 1px;
+    top: -1px;
+    z-index: 1;
+    display: block;
+    width: 44px;
+    height: 41px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.tb-memenu-avatar .tb-avatar-head,
+.tb-memenu-avatar .tb-memenu-face {
+    position: absolute !important;
+    inset: auto !important;
+    top: -4px !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: -3px !important;
+}
+
+.tb-memenu-circle {
+    z-index: 2;
+}
+
+.tb-divider {
+    display: block;
+    width: 1px;
+    height: 40px;
+    flex-shrink: 0;
+    align-self: flex-start;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.tb-collapse {
+    position: relative;
+    display: block;
+    width: 15px;
+    height: 46px;
+    flex-shrink: 0;
+    padding: 0;
+    cursor: pointer;
+    border: 0;
+    background: transparent;
+}
+
+.tb-collapse img {
+    position: absolute;
+    top: -1px;
+    left: 1px;
+    display: block;
+    width: 13px;
+    height: 45px;
+    image-rendering: var(--octane-pixel-art, pixelated);
 }
 
 .tb-toggle {
@@ -85,6 +239,9 @@
 }
 
 .tb-open-shell {
+    gap: 8px;
+    padding-top: 1px;
+    margin-left: 4px;
     scrollbar-width: none;
     -ms-overflow-style: none;
 
@@ -93,10 +250,24 @@
     }
 }
 
+.tb-open-shell.tb-open-shell-right {
+    gap: 0;
+    margin-left: 0;
+}
+
+.tb-open-shell-right .tb-divider {
+    margin-top: 2px;
+    margin-right: 2px;
+}
+
+.tb-open-shell-right .tb-slot:has(.icon-friendsearch) {
+    margin-left: 1px;
+}
+
 .tbme-panel {
-    background: rgba(85, 85, 85, 0.95);
-    border: 1px solid #3d3d3d;
-    border-radius: 8px;
+    background: rgba(46, 45, 44, 0.92);
+    border: 1px solid rgba(0, 0, 0, 0.65);
+    border-radius: 7px;
     padding: 10px 12px;
     box-shadow:
         0 6px 18px rgba(0, 0, 0, 0.35),
@@ -117,4 +288,109 @@
         opacity: 0.85;
         transform: translateY(0);
     }
+}
+
+/* AIR new_items_label (habbo-toolbar-com new_items_label_xml): 27x20 red border style 7, white u_small caption,
+   at the top right of the catalogue icon (BottomBarLeft COUNTER_MARGIN 0). */
+.octane-toolbar-new-additions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    min-width: 27px;
+    height: 20px;
+    padding: 0 4px;
+    box-sizing: border-box;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    background: #ee2924;
+    color: #ffffff;
+    /* new_textfield is u_small: 10px regular (not bold) AIR Ubuntu; our `Ubuntu` face is the condensed cut. */
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 18px;
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+/* AIR unseen item counter (habbo-window-manager-com new_items_counter / unseen_item_counter_xml), which BottomBarLeft,
+   MeMenuNewController and ProgMenuController hang on the top right of an icon: a red (0xee2924) border style 7 with the
+   `count` field in il_regular_white bold, i.e. 11px bold white regular Ubuntu. */
+.octane-toolbar-count {
+    min-width: 18px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    background: #ee2924;
+    color: #ffffff;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 11px;
+    text-align: center;
+}
+
+@layer base {
+    /* LayoutItemCountView forces a navy border with an important utility; only an earlier-layer !important beats it. */
+    .octane-toolbar-count {
+        border-color: #000000 !important;
+    }
+}
+
+/* prog_menu_view field_text: u_regular at font_size 9, white. The item box itself lives in QuestsView.css. */
+.octane-toolbar-progression .octane-toolbar-progression-label {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-weight: 400;
+}
+
+/* me_menu_new_view: 60x48 regions with a 32x30 icon (grey until hovered) over field_text, u_regular at font_size 9,
+   white. AIR fits its 8 regions in 546 px; ours has more entries, so the bar wraps onto a second row at that width. */
+.octane-toolbar-me {
+    width: max-content;
+    max-width: min(560px, calc(100vw - 16px));
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.octane-toolbar-me-item {
+    position: relative;
+    width: 60px;
+    height: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-toolbar-me-item:not(:hover) .octane-toolbar-me-icon {
+    filter: grayscale(1);
+}
+
+/* The icon keeps its own size from icons.css / QuestsView.css; the caption sits at AIR's y32 whatever its height. */
+.octane-toolbar-me-icon {
+    flex: 0 0 auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.octane-toolbar-me-label {
+    position: absolute;
+    top: 32px;
+    left: 0;
+    width: 60px;
+    overflow: hidden;
+    text-align: center;
+    color: #ffffff;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    line-height: 12px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }

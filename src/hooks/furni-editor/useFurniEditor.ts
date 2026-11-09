@@ -13,9 +13,9 @@ import {
     FurniEditorSearchResultEvent,
     FurniEditorUpdateComposer,
     FurniEditorUpdateFurnidataComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useRef, useState } from 'react';
-import { NotificationAlertType, SendMessageComposer } from '../../api';
+import { NotificationAlertType, SendMessageComposer, localizeWithFallback } from '../../api';
 import { useMessageEvent, useNotification } from '../../hooks';
 
 export interface FurniItem {
@@ -79,9 +79,37 @@ export const useFurniEditor = () => {
 
     const clearError = useCallback(() => setError(null), []);
 
+    // A probe is a search whose answer belongs to the edit sheet (siblings of
+    // the open furni, duplicates of its sprite id), not to the Search tab: the
+    // next search result is routed to relatedItems and the list is left alone.
+    const probeRef = useRef<string | null>(null);
+    const [relatedItems, setRelatedItems] = useState<FurniItem[]>([]);
+
     // Handle search results
     useMessageEvent(FurniEditorSearchResultEvent, (event: FurniEditorSearchResultEvent) => {
         const parser = event.getParser();
+        const rows: FurniItem[] = parser.items.map((item) => ({
+            id: item.id,
+            spriteId: item.spriteId,
+            itemName: item.itemName,
+            publicName: item.publicName,
+            type: item.type,
+            width: item.width,
+            length: item.length,
+            stackHeight: item.stackHeight,
+            allowStack: item.allowStack,
+            allowWalk: item.allowWalk,
+            allowSit: item.allowSit,
+            allowLay: item.allowLay,
+            interactionType: item.interactionType,
+            interactionModesCount: item.interactionModesCount
+        }));
+
+        if (probeRef.current !== null) {
+            probeRef.current = null;
+            setRelatedItems(rows);
+            return;
+        }
 
         setLoading(false);
         setItems(
@@ -201,7 +229,7 @@ export const useFurniEditor = () => {
             }
 
             if (simpleAlert) {
-                simpleAlert(parser.message || 'Operation failed', NotificationAlertType.ALERT, null, null, 'Furni Editor Error');
+                simpleAlert(parser.message || 'Operation failed', NotificationAlertType.ALERT, null, null, localizeWithFallback('octane.furni_editor.furni_editor_error', 'Furni Editor Error'));
             }
 
             return;
@@ -216,7 +244,7 @@ export const useFurniEditor = () => {
             }
 
             if (simpleAlert) {
-                simpleAlert('Item updated successfully', NotificationAlertType.DEFAULT, null, null, 'Furni Editor');
+                simpleAlert(localizeWithFallback('octane.furni_editor.item_updated_successfully', 'Item updated successfully'), NotificationAlertType.DEFAULT, null, null, localizeWithFallback('octane.furni_editor.furni_editor', 'Furni Editor'));
             }
         } else if (action === 'delete') {
             setSelectedItem(null);
@@ -225,7 +253,7 @@ export const useFurniEditor = () => {
             setFurniDataDiagnostic(null);
 
             if (simpleAlert) {
-                simpleAlert('Item deleted successfully', NotificationAlertType.DEFAULT, null, null, 'Furni Editor');
+                simpleAlert(localizeWithFallback('octane.furni_editor.item_deleted_successfully', 'Item deleted successfully'), NotificationAlertType.DEFAULT, null, null, localizeWithFallback('octane.furni_editor.furni_editor', 'Furni Editor'));
             }
         }
     });
@@ -234,6 +262,18 @@ export const useFurniEditor = () => {
         setLoading(true);
         setError(null);
         SendMessageComposer(new FurniEditorSearchComposer(query, type, pg, sortField, sortDir));
+    }, []);
+
+    // Ask the server for the rows that share this furni's line prefix; the
+    // sheet derives siblings and duplicates from them. Empty query = clear.
+    const probeRelated = useCallback((query: string) => {
+        if (!query.trim()) {
+            probeRef.current = null;
+            setRelatedItems([]);
+            return;
+        }
+        probeRef.current = query;
+        SendMessageComposer(new FurniEditorSearchComposer(query, '', 1, 'itemName', 'asc'));
     }, []);
 
     const loadDetail = useCallback((id: number) => {
@@ -270,6 +310,15 @@ export const useFurniEditor = () => {
         setSelectedItem((prev) => (prev && prev.id === id ? { ...prev, publicName: name } : prev));
         setLoading(true);
         SendMessageComposer(new FurniEditorUpdateFurnidataComposer(id, JSON.stringify({ name, description })));
+    }, []);
+
+    // Push items_base structural values into the furnidata entry (xdim, ydim,
+    // height, canstandon, cansiton, canlayon). The server refuses to create.
+    const updateFurnidataStructure = useCallback((id: number, structure: Record<string, number | boolean>) => {
+        pendingActionRef.current = { action: 'update', itemId: id };
+        setLoading(true);
+        setError(null);
+        SendMessageComposer(new FurniEditorUpdateFurnidataComposer(id, JSON.stringify({ structure })));
     }, []);
 
     const revertFurnidata = useCallback((id: number) => {
@@ -325,6 +374,8 @@ export const useFurniEditor = () => {
         furniDataEntry,
         furniDataDiagnostic,
         interactions,
+        relatedItems,
+        probeRelated,
         searchItems,
         loadDetail,
         loadBySpriteId,
@@ -333,6 +384,7 @@ export const useFurniEditor = () => {
         loadInteractions,
         updateFurnidata,
         revertFurnidata,
+        updateFurnidataStructure,
         syncPublicName,
         importText,
         importResult

@@ -2,54 +2,55 @@ import { FC, useCallback, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
+import { hasWiredAdvancedSources, WiredAdvancedSourceRows } from '../WiredAdvancedSourceRows';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
-const SOURCE_FURNI_PICKED = 0;
 
 export const WiredSelectorFurniByTypeView: FC<{}> = () => {
     const [matchState, setMatchState] = useState(false);
-    const [filterExisting, setFilterExisting] = useState(false);
-    const [invert, setInvert] = useState(false);
+    const [furniSource, setFurniSource] = useState(100);
 
-    const { trigger = null, setIntParams } = useWired();
+    // Official layout: [match state], the picked furni (the types) in the official source slot.
+    const { trigger = null, setIntParams, setSourceTypes = null } = useWired();
 
     useEffect(() => {
         if (!trigger) return;
 
         const p = trigger.intData;
-        if (p.length >= 2) setMatchState(p[1] === 1);
-        if (p.length >= 3) setFilterExisting(p[2] === 1);
-        if (p.length >= 4) setInvert(p[3] === 1);
+        setMatchState(p[0] === 1);
+        setFurniSource(trigger.furniSourceTypes?.[0] ?? trigger.inputSourcesConf?.furniDefaults?.[0] ?? 100);
     }, [trigger]);
 
-    const save = useCallback(() => {
-        setIntParams([SOURCE_FURNI_PICKED, matchState ? 1 : 0, filterExisting ? 1 : 0, invert ? 1 : 0]);
-    }, [matchState, filterExisting, invert, setIntParams]);
+    // The type source is the advanced row of the server-listed furni selection; without that list the picks are the types.
+    const hasSourceRows = hasWiredAdvancedSources(trigger);
 
-    const requiresFurni = WiredFurniType.STUFF_SELECTION_OPTION_BY_ID;
+    const save = useCallback(() => {
+        setIntParams([matchState ? 1 : 0]);
+        if (!hasSourceRows) setSourceTypes({ furni: [100], users: [] });
+    }, [matchState, hasSourceRows, setIntParams, setSourceTypes]);
+
+    const requiresFurni = !hasSourceRows || furniSource === 100 ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID : WiredFurniType.STUFF_SELECTION_OPTION_NONE;
 
     return (
-        <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
-            <div className="flex flex-col gap-2">
-                <label className="flex items-center gap-2">
-                    <input type="checkbox" className="form-check-input" checked={matchState} onChange={(e) => setMatchState(e.target.checked)} />
-                    <Text small>{LocalizeText('wiredfurni.params.state_match')}</Text>
-                </label>
+        <NativeTextTree>
+            <WiredSelectorBaseView
+                hasSpecialInput={true}
+                requiresFurni={requiresFurni}
+                save={save}
+                hideDelay={true}
+                cardStyle={{ width: 400 }}
+                footer={hasSourceRows ? <WiredAdvancedSourceRows onFurniSourceChange={(slot, value) => slot === 0 && setFurniSource(value)} /> : null}
+            >
+                <div className="flex flex-col gap-2">
+                    <label className="flex items-center gap-2">
+                        <Checkbox checked={matchState} onCheckedChange={(nextChecked) => setMatchState(nextChecked)} />
+                        <Text small>{LocalizeText('wiredfurni.params.state_match')}</Text>
+                    </label>
 
-                <hr className="m-0 bg-dark" />
-
-                <Text bold>{LocalizeText('wiredfurni.params.selector_options_selector')}</Text>
-
-                <label className="flex items-center gap-2">
-                    <input type="checkbox" className="form-check-input" checked={filterExisting} onChange={(e) => setFilterExisting(e.target.checked)} />
-                    <Text small>{LocalizeText('wiredfurni.params.selector_option.0')}</Text>
-                </label>
-
-                <label className="flex items-center gap-2">
-                    <input type="checkbox" className="form-check-input" checked={invert} onChange={(e) => setInvert(e.target.checked)} />
-                    <Text small>{LocalizeText('wiredfurni.params.selector_option.1')}</Text>
-                </label>
-            </div>
-        </WiredSelectorBaseView>
+                </div>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

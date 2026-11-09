@@ -1,0 +1,1064 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`native text csm, density and geometry > interpolates the csm table and applies the field controls 1`] = `
+[
+  [
+    "4",
+    {
+      "gamma": 1,
+      "inside": 0.25,
+      "outside": -0.5299999713897705,
+      "pixelSize": 8,
+    },
+  ],
+  [
+    "8",
+    {
+      "gamma": 1,
+      "inside": 0.25,
+      "outside": -0.5299999713897705,
+      "pixelSize": 8,
+    },
+  ],
+  [
+    "11",
+    {
+      "gamma": 1,
+      "inside": 0.21250000596046448,
+      "outside": -0.4624999761581421,
+      "pixelSize": 11,
+    },
+  ],
+  [
+    "12.5",
+    {
+      "gamma": 1,
+      "inside": 0.21424999833106995,
+      "outside": -0.43924999237060547,
+      "pixelSize": 12.5,
+    },
+  ],
+  [
+    "24",
+    {
+      "gamma": 1,
+      "inside": 0.3675999939441681,
+      "outside": -0.5676000118255615,
+      "pixelSize": 24,
+    },
+  ],
+  [
+    "48",
+    {
+      "gamma": 1,
+      "inside": 0.4000000059604645,
+      "outside": -0.6000000238418579,
+      "pixelSize": 26.666667938232422,
+    },
+  ],
+  [
+    "100",
+    {
+      "gamma": 1,
+      "inside": 0.4000000059604645,
+      "outside": -0.6000000238418579,
+      "pixelSize": 26.666667938232422,
+    },
+  ],
+]
+`;
+
+exports[`native text csm, density and geometry > interpolates the csm table and applies the field controls 2`] = `
+[
+  [
+    "[12,0,0,"dark",0]",
+    {
+      "gamma": 1,
+      "inside": 0.20000000298023224,
+      "outside": -0.4399999976158142,
+    },
+  ],
+  [
+    "[12,100,0,"dark",0]",
+    {
+      "gamma": 1,
+      "inside": 0.08000000298023224,
+      "outside": -0.5599999976158142,
+    },
+  ],
+  [
+    "[12,-100,100,"dark",0]",
+    {
+      "gamma": 1,
+      "inside": 0.26000000298023224,
+      "outside": -0.2599999976158142,
+    },
+  ],
+  [
+    "[24,50,50,"light",0]",
+    {
+      "gamma": 1,
+      "inside": 0.10499999642372132,
+      "outside": -0.910000023841858,
+    },
+  ],
+  [
+    "[9,0,0,"dark",3]",
+    "RangeError: csmTableHint must be 0, 1, or 2",
+  ],
+  [
+    "[12,400,-400,"dark",0]",
+    {
+      "gamma": 1,
+      "inside": 0.20000000298023224,
+      "outside": -0.9199999976158142,
+    },
+  ],
+]
+`;
+
+exports[`native text csm, density and geometry > interpolates the csm table and applies the field controls 3`] = `
+{
+  "gamma": 1,
+  "inside": 0.20000000298023224,
+  "outside": -0.4399999976158142,
+}
+`;
+
+exports[`native text csm, density and geometry > interpolates the csm table and applies the field controls 4`] = `
+{
+  "gamma": 1,
+  "inside": 0.15200000298023225,
+  "outside": -0.5359999976158142,
+}
+`;
+
+exports[`native text csm, density and geometry > measures points and flattens a quadratic curve 1`] = `
+{
+  "x": 2.5,
+  "y": 5,
+}
+`;
+
+exports[`native text csm, density and geometry > measures points and flattens a quadratic curve 2`] = `
+[
+  [
+    "[0,0]",
+    0,
+  ],
+  [
+    "[5,5]",
+    25,
+  ],
+  [
+    "[-3,4]",
+    25,
+  ],
+  [
+    "[10,0]",
+    0,
+  ],
+]
+`;
+
+exports[`native text csm, density and geometry > measures points and flattens a quadratic curve 3`] = `13`;
+
+exports[`native text csm, density and geometry > measures points and flattens a quadratic curve 4`] = `
+[
+  "perpendicular",
+  8,
+  [
+    [
+      0,
+      0,
+      1.25,
+      2.1875,
+    ],
+    [
+      1.25,
+      2.1875,
+      2.5,
+      3.75,
+    ],
+    [
+      2.5,
+      3.75,
+      3.75,
+      4.6875,
+    ],
+    [
+      3.75,
+      4.6875,
+      5,
+      5,
+    ],
+  ],
+]
+`;
+
+exports[`native text csm, density and geometry > measures points and flattens a quadratic curve 5`] = `
+[
+  "second-euclidean",
+  16,
+  [
+    [
+      0,
+      0,
+      0.625,
+      1.171875,
+    ],
+    [
+      0.625,
+      1.171875,
+      1.25,
+      2.1875,
+    ],
+    [
+      1.25,
+      2.1875,
+      1.875,
+      3.046875,
+    ],
+    [
+      1.875,
+      3.046875,
+      2.5,
+      3.75,
+    ],
+  ],
+]
+`;
+
+exports[`native text csm, density and geometry > measures points and flattens a quadratic curve 6`] = `
+[
+  "second-max",
+  16,
+  [
+    [
+      0,
+      0,
+      0.625,
+      1.171875,
+    ],
+    [
+      0.625,
+      1.171875,
+      1.25,
+      2.1875,
+    ],
+    [
+      1.25,
+      2.1875,
+      1.875,
+      3.046875,
+    ],
+    [
+      1.875,
+      3.046875,
+      2.5,
+      3.75,
+    ],
+  ],
+]
+`;
+
+exports[`native text csm, density and geometry > measures points and flattens a quadratic curve 7`] = `
+[
+  "second-sum",
+  16,
+  [
+    [
+      0,
+      0,
+      0.625,
+      1.171875,
+    ],
+    [
+      0.625,
+      1.171875,
+      1.25,
+      2.1875,
+    ],
+    [
+      1.25,
+      2.1875,
+      1.875,
+      3.046875,
+    ],
+    [
+      1.875,
+      3.046875,
+      2.5,
+      3.75,
+    ],
+  ],
+]
+`;
+
+exports[`native text csm, density and geometry > turns distances and sample counts into coverage 1`] = `
+[
+  [
+    "[0,0.5,0.5]",
+    0,
+  ],
+  [
+    "[0.5,0.5,0.5]",
+    255,
+  ],
+  [
+    "[-0.3,0.2,0.9]",
+    0,
+  ],
+  [
+    "[2,0.2,0.9]",
+    255,
+  ],
+  [
+    "[1,0.1,0.1]",
+    255,
+  ],
+]
+`;
+
+exports[`native text csm, density and geometry > turns distances and sample counts into coverage 2`] = `
+[
+  [
+    "0",
+    0,
+  ],
+  [
+    "1",
+    15,
+  ],
+  [
+    "2",
+    31,
+  ],
+  [
+    "5",
+    79,
+  ],
+  [
+    "8",
+    127,
+  ],
+  [
+    "9",
+    143,
+  ],
+  [
+    "16",
+    255,
+  ],
+  [
+    "64",
+    "RangeError: coveredSamples must be an integer from 0 through 16",
+  ],
+]
+`;
+
+exports[`native text numbers and colours > converts float32 values to bits and back 1`] = `
+[
+  [
+    "0",
+    0,
+  ],
+  [
+    "1",
+    1065353216,
+  ],
+  [
+    "-1",
+    3212836864,
+  ],
+  [
+    "0.1",
+    1036831949,
+  ],
+  [
+    "3.4028234663852886e+38",
+    2139095039,
+  ],
+  [
+    "1e-45",
+    1,
+  ],
+  [
+    "3.141592653589793",
+    1078530011,
+  ],
+]
+`;
+
+exports[`native text numbers and colours > converts float32 values to bits and back 2`] = `
+[
+  [
+    "0",
+    0,
+  ],
+  [
+    "1",
+    1,
+  ],
+  [
+    "-1",
+    -1,
+  ],
+  [
+    "0.1",
+    0.100000001,
+  ],
+  [
+    "3.4028234663852886e+38",
+    3.4028234663852886e+38,
+  ],
+  [
+    "1e-45",
+    0,
+  ],
+  [
+    "3.141592653589793",
+    3.141592741,
+  ],
+]
+`;
+
+exports[`native text numbers and colours > converts float32 values to bits and back 3`] = `"TypeError: value must be finite"`;
+
+exports[`native text numbers and colours > converts float32 values to bits and back 4`] = `
+[
+  [
+    ""AAEC"",
+    [
+      0,
+      1,
+      2,
+    ],
+  ],
+  [
+    ""AQID"",
+    [
+      1,
+      2,
+      3,
+    ],
+  ],
+  [
+    """",
+    [],
+  ],
+  [
+    ""AA=="",
+    [
+      0,
+    ],
+  ],
+  [
+    ""!!"",
+    "DOMException: Invalid character",
+  ],
+  [
+    ""AB"",
+    [
+      0,
+    ],
+  ],
+]
+`;
+
+exports[`native text numbers and colours > normalizes colours 1`] = `
+[
+  [
+    "0",
+    "TypeError: color must be an RGBA array",
+  ],
+  [
+    "16777215",
+    "TypeError: color must be an RGBA array",
+  ],
+  [
+    "1193046",
+    "TypeError: color must be an RGBA array",
+  ],
+  [
+    "16777216",
+    "TypeError: color must be an RGBA array",
+  ],
+  [
+    "-1",
+    "TypeError: color must be an RGBA array",
+  ],
+  [
+    "1.5",
+    "TypeError: color must be an RGBA array",
+  ],
+  [
+    "[1,2,3]",
+    "RangeError: RGBA channels must be integers from 0 through 255",
+  ],
+  [
+    "[1,2]",
+    "RangeError: RGBA channels must be integers from 0 through 255",
+  ],
+  [
+    "[256,0,0]",
+    "RangeError: RGBA channels must be integers from 0 through 255",
+  ],
+]
+`;
+
+exports[`native text numbers and colours > normalizes colours 2`] = `
+[
+  [
+    "[16711680,null]",
+    [
+      255,
+      0,
+      0,
+      255,
+    ],
+  ],
+  [
+    "[16711680,0.5]",
+    [
+      255,
+      0,
+      0,
+      127,
+    ],
+  ],
+  [
+    "[[1,2,3,4],null]",
+    [
+      1,
+      2,
+      3,
+      4,
+    ],
+  ],
+  [
+    "[[1,2,3,4],1]",
+    [
+      1,
+      2,
+      3,
+      255,
+    ],
+  ],
+  [
+    "[16711680,2]",
+    "RangeError: alpha must be from 0 through 1",
+  ],
+  [
+    "[[1,2,3],null]",
+    "RangeError: color must be a 24-bit integer or RGBA bytes",
+  ],
+  [
+    "[-1,null]",
+    "RangeError: color must be a 24-bit integer or RGBA bytes",
+  ],
+]
+`;
+
+exports[`native text numbers and colours > normalizes colours 3`] = `
+[
+  [
+    "4279312947",
+    4279312947,
+  ],
+  [
+    ""#ff112233"",
+    4279312947,
+  ],
+  [
+    ""ff112233"",
+    4279312947,
+  ],
+  [
+    ""#12345"",
+    "RangeError: background must be an 8-digit ARGB color",
+  ],
+  [
+    "4294967296",
+    "RangeError: background must be an unsigned 32-bit ARGB color",
+  ],
+  [
+    "-1",
+    "RangeError: background must be an unsigned 32-bit ARGB color",
+  ],
+  [
+    "1.5",
+    "RangeError: background must be an unsigned 32-bit ARGB color",
+  ],
+]
+`;
+
+exports[`native text numbers and colours > normalizes colours 4`] = `
+[
+  [
+    "11259375",
+    [
+      171,
+      205,
+      239,
+      255,
+    ],
+  ],
+  [
+    "[9,8,7,255]",
+    [
+      9,
+      8,
+      7,
+      255,
+    ],
+  ],
+  [
+    "[9,8,7,128]",
+    "RangeError: foreground must be opaque in the current native profile",
+  ],
+  [
+    "[9,8,7]",
+    "RangeError: foreground must be a 24-bit integer or RGBA bytes",
+  ],
+  [
+    "16777216",
+    "RangeError: foreground must be a 24-bit integer or RGBA bytes",
+  ],
+]
+`;
+
+exports[`native text numbers and colours > normalizes colours 5`] = `
+[
+  [
+    "0",
+    0,
+  ],
+  [
+    "1.5",
+    1.5,
+  ],
+  [
+    "null",
+    "TypeError: size must be finite",
+  ],
+  [
+    "null",
+    "TypeError: size must be finite",
+  ],
+  [
+    "-2",
+    -2,
+  ],
+]
+`;
+
+exports[`native text numbers and colours > normalizes colours 6`] = `
+[
+  [
+    "0",
+    [
+      0,
+      0,
+    ],
+  ],
+  [
+    "1",
+    [
+      1,
+      1,
+    ],
+  ],
+  [
+    "7.75",
+    [
+      7.75,
+      7.75,
+    ],
+  ],
+  [
+    "-3.2",
+    [
+      -3.2,
+      -3.25,
+    ],
+  ],
+  [
+    "100.125",
+    [
+      100.1,
+      100.25,
+    ],
+  ],
+  [
+    "0.1",
+    [
+      0.1,
+      0,
+    ],
+  ],
+]
+`;
+
+exports[`native text numbers and colours > normalizes colours 7`] = `
+[
+  [
+    "[255,0,0,0.5]",
+    [
+      93,
+      69,
+      69,
+    ],
+  ],
+  [
+    "[0,255,0,1]",
+    [
+      149,
+      149,
+      149,
+    ],
+  ],
+  [
+    "[12,200,99]",
+    [
+      114,
+      141,
+      127,
+    ],
+  ],
+  [
+    "[0,0,0,0]",
+    [
+      0,
+      0,
+      0,
+    ],
+  ],
+]
+`;
+
+exports[`native text numbers and colours > quantizes and blends alpha 1`] = `
+[
+  [
+    "0",
+    0,
+  ],
+  [
+    "0.001",
+    0,
+  ],
+  [
+    "0.25",
+    63,
+  ],
+  [
+    "0.5",
+    127,
+  ],
+  [
+    "0.999",
+    254,
+  ],
+  [
+    "1",
+    255,
+  ],
+  [
+    "-1",
+    0,
+  ],
+  [
+    "2",
+    255,
+  ],
+]
+`;
+
+exports[`native text numbers and colours > quantizes and blends alpha 2`] = `
+[
+  [
+    "[0,255,255,255]",
+    254,
+  ],
+  [
+    "[255,0,255,128]",
+    128,
+  ],
+  [
+    "[100,200,128,64]",
+    137,
+  ],
+  [
+    "[10,20,255,1]",
+    10,
+  ],
+]
+`;
+
+exports[`native text numbers and colours > quantizes and blends alpha 3`] = `
+[
+  [
+    "[0,0,0,255]",
+    [
+      0,
+      0,
+      0,
+      255,
+    ],
+  ],
+  [
+    "[255,255,255,255]",
+    [
+      255,
+      255,
+      255,
+      255,
+    ],
+  ],
+  [
+    "[255,128,0,128]",
+    [
+      128,
+      64,
+      0,
+      128,
+    ],
+  ],
+  [
+    "[10,20,30,0]",
+    [
+      0,
+      0,
+      0,
+      0,
+    ],
+  ],
+]
+`;
+
+exports[`native text numbers and colours > quantizes and blends alpha 4`] = `
+[
+  [
+    "-3",
+    0,
+  ],
+  [
+    "0",
+    0,
+  ],
+  [
+    "127.5",
+    127.5,
+  ],
+  [
+    "255",
+    255,
+  ],
+  [
+    "300",
+    255,
+  ],
+]
+`;
+
+exports[`native text numbers and colours > rounds ties to even 1`] = `
+[
+  [
+    "-2.5",
+    [
+      -2,
+      -2,
+    ],
+  ],
+  [
+    "-1.5",
+    [
+      -2,
+      -2,
+    ],
+  ],
+  [
+    "-0.5",
+    [
+      0,
+      0,
+    ],
+  ],
+  [
+    "0",
+    [
+      0,
+      0,
+    ],
+  ],
+  [
+    "0.4",
+    [
+      0,
+      0,
+    ],
+  ],
+  [
+    "0.5",
+    [
+      0,
+      0,
+    ],
+  ],
+  [
+    "1.5",
+    [
+      2,
+      2,
+    ],
+  ],
+  [
+    "2.5",
+    [
+      2,
+      2,
+    ],
+  ],
+  [
+    "3.5",
+    [
+      4,
+      4,
+    ],
+  ],
+  [
+    "2.4999",
+    [
+      2,
+      2,
+    ],
+  ],
+  [
+    "1000000000.5",
+    [
+      1000000000,
+      1000000000,
+    ],
+  ],
+]
+`;
+
+exports[`native text numbers and colours > rounds ties to even 2`] = `
+[
+  [
+    "[1,2]",
+    0,
+  ],
+  [
+    "[3,2]",
+    2,
+  ],
+  [
+    "[5,2]",
+    2,
+  ],
+  [
+    "[7,4]",
+    2,
+  ],
+  [
+    "[-5,2]",
+    "RangeError: roundRationalTiesEven requires safe non-negative integers",
+  ],
+  [
+    "[1,3]",
+    0,
+  ],
+]
+`;
+
+exports[`native text retained bitmap > composites coverage onto a retained bitmap and onto an opaque background > not rgba 1`] = `"TypeError: retained must contain premultiplied RGBA bytes"`;
+
+exports[`native text retained bitmap > composites coverage onto a retained bitmap and onto an opaque background > on black 1`] = `
+[
+  254,
+  0,
+  0,
+  255,
+  0,
+  100,
+  0,
+  255,
+  99,
+  99,
+  123,
+  255,
+  3,
+  6,
+  9,
+  255,
+  200,
+  100,
+  50,
+  255,
+  0,
+  0,
+  0,
+  255,
+]
+`;
+
+exports[`native text retained bitmap > composites coverage onto a retained bitmap and onto an opaque background > on white 1`] = `
+[
+  255,
+  1,
+  1,
+  255,
+  155,
+  255,
+  155,
+  255,
+  231,
+  231,
+  255,
+  255,
+  181,
+  184,
+  187,
+  255,
+  200,
+  100,
+  50,
+  255,
+  255,
+  255,
+  255,
+  255,
+]
+`;
+
+exports[`native text retained bitmap > composites coverage onto a retained bitmap and onto an opaque background > retained 1`] = `
+[
+  254,
+  0,
+  0,
+  254,
+  0,
+  100,
+  0,
+  100,
+  99,
+  99,
+  123,
+  123,
+  3,
+  6,
+  9,
+  77,
+  200,
+  100,
+  50,
+  255,
+  0,
+  0,
+  0,
+  0,
+]
+`;
+
+exports[`native text retained bitmap > composites coverage onto a retained bitmap and onto an opaque background > translucent 1`] = `"RangeError: exact AIR32 NORMAL retained rendering requires opaque text"`;

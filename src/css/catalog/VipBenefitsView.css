@@ -1,0 +1,118 @@
+/*
+ * AIR vip_benefits (habbo-catalog-com/vip_benefits.xml): frame 457x450, margins 0/33/0/0, so the
+ * container is 457x417. Every position below is the layout's own x/y inside that container.
+ */
+.octane-card-shell.octane-vip-benefits,
+.draggable-window:has(> .octane-vip-benefits) {
+    box-sizing: border-box;
+    width: 457px !important;
+    min-width: 457px !important;
+    max-width: 457px !important;
+    height: 450px !important;
+    min-height: 450px !important;
+    max-height: 450px !important;
+}
+
+.octane-card-shell.octane-vip-benefits {
+    resize: none !important;
+}
+
+.octane-vip-benefits,
+.octane-vip-benefits * {
+    box-sizing: border-box;
+}
+
+.octane-card-shell.octane-vip-benefits .octane-vip-benefits-content.container-fluid {
+    position: absolute !important;
+    /* margin_top 33 / margin_left 0 through the 1px frame box, as in the make-offer window (30/6 -> 37/5). */
+    top: 40px !important;
+    left: -1px !important;
+    z-index: 1;
+    display: block !important;
+    width: 457px !important;
+    min-width: 457px !important;
+    max-width: 457px !important;
+    height: 417px !important;
+    min-height: 417px !important;
+    max-height: 417px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-vip-benefits-content :where(span, div, b) {
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+/* hc_benefits_header: x1 y0 455x42. */
+.octane-vip-benefits-header {
+    position: absolute;
+    top: 0;
+    left: 1px;
+    width: 455px;
+    height: 42px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* hc_benefits_teaser: x24 y91 237x253. */
+.octane-vip-benefits-teaser {
+    position: absolute;
+    top: 91px;
+    left: 24px;
+    width: 237px;
+    height: 253px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* title: x0 y55 457x30, centered, u_bold 24. */
+.octane-vip-benefits-title {
+    position: absolute;
+    top: 55px;
+    left: 0;
+    width: 457px;
+    height: 30px;
+    font-family: HabboAirUbuntuBold, UbuntuBold, HabboAirUbuntu, sans-serif !important;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 30px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* description: x275 y98 163x269, u_regular, leading 3. */
+.octane-vip-benefits-description {
+    position: absolute;
+    top: 98px;
+    left: 275px;
+    width: 163px;
+    height: 269px;
+    overflow: hidden;
+    line-height: 18px;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+/* details: x27 y351 403x50, u_regular 10, leading 3. */
+.octane-vip-benefits-details {
+    position: absolute;
+    top: 351px;
+    left: 27px;
+    width: 403px;
+    height: 50px;
+    overflow: hidden;
+    font-size: 10px;
+    line-height: 15px;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+.octane-vip-benefits-description span,
+.octane-vip-benefits-description b span {
+    line-height: 28px;
+}

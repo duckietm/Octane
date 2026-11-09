@@ -1,4 +1,4 @@
-.nitro-alert {
+.octane-alert {
     min-height: 150px;
     max-height: 350px;
 
@@ -12,49 +12,207 @@
         min-width: 250px;
     }
 
-    &.nitro-alert-default,
-    &.nitro-alert-motd {
+    &.octane-alert-default,
+    &.octane-alert-motd {
         width: 350px;
         .notification-text {
             min-width: auto;
         }
     }
 
-	&.nitro-alert-credits {
+	&.octane-alert-credits {
         width: 370px;
         .notification-text {
             min-width: auto;
         }
     }
 
-    &.nitro-alert-moderation,
-    &.nitro-alert-alert {
+    &.octane-alert-moderation,
+    &.octane-alert-alert {
         width: 250px;
         .notification-text {
             min-width: 225px;
         }
     }
 
-    &.nitro-alert-system {
-        width: auto;
-        min-width: 260px;
-        max-width: 90vw;
-        min-height: auto;
-        max-height: none;
-        height: auto;
+    /* Hotel event announcement. The box is a fixed 530x300 so that a one word
+       message and a long one produce exactly the same window: the message is the
+       only part that scrolls, and the button never moves. */
+    &.octane-alert-hotel-event {
+        width: 530px;
+        height: 300px;
+        min-height: 300px;
+        max-height: 300px;
 
-        .notification-text {
-            min-width: auto;
+        animation: hotelEventPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+        .octane-card-content-shell {
+            display: flex;
+            flex-direction: column;
+            /* The shell carries h-full from the card defaults, which inside a card
+               of a fixed height would add up to the header's height on top of it.
+               It takes what is left under the header instead. */
+            flex: 1 1 auto;
+            height: auto;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .hotel-event-body {
+            display: flex;
+            /* Stretch, not flex-start: the text column has to take the body's
+               height, otherwise a long message grows past the fixed box instead
+               of scrolling inside it. The image centres itself instead. */
+            align-items: stretch;
+            gap: 14px;
+            padding: 6px 4px 0 4px;
+            flex: 1;
+            /* Without this the flex child refuses to shrink and the message pushes
+               the button out of the fixed height. */
+            min-height: 0;
+        }
+
+        .hotel-event-figure {
+            position: relative;
+            width: 170px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            align-self: center;
+        }
+
+        .hotel-event-promo {
+            width: 170px;
+            image-rendering: var(--octane-pixel-art, pixelated);
+        }
+
+        .hotel-event-avatar {
+            filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
+            animation: hotelEventBob 2.6s ease-in-out infinite;
+        }
+
+        .hotel-event-avatar-shadow {
+            width: 54px;
+            height: 9px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(0, 0, 0, 0.32) 0%, transparent 70%);
+        }
+
+        .hotel-event-details {
+            flex: 1;
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            color: #2b4a63;
+            font-size: 12px;
+        }
+
+        .hotel-event-headline {
+            font-size: 32px;
+            line-height: 1.05;
+            font-weight: 700;
+            /* No text-shadow here: the glyphs are filled by the gradient through
+               background-clip, so a shadow shows straight through them. */
+            background: linear-gradient(180deg, #ffa412 0%, #ef6c00 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            /* A long headline stays on one line rather than eating the box. */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .hotel-event-intro,
+        .hotel-event-room {
+            /* Two lines at most: a 60 character room name cannot reflow the card. */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .hotel-event-host {
+            font-weight: 700;
+            color: #1b3a52;
+        }
+
+        .hotel-event-room-label {
+            font-style: italic;
+        }
+
+        .hotel-event-room-name {
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .hotel-event-message {
+            flex: 1;
+            min-height: 0;
+            padding: 7px 9px;
+            border: 1px solid #b6c6d8;
+            border-radius: 6px;
+            background: linear-gradient(180deg, #ffffff 0%, #eef3f9 100%);
+            box-shadow: inset 0 1px 0 #fff;
+            word-break: break-word;
+            /* The only part that scrolls, so the window keeps its size. */
+            overflow-y: auto;
+        }
+
+        .hotel-event-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            /* The message box is optional. Without it nothing else fills the column,
+               so the footer takes the slack and stays at the bottom of the card. */
+            margin-top: auto;
+            font-style: italic;
+            color: #4a6880;
+            font-size: 11px;
+        }
+
+        .hotel-event-actions {
+            display: flex;
+            justify-content: center;
+            padding: 12px 0 6px 0;
+        }
+
+        .hotel-event-visit {
+            padding: 7px 26px;
+            font-size: 14px;
+            font-weight: 700;
+            background: linear-gradient(180deg, #35a3d6 0%, #1f7fb5 100%);
+            border-color: #16597f;
+        }
+
+        .hotel-event-countdown {
+            height: 4px;
+            margin: 0 -10px -10px -10px;
+            background: rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+
+        .hotel-event-countdown-bar {
+            height: 100%;
+            width: 100%;
+            transform-origin: left center;
+            background: linear-gradient(90deg, #ffd166 0%, #f28c28 100%);
+            animation-name: hotelEventCountdown;
+            animation-timing-function: linear;
+            animation-fill-mode: forwards;
         }
     }
 
-    &.nitro-alert-nitro-info {
+    &.octane-alert-octane-info {
         width: 460px;
         min-height: 320px;
         max-height: 640px;
-        animation: nitroInfoPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        animation: octaneInfoPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-        .nitro-info-hero {
+        .octane-info-hero {
             position: relative;
             display: flex;
             flex-direction: column;
@@ -71,7 +229,7 @@
             overflow: hidden;
         }
 
-        .nitro-info-hero-stars {
+        .octane-info-hero-stars {
             position: absolute;
             inset: 0;
             background-image:
@@ -81,11 +239,11 @@
                 radial-gradient(1.5px 1.5px at 88% 78%, rgba(255, 255, 255, 0.75), transparent 60%),
                 radial-gradient(1px 1px at 12% 80%, rgba(255, 255, 255, 0.8), transparent 60%);
             opacity: 0.85;
-            animation: nitroInfoTwinkle 2.6s ease-in-out infinite alternate;
+            animation: octaneInfoTwinkle 2.6s ease-in-out infinite alternate;
             pointer-events: none;
         }
 
-        .nitro-info-version-badge {
+        .octane-info-version-badge {
             position: relative;
             display: inline-flex;
             align-items: center;
@@ -110,22 +268,22 @@
             max-width: 90%;
         }
 
-        .nitro-info-version-spark {
+        .octane-info-version-spark {
             color: #fff;
             text-shadow: 0 0 6px rgba(255, 255, 200, 0.9);
-            animation: nitroInfoSpin 3s linear infinite;
+            animation: octaneInfoSpin 3s linear infinite;
             display: inline-block;
         }
 
-        .nitro-info-version-spark:last-child {
+        .octane-info-version-spark:last-child {
             animation-direction: reverse;
         }
 
-        .nitro-info-content {
+        .octane-info-content {
             padding: 0 2px;
         }
 
-        .nitro-info-avatar-wrap {
+        .octane-info-avatar-wrap {
             position: relative;
             width: 90px;
             display: flex;
@@ -135,26 +293,26 @@
             padding-top: 2px;
         }
 
-        .nitro-info-avatar {
+        .octane-info-avatar {
             filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
-            animation: nitroInfoBob 2.6s ease-in-out infinite;
+            animation: octaneInfoBob 2.6s ease-in-out infinite;
         }
 
-        .nitro-info-avatar-shadow {
+        .octane-info-avatar-shadow {
             width: 60px;
             height: 8px;
             margin-top: -4px;
             background: radial-gradient(ellipse, rgba(0, 0, 0, 0.4) 0%, transparent 70%);
-            animation: nitroInfoShadowPulse 2.6s ease-in-out infinite;
+            animation: octaneInfoShadowPulse 2.6s ease-in-out infinite;
         }
 
-        .nitro-info-body {
+        .octane-info-body {
             font-family: Volter, Volter_Goldfish, "Ubuntu", sans-serif;
             color: #2f2f2f;
             padding-right: 4px;
         }
 
-        .nitro-info-section {
+        .octane-info-section {
             background: linear-gradient(to bottom, #ffffff 0%, #eaf1fb 100%);
             border: 1px solid #6f8db5;
             border-radius: 6px;
@@ -166,7 +324,7 @@
             transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
 
-        .nitro-info-section:hover {
+        .octane-info-section:hover {
             transform: translateY(-1px);
             box-shadow:
                 inset 0 1px 0 rgba(255, 255, 255, 0.8),
@@ -174,7 +332,7 @@
                 0 0 0 1px rgba(110, 160, 230, 0.4);
         }
 
-        .nitro-info-section-header {
+        .octane-info-section-header {
             display: flex;
             align-items: center;
             gap: 6px;
@@ -187,34 +345,34 @@
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
         }
 
-        .nitro-info-section-icon {
+        .octane-info-section-icon {
             font-size: 14px;
             filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.4));
         }
 
-        .nitro-info-section-hotel .nitro-info-section-header {
+        .octane-info-section-hotel .octane-info-section-header {
             background: linear-gradient(180deg, #4fb3ff 0%, #1f6dc7 100%);
         }
 
-        .nitro-info-section-server .nitro-info-section-header {
+        .octane-info-section-server .octane-info-section-header {
             background: linear-gradient(180deg, #6bd66b 0%, #2a8a2a 100%);
         }
 
-        .nitro-info-section-credits .nitro-info-section-header {
+        .octane-info-section-credits .octane-info-section-header {
             background: linear-gradient(180deg, #ff9a44 0%, #d9591a 100%);
         }
 
-        .nitro-info-section-generic .nitro-info-section-header {
+        .octane-info-section-generic .octane-info-section-header {
             background: linear-gradient(180deg, #8da0bc 0%, #4b5d7a 100%);
         }
 
-        .nitro-info-section-body {
+        .octane-info-section-body {
             padding: 6px 10px;
             color: #1f2f4a;
         }
 
-        .nitro-info-stats-list,
-        .nitro-info-credits-list {
+        .octane-info-stats-list,
+        .octane-info-credits-list {
             list-style: none;
             margin: 0;
             padding: 0;
@@ -223,7 +381,7 @@
             gap: 2px;
         }
 
-        .nitro-info-stats-list li {
+        .octane-info-stats-list li {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -232,18 +390,18 @@
             border-radius: 3px;
         }
 
-        .nitro-info-stats-list li:nth-child(odd) {
+        .octane-info-stats-list li:nth-child(odd) {
             background: rgba(110, 160, 230, 0.08);
         }
 
-        .nitro-info-stat-label {
+        .octane-info-stat-label {
             font-size: 12px;
             color: #4a5a76;
             font-weight: 500;
             flex-shrink: 0;
         }
 
-        .nitro-info-stat-value {
+        .octane-info-stat-value {
             font-size: 12px;
             color: #1a3a6b;
             font-weight: 700;
@@ -256,7 +414,7 @@
             word-break: break-word;
         }
 
-        .nitro-info-credits-list li {
+        .octane-info-credits-list li {
             display: flex;
             align-items: flex-start;
             gap: 6px;
@@ -268,18 +426,18 @@
             word-break: break-word;
         }
 
-        .nitro-info-credits-list li:hover {
+        .octane-info-credits-list li:hover {
             background: rgba(255, 180, 80, 0.15);
         }
 
-        .nitro-info-credit-star {
+        .octane-info-credit-star {
             color: #f0a318;
             text-shadow: 0 0 4px rgba(240, 163, 24, 0.6);
             font-size: 13px;
             flex-shrink: 0;
         }
 
-        .nitro-info-footer {
+        .octane-info-footer {
             margin-top: 6px;
             padding-top: 8px;
             border-top: 1px dashed #b0b0b0;
@@ -288,11 +446,11 @@
             gap: 6px;
         }
 
-        .nitro-info-actions {
+        .octane-info-actions {
             margin-top: 2px;
         }
 
-        .nitro-info-report-btn {
+        .octane-info-report-btn {
             position: relative;
             overflow: hidden;
             background: linear-gradient(180deg, #ff6b6b 0%, #c92a2a 100%) !important;
@@ -305,7 +463,7 @@
             transition: transform 0.12s ease, box-shadow 0.12s ease;
         }
 
-        .nitro-info-report-btn:hover {
+        .octane-info-report-btn:hover {
             transform: translateY(-1px);
             box-shadow:
                 inset 0 1px 0 rgba(255, 255, 255, 0.4),
@@ -314,11 +472,11 @@
                 0 0 18px rgba(255, 100, 100, 0.7);
         }
 
-        .nitro-info-report-btn:active {
+        .octane-info-report-btn:active {
             transform: translateY(1px);
         }
 
-        .nitro-info-report-btn::after {
+        .octane-info-report-btn::after {
             content: '';
             position: absolute;
             top: 0;
@@ -327,11 +485,11 @@
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             transform: skewX(-20deg);
-            animation: nitroInfoShine 2.8s ease-in-out infinite;
+            animation: octaneInfoShine 2.8s ease-in-out infinite;
         }
     }
 
-    &.nitro-alert-furnidata {
+    &.octane-alert-furnidata {
         width: 400px;
         max-height: 520px;
 
@@ -488,38 +646,38 @@
     }
 }
 
-@keyframes nitroInfoPop {
+@keyframes octaneInfoPop {
     0% { transform: scale(0.85); opacity: 0; }
     60% { transform: scale(1.04); opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
 }
 
-@keyframes nitroInfoTwinkle {
+@keyframes octaneInfoTwinkle {
     0% { opacity: 0.4; }
     100% { opacity: 1; }
 }
 
-@keyframes nitroInfoSpin {
+@keyframes octaneInfoSpin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
-@keyframes nitroInfoBob {
+@keyframes octaneInfoBob {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-3px); }
 }
 
-@keyframes nitroInfoShadowPulse {
+@keyframes octaneInfoShadowPulse {
     0%, 100% { transform: scaleX(1); opacity: 0.55; }
     50% { transform: scaleX(0.8); opacity: 0.35; }
 }
 
-@keyframes nitroInfoShine {
+@keyframes octaneInfoShine {
     0% { left: -120%; }
     60%, 100% { left: 140%; }
 }
 
-.nitro-notification-bubble {
+.octane-notification-bubble {
     pointer-events: all;
     padding: 6px 5px;
     pointer-events: all;
@@ -540,10 +698,721 @@
     margin-top: -6px;
 }
 
-.alertView_nitro-coolui-logo {
-	width: 150px;
-	height: 73px;
-	position: relative;
-	background-image: url("@/assets/images/notifications/nitro_v3.png");
-	background-repeat: no-repeat;
+.octane-rightside-notifications {
+    width: 100%;
+    align-items: flex-end;
+    gap: 4px;
+    pointer-events: none;
+}
+
+.octane-rightside-notifications > * {
+    margin-left: auto;
+    pointer-events: auto;
+}
+
+.octane-swf-notification-bubble {
+    width: 188px;
+    max-width: 188px;
+    min-height: 42px;
+    margin-left: auto;
+    padding: 6px 7px !important;
+    border: 1px solid rgba(0, 0, 0, 0.72);
+    border-right: 0;
+    border-radius: 7px 0 0 7px !important;
+    background: rgba(46, 45, 44, 0.82) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.10),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.42),
+        0 2px 0 rgba(0, 0, 0, 0.24) !important;
+    color: #ffffff;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px !important;
+    line-height: 1.15;
+    text-shadow: 1px 1px 0 #000000;
+}
+
+.octane-swf-notification-bubble .w-\[50px\],
+.octane-swf-notification-bubble .h-\[50px\],
+.octane-swf-notification-bubble .bubble-image-container {
+    width: 38px !important;
+    height: 38px !important;
+}
+
+.octane-swf-notification-bubble img {
+    width: auto;
+    height: auto;
+    max-width: 38px;
+    max-height: 38px;
+    object-fit: contain;
+}
+
+.octane-swf-notification-bubble .btn,
+.octane-swf-notification-bubble button {
+    min-height: 24px;
+    padding: 0 8px;
+    border: 3px solid transparent !important;
+    border-image-source: var(--habbo-skin-button) !important;
+    border-image-slice: 3 fill !important;
+    border-image-width: 3px !important;
+    border-image-repeat: stretch !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #111111 !important;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: none;
+}
+
+.octane-swf-notification-bubble .btn:hover,
+.octane-swf-notification-bubble button:hover {
+    border-image-source: var(--habbo-skin-button-hover) !important;
+}
+
+.octane-friendonline-notification {
+    position: relative;
+    min-width: 86px;
+    height: 58px;
+    margin-left: auto;
+    cursor: pointer;
+    pointer-events: auto;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    user-select: none;
+}
+
+.octane-friendonline-notification__content {
+    position: absolute;
+    left: 0;
+    top: 12px;
+    display: flex;
+    height: 34px;
+    overflow: hidden;
+}
+
+.octane-friendonline-notification__left,
+.octane-friendonline-notification__right {
+    width: auto;
+    height: auto;
+    flex: 0 0 auto;
+}
+
+.octane-friendonline-notification__middle {
+    height: 34px;
+    flex: 1 1 auto;
+    background-repeat: repeat-x;
+}
+
+.octane-friendonline-notification__message {
+    /* notification_friendonline: a style 3 text without text_style, u_regular 12 px 0xcfcfcf (regular Ubuntu). */
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    position: absolute;
+    left: 8px;
+    top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 19px;
+    max-width: calc(100% - 16px);
+    color: #cfcfcf;
+    font-size: 12px;
+    line-height: 19px;
+    white-space: nowrap;
+    text-shadow: 0 1px 0 #000;
+}
+
+.octane-friendonline-notification__message span {
+    display: block;
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+}
+
+.octane-friendonline-notification__message img {
+    width: auto;
+    height: auto;
+    margin-top: 1px;
+    flex: 0 0 auto;
+}
+
+.octane-friendonline-notification__avatar {
+    position: absolute;
+    left: 33px;
+    top: 3px;
+    width: 53px;
+    height: 53px;
+}
+
+.octane-friendonline-notification__circle-inner,
+.octane-friendonline-notification__circle {
+    position: absolute;
+    inset: 0;
+    width: auto;
+    height: auto;
+    pointer-events: none;
+}
+
+.octane-friendonline-notification__head {
+    position: absolute;
+    left: 2px;
+    top: 1px;
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.octane-friendonline-notification__head .avatar-image {
+    width: 50px !important;
+    height: 50px !important;
+    background-size: 76px auto !important;
+    background-position: center 34% !important;
+    background-repeat: no-repeat !important;
+}
+
+/* Command list produced by ":commands". NotificationDefaultAlertView tags the alert
+   with .octane-alert-command-list and renders one button per command; without these
+   rules the buttons stay inline and several commands share a visual line. */
+.octane-alert.octane-alert-command-list {
+    width: 430px;
+    max-height: 470px;
+}
+
+.notification-command-template {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 370px;
+    padding-right: 4px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* The listing names itself on its first line; that line becomes the card header,
+   so the body carries no heading of its own. */
+.notification-command-search {
+    --notification-command-search-bg: #fff;
+    --notification-command-search-border: #a8a8a8;
+
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    width: 100%;
+    margin-bottom: 4px;
+    padding: 3px 7px;
+    background: var(--notification-command-search-bg);
+    border: 1px solid var(--notification-command-search-border);
+    border-radius: 3px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+    color: inherit;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.notification-command-copy {
+    padding: 0 8px 4px 8px;
+    color: #4b5563;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.notification-command-row {
+    display: grid;
+    grid-template-columns: minmax(0, 150px) minmax(0, 1fr);
+    align-items: baseline;
+    gap: 2px 10px;
+    width: 100%;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.notification-command-row:nth-child(even) {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.notification-command-row:hover {
+    background: #fff6d6;
+    border-color: #d8a72a;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.notification-command-row:active {
+    background: #ffe9a8;
+}
+
+.notification-command-name {
+    min-width: 0;
+    color: #2d4a82;
+    font-weight: 700;
+    font-size: 12px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    overflow-wrap: anywhere;
+}
+
+.notification-command-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.notification-command-args {
+    color: #7a6a35;
+    font-size: 11px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    overflow-wrap: anywhere;
+}
+
+.notification-command-description {
+    color: #6b7280;
+    font-size: 11px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+@keyframes hotelEventPop {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes hotelEventBob {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+@keyframes hotelEventCountdown {
+    from {
+        transform: scaleX(1);
+    }
+    to {
+        transform: scaleX(0);
+    }
+}
+
+/* Official layout_notification on the "black borderless" border skin (style 1). */
+@font-face {
+    font-family: Volter;
+    font-weight: 700;
+    font-style: normal;
+    src: url("@/assets/webfonts/Volter-b.ttf") format("truetype");
+}
+
+.octane-swf-notification-bubble.octane-notification-item {
+    width: 190px;
+    max-width: 190px;
+    min-height: 66px;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 2px !important;
+    border: 6px solid transparent;
+    border-image: url("@/assets/images/notifications/notification_border_black.png") 6 fill / 6px stretch;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #ffffff;
+    font-family: Volter, Ubuntu, sans-serif;
+    font-size: 9px !important;
+    font-weight: 700;
+    line-height: 11px;
+    text-shadow: none;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-notification-item__icon {
+    display: flex;
+    flex: 0 0 50px;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+}
+
+.octane-notification-item__icon img {
+    max-width: 50px !important;
+    max-height: 50px !important;
+    object-fit: contain;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-notification-item__text {
+    display: flex;
+    flex-direction: column;
+    width: 116px;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.octane-notification-item__rarity {
+    margin-top: 2px;
+}
+
+/* Official club_gift_notification on the border_9 skin. */
+.octane-swf-notification-bubble.octane-club-gift-notification {
+    position: relative;
+    display: block;
+    width: 192px;
+    max-width: 192px;
+    height: 82px;
+    min-height: 82px;
+    padding: 0 !important;
+    border: 0;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #ffffff;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px !important;
+    line-height: 14px;
+    text-shadow: none;
+}
+
+.octane-club-gift-notification__border {
+    position: absolute;
+    inset: 0;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 7px 7px 8px 7px;
+    border-image: url("@/assets/images/notifications/notification_border_9.png") 7 7 8 7 fill / 7px 7px 8px 7px stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.octane-club-gift-notification__icon {
+    position: absolute;
+    top: 7px;
+    left: 6px;
+    width: 16px;
+    height: 16px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-club-gift-notification__text {
+    position: absolute;
+    top: 7px;
+    left: 25px;
+    width: 161px;
+    height: 36px;
+    overflow: hidden;
+    overflow-wrap: break-word;
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__button {
+    position: absolute;
+    top: 44px;
+    right: 6px;
+    min-width: 96px;
+    height: 28px;
+    padding: 0 10px;
+    border: 5px solid transparent !important;
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-default.png") !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__button:hover {
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-hover.png") !important;
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__button:active {
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-pressed.png") !important;
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__later {
+    position: absolute;
+    top: 49px;
+    left: 8px;
+    min-height: 0;
+    padding: 0;
+    border: 0 !important;
+    border-image-source: none !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__later:hover {
+    color: #bae1f9 !important;
+}
+
+/*
+ * AIR's new feature notifications (new_feature_notification_xml 192x92, _promo_xml 192x34,
+ * _countdown_xml 192x76) on the border_9 skin, which the hotel can recolour (notifications.new_feature.color).
+ */
+.octane-new-feature-notification {
+    position: relative;
+    display: block;
+    width: 192px;
+    height: 92px;
+    isolation: isolate;
+    color: #ffffff;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 14px;
+}
+
+.octane-new-feature-notification[data-type="promo"] {
+    height: auto;
+    min-height: 34px;
+}
+
+.octane-new-feature-notification[data-type="countdown"] {
+    height: 76px;
+}
+
+.octane-new-feature-notification__border {
+    position: absolute;
+    inset: 0;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 7px 7px 8px 7px;
+    border-image: url("@/assets/images/notifications/notification_border_9.png") 7 7 8 7 fill / 7px 7px 8px 7px stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+/* A hotel colour other than the skin's own 0x686661 takes the border's hue, keeping its shading. */
+.octane-new-feature-notification__border[data-tinted="true"]::after {
+    position: absolute;
+    inset: -7px -7px -8px -7px;
+    border-radius: 6px;
+    background: var(--octane-new-feature-color);
+    mix-blend-mode: color;
+    content: "";
+}
+
+.octane-new-feature-notification__image {
+    position: absolute;
+    top: 5px;
+    left: 6px;
+    width: 55px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.octane-new-feature-notification__image img {
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-new-feature-notification__desc {
+    position: absolute;
+    top: 7px;
+    left: 67px;
+    width: 113px;
+    height: 45px;
+    overflow: hidden;
+    overflow-wrap: break-word;
+}
+
+.octane-new-feature-notification__open {
+    position: absolute;
+    top: 54px;
+    left: 133px;
+    min-width: 51px;
+    height: 28px;
+    padding: 0 6px;
+    border: 5px solid transparent !important;
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-default.png") !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-new-feature-notification__open:hover {
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-hover.png") !important;
+}
+
+.octane-new-feature-notification__open:active {
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-pressed.png") !important;
+}
+
+/* cancel_link_region (8,60 155x17): underlined white link, 0xBAE1F9 while hovered. */
+.octane-new-feature-notification__cancel-link {
+    position: absolute;
+    top: 60px;
+    left: 8px;
+    max-width: 155px;
+    min-height: 0;
+    padding: 0;
+    border: 0 !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 17px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-new-feature-notification__cancel-link:hover {
+    color: #bae1f9 !important;
+}
+
+/* promo / countdown: the whole box is main_region (brightness_and_shadow_under_gentle). */
+.octane-new-feature-notification__main-region {
+    position: relative;
+    display: block;
+    width: 192px;
+    min-height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.octane-new-feature-notification[data-type="promo"] .octane-new-feature-notification__main-region {
+    min-height: 34px;
+    padding: 7px 0 9px;
+}
+
+.octane-new-feature-notification[data-type="countdown"] .octane-new-feature-notification__main-region {
+    height: 76px;
+}
+
+.octane-new-feature-notification__main-region:hover {
+    filter: brightness(1.08) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
+.octane-new-feature-notification__main-region .octane-new-feature-notification__image {
+    top: 7px;
+    left: 8px;
+    width: 20px;
+    height: 20px;
+}
+
+.octane-new-feature-notification__main-region .octane-new-feature-notification__desc {
+    position: relative;
+    top: 0;
+    left: 0;
+    display: block;
+    margin-left: 30px;
+    width: auto;
+    max-width: 148px;
+    height: auto;
+    text-decoration: underline;
+}
+
+.octane-new-feature-notification[data-type="countdown"] .octane-new-feature-notification__desc {
+    position: absolute;
+    top: 7px;
+    left: 14px;
+    margin-left: 0;
+    width: 154px;
+    max-width: 154px;
+}
+
+/* NewFeatureNotification: hovering a promo / countdown lights its text up (LINK_COLOR_HIGHLIGHT). */
+.octane-new-feature-notification:hover .octane-new-feature-notification__main-region .octane-new-feature-notification__desc {
+    color: #bae1f9;
+}
+
+/* cancel_link_region of promo (174,12) and countdown (174,9): common_close_x at 0.55. */
+.octane-new-feature-notification__cancel-region {
+    position: absolute;
+    top: 12px;
+    left: 174px;
+    width: 10px;
+    height: 10px;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-new-feature-notification[data-type="countdown"] .octane-new-feature-notification__cancel-region {
+    top: 9px;
+}
+
+.octane-new-feature-notification__cancel-region img {
+    display: block;
+    opacity: 0.55;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* countdown_widget (46,33 99x37): three counters, value over unit, colon separated. */
+.octane-new-feature-notification__countdown {
+    position: absolute;
+    top: 33px;
+    left: 46px;
+    width: 99px;
+    height: 37px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.octane-new-feature-notification__counter {
+    display: flex;
+    align-items: center;
+}
+
+.octane-new-feature-notification__separator {
+    padding: 0 1px;
+    font-weight: bold;
+}
+
+.octane-new-feature-notification__counter-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 26px;
+    padding: 2px 1px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.octane-new-feature-notification__counter-value {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 16px;
+}
+
+.octane-new-feature-notification__counter-unit {
+    font-size: 9px;
+    line-height: 10px;
 }

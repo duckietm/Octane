@@ -1,47 +1,51 @@
 {
-    "image.library.notifications.url": "${image.library.url}notifications/%image%.png",
-    "achievements.images.url": "${image.library.url}Quests/%image%.png",
-    "camera.url": "http://localhost:3000/camera/photo/",
-    "thumbnails.url": "http://localhost:3000/camera/photo/temp/thumb/%thumbnail%.png",
+    "// ---- Hotel and links ----": "",
+    "hotel.name": "Camwijs",
     "url.prefix": "",
     "habbopages.url": "/gamedata/habbopages/",
     "group.homepage.url": "${url.prefix}/groups/%groupid%/id",
-    "guide.help.alpha.groupid": 0,
-    "chat.viewer.height.percentage": 0.4,
-    "widget.dimmer.colorwheel": false,
-    "avatar.wardrobe.max.slots": 10,
-    "user.badges.max.slots": 5,
-    "user.tags.enabled": false,
-    "camera.publish.disabled": false,
-    "hc.disabled": false,
-    "badge.descriptions.enabled": true,
-    "furni.descriptions.enabled": true,
-    "furni.location.enabled": true,
-    "furni.location.require.access": true,
-    "motto.max.length": 38,
-    "bot.name.max.length": 15,
-    "pet.package.name.max.length": 15,
-    "wired.action.bot.talk.to.avatar.max.length": 64,
-    "wired.action.bot.talk.max.length": 64,
-    "wired.action.chat.max.length": 100,
-    "wired.action.kick.from.room.max.length": 100,
-    "wired.action.mute.user.max.length": 100,
-    "game.center.enabled": false,
-    "radio_ui.enabled": false,
-    "mentions_ui.enabled": true,
-    "mentions_ui.sound": true,
-	"mentions_ui.aliases.everyone": [ "all", "everyone" ],
-    "mentions_ui.aliases.friends":  [ "friends" ],
-    "mentions_ui.aliases.room":     [ "room" ],
-    "guides.enabled": true,
-	"housekeeping.enabled": true,
-    "buildersclub.enabled": true,
-    "toolbar.hide.quests": true,
-    "toolbar.buildersclub.enabled": true,
-    "toolbar.rarevalues.enabled": true,
-    "toolbar.fortunewheel.enabled": true,
-    "show.google.ads": false,
-    "catalog.classic.style": false,
+    "habboway.url": "${image.library.url}habboway",
+    "email.verification.url": "",
+    "web.shop.relativeUrl": "",
+    "link.format.club": "",
+    "link.format.duckets": "",
+    "link.format.collectibles": "",
+    "link.format.safetylock_unlock": "",
+    "link.format.bots.help": "",
+    "niko.appstore.link.url": "",
+    "niko.trophy.appstore.image": "",
+    "emustats.endpoint": "${api.url}/api/emustats",
+    "external.plugins": [],
+    "external.plugins.allowed.hosts": [],
+    "// ---- Images and assets ----": "",
+    "image.library.notifications.url": "${image.library.url}notifications/%image%.png",
+    "achievements.images.url": "${image.library.url}Quests/%image%.png",
+    "image.library.questing.url": "",
+    "image.library.dailytasks.url": "",
+    "currency.asset.icon.url": "${images.url}/wallet/%type%.png",
+    "catalog.asset.url": "${image.library.url}catalogue",
+    "catalog.asset.image.url": "${catalog.asset.url}/%name%.gif",
+    "catalog.asset.icon.url": "${catalog.asset.url}/icon_%name%.png",
+    "ui.header.images.url": "",
+    "ui.header.images.count": 30,
+    "// ---- Loading screen texts (used before the external texts load) ----": "",
+    "loader": "Opstarten...",
+    "loader.waiting": "Loading content...",
+    "generic.reconnecting": "Connecting to server...",
+    "loading.task.assets": "Loading game assets...",
+    "loading.task.localization": "Loading translations...",
+    "loading.task.avatar": "Loading wardrobe...",
+    "loading.task.sounds": "Loading sounds...",
+    "loading.task.renderer": "Initializing renderer...",
+    "loading.task.engine": "Loading graphics engine...",
+    "loading.task.session": "Verifying session...",
+    "loading.task.startsession": "Starting session...",
+    "loading.task.userdata": "Loading user data...",
+    "loading.task.rooms": "Loading rooms...",
+    "onboarding.button.ready": "Ready!",
+    "client.starting.revolving": "For science, you monster/Loading funny message…please wait./Would you like fries with that?/Follow the yellow duck./Time is just an illusion./Are we there yet?!/I like your t-shirt./Look left. Look right. Blink twice. Ta da!/It's not you, it's me./Shhh! I'm trying to think here./Loading pixel universe.",
+    "client.loading.failed": "Loading failed",
+    "// ---- Login screen ----": "",
     "loginview": {
         "images": {
             "background": "${asset.url}/c_images/reception/stretch_blue.png",
@@ -53,6 +57,551 @@
             "right.repeat": "${asset.url}/c_images/reception/US_top_right.png"
         }
     },
+    "login_background.colour": "#6eadc8",
+    "login_background": "",
+    "login_sun": "",
+    "login_drape": "",
+    "login_left": "",
+    "login_right.repeat": "",
+    "login_right": "",
+    "login.remember.rotate.interval.minutes": 15,
+    "login.remember.cookie": false,
+    "// ---- Hotel view ----": "",
+    "hotelview": {
+        "room.pool": "791",
+        "room.picnic": "2193",
+        "room.rooftop": "",
+        "room.rooftop.pool": "",
+        "room.peaceful": "",
+        "room.infobus": "5956",
+        "room.lobby": "1450",
+        "show.avatar": true,
+        "widgets": {
+            "slot.1.widget": "",
+            "slot.1.conf": {},
+            "slot.2.widget": "",
+            "slot.2.conf": {
+                "image": "",
+                "texts": "",
+                "btnLink": ""
+            },
+            "slot.3.widget": "",
+            "slot.3.conf": {},
+            "slot.4.widget": "",
+            "slot.4.conf": {},
+            "slot.5.widget": "",
+            "slot.5.conf": {},
+            "slot.6.widget": "",
+            "slot.6.conf": {
+                "campaign": ""
+            },
+            "slot.7.widget": "",
+            "slot.7.conf": {}
+        },
+        "images": {
+            "background": "${asset.url}/images/reception/stretch_blue.png",
+            "background.colour": "#8ee0f0",
+            "sun": "${asset.url}/images/reception/sun.png",
+            "drape": "${asset.url}/images/reception/drape.png",
+            "left": "",
+            "right": "",
+            "right.repeat": ""
+        }
+    },
+    "landing.view.roomcategory": "random_friending_room",
+    "landing.view.community.interactive": true,
+    "landing.view.community.catalog.target": "",
+    "landing.view.communitygoalhof.hasroomlink": false,
+    "landing.view.dynamic.slot.6.conf": "",
+    "// ---- Toolbar and features on/off ----": "",
+    "toolbar.hide.quests": true,
+    "toolbar.buildersclub.enabled": true,
+    "toolbar.rarevalues.enabled": true,
+    "toolbar.fortunewheel.enabled": true,
+    "toolbar.stories.enabled": false,
+    "toolbar.new_additions.notification.enabled": true,
+    "buildersclub.enabled": true,
+    "game.center.enabled": false,
+    "game.center.allowed.hosts": [],
+    "games.highscores.enabled": true,
+    "dailytasks.enabled": true,
+    "friendbar.notifications.enabled": true,
+    "radio_ui.enabled": false,
+    "show.google.ads": false,
+    "ads.frame.url": "",
+    "hc.disabled": false,
+    "club.membership.extend.promotion.enabled": true,
+    "raid.protection.enabled": true,
+    "discord.enabled": false,
+    "user.custom.filter.enabled": true,
+    "// ---- Currencies and purse ----": "",
+    "system.currency.types": [
+        -1,
+        0,
+        5,
+        105
+    ],
+    "currency.display.number.short": false,
+    "currency.seasonal.color": "blue",
+    "activitypoint.name.0": "duckets",
+    "activitypoint.name.5": "diamonds",
+    "activity.point.display.enabled": true,
+    "hc.center": {
+        "benefits.info": true,
+        "payday.info": true,
+        "gift.info": true,
+        "benefits.habbopage": "habboclub",
+        "payday.habbopage": "hcpayday"
+    },
+    "respect.options": {
+        "enabled": false,
+        "sound": "sound_respect_received"
+    },
+    "respect.replenish_cost_duckets": 50,
+    "seasonalcurrencyindicator.page": "",
+    "// ---- Catalog ----": "",
+    "catalog.tab.icons": false,
+    "catalog.headers": false,
+    "catalog.links": {
+        "hc.buy_hc": "habbo_club",
+        "hc.hc_gifts": "club_gifts",
+        "pets.buy_food": "pet_food",
+        "pets.buy_saddle": "saddles"
+    },
+    "catalog.vip.benefits.enabled": true,
+    "catalog.multiple.purchase.enabled": true,
+    "catalog.new.additions.page.open.disabled": false,
+    "catalog.gift_wrapping_new.gift_card": "",
+    "catalog.purchase.gift_wrapping.default_box_index": 0,
+    "gotobreedingnestfailure.catalogpage.food": "",
+    "gotobreedingnestfailure.catalogpage.nests": "",
+    "special_items.chests.items": "wf_storage_furni1,furni,wf_storage_furni1;wf_storage_furni2,furni,wf_storage_furni2;wf_storage_furni_starter,furni,wf_storage_furni_starter;wf_storage_coins1,furni,wf_storage_coins1;wf_storage_coins2,furni,wf_storage_coins2;wf_act_give_furni,furni,wf_act_give_furni;wf_act_give_currency,furni,wf_act_give_currency;wf_cnd_chest_has_items,furni,wf_cnd_chest_has_items;wf_cnd_chest_has_item_type,furni,wf_cnd_chest_has_item_type;wf_xtra_scan_chest_furni_by_type,furni,wf_xtra_scan_chest_furni_by_type;wf_act_init_transaction,furni,wf_act_init_transaction;wf_act_cancel_transaction,furni,wf_act_cancel_transaction;wf_trg_transaction_complete,furni,wf_trg_transaction_complete;wf_trg_transaction_fail,furni,wf_trg_transaction_fail;wf_contract_payment,furni,wf_contract_payment;wf_contract_reward,furni,wf_contract_reward;wf_contract_trade,furni,wf_contract_trade;wf_xtra_custom_contract,furni,wf_xtra_custom_contract",
+    "special_items.chests.free_claim": "chests_starter",
+    "// ---- Collectibles ----": "",
+    "collectibles.enabled": true,
+    "nft.shop.enabled": true,
+    "nft.minting.enabled": false,
+    "collectibles.transfer.enabled": false,
+    "nft.credit.converting.enabled": true,
+    "// ---- Avatar, avatar editor and badges ----": "",
+    "avatar.wardrobe.max.slots": 10,
+    "avatar.expression.67.enabled": true,
+    "avatar.expressions_menu.enabled": true,
+    "avatar.signs.enabled": true,
+    "avatar.sitting.enabled": true,
+    "handitem.drop.enabled": true,
+    "avatareditor.show.unowned.sellables": false,
+    "avatareditor.show.clubitems.dimmed": true,
+    "avatareditor.show.clubitems.first": true,
+    "effects.in.avatar.editor": true,
+    "avatareditor.effects.buy.button.catalog.page.name": "",
+    "user.badges.max.slots": 5,
+    "user.tags.enabled": false,
+    "badge.descriptions.enabled": true,
+    "badge.display.excluded.badgeCodes": "",
+    "badge_rarity.uncommon": false,
+    "motto.max.length": 38,
+    "backgrounds.data": [],
+    "stands.data": [],
+    "overlays.data": [],
+    "// ---- Chat and mentions ----": "",
+    "chat.input.maxlength": 100,
+    "chat.history.max.items": 100,
+    "chat.viewer.height.percentage": 0.25,
+    "chat.styles": [
+        {
+            "styleId": 0,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 1,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 2,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 3,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 4,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 5,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 6,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 7,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 8,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 9,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 10,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 11,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 12,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 13,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 14,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 15,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 16,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 17,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 18,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 19,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 20,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 21,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 22,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 23,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 24,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 25,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 26,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 27,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 28,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 29,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 30,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 31,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 32,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 33,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 34,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 35,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 36,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 37,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 38,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 39,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 40,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 41,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 42,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 43,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 44,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 45,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 46,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 47,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 48,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 49,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 50,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 51,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 52,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 53,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        }
+    ],
+    "chat.styles.disabled": [],
+    "mentions_ui.enabled": true,
+    "mentions_ui.sound": true,
+    "mentions_ui.aliases.everyone": [
+        "all",
+        "everyone"
+    ],
+    "mentions_ui.aliases.friends": [
+        "friends"
+    ],
+    "mentions_ui.aliases.room": [
+        "room"
+    ],
+    "// ---- Rooms, furni and navigator ----": "",
     "navigator.room.models": [
         {
             "clubLevel": 0,
@@ -230,465 +779,45 @@
             "name": "9"
         }
     ],
-    "hotelview": {
-        "room.pool": "791",
-        "room.picnic": "2193",
-        "room.rooftop": "",
-        "room.rooftop.pool": "",
-        "room.peaceful": "",
-        "room.infobus": "5956",
-        "room.lobby": "1450",
-        "show.avatar": true,
-        "widgets": {
-            "slot.1.widget": "",
-            "slot.1.conf": {},
-            "slot.2.widget": "",
-            "slot.2.conf": {
-                "image": "",
-                "texts": "",
-                "btnLink": ""
-            },
-            "slot.3.widget": "",
-            "slot.3.conf": {},
-            "slot.4.widget": "",
-            "slot.4.conf": {},
-            "slot.5.widget": "",
-            "slot.5.conf": {},
-            "slot.6.widget": "",
-            "slot.6.conf": {
-                "campaign": ""
-            },
-            "slot.7.widget": "",
-            "slot.7.conf": {}
-        },
-        "images": {
-            "background": "${asset.url}/images/reception/stretch_blue.png",
-            "background.colour": "#8ee0f0",
-            "sun": "${asset.url}/images/reception/sun.png",
-            "drape": "${asset.url}/images/reception/drape.png",
-            "left": "",
-            "right": "",
-            "right.repeat": ""
-        }
-    },
-    "achievements.unseen.ignored": [
-        "ACH_AllTimeHotelPresence"
+    "room.enter.info.enabled": true,
+    "room.enter.info.collapse.delay": 5000,
+    "room.report.enabled": true,
+    "room.ranking.enabled": false,
+    "room.queue.spectator.enabled": false,
+    "roomenterad.habblet.enabled": false,
+    "furni.descriptions.enabled": true,
+    "furni.location.enabled": true,
+    "furni.location.require.access": true,
+    "furni.plant.classnames": [
+        "jungle_c16_flowera1",
+        "jungle_c16_flowera2",
+        "jungle_c16_flowera3",
+        "jungle_c16_flowerb1",
+        "jungle_c16_flowerb2",
+        "jungle_c16_flowerb3",
+        "jungle_c16_flowerc1",
+        "jungle_c16_flowerc2",
+        "jungle_c16_flowerc3",
+        "jungle_c16_flowerd1",
+        "jungle_c16_flowerd2",
+        "jungle_c16_flowerd3"
     ],
-    "avatareditor.show.clubitems.dimmed": true,
-    "avatareditor.show.clubitems.first": true,
-    "chat.history.max.items": 100,
-    "system.currency.types": [
-        -1,
-        0,
-        5,
-        105
-    ],
-    "catalog.links": {
-        "hc.buy_hc": "habbo_club",
-        "hc.hc_gifts": "club_gifts",
-        "pets.buy_food": "pet_food",
-        "pets.buy_saddle": "saddles"
-    },
-    "hc.center": {
-        "benefits.info": true,
-        "payday.info": true,
-        "gift.info": true,
-        "benefits.habbopage": "habboclub",
-        "payday.habbopage": "hcpayday"
-    },
-    "respect.options": {
-        "enabled": false,
-        "sound": "sound_respect_received"
-    },
-    "currency.display.number.short": false,
-    "currency.asset.icon.url": "${images.url}/wallet/%type%.png",
-    "catalog.asset.url": "${image.library.url}catalogue",
-    "catalog.asset.image.url": "${catalog.asset.url}/%name%.gif",
-    "catalog.asset.icon.url": "${catalog.asset.url}/icon_%name%.png",
-    "catalog.tab.icons": false,
-    "catalog.headers": false,
-    "chat.input.maxlength": 100,
-    "chat.styles.disabled": [],
-    "chat.styles": [
-        {
-            "styleId": 0,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 1,
-            "minRank": 5,
-            "isSystemStyle": true,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 2,
-            "minRank": 5,
-            "isSystemStyle": true,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 3,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 4,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 5,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 6,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 7,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 8,
-            "minRank": 5,
-            "isSystemStyle": true,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 9,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 10,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 11,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 12,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 13,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 14,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 15,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 16,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 17,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 18,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 19,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 20,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 21,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 22,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 23,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 24,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 25,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 26,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 27,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 28,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 29,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 30,
-            "minRank": 5,
-            "isSystemStyle": true,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 31,
-            "minRank": 5,
-            "isSystemStyle": true,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 32,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 33,
-            "minRank": 5,
-            "isSystemStyle": true,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 34,
-            "minRank": 5,
-            "isSystemStyle": true,
-            "isHcOnly": false,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 35,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 36,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 37,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 38,
-            "minRank": 0,
-            "isSystemStyle": false,
-            "isHcOnly": true,
-            "isAmbassadorOnly": false
-        },
-        {
-            "styleId": 39,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 40,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 41,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 42,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 43,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 44,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 45,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 46,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 47,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 48,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 49,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 50,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 51,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 52,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        },
-        {
-            "styleId": 53,
-            "minRank": 5,
-            "isSystemStyle": false,
-            "isHcOnly": false,
-            "isAmbassadorOnly": true
-        }
-    ],
+    "widget.dimmer.colorwheel": false,
+    "trading.warning.enabled": true,
+    "bot.name.max.length": 15,
+    "pet.package.name.max.length": 15,
+    "hotel_alert_animated": false,
+    "// ---- Groups and forums ----": "",
+    "group.blocking.enabled": true,
+    "groupforum.poll.period": 300,
+    "// ---- Camera and stories ----": "",
+    "camera.url": "http://localhost/camera/photo/temp",
+    "thumbnails.url": "http://localhost/camera/photo/temp/thumb/%thumbnail%.png",
+    "camera.render.mode": "server",
+    "camera.publish.disabled": false,
+    "camera.effects.enabled": true,
+    "camera.photo.publishing.enabled": true,
+    "camera.competition.enabled": false,
     "camera.available.effects": [
         {
             "name": "dark_sepia",
@@ -1371,6 +1500,33 @@
             "enabled": true
         }
     ],
+    "disclaimer.credit_spending.enabled": false,
+    "stories.image_url_base": "",
+    "// ---- Help, guides and new users ----": "",
+    "guides.enabled": true,
+    "guide.help.alpha.groupid": 0,
+    "guardians.enabled": true,
+    "chatreviewreporterfeedbackctrl.enabled": true,
+    "habboway.enabled": true,
+    "help.habboway.page.count": 6,
+    "safety_quiz.disabled": false,
+    "nux.lobbies.enabled": false,
+    "nux.noob.lobby.popup.delay": 70,
+    "nux.noob.chat.reminder.delay": 240,
+    "nux.chat.reminder.shown": "",
+    "// ---- Quests, achievements and talents ----": "",
+    "achievements.unseen.ignored": [
+        "ACH_AllTimeHotelPresence"
+    ],
+    "seasonalQuestCalendar.enabled": false,
+    "seasonalQuestCalendar.campaignPrefix": "xmas13",
+    "seasonalQuestCalendar.currency": "0",
+    "seasonalQuestCalendar.maximum.entities": 42,
+    "talent.track.enabled": true,
+    "talent.track.citizenship.enabled": true,
+    "new.user.citizenship.popup.enabled": false,
+    "talentpromo.track": "",
+    "// ---- Notifications ----": "",
     "notification": {
         "notification.admin.transient": {
             "display": "POP_UP",
@@ -1429,6 +1585,14 @@
             "title": ""
         },
         "notification.feed.enabled": false,
+        "notification.hotel.event": {
+            "image": "${image.library.url}web_promo_small/spromo_Games_Bundle.png",
+            "sound": "messenger_new_thread"
+        },
+        "notification.hotel.event.ended": {
+            "image": "${image.library.url}web_promo_small/spromo_Games_Bundle.png",
+            "sound": "messenger_new_thread"
+        },
         "notification.floorplan_editor.error": {
             "display": "POP_UP"
         },
@@ -1480,7 +1644,61 @@
             "image": "${image.library.url}/album1584/X1517.gif"
         }
     },
-    "backgrounds.data": [],
-    "stands.data": [],
-    "overlays.data": []
+    "notifications.new_feature.active": "rewardtrack_intro",
+    "notifications.new_feature.type.rewardtrack_intro": "promo",
+    "notifications.new_feature.condition.rewardtrack_intro": "reward_track_incomplete:introduction",
+    "notifications.new_feature.image.rewardtrack_intro": "reward_track_small_icon",
+    "notifications.new_feature.internal_link.rewardtrack_intro": "reward_track/open/introduction",
+    "// ---- Wired ----": "",
+    "wired.action.bot.talk.to.avatar.max.length": 64,
+    "wired.action.bot.talk.max.length": 64,
+    "wired.action.chat.max.length": 100,
+    "wired.action.kick.from.room.max.length": 100,
+    "wired.action.mute.user.max.length": 100,
+    "wired.timezones": "",
+    "wired.selfdonation.enabled": false,
+    "wired.selfdonation.max.amount": 500,
+    "wired.coins_chest.starter_capacity": 100,
+    "wired.coins_chest.initial_capacity": 5000,
+    "wired.coins_chest.upgrade_capacity": 5000,
+    "wired.furni_chest.starter_capacity": 100,
+    "wired.furni_chest.initial_capacity": 1000,
+    "wired.furni_chest.upgrade_capacity": 1000,
+    "wired.furni_highlight.darken_levels": "",
+    "wired.api.docs.link": "",
+    "wired.webapi.url": "",
+    "wired.webapi.docs_url": "",
+    "wired.webapi.hotels": null,
+    "// ---- Radio and soundboard ----": "",
+    "radio.stations.url": "",
+    "soundboard.layout.url": "configuration/soundboard-layout.jsonc",
+    "soundboard.sounds.url": "",
+    "soundboard.url.prefix": "",
+    "// ---- Staff: moderation and housekeeping ----": "",
+    "housekeeping.enabled": true,
+    "housekeeping.telemetry.enabled": false,
+    "housekeeping.audit.poll_interval_ms": 30000,
+    "housekeeping.sanction_templates": null,
+    "housekeeping.ticket_replies": null,
+    "housekeeping.escalation": null,
+    "habboinfotool.url": "",
+    "moderatoractionlog.url": "",
+    "identityinformationtool.url": "",
+    "roomadmin.url": "",
+    "cfh.topic_id.to.sanction_type_id": "",
+    "stories.admin.tool.base.url": "",
+    "// ---- Recolorable Builders Club furni (palettes per furni, Habbo's recolorable_bc) ----": "",
+    "recolorable_bc.palette.artdeco1": "672913,A73E18,EB840C,E9C258,669933",
+    "recolorable_bc.palette.classic": "FFFFFF,F7EBBC,ABD0D2,5EAAF8,835AB1,AC5AB1,FF99BC,525252,672913,E14218,FF9900,FFD837,92D13D,007223",
+    "recolorable_bc.palette.default": "FFFFFF,AEF0D8,99FFCC,00E9E5,00F8FD,A1E8FD,ABD0D2,BCC0C4,F5D1B3,FDE1B1,F7EBBC,FDD97E,FFD837,DBF96F,BAFA00,9ABD00,8AAE00,92D13D,B6FA70,4EFA99,52DA50,00BA00,00AA00,00A943,007900,007223,005900,2E632E,0D380C,336666,004059,525252,778084,008895,2CBFFF,5EAAF8,BCB7FF,DDB6FE,FEB6FE,F5BFE1,FF99BC,FF7852,E14218,FF3600,E76000,FF9900,FEA13D,AD8100,666600,513100,6F3D0C,672913,8D1600,AE0024,E7005F,FF549C,AC5AB1,835AB1,6685FF,0085FF,0074FF,9C73FF,FE72FF,DE00D7,96008E,3F1BC7,0000C8,683EFF,0000FF",
+    "recolorable_bc.palette.grass": "B0B1AE,6AB18E,57832E,30B106,929E12,B19626,B15501",
+    "recolorable_bc.palette.industrial": "545B5B,3C412F,3D3432,262C31,383F55",
+    "recolorable_bc.palette.metal": "8F9B9B,676F51,695955,414B53,606B92",
+    "recolorable_bc.palette.metalcrate": "BBBBBB,B5AC8A,7D989A,457DB6,604282,7E4282,BB708A,3C3C3C,4B1E0E,A53012,BB7000,BB9E28,6B992D,00541A",
+    "recolorable_bc.palette.redbrick": "CECECE,C7BE98,8AA8A9,4C89C8,6A498F,8B498F,CE7B98,424242,53210F,B63513,CE7B00,CEAE2C,76A931,005C1C",
+    "recolorable_bc.palette.sand": "F7EBBC,C29655,7E5C1D,95701D,CB8233,E1A53A,F0C833",
+    "recolorable_bc.palette.stone": "D0D0D0,C9C099,8BAAAB,4D8BCA,6B4990,8C4990,D07D99,434343,54210F,B73614,D07D00,D0B02D,77AA32,005D1D",
+    "recolorable_bc.palette.water": "336666,0069A6,5EAAF8,7AD8FF,99FFCC,E14218",
+    "recolorable_bc.palette.wood": "636568,667660,5A5045,7F603B,714A23,7D3822",
+    "recolorable_bc.palette_to_furni": "default=bc_block_0_recolorable,bc_block_1_recolorable,bc_cone_recolorable,bc_cylinder_recolorable,bc_halfcylinder_recolorable,bc_hemisphere_recolorable,bc_panel_recolorable,bc_pyramidtip_recolorable,bc_quarterring_recolorable,bc_round_recolorable,bc_stairs_recolorable,bc_standinghalfcylinder_recolorable,bc_standingtriangularprism_recolorable,bc_stick_recolorable,bc_triangularprism_recolorable,bc_wedge_recolorable,bc_block_small_recolorable,bc_curvedramp_recolorable,bc_glasspanel_recolorable,bc_quartercircle_recolorable,bc_ramp_recolorable,bc_sphere_recolorable,bc_sphere_small_recolorable,bc_wedgecrnr_recolorable,bc_alpha1_alpha_recolorable,bc_alpha1_a_recolorable,bc_alpha1_b_recolorable,bc_alpha1_c_recolorable,bc_alpha1_d_recolorable,bc_alpha1_e_recolorable,bc_alpha1_f_recolorable,bc_alpha1_g_recolorable,bc_alpha1_h_recolorable,bc_alpha1_i_recolorable,bc_alpha1_j_recolorable,bc_alpha1_k_recolorable,bc_alpha1_l_recolorable,bc_alpha1_m_recolorable,bc_alpha1_n_recolorable,bc_alpha1_num_recolorable,bc_alpha1_o_recolorable,bc_alpha1_p_recolorable,bc_alpha1_q_recolorable,bc_alpha1_r_recolorable,bc_alpha1_s_recolorable,bc_alpha1_t_recolorable,bc_alpha1_u_recolorable,bc_alpha1_v_recolorable,bc_alpha1_w_recolorable,bc_alpha1_x_recolorable,bc_alpha1_y_recolorable,bc_alpha1_z_recolorable;artdeco1=bc_block_artdeco1_recolorable;classic=bc_block_glass_recolorable,bc_block_marble_recolorable,bc_block_wool_recolorable,bc_flowerhedge_recolorable,bc_lavarock_recolorable,bc_terra_recolorable,bc_tile_recolorable;grass=bc_block_grass_recolorable;industrial=bc_block_industrial_recolorable;metal=bc_block_metalgrip_recolorable;redbrick=bc_block_redbrick_recolorable;sand=bc_block_sand_recolorable;water=bc_block_water_recolorable;metalcrate=bc_metalcrate_recolorable;stone=bc_stone_recolorable;wood=bc_wood_recolorable"
 }

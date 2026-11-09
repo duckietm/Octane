@@ -50,6 +50,10 @@ for(const file of walk(dist))
     if(file.endsWith('.css')) encryptFile(file);
 }
 
+const viteManifest = join(dist, '.vite', 'manifest.json');
+
+if(existsSync(viteManifest)) copyFileSync(viteManifest, join(dist, 'manifest.json'));
+
 const assetMirrorDir = join(dist, 'src', 'assets');
 mkdirSync(assetMirrorDir, { recursive: true });
 
@@ -62,8 +66,9 @@ for(const file of [ 'app.css.dat', 'app.js.dat' ])
 }
 
 const publicLoaderAssets = [
+    [ 'src/assets/images/loading/octane-logo.png', 'octane-logo.png' ],
     [ 'src/assets/images/loading/loading.gif', 'loading.gif' ],
-    [ 'src/assets/images/notifications/nitro_v3.png', 'nitro_v3.png' ]
+    [ 'src/assets/images/notifications/octane_v3.png', 'octane_v3.png' ]
 ];
 
 for(const [ source, file ] of publicLoaderAssets)
@@ -78,4 +83,15 @@ for(const [ source, file ] of publicLoaderAssets)
     }
 }
 
-writeFileSync(join(dist, 'index.html'), `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><script async defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"></script></head><body><div id="root"></div><script src="configuration/bootstrap.js?v=${ buildVersion }"></script></body></html>`);
+// No inline or injected scripts and event handlers, no plugins, no <base> hijack. The loader runs the
+// client from blob: modules, Pixi builds shader helpers with new Function ('unsafe-eval') and third-party
+// scripts (Turnstile, ads) load over https. Build with OCTANE_CSP=off to leave it out.
+const contentSecurityPolicy = [
+    "script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' https: blob:",
+    "worker-src 'self' blob:",
+    "object-src 'none'",
+    "base-uri 'self'"
+].join('; ');
+const cspMeta = (process.env.OCTANE_CSP === 'off') ? '' : `<meta http-equiv="Content-Security-Policy" content="${ contentSecurityPolicy }">`;
+
+writeFileSync(join(dist, 'index.html'), `<!DOCTYPE html><html><head><meta charset="utf-8">${ cspMeta }<meta name="viewport" content="width=device-width, initial-scale=1"><script async defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"></script></head><body><div id="root"></div><script src="configuration/bootstrap.js?v=${ buildVersion }"></script></body></html>`);

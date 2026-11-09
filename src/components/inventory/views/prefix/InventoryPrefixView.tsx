@@ -1,21 +1,24 @@
+import { CreateLinkEvent } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { FaTrashAlt } from 'react-icons/fa';
-import { getPrefixEffectStyle, getPrefixFontStyle, IPrefixItem, LocalizeText, parsePrefixColors } from '../../../../api';
+import { getPrefixEffectStyle, getPrefixFontStyle, IPrefixItem, localizeWithFallback, LocalizeText, parsePrefixColors } from '../../../../api';
 import { GetNickIconUrl } from '../../../../assets/images/user_custom/nick_icons';
-import { Button } from '../../../../common';
+import { ClassicScrollAreaView } from '../../../../common/scroll-area/ClassicScrollAreaView';
 import { useInventoryNickIcons, useInventoryPrefixes, useNotification } from '../../../../hooks';
-import { NitroButton } from '../../../../layout';
+import { OctaneButton } from '../../../../layout';
+import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
+import { TabBar, TabBarTab } from '../../../../common/TabBar';
+import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type InventoryIdentityTab = 'prefixes' | 'icons';
 
-const PrefixPreview: FC<{ text: string; color: string; icon: string; effect?: string; font?: string; className?: string; textSize?: string }> = ({
+const PrefixPreview: FC<{ text: string; color: string; icon: string; effect?: string; font?: string; className?: string }> = ({
     text,
     color,
     icon,
     effect = '',
     font = '',
-    className = '',
-    textSize = 'text-sm'
+    className = ''
 }) => {
     const colors = parsePrefixColors(text, color);
     const hasMultiColor = colors.length > 1 && new Set(colors).size > 1;
@@ -23,62 +26,27 @@ const PrefixPreview: FC<{ text: string; color: string; icon: string; effect?: st
     const fontStyle = getPrefixFontStyle(font);
 
     return (
-        <span className={`font-bold ${textSize} ${className}`} style={{ ...fontStyle, ...fxStyle }}>
-            {icon && <span className="mr-0.5">{icon}</span>}
-            <span style={hasMultiColor ? { ...fontStyle, ...fxStyle } : { ...fontStyle, ...fxStyle, color: colors[0] || '#FFFFFF' }}>
-                {'{'}
-                {hasMultiColor
-                    ? [...text].map((char, i) => (
-                          <span key={i} style={{ ...fontStyle, color: colors[i] || colors[colors.length - 1], ...getPrefixEffectStyle(effect, colors[i]) }}>
-                              {char}
-                          </span>
-                      ))
-                    : text}
-                {'}'}
+        <NativeTextTree>
+            <span className={`octane-inventory-prefix-text ${className}`} style={{ ...fontStyle, ...fxStyle }}>
+                {icon && <span className="octane-inventory-prefix-icon">{icon}</span>}
+                <span style={hasMultiColor ? { ...fontStyle, ...fxStyle } : { ...fontStyle, ...fxStyle, color: colors[0] || '#FFFFFF' }}>
+                    {'{'}
+                    {hasMultiColor
+                        ? [...text].map((char, i) => (
+                              <span key={i} style={{ ...fontStyle, color: colors[i] || colors[colors.length - 1], ...getPrefixEffectStyle(effect, colors[i]) }}>
+                                  {char}
+                              </span>
+                          ))
+                        : text}
+                    {'}'}
+                </span>
             </span>
-        </span>
+        </NativeTextTree>
     );
 };
 
-const PrefixItemView: FC<{
-    prefix: IPrefixItem;
-    isSelected: boolean;
-    onClick: () => void;
-}> = ({ prefix, isSelected, onClick }) => {
-    return (
-        <div
-            className={`flex items-center justify-center rounded-md border-2 cursor-pointer p-2 transition-colors
-                ${isSelected ? 'border-card-grid-item-active bg-card-grid-item-active' : 'border-card-grid-item-border bg-card-grid-item'}
-                ${prefix.active ? 'ring-2 ring-green-400' : ''}`}
-            onClick={onClick}
-        >
-            <PrefixPreview className="truncate" color={prefix.color} effect={prefix.effect} font={prefix.font} icon={prefix.icon} text={prefix.text} />
-        </div>
-    );
-};
-
-const NickIconItemView: FC<{
-    iconKey: string;
-    displayName: string;
-    isSelected: boolean;
-    isActive: boolean;
-    onClick: () => void;
-}> = ({ iconKey, displayName, isSelected, isActive, onClick }) => {
-    return (
-        <div
-            className={`relative flex cursor-pointer items-center justify-center rounded-md border-2 p-2 transition-colors
-                ${isSelected ? 'border-card-grid-item-active bg-card-grid-item-active' : 'border-card-grid-item-border bg-card-grid-item'}
-                ${isActive ? 'ring-2 ring-green-400' : ''}`}
-            onClick={onClick}
-        >
-            {isActive && <span className="absolute right-1 top-1 rounded bg-[#15954c] px-1 py-0.5 text-[8px] font-bold uppercase text-white">Active</span>}
-            <div className="flex flex-col items-center gap-1">
-                <img className="h-auto max-h-[28px] w-auto object-contain" src={GetNickIconUrl(iconKey)} alt={displayName || iconKey} />
-                <span className="max-w-[90px] truncate text-center text-[11px] font-bold">{displayName || iconKey}</span>
-            </div>
-        </div>
-    );
-};
+const cellClass = (isSelected: boolean, isActive: boolean) =>
+    `octane-inventory-identity-cell${isSelected ? ' is-selected' : ''}${isActive ? ' is-active' : ''}`;
 
 export const InventoryPrefixView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -105,15 +73,13 @@ export const InventoryPrefixView: FC<{}> = () => {
         deactivate: deactivateNickIcons = null
     } = useInventoryNickIcons();
     const { showConfirm = null } = useNotification();
-    const hasPrefixes = prefixes && prefixes.length > 0;
-    const hasNickIcons = nickIcons && nickIcons.length > 0;
     const selectedIconUrl = useMemo(() => (selectedNickIcon ? GetNickIconUrl(selectedNickIcon.iconKey) : ''), [selectedNickIcon]);
 
     const attemptDeletePrefix = () => {
         if (!selectedPrefix) return;
 
         showConfirm(
-            `Are you sure you want to delete the prefix {${selectedPrefix.text}}?`,
+            localizeWithFallback('inventory.prefixes.delete.confirm', 'Are you sure you want to delete the prefix ${prefix}?', ['prefix'], [`{${selectedPrefix.text}}`]),
             () => deletePrefix(selectedPrefix.id),
             null,
             null,
@@ -140,153 +106,142 @@ export const InventoryPrefixView: FC<{}> = () => {
         return () => setIsVisible(false);
     }, []);
 
-    return (
-        <div className="flex h-full flex-col gap-2">
-            <div className="shrink-0 rounded border border-black/10 bg-[#C9C9C9] p-1">
-                <div className="flex items-center gap-2">
-                    <button
-                        className={`rounded px-3 py-1.5 text-[11px] font-bold transition-colors ${activeTab === 'prefixes' ? 'bg-[#418db0] text-white' : 'bg-white text-black'}`}
-                        type="button"
-                        onClick={() => setActiveTab('prefixes')}
-                    >
-                        Prefixes
-                    </button>
-                    <button
-                        className={`rounded px-3 py-1.5 text-[11px] font-bold transition-colors ${activeTab === 'icons' ? 'bg-[#418db0] text-white' : 'bg-white text-black'}`}
-                        type="button"
-                        onClick={() => setActiveTab('icons')}
-                    >
-                        Icons
-                    </button>
-                </div>
-            </div>
+    const tabs: { id: InventoryIdentityTab; label: string }[] = [
+        { id: 'prefixes', label: localizeWithFallback('inventory.prefixes.tab.prefixes', 'Prefixes') },
+        { id: 'icons', label: localizeWithFallback('inventory.prefixes.tab.icons', 'Icons') }
+    ];
 
-            {activeTab === 'prefixes' && (
-                <div className="grid h-full grid-cols-12 gap-2">
-                    <div className="col-span-7 flex flex-col gap-1 overflow-auto pr-1">
-                        <div className="grid grid-cols-3 gap-1">
-                            {prefixes.map((prefix) => (
-                                <PrefixItemView
-                                    key={prefix.id}
-                                    isSelected={selectedPrefix?.id === prefix.id}
-                                    prefix={prefix}
-                                    onClick={() => setSelectedPrefix(prefix)}
-                                />
-                            ))}
-                        </div>
-                        {!hasPrefixes && (
-                            <div className="flex h-full items-center justify-center text-sm opacity-50">{LocalizeText('inventory.empty.title')}</div>
-                        )}
-                    </div>
-                    <div className="col-span-5 flex flex-col justify-between overflow-auto">
-                        {activePrefix && (
-                            <div className="flex flex-col gap-1">
-                                <span className="min-h-[1.25rem] truncate text-sm leading-5">Active prefix</span>
-                                <div className="flex items-center justify-center rounded-md border-2 border-green-400 bg-card-grid-item p-3">
-                                    <PrefixPreview
-                                        color={activePrefix.color}
-                                        effect={activePrefix.effect}
-                                        font={activePrefix.font}
-                                        icon={activePrefix.icon}
-                                        text={activePrefix.text}
-                                        textSize="text-lg"
-                                    />
-                                </div>
+    const activeLabel = localizeWithFallback('inventory.prefixes.active', 'Active');
+    const activateLabel = localizeWithFallback('inventory.prefixes.activate', 'Activate');
+    const deactivateLabel = localizeWithFallback('inventory.prefixes.deactivate', 'Deactivate');
+    const deleteLabel = localizeWithFallback('inventory.prefixes.delete', 'Delete');
+
+    return (
+        <NativeTextTree>
+            <div className="octane-inventory-identity">
+                <TabBar className="octane-inventory-identity-tabs" value={activeTab}>
+                    {tabs.map((tab) => (
+                        <TabBarTab
+                            key={tab.id}
+                            className={`octane-inventory-identity-tab${activeTab === tab.id ? ' is-active' : ''}`}
+                            value={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                        >
+                            {tab.label}
+                        </TabBarTab>
+                    ))}
+                </TabBar>
+
+                {activeTab === 'prefixes' &&
+                    (prefixes.length === 0 ? (
+                        <InventoryCategoryEmptyView
+                            desc={localizeWithFallback('inventory.empty.prefixes.desc', 'Prefixes you buy show up here.')}
+                            title={localizeWithFallback('inventory.empty.prefixes.title', 'You have no prefixes')}
+                        />
+                    ) : (
+                        <div className="octane-inventory-animals is-prefixes">
+                            <div className="octane-inventory-animal-grid">
+                                <ClassicScrollAreaView className="size-full">
+                                    <div className="octane-inventory-animal-cells">
+                                        {prefixes.map((prefix: IPrefixItem) => (
+                                            <BaseButton
+                                                key={prefix.id}
+                                                className={cellClass(selectedPrefix?.id === prefix.id, !!prefix.active)}
+                                                type="button"
+                                                onClick={() => setSelectedPrefix(prefix)}
+                                            >
+                                                <PrefixPreview color={prefix.color} effect={prefix.effect} font={prefix.font} icon={prefix.icon} text={prefix.text} />
+                                            </BaseButton>
+                                        ))}
+                                    </div>
+                                </ClassicScrollAreaView>
                             </div>
-                        )}
-                        {!activePrefix && (
-                            <div className="flex flex-col gap-1">
-                                <span className="min-h-[1.25rem] truncate text-sm leading-5">Active prefix</span>
-                                <div className="flex items-center justify-center rounded-md border-2 border-dashed border-card-grid-item-border bg-card-grid-item p-3 opacity-50">
-                                    <span className="text-sm">No active prefix</span>
-                                </div>
-                            </div>
-                        )}
-                        {!!selectedPrefix && (
-                            <div className="mt-2 flex flex-col gap-2">
-                                <div className="flex items-center justify-center gap-2 rounded bg-card-grid-item p-2">
-                                    <PrefixPreview
-                                        color={selectedPrefix.color}
-                                        effect={selectedPrefix.effect}
-                                        font={selectedPrefix.font}
-                                        icon={selectedPrefix.icon}
-                                        text={selectedPrefix.text}
-                                        textSize="text-lg"
-                                    />
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <NitroButton
-                                        className="grow"
-                                        onClick={() => (selectedPrefix.active ? deactivatePrefix() : activatePrefix(selectedPrefix.id))}
-                                    >
-                                        {selectedPrefix.active ? 'Deactivate' : 'Activate'}
-                                    </NitroButton>
-                                    {!selectedPrefix.active && (
-                                        <NitroButton className="bg-danger! hover:bg-danger/80! p-1" onClick={attemptDeletePrefix}>
-                                            <FaTrashAlt className="fa-icon" />
-                                        </NitroButton>
+                            <div className="octane-inventory-animal-preview">
+                                <div className="octane-inventory-animal-name">{selectedPrefix?.active ? activeLabel : ''}</div>
+                                <div className="octane-inventory-animal-image">
+                                    {selectedPrefix && (
+                                        <PrefixPreview
+                                            className="is-large"
+                                            color={selectedPrefix.color}
+                                            effect={selectedPrefix.effect}
+                                            font={selectedPrefix.font}
+                                            icon={selectedPrefix.icon}
+                                            text={selectedPrefix.text}
+                                        />
                                     )}
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
-
-            {activeTab === 'icons' && (
-                <div className="grid h-full grid-cols-12 gap-2">
-                    <div className="col-span-7 flex flex-col gap-1 overflow-auto pr-1">
-                        <div className="grid grid-cols-3 gap-1">
-                            {nickIcons.map((icon) => (
-                                <NickIconItemView
-                                    key={icon.id}
-                                    displayName={icon.displayName}
-                                    iconKey={icon.iconKey}
-                                    isActive={!!icon.active}
-                                    isSelected={selectedNickIcon?.id === icon.id}
-                                    onClick={() => setSelectedNickIcon(icon)}
-                                />
-                            ))}
-                        </div>
-                        {!hasNickIcons && <div className="flex h-full items-center justify-center text-sm opacity-50">No purchased icons yet</div>}
-                    </div>
-                    <div className="col-span-5 flex flex-col justify-between overflow-auto">
-                        <div className="flex flex-col gap-1">
-                            <span className="min-h-[1.25rem] truncate text-sm leading-5">Active icon</span>
-                            <div
-                                className={`flex min-h-[88px] items-center justify-center rounded-md border-2 bg-card-grid-item p-3 ${activeNickIcon ? 'border-green-400' : 'border-dashed border-card-grid-item-border opacity-50'}`}
-                            >
-                                {activeNickIcon && (
-                                    <img
-                                        className="h-auto max-h-[36px] w-auto object-contain"
-                                        src={GetNickIconUrl(activeNickIcon.iconKey)}
-                                        alt={activeNickIcon.displayName || activeNickIcon.iconKey}
-                                    />
-                                )}
-                                {!activeNickIcon && <span className="text-sm">No active icon</span>}
-                            </div>
-                        </div>
-                        {!!selectedNickIcon && (
-                            <div className="mt-2 flex flex-col gap-2">
-                                <div className="flex min-h-[100px] flex-col items-center justify-center gap-2 rounded bg-card-grid-item p-3 text-center">
-                                    <img
-                                        className="h-auto max-h-[40px] w-auto object-contain"
-                                        src={selectedIconUrl}
-                                        alt={selectedNickIcon.displayName || selectedNickIcon.iconKey}
-                                    />
-                                    <span className="text-sm font-bold">{selectedNickIcon.displayName || selectedNickIcon.iconKey}</span>
+                                <div className="octane-inventory-animal-description">
+                                    {!selectedPrefix && activePrefix && (
+                                        <>
+                                            {activeLabel}: <PrefixPreview color={activePrefix.color} effect={activePrefix.effect} font={activePrefix.font} icon={activePrefix.icon} text={activePrefix.text} />
+                                        </>
+                                    )}
                                 </div>
-                                <Button
-                                    disabled={false}
-                                    onClick={() => (selectedNickIcon.active ? deactivateNickIcon() : activateNickIcon(selectedNickIcon.id))}
-                                >
-                                    {selectedNickIcon.active ? 'Deactivate' : 'Activate'}
-                                </Button>
+                                <div className="octane-inventory-animal-actions">
+                                    <OctaneButton
+                                        className="octane-inventory-animal-place"
+                                        disabled={!selectedPrefix}
+                                        onClick={() => (selectedPrefix.active ? deactivatePrefix() : activatePrefix(selectedPrefix.id))}
+                                    >
+                                        {selectedPrefix?.active ? deactivateLabel : activateLabel}
+                                    </OctaneButton>
+                                    <OctaneButton className="octane-inventory-animal-place" disabled={!selectedPrefix || selectedPrefix.active} onClick={attemptDeletePrefix}>
+                                        {deleteLabel}
+                                    </OctaneButton>
+                                </div>
                             </div>
-                        )}
-                    </div>
-                </div>
-            )}
-        </div>
+                        </div>
+                    ))}
+
+                {activeTab === 'icons' &&
+                    (nickIcons.length === 0 ? (
+                        <InventoryCategoryEmptyView
+                            actionLabel={localizeWithFallback('inventory.empty.nickicons.action', 'Customize identity')}
+                            desc={localizeWithFallback('inventory.empty.nickicons.desc', 'Icons are bought in the identity customizer.')}
+                            onAction={() => CreateLinkEvent('customize/show')}
+                            title={localizeWithFallback('inventory.empty.nickicons.title', 'You have no icons')}
+                        />
+                    ) : (
+                        <div className="octane-inventory-animals is-prefixes">
+                            <div className="octane-inventory-animal-grid">
+                                <ClassicScrollAreaView className="size-full">
+                                    <div className="octane-inventory-animal-cells">
+                                        {nickIcons.map((icon) => (
+                                            <BaseButton
+                                                key={icon.id}
+                                                className={cellClass(selectedNickIcon?.id === icon.id, !!icon.active)}
+                                                type="button"
+                                                onClick={() => setSelectedNickIcon(icon)}
+                                            >
+                                                {GetNickIconUrl(icon.iconKey) && <img alt={icon.displayName || icon.iconKey} className="octane-inventory-identity-icon" src={GetNickIconUrl(icon.iconKey)} />}
+                                            </BaseButton>
+                                        ))}
+                                    </div>
+                                </ClassicScrollAreaView>
+                            </div>
+                            <div className="octane-inventory-animal-preview">
+                                <div className="octane-inventory-animal-name">{selectedNickIcon ? selectedNickIcon.displayName || selectedNickIcon.iconKey : ''}</div>
+                                <div className="octane-inventory-animal-image">
+                                    {selectedNickIcon && selectedIconUrl && (
+                                        <img alt={selectedNickIcon.displayName || selectedNickIcon.iconKey} className="octane-inventory-identity-icon is-large" src={selectedIconUrl} />
+                                    )}
+                                </div>
+                                <div className="octane-inventory-animal-description">
+                                    {!selectedNickIcon && activeNickIcon && `${activeLabel}: ${activeNickIcon.displayName || activeNickIcon.iconKey}`}
+                                </div>
+                                <div className="octane-inventory-animal-actions">
+                                    <OctaneButton
+                                        className="octane-inventory-animal-place"
+                                        disabled={!selectedNickIcon}
+                                        onClick={() => (selectedNickIcon.active ? deactivateNickIcon() : activateNickIcon(selectedNickIcon.id))}
+                                    >
+                                        {selectedNickIcon?.active ? deactivateLabel : activateLabel}
+                                    </OctaneButton>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+            </div>
+        </NativeTextTree>
     );
 };

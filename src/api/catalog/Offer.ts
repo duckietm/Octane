@@ -28,6 +28,8 @@ export class Offer implements IPurchasableOffer {
     private _clubLevel: number = 0;
     private _products: IProduct[];
     private _badgeCode: string;
+    private _chatStyleId: string = null;
+    private _isChatStyleOffer: boolean = false;
     private _bundlePurchaseAllowed: boolean = false;
     private _itemIds: string = '';
     private _haveOffer: boolean = false;
@@ -58,17 +60,41 @@ export class Offer implements IPurchasableOffer {
         this._bundlePurchaseAllowed = bundlePurchaseAllowed;
         this._itemIds = itemIds || '';
         this._haveOffer = haveOffer;
+        this._isChatStyleOffer = Offer.isChatStyleOnly(products);
 
         this.setPricingModelForProducts();
         this.setPricingType();
 
+        // AIR Offer: the first badge wins; a chat style that comes with other products is
+        // shown as an add-on next to the preview (catalogue_chatstyle_background).
         for (const product of products) {
             if (product.productType === ProductTypeEnum.BADGE) {
                 this._badgeCode = product.extraParam;
 
                 break;
             }
+
+            if (!this._isChatStyleOffer && product.productType === ProductTypeEnum.CHAT_STYLE) {
+                this._chatStyleId = product.extraParam;
+
+                break;
+            }
         }
+    }
+
+    /** AIR Offer: a chat style alone, or a chat style together with a badge, is sold as one product. */
+    public static isChatStyleOnly(products: IProduct[]): boolean {
+        if (!products) return false;
+
+        if (products.length === 1) return products[0].productType === ProductTypeEnum.CHAT_STYLE;
+
+        if (products.length === 2) {
+            const types = products.map((product) => product.productType);
+
+            return types.includes(ProductTypeEnum.CHAT_STYLE) && types.includes(ProductTypeEnum.BADGE);
+        }
+
+        return false;
     }
 
     public activate(): void {}
@@ -114,6 +140,8 @@ export class Offer implements IPurchasableOffer {
 
         if (this._products.length === 1) return this._products[0];
 
+        if (this._isChatStyleOffer) return this._products.find((product) => product.productType === ProductTypeEnum.CHAT_STYLE) ?? null;
+
         const products = Product.stripAddonProducts(this._products);
 
         if (products.length) return products[0];
@@ -139,6 +167,15 @@ export class Offer implements IPurchasableOffer {
 
     public get badgeCode(): string {
         return this._badgeCode;
+    }
+
+    /** The chat style sold as an add-on next to other products, or null. */
+    public get chatStyleId(): string {
+        return this._chatStyleId;
+    }
+
+    public get isChatStyleOffer(): boolean {
+        return this._isChatStyleOffer;
     }
 
     public get localizationName(): string {
@@ -182,6 +219,12 @@ export class Offer implements IPurchasableOffer {
     }
 
     private setPricingModelForProducts(): void {
+        if (this._isChatStyleOffer) {
+            this._pricingModel = Offer.PRICING_MODEL_SINGLE;
+
+            return;
+        }
+
         const products = Product.stripAddonProducts(this._products);
 
         if (products.length === 1) {

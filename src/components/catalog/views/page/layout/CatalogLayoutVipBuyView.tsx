@@ -1,313 +1,445 @@
-import { ClubOfferData, GiftReceiverNotFoundEvent, PurchaseFromCatalogAsGiftComposer, PurchaseFromCatalogComposer } from '@nitrots/nitro-renderer';
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CatalogPurchaseState, LocalizeText, SanitizeHtml, SendMessageComposer } from '../../../../../api';
-import { AutoGrid, Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutLoadingSpinnerView, Text } from '../../../../../common';
-import { CatalogEvent, CatalogPurchasedEvent, CatalogPurchaseFailureEvent } from '../../../../../events';
-import { useCatalogData, useCatalogSkipPurchaseConfirmation, useClubOffers, useMessageEvent, usePurse, useUiEvent, useUserDataSnapshot } from '../../../../../hooks';
+import { ClubOfferData, CreateLinkEvent, PurchaseFromCatalogComposer } from '@octane/renderer';
+import { FC, useCallback, useMemo, useRef, useState } from 'react';
+import {
+    CatalogPurchaseState,
+    DispatchUiEvent,
+    GetConfigurationValue,
+    LocalizeText,
+    OpenUrl,
+    SanitizeHtml,
+    SendMessageComposer,
+    ShowVipBenefits
+} from '../../../../../api';
+import vipIconMedium from '../../../../../assets/images/catalog/air/vip-icon-medium.png';
+import { Button, LayoutCurrencyIcon, LayoutLoadingSpinnerView } from '../../../../../common';
+import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
+import {
+    CatalogEvent,
+    CatalogInitGiftEvent,
+    CatalogPurchasedEvent,
+    CatalogPurchaseFailureEvent,
+    CatalogPurchaseNotAllowedEvent,
+    CatalogPurchaseSoldOutEvent
+} from '../../../../../events';
+import {
+    useCatalogActions,
+    useCatalogData,
+    useCatalogSkipPurchaseConfirmation,
+    useCatalogUiState,
+    useClubOffers,
+    useGiftConfiguration,
+    useNotification,
+    usePurse,
+    useUiEvent
+} from '../../../../../hooks';
+import { CatalogClubPurchaseConfirmView } from './CatalogClubPurchaseConfirmView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
+import { clubOffersWindowId, getClubMembershipSummary, groupClubOffers, isVipPurchaseLayout } from './clubPurchase.helpers';
 
-const VIP_WINDOW_ID = 1;
-
-export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = (props) => {
-    const [pendingOffer, setPendingOffer] = useState<ClubOfferData>(null);
+export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null }) => {
+    const [pendingOffer, setPendingOffer] = useState<ClubOfferData | null>(null);
+    const [purchaseWillBeGift, setPurchaseWillBeGift] = useState(false);
     const [purchaseState, setPurchaseState] = useState(CatalogPurchaseState.NONE);
     const [catalogSkipPurchaseConfirmation] = useCatalogSkipPurchaseConfirmation();
-    const [giftMode, setGiftMode] = useState(false);
-    const [giftRecipient, setGiftRecipient] = useState('');
-    const [giftError, setGiftError] = useState<string | null>(null);
-    const [giftSuccess, setGiftSuccess] = useState(false);
     const { currentPage = null } = useCatalogData();
+    const { resetPlacedOfferData = null } = useCatalogActions();
+    const { giftReceiver = null } = useCatalogUiState();
+    const { data: giftConfiguration = null } = useGiftConfiguration();
     const { purse = null, getCurrencyAmount = null } = usePurse();
-    const { data: offers = null } = useClubOffers(VIP_WINDOW_ID);
-    const { userName: ownUserName = '' } = useUserDataSnapshot();
-    const isPurchasingRef = useRef<boolean>(false);
-    const wasGiftPurchaseRef = useRef<boolean>(false);
-    const giftSuccessTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    const isSelfGift = giftMode && !!ownUserName && giftRecipient.trim().toLowerCase() === ownUserName.toLowerCase();
+    const { showConfirm = null, simpleAlert = null } = useNotification();
+    const isPurchasingRef = useRef(false);
+    const pageData = currentPage ?? page;
+    const layoutCode = pageData?.layoutCode ?? 'club_buy';
+    const isVipPage = isVipPurchaseLayout(layoutCode);
+    const { data: offers = null } = useClubOffers(clubOffersWindowId(layoutCode));
+    const offerGroups = useMemo(() => groupClubOffers(layoutCode, offers ?? []), [layoutCode, offers]);
+    const membership = useMemo(() => getClubMembershipSummary(purse), [purse]);
 
     const onCatalogEvent = useCallback((event: CatalogEvent) => {
+        if (!isPurchasingRef.current) return;
+
         switch (event.type) {
             case CatalogPurchasedEvent.PURCHASE_SUCCESS:
                 isPurchasingRef.current = false;
+                setPurchaseWillBeGift(false);
                 setPurchaseState(CatalogPurchaseState.NONE);
-                setGiftError(null);
-                if (wasGiftPurchaseRef.current) {
-                    wasGiftPurchaseRef.current = false;
-                    setGiftRecipient('');
-                    setGiftMode(false);
-                    setGiftSuccess(true);
-                    if (giftSuccessTimerRef.current) clearTimeout(giftSuccessTimerRef.current);
-                    giftSuccessTimerRef.current = setTimeout(() => setGiftSuccess(false), 3500);
-                }
+                setPendingOffer(null);
                 return;
+            // A refusal of any kind ends the purchase: "not allowed" and "sold out" used to leave it pending forever.
             case CatalogPurchaseFailureEvent.PURCHASE_FAILED:
+            case CatalogPurchaseNotAllowedEvent.NOT_ALLOWED:
+            case CatalogPurchaseSoldOutEvent.SOLD_OUT:
                 isPurchasingRef.current = false;
-                wasGiftPurchaseRef.current = false;
-                setPurchaseState(CatalogPurchaseState.FAILED);
+                setPurchaseWillBeGift(false);
+                setPurchaseState(CatalogPurchaseState.NONE);
+                setPendingOffer(null);
                 return;
         }
     }, []);
 
     useUiEvent(CatalogPurchasedEvent.PURCHASE_SUCCESS, onCatalogEvent);
     useUiEvent(CatalogPurchaseFailureEvent.PURCHASE_FAILED, onCatalogEvent);
+    useUiEvent(CatalogPurchaseNotAllowedEvent.NOT_ALLOWED, onCatalogEvent);
+    useUiEvent(CatalogPurchaseSoldOutEvent.SOLD_OUT, onCatalogEvent);
 
-    useEffect(
-        () => () => {
-            if (giftSuccessTimerRef.current) clearTimeout(giftSuccessTimerRef.current);
+    const getOfferText = useCallback(
+        (offer: ClubOfferData) => {
+            if (!isVipPage) return LocalizeText('catalog.club.item.header', ['months'], [offer.months.toString()]);
+
+            if (offer.months > 0) {
+                return LocalizeText('catalog.vip.item.header.months', ['num_months'], [offer.months.toString()]);
+            }
+
+            return LocalizeText('catalog.vip.item.header.days', ['num_days'], [offer.extraDays.toString()]);
         },
-        []
+        [isVipPage]
     );
 
-    const handleGiftReceiverNotFound = useCallback(() => {
-        if (!isPurchasingRef.current) return;
-        isPurchasingRef.current = false;
-        setPurchaseState(CatalogPurchaseState.NONE);
-        setGiftError(LocalizeText('catalog.gift_wrapping.receiver_not_found.title'));
+    const getPurchaseHeader = useCallback(
+        (offer: ClubOfferData) => {
+            const extensionOrSubscription = membership.tier === 'vip' ? 'extension.' : 'subscription.';
+            const daysOrMonths = offer.months === 0 ? 'days' : 'months';
+            const value = offer.months === 0 ? offer.extraDays : offer.months;
+
+            return LocalizeText(`catalog.vip.buy.confirm.${extensionOrSubscription}${daysOrMonths}`, [`num_${daysOrMonths}`], [value.toString()]);
+        },
+        [membership.tier]
+    );
+
+    const getPurchaseValidUntil = useCallback((offer: ClubOfferData) => {
+        return LocalizeText(
+            'catalog.vip.buy.confirm.end_date',
+            ['day', 'month', 'year'],
+            [offer.day.toString(), offer.month.toString(), offer.year.toString()]
+        );
     }, []);
 
-    useMessageEvent<GiftReceiverNotFoundEvent>(GiftReceiverNotFoundEvent, handleGiftReceiverNotFound);
+    const getActivityPointName = useCallback((type: number) => {
+        const fallbackLocalization = type === 0 ? 'tooltip.duckets' : type === 5 ? 'tooltip.diamonds' : '';
+        const currencyLocalization = GetConfigurationValue<string>(`activitypoint.name.${type}`, fallbackLocalization);
 
-    const getOfferText = useCallback((offer: ClubOfferData) => {
-        let offerText = '';
+        return currencyLocalization ? LocalizeText(currencyLocalization) : `#${type}`;
+    }, []);
 
-        if (offer.months > 0) {
-            offerText = LocalizeText('catalog.vip.item.header.months', ['num_months'], [offer.months.toString()]);
+    const showInsufficientBalanceAlert = useCallback(
+        (offer: ClubOfferData) => {
+            if (!getCurrencyAmount) return false;
+
+            if (offer.priceCredits > getCurrencyAmount(-1)) {
+                const description = LocalizeText('catalog.alert.notenough.credits.description');
+                const title = LocalizeText('catalog.alert.notenough.title');
+
+                if (showConfirm) {
+                    const settle = () => resetPlacedOfferData?.();
+
+                    showConfirm(
+                        description,
+                        () => {
+                            settle();
+
+                            const shopUrl = GetConfigurationValue<string>('web.shop.relativeUrl', '');
+
+                            if (shopUrl) OpenUrl(shopUrl);
+                        },
+                        settle,
+                        null,
+                        null,
+                        title
+                    );
+                } else {
+                    simpleAlert?.(description, null, null, null, title);
+                }
+
+                return true;
+            }
+
+            if (offer.priceActivityPoints > getCurrencyAmount(offer.priceActivityPointsType)) {
+                const currencyLocalization = GetConfigurationValue<string>(
+                    `activitypoint.name.${offer.priceActivityPointsType}`,
+                    offer.priceActivityPointsType === 0 ? 'tooltip.duckets' : ''
+                );
+
+                if (currencyLocalization) {
+                    const currencyName = LocalizeText(currencyLocalization);
+                    const description = LocalizeText('catalog.alert.notenough.activitypoints.description', ['currencyname'], [currencyName]);
+                    const title = LocalizeText('catalog.alert.notenough.activitypoints.title', ['currencyname'], [currencyName]);
+
+                    if (offer.priceActivityPointsType === 0 && showConfirm) {
+                        const settle = () => resetPlacedOfferData?.();
+
+                        showConfirm(
+                            description,
+                            () => {
+                                settle();
+
+                                const ducketsUrl = GetConfigurationValue<string>('link.format.duckets', '');
+
+                                if (ducketsUrl) OpenUrl(ducketsUrl);
+                            },
+                            settle,
+                            null,
+                            null,
+                            title
+                        );
+                    } else {
+                        simpleAlert?.(description, null, null, null, title);
+                    }
+                } else {
+                    simpleAlert?.(
+                        LocalizeText('catalog.alert.notenough.activitypoints.description'),
+                        null,
+                        null,
+                        null,
+                        LocalizeText(`catalog.alert.notenough.activitypoints.title.${offer.priceActivityPointsType}`)
+                    );
+                }
+
+                return true;
+            }
+
+            return false;
+        },
+        [getCurrencyAmount, resetPlacedOfferData, showConfirm, simpleAlert]
+    );
+
+    const submitPurchase = useCallback(
+        (offer: ClubOfferData) => {
+            if (!pageData || isPurchasingRef.current) return;
+
+            if (showInsufficientBalanceAlert(offer)) {
+                setPendingOffer(null);
+                setPurchaseState(CatalogPurchaseState.NONE);
+
+                return;
+            }
+
+            isPurchasingRef.current = true;
+            setPurchaseWillBeGift(false);
+            setPendingOffer(offer);
+            setPurchaseState(CatalogPurchaseState.PURCHASE);
+            SendMessageComposer(new PurchaseFromCatalogComposer(pageData.pageId, offer.offerId, null, 1));
+        },
+        [pageData, showInsufficientBalanceAlert]
+    );
+
+    const startPurchase = useCallback(
+        (offer: ClubOfferData) => {
+            if (isPurchasingRef.current) return;
+
+            if (showInsufficientBalanceAlert(offer)) return;
+
+            if (catalogSkipPurchaseConfirmation) {
+                submitPurchase(offer);
+                return;
+            }
+
+            setPurchaseWillBeGift(false);
+            setPendingOffer(offer);
+            setPurchaseState(CatalogPurchaseState.CONFIRM);
+        },
+        [catalogSkipPurchaseConfirmation, showInsufficientBalanceAlert, submitPurchase]
+    );
+
+    const startGift = useCallback(
+        (offer: ClubOfferData) => {
+            if (!pageData || isPurchasingRef.current || !offer.giftable) return;
+            if (showInsufficientBalanceAlert(offer)) return;
+
+            setPurchaseWillBeGift(true);
+            setPendingOffer(offer);
+            setPurchaseState(CatalogPurchaseState.CONFIRM);
+        },
+        [pageData, showInsufficientBalanceAlert]
+    );
+
+    const confirmPendingOffer = useCallback(() => {
+        if (!pendingOffer) return;
+
+        if (purchaseWillBeGift) {
+            if (!pageData) return;
+
+            DispatchUiEvent(new CatalogInitGiftEvent(pageData.pageId, pendingOffer.offerId, '', giftReceiver ?? ''));
+            setPurchaseWillBeGift(false);
+            setPendingOffer(null);
+            setPurchaseState(CatalogPurchaseState.NONE);
+            return;
         }
 
-        if (offer.extraDays > 0) {
-            if (offerText !== '') offerText += ' ';
+        submitPurchase(pendingOffer);
+    }, [giftReceiver, pageData, pendingOffer, purchaseWillBeGift, submitPurchase]);
 
-            offerText += ' ' + LocalizeText('catalog.vip.item.header.days', ['num_days'], [offer.extraDays.toString()]);
-        }
-
-        return offerText;
-    }, []);
-
-    const getPurchaseHeader = useCallback(() => {
-        if (!purse) return '';
-
-        const extensionOrSubscription = purse.clubDays > 0 || purse.clubPeriods > 0 ? 'extension.' : 'subscription.';
-        const daysOrMonths = pendingOffer.months === 0 ? 'days' : 'months';
-        const daysOrMonthsText = pendingOffer.months === 0 ? pendingOffer.extraDays : pendingOffer.months;
-        const locale = LocalizeText('catalog.vip.buy.confirm.' + extensionOrSubscription + daysOrMonths);
-
-        return locale.replace('%NUM_' + daysOrMonths.toUpperCase() + '%', daysOrMonthsText.toString());
-    }, [pendingOffer, purse]);
-
-    const getPurchaseValidUntil = useCallback(() => {
-        let locale = LocalizeText('catalog.vip.buy.confirm.end_date');
-
-        locale = locale.replace('%month%', pendingOffer.month.toString());
-        locale = locale.replace('%day%', pendingOffer.day.toString());
-        locale = locale.replace('%year%', pendingOffer.year.toString());
-
-        return locale;
-    }, [pendingOffer]);
-
-    const getSubscriptionDetails = useMemo(() => {
-        const clubDays = purse.clubDays;
-        const clubPeriods = purse.clubPeriods;
-        const totalDays = clubPeriods * 31 + clubDays;
-
-        return LocalizeText('catalog.vip.extend.info', ['days'], [totalDays.toString()]);
-    }, [purse]);
-
-    const purchaseSubscription = useCallback(() => {
-        if (!pendingOffer || isPurchasingRef.current) return;
-        if (giftMode && !giftRecipient.trim()) return;
-        if (isSelfGift) return;
-
-        isPurchasingRef.current = true;
-        wasGiftPurchaseRef.current = giftMode;
-        setPurchaseState(CatalogPurchaseState.PURCHASE);
-        setGiftError(null);
-        setGiftSuccess(false);
-
-        if (giftMode) {
-            SendMessageComposer(new PurchaseFromCatalogAsGiftComposer(currentPage.pageId, pendingOffer.offerId, '', giftRecipient.trim(), '', 0, 0, 0, false));
-        } else {
-            SendMessageComposer(new PurchaseFromCatalogComposer(currentPage.pageId, pendingOffer.offerId, null, 1));
-        }
-    }, [pendingOffer, currentPage, giftMode, giftRecipient, isSelfGift]);
-
-    const setOffer = useCallback((offer: ClubOfferData) => {
-        setPurchaseState(CatalogPurchaseState.NONE);
-        setPendingOffer(offer);
-        setGiftError(null);
-        setGiftSuccess(false);
-        if (!offer?.giftable) setGiftMode(false);
-    }, []);
-
-    const onGiftRecipientChange = useCallback((value: string) => {
-        setGiftRecipient(value);
-        setGiftError(null);
-        setGiftSuccess(false);
-    }, []);
-
-    const getPurchaseButton = useCallback(() => {
-        if (!pendingOffer) return null;
-
-        if (pendingOffer.priceCredits > getCurrencyAmount(-1)) {
+    const renderPrice = (offer: ClubOfferData) => {
+        if (!isVipPage) {
             return (
-                <Button fullWidth variant="danger">
-                    {LocalizeText('catalog.alert.notenough.title')}
-                </Button>
+                <NativeTextTree>
+                    <span className="octane-club-offer-prices is-compact-text">
+                        {offer.priceCredits > 0 && LocalizeText('catalog.club.price', ['price'], [offer.priceCredits.toString()])}
+                        {offer.priceCredits > 0 && offer.priceActivityPoints > 0 && ' + '}
+                        {offer.priceActivityPoints > 0 && `${offer.priceActivityPoints} ${getActivityPointName(offer.priceActivityPointsType)}`}
+                    </span>
+                </NativeTextTree>
             );
         }
 
-        if (pendingOffer.priceActivityPoints > getCurrencyAmount(pendingOffer.priceActivityPointsType)) {
-            return (
-                <Button fullWidth variant="danger">
-                    {LocalizeText('catalog.alert.notenough.activitypoints.title.' + pendingOffer.priceActivityPointsType)}
-                </Button>
-            );
-        }
+        return (
+            <NativeTextTree>
+                <span className="octane-club-offer-prices">
+                    {offer.priceCredits > 0 && (
+                        <span className="octane-club-offer-price" data-currency-type="-1">
+                            <span>{offer.priceCredits}</span>
+                            <LayoutCurrencyIcon type={-1} />
+                        </span>
+                    )}
+                    {offer.priceActivityPoints > 0 && (
+                        <>
+                            {offer.priceCredits > 0 && <span className="octane-club-price-separator">+</span>}
+                            <span className="octane-club-offer-price" data-currency-type={offer.priceActivityPointsType}>
+                                <span>{offer.priceActivityPoints}</span>
+                                <LayoutCurrencyIcon type={offer.priceActivityPointsType} />
+                            </span>
+                        </>
+                    )}
+                </span>
+            </NativeTextTree>
+        );
+    };
 
-        const giftBlocked = giftMode && (!giftRecipient.trim() || isSelfGift);
-        const buyLabel = giftMode ? LocalizeText('catalog.gift_wrapping.give_gift') : LocalizeText('buy');
+    const renderOffer = (offer: ClubOfferData) => {
+        const isPending = pendingOffer?.offerId === offer.offerId;
 
-        switch (purchaseState) {
-            case CatalogPurchaseState.CONFIRM:
-                return (
-                    <Button disabled={giftBlocked} fullWidth variant="warning" onClick={purchaseSubscription}>
-                        {LocalizeText('catalog.marketplace.confirm_title')}
-                    </Button>
-                );
-            case CatalogPurchaseState.PURCHASE:
-                return (
-                    <Button disabled fullWidth variant="primary">
-                        <LayoutLoadingSpinnerView />
-                    </Button>
-                );
-            case CatalogPurchaseState.FAILED:
-                return (
-                    <Button disabled fullWidth variant="danger">
-                        {LocalizeText('generic.failed')}
-                    </Button>
-                );
-            case CatalogPurchaseState.NONE:
-            default:
-                return (
-                    <Button disabled={giftBlocked} fullWidth variant="success" onClick={() => (catalogSkipPurchaseConfirmation ? purchaseSubscription() : setPurchaseState(CatalogPurchaseState.CONFIRM))}>
-                        {buyLabel}
-                    </Button>
-                );
-        }
-    }, [pendingOffer, purchaseState, purchaseSubscription, getCurrencyAmount, giftMode, giftRecipient, isSelfGift, catalogSkipPurchaseConfirmation]);
+        return (
+            <article
+                key={offer.offerId}
+                className={`octane-club-offer ${isVipPage ? 'is-wide' : 'is-compact'} ${offer.vip ? 'is-vip' : 'is-hc'}`}
+                data-offer-id={offer.offerId}
+            >
+                <header className="octane-club-offer-header">
+                    {isVipPage ? (
+                        <img alt="" aria-hidden="true" className="octane-club-vip-medium-mark" draggable={false} src={vipIconMedium} />
+                    ) : (
+                        <span aria-hidden="true" className={`octane-club-compact-mark ${offer.vip ? 'is-vip' : 'is-hc'}`} />
+                    )}
+                    <strong>{getOfferText(offer)}</strong>
+                </header>
+                <div className="octane-club-offer-footer">
+                    {renderPrice(offer)}
+                    <div className="octane-club-offer-actions">
+                        {isVipPage && giftConfiguration?.isEnabled && offer.giftable && (
+                            <Button classNames={['octane-club-offer-action']} disabled={isPurchasingRef.current} onClick={() => startGift(offer)}>
+                                {LocalizeText('catalog.purchase_confirmation.gift')}
+                            </Button>
+                        )}
+                        <Button classNames={['octane-club-offer-action', 'is-buy']} disabled={isPurchasingRef.current} onClick={() => startPurchase(offer)}>
+                            {isPending && purchaseState === CatalogPurchaseState.PURCHASE ? (
+                                <LayoutLoadingSpinnerView />
+                            ) : (
+                                LocalizeText('catalog.club.button.buy')
+                            )}
+                        </Button>
+                    </div>
+                </div>
+            </article>
+        );
+    };
+
+    const membershipHeaderKey = {
+        hc: 'catalog.club.buy.header.hc',
+        none: 'catalog.club.buy.header.none',
+        vip: 'catalog.club.buy.header.vip'
+    }[membership.tier];
+    const membershipInfoKey = {
+        hc: 'catalog.club.buy.info.hc',
+        none: 'catalog.club.buy.info.none',
+        vip: 'catalog.club.buy.info.vip'
+    }[membership.tier];
+    const remainingKey = membership.tier === 'vip' ? 'catalog.club.buy.remaining.vip' : 'catalog.club.buy.remaining.hc';
+    const teaserImage = pageData?.localization.getImage(1) ?? '';
+    const vipTitleKey = membership.tier === 'vip' ? 'catalog.vip.extend.title' : 'catalog.vip.buy.title';
+    const vipInfo =
+        membership.tier === 'vip' ? LocalizeText('catalog.vip.extend.info', ['days'], [membership.totalDays.toString()]) : LocalizeText('catalog.vip.buy.info');
 
     return (
-        <Grid>
-            <Column fullHeight justifyContent="between" overflow="hidden" size={7}>
-                <AutoGrid className="nitro-catalog-layout-vip-buy-grid" columnCount={1}>
-                    {offers &&
-                        offers.length > 0 &&
-                        offers.map((offer, index) => {
-                            const isActive = pendingOffer === offer;
-
-                            return (
-                                <div
-                                    key={index}
-                                    className={
-                                        'nitro-vip-buy-offer flex flex-col gap-1.5 p-2 rounded-md border-2 cursor-pointer ' +
-                                        (isActive
-                                            ? 'active border-[#7a5500] bg-[#ffe066]'
-                                            : 'border-[#b48a18] bg-[#fffbe7] hover:bg-[#fff5c4] hover:border-[#9c7610]')
-                                    }
-                                    onClick={() => setOffer(offer)}
-                                >
-                                    <div className="vip-offer-header flex items-center gap-2 pb-1.5 border-b border-dashed border-[#b48a18]">
-                                        <span className="vip-offer-banner inline-flex items-center justify-center shrink-0 w-[34px] h-[20px]">
-                                            <i className="nitro-icon icon-hc-banner nitro-catalog-vip-hc-banner" />
-                                        </span>
-                                        <span className="vip-offer-title flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-bold text-[1.05rem] leading-tight text-[#2c2a25]">
-                                            {getOfferText(offer)}
-                                        </span>
-                                    </div>
-                                    <div className="vip-offer-prices flex flex-col gap-1">
-                                        {offer.priceCredits > 0 && (
-                                            <span className="vip-offer-price flex items-center gap-1.5 font-bold text-[0.95rem] leading-tight text-[#4a473e] whitespace-nowrap">
-                                                <LayoutCurrencyIcon type={-1} />
-                                                <span>{offer.priceCredits}</span>
-                                            </span>
-                                        )}
-                                        {offer.priceActivityPoints > 0 && (
-                                            <span className="vip-offer-price flex items-center gap-1.5 font-bold text-[0.95rem] leading-tight text-[#4a473e] whitespace-nowrap">
-                                                <LayoutCurrencyIcon type={offer.priceActivityPointsType} />
-                                                <span>{offer.priceActivityPoints}</span>
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                </AutoGrid>
-                <Text center dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('catalog.vip.buy.hccenter')) }}></Text>
-            </Column>
-            <Column overflow="hidden" size={5}>
-                <Column center fullHeight overflow="hidden">
-                    {currentPage.localization.getImage(1) && <img alt="" src={currentPage.localization.getImage(1)} />}
-                    <Text center dangerouslySetInnerHTML={{ __html: SanitizeHtml(getSubscriptionDetails) }} overflow="auto" />
-                </Column>
-                {pendingOffer && (
-                    <Column fullWidth grow justifyContent="end">
-                        <Flex alignItems="end">
-                            <Column grow gap={0}>
-                                <Text fontWeight="bold">{giftMode ? LocalizeText('catalog.purchase_confirmation.gift') : getPurchaseHeader()}</Text>
-                                <Text>{getPurchaseValidUntil()}</Text>
-                            </Column>
-                            <div className="flex flex-col gap-1">
-                                {pendingOffer.priceCredits > 0 && (
-                                    <Flex alignItems="center" gap={1} justifyContent="end">
-                                        <Text>{pendingOffer.priceCredits}</Text>
-                                        <LayoutCurrencyIcon type={-1} />
-                                    </Flex>
-                                )}
-                                {pendingOffer.priceActivityPoints > 0 && (
-                                    <Flex alignItems="center" gap={1} justifyContent="end">
-                                        <Text>{pendingOffer.priceActivityPoints}</Text>
-                                        <LayoutCurrencyIcon type={pendingOffer.priceActivityPointsType} />
-                                    </Flex>
-                                )}
+        <NativeTextTree>
+            <div className={`octane-club-purchase-layout ${isVipPage ? 'is-vip-page' : 'is-club-page'}`}>
+                {isVipPage ? (
+                    <>
+                        <div className="octane-club-vip-intro">
+                            {teaserImage ? <img alt="" className="octane-club-teaser" src={teaserImage} /> : <span className="octane-club-teaser" />}
+                            <div className="octane-club-vip-copy">
+                                <strong>{LocalizeText(vipTitleKey)}</strong>
+                                <span>{vipInfo}</span>
                             </div>
-                        </Flex>
-                        {pendingOffer.giftable && (
-                            <Column className="mt-1" gap={1}>
-                                <Flex alignItems="center" gap={2}>
-                                    <label className="flex items-center gap-1 cursor-pointer text-sm">
-                                        <input
-                                            checked={giftMode}
-                                            className="cursor-pointer"
-                                            type="checkbox"
-                                            onChange={(event) => {
-                                                setGiftMode(event.target.checked);
-                                                setGiftError(null);
-                                                setGiftSuccess(false);
-                                            }}
-                                        />
-                                        <span>{LocalizeText('catalog.purchase_confirmation.gift')}</span>
-                                    </label>
-                                    {giftMode && (
-                                        <input
-                                            className="flex-1 min-w-0 border border-[#b48a18] bg-white rounded px-2 py-1 text-sm"
-                                            placeholder={LocalizeText('catalog.gift_wrapping.receiver')}
-                                            type="text"
-                                            value={giftRecipient}
-                                            onChange={(event) => onGiftRecipientChange(event.target.value)}
-                                        />
-                                    )}
-                                </Flex>
-                                {giftMode && isSelfGift && (
-                                    <Text className="text-[#b00020] text-xs">{LocalizeText('catalog.gift_wrapping.cannot_send_to_self')}</Text>
-                                )}
-                                {giftMode && giftError && !isSelfGift && <Text className="text-[#b00020] text-xs">{giftError}</Text>}
-                                {giftSuccess && <Text className="text-[#1f7a1f] text-sm font-bold">{LocalizeText('catalog.gift_wrapping.gift_sent')}</Text>}
-                            </Column>
+                        </div>
+                        <div className="octane-club-vip-offers">{offerGroups.vip.map(renderOffer)}</div>
+                        {/* AIR layout_loyalty_vip_buy has vip_link (VipBuyCatalogWidget.initLinks -> showVipBenefits) where layout_vip_buy has the HC Center link. */}
+                        {layoutCode === 'loyalty_vip_buy' ? (
+                            <BaseButton className="octane-club-vip-benefits-link" onClick={() => ShowVipBenefits()}>
+                                {LocalizeText('catalog.vip.buy.link')}
+                            </BaseButton>
+                        ) : (
+                            <div
+                                className="octane-club-center-link"
+                                dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('catalog.vip.buy.hccenter')) }}
+                                role="link"
+                                tabIndex={0}
+                                onClick={(event) => {
+                                    event.preventDefault();
+                                    CreateLinkEvent('habboUI/open/hccenter');
+                                }}
+                                onKeyDown={(event) => {
+                                    if (event.key !== 'Enter' && event.key !== ' ') return;
+
+                                    event.preventDefault();
+                                    CreateLinkEvent('habboUI/open/hccenter');
+                                }}
+                            />
                         )}
-                        {getPurchaseButton()}
-                    </Column>
+                    </>
+                ) : (
+                    <>
+                        <header className="octane-club-membership-header">
+                            <strong>{LocalizeText(membershipHeaderKey)}</strong>
+                        </header>
+                        <p className="octane-club-membership-info">{LocalizeText(membershipInfoKey)}</p>
+                        <div className="octane-club-emblem" aria-hidden="true">
+                            <span className="octane-club-vip-emblem" />
+                        </div>
+                        <div className="octane-club-columns">
+                            <section className="octane-club-hc-column">
+                                {offerGroups.hc.map(renderOffer)}
+                                {membership.tier === 'vip' && (
+                                    <div className="octane-club-info-card">
+                                        <strong>{LocalizeText('catalog.club.info.header')}</strong>
+                                        <span>{LocalizeText('catalog.club.info.content')}</span>
+                                    </div>
+                                )}
+                            </section>
+                            <section className="octane-club-vip-column">{offerGroups.vip.map(renderOffer)}</section>
+                        </div>
+                        {membership.active && (
+                            <div className="octane-club-remaining">{LocalizeText(remainingKey, ['days'], [membership.totalDays.toString()])}</div>
+                        )}
+                        <BaseButton className="octane-club-center-link" type="button" onClick={() => CreateLinkEvent('habboUI/open/hccenter')}>
+                            {LocalizeText('catalog.club.buy.link')}
+                        </BaseButton>
+                    </>
                 )}
-            </Column>
-        </Grid>
+
+                {pendingOffer && purchaseState !== CatalogPurchaseState.NONE && purchaseState !== CatalogPurchaseState.PURCHASE && (
+                    <CatalogClubPurchaseConfirmView
+                        offer={pendingOffer}
+                        productText={getPurchaseHeader(pendingOffer)}
+                        validUntilText={getPurchaseValidUntil(pendingOffer)}
+                        onCancel={() => {
+                            setPurchaseWillBeGift(false);
+                            setPendingOffer(null);
+                            setPurchaseState(CatalogPurchaseState.NONE);
+                        }}
+                        onConfirm={confirmPendingOffer}
+                    />
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

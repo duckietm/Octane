@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="new_moderation_tool" width="238" height="206" version="0.1" uid="A30BE66B-4D1A-FE18-63EC-D95D54939667">
+  <window>
+    <frame x="42" y="42" width="238" height="206" params="32769" style="100" caption="%24%7Bmoderation.title%7D" color="0x0418db0">
+      <filters>
+        <DropShadowFilter angle="0" alpha="0.34901960784313724" blurX="20" blurY="20"/>
+      </filters>
+      <children>
+        <container x="0" y="0" width="238" height="173" params="2192" style="3" name="main_view" visible="false">
+          <children>
+            <itemlist_vertical x="11" y="7" width="215" height="154" params="144" style="3">
+              <children>
+                <button x="0" y="0" width="214" height="25" params="131089" style="102" name="ban_user_btn" caption="%24%7Bmoderation.main.ban_users%7D" color="0x0eeeeee" width_min="214"/>
+                <button x="0" y="32" width="214" height="25" params="131089" style="102" name="hotel_alert_btn" caption="%24%7Bmoderation.main.hotel_alert%7D" id="1" color="0x0eeeeee" width_min="214"/>
+                <button x="0" y="64" width="214" height="25" params="131089" style="102" name="send_warning_btn" caption="%24%7Bmoderation.main.send_warning%7D" id="2" color="0x0eeeeee" width_min="214"/>
+                <button x="0" y="96" width="214" height="25" params="131089" style="102" name="give_coins_btn" caption="%24%7Bmoderation.main.give_coins%7D" id="3" color="0x0eeeeee" width_min="214"/>
+                <button x="0" y="128" width="214" height="25" params="131089" style="102" name="give_furni_btn" caption="%24%7Bmoderation.main.give_furni%7D" id="4" color="0x0eeeeee" width_min="214"/>
+              </children>
+              <variables>
+                <var key="spacing" value="7" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </container>
+        <container x="0" y="0" width="238" height="173" params="2192" style="3" name="subview_wrapper">
+          <children>
+            <container_button x="9" y="133" width="27" height="26" params="17" style="103" name="return_btn">
+              <children>
+                <icon x="8" y="9" width="14" height="11" params="16" style="2" color="0x0555555"/>
+              </children>
+            </container_button>
+            <container x="0" y="0" width="238" height="173" params="2192" style="0" name="hotel_alert_view" visible="false">
+              <children>
+                <text x="9" y="8" width="106" height="16" params="16" style="3" name="hotel_alert_txt" caption="%24%7Bmoderation.hotel_alert.title%7D" color="0x00">
+                  <variables>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x333333" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <border x="9" y="29" width="217" height="96" params="144" style="105" name="message_border">
+                  <children>
+                    <input x="5" y="5" width="207" height="86" params="2177" style="3" name="hotel_alert_input">
+                      <variables>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="multiline" value="true" type="Boolean"/>
+                        <var key="word_wrap" value="true" type="Boolean"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                      </variables>
+                    </input>
+                  </children>
+                </border>
+                <button x="44" y="133" width="181" height="26" params="131089" style="103" name="send_hotel_alert_btn" caption="%24%7Bmoderation.hotel_alert.send%7D" width_min="181"/>
+              </children>
+            </container>
+            <container x="0" y="0" width="238" height="173" params="2192" style="0" name="send_warning_view" visible="false">
+              <children>
+                <text x="9" y="8" width="57" height="16" params="16" style="3" name="user_txt" caption="%24%7Bmoderation.warning.user%7D" color="0x00">
+                  <variables>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x333333" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <border x="9" y="29" width="217" height="26" params="144" style="105">
+                  <children>
+                    <input x="5" y="5" width="207" height="16" params="2177" style="3" name="warning_username_input">
+                      <variables>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                      </variables>
+                    </input>
+                  </children>
+                </border>
+                <text x="9" y="59" width="72" height="16" params="16" style="3" name="text_txt" caption="%24%7Bmoderation.warning.text%7D" color="0x00">
+                  <variables>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x333333" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <border x="9" y="81" width="217" height="44" params="144" style="105">
+                  <children>
+                    <input x="5" y="5" width="207" height="34" params="2177" style="3" name="warning_input">
+                      <variables>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="multiline" value="true" type="Boolean"/>
+                        <var key="word_wrap" value="true" type="Boolean"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                      </variables>
+                    </input>
+                  </children>
+                </border>
+                <button x="44" y="133" width="181" height="26" params="131089" style="103" name="send_warning_btn" caption="%24%7Bmoderation.warning.send%7D" width_min="181"/>
+              </children>
+            </container>
+            <container x="0" y="0" width="238" height="173" params="2192" style="0" name="give_coins_view" visible="false">
+              <children>
+                <text x="9" y="8" width="57" height="16" params="16" style="3" name="user_txt" caption="%24%7Bmoderation.give_coins.user%7D" color="0x00">
+                  <variables>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x333333" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <border x="9" y="29" width="217" height="26" params="144" style="105">
+                  <children>
+                    <input x="5" y="5" width="204" height="16" params="2177" style="3" name="give_coins_username_input" caption="name">
+                      <variables>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                        <var key="editable" value="false" type="Boolean"/>
+                      </variables>
+                    </input>
+                  </children>
+                </border>
+                <text x="9" y="66" width="131" height="16" params="16" style="3" name="amount_txt" caption="%24%7Bmoderation.give_coins.amount%7D" color="0x00">
+                  <variables>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x333333" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <border x="10" y="87" width="86" height="26" params="144" style="105">
+                  <children>
+                    <input x="5" y="5" width="76" height="16" params="2177" style="3" name="amount_coins_input" caption="1">
+                      <variables>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="multiline" value="true" type="Boolean"/>
+                        <var key="restrict" value="0-9" type="String"/>
+                        <var key="word_wrap" value="true" type="Boolean"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                        <var key="editable" value="false" type="Boolean"/>
+                      </variables>
+                    </input>
+                  </children>
+                </border>
+                <button x="44" y="133" width="181" height="26" params="131089" style="103" name="add_coins_btn" caption="%24%7Bmoderation.give_coins.add%7D" width_min="181"/>
+                <iconbutton x="103" y="89" width="30" height="30" params="17" style="4" name="minus_btn_coins" background="true" treshold="0"/>
+                <iconbutton x="132" y="89" width="30" height="30" params="17" style="3" name="plus_btn_coins" background="true" treshold="0"/>
+              </children>
+            </container>
+            <container x="0" y="0" width="238" height="173" params="2192" style="0" name="give_furni_view">
+              <children>
+                <text x="9" y="8" width="57" height="16" params="16" style="3" name="user_txt" caption="%24%7Bmoderation.give_furni.user%7D" color="0x00">
+                  <variables>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x333333" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <border x="9" y="29" width="217" height="26" params="144" style="105">
+                  <children>
+                    <input x="5" y="5" width="204" height="16" params="2177" style="3" name="give_furni_username_input" caption="name">
+                      <variables>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                      </variables>
+                    </input>
+                  </children>
+                </border>
+                <text x="134" y="66" width="45" height="16" params="16" style="3" name="amount_txt" caption="%24%7Bmoderation.give_furni.amount%7D" color="0x00">
+                  <variables>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x333333" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <border x="134" y="87" width="34" height="26" params="144" style="105">
+                  <children>
+                    <input x="5" y="5" width="24" height="16" params="2177" style="3" name="amount_furni_input" caption="1">
+                      <variables>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="multiline" value="true" type="Boolean"/>
+                        <var key="restrict" value="0-9" type="String"/>
+                        <var key="word_wrap" value="true" type="Boolean"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                        <var key="editable" value="false" type="Boolean"/>
+                      </variables>
+                    </input>
+                  </children>
+                </border>
+                <text x="9" y="66" width="76" height="16" params="16" style="3" name="product_name_txt" caption="%24%7Bmoderation.give_furni.product%7D" color="0x00">
+                  <variables>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x333333" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <border x="9" y="87" width="110" height="26" params="144" style="105">
+                  <children>
+                    <input x="5" y="5" width="97" height="16" params="2177" style="3" name="product_name_input" caption="throne">
+                      <variables>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                      </variables>
+                    </input>
+                  </children>
+                </border>
+                <iconbutton x="175" y="89" width="30" height="30" params="17" style="4" name="minus_btn_furni" background="true" treshold="0"/>
+                <iconbutton x="204" y="89" width="30" height="30" params="17" style="3" name="plus_btn_furni" background="true" treshold="0"/>
+                <button x="44" y="133" width="181" height="26" params="131089" style="103" name="add_furni_btn" caption="%24%7Bmoderation.give_furni.add%7D" width_min="181"/>
+              </children>
+            </container>
+            <container x="0" y="0" width="238" height="173" params="2192" style="0" name="ban_view" visible="false">
+              <children>
+                <text x="9" y="8" width="57" height="16" params="16" style="3" name="user_txt" caption="%24%7Bmoderation.ban_management.user%7D" color="0x00">
+                  <variables>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x333333" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <border x="9" y="29" width="217" height="26" params="144" style="105">
+                  <children>
+                    <input x="5" y="5" width="204" height="16" params="2177" style="3" name="ban_username_input">
+                      <variables>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                      </variables>
+                    </input>
+                  </children>
+                </border>
+                <selector x="13" y="62" width="210" height="54" params="145" style="3" name="ban_type">
+                  <children>
+                    <radiobutton x="0" y="25" width="13" height="16" params="17" style="100" name="unban_radio" treshold="0" height_min="16" height_max="16"/>
+                    <radiobutton x="0" y="4" width="12" height="16" params="17" style="100" name="ban_radio" treshold="0" height_min="16" height_max="16"/>
+                  </children>
+                </selector>
+                <button x="44" y="133" width="181" height="26" params="131089" style="103" name="ban_btn" caption="%24%7Bmoderation.ban_management.do%7D" width_min="181"/>
+                <text x="28" y="65" width="47" height="16" params="16" style="3" caption="%24%7Bmoderation.ban_management.ban%7D">
+                  <variables>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x333333" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <text x="28" y="86" width="63" height="16" params="16" style="3" caption="%24%7Bmoderation.ban_management.unban%7D">
+                  <variables>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x333333" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <dropmenu x="124" y="63" width="101" height="22" params="81" style="100" name="duration_selector" caption="1%20Month">
+                  <variables>
+                    <var key="item_array">
+                      <value>
+                        <Array>
+                          <var key="0" value="1 Hour" type="String"/>
+                          <var key="1" value="3 Hours" type="String"/>
+                          <var key="2" value="1 Day" type="String"/>
+                          <var key="3" value="7 Days" type="String"/>
+                          <var key="4" value="1 Month" type="String"/>
+                          <var key="5" value="3 Months" type="String"/>
+                          <var key="6" value="Permanent" type="String"/>
+                        </Array>
+                      </value>
+                    </var>
+                  </variables>
+                </dropmenu>
+              </children>
+            </container>
+          </children>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="0" type="int"/>
+        <var key="margin_top" value="33" type="int"/>
+        <var key="margin_right" value="0" type="int"/>
+        <var key="margin_bottom" value="0" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

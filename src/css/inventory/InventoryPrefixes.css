@@ -1,0 +1,130 @@
+/* The prefixes and icons page, laid out like the pets and bots pages: the cells at the left, the
+   preview, its line and the buttons at the right. */
+.octane-inventory-identity {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.octane-inventory-identity > .octane-inventory-animals,
+.octane-inventory-identity > .octane-inventory-empty {
+    flex: 1 1 0;
+    height: auto;
+    min-height: 0;
+}
+
+.octane-inventory-identity-tabs {
+    display: flex;
+    flex: none;
+    gap: 2px;
+}
+
+.octane-inventory-identity-tab {
+    min-width: 70px;
+    height: 22px;
+    padding: 0 10px;
+    border: 1px solid #919191;
+    border-radius: 3px;
+    background: #cfcfcf;
+    color: #000000;
+    font-size: 12px;
+    line-height: 20px;
+    cursor: pointer;
+}
+
+.octane-inventory-identity-tab.is-active {
+    border-color: #2f6982;
+    background: #ffffff;
+    font-weight: 700;
+}
+
+.octane-inventory-animals.is-prefixes .octane-inventory-animal-cells {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 3px;
+}
+
+.octane-inventory-identity-cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: 34px;
+    padding: 0 6px;
+    overflow: hidden;
+    border: 1px solid #1c1c1c;
+    border-radius: 3px;
+    background: #33373b;
+    cursor: pointer;
+}
+
+.octane-inventory-identity-cell.is-selected {
+    outline: 2px solid #ffffff;
+    outline-offset: -3px;
+}
+
+.octane-inventory-identity-cell.is-active::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #3fb34f;
+}
+
+.octane-inventory-prefix-text {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.octane-inventory-prefix-text.is-large {
+    font-size: 16px;
+}
+
+.octane-inventory-prefix-icon {
+    margin-right: 2px;
+}
+
+.octane-inventory-identity-icon {
+    max-width: 100%;
+    max-height: 26px;
+    object-fit: contain;
+}
+
+.octane-inventory-identity-icon.is-large {
+    max-height: 56px;
+}
+
+/* The preview is a dark well wide enough for a prefix, not the tall box a pet needs. */
+.octane-inventory-animals.is-prefixes .octane-inventory-animal-image {
+    top: 24px;
+    left: 0;
+    width: 180px;
+    height: 74px;
+    border: 1px solid #1c1c1c;
+    border-radius: 3px;
+    background: #33373b;
+}
+
+.octane-inventory-animals.is-prefixes .octane-inventory-animal-description {
+    top: 104px;
+    left: 0;
+    width: 180px;
+    height: 34px;
+    color: #000000;
+}
+
+.octane-inventory-animals.is-prefixes .octane-inventory-animal-actions {
+    top: 144px;
+    left: 0;
+}

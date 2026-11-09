@@ -29,21 +29,21 @@ env:
   # configured. Override per-fork via the RENDERER_REPO / RENDERER_REF
   # repository variables (Settings → Secrets and variables → Actions →
   # Variables) or, for one-off runs, via the workflow_dispatch inputs.
-  UPSTREAM_RENDERER_REPO: 'duckietm/Nitro_Render_V3'
+  UPSTREAM_RENDERER_REPO: 'duckietm/Octane-Renderer'
 
 jobs:
   check:
     name: Type check + tests
     runs-on: ubuntu-latest
     steps:
-      # The build/dev/typecheck setup expects the Nitro renderer SDK to
+      # The build/dev/typecheck setup expects the Octane renderer SDK to
       # live as a sibling of this repo (see CLAUDE.md → Setup walkthrough).
-      # Mirror that here by checking the client into <workspace>/Nitro-V3
-      # and the renderer into <workspace>/Nitro_Render_V3.
-      - name: Checkout Nitro-V3
-        uses: actions/checkout@v4
+      # Mirror that here by checking the client into <workspace>/octane
+      # and the renderer into <workspace>/octane-renderer.
+      - name: Checkout Octane
+        uses: actions/checkout@v7
         with:
-          path: Nitro-V3
+          path: octane
 
       # Resolve the renderer pairing with a clear precedence, from most
       # specific to most generic — no fork names or feature branches are
@@ -55,11 +55,11 @@ jobs:
       #        → per-fork config set under Settings → Variables, applies
       #          to push and pull_request runs without editing this file.
       #   3. dynamic, owner-aware default (no hardcoded fork name)
-      #        → <github.repository_owner>/Nitro_Render_V3 when it carries
-      #          the resolved ref, else UPSTREAM_RENDERER_REPO. Ref is
-      #          `main` on a main build, otherwise `Dev`. So a fork's
-      #          client pairs with the fork's renderer when the companion
-      #          code lives there, and with upstream when it doesn't.
+      #        → a fork renderer only when it carries a branch specific to
+      #          the PR, otherwise <github.repository_owner>/Octane-Renderer
+      #          or UPSTREAM_RENDERER_REPO. Ref is `main` on a main build,
+      #          otherwise `Dev`. A stale generic fork branch must never
+      #          shadow the current upstream integration branch.
       #
       # The two repos must stay wire-aligned (composer/parser
       # signatures); pairing the client with a stale renderer is what
@@ -70,149 +70,82 @@ jobs:
       - name: Resolve renderer ref
         id: renderer
         env:
-          IN_REPO: ${{ github.event.inputs.renderer_repo }}
-          IN_REF:  ${{ github.event.inputs.renderer_ref }}
-          VAR_REPO: ${{ vars.RENDERER_REPO }}
-          VAR_REF:  ${{ vars.RENDERER_REF }}
+          INPUT_RENDERER_REPO: ${{ github.event.inputs.renderer_repo }}
+          INPUT_RENDERER_REF: ${{ github.event.inputs.renderer_ref }}
+          VARIABLE_RENDERER_REPO: ${{ vars.RENDERER_REPO }}
+          VARIABLE_RENDERER_REF: ${{ vars.RENDERER_REF }}
+          PR_HEAD_OWNER: ${{ github.event.pull_request.head.repo.owner.login || '' }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref || '' }}
         run: |
-          # Dynamic, owner-aware renderer pairing — nothing is hardcoded to a
-          # specific fork. The companion renderer is discovered from the
-          # client repo's OWNER first, then the upstream fallback: "if the
-          # companion code is on my fork, pair with my fork; otherwise pair
-          # with upstream". For PRs the context is the base ref.
-          #
-          # Precedence (most specific wins):
-          #   1. workflow_dispatch inputs (renderer_repo / renderer_ref)
-          #   2. repo variables (vars.RENDERER_REPO / vars.RENDERER_REF)
-          #   3. dynamic: <owner>/Nitro_Render_V3 when it carries the ref,
-          #      else ${UPSTREAM_RENDERER_REPO}.
-          PR_HEAD_OWNER="${{ github.event.pull_request.head.repo.owner.login || '' }}"
-          PR_HEAD_REF="${{ github.event.pull_request.head.ref || '' }}"
+          node --test octane/.github/scripts/resolve-renderer.test.mjs
+          node octane/.github/scripts/resolve-renderer.mjs
 
-          case "${GITHUB_EVENT_NAME}" in
-            pull_request) CTX="${GITHUB_BASE_REF}" ;;
-            *)            CTX="${GITHUB_REF_NAME}" ;;
-          esac
-
-          # Branch-aware desired ref: main on a main build, else Dev.
-          case "$CTX" in
-            main) AUTO_REF="main" ;;
-            *)    AUTO_REF="Dev" ;;
-          esac
-
-          REF="$IN_REF"
-          [ -z "$REF" ] && REF="$VAR_REF"
-          [ -z "$REF" ] && REF="$AUTO_REF"
-
-          # Probe whether <repo> has branch <ref> (remote-only, no checkout).
-          has_ref() { git ls-remote --exit-code --heads "https://github.com/$1.git" "$2" >/dev/null 2>&1; }
-
-          REPO="$IN_REPO"
-          [ -z "$REPO" ] && REPO="$VAR_REPO"
-          if [ -z "$REPO" ]; then
-            # Fork PRs into duckietm: pair with the head author's renderer fork
-            # instead of upstream Dev which may not yet carry the companion wire.
-            if [ -n "$PR_HEAD_OWNER" ] && [ "$PR_HEAD_OWNER" != "${{ github.repository_owner }}" ]; then
-              HEAD_RENDERER="${PR_HEAD_OWNER}/Nitro_Render_V3"
-              if has_ref "$HEAD_RENDERER" "$REF"; then
-                REPO="$HEAD_RENDERER"
-              fi
-            fi
-          fi
-          if [ -z "$REPO" ]; then
-            OWN_REPO="${GITHUB_REPOSITORY_OWNER}/Nitro_Render_V3"
-            if has_ref "$OWN_REPO" "$REF"; then
-              REPO="$OWN_REPO"               # companion lives on my own fork
-            else
-              REPO="$UPSTREAM_RENDERER_REPO"  # fall back to upstream
-            fi
-          fi
-
-          # Fork PR auto mode: prefer the companion renderer branch that matches
-          # the client head (e.g. feat/chest-furni-v2-ui → feat/chest-furni-v2),
-          # then the base-ref default (Dev/main), then integration. A matching
-          # renderer feature branch may itself be stacked on required protocol PRs.
-          if [ -z "$IN_REF" ] && [ -z "$VAR_REF" ] && [ -n "$PR_HEAD_REF" ] && [ -n "$REPO" ]; then
-            COMPANION_REFS="$PR_HEAD_REF"
-            case "$PR_HEAD_REF" in
-              *-ui) COMPANION_REFS="${PR_HEAD_REF%-ui}-renderer ${PR_HEAD_REF%-ui} $COMPANION_REFS" ;;
-            esac
-            COMPANION_REFS="$COMPANION_REFS $AUTO_REF integration"
-            for CAND in $COMPANION_REFS; do
-              if has_ref "$REPO" "$CAND"; then
-                REF="$CAND"
-                break
-              fi
-            done
-          fi
-
-          # Safety net: never pair against a repo/ref that doesn't exist.
-          if ! has_ref "$REPO" "$REF"; then
-            echo "::warning::renderer '$REPO' has no branch '$REF' — falling back to ${UPSTREAM_RENDERER_REPO}"
-            REPO="$UPSTREAM_RENDERER_REPO"
-            has_ref "$REPO" "$REF" || REF="Dev"
-          fi
-
-          echo "repo=$REPO" >> "$GITHUB_OUTPUT"
-          echo "ref=$REF"   >> "$GITHUB_OUTPUT"
-          echo "Resolved renderer pairing: $REPO @ $REF (client ctx: $CTX, event: ${GITHUB_EVENT_NAME})"
-
-      - name: Checkout Nitro_Render_V3 (sibling)
-        uses: actions/checkout@v4
+      - name: Checkout Octane Renderer (sibling)
+        uses: actions/checkout@v7
         with:
           repository: ${{ steps.renderer.outputs.repo }}
           ref: ${{ steps.renderer.outputs.ref }}
-          path: Nitro_Render_V3
+          path: octane-renderer
 
-      - name: Setup Node 22
-        uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v7
         with:
-          node-version: '22'
-          cache: yarn
-          cache-dependency-path: |
-            Nitro-V3/yarn.lock
-            Nitro_Render_V3/yarn.lock
+          node-version-file: 'octane/.nvmrc'
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install renderer SDK deps
-        working-directory: Nitro_Render_V3
-        run: yarn install --frozen-lockfile
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+        working-directory: octane-renderer
+        run: corepack yarn install --immutable
 
       - name: Install client deps
-        working-directory: Nitro-V3
-        run: yarn install --frozen-lockfile
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+        working-directory: octane
+        run: corepack yarn install --immutable
 
       # The renderer SDK is consumed via a filesystem symlink in
-      # node_modules/@nitrots/nitro-renderer; create it AFTER yarn
+      # node_modules/@octane/renderer; create it AFTER yarn
       # install (otherwise yarn would clean it up since the package
-      # isn't declared in package.json). tsgo (TS 7 native preview)
+      # isn't declared in package.json). TypeScript 7
       # then resolves the tsconfig `include` entry pointing at the
       # renderer's `src/**/*.ts`.
       #
       # Use an absolute path so the link target is unambiguous
       # regardless of the cwd that reads it. A relative target like
-      # `../../../Nitro_Render_V3` resolves to
-      # `Nitro-V3/Nitro_Render_V3` (one too few `..`), which doesn't
-      # exist and makes tsgo report TS2307 across the entire src/.
+      # `../../../octane-renderer` resolves to
+      # `octane/octane-renderer` (one too few `..`), which doesn't
+      # exist and makes the type check report TS2307 across the entire src/.
       - name: Symlink renderer into client node_modules
         run: |
-          mkdir -p Nitro-V3/node_modules/@nitrots
-          ln -sfn "${{ github.workspace }}/Nitro_Render_V3" Nitro-V3/node_modules/@nitrots/nitro-renderer
-          ls -la Nitro-V3/node_modules/@nitrots/
-          ls Nitro-V3/node_modules/@nitrots/nitro-renderer/packages/api/src/ | head -5
+          mkdir -p octane/node_modules/@octane
+          ln -sfn "${{ github.workspace }}/octane-renderer" octane/node_modules/@octane/renderer
+          ls -la octane/node_modules/@octane/
+          ls octane/node_modules/@octane/renderer/packages/api/src/ | head -5
 
-      - name: Type check (tsgo)
-        working-directory: Nitro-V3
+      - name: Type check (TypeScript 7)
+        working-directory: octane
         run: yarn typecheck
 
-      # Hook-order lint gate — the full yarn eslint emits ~900 pre-existing
-      # baseline errors (brace style, indentation), so we use a focused
-      # config that asserts only react-hooks/rules-of-hooks. Catches the
+      # Hook-order lint gate — ESLint runs only react-hooks/rules-of-hooks
+      # (Biome does the rest). Catches the
       # "hook below early-return" pattern that produced two production
       # crashes this session (CatalogPurchaseWidgetView, CatalogItemGridWidgetView).
       - name: ESLint (hook-order gate)
-        working-directory: Nitro-V3
+        working-directory: octane
         run: yarn lint:hooks
 
+      # Dependency gate: a package.json entry nothing imports, or an import
+      # package.json does not list. Unused files and exports are reported by a
+      # plain `yarn knip` locally but do not fail CI. Runs after the renderer
+      # symlink so the tsconfig aliases resolve as they do on a developer machine.
+      - name: Knip (dependencies)
+        working-directory: octane
+        run: yarn knip --dependencies
+
       - name: Vitest
-        working-directory: Nitro-V3
+        working-directory: octane
         run: yarn test --run

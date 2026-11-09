@@ -1,59 +1,65 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 
+const INT32_MIN = -2147483648;
+const INT32_MAX = 2147483647;
+
+/** Official NumberInputParam(0, int32 min, int32 max): out of range clamps, anything else is 0. */
+export const clampEffectId = (value: number) => (Number.isFinite(value) ? Math.max(INT32_MIN, Math.min(INT32_MAX, Math.trunc(value))) : 0);
+
 interface WiredConditionActorIsWearingEffectViewProps {
-    negative?: boolean;
+    /**
+     * The freeze conditions share this dialog for its user source, but they ask
+     * WiredFreezeUtil whether someone is frozen — there is no effect to name. They pass false, and the
+     * effect-id box stays out of the window.
+     */
+    showEffect?: boolean;
 }
 
-export const WiredConditionActorIsWearingEffectView: FC<WiredConditionActorIsWearingEffectViewProps> = ({ negative = false }) => {
-    const [effect, setEffect] = useState(-1);
-    const [quantifier, setQuantifier] = useState(1);
-    const { trigger = null, setIntParams = null } = useWired();
-    const [userSource, setUserSource] = useState<number>(() => {
-        if (trigger?.intData?.length > 1) return trigger.intData[1];
-        return 0;
-    });
+export const WiredConditionActorIsWearingEffectView: FC<WiredConditionActorIsWearingEffectViewProps> = ({ showEffect = true }) => {
+    const [effect, setEffect] = useState(0);
+    // Official layout: [effect (0 any)], the users in the official source slot; the quantifier is the base view's.
+    const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
+    const [userSource, setUserSource] = useState<number>(() => trigger?.userSourceTypes?.[0] ?? 0);
 
-    const save = () => setIntParams([effect, userSource, quantifier]);
+    const save = () => {
+        setIntParams([effect]);
+        setSourceTypes({ furni: [], users: [userSource] });
+    };
 
     useEffect(() => {
-        setEffect(trigger?.intData[0] ?? 0);
-        if (trigger?.intData?.length > 1) setUserSource(trigger.intData[1]);
-        else setUserSource(0);
-        setQuantifier(trigger?.intData?.length > 2 ? (trigger.intData[2] === 1 ? 1 : 0) : 1);
+        setEffect(clampEffectId(trigger?.intData?.[0] ?? 0));
+        setUserSource(trigger?.userSourceTypes?.[0] ?? 0);
     }, [trigger]);
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.quantifier_selection')}</Text>
-                {[0, 1].map((value) => (
-                    <label key={value} className="flex items-center gap-1">
-                        <input
-                            checked={quantifier === value}
-                            className="form-check-input"
-                            name="effectQuantifier"
-                            type="radio"
-                            onChange={() => setQuantifier(value)}
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                {showEffect && (
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{localizeWithFallback('wiredfurni.params.effectid', LocalizeText('wiredfurni.tooltip.effectid'))}</Text>
+                        <OctaneInput
+                            max={INT32_MAX}
+                            min={INT32_MIN}
+                            title={LocalizeText('wiredfurni.tooltip.effectid')}
+                            type="number"
+                            value={effect}
+                            onChange={(event) => setEffect(clampEffectId(parseInt(event.target.value)))}
                         />
-                        <Text>{LocalizeText(`wiredfurni.params.quantifier.users${negative ? '.neg' : ''}.${value}`)}</Text>
-                    </label>
-                ))}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.effectid', LocalizeText('wiredfurni.tooltip.effectid'))}</Text>
-                <NitroInput type="number" value={effect} onChange={(event) => setEffect(parseInt(event.target.value))} />
-            </div>
-        </WiredConditionBaseView>
+                    </div>
+                )}
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

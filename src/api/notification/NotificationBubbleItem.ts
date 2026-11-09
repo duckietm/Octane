@@ -1,4 +1,15 @@
+import type { CollectibleProductData } from '@octane/renderer';
 import { NotificationBubbleType } from './NotificationBubbleType';
+
+/**
+ * The extra data of an `nft_opening` bubble (AIR `CollectiblesController` passes the reward, its rarity and
+ * the rarity colour): the bubble shows the reward's icon and "Rarity: <rarity>" in that colour.
+ */
+export interface NotificationCollectibleReward {
+    product: CollectibleProductData;
+    rarity: string;
+    rarityColor: number;
+}
 
 export class NotificationBubbleItem {
     private static ITEM_ID: number = -1;
@@ -9,13 +20,15 @@ export class NotificationBubbleItem {
     private _iconUrl: string;
     private _linkUrl: string;
     private _senderName: string;
+    private _collectible: NotificationCollectibleReward;
 
     constructor(
         message: string,
         notificationType: string = NotificationBubbleType.INFO,
         iconUrl: string = null,
         linkUrl: string = null,
-        senderName: string = ''
+        senderName: string = '',
+        collectible: NotificationCollectibleReward = null
     ) {
         NotificationBubbleItem.ITEM_ID += 1;
 
@@ -25,6 +38,7 @@ export class NotificationBubbleItem {
         this._iconUrl = iconUrl;
         this._linkUrl = linkUrl;
         this._senderName = senderName;
+        this._collectible = collectible;
     }
 
     public get id(): number {
@@ -49,5 +63,9 @@ export class NotificationBubbleItem {
 
     public get senderName(): string {
         return this._senderName;
+    }
+
+    public get collectible(): NotificationCollectibleReward {
+        return this._collectible;
     }
 }

@@ -1,0 +1,4 @@
+/* Wired variable fx editor. The fx themselves are drawn by the room renderer, not with css. */
+.octane-wired-fx-editor__override .form-select {
+    max-width: 100%;
+}

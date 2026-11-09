@@ -1,10 +1,10 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { GetWiredTimeLocale, LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
+import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import contextVariableIcon from '../../../../assets/images/wired/var/icon_source_context_clean.png';
 import furniVariableIcon from '../../../../assets/images/wired/var/icon_source_furni.png';
 import userVariableIcon from '../../../../assets/images/wired/var/icon_source_user.png';
-import { Button, Slider, Text } from '../../../../common';
+import { Button, Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
 import { CLICKED_USER_SOURCE, FURNI_SOURCES, sortWiredSourceOptions, USER_SOURCES, useAvailableUserSources } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
@@ -12,16 +12,21 @@ import {
     buildWiredVariablePickerEntries,
     createFallbackVariableEntry,
     flattenWiredVariablePickerEntries,
-    getCustomVariableItemId,
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
+import { fromWiredVariableId, toWiredVariableId, wiredVariableIdList } from '../WiredVariableIds';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { WiredActionDelaySection } from './WiredActionDelaySection';
+import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type VariableTargetType = 'user' | 'furni' | 'context';
 
-const TARGET_USER = 0;
-const TARGET_FURNI = 1;
-const TARGET_CONTEXT = 2;
+// Official variable targets (1 user, 0 furni, -20 context); int params [target], furni / user slot 0
+// are the holders.
+const TARGET_USER = 1;
+const TARGET_FURNI = 0;
+const TARGET_CONTEXT = -20;
 const SOURCE_SELECTED = 100;
 
 const TARGET_BUTTONS: Array<{ key: VariableTargetType; icon: string }> = [
@@ -60,7 +65,9 @@ export const WiredActionRemoveVariableView: FC<{}> = () => {
         setActionDelay = null,
         setIntParams = null,
         setFurniIds = null,
-        setStringParam = null
+        setStringParam = null,
+        setSourceTypes = null,
+        setVariableIds = null
     } = useWired();
     const { userVariableDefinitions = [], furniVariableDefinitions = [], contextVariableDefinitions = [] } = useWiredTools();
     const [selectedTargetType, setSelectedTargetType] = useState<VariableTargetType>('user');
@@ -128,23 +135,25 @@ export const WiredActionRemoveVariableView: FC<{}> = () => {
         const nextTargetType = normalizeTargetType(trigger.intData.length > 0 ? trigger.intData[0] : TARGET_USER);
 
         setSelectedTargetType(nextTargetType);
+        // AIR: the variable is the first variable id; an older server wrote its id as the string.
         setSelectedVariableToken(
-            normalizeVariableTokenFromWire(!Number.isNaN(parsedVariableItemId) && parsedVariableItemId > 0 ? String(parsedVariableItemId) : '')
+            fromWiredVariableId(trigger.variableIds?.[0] ?? '') ||
+                normalizeVariableTokenFromWire(!Number.isNaN(parsedVariableItemId) && parsedVariableItemId > 0 ? String(parsedVariableItemId) : '')
         );
-        setUserSource(trigger.intData.length > 1 ? trigger.intData[1] : 0);
-        setFurniSource(trigger.intData.length > 2 ? trigger.intData[2] : (trigger.selectedItems?.length ?? 0) > 0 ? SOURCE_SELECTED : 0);
+        setUserSource(trigger.userSourceTypes?.[0] ?? 0);
+        setFurniSource(trigger.furniSourceTypes?.[0] ?? ((trigger.selectedItems?.length ?? 0) > 0 ? SOURCE_SELECTED : 0));
     }, [trigger]);
 
     const save = () => {
         const targetValue = getTargetValue(selectedTargetType);
-        const variableItemId = getCustomVariableItemId(selectedVariableToken);
-
-        setStringParam(variableItemId ? String(variableItemId) : '');
-        setIntParams([targetValue, userSource, furniSource]);
+        setStringParam('');
+        setVariableIds(wiredVariableIdList(toWiredVariableId(selectedTargetType, selectedVariableToken)));
+        setIntParams([targetValue]);
+        setSourceTypes({ furni: [furniSource], users: [userSource] });
         setFurniIds(selectedTargetType === 'furni' && furniSource === SOURCE_SELECTED ? [...furniIds] : []);
     };
 
-    const validate = () => getCustomVariableItemId(selectedVariableToken) > 0;
+    const validate = () => !!selectedVariableToken;
 
     const requiresFurni =
         selectedTargetType === 'furni' ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT : WiredFurniType.STUFF_SELECTION_OPTION_NONE;
@@ -152,11 +161,11 @@ export const WiredActionRemoveVariableView: FC<{}> = () => {
     const missingVariablesText = (() => {
         switch (selectedTargetType) {
             case 'furni':
-                return 'No wf_var_furni variables found in this room.';
+                return localizeWithFallback('octane.wired.no_wf_var_furni_variables_found', 'No wf_var_furni variables found in this room.');
             case 'context':
-                return 'No wf_var_context variables found in this room.';
+                return localizeWithFallback('octane.wired.no_wf_var_context_variables_found', 'No wf_var_context variables found in this room.');
             default:
-                return 'No wf_var_user variables found in this room.';
+                return localizeWithFallback('octane.wired.no_wf_var_user_variables_found', 'No wf_var_user variables found in this room.');
         }
     })();
 
@@ -178,77 +187,74 @@ export const WiredActionRemoveVariableView: FC<{}> = () => {
     };
 
     return (
-        <WiredActionBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} validate={validate} cardStyle={{ width: 244 }} hideDelay={true}>
-            <div className="nitro-wired__give-var">
-                <div className="nitro-wired__give-var-heading">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <div className="nitro-wired__give-var-targets">
-                        {TARGET_BUTTONS.map((button) => (
-                            <button
-                                key={button.key}
-                                type="button"
-                                className={`nitro-wired__give-var-target nitro-wired__give-var-target--${button.key} ${selectedTargetType === button.key ? 'is-active' : ''}`}
-                                onClick={() => handleTargetTypeChange(button.key)}
-                            >
-                                <img src={button.icon} alt={button.key} />
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                <WiredVariablePicker
-                    entries={resolvedVariableEntries}
-                    recentScope="variable-effects"
-                    selectedToken={selectedVariableToken}
-                    onSelect={(entry) => setSelectedVariableToken(entry.token)}
-                />
-
-                {!targetDefinitions.length && <Text small>{missingVariablesText}</Text>}
-
-                <div className="nitro-wired__divider" />
-
-                <div className="nitro-wired__give-var-section">
-                    <div className="nitro-wired__give-var-section-title">
-                        {LocalizeText('wiredfurni.params.delay', ['seconds'], [GetWiredTimeLocale(actionDelay)])}
-                    </div>
-                    <Slider max={20} min={0} value={actionDelay} onChange={(event) => setActionDelay(event)} />
-                </div>
-
-                {selectedTargetType !== 'context' && (
-                    <>
-                        <div className="nitro-wired__divider" />
-
-                        <div className="nitro-wired__give-var-section">
-                            <div className="nitro-wired__give-var-section-title">{localizeWithFallback('wiredfurni.params.sources.merged.title.variables', 'Fonte variabile:')}</div>
-                            <div className="flex items-center gap-1">
-                                <Button
-                                    disabled={resolvedSourceOptions.length <= 1}
-                                    variant="primary"
-                                    classNames={['nitro-wired__picker-button']}
-                                    className="px-2 py-1"
-                                    onClick={() => cycleSource(-1)}
+        <NativeTextTree>
+            <WiredActionBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} validate={validate} cardStyle={{ width: 244 }} hideDelay={true}>
+                <div className="octane-wired__give-var">
+                    <div className="octane-wired__give-var-heading">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
+                        <div className="octane-wired__give-var-targets">
+                            {TARGET_BUTTONS.map((button) => (
+                                <BaseButton
+                                    key={button.key}
+                                    type="button"
+                                    className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${selectedTargetType === button.key ? 'is-active' : ''}`}
+                                    onClick={() => handleTargetTypeChange(button.key)}
                                 >
-                                    <FaChevronLeft />
-                                </Button>
-                                <div className="flex min-w-0 flex-1 items-center justify-center nitro-wired__picker-label">
-                                    <Text small className="text-center">
-                                        {selectedSourceOption ? LocalizeText(selectedSourceOption.label) : '-'}
-                                    </Text>
-                                </div>
-                                <Button
-                                    disabled={resolvedSourceOptions.length <= 1}
-                                    variant="primary"
-                                    classNames={['nitro-wired__picker-button']}
-                                    className="px-2 py-1"
-                                    onClick={() => cycleSource(1)}
-                                >
-                                    <FaChevronRight />
-                                </Button>
-                            </div>
+                                    <img src={button.icon} alt={button.key} />
+                                </BaseButton>
+                            ))}
                         </div>
-                    </>
-                )}
-            </div>
-        </WiredActionBaseView>
+                    </div>
+
+                    <WiredVariablePicker
+                        entries={resolvedVariableEntries}
+                        recentScope="variable-effects"
+                        selectedToken={selectedVariableToken}
+                        onSelect={(entry) => setSelectedVariableToken(entry.token)}
+                    />
+
+                    {!targetDefinitions.length && <Text small>{missingVariablesText}</Text>}
+
+                    <div className="octane-wired__divider" />
+
+                    <WiredActionDelaySection value={actionDelay} onChange={setActionDelay} />
+
+                    {selectedTargetType !== 'context' && (
+                        <>
+                            <div className="octane-wired__divider" />
+
+                            <div className="octane-wired__give-var-section">
+                                <div className="octane-wired__give-var-section-title">{localizeWithFallback('wiredfurni.params.sources.merged.title.variables', 'Fonte variabile:')}</div>
+                                <div className="flex items-center gap-1">
+                                    <Button
+                                        disabled={resolvedSourceOptions.length <= 1}
+                                        variant="primary"
+                                        classNames={['octane-wired__picker-button']}
+                                        className="px-2 py-1"
+                                        onClick={() => cycleSource(-1)}
+                                    >
+                                        <FaChevronLeft />
+                                    </Button>
+                                    <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
+                                        <Text small className="text-center">
+                                            {selectedSourceOption ? LocalizeText(selectedSourceOption.label) : '-'}
+                                        </Text>
+                                    </div>
+                                    <Button
+                                        disabled={resolvedSourceOptions.length <= 1}
+                                        variant="primary"
+                                        classNames={['octane-wired__picker-button']}
+                                        className="px-2 py-1"
+                                        onClick={() => cycleSource(1)}
+                                    >
+                                        <FaChevronRight />
+                                    </Button>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

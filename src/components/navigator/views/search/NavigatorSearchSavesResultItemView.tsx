@@ -1,39 +1,33 @@
-import { NavigatorDeleteSavedSearchComposer, NavigatorSavedSearch } from '@nitrots/nitro-renderer';
+import { NavigatorDeleteSavedSearchComposer, NavigatorSavedSearch } from '@octane/renderer';
 import { FC, MouseEvent } from 'react';
-import { FaBolt } from 'react-icons/fa';
-import { LocalizeText, SendMessageComposer } from '../../../../api';
-import { Flex, Text } from '../../../../common';
+import { LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../api';
 import { useNavigatorUiStore } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export interface NavigatorSearchSavesResultItemViewProps {
     search: NavigatorSavedSearch;
 }
 
+const savedSearchLabel = (search: NavigatorSavedSearch) => {
+    let code = search.code || '';
+
+    if (code.startsWith('${')) code = code.slice(2, code.length - 1);
+    if (code.startsWith('category__')) code = code.slice('category__'.length);
+
+    const title = localizeWithFallback('navigator.searchcode.title.' + code, search.code || code);
+
+    return search.filter ? `${title} - ${search.filter}` : title;
+};
+
 export const NavigatorSearchSavesResultItemView: FC<NavigatorSearchSavesResultItemViewProps> = (props) => {
     const { search = null } = props;
+    const title = savedSearchLabel(search);
 
-    const getResultTitle = () => {
-        let name = search.code;
-
-        if (!name || !name.length || LocalizeText('navigator.searchcode.title.' + name) === 'navigator.searchcode.title.' + name) return search.code;
-
-        if (name.startsWith('${')) return name.slice(2, name.length - 1);
-
-        return 'navigator.searchcode.title.' + name;
-    };
-
-    // Drive the search through the navigator store so useNavigatorSearch
-    // both fires the request AND accepts the response. Sending the
-    // composer directly didn't work: the search hook only keeps a
-    // NavigatorSearchEvent whose result.code matches the active tab, so a
-    // raw search whose code differed from the current tab was discarded
-    // (clicking a saved search appeared to do nothing).
     const openSearch = () => {
-        const code = search.code.split('.').reverse()[0];
-        const store = useNavigatorUiStore.getState();
-
-        store.setTab(code);
-        if (search.filter) store.setFilter(search.filter);
+        useNavigatorUiStore.getState().setSearch(search.code, search.filter || '');
+        useNavigatorUiStore.getState().show();
     };
 
     const deleteSearch = (event: MouseEvent) => {
@@ -42,23 +36,20 @@ export const NavigatorSearchSavesResultItemView: FC<NavigatorSearchSavesResultIt
     };
 
     return (
-        <Flex
-            pointer
-            alignItems="center"
-            gap={1}
-            className="saved-search-row group px-1 py-0.5 shrink-0"
-            title={LocalizeText('navigator.tooltip.open.saved.search')}
-            onClick={openSearch}
-        >
-            <FaBolt className="text-orange-500 shrink-0 text-[10px]" />
-            <Text small pointer truncate variant="black" className="grow! min-w-0">
-                {LocalizeText(getResultTitle())}
-            </Text>
-            <i
-                className="nitro-icon icon-navigator-search-delete cursor-pointer flex-shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
-                title={LocalizeText('navigator.tooltip.remove.saved.search')}
-                onClick={deleteSearch}
-            />
-        </Flex>
+        <NativeTextTree>
+            <div className="saved-search-row">
+                <Hint content={LocalizeText('navigator.tooltip.open.saved.search')}><BaseButton aria-label={LocalizeText('navigator.tooltip.open.saved.search')} type="button" className="saved-search-row__open" onClick={openSearch}>
+                    <span className="saved-search-row__label">{title}</span>
+                </BaseButton></Hint>
+                <Hint content={LocalizeText('navigator.tooltip.remove.saved.search')}>
+                    <BaseButton
+                        type="button"
+                        className="saved-search-row__delete"
+                        aria-label={`${LocalizeText('navigator.tooltip.remove.saved.search')} ${title}`}
+                        onClick={deleteSearch}
+                    />
+                </Hint>
+            </div>
+        </NativeTextTree>
     );
 };

@@ -1,5 +1,6 @@
 import { FC, useCallback, useMemo } from 'react';
 import { GetConfigurationValue, useUiSettings } from '../../api';
+import { BaseButton } from '../../common/BaseButton';
 
 export const InterfaceImageTabView: FC<{}> = () => {
     const { settings, updateSettings } = useUiSettings();
@@ -33,7 +34,7 @@ export const InterfaceImageTabView: FC<{}> = () => {
     return (
         <div className="grid grid-cols-8 gap-1 p-2 overflow-auto max-h-[400px]">
             {images.map((url, i) => (
-                <div
+                <BaseButton aria-label={url}
                     key={i}
                     className={`w-[75px] h-[75px] rounded cursor-pointer border-2 transition-all hover:scale-105 ${settings.colorMode === 'image' && settings.headerImageUrl === url ? 'border-white shadow-lg' : 'border-transparent'}`}
                     style={{

@@ -4,7 +4,7 @@ export {
     HEIGHT_SCHEME,
     MAX_NUM_TILE_PER_AXIS,
     TILE_SIZE
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 
 export const MIN_WALL_HEIGHT = 0;
 export const MAX_WALL_HEIGHT = 16;

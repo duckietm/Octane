@@ -1,6 +1,6 @@
-import { GetMarketplaceConfigurationMessageComposer, MarketplaceConfigurationEvent, MarketplaceConfigurationMessageParser } from '@nitrots/nitro-renderer';
+import { GetMarketplaceConfigurationMessageComposer, MarketplaceConfigurationEvent, MarketplaceConfigurationMessageParser } from '@octane/renderer';
 import { UseQueryResult } from '@tanstack/react-query';
-import { useNitroQuery } from '../../api/nitro-query';
+import { useOctaneQuery } from '../../api/octane-query';
 
 /**
  * Marketplace configuration (commission rates, min/max ask, etc.) as
@@ -12,12 +12,12 @@ import { useNitroQuery } from '../../api/nitro-query';
  * stuffed the parser into catalogOptions.marketplaceConfiguration
  * via setCatalogOptions inside its own listener, and dispatched
  * GetMarketplaceConfigurationMessageComposer from an effect that
- * checked the same field as the cache. With useNitroQuery, the cache
+ * checked the same field as the cache. With useOctaneQuery, the cache
  * is React Query's; the component just reads `data`.
  */
 export const useMarketplaceConfiguration = (options: { enabled?: boolean } = {}): UseQueryResult<MarketplaceConfigurationMessageParser> =>
-    useNitroQuery<MarketplaceConfigurationEvent, MarketplaceConfigurationMessageParser>({
-        key: ['nitro', 'catalog', 'marketplaceConfiguration'],
+    useOctaneQuery<MarketplaceConfigurationEvent, MarketplaceConfigurationMessageParser>({
+        key: ['octane', 'catalog', 'marketplaceConfiguration'],
         request: () => new GetMarketplaceConfigurationMessageComposer(),
         parser: MarketplaceConfigurationEvent,
         select: (event) => event.getParser(),

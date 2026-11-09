@@ -1,4 +1,5 @@
 import { memo, useMemo } from 'react';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 interface CatalogGuildFurniRecolorFilterProps {
     colorA?: string;
@@ -37,15 +38,17 @@ export const CatalogGuildFurniRecolorFilter = memo((props: CatalogGuildFurniReco
     if (!tables) return null;
 
     return (
-        <svg aria-hidden="true" focusable="false" width="0" height="0" style={{ position: 'absolute', width: 0, height: 0 }}>
-            <filter id={GUILD_FURNI_RECOLOR_FILTER_ID} colorInterpolationFilters="sRGB">
-                <feComponentTransfer>
-                    <feFuncR type="table" tableValues={tables.r} />
-                    <feFuncG type="table" tableValues={tables.g} />
-                    <feFuncB type="table" tableValues={tables.b} />
-                </feComponentTransfer>
-            </filter>
-        </svg>
+        <NativeTextTree>
+            <svg aria-hidden="true" focusable="false" width="0" height="0" style={{ position: 'absolute', width: 0, height: 0 }}>
+                <filter id={GUILD_FURNI_RECOLOR_FILTER_ID} colorInterpolationFilters="sRGB">
+                    <feComponentTransfer>
+                        <feFuncR type="table" tableValues={tables.r} />
+                        <feFuncG type="table" tableValues={tables.g} />
+                        <feFuncB type="table" tableValues={tables.b} />
+                    </feComponentTransfer>
+                </filter>
+            </svg>
+        </NativeTextTree>
     );
 });
 

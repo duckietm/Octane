@@ -1,0 +1,65 @@
+/* classic v75 window manager look for the moderator windows (layout geometry comes from the pinned XML). */
+.native-frame {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    color: #000;
+    font: 400 12px/14px HabboAirUbuntu, UbuntuRegular, sans-serif;
+    pointer-events: auto;
+    filter: drop-shadow(0 0 10px rgb(0 0 0 / 35%));
+}
+
+.native-frame *, .native-frame *::before, .native-frame *::after { box-sizing: border-box; }
+
+.native-frame__chrome {
+    position: absolute;
+    inset: 0;
+    border-image: url('../../assets/images/friends/swf/illumina_light_border_frame.png') 4 4 7 4 fill / 4px 4px 7px 4px stretch;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.native-frame__titlebar { position: absolute; inset: 0 0 auto; height: 30px; cursor: move; user-select: none; }
+.native-frame__title { position: absolute; left: 8px; top: 11px; margin: 0; padding: 0; line-height: 0; white-space: nowrap; }
+
+.native-frame__close {
+    position: absolute;
+    right: 8px;
+    top: 9px;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: url('../../assets/images/friends/swf/illumina_light_button_frame_close.png') 0 0 no-repeat;
+    image-rendering: pixelated;
+    cursor: pointer;
+}
+
+.native-frame__close:hover { background-position: -52px 0; }
+.native-frame__close:active { background-position: -26px 0; }
+
+.native-frame__client { position: absolute; }
+.native-itemlist, .native-region, .native-label, .native-bitmap, .native-border { position: absolute; }
+.native-region { cursor: pointer; }
+.native-region[data-native-enabled='false'] { cursor: default; }
+.native-bitmap img { position: absolute; image-rendering: pixelated; }
+.native-border { pointer-events: none; }
+.native-skin { position: relative; }
+
+/* start panel additions: the selected user's head, presence dot and clear cross, and the find-user row. Not in AIR's start_panel:
+   they take the regular Ubuntu (our `Ubuntu` face is the condensed cut) at il_regular 11 px, like the result rows drawn below them. */
+.native-start-panel__head { position: absolute; width: 20px; height: 20px; overflow: hidden; pointer-events: none; }
+.native-start-panel__head .avatar-image { width: 20px; height: 20px; }
+.native-start-panel__presence { position: absolute; width: 6px; height: 6px; border: 1px solid #fff; border-radius: 50%; background: #9a9a9a; pointer-events: none; box-sizing: content-box; }
+.native-start-panel__presence.is-present { background: #2fb344; }
+.native-start-panel__clear { position: absolute; width: 12px; height: 12px; margin: 0; padding: 0; border: 0; background: transparent; color: #7a7a7a; font: 700 12px/12px HabboAirUbuntu, UbuntuRegular, sans-serif; cursor: pointer; }
+.native-start-panel__clear:hover { color: #c0392b; }
+.native-start-panel__search { position: absolute; }
+.native-start-panel__search input { display: block; width: 100%; height: 20px; margin: 0; padding: 0 5px; border: 1px solid #a8a8a8; border-radius: 3px; background: #fff; color: #000; font: 400 11px/18px HabboAirUbuntu, UbuntuRegular, sans-serif; outline: none; }
+.native-start-panel__search input:focus { border-color: #418db0; }
+.native-start-panel__results { position: absolute; left: 0; top: 22px; z-index: 5; width: 100%; border: 1px solid #a8a8a8; border-radius: 3px; background: #fff; box-shadow: 0 2px 6px rgb(0 0 0 / 25%); overflow: hidden; }
+.native-start-panel__result { position: absolute; left: 1px; right: 1px; height: 16px; cursor: pointer; }
+.native-start-panel__result.is-empty { cursor: default; }
+.native-start-panel__result:not(.is-empty):hover { outline: 1px solid #c8c8c8; outline-offset: -1px; }
+.native-start-panel__result > div { line-height: 0; }

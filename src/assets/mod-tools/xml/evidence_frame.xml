@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><layout name="chatlog" width="480" height="565" version="0.1" uid="4C8947E2-BD2B-DB90-A90B-1166C245A710">
+  <window>
+    <frame x="60" y="4" width="480" height="565" params="98305" style="0" caption="Chatlog" color="0xff418db0" width_min="150" height_min="100">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.34901960784313724" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <container x="0" y="0" width="470" height="533" params="2192" style="0" name="chat_cont" caption="Chatlog" color="0xffff4184b0" background="true">
+          <children>
+            <itemlist_vertical x="0" y="0" width="443" height="530" params="2193" style="0" name="evidence_list" caption="Chatlog" color="0xffff418db0" background="true">
+              <children>
+                <container x="0" y="0" width="450" height="21" params="144" style="0" color="0xffff418db0" background="true">
+                  <children>
+                    <label x="0" y="0" width="57" height="19" params="17" style="3" name="text" caption="Context" color="0xffff418db0" background="true">
+                      <variables>
+                        <var key="text_style" value="u_headline_small" type="String"/>
+                        <var key="text_color" value="0xffffff" type="hex"/>
+                      </variables>
+                    </label>
+                    <button x="340" y="0" width="110" height="22" params="131089" style="0" name="btnHeaderAction" caption="Room%20tool" width_min="110" width_max="110"/>
+                    <button x="227" y="0" width="110" height="22" params="131089" style="0" name="btnHeaderAction2" caption="Open%20thread" width_min="110" width_max="110"/>
+                  </children>
+                </container>
+                <container x="0" y="21" width="420" height="41" params="144" style="0" name="chatline" background="true">
+                  <children>
+                    <label x="0" y="0" width="33" height="17" params="16" style="3" name="time_txt" caption="18%3A30">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                      </variables>
+                    </label>
+                    <text x="40" y="0" width="95" height="15" params="17" style="0" name="chatter_txt" caption="ROBIN_WAN_PERSI" background="true">
+                      <variables>
+                        <var key="antialias_type" value="advanced" type="String"/>
+                        <var key="font_face" value="Ubuntu" type="String"/>
+                        <var key="font_size" value="12" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                        <var key="sharpness" value="0" type="Number"/>
+                        <var key="thickness" value="0" type="Number"/>
+                        <var key="bold" value="true" type="Boolean"/>
+                        <var key="underline" value="true" type="Boolean"/>
+                        <var key="kerning" value="true" type="Boolean"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                      </variables>
+                    </text>
+                    <text x="140" y="0" width="210" height="65" params="16" style="3" name="msg_txt" caption="Sharing%20your%20password%20or%20personal%20details%20online%20is%20dangerous.%20The%20moderators%20might%20monitor%20these%20conversations%20for%20your%20safety.">
+                      <variables>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                        <var key="multiline" value="true" type="Boolean"/>
+                        <var key="word_wrap" value="true" type="Boolean"/>
+                        <var key="spacing" value="0" type="Number"/>
+                        <var key="leading" value="0" type="Number"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+              </children>
+            </itemlist_vertical>
+            <scrollbar_vertical x="451" y="0" width="17" height="533" params="2129" style="0" name="scroller" caption="Chatlog">
+              <variables>
+                <var key="scrollable" value="evidence_list" type="String"/>
+              </variables>
+            </scrollbar_vertical>
+          </children>
+        </container>
+      </children>
+    </frame>
+  </window>
+</layout>

@@ -1,0 +1,130 @@
+/* AIR hc_center (habbo-catalog-com): an Ubuntu (style 3) frame. Our `Ubuntu` face is the condensed cut, the
+   AIR one is the regular cut. Sizes and colours below follow the layout's text elements. */
+.octane-hc-center-window {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+}
+
+@layer base {
+    .octane-hc-center-window :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
+
+/* status_title: u_bold; status_info: html, default regular 12, black. */
+.octane-hc-center__status-title {
+    color: #000000;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+}
+
+.octane-hc-center__status-info {
+    color: #000000;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 15px;
+}
+
+/* special_title / gift_title / general_title: u_bold at font_size 16. */
+.octane-hc-center__title {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+}
+
+/* general_title: text_color 0x4a8eb1. */
+.octane-hc-center__title--blue {
+    color: #4a8eb1;
+}
+
+/* special_info / gift_info (white) and general_info (black): regular 12. */
+.octane-hc-center__info {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 15px;
+}
+
+/* special_infolink (white), special_breakdown_link and general_infolink (0x4a8eb1): regular 12, underlined. */
+.octane-hc-center__link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 17px;
+    text-align: left;
+    text-decoration: underline;
+}
+
+.octane-hc-center__link--white {
+    color: #ffffff;
+}
+
+.octane-hc-center__link--blue {
+    color: #4a8eb1;
+}
+
+/* special_content_postit: titles u_bold 16, contents regular 16, all 0x683203. */
+.octane-hc-center__postit {
+    color: #683203;
+}
+
+.octane-hc-center__postit-title {
+    color: #683203;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+}
+
+.octane-hc-center__postit-content {
+    color: #683203;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+}
+
+/*
+ * btn_buy (button_thick style 6, color 0x54c32e) and btn_gift (button_thick style 5, color 0x3399cc): AIR's grey
+ * shiny thick skin multiplied by the element colour, white button_shiny_bold 12 px caption. The common Button draws
+ * the 0x00aa00 green (an unlayered important rule, which only a layered important rule outranks).
+ */
+@layer base {
+    .octane-hc-center-window :where(.octane-hc-center__buy, .octane-hc-center__gifts).habbo-btn-primary {
+        color: #ffffff !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+    }
+
+    .octane-hc-center-window .octane-hc-center__buy.habbo-btn-primary {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-54c32e) !important;
+    }
+
+    .octane-hc-center-window .octane-hc-center__buy.habbo-btn-primary:hover {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-54c32e-hover) !important;
+    }
+
+    .octane-hc-center-window .octane-hc-center__buy.habbo-btn-primary:active {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-54c32e-pressed) !important;
+    }
+
+    .octane-hc-center-window .octane-hc-center__buy.habbo-btn-primary:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-54c32e-disabled) !important;
+    }
+
+    .octane-hc-center-window .octane-hc-center__gifts.habbo-btn-primary {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-3399cc) !important;
+    }
+
+    .octane-hc-center-window .octane-hc-center__gifts.habbo-btn-primary:hover {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-3399cc-hover) !important;
+    }
+
+    .octane-hc-center-window .octane-hc-center__gifts.habbo-btn-primary:active {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-3399cc-pressed) !important;
+    }
+
+    .octane-hc-center-window .octane-hc-center__gifts.habbo-btn-primary:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-thick-tint-3399cc-disabled) !important;
+    }
+}

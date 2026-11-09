@@ -3,9 +3,9 @@ import { FloorplanAction, FloorplanState } from '../state/types';
 import { PointerProjection } from './usePointerToTile';
 
 type Handlers = {
-    onPointerDown: (e: PointerEvent<SVGSVGElement>) => void;
-    onPointerMove: (e: PointerEvent<SVGSVGElement>) => void;
-    onPointerUp: (e: PointerEvent<SVGSVGElement>) => void;
+    onPointerDown: (e: PointerEvent<Element>) => void;
+    onPointerMove: (e: PointerEvent<Element>) => void;
+    onPointerUp: (e: PointerEvent<Element>) => void;
 };
 
 const tileKey = (row: number, col: number) => `${row},${col}` as const;
@@ -36,7 +36,7 @@ export const useTool = (state: FloorplanState, dispatch: Dispatch<FloorplanActio
     const squareStartRef = useRef<{ row: number; col: number } | null>(null);
 
     const apply = useCallback(
-        (e: PointerEvent<SVGSVGElement>) => {
+        (e: PointerEvent<Element>) => {
             const hit = projection.fromClient(e.clientX, e.clientY);
             if (!hit) return;
             const key = tileKey(hit.row, hit.col);
@@ -48,7 +48,7 @@ export const useTool = (state: FloorplanState, dispatch: Dispatch<FloorplanActio
     );
 
     const onPointerDown = useCallback(
-        (e: PointerEvent<SVGSVGElement>) => {
+        (e: PointerEvent<Element>) => {
             isDownRef.current = true;
             lastTileRef.current = null;
             try {
@@ -69,7 +69,7 @@ export const useTool = (state: FloorplanState, dispatch: Dispatch<FloorplanActio
     );
 
     const onPointerMove = useCallback(
-        (e: PointerEvent<SVGSVGElement>) => {
+        (e: PointerEvent<Element>) => {
             if (!isDownRef.current) return;
 
             if (state.squareSelect && squareStartRef.current) {
@@ -87,7 +87,7 @@ export const useTool = (state: FloorplanState, dispatch: Dispatch<FloorplanActio
     );
 
     const onPointerUp = useCallback(
-        (e: PointerEvent<SVGSVGElement>) => {
+        (e: PointerEvent<Element>) => {
             isDownRef.current = false;
             lastTileRef.current = null;
             try {

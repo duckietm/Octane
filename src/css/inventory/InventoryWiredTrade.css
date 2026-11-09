@@ -1,0 +1,426 @@
+/*
+ * AIR inventory_trading_wired (478 x 274), hosted in the inventory window next to the furni grid like a user trade.
+ * Positions are AIR's: trade_container 478 x 233, offers_0 at 17,29, offers_1 at 263,29 (200 x 200 each, the grid
+ * border 136 x 136 at 32,22 with 40 px slots 4 px apart), lock_0 at 223,192, trade_type_splitter at 212,95,
+ * requirements_button at 453,6, button_container at 0,240.
+ */
+.octane-inventory-window.is-wired-trading {
+    width: 692px !important;
+    min-width: 692px !important;
+    max-width: min(692px, calc(100vw - 16px)) !important;
+}
+
+.octane-wired-trade {
+    display: flex;
+    flex: 1 1 auto;
+    gap: 8px;
+    min-height: 0;
+}
+
+.octane-wired-trade-inventory {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.octane-wired-trade-amount {
+    width: 49px;
+}
+
+.octane-wired-trade-panel {
+    position: relative;
+    flex: 0 0 478px;
+    width: 478px;
+    height: 274px;
+    /* The layout's texts carry no text_style: u_regular, 12 px. */
+    font-size: 12px;
+    color: #000;
+}
+
+.octane-wired-trade-container {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 233px;
+    border: 1px solid #27556a;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.octane-wired-trade-info {
+    position: absolute;
+    left: 38px;
+    top: 7px;
+    width: 401px;
+    height: 17px;
+    overflow: hidden;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    opacity: 0.6;
+}
+
+.octane-wired-trade-requirements-button {
+    position: absolute;
+    left: 453px;
+    top: 6px;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-wired-trade-requirements-button img {
+    display: block;
+}
+
+.octane-wired-trade-requirements-button.is-highlighted {
+    outline: 2px solid #4fbce3;
+}
+
+.octane-wired-trade-offers {
+    position: absolute;
+    top: 29px;
+    width: 200px;
+    height: 200px;
+}
+
+.octane-wired-trade-offers.is-own {
+    left: 17px;
+}
+
+.octane-wired-trade-offers.is-receive,
+.octane-wired-trade-offers.is-payment {
+    left: 263px;
+}
+
+.octane-wired-trade-offers.is-payment img {
+    position: absolute;
+    left: 20px;
+    top: 9px;
+    width: 170px;
+    height: 173px;
+}
+
+.octane-wired-trade-title {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 200px;
+    height: 16px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.octane-wired-trade-grid {
+    position: absolute;
+    left: 32px;
+    top: 22px;
+    display: grid;
+    grid-template-columns: repeat(3, 40px);
+    grid-auto-rows: 40px;
+    gap: 4px;
+    width: 136px;
+    height: 136px;
+    padding: 4px;
+    box-sizing: border-box;
+    border: 1px solid #27556a;
+    border-radius: 4px;
+}
+
+.octane-wired-trade-slot {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    background: #f2f2f2 center no-repeat;
+    box-sizing: border-box;
+}
+
+.octane-wired-trade-slot.is-filled {
+    cursor: pointer;
+}
+
+.octane-wired-trade-slot.is-active {
+    border-color: #0f1b22;
+    box-shadow: 0 0 0 2px #418db0;
+}
+
+.octane-wired-trade-slot-count {
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    min-width: 12px;
+    padding: 0 2px;
+    border-radius: 3px;
+    background: #fff;
+    border: 1px solid #a5a5a5;
+    font-size: 9px;
+    line-height: 10px;
+}
+
+.octane-wired-trade-slot-remove {
+    position: absolute;
+    left: 1px;
+    bottom: 1px;
+    display: flex;
+    padding: 1px 2px;
+    border-radius: 3px;
+    background: #c0392b;
+    color: #fff;
+    font-size: 8px;
+}
+
+.octane-wired-trade-count {
+    position: absolute;
+    left: 0;
+    width: 200px;
+    text-align: center;
+    opacity: 0.6;
+    white-space: nowrap;
+}
+
+.octane-wired-trade-count.is-items {
+    top: 162px;
+}
+
+.octane-wired-trade-count.is-credits {
+    top: 180px;
+}
+
+.octane-wired-trade-lock {
+    position: absolute;
+    left: 223px;
+    top: 192px;
+    width: 32px;
+    height: 34px;
+    object-fit: none;
+}
+
+.octane-wired-trade-splitter {
+    position: absolute;
+    left: 212px;
+    top: 95px;
+    width: 53px;
+    height: 42px;
+    object-fit: none;
+}
+
+.octane-wired-trade-buttons {
+    position: absolute;
+    left: 0;
+    top: 240px;
+    width: 478px;
+    height: 32px;
+}
+
+.octane-wired-trade-accept {
+    position: absolute;
+    left: 5px;
+    top: 0;
+    width: 157px;
+    height: 28px;
+}
+
+.octane-wired-trade-time {
+    position: absolute;
+    left: 168px;
+    top: 5px;
+    width: 136px;
+    white-space: nowrap;
+    /* seconds_left_text: text_color 0xbf272a. */
+    color: #bf272a;
+}
+
+/* AIR's cancel sits at 415 with "Cancel"; anchored to the right edge so a longer caption ("Annuleren") stays inside. */
+.octane-wired-trade-cancel {
+    position: absolute;
+    right: 7px;
+    top: 0;
+    min-width: 56px;
+    height: 28px;
+}
+
+/* trade_requirements_bubble: AIR floats it by the button; here it opens over the table, under the button. */
+.octane-wired-trade-bubble {
+    position: absolute;
+    right: 4px;
+    top: 28px;
+    z-index: 10;
+    width: 430px;
+    max-height: 200px;
+    overflow: auto;
+    padding: 7px 13px;
+    box-sizing: border-box;
+    border: 1px solid #000;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.octane-wired-trade-bubble.is-highlighted {
+    box-shadow: 0 0 0 3px rgba(79, 188, 227, 0.6);
+}
+
+/* bubble_title: plain u_regular (no bold var). */
+.octane-wired-trade-bubble-title {
+    font-weight: 400;
+    opacity: 0.5;
+    margin-bottom: 6px;
+}
+
+.octane-wired-trade-bubble-columns {
+    display: flex;
+    gap: 30px;
+}
+
+.octane-wired-trade-bubble-column {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.octane-wired-trade-bubble-heading {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.octane-wired-trade-bubble-definition {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    min-height: 60px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    background: #f7f7f7;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.octane-wired-trade-bubble-met {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+    padding: 4px 6px;
+    background: #d9d9d9;
+}
+
+.octane-wired-trade-bubble-note {
+    margin-top: 6px;
+}
+
+/* disclaimer_text: text_color 0xbf272a. */
+.octane-wired-trade-bubble-note.is-disclaimer {
+    color: #bf272a;
+}
+
+.octane-wired-trade-rule {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+.octane-wired-trade-node {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: #000;
+}
+
+.octane-wired-trade-node img {
+    max-width: 32px;
+    max-height: 32px;
+    object-fit: contain;
+}
+
+.octane-wired-trade-or {
+    opacity: 0.5;
+}
+
+.octane-wired-trade-and {
+    opacity: 0.8;
+}
+
+/*
+ * Trade text (AIR inventory_trading, inventory_trading_wired, inventory_trading_name_scam_warning). These are
+ * Ubuntu frames: the texts carry no text_style, so u_regular 12 px black; the user names in the offer titles are
+ * bold; the style 3 buttons draw button_shiny_regular, 12 px regular (our
+ * buttons were 11-12.6 px bold). Our `Ubuntu` face is the condensed cut and the card shell hands it to spans and
+ * buttons, so the trade body takes the regular one.
+ */
+.octane-inventory-window .octane-inventory-body.is-trade,
+.octane-trade-name-scam-body {
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+/* text_list_0 / text_list_1: bold_text (the user) + plain_text (are offering), u_regular 12 px. */
+.octane-trade-offer-title {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.octane-trade-offer-title .octane-trade-offer-user {
+    font-weight: 700;
+}
+
+/* inventory_trading_name_scam_warning: trader_label / close_countdown_text 0x555555, trader_name_text 13 px bold. */
+.octane-trade-name-scam-body .octane-trade-name-scam-muted {
+    color: #555555;
+    font-size: 12px;
+}
+
+.octane-trade-name-scam-body .octane-trade-name-scam-trader {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* The buttons carry important Tailwind sizes and the card shell's condensed face; an important rule in the
+   earlier base layer outranks both. */
+@layer base {
+    .octane-inventory-window .octane-inventory-body.is-trade :where(*):not(svg, svg *),
+    .octane-trade-name-scam-body :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    .octane-inventory-window .octane-inventory-body.is-trade :where(.octane-trade-button, .octane-wired-trade-accept, .octane-wired-trade-cancel),
+    .octane-trade-name-scam-body .octane-trade-button {
+        font-size: 12px !important;
+        font-weight: 400 !important;
+    }
+    /* button_accept, button_cancel (inventory_trading / _wired) and the name scam warning's open_profile_button /
+       close_button are the grey `button` (style 3, habbo_skin_button_shiny) with black text; the shared
+       .habbo-btn-secondary draws the flat 3 px button_default picture. AIR's cancel is grey too, never red. */
+    .octane-inventory-window .octane-inventory-body.is-trade :where(.octane-trade-button, .octane-wired-trade-accept, .octane-wired-trade-cancel).habbo-btn-secondary,
+    .octane-trade-name-scam-body .octane-trade-button.habbo-btn-secondary {
+        border-width: 5px !important;
+        border-image-source: var(--habbo-skin-shiny) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        color: #000000 !important;
+    }
+
+    .octane-inventory-window .octane-inventory-body.is-trade :where(.octane-trade-button, .octane-wired-trade-accept, .octane-wired-trade-cancel).habbo-btn-secondary:hover,
+    .octane-trade-name-scam-body .octane-trade-button.habbo-btn-secondary:hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    .octane-inventory-window .octane-inventory-body.is-trade :where(.octane-trade-button, .octane-wired-trade-accept, .octane-wired-trade-cancel).habbo-btn-secondary:active,
+    .octane-trade-name-scam-body .octane-trade-button.habbo-btn-secondary:active {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+
+    .octane-inventory-window .octane-inventory-body.is-trade :where(.octane-trade-button, .octane-wired-trade-accept, .octane-wired-trade-cancel).habbo-btn-secondary:is(:disabled, .pointer-events-none),
+    .octane-trade-name-scam-body .octane-trade-button.habbo-btn-secondary:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-disabled) !important;
+        color: #777777 !important;
+    }
+}

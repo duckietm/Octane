@@ -46,4 +46,14 @@ describe('useRoomCreatorStore', () => {
         vi.advanceTimersByTime(4500);
         expect(useRoomCreatorStore.getState().isCreating).toBe(false);
     });
+
+    it('endCreate() unlocks at once and cancels the pending lockout timer', () => {
+        useRoomCreatorStore.getState().beginCreate();
+        useRoomCreatorStore.getState().endCreate();
+        expect(useRoomCreatorStore.getState().isCreating).toBe(false);
+
+        useRoomCreatorStore.getState().beginCreate();
+        vi.advanceTimersByTime(4999);
+        expect(useRoomCreatorStore.getState().isCreating).toBe(true);
+    });
 });

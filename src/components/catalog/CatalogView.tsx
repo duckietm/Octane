@@ -1,14 +1,20 @@
-import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
-import { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaBars, FaCog } from 'react-icons/fa';
-import { CatalogType, GetConfigurationValue, LocalizeShortNumber, LocalizeText, SanitizeHtml } from '../../api';
-import { LayoutCurrencyIcon, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
-import { useCatalogActions, useCatalogData, useCatalogUiState, useHasPermission, usePurse } from '../../hooks';
+import { CatalogType, GetConfigurationValue, LocalizeShortNumber, LocalizeText, localizeWithFallback, SanitizeHtml } from '../../api';
+import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
+import { BaseButton } from '../../common/BaseButton';
+import { CssNativeText } from '../../common/native-text/CssNativeText';
+import { ToggleButton } from '../../common/ToggleButton';
+import { CatalogEffectsHost, useCatalogActions, useCatalogData, useCatalogUiState, useHasPermission, usePurse } from '../../hooks';
+import { CatalogStudioProvider } from './admin/studio/CatalogStudioProvider';
 import { CatalogAdminProvider, useCatalogAdmin } from './CatalogAdminContext';
+import { getCatalogHeaderDescription } from './catalogLocalization.helpers';
 import { parseCatalogTabLabel, useCatalogWindowWidth } from './useCatalogWindowWidth';
 import { CatalogAdminManagerView } from './views/admin/CatalogAdminManagerView';
 import { CatalogAdminOfferEditView } from './views/admin/CatalogAdminOfferEditView';
 import { CatalogAdminPageEditView } from './views/admin/CatalogAdminPageEditView';
+import { CatalogLoadingStateView } from './views/CatalogLoadingStateView';
 import { CatalogBuildersClubStatusView } from './views/catalog-header/CatalogBuildersClubStatusView';
 import { CatalogIconView } from './views/catalog-icon/CatalogIconView';
 import { CatalogGiftView } from './views/gift/CatalogGiftView';
@@ -17,9 +23,10 @@ import { CatalogNavigationView } from './views/navigation/CatalogNavigationView'
 import { CatalogSearchView } from './views/page/common/CatalogSearchView';
 import { GetCatalogLayout } from './views/page/layout/GetCatalogLayout';
 import { MarketplacePostOfferView } from './views/page/layout/marketplace/MarketplacePostOfferView';
+import { VipBenefitsView } from './views/vip-benefits/VipBenefitsView';
 
 const CatalogViewInner: FC<{}> = () => {
-    const { rootNode = null, currentPage = null, searchResult = null } = useCatalogData();
+    const { rootNode = null, currentPage = null, searchResult = null, isBusy = false, catalogLoadError = null } = useCatalogData();
     const {
         isVisible = false,
         setIsVisible = null,
@@ -29,18 +36,32 @@ const CatalogViewInner: FC<{}> = () => {
         setSearchResult = null,
         currentType = CatalogType.NORMAL
     } = useCatalogUiState();
-    const { openPageByName = null, openPageByOfferId = null, activateNode = null, openCatalogByType = null, toggleCatalogByType = null } = useCatalogActions();
+    const {
+        openPageById = null,
+        openPageByName = null,
+        openPageByOfferId = null,
+        activateNode = null,
+        openCatalogByType = null,
+        toggleCatalogByType = null,
+        retryCurrentPage = null
+    } = useCatalogActions();
     const catalogAdmin = useCatalogAdmin();
     const adminMode = catalogAdmin?.adminMode ?? false;
     const setAdminMode = catalogAdmin?.setAdminMode ?? (() => {});
 
+    // One function for the whole session: a layout that hides the navigation must not hide it again on every render.
+    const hideNavigation = useCallback(() => setNavigationHidden?.(true), [setNavigationHidden]);
+
     const isMod = useHasPermission('acc_catalogfurni');
+    // AIR's Builders Club warehouse has its own title and no tab row: its pages are listed on the left only.
+    const isBuilder = currentType === CatalogType.BUILDER;
+    const adminToggle = <FaCog className={`text-[10px] ${adminMode ? 'animate-spin' : ''}`} style={adminMode ? { animationDuration: '3s' } : {}} />;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { purse = null } = usePurse();
     const displayedCurrencies = GetConfigurationValue<number[]>('system.currency.types', []);
     const activeCatalogNode = activeNodes?.[activeNodes.length - 1] ?? null;
     const buildersClubEnabled = GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true));
-    // Strip SWF-style suffixes like "(BC)" or "(Hot)" but keep the
+    // Strip technical suffixes like "(BC)" or "(Hot)" but keep the
     // pageId hint the gameserver appends when the viewer has
     // ACC_CATALOG_IDS - that's a pure-numeric "(6)" trailer.
     const stripSwfTabSuffix = (label: string) => (label || '').replace(/\s*\(\D[^)]*\)\s*$/g, '').trim();
@@ -50,9 +71,8 @@ const CatalogViewInner: FC<{}> = () => {
     const visibleRootTabCount = useMemo(() => {
         if (!rootNode?.children?.length) return 0;
 
-        return rootNode.children.filter((child, index) => {
+        return rootNode.children.filter((child) => {
             if (!child.isVisible) return false;
-            if (index === 0 && getSwfTabLabel(child.localization).toLowerCase().includes('rari')) return false;
 
             return true;
         }).length;
@@ -112,14 +132,16 @@ const CatalogViewInner: FC<{}> = () => {
                         return;
                     case 'open':
                         if (parts.length > 2) {
-                            if (parts.length === 4) {
-                                switch (parts[2]) {
-                                    case 'offerId':
-                                        openPageByOfferId(parseInt(parts[3]));
-                                        return;
-                                }
+                            if (parts.length === 4 && parts[2] === 'offerId') {
+                                openPageByOfferId(parseInt(parts[3]));
+                            } else if (parts.length > 3) {
+                                // A page path: catalog/open/clothing/effects.
+                                openPageByName(parts.slice(2).join('/'));
                             } else {
-                                openPageByName(parts[2]);
+                                const pageId = Number(parts[2]);
+
+                                if (Number.isInteger(pageId) && pageId > 0) openPageById(pageId);
+                                else openPageByName(parts[2]);
                             }
                         } else {
                             setIsVisible(true);
@@ -134,153 +156,198 @@ const CatalogViewInner: FC<{}> = () => {
         AddLinkEventTracker(linkTracker);
 
         return () => RemoveLinkEventTracker(linkTracker);
-    }, [setIsVisible, openPageByOfferId, openPageByName, openCatalogByType, toggleCatalogByType, buildersClubEnabled]);
+    }, [setIsVisible, openPageById, openPageByOfferId, openPageByName, openCatalogByType, toggleCatalogByType, buildersClubEnabled]);
 
     return (
         <>
             {isVisible && (
-                <NitroCardView
-                    classNames={['nitro-catalog-window']}
+                <OctaneCardView
+                    classNames={['octane-catalog-window']}
                     dragStyle={catalogWindowStyle}
                     isResizable={false}
                     style={catalogWindowStyle}
                     uniqueKey="catalog"
                 >
-                    <NitroCardHeaderView
-                        className={currentType === CatalogType.BUILDER ? 'builders-club-card-header' : ''}
-                        headerText={LocalizeText('catalog.title')}
+                    <OctaneCardHeaderView
+                        className={isBuilder ? 'builders-club-card-header' : ''}
+                        headerText={
+                            isBusy
+                                ? LocalizeText('generic.loading') || 'Loading...'
+                                : isBuilder
+                                  ? localizeWithFallback('builder.catalog.title', 'The Builders Club Warehouse')
+                                  : LocalizeText('catalog.title')
+                        }
                         onCloseClick={() => setIsVisible(false)}
                     />
-                    <div className="nitro-catalog-mobile-header">
+                    <div className="octane-catalog-mobile-header">
                         {isMod && (
-                            <div className="nitro-catalog-mobile-burger">
-                                <button className="nitro-catalog-burger-btn" onClick={() => setMobileMenuOpen((value) => !value)}>
+                            <div className="octane-catalog-mobile-burger">
+                                <BaseButton className="octane-catalog-burger-btn" onClick={() => setMobileMenuOpen((value) => !value)}>
                                     <FaBars />
-                                </button>
+                                </BaseButton>
                                 {mobileMenuOpen && (
-                                    <div className="nitro-catalog-burger-menu">
-                                        <button
+                                    <div className="octane-catalog-burger-menu">
+                                        <BaseButton
                                             onClick={() => {
                                                 setAdminMode(!adminMode);
                                                 setMobileMenuOpen(false);
                                             }}
                                         >
-                                            {adminMode ? 'Exit Admin' : 'Admin'}
-                                        </button>
+                                            {adminMode ? localizeWithFallback('octane.catalog.exit_admin', 'Exit Admin') : 'Admin'}
+                                        </BaseButton>
                                     </div>
                                 )}
                             </div>
                         )}
-                        <div className="nitro-catalog-mobile-currency">
-                            <div className="nitro-catalog-coin">
+                        <div className="octane-catalog-mobile-currency">
+                            <div className="octane-catalog-coin">
                                 <span>{LocalizeShortNumber(purse?.credits ?? 0)}</span>
                                 <LayoutCurrencyIcon type={-1} />
                             </div>
                             {displayedCurrencies.map((type) => (
-                                <div key={type} className="nitro-catalog-coin">
+                                <div key={type} className="octane-catalog-coin">
                                     <span>{LocalizeShortNumber(purse?.activityPoints?.get(type) ?? 0)}</span>
                                     <LayoutCurrencyIcon type={type} />
                                 </div>
                             ))}
                         </div>
                     </div>
-                    <NitroCardTabsView classNames={['nitro-catalog-tabs-shell']} innerRef={tabsShellRef} justifyContent="start">
-                        {rootNode &&
-                            rootNode.children.length > 0 &&
-                            rootNode.children.map((child, index) => {
-                                if (!child.isVisible) return null;
-                                if (index === 0 && getSwfTabLabel(child.localization).toLowerCase().includes('rari')) return null;
+                    {!isBuilder && (
+                        <OctaneCardTabsView classNames={['octane-catalog-tabs-shell']} innerRef={tabsShellRef} justifyContent="start">
+                            {rootNode &&
+                                rootNode.children.length > 0 &&
+                                rootNode.children.map((child, index) => {
+                                    if (!child.isVisible) return null;
+                                    return (
+                                        <OctaneCardTabsItemView
+                                            key={`${child.pageId}-${child.pageName}-${index}`}
+                                            isActive={child.isActive}
+                                            title={child.localization}
+                                            onClick={() => {
+                                                if (searchResult) setSearchResult(null);
 
-                                return (
-                                    <NitroCardTabsItemView
-                                        key={`${child.pageId}-${child.pageName}-${index}`}
-                                        isActive={child.isActive}
-                                        title={child.localization}
-                                        onClick={() => {
-                                            if (searchResult) setSearchResult(null);
-
-                                            activateNode(child);
-                                        }}
-                                    >
-                                        <div className="flex items-center gap-1">
-                                            {child.iconId > 0 && <CatalogIconView icon={child.iconId} className="nitro-catalog-tab-icon" />}
-                                            <span className="nitro-catalog-tab-label">{getSwfTabLabel(child.localization)}</span>
-                                        </div>
-                                    </NitroCardTabsItemView>
-                                );
-                            })}
-                        {isMod && (
-                            <NitroCardTabsItemView classNames={['nitro-catalog-admin-tab']} isActive={adminMode} onClick={() => setAdminMode(!adminMode)}>
-                                <FaCog className={`text-[10px] ${adminMode ? 'animate-spin' : ''}`} style={adminMode ? { animationDuration: '3s' } : {}} />
-                            </NitroCardTabsItemView>
+                                                activateNode(child);
+                                            }}
+                                        >
+                                            <div className="flex items-center gap-1">
+                                                <span className="octane-catalog-tab-label">
+                                                    <CssNativeText
+                                                        colorKey={child.isActive}
+                                                        text={getSwfTabLabel(child.localization)}
+                                                        textStyle="u_button_tab"
+                                                    />
+                                                </span>
+                                            </div>
+                                        </OctaneCardTabsItemView>
+                                    );
+                                })}
+                            {isMod && (
+                                <OctaneCardTabsItemView classNames={['octane-catalog-admin-tab']} isActive={adminMode} onClick={() => setAdminMode(!adminMode)}>
+                                    {adminToggle}
+                                </OctaneCardTabsItemView>
+                            )}
+                        </OctaneCardTabsView>
+                    )}
+                    <div className={`octane-catalog-standard-header ${isBuilder ? 'is-builder' : ''}`}>
+                        {isBuilder && isMod && (
+                            <ToggleButton aria-label={localizeWithFallback('octane.catalog.admin', 'Admin')} className="octane-catalog-builder-admin-toggle" pressed={adminMode} onPressedChange={setAdminMode}>
+                                {adminToggle}
+                            </ToggleButton>
                         )}
-                    </NitroCardTabsView>
-                    <div className="nitro-catalog-swf-header">
                         <div
-                            className="nitro-catalog-swf-header-bg"
+                            className="octane-catalog-standard-header-bg"
                             style={currentPage?.localization?.getImage(0) ? { backgroundImage: `url(${currentPage.localization.getImage(0)})` } : undefined}
                         />
-                        <div className="nitro-catalog-swf-header-icon">
+                        <div className="octane-catalog-standard-header-icon">
                             <CatalogIconView icon={activeCatalogNode?.iconId ?? rootNode?.iconId ?? 1} />
                         </div>
-                        <div className="nitro-catalog-swf-header-copy">
-                            <div className="nitro-catalog-swf-header-title">
-                                {currentType === CatalogType.BUILDER
-                                    ? LocalizeText('builder.header.title')
-                                    : getSwfTabLabel(activeCatalogNode?.localization ?? LocalizeText('catalog.title'))}
-                            </div>
-                            {currentType === CatalogType.BUILDER ? (
-                                <div className="nitro-catalog-swf-header-description">{LocalizeText('builder.header.status.membership')}</div>
+                        <div className="octane-catalog-standard-header-copy">
+                            {isBuilder ? (
+                                <CatalogBuildersClubStatusView />
                             ) : (
-                                <div
-                                    className="nitro-catalog-swf-header-description"
-                                    dangerouslySetInnerHTML={{ __html: SanitizeHtml(currentPage?.localization?.getText(0) || '') }}
-                                />
+                                <>
+                                    <div className="octane-catalog-standard-header-title">
+                                        <CssNativeText
+                                            text={
+                                                searchResult
+                                                    ? LocalizeText('catalog.search.header')
+                                                    : getSwfTabLabel(activeCatalogNode?.localization ?? LocalizeText('catalog.title'))
+                                            }
+                                            textStyle="u_headline_big"
+                                        />
+                                    </div>
+                                    <div
+                                        className="octane-catalog-standard-header-description"
+                                        dangerouslySetInnerHTML={{
+                                            __html: SanitizeHtml(
+                                                searchResult
+                                                    ? LocalizeText(
+                                                          'catalog.search.results',
+                                                          ['count', 'needle'],
+                                                          [String(searchResult.offers.length), searchResult.searchValue]
+                                                      )
+                                                    : getCatalogHeaderDescription(currentPage?.layoutCode, currentPage?.localization)
+                                            )
+                                        }}
+                                    />
+                                </>
                             )}
                         </div>
                     </div>
-                    <NitroCardContentView classNames={['nitro-catalog-content-shell']}>
-                        <CatalogBuildersClubStatusView />
-                        <div className={`nitro-catalog-stage ${navigationHidden ? 'is-navigation-hidden' : ''}`}>
+                    <OctaneCardContentView classNames={['octane-catalog-content-shell']}>
+                        <div className={`octane-catalog-stage ${navigationHidden ? 'is-navigation-hidden' : ''}`}>
                             {!navigationHidden && (
-                                <div className="nitro-catalog-sidebar">
-                                    <div className="nitro-catalog-search-shell">
+                                <div className="octane-catalog-sidebar">
+                                    <div className="octane-catalog-search-shell">
                                         <CatalogSearchView />
                                     </div>
-                                    <div className="nitro-catalog-navigation-shell">
-                                        {activeNodes && activeNodes.length > 0 && <CatalogNavigationView node={activeNodes[0]} />}
+                                    <div className="octane-catalog-navigation-shell">
+                                        {activeNodes && activeNodes.length > 0 && <CatalogNavigationView node={activeNodes[0]} catalogType={currentType} />}
                                     </div>
                                 </div>
                             )}
-                            <div className="nitro-catalog-layout-shell">
-                                <div className="nitro-catalog-layout-header-shell">
+                            <div aria-busy={isBusy} className="octane-catalog-layout-shell">
+                                <div className="octane-catalog-layout-header-shell">
                                     <CatalogBreadcrumbView />
-                                    <div className="nitro-catalog-layout-hero">
+                                    <div className="octane-catalog-layout-hero">
                                         {!!currentPage?.localization?.getImage(0) && <img alt="" src={currentPage.localization.getImage(0)} />}
                                     </div>
                                 </div>
-                                <div className="nitro-catalog-layout-container">{GetCatalogLayout(currentPage, () => setNavigationHidden(true))}</div>
+                                <div className="octane-catalog-layout-container">{GetCatalogLayout(currentPage, hideNavigation)}</div>
                             </div>
                         </div>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                    {(isBusy || catalogLoadError) && <CatalogLoadingStateView error={catalogLoadError} onRetry={retryCurrentPage} />}
+                </OctaneCardView>
             )}
             <CatalogAdminManagerView />
             <CatalogAdminPageEditView />
             <CatalogAdminOfferEditView />
             <CatalogGiftView />
             <MarketplacePostOfferView />
+            <VipBenefitsView />
         </>
     );
 };
 
 export const CatalogView: FC<{}> = () => {
     const { catalogLocalizationVersion = 0 } = useCatalogData();
+    const { isVisible = false } = useCatalogUiState();
 
+    const isCatalogAdmin = useHasPermission('acc_catalogfurni');
+
+    // Opening a studio session is expensive on the server: it loads every
+    // catalog item with FOR UPDATE and every items_base id, on the thread
+    // serving this client. Tying it to authentication meant every staff login
+    // stalled the hotel view — no room list, no catalog — until it finished.
+    // The session is only needed once the catalog is actually open.
     return (
-        <CatalogAdminProvider>
-            <div className="hidden" data-catalog-localization-version={catalogLocalizationVersion} />
-            <CatalogViewInner />
-        </CatalogAdminProvider>
+        <CatalogStudioProvider active={isCatalogAdmin && isVisible}>
+            <CatalogEffectsHost />
+            <CatalogAdminProvider>
+                <div className="hidden" data-catalog-localization-version={catalogLocalizationVersion} />
+                <CatalogViewInner />
+            </CatalogAdminProvider>
+        </CatalogStudioProvider>
     );
 };

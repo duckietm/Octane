@@ -16,9 +16,9 @@ import {
     RoomObjectVariable,
     RoomTradingLevelEnum,
     RoomWidgetEnumItemExtradataParameter
-} from '@nitrots/nitro-renderer';
-import { GetRoomSession, IsOwnerOfFurniture } from '../../nitro';
-import { LocalizeText } from '../../utils';
+} from '@octane/renderer';
+import { GetRoomSession, IsAnyRoomController, IsOwnerOfFurniture } from '../../octane';
+import { IsBuildersClubFurniId, IsTemporaryFurniId, LocalizeText } from '../../utils';
 import { AvatarInfoFurni } from './AvatarInfoFurni';
 import { AvatarInfoName } from './AvatarInfoName';
 import { AvatarInfoPet } from './AvatarInfoPet';
@@ -86,6 +86,8 @@ export class AvatarInfoUtilities {
 
         furniInfo.id = objectId;
         furniInfo.category = category;
+        furniInfo.isTemporary = IsTemporaryFurniId(objectId);
+        furniInfo.isBuildersClub = IsBuildersClubFurniId(objectId);
 
         const model = roomObject.model;
 
@@ -151,7 +153,7 @@ export class AvatarInfoUtilities {
         furniInfo.isWallItem = category === RoomObjectCategory.WALL;
         furniInfo.isRoomOwner = roomSession.isRoomOwner;
         furniInfo.roomControllerLevel = roomSession.controllerLevel;
-        furniInfo.isAnyRoomController = GetSessionDataManager().isModerator;
+        furniInfo.isAnyRoomController = IsAnyRoomController();
         furniInfo.ownerId = model.getValue<number>(RoomObjectVariable.FURNITURE_OWNER_ID);
         furniInfo.ownerName = model.getValue<string>(RoomObjectVariable.FURNITURE_OWNER_NAME);
         furniInfo.usagePolicy = model.getValue<number>(RoomObjectVariable.FURNITURE_USAGE_POLICY);
@@ -198,6 +200,7 @@ export class AvatarInfoUtilities {
         userInfo.cardBackgroundId = userData.cardBackground ?? 0;
         userInfo.borderId = (userData as any).borderId ?? 0;
         userInfo.achievementScore = userData.activityPoints;
+        userInfo.badgesRank = userData.badgesRank ?? -1;
         userInfo.webID = userData.webID;
         userInfo.roomIndex = userData.roomIndex;
         userInfo.userType = RoomObjectType.USER;
@@ -211,7 +214,7 @@ export class AvatarInfoUtilities {
         userInfo.amIOwner = roomSession.isRoomOwner;
         userInfo.isGuildRoom = roomSession.isGuildRoom;
         userInfo.roomControllerLevel = roomSession.controllerLevel;
-        userInfo.amIAnyRoomController = GetSessionDataManager().isModerator;
+        userInfo.amIAnyRoomController = IsAnyRoomController();
         userInfo.isAmbassador = GetSessionDataManager().isAmbassador;
 
         if (userInfo.type === AvatarInfoUser.PEER) {
@@ -222,7 +225,7 @@ export class AvatarInfoUtilities {
                 userInfo.canBeBanned = this.canBeBanned(userInfo);
             }
 
-            userInfo.isIgnored = GetSessionDataManager().isUserIgnored(userData.name);
+            userInfo.isIgnored = GetSessionDataManager().isUserIgnored(userData.webID);
             userInfo.respectLeft = GetSessionDataManager().respectsLeft;
 
             const isShuttingDown = GetSessionDataManager().isSystemShutdown;
@@ -253,9 +256,10 @@ export class AvatarInfoUtilities {
 
             userInfo.canTradeReason = AvatarInfoUser.TRADE_REASON_OK;
 
-            if (isShuttingDown) userInfo.canTradeReason = AvatarInfoUser.TRADE_REASON_SHUTDOWN;
-
+            // A shutdown is the reason even in a room without free trading.
             if (tradeMode !== RoomTradingLevelEnum.FREE_TRADING) userInfo.canTradeReason = AvatarInfoUser.TRADE_REASON_NO_TRADING;
+
+            if (isShuttingDown) userInfo.canTradeReason = AvatarInfoUser.TRADE_REASON_SHUTDOWN;
 
             // const _local_12 = GetSessionDataManager().userId;
             // _local_13 = GetSessionDataManager().getUserTags(_local_12);
@@ -292,7 +296,7 @@ export class AvatarInfoUtilities {
         userInfo.amIOwner = roomSession.isRoomOwner;
         userInfo.isGuildRoom = roomSession.isGuildRoom;
         userInfo.roomControllerLevel = roomSession.controllerLevel;
-        userInfo.amIAnyRoomController = GetSessionDataManager().isModerator;
+        userInfo.amIAnyRoomController = IsAnyRoomController();
         userInfo.isAmbassador = GetSessionDataManager().isAmbassador;
         userInfo.badges = [AvatarInfoUser.DEFAULT_BOT_BADGE_ID];
         userInfo.figure = userData.figure;
@@ -318,7 +322,7 @@ export class AvatarInfoUtilities {
 
         botInfo.amIOwner = roomSession.isRoomOwner;
         botInfo.roomControllerLevel = roomSession.controllerLevel;
-        botInfo.amIAnyRoomController = GetSessionDataManager().isModerator;
+        botInfo.amIAnyRoomController = IsAnyRoomController();
         botInfo.badges = [AvatarInfoUser.DEFAULT_BOT_BADGE_ID];
         botInfo.figure = userData.figure;
 
@@ -379,7 +383,7 @@ export class AvatarInfoUtilities {
         petInfo.remainingGrowTime = petData.remainingGrowTime;
         petInfo.publiclyBreedable = petData.publiclyBreedable;
 
-        if (isOwner || roomSession.isRoomOwner || GetSessionDataManager().isModerator || roomSession.controllerLevel >= RoomControllerLevel.GUEST)
+        if (isOwner || roomSession.isRoomOwner || IsAnyRoomController() || roomSession.controllerLevel >= RoomControllerLevel.GUEST)
             petInfo.canRemovePet = true;
 
         return petInfo;

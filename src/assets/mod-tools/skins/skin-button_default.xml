@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<skin name="default_button_skin" version="0.0">
+
+	<!-- shared variables -->
+
+	<variables>
+		<variable key="asset"	value="habbo_blue_skin_png"	type="String" />
+	</variables>
+
+	<!-- the following maps layouts for render states -->
+
+	<states>
+		<state name="default"  layout="button" template="default_button" />
+		<state name="disabled" layout="button" template="disabled_button" />
+		<state name="pressed"  layout="button" template="pressed_button" />
+		<state name="hovering" layout="button" template="hovering_button" />
+	</states>
+
+	<!-- templates defines regions in bitmap asset -->
+
+	<templates>
+		<template name="default_button" asset="$asset">
+			<entities>
+				<entity name="top_left"	  type="bitmap"><region><Rectangle x="89" y="0"  width="3" height="3" /></region></entity>
+				<entity name="mid_left"	  type="bitmap"><region><Rectangle x="89" y="3"  width="3" height="1" /></region></entity>
+				<entity name="btm_left"   type="bitmap"><region><Rectangle x="89" y="19" width="3" height="3" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="92" y="0"  width="1" height="3" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="92" y="3"  width="1" height="1" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="92" y="19" width="1" height="3" /></region></entity>
+				<entity name="top_right"  type="bitmap"><region><Rectangle x="95" y="0"  width="3" height="3" /></region></entity>
+				<entity name="mid_right"  type="bitmap"><region><Rectangle x="95" y="3"  width="3" height="1" /></region></entity>
+				<entity name="btm_right"  type="bitmap"><region><Rectangle x="95" y="19" width="3" height="3" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="disabled_button" asset="$asset">
+			<entities>
+				<entity name="top_left"	  type="bitmap"><region><Rectangle x="99" y="0"  width="3" height="3" /></region></entity>
+				<entity name="mid_left"	  type="bitmap"><region><Rectangle x="99" y="3"  width="3" height="1" /></region></entity>
+				<entity name="btm_left"   type="bitmap"><region><Rectangle x="99" y="19" width="3" height="3" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="102" y="0"  width="1" height="3" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="102" y="3"  width="1" height="1" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="102" y="19" width="1" height="3" /></region></entity>
+				<entity name="top_right"  type="bitmap"><region><Rectangle x="105" y="0"  width="3" height="3" /></region></entity>
+				<entity name="mid_right"  type="bitmap"><region><Rectangle x="105" y="3"  width="3" height="1" /></region></entity>
+				<entity name="btm_right"  type="bitmap"><region><Rectangle x="105" y="19" width="3" height="3" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="pressed_button" asset="$asset">
+			<entities>
+				<entity name="top_left"	  type="bitmap"><region><Rectangle x="109" y="0"  width="3" height="3" /></region></entity>
+				<entity name="mid_left"	  type="bitmap"><region><Rectangle x="109" y="3"  width="3" height="1" /></region></entity>
+				<entity name="btm_left"   type="bitmap"><region><Rectangle x="109" y="19" width="3" height="3" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="112" y="0"  width="1" height="3" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="112" y="3"  width="1" height="1" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="112" y="19" width="1" height="3" /></region></entity>
+				<entity name="top_right"  type="bitmap"><region><Rectangle x="115" y="0"  width="3" height="3" /></region></entity>
+				<entity name="mid_right"  type="bitmap"><region><Rectangle x="115" y="3"  width="3" height="1" /></region></entity>
+				<entity name="btm_right"  type="bitmap"><region><Rectangle x="115" y="19" width="3" height="3" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="hovering_button" asset="$asset">
+			<entities>
+				<entity name="top_left"	  type="bitmap"><region><Rectangle x="89" y="46"  width="3" height="3" /></region></entity>
+				<entity name="mid_left"	  type="bitmap"><region><Rectangle x="89" y="49"  width="3" height="1" /></region></entity>
+				<entity name="btm_left"   type="bitmap"><region><Rectangle x="89" y="65" width="3" height="3" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="92" y="46"  width="1" height="3" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="92" y="49"  width="1" height="1" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="92" y="65" width="1" height="3" /></region></entity>
+				<entity name="top_right"  type="bitmap"><region><Rectangle x="95" y="46"  width="3" height="3" /></region></entity>
+				<entity name="mid_right"  type="bitmap"><region><Rectangle x="95" y="49"  width="3" height="1" /></region></entity>
+				<entity name="btm_right"  type="bitmap"><region><Rectangle x="95" y="65" width="3" height="3" /></region></entity>
+			</entities>
+		</template>
+	</templates>
+
+	<!-- markup for layout drawer -->
+
+	<layouts>
+		<layout name="button" transparent="true">
+			<entities>
+
+				<!-- left -->
+
+				<entity name="top_left" id="0">
+					<region><Rectangle x="0" y="0" width="3" height="3" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+
+				<entity name="mid_left" id="0">
+					<region><Rectangle x="0" y="3" width="3" height="16" /></region>
+					<scale horizontal="fixed" vertical="strech" />
+				</entity>
+
+				<entity name="btm_left" id="0">
+					<region><Rectangle x="0" y="19" width="3" height="3" /></region>
+					<scale horizontal="fixed" vertical="move" />
+				</entity>
+
+				<!-- center -->
+
+				<entity name="top_center" id="1">
+					<region><Rectangle x="3"  y="0" width="1" height="3" /></region>
+					<scale horizontal="strech" vertical="fixed" />
+				</entity>
+
+				<entity name="mid_center" id="1">
+					<region><Rectangle x="3"  y="3" width="1" height="16" /></region>
+					<scale horizontal="strech" vertical="strech" />
+				</entity>
+
+				<entity name="btm_center" id="1">
+					<region><Rectangle x="3"  y="19" width="1" height="3" /></region>
+					<scale horizontal="strech" vertical="move" />
+				</entity>
+
+				<!-- right -->
+
+				<entity name="top_right" id="2">
+					<region><Rectangle x="4" y="0" width="3" height="3" /></region>
+					<scale horizontal="move" vertical="fixed" />
+				</entity>
+
+				<entity name="mid_right" id="2">
+					<region><Rectangle x="4" y="3" width="3" height="16" /></region>
+					<scale horizontal="move" vertical="strech" />
+				</entity>
+
+				<entity name="btm_right" id="2">
+					<region><Rectangle x="4" y="19" width="3" height="3" /></region>
+					<scale horizontal="move" vertical="move" />
+				</entity>
+
+			</entities>
+		</layout>
+	</layouts>
+</skin>

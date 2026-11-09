@@ -1,24 +1,258 @@
-import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
-import { FC, useEffect, useState } from 'react';
+import { Progress } from '@base-ui/react/progress';
+import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { LocalizeText } from '../../api';
-import { Column, Flex, Text } from '../../common';
 import { useSoundboard } from '../../hooks';
-import { NitroCard } from '../../layout';
+import { isTextEntryTarget } from '../../hooks/rooms/useRoomKeyboardMovement';
+import { useSoundboardFeedStore } from '../../hooks/soundboard/soundboardFeedStore';
+import {
+    DisplaySoundboardSound,
+    filterSoundboardSounds,
+    SoundboardCategory
+} from '../../hooks/soundboard/soundboardPresentation';
+import { OctaneCard } from '../../layout';
+import { SoundboardPadView } from './SoundboardPadView';
+import { SoundboardShelfView } from './SoundboardShelfView';
+import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+
+const PAGE_SIZE = 10;
+const PLAYING_MS = 1_500;
+const SHELF_SIZE = 6;
+
+const isTypingTarget = isTextEntryTarget;
+
+interface SoundboardContentViewProps {
+    sounds: DisplaySoundboardSound[];
+    categories: SoundboardCategory[];
+    recentSoundIds: number[];
+    favoriteIds?: number[];
+    isCoolingDown: boolean;
+    cooldownRemainingSeconds?: number;
+    cooldownTotalSeconds?: number;
+    playingSoundId?: number | null;
+    silencedCount?: number;
+    rightsOnly?: boolean;
+    onPlay: (sound: DisplaySoundboardSound) => void;
+    onToggleFavorite?: (sound: DisplaySoundboardSound) => void;
+    onRestoreSilenced?: () => void;
+}
+
+export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
+    sounds,
+    categories,
+    recentSoundIds,
+    favoriteIds = [],
+    isCoolingDown,
+    cooldownRemainingSeconds = 0,
+    cooldownTotalSeconds = 0,
+    playingSoundId = null,
+    silencedCount = 0,
+    rightsOnly = false,
+    onPlay,
+    onToggleFavorite,
+    onRestoreSilenced
+}) => {
+    const [query, setQuery] = useState('');
+    const [categoryId, setCategoryId] = useState('all');
+    const [page, setPage] = useState(0);
+    const searchRef = useRef<HTMLInputElement>(null);
+    const filteredSounds = useMemo(
+        () => filterSoundboardSounds(sounds, query, categoryId, recentSoundIds, favoriteIds),
+        [sounds, query, categoryId, recentSoundIds, favoriteIds]
+    );
+    const totalPages = Math.max(1, Math.ceil(filteredSounds.length / PAGE_SIZE));
+    const pageSounds = filteredSounds.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+    const favoriteSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
+    const shelfIds = favoriteIds.length ? favoriteIds : recentSoundIds;
+    const shelfSounds = useMemo(
+        () => shelfIds.map((id) => sounds.find((sound) => sound.id === id)).filter((sound): sound is DisplaySoundboardSound => !!sound).slice(0, SHELF_SIZE),
+        [shelfIds, sounds]
+    );
+    const cooldownPercent = isCoolingDown && cooldownTotalSeconds > 0
+        ? Math.min(100, Math.round((cooldownRemainingSeconds / cooldownTotalSeconds) * 100))
+        : 0;
+
+    useEffect(() => setPage(0), [query, categoryId, sounds, recentSoundIds]);
+
+    useEffect(() => {
+        if (page >= totalPages) setPage(totalPages - 1);
+    }, [page, totalPages]);
+
+    useEffect(() => {
+        if (categoryId === 'favorites' && !favoriteIds.length) setCategoryId('all');
+    }, [categoryId, favoriteIds.length]);
+
+    const changePage = (delta: number) => setPage((current) => Math.min(totalPages - 1, Math.max(0, current + delta)));
+
+    // Shortcuts while the panel is open: 1-9 and 0 play the visible pads, arrows page, "/" searches.
+    useEffect(() => {
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.ctrlKey || event.altKey || event.metaKey || isTypingTarget(event.target)) return;
+
+            if (event.key === '/') {
+                event.preventDefault();
+                searchRef.current?.focus();
+                return;
+            }
+
+            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+                event.preventDefault();
+                changePage(event.key === 'ArrowLeft' ? -1 : 1);
+                return;
+            }
+
+            if (/^[0-9]$/.test(event.key)) {
+                const sound = pageSounds[(Number(event.key) + 9) % 10];
+                if (!sound || isCoolingDown) return;
+
+                event.preventDefault();
+                onPlay(sound);
+            }
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    });
+
+    const selectCategory = (value: string) => {
+        setCategoryId(value);
+        setPage(0);
+    };
+
+    const categoryClassName = (value: string) => `shrink-0 cursor-pointer rounded-full border px-2.5 py-1 text-[11px] font-bold transition-colors ${
+        categoryId === value
+            ? 'border-[#286889] bg-[#3d8fba] text-white'
+            : 'border-[#8ca9b8] bg-white/70 text-[#28566f] hover:bg-white'
+    }`;
+
+    return (
+        <NativeTextTree>
+            <div className="flex flex-col gap-2">
+                <input
+                    ref={searchRef}
+                    type="search"
+                    value={query}
+                    aria-label={LocalizeText('soundboard.search')}
+                    placeholder={`${LocalizeText('soundboard.search')}  ( / )`}
+                    onChange={(event) => setQuery(event.target.value)}
+                    onKeyDown={(event) => event.key === 'Escape' && event.currentTarget.blur()}
+                    className="h-8 w-full rounded-md border border-[#8ca9b8] bg-white px-2.5 text-xs text-[#17384b] outline-none focus:border-[#3d8fba] focus:ring-1 focus:ring-[#3d8fba]"
+                />
+
+                {!query.trim() && !!shelfSounds.length && (
+                    <SoundboardShelfView
+                        label={favoriteIds.length ? `★ ${LocalizeText('soundboard.category.favorites')}` : LocalizeText('soundboard.category.recent')}
+                        sounds={shelfSounds}
+                        disabled={isCoolingDown}
+                        playingSoundId={playingSoundId}
+                        onPlay={onPlay}
+                    />
+                )}
+
+                <div className="flex gap-1.5 overflow-x-auto pb-0.5" aria-label={LocalizeText('soundboard.categories')}>
+                    {!!favoriteIds.length && (
+                        <BaseButton type="button" onClick={() => selectCategory('favorites')} className={categoryClassName('favorites')}>
+                            ★ {LocalizeText('soundboard.category.favorites')}
+                        </BaseButton>
+                    )}
+                    <BaseButton type="button" onClick={() => selectCategory('all')} className={categoryClassName('all')}>
+                        {LocalizeText('soundboard.category.all')}
+                    </BaseButton>
+                    {!!recentSoundIds.length && (
+                        <BaseButton type="button" onClick={() => selectCategory('recent')} className={categoryClassName('recent')}>
+                            {LocalizeText('soundboard.category.recent')}
+                        </BaseButton>
+                    )}
+                    {categories.map((category) => (
+                        <BaseButton key={category.id} type="button" onClick={() => selectCategory(category.id)} className={categoryClassName(category.id)}>
+                            {category.label}
+                        </BaseButton>
+                    ))}
+                </div>
+
+                {!filteredSounds.length ? (
+                    <div className="py-4 text-center text-xs text-black/50">{LocalizeText('soundboard.empty')}</div>
+                ) : (
+                    <div
+                        className="soundboard-list"
+                        data-testid="soundboard-grid"
+                        onWheel={(event) => totalPages > 1 && event.deltaY !== 0 && changePage(event.deltaY > 0 ? 1 : -1)}
+                    >
+                        {pageSounds.map((sound, index) => (
+                            <SoundboardPadView
+                                key={sound.id}
+                                sound={sound}
+                                hotkey={String((index + 1) % 10)}
+                                favorite={favoriteSet.has(sound.id)}
+                                playing={sound.id === playingSoundId}
+                                disabled={isCoolingDown}
+                                onPlay={onPlay}
+                                onToggleFavorite={onToggleFavorite}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                <Progress.Root className="soundboard-cooldown" aria-label={LocalizeText('soundboard.cooldown')} max={100} min={0} value={cooldownPercent}>
+                    <Progress.Track className="soundboard-cooldown__track">
+                        <Progress.Indicator className="soundboard-cooldown__fill" />
+                    </Progress.Track>
+                </Progress.Root>
+
+                {totalPages > 1 && (
+                    <div className="flex select-none items-center justify-center gap-1.5">
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <BaseButton
+                                key={index}
+                                type="button"
+                                aria-label={LocalizeText('soundboard.pagination.page', ['page'], [String(index + 1)])}
+                                aria-current={index === page ? 'page' : undefined}
+                                onClick={() => setPage(index)}
+                                className={`h-2 w-2 cursor-pointer rounded-full transition-colors ${index === page ? 'bg-[#3d8fba]' : 'bg-[#9bb7c7] hover:bg-[#6f98b0]'}`}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {silencedCount > 0 && (
+                    <div className="soundboard-silenced text-black/60">
+                        <span>{LocalizeText('soundboard.silenced.count', ['count'], [String(silencedCount)])}</span>
+                        <BaseButton type="button" className="soundboard-silenced__restore" onClick={onRestoreSilenced}>
+                            {LocalizeText('soundboard.silenced.restore')}
+                        </BaseButton>
+                    </div>
+                )}
+
+                {rightsOnly && <div className="text-center text-[10px] text-black/60">{LocalizeText('soundboard.room.mode.rights')}</div>}
+
+                <div className="text-center text-[10px] text-black/45">{LocalizeText('soundboard.hint')}</div>
+            </div>
+        </NativeTextTree>
+    );
+};
 
 export const SoundboardView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
-    const { enabled, sounds, lastPlayed, play } = useSoundboard();
-
-    const PAGE_SIZE = 9;
-    const [page, setPage] = useState(0);
-    const totalPages = Math.max(1, Math.ceil(sounds.length / PAGE_SIZE));
-
-    // Clamp the page if the sound list shrinks (or on first load).
-    useEffect(() => {
-        if (page > totalPages - 1) setPage(0);
-    }, [totalPages, page]);
-
-    const pageSounds = sounds.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+    const {
+        enabled,
+        roomMode,
+        sounds,
+        categories,
+        recentSoundIds,
+        favoriteIds,
+        silencedUserIds,
+        isCoolingDown,
+        cooldownRemainingSeconds,
+        cooldownTotalSeconds,
+        play,
+        toggleFavorite,
+        restoreSilencedUsers,
+        refresh
+    } = useSoundboard();
+    const lastPlayed = useSoundboardFeedStore((state) => state.lastPlayed);
+    const [playingSoundId, setPlayingSoundId] = useState<number | null>(null);
+    const wasVisibleRef = useRef(false);
 
     useEffect(() => {
         const linkTracker: ILinkEventTracker = {
@@ -34,7 +268,7 @@ export const SoundboardView: FC<{}> = () => {
                         setIsVisible(false);
                         return;
                     case 'toggle':
-                        setIsVisible((prev) => !prev);
+                        setIsVisible((current) => !current);
                         return;
                 }
             },
@@ -42,74 +276,53 @@ export const SoundboardView: FC<{}> = () => {
         };
 
         AddLinkEventTracker(linkTracker);
-
         return () => RemoveLinkEventTracker(linkTracker);
     }, []);
 
-    // The soundboard belongs to the room — close it when the room turns it off.
     useEffect(() => {
         if (!enabled) setIsVisible(false);
     }, [enabled]);
 
+    useEffect(() => {
+        const visible = isVisible && enabled;
+
+        if (visible && !wasVisibleRef.current) refresh();
+        wasVisibleRef.current = visible;
+    }, [enabled, isVisible, refresh]);
+
+    useEffect(() => {
+        if (!lastPlayed) return;
+
+        setPlayingSoundId(lastPlayed.soundId);
+        const timer = window.setTimeout(() => setPlayingSoundId(null), PLAYING_MS);
+
+        return () => window.clearTimeout(timer);
+    }, [lastPlayed]);
+
     if (!isVisible || !enabled) return null;
 
     return (
-        <NitroCard className="w-[420px] max-w-[96vw]" uniqueKey="soundboard">
-            <NitroCard.Header headerText={LocalizeText('soundboard.title')} onCloseClick={() => setIsVisible(false)} />
-            <NitroCard.Content>
-                <Column gap={2}>
-                    {!sounds.length && (
-                        <Text small className="text-black/50">
-                            {LocalizeText('soundboard.empty')}
-                        </Text>
-                    )}
-                    {!!sounds.length && (
-                        <>
-                            <div className="grid grid-cols-3 gap-2">
-                                {pageSounds.map((sound) => (
-                                    <button
-                                        key={sound.id}
-                                        onClick={() => play(sound)}
-                                        title={sound.name}
-                                        className="flex h-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg bg-[#3a7bb5] px-2 text-white shadow transition-transform hover:bg-[#336ea3] active:scale-95"
-                                    >
-                                        <span className="text-2xl leading-none">🔊</span>
-                                        <span className="line-clamp-2 text-center text-[11px] font-bold leading-tight">{sound.name}</span>
-                                    </button>
-                                ))}
-                            </div>
-                            {totalPages > 1 && (
-                                <Flex alignItems="center" justifyContent="center" gap={2} className="select-none pt-1">
-                                    <button
-                                        disabled={page === 0}
-                                        onClick={() => setPage((p) => Math.max(0, p - 1))}
-                                        className="cursor-pointer rounded bg-[#3a7bb5] px-3 py-1 text-sm font-bold text-white hover:bg-[#336ea3] disabled:cursor-default disabled:opacity-40"
-                                    >
-                                        ◀
-                                    </button>
-                                    <Text small bold className="min-w-[44px] text-center text-[#2f6f95]">
-                                        {page + 1} / {totalPages}
-                                    </Text>
-                                    <button
-                                        disabled={page >= totalPages - 1}
-                                        onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-                                        className="cursor-pointer rounded bg-[#3a7bb5] px-3 py-1 text-sm font-bold text-white hover:bg-[#336ea3] disabled:cursor-default disabled:opacity-40"
-                                    >
-                                        ▶
-                                    </button>
-                                </Flex>
-                            )}
-                        </>
-                    )}
-                    {lastPlayed && (
-                        <Flex alignItems="center" justifyContent="center" className="pt-1">
-                            <Text small className="text-[#2f6f95]">
-                                {LocalizeText('soundboard.lastplayed', ['user'], [lastPlayed.username])}
-                            </Text>
-                        </Flex>
-                    )}
-                </Column>
-            </NitroCard.Content>
-        </NitroCard>
+        <NativeTextTree>
+            <OctaneCard className="w-[420px] max-w-[96vw]" uniqueKey="soundboard">
+                <OctaneCard.Header headerText={LocalizeText('soundboard.title')} onCloseClick={() => setIsVisible(false)} />
+                <OctaneCard.Content>
+                    <SoundboardContentView
+                        sounds={sounds}
+                        categories={categories}
+                        recentSoundIds={recentSoundIds}
+                        favoriteIds={favoriteIds}
+                        isCoolingDown={isCoolingDown}
+                        cooldownRemainingSeconds={cooldownRemainingSeconds}
+                        cooldownTotalSeconds={cooldownTotalSeconds}
+                        playingSoundId={playingSoundId}
+                        silencedCount={silencedUserIds.length}
+                        rightsOnly={roomMode === 2}
+                        onPlay={play}
+                        onToggleFavorite={(sound) => toggleFavorite(sound.id)}
+                        onRestoreSilenced={restoreSilencedUsers}
+                    />
+                </OctaneCard.Content>
+            </OctaneCard>
+        </NativeTextTree>
     );
 };

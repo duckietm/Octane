@@ -1,11 +1,38 @@
-import { FurniturePickupAllComposer } from '@nitrots/nitro-renderer';
-import { FC, useEffect, useEffectEvent, useMemo, useState } from 'react';
-import { chooserSelectionVisualizer, LocalizeText, RoomObjectItem, SendMessageComposer } from '../../../../api';
-import { Button, Flex, InfiniteScroll, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
-import { useHasPermission } from '../../../../hooks';
-import { classNames, NitroInput } from '../../../../layout';
+import { FurniturePickupAllComposer, RoomObjectCategory } from '@octane/renderer';
+import { FC, useMemo, useState } from 'react';
+import { chooserSelectionVisualizer, localizeWithFallback, RoomObjectItem, SendMessageComposer } from '../../../../api';
+import { IsBuildersClubFurniId, IsTemporaryFurniId } from '../../../../api/utils/FurniIdBand';
+import { Button, InfiniteScroll, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
+import { useFurniPickupGuard } from '../../../../hooks';
+import { classNames, OctaneInput } from '../../../../layout';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
+import '../../../../css/room/RoomWidgetsSweepAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const LIMIT_FURNI_PICKALL = 100;
+
+/** Official FurniChooserTableObject: Builders Club and temporary (Wired) furni show "-" in the owner column. */
+const furniOwnerCell = (item: RoomObjectItem) => {
+    if (IsBuildersClubFurniId(item.id) || IsTemporaryFurniId(item.id)) return '-';
+
+    return item.ownerName && item.ownerName !== '-' ? item.ownerName : '';
+};
+
+/** The menu's "all" entry; owner names go in with a prefix so an owner called "all" keeps its own entry. */
+const FILTER_ALL = '';
+const OWNER_FILTER_PREFIX = 'owner:';
+
+/** AIR UsersView type menu: all, Habbo, pet and bot. Its third entry filters on user type 4 (populateWithFilters). */
+const USER_TYPE_FILTERS = ['1', '2', '4'];
+const USER_TYPE_FALLBACKS: Record<string, string> = { '1': 'Habbo', '2': 'Pet', '3': 'Bot', '4': 'Bot' };
+
+/** AIR UsersChooserTableObject: the type cell reads `${new_user_chooser.usertype.<type>}`. */
+export const userTypeLabel = (type: string) => localizeWithFallback(`new_user_chooser.usertype.${type}`, USER_TYPE_FALLBACKS[type] ?? type);
+
+/** Floor and wall furni can share an id: rows, picks and highlights are told apart by category too. */
+export const chooserItemKey = (item: RoomObjectItem) => `${item.category}:${item.id}`;
 
 interface ChooserWidgetViewProps {
     title: string;
@@ -16,56 +43,20 @@ interface ChooserWidgetViewProps {
     type?: 'furni' | 'users';
 }
 
+/* The user and furni choosers of the official client: a search box and a menu on top, a table with
+   its column heads, and the number found at the foot. The users are told apart by their type, the
+   furni by their owner. A click selects one row (AIR TableView onRowClicked -> choose); the pick-up
+   checkboxes are our own addition to the furni chooser. */
 export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
     const { title = null, items = [], selectItem = null, onClose = null, pickallFurni = false, type = 'furni' } = props;
-    const [selectedItems, setSelectedItems] = useState<RoomObjectItem[]>([]);
     const [searchValue, setSearchValue] = useState('');
-    const [checkAll, setCheckAll] = useState(false);
-    const [checkedIds, setCheckedIds] = useState<number[]>([]);
-    const canSeeId = useHasPermission('acc_supporttool');
+    const [selectedKey, setSelectedKey] = useState<string>(null);
+    const [checkedKeys, setCheckedKeys] = useState<string[]>([]);
+    const [selectedFilter, setSelectedFilter] = useState(FILTER_ALL);
+    const { confirmIfWebApiBox } = useFurniPickupGuard();
+    const isUsers = type === 'users';
 
-    const ownerNames = useMemo(() => {
-        const names = Array.from(new Set(items.map((item) => item.ownerName || 'Unknown')));
-        return names.sort();
-    }, [items]);
-
-    const [selectedFilter, setSelectedFilter] = useState(() => {
-        if (pickallFurni) return 'all';
-        return ownerNames.length > 0 ? ownerNames[0] : '';
-    });
-
-    useEffect(() => {
-        if (!pickallFurni && ownerNames.length > 0 && !selectedFilter) setSelectedFilter(ownerNames[0]);
-    }, [pickallFurni, ownerNames, selectedFilter]);
-
-    const checkedId = (id?: number) => {
-        if (id) {
-            if (isChecked(id)) setCheckedIds(checkedIds.filter((x) => x !== id));
-            else if (checkedIds.length < LIMIT_FURNI_PICKALL) setCheckedIds([...checkedIds, id]);
-        } else {
-            setCheckAll((value) => !value);
-
-            if (!checkAll) {
-                const allItems = filteredItems.slice(0, LIMIT_FURNI_PICKALL);
-                setCheckedIds(allItems.map((x) => x.id));
-                setSelectedItems(allItems);
-            } else {
-                setCheckedIds([]);
-                setSelectedItems([]);
-                chooserSelectionVisualizer.clearAll();
-            }
-        }
-    };
-
-    const isChecked = (id: number) => checkedIds.includes(id);
-
-    const onClickPickAll = () => {
-        SendMessageComposer(new FurniturePickupAllComposer(...checkedIds));
-        setCheckedIds([]);
-        setCheckAll(false);
-        chooserSelectionVisualizer.clearAll();
-        setSelectedItems([]);
-    };
+    const ownerNames = useMemo(() => Array.from(new Set(items.map((item) => item.ownerName || 'Unknown'))).sort(), [items]);
 
     const filteredItems = useMemo(() => {
         const value = searchValue.toLocaleLowerCase();
@@ -73,118 +64,156 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
         return items
             .filter((item) => {
                 const matchesSearch = item.name?.toLocaleLowerCase().includes(value);
-                const matchesFilter = !pickallFurni
-                    ? selectedFilter
-                        ? item.ownerName === selectedFilter
-                        : true
-                    : selectedFilter === 'all' || item.ownerName === selectedFilter;
+                const matchesFilter =
+                    selectedFilter === FILTER_ALL ||
+                    (isUsers ? item.type === selectedFilter : OWNER_FILTER_PREFIX + (item.ownerName || 'Unknown') === selectedFilter);
+
                 return matchesSearch && matchesFilter;
             })
-            .sort((a, b) => a.name.localeCompare(b.name));
-    }, [items, searchValue, selectedFilter, pickallFurni]);
+            .sort((a, b) => a.name.toLocaleUpperCase().localeCompare(b.name.toLocaleUpperCase()) || a.id - b.id);
+    }, [items, searchValue, selectedFilter, isUsers]);
 
-    const notifySelectionChange = useEffectEvent((items: RoomObjectItem[]) => {
-        selectItem(items[items.length - 1]);
-
+    const highlight = (keys: string[]) => {
         chooserSelectionVisualizer.clearAll();
-        items.forEach((item) => {
-            if (item.id && item.category) chooserSelectionVisualizer.show(item.id, item.category);
-        });
-    });
+        items.filter((item) => keys.includes(chooserItemKey(item))).forEach((item) => chooserSelectionVisualizer.show(item.id, item.category));
+    };
 
-    useEffect(() => {
-        if (selectedItems.length === 0) return;
+    const updateChecked = (keys: string[]) => {
+        setCheckedKeys(keys);
+        highlight(keys);
+    };
 
-        notifySelectionChange(selectedItems);
-    }, [selectedItems]);
+    const checkedItems = items.filter((item) => checkedKeys.includes(chooserItemKey(item)));
+    const checkableItems = filteredItems.slice(0, LIMIT_FURNI_PICKALL);
+    const allChecked = checkableItems.length > 0 && checkableItems.every((item) => checkedKeys.includes(chooserItemKey(item)));
 
-    const toggleItemSelection = (item: RoomObjectItem) => {
-        setSelectedItems((prev) => {
-            if (prev.some((selected) => selected.id === item.id)) {
-                chooserSelectionVisualizer.hide(item.id, item.category);
-                return prev.filter((selected) => selected.id !== item.id);
-            } else {
-                return [...prev, item];
-            }
+    const toggleChecked = (item: RoomObjectItem) => {
+        const key = chooserItemKey(item);
+
+        if (checkedKeys.includes(key)) updateChecked(checkedKeys.filter((value) => value !== key));
+        else if (checkedKeys.length < LIMIT_FURNI_PICKALL) updateChecked([...checkedKeys, key]);
+    };
+
+    const choose = (item: RoomObjectItem) => {
+        setSelectedKey(chooserItemKey(item));
+        selectItem?.(item);
+
+        if (pickallFurni) {
+            toggleChecked(item);
+            return;
+        }
+
+        highlight([chooserItemKey(item)]);
+    };
+
+    const onClickPickAll = () => {
+        // The pick-up packet carries floor furni ids only.
+        const ids = checkedItems.filter((item) => item.category === RoomObjectCategory.FLOOR).map((item) => item.id);
+
+        if (!ids.length) return;
+
+        confirmIfWebApiBox(ids, RoomObjectCategory.FLOOR, () => {
+            SendMessageComposer(new FurniturePickupAllComposer(...ids));
+            updateChecked([]);
+            setSelectedKey(null);
         });
     };
 
     const handleClose = () => {
         chooserSelectionVisualizer.clearAll();
-        setSelectedItems([]);
+        setSelectedKey(null);
+        setCheckedKeys([]);
         onClose();
     };
 
+    const foundText = (isUsers ? localizeWithFallback('new_user_chooser.amount_indicator', '%amount% users found') : localizeWithFallback('new_furni_chooser.amount_indicator', '%amount% items found')).replace(/%amount%/g, String(filteredItems.length));
+    const filterOptions = isUsers
+        ? USER_TYPE_FILTERS.map((value) => ({ value, label: userTypeLabel(value) }))
+        : ownerNames.map((name) => ({ value: OWNER_FILTER_PREFIX + name, label: name }));
+    const isRowSelected = (row: RoomObjectItem) => (pickallFurni ? checkedKeys.includes(chooserItemKey(row)) : selectedKey === chooserItemKey(row));
+
     return (
-        <NitroCardView className="w-[420px] h-[400px]" theme="primary-slim">
-            <NitroCardHeaderView headerText={title + ' (' + filteredItems.length + ')'} onCloseClick={handleClose} />
-            <NitroCardContentView overflow="hidden" gap={1}>
-                <Flex gap={2}>
-                    <NitroInput
-                        type="text"
-                        placeholder={LocalizeText('generic.search')}
-                        value={searchValue}
-                        onChange={(event) => setSearchValue(event.target.value)}
-                    />
-                    {pickallFurni && (
-                        <select className="form-control form-control-sm" value={selectedFilter} onChange={(event) => setSelectedFilter(event.target.value)}>
-                            <option value="all">{LocalizeText('roomsettings.access_rights.anyone')}</option>
-                            {ownerNames.length > 0 ? (
-                                ownerNames.map((value, index) => (
-                                    <option key={index} value={value}>
-                                        {value}
-                                    </option>
-                                ))
-                            ) : (
-                                <option disabled>No owners found</option>
+        <NativeTextTree>
+            <OctaneCardView className={classNames('octane-chooser', isUsers ? 'w-[290px] h-[357px]' : 'w-[413px] h-[354px]')} theme="primary-slim">
+                <OctaneCardHeaderView headerText={title} onCloseClick={handleClose} />
+                <OctaneCardContentView overflow="hidden" gap={1}>
+                    <div className="octane-chooser-bar">
+                        <div className="relative grow">
+                            <OctaneInput
+                                type="text"
+                                placeholder={localizeWithFallback('new_chooser.search', 'Search')}
+                                value={searchValue}
+                                onChange={(event) => setSearchValue(event.target.value)}
+                            />
+                            {searchValue.length > 0 && (
+                                <BaseButton
+                                    aria-label={localizeWithFallback('generic.clear', 'Clear')}
+                                    className="octane-chooser-clear"
+                                    type="button"
+                                    onClick={() => setSearchValue('')}
+                                >
+                                    ×
+                                </BaseButton>
                             )}
-                        </select>
-                    )}
-                </Flex>
-                {pickallFurni && (
-                    <Flex gap={2}>
-                        <input className="form-check-input" type="checkbox" checked={checkAll} onChange={() => checkedId()} />
-                        <Text>{LocalizeText('widget.chooser.checkall')}</Text>
-                    </Flex>
-                )}
-                <InfiniteScroll
-                    rows={filteredItems}
-                    rowRender={(row) => (
-                        <Flex
-                            alignItems="center"
-                            className={classNames('rounded p-1', selectedItems.some((item) => item.id === row.id) && 'bg-muted')}
-                            pointer
-                            onClick={() => {
-                                toggleItemSelection(row);
-                                if (pickallFurni) checkedId(row.id);
-                            }}
+                        </div>
+                        <Select
+                            aria-label={isUsers ? localizeWithFallback('new_user_chooser.col.type', 'Type') : localizeWithFallback('new_furni_chooser.col.owner', 'Owner')}
+                            className={classNames('octane-chooser-filter', !isUsers && 'octane-chooser-filter-wide')}
+                            value={selectedFilter}
+                            onChange={(event) => setSelectedFilter(event.target.value)}
                         >
+                            <option value={FILTER_ALL}>
+                                {isUsers ? localizeWithFallback('new_user_chooser.usertype.all', 'All types') : localizeWithFallback('new_furni_chooser.owner_selector.default', 'All owners')}
+                            </option>
+                            {filterOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </Select>
+                    </div>
+                    <div className="octane-chooser-table">
+                        <div className="octane-chooser-row octane-chooser-head">
                             {pickallFurni && (
-                                <input
-                                    className="shrink-0 mx-1 form-check-input"
-                                    type="checkbox"
-                                    checked={isChecked(row.id)}
-                                    onChange={() => checkedId(row.id)}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        toggleItemSelection(row);
-                                    }}
-                                />
+                                <Checkbox checked={allChecked} aria-label={localizeWithFallback('widget.chooser.checkall', 'Select all')} onCheckedChange={ () => updateChecked(allChecked ? [] : checkableItems.map(chooserItemKey)) } />
                             )}
-                            <Text truncate>
-                                {row.name}
-                                {canSeeId && ' - ' + row.id}
-                                {type === 'furni' && row.ownerName && row.ownerName !== '-' && ` (Owner: ${row.ownerName})`}
-                            </Text>
-                        </Flex>
+                            <span className="octane-chooser-cell grow">{isUsers ? localizeWithFallback('new_user_chooser.col.name', 'Name') : localizeWithFallback('new_furni_chooser.col.name', 'Name')}</span>
+                            <span className={classNames('octane-chooser-cell', isUsers ? 'w-[90px]' : 'w-[120px]')}>
+                                {isUsers ? localizeWithFallback('new_user_chooser.col.type', 'Type') : localizeWithFallback('new_furni_chooser.col.owner', 'Owner')}
+                            </span>
+                            {!isUsers && <span className="octane-chooser-cell w-[90px]">{localizeWithFallback('new_furni_chooser.col.id', 'ID')}</span>}
+                        </div>
+                        <div className="octane-chooser-body">
+                            <InfiniteScroll
+                                rows={filteredItems}
+                                rowRender={(row) => (
+                                    <div
+                                        aria-selected={isRowSelected(row)}
+                                        className={classNames('octane-chooser-row octane-chooser-item', isRowSelected(row) && 'is-selected')}
+                                        role="row"
+                                        onClick={() => choose(row)}
+                                    >
+                                        {pickallFurni && (
+                                            <Checkbox checked={checkedKeys.includes(chooserItemKey(row))} onClick={(event) => event.stopPropagation()} onCheckedChange={ () => toggleChecked(row) } />
+                                        )}
+                                        <span className="octane-chooser-cell grow truncate">{row.name}</span>
+                                        <span className={classNames('octane-chooser-cell truncate', isUsers ? 'w-[90px]' : 'w-[120px]')}>
+                                            {isUsers ? userTypeLabel(row.type) : furniOwnerCell(row)}
+                                        </span>
+                                        {!isUsers && <span className="octane-chooser-cell w-[90px] truncate">{row.id}</span>}
+                                    </div>
+                                )}
+                            />
+                        </div>
+                    </div>
+                    {pickallFurni && (
+                        <Button variant="secondary" onClick={onClickPickAll} disabled={!checkedItems.some((item) => item.category === RoomObjectCategory.FLOOR)}>
+                            {localizeWithFallback('widget.chooser.btn.pickall', 'Pick up selected')}
+                        </Button>
                     )}
-                />
-                {pickallFurni && (
-                    <Button variant="secondary" onClick={onClickPickAll} disabled={!checkedIds.length}>
-                        {LocalizeText('widget.chooser.btn.pickall')}
-                    </Button>
-                )}
-            </NitroCardContentView>
-        </NitroCardView>
+                    <div className="octane-chooser-amount">{foundText}</div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

@@ -1,83 +1,82 @@
+import { FC } from 'react';
 import { ICatalogPage } from '../../../../../api';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 import { CatalogLayoutBadgeDisplayView } from './CatalogLayoutBadgeDisplayView';
 import { CatalogLayoutBuildersClubBuyView } from './CatalogLayoutBuildersClubBuyView';
+import { CatalogLayoutCollectiblesView } from './CatalogLayoutCollectiblesView';
 import { CatalogLayoutColorGroupingView } from './CatalogLayoutColorGroupingView';
 import { CatalogLayoutDefaultView } from './CatalogLayoutDefaultView';
 import { CatalogLayouGuildCustomFurniView } from './CatalogLayoutGuildCustomFurniView';
 import { CatalogLayouGuildForumView } from './CatalogLayoutGuildForumView';
 import { CatalogLayouGuildFrontpageView } from './CatalogLayoutGuildFrontpageView';
-import { CatalogLayoutInfoLoyaltyView } from './CatalogLayoutInfoLoyaltyView';
+import { CatalogLayoutInfoRentablesView, CatalogLayoutMonkeyView, CatalogLayoutRecyclerInfoView } from './CatalogLayoutAirInfoPagesView';
+import { CatalogLayoutInfoDucketsView, CatalogLayoutInfoLoyaltyView } from './CatalogLayoutInfoIllustrationView';
+import { CatalogLayoutInformationView } from './CatalogLayoutInformationView';
+import { CatalogLayoutPetCustomizationView } from './CatalogLayoutPetCustomizationView';
 import { CatalogLayoutPets2View } from './CatalogLayoutPets2View';
 import { CatalogLayoutPets3View } from './CatalogLayoutPets3View';
+import { CatalogLayoutRecolorableFurnitureView } from './CatalogLayoutRecolorableFurnitureView';
 import { CatalogLayoutRoomAdsView } from './CatalogLayoutRoomAdsView';
 import { CatalogLayoutRoomBundleView } from './CatalogLayoutRoomBundleView';
 import { CatalogLayoutSingleBundleView } from './CatalogLayoutSingleBundleView';
+import { CatalogLayoutSoldLimitedView } from './CatalogLayoutSoldLimitedView';
 import { CatalogLayoutSoundMachineView } from './CatalogLayoutSoundMachineView';
 import { CatalogLayoutSpacesView } from './CatalogLayoutSpacesView';
 import { CatalogLayoutTrophiesView } from './CatalogLayoutTrophiesView';
+import { CatalogLayoutUnavailableView } from './CatalogLayoutUnavailableView';
 import { CatalogLayoutVipBuyView } from './CatalogLayoutVipBuyView';
+import { CatalogLayoutRenderer, getCatalogLayoutDefinition } from './catalogLayoutRegistry';
 import { CatalogLayoutFrontpage4View } from './frontpage4/CatalogLayoutFrontpage4View';
 import { CatalogLayoutMarketplaceOwnItemsView } from './marketplace/CatalogLayoutMarketplaceOwnItemsView';
 import { CatalogLayoutMarketplacePublicItemsView } from './marketplace/CatalogLayoutMarketplacePublicItemsView';
 import { CatalogLayoutPetView } from './pets/CatalogLayoutPetView';
+import { CatalogLayoutRecyclerPrizesView } from './recycler/CatalogLayoutRecyclerPrizesView';
+import { CatalogLayoutRecyclerView } from './recycler/CatalogLayoutRecyclerView';
 import { CatalogLayoutVipGiftsView } from './vip-gifts/CatalogLayoutVipGiftsView';
+
+const layoutRenderers: Record<CatalogLayoutRenderer, FC<CatalogLayoutProps>> = {
+    badgeDisplay: CatalogLayoutBadgeDisplayView,
+    buildersClubBuy: CatalogLayoutBuildersClubBuyView,
+    clubGifts: CatalogLayoutVipGiftsView,
+    collectibles: CatalogLayoutCollectiblesView,
+    colorGrouping: CatalogLayoutColorGroupingView,
+    default: CatalogLayoutDefaultView,
+    frontpage: CatalogLayoutFrontpage4View,
+    guildCustomFurni: CatalogLayouGuildCustomFurniView,
+    guildForum: CatalogLayouGuildForumView,
+    guildFrontpage: CatalogLayouGuildFrontpageView,
+    info: CatalogLayoutInformationView,
+    infoLoyalty: CatalogLayoutInfoLoyaltyView,
+    infoDuckets: CatalogLayoutInfoDucketsView,
+    infoRentables: CatalogLayoutInfoRentablesView,
+    recyclerInfo: CatalogLayoutRecyclerInfoView,
+    monkey: CatalogLayoutMonkeyView,
+    marketplaceOwnItems: CatalogLayoutMarketplaceOwnItemsView,
+    marketplacePublicItems: CatalogLayoutMarketplacePublicItemsView,
+    petCustomization: CatalogLayoutPetCustomizationView,
+    pets: CatalogLayoutPetView,
+    pets2: CatalogLayoutPets2View,
+    pets3: CatalogLayoutPets3View,
+    recolorableFurniture: CatalogLayoutRecolorableFurnitureView,
+    roomAds: CatalogLayoutRoomAdsView,
+    roomBundle: CatalogLayoutRoomBundleView,
+    recycler: CatalogLayoutRecyclerView,
+    recyclerPrizes: CatalogLayoutRecyclerPrizesView,
+    singleBundle: CatalogLayoutSingleBundleView,
+    soundMachine: CatalogLayoutSoundMachineView,
+    spaces: CatalogLayoutSpacesView,
+    soldLimited: CatalogLayoutSoldLimitedView,
+    trophies: CatalogLayoutTrophiesView,
+    unavailable: CatalogLayoutUnavailableView,
+    vipBuy: CatalogLayoutVipBuyView
+};
 
 export const GetCatalogLayout = (page: ICatalogPage, hideNavigation: () => void) => {
     if (!page) return null;
 
     const layoutProps: CatalogLayoutProps = { page, hideNavigation };
+    const definition = getCatalogLayoutDefinition(page.layoutCode);
+    const LayoutView = definition ? layoutRenderers[definition.renderer] : CatalogLayoutUnavailableView;
 
-    switch (page.layoutCode) {
-        case 'frontpage_featured':
-            return null;
-        case 'frontpage4':
-            return <CatalogLayoutFrontpage4View {...layoutProps} />;
-        case 'pets':
-            return <CatalogLayoutPetView {...layoutProps} />;
-        case 'pets2':
-            return <CatalogLayoutPets2View {...layoutProps} />;
-        case 'pets3':
-            return <CatalogLayoutPets3View {...layoutProps} />;
-        case 'vip_buy':
-            return <CatalogLayoutVipBuyView {...layoutProps} />;
-        case 'builders_club_frontpage':
-        case 'builders_club_addons':
-        case 'builders_club_loyalty':
-            return <CatalogLayoutBuildersClubBuyView {...layoutProps} />;
-        case 'guild_frontpage':
-            return <CatalogLayouGuildFrontpageView {...layoutProps} />;
-        case 'guild_forum':
-            return <CatalogLayouGuildForumView {...layoutProps} />;
-        case 'guild_custom_furni':
-            return <CatalogLayouGuildCustomFurniView {...layoutProps} />;
-        case 'club_gifts':
-            return <CatalogLayoutVipGiftsView {...layoutProps} />;
-        case 'marketplace_own_items':
-            return <CatalogLayoutMarketplaceOwnItemsView {...layoutProps} />;
-        case 'marketplace':
-            return <CatalogLayoutMarketplacePublicItemsView {...layoutProps} />;
-        case 'single_bundle':
-            return <CatalogLayoutSingleBundleView {...layoutProps} />;
-        case 'room_bundle':
-            return <CatalogLayoutRoomBundleView {...layoutProps} />;
-        case 'spaces_new':
-            return <CatalogLayoutSpacesView {...layoutProps} />;
-        case 'trophies':
-            return <CatalogLayoutTrophiesView {...layoutProps} />;
-        case 'info_loyalty':
-            return <CatalogLayoutInfoLoyaltyView {...layoutProps} />;
-        case 'badge_display':
-            return <CatalogLayoutBadgeDisplayView {...layoutProps} />;
-        case 'roomads':
-            return <CatalogLayoutRoomAdsView {...layoutProps} />;
-        case 'default_3x3_color_grouping':
-            return <CatalogLayoutColorGroupingView {...layoutProps} />;
-        case 'soundmachine':
-            return <CatalogLayoutSoundMachineView {...layoutProps} />;
-        case 'bots':
-        case 'default_3x3':
-        default:
-            return <CatalogLayoutDefaultView {...layoutProps} />;
-    }
+    return <LayoutView {...layoutProps} />;
 };

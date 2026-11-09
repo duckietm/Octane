@@ -1,8 +1,21 @@
-import { GetAvatarRenderManager, GetSessionDataManager, Vector3d } from '@nitrots/nitro-renderer';
+import { GetAvatarRenderManager, GetSessionDataManager, RoomObjectVariable, Vector3d } from '@octane/renderer';
 import { FC, useEffect } from 'react';
-import { BuildPurchasableClothingFigure, FurniCategory, Offer, ProductTypeEnum } from '../../../../../api';
-import { AutoGrid, Column, LayoutGridItem, LayoutRoomPreviewerView } from '../../../../../common';
+import { FurniCategory, GetProductIconUrl, Offer, ProductTypeEnum } from '../../../../../api';
+import { AutoGrid, Column, LayoutChatStyleImageView, LayoutGridItem, LayoutHabbiconImageView, LayoutRoomPreviewerView } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogData, useCatalogUiState } from '../../../../../hooks';
+
+const PREVIEW_LIFT = 21;
+
+// A habbicon shows above the avatar for 3 s and then fades, as in the room; the
+// preview triggers it again on this cadence so it keeps playing.
+const HABBICON_PREVIEW_REPEAT_MS = 4000;
+// Extra lift for the habbicon preview, so the room sits higher in the view.
+const HABBICON_PREVIEW_EXTRA_LIFT = 40;
+
+const NEUTRAL_FLOOR = 'default';
+const NEUTRAL_WALL = 'default';
+const NEUTRAL_LANDSCAPE = 'default';
 
 export const CatalogViewProductWidgetView: FC<{ height?: number }> = (props) => {
     const { height = 240 } = props;
@@ -15,104 +28,174 @@ export const CatalogViewProductWidgetView: FC<{ height?: number }> = (props) => 
 
         const product = currentOffer.product;
 
-        if (!product) return;
+        const clearViewOffset = () => {
+            roomPreviewer.addViewOffset.y = 0;
+        };
 
-        roomPreviewer.reset(false);
-        roomPreviewer.updateObjectRoom('111', '217', '1.1');
+        if (!product) {
+            clearViewOffset();
+            return;
+        }
+
+        roomPreviewer.addViewOffset.y = -(PREVIEW_LIFT + (product.isUniqueLimitedItem ? 15 : 0));
+        roomPreviewer.centerWallItems = true;
+        roomPreviewer.setAutomaticStateChange(false);
         roomPreviewer.updateRoomWallsAndFloorVisibility(true, true);
+
+        let animateFurnitureState = false;
+        let habbiconTimer: number = null;
 
         const populate = () => {
             switch (product.productType) {
                 case ProductTypeEnum.FLOOR: {
-                    if (!product.furnitureData) return;
+                    if (!product.furnitureData) {
+                        roomPreviewer.reset(false);
+                        return;
+                    }
 
                     const furniData = GetSessionDataManager().getFloorItemData(product.furnitureData.id);
                     const isPurchasableClothing = product.furnitureData.specialType === FurniCategory.FIGURE_PURCHASABLE_SET;
-                    const hasResolvableFigureSets = (() => {
-                        if (!furniData || !furniData.customParams || !furniData.customParams.length) return false;
 
-                        const parts = furniData.customParams.split(',').map((value) => parseInt(value));
-
-                        for (const part of parts) {
-                            if (isNaN(part)) continue;
-
-                            if (GetAvatarRenderManager().structureData?.getFigurePartSet(part)) return true;
-                        }
-
-                        return false;
-                    })();
-
-                    if (isPurchasableClothing || hasResolvableFigureSets) {
-                        const customParts = furniData.customParams.split(',').map((value) => parseInt(value));
+                    if (isPurchasableClothing) {
+                        const sessionDataManager = GetSessionDataManager();
+                        const avatarRenderManager = GetAvatarRenderManager();
+                        const customParams = furniData?.customParams ?? product.furnitureData.customParams ?? '';
+                        const customParts = customParams
+                            .split(',')
+                            .map((value) => value.trim())
+                            .filter((value) => /^\d+$/.test(value))
+                            .map(Number);
                         const figureSets: number[] = [];
 
                         for (const part of customParts) {
-                            if (isNaN(part)) continue;
+                            if (!Number.isSafeInteger(part) || part <= 0) continue;
 
-                            if (GetAvatarRenderManager().isValidFigureSetForGender(part, GetSessionDataManager().gender)) figureSets.push(part);
+                            if (avatarRenderManager.isValidFigureSetForGender(part, sessionDataManager.gender)) figureSets.push(part);
                         }
 
-                        const figureString = BuildPurchasableClothingFigure(GetSessionDataManager().figure, figureSets);
+                        const figureString = avatarRenderManager.getFigureStringWithFigureIds(sessionDataManager.figure, sessionDataManager.gender, figureSets);
 
-                        roomPreviewer.addAvatarIntoRoom(figureString, product.productClassId);
+                        roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, NEUTRAL_WALL, NEUTRAL_LANDSCAPE);
+                        roomPreviewer.addAvatarIntoRoom(figureString || sessionDataManager.figure, 0);
+                        roomPreviewer.zoomIn();
                     } else {
+                        roomPreviewer.reset(true);
+                        roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, NEUTRAL_WALL, NEUTRAL_LANDSCAPE);
                         roomPreviewer.addFurnitureIntoRoom(product.productClassId, new Vector3d(90), previewStuffData, product.extraParam);
+                        animateFurnitureState = true;
                     }
                     return;
                 }
                 case ProductTypeEnum.WALL: {
-                    if (!product.furnitureData) return;
+                    if (!product.furnitureData) {
+                        roomPreviewer.reset(false);
+                        return;
+                    }
 
                     roomPreviewer.updateRoomWallsAndFloorVisibility(true, true);
 
                     switch (product.furnitureData.specialType) {
                         case FurniCategory.FLOOR:
-                            roomPreviewer.updateObjectRoom(product.extraParam);
+                            roomPreviewer.reset(true);
+                            roomPreviewer.updateObjectRoom(product.extraParam, NEUTRAL_WALL, NEUTRAL_LANDSCAPE);
                             return;
                         case FurniCategory.WALL_PAPER:
-                            roomPreviewer.updateObjectRoom(null, product.extraParam);
+                            roomPreviewer.reset(true);
+                            roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, product.extraParam, NEUTRAL_LANDSCAPE);
                             return;
                         case FurniCategory.LANDSCAPE: {
-                            roomPreviewer.updateObjectRoom(null, null, product.extraParam);
+                            roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, NEUTRAL_WALL, product.extraParam);
 
                             const furniData = GetSessionDataManager().getWallItemDataByName('window_double_default');
 
                             if (furniData) roomPreviewer.addWallItemIntoRoom(furniData.id, new Vector3d(90), furniData.customParams);
+                            else roomPreviewer.reset(false);
                             return;
                         }
                         default:
-                            roomPreviewer.updateObjectRoom('101', '101', '1.1');
+                            roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, NEUTRAL_WALL, NEUTRAL_LANDSCAPE);
                             roomPreviewer.addWallItemIntoRoom(product.productClassId, new Vector3d(90), product.extraParam);
+                            animateFurnitureState = true;
                             return;
                     }
                 }
                 case ProductTypeEnum.ROBOT:
+                    roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, NEUTRAL_WALL, NEUTRAL_LANDSCAPE);
                     roomPreviewer.addAvatarIntoRoom(product.extraParam, 0);
+                    roomPreviewer.zoomIn();
                     return;
+                case ProductTypeEnum.HABBICON: {
+                    // The own avatar with the habbicon above its head, the way the room shows it.
+                    roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, NEUTRAL_WALL, NEUTRAL_LANDSCAPE);
+                    roomPreviewer.addViewOffset.y = -(PREVIEW_LIFT + HABBICON_PREVIEW_EXTRA_LIFT);
+                    roomPreviewer.addAvatarIntoRoom(GetSessionDataManager().figure, 0);
+                    // Always the normal scale, whatever zoom an earlier preview or the zoom
+                    // control left behind.
+                    roomPreviewer.zoomIn();
+
+                    let triggerSequence = 0;
+                    const showHabbicon = () => {
+                        const model = roomPreviewer.getRoomPreviewObject()?.model;
+
+                        if (!model) return;
+
+                        model.setValue(RoomObjectVariable.FIGURE_HABBICON, product.productClassId);
+                        model.setValue(RoomObjectVariable.FIGURE_HABBICON_TRIGGER_SEQUENCE, ++triggerSequence);
+                    };
+
+                    showHabbicon();
+                    habbiconTimer = window.setInterval(showHabbicon, HABBICON_PREVIEW_REPEAT_MS);
+                    return;
+                }
                 case ProductTypeEnum.EFFECT:
+                    roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, NEUTRAL_WALL, NEUTRAL_LANDSCAPE);
                     roomPreviewer.addAvatarIntoRoom(GetSessionDataManager().figure, product.productClassId);
+                    roomPreviewer.zoomIn();
+                    return;
+                default:
+                    roomPreviewer.reset(false);
                     return;
             }
         };
 
         populate();
-        roomPreviewer.setAutomaticStateChange(false);
+        roomPreviewer.setAutomaticStateChange(animateFurnitureState);
+
+        return () => {
+            if (habbiconTimer !== null) window.clearInterval(habbiconTimer);
+
+            clearViewOffset();
+        };
     }, [currentOffer, previewStuffData, roomPreviewer]);
 
     if (!currentOffer) return null;
 
     if (currentOffer.pricingModel === Offer.PRICING_MODEL_BUNDLE) {
         return (
-            <Column fit className="bg-muted p-2 rounded" overflow="hidden">
-                <AutoGrid fullWidth className="nitro-catalog-layout-bundle-grid" columnCount={4}>
-                    {currentOffer.products.length > 0 &&
-                        currentOffer.products.map((product, index) => {
-                            return <LayoutGridItem key={index} itemCount={product.productCount} itemImage={product.getIconUrl(currentOffer)} />;
-                        })}
-                </AutoGrid>
-            </Column>
+            <NativeTextTree>
+                <Column fit className="bg-muted p-2 rounded" overflow="hidden">
+                    <AutoGrid fullWidth className="octane-catalog-layout-bundle-grid" columnCount={4}>
+                        {currentOffer.products.length > 0 &&
+                            currentOffer.products.map((product, index) => {
+                                const iconUrl = GetProductIconUrl(product, currentOffer);
+
+                                return (
+                                    <LayoutGridItem key={index} itemCount={product.productCount}>
+                                        {product.productType === ProductTypeEnum.HABBICON ? (
+                                            <LayoutHabbiconImageView id={product.productClassId} />
+                                        ) : product.productType === ProductTypeEnum.CHAT_STYLE ? (
+                                            <LayoutChatStyleImageView styleId={product.extraParam} />
+                                        ) : (
+                                            iconUrl && <img alt="" className="octane-catalog-grid-offer-icon" draggable={false} src={iconUrl} />
+                                        )}
+                                    </LayoutGridItem>
+                                );
+                            })}
+                    </AutoGrid>
+                </Column>
+            </NativeTextTree>
         );
     }
 
-    return <LayoutRoomPreviewerView key={currentOffer?.offerId} height={height} roomPreviewer={roomPreviewer} />;
+    return <LayoutRoomPreviewerView height={height} roomPreviewer={roomPreviewer} />;
 };

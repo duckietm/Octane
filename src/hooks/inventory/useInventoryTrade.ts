@@ -18,9 +18,9 @@ import {
     TradingOtherNotAllowedEvent,
     TradingUnacceptComposer,
     TradingYouAreNotAllowedEvent
-} from '@nitrots/nitro-renderer';
-import { useEffect, useState } from 'react';
-import { useBetween } from 'use-between';
+} from '@octane/renderer';
+import { useEffect, useRef, useState } from 'react';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
     CloneObject,
     GetRoomSession,
@@ -34,10 +34,31 @@ import {
 } from '../../api';
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
+import { reopenedTradeState } from '../../api/inventory/TradeReopen';
 import { useInventoryFurni } from './useInventoryFurni';
+
+/**
+ * Gives the inventory back every item a trade had locked.
+ *
+ * Offering an item locks it so it cannot be placed, sold or recycled while the trade
+ * holds it. Nothing released that lock: on a cancelled trade the server returns the
+ * items and sends no inventory packet at all, so a rare that was offered and then taken
+ * back stayed locked - Place disabled, no sale, no recycle - until the inventory was
+ * reloaded.
+ */
+export const unlockAllGroups = (groupItems: GroupItem[]): GroupItem[] =>
+    groupItems.map((groupItem) => {
+        const copy = groupItem.clone();
+
+        copy.unlockAllItems();
+
+        return copy;
+    });
 
 const useInventoryTradeState = () => {
     const [ownUser, setOwnUser] = useState<TradeUserData>(null);
+    const ownUserRef = useRef<TradeUserData>(null);
+    ownUserRef.current = ownUser;
     const [otherUser, setOtherUser] = useState<TradeUserData>(null);
     const [tradeState, setTradeState] = useState(TradeState.TRADING_STATE_READY);
     const { groupItems = [], setGroupItems = null, activate = null, deactivate = null } = useInventoryFurni();
@@ -72,6 +93,8 @@ const useInventoryTradeState = () => {
 
         SendMessageComposer(new TradingListItemRemoveComposer(item.id));
     };
+
+    const unlockOfferedItems = () => setGroupItems(unlockAllGroups);
 
     const stopTrading = () => {
         if (!isTrading) return;
@@ -108,6 +131,9 @@ const useInventoryTradeState = () => {
                 return newValue;
             });
         }
+
+        // A side taking back its acceptance during the countdown stops it, as on the server.
+        if (!parser.userAccepts) setTradeState(reopenedTradeState);
     });
 
     useMessageEvent<TradingCloseEvent>(TradingCloseEvent, (event) => {
@@ -121,6 +147,8 @@ const useInventoryTradeState = () => {
             }
         }
 
+        unlockOfferedItems();
+
         setOwnUser(null);
         setOtherUser(null);
         setTradeState(TradeState.TRADING_STATE_READY);
@@ -128,6 +156,8 @@ const useInventoryTradeState = () => {
 
     useMessageEvent<TradingCompletedEvent>(TradingCompletedEvent, (event) => {
         const parser = event.getParser();
+
+        unlockOfferedItems();
 
         setOwnUser(null);
         setOtherUser(null);
@@ -145,7 +175,10 @@ const useInventoryTradeState = () => {
         const firstUserItems = parseTradeItems(parser.firstUserItemArray);
         const secondUserItems = parseTradeItems(parser.secondUserItemArray);
 
+        // A list that arrives with no trade open has nobody to apply to.
         setOwnUser((prevValue) => {
+            if (!prevValue) return prevValue;
+
             const newValue = CloneObject(prevValue);
 
             if (newValue.userId === parser.firstUserID) {
@@ -158,32 +191,40 @@ const useInventoryTradeState = () => {
                 newValue.userItems = secondUserItems;
             }
 
-            const tradeIds: number[] = [];
+            // Every change to the offer clears both acceptances on the server, which does not say so.
+            newValue.accepts = false;
 
-            for (const groupItem of newValue.userItems.getValues()) {
-                let i = 0;
+            return newValue;
+        });
 
-                while (i < groupItem.getTotalCount()) {
-                    const item = groupItem.getItemByIndex(i);
+        // The own offer locks its items in the inventory. Worked out here, not inside the updater above: a state
+        // update inside another updater runs again whenever that updater does.
+        const ownItems = ownUserRef.current?.userId === parser.firstUserID ? firstUserItems : secondUserItems;
+        const tradeIds: number[] = [];
 
-                    if (item) tradeIds.push(item.ref);
+        for (const groupItem of ownItems.getValues()) {
+            let i = 0;
 
-                    i++;
-                }
+            while (i < groupItem.getTotalCount()) {
+                const item = groupItem.getItemByIndex(i);
+
+                if (item) tradeIds.push(item.ref);
+
+                i++;
             }
+        }
 
-            setGroupItems((prevValue) => {
-                const newValue = [...prevValue];
+        setGroupItems((prevValue) => {
+            const newValue = [...prevValue];
 
-                for (const groupItem of newValue) groupItem.lockItemIds(tradeIds);
-
-                return newValue;
-            });
+            for (const groupItem of newValue) groupItem.lockItemIds(tradeIds);
 
             return newValue;
         });
 
         setOtherUser((prevValue) => {
+            if (!prevValue) return prevValue;
+
             const newValue = CloneObject(prevValue);
 
             if (newValue.userId === parser.firstUserID) {
@@ -196,8 +237,12 @@ const useInventoryTradeState = () => {
                 newValue.userItems = secondUserItems;
             }
 
+            newValue.accepts = false;
+
             return newValue;
         });
+
+        setTradeState(reopenedTradeState);
     });
 
     useMessageEvent<TradingNotOpenEvent>(TradingNotOpenEvent, (event) => {
@@ -207,34 +252,39 @@ const useInventoryTradeState = () => {
     useMessageEvent<TradingOpenEvent>(TradingOpenEvent, (event) => {
         const parser = event.getParser();
 
+        // The ids come from the packet: the room may not list one of the two users (yet), and then only the name is missing.
+        const ownUserId = GetSessionDataManager().userId;
+        const userDataManager = GetRoomSession()?.userDataManager;
+        const firstUserName = userDataManager?.getUserData(parser.userID)?.name ?? '';
+        const secondUserName = userDataManager?.getUserData(parser.otherUserID)?.name ?? '';
+
         const firstUser = new TradeUserData();
-        const firstUserData = GetRoomSession().userDataManager.getUserData(parser.userID);
 
         firstUser.userItems = new AdvancedMap();
 
         const secondUser = new TradeUserData();
-        const secondUserData = GetRoomSession().userDataManager.getUserData(parser.otherUserID);
 
         secondUser.userItems = new AdvancedMap();
 
-        if (firstUserData.webID === GetSessionDataManager().userId) {
-            firstUser.userId = firstUserData.webID;
-            firstUser.userName = firstUserData.name;
+        if (parser.userID === ownUserId) {
+            firstUser.userId = parser.userID;
+            firstUser.userName = firstUserName;
             firstUser.canTrade = parser.userCanTrade;
 
-            secondUser.userId = secondUserData.webID;
-            secondUser.userName = secondUserData.name;
+            secondUser.userId = parser.otherUserID;
+            secondUser.userName = secondUserName;
             secondUser.canTrade = parser.otherUserCanTrade;
-        } else if (secondUserData.webID === GetSessionDataManager().userId) {
-            firstUser.userId = secondUserData.webID;
-            firstUser.userName = secondUserData.name;
+        } else if (parser.otherUserID === ownUserId) {
+            firstUser.userId = parser.otherUserID;
+            firstUser.userName = secondUserName;
             firstUser.canTrade = parser.otherUserCanTrade;
 
-            secondUser.userId = firstUserData.webID;
-            secondUser.userName = firstUserData.name;
+            secondUser.userId = parser.userID;
+            secondUser.userName = firstUserName;
             secondUser.canTrade = parser.userCanTrade;
         }
 
+        ownUserRef.current = firstUser;
         setOwnUser(firstUser);
         setOtherUser(secondUser);
         setTradeState(TradeState.TRADING_STATE_RUNNING);
@@ -269,4 +319,6 @@ const useInventoryTradeState = () => {
     return { ownUser, otherUser, tradeState, setTradeState, isTrading, groupItems, progressTrade, removeItem, stopTrading };
 };
 
-export const useInventoryTrade = () => useBetween(useInventoryTradeState);
+export const useInventoryTrade = () => useSharedHook(useInventoryTradeState);
+
+registerSharedHook(useInventoryTradeState);

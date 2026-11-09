@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="start_panel" width="212" height="168" version="0.1" uid="1D36443C-2B4A-19D9-6DCB-A33F4041A354">
+  <window>
+    <frame x="60" y="4" width="212" height="168" params="32769" style="0" caption="Msg%20to%3A" color="0xff418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.34901960784313724" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <dropmenu x="0" y="0" width="200" height="20" params="1" style="0" name="msgTemplatesSelect" caption="Select%20from%20message%20templates"/>
+        <input x="0" y="25" width="199" height="58" params="1" style="0" name="message_input" caption="Type%20your%20message%20here%20or%20select%20one%20of%20the%20predefined%20texts." color="0xffffffffff" background="true">
+          <variables>
+            <var key="always_show_selection" value="true" type="Boolean"/>
+            <var key="border" value="true" type="Boolean"/>
+            <var key="sharpness" value="0" type="Number"/>
+            <var key="thickness" value="0" type="Number"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="kerning" value="false" type="Boolean"/>
+            <var key="spacing" value="0" type="Number"/>
+            <var key="leading" value="0" type="Number"/>
+          </variables>
+        </input>
+        <button x="0" y="115" width="200" height="21" params="131089" style="0" name="send_message_but" caption="Send%20message" width_min="200" width_max="200"/>
+      </children>
+    </frame>
+  </window>
+</layout>

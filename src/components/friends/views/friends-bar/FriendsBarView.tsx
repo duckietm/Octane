@@ -1,24 +1,23 @@
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { FC, useLayoutEffect, useRef, useState } from 'react';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { LocalizeText, MessengerFriend, localizeWithFallback } from '../../../../api';
+import friendsBrowseArrowLeft from '../../../../assets/images/toolbar/air/friend-browse-arrow-left.png';
+import friendsBrowseArrowRight from '../../../../assets/images/toolbar/air/friend-browse-arrow-right.png';
+import friendsBrowseBg from '../../../../assets/images/toolbar/air/friends-browse-bg.png';
+import { localizeWithFallback, MessengerFriend } from '../../../../api';
+import { AIR_RAIL_CHAT_RESERVED_HALF, AIR_RAIL_EDGE_GAP, resolveAirFriendTabCapacity } from '../../../toolbar/bottomDockLayout';
+import { orderFriendsForBar } from '../../../../hooks/friends/friendBarNotifications.helpers';
+import { useFriendBarNotificationsStore } from '../../../../hooks/friends/friendBarNotificationsStore';
 import { FriendBarItemView } from './FriendBarItemView';
+import { FriendBarRequestsView } from './FriendBarRequestsView';
+import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
-// Hard cap on simultaneously-shown friend chips. The effective count is
-// reduced below this when the bar would otherwise overflow its (clipped)
-// slot in the toolbar — see the width measurement below.
-const MAX_DISPLAY_COUNT = 3;
+const AIR_TAB_WIDTH = 127;
+const AIR_TAB_SPACING = 3;
+const AIR_MIN_VISIBLE_SLOTS = 3;
+const BASE_PAD = 8;
+const RIGHT_SAFE = 24;
 
-// Layout constants mirrored from FriendBarItemView / the flex gaps here, used
-// to compute how many friend chips fit in the available width. A "slot" is one
-// w-[132px] button plus the gap-[6px] that precedes it.
-const ITEM_SLOT = 138; // 132px chip + 6px gap (friend chip and search chip)
-const ARROWS_WIDTH = 52; // two w-[20px] arrows, each + 6px gap
-const REQUEST_SLOT = 120; // requests chip (only present when requestsCount > 0)
-const BASE_PAD = 8; // container px-[2px] + a little slack
-const RIGHT_SAFE = 24; // right inset (right-0/right-3) + pr-3 safety margin
-
-// Mirrored from Toolbar to keep physics identical
 const containerVariants: Variants = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.05 } },
@@ -34,26 +33,36 @@ const itemVariants: Variants = {
 export const FriendBarView: FC<{ onlineFriends: MessengerFriend[]; requestsCount?: number }> = (props) => {
     const { onlineFriends = [], requestsCount = 0 } = props;
     const [indexOffset, setIndexOffset] = useState(0);
-    const [maxVisible, setMaxVisible] = useState(MAX_DISPLAY_COUNT);
+    const [maxVisible, setMaxVisible] = useState(AIR_MIN_VISIBLE_SLOTS);
     const elementRef = useRef<HTMLDivElement>(null);
 
-    // Auto-fit the visible friend count to the room actually available between
-    // the bar's left edge and the right side of the viewport. The bar lives in
-    // a `overflow-x: clip` toolbar slot, so anything that doesn't fit would be
-    // silently cut off (the scroll arrow / search button disappear). The bar's
-    // left edge is stable (it sits after fixed-width toolbar icons), so growing
-    // or shrinking the chip count never moves it — no measurement feedback loop.
     useLayoutEffect(() => {
         const element = elementRef.current;
 
         if (!element) return;
 
+        const rail = element.closest('.tb-nav-clip') as HTMLElement | null;
+
         const measure = () => {
-            const left = element.getBoundingClientRect().left;
-            const available = window.innerWidth - left - RIGHT_SAFE;
-            const fixed = ARROWS_WIDTH + ITEM_SLOT /* search chip */ + BASE_PAD + (requestsCount > 0 ? REQUEST_SLOT : 0);
-            const fit = Math.floor((available - fixed) / ITEM_SLOT);
-            const next = Math.max(1, Math.min(MAX_DISPLAY_COUNT, fit));
+            const requestWidth = BASE_PAD + (requestsCount > 0 ? AIR_TAB_WIDTH + AIR_TAB_SPACING : 0);
+            let next: number;
+
+            if (rail) {
+                const railRect = rail.getBoundingClientRect();
+                const barRect = element.getBoundingClientRect();
+                const contentWidth = Math.max(railRect.width, rail.scrollWidth);
+                const preceding = Math.max(0, barRect.left - railRect.left);
+                const trailing = Math.max(0, railRect.left + contentWidth - barRect.right);
+                const reserved = document.querySelector('.tb-frame') ? AIR_RAIL_CHAT_RESERVED_HALF : AIR_RAIL_EDGE_GAP;
+                const available = Math.max(0, window.innerWidth / 2 - reserved) - preceding - trailing;
+
+                next = available - requestWidth < AIR_TAB_WIDTH ? 0 : resolveAirFriendTabCapacity(available, requestWidth, AIR_TAB_SPACING);
+            } else {
+                const left = element.getBoundingClientRect().left;
+                const available = window.innerWidth - left - RIGHT_SAFE;
+
+                next = Math.max(AIR_MIN_VISIBLE_SLOTS, resolveAirFriendTabCapacity(available, requestWidth, AIR_TAB_SPACING));
+            }
 
             setMaxVisible((prev) => (prev === next ? prev : next));
         };
@@ -63,6 +72,7 @@ export const FriendBarView: FC<{ onlineFriends: MessengerFriend[]; requestsCount
         const observer = new ResizeObserver(measure);
 
         observer.observe(document.documentElement);
+        if (rail) observer.observe(rail);
         window.addEventListener('resize', measure);
 
         return () => {
@@ -71,77 +81,75 @@ export const FriendBarView: FC<{ onlineFriends: MessengerFriend[]; requestsCount
         };
     }, [requestsCount, onlineFriends.length]);
 
-    // `safeOffset` is the offset clamped to the current list/fit. Every read
-    // below uses it, so a stale `indexOffset` (after the list shrinks or the fit
-    // grows) renders correctly and self-corrects on the next arrow click — no
-    // write-back effect needed.
-    // Defensive: never let a null/undefined slip into the friend map. The
-    // legacy bar padded empty slots with `null` and rendered each as a
-    // FriendBarItemView (which falls back to the "find friends" chip), so an
-    // empty list produced THREE "Trova Amici" buttons. Filtering here makes the
-    // search chip below the ONLY source of that affordance — exactly one, always.
-    const validFriends = onlineFriends.filter(Boolean);
-    const maxOffset = Math.max(0, validFriends.length - maxVisible);
+    // AIR HabboFriendBarData.setFriendAt(friend, 0): a friend with new activity moves to the front.
+    const notifiedOrder = useFriendBarNotificationsStore((state) => state.order);
+    const validFriends = orderFriendsForBar(onlineFriends.filter(Boolean), notifiedOrder);
+    const maxOffset = maxVisible > 0 ? Math.max(0, validFriends.length - maxVisible) : 0;
     const safeOffset = Math.min(indexOffset, maxOffset);
     const canScrollLeft = safeOffset > 0;
     const canScrollRight = safeOffset < maxOffset;
+    const showArrows = maxOffset > 0;
     const visibleFriends = validFriends.slice(safeOffset, safeOffset + maxVisible);
+    const findFriendsSlotCount = Math.max(0, Math.min(AIR_MIN_VISIBLE_SLOTS, maxVisible) - visibleFriends.length);
 
     return (
-        <motion.div
-            ref={elementRef}
-            className="flex h-[40px] items-center gap-[6px] px-[2px] py-[3px]"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-        >
-            {requestsCount > 0 && (
-                <motion.div variants={itemVariants}>
-                    <div className="flex h-[34px] items-center rounded-[7px] border border-[#9fc56f] bg-[#5f7d2f] px-[10px] text-[0.83rem] whitespace-nowrap text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_2px_0_rgba(0,0,0,0.25)]">
-                        {requestsCount} {LocalizeText('friendbar.requests.title')}
-                    </div>
-                </motion.div>
-            )}
-            <motion.div variants={itemVariants}>
-                <div
-                    className={`flex h-[34px] w-[20px] items-center justify-center text-white/80 transition-all ${!canScrollLeft ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:text-white active:scale-95'}`}
-                    onClick={() => {
-                        if (canScrollLeft) setIndexOffset(safeOffset - 1);
-                    }}
-                >
-                    <FaChevronLeft className="text-white/70 text-sm drop-shadow-[1px_1px_0_#000]" />
-                </div>
-            </motion.div>
-
-            <AnimatePresence mode="popLayout">
-                {visibleFriends.map((friend) => (
-                    <motion.div key={friend.id} variants={itemVariants} layout initial="hidden" animate="visible" exit="exit">
-                        <FriendBarItemView friend={friend} />
-                    </motion.div>
-                ))}
-                <motion.div key="friend-search" variants={itemVariants} layout initial="hidden" animate="visible" exit="exit">
-                    <FriendBarItemView friend={null} />
-                </motion.div>
-                {!validFriends.length && requestsCount <= 0 && (
-                    <motion.div key="friend-empty" variants={itemVariants} layout initial="hidden" animate="visible" exit="exit">
-                        <div className="flex h-[34px] items-center rounded-[7px] border border-[#9fc56f] bg-[#5f7d2f] px-[10px] text-[0.83rem] font-medium whitespace-nowrap text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_2px_0_rgba(0,0,0,0.25)]">
-                            {localizeWithFallback('friendbar.empty.online', 'No friends online')}
-                        </div>
+        <NativeTextTree>
+            <motion.div
+                ref={elementRef}
+                className="friend-bar flex h-[40px] items-center gap-[3px] px-[2px] py-[3px]"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+            >
+                {maxVisible > 0 && requestsCount > 0 && (
+                    <motion.div variants={itemVariants}>
+                        <FriendBarRequestsView />
                     </motion.div>
                 )}
-            </AnimatePresence>
+                {showArrows && (
+                    <motion.div variants={itemVariants}>
+                        <BaseButton
+                            type="button"
+                            disabled={!canScrollLeft}
+                            aria-label={localizeWithFallback('friendbar.scroll.left', 'Previous friends')}
+                            className={`friend-bar-button left ${!canScrollLeft ? 'is-disabled' : ''}`}
+                            onClick={() => setIndexOffset(safeOffset - 1)}
+                        >
+                            <img src={friendsBrowseBg} alt="" className="friend-bar-browse-bg" />
+                            <img src={friendsBrowseArrowLeft} alt="" className="friend-bar-browse-arrow" />
+                        </BaseButton>
+                    </motion.div>
+                )}
 
-            <motion.div variants={itemVariants}>
-                <div
-                    className={`flex h-[34px] w-[20px] items-center justify-center text-white/80 transition-all ${!canScrollRight ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:text-white active:scale-95'}`}
-                    onClick={() => {
-                        if (canScrollRight) setIndexOffset(safeOffset + 1);
-                    }}
-                >
-                    <FaChevronRight className="text-white/70 text-sm drop-shadow-[1px_1px_0_#000]" />
-                </div>
+                <AnimatePresence mode="popLayout">
+                    {visibleFriends.map((friend) => (
+                        <motion.div key={friend.id} variants={itemVariants} layout initial="hidden" animate="visible" exit="exit">
+                            <FriendBarItemView friend={friend} />
+                        </motion.div>
+                    ))}
+                    {Array.from({ length: findFriendsSlotCount }, (_, index) => (
+                        <motion.div key={`friend-search-${index}`} variants={itemVariants} layout initial="hidden" animate="visible" exit="exit">
+                            <FriendBarItemView friend={null} />
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+
+                {showArrows && (
+                    <motion.div variants={itemVariants}>
+                        <BaseButton
+                            type="button"
+                            disabled={!canScrollRight}
+                            aria-label={localizeWithFallback('friendbar.scroll.right', 'Next friends')}
+                            className={`friend-bar-button right ${!canScrollRight ? 'is-disabled' : ''}`}
+                            onClick={() => setIndexOffset(safeOffset + 1)}
+                        >
+                            <img src={friendsBrowseBg} alt="" className="friend-bar-browse-bg" />
+                            <img src={friendsBrowseArrowRight} alt="" className="friend-bar-browse-arrow" />
+                        </BaseButton>
+                    </motion.div>
+                )}
             </motion.div>
-        </motion.div>
+        </NativeTextTree>
     );
 };

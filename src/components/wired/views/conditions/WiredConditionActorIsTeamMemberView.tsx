@@ -1,73 +1,53 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
+import { WiredIconRadioGroup } from '../WiredMoveIconRadios';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 
-const teamIds: number[] = [1, 2, 3, 4];
+// Official: 0 "in any team" (team.any) on its own row, then the teams 1-4 in 2 columns.
+const TEAM_IDS: number[] = [1, 2, 3, 4];
 
-interface WiredConditionActorIsTeamMemberViewProps {
-    negative?: boolean;
-}
-
-export const WiredConditionActorIsTeamMemberView: FC<WiredConditionActorIsTeamMemberViewProps> = ({ negative = false }) => {
+export const WiredConditionActorIsTeamMemberView: FC = () => {
     const [selectedTeam, setSelectedTeam] = useState(-1);
-    const [quantifier, setQuantifier] = useState(1);
-    const { trigger = null, setIntParams = null } = useWired();
-    const [userSource, setUserSource] = useState<number>(() => {
-        if (trigger?.intData?.length > 1) return trigger.intData[1];
-        return 0;
-    });
+    // Official layout: [team (0 any team, 1-4)], the users in the official source slot; the quantifier is the base view's.
+    const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
+    const [userSource, setUserSource] = useState<number>(() => trigger?.userSourceTypes?.[0] ?? 0);
 
-    const save = () => setIntParams([selectedTeam, userSource, quantifier]);
+    const save = () => {
+        setIntParams([selectedTeam]);
+        setSourceTypes({ furni: [], users: [userSource] });
+    };
 
     useEffect(() => {
         setSelectedTeam(trigger.intData.length > 0 ? trigger.intData[0] : 0);
-        setUserSource(trigger.intData.length > 1 ? trigger.intData[1] : 0);
-        setQuantifier(trigger.intData.length > 2 ? (trigger.intData[2] === 1 ? 1 : 0) : 1);
+        setUserSource(trigger.userSourceTypes?.[0] ?? 0);
     }, [trigger]);
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.quantifier_selection')}</Text>
-                {[0, 1].map((value) => (
-                    <label key={value} className="flex items-center gap-1">
-                        <input
-                            checked={quantifier === value}
-                            className="form-check-input"
-                            name="teamMemberQuantifier"
-                            type="radio"
-                            onChange={() => setQuantifier(value)}
-                        />
-                        <Text>{LocalizeText(`wiredfurni.params.quantifier.users${negative ? '.neg' : ''}.${value}`)}</Text>
-                    </label>
-                ))}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
-                {teamIds.map((value) => {
-                    return (
-                        <div key={value} className="items-center gap-1">
-                            <input
-                                checked={selectedTeam === value}
-                                className="form-check-input"
-                                id={`selectedTeam${value}`}
-                                name="selectedTeam"
-                                type="radio"
-                                onChange={(event) => setSelectedTeam(value)}
-                            />
-                            <Text>{LocalizeText(`wiredfurni.params.team.${value}`)}</Text>
-                        </div>
-                    );
-                })}
-            </div>
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
+                    <WiredIconRadioGroup
+                        columns={2}
+                        name="selectedTeam"
+                        options={[
+                            { value: 0, label: LocalizeText('wiredfurni.params.team.any'), newLine: true },
+                            ...TEAM_IDS.map((value) => ({ value, label: LocalizeText(`wiredfurni.params.team.${value}`) }))
+                        ]}
+                        value={selectedTeam}
+                        onChange={setSelectedTeam}
+                    />
+                </div>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

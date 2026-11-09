@@ -1,4 +1,5 @@
 import { WiredConditionlayout } from '../../../../api';
+import { WiredConditionCheckArrayView } from './WiredConditionCheckArrayView';
 import { WiredConditionActorDirView } from './WiredConditionActorDirView';
 import { WiredConditionActorHasHandItemView } from './WiredConditionActorHasHandItem';
 import { WiredConditionActorIsGroupMemberView } from './WiredConditionActorIsGroupMemberView';
@@ -26,8 +27,14 @@ import { WiredConditionTeamHasRankView } from './WiredConditionTeamHasRankView';
 import { WiredConditionTeamHasScoreView } from './WiredConditionTeamHasScoreView';
 import { WiredConditionTimeElapsedLessView } from './WiredConditionTimeElapsedLessView';
 import { WiredConditionTimeElapsedMoreView } from './WiredConditionTimeElapsedMoreView';
-import { WiredConditionTriggerFurniAdjacentStateView } from './WiredConditionTriggerFurniAdjacentStateView';
+import { WiredConditionFurniOpacityView } from './WiredConditionFurniOpacityView';
+import { WiredConditionUserCooldownView } from './WiredConditionUserCooldownView';
+import { WiredConditionUserHighscorePointsView } from './WiredConditionUserHighscorePointsView';
+import { WiredConditionUserLevelView } from './WiredConditionUserLevelView';
+import { WiredConditionUserOnceView } from './WiredConditionUserOnceView';
+import { WiredConditionUserRankView } from './WiredConditionUserRankView';
 import { WiredConditionTriggererMatchView } from './WiredConditionTriggererMatchView';
+import { WiredConditionTriggerFurniAdjacentStateView } from './WiredConditionTriggerFurniAdjacentStateView';
 import { WiredConditionUserCountInRoomView } from './WiredConditionUserCountInRoomView';
 import { WiredConditionUserOnFurniWithStateView } from './WiredConditionUserOnFurniWithStateView';
 import { WiredConditionUserPerformsActionView } from './WiredConditionUserPerformsActionView';
@@ -36,10 +43,12 @@ import { WiredConditionVariableValueMatchView } from './WiredConditionVariableVa
 
 export const WiredConditionLayoutView = (code: number) => {
     switch (code) {
+        case WiredConditionlayout.CHECK_ARRAY:
+            return <WiredConditionCheckArrayView />;
         case WiredConditionlayout.ACTOR_HAS_HANDITEM:
             return <WiredConditionActorHasHandItemView />;
         case WiredConditionlayout.NOT_ACTOR_HAS_HANDITEM:
-            return <WiredConditionActorHasHandItemView negative={true} />;
+            return <WiredConditionActorHasHandItemView />;
         case WiredConditionlayout.ACTOR_DIR:
             return <WiredConditionActorDirView />;
         case WiredConditionlayout.SLC_QUANTITY:
@@ -47,7 +56,7 @@ export const WiredConditionLayoutView = (code: number) => {
         case WiredConditionlayout.HAS_VAR:
             return <WiredConditionHasVariableView />;
         case WiredConditionlayout.NEG_HAS_VAR:
-            return <WiredConditionHasVariableView negative={true} />;
+            return <WiredConditionHasVariableView />;
         case WiredConditionlayout.VAR_VAL_MATCH:
             return <WiredConditionVariableValueMatchView />;
         case WiredConditionlayout.VAR_AGE_MATCH:
@@ -55,27 +64,51 @@ export const WiredConditionLayoutView = (code: number) => {
         case WiredConditionlayout.TRIGGERER_MATCH:
             return <WiredConditionTriggererMatchView />;
         case WiredConditionlayout.NOT_TRIGGERER_MATCH:
-            return <WiredConditionTriggererMatchView negative={true} />;
+            return <WiredConditionTriggererMatchView />;
         case WiredConditionlayout.ACTOR_IS_GROUP_MEMBER:
             return <WiredConditionActorIsGroupMemberView />;
         case WiredConditionlayout.NOT_ACTOR_IN_GROUP:
-            return <WiredConditionActorIsGroupMemberView negative={true} />;
+            return <WiredConditionActorIsGroupMemberView />;
         case WiredConditionlayout.ACTOR_IS_ON_FURNI:
             return <WiredConditionActorIsOnFurniView />;
         case WiredConditionlayout.NOT_ACTOR_ON_FURNI:
-            return <WiredConditionActorIsOnFurniView negative={true} />;
+            return <WiredConditionActorIsOnFurniView />;
         case WiredConditionlayout.ACTOR_IS_IN_TEAM:
             return <WiredConditionActorIsTeamMemberView />;
         case WiredConditionlayout.NOT_ACTOR_IN_TEAM:
-            return <WiredConditionActorIsTeamMemberView negative={true} />;
+            return <WiredConditionActorIsTeamMemberView />;
         case WiredConditionlayout.ACTOR_IS_WEARING_BADGE:
             return <WiredConditionActorIsWearingBadgeView />;
         case WiredConditionlayout.NOT_ACTOR_WEARS_BADGE:
-            return <WiredConditionActorIsWearingBadgeView negative={true} />;
+            return <WiredConditionActorIsWearingBadgeView />;
+        case WiredConditionlayout.USER_STATE:
+            return <WiredConditionActorIsWearingEffectView showEffect={false} />;
+        case WiredConditionlayout.NOT_USER_STATE:
+            return <WiredConditionActorIsWearingEffectView showEffect={false} />;
+        case WiredConditionlayout.USER_AMOUNT:
+            return <WiredConditionTeamHasScoreView scoped={false} />;
+        case WiredConditionlayout.USER_ATTRIBUTE:
+            return <WiredConditionActorIsWearingBadgeView field={null} />;
+        case WiredConditionlayout.NOT_USER_ATTRIBUTE:
+            return <WiredConditionActorIsWearingBadgeView field={null} />;
+        case WiredConditionlayout.USER_RANGE:
+            return <WiredConditionHasAltitudeView variant="userRange" />;
+        case WiredConditionlayout.FURNI_RANGE:
+            return <WiredConditionHasAltitudeView variant="furniRange" />;
+        case WiredConditionlayout.USER_LEVEL:
+            return <WiredConditionUserLevelView />;
+        case WiredConditionlayout.FURNI_PROPERTY:
+            return <WiredConditionHasAltitudeView variant="furniProperty" />;
+        case WiredConditionlayout.USER_TAG:
+            return <WiredConditionActorIsWearingBadgeView field="tag" />;
+        case WiredConditionlayout.NOT_USER_TAG:
+            return <WiredConditionActorIsWearingBadgeView field="tag" />;
+        case WiredConditionlayout.USER_MOTTO:
+            return <WiredConditionActorIsWearingBadgeView field="motto" />;
         case WiredConditionlayout.ACTOR_IS_WEARING_EFFECT:
             return <WiredConditionActorIsWearingEffectView />;
         case WiredConditionlayout.NOT_ACTOR_WEARING_EFFECT:
-            return <WiredConditionActorIsWearingEffectView negative={true} />;
+            return <WiredConditionActorIsWearingEffectView />;
         case WiredConditionlayout.DATE_RANGE_ACTIVE:
             return <WiredConditionDateRangeView />;
         case WiredConditionlayout.MOVEMENT_VALIDATION:
@@ -95,11 +128,11 @@ export const WiredConditionLayoutView = (code: number) => {
         case WiredConditionlayout.STUFF_TYPE_MATCHES:
             return <WiredConditionFurniIsOfTypeView />;
         case WiredConditionlayout.NOT_FURNI_IS_OF_TYPE:
-            return <WiredConditionFurniIsOfTypeView negative={true} />;
+            return <WiredConditionFurniIsOfTypeView />;
         case WiredConditionlayout.STATES_MATCH:
             return <WiredConditionFurniMatchesSnapshotView />;
         case WiredConditionlayout.NOT_STATES_MATCH:
-            return <WiredConditionFurniMatchesSnapshotView negative={true} />;
+            return <WiredConditionFurniMatchesSnapshotView />;
         case WiredConditionlayout.TIME_ELAPSED_LESS:
             return <WiredConditionTimeElapsedLessView />;
         case WiredConditionlayout.TIME_ELAPSED_MORE:
@@ -112,7 +145,7 @@ export const WiredConditionLayoutView = (code: number) => {
         case WiredConditionlayout.USER_PERFORMS_ACTION:
             return <WiredConditionUserPerformsActionView />;
         case WiredConditionlayout.NOT_USER_PERFORMS_ACTION:
-            return <WiredConditionUserPerformsActionView negative={true} />;
+            return <WiredConditionUserPerformsActionView />;
         case WiredConditionlayout.HAS_ALTITUDE:
             return <WiredConditionHasAltitudeView />;
         case WiredConditionlayout.TEAM_HAS_SCORE:
@@ -129,6 +162,18 @@ export const WiredConditionLayoutView = (code: number) => {
             return <WiredConditionChestHasItemsView />;
         case WiredConditionlayout.CHEST_HAS_ITEM_TYPE:
             return <WiredConditionChestHasItemTypeView />;
+        case WiredConditionlayout.USER_RANK:
+            return <WiredConditionUserRankView />;
+        case WiredConditionlayout.FURNI_OPACITY:
+            return <WiredConditionFurniOpacityView />;
+        case WiredConditionlayout.USER_COOLDOWN:
+            return <WiredConditionUserCooldownView />;
+        case WiredConditionlayout.USER_ONCE:
+            return <WiredConditionUserOnceView />;
+        case WiredConditionlayout.USER_DAILY:
+            return <WiredConditionUserOnceView daily={true} />;
+        case WiredConditionlayout.USER_HIGHSCORE_POINTS:
+            return <WiredConditionUserHighscorePointsView />;
     }
 
     return null;

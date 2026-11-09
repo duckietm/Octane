@@ -1,8 +1,8 @@
 {
     "distObfuscationEnabled": true,
-    "secureAssetsEnabled": true,
-    "secureApiEnabled": true,
+    "secureAssetsEnabled": false,
+    "secureApiEnabled": false,
     "apiBaseUrl": "https://nitro.example.com:2096",
     "plainConfigBaseUrl": "https://hotel.example.com/configuration/",
-    "plainGamedataBaseUrl": "https://hotel.example.com/client/nitro/gamedata/"
+    "plainGamedataBaseUrl": "https://hotel.example.com/client/octane/gamedata/"
 }

@@ -1,6 +1,7 @@
-import { GetRoomEngine, RoomPreviewer } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, RoomPreviewer } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useState } from 'react';
-import { LayoutRoomPreviewerView } from '../../common';
+import { LayoutRoomPreviewerView, PIXEL_ART_RENDERING } from '../../common';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface AvatarEffectPreviewViewProps {
     figure: string;
@@ -23,21 +24,32 @@ export const AvatarEffectPreviewView: FC<AvatarEffectPreviewViewProps> = (props)
 
         return () => {
             previewer.dispose();
-            setRoomPreviewer(null);
         };
     }, []);
 
     useEffect(() => {
         if (!roomPreviewer || !figure) return;
 
-        roomPreviewer.addAvatarIntoRoom(figure, effect);
-        roomPreviewer.updateObjectUserFigure(figure, gender);
-    }, [roomPreviewer, figure, gender, effect]);
+        roomPreviewer.addAvatarIntoRoom(figure, 0);
+    }, [roomPreviewer, figure]);
 
     useEffect(() => {
-        if (!roomPreviewer) return;
+        if (!roomPreviewer || !figure) return;
+
+        roomPreviewer.updateObjectUserFigure(figure, gender);
+    }, [roomPreviewer, figure, gender]);
+
+    useEffect(() => {
+        if (!roomPreviewer || !figure) return;
+
+        roomPreviewer.updateUserEffect(effect);
+    }, [roomPreviewer, figure, effect]);
+
+    useEffect(() => {
+        if (!roomPreviewer || !figure) return;
+
         roomPreviewer.updateAvatarDirection(direction, direction);
-    }, [roomPreviewer, direction]);
+    }, [roomPreviewer, figure, direction]);
 
     if (!roomPreviewer) return null;
 
@@ -56,14 +68,16 @@ export const AvatarEffectPreviewView: FC<AvatarEffectPreviewViewProps> = (props)
         height: `${100 / zoom}%`,
         transform: `scale(${zoom})`,
         transformOrigin: 'top left',
-        imageRendering: 'pixelated'
+        imageRendering: PIXEL_ART_RENDERING
     };
 
     return (
-        <div style={outerStyle}>
-            <div style={innerStyle}>
-                <LayoutRoomPreviewerView roomPreviewer={roomPreviewer} height={renderHeight} />
+        <NativeTextTree>
+            <div style={outerStyle}>
+                <div style={innerStyle}>
+                    <LayoutRoomPreviewerView roomPreviewer={roomPreviewer} height={renderHeight} />
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

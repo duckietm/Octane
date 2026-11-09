@@ -1,16 +1,16 @@
 import { useSyncExternalStore } from 'react';
 
 /**
- * useSyncExternalStore wrapper for the Nitro renderer's subscribe + snapshot
+ * useSyncExternalStore wrapper for the Octane renderer's subscribe + snapshot
  * getter contract.
  *
- * Pair with EventDispatcher.subscribe() (Nitro_Render_V3 v2.1.0+) and a
+ * Pair with EventDispatcher.subscribe() (Octane Renderer v2.1.0+) and a
  * referentially-stable snapshot getter such as
  * SessionDataManager.getUserDataSnapshot() or
  * RoomSessionManager.getActiveRoomSessionSnapshot().
  *
  *   const userData = useExternalSnapshot(
- *       cb => GetEventDispatcher().subscribe(NitroEventType.SESSION_DATA_UPDATED, cb),
+ *       cb => GetEventDispatcher().subscribe(OctaneEventType.SESSION_DATA_UPDATED, cb),
  *       () => GetSessionDataManager().getUserDataSnapshot()
  *   );
  *

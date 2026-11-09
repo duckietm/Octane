@@ -1,0 +1,328 @@
+/* AIR quest/seasonalcalendar: SeasonalCalendar.xml (642x465). The calendar strip is 640x320 with
+   the day images of the campaign gallery 80 px apart; the footer holds the catalogue promo (384x97)
+   and the rare teaser (235x97). */
+
+.octane-seasonal-calendar {
+    width: 642px;
+}
+
+.octane-seasonal-calendar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.octane-seasonal-strip-window {
+    position: relative;
+    width: 640px;
+    height: 320px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.octane-seasonal-strip {
+    position: absolute;
+    inset: 0 auto auto 0;
+    height: 320px;
+    transition: transform 100ms linear;
+    will-change: transform;
+}
+
+.octane-seasonal-background {
+    position: absolute;
+    top: 0;
+    width: 640px;
+    height: 320px;
+    user-select: none;
+}
+
+.octane-seasonal-day {
+    position: absolute;
+    top: 0;
+    width: 79px;
+    height: 313px;
+}
+
+.octane-seasonal-day-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 79px;
+    height: 289px;
+    user-select: none;
+}
+
+.octane-seasonal-day-indicator-edge {
+    position: absolute;
+    top: 293px;
+    left: 5px;
+    width: 67px;
+    height: 18px;
+    border-radius: 4px;
+    background: rgb(0 0 0 / 35%);
+}
+
+.octane-seasonal-day-indicator {
+    position: absolute;
+    top: 294px;
+    left: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 65px;
+    height: 16px;
+    border-radius: 3px;
+    background: var(--seasonal-indicator, #20911d);
+}
+
+.octane-seasonal-day-indicator-flash {
+    animation: octane-seasonal-flash 2s linear infinite;
+}
+
+@keyframes octane-seasonal-flash {
+    0%,
+    100% {
+        background: var(--seasonal-indicator, #20911d);
+    }
+
+    50% {
+        background: var(--seasonal-indicator-flash, #84f581);
+    }
+}
+
+.octane-seasonal-day-indicator-text {
+    overflow: hidden;
+    max-width: 62px;
+    color: #fff;
+    font: 700 13px Ubuntu, Arial, sans-serif;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.octane-seasonal-day-indicator-status {
+    position: absolute;
+    top: 3px;
+    left: 50px;
+}
+
+.octane-seasonal-day-region {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-seasonal-stripe-mask {
+    position: absolute;
+    top: 291px;
+    width: 43px;
+    height: 22px;
+    pointer-events: none;
+}
+
+.octane-seasonal-stripe-mask-left {
+    left: 0;
+}
+
+.octane-seasonal-stripe-mask-right {
+    left: 597px;
+}
+
+.octane-seasonal-arrow {
+    position: absolute;
+    top: 287px;
+    width: 20px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.octane-seasonal-arrow:disabled {
+    cursor: default;
+}
+
+.octane-seasonal-arrow img {
+    display: block;
+}
+
+.octane-seasonal-arrow-back {
+    left: 6px;
+}
+
+.octane-seasonal-arrow-next {
+    left: 613px;
+}
+
+.octane-seasonal-arrow-pressed img {
+    transform: translate(1px, 1px);
+}
+
+.octane-seasonal-footer {
+    display: flex;
+    gap: 6px;
+    height: 135px;
+    padding: 1px 6px 0 5px;
+}
+
+.octane-seasonal-promo {
+    position: relative;
+    display: flex;
+    width: 384px;
+    height: 97px;
+    padding: 2px;
+    border-radius: 4px;
+    background: #04bdc8;
+}
+
+.octane-seasonal-promo::before {
+    position: absolute;
+    inset: 2px;
+    border-radius: 3px;
+    background: linear-gradient(#95dfe4 0 46px, #70d7dd 46px);
+    content: '';
+}
+
+.octane-seasonal-promo-preview {
+    position: relative;
+    display: grid;
+    width: 93px;
+    height: 93px;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 3px;
+    background: rgb(255 255 255 / 45%);
+}
+
+.octane-seasonal-promo-info {
+    position: relative;
+    flex: 1;
+    padding: 5px 8px 0 11px;
+    color: #000;
+}
+
+.octane-seasonal-promo-header {
+    font: 700 12px Ubuntu, Arial, sans-serif;
+}
+
+.octane-seasonal-promo-name {
+    min-height: 16px;
+    margin-top: 4px;
+    font-size: 12px;
+}
+
+.octane-seasonal-promo-balance {
+    position: absolute;
+    bottom: 10px;
+    left: 11px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 12px;
+}
+
+.octane-seasonal-promo-buy {
+    position: absolute;
+    right: 21px;
+    bottom: 22px;
+    width: 110px;
+}
+
+.octane-seasonal-teaser {
+    position: relative;
+    width: 235px;
+    height: 97px;
+    padding: 2px;
+    border-radius: 4px;
+    background: #9cb0b6;
+}
+
+.octane-seasonal-teaser::before {
+    position: absolute;
+    inset: 2px;
+    border-radius: 3px;
+    background: linear-gradient(#d4e4e8 0 46px, #c6d7dd 46px);
+    content: '';
+}
+
+.octane-seasonal-teaser-header,
+.octane-seasonal-teaser-info {
+    position: relative;
+    color: #000;
+    font-size: 11px;
+    text-align: center;
+}
+
+.octane-seasonal-teaser-header {
+    margin-top: 6px;
+    font-weight: 700;
+}
+
+.octane-seasonal-teaser-rares {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.octane-seasonal-teaser-rare {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #9cb0b6;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.octane-seasonal-teaser-rare:disabled {
+    cursor: default;
+}
+
+.octane-seasonal-teaser-rare-locked {
+    background: #9cb0b6;
+}
+
+.octane-seasonal-teaser-rare img {
+    max-width: 36px;
+    max-height: 36px;
+}
+
+/* style 28: the padlock of the locked rare (20x24). */
+.octane-seasonal-teaser-lock {
+    width: 14px;
+    height: 12px;
+    margin-top: 6px;
+    border-radius: 2px;
+    background: #5f7076;
+    box-shadow: 0 -9px 0 -3px transparent;
+    position: relative;
+}
+
+.octane-seasonal-teaser-lock::before {
+    position: absolute;
+    top: -9px;
+    left: 2px;
+    width: 10px;
+    height: 11px;
+    box-sizing: border-box;
+    border: 3px solid #5f7076;
+    border-bottom: 0;
+    border-radius: 5px 5px 0 0;
+    content: '';
+}
+
+.octane-seasonal-teaser-info {
+    margin-top: 5px;
+}

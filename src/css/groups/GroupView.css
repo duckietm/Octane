@@ -1,0 +1,1273 @@
+.octane-groups-window {
+    /* AIR's group windows are Ubuntu frames; our `Ubuntu` face is the condensed cut. */
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    color: #111111;
+}
+
+.octane-groups-window .octane-card-content,
+.octane-groups-window .octane-card-content-shell,
+.octane-groups-content {
+    background: #eeeee7 !important;
+    color: #111111;
+}
+
+.octane-groups-window .octane-card-tabs {
+    background: #d6d5cc;
+    border-bottom: 1px solid #77776f;
+}
+
+.octane-groups-window .octane-card-tabs-item {
+    min-height: 25px;
+    border: 1px solid #111111;
+    border-bottom: 0;
+    border-radius: 6px 6px 0 0;
+    background: #c8c7bf;
+    color: #111111;
+    text-shadow: none;
+}
+
+.octane-groups-window .octane-card-tabs-item.active,
+.octane-groups-window .octane-card-tabs-item:hover {
+    background: #eeeee7;
+}
+
+.octane-groups-window input,
+.octane-groups-window textarea,
+.octane-groups-window select,
+.octane-groups-window .octane-select-trigger,
+.octane-groups-input,
+.octane-groups-select {
+    border: 1px solid #9c9c94 !important;
+    border-radius: 3px !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.08);
+    font-size: 12px;
+}
+
+.octane-groups-tab-header {
+    display: flex;
+    min-height: 70px;
+    padding: 6px;
+    margin-bottom: 6px;
+    border: 1px solid #b4b4ad;
+    border-radius: 6px;
+    background: #f7f7f2;
+}
+
+.octane-group-tab-image {
+    flex: 0 0 auto;
+}
+
+.octane-groups-footer {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid #c7c7bf;
+}
+
+.octane-groups-button,
+.octane-groups-window button:not(.octane-card-header-close):not(.octane-select-trigger),
+.octane-group-room-info .octane-groups-button {
+    min-height: 24px;
+    border: 3px solid transparent !important;
+    border-image-source: var(--habbo-skin-button) !important;
+    border-image-slice: 3 fill !important;
+    border-image-width: 3px !important;
+    border-image-repeat: stretch !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    /* AIR button text is black (button_shiny_bold / button_shiny_regular carry no colour). */
+    color: #000000 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.octane-groups-button:hover,
+.octane-groups-window button:not(.octane-card-header-close):not(.octane-select-trigger):hover,
+.octane-group-room-info .octane-groups-button:hover {
+    border-image-source: var(--habbo-skin-button-hover) !important;
+    filter: none !important;
+}
+
+.octane-groups-button:active,
+.octane-groups-window button:not(.octane-card-header-close):not(.octane-select-trigger):active,
+.octane-group-room-info .octane-groups-button:active {
+    border-image-source: var(--habbo-skin-button-pressed) !important;
+}
+
+.octane-groups-button:disabled,
+.octane-groups-window button:disabled:not(.octane-select-trigger),
+.octane-group-room-info .octane-groups-button:disabled {
+    border-image-source: var(--habbo-skin-button-disabled) !important;
+    color: #777777 !important;
+    opacity: 1 !important;
+}
+
+.octane-groups-button--primary {
+    border-width: 5px !important;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-image-source: var(--habbo-skin-shiny-thick-green) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35) !important;
+}
+
+.octane-groups-button--primary:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-green-hover) !important;
+}
+
+.octane-groups-button--primary:active {
+    border-image-source: var(--habbo-skin-shiny-thick-green-pressed) !important;
+}
+
+.octane-group-information-standalone {
+    width: 365px !important;
+    height: 267px !important;
+    resize: none !important;
+}
+
+.octane-group-information-standalone .octane-card-content-shell,
+.octane-group-information-standalone .octane-groups-content {
+    width: 365px !important;
+    height: 234px !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info {
+    position: relative;
+    display: block !important;
+    width: 343px !important;
+    height: 212px !important;
+    min-height: 0 !important;
+    max-height: 212px !important;
+    box-sizing: border-box !important;
+    margin: 10px 11px 0 !important;
+    padding: 0 !important;
+    border: 1px solid #77776f !important;
+    border-radius: 5px !important;
+    background: #cccccc !important;
+    color: #000000;
+    font-size: 12px;
+    overflow: hidden !important;
+    clip-path: inset(0 round 5px);
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__badge-column {
+    position: absolute;
+    left: 14px !important;
+    top: 16px !important;
+    width: 105px !important;
+    height: 134px !important;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__badge-wrap {
+    position: absolute;
+    left: 0 !important;
+    top: 0 !important;
+    width: 80px !important;
+    height: 80px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__badge-wrap .group-badge {
+    flex: 0 0 auto;
+    min-width: 80px;
+    min-height: 80px;
+    background-size: auto !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__badge-wrap img {
+    width: auto;
+    height: auto;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__meta {
+    position: absolute;
+    left: 0 !important;
+    top: 85px !important;
+    width: 82px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.octane-extended-profile-group-info__member-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+    cursor: pointer;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__member-link {
+    display: block;
+    width: 82px !important;
+    height: 17px;
+    padding: 0 !important;
+    border: 0 !important;
+    border-image-source: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+    font-weight: 700;
+    font-size: 12px;
+    text-align: center;
+    text-decoration: underline;
+    line-height: 17px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__role {
+    display: block !important;
+    position: absolute !important;
+    left: 30px !important;
+    top: 118px !important;
+    width: 20px !important;
+    height: 20px !important;
+    z-index: 2;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__content {
+    position: absolute;
+    left: 116px !important;
+    top: 11px !important;
+    width: 196px !important;
+    height: 190px !important;
+    display: block;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy {
+    position: absolute;
+    left: 0 !important;
+    top: 0 !important;
+    width: 196px !important;
+    height: 47px !important;
+    display: block;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy > .flex {
+    display: block !important;
+    width: 196px !important;
+    height: 16px !important;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy > .flex > .flex {
+    display: none !important;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy .text-bold,
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy b,
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy .fw-bold {
+    display: block !important;
+    width: 196px !important;
+    height: 16px !important;
+    color: #111111 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 16px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy > .text {
+    display: block !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 16px !important;
+    width: 196px !important;
+    height: 15px !important;
+    color: #111111 !important;
+    font-size: 11px !important;
+    line-height: 15px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__description {
+    position: absolute;
+    left: 0;
+    top: 32px !important;
+    width: 194px !important;
+    height: 31px !important;
+    padding: 0;
+    color: #000000 !important;
+    font-size: 12px !important;
+    line-height: 15px !important;
+    overflow: hidden !important;
+    word-break: normal;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__links {
+    position: absolute;
+    left: 0;
+    top: 84px !important;
+    width: 190px !important;
+    height: 58px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__links .text,
+.octane-group-information-standalone .octane-extended-profile-group-info__links span {
+    color: #000000 !important;
+    font-size: 12px;
+    line-height: 16px;
+    text-decoration: underline;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__button {
+    position: absolute;
+    left: -2px !important;
+    top: 168px !important;
+    width: 160px !important;
+    height: 29px !important;
+    min-height: 29px !important;
+    box-sizing: border-box !important;
+    border: 2px solid #111111 !important;
+    border-image-source: none !important;
+    border-radius: 3px !important;
+    background: linear-gradient(180deg, #ffffff 0%, #f4f4f2 48%, #d5d5d1 100%) !important;
+    color: #111111 !important;
+    text-shadow: none !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 #a6a6a0 !important;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__button:hover {
+    background: linear-gradient(180deg, #ffffff 0%, #fafaf8 48%, #e0e0dc 100%) !important;
+}
+
+.octane-group-information-standalone .octane-extended-profile-group-info__button .text-white,
+.octane-group-information-standalone .octane-extended-profile-group-info__button span {
+    color: #000000 !important;
+    text-shadow: none !important;
+}
+
+.octane-group-members {
+    width: 332px;
+    height: 431px;
+    resize: none !important;
+}
+
+.octane-group-members .octane-card-content-shell,
+.octane-group-members .octane-groups-content {
+    position: relative;
+    width: 332px;
+    height: 398px;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #eeeee7 !important;
+}
+
+.octane-group-members-search {
+    position: absolute;
+    left: 6px;
+    top: 0;
+    width: 320px;
+    height: 77px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.octane-group-members-search__badge {
+    position: absolute;
+    left: 17px;
+    top: 22px;
+    width: 39px;
+    height: 39px;
+    min-width: 39px;
+    min-height: 39px;
+    background-size: auto !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-group-members-search .flex-column,
+.octane-group-members-search .d-flex.flex-column,
+.octane-group-members-search > .column {
+    position: absolute;
+    left: 78px;
+    top: 14px;
+    width: 230px;
+    height: 59px;
+    gap: 9px !important;
+}
+
+.octane-group-members-search input {
+    width: 214px !important;
+    height: 25px !important;
+    min-height: 25px !important;
+    padding: 2px 6px !important;
+    font-size: 13px !important;
+}
+
+.octane-group-members-search select,
+.octane-group-members-search .octane-select-trigger {
+    width: 230px !important;
+    height: 25px !important;
+    min-height: 25px !important;
+    padding: 2px 6px !important;
+    /* type_drop_menu: the Ubuntu drop menu, 12 px (the filter input beside it is 13 px). */
+    font-size: 12px !important;
+}
+
+.octane-group-members-list-grid {
+    position: absolute;
+    left: 4px;
+    top: 82px;
+    width: 324px;
+    height: 277px;
+    display: grid !important;
+    grid-template-columns: repeat(2, 164px) !important;
+    grid-auto-rows: 35px;
+    gap: 0 0 !important;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.octane-group-member-row {
+    position: relative;
+    width: 164px !important;
+    height: 35px !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000000;
+}
+
+.octane-group-member-row:hover {
+    background: rgba(255, 255, 255, .35) !important;
+}
+
+.octane-group-member-row__avatar {
+    position: absolute;
+    left: -3px;
+    top: 0;
+    width: 33px;
+    height: 34px;
+    overflow: hidden;
+}
+
+.octane-group-member-row__head {
+    position: absolute;
+    left: 50%;
+    top: -12px;
+    width: auto !important;
+    height: auto !important;
+    transform: translateX(-50%);
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-group-member-row__copy {
+    position: absolute;
+    left: 33px;
+    top: 1px;
+    width: 94px;
+    height: 31px;
+    overflow: hidden;
+}
+
+.octane-group-member-row__name {
+    display: block;
+    width: 77px;
+    height: 16px;
+    color: #000000 !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.octane-group-member-row__since {
+    display: block;
+    position: absolute;
+    left: 17px;
+    top: 14px;
+    width: 61px;
+    height: 15px;
+    color: #666666 !important;
+    font-size: 10px !important;
+    font-style: italic;
+    line-height: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.octane-group-member-row__actions {
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    width: 34px;
+    height: 18px;
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    align-items: center;
+}
+
+.octane-group-member-row__actions .octane-icon,
+.octane-group-member-row__actions .octane-friends-spritesheet {
+    margin: 0 !important;
+    flex: 0 0 auto;
+}
+
+.octane-group-members .octane-groups-footer {
+    position: absolute;
+    left: 4px;
+    top: 363px;
+    width: 324px;
+    height: 25px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.octane-group-members .octane-groups-button--pager {
+    width: 50px !important;
+    height: 25px !important;
+    min-height: 25px !important;
+    padding: 0 !important;
+}
+
+.octane-group-members .octane-groups-footer .text {
+    width: 178px;
+    text-align: center;
+    /* footer_info_txt: u_regular, 12 px black. */
+    color: #000000 !important;
+    font-size: 12px;
+}
+
+.octane-group-room-info {
+    margin-left: auto;
+    margin-right: 0;
+    width: 188px;
+    max-width: 188px;
+    height: 113px;
+    border: 1px solid #707070;
+    border-radius: 4px;
+    background: rgba(24, 24, 24, 0.92);
+    color: #ffffff;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+        0 2px 0 rgba(0, 0, 0, 0.35);
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    transition: height 0.18s ease;
+}
+
+.octane-group-room-info.is-closed {
+    height: 22px;
+}
+
+.octane-group-room-info__contracted {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 186px;
+    height: 21px;
+    padding: 0 21px 0 4px;
+    cursor: pointer;
+    background: linear-gradient(180deg, rgba(54, 54, 54, 0.98), rgba(33, 33, 33, 0.98));
+    border-bottom: 1px solid #000000;
+    border-radius: 3px 3px 0 0;
+}
+
+.octane-group-room-info__base-icon {
+    width: auto;
+    height: auto;
+    flex: 0 0 auto;
+    margin-right: 3px;
+}
+
+.octane-group-room-info__toggle {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 17px;
+    height: 17px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+}
+
+.octane-group-room-info__toggle::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 6px;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #d7d7d7;
+    filter: drop-shadow(1px 1px 0 #000000);
+}
+
+.octane-group-room-info.is-closed .octane-group-room-info__toggle {
+    transform: none;
+}
+
+.octane-group-room-info.is-closed .octane-group-room-info__toggle::after {
+    transform: rotate(180deg);
+}
+
+.octane-group-room-info__title,
+.octane-group-room-info .text-white {
+    color: #ffffff !important;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+    letter-spacing: -0.2px;
+    text-shadow: 1px 1px 0 #000000;
+}
+
+.octane-group-room-info__content {
+    height: 90px;
+    overflow: hidden;
+    transition: opacity 0.14s ease;
+    background: rgba(27, 27, 27, 0.94);
+}
+
+.octane-group-room-info.is-closed .octane-group-room-info__content {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.octane-group-room-info__main {
+    height: 57px;
+    padding: 7px 8px 0 10px;
+    gap: 7px;
+}
+
+.octane-group-room-info__badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 39px;
+    height: 39px;
+    flex: 0 0 39px;
+    filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.75));
+}
+
+.octane-group-room-info__badge .layout-badge-image,
+.octane-group-room-info__badge .badge-image {
+    width: 39px !important;
+    height: 39px !important;
+    background-size: contain !important;
+    background-position: center !important;
+}
+
+.octane-group-room-info__group-name {
+    display: -webkit-box;
+    width: 124px;
+    height: 42px;
+    overflow: hidden;
+    color: #ffffff !important;
+    font-size: 12px !important;
+    font-weight: 700;
+    line-height: 13px;
+    text-shadow: 1px 1px 0 #000000;
+    word-break: break-word;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.octane-group-room-info__button-wrap {
+    padding: 3px 8px 0;
+}
+
+.octane-group-room-info__button {
+    width: 170px;
+    height: 27px;
+    min-height: 27px;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+}
+
+/* SWF group_room_info.xml coordinates. */
+.octane-group-room-info {
+    width: 195px !important;
+    max-width: 195px !important;
+    height: 119px !important;
+    margin-left: auto !important;
+    border-radius: 4px !important;
+}
+
+.octane-group-room-info.is-closed {
+    height: 25px !important;
+}
+
+.octane-group-room-info__contracted {
+    width: 195px !important;
+    height: 25px !important;
+    padding: 0 24px 0 5px !important;
+}
+
+.octane-group-room-info__base-icon {
+    width: 21px !important;
+    max-width: 21px !important;
+    height: 16px !important;
+    max-height: 16px !important;
+    margin: 0 -11px 0 0 !important;
+}
+
+.octane-group-room-info__title,
+.octane-group-room-info .text-white {
+    font-size: 13px !important;
+    line-height: 18px !important;
+    letter-spacing: -0.4px !important;
+}
+
+.octane-group-room-info__content {
+    height: 94px !important;
+}
+
+.octane-group-room-info__main {
+    height: 51px !important;
+    padding: 7px 11px 0 12px !important;
+    gap: 8px !important;
+}
+
+.octane-group-room-info__badge {
+    width: 39px !important;
+    height: 39px !important;
+    flex: 0 0 39px !important;
+}
+
+.octane-group-room-info__group-name {
+    width: 125px !important;
+    height: 50px !important;
+    font-size: 13px !important;
+    line-height: 14px !important;
+}
+
+.octane-group-room-info__button-wrap {
+    padding: 1px 10px 0 !important;
+}
+
+.octane-group-room-info__button {
+    width: 175px !important;
+    height: 29px !important;
+    min-height: 29px !important;
+}
+
+/* group_room_info.xml: fixed 195x119 surface, using the same dark treatment as
+ * the original right-side widgets. The content is positioned by the SWF x/y values. */
+.octane-group-room-info {
+    position: relative !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(0, 0, 0, 0.92) !important;
+    border-radius: 5px !important;
+    background: rgba(117, 116, 111, 0.40) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+        0 2px 0 rgba(0, 0, 0, 0.32) !important;
+}
+
+.octane-group-room-info__contracted {
+    position: relative !important;
+    width: 195px !important;
+    height: 25px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 4px 4px 0 0 !important;
+    background: rgba(28, 34, 37, 0.40) !important;
+}
+
+.octane-group-room-info__contracted::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    background: #000000;
+    pointer-events: none;
+}
+
+.octane-group-room-info__base-icon {
+    position: absolute !important;
+    top: 3px !important;
+    left: 5px !important;
+    width: 21px !important;
+    height: 16px !important;
+    margin: 0 !important;
+}
+
+.octane-group-room-info__title {
+    position: absolute !important;
+    top: 2px !important;
+    left: 27px !important;
+    width: 143px !important;
+    height: 18px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+.octane-group-room-info__toggle {
+    top: 4px !important;
+    right: 5px !important;
+}
+
+.octane-group-room-info__content {
+    position: relative !important;
+    width: 195px !important;
+    height: 94px !important;
+    overflow: hidden !important;
+    background: rgba(117, 116, 111, 0.40) !important;
+}
+
+.octane-group-room-info__main {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 195px !important;
+    height: 54px !important;
+    padding: 0 !important;
+}
+
+.octane-group-room-info__badge {
+    position: absolute !important;
+    top: 7px !important;
+    left: 12px !important;
+}
+
+.octane-group-room-info__group-name {
+    position: absolute !important;
+    top: 7px !important;
+    left: 59px !important;
+    width: 125px !important;
+    height: 50px !important;
+    margin: 0 !important;
+    color: #ffffff !important;
+}
+
+.octane-group-room-info__button-wrap {
+    position: absolute !important;
+    top: 54px !important;
+    left: 10px !important;
+    width: 175px !important;
+    height: 29px !important;
+    padding: 0 !important;
+}
+
+.octane-group-room-info .octane-group-room-info__button {
+    width: 175px !important;
+    height: 29px !important;
+    min-height: 29px !important;
+    box-sizing: border-box !important;
+    border: 1px solid #050505 !important;
+    border-image-source: none !important;
+    border-radius: 2px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: linear-gradient(180deg, #ffffff 0%, #f4f4f2 45%, #d7d7d3 100%) !important;
+    color: #111111 !important;
+    text-align: center !important;
+    text-shadow: none !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 #a7a7a3,
+        0 1px 0 rgba(0, 0, 0, 0.45) !important;
+}
+
+.octane-group-room-info__button .text-white {
+    color: #111111 !important;
+}
+
+/* SWF guild_members_window/member_entry layout */
+.octane-group-members {
+    width: 351px !important;
+    height: 431px !important;
+    resize: none !important;
+}
+
+.octane-group-members .octane-card-header,
+.octane-group-members .octane-card-header-shell {
+    height: 32px !important;
+}
+
+.octane-group-members .octane-card-header-text {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 30px !important;
+    text-align: center !important;
+}
+
+.octane-group-members .octane-card-content-shell,
+.octane-group-members .octane-groups-content {
+    position: relative !important;
+    width: 351px !important;
+    height: 398px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #eeeee7 !important;
+}
+
+.octane-group-members-search {
+    position: absolute !important;
+    left: 7px !important;
+    top: 9px !important;
+    width: 337px !important;
+    height: 70px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+}
+
+.octane-group-members-search__badge {
+    position: absolute !important;
+    left: 19px !important;
+    top: 8px !important;
+    width: 39px !important;
+    height: 39px !important;
+    min-width: 39px !important;
+    min-height: 39px !important;
+}
+
+.octane-group-members-search__controls,
+.octane-group-members-search .flex-column,
+.octane-group-members-search .d-flex.flex-column,
+.octane-group-members-search > .column {
+    position: absolute !important;
+    left: 80px !important;
+    top: 5px !important;
+    width: 244px !important;
+    height: 56px !important;
+    gap: 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.octane-group-members-search input {
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 216px !important;
+    height: 25px !important;
+    min-height: 25px !important;
+    padding: 2px 5px !important;
+    border: 1px solid #000000 !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    color: #222222 !important;
+    font-size: 13px !important;
+}
+
+.octane-group-members-search select,
+.octane-group-members-search .octane-select-trigger {
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 244px !important;
+    height: 25px !important;
+    min-height: 25px !important;
+    padding: 2px 23px 2px 5px !important;
+    border: 1px solid #000000 !important;
+    border-radius: 0 !important;
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+    color: #222222 !important;
+    font-size: 13px !important;
+}
+
+.octane-group-members-list-grid {
+    position: absolute !important;
+    left: 6px !important;
+    top: 82px !important;
+    width: 339px !important;
+    height: 272px !important;
+    display: grid !important;
+    grid-template-columns: 169px 169px !important;
+    grid-auto-rows: 39px !important;
+    gap: 0 1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.octane-group-member-row {
+    position: relative !important;
+    width: 168px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    margin: 0 0 3px 0 !important;
+    padding: 0 !important;
+    border: 1px solid #77776f !important;
+    border-radius: 5px !important;
+    background: #f5f5f0 !important;
+    box-shadow: inset 0 1px 0 #ffffff !important;
+    overflow: hidden !important;
+}
+
+.octane-group-member-row:hover {
+    background: #ffffff !important;
+}
+
+.octane-group-member-row__avatar {
+    position: absolute !important;
+    left: -5px !important;
+    top: -5px !important;
+    width: 43px !important;
+    height: 45px !important;
+    overflow: hidden !important;
+}
+
+.octane-group-member-row__head {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    transform: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+
+.octane-group-member-row__copy {
+    position: absolute !important;
+    left: 38px !important;
+    top: 1px !important;
+    width: 96px !important;
+    height: 32px !important;
+    overflow: hidden !important;
+}
+
+.octane-group-member-row__name {
+    display: block !important;
+    width: 93px !important;
+    height: 16px !important;
+    color: #111111 !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 16px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.octane-group-member-row__since {
+    display: block !important;
+    position: absolute !important;
+    left: 11px !important;
+    top: 15px !important;
+    width: 85px !important;
+    height: 14px !important;
+    color: #6a6a65 !important;
+    font-size: 10px !important;
+    font-style: italic !important;
+    line-height: 14px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+}
+
+.octane-group-member-row__actions {
+    position: absolute !important;
+    right: 3px !important;
+    top: 17px !important;
+    width: 28px !important;
+    height: 16px !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 1px !important;
+}
+
+.octane-group-member-row__actions .octane-icon,
+.octane-group-member-row__actions .octane-friends-spritesheet {
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+}
+
+.octane-group-members-footer {
+    position: absolute !important;
+    left: 8px !important;
+    top: 360px !important;
+    width: 335px !important;
+    height: 31px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+.octane-group-members-footer .octane-groups-button--pager {
+    width: 51px !important;
+    height: 29px !important;
+    min-height: 29px !important;
+    padding: 0 !important;
+}
+
+.octane-group-members-footer .octane-groups-button--pager:first-child {
+    visibility: hidden;
+}
+
+.octane-group-members-footer__page {
+    position: absolute;
+    left: 73px;
+    top: 4px;
+    width: 204px;
+    height: 23px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    color: #5d5d58;
+}
+
+.octane-group-members-footer__label,
+.octane-group-members-footer__total {
+    color: #5d5d58 !important;
+    font-size: 12px !important;
+    line-height: 20px !important;
+    white-space: nowrap !important;
+}
+
+.octane-group-members-footer__input {
+    width: 22px !important;
+    height: 22px !important;
+    min-height: 22px !important;
+    padding: 0 !important;
+    border: 1px solid #000000 !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    text-align: center !important;
+    font-size: 12px !important;
+    box-shadow: none !important;
+    appearance: textfield !important;
+}
+
+.octane-group-members-footer__input::-webkit-outer-spin-button,
+.octane-group-members-footer__input::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+/* Badge editor part picker: cap the symbol/base grid at 8 rows and scroll the
+   rest. Each tile is 48px tall (40px badge + 2x4px padding) with 4px gaps, so
+   8 rows + 7 gaps = 412px. The rows template/height overrides undo the Grid
+   component's h-full + 1fr stretched rows so tiles keep their natural height. */
+.octane-group-badge-part-picker {
+    max-height: 412px;
+    overflow-y: auto;
+    grid-template-rows: none !important;
+    grid-auto-rows: max-content;
+    align-content: start;
+}
+
+/*
+ * Member Entry / groups members window: accept-all and the previous_page_button / next_page_button pagers are
+ * AIR's grey `button` / container_button (style 3, habbo_skin_button_shiny), 12 px regular black, not the flat
+ * 3 px button_default picture. The Button's 12.6 px bold size and the skins are important rules, which only an
+ * important rule in the base layer outranks.
+ */
+@layer base {
+    .octane-groups-window .octane-groups-button:not(.octane-group-room-info__button) {
+        border-width: 5px !important;
+        border-image-source: var(--habbo-skin-shiny) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        color: #000000 !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+    }
+
+    .octane-groups-window .octane-groups-button:not(.octane-group-room-info__button):hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    .octane-groups-window .octane-groups-button:not(.octane-group-room-info__button):active {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+
+    .octane-groups-window .octane-groups-button:not(.octane-group-room-info__button):is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-disabled) !important;
+        color: #777777 !important;
+    }
+}
+
+/*
+ * group_info join_button / leave_button / request_membership_button and group_room_info join_button /
+ * request_membership_button / manage_button are the grey button_thick (style 3, habbo_skin_button_shiny_thick)
+ * with button_shiny_bold, 12 px bold black. The common Button would draw the green .habbo-btn-primary at
+ * 12.6 px; both are important rules, which only an important rule in the base layer outranks.
+ */
+@layer base {
+    .octane-group-room-info .octane-group-room-info__button.habbo-btn-primary,
+    .octane-group-information-standalone .octane-extended-profile-group-info__button.habbo-btn-primary {
+        border-width: 5px !important;
+        border-style: solid !important;
+        border-color: transparent !important;
+        border-radius: 0 !important;
+        border-image-source: var(--habbo-skin-shiny-thick) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        border-image-repeat: stretch !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: #000000 !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        text-shadow: none !important;
+    }
+
+    .octane-group-room-info .octane-group-room-info__button.habbo-btn-primary:hover,
+    .octane-group-information-standalone .octane-extended-profile-group-info__button.habbo-btn-primary:hover {
+        border-image-source: var(--habbo-skin-shiny-thick-hover) !important;
+    }
+
+    .octane-group-room-info .octane-group-room-info__button.habbo-btn-primary:active,
+    .octane-group-information-standalone .octane-extended-profile-group-info__button.habbo-btn-primary:active {
+        border-image-source: var(--habbo-skin-shiny-thick-pressed) !important;
+    }
+
+    .octane-group-room-info .octane-group-room-info__button.habbo-btn-primary:is(:disabled, .pointer-events-none),
+    .octane-group-information-standalone .octane-extended-profile-group-info__button.habbo-btn-primary:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-thick-disabled) !important;
+        color: #777777 !important;
+    }
+}

@@ -1,10 +1,10 @@
-/* Tema Neon Viola — pezzo "catalog" (catalogo Hippiehotel, .nitro-catalog). */
+/* Tema Neon Viola — pezzo "catalog" (catalogo Hippiehotel, .octane-catalog). */
 
-.nitro-catalog .nitro-card-header-shell {
+.octane-catalog .octane-card-header-shell {
     background: linear-gradient(180deg, #9333ea 0%, #6d28d9 100%) !important;
 }
 
-.nitro-catalog .group\/rail {
+.octane-catalog .group\/rail {
     background: #1a1030 !important;
     border-right-color: #7c3aed !important;
 }

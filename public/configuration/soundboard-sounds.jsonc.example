@@ -1,0 +1,11 @@
+{
+    // Optional local-only fallback used when the server returns no sounds.
+    // Copy this file to `soundboard-sounds.jsonc`, or point `soundboard.url`
+    // to either a strict JSON or JSONC document.
+    //
+    // File-defined pads play only for the user who clicks them. Multiplayer
+    // sounds must exist in the emulator's `soundboard_sounds` table.
+    "sounds": [
+        // { "id": 1, "name": "Example", "url": "sounds/soundboard/example.ogg" },
+    ],
+}

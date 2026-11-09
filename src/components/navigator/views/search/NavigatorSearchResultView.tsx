@@ -1,124 +1,157 @@
-import { NavigatorSearchComposer, NavigatorSearchResultList, NavigatorSearchSaveComposer } from '@nitrots/nitro-renderer';
-import { FC, useEffect, useState } from 'react';
-import { FaBars, FaMinus, FaPlus, FaTh, FaWindowMaximize, FaWindowRestore } from 'react-icons/fa';
-import { LocalizeText, NavigatorSearchResultViewDisplayMode, SendMessageComposer } from '../../../../api';
-import { AutoGrid, AutoGridProps, Column, Flex, Grid, LayoutSearchSavesView, Text } from '../../../../common';
-import { useNavigatorData } from '../../../../hooks';
+import { Collapsible } from '@base-ui/react/collapsible';
+import { NavigatorSearchResultList, NavigatorSearchSaveComposer, PerkEnum } from '@octane/renderer';
+import { FC } from 'react';
+import { LocalizeText, localizeServerText, localizeWithFallback, NavigatorSearchResultViewDisplayMode, SendMessageComposer } from '../../../../api';
+import categoryCollapse from '../../../../assets/images/navigator/air/category-collapse.png';
+import categoryExpand from '../../../../assets/images/navigator/air/category-expand.png';
+import categoryShowMore from '../../../../assets/images/navigator/air/category-show-more.png';
+import navViewMini from '../../../../assets/images/navigator/air/nav-view-mini.png';
+import navViewRow from '../../../../assets/images/navigator/air/nav-view-row.png';
+import navViewThumbs from '../../../../assets/images/navigator/air/nav-view-thumbs.png';
+import { LayoutSearchSavesView } from '../../../../common';
+import { useNavigatorData, useNavigatorUiStore, usePerkAllowed } from '../../../../hooks';
 import { NavigatorSearchResultItemView } from './NavigatorSearchResultItemView';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
-export interface NavigatorSearchResultViewProps extends AutoGridProps {
+export interface NavigatorSearchResultViewProps {
     searchResult: NavigatorSearchResultList;
+    parentCode?: string;
+    parentFilter?: string;
+    forceOpen?: boolean;
 }
 
-export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (props) => {
-    const { searchResult = null, ...rest } = props;
-    const [isExtended, setIsExtended] = useState(true);
-    const [displayMode, setDisplayMode] = useState<number>(0);
-    const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
-    const [isPopoverActive, setIsPopoverActive] = useState<boolean>(false);
+const isEventView = (code: string) => code === 'roomads_view' || code === 'new_ads' || code.startsWith('eventcategory__');
 
+export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (props) => {
+    const { searchResult = null, parentCode = '', parentFilter = '', forceOpen = false } = props;
     const { topLevelContext } = useNavigatorData();
+    const isExtended = useNavigatorUiStore((state) => {
+        if (forceOpen && !state.collapsedResultCodes.includes(searchResult.code)) return true;
+
+        return state.expandedResultCodes.includes(searchResult.code) || (!state.collapsedResultCodes.includes(searchResult.code) && !searchResult.closed);
+    });
+    const thumbnailPerk = usePerkAllowed(PerkEnum.NAVIGATOR_ROOM_THUMBNAIL_CAMERA);
+    const chosenMode = useNavigatorUiStore((state) => state.resultViewModes[searchResult.code] ?? searchResult.mode);
+    // AIR BlockResultsView: without the thumbnail perk every block is rows, except under the official view.
+    const officialView = topLevelContext?.code === 'official_view' || parentCode === 'official_view';
+    const displayMode = thumbnailPerk ? chosenMode : officialView ? searchResult.mode : NavigatorSearchResultViewDisplayMode.LIST;
 
     const getResultTitle = () => {
-        let name = searchResult.code;
+        const name = searchResult.code;
 
-        if (!name || !name.length || LocalizeText('navigator.searchcode.title.' + name) === 'navigator.searchcode.title.' + name) return searchResult.data;
+        // AIR: the server's block text when it has one, else the search code's title.
+        // The server often sends a text key (`${navigator.flatcategory.global.BC}`): it is looked up like AIR does.
+        if (searchResult.data) return localizeServerText(searchResult.data);
+        if (!name || !name.length) return '';
+        if (name.startsWith('${')) return localizeServerText(name);
 
-        if (name.startsWith('${')) return name.slice(2, name.length - 1);
-
-        return 'navigator.searchcode.title.' + name;
+        return localizeWithFallback('navigator.searchcode.title.' + name, name);
     };
 
     const toggleDisplayMode = () => {
-        setDisplayMode((prevValue) => {
-            if (prevValue === NavigatorSearchResultViewDisplayMode.LIST) return NavigatorSearchResultViewDisplayMode.THUMBNAILS;
+        const nextMode =
+            displayMode === NavigatorSearchResultViewDisplayMode.LIST
+                ? NavigatorSearchResultViewDisplayMode.THUMBNAILS
+                : NavigatorSearchResultViewDisplayMode.LIST;
 
-            return NavigatorSearchResultViewDisplayMode.LIST;
-        });
+        useNavigatorUiStore.getState().setResultViewMode(searchResult.code, nextMode);
     };
 
     const showMore = () => {
-        if (searchResult.action == 1) SendMessageComposer(new NavigatorSearchComposer(searchResult.code, ''));
-        else if (searchResult.action == 2 && topLevelContext) SendMessageComposer(new NavigatorSearchComposer(topLevelContext.code, ''));
+        if (searchResult.action == 1) {
+            useNavigatorUiStore.getState().setSearch(searchResult.code, parentFilter);
+            return;
+        }
+        if (searchResult.action != 2) return;
+
+        // Back returns to the previous search, like Habbo; without history it goes to the tab root.
+        const store = useNavigatorUiStore.getState();
+
+        if (store.searchHistoryOffset > 0) store.goBack();
+        else if (topLevelContext) store.setSearch(topLevelContext.code, '');
     };
 
-    useEffect(() => {
-        if (!searchResult) return;
-
-        setIsExtended(searchResult.code === 'myworld_view' ? true : !searchResult.closed);
-        setDisplayMode(searchResult.mode);
-    }, [searchResult]);
-
-    const gridHasTwoColumns = displayMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS;
+    const isTileMode = displayMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS;
+    const resultTitle = getResultTitle();
+    const listViewLabel = localizeWithFallback('navigator.viewmode.list', 'Show rooms as a list');
+    const tileViewLabel = localizeWithFallback('navigator.viewmode.tiles', 'Show rooms as tiles');
+    const hideSave = parentCode === 'official_view' || searchResult.code === 'official_view';
+    const eventTitle = isEventView(searchResult.code) || isEventView(parentCode);
 
     return (
-        <Column className="nitro-card-panel" gap={0}>
-            <Flex fullWidth alignItems="center" className="px-2 py-1" justifyContent="between">
-                <Flex grow pointer alignItems="center" gap={1} onClick={(event) => setIsExtended((prevValue) => !prevValue)}>
-                    {isExtended && <FaMinus className="text-secondary fa-icon" />}
-                    {!isExtended && <FaPlus className="text-secondary fa-icon" />}
-                    <Text>{LocalizeText(getResultTitle())}</Text>
-                </Flex>
-                <div className="flex gap-2 items-center">
-                    {displayMode === NavigatorSearchResultViewDisplayMode.LIST && (
-                        <FaTh className="text-secondary fa-icon cursor-pointer" onClick={toggleDisplayMode} />
-                    )}
-                    {displayMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS && (
-                        <FaBars className="text-secondary fa-icon cursor-pointer" onClick={toggleDisplayMode} />
-                    )}
-                    {searchResult.action > 0 && searchResult.action === 1 && (
-                        <FaWindowMaximize className="text-secondary fa-icon cursor-pointer" title={LocalizeText('navigator.more.rooms')} onClick={showMore} />
-                    )}
-                    {searchResult.action > 0 && searchResult.action !== 1 && (
-                        <FaWindowRestore className="text-secondary fa-icon cursor-pointer" title={LocalizeText('navigator.back')} onClick={showMore} />
-                    )}
-                    <LayoutSearchSavesView
-                        title={LocalizeText('navigator.tooltip.add.saved.search')}
-                        onClick={() => SendMessageComposer(new NavigatorSearchSaveComposer(getResultTitle(), searchResult.data))}
-                    />
-                </div>
-            </Flex>
-            {isExtended && (
-                <>
-                    {gridHasTwoColumns ? (
-                        <AutoGrid columnCount={3} {...rest} className="mx-2" columnMinHeight={130} columnMinWidth={110}>
-                            {searchResult.rooms.length > 0 &&
-                                searchResult.rooms.map((room, index) => (
-                                    <NavigatorSearchResultItemView
-                                        key={index}
-                                        roomData={room}
-                                        thumbnail={true}
-                                        isPopoverActive={isPopoverActive}
-                                        setIsPopoverActive={setIsPopoverActive}
-                                        selectedRoomId={selectedRoomId}
-                                        setSelectedRoomId={setSelectedRoomId}
-                                    />
-                                ))}
-                        </AutoGrid>
-                    ) : (
-                        <Grid className="navigator-grid" columnCount={1} gap={0}>
-                            {searchResult.rooms.length > 0 &&
-                                searchResult.rooms.map((room, index) => (
-                                    <NavigatorSearchResultItemView
-                                        key={index}
-                                        roomData={room}
-                                        isPopoverActive={isPopoverActive}
-                                        setIsPopoverActive={setIsPopoverActive}
-                                        selectedRoomId={selectedRoomId}
-                                        setSelectedRoomId={setSelectedRoomId}
-                                    />
-                                ))}
-                        </Grid>
-                    )}
-                    {searchResult.rooms.length === 0 && (
-                        <Text className="px-3 py-2 text-sm" variant="muted">
-                            {LocalizeText(
-                                searchResult.code === 'myworld_view' ? 'navigator.roomsettings.moderation.none' : 'navigator.search.returned.no.results'
-                            )}
-                        </Text>
-                    )}
-                </>
-            )}
-        </Column>
+        <NativeTextTree>
+            <Collapsible.Root
+                render={<section />}
+                className={`octane-navigator-air__category${isExtended ? '' : ' is-collapsed'}`}
+                open={isExtended}
+                onOpenChange={() => useNavigatorUiStore.getState().setResultCollapsed(searchResult.code, isExtended)}
+            >
+                <header className="octane-navigator-air__category-header">
+                    <Collapsible.Trigger className="octane-navigator-air__category-toggle" aria-label={resultTitle}>
+                        <img src={isExtended ? categoryCollapse : categoryExpand} alt="" />
+                        <span>{resultTitle}</span>
+                    </Collapsible.Trigger>
+                    <div className="octane-navigator-air__category-controls">
+                        {isExtended && thumbnailPerk && displayMode === NavigatorSearchResultViewDisplayMode.LIST && (
+                            <Hint content={tileViewLabel}>
+                                <BaseButton
+                                    type="button"
+                                    className="octane-navigator-air__icon-button"
+                                    aria-label={tileViewLabel}
+                                    onClick={toggleDisplayMode}
+                                >
+                                    <img src={navViewThumbs} alt="" />
+                                </BaseButton>
+                            </Hint>
+                        )}
+                        {isExtended && thumbnailPerk && isTileMode && (
+                            <Hint content={listViewLabel}>
+                                <BaseButton
+                                    type="button"
+                                    className="octane-navigator-air__icon-button"
+                                    aria-label={listViewLabel}
+                                    onClick={toggleDisplayMode}
+                                >
+                                    <img src={navViewRow} alt="" />
+                                </BaseButton>
+                            </Hint>
+                        )}
+                        {searchResult.action > 0 && searchResult.action === 1 && (
+                            <Hint content={LocalizeText('navigator.more.rooms')}>
+                                <BaseButton aria-label={LocalizeText('navigator.more.rooms')} type="button" className="octane-navigator-air__icon-button" onClick={showMore}>
+                                    <img src={categoryShowMore} alt="" />
+                                </BaseButton>
+                            </Hint>
+                        )}
+                        {searchResult.action > 0 && searchResult.action !== 1 && (
+                            <Hint content={LocalizeText('navigator.back')}>
+                                <BaseButton aria-label={LocalizeText('navigator.back')} type="button" className="octane-navigator-air__icon-button" onClick={showMore}>
+                                    <img src={navViewMini} alt="" />
+                                </BaseButton>
+                            </Hint>
+                        )}
+                        {!hideSave && (
+                            <LayoutSearchSavesView
+                                title={LocalizeText('navigator.tooltip.add.saved.search')}
+                                onClick={() => SendMessageComposer(new NavigatorSearchSaveComposer(searchResult.code, parentFilter))}
+                            />
+                        )}
+                    </div>
+                </header>
+                <Collapsible.Panel className={isTileMode ? 'octane-navigator-air__tiles' : 'octane-navigator-air__rows'}>
+                        {searchResult.rooms.map((room, index) => (
+                            <NavigatorSearchResultItemView
+                                key={room.roomId || index}
+                                roomData={room}
+                                thumbnail={isTileMode}
+                                eventTitle={eventTitle}
+                                stripe={isTileMode ? Math.floor(index / 3) % 2 === 1 : index % 2 === 1}
+                            />
+                        ))}
+                </Collapsible.Panel>
+            </Collapsible.Root>
+        </NativeTextTree>
     );
 };

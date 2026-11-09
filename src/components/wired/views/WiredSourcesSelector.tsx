@@ -6,12 +6,13 @@ import {
     RoomObjectCategory,
     RoomObjectVariable,
     Triggerable
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { GetRoomSession, LocalizeText } from '../../../api';
 import { Button, Text } from '../../../common';
-import { useMessageEvent, useNitroEvent, useWired } from '../../../hooks';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { useMessageEvent, useOctaneEvent, useWired } from '../../../hooks';
 
 export const FURNI_SOURCES = [
     { value: 100, label: 'wiredfurni.params.sources.furni.100' },
@@ -77,6 +78,22 @@ export const sortWiredSourceOptions = (options: WiredSourceOption[], category: '
     });
 };
 
+/**
+ * The sources the server allows for one furni or user slot of the box (its InputSourcesConf), in the server's order.
+ * Labels the view passed for the same values are kept. Without a server list for that slot the view's own list stays.
+ */
+export const getServerSlotSources = (trigger: Triggerable, category: 'furni' | 'users', slot: number, fallback: WiredSourceOption[]): WiredSourceOption[] => {
+    const conf = trigger?.inputSourcesConf;
+    const allowed = category === 'furni' ? conf?.furniAllowed?.[slot] : conf?.userAllowed?.[slot];
+
+    if (!allowed?.length) return fallback;
+
+    // The clicked user source depends on the stack's trigger and is added separately.
+    return allowed
+        .filter((value) => value !== CLICKED_USER_SOURCE_VALUE)
+        .map((value) => fallback.find((option) => option.value === value) ?? { value, label: `wiredfurni.params.sources.${category}.${value}` });
+};
+
 interface WiredSourcesSelectorProps {
     showFurni?: boolean;
     showUsers?: boolean;
@@ -86,6 +103,9 @@ interface WiredSourcesSelectorProps {
     usersTitle?: string;
     furniSources?: WiredSourceOption[];
     userSources?: WiredSourceOption[];
+    /** Which of the box's furni / user source slots this row edits, for the server's allowed sources. */
+    furniSlot?: number;
+    userSlot?: number;
     allowClickedUserSource?: boolean;
     furniDetail?: ReactNode;
     userDetail?: ReactNode;
@@ -96,23 +116,27 @@ interface WiredSourcesSelectorProps {
 const BOT_SOURCE_TITLE = 'wiredfurni.params.sources.users.title.bots';
 
 const CLICK_USER_TRIGGER_NAME = 'wf_trg_click_user';
-const isClickUserTriggerName = (value?: string) => {
-    if (!value) return false;
+const BOT_REACHED_USER_TRIGGER_NAME = 'wf_trg_bot_reached_avtr';
 
-    return value.toLowerCase().startsWith(CLICK_USER_TRIGGER_NAME);
-};
+export const REACHED_USER_SOURCE_VALUE = 10;
+export const REACHED_USER_SOURCE = { value: REACHED_USER_SOURCE_VALUE, label: 'wiredfurni.params.sources.users.10' };
 
-const hasClickUserTriggerInStack = (trigger: Triggerable) => {
-    if (!trigger) return false;
+const matchesTriggerName = (value: string, triggerName: string) => !!value && value.toLowerCase().startsWith(triggerName);
+
+/** Which of the stack-dependent user sources the box's stack offers: 11 under Click User, 10 under Bot Reaches User. */
+const getStackUserSources = (trigger: Triggerable) => {
+    const found = { clickedUser: false, reachedUser: false };
+
+    if (!trigger) return found;
 
     const roomSession = GetRoomSession();
     const roomId = roomSession?.roomId ?? GetRoomEngine().activeRoomId;
 
-    if (roomId == null || roomId < 0) return false;
+    if (roomId == null || roomId < 0) return found;
 
     const triggerObject = GetRoomEngine().getRoomObject(roomId, trigger.id, RoomObjectCategory.FLOOR);
 
-    if (!triggerObject) return false;
+    if (!triggerObject) return found;
 
     const triggerLocation = triggerObject.getLocation();
     const roomObjects = GetRoomEngine().getRoomObjects(roomId, RoomObjectCategory.FLOOR) || [];
@@ -126,11 +150,26 @@ const hasClickUserTriggerInStack = (trigger: Triggerable) => {
 
         const typeId = roomObject.model.getValue<number>(RoomObjectVariable.FURNITURE_TYPE_ID);
         const furniData = GetSessionDataManager().getFloorItemData(typeId);
+        const names = [furniData?.className, furniData?.fullName, furniData?.name];
 
-        if (isClickUserTriggerName(furniData?.className) || isClickUserTriggerName(furniData?.fullName) || isClickUserTriggerName(furniData?.name)) return true;
+        if (names.some((name) => matchesTriggerName(name, CLICK_USER_TRIGGER_NAME))) found.clickedUser = true;
+        if (names.some((name) => matchesTriggerName(name, BOT_REACHED_USER_TRIGGER_NAME))) found.reachedUser = true;
     }
 
-    return false;
+    return found;
+};
+
+/** Puts the stack-dependent sources right after the triggering user, as the official editor does. */
+const insertAfterTrigger = (userSources: WiredSourceOption[], extra: WiredSourceOption[]) => {
+    const missing = extra.filter((source) => !userSources.some((option) => option.value === source.value));
+
+    if (!missing.length) return userSources;
+
+    const triggerIndex = userSources.findIndex((option) => option.value === 0);
+
+    if (triggerIndex === -1) return [...userSources, ...missing];
+
+    return [...userSources.slice(0, triggerIndex + 1), ...missing, ...userSources.slice(triggerIndex + 1)];
 };
 
 export const getAvailableUserSources = (
@@ -138,18 +177,17 @@ export const getAvailableUserSources = (
     userSources: WiredSourceOption[],
     currentUserSource: number,
     usersTitle = 'wiredfurni.params.sources.users.title',
-    allowClickedUserSource = true
+    allowClickedUserSource = true,
+    stackSources: { clickedUser: boolean; reachedUser: boolean } = getStackUserSources(trigger)
 ) => {
     if (!allowClickedUserSource || usersTitle === BOT_SOURCE_TITLE) return userSources;
-    if (userSources.some((option) => option.value === CLICKED_USER_SOURCE_VALUE)) return userSources;
 
-    if (!hasClickUserTriggerInStack(trigger)) return userSources;
+    const extra: WiredSourceOption[] = [];
 
-    const triggerIndex = userSources.findIndex((option) => option.value === 0);
+    if (stackSources.reachedUser) extra.push(REACHED_USER_SOURCE);
+    if (stackSources.clickedUser) extra.push(CLICKED_USER_SOURCE);
 
-    if (triggerIndex === -1) return [...userSources, CLICKED_USER_SOURCE];
-
-    return [...userSources.slice(0, triggerIndex + 1), CLICKED_USER_SOURCE, ...userSources.slice(triggerIndex + 1)];
+    return insertAfterTrigger(userSources, extra);
 };
 
 export const useAvailableUserSources = (
@@ -158,10 +196,12 @@ export const useAvailableUserSources = (
     usersTitle = 'wiredfurni.params.sources.users.title',
     allowClickedUserSource = true
 ) => {
-    const [hasClickUserTrigger, setHasClickUserTrigger] = useState(false);
+    const [stackSources, setStackSources] = useState({ clickedUser: false, reachedUser: false });
 
     const refreshStackSources = useCallback(() => {
-        setHasClickUserTrigger(hasClickUserTriggerInStack(trigger));
+        const next = getStackUserSources(trigger);
+
+        setStackSources((previous) => (previous.clickedUser === next.clickedUser && previous.reachedUser === next.reachedUser ? previous : next));
     }, [trigger]);
 
     useEffect(() => {
@@ -174,7 +214,7 @@ export const useAvailableUserSources = (
         return () => window.clearInterval(intervalId);
     }, [refreshStackSources, trigger]);
 
-    useNitroEvent<RoomEngineObjectEvent>(
+    useOctaneEvent<RoomEngineObjectEvent>(
         [RoomEngineObjectEvent.ADDED, RoomEngineObjectEvent.REMOVED, RoomEngineObjectEvent.PLACED, RoomEngineObjectEvent.CONTENT_UPDATED],
         (event) => {
             if (!trigger) return;
@@ -197,9 +237,18 @@ export const useAvailableUserSources = (
     });
 
     return useMemo(
-        () => getAvailableUserSources(trigger, userSources, 0, usersTitle, allowClickedUserSource && hasClickUserTrigger),
-        [allowClickedUserSource, hasClickUserTrigger, trigger, userSources, usersTitle]
+        () => getAvailableUserSources(trigger, userSources, 0, usersTitle, allowClickedUserSource, stackSources),
+        [allowClickedUserSource, stackSources, trigger, userSources, usersTitle]
     );
+};
+
+/** A stored source the list no longer offers stays shown, so reopening and saving the box keeps it. */
+const keepStoredSource = (sources: WiredSourceOption[], fallback: WiredSourceOption[], stored: number) => {
+    if (sources.some((option) => option.value === stored)) return sources;
+
+    const option = fallback.find((candidate) => candidate.value === stored);
+
+    return option ? [...sources, option] : sources;
 };
 
 export const WiredSourcesSelector: FC<WiredSourcesSelectorProps> = (props) => {
@@ -210,8 +259,10 @@ export const WiredSourcesSelector: FC<WiredSourcesSelectorProps> = (props) => {
         userSource = 0,
         furniTitle = 'wiredfurni.params.sources.furni.title',
         usersTitle = 'wiredfurni.params.sources.users.title',
-        furniSources = FURNI_SOURCES,
-        userSources = USER_SOURCES,
+        furniSources: viewFurniSources = FURNI_SOURCES,
+        userSources: viewUserSources = USER_SOURCES,
+        furniSlot = 0,
+        userSlot = 0,
         allowClickedUserSource = true,
         furniDetail = null,
         userDetail = null,
@@ -219,18 +270,30 @@ export const WiredSourcesSelector: FC<WiredSourcesSelectorProps> = (props) => {
         onChangeUsers = null
     } = props;
     const { trigger = null } = useWired();
+    const furniSources = useMemo(
+        () => keepStoredSource(getServerSlotSources(trigger, 'furni', furniSlot, viewFurniSources), viewFurniSources, furniSource),
+        [trigger, furniSlot, viewFurniSources, furniSource]
+    );
+    const userSources = useMemo(
+        () => keepStoredSource(getServerSlotSources(trigger, 'users', userSlot, viewUserSources), viewUserSources, userSource),
+        [trigger, userSlot, viewUserSources, userSource]
+    );
     const availableUserSources = useAvailableUserSources(trigger, userSources, usersTitle, allowClickedUserSource);
-    const orderedFurniSources = useMemo(() => sortWiredSourceOptions(furniSources, 'furni'), [furniSources]);
+    // A slot the server lists keeps the server's order (the official arrows walk InputSourcesConf as received); only the
+    // views' own fallback lists are sorted.
+    const hasServerFurni = !!trigger?.inputSourcesConf?.furniAllowed?.[furniSlot]?.length;
+    const hasServerUsers = !!trigger?.inputSourcesConf?.userAllowed?.[userSlot]?.length;
+    const orderedFurniSources = useMemo(() => (hasServerFurni ? furniSources : sortWiredSourceOptions(furniSources, 'furni')), [furniSources, hasServerFurni]);
     const orderedUserSources = useMemo(() => {
-        if (usersTitle === BOT_SOURCE_TITLE) return [...availableUserSources];
+        if (hasServerUsers || usersTitle === BOT_SOURCE_TITLE) return [...availableUserSources];
 
         return sortWiredSourceOptions(availableUserSources, 'users');
-    }, [availableUserSources, usersTitle]);
+    }, [availableUserSources, hasServerUsers, usersTitle]);
 
     useEffect(() => {
         if (!showUsers || !onChangeUsers) return;
-        if (userSource !== CLICKED_USER_SOURCE_VALUE) return;
-        if (availableUserSources.some((source) => source.value === CLICKED_USER_SOURCE_VALUE)) return;
+        if (userSource !== CLICKED_USER_SOURCE_VALUE && userSource !== REACHED_USER_SOURCE_VALUE) return;
+        if (availableUserSources.some((source) => source.value === userSource)) return;
 
         onChangeUsers(0);
     }, [availableUserSources, onChangeUsers, showUsers, userSource]);
@@ -267,48 +330,50 @@ export const WiredSourcesSelector: FC<WiredSourcesSelectorProps> = (props) => {
     if (!showFurni && !showUsers) return null;
 
     return (
-        <div className="flex flex-col gap-2">
-            {showFurni && (
-                <>
-                    <Text bold>{LocalizeText(furniTitle)}</Text>
-                    <div className="flex items-center gap-1">
-                        <Button variant="primary" classNames={['nitro-wired__picker-button']} className="px-2 py-1" onClick={prevFurni}>
-                            <FaChevronLeft />
-                        </Button>
-                        <div className="flex min-w-0 flex-1 items-center justify-center nitro-wired__picker-label">
-                            <Text small className="text-center">
-                                {LocalizeText(orderedFurniSources[furniIndex].label)}
-                            </Text>
+        <NativeTextTree>
+            <div className="flex flex-col gap-2">
+                {showFurni && (
+                    <>
+                        <Text bold>{LocalizeText(furniTitle)}</Text>
+                        <div className="flex items-center gap-1">
+                            <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={prevFurni}>
+                                <FaChevronLeft />
+                            </Button>
+                            <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
+                                <Text small className="text-center">
+                                    {LocalizeText(orderedFurniSources[furniIndex].label)}
+                                </Text>
+                            </div>
+                            <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={nextFurni}>
+                                <FaChevronRight />
+                            </Button>
                         </div>
-                        <Button variant="primary" classNames={['nitro-wired__picker-button']} className="px-2 py-1" onClick={nextFurni}>
-                            <FaChevronRight />
-                        </Button>
-                    </div>
-                    {furniDetail && <div className="nitro-wired__source-detail">{furniDetail}</div>}
-                </>
-            )}
+                        {furniDetail && <div className="octane-wired__source-detail">{furniDetail}</div>}
+                    </>
+                )}
 
-            {showFurni && showUsers && <hr className="m-0 bg-dark" />}
+                {showFurni && showUsers && <hr className="m-0 bg-dark" />}
 
-            {showUsers && (
-                <>
-                    <Text bold>{LocalizeText(usersTitle)}</Text>
-                    <div className="flex items-center gap-1">
-                        <Button variant="primary" classNames={['nitro-wired__picker-button']} className="px-2 py-1" onClick={prevUsers}>
-                            <FaChevronLeft />
-                        </Button>
-                        <div className="flex min-w-0 flex-1 items-center justify-center nitro-wired__picker-label">
-                            <Text small className="text-center">
-                                {LocalizeText(orderedUserSources[userIndex].label)}
-                            </Text>
+                {showUsers && (
+                    <>
+                        <Text bold>{LocalizeText(usersTitle)}</Text>
+                        <div className="flex items-center gap-1">
+                            <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={prevUsers}>
+                                <FaChevronLeft />
+                            </Button>
+                            <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
+                                <Text small className="text-center">
+                                    {LocalizeText(orderedUserSources[userIndex].label)}
+                                </Text>
+                            </div>
+                            <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={nextUsers}>
+                                <FaChevronRight />
+                            </Button>
                         </div>
-                        <Button variant="primary" classNames={['nitro-wired__picker-button']} className="px-2 py-1" onClick={nextUsers}>
-                            <FaChevronRight />
-                        </Button>
-                    </div>
-                    {userDetail && <div className="nitro-wired__source-detail">{userDetail}</div>}
-                </>
-            )}
-        </div>
+                        {userDetail && <div className="octane-wired__source-detail">{userDetail}</div>}
+                    </>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

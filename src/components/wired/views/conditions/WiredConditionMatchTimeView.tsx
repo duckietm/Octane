@@ -1,13 +1,20 @@
-import { ChangeEvent, FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { resolveConditionTimezone, useWiredRoomTimezone, WiredConditionTimezoneSection } from './WiredConditionTimezoneSection';
+import { Radio } from '../../../../common/Radio';
+import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MODE_SKIP = 0;
 const MODE_EXACT = 1;
 const MODE_RANGE = 2;
 const MODE_OPTIONS = [MODE_SKIP, MODE_EXACT, MODE_RANGE];
+/** An official "use" flag and range as the editor's mode: off, a single value, or a range. */
+const toMode = (use: boolean, from: number, to: number) => (!use ? MODE_SKIP : from === to ? MODE_EXACT : MODE_RANGE);
+
 
 const clampValue = (value: number, min: number, max: number) => {
     if (isNaN(value)) return min;
@@ -28,7 +35,7 @@ interface TimeFilterSectionProps {
     onToChange: (value: number) => void;
 }
 
-const parseInputValue = (event: ChangeEvent<HTMLInputElement>, min: number, max: number) => {
+const parseInputValue = (event: { target: { value: string } }, min: number, max: number) => {
     return clampValue(parseInt(event.target.value || min.toString(), 10), min, max);
 };
 
@@ -36,15 +43,9 @@ const InlineNumberInput: FC<{ value: number; min: number; max: number; onChange:
     const { value = 0, min = 0, max = 0, onChange = null } = props;
 
     return (
-        <input
-            className="form-control form-control-sm text-center"
-            max={max}
-            min={min}
-            style={{ width: 56 }}
-            type="number"
-            value={value}
-            onChange={(event) => onChange(parseInputValue(event, min, max))}
-        />
+        <NativeTextTree>
+            <NumberInput className="form-control form-control-sm text-center" max={max} min={min} style={{ width: 56 }} value={value} onChange={(event) => onChange(parseInputValue(event, min, max))} />
+        </NativeTextTree>
     );
 };
 
@@ -63,51 +64,35 @@ const TimeFilterSection: FC<TimeFilterSectionProps> = (props) => {
     } = props;
 
     return (
-        <div className="d-flex flex-column gap-2">
-            <Text bold>{LocalizeText(titleKey)}</Text>
-            <div className="flex items-center gap-1">
-                <input
-                    checked={mode === MODE_SKIP}
-                    className="form-check-input"
-                    id={`${sectionId}0`}
-                    name={sectionId}
-                    type="radio"
-                    onChange={() => onModeChange(MODE_SKIP)}
-                />
-                <Text>{LocalizeText('wiredfurni.params.time.skip')}</Text>
+        <NativeTextTree>
+            <div className="d-flex flex-column gap-2">
+                <Text bold>{LocalizeText(titleKey)}</Text>
+                <div className="flex items-center gap-1">
+                    <Radio checked={mode === MODE_SKIP} id={`${sectionId}0`} name={sectionId} onCheckedChange={() => onModeChange(MODE_SKIP)} />
+                    <Text>{LocalizeText('wiredfurni.params.time.skip')}</Text>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Radio checked={mode === MODE_EXACT} id={`${sectionId}1`} name={sectionId} onCheckedChange={() => onModeChange(MODE_EXACT)} />
+                    <Text>{LocalizeText('wiredfurni.params.time.exact')}</Text>
+                    <InlineNumberInput max={max} min={min} value={fromValue} onChange={onFromChange} />
+                </div>
+                <div className="flex items-center gap-2">
+                    <Radio checked={mode === MODE_RANGE} id={`${sectionId}2`} name={sectionId} onCheckedChange={() => onModeChange(MODE_RANGE)} />
+                    <Text>{LocalizeText('wiredfurni.params.time.range')}</Text>
+                    <InlineNumberInput max={max} min={min} value={fromValue} onChange={onFromChange} />
+                    <Text>-</Text>
+                    <InlineNumberInput max={max} min={min} value={toValue} onChange={onToChange} />
+                </div>
             </div>
-            <div className="flex items-center gap-2">
-                <input
-                    checked={mode === MODE_EXACT}
-                    className="form-check-input"
-                    id={`${sectionId}1`}
-                    name={sectionId}
-                    type="radio"
-                    onChange={() => onModeChange(MODE_EXACT)}
-                />
-                <Text>{LocalizeText('wiredfurni.params.time.exact')}</Text>
-                <InlineNumberInput max={max} min={min} value={fromValue} onChange={onFromChange} />
-            </div>
-            <div className="flex items-center gap-2">
-                <input
-                    checked={mode === MODE_RANGE}
-                    className="form-check-input"
-                    id={`${sectionId}2`}
-                    name={sectionId}
-                    type="radio"
-                    onChange={() => onModeChange(MODE_RANGE)}
-                />
-                <Text>{LocalizeText('wiredfurni.params.time.range')}</Text>
-                <InlineNumberInput max={max} min={min} value={fromValue} onChange={onFromChange} />
-                <Text>-</Text>
-                <InlineNumberInput max={max} min={min} value={toValue} onChange={onToChange} />
-            </div>
-        </div>
+        </NativeTextTree>
     );
 };
 
 export const WiredConditionMatchTimeView: FC<{}> = () => {
-    const { trigger = null, setIntParams = null } = useWired();
+    const { trigger = null, setIntParams = null, setStringParam = null } = useWired();
+    const { roomZone } = useWiredRoomTimezone();
+    // The string param is the timezone; a box without one follows the room's.
+    const [timezone, setTimezone] = useState('');
     const [hourMode, setHourMode] = useState(MODE_SKIP);
     const [hourFrom, setHourFrom] = useState(0);
     const [hourTo, setHourTo] = useState(0);
@@ -121,71 +106,81 @@ export const WiredConditionMatchTimeView: FC<{}> = () => {
     useEffect(() => {
         if (!trigger) return;
 
-        setHourMode(MODE_OPTIONS.includes(trigger.intData[0]) ? trigger.intData[0] : MODE_SKIP);
-        setHourFrom(clampValue(trigger.intData[1] ?? 0, 0, 23));
-        setHourTo(clampValue(trigger.intData[2] ?? 0, 0, 23));
-        setMinuteMode(MODE_OPTIONS.includes(trigger.intData[3]) ? trigger.intData[3] : MODE_SKIP);
-        setMinuteFrom(clampValue(trigger.intData[4] ?? 0, 0, 59));
-        setMinuteTo(clampValue(trigger.intData[5] ?? 0, 0, 59));
-        setSecondMode(MODE_OPTIONS.includes(trigger.intData[6]) ? trigger.intData[6] : MODE_SKIP);
-        setSecondFrom(clampValue(trigger.intData[7] ?? 0, 0, 59));
-        setSecondTo(clampValue(trigger.intData[8] ?? 0, 0, 59));
+        // Official layout: [useSeconds, useMinutes, useHours, secondMin, secondMax, minuteMin, minuteMax, hourMin, hourMax].
+        const d = trigger.intData;
+        const [secFrom, secTo] = [clampValue(d[3] ?? 0, 0, 59), clampValue(d[4] ?? 59, 0, 59)];
+        const [minFrom, minTo] = [clampValue(d[5] ?? 0, 0, 59), clampValue(d[6] ?? 59, 0, 59)];
+        const [hrFrom, hrTo] = [clampValue(d[7] ?? 0, 0, 23), clampValue(d[8] ?? 23, 0, 23)];
+
+        setSecondMode(toMode(d[0] === 1, secFrom, secTo));
+        setSecondFrom(secFrom);
+        setSecondTo(secTo);
+        setMinuteMode(toMode(d[1] === 1, minFrom, minTo));
+        setMinuteFrom(minFrom);
+        setMinuteTo(minTo);
+        setHourMode(toMode(d[2] === 1, hrFrom, hrTo));
+        setHourFrom(hrFrom);
+        setHourTo(hrTo);
+        setTimezone((trigger.stringData ?? '').trim());
     }, [trigger]);
 
     const save = () => {
+        const range = (mode: number, from: number, to: number, max: number) => [clampValue(from, 0, max), clampValue(mode === MODE_RANGE ? to : from, 0, max)];
+
         setIntParams([
-            hourMode,
-            clampValue(hourFrom, 0, 23),
-            clampValue(hourTo, 0, 23),
-            minuteMode,
-            clampValue(minuteFrom, 0, 59),
-            clampValue(minuteTo, 0, 59),
-            secondMode,
-            clampValue(secondFrom, 0, 59),
-            clampValue(secondTo, 0, 59)
+            secondMode !== MODE_SKIP ? 1 : 0,
+            minuteMode !== MODE_SKIP ? 1 : 0,
+            hourMode !== MODE_SKIP ? 1 : 0,
+            ...range(secondMode, secondFrom, secondTo, 59),
+            ...range(minuteMode, minuteFrom, minuteTo, 59),
+            ...range(hourMode, hourFrom, hourTo, 23)
         ]);
+        setStringParam(resolveConditionTimezone(timezone, roomZone));
     };
 
     return (
-        <WiredConditionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <div className="flex flex-col gap-3">
-                <TimeFilterSection
-                    fromValue={hourFrom}
-                    max={23}
-                    min={0}
-                    mode={hourMode}
-                    sectionId="matchTimeHour"
-                    titleKey="wiredfurni.params.time.hour_selection"
-                    toValue={hourTo}
-                    onFromChange={(value) => setHourFrom(clampValue(value, 0, 23))}
-                    onModeChange={setHourMode}
-                    onToChange={(value) => setHourTo(clampValue(value, 0, 23))}
-                />
-                <TimeFilterSection
-                    fromValue={minuteFrom}
-                    max={59}
-                    min={0}
-                    mode={minuteMode}
-                    sectionId="matchTimeMinute"
-                    titleKey="wiredfurni.params.time.minute_selection"
-                    toValue={minuteTo}
-                    onFromChange={(value) => setMinuteFrom(clampValue(value, 0, 59))}
-                    onModeChange={setMinuteMode}
-                    onToChange={(value) => setMinuteTo(clampValue(value, 0, 59))}
-                />
-                <TimeFilterSection
-                    fromValue={secondFrom}
-                    max={59}
-                    min={0}
-                    mode={secondMode}
-                    sectionId="matchTimeSecond"
-                    titleKey="wiredfurni.params.time.second_selection"
-                    toValue={secondTo}
-                    onFromChange={(value) => setSecondFrom(clampValue(value, 0, 59))}
-                    onModeChange={setSecondMode}
-                    onToChange={(value) => setSecondTo(clampValue(value, 0, 59))}
-                />
-            </div>
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
+                <div className="flex flex-col gap-3">
+                    <TimeFilterSection
+                        fromValue={hourFrom}
+                        max={23}
+                        min={0}
+                        mode={hourMode}
+                        sectionId="matchTimeHour"
+                        titleKey="wiredfurni.params.time.hour_selection"
+                        toValue={hourTo}
+                        onFromChange={(value) => setHourFrom(clampValue(value, 0, 23))}
+                        onModeChange={setHourMode}
+                        onToChange={(value) => setHourTo(clampValue(value, 0, 23))}
+                    />
+                    <TimeFilterSection
+                        fromValue={minuteFrom}
+                        max={59}
+                        min={0}
+                        mode={minuteMode}
+                        sectionId="matchTimeMinute"
+                        titleKey="wiredfurni.params.time.minute_selection"
+                        toValue={minuteTo}
+                        onFromChange={(value) => setMinuteFrom(clampValue(value, 0, 59))}
+                        onModeChange={setMinuteMode}
+                        onToChange={(value) => setMinuteTo(clampValue(value, 0, 59))}
+                    />
+                    <TimeFilterSection
+                        fromValue={secondFrom}
+                        max={59}
+                        min={0}
+                        mode={secondMode}
+                        sectionId="matchTimeSecond"
+                        titleKey="wiredfurni.params.time.second_selection"
+                        toValue={secondTo}
+                        onFromChange={(value) => setSecondFrom(clampValue(value, 0, 59))}
+                        onModeChange={setSecondMode}
+                        onToChange={(value) => setSecondTo(clampValue(value, 0, 59))}
+                    />
+                    <WiredConditionTimezoneSection value={timezone} onChange={setTimezone} />
+                </div>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

@@ -1,8 +1,8 @@
 import { FC, PropsWithChildren, useState } from 'react';
 import { GetConfigurationValue, UnseenItemCategory } from '../../../../api';
 import { LayoutBadgeImageView } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useInventoryBadges, useInventoryUnseenTracker } from '../../../../hooks';
-import { InfiniteGrid } from '../../../../layout';
 
 export const InventoryBadgeItemView: FC<PropsWithChildren<{ badgeCode: string }>> = (props) => {
     const { badgeCode = null, children = null, ...rest } = props;
@@ -26,19 +26,19 @@ export const InventoryBadgeItemView: FC<PropsWithChildren<{ badgeCode: string }>
     const onDragEnd = () => setIsDragging(false);
 
     return (
-        <InfiniteGrid.Item
-            draggable
-            className={`cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-40 scale-95' : ''}`}
-            itemActive={selectedBadgeCode === badgeCode}
-            itemUnseen={unseen}
-            onDoubleClick={(event) => toggleBadge(selectedBadgeCode)}
-            onDragEnd={onDragEnd}
-            onDragStart={onDragStart}
-            onMouseDown={(event) => setSelectedBadgeCode(badgeCode)}
-            {...rest}
-        >
-            <LayoutBadgeImageView badgeCode={badgeCode} />
-            {children}
-        </InfiniteGrid.Item>
+        <NativeTextTree>
+            <div
+                draggable
+                className={`octane-inventory-thumb octane-inventory-badge-cell ${selectedBadgeCode === badgeCode ? 'is-selected' : ''} ${unseen ? 'is-unseen' : ''} ${isDragging ? 'is-dragging' : ''}`}
+                onDoubleClick={() => toggleBadge(badgeCode)}
+                onDragEnd={onDragEnd}
+                onDragStart={onDragStart}
+                onMouseDown={(event) => setSelectedBadgeCode(badgeCode)}
+                {...rest}
+            >
+                <LayoutBadgeImageView badgeCode={badgeCode} />
+                {children}
+            </div>
+        </NativeTextTree>
     );
 };

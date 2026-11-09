@@ -1,4 +1,3 @@
-import { MouseEventType, TouchEventType } from '@nitrots/nitro-renderer';
 import {
     CSSProperties,
     FC,
@@ -21,6 +20,7 @@ const POS_MEMORY: Map<Key, { x: number; y: number }> = new Map();
 const BOUNDS_THRESHOLD_TOP: number = 0;
 const BOUNDS_THRESHOLD_LEFT: number = 0;
 const DRAG_OUTSIDE_PERCENT: number = 0.8;
+const DRAG_START_THRESHOLD_PX: number = 3;
 
 export interface DraggableWindowProps {
     uniqueKey?: Key;
@@ -30,6 +30,12 @@ export interface DraggableWindowProps {
     dragStyle?: CSSProperties;
     offsetLeft?: number;
     offsetTop?: number;
+    /** An explicit start position (a window tracker places the window); the remembered position of `uniqueKey` is then not used. */
+    initialPosition?: { x: number; y: number };
+    /** The position is taken as given, without keeping the window inside the viewport. */
+    unconstrainedPosition?: boolean;
+    /** Told where the window was dropped after a drag (or where an explicit start position was moved to). */
+    onPositionChange?: (position: { x: number; y: number }) => void;
     children?: ReactNode;
 }
 
@@ -42,15 +48,20 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
         dragStyle = {},
         children = null,
         offsetLeft = 0,
-        offsetTop = 0
+        offsetTop = 0,
+        initialPosition,
+        unconstrainedPosition = false,
+        onPositionChange
     } = props;
     const [delta, setDelta] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
     const [offset, setOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-    const [start, setStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
     const [isPositioned, setIsPositioned] = useState(false);
     const [dragHandler, setDragHandler] = useState<HTMLElement>(null);
     const elementRef = useRef<HTMLDivElement>(null);
+    const offsetRef = useRef({ x: 0, y: 0 });
+    const deltaRef = useRef({ x: 0, y: 0 });
+    const dragRef = useRef<{ pointerId: number; startX: number; startY: number; active: boolean } | null>(null);
     const bringToTop = useCallback(() => {
         let zIndex = 400;
         for (const existingWindow of CURRENT_WINDOWS) {
@@ -85,27 +96,8 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
         [moveCurrentWindow]
     );
 
-    const startDragging = useCallback((startX: number, startY: number) => {
-        setStart({ x: startX, y: startY });
-        setIsDragging(true);
-    }, []);
-
-    const onDragMouseDown = useCallback(
-        (event: MouseEvent) => {
-            startDragging(event.clientX, event.clientY);
-        },
-        [startDragging]
-    );
-
-    const onTouchDown = useCallback(
-        (event: TouchEvent) => {
-            const touch = event.touches[0];
-            startDragging(touch.clientX, touch.clientY);
-        },
-        [startDragging]
-    );
-
     const clampPosition = useCallback((newX: number, newY: number) => {
+        if (unconstrainedPosition) return { x: newX, y: newY };
         if (!elementRef.current) return { x: newX, y: newY };
 
         const windowWidth = elementRef.current.offsetWidth;
@@ -118,70 +110,11 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
         const clampedY = Math.max(BOUNDS_THRESHOLD_TOP, Math.min(newY, viewportHeight - windowHeight + maxOutY));
 
         return { x: clampedX, y: clampedY };
-    }, []);
+    }, [unconstrainedPosition]);
 
-    const onDragMouseMove = useCallback(
-        (event: MouseEvent) => {
-            if (!elementRef.current || !isDragging) return;
-
-            const newDeltaX = event.clientX - start.x;
-            const newDeltaY = event.clientY - start.y;
-            const newOffsetX = offset.x + newDeltaX;
-            const newOffsetY = offset.y + newDeltaY;
-
-            const clampedPos = clampPosition(newOffsetX, newOffsetY);
-            setDelta({ x: clampedPos.x - offset.x, y: clampedPos.y - offset.y });
-        },
-        [start, offset, clampPosition, isDragging]
-    );
-
-    const onDragTouchMove = useCallback(
-        (event: TouchEvent) => {
-            if (!elementRef.current || !isDragging) return;
-
-            const touch = event.touches[0];
-            const newDeltaX = touch.clientX - start.x;
-            const newDeltaY = touch.clientY - start.y;
-            const newOffsetX = offset.x + newDeltaX;
-            const newOffsetY = offset.y + newDeltaY;
-
-            const clampedPos = clampPosition(newOffsetX, newOffsetY);
-            setDelta({ x: clampedPos.x - offset.x, y: clampedPos.y - offset.y });
-        },
-        [start, offset, clampPosition, isDragging]
-    );
-
-    const completeDrag = useCallback(() => {
-        if (!elementRef.current || !dragHandler || !isDragging) return;
-
-        const finalOffsetX = offset.x + delta.x;
-        const finalOffsetY = offset.y + delta.y;
-        const clampedPos = clampPosition(finalOffsetX, finalOffsetY);
-
-        setDelta({ x: 0, y: 0 });
-        setOffset({ x: clampedPos.x, y: clampedPos.y });
-        setIsDragging(false);
-
-        if (uniqueKey !== null) {
-            const newStorage = { ...GetLocalStorage<WindowSaveOptions>(`nitro.windows.${uniqueKey}`) };
-            newStorage.offset = { x: clampedPos.x, y: clampedPos.y };
-            SetLocalStorage<WindowSaveOptions>(`nitro.windows.${uniqueKey}`, newStorage);
-        }
-    }, [dragHandler, delta, offset, uniqueKey, clampPosition, isDragging]);
-
-    const onDragMouseUp = useCallback(
-        (event: MouseEvent) => {
-            completeDrag();
-        },
-        [completeDrag]
-    );
-
-    const onDragTouchUp = useCallback(
-        (event: TouchEvent) => {
-            completeDrag();
-        },
-        [completeDrag]
-    );
+    const initialX = initialPosition?.x;
+    const initialY = initialPosition?.y;
+    const hasInitialPosition = initialPosition !== undefined;
 
     useLayoutEffect(() => {
         const element = elementRef.current as HTMLElement;
@@ -189,6 +122,16 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
 
         CURRENT_WINDOWS.push(element);
         bringToTop();
+
+        return () => {
+            const index = CURRENT_WINDOWS.indexOf(element);
+            if (index >= 0) CURRENT_WINDOWS.splice(index, 1);
+        };
+    }, [handleSelector, windowPosition, uniqueKey, disableDrag, offsetLeft, offsetTop, bringToTop]);
+
+    useLayoutEffect(() => {
+        const element = elementRef.current as HTMLElement;
+        if (!element) return;
 
         if (!disableDrag) {
             const handle = element.querySelector(handleSelector);
@@ -215,66 +158,115 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
                 break;
         }
 
-        const clampedPos = clampPosition(offsetX, offsetY);
+        const clampedPos = clampPosition(initialX ?? offsetX, initialY ?? offsetY);
+        offsetRef.current = { x: clampedPos.x, y: clampedPos.y };
+        deltaRef.current = { x: 0, y: 0 };
         setOffset({ x: clampedPos.x, y: clampedPos.y });
         setDelta({ x: 0, y: 0 });
         setIsPositioned(true);
+        if (hasInitialPosition && (clampedPos.x !== initialX || clampedPos.y !== initialY)) onPositionChange?.(clampedPos);
+    }, [handleSelector, windowPosition, uniqueKey, disableDrag, offsetLeft, offsetTop, clampPosition, initialX, initialY, hasInitialPosition, onPositionChange]);
 
-        return () => {
-            const index = CURRENT_WINDOWS.indexOf(element);
-            if (index >= 0) CURRENT_WINDOWS.splice(index, 1);
-        };
-    }, [handleSelector, windowPosition, uniqueKey, disableDrag, offsetLeft, offsetTop, bringToTop]);
 
     useEffect(() => {
         if (!dragHandler) return;
 
-        dragHandler.addEventListener(MouseEventType.MOUSE_DOWN, onDragMouseDown);
-        dragHandler.addEventListener(TouchEventType.TOUCH_START, onTouchDown);
+        const onPointerDown = (event: PointerEvent) => {
+            if ((event.target as HTMLElement)?.closest?.('button, input, select, textarea, a')) return;
+            if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+            dragRef.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, active: false };
+            deltaRef.current = { x: 0, y: 0 };
+        };
+
+        const onPointerMove = (event: PointerEvent) => {
+            const drag = dragRef.current;
+            if (!drag || event.pointerId !== drag.pointerId) return;
+
+            if (!drag.active) {
+                if (Math.abs(event.clientX - drag.startX) + Math.abs(event.clientY - drag.startY) < DRAG_START_THRESHOLD_PX) return;
+
+                drag.active = true;
+
+                try {
+                    dragHandler.setPointerCapture(event.pointerId);
+                } catch {}
+
+                setIsDragging(true);
+            }
+
+            const clampedPos = clampPosition(offsetRef.current.x + (event.clientX - drag.startX), offsetRef.current.y + (event.clientY - drag.startY));
+            const nextDelta = { x: clampedPos.x - offsetRef.current.x, y: clampedPos.y - offsetRef.current.y };
+
+            deltaRef.current = nextDelta;
+            setDelta(nextDelta);
+        };
+
+        const onPointerEnd = (event: PointerEvent) => {
+            const drag = dragRef.current;
+            if (!drag || event.pointerId !== drag.pointerId) return;
+
+            dragRef.current = null;
+
+            if (!drag.active) return;
+
+            try {
+                dragHandler.releasePointerCapture(event.pointerId);
+            } catch {}
+
+            const clampedPos = clampPosition(offsetRef.current.x + deltaRef.current.x, offsetRef.current.y + deltaRef.current.y);
+
+            deltaRef.current = { x: 0, y: 0 };
+            offsetRef.current = clampedPos;
+            setDelta({ x: 0, y: 0 });
+            setOffset(clampedPos);
+            setIsDragging(false);
+            onPositionChange?.(clampedPos);
+
+            if (uniqueKey !== null && !hasInitialPosition) {
+                const newStorage = { ...GetLocalStorage<WindowSaveOptions>(`nitro.windows.${uniqueKey}`) };
+                newStorage.offset = { x: clampedPos.x, y: clampedPos.y };
+                SetLocalStorage<WindowSaveOptions>(`nitro.windows.${uniqueKey}`, newStorage);
+            }
+        };
+
+        dragHandler.addEventListener('pointerdown', onPointerDown);
+        dragHandler.addEventListener('pointermove', onPointerMove);
+        dragHandler.addEventListener('pointerup', onPointerEnd);
+        dragHandler.addEventListener('pointercancel', onPointerEnd);
 
         return () => {
-            dragHandler.removeEventListener(MouseEventType.MOUSE_DOWN, onDragMouseDown);
-            dragHandler.removeEventListener(TouchEventType.TOUCH_START, onTouchDown);
+            dragHandler.removeEventListener('pointerdown', onPointerDown);
+            dragHandler.removeEventListener('pointermove', onPointerMove);
+            dragHandler.removeEventListener('pointerup', onPointerEnd);
+            dragHandler.removeEventListener('pointercancel', onPointerEnd);
         };
-    }, [dragHandler, onDragMouseDown, onTouchDown]);
+    }, [dragHandler, uniqueKey, clampPosition, hasInitialPosition, onPositionChange]);
 
     useEffect(() => {
-        if (!isDragging) return;
-
-        document.addEventListener(MouseEventType.MOUSE_UP, onDragMouseUp);
-        document.addEventListener(TouchEventType.TOUCH_END, onDragTouchUp);
-        document.addEventListener(MouseEventType.MOUSE_MOVE, onDragMouseMove);
-        document.addEventListener(TouchEventType.TOUCH_MOVE, onDragTouchMove);
-
-        return () => {
-            document.removeEventListener(MouseEventType.MOUSE_UP, onDragMouseUp);
-            document.removeEventListener(TouchEventType.TOUCH_END, onDragTouchUp);
-            document.removeEventListener(MouseEventType.MOUSE_MOVE, onDragMouseMove);
-            document.removeEventListener(TouchEventType.TOUCH_MOVE, onDragTouchMove);
-        };
-    }, [isDragging, onDragMouseUp, onDragMouseMove, onDragTouchUp, onDragTouchMove]);
-
-    useEffect(() => {
-        if (!uniqueKey) return;
+        if (!uniqueKey || hasInitialPosition) return;
 
         const localStorage = GetLocalStorage<WindowSaveOptions>(`nitro.windows.${uniqueKey}`);
         if (!localStorage || !localStorage.offset) return;
 
         const clampedPos = clampPosition(localStorage.offset.x, localStorage.offset.y);
+        offsetRef.current = { x: clampedPos.x, y: clampedPos.y };
+        deltaRef.current = { x: 0, y: 0 };
         setDelta({ x: 0, y: 0 });
         setOffset({ x: clampedPos.x, y: clampedPos.y });
         setIsPositioned(true);
-    }, [uniqueKey, clampPosition]);
+    }, [uniqueKey, clampPosition, hasInitialPosition]);
 
     return createPortal(
         <div
             ref={elementRef}
             className="absolute draggable-window"
+            data-window-key={uniqueKey ?? undefined}
             style={{
                 ...dragStyle,
                 left: 0,
                 top: 0,
-                transform: `translate3d(${offset.x + delta.x}px, ${offset.y + delta.y}px, 0)`,
+                transform: `translate3d(${Math.round(offset.x + delta.x)}px, ${Math.round(offset.y + delta.y)}px, 0)`,
                 willChange: isDragging ? 'transform' : undefined,
                 backfaceVisibility: 'hidden',
                 visibility: isPositioned ? 'visible' : 'hidden'

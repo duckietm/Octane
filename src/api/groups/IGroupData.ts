@@ -8,6 +8,7 @@ export interface IGroupData {
     groupState: number;
     groupCanMembersDecorate: boolean;
     groupHasForum: boolean;
+    groupMembersCount?: number;
     groupColors: number[];
     groupBadgeParts: GroupBadgePart[];
 }

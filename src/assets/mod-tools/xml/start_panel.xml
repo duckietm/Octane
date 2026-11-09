@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><layout name="start_panel" width="170" height="170" version="0.1" uid="603AC898-69B3-135E-7C00-31DE3EE2F1B5">
+  <window>
+    <frame x="120" y="64" width="170" height="170" params="32769" style="100" name="mod_start_panel" caption="Mod%20Tools" color="0x0418db0">
+      <filters>
+        <DropShadowFilter angle="0" alpha="0.34901960784313724" blurX="20" blurY="20"/>
+      </filters>
+      <children>
+        <itemlist x="0" y="10" width="158" height="128" params="16" style="100">
+          <children>
+            <region x="0" y="0" width="155" height="30" params="17" style="102" name="room_tool_but" treshold="0">
+              <children>
+                <border x="0" y="0" width="155" height="30" params="16" style="102" name="mouseover" visible="false"/>
+                <label x="24" y="7" width="123" height="15" params="1073741840" style="100" name="offence_name" caption="Room%20tool%20for%20this%20room">
+                  <variables>
+                    <var key="text_style" value="il_button" type="String"/>
+                  </variables>
+                </label>
+                <static_bitmap x="6" y="6" width="20" height="20" params="16" style="100">
+                  <variables>
+                    <var key="asset_uri" value="roomtools_history_open_icon" type="String"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </region>
+            <region x="0" y="30" width="155" height="30" params="17" style="102" name="chatlog_but" treshold="0">
+              <children>
+                <border x="0" y="0" width="155" height="30" params="16" style="102" name="mouseover" visible="false"/>
+                <label x="24" y="7" width="111" height="15" params="272" style="100" name="offence_name" caption="Chatlog%20for%20this%20room">
+                  <variables>
+                    <var key="text_style" value="il_button" type="String"/>
+                  </variables>
+                </label>
+                <static_bitmap x="6" y="6" width="20" height="20" params="16" style="100">
+                  <variables>
+                    <var key="asset_uri" value="roomtools_chat_history" type="String"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </region>
+            <region x="0" y="60" width="155" height="30" params="17" style="102" name="userinfo_but" treshold="0">
+              <children>
+                <border x="0" y="0" width="155" height="30" params="16" style="102" name="mouseover" visible="false"/>
+                <label x="24" y="7" width="50" height="15" params="32784" style="100" name="offence_name" caption="User%20info%3A">
+                  <variables>
+                    <var key="text_style" value="il_button" type="String"/>
+                  </variables>
+                </label>
+                <static_bitmap x="5" y="4" width="20" height="20" params="16" style="100">
+                  <variables>
+                    <var key="asset_uri" value="placeholder_avatar_small_head_cropped_png" type="String"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </region>
+            <region x="0" y="90" width="155" height="30" params="17" style="102" name="ticket_queue_but" treshold="0">
+              <children>
+                <border x="0" y="0" width="155" height="30" params="16" style="102" name="mouseover" visible="false"/>
+                <label x="24" y="7" width="78" height="15" params="16" style="100" name="offence_name" caption="Ticket%20browser">
+                  <variables>
+                    <var key="text_style" value="il_button" type="String"/>
+                  </variables>
+                </label>
+                <static_bitmap x="6" y="5" width="20" height="20" params="16" style="100">
+                  <variables>
+                    <var key="asset_uri" value="tools_file_icon" type="String"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </region>
+          </children>
+        </itemlist>
+      </children>
+      <variables>
+        <var key="margin_left" value="6" type="int"/>
+        <var key="margin_top" value="25" type="int"/>
+        <var key="margin_right" value="6" type="int"/>
+        <var key="margin_bottom" value="7" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

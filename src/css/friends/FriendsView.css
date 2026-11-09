@@ -1,4 +1,4 @@
-.nitro-friends-spritesheet {
+.octane-friends-spritesheet {
     background: url('@/assets/images/friends/friends-spritesheet.png') transparent no-repeat;
 
     &.icon-friendbar-visit {
@@ -104,7 +104,7 @@
     height: 25px;
 }
 
-.nitro-friends {
+.octane-friends {
     width: min(332px, calc(100vw - 16px));
     height: 445px;
     min-width: 0;
@@ -121,43 +121,18 @@
         font-family: Ubuntu, sans-serif !important;
     }
 
-    & .nitro-card-content-shell {
+    & .octane-card-content-shell {
         padding: 0 !important;
         gap: 0 !important;
         background: #f3f3ef;
     }
 
-    & .nitro-card-accordion-set-content,
-    & .nitro-card-content-shell {
-        scrollbar-width: auto;
-        scrollbar-color: auto;
-    }
-
-    & .nitro-card-accordion-set-content::-webkit-scrollbar,
-    & .nitro-card-content-shell::-webkit-scrollbar {
-        width: 13px;
-        height: 13px;
-    }
-
-    & .nitro-card-accordion-set-content::-webkit-scrollbar-track,
-    & .nitro-card-content-shell::-webkit-scrollbar-track {
-        background: linear-gradient(180deg, #e1e5e8 0%, #cad1d5 100%);
-        border-left: 1px solid #818a8f;
-    }
-
-    & .nitro-card-accordion-set-content::-webkit-scrollbar-thumb,
-    & .nitro-card-content-shell::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, #93b6c6 0%, #688fa2 100%);
-        border: 1px solid #476a7a;
-        border-radius: 2px;
-    }
-
-    & .nitro-card-accordion-set {
+    & .octane-card-accordion-set {
         background: transparent;
         border: 0;
     }
 
-    & .nitro-card-accordion-set-header {
+    & .octane-card-accordion-set-header {
         min-height: 24px;
         padding: 3px 7px !important;
         color: #111;
@@ -166,23 +141,23 @@
         border: 0 !important;
     }
 
-    & .nitro-card-accordion-set-header span {
+    & .octane-card-accordion-set-header span {
         font-size: 12px;
         color: #111 !important;
     }
 
-    & .nitro-card-accordion-set-header .fa-icon {
+    & .octane-card-accordion-set-header .fa-icon {
         width: 10px;
         height: 10px;
         color: #000;
     }
 
-    & .nitro-card-accordion-set.active {
+    & .octane-card-accordion-set.active {
         min-height: 0;
         border: 0 !important;
     }
 
-    & .nitro-card-accordion-set-content {
+    & .octane-card-accordion-set-content {
         overflow-y: auto !important;
     }
 
@@ -269,12 +244,12 @@
         gap: 3px;
     }
 
-    & .nitro-friends-spritesheet.icon-follow {
+    & .octane-friends-spritesheet.icon-follow {
         width: 15px;
         height: 14px;
     }
 
-    & .nitro-friends-spritesheet.icon-chat {
+    & .octane-friends-spritesheet.icon-chat {
         width: 17px;
         height: 16px;
     }
@@ -298,7 +273,7 @@
     }
 }
 
-.nitro-friends-room-invite {
+.octane-friends-room-invite {
     width: min(270px, calc(100vw - 16px));
     height: min(225px, calc(100vh - 16px));
     min-width: 0;
@@ -307,34 +282,35 @@
     max-height: calc(100vh - 16px);
     resize: none !important;
 
-    & .nitro-card-content-shell {
+    & .octane-card-content-shell {
         padding: 10px !important;
         gap: 8px !important;
     }
 }
 
-.nitro-friends-room-invite-content {
+.octane-friends-room-invite-content {
     height: 100%;
 }
 
-.nitro-friends-room-invite-summary {
+/* room_invite_confirm invite_summary / invite_note: Volter 9, text_color 0 (style 0 frame). */
+.octane-friends-room-invite-summary {
     padding: 6px 8px;
-    color: #111;
-    font-size: 13px;
-    line-height: 1.3;
-    font-weight: 700;
+    color: #000;
+    font-size: 9px;
+    line-height: 12px;
+    font-weight: 400;
     background: #fff;
     border: 1px solid rgba(0, 0, 0, .35);
     border-radius: 8px;
 }
 
-.nitro-friends-room-invite-textarea {
+.octane-friends-room-invite-textarea {
     width: 100%;
     height: 92px;
     padding: 7px 8px;
-    color: #111;
-    font-size: 13px;
-    line-height: 1.3;
+    color: #000;
+    font-size: 9px;
+    line-height: 12px;
     background: #fff;
     border: 1px solid #888;
     border-radius: 2px;
@@ -347,24 +323,24 @@
     }
 }
 
-.nitro-friends-room-invite-note {
+.octane-friends-room-invite-note {
     padding: 4px 6px;
-    color: #111 !important;
-    font-size: 12px !important;
-    line-height: 1.3;
+    color: #000 !important;
+    font-size: 9px !important;
+    line-height: 12px;
     background: rgba(255, 255, 255, .75);
     border-radius: 8px;
 }
 
-.nitro-friends-room-invite-actions {
+.octane-friends-room-invite-actions {
     display: flex;
     gap: 8px;
     margin-top: auto;
 }
 
-.nitro-friends-remove-confirmation {
-    width: min(270px, calc(100vw - 16px));
-    height: min(225px, calc(100vh - 16px));
+.octane-friends-remove-confirmation {
+    width: min(160px, calc(100vw - 16px));
+    height: min(200px, calc(100vh - 16px));
     min-width: 0;
     min-height: 0;
     max-width: calc(100vw - 16px);
@@ -372,44 +348,150 @@
     resize: none !important;
 }
 
-.nitro-friends-remove-confirmation-text {
-    color: #111;
-    font-size: 13px;
-    line-height: 1.35;
-    white-space: pre-wrap;
+/* friend_remove_confirm remove_info: Volter 9, word-wrapped, inside a 150 x 143 border. */
+.octane-friends-remove-confirmation-text {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 10px;
+    overflow: auto;
+    border: 1px solid #b6b6b6;
+    border-radius: 4px;
+    background: #fff;
+    color: #000;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
     overflow-wrap: anywhere;
 }
 
-.nitro-friends-remove-confirmation-content {
+.octane-friends-remove-confirmation-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     height: 100%;
 }
 
-.nitro-friends-remove-confirmation-names {
-    margin-top: 4px;
+.octane-friends-remove-confirmation-actions {
+    display: flex;
+    justify-content: space-between;
 }
 
-.nitro-friends-remove-confirmation-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: auto;
+.octane-friends-remove-confirmation-actions button {
+    width: 60px;
+    min-width: 60px;
+    height: 21px;
 }
 
 .friend-bar {
+    height: 36px;
+    max-height: 36px;
+    font-family: Ubuntu, sans-serif;
+
     & .friend-bar-item {
         pointer-events: all;
+        min-height: 34px;
+        border: 1px solid rgba(0, 0, 0, 0.55);
+        border-radius: 7px;
+        background: rgba(46, 45, 44, 0.76);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.13),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+            0 2px 0 rgba(0, 0, 0, 0.22);
+        text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.95);
+        color: rgba(255, 255, 255, 0.92);
+
+        &:hover {
+            background: rgba(59, 58, 55, 0.82);
+        }
 
         &.friend-bar-search-item-active {
-            background-color: #b69b83;
-            border: 2px solid #e2c1a3;
+            background: rgba(46, 45, 44, 0.76);
+            border: 1px solid rgba(0, 0, 0, 0.55);
 
             & .search-content {
                 font-size: 12px;
             }
         }
 
+        &.find-friends-active {
+            background: rgba(46, 45, 44, 0.76);
+        }
+
+        &.friend-bar-request,
+        &.friend-bar-empty {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
         & .friend-bar-item-head {
             pointer-events: none;
         }
+
+        & .friend-bar-text {
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1;
+        }
+    }
+
+    & .friend-bar-search-icon {
+        filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.75));
+    }
+
+    & .friend-bar-button {
+        position: relative;
+        pointer-events: all;
+        width: 29px;
+        height: 31px;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        image-rendering: var(--octane-pixel-art, pixelated);
+
+        &:hover:not(.is-disabled):not(:disabled) .friend-bar-browse-arrow {
+            filter: brightness(1.15);
+        }
+
+        &.is-disabled,
+        &:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+            filter: none;
+        }
+    }
+
+    & .friend-bar-browse-bg,
+    & .friend-bar-browse-arrow {
+        position: absolute;
+        pointer-events: none;
+        image-rendering: var(--octane-pixel-art, pixelated);
+    }
+
+    & .friend-bar-browse-bg {
+        left: 0;
+        top: 0;
+        width: 29px;
+        height: 31px;
+    }
+
+    & .friend-bar-button.left .friend-bar-browse-bg {
+        transform: scaleX(-1);
+    }
+
+    & .friend-bar-button.left .friend-bar-browse-arrow {
+        left: 12px;
+        top: 11px;
+        width: 5px;
+        height: 10px;
+    }
+
+    & .friend-bar-button.right .friend-bar-browse-arrow {
+        left: 11px;
+        top: 10px;
+        width: 5px;
+        height: 10px;
     }
 }
 
@@ -425,7 +507,7 @@
 }
 
 @media (max-width: 520px), (max-height: 470px) {
-    .nitro-friends {
+    .octane-friends {
         width: calc(100vw - 16px) !important;
         max-width: calc(100vw - 16px) !important;
         height: min(445px, calc(100vh - 16px)) !important;
@@ -448,35 +530,10 @@
         font-family: Ubuntu, sans-serif !important;
     }
 
-    & .nitro-card-content-shell {
+    & .octane-card-content-shell {
         padding: 0 !important;
         gap: 0 !important;
         background: #f3f3ef;
-    }
-
-    & .nitro-card-content-shell,
-    & .chat-messages {
-        scrollbar-width: auto;
-        scrollbar-color: auto;
-    }
-
-    & .nitro-card-content-shell::-webkit-scrollbar,
-    & .chat-messages::-webkit-scrollbar {
-        width: 13px;
-        height: 13px;
-    }
-
-    & .nitro-card-content-shell::-webkit-scrollbar-track,
-    & .chat-messages::-webkit-scrollbar-track {
-        background: linear-gradient(180deg, #e1e5e8 0%, #cad1d5 100%);
-        border-left: 1px solid #818a8f;
-    }
-
-    & .nitro-card-content-shell::-webkit-scrollbar-thumb,
-    & .chat-messages::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, #93b6c6 0%, #688fa2 100%);
-        border: 1px solid #476a7a;
-        border-radius: 2px;
     }
 
     & .messenger-card-body {
@@ -494,7 +551,6 @@
         padding: 6px 8px;
         background: #efefef;
         border-bottom: 1px solid rgba(0, 0, 0, .12);
-        scrollbar-width: none;
     }
 
     & .messenger-avatar-tab {
@@ -800,15 +856,6 @@
     min-width: 0;
 }
 
-.friends-group-chips-scroll::-webkit-scrollbar {
-    height: 4px;
-}
-
-.friends-group-chips-scroll::-webkit-scrollbar-thumb {
-    background: #c0c0b8;
-    border-radius: 2px;
-}
-
 .friends-group-chip {
     flex: 0 0 auto;
     padding: 1px 8px;
@@ -879,7 +926,7 @@
 }
 
 /* Category manager: keep the list scrollable */
-.nitro-friends-category-manager {
+.octane-friends-category-manager {
     width: min(270px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -887,14 +934,14 @@
     resize: none !important;
 }
 
-.nitro-friends-category-manager .nitro-card-content-shell {
-    color: #111;
+.octane-friends-category-manager .octane-card-content-shell {
+    color: #000;
     background: #f3f3ef;
 }
 
-.nitro-friends-category-manager :where(input, select, textarea),
-.nitro-friends-room-invite :where(input, select, textarea),
-.nitro-friends-remove-confirmation :where(input, select, textarea) {
+.octane-friends-category-manager :where(input, select, .octane-select-trigger, textarea),
+.octane-friends-room-invite :where(input, select, .octane-select-trigger, textarea),
+.octane-friends-remove-confirmation :where(input, select, .octane-select-trigger, textarea) {
     min-height: 22px;
     border: 1px solid #858585 !important;
     border-radius: 3px !important;
@@ -904,21 +951,13 @@
     font-size: 11px !important;
 }
 
-.nitro-friends-category-manager :where(input:focus, select:focus, textarea:focus),
-.nitro-friends-room-invite :where(input:focus, select:focus, textarea:focus),
-.nitro-friends-remove-confirmation :where(input:focus, select:focus, textarea:focus) {
-    border-color: #4a7d8c !important;
-    box-shadow: 0 0 0 2px rgba(74, 125, 140, 0.24), inset 0 1px 0 rgba(0, 0, 0, 0.14) !important;
-    outline: none !important;
-}
-
-.nitro-friends-category-manager :where(.text-muted, .text-dark),
-.nitro-friends-room-invite :where(.text-muted, .text-dark),
-.nitro-friends-remove-confirmation :where(.text-muted, .text-dark) {
+.octane-friends-category-manager :where(.text-muted, .text-dark),
+.octane-friends-room-invite :where(.text-muted, .text-dark),
+.octane-friends-remove-confirmation :where(.text-muted, .text-dark) {
     color: #565656 !important;
 }
 
-.nitro-friends-category-manager .friends-category-list {
+.octane-friends-category-manager .friends-category-list {
     max-height: 220px;
     overflow-y: auto;
 }
@@ -966,65 +1005,6 @@
     left: 4px;
 }
 
-.persistent-message-meta {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
-
-.messenger-persistent .messenger-conversation,
-.messenger-persistent .messenger-inbox {
-    display: flex;
-    min-height: 0;
-    flex: 1;
-    flex-direction: column;
-}
-
-.messenger-all-button,
-.messenger-mobile-back,
-.messenger-search,
-.messenger-inbox-row,
-.persistent-message-bubble,
-.messenger-retry {
-    border: 1px solid rgba(0, 0, 0, .25);
-    border-radius: 4px;
-    background: linear-gradient(#fff, #e8edef);
-    color: #111;
-}
-
-.messenger-all-button { margin-left: auto; padding: 5px 9px; font-size: 12px; font-weight: 700; }
-.messenger-unread-badge { position: absolute; top: -3px; right: -3px; min-width: 16px; padding: 1px 4px; border-radius: 999px; background: #d94444; color: #fff; font-size: 9px; }
-.messenger-search { display: flex; align-items: center; gap: 6px; margin: 8px; padding: 5px 8px; background: #fff; }
-.messenger-search input { width: 100%; border: 0; background: transparent; outline: 0; }
-.messenger-inbox-list { min-height: 0; overflow-y: auto; padding: 0 8px 8px; }
-.messenger-inbox-row { display: flex; width: 100%; min-height: 48px; align-items: center; gap: 8px; margin-bottom: 4px; padding: 5px 8px; text-align: left; }
-.messenger-inbox-avatar { position: relative; display: flex !important; width: 38px; height: 38px; flex: 0 0 38px; align-items: center; justify-content: center; overflow: hidden; }
-.messenger-inbox-avatar .avatar-image { inset: 50% auto auto 50% !important; width: 24px !important; height: 24px !important; background-size: 24px 24px !important; background-position: center !important; transform: translate(-50%, -50%) !important; image-rendering: auto !important; }
-.messenger-inbox-row span { display: flex; min-width: 0; flex-direction: column; }
-.messenger-inbox-row small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: .7; }
-.persistent-message-list { scroll-anchor: none; }
-.persistent-message { display: flex; max-width: 78%; flex-direction: column; align-items: flex-start; }
-.persistent-message.own { margin-left: auto; align-items: flex-end; }
-.persistent-message-bubble,
-.persistent-message > small {
-    font-family: UbuntuCondensed, Ubuntu, sans-serif;
-}
-.persistent-message-bubble span { font-family: UbuntuCondensed, Ubuntu, sans-serif !important; }
-.persistent-message-bubble { display: flex; gap: 6px; padding: 7px 9px; border-radius: 12px 12px 12px 3px; background: #fff; }
-.persistent-message.own .persistent-message-bubble { border-radius: 12px 12px 3px 12px; background: #c8edf2; }
-.persistent-message-bubble button { padding: 0; border: 0; background: transparent; opacity: 0; }
-.persistent-message-bubble:hover button { opacity: .55; }
-.messenger-history-state { padding: 4px; text-align: center; font-size: 11px; opacity: .7; }
-.messenger-retry { padding: 2px 6px; color: #a81a12; font-size: 10px; }
-.messenger-mobile-back { display: none; padding: 4px 6px; }
-.messenger-btn.close-conversation { width: 24px; padding: 0; background: #d7d7d7; color: #111 !important; }
-
-@media (max-width: 520px) {
-    .messenger-persistent .messenger-mobile-back { display: inline-flex; }
-    .messenger-persistent .messenger-thread-header .messenger-actions .messenger-btn:not(.danger):not(.close-conversation) { display: none; }
-    .messenger-persistent .persistent-message { max-width: 88%; }
-}
-
 .messenger-typing-indicator {
     padding: 2px 8px;
     font-size: 11px;
@@ -1032,7 +1012,7 @@
     opacity: 0.7;
 }
 
-.nitro-friends .friends-list-avatar {
+.octane-friends .friends-list-avatar {
     position: relative !important;
     width: 23px;
     height: 23px;
@@ -1040,7 +1020,7 @@
     overflow: hidden;
 }
 
-.nitro-friends .friends-list-avatar .avatar-image {
+.octane-friends .friends-list-avatar .avatar-image {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
@@ -1052,9 +1032,1671 @@
     image-rendering: auto !important;
 }
 
-.nitro-friends .nitro-card-accordion-set-header > div,
-.nitro-friends .nitro-card-accordion-set-header span {
+.octane-friends .octane-card-accordion-set-header > div,
+.octane-friends .octane-card-accordion-set-header span {
     font-size: 12px !important;
     font-weight: 700 !important;
     line-height: 1.15 !important;
+}
+/* BEGIN HOBBA_FRIENDBAR_EXACT */
+.friend-bar-icons{background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC8AAABHCAMAAACgXu6pAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAGBQTFRFAAAAAAAAVpv9Vqn9WLD9Vrz9P4DjPJDmAAAAAAAAAAAAAAAAMGCnLm6w////IkFvIEx6RDMaeVQ0nn5O5LwNgtJN3fOaVaQyN2qPQX6p0j0yJJODGmle5ubdR8m0K6yZa2ZXBQAAACB0Uk5TAP/////////yTf3+///////////////////////////8q0vzAAACxElEQVR4nK2WbW/aMBCAz2FD6aSRQSs6lZL//7vSUq3bCp0qFBZIvDu/5c42HR9qCXAePz4uh22igDcFoCHTRq4ENTyZoaAAGCxX0qaRXqc2vU6a+d6msaNObXrvtPe5zf3yb8F4V7bGk/bof1EHwbsSWjSVt6fQcV8VEbc+6SbGtIChG33SLVegu+Crz3AqzDdKX00Dj/3BJpj4nkt/1ub9qj3jwz7vB/5Bvq+bK08Vc9Rz8X314/ikp/4xLFzpd2B0iPIZl47MxwRHXfhYv6yP3CYD3D/CbF9k/A6qfUGlsRjUjDjljT22V1RFnPI+VPvT6Nst4Deb2CrYTN4H+mxHeKZduc/W9P7v2wmt613gZ5oSHxCfPwl3+/2b3cN4+LzyCSlXDntL8QkZ7nx4dRx73E948DXInr8yPwAcuK9A+OGWDS9bwel+ruGF3SNd2ZEcJ39evCwC3l4PO+envKTzar6DOYuDVzvjZ3hJ8ecUawshlAbnp9z5eNPbm9+LxE94aQ9bajfq14L7WU7+cvDlcwPOz3Hjj7+PHfB+hhs/4J9zxf0MZ/kvPY7yF9zXE6u79JjXM+asnuBxVE/BRx902ErCl5z5Y5O+4KX7L40b/yfnrXzvfLjKwUvOq0v9fPzMjOjJhXOlbpMB/UwDea7U9+j5qAD9g/wcx/3o+TO93aa+4Gy93dEZ9sQSzXHyv1bYeVzh/B4H7vHizxv5Oc58jLGGYZP4gnufcA39Zq2ae+7HPPh1U5PTrDbSj3jw757qftJPmjqKH/Exf6hppTcQ5y958PGb+81qQlGEH3EWfzXBJ9tNGl/wkD8WgCLU+kHmH3HnP66xBDUAFQMHgp9w7+NNwcNqg8PQcD/mwTcRTDTpR9z7tKw+4RM74MLifsxZfLsm0/iCGx/grW58nLqha+Nn+Jnz59z+Ld89Hz7i/Gn/AV53K5jzs3RHAAAAAElFTkSuQmCC) transparent no-repeat}
+
+.friend-bar-icons.icon-friendbar-visit{width:23px;height:21px;background-position:0px -24px}
+
+.friend-bar-icons.icon-friendbar-visit:hover{background-position:-24px -24px;height:23px}
+
+.friend-bar-icons.icon-profile{width:23px;height:21px;background-position:0px -48px}
+
+.friend-bar-icons.icon-profile:hover{background-position:-24px -48px;height:23px}
+
+.friend-bar-icons.icon-friendbar-chat{width:22px;height:21px;background-position:0px 0px}
+
+.friend-bar-icons.icon-friendbar-chat:hover{background-position:-24px 0px;height:23px}
+
+.friend-bar{height:40px;max-height:40px}
+
+.friend-bar .friend-bar-button{height:31px;width:29px;z-index:2;border:none;padding:0;background:transparent}
+
+.friend-bar .friend-bar-button.left{margin-right:-4px}
+
+.friend-bar .friend-bar-button.left:disabled{opacity:.2}
+
+.friend-bar .friend-bar-button.right{margin-left:-4px}
+
+.friend-bar .friend-bar-button.right:disabled{opacity:.2}
+
+.friend-bar .friend-bar-item{width:127px;margin:0;z-index:0;position:relative;padding-left:42px;text-align:left;min-height:36px}
+
+.friend-bar .friend-bar-item .activity-vip{background-color:#00000040;margin:0 0 0 -11px;padding:5px 10px;width:128px}
+
+.friend-bar .friend-bar-item.friend-bar-item-active{position:relative}
+
+.friend-bar .friend-bar-item.find-friends{border-image-source:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAH8AAAAkCAYAAACg9OUnAAAACXBIWXMAABYlAAAWJQFJUiTwAAAGn2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNy4xLWMwMDAgNzkuYjBmOGJlOTAsIDIwMjEvMTIvMTUtMjE6MjU6MTUgICAgICAgICI+IDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIFBob3Rvc2hvcCAyMy4yIChNYWNpbnRvc2gpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyMi0wMy0yM1QxMTowMjoxNyswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyMi0wNC0yNlQxNTozMDoxMSswMjowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjItMDQtMjZUMTU6MzA6MTErMDI6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6ZGIxZDAxNjgtNDBmMi00OGQyLWFjMjItNTc3MTQwZDVkM2Y2IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6ZGE0NWVjOGEtNzU5Ny1mOTRmLWFhOGEtNGNhMTBkZTgwMjFlIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6NWVhMzg4OGItNTgxYy00YzczLWIzYmEtOTgyYzY4ZTE0OWYxIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NWVhMzg4OGItNTgxYy00YzczLWIzYmEtOTgyYzY4ZTE0OWYxIiBzdEV2dDp3aGVuPSIyMDIyLTAzLTIzVDExOjAyOjE3KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjMuMiAoTWFjaW50b3NoKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZDc4NzFhOTYtYmM2ZS00OWMxLWI2MWQtZWM5YTg1YmU3ODQ5IiBzdEV2dDp3aGVuPSIyMDIyLTAzLTIzVDExOjAyOjE3KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjMuMiAoTWFjaW50b3NoKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZGIxZDAxNjgtNDBmMi00OGQyLWFjMjItNTc3MTQwZDVkM2Y2IiBzdEV2dDp3aGVuPSIyMDIyLTA0LTI2VDE1OjMwOjExKzAyOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjMuMiAoTWFjaW50b3NoKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8L3JkZjpTZXE+IDwveG1wTU06SGlzdG9yeT4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4ey+M5AAAA/klEQVR4nO3csY3CQBRF0fctWsGiAyScUNK6EiiJhJXoAEExn4A1GhtDBivNuyfzeAJLd+zsOzJTpYgYL6AamRnl9UKS9r9X9V2bkrQ7Xv7jufAFw4u9O17iZ7NUZKYiIonuo+9aZWYs5m6eT4cvPw4+bbXePq2FpNFbT/h6lQeg71o15U3C123at5nfBgfEN0Z8Y8Q3RnxjxDdGfGPEN0Z8Y8Q3RnxjxDdGfGPEN0Z8Y8Q3RnxjxDdGfGPEN0Z8Y8Q3RnxjxDc2ij830oN6TPs20n1059UG1GE6qiX9jWi/24h6PUa0hwVGtetVfuEzM57iw8Mj/oBDUL/y1yw3TgtG6hpFz20AAAAASUVORK5CYII=);border-image-slice:17 17 17 17 fill;border-image-width:17px 17px 17px 17px;border-image-repeat:repeat repeat;color:#fff}
+
+.friend-bar .friend-bar-item.find-friends:hover{border-image-source:url(data:image/png;base64,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Y0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAWJQAAFiUBSVIk8AAABp9pVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDcuMS1jMDAwIDc5LmIwZjhiZTkwLCAyMDIxLzEyLzE1LTIxOjI1OjE1ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjMuMiAoTWFjaW50b3NoKSIgeG1wOkNyZWF0ZURhdGU9IjIwMjItMDMtMjNUMTE6MDI6MTcrMDE6MDAiIHhtcDpNZXRhZGF0YURhdGU9IjIwMjItMDQtMjZUMTU6Mjg6NDArMDI6MDAiIHhtcDpNb2RpZnlEYXRlPSIyMDIyLTA0LTI2VDE1OjI4OjQwKzAyOjAwIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjk3NjkyYmQ3LTIzNjMtNDljMS1iZmYzLTVmYmZmNmE2NmU2YSIgeG1wTU06RG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOmE3MTU2OGMxLTQzMjItYWE0Ny1hYTkwLTVlNWUxYTY1MjIzYyIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjVlYTM4ODhiLTU4MWMtNGM3My1iM2JhLTk4MmM2OGUxNDlmMSIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjVlYTM4ODhiLTU4MWMtNGM3My1iM2JhLTk4MmM2OGUxNDlmMSIgc3RFdnQ6d2hlbj0iMjAyMi0wMy0yM1QxMTowMjoxNyswMTowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIzLjIgKE1hY2ludG9zaCkiLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOmQ3ODcxYTk2LWJjNmUtNDljMS1iNjFkLWVjOWE4NWJlNzg0OSIgc3RFdnQ6d2hlbj0iMjAyMi0wMy0yM1QxMTowMjoxNyswMTowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIzLjIgKE1hY2ludG9zaCkiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjk3NjkyYmQ3LTIzNjMtNDljMS1iZmYzLTVmYmZmNmE2NmU2YSIgc3RFdnQ6d2hlbj0iMjAyMi0wNC0yNlQxNToyODo0MCswMjowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIzLjIgKE1hY2ludG9zaCkiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+za5dswAAAQBJREFUeJzt3LFRw0AURdH3NY5QFSinBlKaQMWZJkipgdxUYdJHAPKsZJsMM7PvnkyrDTRzV8q+yrZaVbVeQDdsV3u9k6SXj0/N02hJ2h+O//FcuIHlxd4fjvV8f6eyraoy0XPM0yjbtbt08/3t9dbPgz/28Ph0tlaSVm894fvVHoB5GjW0Nwnft23f4co+BCB+MOIHI34w4gcjfjDiByN+MOIHI34w4gcjfjDiByN+MOIHI34w4gcjfjDiByN+MOIHI34w4gcjfrBV/EsjPejHtu8gfY/uXNuAPmxHtaSfEe3fNqJfpxHtZYFR7X61X3jbdRYfGU7xFxyC/rW/ZvkC4PhG4qBMkwsAAAAASUVORK5CYII=)}
+
+.friend-bar .friend-bar-item .friend-bar-text{overflow:hidden;font-size:13px;line-height:1;color:#fff;font-family:Ubuntu,Arial,sans-serif;font-weight:700}
+
+.friend-bar .friend-bar-item.find-friends-active{border-image-source:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAH8AAAAkCAYAAACg9OUnAAAACXBIWXMAABYlAAAWJQFJUiTwAAAF0GlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNy4xLWMwMDAgNzkuYjBmOGJlOTAsIDIwMjEvMTIvMTUtMjE6MjU6MTUgICAgICAgICI+IDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIFBob3Rvc2hvcCAyMy4yIChNYWNpbnRvc2gpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyMi0wMy0yM1QxMTowMjo1OCswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyMi0wMy0yM1QxMTowMjo1OCswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjItMDMtMjNUMTE6MDI6NTgrMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MmY4ZGUwY2QtMDc4ZS00ZjYwLWI3ZTctYmU0YWVjMThiOWZiIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6ZWI2ZjI0M2QtZjk4NS03MDQ2LTkzZDMtZTZkZGM1YmE1ZWU2IiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6NzI1OGQwZGEtMDczNi00YWEzLTg2ODQtNTVhYzdjZGM5ZjU5IiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NzI1OGQwZGEtMDczNi00YWEzLTg2ODQtNTVhYzdjZGM5ZjU5IiBzdEV2dDp3aGVuPSIyMDIyLTAzLTIzVDExOjAyOjU4KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjMuMiAoTWFjaW50b3NoKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MmY4ZGUwY2QtMDc4ZS00ZjYwLWI3ZTctYmU0YWVjMThiOWZiIiBzdEV2dDp3aGVuPSIyMDIyLTAzLTIzVDExOjAyOjU4KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjMuMiAoTWFjaW50b3NoKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8L3JkZjpTZXE+IDwveG1wTU06SGlzdG9yeT4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4/UFR0AAABAUlEQVR4nO3csVHDQBRF0fc1roISKIAcdWFSVJZJURcmpwBKoI1HAPKsZJsMM7PvnkyrDTRzV8q+yrZaVbVeQDdsV3u9k6SXtydN42xJOhz3//FcuIHlxT4c9/X8+Kqyraoy0XNM4yzbtbt08+P989bPgz92/3B3tlaSVm894fvVHoBpnDW0Nwnft23f4co+BCB+MOIHI34w4gcjfjDiByN+MOIHI34w4gcjfjDiByN+MOIHI34w4gcjfjDiByN+MOIHI34w4gcjfrBV/EsjPejHtu8gfY/uXNuAPmxHtaSfEe3fNqJfpxHtZYFR7X61X3jbdRYfGU7xFxyC/rW/ZvkC59NG9qeKzZgAAAAASUVORK5CYII=);border-image-slice:17 17 17 17 fill;border-image-width:17px 17px 17px 17px;border-image-repeat:repeat repeat;min-height:36px}
+
+.friend-bar .friend-bar-item.find-friends-active.group{border-image-source:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAH8AAAAkAgMAAADdmg20AAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAxQTFRFAAAAAAAA////rKysyPzlBQAAAAR0Uk5TAP///7MtQIgAAABfSURBVHicY2QIZcAD/q9hZF2KV8F0RqkJ+BQwPGOUWuqAR/73NMasqXitWMaYPQWvFUtHFYwqGFWARQHBnBWV6oBHwe9ZjFEBeK14xSiK34rljKL4bADawcgYglfBagDAnD+ZcLOBjwAAAABJRU5ErkJggg==)}
+
+.friend-bar .friend-bar-item.find-friends-active.group:hover{border-image-source:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAH8AAAAkAgMAAADdmg20AAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAxQTFRFAAAAAAAA////mZmZHt7E6wAAAAR0Uk5TAP///7MtQIgAAABfSURBVHicY2QIZcAD/q9hZF2KV8F0RqkJ+BQwPGOUWuqAR/73NMasqXitWMaYPQWvFUtHFYwqGFWARQHBnBWV6oBHwe9ZjFEBeK14xSiK34rljKL4bADawcgYglfBagDAnD+ZcLOBjwAAAABJRU5ErkJggg==)}
+
+.friend-bar .friend-bar-item.find-friends-active:hover{border-image-source:url(data:image/png;base64,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Y0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAWJQAAFiUBSVIk8AAABp9pVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDcuMS1jMDAwIDc5LmIwZjhiZTkwLCAyMDIxLzEyLzE1LTIxOjI1OjE1ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjMuMiAoTWFjaW50b3NoKSIgeG1wOkNyZWF0ZURhdGU9IjIwMjItMDMtMjNUMTE6MDI6NTgrMDE6MDAiIHhtcDpNZXRhZGF0YURhdGU9IjIwMjItMDQtMjZUMTU6Mjc6NDYrMDI6MDAiIHhtcDpNb2RpZnlEYXRlPSIyMDIyLTA0LTI2VDE1OjI3OjQ2KzAyOjAwIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjI5Mzc1MDEzLWYyYWMtNDVlYi05MzU4LTM2MjczOTYxYTZmOSIgeG1wTU06RG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOmU1ZjNiYmY0LTdkM2QtMDU0Mi05ZjE5LTg5ZjQ1YmY0MzU5MyIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjcyNThkMGRhLTA3MzYtNGFhMy04Njg0LTU1YWM3Y2RjOWY1OSIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjcyNThkMGRhLTA3MzYtNGFhMy04Njg0LTU1YWM3Y2RjOWY1OSIgc3RFdnQ6d2hlbj0iMjAyMi0wMy0yM1QxMTowMjo1OCswMTowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIzLjIgKE1hY2ludG9zaCkiLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjJmOGRlMGNkLTA3OGUtNGY2MC1iN2U3LWJlNGFlYzE4YjlmYiIgc3RFdnQ6d2hlbj0iMjAyMi0wMy0yM1QxMTowMjo1OCswMTowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIzLjIgKE1hY2ludG9zaCkiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjI5Mzc1MDEzLWYyYWMtNDVlYi05MzU4LTM2MjczOTYxYTZmOSIgc3RFdnQ6d2hlbj0iMjAyMi0wNC0yNlQxNToyNzo0NiswMjowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIzLjIgKE1hY2ludG9zaCkiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+QD39pwAAAQBJREFUeJzt3LFRw0AURdH3NY5QHyijAWIKQYWZQohpgMz0YdJHAPKsZJsMM7PvnkyrDTRzV8q+yrZaVbVeQDdsV3u9k6SPzxdN42xJOhz3//FcuIHlxT4c93V/96yyraoy0XNM4yzbtbt08+31/dbPgz/2+PRwtlaSVm894fvVHoBpnDW0Nwnft23f4co+BCB+MOIHI34w4gcjfjDiByN+MOIHI34w4gcjfjDiByN+MOIHI34w4gcjfjDiByN+MOIHI34w4gcjfrBV/EsjPejHtu8gfY/uXNuAPmxHtaSfEe3fNqJfpxHtZYFR7X61X3jbdRYfGU7xFxyC/rW/ZvkCrGtG2apNN2cAAAAASUVORK5CYII=)}
+
+.friend-bar .friend-bar-item.find-friends-active .friend-bar-text{padding-top:4px}
+
+.friend-bar .friend-bar-item .friend-bar-item-head{pointer-events:none}
+
+.friend-bar .friend-bar-item .friend-bar-item-head.avatar{top:-31px;left:-23px}
+
+.friend-bar .friend-bar-item .friend-bar-item-head.group{top:-5px;left:-5px}
+
+.friend-bar .friend-bar-item.friend-bar-search .friend-bar-item-head{top:-2px;left:6px;width:31px;height:34px;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAiCAYAAACnSgJKAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFzmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDggNzkuMTY0MDM2LCAyMDE5LzA4LzEzLTAxOjA2OjU3ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjEuMCAoTWFjaW50b3NoKSIgeG1wOkNyZWF0ZURhdGU9IjIwMjEtMDctMDNUMTk6MjQ6MTktMDQ6MDAiIHhtcDpNZXRhZGF0YURhdGU9IjIwMjEtMDctMDNUMTk6MjQ6MTktMDQ6MDAiIHhtcDpNb2RpZnlEYXRlPSIyMDIxLTA3LTAzVDE5OjI0OjE5LTA0OjAwIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjhlOThlNTNiLTU3OGMtNDlkMS05ZWM0LWI4ZmE0YTA1OWVhZiIgeG1wTU06RG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjU1YWEzMTg3LTM4ZDktM2U0Zi04MGMwLWVkZDhmYWU0Y2FlNyIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjY0MWY0Y2ZkLTcxM2QtNGNlOC04ZWZlLWE1YmIyYzU5ZTA2MyIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjY0MWY0Y2ZkLTcxM2QtNGNlOC04ZWZlLWE1YmIyYzU5ZTA2MyIgc3RFdnQ6d2hlbj0iMjAyMS0wNy0wM1QxOToyNDoxOS0wNDowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIxLjAgKE1hY2ludG9zaCkiLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjhlOThlNTNiLTU3OGMtNDlkMS05ZWM0LWI4ZmE0YTA1OWVhZiIgc3RFdnQ6d2hlbj0iMjAyMS0wNy0wM1QxOToyNDoxOS0wNDowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIxLjAgKE1hY2ludG9zaCkiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+oOH7fQAAAn1JREFUWIWVWEuWgkAM5BLjCWYhJ9CtD5d6F+dszBVwiXgiZhpIdyWpAC7y5KNdqVQlDVbjOFZr8fV9HH3U6nxrjSg2Qc/X+xSn620KOT8vx+lanFy9mlgIjIAUtCnX9f27upbWqiaYFXApHwLbhfGavn9TiZbflARC8FSexGT6NAtbVul7jCE7xhApCPiRMlKlbZCNT8pXy8tjq1Ah2zXGruyN98FanIgEE2ubncocgObPSF9vvMg3kkBmHi3AmEZeYCTWDFixXqYJyOKkxXDxLUN65g2UseHaRyX11YmlyDjNnEB1EMM1Vkfr8rvT2/oDo30O4+/zPbbd/KnvL+CT4SKzQaaY3FpJ03ECE+Ac/8nolqtn5siQM7s7w6WRaUOAM+vlWAIrkJkz8/D2K6VLYD+vyxz9ZTpHkMzeXFMz34JbfSO9M3hfwD3oW+kuzGW3U30elpw4VoG/FuadZs0qgNtsNhy63A6Fc6BxAn30c7D7wh7L7sYr603rctT4sbBV532pAlaimE+YA7jsaqrcCyD+UBnMAoPxlAzgelmHg5OxycClzCwRDDFgK9EFzJE9lj33aDdQTTERqnnnW28V3A4b1qPp2MqgmRqtOzRc7cHVEw1MM2wVNI5ibvpcGNskQuY2AWkx0QuNk5n3njkmiN+nfR49OqP+xa1ls2Aa2wrZ6RYaDsNuNmxY4G7F2NokNjV37Btkr5mEm0g3hMnSR+c4gfLaMy/6XnygF7WDpDXlLiWv94NjFZBRkWLwUkD5rSwfMUcPWB2xDZ3LO+909tK4+3V2Ym+0tPOfb6HH8RC8re4GxwQQBKeeLfHWu/tH4GLCA0T0p8Getf4AtWGS7WEg8JMAAAAASUVORK5CYII=)}
+/* END HOBBA_FRIENDBAR_EXACT */
+
+/* BEGIN SWF_FRIENDS_EXACT_DOM */
+.swf-friends-window {
+    font-family: Ubuntu, Arial, sans-serif;
+    color: #000;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    text-shadow: none;
+}
+
+.swf-friends-window *:not(.avatar-image) {
+    box-sizing: border-box;
+}
+
+.swf-friends-window button {
+    font-family: Ubuntu, Arial, sans-serif;
+    cursor: pointer;
+}
+
+.swf-friends-window {
+    position: relative;
+    width: 240px;
+    height: 400px;
+    overflow: hidden;
+    border: 1px solid #1a5d74;
+    border-radius: 5px;
+    background: #3f9fc1;
+    box-shadow: inset 0 1px 0 #76d3ec;
+}
+
+.swf-friends-titlebar {
+    position: relative;
+    height: 24px;
+    cursor: move;
+    border-bottom: 1px solid #1b6a86;
+    background:
+        repeating-linear-gradient(0deg, rgba(255,255,255,.26) 0 1px, transparent 1px 2px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.22) 0 1px, transparent 1px 2px),
+        linear-gradient(#55b5d5, #3297be);
+}
+
+.swf-friends-titlebar-grip,
+.swf-friends-titlebar::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    width: 85px;
+    height: 16px;
+    background:
+        repeating-linear-gradient(0deg, rgba(255,255,255,.30) 0 1px, transparent 1px 2px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.26) 0 1px, transparent 1px 2px);
+}
+
+.swf-friends-titlebar-grip { left: 5px; }
+.swf-friends-titlebar::after { right: 22px; width: 77px; }
+
+.swf-friends-title {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 24px;
+    text-align: center;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 23px;
+    text-shadow: 1px 1px 0 #1d657d;
+}
+
+.swf-friends-close {
+    position: absolute;
+    right: 3px;
+    top: 4px;
+    width: 17px;
+    height: 17px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.swf-friends-close::before,
+.swf-friends-close::after {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 2px;
+    width: 2px;
+    height: 13px;
+    background: #bfeefa;
+}
+
+.swf-friends-close::before { transform: rotate(45deg); }
+.swf-friends-close::after { transform: rotate(-45deg); }
+
+.swf-friends-category {
+    height: 17px;
+    border-top: 1px solid #7eddf4;
+    border-bottom: 1px solid #1c6d87;
+    background: #56c5ee;
+}
+
+.swf-friends-category .friends-group-chips {
+    height: 16px !important;
+    padding: 0 5px !important;
+    border: 0 !important;
+    background: transparent !important;
+}
+
+.swf-friends-category .friends-group-chips-scroll { overflow: hidden; }
+.swf-friends-category .friends-group-chip { display: none; }
+
+.swf-friends-category .friends-group-chip.active {
+    display: block;
+    height: 16px;
+    padding: 0 11px 0 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #000 !important;
+    font-size: 10px !important;
+    font-weight: 700;
+    line-height: 15px;
+}
+
+.swf-friends-category .friends-group-chip.active::after {
+    content: "";
+    display: inline-block;
+    margin-left: 3px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #000;
+    vertical-align: middle;
+}
+
+.swf-friends-category .friends-group-chip-manage { display: none !important; }
+
+.swf-friends-body {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    top: 42px;
+    bottom: 68px;
+    overflow: hidden;
+    background: #f2f2ee;
+}
+
+.swf-friends-section-header {
+    position: relative;
+    height: 19px;
+    padding: 2px 4px 0;
+    background: #fff;
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 14px;
+}
+
+button.swf-friends-section-header {
+    width: 100%;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+}
+
+.swf-friends-category button.friends-group-chip {
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+}
+
+.swf-friends-section-header span::after {
+    content: "";
+    display: inline-block;
+    margin-left: 4px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #000;
+    vertical-align: middle;
+}
+
+.swf-friends-section-header.collapsed span::after {
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 5px solid #000;
+    border-right: 0;
+}
+
+.swf-friends-select-all {
+    position: absolute;
+    right: 6px;
+    top: 2px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #000;
+    font-size: 10px;
+    line-height: 14px;
+    text-decoration: underline;
+}
+
+.swf-friends-section-list {
+    max-height: 250px;
+    overflow: hidden;
+}
+
+.swf-friends-offline-list {
+    max-height: 152px;
+    overflow-y: auto;
+}
+
+.swf-friends-search-results {
+    display: block;
+    height: 100%;
+    overflow-y: auto;
+    background: #f2f2ee;
+}
+
+.swf-friends-search-results > .search-input {
+    width: calc(100% - 8px);
+    height: 22px;
+    min-height: 22px;
+    margin: 4px;
+    padding: 2px 5px;
+    border: 1px solid #8e8e88;
+    border-radius: 2px;
+    font-size: 10px !important;
+}
+
+.swf-friends-window .friends-list-item {
+    width: 100%;
+    height: 20px !important;
+    min-height: 20px !important;
+    padding: 0 3px !important;
+    border: 0 !important;
+    background: #eeeeea !important;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.swf-friends-window .friends-list-item:nth-child(even) { background: #fff !important; }
+.swf-friends-window .friends-list-item:hover,
+.swf-friends-window .friends-list-item.selected { background: #d9edf4 !important; }
+
+.swf-friends-window .friends-list-user {
+    height: 20px;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.swf-friends-window .friends-list-avatar {
+    position: relative;
+    width: 18px !important;
+    min-width: 18px !important;
+    height: 20px !important;
+    overflow: hidden !important;
+}
+
+.swf-friends-window .friends-list-avatar .avatar-image {
+    position: absolute;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    background-size: 42px auto !important;
+    background-position: -10px -12px !important;
+    transform: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+
+.swf-friends-window .friends-list-name {
+    max-width: 92px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #000 !important;
+    font-size: 10px !important;
+    font-weight: 400;
+    line-height: 20px;
+}
+
+.swf-friends-window .friends-list-actions {
+    height: 20px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.swf-friends-window .octane-friends-spritesheet.icon-follow {
+    width: 16px;
+    height: 14px;
+    background: url("@/assets/images/friends/swf/follow_friend.png") center center / auto no-repeat !important;
+}
+
+.swf-friends-window .octane-friends-spritesheet.icon-chat {
+    width: 17px;
+    height: 16px;
+    background: url("@/assets/images/friends/swf/friendlist_chat.png") center center / auto no-repeat !important;
+}
+
+.swf-friends-window .friends-list-group-toggle {
+    width: 10px;
+    height: 10px;
+    overflow: hidden;
+    color: transparent;
+}
+
+.swf-friends-window .friends-list-group-toggle::before {
+    content: "";
+    display: block;
+    margin-top: 3px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #000;
+}
+
+.swf-friends-window .octane-friends-spritesheet.icon-heart,
+.swf-friends-window .octane-friends-spritesheet.icon-smile,
+.swf-friends-window .octane-friends-spritesheet.icon-bobba,
+.swf-friends-window .octane-friends-spritesheet.icon-none {
+    width: 16px;
+    height: 14px;
+}
+
+.swf-friends-footer {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    bottom: 35px;
+    height: 34px;
+    padding: 4px;
+    background: #deded9;
+    border: 1px solid #777771;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.swf-friends-footer-button {
+    width: 27px;
+    height: 22px;
+    padding: 0;
+    border: 3px solid transparent;
+    border-image-source: var(--habbo-skin-button);
+    border-image-slice: 3 fill;
+    border-image-width: 3px;
+    background: transparent;
+}
+
+.swf-friends-footer-button.invite::before,
+.swf-friends-footer-button.home::before,
+.swf-friends-footer-button.search::before,
+.swf-friends-footer-button.delete::before {
+    content: "";
+    display: block;
+    margin: 1px auto 0;
+    background-position: center center;
+    background-size: auto;
+    background-repeat: no-repeat;
+}
+
+.swf-friends-footer-button.invite::before { width: 19px; height: 13px; background-image: url("@/assets/images/friends/swf/room_invite.png"); }
+.swf-friends-footer-button.home::before { width: 13px; height: 11px; margin-top: 2px; background-image: url("@/assets/images/friends/swf/open_homepage.png"); }
+.swf-friends-footer-button.search { margin-left: auto; }
+.swf-friends-footer-button.search::before { width: 13px; height: 13px; background-image: url("@/assets/images/friends/swf/search.png"); }
+.swf-friends-footer-button.delete::before { width: 13px; height: 13px; background-image: url("@/assets/images/friends/swf/remove_friend_bin.png"); }
+.swf-friends-footer-button:disabled { opacity: .55; }
+
+.swf-friends-search-strip {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 18px;
+    height: 17px;
+    padding: 1px 0 0 5px;
+    border-top: 1px solid #1f5f78;
+    border-bottom: 1px solid #1f5f78;
+    background: #6f6f6f;
+    color: #fff;
+    font-size: 10px;
+    line-height: 13px;
+    text-shadow: 1px 1px 0 #333;
+}
+
+.swf-friends-search-strip {
+    cursor: pointer;
+    text-align: left;
+}
+
+.swf-friends-search-strip::after {
+    content: "";
+    position: absolute;
+    left: 41px;
+    top: 5px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #fff;
+}
+/* END SWF_FRIENDS_EXACT_DOM */
+
+/* The friend list and messenger deliberately avoid generic Octane cards. The
+ * original SWF used fixed, pixel-aligned rows and nested plain containers. */
+.swf-friends-window .friends-list-profile {
+    display: block;
+    width: 15px;
+    min-width: 15px;
+    height: 11px;
+    overflow: hidden;
+}
+
+.swf-friends-window .friends-list-profile > * {
+    width: 15px !important;
+    height: 11px !important;
+    min-width: 15px !important;
+    min-height: 11px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.swf-friends-window .swf-friend-action,
+.swf-friends-window .swf-friend-relationship,
+.swf-friends-window .swf-friend-category-toggle {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: auto;
+    box-shadow: none;
+}
+
+.swf-friends-window .swf-friend-action.follow { background-image: url("@/assets/images/friends/swf/follow_friend.png"); }
+.swf-friends-window .swf-friend-action.chat { background-image: url("@/assets/images/friends/swf/friendlist_chat.png"); }
+.swf-friends-window .swf-friend-action.add { background-image: url("@/assets/images/friends/swf/plus_friend_icon.png"); }
+.swf-friends-window .swf-friend-category-toggle::before {
+    content: "";
+    display: block;
+    width: 0;
+    height: 0;
+    margin: 5px auto 0;
+    border-top: 5px solid #111;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
+
+.swf-friends-window .swf-friend-relationship {
+    position: relative;
+    width: 26px;
+    min-width: 26px;
+    background-image: url("@/assets/images/friends/friends-spritesheet.png");
+    background-repeat: no-repeat;
+}
+.swf-friends-window .swf-friend-relationship.heart { background-position: -5px -67px; }
+.swf-friends-window .swf-friend-relationship.smile { background-position: -57px -67px; }
+.swf-friends-window .swf-friend-relationship.bobba { background-position: -96px -5px; }
+.swf-friends-window .swf-friend-relationship.none { background-position: -31px -67px; }
+.swf-friends-window .swf-friend-relationship::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 6px;
+    width: 0;
+    height: 0;
+    border-top: 4px solid #111;
+    border-right: 3px solid transparent;
+    border-left: 3px solid transparent;
+}
+
+.swf-relationship-chooser {
+    position: fixed;
+    z-index: 10000;
+    width: 30px;
+    height: 68px;
+    padding: 2px;
+    border: 1px solid #777;
+    background: #fff;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, .45);
+}
+.swf-relationship-chooser button {
+    display: block;
+    width: 25px;
+    height: 15px;
+    padding: 0;
+    border: 0;
+    background-color: #ececec;
+    background-image: url("@/assets/images/friends/friends-spritesheet.png");
+    background-repeat: no-repeat;
+}
+.swf-relationship-chooser button:nth-child(even) { background-color: #fff; }
+.swf-relationship-chooser button:hover { background-color: #cdebf6; }
+.swf-relationship-chooser button.none { background-position: -31px -67px; }
+.swf-relationship-chooser button.heart { background-position: -5px -67px; }
+.swf-relationship-chooser button.smile { background-position: -57px -67px; }
+.swf-relationship-chooser button.bobba { background-position: -96px -5px; }
+
+.swf-friends-window .friends-list-group-assign { position: relative; }
+.swf-friends-window .friends-list-group-menu {
+    position: absolute;
+    right: 0;
+    top: 17px;
+    z-index: 10;
+    min-width: 105px;
+    padding: 2px;
+    border: 1px solid #555;
+    background: #f4f4ef;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, .45);
+}
+.swf-friends-window .friends-list-group-menu button {
+    display: block;
+    width: 100%;
+    padding: 2px 4px;
+    border: 0;
+    background: transparent;
+    color: #000;
+    font-size: 10px;
+    text-align: left;
+}
+.swf-friends-window .friends-list-group-menu button:hover,
+.swf-friends-window .friends-list-group-menu button.active { background: #63c4e7; }
+
+.swf-friends-search-results {
+    position: relative;
+    box-sizing: border-box;
+    padding: 3px;
+}
+.swf-friends-search-input {
+    display: block;
+    width: 100%;
+    height: 20px;
+    margin: 0 0 4px;
+    padding: 2px 5px;
+    border: 1px solid #8e8e88;
+    border-radius: 2px;
+    background: #fff;
+    color: #000;
+    font-size: 10px;
+}
+.swf-friends-search-results .swf-search-section { margin: 0 0 4px; }
+.swf-friends-search-results .swf-search-section h4 {
+    height: 18px;
+    margin: 0;
+    padding: 3px 3px 0;
+    background: #fff;
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* Illumina messenger header: fixed SWF pixel coordinates. */
+
+/* Assets and nine-slice regions match the Illumina-light SWF frame. */
+
+/* Friend bar: original SWF tab measurements and attached “find friends” state. */
+.friend-bar .friend-bar-find-friends {
+    position: relative;
+    z-index: 20;
+    flex: 0 0 127px;
+    width: 127px;
+    height: 36px;
+}
+
+.friend-bar .friend-bar-find-friends .friend-bar-item,
+.friend-bar > * .friend-bar-item:not(.friend-bar-request):not(.friend-bar-empty) {
+    box-sizing: border-box;
+    width: 127px;
+    min-width: 127px;
+    height: 36px;
+    min-height: 36px;
+}
+
+.friend-bar .friend-bar-find-friends .friend-bar-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 9px 0 38px;
+    cursor: pointer;
+}
+
+.friend-bar .friend-bar-find-friends .friend-bar-search-icon {
+    position: absolute;
+    top: 1px;
+    left: 6px;
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 29px;
+    max-height: 33px;
+    pointer-events: none;
+}
+
+.friend-bar .friend-bar-find-friends .friend-bar-text {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+    padding-top: 0;
+    color: #fff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.friend-bar .friend-bar-find-friends-panel {
+    position: absolute;
+    bottom: 34px;
+    left: 0;
+    z-index: 100;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: 127px;
+    min-height: 164px;
+    padding: 6px 7px 8px;
+    border: 1px solid #74dbfa;
+    border-radius: 4px 4px 0 0;
+    background: #4f8e38;
+    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.55), 0 2px 5px rgba(0, 0, 0, 0.45);
+    color: #fff;
+}
+
+.friend-bar:has(.friend-bar-find-friends.is-selected) .friend-bar-friend.is-selected .friend-bar-actions {
+    display: none;
+}
+
+.friend-bar .friend-bar-find-friends-header {
+    display: flex;
+    align-items: center;
+    min-height: 30px;
+    color: #fff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.friend-bar .friend-bar-find-friends-header img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 31px;
+    max-height: 34px;
+    margin: -4px 4px -2px -3px;
+}
+
+.friend-bar .friend-bar-find-friends-copy {
+    min-height: 62px;
+    padding: 3px 2px;
+    color: #fff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    line-height: 14px;
+}
+
+.friend-bar .friend-bar-find-friends-button {
+    width: 111px;
+    min-height: 32px;
+    margin: auto auto 0;
+    border: 2px solid #000;
+    border-radius: 4px;
+    background: linear-gradient(#fff, #d5d5d5);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.9);
+    color: #000;
+    cursor: pointer;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.friend-bar .friend-bar-find-friends-button:hover {
+    background: linear-gradient(#fff, #ececec);
+}
+
+.friend-bar .friend-bar-actions {
+    position: absolute;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    z-index: 80;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 110px;
+    padding: 7px 8px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    background: #4f8e38;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+    transform: translateX(-50%);
+}
+
+.friend-bar .friend-bar-actions-name {
+    max-width: 120px;
+    overflow: hidden;
+    color: #fff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    text-overflow: ellipsis;
+    text-shadow: 1px 1px #000;
+    white-space: nowrap;
+}
+
+.friend-bar .friend-bar-actions-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 5px;
+}
+
+/* Selected tabs follow the original SWF geometry instead of generic popovers. */
+.friend-bar .friend-bar-find-friends-panel {
+    bottom: 0;
+    width: 127px;
+    height: 164px;
+    min-height: 164px;
+    padding: 4px 5px 7px;
+    border: 2px solid #122329;
+    border-radius: 4px;
+    background: #5f9fad;
+    box-shadow: inset 0 0 0 1px #a7e8f3, 1px 2px 0 rgba(0, 0, 0, 0.42);
+}
+
+.friend-bar .friend-bar-find-friends-header {
+    min-height: 30px;
+    padding: 0 3px;
+    border-bottom: 1px solid rgba(7, 34, 40, 0.45);
+    color: #fff;
+    font-size: 12px;
+    text-shadow: 1px 1px #1d5560;
+}
+
+.friend-bar .friend-bar-find-friends-header img {
+    margin: -4px 4px -2px -4px;
+}
+
+.friend-bar .friend-bar-find-friends-copy {
+    box-sizing: border-box;
+    min-height: 76px;
+    padding: 7px 4px 3px;
+    color: #000; /* add_friends_tab text: Ubuntu 12, no text_color (black) */
+    font-size: 12px;
+    line-height: 13px;
+}
+
+.friend-bar .friend-bar-find-friends-button {
+    width: 109px;
+    min-height: 30px;
+    margin: auto 2px 0;
+    border: 2px solid #000;
+    border-radius: 2px;
+    background: linear-gradient(#fff, #d9d9d9);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 1);
+    font-size: 12px;
+}
+
+.friend-bar .friend-bar-friend {
+    position: relative;
+    z-index: 20;
+    flex: 0 0 127px;
+    width: 127px;
+    height: 36px;
+}
+
+.friend-bar .friend-bar-friend.is-selected {
+    z-index: 30;
+}
+
+.friend-bar .friend-bar-friend:not(.is-selected) .friend-bar-actions {
+    /* AnimatePresence retains the panel briefly while it exits, after the
+       parent has already lost is-selected. Hide that stale closing frame. */
+    display: none;
+}
+
+.friend-bar .friend-bar-friend .friend-bar-actions-name {
+    max-width: 166px;
+    min-height: 30px;
+    padding-top: 5px;
+    color: #fff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 13px;
+    line-height: 16px;
+    text-align: left;
+    text-shadow: 1px 1px #000;
+}
+
+.friend-bar .friend-bar-friend .friend-bar-actions-buttons {
+    position: absolute;
+    bottom: 7px;
+    left: 40px;
+    gap: 4px;
+    margin: 0;
+}
+
+.friend-bar .friend-bar-friend .friend-bar-actions-buttons .tbme-icon {
+    width: 23px;
+    height: 21px;
+    border: 1px solid #050505;
+    border-radius: 2px;
+    background-color: #30342a;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-item-head.avatar {
+    z-index: 90;
+}
+
+/* In the SWF the expanded controls stay on the left while the selected tab
+   (name and avatar) docks to the right edge of that control strip. */
+.friend-bar .friend-bar-friend.is-selected .friend-bar-tab {
+    position: absolute;
+    right: auto;
+    bottom: 0;
+    left: 135px;
+    z-index: 91;
+    padding-left: 35px;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-item-head.avatar {
+    top: -27px !important;
+    right: auto;
+    bottom: auto;
+    left: 218px !important;
+    width: 37px;
+    height: 66px;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-actions-name {
+    display: none;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-actions-buttons {
+    bottom: 8px;
+    left: 38px;
+}
+
+/* Selected friends expand into the same compact vertical tab used by the SWF. */
+.friend-bar .friend-bar-friend.is-selected .friend-bar-actions {
+    bottom: 0;
+    left: 3px;
+    width: 127px;
+    min-height: 70px;
+    padding: 0;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-tab {
+    top: 0;
+    right: auto;
+    bottom: auto;
+    left: 0;
+    z-index: 92;
+    width: 127px;
+    height: 35px;
+    min-height: 35px;
+    padding-left: 42px;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-tab .friend-bar-text {
+    padding-top: 0;
+    color: #fff;
+    font-size: 13px;
+    line-height: 18px;
+    text-shadow: 1px 1px #1a2111;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-item-head.avatar {
+    top: -47px !important;
+    right: auto;
+    bottom: auto;
+    left: -23px !important;
+    z-index: 93;
+    width: 37px;
+    height: 66px;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-actions-name {
+    position: absolute;
+    top: 8px;
+    left: 41px;
+    display: block;
+    max-width: 77px;
+    min-height: 18px;
+    overflow: hidden;
+    padding: 0;
+    color: #fff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: left;
+    text-overflow: ellipsis;
+    text-shadow: 1px 1px #1a2111;
+    white-space: nowrap;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-actions-buttons {
+    bottom: 7px;
+    left: 31px;
+    z-index: 94;
+}
+
+/* Clear the old friend-bar skin from selected entities before applying the
+   compact SWF state above. */
+.friend-bar .friend-bar-friend.is-selected .friend-bar-tab {
+    position: absolute;
+    top: -70px;
+    left: 0;
+    z-index: 92;
+    box-sizing: border-box;
+    display: block;
+    width: 127px;
+    height: 35px;
+    padding-left: 42px;
+    cursor: pointer;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-tab .friend-bar-text {
+    display: block;
+    overflow: hidden;
+    padding-top: 8px;
+    color: #fff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 18px;
+    text-overflow: ellipsis;
+    text-shadow: 1px 1px #1a2111;
+    white-space: nowrap;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-item-head.avatar {
+    position: absolute !important;
+    top: -47px !important;
+    left: -23px !important;
+    z-index: 93;
+    display: block;
+    width: 54px;
+    height: 62px;
+    overflow: visible;
+}
+
+/* SWF selected friend tab: keep a single label and a compact head preview. */
+.friend-bar .friend-bar-friend.is-selected .friend-bar-actions {
+    position: absolute;
+    right: auto;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    z-index: 80;
+    box-sizing: border-box;
+    display: block;
+    width: 127px;
+    height: 70px;
+    min-height: 70px;
+    padding: 0;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-tab {
+    position: absolute;
+    top: -34px;
+    right: auto;
+    bottom: auto;
+    left: 0;
+    z-index: 92;
+    box-sizing: border-box;
+    display: block;
+    width: 127px;
+    height: 35px;
+    padding-left: 44px;
+    cursor: pointer;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-tab .friend-bar-text {
+    display: block;
+    width: 75px;
+    overflow: hidden;
+    padding-top: 8px;
+    color: #fff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: left;
+    text-overflow: ellipsis;
+    text-shadow: 1px 1px #1a2111;
+    white-space: nowrap;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-item-head.avatar {
+    position: absolute !important;
+    top: -39px !important;
+    right: auto;
+    bottom: auto;
+    left: -3px !important;
+    z-index: 93;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px !important;
+    height: 40px !important;
+    overflow: hidden;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-item-head.avatar > * {
+    width: 40px !important;
+    height: 40px !important;
+    filter: none !important;
+    box-shadow: none !important;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-actions-buttons {
+    position: absolute;
+    right: auto;
+    bottom: 7px;
+    left: 50%;
+    z-index: 94;
+    display: flex;
+    gap: 4px;
+    margin: 0;
+    transform: translateX(-50%);
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-actions-buttons .tbme-icon {
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-actions {
+    border-radius: 4px !important;
+    overflow: hidden;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-tab {
+    border-radius: 2px 2px 0 0 !important;
+}
+
+/* `new_friend_entity_xml` + `new_controls_xml`: 127 x 70 selected SWF tab. */
+.friend-bar .friend-bar-friend.is-selected .friend-bar-actions {
+    right: auto;
+    bottom: 0;
+    left: 3px;
+    width: 127px;
+    height: 70px;
+    min-height: 70px;
+    padding: 0;
+    border-radius: 4px !important;
+    background: #72883f !important;
+    box-shadow: none;
+    transform: none !important;
+    overflow: hidden;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-tab {
+    top: -34px;
+    width: 127px;
+    height: 35px;
+    margin: 0 3px;
+    padding-left: 0;
+    border: 0;
+    border-image-source: none !important;
+    border-radius: 2px 2px 0 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-tab .friend-bar-text {
+    width: 127px;
+    padding-top: 2px;
+    line-height: 18px;
+    text-align: center;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-item-head.avatar {
+    left: 0 !important;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-item-head.avatar .avatar-image {
+    background-size: auto !important;
+    background-position: -25px -38px !important;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-actions-buttons {
+    top: 35px;
+    right: auto;
+    bottom: auto;
+    left: 30px;
+    gap: 4px;
+    transform: none;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-actions-buttons .friend-bar-icons {
+    flex: 0 0 25px;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    background-color: transparent !important;
+    box-shadow: none;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-action-icon {
+    display: flex;
+    width: 23px;
+    height: 21px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-action-icon img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 23px;
+    max-height: 21px;
+    pointer-events: none;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-actions-buttons {
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-icons:hover {
+    height: 21px;
+    transform: none !important;
+}
+
+.friend-bar .friend-bar-friend.is-selected .icon-friendbar-chat:hover {
+    background-position: 0 0;
+}
+
+.friend-bar .friend-bar-friend.is-selected .icon-friendbar-visit:hover {
+    background-position: 0 -24px;
+}
+
+.friend-bar .friend-bar-friend.is-selected .icon-profile:hover {
+    background-position: 0 -48px;
+}
+
+.swf-friends-window .swf-friends-titlebar {
+    background-color: #418db0;
+    background-image: url("@/assets/images/habbo-skin/2249_habbo_skin_blue_png$87fbbf84559e7bad0222a9c697b1104d-1406111769.png");
+    background-position: -393px 0;
+    background-repeat: repeat-x;
+    background-size: auto;
+}
+
+.swf-friends-window .swf-friends-close {
+    width: 15px;
+    height: 15px;
+    right: 4px;
+    top: 4px;
+    background-image: url("@/assets/images/habbo-skin/2249_habbo_skin_blue_png$87fbbf84559e7bad0222a9c697b1104d-1406111769.png");
+    background-position: -377px -216px;
+    background-repeat: no-repeat;
+}
+
+.swf-friends-window .swf-friends-close::before,
+.swf-friends-window .swf-friends-close::after {
+    display: none;
+}
+
+.swf-friends-window {
+    width: 240px;
+    height: 400px;
+    overflow: hidden;
+    border: 1px solid #1a5d74;
+    border-radius: 5px;
+    background: #3f9fc1;
+    box-shadow: inset 0 1px 0 #76d3ec;
+}
+
+.swf-friends-window .swf-friends-titlebar {
+    height: 24px;
+}
+
+.swf-friends-window .swf-friends-category {
+    height: 17px;
+}
+
+.swf-friends-window .swf-friends-body {
+    top: 42px;
+    right: 4px;
+    bottom: 68px;
+    left: 4px;
+    overflow: hidden;
+    background: #f2f2ee;
+}
+
+.swf-friends-window .swf-friends-section-header {
+    height: 19px;
+    padding: 2px 4px 0;
+    line-height: 14px;
+}
+
+.swf-friends-window .swf-friends-section-list {
+    max-height: 250px;
+}
+
+.swf-friends-window .swf-friends-offline-list {
+    max-height: 152px;
+    overflow-y: auto;
+}
+
+.swf-friends-window .friends-list-item {
+    display: flex;
+    align-items: center;
+    min-height: 20px;
+    height: 20px;
+    padding: 0 3px;
+}
+
+.swf-friends-window .friends-list-user {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    min-width: 0;
+    height: 20px;
+}
+
+.swf-friends-window .friends-list-avatar {
+    display: block;
+    flex: 0 0 20px;
+    width: 20px !important;
+    min-width: 20px !important;
+    height: 20px !important;
+    overflow: hidden;
+}
+
+.swf-friends-window .friends-list-avatar .avatar-image {
+    position: absolute;
+    inset: 0 !important;
+    width: 20px !important;
+    height: 20px !important;
+    margin: 0 !important;
+    transform: none !important;
+    background-position: -11px -12px !important;
+    background-size: 42px auto !important;
+}
+
+.swf-friends-window .friends-list-profile {
+    display: flex;
+    flex: 0 0 15px;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    min-width: 15px;
+    height: 11px;
+    margin-left: 1px;
+}
+
+.swf-friends-window .friends-list-name {
+    min-width: 0;
+    margin-left: 3px;
+    overflow: hidden;
+    color: #111;
+    font-size: 10px;
+    font-weight: normal;
+    line-height: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.swf-friends-window .friends-list-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    height: 20px;
+    gap: 0;
+}
+
+.swf-friends-window .friends-list-group-assign {
+    display: none;
+}
+
+.swf-friends-window .swf-friend-action,
+.swf-friends-window .swf-friend-relationship {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+}
+
+.swf-friends-window .friends-list-item.online .swf-friend-relationship {
+    order: 1;
+}
+
+.swf-friends-window .friends-list-item.online .swf-friend-action.follow {
+    order: 2;
+}
+
+.swf-friends-window .friends-list-item.online .swf-friend-action.chat {
+    order: 3;
+}
+
+.swf-friends-window .friends-list-item.offline .friends-list-actions {
+    display: none;
+}
+
+.swf-friends-window {
+    height: 350px;
+    min-height: 300px;
+    max-height: calc(100vh - 16px);
+    resize: vertical;
+}
+
+.swf-friends-window .swf-friends-body {
+    bottom: 68px;
+    background: #fff;
+}
+
+.swf-friends-window .swf-friends-section-header {
+    background: #fff;
+}
+
+.swf-friends-window .friends-list-item {
+    position: relative;
+    justify-content: initial;
+    background: #fff !important;
+}
+
+.swf-friends-window .friends-list-item:nth-child(even) {
+    background: #fff !important;
+}
+
+.swf-friends-window .friends-list-item.selected,
+.swf-friends-window .friends-list-item:hover {
+    background: #cbeefb !important;
+}
+
+.swf-friends-window .friends-list-user {
+    gap: 0;
+}
+
+.swf-friends-window .friends-list-avatar {
+    position: relative;
+    align-self: center;
+}
+
+.swf-friends-window .friends-list-actions {
+    margin-left: auto;
+}
+
+.swf-friends-window .swf-friend-relationship {
+    width: 16px;
+    min-width: 16px;
+}
+
+.swf-friends-window .swf-relationship-chooser {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    z-index: 30;
+}
+
+.habbicon-selector-sections {
+    overflow-x: hidden !important;
+}
+
+.swf-friends-window .swf-friends-titlebar {
+    background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .26) 0 1px, transparent 1px 2px),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, .22) 0 1px, transparent 1px 2px),
+        linear-gradient(#55b5d5, #3297be);
+}
+
+.swf-friends-window .swf-friends-close {
+    width: 17px;
+    height: 17px;
+    right: 3px;
+    top: 4px;
+    background: transparent;
+}
+
+.swf-friends-window .swf-friends-close::before,
+.swf-friends-window .swf-friends-close::after {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 2px;
+    display: block;
+    width: 2px;
+    height: 13px;
+    background: #bfeefa;
+}
+
+.swf-friends-window .swf-friends-close::before { transform: rotate(45deg); }
+.swf-friends-window .swf-friends-close::after { transform: rotate(-45deg); }
+
+.swf-friends-window .swf-friends-titlebar {
+    background-color: #418db0;
+    background-image: url("@/assets/images/friends/swf/friends-blue-header.png");
+    background-position: left top;
+    background-repeat: repeat-x;
+}
+
+.swf-friends-window .swf-friends-close {
+    width: 15px;
+    height: 15px;
+    right: 4px;
+    background: url("@/assets/images/friends/swf/friends-blue-close-default.png") center / 15px 15px no-repeat;
+}
+
+.swf-friends-window .swf-friends-close:hover {
+    background-image: url("@/assets/images/friends/swf/friends-blue-close-hover.png");
+}
+
+.swf-friends-window .swf-friends-close:active {
+    background-image: url("@/assets/images/friends/swf/friends-blue-close-pressed.png");
+}
+
+.swf-friends-window .swf-friends-close::before,
+.swf-friends-window .swf-friends-close::after {
+    display: none;
+}
+
+/*
+ * AIR friend bar tiles: skin border style 6 (habbo_skin_ubuntu, 80,10 20x20) tinted by the tab colour. The skin is a
+ * 1px black outline (2px at the bottom), a 2px white ring and a #bab8b4 fill, so the ring takes the tab colour and the
+ * fill takes the colour multiplied by #bab8b4. Colours from the tabs: friend (FriendEntityTab) 0x9dbf5a / 0xd3f794
+ * when exposed, find friends (add_friends_tab) 0x7fc8de / 0x91e1f9, friend requests (FriendRequestsTab) 0xfac919 /
+ * 0xffd966.
+ */
+.friend-bar {
+    --air-tab-friend-ring: #9dbf5a;
+    --air-tab-friend-fill: #72893f;
+    --air-tab-friend-ring-exposed: #d3f794;
+    --air-tab-friend-fill-exposed: #99b268;
+    --air-tab-find-ring: #7fc8de;
+    --air-tab-find-fill: #5c909c;
+    --air-tab-find-ring-exposed: #91e1f9;
+    --air-tab-find-fill-exposed: #6aa2b0;
+    --air-tab-request-ring: #fac919;
+    --air-tab-request-fill: #b69112;
+    --air-tab-request-ring-exposed: #ffd966;
+    --air-tab-request-fill-exposed: #ba9d48;
+}
+
+.friend-bar .friend-bar-find-friends .friend-bar-item.friend-bar-search.find-friends,
+.friend-bar .friend-bar-friend:not(.is-selected) .friend-bar-item.friend-bar-tab.find-friends-active,
+.friend-bar .friend-bar-item.friend-bar-request.find-friends-active.find-friends-active {
+    --air-tab-ring: var(--air-tab-friend-ring);
+    --air-tab-fill: var(--air-tab-friend-fill);
+    --air-tab-ring-exposed: var(--air-tab-friend-ring-exposed);
+    --air-tab-fill-exposed: var(--air-tab-friend-fill-exposed);
+    border: 1px solid #000;
+    border-bottom-width: 2px;
+    border-image-source: none;
+    border-radius: 4px;
+    background: var(--air-tab-fill);
+    box-shadow: inset 0 0 0 2px var(--air-tab-ring);
+    text-shadow: none;
+}
+
+.friend-bar .friend-bar-find-friends .friend-bar-item.friend-bar-search.find-friends {
+    --air-tab-ring: var(--air-tab-find-ring);
+    --air-tab-fill: var(--air-tab-find-fill);
+    --air-tab-ring-exposed: var(--air-tab-find-ring-exposed);
+    --air-tab-fill-exposed: var(--air-tab-find-fill-exposed);
+}
+
+.friend-bar .friend-bar-item.friend-bar-request.find-friends-active.find-friends-active {
+    --air-tab-ring: var(--air-tab-request-ring);
+    --air-tab-fill: var(--air-tab-request-fill);
+    --air-tab-ring-exposed: var(--air-tab-request-ring-exposed);
+    --air-tab-fill-exposed: var(--air-tab-request-fill-exposed);
+}
+
+.friend-bar .friend-bar-find-friends .friend-bar-item.friend-bar-search.find-friends:hover,
+.friend-bar .friend-bar-find-friends.is-selected .friend-bar-item.friend-bar-search.find-friends,
+.friend-bar .friend-bar-friend:not(.is-selected) .friend-bar-item.friend-bar-tab.find-friends-active:hover,
+.friend-bar .friend-bar-item.friend-bar-request.find-friends-active.find-friends-active:hover {
+    border-image-source: none;
+    background: var(--air-tab-fill-exposed);
+    box-shadow: inset 0 0 0 2px var(--air-tab-ring-exposed);
+}
+
+/* add_friends_tab title: 77 x 30, so a long caption wraps onto a second line instead of being cut off. */
+.friend-bar .friend-bar-find-friends .friend-bar-item.friend-bar-search.find-friends .friend-bar-text {
+    display: -webkit-box;
+    overflow: hidden;
+    line-height: 13px;
+    white-space: normal;
+    text-align: left;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+/*
+ * Text as AIR draws the friend windows (Octane's `Ubuntu` face is the condensed cut; AIR's is the regular one).
+ *
+ * room_invite_confirm / friend_remove_confirm are style 0 frames: Volter 9 black, the OK is a style 0 button_thick
+ * and Cancel a style 0 button, both the grey classic skin (the components pass variant="secondary").
+ */
+.octane-friends-room-invite .octane-card-content-shell,
+.octane-friends-remove-confirmation .octane-card-content-shell {
+    color: #000;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+}
+
+/* The category manager is Octane's own: AIR conventions, regular Ubuntu u_regular 12 black. */
+.octane-friends-category-manager .octane-card-content-shell {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-friends-category-manager .text-sm {
+    font-size: 12px;
+}
+
+/* new_bar / new_friend_entity / add_friends_tab / friend_request(s)_tab: regular Ubuntu throughout. */
+.friend-bar {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+/* add_friends_tab button: button_thick style 3, the grey habbo_skin_button_shiny_thick, 12 px bold black. */
+.friend-bar .friend-bar-find-friends .friend-bar-find-friends-button {
+    border: 5px solid transparent;
+    border-radius: 0;
+    border-image-source: var(--habbo-skin-shiny-thick);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    background: transparent;
+    box-shadow: none;
+    color: #000;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.friend-bar .friend-bar-find-friends .friend-bar-find-friends-button:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-hover);
+    background: transparent;
+}
+
+.friend-bar .friend-bar-find-friends .friend-bar-find-friends-button:active {
+    border-image-source: var(--habbo-skin-shiny-thick-pressed);
+}
+
+@layer base {
+    .friend-bar :where(*):not(svg, svg *),
+    .octane-friends-category-manager .octane-card-content-shell :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    .octane-friends-room-invite .octane-card-content-shell :where(*):not(svg, svg *),
+    .octane-friends-remove-confirmation .octane-card-content-shell :where(*):not(svg, svg *) {
+        font-family: Volter, monospace !important;
+    }
+
+    /* Button's size is an important utility (12.6 px); the style 0 buttons are Volter 9. */
+    .octane-friends-room-invite .octane-card-content-shell :where(.habbo-btn-secondary),
+    .octane-friends-remove-confirmation .octane-card-content-shell :where(.habbo-btn-secondary) {
+        color: #000 !important;
+        font-size: 9px !important;
+        font-weight: 400 !important;
+    }
+
+    /* Friend names and tab titles: u_bold 12 white (new_friend_entity name, friend_requests_tab label, the
+       add_friends_tab title is Ubuntu 12 bold). Octane had 13 px. */
+    .friend-bar :where(.friend-bar-text, .friend-bar-actions-name) {
+        font-size: 12px !important;
+        font-weight: 700 !important;
+    }
+
+    /* Category manager buttons: AIR's grey button_thick (habbo_skin_button_shiny_thick), 12 px bold black. */
+    .octane-friends-category-manager .octane-card-content-shell .habbo-btn-primary {
+        border-image-source: var(--habbo-skin-shiny-thick) !important;
+        color: #000 !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        text-shadow: none !important;
+    }
+
+    .octane-friends-category-manager .octane-card-content-shell .habbo-btn-primary:hover {
+        border-image-source: var(--habbo-skin-shiny-thick-hover) !important;
+    }
+
+    .octane-friends-category-manager .octane-card-content-shell .habbo-btn-primary:active {
+        border-image-source: var(--habbo-skin-shiny-thick-pressed) !important;
+    }
+
+    .octane-friends-category-manager .octane-card-content-shell .habbo-btn-primary:disabled,
+    .octane-friends-category-manager .octane-card-content-shell .habbo-btn-primary.pointer-events-none {
+        border-image-source: var(--habbo-skin-shiny-thick-disabled) !important;
+        color: #777 !important;
+    }
 }

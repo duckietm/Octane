@@ -2,70 +2,327 @@ import {
     CameraPublishStatusMessageEvent,
     CameraPurchaseOKMessageEvent,
     CameraStorageUrlMessageEvent,
+    CompetitionStatusMessageEvent,
     CreateLinkEvent,
+    GetEventDispatcher,
     GetRoomEngine,
+    GetSessionDataManager,
+    IRoomCameraWidgetEffect,
+    IRoomCameraWidgetSelectedEffect,
+    OctaneToolbarAnimateIconEvent,
+    PhotoCompetitionMessageComposer,
     PublishPhotoMessageComposer,
-    PurchasePhotoMessageComposer
-} from '@nitrots/nitro-renderer';
-import { FC, useEffect, useMemo, useState } from 'react';
-import { GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../../api';
-import { Button, Column, LayoutCurrencyIcon, LayoutImage, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../common';
-import { useMessageEvent } from '../../../hooks';
+    PurchasePhotoMessageComposer,
+    ToolbarIconEnum
+} from '@octane/renderer';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+    CameraPicture,
+    FinishCameraRenderMessage,
+    GetCameraEffectDataJson,
+    GetCameraRenderMode,
+    GetConfigurationValue,
+    getPublishedPhotoUrl,
+    LocalizeText,
+    OpenUrl,
+    SendMessageComposer
+} from '../../../api';
+import creditIcon from '../../../assets/images/camera/checkout/credit.png';
+import ducketIcon from '../../../assets/images/camera/checkout/ducket.png';
+import { OctaneCardView } from '../../../common';
+import { useMessageEvent, useNotification, usePurse } from '../../../hooks';
+import { joinCameraPhotoUrl } from '../CameraAirUtilities';
+import { CAMERA_BOX_COLOR, CAMERA_COMPETITION_COLOR, CameraCenteredText, CameraNativeText } from './CameraNativeText';
+import { CameraSkinButton } from './CameraSkinButton';
+import { Checkbox } from '../../../common/Checkbox';
+import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 export interface CameraWidgetCheckoutViewProps {
     base64Url: string;
     onCloseClick: () => void;
     onCancelClick: () => void;
     price: { credits: number; duckets: number; publishDucketPrice: number };
+    // camera.render.mode "server": the photo (with the scene captured at the shutter), its effects and zoom.
+    picture?: CameraPicture;
+    effects?: IRoomCameraWidgetSelectedEffect[];
+    zoom?: number;
+    availableEffects?: IRoomCameraWidgetEffect[];
 }
 
+const CAMERA_POINT_CURRENCY_TYPE = 0;
+
 export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (props) => {
-    const { base64Url = null, onCloseClick = null, onCancelClick = null, price = null } = props;
+    const {
+        base64Url = null,
+        onCloseClick = null,
+        onCancelClick = null,
+        price: offeredPrice = null,
+        picture = null,
+        effects = null,
+        zoom = 1,
+        availableEffects = null
+    } = props;
+    // Official (setPrices runs once): the prices are fixed when the dialog opens.
+    const [price, setPrice] = useState(offeredPrice);
+    // A second click before React re-renders must not send the request again (the server would
+    // create and charge twice); set in the same task as the send.
+    const pendingRef = useRef(false);
+    const pendingTimerRef = useRef<number>(null);
     const [pictureUrl, setPictureUrl] = useState<string>(null);
-    const [publishUrl, setPublishUrl] = useState<string>(null);
+    const [publishId, setPublishId] = useState<string>(null);
     const [picturesBought, setPicturesBought] = useState(0);
     const [wasPicturePublished, setWasPicturePublished] = useState(false);
+    const [isImageLoaded, setIsImageLoaded] = useState(false);
+    const [hasRenderingFailed, setHasRenderingFailed] = useState(false);
     const [isWaiting, setIsWaiting] = useState(false);
     const [publishCooldown, setPublishCooldown] = useState(0);
+    const [statusLocalization, setStatusLocalization] = useState('camera.purchase.pleasewait');
+    const [competitionState, setCompetitionState] = useState<'idle' | 'submitted' | 'limit' | 'email' | 'error'>('idle');
+    const productImageContainerRef = useRef<HTMLDivElement>(null);
+    const productImageRef = useRef<HTMLImageElement>(null);
+    const { getCurrencyAmount = null } = usePurse();
+    const { showConfirm = null, simpleAlert = null } = useNotification();
 
-    const publishDisabled = useMemo(() => GetConfigurationValue<boolean>('camera.publish.disabled', false), []);
+    const publishDisabled = useMemo(
+        () => GetConfigurationValue<boolean>('camera.publish.disabled', false) || !GetConfigurationValue<boolean>('camera.photo.publishing.enabled', true),
+        []
+    );
+    const competitionEnabled = useMemo(() => GetConfigurationValue<boolean>('camera.competition.enabled', false), []);
+    const spendingDisclaimerEnabled = useMemo(() => GetConfigurationValue<boolean>('disclaimer.credit_spending.enabled', false), []);
+    const [disclaimerAccepted, setDisclaimerAccepted] = useState(!spendingDisclaimerEnabled);
 
-    useMessageEvent<CameraPurchaseOKMessageEvent>(CameraPurchaseOKMessageEvent, (event) => {
+    const publishedPhotoUrl = useMemo(() => {
+        if (!publishId) return '';
+
+        return getPublishedPhotoUrl(publishId, GetConfigurationValue<string>('camera.url', ''), GetSessionDataManager()?.userName ?? '');
+    }, [publishId]);
+
+    useEffect(() => {
+        if (!price && offeredPrice) setPrice(offeredPrice);
+    }, [offeredPrice, price]);
+
+    const finishPending = useCallback(() => {
+        pendingRef.current = false;
+        if (pendingTimerRef.current !== null) window.clearTimeout(pendingTimerRef.current);
+        pendingTimerRef.current = null;
+    }, []);
+
+    const startPending = () => {
+        pendingRef.current = true;
+        setIsWaiting(true);
+        setStatusLocalization('camera.purchase.pleasewait');
+        if (pendingTimerRef.current !== null) window.clearTimeout(pendingTimerRef.current);
+        // No answer within 30 s: let the user try again.
+        pendingTimerRef.current = window.setTimeout(() => {
+            pendingRef.current = false;
+            pendingTimerRef.current = null;
+            setIsWaiting(false);
+            setStatusLocalization('generic.failed');
+        }, 30000);
+    };
+
+    useEffect(() => () => {
+        if (pendingTimerRef.current !== null) window.clearTimeout(pendingTimerRef.current);
+    }, []);
+
+    const reportRenderingFailure = useCallback(() => {
+        setPictureUrl(null);
+        setIsImageLoaded(false);
+        setHasRenderingFailed(true);
+        setStatusLocalization('');
+        simpleAlert(LocalizeText('camera.render.count.info'), null, null, null, LocalizeText('generic.alert.title'));
+    }, [simpleAlert]);
+
+    // Official: not enough credits offers the shop; not enough duckets offers the duckets page.
+    const showNotEnoughCreditsAlert = useCallback(() => {
+        const shopUrl = GetConfigurationValue<string>('web.shop.relativeUrl', '');
+
+        if (!shopUrl || !showConfirm) {
+            simpleAlert(LocalizeText('catalog.alert.notenough.credits.description'), null, null, null, LocalizeText('catalog.alert.notenough.title'));
+            return;
+        }
+
+        showConfirm(
+            LocalizeText('catalog.alert.notenough.credits.description'),
+            () => OpenUrl(shopUrl),
+            () => undefined,
+            null,
+            null,
+            LocalizeText('catalog.alert.notenough.title')
+        );
+    }, [showConfirm, simpleAlert]);
+
+    const showNotEnoughDucketsAlert = useCallback(() => {
+        const currencyLocalization = GetConfigurationValue<string>(`activitypoint.name.${CAMERA_POINT_CURRENCY_TYPE}`, 'duckets');
+        const currencyName = LocalizeText(currencyLocalization);
+        const ducketsUrl = GetConfigurationValue<string>('link.format.duckets', '');
+
+        if (ducketsUrl && showConfirm) {
+            showConfirm(
+                LocalizeText('catalog.alert.notenough.activitypoints.description', ['currencyname'], [currencyName]),
+                () => OpenUrl(ducketsUrl),
+                () => undefined,
+                null,
+                null,
+                LocalizeText('catalog.alert.notenough.activitypoints.title', ['currencyname'], [currencyName])
+            );
+            return;
+        }
+
+        simpleAlert(
+            LocalizeText('catalog.alert.notenough.activitypoints.description', ['currencyname'], [currencyName]),
+            null,
+            null,
+            null,
+            LocalizeText('catalog.alert.notenough.activitypoints.title', ['currencyname'], [currencyName])
+        );
+    }, [showConfirm, simpleAlert]);
+
+    const animatePictureToInventory = useCallback(() => {
+        const sourceImage = productImageRef.current;
+        const sourceContainer = productImageContainerRef.current;
+
+        if (!sourceImage || !sourceContainer) return;
+
+        const transitionImage = sourceImage.cloneNode(true) as HTMLImageElement;
+        const sourceBounds = sourceContainer.getBoundingClientRect();
+        const transitionEvent = new OctaneToolbarAnimateIconEvent(transitionImage, sourceBounds.x, sourceBounds.y);
+
+        transitionImage.width = 120;
+        transitionImage.height = 120;
+        transitionEvent.iconName = ToolbarIconEnum.INVENTORY;
+        GetEventDispatcher().dispatchEvent(transitionEvent);
+    }, []);
+
+    useMessageEvent<CameraPurchaseOKMessageEvent>(CameraPurchaseOKMessageEvent, () => {
+        animatePictureToInventory();
         setPicturesBought((value) => value + 1);
+        setStatusLocalization('camera.purchase.successful');
         setIsWaiting(false);
+        finishPending();
     });
 
     useMessageEvent<CameraPublishStatusMessageEvent>(CameraPublishStatusMessageEvent, (event) => {
         const parser = event.getParser();
+        const secondsToWait = Math.max(0, parser.secondsToWait);
 
-        setPublishUrl(parser.extraDataId);
-        setPublishCooldown(parser.secondsToWait);
         setWasPicturePublished(parser.ok);
+        setStatusLocalization(parser.ok ? 'camera.publish.successful' : '');
         setIsWaiting(false);
+        finishPending();
+
+        if (parser.ok) {
+            setPublishId(parser.extraDataId);
+            setPublishCooldown(0);
+            return;
+        }
+
+        setPublishCooldown(secondsToWait);
+        simpleAlert(
+            LocalizeText('camera.publish.wait', ['minutes'], [(Math.floor(secondsToWait / 60) + 1).toString()]),
+            null,
+            null,
+            null,
+            LocalizeText('generic.alert.title')
+        );
+    });
+
+    useMessageEvent<CompetitionStatusMessageEvent>(CompetitionStatusMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        if (parser.ok) {
+            setCompetitionState('submitted');
+            setStatusLocalization('camera.competition.submitted.status');
+        } else {
+            switch (parser.errorReason) {
+                case 'too-many-submits':
+                    setCompetitionState('limit');
+                    break;
+                case 'email-not-verified':
+                    setCompetitionState('email');
+
+                    showConfirm(
+                        LocalizeText('camera.competition.email.not.verified'),
+                        () => {
+                            const verificationUrl = GetConfigurationValue<string>('email.verification.url', '');
+
+                            if (verificationUrl) OpenUrl(verificationUrl);
+                        },
+                        () => undefined,
+                        LocalizeText('email.settings'),
+                        LocalizeText('groupforum.settings.cancel'),
+                        LocalizeText('generic.alert.title')
+                    );
+                    break;
+                default:
+                    setCompetitionState('error');
+                    break;
+            }
+
+            setStatusLocalization('generic.failed');
+        }
+
+        setIsWaiting(false);
+        finishPending();
     });
 
     useMessageEvent<CameraStorageUrlMessageEvent>(CameraStorageUrlMessageEvent, (event) => {
         const parser = event.getParser();
+        const imageBaseUrl = GetConfigurationValue<string>('stories.image_url_base', '') || GetConfigurationValue<string>('camera.url', '');
+        const nextPictureUrl = joinCameraPhotoUrl(imageBaseUrl, parser.url);
 
-        setPictureUrl(GetConfigurationValue<string>('camera.url') + '/' + parser.url);
+        setIsImageLoaded(false);
+        setHasRenderingFailed(false);
+
+        if (!nextPictureUrl) {
+            reportRenderingFailure();
+            return;
+        }
+
+        setPictureUrl(nextPictureUrl);
     });
 
-    const processAction = (type: string, value: string | number = null) => {
+    const processAction = (type: string) => {
         switch (type) {
             case 'close':
                 onCloseClick();
                 return;
             case 'buy':
-                if (isWaiting) return;
+                if (pendingRef.current || isWaiting || !isImageLoaded || !disclaimerAccepted) return;
 
-                setIsWaiting(true);
+                if (price.credits > getCurrencyAmount(-1)) {
+                    showNotEnoughCreditsAlert();
+                    return;
+                }
+
+                if (price.duckets > getCurrencyAmount(CAMERA_POINT_CURRENCY_TYPE)) {
+                    showNotEnoughDucketsAlert();
+                    return;
+                }
+
+                startPending();
+
+                if (spendingDisclaimerEnabled) setDisclaimerAccepted(false);
+
                 SendMessageComposer(new PurchasePhotoMessageComposer(''));
                 return;
             case 'publish':
-                if (isWaiting) return;
+                if (pendingRef.current || isWaiting || !isImageLoaded || publishCooldown > 0) return;
 
-                setIsWaiting(true);
+                if (price.publishDucketPrice > getCurrencyAmount(CAMERA_POINT_CURRENCY_TYPE)) {
+                    showNotEnoughDucketsAlert();
+                    return;
+                }
+
+                startPending();
                 SendMessageComposer(new PublishPhotoMessageComposer());
+                return;
+            case 'competition':
+                if (pendingRef.current || isWaiting || !isImageLoaded || ['submitted', 'limit', 'error'].includes(competitionState)) return;
+
+                startPending();
+                SendMessageComposer(new PhotoCompetitionMessageComposer());
                 return;
             case 'cancel':
                 onCancelClick();
@@ -73,102 +330,202 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
         }
     };
 
+    // AIR sends the photo data once, when the purchase dialog opens.
     useEffect(() => {
+        if (GetCameraRenderMode() === 'server') {
+            // The scene captured at the shutter, now with the editor's effects (frames last) and zoom; the server renders it.
+            const composer = picture?.renderRoomMessage ?? null;
+
+            if (!FinishCameraRenderMessage(composer, GetCameraEffectDataJson(effects ?? [], availableEffects ?? []), zoom)) {
+                setHasRenderingFailed(true);
+                setStatusLocalization('');
+                simpleAlert(LocalizeText('camera.alert.too_much_stuff'), null, null, null, LocalizeText('generic.alert.title'));
+                return;
+            }
+
+            SendMessageComposer(composer);
+            return;
+        }
+
         if (!base64Url) return;
 
         GetRoomEngine().saveBase64AsScreenshot(base64Url);
+        // Sent once per opened dialog, like AIR; the other inputs belong to the same checkout.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [base64Url]);
+
+    useEffect(() => {
+        if (publishCooldown <= 0) return;
+
+        const timer = window.setTimeout(() => setPublishCooldown(0), publishCooldown * 1000);
+
+        return () => window.clearTimeout(timer);
+    }, [publishCooldown]);
 
     if (!price) return null;
 
-    const displayUrl = pictureUrl || base64Url;
+    const buyDisabled = isWaiting || !isImageLoaded || !disclaimerAccepted;
+    const publishButtonDisabled = isWaiting || !isImageLoaded || publishCooldown > 0;
+    const competitionDisabled = isWaiting || !isImageLoaded || ['submitted', 'limit', 'error'].includes(competitionState);
+    const costLabel = LocalizeText('catalog.purchase.confirmation.dialog.cost');
+    const renderButton = (key: string, className: string, label: string, disabled: boolean, variant: 'green' | 'gray', onClick: () => void) => (
+        <CameraSkinButton key={key} className={className} disabled={disabled} label={label} variant={variant} onClick={onClick} />
+    );
 
     return (
-        <NitroCardView className="nitro-camera-checkout" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('camera.confirm_phase.title')} onCloseClick={(event) => processAction('close')} />
-            <NitroCardContentView>
-                <div className="flex items-center justify-center">
-                    {displayUrl && displayUrl.length && <LayoutImage className="picture-preview border w-[320px] h-[320px]" imageUrl={displayUrl} />}
-                    {(!displayUrl || !displayUrl.length) && (
-                        <div className="flex items-center justify-center picture-preview border w-[320px] h-[320px]">
-                            <Text bold>{LocalizeText('camera.loading')}</Text>
-                        </div>
-                    )}
+        <NativeTextTree>
+            <OctaneCardView className="octane-camera-checkout" frameStyle={3} isResizable={false} theme="primary-slim">
+                <div className="octane-card-header-shell">
+                    <span className="octane-card-title">
+                        <CameraCenteredText background={0x484949} color={0xffffff} text={LocalizeText('camera.confirm_phase.title')} textStyle="u_frame_title" width={340} />
+                    </span>
+                    <BaseButton aria-label={LocalizeText('generic.close')} className="octane-card-close-button" type="button" onClick={() => processAction('close')} />
                 </div>
-                <div className="flex items-center bg-muted rounded p-2 justify-between">
-                    <Column gap={1} size={publishDisabled ? 10 : 6}>
-                        <Text bold>{LocalizeText('camera.purchase.header')}</Text>
-                        {(price.credits > 0 || price.duckets > 0) && (
-                            <div className="flex gap-1">
-                                <Text>{LocalizeText('catalog.purchase.confirmation.dialog.cost')}</Text>
-                                {price.credits > 0 && (
-                                    <div className="flex gap-1">
-                                        <Text bold>{price.credits}</Text>
-                                        <LayoutCurrencyIcon type={-1} />
-                                    </div>
-                                )}
-                                {price.duckets > 0 && (
-                                    <div className="flex gap-1">
-                                        <Text bold>{price.duckets}</Text>
-                                        <LayoutCurrencyIcon type={5} />
-                                    </div>
-                                )}
+                <div className="octane-camera-checkout__list">
+                    <div ref={productImageContainerRef} className={`octane-camera-checkout__image${hasRenderingFailed ? ' is-failed' : ''}`}>
+                        {!isImageLoaded && !hasRenderingFailed && (
+                            <div className="octane-camera-checkout__loading">
+                                <CameraNativeText background={0xcccccc} color={0xffffff} size={36} text={LocalizeText('camera.loading')} />
                             </div>
                         )}
-                        {picturesBought > 0 && (
-                            <Text>
-                                <Text bold>{LocalizeText('camera.purchase.count.info')}</Text> {picturesBought}
-                                <u className="ms-1 cursor-pointer" onClick={() => CreateLinkEvent('inventory/toggle')}>
-                                    {LocalizeText('camera.open.inventory')}
-                                </u>
-                            </Text>
+                        {pictureUrl && !hasRenderingFailed && (
+                            <img
+                                ref={productImageRef}
+                                alt=""
+                                src={pictureUrl}
+                                style={{ visibility: isImageLoaded ? 'visible' : 'hidden' }}
+                                onLoad={() => {
+                                    setIsImageLoaded(true);
+                                    setHasRenderingFailed(false);
+                                    setStatusLocalization('camera.confirm_phase.info');
+                                }}
+                                onError={reportRenderingFailure}
+                            />
                         )}
-                    </Column>
-                    <div className="flex items-center">
-                        <Button disabled={isWaiting} variant="success" onClick={(event) => processAction('buy')}>
-                            {LocalizeText(!picturesBought ? 'buy' : 'camera.buy.another.button.text')}
-                        </Button>
                     </div>
-                </div>
-                {!publishDisabled && (
-                    <div className="flex items-center justify-between bg-muted rounded p-2">
-                        <div className="flex flex-col gap-1">
-                            <Text bold>{LocalizeText(wasPicturePublished ? 'camera.publish.successful' : 'camera.publish.explanation')}</Text>
-                            <Text>{LocalizeText(wasPicturePublished ? 'camera.publish.success.short.info' : 'camera.publish.detailed.explanation')}</Text>
-                            {wasPicturePublished && (
-                                <a href={publishUrl} rel="noreferrer" target="_blank">
-                                    {LocalizeText('camera.link.to.published')}
+
+                    <div className={`octane-camera-checkout__status${statusLocalization ? '' : ' is-empty'}`}>
+                        {!!statusLocalization && <CameraNativeText maxWidth={320} text={LocalizeText(statusLocalization)} />}
+                    </div>
+
+                    {competitionEnabled && (
+                        <section className="octane-camera-checkout__box is-competition">
+                            <div className="octane-camera-checkout__box-name">
+                                <CameraNativeText
+                                    background={CAMERA_COMPETITION_COLOR}
+                                    color={0xffffff}
+                                    size={14}
+                                    text={LocalizeText(
+                                        competitionState === 'submitted'
+                                            ? 'camera.competition.submitted.info'
+                                            : competitionState === 'limit'
+                                              ? 'camera.competition.limit.info'
+                                              : 'camera.competition.header'
+                                    )}
+                                    textStyle="u_bold"
+                                />
+                            </div>
+                            <div className="octane-camera-checkout__competition-info">
+                                <CameraNativeText background={CAMERA_COMPETITION_COLOR} color={0xffffff} maxWidth={190} text={LocalizeText('camera.competition.info')} />
+                            </div>
+                            {renderButton('competition', 'is-competition-button', LocalizeText('generic.submit'), competitionDisabled, 'green', () => processAction('competition'))}
+                        </section>
+                    )}
+
+                    <section className={`octane-camera-checkout__box is-purchase${picturesBought > 0 ? ' has-inventory-link' : ''}`}>
+                        <div className="octane-camera-checkout__box-name">
+                            <CameraNativeText background={CAMERA_BOX_COLOR} size={14} text={LocalizeText('camera.purchase.header')} textStyle="u_bold" />
+                        </div>
+                        <div className="octane-camera-checkout__price-row">
+                            <CameraNativeText background={CAMERA_BOX_COLOR} size={14} text={costLabel} />
+                            <CameraNativeText background={CAMERA_BOX_COLOR} size={14} text={String(price.credits)} textStyle="u_bold" />
+                            <img alt="" className="octane-camera-checkout__icon" src={creditIcon} />
+                            {price.duckets > 0 && (
+                                <>
+                                    <CameraNativeText background={CAMERA_BOX_COLOR} size={14} text={String(price.duckets)} textStyle="u_bold" />
+                                    <img alt="" className="octane-camera-checkout__icon" src={ducketIcon} />
+                                </>
+                            )}
+                        </div>
+                        {picturesBought > 0 && (
+                            <div className="octane-camera-checkout__inventory-row">
+                                <CameraNativeText background={CAMERA_BOX_COLOR} size={14} text={LocalizeText('camera.purchase.count.info')} textStyle="u_bold" />
+                                <CameraNativeText background={CAMERA_BOX_COLOR} size={14} text={String(picturesBought)} />
+                                <BaseButton className="octane-camera-checkout__link" type="button" onClick={() => CreateLinkEvent('inventory/show/furni')}>
+                                    <CameraNativeText background={CAMERA_BOX_COLOR} text={LocalizeText('camera.open.inventory')} underline />
+                                </BaseButton>
+                            </div>
+                        )}
+                        {renderButton(
+                            'buy',
+                            'is-buy-button',
+                            LocalizeText(picturesBought ? 'camera.buy.another.button.text' : 'catalog.purchase_confirmation.buy'),
+                            buyDisabled,
+                            'green',
+                            () => processAction('buy')
+                        )}
+                    </section>
+
+                    {!publishDisabled && (
+                        <section className={`octane-camera-checkout__box is-publish${wasPicturePublished ? ' is-published' : ''}`}>
+                            <div className="octane-camera-checkout__box-name">
+                                <CameraNativeText
+                                    background={CAMERA_BOX_COLOR}
+                                    maxWidth={300}
+                                    size={14}
+                                    text={LocalizeText(wasPicturePublished ? 'camera.publish.successful' : 'camera.publish.explanation')}
+                                    textStyle="u_bold"
+                                />
+                            </div>
+                            <div className="octane-camera-checkout__publish-info">
+                                <CameraNativeText
+                                    background={CAMERA_BOX_COLOR}
+                                    maxWidth={191}
+                                    text={LocalizeText(wasPicturePublished ? 'camera.publish.success.short.info' : 'camera.publish.detailed.explanation')}
+                                />
+                            </div>
+                            {!wasPicturePublished && (
+                                <div className="octane-camera-checkout__price-row is-publish-price">
+                                    <CameraNativeText background={CAMERA_BOX_COLOR} size={14} text={costLabel} />
+                                    <CameraNativeText background={CAMERA_BOX_COLOR} size={14} text={String(price.publishDucketPrice)} textStyle="u_bold" />
+                                    <img alt="" className="octane-camera-checkout__icon" src={ducketIcon} />
+                                </div>
+                            )}
+                            {wasPicturePublished && !!publishedPhotoUrl && (
+                                <a className="octane-camera-checkout__link is-publish-link" href={publishedPhotoUrl} rel="noreferrer" target="_blank">
+                                    <CameraNativeText background={CAMERA_BOX_COLOR} text={LocalizeText('camera.link.to.published')} underline />
                                 </a>
                             )}
-                            {!wasPicturePublished && price.publishDucketPrice > 0 && (
-                                <div className="flex gap-1">
-                                    <Text>{LocalizeText('catalog.purchase.confirmation.dialog.cost')}</Text>
-                                    <div className="flex gap-1">
-                                        <Text bold>{price.publishDucketPrice}</Text>
-                                        <LayoutCurrencyIcon type={5} />
-                                    </div>
-                                </div>
-                            )}
-                            {publishCooldown > 0 && (
-                                <div className="mt-1 text-center font-bold	">
-                                    {LocalizeText('camera.publish.wait', ['minutes'], [Math.ceil(publishCooldown / 60).toString()])}
-                                </div>
-                            )}
-                        </div>
-                        {!wasPicturePublished && (
-                            <div className="flex align-items-end">
-                                <Button disabled={isWaiting || publishCooldown > 0} variant="success" onClick={(event) => processAction('publish')}>
-                                    {LocalizeText('camera.publish.button.text')}
-                                </Button>
-                            </div>
+                            {!wasPicturePublished &&
+                                renderButton('publish', 'is-publish-button', LocalizeText('camera.publish.button.text'), publishButtonDisabled, 'green', () => processAction('publish'))}
+                        </section>
+                    )}
+
+                    <div className="octane-camera-checkout__removal">
+                        <CameraNativeText maxWidth={320} text={LocalizeText('camera.warning.disclaimer')} />
+                    </div>
+
+                    {spendingDisclaimerEnabled && (
+                        <label className="octane-camera-checkout__spending">
+                            <Checkbox checked={disclaimerAccepted} onCheckedChange={(nextChecked) => setDisclaimerAccepted(nextChecked)} />
+                            <span className="octane-camera-checkout__spending-text">
+                                <CameraNativeText maxWidth={278} text={LocalizeText('disclaimer.credit_spending')} />
+                            </span>
+                        </label>
+                    )}
+
+                    <div className="octane-camera-checkout__buttons">
+                        {renderButton(
+                            'cancel',
+                            'is-cancel-button',
+                            LocalizeText(isWaiting || picturesBought > 0 || wasPicturePublished ? 'generic.close' : 'catalog.purchase_confirmation.cancel'),
+                            false,
+                            'gray',
+                            () => processAction('cancel')
                         )}
                     </div>
-                )}
-                <Text center>{LocalizeText('camera.warning.disclaimer')}</Text>
-                <div className="flex justify-end">
-                    <Button onClick={(event) => processAction('cancel')}>{LocalizeText('generic.cancel')}</Button>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

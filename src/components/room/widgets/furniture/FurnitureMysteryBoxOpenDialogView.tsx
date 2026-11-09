@@ -4,12 +4,14 @@ import {
     GotMysteryBoxPrizeMessageEvent,
     MysteryBoxWaitingCanceledMessageComposer,
     ShowMysteryBoxWaitMessageEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
-import { Button, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { LayoutPrizeProductImageView } from '../../../../common/layout/LayoutPrizeProductImageView';
 import { useMessageEvent } from '../../../../hooks';
+import '../../../../css/room/FurniWindowsBAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface FurnitureMysteryBoxOpenDialogViewProps {
     ownerId: number;
@@ -57,38 +59,40 @@ export const FurnitureMysteryBoxOpenDialogView: FC<FurnitureMysteryBoxOpenDialog
     if (mode === ViewMode.HIDDEN) return null;
 
     return (
-        <NitroCardView className="nitro-mysterybox-dialog" theme="primary-slim">
-            <NitroCardHeaderView
-                headerText={
-                    mode === ViewMode.WAITING ? LocalizeText(`mysterybox.dialog.${isOwner ? 'owner' : 'other'}.title`) : LocalizeText('mysterybox.reward.title')
-                }
-                onCloseClick={close}
-            />
-            <NitroCardContentView>
-                {mode === ViewMode.WAITING && (
-                    <>
-                        <Text variant="primary"> {LocalizeText(`mysterybox.dialog.${isOwner ? 'owner' : 'other'}.subtitle`)} </Text>
-                        <Text> {LocalizeText(`mysterybox.dialog.${isOwner ? 'owner' : 'other'}.description`)} </Text>
-                        <Text> {LocalizeText(`mysterybox.dialog.${isOwner ? 'owner' : 'other'}.waiting`)}</Text>
-                        <Button className="mt-auto" variant="danger" onClick={close}>
-                            {' '}
-                            {LocalizeText(`mysterybox.dialog.${isOwner ? 'owner' : 'other'}.cancel`)}{' '}
-                        </Button>
-                    </>
-                )}
-                {mode === ViewMode.PRIZE && prizeData && (
-                    <>
-                        <Text variant="black"> {LocalizeText('mysterybox.reward.text')} </Text>
-                        <Flex className="prize-container justify-center mx-auto">
-                            <LayoutPrizeProductImageView classId={prizeData.classId} productType={prizeData.contentType} />
-                        </Flex>
-                        <Button className="mt-auto" variant="success" onClick={close}>
-                            {' '}
-                            {LocalizeText('mysterybox.reward.close')}{' '}
-                        </Button>
-                    </>
-                )}
-            </NitroCardContentView>
-        </NitroCardView>
+        <NativeTextTree>
+            <OctaneCardView className="octane-mysterybox-dialog octane-furni-mysterybox" theme="primary-slim">
+                <OctaneCardHeaderView
+                    headerText={
+                        mode === ViewMode.WAITING ? LocalizeText(`mysterybox.dialog.${isOwner ? 'owner' : 'other'}.title`) : LocalizeText('mysterybox.reward.title')
+                    }
+                    onCloseClick={close}
+                />
+                <OctaneCardContentView>
+                    {mode === ViewMode.WAITING && (
+                        <>
+                            <Text className="octane-furni-mysterybox__subtitle" variant="black"> {LocalizeText(`mysterybox.dialog.${isOwner ? 'owner' : 'other'}.subtitle`)} </Text>
+                            <Text> {LocalizeText(`mysterybox.dialog.${isOwner ? 'owner' : 'other'}.description`)} </Text>
+                            <Text> {LocalizeText(`mysterybox.dialog.${isOwner ? 'owner' : 'other'}.waiting`)}</Text>
+                            <Button className="mt-auto" variant="danger" onClick={close}>
+                                {' '}
+                                {LocalizeText(`mysterybox.dialog.${isOwner ? 'owner' : 'other'}.cancel`)}{' '}
+                            </Button>
+                        </>
+                    )}
+                    {mode === ViewMode.PRIZE && prizeData && (
+                        <>
+                            <Text variant="black"> {LocalizeText('mysterybox.reward.text')} </Text>
+                            <Flex className="prize-container justify-center mx-auto">
+                                <LayoutPrizeProductImageView classId={prizeData.classId} productType={prizeData.contentType} />
+                            </Flex>
+                            <Button className="mt-auto" variant="success" onClick={close}>
+                                {' '}
+                                {LocalizeText('mysterybox.reward.close')}{' '}
+                            </Button>
+                        </>
+                    )}
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

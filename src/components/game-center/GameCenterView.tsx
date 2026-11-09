@@ -1,13 +1,21 @@
-import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, Game2GetAccountGameStatusMessageComposer, GetGameStatusMessageComposer, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { useEffect } from 'react';
-import { Flex } from '../../common';
+import { LocalizeText, SendMessageComposer } from '../../api';
 import { useGameCenter } from '../../hooks';
-import { GameListView } from './views/GameListView';
 import { GameStageView } from './views/GameStageView';
-import { GameView } from './views/GameView';
+import { GameTileView } from './views/GameTileView';
+import { SnowWarInstructionsView } from './views/snowwar/SnowWarInstructionsView';
+import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+
+const localizeWithFallback = (key: string, fallback: string) =>
+{
+    const text = LocalizeText(key);
+    return text && text !== key ? text : fallback;
+};
 
 export const GameCenterView = () => {
-    const { isVisible, setIsVisible, games, accountStatus } = useGameCenter();
+    const { isVisible, setIsVisible, games, selectedGame, accountStatus, instructionsOpen } = useGameCenter();
 
     useEffect(() => {
         const toggleGameCenter = () => {
@@ -22,6 +30,9 @@ export const GameCenterView = () => {
                     case 'toggle':
                         toggleGameCenter();
                         break;
+                    case 'show':
+                        setIsVisible(true);
+                        break;
                 }
             },
             eventUrlPrefix: 'games/'
@@ -32,15 +43,31 @@ export const GameCenterView = () => {
         return () => RemoveLinkEventTracker(linkTracker);
     }, [setIsVisible]);
 
+    useEffect(() => {
+        if (!selectedGame) return;
+
+        SendMessageComposer(new GetGameStatusMessageComposer(selectedGame.gameId));
+        SendMessageComposer(new Game2GetAccountGameStatusMessageComposer(selectedGame.gameId));
+    }, [selectedGame]);
+
     if (!isVisible || !games || !accountStatus) return;
 
     return (
-        <Flex className="top-0 bottom-0 inset-s-0 inset-e-0 bg-black" justifyContent="center" position="absolute">
-            <Flex column className="game-center-main">
-                <GameView />
-                <GameListView />
-            </Flex>
-            <GameStageView />
-        </Flex>
+        <NativeTextTree>
+            <div className="game-center-main">
+                <div className="game-center-header">
+                    <div className="game-center-header__title">{localizeWithFallback('gamecenter.game_list_title', 'Choose a game')}</div>
+                    <BaseButton className="game-center-header__close" type="button" onClick={() => setIsVisible(false)}>&times;</BaseButton>
+                </div>
+                {instructionsOpen
+                    ? <SnowWarInstructionsView />
+                    : (
+                        <div className="game-tile-grid">
+                            {games.map((game) => <GameTileView key={game.gameId} game={game} />)}
+                        </div>
+                    )}
+                <GameStageView />
+            </div>
+        </NativeTextTree>
     );
 };

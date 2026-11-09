@@ -8,7 +8,7 @@ import {
     RoomEngineObjectEvent,
     RoomEnterEffect,
     RoomSessionDanceEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import {
     AvatarInfoFurni,
@@ -16,12 +16,14 @@ import {
     AvatarInfoRentableBot,
     AvatarInfoUser,
     GetConfigurationValue,
-    RoomWidgetUpdateRentableBotChatEvent
+    RoomWidgetUpdateRentableBotChatEvent,
+    RoomWidgetUpdateRentableBotTextSkillEvent
 } from '../../../../api';
 import { Column, LayoutFurniIconImageView } from '../../../../common';
-import { useAvatarInfoWidget, useNitroEvent, useRoom, useUiEvent } from '../../../../hooks';
+import { useAvatarInfoWidget, useFurniPickupGuard, useOctaneEvent, useRoom, useUiEvent } from '../../../../hooks';
 import { AvatarInfoPetTrainingPanelView } from './AvatarInfoPetTrainingPanelView';
 import { AvatarInfoRentableBotChatView } from './AvatarInfoRentableBotChatView';
+import { AvatarInfoRentableBotTextSkillView } from './AvatarInfoRentableBotTextSkillView';
 import { AvatarInfoUseProductConfirmView } from './AvatarInfoUseProductConfirmView';
 import { AvatarInfoUseProductView } from './AvatarInfoUseProductView';
 import { InfoStandWidgetBotView } from './infostand/InfoStandWidgetBotView';
@@ -29,24 +31,28 @@ import { InfoStandWidgetFurniView } from './infostand/InfoStandWidgetFurniView';
 import { InfoStandWidgetPetView } from './infostand/InfoStandWidgetPetView';
 import { InfoStandWidgetRentableBotView } from './infostand/InfoStandWidgetRentableBotView';
 import { InfoStandWidgetUserView } from './infostand/InfoStandWidgetUserView';
+import { AvatarInfoNewUserHelpView } from './menu/AvatarInfoNewUserHelpView';
 import { AvatarInfoWidgetAvatarView } from './menu/AvatarInfoWidgetAvatarView';
 import { AvatarInfoWidgetDecorateView } from './menu/AvatarInfoWidgetDecorateView';
-import { AvatarInfoWidgetFurniView } from './menu/AvatarInfoWidgetFurniView';
 import { AvatarInfoWidgetNameView } from './menu/AvatarInfoWidgetNameView';
 import { AvatarInfoWidgetOwnAvatarView } from './menu/AvatarInfoWidgetOwnAvatarView';
 import { AvatarInfoWidgetOwnPetView } from './menu/AvatarInfoWidgetOwnPetView';
 import { AvatarInfoWidgetPetView } from './menu/AvatarInfoWidgetPetView';
 import { AvatarInfoWidgetRentableBotView } from './menu/AvatarInfoWidgetRentableBotView';
+import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const AvatarInfoWidgetView: FC<{}> = (props) => {
     const BLOCK_MENU_WINDOW_MS = 500;
     const BLOCK_ROTATE_WINDOW_MS = 500;
     const [isGameMode, setGameMode] = useState(false);
+    const { pickupRoomObject } = useFurniPickupGuard();
     const [isDancing, setIsDancing] = useState(false);
     const [isTouchLayout, setIsTouchLayout] = useState(false);
     const [mobileFurniDetailsOpen, setMobileFurniDetailsOpen] = useState(false);
     const [mobileUserDetailsOpen, setMobileUserDetailsOpen] = useState(false);
     const [rentableBotChatEvent, setRentableBotChatEvent] = useState<RoomWidgetUpdateRentableBotChatEvent>(null);
+    const [rentableBotTextSkillEvent, setRentableBotTextSkillEvent] = useState<RoomWidgetUpdateRentableBotTextSkillEvent>(null);
     const {
         avatarInfo = null,
         setAvatarInfo = null,
@@ -66,21 +72,21 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
     const updateAvatarClickControl = (updates: { suppressMenuUntil?: number; suppressRotateUntil?: number }) => {
         const globalScope = globalThis as any;
 
-        if (!globalScope.__nitroAvatarClickControl) {
-            globalScope.__nitroAvatarClickControl = {
+        if (!globalScope.__octaneAvatarClickControl) {
+            globalScope.__octaneAvatarClickControl = {
                 suppressMenuUntil: 0,
                 suppressRotateUntil: 0
             };
         }
 
-        Object.assign(globalScope.__nitroAvatarClickControl, updates);
+        Object.assign(globalScope.__octaneAvatarClickControl, updates);
     };
 
-    useNitroEvent<RoomEngineEvent>(RoomEngineEvent.NORMAL_MODE, (event) => {
+    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.NORMAL_MODE, (event) => {
         if (isGameMode) setGameMode(false);
     });
 
-    useNitroEvent<RoomEngineEvent>(RoomEngineEvent.GAME_MODE, (event) => {
+    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.GAME_MODE, (event) => {
         if (!isGameMode) setGameMode(true);
     });
 
@@ -94,7 +100,7 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
         return () => query.removeEventListener('change', updateTouchLayout);
     }, []);
 
-    useNitroEvent<RoomSessionDanceEvent>(RoomSessionDanceEvent.RSDE_DANCE, (event) => {
+    useOctaneEvent<RoomSessionDanceEvent>(RoomSessionDanceEvent.RSDE_DANCE, (event) => {
         if (event.roomIndex !== roomSession.ownRoomIndex) return;
 
         setIsDancing(event.danceId !== 0);
@@ -102,7 +108,13 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
 
     useUiEvent<RoomWidgetUpdateRentableBotChatEvent>(RoomWidgetUpdateRentableBotChatEvent.UPDATE_CHAT, (event) => setRentableBotChatEvent(event));
 
-    useNitroEvent<RoomEngineObjectEvent>(RoomEngineObjectEvent.REQUEST_MANIPULATION, (event) => {
+    useUiEvent<RoomWidgetUpdateRentableBotTextSkillEvent>(RoomWidgetUpdateRentableBotTextSkillEvent.UPDATE_TEXT_SKILL, (event) =>
+        setRentableBotTextSkillEvent(event)
+    );
+
+    useOctaneEvent<RoomEngineObjectEvent>(RoomEngineObjectEvent.REQUEST_PICKUP, (event) => pickupRoomObject(event.objectId, event.category));
+
+    useOctaneEvent<RoomEngineObjectEvent>(RoomEngineObjectEvent.REQUEST_MANIPULATION, (event) => {
         if (!(avatarInfo instanceof AvatarInfoFurni)) return;
         if (event.category !== avatarInfo.category || event.objectId !== avatarInfo.id) return;
 
@@ -158,13 +170,9 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
 
         if (avatarInfo) {
             switch (avatarInfo.type) {
-                case AvatarInfoFurni.FURNI: {
-                    const info = avatarInfo as AvatarInfoFurni;
-
-                    if (!isDecorating) return null;
-
-                    return <AvatarInfoWidgetFurniView avatarInfo={info} onClose={() => setAvatarInfo(null)} />;
-                }
+                // AIR has no bubble over furni: move, rotate and pick up stay in the infostand.
+                case AvatarInfoFurni.FURNI:
+                    return null;
                 case AvatarInfoUser.OWN_USER:
                 case AvatarInfoUser.PEER: {
                     const info = avatarInfo as AvatarInfoUser;
@@ -176,15 +184,17 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
                     if (info.isSpectatorMode) return null;
 
                     if (info.isOwnUser) {
-                        if (RoomEnterEffect.isRunning()) return null;
+                        if (RoomEnterEffect.isRunning()) return <AvatarInfoNewUserHelpView avatarInfo={info} onClose={() => setAvatarInfo(null)} />;
 
                         return (
-                            <AvatarInfoWidgetOwnAvatarView
-                                avatarInfo={info}
-                                isDancing={isDancing}
-                                setIsDecorating={setIsDecorating}
-                                onClose={() => setAvatarInfo(null)}
-                            />
+                            <NativeTextTree>
+                                <AvatarInfoWidgetOwnAvatarView
+                                    avatarInfo={info}
+                                    isDancing={isDancing}
+                                    setIsDecorating={setIsDecorating}
+                                    onClose={() => setAvatarInfo(null)}
+                                />
+                            </NativeTextTree>
                         );
                     }
 
@@ -216,9 +226,11 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
 
                     if (!mobileFurniDetailsOpen) {
                         return (
-                            <button className="nitro-mobile-furni-infostand-trigger" type="button" onClick={() => setMobileFurniDetailsOpen(true)}>
-                                <LayoutFurniIconImageView productType={info.productType} productClassId={info.spriteId} />
-                            </button>
+                            <NativeTextTree>
+                                <BaseButton className="octane-mobile-furni-infostand-trigger" type="button" onClick={() => setMobileFurniDetailsOpen(true)}>
+                                    <LayoutFurniIconImageView productType={info.productType} productClassId={info.spriteId} />
+                                </BaseButton>
+                            </NativeTextTree>
                         );
                     }
                 }
@@ -226,26 +238,6 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
                 return <InfoStandWidgetFurniView avatarInfo={avatarInfo as AvatarInfoFurni} onClose={() => setAvatarInfo(null)} />;
             case AvatarInfoUser.OWN_USER:
             case AvatarInfoUser.PEER:
-                if (isTouchLayout) {
-                    const info = avatarInfo as AvatarInfoUser;
-                    const figure = encodeURIComponent(info.figure || '');
-                    const avatarHeadUrl = `https://www.habbo.com/habbo-imaging/avatarimage?figure=${figure}&direction=2&head_direction=2&gesture=sml&size=m&headonly=1`;
-
-                    if (!mobileUserDetailsOpen) {
-                        return (
-                            <button
-                                className="nitro-mobile-furni-infostand-trigger nitro-mobile-user-infostand-trigger"
-                                type="button"
-                                onClick={() => setMobileUserDetailsOpen(true)}
-                            >
-                                <div className="nitro-mobile-user-infostand-avatar">
-                                    <img className="nitro-mobile-user-infostand-avatar-image" src={avatarHeadUrl} alt={info.name} draggable={false} />
-                                </div>
-                            </button>
-                        );
-                    }
-                }
-
                 return <InfoStandWidgetUserView avatarInfo={avatarInfo as AvatarInfoUser} setAvatarInfo={setAvatarInfo} onClose={() => setAvatarInfo(null)} />;
             case AvatarInfoUser.BOT:
                 return <InfoStandWidgetBotView avatarInfo={avatarInfo as AvatarInfoUser} onClose={() => setAvatarInfo(null)} />;
@@ -257,37 +249,49 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
     };
 
     return (
-        <>
-            {isDecorating && (
-                <AvatarInfoWidgetDecorateView
-                    roomIndex={roomSession.ownRoomIndex}
-                    setIsDecorating={setIsDecorating}
-                    userId={GetSessionDataManager().userId}
-                    userName={GetSessionDataManager().userName}
-                />
-            )}
-            {getMenuView()}
-            {avatarInfo && (
-                <Column alignItems="end" className="absolute right-[10px] bottom-[65px] pointer-events-none z-30 text-white">
-                    {getInfostandView()}
-                </Column>
-            )}
-            {nameBubbles.length > 0 &&
-                nameBubbles.map((name, index) => <AvatarInfoWidgetNameView key={index} nameInfo={name} onClose={() => removeNameBubble(index)} />)}
-            {productBubbles.length > 0 &&
-                productBubbles.map((item, index) => {
-                    return (
-                        <AvatarInfoUseProductView
-                            key={item.id}
-                            item={item}
-                            updateConfirmingProduct={updateConfirmingProduct}
-                            onClose={() => removeProductBubble(index)}
-                        />
-                    );
-                })}
-            {rentableBotChatEvent && <AvatarInfoRentableBotChatView chatEvent={rentableBotChatEvent} onClose={() => setRentableBotChatEvent(null)} />}
-            {confirmingProduct && <AvatarInfoUseProductConfirmView item={confirmingProduct} onClose={() => updateConfirmingProduct(null)} />}
-            <AvatarInfoPetTrainingPanelView />
-        </>
+        <NativeTextTree>
+            <>
+                {isDecorating && (
+                    <AvatarInfoWidgetDecorateView
+                        roomIndex={roomSession.ownRoomIndex}
+                        setIsDecorating={setIsDecorating}
+                        userId={GetSessionDataManager().userId}
+                        userName={GetSessionDataManager().userName}
+                    />
+                )}
+                {getMenuView()}
+                {avatarInfo && (
+                    <Column alignItems="end" className="octane-infostand-area absolute right-[10px] bottom-[65px] pointer-events-none z-30 text-white">
+                        {getInfostandView()}
+                    </Column>
+                )}
+                {nameBubbles.length > 0 &&
+                    nameBubbles.map((name) => (
+                        // Keyed by the avatar, not the position: removing one bubble made the next take over its faded instance.
+                        <AvatarInfoWidgetNameView key={name.roomIndex} nameInfo={name} onClose={() => removeNameBubble(nameBubbles.indexOf(name))} />
+                    ))}
+                {productBubbles.length > 0 &&
+                    productBubbles.map((item, index) => {
+                        return (
+                            <AvatarInfoUseProductView
+                                key={item.id}
+                                item={item}
+                                updateConfirmingProduct={updateConfirmingProduct}
+                                onClose={() => removeProductBubble(index)}
+                            />
+                        );
+                    })}
+                {rentableBotChatEvent && <AvatarInfoRentableBotChatView chatEvent={rentableBotChatEvent} onClose={() => setRentableBotChatEvent(null)} />}
+                {rentableBotTextSkillEvent && (
+                    <AvatarInfoRentableBotTextSkillView
+                        key={`${rentableBotTextSkillEvent.botId}:${rentableBotTextSkillEvent.skillType}:${rentableBotTextSkillEvent.text}`}
+                        skillEvent={rentableBotTextSkillEvent}
+                        onClose={() => setRentableBotTextSkillEvent(null)}
+                    />
+                )}
+                {confirmingProduct && <AvatarInfoUseProductConfirmView item={confirmingProduct} onClose={() => updateConfirmingProduct(null)} />}
+                <AvatarInfoPetTrainingPanelView />
+            </>
+        </NativeTextTree>
     );
 };

@@ -1,6 +1,6 @@
-import { UnseenItemsEvent, UnseenResetCategoryComposer, UnseenResetItemsComposer } from '@nitrots/nitro-renderer';
+import { UnseenItemsEvent, UnseenResetCategoryComposer, UnseenResetItemsComposer } from '@octane/renderer';
 import { useCallback, useMemo, useState } from 'react';
-import { useBetween } from 'use-between';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';
 
@@ -126,4 +126,6 @@ const useInventoryUnseenTrackerState = () => {
     return { getCount, getFullCount, resetCategory, resetItems, isUnseen, removeUnseen };
 };
 
-export const useInventoryUnseenTracker = () => useBetween(useInventoryUnseenTrackerState);
+export const useInventoryUnseenTracker = () => useSharedHook(useInventoryUnseenTrackerState);
+
+registerSharedHook(useInventoryUnseenTrackerState);

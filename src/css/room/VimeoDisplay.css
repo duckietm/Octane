@@ -1,0 +1,96 @@
+/* Vimeo viewer: the official vimeo_viewer_xml (451x356 frame). Coordinates are the XML's,
+   relative to the frame's content plane under the caption. */
+.octane-card-shell.octane-vimeo-viewer {
+    box-sizing: border-box;
+    width: 451px !important;
+    min-width: 451px !important;
+    max-width: 451px !important;
+    height: 356px !important;
+    min-height: 356px !important;
+    max-height: 356px !important;
+    resize: none !important;
+}
+
+.draggable-window:has(> .octane-vimeo-viewer) {
+    width: 451px !important;
+    height: 356px !important;
+}
+
+.octane-vimeo-viewer-content {
+    position: absolute;
+    top: 34px;
+    left: 0;
+    width: 451px;
+    height: 316px;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+}
+
+.octane-vimeo-viewer-background {
+    position: absolute;
+    top: 6px;
+    left: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 431px;
+    height: 302px;
+    overflow: hidden;
+    background: #000000;
+}
+
+.octane-vimeo-viewer-player {
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* no_videos_label: il_regular_white, 11 px white. */
+.octane-vimeo-viewer-empty {
+    color: #ffffff;
+    font-size: 11px;
+}
+
+.octane-vimeo-viewer-id {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    width: 421px;
+    height: 19px;
+    padding: 1px;
+    border-radius: 3px;
+    background: #ffffff;
+    box-shadow: inset 0 0 0 1px #9a9a9a;
+}
+
+.octane-vimeo-viewer-id-label {
+    flex: none;
+    width: 52px;
+    font-weight: 700;
+}
+
+.octane-vimeo-viewer-id-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 17px;
+    padding: 0 2px;
+    border: 0;
+    background: transparent;
+    color: #000000;
+    font: inherit;
+    outline: none;
+}
+
+.octane-vimeo-viewer-id-input:disabled {
+    color: #555555;
+}
+
+/* vimeo_viewer is a style 3 (Ubuntu) frame; our `Ubuntu` face is the condensed cut. */
+@layer base {
+    .octane-vimeo-viewer-content :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}

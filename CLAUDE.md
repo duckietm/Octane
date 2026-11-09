@@ -1,4 +1,4 @@
-# Claude Code — project memory for Nitro-V3
+# Claude Code — project memory for Octane
 
 This file is read automatically by Claude Code at session start. It captures
 the conventions and current state of this branch so a new session can hit
@@ -10,7 +10,7 @@ This client carries a long-running React 19.2 modernization: React 19
 idioms + supporting infrastructure (TanStack Query, Zustand, Vitest,
 React Compiler, error boundaries), god-hook splits, and logic-bug audits.
 
-**Working base is now `main`** (tracking `duckietm/Nitro-V3`). The earlier
+**Working base is now `main`** (tracking `duckietm/Octane`). The earlier
 `feat/react19-modernization` long-running branch was superseded — feature
 work now ships as small focused PRs against `duckietm:Dev`, staged through
 Dev then merged to main. (`feat/react19-modernization` still exists on the
@@ -23,7 +23,7 @@ fork as backup; do not force-push it.)
 to `src/hooks/rooms/widgets/useDoorState.ts`, 9 UI flags moved to a Zustand
 `navigatorUiStore`, search migrated to a query hook, and 5 sub-views wrapped
 in `WidgetErrorBoundary`. **Caveat**: duckietm patched `useNavigatorSearch`
-post-merge (`05d71dd1`) — see the `useNitroQuery` fragility note below.
+post-merge (`05d71dd1`) — see the `useOctaneQuery` fragility note below.
 
 When syncing upstream, expect conflicts in `App.tsx` / `bootstrap.ts` /
 `LoginView.tsx` on React 19 imports — always keep the modernized version.
@@ -45,7 +45,8 @@ read that before starting anything non-trivial.
 | Dev server | `yarn start` |
 | Production build | `yarn build` |
 | Serve production build | `yarn preview` (defaults to http://localhost:4173) |
-| Lint | `yarn eslint` |
+| Lint | `yarn lint` (Biome) |
+| Hook-order lint (CI gate) | `yarn lint:hooks` |
 | Type-check (TS 7 native, fast) | `yarn typecheck` |
 | Test (Vitest, once) | `yarn test` |
 | Test (watch) | `yarn test:watch` |
@@ -53,20 +54,26 @@ read that before starting anything non-trivial.
 ## Setup walkthrough
 
 1. **Clone the renderer SDK as a sibling of this repo.**
-   `vite.config.mjs` resolves the `@nitrots/*` aliases against
-   `../Nitro_Render_V3` (preferred) or `../renderer` (legacy). If neither
+   `vite.config.mjs` resolves the `@octane/*` aliases against
+   `../octane-renderer` (preferred) or `../renderer` (legacy). If neither
    exists, the dev server and build now fail fast with a message
    pointing here.
 
    ```sh
-   cd ..                            # parent of Nitro-V3
-   git clone <renderer-repo> Nitro_Render_V3
-   cd Nitro_Render_V3 && yarn install
+   cd ..                            # parent of octane
+   git clone <renderer-repo> octane-renderer
+   cd octane-renderer && yarn install
    ```
+
+   `pixi.js` resolves to the renderer's `node_modules`, so
+   `vite.config.mjs` also checks that the installed copy matches the
+   version the renderer's `package.json` pins and fails fast telling you
+   to rerun `yarn install` there. Re-run it whenever the renderer bumps
+   Pixi.
 
 2. **Install client deps.**
    ```sh
-   cd ../Nitro-V3
+   cd ../octane
    yarn install
    ```
 
@@ -80,8 +87,8 @@ read that before starting anything non-trivial.
    - Dev: `yarn start` (Vite, HMR, includes the renderer source).
    - Production preview: `yarn build && yarn preview`.
 
-The renderer SDK (`@nitrots/nitro-renderer`) is consumed via a filesystem
-link to a sibling working tree — `../Nitro_Render_V3` (preferred) or
+The renderer SDK (`@octane/renderer`) is consumed via a filesystem
+link to a sibling working tree — `../octane-renderer` (preferred) or
 `../renderer` (legacy). Without it, `yarn typecheck` reports TS2307 across
 the codebase — that's expected on a sandbox without the renderer, not a
 regression.
@@ -100,11 +107,39 @@ login/WebGL, so they're not usable for in-game verification.
 ## Stack snapshot
 
 - React 19.2.5, `react-dom` 19.2.5, `@types/react` 19.2.x.
-- TypeScript: TS 6 for build, **TS 7 native preview** (`@typescript/native-preview`,
-  invoked via `tsgo`) for the `typecheck` script.
+- TypeScript: TS 6 (`typescript`) for the tools that need its JavaScript API (`@typescript-eslint/parser`,
+  peer `<6.1`), and **TS 7** (the `typescript7` alias of `typescript@7`, run as
+  `node node_modules/typescript7/bin/tsc`) for the `typecheck` script.
+- UI primitives: Base UI (`@base-ui/react`, imported per subpath). Radix UI is no longer a
+  dependency. Use the `src/common/` wrappers instead of native controls or hand-rolled
+  ARIA widgets:
+  `Checkbox`, `Radio` (a controlled one-item `RadioGroup`, drop-in for
+  `<input type="radio" checked onChange>`), `Select` (drop-in for `<select>` + `<option>`,
+  change event keeps `target.value`), `NumberInput` (drop-in for `type="number"`, event keeps
+  `target.value` / `target.valueAsNumber`, role spinbutton, hover/focus up-down overlay), `Slider`, `FloatingPopover`,
+  `TabBar`, `InlineDialog` (dialog mounted inline; `modal="trap-focus"` for the catalog confirms), `CollapsibleSection`, `Tooltip`,
+  `ToggleButton` (every `aria-pressed` two-state button, incl. `InfiniteGrid.Item`), `ListSelect` (Base UI Select with the
+  caller's own trigger/classes, for custom drop menus), `SuggestInput` (text input + Autocomplete list, replaces `<datalist>`),
+  `Slider` with `orientation="vertical"`. `Hint` (in `common/Tooltip.tsx`) gives an icon-only control a tooltip without a
+  wrapper element: use it instead of a `title` attribute and keep an `aria-label`. A `div role="button"` is never right:
+  use `BaseButton` / `ToggleButton` (unless the region contains its own button).
+  Radios that share a `name` keep native group behaviour (arrow keys, one tab stop).
+  `<button>` is `BaseButton` (Base UI Button, still a native `<button>`; it sets `type="button"` unless a
+  `type` is passed, so form submit buttons need an explicit `type="submit"`). Deliberately native: text
+  `<input>` and `<textarea>` (Base UI `Input` is a plain input; there is no textarea primitive), and the
+  draggable-window dialogs (`UserSettingsView`, `LayoutMiniCameraView`: Dialog.Popup needs a Dialog.Portal,
+  which mounts one render late, but `DraggableWindow` looks up its handle and measures its size once at
+  mount, and the camera preview effect needs its canvas at mount).
+  Skin them through the `octane-*` classes (`.octane-checkbox[data-checked]`,
+  `.octane-radio`, `.octane-select-trigger`, `.octane-number-input`): CSS written for
+  `input[type=...]` / `select` must be mirrored onto those classes. Base UI roots render as
+  `<i>` so a window's generic `span` / `input` rules do not hit them. In tests, read
+  `aria-checked` / `aria-disabled` (not `.checked` / `.disabled`), pick options with
+  `src/test-utils/selectOption.ts`, and use `getByRole('checkbox'|'radio', { name })` rather
+  than `getByLabelText` for wrapped boxes (the label also matches the hidden input).
 - Vite 8 + `@vitejs/plugin-react` 6 + `babel-plugin-react-compiler` 1.0.
-- ESLint 10 + `typescript-eslint` 8 + `eslint-plugin-react-hooks@7` +
-  `eslint-plugin-react-compiler`.
+- Biome for lint and format; ESLint 10 + `@typescript-eslint/parser` 8 + `eslint-plugin-react-hooks@7`
+  only for the Rules of Hooks gate (`yarn lint:hooks`).
 - TanStack Query 5 (`@tanstack/react-query` + devtools).
 - Zustand 5.
 - Vitest 3 + jsdom + `@testing-library/react` + `@testing-library/jest-dom`.
@@ -129,7 +164,7 @@ src/api/                                 → cross-cutting helpers (LocalizeText
 src/common/                              → reusable UI primitives + error boundary
 src/state/                               → Zustand stores (cross-feature only)
 src/**/*.test.{ts,tsx}                   → Vitest suites co-located next to their subject (e.g. `Foo.ts` + `Foo.test.ts`)
-src/nitro-renderer.mock.ts               → hand-written renderer-SDK stub for tests (aliased over `@nitrots/nitro-renderer`)
+src/octane-renderer.mock.ts               → hand-written renderer-SDK stub for tests (aliased over `@octane/renderer`)
 src/test-setup.ts                        → Vitest setupFiles entry (jest-dom matchers, etc.)
 ```
 
@@ -149,15 +184,15 @@ canonical pattern.
 ### `useSessionSnapshots` (renderer snapshot pattern, React-side — OPT-IN)
 
 For state that lives on a renderer Manager and is invalidated through
-`NitroEventType.*_UPDATED`, the file
+`OctaneEventType.*_UPDATED`, the file
 `src/hooks/session/useSessionSnapshots.ts` exposes eight consumer hooks
 backed by `useSyncExternalStore`:
 
 ```ts
 const userData = useUserDataSnapshot();           // SessionData
 const room    = useActiveRoomSessionSnapshot();   // RoomSession
-const ignored = useIgnoredUsersSnapshot();        // ReadonlyArray<string>
-const isIgn   = useIsUserIgnored(name);           // boolean, memoized
+const ignored = useIgnoredUsersSnapshot();        // ReadonlyArray<number> (user ids)
+const isIgn   = useIsUserIgnored(userId);         // boolean, memoized
 const badges  = useGroupBadgesSnapshot();         // ReadonlyMap<number,string>
 const badge   = useGroupBadge(groupId);           // string, memoized
 const vols    = useVolumesSnapshot();             // sound volumes
@@ -175,56 +210,42 @@ respectsPetLeft from `useUserDataSnapshot`; `useChatWidget.ownUserId`
 reads from the snapshot directly; `AvatarInfoWidgetAvatarView` flips
 its Ignore/Unignore menu via `useIsUserIgnored`.
 
-The original rollback (`e142efd`) was caused by a hard structural
-constraint, NOT a stale renderer or React Compiler quirk: **snapshot
-hooks (`useSyncExternalStore`-based) must NOT be called inside a
-`useBetween(stateFn)` scope.** `use-between` 1.x swaps
-`ReactCurrentDispatcher.current` with its own proxy
-(`ownDispatcher` at
-`node_modules/use-between/release/index.esm.js:54-169`) that
-re-implements only useState / useReducer / useEffect /
-useLayoutEffect / useCallback / useMemo / useRef /
-useImperativeHandle. `useSyncExternalStore` isn't on the list, so
-React resolves `dispatcher.useSyncExternalStore` to `undefined` and
-crashes on first paint — that's the original "(intermediate value)()
-is undefined" at `ToolbarView.tsx:46`. Chrome reports the same as
-`dispatcher.useSyncExternalStore is not a function`.
-
-**Fix pattern, applied to `useSessionInfo`:** call the snapshot hook
-in the OUTER exported wrapper, after `useBetween`, so it runs in the
-real React dispatcher's scope. The inner state function (the one
-`useBetween` actually proxies) keeps only useState /
-useMessageEvent / plain actions.
+The legacy `use-between` dispatcher proxy could not execute
+`useSyncExternalStore` hooks and caused the original snapshot crash.
+The project now uses `useSharedHook`, whose source runs in a normal
+React host and publishes its snapshot through a Zustand vanilla store.
+Shared sources must be registered at module scope so the root registry
+can mount them before their first consumer renders.
 
 ```ts
 const useSessionInfoState = () => {
-    // ONLY use-between-safe hooks here.
     const [chatStyleId, setChatStyleId] = useState(0);
     // … useMessageEvent, actions …
     return { chatStyleId, /* actions */ };
 };
 
 export const useSessionInfo = () => {
-    const shared = useBetween(useSessionInfoState);
-    const userData = useUserDataSnapshot();        // outside useBetween → ok
+    const shared = useSharedHook(useSessionInfoState);
+    const userData = useUserDataSnapshot();
     return { ...shared, userFigure: userData.figure, /* etc */ };
 };
+
+registerSharedHook(useSessionInfoState);
 ```
 
 Regression guard: `src/hooks/session/useSessionSnapshots.test.tsx`
-asserts the negative case (snapshot inside useBetween crashes via
-ErrorBoundary) and the positive case (outside works). A CI gate
-(`yarn lint:hooks` →
+and `src/state/useSharedHook.test.tsx` cover snapshot and shared-source
+lifecycle behavior. A CI gate (`yarn lint:hooks` →
 `react-hooks/rules-of-hooks: error`) blocks any future commit that
 reintroduces hook-order issues.
 
-### `useNitroEventState` / `useMessageEventState`
+### `useOctaneEventState` / `useMessageEventState`
 
 For "derived state from a single event" replace the two-step
-`useState + useNitroEvent(e => setState(...))` with a single call:
+`useState + useOctaneEvent(e => setState(...))` with a single call:
 
 ```ts
-const foo = useNitroEventState(SomeEvent, e => e.payload, initial);
+const foo = useOctaneEventState(SomeEvent, e => e.payload, initial);
 const data = useMessageEventState(SomeParser, e => e.getParser()?.field ?? null, null);
 ```
 
@@ -232,13 +253,13 @@ The selector is held in a `useLayoutEffect`-refreshed ref so the listener
 stays registered across renders. Both hooks are exported from
 `src/hooks/events`.
 
-### `useNitroQuery`
+### `useOctaneQuery`
 
 For composer/parser request-response pairs:
 
 ```ts
-const { data } = useNitroQuery<SomeParser, SomeData>({
-    key: ['nitro', 'domain', 'request', ...args],
+const { data } = useOctaneQuery<SomeParser, SomeData>({
+    key: ['octane', 'domain', 'request', ...args],
     request: () => new SomeComposer(args),
     parser: SomeParser,
     select: e => e.getParser()?.data,
@@ -249,27 +270,27 @@ const { data } = useNitroQuery<SomeParser, SomeData>({
 
 Already wired up; `QueryClientProvider` is mounted in `src/index.tsx`.
 
-Companion `useNitroEventInvalidator(eventType, queryKey, accept?)` —
-import from `src/api/nitro-query`. Subscribes to the renderer event
+Companion `useOctaneEventInvalidator(eventType, queryKey, accept?)` —
+import from `src/api/octane-query`. Subscribes to the renderer event
 and invalidates the query slot on every push, so server-driven
 refresh paths work the same as the initial request/response (e.g.
 ClubGiftInfoEvent firing again after the user claims a gift).
 
-**⚠️ Fragility — do NOT use `useNitroQuery` for primary visible data.**
-The one-shot listener inside `awaitNitroResponse` (register listener →
+**⚠️ Fragility — do NOT use `useOctaneQuery` for primary visible data.**
+The one-shot listener inside `awaitOctaneResponse` (register listener →
 await one matching response → remove itself) is fragile against
 renderer-bundle quirks: for some parsers the event fires but the listener
 never matches, so the promise never resolves and `query.data` stays
 `undefined` forever — the UI shows the server's response arriving in logs
 but renders blank. This bit **ModTools Room/CFH chatlog** (reverted to
 `useMessageEvent + useEffect`) and then **Navigator search** (P2 shipped
-with `useNitroQuery`, duckietm reverted it in `05d71dd1` to the god-hook
-pattern). **Rule: reserve `useNitroQuery` for config / secondary fetches
+with `useOctaneQuery`, duckietm reverted it in `05d71dd1` to the god-hook
+pattern). **Rule: reserve `useOctaneQuery` for config / secondary fetches
 where a brief blank is tolerable. For anything that is the primary visible
 content of a panel, use `useMessageEvent + useState/useEffect`** — that's
 what the rest of the codebase does and it's robust.
 
-### Singleton-filter split for `useBetween`-based hooks
+### Singleton-filter split for Zustand-backed shared hooks
 
 When a hook backs many consumers but most only need either state OR
 actions (not both), split it without breaking the shared-singleton
@@ -285,32 +306,33 @@ const useFooStore = () => {
 
 // public: read-only filter
 export const useFooState = () => {
-    const { data } = useBetween(useFooStore);
+    const { data } = useSharedHook(useFooStore);
     return { data };
 };
 
 // public: imperative filter
 export const useFooActions = () => {
-    const { doThing } = useBetween(useFooStore);
+    const { doThing } = useSharedHook(useFooStore);
     return { doThing };
 };
 
 // deprecated shim — keeps the historical return shape
-export const useFoo = () => useBetween(useFooStore);
+export const useFoo = () => useSharedHook(useFooStore);
+
+registerSharedHook(useFooStore);
 ```
 
-`useBetween` ensures all three entry points hit the same store
-instance, so listeners/effects register once. Used by `useWiredTools`,
-`useTranslation`, `useNotification`, `useFriends`.
+`useSharedHook` ensures all three entry points read the same Zustand
+store, while the registered source owns listeners and effects once.
 
 ### Zustand stores
 
 For cross-feature UI state (avoid module-level `let`):
 
 ```ts
-import { createNitroStore } from '@/state/createNitroStore';
+import { createOctaneStore } from '@/state/createOctaneStore';
 
-export const useFooStore = createNitroStore<FooState>()((set) => ({
+export const useFooStore = createOctaneStore<FooState>()((set) => ({
     ...
 }));
 ```
@@ -326,7 +348,7 @@ Adoptions: `src/components/navigator/views/navigatorRoomCreatorStore.ts` (create
 ### `WidgetErrorBoundary`
 
 Wrap any in-room widget tree so a crash degrades gracefully (logs to
-NitroLogger, falls back to `null`). Already applied at `RoomWidgetsView`
+OctaneLogger, falls back to `null`). Already applied at `RoomWidgetsView`
 as an umbrella; per-widget wrapping is a follow-up.
 
 ```tsx
@@ -354,7 +376,7 @@ read `asset.url`, `login.endpoint`, … against an empty store before
 
 Game assets (`bundled/`, `c_images/`, `gamedata/`, `swf/...`) are NOT
 copied or symlinked under `public/`. They're served by a custom Vite
-plugin (`nitroAssetsServer` in `vite.config.mjs`) that mounts `sirv`
+plugin (`octaneAssetsServer` in `vite.config.mjs`) that mounts `sirv`
 on `/nitro-assets` and `/swf`, reading from
 `E:\Users\simol\Desktop\DEV\Nitro-Files\`. sirv is a connect-style
 middleware that bypasses chokidar entirely, so the ~177k asset files
@@ -365,25 +387,25 @@ into `configurePreviewServer` so `yarn preview` keeps working.
 
 | Adopted | Pilot sites |
 |---|---|
-| Renderer snapshot consumer hooks (`useSessionSnapshots`) | `useSessionInfo` (userFigure / userRespectRemaining / petRespectRemaining via `useUserDataSnapshot` in the outer wrapper, outside useBetween), `useChatWidget.ownUserId` (via `useUserDataSnapshot`), `AvatarInfoWidgetAvatarView` Ignore/Unignore (via `useIsUserIgnored`), `ModToolsView` selected-user presence dot (via `useRoomUserListSnapshot` — green when still in the active room, gray when they've left). The 8 hooks (userData / activeRoomSession / ignoredUsers / groupBadges / soundVolumes / roomUserList / isUserIgnored / groupBadge) keep their typeof-guard defensive fallbacks for stale-renderer paths. |
+| Renderer snapshot consumer hooks (`useSessionSnapshots`) | `useSessionInfo` (userFigure / userRespectRemaining / petRespectRemaining via `useUserDataSnapshot`), `useChatWidget.ownUserId` (via `useUserDataSnapshot`), `AvatarInfoWidgetAvatarView` Ignore/Unignore (via `useIsUserIgnored`), `ModToolsView` selected-user presence dot (via `useRoomUserListSnapshot` — green when still in the active room, gray when they've left). The 8 hooks (userData / activeRoomSession / ignoredUsers / groupBadges / soundVolumes / roomUserList / isUserIgnored / groupBadge) keep their typeof-guard defensive fallbacks for stale-renderer paths. |
 | Reactive event-driven local state (companion to snapshots — when there is no manager-snapshot to read from yet) | `AvatarInfoWidgetAvatarView` Give/Remove Rights — local `controllerLevel` initialized from `avatarInfo.targetRoomControllerLevel`, kept reactive via `useMessageEvent<FlatControllerAddedEvent>` / `FlatControllerRemovedEvent` filtered by `parser.data.userId === avatarInfo.webID`, plus optimistic bump on click so the moderate submenu flips immediately. Same shape as `useIsUserIgnored` but the source is the renderer event bus, not a snapshot getter — use this when adding a manager-side snapshot for the same data isn't justified. |
-| `useNitroEventState` + companions (Reducer, ExternalSnapshot) | `OfferView`, `useAvatarInfoWidget` (figure/badges/group reducer), `useInventoryFurni` (pure reducers + fragments useRef) |
-| `useNitroQuery` + `useNitroEventInvalidator` | `OfferView`, `CatalogLayoutRoomAdsView`, `ModToolsChatlogView`, `CfhChatlogView`, `useGiftConfiguration`, `useUserGroups`, `useClubOffers(windowId)`, `useSellablePetPalette(breed)`, `useMarketplaceConfiguration`, `useClubGifts` (with invalidator) |
+| `useOctaneEventState` + companions (Reducer, ExternalSnapshot) | `OfferView`, `useAvatarInfoWidget` (figure/badges/group reducer), `useInventoryFurni` (pure reducers + fragments useRef) |
+| `useOctaneQuery` + `useOctaneEventInvalidator` | `CatalogLayoutRoomAdsView`, `ModToolsChatlogView`, `CfhChatlogView`, `useGiftConfiguration`, `useUserGroups`, `useClubOffers(windowId)`, `useSellablePetPalette(breed)`, `useMarketplaceConfiguration`, `useClubGifts` (with invalidator) |
 | Zustand | `NavigatorRoomCreatorView` (`useRoomCreatorStore`), `WiredCreatorToolsView` (`useWiredCreatorToolsUiStore` — every panel-lifecycle-relevant flag, snapshot, selection, highlight, inline editor, picker chain hoisted; what's left in the component as `useState` is genuinely transient: keepSelected, globalClock, roomEnteredAt, selectedMonitorErrorType, selectedMonitorLogDetails) |
 | God-hook split (state + actions + shim) | `doorbell`, `poll`, `furni-chooser`, `user-chooser`, `friend-request`, `chat-input` |
-| God-hook split (`useBetween` singleton + state filter + actions filter + shim) | `wired-tools`, `translation`, `notification`, `friends`, `catalog` (three-way: `useCatalogData` / `useCatalogUiState` / `useCatalogActions` — all 48 consumers migrated, deprecated `useCatalog` shim removed) |
-| Navigator modernization (merged to main 2026-05-28, PRs #168/#169/#170) | 492-line `useNavigator` god-hook split into `useNavigatorStore` (internal `useBetween` closure) + flat filters `useNavigatorData` / `useNavigatorUiState` / `useNavigatorSearch`; door bell/password lifecycle extracted to `src/hooks/rooms/widgets/useDoorState.ts` (dual-subscribes `GetGuestRoomResultEvent` + `GenericErrorEvent` alongside the nav store, each filtering by branch/errorCode); 9 UI flags + `currentTabCode`/`currentFilter` in Zustand `navigatorUiStore` (`src/hooks/navigator/navigatorUiStore.ts`); all 5 Navigator sub-views wrapped in `WidgetErrorBoundary`; old shim deleted. **`useNavigatorSearch` was reverted by duckietm (`05d71dd1`) from `useNitroQuery` to `useMessageEvent + useEffect`** — see the useNitroQuery fragility note. Specs/plans under `docs/superpowers/`. |
+| God-hook split (Zustand-backed shared source + state filter + actions filter + shim) | `wired-tools`, `translation`, `notification`, `friends`, `catalog` (three-way: `useCatalogData` / `useCatalogUiState` / `useCatalogActions` — all 48 consumers migrated, deprecated `useCatalog` shim removed) |
+| Navigator modernization (merged to main 2026-05-28, PRs #168/#169/#170) | 492-line `useNavigator` god-hook split into a Zustand-backed shared `useNavigatorStore` + flat filters `useNavigatorData` / `useNavigatorUiState` / `useNavigatorSearch`; door bell/password lifecycle extracted to `src/hooks/rooms/widgets/useDoorState.ts` (dual-subscribes `GetGuestRoomResultEvent` + `GenericErrorEvent` alongside the nav store, each filtering by branch/errorCode); 9 UI flags + `currentTabCode`/`currentFilter` in Zustand `navigatorUiStore` (`src/hooks/navigator/navigatorUiStore.ts`); all 5 Navigator sub-views wrapped in `WidgetErrorBoundary`; old shim deleted. **`useNavigatorSearch` was reverted by duckietm (`05d71dd1`) from `useOctaneQuery` to `useMessageEvent + useEffect`** — see the useOctaneQuery fragility note. Specs/plans under `docs/superpowers/`. |
 | `WidgetErrorBoundary` | `RoomWidgetsView` umbrella + per-widget wrap on all 13 room widgets and all 20 furniture widgets (so a crash in one widget no longer takes down its siblings) |
-| Vitest | 207/207 cases — pure helpers (incl. 4 new on `getPetPackageNameError`) + 2 Zustand store suites (`navigatorRoomCreatorStore`, `wiredCreatorToolsUiStore` with 45 cases including the picker-chain hoists) + 2 component-/hook-level pilots (WidgetErrorBoundary, useDoorbellState) on top of the renderer-SDK mock at `src/nitro-renderer.mock.ts`, 34 cases on the catalog pure helpers, 4 contract cases on the catalog filters. **Tests are co-located** under `src/`, alongside their subject. |
+| Vitest | 207/207 cases — pure helpers (incl. 4 new on `getPetPackageNameError`) + 2 Zustand store suites (`navigatorRoomCreatorStore`, `wiredCreatorToolsUiStore` with 45 cases including the picker-chain hoists) + 2 component-/hook-level pilots (WidgetErrorBoundary, useDoorbellState) on top of the renderer-SDK mock at `src/octane-renderer.mock.ts`, 34 cases on the catalog pure helpers, 4 contract cases on the catalog filters. **Tests are co-located** under `src/`, alongside their subject. |
 | Form Actions | Login / Register / Forgot (LoginView.tsx) |
 | Upstream `origin/Dev` absorbed (merge `779a98c`) | Through `b2318b9` (2026-05-18): JSON5, user-settings reset password/email/username, wear-badge popup fix, login screen fix, About, offer-selection refactor |
 
 | Not yet | Notes |
 |---|---|
-| Split `useChatWidget` / `useAvatarInfoWidget` (data/actions) | Both state-driven via events with no clean imperative actions to extract — split still skip-motivated, but `useAvatarInfoWidget` got a typed `__nitroAvatarClickControl` accessor + module-scope DEBOUNCE const in 2026-05-18 (commit `05ff7df`). `useChatWidget.ownUserId` reactive migration re-applied 2026-05-19 in `d28819d` via `useUserDataSnapshot` (direct hook call — useChatWidget isn't wrapped in useBetween so the snapshot-outside-useBetween constraint doesn't apply). |
+| Split `useChatWidget` / `useAvatarInfoWidget` (data/actions) | Both state-driven via events with no clean imperative actions to extract — split still skip-motivated, but `useAvatarInfoWidget` got a typed `__octaneAvatarClickControl` accessor + module-scope DEBOUNCE const in 2026-05-18 (commit `05ff7df`). `useChatWidget.ownUserId` reactive migration re-applied 2026-05-19 in `d28819d` via `useUserDataSnapshot`. |
 | Split `usePetPackageWidget` / `useWordQuizWidget` / `useChatCommandSelector` (data/actions) | Data/actions split remains a bad fit, but all three got real modernization in 2026-05-18 instead: usePetPackageWidget → useReducer + extracted `getPetPackageNameError` pure helper + 4 tests; useWordQuizWidget → fixed stale-closure bug in `setUserAnswers` updater + `useRef` for the timeout handle; useChatCommandSelector → module-level `let` cache replaced with a Zustand store. |
-| Migrate more consumers to renderer snapshot hooks | **Unblocked.** Three pilot consumers shipped 2026-05-19 (`d28819d`), pattern documented above. Next candidates: any code reading from `GetSessionDataManager().userId / userName / clubLevel / securityLevel`, `GetRoomSessionManager().getActiveSession()`, or `GetSoundManager().<volume>` synchronously — those don't re-render today when the value changes. Rule: snapshot read MUST be outside any `useBetween` scope (CI gate `yarn lint:hooks` catches violations; regression test at `src/hooks/session/useSessionSnapshots.test.tsx`). |
-| Widen the component / hook test coverage | Mock layer is in place (`src/nitro-renderer.mock.ts`) and 3+ hook/component pilots pass. Good follow-up targets: `LoginView` Form Actions happy/error paths, `OfferView` with `useNitroQuery`. (Acceptable only as a side-effect of a real change — coverage growth on its own is deprioritized per session feedback.) |
+| Migrate more consumers to renderer snapshot hooks | **Unblocked.** Three pilot consumers shipped 2026-05-19 (`d28819d`), pattern documented above. Next candidates: any code reading from `GetSessionDataManager().userId / userName / clubLevel / securityLevel`, `GetRoomSessionManager().getActiveSession()`, or `GetSoundManager().<volume>` synchronously — those don't re-render today when the value changes. CI gate `yarn lint:hooks` and `src/hooks/session/useSessionSnapshots.test.tsx` guard hook correctness. |
+| Widen the component / hook test coverage | Mock layer is in place (`src/octane-renderer.mock.ts`) and 3+ hook/component pilots pass. Good follow-up targets: `LoginView` Form Actions happy/error paths, `OfferView` with `useOctaneQuery`. (Acceptable only as a side-effect of a real change — coverage growth on its own is deprioritized per session feedback.) |
 
 ## Known open logic bugs
 
@@ -416,10 +438,10 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
 - Test runner config: `vitest.config.mts` (separate from `vite.config.mjs`)
 - Test setup: `src/test-setup.ts`
 - Test convention: co-located under `src/` next to the subject (`src/<path>/Foo.ts` ↔ `src/<path>/Foo.test.ts`). No separate `tests/` tree.
-- React Query adapter: `src/api/nitro-query/createNitroQuery.ts`
-- Zustand factory: `src/state/createNitroStore.ts`
+- React Query adapter: `src/api/octane-query/createOctaneQuery.ts`
+- Zustand factory: `src/state/createOctaneStore.ts`
 - Error boundary: `src/common/error-boundary/WidgetErrorBoundary.tsx`
-- Event hooks (`useNitroEvent`, `useMessageEvent`, `useNitroEventState`,
+- Event hooks (`useOctaneEvent`, `useMessageEvent`, `useOctaneEventState`,
   `useMessageEventState`): `src/hooks/events/`
 - Wired-tools split (types/constants/helpers + 3 tab views):
   `src/components/wired-tools/`
@@ -427,7 +449,7 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
   `src/components/user-settings/UserAccountSettingsView.tsx`
 - Access-token persistence helper (used by login + remember + rotate):
   `src/api/auth/accessToken.ts` (`persistAccessTokenFromPayload`)
-- Asset middleware: `nitroAssetsServer()` in `vite.config.mjs`
+- Asset middleware: `octaneAssetsServer()` in `vite.config.mjs`
 - Configuration pre-init: `src/bootstrap.ts` (`await GetConfiguration().init()`
   before `import('./index')`)
 - Catalog pure helpers: `src/hooks/catalog/useCatalog.helpers.ts`
@@ -443,9 +465,74 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
   `useNavigatorSearch.ts` (filters), `navigatorUiStore.ts` (Zustand UI
   flags + `setTab`/`setFilter`). Door lifecycle: `src/hooks/rooms/widgets/useDoorState.ts`.
   Specs/plans: `docs/superpowers/specs/2026-05-2*-navigator-*.md`
-- Renderer-SDK mock for Vitest: `src/nitro-renderer.mock.ts`
-  (aliased over `@nitrots/nitro-renderer` via `vitest.config.mts`).
-  Hosts the explicit `NitroLogger` mock, the `mockEventDispatcher` /
+- Avatar editor thumbnails: `src/api/avatar/avatarThumbnailUrls.ts` (blob/object-URL cache, canvas shaping)
+  behind `AvatarEditorThumbnailsHelper`. Part thumbnails go render target -> canvas -> one PNG encode;
+  they are never turned into a `data:` URL in between. The LRU budgets real image bytes (48 MB, was
+  200 MB of base64 characters) and revokes evicted URLs after a grace period, so a render already in
+  flight keeps its image. A browser without `toBlob`/`createObjectURL` falls back to a data URL.
+- Floorplan editor preview panel defaults to the flat `FloorplanPreviewSVG`; the 2D/3D switch in its head mounts
+  the WebGL view on demand and remembers the choice in localStorage (`octane.floorplan.preview3d`), so legacy
+  devices never pay for a second GL context unless asked.
+- Floorplan editor 3D preview (PixiJS 8, own WebGL context): `src/components/floorplan-editor/views/Floorplan3DView.tsx`
+  (React panel + orbit controls) over `src/components/floorplan-editor/scene3d/`
+  (`FloorplanScene.ts` instanced heightmap mesh + GLSL, `heightmap.ts` tile columns
+  and camera, `mat4.ts`). PixiJS is `await import`ed so the editor bundle and jsdom
+  never load it unless the panel is open; Vitest aliases `pixi.js` to `src/pixi.mock.ts`.
+- Floorplan editor look (official-client "Éditeur Sol" layout): scoped `.octane-floorplan-window`
+  styles in `src/css/floorplan-editor/FloorplanEditorView.css` (imported from `src/index.tsx`);
+  labels fall back to English through `src/components/floorplan-editor/state/localize.ts`
+  when the external texts lack a key.
+- Wired creator tools paged windows: `src/components/wired-tools/WiredRoomLogsView.tsx` (room log,
+  `WiredRoomLogsPageComposer` / `WiredLogPageEvent`) and `WiredVariableOwnersView.tsx` (holders of a
+  variable, `WiredVariableHoldersPageComposer` / `WiredVariableHoldersPageEvent`), both on
+  `WiredPagedTable.tsx` + `WiredPaging.helpers.ts` (pure paging and rate limiter) and
+  `src/hooks/wired-tools/useWiredPageRequests.ts`. The "Manage" button of the Variables tab opens the
+  owners window; its "Manage" links feed the existing holder detail panel in `WiredCreatorToolsView.tsx`.
+- Wired settings tab (`src/components/wired-tools/WiredToolsSettingsTabView.tsx`): permissions and timezone go
+  through the official `WiredMenuPermissionsSaveComposer`, reload/rollback through `WiredRoomStateActionComposer`
+  (store actions `saveRoomTimezone`, `reloadRoomWired`, `rollbackRoomWired`). Client config: `wired.timezones`
+  (comma list; empty = browser list), `wired.selfdonation.enabled` shows the sandbox donation button that opens
+  `WiredSelfDonationView.tsx` (`SelfDonationMessageComposer`; the server gates on `hotel.selfdonation.enabled` + `acc_debug`).
+- Wired variable fx (layout codes 130-135, `wf_xtra_varfx_*`, with `wf_xtra_var_fx_*` as aliases): one editor
+  `src/components/wired/views/extras/WiredExtraVariableFxView.tsx` (prop `category`) on the pure tables and
+  param/token codecs in `src/api/wired/WiredVariableFx.ts`, which mirror the server's `WiredVariableFxStyles` /
+  `WiredExtraVariableFx`. The four server packets (`WiredVariableFxConfigs/ConfigsRemoved/Status/StatusRemoved`)
+  feed `src/hooks/wired/wiredVariableFxStore.ts` through `useWiredVariableFxEvents`; `WiredVariableFxView`
+  (`src/components/room/widgets/wired-fx/`, mounted in `RoomView`, renders nothing) drives
+  `useWiredVariableFxRoomDrawing` / `wiredVariableFxRoomDrawing.ts`, which decide visibility and hand each holder its
+  stack through `IRoomEngine.setRoomObjectVariableFx`. The renderer draws it as AIR does, a sprite in the avatar / pet /
+  furni visualization (`Octane-Renderer/packages/room/src/object/visualization/variablefx/`, 150 ms fade in, 350 ms
+  out, the habbicon as the stack's layer-100 entry); each value is painted by the renderer's port of AIR's painters
+  (`VariableFxVisualizer` / `VariableFxRendererRegistry`, `renderers/*`, AIR's `variablefx_*` PNGs in
+  `Octane-Renderer/packages/assets/src/assets/variablefx/images`, loaded as `local://variablefx`), wrapped per value by
+  `src/api/wired/WiredVariableFxVisualizer.ts`. Colour / width ids are AIR's (`WIRED_FX_COLOR`, `WIRED_FX_WIDTH`,
+  per-style options in `wiredVariableFxAppearance`). `src/css/room/WiredVariableFx.css` only holds the editor rule. Only `custom:<id>`
+  variable tokens are offered for overrides/audience, since that is what the server resolves.
+- Wired setup quick menu (`src/components/wired/views/WiredBaseView.tsx`, the ≡ button): copy / paste /
+  paste-into / clear picks / reset / save-without-closing, backed by `useWired` (`clipboardEntry`,
+  `copyWiredToClipboard`, `pasteWiredFromClipboard`, `resetWiredToDefault`, `clearWiredPicks`,
+  `saveWiredAndKeepOpen`) and the pure helpers in `src/api/wired/WiredClipboard.ts`. Paste and reset work by
+  handing the views a cloned definition object (prototype kept, data fields replaced), so every view re-reads
+  it through its `[trigger]` effect; the clipboard is one entry per holder+code for the session.
+- AIR text (pixel-exact labels): `src/common/native-text/` holds the port of AIR's glyph rasteriser (`NativeText`).
+  `NativeLabel` draws a text in the font its computed CSS asks for (`resolveCssNativeFont`: every Ubuntu face becomes AIR's
+  Ubuntu, Volter stays Volter, unsupported faces / letter spacing stay browser text), keeping the CSS line height and wrap width;
+  `nativeTextChildren` turns text-only children into one label and is wired into `Text`, `BaseButton` (so `Button` too), window
+  titles (`OctaneCardHeaderView`) and tabs (`OctaneCardTabsItemView`). `CssNativeText` is the fixed-style variant used by the
+  catalogue. Config `ui.native.text.enabled` (default true) turns it off; jsdom never draws it (tests see plain text, enable it with
+  `forceNativeTextEnabled`). `NativeTextTree` wraps a view's returned JSX and labels every text-only element in it (inputs, selects,
+  code, running text with inline markup and component-owned text excluded); the login views, navigator, inventory,
+  every other view under `src/components` use it, except the room chat bubbles and the windows that already draw NativeText (`GroupNativeLayout`, mod-tools native
+  layouts, the catalogue's CssNativeText). The SKIP list keeps form fields, code and SVG text out; text beside elements without text of their own (a checkbox, radio,
+  icon) gets labels too. `Select` / `ListSelect` draw the value, options (keyed by highlighted / selected state) and group labels
+  natively; the select sizer measures in the regular Ubuntu cut (`.octane-select-sizer.is-native`). Chat bubbles use `ChatNativeContent`
+  (`room/widgets/chat`): the name and message laid out together by `layoutNativeRuns` (one AIR TextField, wrapped at the bubble's
+  max-width), styles read from the bubble CSS; markup (links, mentions, colour tags), emoji, name prefixes/icons and translations
+  stay browser text. `NativeTextRasterCache` reuses finished rasters (16 MB LRU). Rasters (Ubuntu and Volter) are drawn at the device pixel ratio itself (`getNativeTextRasterScale`; on a fractional ratio such as Windows 125 % at the nearest whole font size, halves down: Volter 9 px as 11 px) and shown `pixelated`, so they are never resampled; only the letter-spaced canvas path keeps the next whole scale. A one-line label in a `text-overflow: ellipsis` box that its drawn raster overflows is shortened with "..." (`fitNativeText`); boxes sized to their text are left alone. Never wrap a `.map` callback's keyed element (the key
+  must stay on the returned element): the outer view's tree already covers it.
+- Renderer-SDK mock for Vitest: `src/octane-renderer.mock.ts`
+  (aliased over `@octane/renderer` via `vitest.config.mts`).
+  Hosts the explicit `OctaneLogger` mock, the `mockEventDispatcher` /
   `clearMockEventDispatcher` helpers used by hook tests, the
   `RoomSessionDoorbellEvent` stub, and a long list of placeholder
   classes/enums kept around just so the `src/api/*` barrel cascade
@@ -456,7 +543,7 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
 
 Furni name/description are furnidata-driven (`FurnitureData` by classname) — the
 client does NOT get furni display names from the server. The 3 furni surfaces
-refresh live on the window event `nitro-localization-updated`: catalog
+refresh live on the window event `octane-localization-updated`: catalog
 (`useCatalog.ts`), inventory (`useInventoryFurni.ts`), infostand
 (`useAvatarInfoWidget.ts`). The renderer's `FurnitureDataReload` packet (header
 10047) dispatches that event on server-pushed furnidata changes — no client code

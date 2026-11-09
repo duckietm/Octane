@@ -11,11 +11,12 @@ import {
     GetRoomEngine,
     RoomEngineTriggerWidgetEvent,
     RoomWidgetEnum
-} from '@nitrots/nitro-renderer';
-import { useEffect, useState } from 'react';
+} from '@octane/renderer';
+import { useEffect, useRef, useState } from 'react';
 import { ICraftingIngredient, ICraftingRecipe, LocalizeText, SendMessageComposer } from '../../../../api';
-import { useMessageEvent, useNitroEvent } from '../../../events';
+import { useMessageEvent, useOctaneEvent } from '../../../events';
 import { useInventoryFurni } from '../../../inventory';
+import { useFurniRemovedEvent } from '../../engine';
 import { useNotification } from './../../../notification';
 
 const useFurnitureCraftingWidgetState = () => {
@@ -26,6 +27,7 @@ const useFurnitureCraftingWidgetState = () => {
     const [ingredientNames, setIngredientNames] = useState<string[]>(null);
     const [cachedIngredients, setCachedIngredients] = useState<Map<string, CraftingRecipeIngredientParser[]>>(new Map());
     const [isCrafting, setIsCrafting] = useState(false);
+    const requestedRecipesRef = useRef<string[]>([]);
     const { groupItems = [], getItemsByType = null, activate = null, deactivate = null } = useInventoryFurni();
     const { simpleAlert = null } = useNotification();
 
@@ -36,12 +38,20 @@ const useFurnitureCraftingWidgetState = () => {
         setSelectedRecipe(null);
         setIngredients([]);
         setCachedIngredients(new Map());
+        // The request queue stays: an answer still on its way after a close and reopen would otherwise be filed
+        // under the next recipe asked for, whose own answer was then dropped. Answers come back in order.
+        setIsCrafting(false);
     };
 
     const onClose = () => {
         setObjectId(-1);
         resetData();
     };
+
+    // The crafting table picked up or deleted while open: nothing is left to craft on.
+    useFurniRemovedEvent(objectId !== -1, (event) => {
+        if (event.id === objectId) onClose();
+    });
 
     const craft = () => {
         setIsCrafting(true);
@@ -54,10 +64,13 @@ const useFurnitureCraftingWidgetState = () => {
 
         const cache = cachedIngredients.get(recipe.name);
 
-        if (!cache) SendMessageComposer(new GetCraftingRecipeComposer(recipe.name));
+        if (!cache) {
+            requestedRecipesRef.current.push(recipe.name);
+            SendMessageComposer(new GetCraftingRecipeComposer(recipe.name));
+        }
     };
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.OPEN_WIDGET, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.OPEN_WIDGET, (event) => {
         if (event.widget !== RoomWidgetEnum.CRAFTING) return;
 
         setObjectId(event.objectId);
@@ -97,11 +110,17 @@ const useFurnitureCraftingWidgetState = () => {
 
     useMessageEvent<CraftingRecipeEvent>(CraftingRecipeEvent, (event) => {
         const parser = event.getParser();
+        // The answer carries no recipe name; the server answers in order, so it belongs to the oldest request. It
+        // was filed under the recipe selected now: two quick clicks put one recipe's ingredients under the other,
+        // and with nothing selected the widget threw.
+        const recipeName = requestedRecipesRef.current.shift();
+
+        if (!recipeName) return;
 
         setCachedIngredients((prevValue) => {
             const newValue = new Map(prevValue);
 
-            newValue.set(selectedRecipe.name, parser.ingredients);
+            newValue.set(recipeName, parser.ingredients);
 
             return newValue;
         });

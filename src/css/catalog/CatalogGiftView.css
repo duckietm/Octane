@@ -1,0 +1,660 @@
+.octane-card-shell.octane-catalog-gift {
+    --octane-gift-button: url("../../assets/images/catalog/air/gift/button-default.png");
+    --octane-gift-button-hover: url("../../assets/images/catalog/air/gift/button-hover.png");
+    --octane-gift-button-pressed: url("../../assets/images/catalog/air/gift/button-pressed.png");
+    --octane-gift-button-disabled: url("../../assets/images/catalog/air/gift/button-disabled.png");
+    --octane-gift-panel-border: url("../../assets/images/catalog/air/gift/border-slot-e9e9e9.png");
+    --octane-gift-image-border: url("../../assets/images/catalog/air/gift/image-border-f1f1f1.png");
+    --octane-gift-name-border: var(--habbo-skin-border-white);
+    --octane-gift-palette-mask: url("../../assets/images/catalog/air/gift/palette-color.png");
+
+    box-sizing: border-box;
+    width: 342px !important;
+    min-width: 342px !important;
+    max-width: 342px !important;
+    height: 482px !important;
+    min-height: 482px !important;
+    max-height: 482px !important;
+    resize: none !important;
+}
+
+.draggable-window:has(> .octane-catalog-gift) {
+    width: 342px !important;
+    min-width: 342px !important;
+    max-width: 342px !important;
+    height: 482px !important;
+    min-height: 482px !important;
+    max-height: 482px !important;
+}
+
+.octane-catalog-gift,
+.octane-catalog-gift * {
+    box-sizing: border-box;
+}
+
+.octane-card-shell.octane-catalog-gift .octane-catalog-gift-content.container-fluid {
+    position: absolute !important;
+    /* The shared frame owns a 1px border. These offsets resolve to the
+       AIR frame's outer-local x=6/y=35 coordinate plane. */
+    top: 34px !important;
+    left: 5px !important;
+    z-index: 1;
+    display: block !important;
+    width: 330px !important;
+    min-width: 330px !important;
+    max-width: 330px !important;
+    height: 440px !important;
+    min-height: 440px !important;
+    max-height: 440px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #e9e9e9 !important;
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.octane-catalog-gift-content::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border: 3px solid transparent;
+    border-image-source: var(--octane-gift-panel-border);
+    border-image-slice: 3 fill;
+    border-image-width: 3px;
+    border-image-repeat: stretch;
+    pointer-events: none;
+}
+
+.octane-catalog-gift-content > * {
+    z-index: 1;
+}
+
+.octane-catalog-gift-name-border {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    width: 284px;
+    height: 27px;
+}
+
+.octane-catalog-gift-name-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 6px solid transparent;
+    border-image-source: var(--octane-gift-name-border);
+    border-image-slice: 6 fill;
+    border-image-width: 6px;
+    border-image-repeat: stretch;
+    pointer-events: none;
+}
+
+.octane-catalog-gift-name-input {
+    position: absolute;
+    top: 3px;
+    left: 8px;
+    width: 266px;
+    height: 21px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #000000 !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    font-size: 13px !important;
+    font-style: italic !important;
+    font-weight: 400 !important;
+    line-height: 21px !important;
+}
+
+.octane-catalog-gift-name-input::placeholder,
+.octane-catalog-gift-message::placeholder {
+    color: #777777;
+    opacity: 1;
+}
+
+.octane-catalog-gift-pen {
+    position: absolute;
+    top: 15px;
+    left: 301px;
+    width: 17px;
+    height: 18px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* Base UI mounts the list through a positioner; pin it where the skin always drew the list. */
+.octane-catalog-gift-suggestions-host {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.octane-catalog-gift-suggestions-positioner {
+    position: absolute !important;
+    top: 39px !important;
+    left: 18px !important;
+    z-index: 20 !important;
+    transform: none !important;
+    pointer-events: auto;
+}
+
+.octane-catalog-gift-suggestions {
+    position: relative;
+    width: 264px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #999999;
+    overflow: hidden;
+}
+
+.octane-catalog-gift-suggestions::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 1px;
+    width: 263px;
+    height: 100%;
+    background: #ffffff;
+}
+
+.octane-catalog-gift-suggestions > div {
+    position: relative;
+    margin-left: 2px;
+    width: 262px;
+    height: 20px;
+    padding: 0;
+    overflow: hidden;
+    color: #000000;
+    background: #eeeeee;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 20px;
+    text-overflow: clip;
+    white-space: nowrap;
+    cursor: default;
+}
+
+.octane-catalog-gift-suggestions > div:nth-child(even) {
+    background: #ffffff;
+}
+
+.octane-catalog-gift-suggestions > div.is-highlighted,
+.octane-catalog-gift-suggestions > div[data-highlighted] {
+    background: #ccd1da;
+}
+
+.octane-catalog-gift-card {
+    position: absolute;
+    top: 56px;
+    left: 10px;
+    width: 306px;
+    height: 149px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-catalog-gift-avatar {
+    position: absolute;
+    top: 51px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 149px;
+    overflow: hidden;
+}
+
+.octane-catalog-gift-avatar .octane-catalog-gift-avatar-image {
+    position: static !important;
+    inset: auto !important;
+    flex: 0 0 auto;
+    width: auto !important;
+    height: auto !important;
+}
+
+.octane-catalog-gift-avatar .octane-catalog-gift-avatar-image img {
+    display: block;
+    width: auto;
+    max-width: none;
+    height: auto;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+
+.octane-catalog-gift-incognito {
+    position: static;
+    flex: 0 0 auto;
+    width: 37px;
+    height: 48px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-catalog-gift-message {
+    position: absolute;
+    top: 77px;
+    left: 95px;
+    width: 190px;
+    height: 100px;
+    margin: 0;
+    padding: 0;
+    resize: none;
+    overflow: hidden;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #000000 !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    font-size: 12px !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    line-height: 16px !important;
+    white-space: pre-wrap;
+}
+
+.octane-catalog-gift-message.is-concealed {
+    visibility: hidden;
+}
+
+.octane-catalog-gift-message::placeholder {
+    font-size: 13px !important;
+    font-style: italic !important;
+    line-height: 16px !important;
+}
+
+.octane-catalog-gift-signature {
+    position: absolute;
+    top: 169px;
+    left: 95px;
+    width: 190px;
+    min-height: 15px;
+    overflow: hidden;
+    font-size: 12px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 15px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.octane-catalog-gift-show-face {
+    appearance: none;
+    position: absolute;
+    top: 220px;
+    left: 46px;
+    width: 16px;
+    height: 15px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    background: url("../../assets/images/catalog/air/gift/checkbox-default.png") no-repeat 0 0;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-catalog-gift-show-face:checked,
+.octane-catalog-gift-show-face[data-checked] {
+    background-image: url("../../assets/images/catalog/air/gift/checkbox-selected.png");
+}
+
+.octane-catalog-gift-show-face-label {
+    position: absolute;
+    top: 218px;
+    left: 66px;
+    width: 260px;
+    height: 20px;
+    margin: 0;
+    overflow: hidden;
+    color: #000000 !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 20px !important;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.octane-catalog-gift-box-picker {
+    position: absolute;
+    top: 253px;
+    left: 10px;
+    width: 306px;
+    height: 83px;
+}
+
+.octane-catalog-gift-product-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 82px;
+    height: 82px;
+}
+
+.octane-catalog-gift-product-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 6px solid transparent;
+    border-image-source: var(--octane-gift-image-border);
+    border-image-slice: 6 fill;
+    border-image-width: 6px;
+    border-image-repeat: stretch;
+    pointer-events: none;
+}
+
+.octane-catalog-gift-product-image {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    overflow: hidden;
+}
+
+.octane-catalog-gift-product-image .furni-image {
+    flex: 0 0 auto;
+    margin: 0;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-catalog-gift-arrow {
+    appearance: none;
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    background: transparent;
+    box-shadow: none;
+    cursor: pointer;
+    font-size: 12px !important;
+}
+
+.octane-catalog-gift-arrow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 3px solid transparent;
+    border-image-source: var(--octane-gift-button);
+    border-image-slice: 3 fill;
+    border-image-width: 3px;
+    border-image-repeat: stretch;
+}
+
+.octane-catalog-gift-arrow:hover::before {
+    border-image-source: var(--octane-gift-button-hover);
+}
+
+.octane-catalog-gift-arrow:active::before {
+    border-image-source: var(--octane-gift-button-pressed);
+}
+
+.octane-catalog-gift-arrow:disabled::before {
+    border-image-source: var(--octane-gift-button-disabled);
+}
+
+.octane-catalog-gift-arrow.is-disabled {
+    opacity: 0.5 !important;
+    pointer-events: none;
+}
+
+.octane-catalog-gift-arrow img {
+    position: absolute;
+    z-index: 1;
+    width: 10px;
+    height: 9px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.octane-catalog-gift-box-prev {
+    top: 9px;
+    left: 92px;
+}
+
+.octane-catalog-gift-box-next {
+    top: 9px;
+    left: 121px;
+}
+
+.octane-catalog-gift-ribbon-prev {
+    top: 47px;
+    left: 92px;
+}
+
+.octane-catalog-gift-ribbon-next {
+    top: 47px;
+    left: 121px;
+}
+
+.octane-catalog-gift-box-prev img,
+.octane-catalog-gift-ribbon-prev img {
+    top: 8px;
+    left: 7px;
+}
+
+.octane-catalog-gift-box-next img {
+    top: 8px;
+    left: 8px;
+}
+
+.octane-catalog-gift-ribbon-next img {
+    top: 8px;
+    left: 9px;
+}
+
+.octane-catalog-gift-box-name,
+.octane-catalog-gift-ribbon-name,
+.octane-catalog-gift-color-title {
+    overflow: hidden;
+    color: #000000 !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 20px !important;
+    white-space: nowrap;
+}
+
+.octane-catalog-gift-box-name {
+    position: absolute;
+    top: 5px;
+    left: 154px;
+    width: 152px;
+    height: 20px;
+}
+
+.octane-catalog-gift-price {
+    position: absolute;
+    top: 20px;
+    left: 154px;
+    display: flex;
+    align-items: flex-start;
+    width: 155px;
+    height: 20px;
+    overflow: hidden;
+    color: #000000 !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 17px !important;
+    white-space: nowrap;
+}
+
+.octane-catalog-gift-price span {
+    flex: 0 0 auto;
+}
+
+.octane-catalog-gift-price img {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    margin-top: 1px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-catalog-gift-ribbon-name {
+    position: absolute;
+    top: 50px;
+    left: 154px;
+    width: 152px;
+    height: 22px;
+}
+
+.octane-catalog-gift-ribbon-name.is-disabled,
+.octane-catalog-gift-color-title.is-disabled,
+.octane-catalog-gift-palette.is-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.octane-catalog-gift-color-title {
+    position: absolute;
+    top: 341px;
+    left: 11px;
+    width: 306px;
+    height: 22px;
+}
+
+.octane-catalog-gift-palette {
+    position: absolute;
+    top: 360px;
+    left: 20px;
+    width: 308px;
+    height: 30px;
+    overflow: hidden;
+    background: #eeeeee;
+}
+
+.octane-catalog-gift-palette-grid {
+    position: absolute;
+    top: 2px;
+    left: 1px;
+    display: flex;
+    flex-flow: row wrap;
+    gap: 2px;
+    width: 306px;
+    height: 26px;
+    overflow: hidden;
+}
+
+.octane-catalog-gift-palette-item {
+    appearance: none;
+    position: relative;
+    flex: 0 0 27px;
+    width: 27px;
+    height: 22px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    background: transparent;
+    opacity: 1 !important;
+    cursor: pointer;
+    font-size: 12px !important;
+}
+
+.octane-catalog-gift-palette-item > * {
+    position: absolute;
+    inset: 0;
+    width: 27px;
+    height: 22px;
+    pointer-events: none;
+}
+
+.octane-catalog-gift-palette-color {
+    background: var(--octane-gift-palette-color);
+    mask: var(--octane-gift-palette-mask) 0 0 / 27px 22px no-repeat;
+}
+
+.octane-catalog-gift-palette-border,
+.octane-catalog-gift-palette-selection {
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-catalog-gift-cancel,
+.octane-catalog-gift-submit {
+    appearance: none;
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #000000 !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    cursor: pointer;
+}
+
+.octane-catalog-gift-cancel {
+    top: 407px;
+    left: 9px;
+    width: 100px;
+    height: 20px;
+    padding-right: 20px;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 20px !important;
+    text-align: left;
+    text-decoration: underline;
+}
+
+.octane-catalog-gift-submit {
+    top: 404px;
+    left: 171px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    height: 25px;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 15px !important;
+}
+
+.octane-catalog-gift-submit::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border: 5px solid transparent;
+    border-image-source: var(--habbo-skin-shiny-thick);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+}
+
+.octane-catalog-gift-submit:hover::before {
+    border-image-source: var(--habbo-skin-shiny-thick-hover);
+}
+
+.octane-catalog-gift-submit:active::before {
+    border-image-source: var(--habbo-skin-shiny-thick-pressed);
+}
+
+.octane-catalog-gift-submit:disabled {
+    color: #777777 !important;
+    cursor: default;
+    opacity: 1 !important;
+}
+
+.octane-catalog-gift-submit:disabled::before {
+    border-image-source: var(--habbo-skin-shiny-thick-disabled);
+}

@@ -1,4 +1,3 @@
-/// <reference types="react-scripts" />
 declare module '*.png' {
     const src: string;
     export default src;
@@ -30,12 +29,10 @@ declare module '*.webp' {
 }
 
 declare module '*.css';
-declare module '*.scss';
-declare module '*.sass';
 
 interface Window {
-    NitroConfig?: Record<string, unknown>;
-    NitroSecureApiUrl?: string;
+    OctaneConfig?: Record<string, unknown>;
+    OctaneSecureApiUrl?: string;
 }
 
 interface ImportMeta {

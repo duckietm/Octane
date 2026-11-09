@@ -1,4 +1,4 @@
-import { RoomDataParser } from '@nitrots/nitro-renderer';
+import { RoomDataParser } from '@octane/renderer';
 
 export interface INavigatorData {
     homeRoomId: number;

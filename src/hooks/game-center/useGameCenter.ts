@@ -1,15 +1,22 @@
 import {
     Game2AccountGameStatusMessageEvent,
     Game2AccountGameStatusMessageParser,
+    Game2CheckGameDirectoryStatusMessageComposer,
+    Game2GameDirectoryStatusMessageEvent,
+    Game2UserBlockedMessageEvent,
     GameConfigurationData,
     GameListMessageEvent,
     GameStatusMessageEvent,
     GetGameListMessageComposer,
-    LoadGameUrlEvent
-} from '@nitrots/nitro-renderer';
-import { useEffect, useState } from 'react';
-import { useBetween } from 'use-between';
-import { SendMessageComposer, VisitDesktop } from '../../api';
+    GetSnowWarGameTokensOfferComposer,
+    SnowWarGameTokenOffer,
+    SnowWarGameTokensMessageEvent,
+    LoadGameUrlEvent,
+    RoomEnterEvent
+} from '@octane/renderer';
+import { useCallback, useEffect, useState } from 'react';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
+import { GetRoomSession, SendMessageComposer, setSnowWarReturnRoom, snowWarBlockDeadline, VisitDesktop } from '../../api';
 import { useMessageEvent } from '../events';
 
 const useGameCenterState = () => {
@@ -19,6 +26,38 @@ const useGameCenterState = () => {
     const [accountStatus, setAccountStatus] = useState<Game2AccountGameStatusMessageParser>(null);
     const [gameOffline, setGameOffline] = useState<boolean>(false);
     const [gameURL, setGameURL] = useState<string>(null);
+    // Wall-clock end of the leave block (0 = not blocked).
+    const [blockedUntil, setBlockedUntil] = useState<number>(0);
+    // AIR games_main "How To Play" pages replace the tile grid while open.
+    const [instructionsOpen, setInstructionsOpen] = useState<boolean>(false);
+    // The "get more games" token offers (GetSnowWarGameTokensOffer).
+    const [tokenOffers, setTokenOffers] = useState<SnowWarGameTokenOffer[]>([]);
+
+    useMessageEvent<SnowWarGameTokensMessageEvent>(SnowWarGameTokensMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser) return;
+
+        setTokenOffers(parser.offers ?? []);
+    });
+
+    // Leaving a running match blocks starting a new one; the hub shows the
+    // countdown on the play button.
+    useMessageEvent<Game2UserBlockedMessageEvent>(Game2UserBlockedMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser) return;
+
+        setBlockedUntil(snowWarBlockDeadline(parser.playerBlockLength, Date.now()));
+    });
+
+    useMessageEvent<Game2GameDirectoryStatusMessageEvent>(Game2GameDirectoryStatusMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser) return;
+
+        setBlockedUntil(snowWarBlockDeadline(parser.blockLength, Date.now()));
+    });
 
     useMessageEvent<GameListMessageEvent>(GameListMessageEvent, (event) => {
         let parser = event.getParser();
@@ -46,6 +85,14 @@ const useGameCenterState = () => {
         setGameOffline(parser.isInMaintenance);
     });
 
+    // Entering a room while the hub is open (e.g. the SnowWar arena editor
+    // forwarding the player) must close the fullscreen hub overlay, or the
+    // loaded room sits invisible behind it. Normal hub usage never enters a
+    // room (opening it calls VisitDesktop), so this only fires on forwards.
+    const onRoomEnter = useCallback(() => setIsVisible(false), []);
+
+    useMessageEvent<RoomEnterEvent>(RoomEnterEvent, onRoomEnter);
+
     useMessageEvent<LoadGameUrlEvent>(LoadGameUrlEvent, (event) => {
         let parser = event.getParser();
 
@@ -53,7 +100,9 @@ const useGameCenterState = () => {
 
         switch (parser.gameTypeId) {
             case 2:
-                return console.log('snowwar');
+                // SnowWar runs natively (SnowWarView + useSnowWar), not in an
+                // iframe — the server drives it via the SnowWar packets.
+                return;
             default:
                 return setGameURL(parser.url);
         }
@@ -61,10 +110,16 @@ const useGameCenterState = () => {
 
     useEffect(() => {
         if (isVisible) {
+            // Remember the room we're leaving so SnowWar can return us to it on
+            // exit; VisitDesktop() below drops the room session. Overwrites any
+            // stale value (null when we open the hub from outside a room).
+            setSnowWarReturnRoom(GetRoomSession()?.roomId ?? null);
             SendMessageComposer(new GetGameListMessageComposer());
+            SendMessageComposer(new Game2CheckGameDirectoryStatusMessageComposer());
+            SendMessageComposer(new GetSnowWarGameTokensOfferComposer());
             VisitDesktop();
         } else {
-            // dispose or wtv
+            setInstructionsOpen(false);
         }
     }, [isVisible]);
 
@@ -77,8 +132,14 @@ const useGameCenterState = () => {
         setSelectedGame,
         gameOffline,
         gameURL,
-        setGameURL
+        setGameURL,
+        blockedUntil,
+        instructionsOpen,
+        setInstructionsOpen,
+        tokenOffers
     };
 };
 
-export const useGameCenter = () => useBetween(useGameCenterState);
+export const useGameCenter = () => useSharedHook(useGameCenterState);
+
+registerSharedHook(useGameCenterState);

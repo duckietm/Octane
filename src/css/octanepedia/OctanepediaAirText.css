@@ -1,0 +1,45 @@
+/*
+ * Octanepedia (habbopages) is Octane's own window around server-sent HTML. AIR conventions: regular Ubuntu
+ * (HabboAirUbuntu; Octane's `Ubuntu` is the condensed cut), u_regular 12 px pure black text, 16 / 14 px bold
+ * headings, 11 px small print. Sizes are not !important, so a page that sets its own inline sizes keeps them.
+ * The shared card header keeps its own face.
+ */
+.octanepedia {
+    --octane-card-text: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+@layer base {
+    .octanepedia .octanepedia__page :where(*):not(svg, svg *, code, pre, kbd) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
+
+/* u_regular: 12 px black. */
+.octanepedia .octanepedia__page {
+    color: #000000;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+/* u_headline_medium (page title) and u_headline_small (section titles). */
+.octanepedia .octanepedia__page :where(h1, h2) {
+    margin: 0 0 6px;
+    color: #000000;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 19px;
+}
+
+.octanepedia .octanepedia__page :where(h3, h4, h5, h6) {
+    margin: 0 0 4px;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 17px;
+}
+
+/* Small print: il_regular 11 px. */
+.octanepedia .octanepedia__page :where(small) {
+    font-size: 11px;
+}

@@ -1,4 +1,4 @@
-import { IObjectData, IRoomEngine } from '@nitrots/nitro-renderer';
+import { IObjectData, IRoomEngine } from '@octane/renderer';
 import { LocalizeText } from '../utils';
 import { FurniCategory } from './FurniCategory';
 import { FurnitureItem } from './FurnitureItem';
@@ -87,7 +87,8 @@ export class GroupItem {
 
         const furnitureItem = this.getLastItem();
 
-        if (!furnitureItem) return items;
+        // `found >= count` is never true for NaN, which used to hand back the whole stack.
+        if (!furnitureItem || !Number.isFinite(count) || count <= 0) return items;
 
         let found = 0;
         let i = 0;

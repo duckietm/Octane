@@ -1,4 +1,4 @@
-import { FriendParser } from '@nitrots/nitro-renderer';
+import { FriendParser } from '@octane/renderer';
 
 export class MessengerFriend {
     public static RELATIONSHIP_NONE: number = 0;

@@ -5,10 +5,10 @@ import {
     RoomEngineTriggerWidgetEvent,
     RoomId,
     RoomSessionDimmerPresetsEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useEffect, useState } from 'react';
-import { DimmerFurnitureWidgetPresetItem, FurnitureDimmerUtilities } from '../../../../api';
-import { useNitroEvent } from '../../../events';
+import { DimmerFurnitureWidgetPresetItem, FurnitureDimmerUtilities, IsAnyRoomController, IsPlayTestRestricted } from '../../../../api';
+import { useOctaneEvent } from '../../../events';
 import { useRoom } from '../../useRoom';
 
 const useFurnitureDimmerWidgetState = () => {
@@ -24,7 +24,9 @@ const useFurnitureDimmerWidgetState = () => {
     const [selectedBrightness, setSelectedBrightness] = useState(0);
     const { roomSession = null } = useRoom();
 
-    const canOpenWidget = () => roomSession.isRoomOwner || roomSession.controllerLevel >= RoomControllerLevel.GUEST || GetSessionDataManager().isModerator;
+    // Playtest refuses the dimmer to its owner too (the hotel's own rule beyond AIR), as the server does.
+    const canOpenWidget = () =>
+        !IsPlayTestRestricted(roomSession) && (roomSession.isRoomOwner || roomSession.controllerLevel >= RoomControllerLevel.GUEST || IsAnyRoomController());
 
     const selectPresetId = (id: number) => {
         const preset = presets[id - 1];
@@ -59,13 +61,13 @@ const useFurnitureDimmerWidgetState = () => {
         FurnitureDimmerUtilities.savePreset(preset.id, selectedEffectId, selectedColor, selectedBrightness, true);
     };
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_DIMMER, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_DIMMER, (event) => {
         if (!canOpenWidget()) return;
 
         roomSession.requestMoodlightSettings();
     });
 
-    useNitroEvent<RoomSessionDimmerPresetsEvent>(RoomSessionDimmerPresetsEvent.ROOM_DIMMER_PRESETS, (event) => {
+    useOctaneEvent<RoomSessionDimmerPresetsEvent>(RoomSessionDimmerPresetsEvent.ROOM_DIMMER_PRESETS, (event) => {
         const presets: DimmerFurnitureWidgetPresetItem[] = [];
 
         let i = 0;
@@ -82,7 +84,7 @@ const useFurnitureDimmerWidgetState = () => {
         setSelectedPresetId(event.selectedPresetId);
     });
 
-    useNitroEvent<RoomEngineDimmerStateEvent>(RoomEngineDimmerStateEvent.ROOM_COLOR, (event) => {
+    useOctaneEvent<RoomEngineDimmerStateEvent>(RoomEngineDimmerStateEvent.ROOM_COLOR, (event) => {
         if (RoomId.isRoomPreviewerId(event.roomId)) return;
 
         setLastDimmerState(dimmerState);

@@ -1,8 +1,9 @@
-.nitro-wired {
+.octane-wired {
     width: min(300px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
-    background: #efefef;
+    /* The style's colours come in as variables (api/wired/WiredStyle.ts); the fallbacks are Illumina. */
+    background: var(--wired-frame, #e2e2e2);
     border: 1px solid #8d8d8d !important;
     border-radius: 6px !important;
     box-shadow: inset 0 0 0 1px #fff !important;
@@ -10,7 +11,7 @@
     outline: none !important;
     overflow: hidden;
 
-    .nitro-wired__header {
+    .octane-wired__header {
         min-height: 21px !important;
         max-height: 21px !important;
         position: absolute !important;
@@ -23,7 +24,7 @@
         padding: 0 !important;
         pointer-events: auto;
 
-        .nitro-card-title {
+        .octane-card-title {
             display: block;
             color: #000 !important;
             font-size: 11px !important;
@@ -42,7 +43,7 @@
             content: none;
         }
 
-        .nitro-card-close-button {
+        .octane-card-close-button {
             right: 6px !important;
             width: 18px;
             height: 18px;
@@ -53,8 +54,8 @@
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
 
-        .nitro-card-close-button::before,
-        .nitro-card-close-button::after {
+        .octane-card-close-button::before,
+        .octane-card-close-button::after {
             content: '';
             position: absolute;
             left: 50%;
@@ -67,18 +68,18 @@
             transform-origin: center;
         }
 
-        .nitro-card-close-button::before {
+        .octane-card-close-button::before {
             transform: translate(-50%, -50%) rotate(45deg);
         }
 
-        .nitro-card-close-button::after {
+        .octane-card-close-button::after {
             transform: translate(-50%, -50%) rotate(-45deg);
         }
     }
 
-    .nitro-wired__content {
+    .octane-wired__content {
         position: relative;
-        background: #efefef !important;
+        background: var(--wired-frame, #e2e2e2) !important;
         border: 0 !important;
         box-shadow: none !important;
         padding: 0 !important;
@@ -86,7 +87,7 @@
         overflow: hidden !important;
     }
 
-    .nitro-wired__body {
+    .octane-wired__body {
         display: flex;
         flex-direction: column;
         padding: 8px 10px 10px;
@@ -98,14 +99,14 @@
         overflow-y: auto;
     }
 
-    .nitro-wired__section {
+    .octane-wired__section {
         display: flex;
         flex-direction: column;
         gap: 5px;
         min-width: 0;
     }
 
-    .nitro-wired__summary {
+    .octane-wired__summary {
         position: relative;
         min-height: 56px;
         flex-direction: row;
@@ -117,7 +118,7 @@
         color: #000;
     }
 
-    .nitro-wired__summary-bg {
+    .octane-wired__summary-bg {
         position: absolute;
         width: auto;
         height: auto;
@@ -128,43 +129,149 @@
         -webkit-user-drag: none;
     }
 
-    .nitro-wired__summary-bg--left {
+    .octane-wired__summary-bg--left {
         left: 50%;
         transform: translate(-150%, -50%);
         opacity: 0.45;
     }
 
-    .nitro-wired__summary-bg--right {
+    .octane-wired__summary-bg--right {
         left: 50%;
         top: 72%;
         transform: translate(-46%, -50%);
         opacity: 0.24;
     }
 
-    .nitro-wired__summary-copy {
+    .octane-wired__summary-copy {
         position: relative;
         z-index: 1;
     }
 
-    .nitro-wired__summary-copy {
+    /* The quick menu: a small toggle in the summary corner and a list under it. */
+    /* Lives in the header, on the close button's line and just before it. */
+    .octane-wired__menu {
+        position: absolute;
+        top: 50%;
+        right: 28px;
+        transform: translateY(-50%);
+        z-index: 3;
+        pointer-events: auto;
+    }
+
+    .octane-wired__menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        border: 1px solid #777;
+        border-radius: 5px;
+        background: linear-gradient(180deg, #f9f9f9 0%, #cacaca 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        color: #222;
+        font-size: 13px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .octane-wired__menu-toggle:hover {
+        background: linear-gradient(180deg, #ffffff 0%, #dcdcdc 100%);
+    }
+
+    .octane-wired__menu-positioner {
+        z-index: 3;
+    }
+
+    /* Official quick menu: 145 px base, width = widest row + 12. */
+    .octane-wired__menu-list {
+        min-width: 145px;
+        padding: 2px;
+        border: 1px solid #000;
+        border-radius: 3px;
+        background: #f4f0e8;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Rows 20 px high, text at x 28, the checkbox at x 6. */
+    .octane-wired__menu-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 20px;
+        padding: 0 12px 0 28px;
+        white-space: nowrap;
+        border: 0;
+        background: transparent;
+        color: #222;
+        font-size: 12px;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .octane-wired__menu-item:hover:not(:disabled),
+    .octane-wired__menu-item[data-highlighted]:not([data-disabled]) {
+        background: #b2b2b2;
+    }
+
+    .octane-wired__menu-item:disabled,
+    .octane-wired__menu-item[data-disabled] {
+        color: #9a9488;
+        cursor: default;
+    }
+
+    /* A 3 px spacer with a 1 px line inset 6 px. */
+    .octane-wired__menu-spacer {
+        height: 1px;
+        margin: 1px 6px;
+        background: #aaaaaa;
+    }
+
+    .octane-wired__menu-check {
+        position: absolute;
+        left: 6px;
+    }
+
+    .octane-wired__summary-copy {
         display: flex;
         flex-direction: column;
         min-width: 0;
         gap: 1px;
     }
 
-    .nitro-wired__summary-kind {
+    /* IlluminaHeaderPreset: the kind in 11 px bold, the name in headerNameFontSize bold, 0x494949. */
+    .octane-wired__summary-kind {
         color: #000;
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 700;
         letter-spacing: 0.08em;
         line-height: 1;
         text-transform: uppercase;
     }
 
-    .nitro-wired__summary-title {
-        color: #4a4a4a !important;
-        font-size: 15px !important;
+    /* Official header button (HeaderPreset): centred under the name. */
+    .octane-wired__header-button {
+        align-self: center;
+        margin-top: 3px;
+        padding: 1px 8px;
+        border: 1px solid #8a8a8a;
+        border-radius: 3px;
+        background: linear-gradient(#fff, #dcdcdc);
+        color: #000;
+        font-size: 11px;
+        cursor: pointer;
+    }
+
+    .octane-wired__header-button:hover {
+        background: linear-gradient(#fff, #c8c8c8);
+    }
+
+    .octane-wired__summary-title {
+        color: #494949 !important;
+        font-size: var(--wired-header-name-size, 12px) !important;
         font-weight: 700 !important;
         line-height: 1.02;
         text-align: left !important;
@@ -172,40 +279,90 @@
         word-break: break-word;
     }
 
-    .nitro-wired__section--body {
+    .octane-wired__section--body {
         overflow: visible !important;
     }
 
-    .nitro-wired__section .font-bold:not(.nitro-wired__summary-title) {
+    .octane-wired__section .font-bold:not(.octane-wired__summary-title) {
         width: 100%;
         font-size: 13px !important;
         font-weight: 700 !important;
         text-align: left;
     }
 
-    .nitro-wired__summary-description,
-    .nitro-wired__furni-selector-description,
-    .nitro-wired__picker-label {
+    .octane-wired__summary-description,
+    .octane-wired__furni-selector-description,
+    .octane-wired__picker-label {
         font-size: 12px;
         line-height: 1.15;
     }
 
-    .nitro-wired__source-row,
-    .nitro-wired__give-var-section-title,
-    .nitro-wired__advanced-toggle {
+    /* Official: the pick-furni description in the style's softTextColor. */
+    .octane-wired__furni-selector-description {
+        color: var(--wired-soft-text, #444444);
+    }
+
+    .octane-wired__source-row,
+    .octane-wired__give-var-section-title,
+    .octane-wired__advanced-toggle {
         font-size: 12px;
     }
 
-    .nitro-wired__divider,
+    /* Illumina ruler: a 0xAAAAAA line over a white highlight at alpha 0xAF. */
+    .octane-wired__divider,
     hr {
         height: 1px;
         border: 0;
-        background: #bababa;
-        box-shadow: 0 1px 0 #fff;
+        background: var(--wired-splitter, #aaaaaa);
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.69);
         margin: 0 !important;
     }
 
+    .octane-wired__sections {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+    }
+
+    .octane-wired__sections:empty {
+        display: none;
+    }
+
+    /*
+     * element.allowScrolling (WiredUIBuilder.build: ListScrollParams(maxHeight = screen height / 1.8,
+     * stickyHeader, stickyFooter)): the header and the Ready / Cancel row stay put, the sections
+     * between them scroll, and the whole list is capped at 100vh / 1.8.
+     */
+    &.octane-wired--scrolling .octane-wired__content {
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh / 1.8);
+    }
+
+    &.octane-wired--scrolling .octane-wired__summary,
+    &.octane-wired--scrolling .octane-wired__divider--actions,
+    &.octane-wired--scrolling .octane-wired__actions {
+        flex: 0 0 auto;
+    }
+
+    &.octane-wired--scrolling .octane-wired__body {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+        overflow: hidden;
+    }
+
+    &.octane-wired--scrolling .octane-wired__sections {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
     .form-check-input,
+    .octane-checkbox,
+    .octane-radio,
     input[type='checkbox'],
     input[type='radio'] {
         width: 18px;
@@ -221,11 +378,14 @@
         position: relative;
     }
 
+    .octane-radio,
     input[type='radio'] {
         border-radius: 50%;
     }
 
     .form-check-input:focus,
+    .octane-checkbox:focus,
+    .octane-radio:focus,
     input[type='checkbox']:focus,
     input[type='radio']:focus {
         outline: 1px solid #4b7ea1;
@@ -233,6 +393,7 @@
     }
 
     .form-check-input[type='radio']:checked,
+    .octane-radio[data-checked],
     input[type='radio']:checked {
         background:
             radial-gradient(circle at center, #4a4a4a 0 34%, transparent 38%),
@@ -241,6 +402,7 @@
     }
 
     .form-check-input[type='checkbox']:checked,
+    .octane-checkbox[data-checked],
     input[type='checkbox']:checked {
         background: linear-gradient(180deg, #d9d9d9 0%, #c8c8c8 100%);
         border-color: #767676;
@@ -248,6 +410,8 @@
 
     .form-check-input[type='checkbox']:checked::before,
     .form-check-input[type='checkbox']:checked::after,
+    .octane-checkbox[data-checked]::before,
+    .octane-checkbox[data-checked]::after,
     input[type='checkbox']:checked::before,
     input[type='checkbox']:checked::after {
         content: '';
@@ -262,11 +426,13 @@
     }
 
     .form-check-input[type='checkbox']:checked::before,
+    .octane-checkbox[data-checked]::before,
     input[type='checkbox']:checked::before {
         transform: translate(-50%, -50%) rotate(45deg);
     }
 
     .form-check-input[type='checkbox']:checked::after,
+    .octane-checkbox[data-checked]::after,
     input[type='checkbox']:checked::after {
         transform: translate(-50%, -50%) rotate(-45deg);
     }
@@ -285,6 +451,7 @@
     .form-select,
     input[type='text'],
     input[type='number'],
+    .octane-number-input,
     textarea {
         min-height: 24px;
         border: 1px solid #8d8d8d !important;
@@ -296,9 +463,9 @@
         padding: 3px 6px;
     }
 
-    .nitro-wired__button,
-    .nitro-wired__picker-button,
-    .nitro-slider-button {
+    .octane-wired__button,
+    .octane-wired__picker-button,
+    .octane-slider-button {
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -312,31 +479,31 @@
         padding-bottom: 0 !important;
     }
 
-    .nitro-wired__button:hover,
-    .nitro-wired__picker-button:hover,
-    .nitro-slider-button:hover {
+    .octane-wired__button:hover,
+    .octane-wired__picker-button:hover,
+    .octane-slider-button:hover {
         filter: brightness(0.98);
     }
 
-    .nitro-wired__button--primary,
-    .nitro-wired__button--secondary {
+    .octane-wired__button--primary,
+    .octane-wired__button--secondary {
         font-weight: 700;
     }
 
-    &.nitro-card-shell {
+    &.octane-card-shell {
         resize: none !important;
     }
 
-    .nitro-wired__actions {
+    .octane-wired__actions {
         padding-top: 2px;
     }
 
-    .nitro-slider-wrapper {
+    .octane-slider-wrapper {
         align-items: center;
         gap: 4px;
     }
 
-    .nitro-wired__advanced-toggle {
+    .octane-wired__advanced-toggle {
         width: 100%;
         padding: 0 !important;
         border: 0;
@@ -347,20 +514,31 @@
         text-decoration: underline;
     }
 
-    .nitro-wired__advanced-body,
-    .nitro-wired__source-detail {
+    .octane-wired__advanced-body,
+    .octane-wired__source-detail {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-wired__source-row {
+    /* AdvancedSettingsWrapperPreset: the advanced rows sit on the style's advanced background. */
+    .octane-wired__advanced-body {
+        margin-top: 4px;
+        padding: var(--wired-section-spacing, 5px) var(--wired-section-margin, 5px);
+        background: var(--wired-advanced-background, #cccccc);
+    }
+
+    .octane-wired__advanced-body[hidden] {
+        display: none;
+    }
+
+    .octane-wired__source-row {
         display: flex;
         flex-direction: column;
         gap: 3px;
     }
 
-    .nitro-wired__selection-toggle {
+    .octane-wired__selection-toggle {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -374,33 +552,33 @@
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
     }
 
-    .nitro-wired__selection-toggle.is-active.nitro-wired__selection-toggle--primary {
+    .octane-wired__selection-toggle.is-active.octane-wired__selection-toggle--primary {
         border-color: #66793c;
         background: linear-gradient(180deg, #a5b56e 0%, #8ea25a 100%);
         color: #fff;
     }
 
-    .nitro-wired__selection-toggle.is-active.nitro-wired__selection-toggle--secondary {
+    .octane-wired__selection-toggle.is-active.octane-wired__selection-toggle--secondary {
         border-color: #6172b7;
         background: linear-gradient(180deg, #8d9bdd 0%, #7383cb 100%);
         color: #fff;
     }
 
-    .nitro-wired__selection-toggle:disabled {
+    .octane-wired__selection-toggle:disabled {
         opacity: 0.55;
     }
 
-    .nitro-wired__selection-toggle svg {
+    .octane-wired__selection-toggle svg {
         font-size: 10px;
         margin: 0;
     }
 
-    .nitro-wired__actions {
+    .octane-wired__actions {
         gap: 4px !important;
     }
 
-    .nitro-wired__picker-button,
-    .nitro-slider-button {
+    .octane-wired__picker-button,
+    .octane-slider-button {
         width: 22px;
         min-width: 22px !important;
         flex: 0 0 22px;
@@ -408,41 +586,41 @@
         padding-right: 0 !important;
     }
 
-    .nitro-wired__picker-button svg,
-    .nitro-slider-button svg {
+    .octane-wired__picker-button svg,
+    .octane-slider-button svg {
         margin: 0;
     }
 
-    .nitro-wired__picker-label {
+    .octane-wired__picker-label {
         min-width: 0;
         text-align: center;
         word-break: break-word;
     }
 
-    .nitro-wired__give-var {
+    .octane-wired__give-var {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-wired__give-var--trigger-variable {
+    .octane-wired__give-var--trigger-variable {
         width: min(244px, 100%);
     }
 
-    .nitro-wired__give-var-heading {
+    .octane-wired__give-var-heading {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 4px;
     }
 
-    .nitro-wired__give-var-targets {
+    .octane-wired__give-var-targets {
         display: inline-flex;
         align-items: center;
         gap: 2px;
     }
 
-    .nitro-wired__give-var-target {
+    .octane-wired__give-var-target {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -456,261 +634,49 @@
         transition: filter 0.12s ease-in-out;
     }
 
-    .nitro-wired__give-var-target:hover {
+    .octane-wired__give-var-target:hover {
         filter: brightness(0.98);
     }
 
-    .nitro-wired__give-var-target img {
+    .octane-wired__give-var-target img {
         width: auto;
         height: auto;
         max-width: 12px;
         max-height: 12px;
-        image-rendering: pixelated;
+        image-rendering: var(--octane-pixel-art, pixelated);
     }
 
-    .nitro-wired__give-var-target--furni.is-active {
+    .octane-wired__give-var-target--furni.is-active {
         background: linear-gradient(180deg, #f7db6d 0%, #ddb948 100%);
     }
 
-    .nitro-wired__give-var-target--user.is-active {
+    .octane-wired__give-var-target--user.is-active {
         background: linear-gradient(180deg, #74be68 0%, #4f9644 100%);
     }
 
-    .nitro-wired__give-var-target--global.is-active {
+    .octane-wired__give-var-target--global.is-active {
         background: linear-gradient(180deg, #7bc4f0 0%, #5497d2 100%);
     }
 
-    .nitro-wired__give-var-target--context.is-active {
+    .octane-wired__give-var-target--context.is-active {
         background: linear-gradient(180deg, #f0ad65 0%, #d68739 100%);
     }
 
-    .nitro-wired__give-var-target.is-active {
+    .octane-wired__give-var-target.is-active {
         border-color: #4d4d4d;
         box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.92);
     }
 
-    .nitro-wired__give-var-target:disabled {
+    .octane-wired__give-var-target:disabled {
         opacity: 0.72;
         cursor: default;
     }
 
-    .nitro-wired__give-var-select {
+    .octane-wired__give-var-select {
         min-height: 23px;
     }
 
-    .nitro-wired__variable-picker {
-        position: relative;
-        width: 100%;
-    }
-
-    .nitro-wired__variable-picker-trigger {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        min-height: 23px;
-        padding: 0 22px 0 8px;
-        border: 1px solid #8e8e8e;
-        border-radius: 4px;
-        background: linear-gradient(180deg, #ffffff 0%, #ededed 100%);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-        font-size: 11px;
-        text-align: left;
-        position: relative;
-    }
-
-    .nitro-wired__variable-picker-trigger::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        right: 8px;
-        width: 0;
-        height: 0;
-        margin-top: -2px;
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-top: 5px solid #555;
-    }
-
-    .nitro-wired__variable-picker-placeholder {
-        color: #7a7a7a;
-    }
-
-    .nitro-wired__variable-picker-panel {
-        position: absolute;
-        top: calc(100% + 2px);
-        left: 0;
-        z-index: 30;
-        width: 202px;
-        padding: 4px;
-        border: 1px solid #8e8e8e;
-        border-radius: 4px;
-        background: #f5f5f5;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        overflow: visible;
-    }
-
-    .nitro-wired__variable-picker-panel.is-portal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 5001;
-        margin: 0;
-        pointer-events: auto;
-    }
-
-    .nitro-wired__variable-picker-toolbar {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        padding-bottom: 4px;
-        border-bottom: 1px solid #d0d0d0;
-    }
-
-    .nitro-wired__variable-picker-mode {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 20px;
-        height: 20px;
-        padding: 0;
-        border: 1px solid transparent;
-        border-radius: 3px;
-        background: transparent;
-    }
-
-    .nitro-wired__variable-picker-mode.is-active {
-        border-color: #8e8e8e;
-        background: linear-gradient(180deg, #f3cc58 0%, #d2a93a 100%);
-    }
-
-    .nitro-wired__variable-picker-mode img {
-        width: auto;
-        height: auto;
-        max-width: 13px;
-        max-height: 13px;
-        image-rendering: pixelated;
-    }
-
-    .nitro-wired__variable-picker-search {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        min-height: 24px;
-        padding: 0 4px;
-        margin-top: 4px;
-        border: 1px solid #c4c4c4;
-        border-radius: 3px;
-        background: #fff;
-    }
-
-    .nitro-wired__variable-picker-search-icon {
-        width: auto;
-        height: auto;
-        max-width: 10px;
-        max-height: 10px;
-        opacity: 0.75;
-        image-rendering: pixelated;
-    }
-
-    .nitro-wired__variable-picker-search-input {
-        flex: 1 1 auto;
-        min-width: 0;
-        border: 0;
-        background: transparent;
-        font-size: 11px;
-        line-height: 1;
-        outline: none;
-    }
-
-    .nitro-wired__variable-picker-clear {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 14px;
-        height: 14px;
-        padding: 0;
-        border: 0;
-        background: transparent;
-    }
-
-    .nitro-wired__variable-picker-clear img {
-        width: auto;
-        height: auto;
-        max-width: 10px;
-        max-height: 10px;
-        image-rendering: pixelated;
-    }
-
-    .nitro-wired__variable-picker-list,
-    .nitro-wired__variable-picker-submenu {
-        display: flex;
-        flex-direction: column;
-        max-height: 140px;
-        margin-top: 4px;
-        overflow-y: auto;
-        border: 1px solid #c8c8c8;
-        border-radius: 3px;
-        background: #fff;
-    }
-
-    .nitro-wired__variable-picker-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 6px;
-        min-height: 20px;
-        padding: 0 6px;
-        border: 0;
-        background: transparent;
-        font-size: 11px;
-        text-align: left;
-    }
-
-    .nitro-wired__variable-picker-row:nth-child(even) {
-        background: #f3f3f3;
-    }
-
-    .nitro-wired__variable-picker-row:hover {
-        background: #dfe8f6;
-    }
-
-    .nitro-wired__variable-picker-row.is-selected {
-        background: #d7dfea;
-    }
-
-    .nitro-wired__variable-picker-row.is-disabled {
-        color: #7b7b7b;
-    }
-
-    .nitro-wired__variable-picker-row-label {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .nitro-wired__variable-picker-row-arrow {
-        flex: 0 0 auto;
-        font-size: 9px;
-    }
-
-    .nitro-wired__variable-picker-empty {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 86px;
-        color: #8a8a8a;
-    }
-
-    .nitro-wired__variable-picker-submenu {
-        position: fixed;
-        width: 120px;
-        margin-top: 0;
-        z-index: 5000;
-        pointer-events: auto;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
-    }
-
-    .nitro-wired__give-var-checkbox {
+    .octane-wired__give-var-checkbox {
         display: flex;
         align-items: center;
         gap: 4px;
@@ -720,25 +686,25 @@
         line-height: 1;
     }
 
-    .nitro-wired__give-var-section {
+    .octane-wired__give-var-section {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-wired__give-var-section-title {
+    .octane-wired__give-var-section-title {
         font-size: 11px;
         font-weight: 700;
         line-height: 1.1;
     }
 
-    .nitro-wired__give-var-input-row {
+    .octane-wired__give-var-input-row {
         display: flex;
         align-items: center;
         gap: 6px;
     }
 
-    .nitro-wired__give-var-number {
+    .octane-wired__give-var-number {
         width: 48px;
         min-width: 48px;
         min-height: 18px !important;
@@ -748,31 +714,31 @@
         text-align: center;
     }
 
-    .nitro-wired__give-var-number--blurred {
+    .octane-wired__give-var-number--blurred {
         filter: blur(0.8px) !important;
         opacity: 0.78;
         pointer-events: none;
     }
 
-    .nitro-wired__resizable-textarea {
+    .octane-wired__resizable-textarea {
         min-height: 140px !important;
         resize: vertical !important;
         overflow: auto;
     }
 
-    .nitro-wired__levelup {
+    .octane-wired__levelup {
         display: flex;
         flex-direction: column;
         gap: 6px;
     }
 
-    .nitro-wired__levelup-section {
+    .octane-wired__levelup-section {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-wired__levelup-section-header {
+    .octane-wired__levelup-section-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -783,48 +749,102 @@
         text-align: left;
     }
 
-    .nitro-wired__levelup-chevron {
+    .octane-wired__levelup-chevron {
         font-size: 12px;
         line-height: 1;
         transform: rotate(180deg);
         transition: transform 0.12s ease;
     }
 
-    .nitro-wired__levelup-chevron.is-open {
+    .octane-wired__levelup-chevron.is-open {
         transform: rotate(0deg);
     }
 
-    .nitro-wired__levelup-section-body {
+    .octane-wired__levelup-section-body {
         display: flex;
         flex-direction: column;
         gap: 8px;
     }
 
-    .nitro-wired__levelup-mode-block {
+    .octane-wired__projectile {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .octane-wired__projectile-section {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .octane-wired__projectile-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .octane-wired__projectile-chevron {
+        flex-shrink: 0;
+        width: 11px;
+        height: 11px;
+        color: #7a7a7a;
+    }
+
+    .octane-wired__projectile-section-body {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .octane-wired__projectile-indent {
+        padding-left: 18px;
+    }
+
+    .octane-wired__projectile-grid {
+        display: flex;
+        justify-content: center;
+        padding: 2px 0;
+    }
+
+    .octane-wired__projectile-number {
+        width: 72px;
+        flex-shrink: 0;
+    }
+
+    .octane-wired__levelup-mode-block {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-wired__levelup-mode-block.is-inactive {
+    .octane-wired__levelup-mode-block.is-inactive {
         opacity: 0.72;
     }
 
-    .nitro-wired__levelup-mode-label {
+    .octane-wired__levelup-mode-label {
         display: flex;
         align-items: center;
         gap: 4px;
         cursor: pointer;
     }
 
-    .nitro-wired__levelup-fields {
+    .octane-wired__levelup-fields {
         display: flex;
         flex-direction: column;
         gap: 4px;
         padding-left: 22px;
     }
 
-    .nitro-wired__levelup-field-row {
+    .octane-wired__levelup-field-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -832,7 +852,7 @@
         min-height: 20px;
     }
 
-    .nitro-wired__levelup-number {
+    .octane-wired__levelup-number {
         width: 74px;
         min-width: 74px;
         min-height: 20px !important;
@@ -842,38 +862,38 @@
         text-align: center;
     }
 
-    .nitro-wired__levelup-textarea {
+    .octane-wired__levelup-textarea {
         min-height: 88px !important;
         resize: vertical !important;
         overflow: auto;
     }
 
-    .nitro-wired__levelup-preview {
+    .octane-wired__levelup-preview {
         max-height: 120px;
         overflow-y: auto;
         padding-right: 2px;
     }
 
-    .nitro-wired__levelup-preview-entry {
+    .octane-wired__levelup-preview-entry {
         padding: 1px 0;
         font-size: 11px;
         line-height: 1.25;
     }
 
-    .nitro-wired__levelup-subvariables {
+    .octane-wired__levelup-subvariables {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-wired__levelup-subvariable-row {
+    .octane-wired__levelup-subvariable-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 8px;
     }
 
-    .nitro-wired__levelup-subvariable-label {
+    .octane-wired__levelup-subvariable-label {
         display: flex;
         align-items: center;
         gap: 4px;
@@ -882,7 +902,7 @@
         cursor: pointer;
     }
 
-    .nitro-wired__levelup-subvariable-token {
+    .octane-wired__levelup-subvariable-token {
         width: 96px;
         min-width: 96px;
         height: 20px;
@@ -895,7 +915,7 @@
         line-height: 20px;
     }
 
-    .nitro-wired__placeholder-preview {
+    .octane-wired__placeholder-preview {
         display: flex;
         width: 100%;
         align-items: flex-start;
@@ -908,39 +928,44 @@
         transition: background 0.12s ease, border-color 0.12s ease;
     }
 
-    .nitro-wired__placeholder-preview:hover {
+    .octane-wired__placeholder-preview:hover {
         background: linear-gradient(180deg, #ffffff 0%, #f4f4f4 100%);
         border-color: #909090;
     }
 
-    .nitro-wired__placeholder-preview.is-copied {
+    .octane-wired__placeholder-preview.is-copied {
         border-color: #73a753;
         background: linear-gradient(180deg, #f8fff2 0%, #eef9e2 100%);
     }
 
-    .nitro-wired__change-var-radio {
+    .octane-wired__change-var-radio {
         display: flex;
         align-items: center;
         gap: 4px;
     }
 
-    .nitro-wired__change-var-reference-block {
+    .octane-wired__change-var-reference-block {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-slider {
+    .octane-slider {
         height: 16px;
     }
 
-    .nitro-slider .track {
+    .octane-slider .track {
         height: 4px;
         border-radius: 999px;
         border: 1px solid #9a9a9a;
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
 
+        /* the filled part lies inside the track: it fills it without a border of its own (no double line) */
         &.track-0 {
+            height: 100%;
+            border: 0;
+            border-radius: inherit;
+            box-shadow: none;
             background: linear-gradient(180deg, #7f9fb1 0%, #64889e 100%);
         }
 
@@ -949,10 +974,10 @@
         }
     }
 
-    .nitro-slider .thumb {
+    /* Base UI centres the thumb on the track itself: no margin, or it sits below the line. */
+    .octane-slider .thumb {
         width: 12px;
         height: 12px;
-        margin-top: 3px;
         border-radius: 50%;
         border: 1px solid #7f7f7f;
         background: linear-gradient(180deg, #fefefe 0%, #dadada 100%);
@@ -960,26 +985,26 @@
     }
 }
 
-.nitro-wired :where(.bg-white, .bg-light, .bg-muted, .bg-card-grid-item, .bg-gray-50) {
+.octane-wired :where(.bg-white, .bg-light, .bg-muted, .bg-card-grid-item, .bg-gray-50) {
     background: #f7f7f7 !important;
     color: #111111 !important;
     box-shadow: none !important;
 }
 
-.nitro-wired :where(.border, .border-muted, .border-card-grid-item-border, .border-white, .border-white\/10, .border-white\/20, .border-white\/30) {
+.octane-wired :where(.border, .border-muted, .border-card-grid-item-border, .border-white, .border-white\/10, .border-white\/20, .border-white\/30) {
     border-color: #b5b5b5 !important;
     box-shadow: none !important;
 }
 
-.nitro-wired :where(.text-muted, .text-dark) {
+.octane-wired :where(.text-muted, .text-dark) {
     color: #5f5f5f !important;
 }
 
-.nitro-wired :where(.text-primary) {
+.octane-wired :where(.text-primary) {
     color: #2f5f7a !important;
 }
 
-.nitro-wired :where(select, input[type='text'], input[type='number'], textarea) {
+.octane-wired :where(select, .octane-select-trigger, input[type='text'], input[type='number'], .octane-number-input, textarea) {
     min-height: 22px;
     border: 1px solid #8b8b8b !important;
     border-radius: 3px !important;
@@ -989,26 +1014,20 @@
     font-size: 11px !important;
 }
 
-.nitro-wired :where(select, input[type='text'], input[type='number'], textarea):focus {
-    border-color: #5c8fa8 !important;
-    box-shadow: 0 0 0 2px rgba(92, 143, 168, 0.24), inset 0 1px 0 rgba(0, 0, 0, 0.14) !important;
-    outline: none !important;
-}
-
-.nitro-card-shell.nitro-wired {
+.octane-card-shell.octane-wired {
     border: 1px solid #8d8d8d !important;
     border-color: #8d8d8d !important;
     box-shadow: inset 0 0 0 1px #fff !important;
     outline: none !important;
 }
 
-.nitro-card-shell.nitro-wired .nitro-card-header-shell,
-.nitro-card-shell.nitro-wired .nitro-card-content-shell {
+.octane-card-shell.octane-wired .octane-card-header-shell,
+.octane-card-shell.octane-wired .octane-card-content-shell {
     border: 0 !important;
     box-shadow: none !important;
 }
 
-.nitro-wired__variable-picker-portal {
+.octane-wired__variable-picker-portal {
     position: fixed;
     inset: 0;
     z-index: 5000;
@@ -1018,4 +1037,802 @@
     border: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
+}
+
+
+.octane-wired.octane-wired__vpicker-positioner {
+    z-index: 5000;
+    width: auto;
+    max-width: none;
+    overflow: visible;
+    background: transparent;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+/*
+ * AIR variable picker (WIN63-202610131318-860371703, uibuilder/presets/newvariablepicker). Colours, tab widths and the
+ * 300px list cap come from the classes; the scrollbar is the interface's classic one. The search_tree_dropdown layout is not indexed, so the
+ * frame, field, font and spacing are measured from the live AIR client at 1x (hhus, 2026-10-16).
+ */
+.octane-wired__vpicker {
+    position: relative;
+    width: 100%;
+}
+
+.octane-wired__vpicker-collapsed {
+    height: 21px;
+}
+
+.octane-wired__vpicker-input-region {
+    position: relative;
+    box-sizing: border-box;
+    cursor: text;
+    background: #fff;
+}
+
+/* Collapsed: a 21px white field, 1px #848484 rounded frame and a 10x5 drop-down triangle 8px from the right. */
+.octane-wired__vpicker-collapsed .octane-wired__vpicker-input-region {
+    height: 21px;
+    border: 1px solid #848484;
+    border-radius: 4px;
+}
+
+.octane-wired__vpicker-collapsed .octane-wired__vpicker-input-region::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    right: 7px;
+    border-top: 5px solid #555;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    pointer-events: none;
+}
+
+/* Expanded: a plain 20px field under the tabs, a #ddd line and 4px of white before the list. */
+.octane-wired__vpicker-search .octane-wired__vpicker-input-region {
+    height: 21px;
+    border-bottom: 1px solid #ddd;
+}
+
+.octane-wired .octane-wired__vpicker-input-region .octane-wired__vpicker-input,
+.octane-wired__vpicker-input-region .octane-wired__vpicker-input {
+    position: absolute;
+    left: 8px;
+    top: 0;
+    width: calc(100% - 30px);
+    height: 19px;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #555 !important;
+    font: 9px/19px Volter, sans-serif !important;
+    outline: 0;
+}
+
+.octane-wired__vpicker-input::placeholder {
+    color: #808080;
+    opacity: 1;
+}
+
+.octane-wired__vpicker-cancel {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-wired__vpicker-cancel img {
+    image-rendering: pixelated;
+}
+
+.octane-wired__vpicker-expanded {
+    position: relative;
+    box-sizing: border-box;
+    padding-bottom: 1px;
+    pointer-events: auto;
+    border: 1px solid #848484;
+    border-radius: 3px;
+    background: #fff;
+    color: #555;
+    font: 9px Volter, sans-serif;
+    overflow: visible;
+}
+
+.octane-wired__vpicker-tabs {
+    display: flex;
+}
+
+.octane-wired__vpicker-tab {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    box-sizing: content-box;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    cursor: pointer;
+}
+
+.octane-wired__vpicker-tabs .octane-wired__vpicker-tab:first-child {
+    border-top-left-radius: 2px;
+}
+
+.octane-wired__vpicker-tab img {
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.octane-wired__vpicker-content {
+    position: relative;
+    margin-top: 4px;
+}
+
+.octane-wired__vpicker-list {
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.octane-wired__vpicker-list.is-sublist {
+    z-index: 1;
+    padding: 2px 0 2px;
+    pointer-events: auto;
+    border: 1px solid #000;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: inset -1px -1px 0 #ccc;
+    color: #555;
+    font: 9px Volter, sans-serif;
+}
+
+.octane-wired__vpicker-node {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 10px 0 9px;
+    cursor: default;
+    white-space: nowrap;
+    line-height: 20px;
+}
+
+.octane-wired__vpicker-node.is-selectable {
+    cursor: pointer;
+}
+
+.octane-wired__vpicker-node-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+/* right_triangle_icon (VariableNodeView.as:339-342), only on nodes with children: 5x10, #767676 on live AIR. */
+.octane-wired__vpicker-node-arrow {
+    flex: 0 0 auto;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid #767676;
+}
+
+.octane-wired__vpicker-empty {
+    padding: 4px 9px 5px;
+    color: #555;
+}
+
+/*
+ * AIR value-or-variable field (ValueOrVariableInputPreset over the illumina input_template: a 21px white field with
+ * the 105 frame) and its popup (ValueOrVariablePopupPreset). value_or_variable_input_icons: two 19px regions that end
+ * 2px before the field's right edge; the target region shows only for a variable with a choice of types.
+ */
+.octane-wired__value-field {
+    position: relative;
+    width: 100%;
+}
+
+/* A value field in one row with another control (AIR SimpleListViewPreset horizontal, e.g. VariableAge's unit). */
+.octane-wired__value-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.octane-wired__value-row .octane-wired__value-field {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.octane-wired__value-row-select {
+    flex: 0 0 90px;
+    width: 90px;
+}
+
+.octane-wired__value-input {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    box-sizing: border-box;
+    height: 21px;
+    padding-right: 2px;
+    border: 1px solid #848484;
+    border-radius: 4px;
+    background: #fff;
+}
+
+/* WiredStyle.invalidInputBackgroundColor (IlluminaWiredStyle: 0xffc6c9). */
+.octane-wired__value-input.is-invalid,
+.octane-wired .octane-wired__number-input.is-invalid,
+.octane-wired .octane-wired__delay-input.is-invalid {
+    background: #ffc6c9 !important;
+}
+
+.octane-wired__value-input.is-disabled {
+    opacity: 0.5;
+}
+
+.octane-wired .octane-wired__value-input input,
+.octane-wired__value-input input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 19px;
+    min-height: 0 !important;
+    padding: 0 0 0 4px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #4a4a4a !important;
+    outline: 0;
+}
+
+.octane-wired__value-input-target,
+.octane-wired__value-input-button {
+    display: flex;
+    flex: 0 0 19px;
+    align-items: center;
+    justify-content: center;
+    width: 19px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.octane-wired__value-input-button {
+    cursor: pointer;
+}
+
+.octane-wired__value-input-button:disabled {
+    cursor: default;
+}
+
+.octane-wired__value-input-target img,
+.octane-wired__value-input-button img {
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+/* input_template warning_display: a bordered caption centred over the field, its pointer 9px above the field. */
+.octane-wired__value-input-error {
+    position: absolute;
+    bottom: calc(100% + 9px);
+    left: 50%;
+    z-index: 2;
+    padding: 3px 7px;
+    border: 1px solid #5a5a5a;
+    border-radius: 3px;
+    background: #fff;
+    color: #4a4a4a;
+    font-size: 11px;
+    line-height: 15px;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.octane-wired__value-input-error::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    border-right: 1px solid #5a5a5a;
+    border-bottom: 1px solid #5a5a5a;
+    background: #fff;
+    transform: translate(-50%, -3px) rotate(45deg);
+}
+
+/* search_tree_dropdown main_cont: the header list sits above the tabs, 5px apart (genericVerticalSpacing). */
+.octane-wired__value-popup {
+    color: #000;
+    font: inherit;
+    font-size: 11px;
+}
+
+.octane-wired__value-popup-header {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 1px;
+}
+
+/* attachInputSource: padded 5/5/5/0 (genericHorizontalSpacing, genericVerticalSpacing); the title in softTextColor 0x444444. */
+.octane-wired__value-popup-source {
+    padding: 5px 5px 0;
+    color: #444;
+}
+
+.octane-wired__value-popup-target {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+}
+
+/* The checkbox group, padded 5/0/5/0 (ValueOrVariablePopupPreset L92). */
+.octane-wired__value-popup-same-holder {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 5px;
+}
+
+.octane-wired__value-popup-same-holder.is-disabled {
+    opacity: 0.5;
+}
+
+.octane-wired__value-popup .octane-wired__divider {
+    margin: 0;
+}
+
+.octane-wired__value-popup-locked {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.octane-wired__value-popup-locked:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+
+/*
+ * Official wired window styles (AIR uibuilder/styles and their wired_style_*.xml templates). The
+ * colours arrive as variables from api/wired/WiredStyle.ts; these blocks restate what each template
+ * draws differently. Illumina is the base look above. Volter is the dark one; volter_yellow,
+ * volter_blue and volter_green are forced for three prototype furni and draw the sections inside a
+ * rounded inner border (border style 13) on the background colour, with the header and the buttons
+ * on the frame colour.
+ */
+.octane-wired.octane-wired--volter {
+    font-family: Volter, monospace;
+
+    /* The Volter templates draw every text in the 9 px Volter font (13 px lines). */
+    .octane-wired__body,
+    .octane-wired__section .font-bold:not(.octane-wired__summary-title),
+    .octane-wired__summary-description,
+    .octane-wired__furni-selector-description,
+    .octane-wired__picker-label,
+    .octane-wired__source-row,
+    .octane-wired__advanced-toggle,
+    .octane-wired__header-button,
+    .octane-wired__button,
+    .form-control,
+    .form-select,
+    input[type='text'],
+    input[type='number'],
+    textarea {
+        font-size: 9px !important;
+        line-height: 13px;
+    }
+
+    .octane-wired__summary {
+        min-height: 0;
+        padding: 26px 5px 5px;
+        background: transparent;
+        color: var(--wired-text);
+    }
+
+    .octane-wired__summary-line {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        min-width: 0;
+    }
+
+    .octane-wired__summary-icon {
+        flex: 0 0 auto;
+        width: 13px;
+        height: 14px;
+        image-rendering: pixelated;
+    }
+
+    .octane-wired__summary-title {
+        font-family: Volter, monospace;
+        font-weight: 700 !important;
+        font-size: var(--wired-header-name-size, 9px) !important;
+        line-height: 13px;
+        color: var(--wired-text) !important;
+        text-shadow: none;
+    }
+
+    .octane-wired__divider,
+    hr {
+        box-shadow: none;
+    }
+}
+
+.octane-wired.octane-wired--style-volter {
+    /* container colour 0x3d3d3d, ruler 0x232323, text white, source box 0x181818, mini button 0x333333, menu item 0x626262 */
+    border-color: #232323 !important;
+    box-shadow: inset 0 0 0 1px #4a4a4a !important;
+    color: #fff;
+
+    .octane-wired__header .octane-card-title {
+        color: #fff !important;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+    }
+
+    .octane-wired__header .octane-card-close-button {
+        border-color: #181818;
+        background: linear-gradient(180deg, #626262 0%, #333333 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    .octane-wired__header .octane-card-close-button::before,
+    .octane-wired__header .octane-card-close-button::after {
+        background: #e8e8e8;
+    }
+
+    .octane-wired__summary-kind,
+    .octane-wired__summary-title,
+    .octane-wired__advanced-toggle,
+    .octane-wired__picker-label,
+    .form-check-label,
+    label,
+    .text-black,
+    .text-black\/60,
+    .text-\[\#000000\] {
+        color: #fff !important;
+        text-shadow: none;
+    }
+
+    .form-check-input,
+    .octane-checkbox,
+    .octane-radio,
+    input[type='checkbox'],
+    input[type='radio'] {
+        border-color: #181818;
+        background: linear-gradient(180deg, #626262 0%, #4a4a4a 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    .form-check-input[type='radio']:checked,
+    .octane-radio[data-checked],
+    input[type='radio']:checked {
+        background:
+            radial-gradient(circle at center, #f4f4f4 0 34%, transparent 38%),
+            linear-gradient(180deg, #626262 0%, #4a4a4a 100%);
+        border-color: #181818;
+    }
+
+    .form-check-input[type='checkbox']:checked,
+    .octane-checkbox[data-checked],
+    input[type='checkbox']:checked {
+        background: linear-gradient(180deg, #7a7a7a 0%, #5a5a5a 100%);
+        border-color: #181818;
+    }
+
+    .form-check-input[type='checkbox']:checked::before,
+    .octane-checkbox[data-checked]::before,
+    .form-check-input[type='checkbox']:checked::after,
+    .octane-checkbox[data-checked]::after,
+    input[type='checkbox']:checked::before,
+    input[type='checkbox']:checked::after {
+        background: #f4f4f4;
+    }
+
+    .form-control,
+    .form-select,
+    input[type='text'],
+    input[type='number'],
+    .octane-number-input,
+    textarea {
+        border-color: #ffffff !important;
+        background: #2b2b2b !important;
+        color: #fff !important;
+        box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .octane-wired__button,
+    .octane-wired__picker-button,
+    .octane-wired__selection-toggle,
+    .octane-slider-button {
+        border-color: #181818 !important;
+        background: linear-gradient(180deg, #6a6a6a 0%, #4f4f4f 46%, #3f3f3f 47%, #4a4a4a 100%) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+        color: #fff !important;
+    }
+
+    .octane-wired__menu-list {
+        background: #626262;
+    }
+
+    .octane-wired__menu-item {
+        color: #fff;
+    }
+}
+
+.octane-wired.octane-wired--inner-border {
+    /* Text and ruler 0x222222, inputs white with a 0x222222 border, source boxes and mini buttons 0xffeda5, menu items 0xdddddd. */
+    border-color: #222222 !important;
+    box-shadow: none !important;
+    color: #222;
+
+    .octane-wired__header .octane-card-title {
+        color: #fff !important;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+    }
+
+    .octane-wired__sections {
+        padding: 8px 9px;
+        border: 1px solid #000;
+        border-radius: 7px;
+        background: var(--wired-background);
+        box-shadow: -1px -1px 0 1px rgba(0, 0, 0, 0.22);
+    }
+
+    /* InnerBorderFramePreset: no ruler above the first section, none above the buttons. */
+    .octane-wired__sections > .octane-wired__divider:first-child,
+    .octane-wired__divider--actions {
+        display: none;
+    }
+
+    .octane-wired__summary-kind,
+    .octane-wired__summary-title,
+    .octane-wired__advanced-toggle,
+    .octane-wired__picker-label,
+    .form-check-label,
+    label {
+        color: #222 !important;
+        text-shadow: none;
+    }
+
+    .form-check-input,
+    .octane-checkbox,
+    .octane-radio,
+    input[type='checkbox'],
+    input[type='radio'] {
+        border-color: #222222;
+        background: #ffffff;
+        box-shadow: none;
+    }
+
+    .form-check-input[type='radio']:checked,
+    .octane-radio[data-checked],
+    input[type='radio']:checked {
+        background: radial-gradient(circle at center, #222222 0 34%, transparent 38%), #ffffff;
+        border-color: #222222;
+    }
+
+    .form-check-input[type='checkbox']:checked,
+    .octane-checkbox[data-checked],
+    input[type='checkbox']:checked {
+        background: #ffeda5;
+        border-color: #222222;
+    }
+
+    .form-control,
+    .form-select,
+    input[type='text'],
+    input[type='number'],
+    .octane-number-input,
+    textarea {
+        border-color: #222222 !important;
+        background: #ffffff !important;
+        color: #222 !important;
+        box-shadow: none;
+    }
+
+    .octane-wired__button,
+    .octane-wired__picker-button,
+    .octane-wired__selection-toggle,
+    .octane-slider-button {
+        border-color: #222222 !important;
+        background: #ffeda5 !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+        color: #222 !important;
+    }
+
+    .octane-wired__menu-list {
+        background: #dddddd;
+    }
+}
+
+/* The yellow frame (style 2) is light: its title stays dark. */
+.octane-wired.octane-wired--style-volter_yellow .octane-wired__header .octane-card-title {
+    color: #222 !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* Delay section: title, seconds field and the Standard / Precise mode button (AIR ActionDelaySection). */
+.octane-wired__delay-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.octane-wired__delay-input {
+    width: 40px;
+    height: 18px;
+    padding: 0 3px;
+    font-size: 11px;
+    text-align: right;
+}
+
+.octane-wired__delay-mode {
+    position: relative;
+    margin-left: auto;
+}
+
+.octane-wired__delay-mode-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 21px;
+    height: 19px;
+    padding: 0;
+    cursor: pointer;
+}
+
+.octane-wired__delay-mode-button img {
+    image-rendering: pixelated;
+}
+
+.octane-wired__delay-mode-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    min-width: 150px;
+    padding: 2px;
+    background: #fff;
+    border: 1px solid #000;
+}
+
+.octane-wired__delay-mode-menu button {
+    padding: 2px 6px;
+    text-align: left;
+    font-size: 11px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.octane-wired__delay-mode-menu button.is-active,
+.octane-wired__delay-mode-menu button:hover {
+    background: #c3dfeb;
+}
+
+/* A disabled icon button keeps its frame; only the icon is drawn at half alpha (AIR Illumina icon buttons). */
+.octane-wired .octane-wired__picker-button:disabled {
+    filter: none;
+    cursor: default;
+}
+
+.octane-wired .octane-wired__picker-button:disabled svg,
+.octane-wired .octane-wired__value-input-button:disabled img {
+    opacity: 0.5;
+}
+
+/*
+ * The text of the wired box body, as AIR's wired_style_illumina and wired_style_volter templates set it.
+ * Illumina: il_regular 11 px (bold texts 11 px bold), inputs 11 px #4a4a4a, buttons il_button 10 px bold, in
+ * regular Ubuntu (our `Ubuntu` face is the condensed cut). Volter and its coloured proto variants: Volter 9 px,
+ * bold texts Volter Bold, inputs and buttons too. Section titles used to be 12-13 px and the Volter boxes
+ * kept their labels, links and buttons in the condensed Ubuntu.
+ */
+.octane-wired.octane-wired--style-illumina .octane-wired__body {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px;
+}
+
+.octane-wired.octane-wired--style-illumina .octane-wired__body :where(*):not(svg, svg *) {
+    font-family: inherit !important;
+    font-size: 11px !important;
+}
+
+.octane-wired.octane-wired--style-illumina .octane-wired__body :where(input, textarea) {
+    color: #4a4a4a;
+}
+
+.octane-wired.octane-wired--style-illumina .octane-wired__body button.font-bold,
+.octane-wired.octane-wired--style-illumina .octane-wired__body button.font-bold * {
+    font-size: 10px !important;
+}
+
+.octane-wired.octane-wired--volter .octane-wired__body {
+    font-family: Volter, monospace;
+    font-size: 9px;
+}
+
+.octane-wired.octane-wired--volter .octane-wired__body :where(*):not(svg, svg *) {
+    font-family: Volter, monospace !important;
+    font-size: 9px !important;
+}
+
+/* The footer buttons carry an important Tailwind size; an important rule in the earlier base layer outranks it. */
+@layer base {
+    .octane-wired.octane-wired--style-illumina .octane-wired__body :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+        font-size: 11px !important;
+    }
+
+    .octane-wired.octane-wired--style-illumina .octane-wired__body button.font-bold,
+    .octane-wired.octane-wired--style-illumina .octane-wired__body button.font-bold * {
+        font-size: 10px !important;
+    }
+
+    .octane-wired.octane-wired--volter .octane-wired__body :where(*):not(svg, svg *) {
+        font-family: Volter, monospace !important;
+        font-size: 9px !important;
+    }
+}
+
+/*
+ * The wired menu (wired_menu_view, wired_menu_table_view) and the windows it opens are Ubuntu frames: regular
+ * Ubuntu at 12 px, titles and table heads bold. Our `Ubuntu` face is the condensed cut, so they take the regular
+ * one; the share tab's code fields keep their monospace.
+ */
+.octane-wired-menu {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+@layer base {
+    .octane-wired-menu :where(*):not(svg, svg *, .font-mono) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
+
+/* wired_menu_view clear_log_btn and roll_back_btn: plain buttons style 5, color 0xe33934: the grey
+   habbo_skin_button_shiny multiplied by 0xe33934, white button_shiny_regular 12 px caption. The common Button's red
+   skin and its 12.6 px bold size are important rules, which only an important base-layer rule outranks. */
+@layer base {
+    .octane-wired-menu :is(.octane-wired-menu__clear-log, .octane-wired-menu__roll-back).habbo-btn-danger {
+        border-image-source: var(--habbo-skin-shiny-tint-e33934) !important;
+        color: #ffffff !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+    }
+
+    .octane-wired-menu :is(.octane-wired-menu__clear-log, .octane-wired-menu__roll-back).habbo-btn-danger:hover {
+        border-image-source: var(--habbo-skin-shiny-tint-e33934-hover) !important;
+    }
+
+    .octane-wired-menu :is(.octane-wired-menu__clear-log, .octane-wired-menu__roll-back).habbo-btn-danger:is(:active, .active) {
+        border-image-source: var(--habbo-skin-shiny-tint-e33934-pressed) !important;
+    }
+
+    .octane-wired-menu :is(.octane-wired-menu__clear-log, .octane-wired-menu__roll-back).habbo-btn-danger:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-tint-e33934-disabled) !important;
+    }
 }

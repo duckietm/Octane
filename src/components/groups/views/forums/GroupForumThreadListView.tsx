@@ -4,260 +4,226 @@ import {
     GuildForumThread,
     GuildForumThreadsEvent,
     ModerateThreadMessageComposer,
-    PostThreadMessageEvent
-} from '@nitrots/nitro-renderer';
+    UpdateThreadMessageComposer,
+    UpdateThreadMessageEvent
+} from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../api';
-import { Button, Column, Flex, LayoutBadgeImageView, Text } from '../../../../common';
-import { useMessageEvent } from '../../../../hooks';
+import { LocalizeText, ReportType, SendMessageComposer } from '../../../../api';
+import lockedIcon from '../../../../assets/images/groups/native/forum_forum_locked.png';
+import unlockedIcon from '../../../../assets/images/groups/native/forum_forum_unlocked.png';
+import hideIcon from '../../../../assets/images/groups/native/forum_forum_hide.png';
+import pinnedIcon from '../../../../assets/images/groups/native/forum_forum_pinned.png';
+import unpinnedIcon from '../../../../assets/images/groups/native/forum_forum_unpinned.png';
+import reportIcon from '../../../../assets/images/groups/native/forum_forum_report.png';
+import unhideIcon from '../../../../assets/images/groups/native/forum_forum_unhide.png';
+import { ClassicScrollAreaView } from '../../../../common';
+import { useHelp, useMessageEvent } from '../../../../hooks';
+import { flatText, GroupText } from '../GroupNativeLayout';
+import { FORUM_PAGE_SIZE, FORUM_SURFACE, stripTags, ForumButton, forumAge, ForumPager } from './GroupForumLayout';
+import { BaseButton } from '../../../../common/BaseButton';
 
-const THREADS_PER_PAGE = 20;
+// Thread states: 1 visible, 10 hidden by a group administrator, 20 deleted by Hotel staff.
+export const THREAD_HIDDEN_BY_ADMIN = 10;
+export const THREAD_DELETED_BY_STAFF = 20;
+export const THREAD_VISIBLE = 1;
+
+/** ThreadListView.getThreadColor: hidden by an admin grey, deleted by staff red, the others alternate starting light. */
+const threadColor = (state: number, rowIndex: number): number => {
+    if (state === THREAD_HIDDEN_BY_ADMIN) return 0xaaaaaa;
+    if (state === THREAD_DELETED_BY_STAFF) return 0xffb0a5;
+
+    return rowIndex % 2 === 1 ? 0xb2e6fa : 0xeefeff;
+};
+
+/** ThreadListView.getModerationMessage. */
+const moderationMessage = (thread: GuildForumThread): string => {
+    if (thread.state === THREAD_HIDDEN_BY_ADMIN) return LocalizeText('groupforum.view.thread_hidden_by_admin', ['ADMIN_NAME', 'admin_name'], [thread.adminName, thread.adminName]);
+    if (thread.state === THREAD_DELETED_BY_STAFF) return LocalizeText('groupforum.view.thread_hidden_by_staff', ['ADMIN_NAME', 'admin_name'], [thread.adminName, thread.adminName]);
+
+    return '';
+};
+
+const ROW_WIDTH = 532;
+const BUTTON_WIDTH = 25;
+
+/** Maps the error code of a permission to the text of that refusal ("Only group owner can start new threads."). */
+export const forumPermissionText = (code: string, operationKey: string): string => {
+    const operation = LocalizeText(`groupforum.view.error.${operationKey}`);
+
+    return LocalizeText(`groupforum.view.error.${code}`, ['operation', 'OPERATION'], [operation, operation]);
+};
 
 interface GroupForumThreadListViewProps {
-    groupId: number;
     forumData: ExtendedForumData;
-    onOpenThread: (groupId: number, threadId: number, thread?: GuildForumThread) => void;
+    groupId: number;
+    pageIndex: number;
+    /** Changes whenever the controller asks for the page again (requestThreadList), e.g. after a new thread was posted. */
+    reloadKey?: number;
+    /** GroupForumController.getThreadLastReadMessageIndex: the index of the last message of the thread the reader has seen. */
+    getLastReadMessageIndex: (thread: GuildForumThread) => number;
+    onLeave: () => void;
     onNewThread: () => void;
-    onOpenSettings: () => void;
-    onBack: () => void;
+    onOpenThread: (thread: GuildForumThread) => void;
+    onPageChange: (pageIndex: number) => void;
 }
 
-export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = (props) => {
-    const { groupId = 0, forumData = null, onOpenThread = null, onNewThread = null, onOpenSettings = null, onBack = null } = props;
-    const effectiveGroupId = forumData?.groupId || groupId;
+
+export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = ({ forumData, groupId, pageIndex, reloadKey = 0, getLastReadMessageIndex, onLeave, onNewThread, onOpenThread, onPageChange }) => {
     const [threads, setThreads] = useState<GuildForumThread[]>([]);
-    const [startIndex, setStartIndex] = useState<number>(0);
-    const [totalThreads, setTotalThreads] = useState<number>(0);
+    const { report = null } = useHelp();
+    const canModerate = forumData.canModerate;
+    const isStaff = forumData.isStaff;
+    // ThreadListView: moderators and Hotel staff get working lock, pin and hide buttons.
+    const canManage = canModerate || isStaff;
+    const canReport = forumData.canReport;
+    const canPostThread = forumData.canPostThread;
+    const pageCount = Math.ceil(forumData.totalThreads / FORUM_PAGE_SIZE);
 
     useMessageEvent<GuildForumThreadsEvent>(GuildForumThreadsEvent, (event) => {
         const parser = event.getParser();
 
-        if (parser.groupId !== effectiveGroupId) return;
+        if (parser.groupId !== groupId || parser.startIndex !== pageIndex * FORUM_PAGE_SIZE) return;
 
-        setTotalThreads(parser.amount);
-
-        if (parser.startIndex === 0) {
-            setThreads(parser.threads);
-        } else {
-            setThreads((prev) => [...prev, ...parser.threads]);
-        }
+        setThreads(parser.threads);
     });
 
-    useMessageEvent<PostThreadMessageEvent>(PostThreadMessageEvent, (event) => {
+    useMessageEvent<UpdateThreadMessageEvent>(UpdateThreadMessageEvent, (event) => {
         const parser = event.getParser();
 
-        if (parser.groupId !== effectiveGroupId) return;
+        if (parser.groupId !== groupId) return;
 
-        setThreads((prev) => [parser.thread, ...prev]);
+        setThreads((previous) => previous.map((thread) => (thread.threadId === parser.thread.threadId ? parser.thread : thread)));
     });
 
     useEffect(() => {
-        if (!effectiveGroupId) return;
+        if (!groupId) return;
 
-        setThreads([]);
-        setStartIndex(0);
-        SendMessageComposer(new GetThreadsMessageComposer(effectiveGroupId, 0, THREADS_PER_PAGE));
-    }, [effectiveGroupId]);
+        SendMessageComposer(new GetThreadsMessageComposer(groupId, pageIndex * FORUM_PAGE_SIZE, FORUM_PAGE_SIZE));
+    }, [groupId, pageIndex, reloadKey]);
 
-    const formatTimeAgo = (seconds: number): string => {
-        if (seconds < 60) return `${seconds}s ${LocalizeText('messageboard.time.ago')}`;
-        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${LocalizeText('messageboard.time.ago')}`;
-        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ${LocalizeText('messageboard.time.ago')}`;
+    // handleButtonVisibility: a visible thread can be hidden, one hidden by an admin shown again, and one deleted by staff only shown again by staff.
+    const hideActionOf = (thread: GuildForumThread): 'hide' | 'unhide' | null => {
+        if (!canManage) return null;
+        if (thread.state === THREAD_HIDDEN_BY_ADMIN) return 'unhide';
+        if (thread.state === THREAD_DELETED_BY_STAFF) return isStaff ? 'unhide' : null;
 
-        return `${Math.floor(seconds / 86400)}d ${LocalizeText('messageboard.time.ago')}`;
+        return 'hide';
     };
 
-    const getThreadStateText = (thread: GuildForumThread): string => {
-        if (thread.state === 10) return LocalizeText('messageboard.thread.hidden.by.admin');
-        if (thread.state === 20) return LocalizeText('messageboard.thread.permanently.deleted.by.moderator');
+    // GroupForumController.deleteThread hides with 10 for a group admin and 20 for staff; unDeleteThread sends 1.
+    const moderate = (thread: GuildForumThread, action: 'hide' | 'unhide') => {
+        const hiddenState = isStaff ? THREAD_DELETED_BY_STAFF : canModerate ? THREAD_HIDDEN_BY_ADMIN : 0;
 
-        return null;
+        SendMessageComposer(new ModerateThreadMessageComposer(groupId, thread.threadId, action === 'unhide' ? THREAD_VISIBLE : hiddenState));
     };
 
-    const canModerate = forumData && forumData.hasModeratePermissionError;
-
-    const pinnedThreads = threads.filter((t) => t.isPinned);
-    const normalThreads = threads.filter((t) => !t.isPinned);
-    const sortedThreads = [...pinnedThreads, ...normalThreads];
-
-    const restoreThread = (thread: GuildForumThread) => {
-        SendMessageComposer(new ModerateThreadMessageComposer(effectiveGroupId, thread.threadId, 1));
-    };
+    const statusKey = !canPostThread ? forumData.postThreadPermissionError : '';
 
     return (
-        <Column className="h-full" gap={0}>
-            <Flex className="bg-muted p-2 border-b" gap={2} alignItems="center" justifyContent="between">
-                <Flex gap={2} alignItems="center">
-                    <Text pointer bold onClick={onBack}>
-                        <span className="inline-block w-[7px] h-[7px] border-l-2 border-b-2 border-current rotate-45 mr-1 align-middle" />{' '}
-                        {LocalizeText('groupforum.view.back')}
-                    </Text>
-                </Flex>
-                <Flex gap={1} alignItems="center">
-                    {forumData && forumData.canChangeSettings && (
-                        <Button variant="link" className="btn-sm" onClick={onOpenSettings}>
-                            {LocalizeText('groupforum.view.settings.header')}
-                        </Button>
-                    )}
-                    {forumData && forumData.hasReadPermissionError && forumData.hasPostThreadPermissionError && (
-                        <Button variant="primary" className="btn-sm" onClick={onNewThread}>
-                            {LocalizeText('messageboard.new.thread.button')}
-                        </Button>
-                    )}
-                </Flex>
-            </Flex>
-            {forumData && (
-                <Flex className="bg-light p-2 border-b" gap={2} alignItems="center">
-                    <LayoutBadgeImageView badgeCode={forumData.icon} isGroup={true} />
-                    <Column className="flex-1" gap={0}>
-                        <Text bold>{forumData.name}</Text>
-                        <Text small variant="muted">
-                            {forumData.description}
-                        </Text>
-                    </Column>
-                    <Column className="text-end" gap={0}>
-                        <Text small>
-                            {forumData.totalThreads} {LocalizeText('groupforum.view.threads')}
-                        </Text>
-                        <Text small>
-                            {forumData.totalMessages} {LocalizeText('messageboard.messages')}
-                        </Text>
-                    </Column>
-                </Flex>
-            )}
-            {forumData && !forumData.hasReadPermissionError && (
-                <Flex className="flex-1 p-4" justifyContent="center" alignItems="center">
-                    <Column alignItems="center" gap={2}>
-                        <Text bold>{LocalizeText('groupforum.view.error.operation_read')}</Text>
-                        <Text small variant="muted">
-                            {LocalizeText('groupforum.view.error.' + forumData.readPermissionError)}
-                        </Text>
-                    </Column>
-                </Flex>
-            )}
-            {(!forumData || forumData.hasReadPermissionError) && (
-                <Column className="overflow-auto flex-1" gap={0}>
-                    {sortedThreads.map((thread, index) => {
-                        const stateText = getThreadStateText(thread);
-
-                        if (stateText) {
-                            return (
-                                <Flex key={thread.threadId} className="p-2 border-b bg-danger bg-opacity-10" alignItems="center" justifyContent="between">
-                                    <Column gap={0}>
-                                        <Text small variant="muted">
-                                            {stateText}
-                                        </Text>
-                                        {canModerate && (
-                                            <Text small variant="muted">
-                                                {thread.header}
-                                            </Text>
-                                        )}
-                                    </Column>
-                                    {canModerate && (
-                                        <Button variant="outline-success" className="btn-sm" onClick={() => restoreThread(thread)}>
-                                            {LocalizeText('groupforum.thread.restore')}
-                                        </Button>
-                                    )}
-                                </Flex>
-                            );
-                        }
+        <>
+            <GroupText background={FORUM_SURFACE} height={25} overrides={flatText(16, { bold: true, color: 0xa6a6a2 })} text={LocalizeText('groupforum.view.all_threads')} width={541} x={0} y={115} />
+            <div className="octane-forum__list">
+                <ClassicScrollAreaView className="octane-forum__scroll" contentClassName="octane-forum__scroll-content" minThumbSize={26} scrollStep={41}>
+                    {/* ThreadListView.update lists the threads in the order the server sends them. */}
+                    {threads.map((thread, rowIndex) => {
+                        // ThreadListView.updateListItem: the unread count follows what the reader has seen of the thread this session.
+                        const unreadCount = thread.totalMessages - getLastReadMessageIndex(thread) - 1;
+                        const isUnread = unreadCount > 0;
+                        const background = threadColor(thread.state, rowIndex);
+                        const rowColor = '#' + background.toString(16).padStart(6, '0');
+                        const subject = thread.header === '' ? '(No Subject)' : thread.header;
+                        const header = thread.state > 1 && !canModerate && !isStaff ? moderationMessage(thread) : subject;
+                        const details = stripTags(
+                            LocalizeText(
+                                'groupforum.view.thread_details',
+                                ['THREAD_AUTHOR_NAME', 'CREATION_TIME', 'LAST_AUTHOR_NAME', 'UPDATE_TIME'],
+                                [thread.authorName, forumAge(thread.creationTimeAsSecondsAgo), thread.lastUserName, forumAge(thread.lastCommentTime)]
+                            )
+                        );
+                        const hideAction = hideActionOf(thread);
+                        const buttonCount = (hideAction ? 1 : 0) + (canReport ? 1 : 0);
+                        const buttonsWidth = buttonCount * BUTTON_WIDTH;
+                        const textsWidth = ROW_WIDTH - 20 - 1 - 1 - 140 - (buttonCount ? 1 + buttonsWidth : 0);
 
                         return (
-                            <Flex
-                                key={thread.threadId}
-                                className={`p-2 border-b hover:bg-muted cursor-pointer ${thread.isPinned ? 'bg-warning bg-opacity-10' : ''} ${thread.unreadMessagesCount > 0 ? 'fw-bold' : ''}`}
-                                gap={2}
-                                alignItems="center"
-                                onClick={() => onOpenThread(effectiveGroupId, thread.threadId, thread)}
-                            >
-                                <Column className="flex-1 overflow-hidden" gap={0}>
-                                    <Flex gap={1} alignItems="center">
-                                        {thread.isPinned && <i className="fas fa-thumbtack text-warning" />}
-                                        {thread.isLocked && <i className="fas fa-lock text-muted" />}
-                                        <Text bold={thread.unreadMessagesCount > 0} className="truncate">
-                                            {thread.header}
-                                        </Text>
-                                    </Flex>
-                                    <Flex gap={1}>
-                                        <Text small variant="muted">
-                                            {LocalizeText('messageboard.started.by')}
-                                        </Text>
-                                        <Text
-                                            small
-                                            pointer
-                                            underline
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                GetUserProfile(thread.authorId);
-                                            }}
+                            <div key={thread.threadId} className="octane-forum__thread">
+                                {/* handleLeftButtonsVisibility: others only see the lock and the pin of a locked or pinned thread, disabled; info_buttons is a
+                                    vertical item list, so a pin without a lock moves up. */}
+                                <div className="octane-forum__thread-flags" style={{ background: rowColor }}>
+                                    {(canManage || thread.isLocked) && (
+                                        <BaseButton
+                                            className="octane-forum__flag"
+                                            disabled={!canManage}
+                                            style={{ top: 0 }}
+                                            type="button"
+                                            onClick={() => SendMessageComposer(new UpdateThreadMessageComposer(groupId, thread.threadId, !thread.isLocked, thread.isPinned))}
                                         >
-                                            {thread.authorName}
-                                        </Text>
-                                        <Text small variant="muted">
-                                            - {formatTimeAgo(thread.creationTimeAsSecondsAgo)}
-                                        </Text>
-                                    </Flex>
-                                </Column>
-                                <Column className="flex-shrink-0 text-center min-w-[60px]" gap={0}>
-                                    <Text small>{thread.totalMessages}</Text>
-                                    <Text small variant="muted">
-                                        {LocalizeText('messageboard.messages')}
-                                    </Text>
-                                </Column>
-                                {thread.unreadMessagesCount > 0 && (
-                                    <Column className="flex-shrink-0 text-center min-w-[60px]" gap={0}>
-                                        <Text small bold variant="danger">
-                                            {thread.unreadMessagesCount}
-                                        </Text>
-                                        <Text small variant="danger">
-                                            {LocalizeText('messageboard.unread')}
-                                        </Text>
-                                    </Column>
+                                            <img alt="" draggable={false} src={thread.isLocked ? lockedIcon : unlockedIcon} style={{ left: 3, top: 1 }} />
+                                        </BaseButton>
+                                    )}
+                                    {(canManage || thread.isPinned) && (
+                                        <BaseButton
+                                            className="octane-forum__flag"
+                                            disabled={!canManage}
+                                            style={{ top: canManage || thread.isLocked ? 20 : 0 }}
+                                            type="button"
+                                            onClick={() => SendMessageComposer(new UpdateThreadMessageComposer(groupId, thread.threadId, thread.isLocked, !thread.isPinned))}
+                                        >
+                                            <img alt="" draggable={false} src={thread.isPinned ? pinnedIcon : unpinnedIcon} style={{ left: 3, top: 2 }} />
+                                        </BaseButton>
+                                    )}
+                                </div>
+                                <div className="octane-forum__thread-body" style={{ left: 21, width: textsWidth, background: rowColor }}>
+                                    <GroupText background={background} overrides={isUnread ? { bold: true } : undefined} text={header} x={0} y={0} />
+                                    <GroupText background={background} overrides={flatText(10)} text={details} x={0} y={16} />
+                                    {/* header_region and unread_region go to the first unread message (onGoToFirstUnread). */}
+                                    <BaseButton className="octane-forum__thread-header" type="button" onClick={() => onOpenThread(thread)} />
+                                </div>
+                                <BaseButton className="octane-forum__thread-counts" type="button" style={{ left: 21 + textsWidth + 1, background: rowColor }} onClick={() => onOpenThread(thread)}>
+                                    <GroupText
+                                        background={background}
+                                        overrides={flatText(10, { bold: isUnread })}
+                                        text={LocalizeText('groupforum.view.thread_details1', ['TOTAL_MESSAGES', 'total_messages'], [String(thread.totalMessages), String(thread.totalMessages)])}
+                                        x={0}
+                                        y={0}
+                                    />
+                                    <GroupText
+                                        background={background}
+                                        overrides={flatText(10, { bold: isUnread })}
+                                        text={LocalizeText('groupforum.view.thread_details2', ['NEW_MESSAGES', 'new_messages'], [String(unreadCount), String(unreadCount)])}
+                                        x={0}
+                                        y={15}
+                                    />
+                                </BaseButton>
+                                {buttonCount > 0 && (
+                                    <div className="octane-forum__thread-actions" style={{ left: ROW_WIDTH - buttonsWidth, width: buttonsWidth }}>
+                                        {hideAction && (
+                                            <BaseButton className="octane-forum__action is-hide" type="button" onClick={() => moderate(thread, hideAction)}>
+                                                <img alt="" draggable={false} src={hideAction === 'unhide' ? unhideIcon : hideIcon} style={{ left: 5, top: 11 }} />
+                                            </BaseButton>
+                                        )}
+                                        {canReport && (
+                                            <BaseButton className="octane-forum__action is-report" style={{ left: hideAction ? BUTTON_WIDTH : 0 }} type="button" onClick={() => report(ReportType.THREAD, { groupId, threadId: thread.threadId })}>
+                                                <img alt="" draggable={false} src={reportIcon} style={{ left: 4, top: 12 }} />
+                                            </BaseButton>
+                                        )}
+                                    </div>
                                 )}
-                                <Column className="flex-shrink-0 text-end min-w-[100px]" gap={0}>
-                                    <Text small variant="muted">
-                                        {LocalizeText('messageboard.last.message')}
-                                    </Text>
-                                    <Text
-                                        small
-                                        pointer
-                                        underline
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            GetUserProfile(thread.lastUserId);
-                                        }}
-                                    >
-                                        {thread.lastUserName}
-                                    </Text>
-                                    <Text small variant="muted">
-                                        {formatTimeAgo(thread.lastCommentTime)}
-                                    </Text>
-                                </Column>
-                            </Flex>
+                            </div>
                         );
                     })}
-                    {sortedThreads.length === 0 && (
-                        <Flex className="p-4" justifyContent="center">
-                            <Text variant="muted">{LocalizeText('groupforum.view.no_threads')}</Text>
-                        </Flex>
-                    )}
-                    {threads.length < totalThreads && (
-                        <Flex justifyContent="center" className="p-2">
-                            <Text
-                                pointer
-                                underline
-                                onClick={() => {
-                                    const nextIndex = threads.length;
-                                    setStartIndex(nextIndex);
-                                    SendMessageComposer(new GetThreadsMessageComposer(effectiveGroupId, nextIndex, THREADS_PER_PAGE));
-                                }}
-                            >
-                                {LocalizeText('groupforum.list.load_more')}
-                            </Text>
-                        </Flex>
-                    )}
-                </Column>
+                </ClassicScrollAreaView>
+            </div>
+            <div className="octane-forum__footer">
+                <ForumButton label={LocalizeText('groupforum.view.mark_read')} width={95} x={10} onClick={onLeave} />
+                <ForumButton disabled={!canPostThread} label={LocalizeText('groupforum.view.start_thread')} right={178} tint="blue" width={115} onClick={onNewThread} />
+                <ForumPager pageCount={pageCount} pageIndex={pageIndex} onPage={onPageChange} />
+            </div>
+            {statusKey && (
+                <div className="octane-forum__status">
+                    <GroupText align="center" background={FORUM_SURFACE} overrides={flatText(11)} text={forumPermissionText(statusKey, 'operation_post_thread')} width={300} x={3} y={3} />
+                </div>
             )}
-        </Column>
+        </>
     );
 };

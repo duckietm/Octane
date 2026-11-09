@@ -1,9 +1,11 @@
 import '@testing-library/jest-dom/vitest';
 
-// Set up a container for React portals (used by NitroCardView's DraggableWindow)
-const draggableWindowsContainer = document.createElement('div');
-draggableWindowsContainer.id = 'draggable-windows-container';
-document.body.appendChild(draggableWindowsContainer);
+// Set up a container for React portals (used by OctaneCardView's DraggableWindow)
+if (typeof document !== 'undefined') {
+    const draggableWindowsContainer = document.createElement('div');
+    draggableWindowsContainer.id = 'draggable-windows-container';
+    document.body.appendChild(draggableWindowsContainer);
+}
 
 // jsdom doesn't ship ResizeObserver, but LayoutRoomPreviewerView (and
 // any component that resizes a canvas to its container) constructs
@@ -25,4 +27,43 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
         }
     }
     (globalThis as unknown as { ResizeObserver: typeof ResizeObserverStub }).ResizeObserver = ResizeObserverStub;
+}
+
+// Node 22.4+ ships an experimental built-in `localStorage` that is only
+// usable when the process is started with `--localstorage-file`. Because
+// vitest's jsdom environment makes `window` and `globalThis` the same
+// object, that built-in getter shadows the perfectly good Storage jsdom
+// already created, and every `window.localStorage.*` call throws
+// "Cannot read properties of undefined". Restore a real Storage so the
+// suite behaves the same on Node 22 (CI) and on newer local runtimes.
+for (const key of [ 'localStorage', 'sessionStorage' ] as const) {
+    if ((globalThis as unknown as Record<string, unknown>)[key]) continue;
+
+    const entries = new Map<string, string>();
+    const storage: Storage = {
+        get length() {
+            return entries.size;
+        },
+        clear: () => entries.clear(),
+        getItem: (name: string) => (entries.has(String(name)) ? entries.get(String(name)) as string : null),
+        key: (index: number) => Array.from(entries.keys())[index] ?? null,
+        removeItem: (name: string) => entries.delete(String(name)) as unknown as void,
+        setItem: (name: string, value: string) => {
+            entries.set(String(name), String(value));
+        }
+    };
+
+    Object.defineProperty(globalThis, key, { configurable: true, value: storage, writable: true });
+}
+
+// Vitest's jsdom shim for `URL.createObjectURL` unwraps a jsdom-internal
+// Blob symbol that the bundled jsdom no longer exposes, so every call throws
+// "Cannot read properties of undefined (reading '_buffer')". Components that
+// show cached image Blobs (LayoutAvatarImageView) only need a stable,
+// revocable url, so hand out synthetic ones.
+{
+    let nextObjectUrlId = 0;
+
+    URL.createObjectURL = () => `blob:test/${++nextObjectUrlId}`;
+    URL.revokeObjectURL = () => undefined;
 }

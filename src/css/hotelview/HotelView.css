@@ -1,502 +1,1422 @@
+.octane-hotel-view {
+    background: #27afcf;
+    background-image: var(--hotel-view-background);
+    /* Anchored where the scene ends, as before; the repeat fills the strip behind the toolbar. */
+    background-position: left bottom var(--hotel-view-scene-bottom, 55px);
+    background-repeat: repeat;
+    z-index: 0;
+}
+
+/* The scene's box: the stage, edges, avatar and drag handles are laid out in it as they were in the old container. */
+.hotelview-frame {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: var(--hotel-view-scene-bottom, 55px);
+    left: 0;
+    overflow: hidden;
+}
+
+.hotelview-stage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--hotel-view-scaled-width);
+    height: var(--hotel-view-scaled-height);
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
 .hotelview {
     position: relative;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, transparent 1185px, #51841E 1185px);
+    width: 1172px;
+    height: 822px;
+    overflow: hidden;
+    color: #fff;
+    font-family: Ubuntu, Arial, sans-serif;
+    transform: scale(var(--hotel-view-scale));
+    transform-origin: top left;
 }
 
 .hotelview-background {
-    position: relative;
-    margin-left: -400px;
-    margin-top: 0;
-    top: 0px;
-    left: 0px;
-    height: 1185px;
-    width: 3000px;
+    position: absolute;
     pointer-events: none;
-    background-image: url(@/assets/images/hotelview/hotelview.png);
-    background-repeat: no-repeat;
 }
 
-.nitro-hotel-view {
+.hotelview-background {
+    inset: 0;
+    background-color: transparent;
+}
+
+.hotelview-edge {
+    position: absolute;
+    z-index: 3;
+    bottom: 0;
+    width: auto;
+    height: auto;
+    pointer-events: none;
+}
+
+.hotelview-edge > img {
     display: block;
-    position: fixed;
-    width: 100%;
-    height: calc(100% - 55px);
-    background: #000;
-    color: #000;
-    box-shadow: 0px 55px 0px 0px #51841E;
-    z-index: 0;
+    width: auto;
+    height: auto;
 }
 
-.nitro-hotel-view-rooftop {
-    background-image: url(@/assets/images/hotelview/rooftop.gif);
-    background-repeat: no-repeat;
-    width: 120px;
-    height: 164px;
-    position: absolute;
-    top: calc(52px + 40px);
-    left: calc(1062px - 90px);
-    cursor: pointer;
-
-    .arrow {
-        width: 30px;
-        height: 42px;
-        position: absolute;
-        background-image: url(@/assets/images/hotelview/arrow_down.png);
-        background-repeat: no-repeat;
-        left: 39px;
-        top: 15px;
-        display: none;
-        animation: MoveUpDown 1s linear infinite;
-        z-index: 9999;
-    }
-
-    &:hover {
-        -webkit-filter: drop-shadow(1px 3px 20px #000000);
-        .arrow {
-            display: block;
-        }
-    }
+.hotelview-edge-left {
+    left: 0;
+    z-index: 4;
 }
 
-.nitro-hotel-view-rooftop-pool {
-    background-image: url(@/assets/images/hotelview/rooftop_pool.gif);
-    background-repeat: no-repeat;
-    width: 183px;
-    height: 164px;
-    position: absolute;
-    top: calc(272px + 40px);
-    left: calc(1324px - 200px);
-    cursor: pointer;
-
-    .arrow {
-        width: 30px;
-        height: 42px;
-        position: absolute;
-        background-image: url(@/assets/images/hotelview/arrow_down.png);
-        background-repeat: no-repeat;
-        left: 75px;
-        top: 0px;
-        display: none;
-        animation: MoveUpDown 1s linear infinite;
-        z-index: 9999;
-    }
-
-    &:hover {
-        -webkit-filter: drop-shadow(1px 3px 20px #000000);
-        .arrow {
-            display: block;
-        }
-    }
+.hotelview-edge-right {
+    right: 0;
 }
 
-.nitro-hotel-view-lobby {
-    background-image: url(@/assets/images/hotelview/lobby.png);
-    background-repeat: no-repeat;
-    width: 73px;
-    height: 65px;
+.hotelview-edge-drape {
     position: absolute;
-    top: calc(597px + 40px);
-    left: calc(1264px - 200px);
-    cursor: pointer;
-
-    .arrow {
-        width: 30px;
-        height: 42px;
-        position: absolute;
-        background-image: url(@/assets/images/hotelview/arrow_down.png);
-        background-repeat: no-repeat;
-        left: 19px;
-        top: 0px;
-        display: none;
-        animation: MoveUpDown 1s linear infinite;
-        z-index: 9999;
-    }
-
-    &:hover {
-        -webkit-filter: drop-shadow(1px 3px 20px #000000);
-        .arrow {
-            display: block;
-        }
-    }
+    z-index: 4;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+    pointer-events: none;
 }
 
-.nitro-hotel-view-picnic {
-    background-image: url(@/assets/images/hotelview/picnic.gif);
-    background-repeat: no-repeat;
-    width: 575px;
-    height: 436px;
+.hotelview-scene-drag-handle,
+.hotelview-hall-of-fame-drag-handle {
     position: absolute;
-    top: calc(240px + 248px);
-    left: calc(889px - 412px);
-    cursor: pointer;
-
-    .arrow {
-        width: 30px;
-        height: 42px;
-        position: absolute;
-        background-image: url(@/assets/images/hotelview/arrow_down.png);
-        background-repeat: no-repeat;
-        left: 315px;
-        top: 110px;
-        display: none;
-        animation: MoveUpDown 1s linear infinite;
-        z-index: 9999;
-    }
-
-    &:hover {
-        -webkit-filter: drop-shadow(1px 3px 20px #000000);
-        .arrow {
-            display: block;
-        }
-    }
-}
-
-.nitro-hotel-view-infobus {
-    background-image: url(@/assets/images/hotelview/infobus.gif);
-    background-repeat: no-repeat;
-    width: 181px;
-    height: 175px;
-    position: absolute;
-    top: calc(92px + 241px);
-    left: calc(1690px - 399px);
-    cursor: pointer;
     z-index: 5;
+    display: grid;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgb(15 96 121 / 70%);
+    border-radius: 50%;
+    background: rgb(233 247 250 / 78%);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 25%);
+    color: rgb(15 96 121 / 85%);
+    cursor: grab;
+    font: 700 15px Arial, sans-serif;
+    line-height: 1;
     pointer-events: auto;
-
-    .arrow-infobus {
-        width: 30px;
-        height: 42px;
-        position: absolute;
-        background-image: url(@/assets/images/hotelview/arrow_down.png);
-        background-repeat: no-repeat;
-        left: 60px;
-        top: 5px;
-        display: none;
-        animation: MoveUpDown 1s linear infinite;
-        z-index: 9999;
-        pointer-events: none;
-    }
-
-    &:hover {
-        -webkit-filter: drop-shadow(1px 3px 20px #000000);
-        .arrow-infobus {
-            display: block;
-        }
-    }
+    touch-action: none;
 }
 
-.nitro-hotel-view-peaceful {
-    background-image: url(@/assets/images/hotelview/peacefulpark.gif);
-    background-repeat: no-repeat;
-    width: 384px;
-    height: 269px;
+.hotelview-scene-drag-handle {
+    top: 8px;
+    left: 8px;
+}
+
+.hotelview-scene-drag-handle:active,
+.hotelview-hall-of-fame-drag-handle:active {
+    cursor: grabbing;
+}
+
+.hotelview-avatar {
     position: absolute;
-    top: calc(119px + 240px);
-    left: calc(1728px - 400px);
+    top: 84%;
+    left: 35%;
+    width: 90px;
+    height: 130px;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+}
+
+.hotelview-avatar-fallback {
+    bottom: 37px;
+    left: 109px;
+    top: auto;
+    transform: none;
+}
+
+.hotelview-slots {
+    position: absolute;
+    inset: 0;
+    width: 1172px;
+    height: 822px;
+}
+
+.hotelview-slot {
+    position: absolute;
+    display: flex;
+    gap: 12px;
+    width: 360px;
+    min-height: 118px;
+}
+
+.hotelview-slot-edit {
+    position: absolute;
+    top: -16px;
+    left: -6px;
+    display: grid;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgb(15 96 121 / 70%);
+    border-radius: 50%;
+    background: rgb(233 247 250 / 70%);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 25%);
+    color: rgb(15 96 121 / 85%);
     cursor: pointer;
-    z-index: 6;
-    pointer-events: none;
-
-    &::before {
-        content: '';
-        position: absolute;
-        top: 10%;
-        left: 38%;
-        width: 60%;
-        height: 65%;
-        pointer-events: auto;
-        z-index: 8;
-    }
-
-    &::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 0;
-        width: 50%;
-        height: 50%;
-        pointer-events: auto;
-        z-index: 8;
-    }
-
-    .arrow-peaceful {
-        width: 30px;
-        height: 42px;
-        position: absolute;
-        background-image: url(@/assets/images/hotelview/arrow_down.png);
-        background-repeat: no-repeat;
-        left: 250px;
-        top: 100px;
-        display: none;
-        animation: MoveUpDown 1s linear infinite;
-        z-index: 9999;
-        pointer-events: none;
-    }
-
-    &:hover {
-        -webkit-filter: drop-shadow(1px 3px 20px #000000);
-        .arrow-peaceful {
-            display: block;
-        }
-    }
+    font: 700 17px Arial, sans-serif;
+    line-height: 1;
 }
 
-.nitro-hotel-view-pool {
-    background-image: url(@/assets/images/hotelview/pool.gif);
-    background-repeat: no-repeat;
-    width: 433px;
-    height: 361px;
+.hotelview-slot-drag-handle {
     position: absolute;
-    top: calc(237px + 240px);
-    left: calc(1633px - 400px);
+    top: -16px;
+    left: 24px;
+    z-index: 2;
+    display: grid;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgb(15 96 121 / 70%);
+    border-radius: 50%;
+    background: rgb(233 247 250 / 70%);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 25%);
+    color: rgb(15 96 121 / 85%);
+    cursor: grab;
+    font: 700 15px Arial, sans-serif;
+    line-height: 1;
+    touch-action: none;
+}
+
+.hotelview-slot-drag-handle:active {
+    cursor: grabbing;
+}
+
+.hotelview-scene-edit {
+    position: absolute;
+    z-index: 4;
+    display: grid;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+    border: 1px solid #0f6079;
+    border-radius: 50%;
+    background: #e9f7fa;
+    color: #0f6079;
     cursor: pointer;
-    z-index: 7;
+    font: 700 17px Arial, sans-serif;
+    line-height: 1;
+}
+
+.hotelview-scene-edit-left {
+    bottom: 28px;
+    left: 24px;
+}
+
+.hotelview-scene-edit-right {
+    right: 24px;
+    bottom: 28px;
+}
+
+.hotelview-scene-edit-drape {
+    top: 14px;
+    left: 250px;
+}
+
+.hotelview-scene-edit-left,
+.hotelview-scene-edit-right,
+.hotelview-scene-edit-drape {
+    display: none;
+}
+
+.hotelview-scene-edit-background {
+    top: 12px;
+    right: auto;
+    left: 12px;
+    width: 30px;
+    height: 22px;
+    border-color: #0b4355;
+    border-radius: 4px;
+    background: #174e60;
+    box-shadow: inset 0 1px rgb(255 255 255 / 22%), 0 1px 2px rgb(0 0 0 / 35%);
+    color: #fff;
+    font: 700 9px Ubuntu, Arial, sans-serif;
+}
+
+.hotelview-slot-1 {
+    top: 8px;
+    left: 200px;
+    width: 400px;
+    min-height: 64px;
+    padding: 7px 11px;
+}
+
+.hotelview-slot-2 {
+    top: 155px;
+    left: 200px;
+    width: 380px;
+}
+
+.hotelview-slot-3 {
+    top: 155px;
+    left: 640px;
+    width: 340px;
+}
+
+.hotelview-slot-4 {
+    top: 410px;
+    left: 240px;
+    width: 360px;
+}
+
+.hotelview-slot-5 {
+    top: 410px;
+    left: 640px;
+    width: 340px;
+}
+
+.hotelview-slot-6 {
+    top: 590px;
+    left: 640px;
+    width: 340px;
+}
+
+.hotelview-slot-disabled {
+    display: grid;
+    min-height: 74px;
+    place-items: center;
+    border: 1px dashed rgb(255 255 255 / 70%);
+    color: rgb(255 255 255 / 90%);
+    font-weight: 700;
+    font-style: italic;
+}
+
+.hotelview-slot-2 .hotelview-slot-image {
+    order: 2;
+}
+
+.hotelview-slot-2 .hotelview-slot-copy {
+    order: 1;
+}
+
+.hotelview-slot-image {
+    flex: 0 0 auto;
+    width: auto;
+    height: auto;
+    align-self: center;
+}
+
+.hotelview-slot-1 .hotelview-slot-image {
+    flex-basis: auto;
+}
+
+.hotelview-slot-nextlimitedrarecountdown {
+    align-items: center;
+    width: 541px;
+    min-height: 60px;
+    padding: 6px 8px;
+    border-radius: 5px;
+    background: rgb(20 93 117 / 24%);
+}
+
+.hotelview-slot-6.hotelview-slot-nextlimitedrarecountdown {
+    left: 315px;
+}
+
+.hotelview-ltd-countdown-icon {
+    width: 34px;
+    height: 37px;
+    margin-left: 1px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.hotelview-slot-nextlimitedrarecountdown .hotelview-slot-copy {
+    display: block;
+}
+
+.hotelview-slot-nextlimitedrarecountdown .hotelview-slot-copy h2 {
+    margin-bottom: 2px;
+}
+
+.hotelview-slot-nextlimitedrarecountdown .hotelview-slot-copy p,
+.hotelview-slot-nextlimitedrarecountdown .hotelview-slot-copy > button {
+    width: 230px;
+}
+
+.hotelview-slot-nextlimitedrarecountdown .hotelview-countdown {
+    width: 230px;
+    min-height: 46px;
+    margin: 6px 0 0;
+    padding: 0 4px;
+    border: 1px solid rgb(255 255 255 / 85%);
+    border-radius: 4px;
+    background: rgb(38 52 56 / 88%);
+    box-shadow: inset 0 1px rgb(255 255 255 / 18%), 0 1px 2px rgb(0 0 0 / 45%);
+    color: #fff;
+    font-size: 22px !important;
+}
+
+.hotelview-slot-nextlimitedrarecountdown .hotelview-ltd-countdown {
+    display: grid;
+    place-items: center;
+    text-align: center;
+}
+
+.hotelview-ltd-countdown-values {
+    display: block;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .25px;
+    line-height: 24px;
+}
+
+.hotelview-ltd-countdown small {
+    display: block;
+    color: rgb(255 255 255 / 86%);
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 11px;
+    white-space: nowrap;
+}
+
+.hotelview-reset-votes {
+    grid-column: 1 / -1;
+    height: 25px;
+    margin: 0;
+    border: 1px solid #8b3737;
+    border-radius: 3px;
+    background: #f7eeee;
+    color: #7c1f1f;
+    cursor: pointer;
+    font: 700 12px Ubuntu, Arial, sans-serif;
+}
+
+.hotelview-slot-copy {
+    min-width: 0;
+    flex: 1;
+}
+
+.hotelview-slot h2,
+.hotelview-slot p,
+.hotelview-slot strong {
+    display: block;
+    margin: 0;
+    color: #fff;
+    text-shadow: 1px 1px rgb(0 0 0 / 22%);
+}
+
+.hotelview-slot h2 {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hotelview-slot p {
+    margin-top: 3px;
+    font-size: 12px;
+    line-height: 13px;
+}
+
+.hotelview-slot strong {
+    margin-top: 3px;
+    font-size: 12px;
+    text-align: center;
+}
+
+.hotelview-slot-copy > button {
+    width: 100%;
+    height: 25px;
+    margin-top: 9px;
+    border: 1px solid #888;
+    border-radius: 5px;
+    background: linear-gradient(#fff, #d5d5d5);
+    box-shadow: inset 0 1px #fff, 0 1px rgb(0 0 0 / 35%);
+    color: #111;
+    cursor: pointer;
+    font: 700 12px Ubuntu, Arial, sans-serif;
+}
+
+.hotelview-slot-copy > button:hover {
+    background: linear-gradient(#fff, #c2c2c2);
+}
+
+.hotelview-slot-copy > button:disabled {
+    cursor: default;
+    filter: grayscale(1);
+    opacity: .72;
+}
+
+.hotelview-slot-copy > button + button {
+    margin-top: 5px;
+}
+
+.hotelview-countdown {
+    padding: 4px 0 0;
+    font-size: 15px !important;
+    letter-spacing: .5px;
+}
+
+.hotelview-vote-options {
+    display: grid;
+    gap: 5px;
+    margin-top: 7px;
+}
+
+.hotelview-vote-options button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 25px;
+    border: 1px solid #888;
+    border-radius: 5px;
+    background: linear-gradient(#fff, #d5d5d5);
+    box-shadow: inset 0 1px #fff, 0 1px rgb(0 0 0 / 35%);
+    color: #111;
+    cursor: pointer;
+    font: 700 12px Ubuntu, Arial, sans-serif;
+}
+
+.hotelview-vote-options span {
+    position: absolute;
+    right: 8px;
+    min-width: 20px;
+    text-align: right;
+}
+
+.hotelview-vote-options button:disabled {
+    cursor: default;
+    opacity: .72;
+}
+
+.hotelview-vote-options button.hotelview-vote-selected:disabled {
+    border-color: #0f6079;
+    background: linear-gradient(#e8fbff, #b8e2ed);
+    color: #0d4557;
+    opacity: 1;
+}
+
+.hotelview-progress {
+    height: 19px;
+    margin-top: 5px;
+    padding: 2px;
+    border: 2px solid #fff;
+    border-radius: 5px;
+    background: #353535;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 65%);
+}
+
+.hotelview-progress span {
+    display: block;
+    height: 100%;
+    border-radius: 2px;
+    background: #9e9e9e;
+}
+
+.hotelview-community-progress {
+    display: flex;
+    padding: 0;
+    overflow: hidden;
+}
+
+.hotelview-community-progress span {
+    flex: 0 0 auto;
+    border-radius: 0;
+}
+
+.hotelview-community-progress .hotelview-community-progress-option-1 {
+    background: linear-gradient(90deg, #4c9db7, #75c6df);
+}
+
+.hotelview-community-progress .hotelview-community-progress-option-2 {
+    background: linear-gradient(90deg, #ce873d, #efbd61);
+}
+
+.hotelview-editor {
+    position: absolute;
+    z-index: 10;
+    top: 24px;
+    left: 50%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-content: start;
+    gap: 8px;
+    box-sizing: border-box;
+    width: 520px;
+    max-height: calc(100% - 48px);
+    padding: 0 12px 12px;
+    border: 2px solid #1d6078;
+    border-radius: 6px;
+    background: #ececea;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 78%), 0 3px 10px rgb(0 0 0 / 55%);
+    color: #222;
+    font: 12px Ubuntu, Arial, sans-serif;
+    overflow-y: auto;
+    transform: translateX(-50%);
+}
+
+.hotelview-editor header,
+.hotelview-editor footer {
+    grid-column: 1 / -1;
+}
+
+.hotelview-editor header {
+    margin: 0 -12px 4px;
+    padding: 7px 34px;
+    border-bottom: 1px solid #0b4355;
+    border-radius: 4px 4px 0 0;
+    background: #337f99;
+    box-shadow: inset 0 1px rgb(255 255 255 / 24%);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    text-shadow: 0 1px rgb(0 0 0 / 45%);
+}
+
+.hotelview-editor-preview {
+    position: relative;
+    grid-column: 1 / -1;
+    overflow: hidden;
+    border: 1px solid #7395a0;
+    border-radius: 4px;
+    background: #d8e7e9;
+    box-shadow: inset 0 1px rgb(255 255 255 / 80%);
+}
+
+.hotelview-editor-preview-label {
+    position: absolute;
+    z-index: 2;
+    top: 4px;
+    left: 4px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    background: rgb(18 56 69 / 78%);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.hotelview-editor-slot-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 90px;
+    padding: 12px 10px 8px;
+}
+
+.hotelview-editor-slot-preview > img {
+    flex: 0 0 78px;
+    width: auto;
+    max-width: 78px;
+    height: auto;
+    max-height: 68px;
+    object-fit: contain;
+}
+
+.hotelview-editor-slot-preview > div {
+    display: grid;
+    flex: 1;
+    gap: 4px;
+    min-width: 0;
+}
+
+.hotelview-editor-slot-preview strong {
+    overflow: hidden;
+    color: #174e60;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hotelview-editor-slot-preview p {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    color: #24464d;
+    font-size: 11px;
+    line-height: 1.2;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.hotelview-editor-slot-preview button {
+    min-height: 20px;
+    padding: 2px 8px;
+    border: 1px solid #5c6f73;
+    border-radius: 3px;
+    background: linear-gradient(#fff, #d9d9d9);
+    color: #161616;
+    font: 700 11px Ubuntu, Arial, sans-serif;
     pointer-events: none;
+}
 
-    &::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 0;
-        width: 100%;
-        height: 50%;
-        pointer-events: auto;
-        z-index: 8;
+.hotelview-editor-preview-votes {
+    grid-template-columns: 1fr 1fr;
+}
+
+.hotelview-editor-slot-preview em {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgb(32 44 47 / 55%);
+    color: #fff;
+    font-weight: 700;
+}
+
+.hotelview-editor-scene-preview {
+    height: 154px;
+    padding-top: 0;
+}
+
+.hotelview-editor-scene-canvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #4caec7;
+    background-position: center;
+    background-repeat: repeat;
+    background-size: auto;
+}
+
+.hotelview-editor-scene-canvas img {
+    position: absolute;
+    bottom: 0;
+    width: auto;
+    height: auto;
+    max-width: 42%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.hotelview-editor-scene-left {
+    left: 0;
+}
+
+.hotelview-editor-scene-right {
+    right: 0;
+}
+
+.hotelview-editor-scene-drape {
+    top: 0;
+    bottom: auto !important;
+    left: 0;
+    max-width: 50% !important;
+    transform: none;
+}
+
+.hotelview-hall-of-fame {
+    position: absolute;
+    z-index: 3;
+    bottom: -18px;
+    left: 50%;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    width: min(900px, 82%);
+    min-height: 148px;
+    padding: 0 12px;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.hotelview-hall-of-fame header {
+    position: absolute;
+    top: -48px;
+    left: 12px;
+    width: 250px;
+    margin: 0;
+    padding-bottom: 7px;
+    border-bottom: 1px solid rgb(255 255 255 / 32%);
+}
+
+.hotelview-hall-of-fame-drag-handle {
+    top: -28px;
+    right: 10px;
+}
+
+.hotelview-hall-of-fame h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+    line-height: 20px;
+    text-shadow: 0 2px 2px rgb(0 0 0 / 65%);
+}
+
+.hotelview-hall-of-fame header p {
+    margin: 2px 0 0;
+    color: rgb(255 255 255 / 82%);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .1px;
+    text-shadow: 0 1px 2px rgb(0 0 0 / 60%);
+}
+
+.hotelview-hall-of-fame-user {
+    position: relative;
+    display: flex;
+    flex: 0 0 64px;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: 148px;
+    transform: scale(min(1, calc(1 / var(--hotel-view-scale, 1))));
+    transform-origin: bottom center;
+}
+
+.hotelview-hall-of-fame-user::before {
+    content: '';
+    position: absolute;
+    bottom: 1px;
+    left: 50%;
+    width: 62px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 38%, #eef6f8 0%, #bcd6de 52%, #8fb2bd 80%, #6a909d 100%);
+    box-shadow: inset 0 1px rgb(255 255 255 / 60%), 0 3px 5px rgb(0 0 0 / 40%);
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.hotelview-hall-of-fame-avatar {
+    position: absolute !important;
+    bottom: -6px;
+    left: 50%;
+    z-index: 1;
+    background-position: 50% 0 !important;
+    transform-origin: bottom center;
+    translate: -50% 0;
+}
+
+.hotelview-hall-of-fame-user span {
+    position: absolute;
+    bottom: 104px;
+    left: 50%;
+    max-width: 90px;
+    padding: 1px 7px;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 22%);
+    border-radius: 9px;
+    background: linear-gradient(rgb(19 76 94 / 88%), rgb(12 54 68 / 88%));
+    box-shadow: inset 0 1px rgb(255 255 255 / 18%), 0 1px 2px rgb(0 0 0 / 45%);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .2px;
+    text-align: center;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 1px rgb(0 0 0 / 65%);
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+.hotelview-editor label {
+    display: grid;
+    gap: 2px;
+    font-weight: 700;
+}
+
+.hotelview-editor input,
+.hotelview-editor select,
+.hotelview-editor .octane-select-trigger,
+.hotelview-editor textarea {
+    min-width: 0;
+    padding: 3px 6px;
+    border: 1px solid #8d8d8d;
+    border-radius: 4px;
+    background: #f6f6f6;
+    box-shadow: inset 0 1px rgb(255 255 255 / 95%);
+    color: #111;
+    font: inherit;
+}
+
+.hotelview-editor .hotelview-editor-toggle {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: center;
+    gap: 7px;
+    min-height: 24px;
+    cursor: pointer;
+}
+
+.hotelview-editor .hotelview-editor-toggle input[type='checkbox'],
+.hotelview-editor .hotelview-editor-toggle .octane-checkbox {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    margin: 0;
+    border: 1px solid #3c6977;
+    border-radius: 3px;
+    background: #fff;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.hotelview-editor .hotelview-editor-toggle input[type='checkbox']::before,
+.hotelview-editor .hotelview-editor-toggle input[type='checkbox']::after,
+.hotelview-editor .hotelview-editor-toggle .octane-checkbox::before {
+    content: none;
+}
+
+.hotelview-editor .hotelview-editor-toggle input[type='checkbox']:checked,
+.hotelview-editor .hotelview-editor-toggle .octane-checkbox[data-checked] {
+    border-color: #124d60;
+    background: #1e748f;
+}
+
+.hotelview-editor .hotelview-editor-toggle input[type='checkbox']:checked::after,
+.hotelview-editor .hotelview-editor-toggle .octane-checkbox[data-checked]::after {
+    content: '✓';
+    position: absolute;
+    inset: -1px 0 0;
+    width: auto;
+    height: auto;
+    background: none;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    transform: none;
+}
+
+.hotelview-editor .hotelview-editor-toggle span {
+    line-height: 18px;
+}
+
+.hotelview-editor textarea {
+    min-height: 52px;
+    resize: vertical;
+}
+
+.hotelview-vote-reward-panel {
+    display: grid;
+    gap: 7px;
+    min-width: 0;
+    margin: 0;
+    padding: 8px;
+    border: 1px solid #94a9ae;
+    border-radius: 4px;
+    background: rgb(255 255 255 / 42%);
+}
+
+.hotelview-vote-rewards {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.hotelview-vote-reward-panel legend {
+    padding: 0 4px;
+    color: #174e60;
+    font-weight: 700;
+}
+
+.hotelview-editor footer {
+    display: flex;
+    justify-content: end;
+    gap: 7px;
+    padding-top: 4px;
+}
+
+.hotelview-editor footer button {
+    width: 86px;
+    height: 25px;
+    margin: 0;
+    border: 1px solid #4f4f4f;
+    border-radius: 4px;
+    background: linear-gradient(#fff, #d8d8d8);
+    color: #111;
+    font-weight: 700;
+}
+
+@media (max-width: 949px), (max-height: 599px) {
+    .hotelview-stage {
+        top: 0;
+        transform: translateX(-50%);
     }
+}
 
-    .arrow-pool {
-        width: 30px;
-        height: 42px;
-        position: absolute;
-        background-image: url(@/assets/images/hotelview/arrow_down.png);
-        background-repeat: no-repeat;
-        left: 195px;
-        top: 250px;
+@media (max-width: 767px) {
+    .hotelview-edge-right,
+    .hotelview-slots,
+    .hotelview-hall-of-fame {
         display: none;
-        animation: MoveUpDown 1s linear infinite;
-        z-index: 9999;
-        pointer-events: none;
-    }
-
-    &:hover {
-        -webkit-filter: drop-shadow(1px 3px 20px #000000);
-        .arrow-pool {
-            display: block;
-        }
     }
 }
 
-@keyframes MoveUpDown {
-    0%, 100% {
-        top: 1px;
-    }
-    50% {
-        top: 10px;
-    }
+/* ---- live AIR landing view widgets inside the slots (friendbar/landingview/widget) ---- */
+
+.hotelview-widget-title {
+    display: block;
+    color: rgb(255 255 255 / 85%);
+    font: 700 9px Ubuntu, Arial, sans-serif;
+    letter-spacing: .5px;
+    text-shadow: 1px 1px rgb(0 0 0 / 22%);
+    text-transform: uppercase;
 }
 
-@media only screen and (min-width: 1700px) {
-    .left {
-        left: 18vw !important;
-    }
+.hotelview-slot .hotelview-widget-button {
+    width: 100%;
+    height: 25px;
+    margin-top: 7px;
+    border: 1px solid #888;
+    border-radius: 5px;
+    background: linear-gradient(#fff, #d5d5d5);
+    box-shadow: inset 0 1px #fff, 0 1px rgb(0 0 0 / 35%);
+    color: #111;
+    cursor: pointer;
+    font: 700 12px Ubuntu, Arial, sans-serif;
 }
 
-@media only screen and (min-width: 2000px) {
-    .left {
-        left: 23vw !important;
-    }
+.hotelview-slot .hotelview-widget-button:hover {
+    background: linear-gradient(#fff, #c2c2c2);
 }
 
-@media only screen and (min-width: 2500px) {
-    .left {
-        left: 28% !important;
-    }
+.hotelview-slot .hotelview-widget-button:disabled {
+    cursor: default;
+    filter: grayscale(1);
+    opacity: .72;
 }
 
-/* ─── Time-of-day overrides ────────────────────────────────────────────────
-   The class hotel-{period} is stamped on .nitro-hotel-view by HotelView.tsx.
-   Controlled by timezone.settings in renderer-config.json.
-   Periods: morning (06-09) | day (10-16) | sunset (17-19) | evening (20-23) | night (00-05)
-─────────────────────────────────────────────────────────────────────────── */
-
-/* Morning: orange-tinted building, warm sky */
-.hotel-morning {
-    box-shadow: 0px 55px 0px 0px #E67451;
-}
-.hotel-morning .hotelview-background {
-    background-image: url(@/assets/images/hotelview/hotelview-morning.png);
-}
-
-/* Day: default — no overrides needed, base styles already use day assets */
-
-/* Sunset: warm orange sky + amber-earth ground */
-.hotel-sunset {
-    box-shadow: 0px 55px 0px 0px #D4651A;
-}
-.hotel-sunset .hotelview {
-    background: linear-gradient(to bottom, transparent 1185px, #353B31 1185px);
-}
-.hotel-sunset .hotelview-background {
-    background-image: url(@/assets/images/hotelview/hotelview-sunset.png);
+.hotelview-slot .hotelview-widget-link {
+    display: block;
+    margin-top: 4px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+    font: 12px Ubuntu, Arial, sans-serif;
+    text-decoration: underline;
+    text-shadow: 1px 1px rgb(0 0 0 / 22%);
 }
 
-/* ─── Sunset widget dimming via ::before pseudo-element ─────────────────────
-   We cannot use opacity on the parent because it would also dim the arrow.
-   Instead we hide the original background-image and redraw it at 0.1 opacity
-   on a ::before layer, leaving the arrow child at full opacity.
-─────────────────────────────────────────────────────────────────────────── */
-
-.hotel-sunset .nitro-hotel-view-rooftop,
-.hotel-sunset .nitro-hotel-view-rooftop-pool,
-.hotel-sunset .nitro-hotel-view-lobby,
-.hotel-sunset .nitro-hotel-view-picnic,
-.hotel-sunset .nitro-hotel-view-infobus,
-.hotel-sunset .nitro-hotel-view-peaceful,
-.hotel-sunset .nitro-hotel-view-pool {
-    background-image: none !important;
+/* PromoArticleWidget: header, one disk per article, image left of the copy. */
+.hotelview-promo-article-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: #fff;
+    font: 700 11px Ubuntu, Arial, sans-serif;
+    text-shadow: 1px 1px rgb(0 0 0 / 22%);
 }
 
-.hotel-sunset .nitro-hotel-view-rooftop::before {
-    content: '';
+.hotelview-promo-article-navigation {
+    display: flex;
+    gap: 2px;
+}
+
+.hotelview-slot .hotelview-promo-article-disk {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 1px solid rgb(255 255 255 / 85%);
+    border-radius: 50%;
+    background: rgb(0 0 0 / 25%);
+    cursor: pointer;
+}
+
+.hotelview-slot .hotelview-promo-article-disk:hover,
+.hotelview-slot .hotelview-promo-article-disk-on {
+    background: #fff;
+}
+
+.hotelview-promo-article-body {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+    transition: opacity 250ms linear;
+}
+
+.hotelview-promo-article-fading {
+    opacity: 0;
+}
+
+.hotelview-promo-article-image {
+    flex: 0 0 auto;
+    max-width: 150px;
+    max-height: 82px;
+}
+
+.hotelview-promo-article-copy {
+    min-width: 0;
+    flex: 1;
+}
+
+/* BonusRarePromoWidget: furni preview, header, progress bar with the status on top. */
+.hotelview-bonus-rare {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hotelview-bonus-rare-preview {
+    display: grid;
+    flex: 0 0 64px;
+    height: 64px;
+    place-items: center;
+}
+
+.hotelview-bonus-rare-copy {
+    min-width: 0;
+    flex: 1;
+}
+
+.hotelview-bonus-rare-progress {
+    position: relative;
+}
+
+.hotelview-bonus-rare-progress span {
+    background: linear-gradient(#ffd348, #f0a400);
+}
+
+.hotelview-bonus-rare-progress em {
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-image: url(@/assets/images/hotelview/rooftop.gif);
-    background-repeat: no-repeat;
-    opacity: 0.2;
-    z-index: 0;
+    inset: 0;
+    color: #fff;
+    font: 700 11px/15px Ubuntu, Arial, sans-serif;
+    text-align: center;
+    text-shadow: 1px 1px rgb(0 0 0 / 55%);
+}
+
+/* CommunityGoalWidget: texts left, the 226x200 meter scaled into the slot on the right. */
+.hotelview-community-goal {
+    display: flex;
+    gap: 8px;
+}
+
+.hotelview-community-goal-copy {
+    min-width: 0;
+    flex: 1;
+}
+
+.hotelview-community-goal-votes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+}
+
+.hotelview-community-goal-meter {
+    position: relative;
+    flex: 0 0 136px;
+    height: 120px;
+}
+
+.hotelview-community-goal-meter > img {
+    position: absolute;
+    transform-origin: 0 0;
+}
+
+.hotelview-community-goal-meter-level-0 {
+    top: 0;
+    left: 0;
+    transform: scale(.6);
+}
+
+.hotelview-community-goal-meter-level-1 {
+    top: 23px;
+    left: 6px;
+    transform: scale(.6);
+}
+
+.hotelview-community-goal-meter-level-2 {
+    top: 6px;
+    left: 18px;
+    transform: scale(.6);
+}
+
+.hotelview-community-goal-meter-level-3 {
+    top: 23px;
+    left: 63px;
+    transform: scale(.6);
+}
+
+.hotelview-community-goal-needle {
+    top: 29px;
+    left: 24px;
+    transform: scale(.6);
+}
+
+.hotelview-slot .hotelview-community-goal-status {
+    position: absolute;
+    top: 88px;
+    right: 0;
+    left: 0;
+    font-size: 11px;
+}
+
+/* Concurrent users goal: the counter, then the badge and the claim button. */
+.hotelview-concurrent-users-reward {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+    color: #fff;
+    font-size: 12px;
+    text-shadow: 1px 1px rgb(0 0 0 / 22%);
+}
+
+.hotelview-concurrent-users-reward img {
+    max-width: 40px;
+    max-height: 40px;
+}
+
+/* DailyQuestWidget: header with the easy | hard switch, quest image left of the copy. */
+.hotelview-daily-quest-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.hotelview-daily-quest-difficulty {
+    display: flex;
+    gap: 4px;
+    color: #fff;
+    font-size: 11px;
+}
+
+.hotelview-slot .hotelview-daily-quest-difficulty button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+    font: 11px Ubuntu, Arial, sans-serif;
+    text-decoration: underline;
+}
+
+.hotelview-slot .hotelview-daily-quest-difficulty .hotelview-daily-quest-selected {
+    cursor: default;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.hotelview-daily-quest-body {
+    display: flex;
+    gap: 8px;
+    margin-top: 3px;
+}
+
+.hotelview-daily-quest-image {
+    flex: 0 0 auto;
+    max-width: 64px;
+    max-height: 64px;
+    align-self: flex-start;
+}
+
+.hotelview-daily-quest-copy {
+    min-width: 0;
+    flex: 1;
+}
+
+/*
+ * CommunityGoalHallOfFameWidget (user_list.xml / user_entry.xml / competition_user_popup.xml): ten
+ * avatars side by side with AIR's vertical offsets, the 154x69 popup with its pointer over one of them.
+ */
+.hotelview-competition-hof {
+    width: 360px;
+}
+
+.hotelview-competition-hof-list {
+    position: relative;
+    height: 200px;
+}
+
+.hotelview-competition-hof-popup {
+    position: absolute;
+    top: 0;
+    left: clamp(0px, calc(var(--hof-index) * 36px - 59px), 206px);
+    z-index: 3;
+    width: 154px;
     pointer-events: none;
 }
 
-.hotel-sunset .nitro-hotel-view-rooftop-pool::before {
+.hotelview-competition-hof-popup::after {
     content: '';
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-image: url(@/assets/images/hotelview/rooftop_pool.gif);
-    background-repeat: no-repeat;
-    opacity: 0.1;
-    z-index: 0;
-    pointer-events: none;
+    top: 69px;
+    left: clamp(8px, calc(var(--hof-index) * 36px + 18px - clamp(0px, calc(var(--hof-index) * 36px - 59px), 206px) - 5px), 136px);
+    border-top: 6px solid #fff;
+    border-right: 5px solid transparent;
+    border-left: 5px solid transparent;
 }
 
-.hotel-sunset .nitro-hotel-view-lobby::before {
-    content: '';
+.hotelview-competition-hof-popup-body {
+    box-sizing: border-box;
+    height: 69px;
+    padding: 6px 10px;
+    border: 1px solid #b6b6b6;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 35%);
+}
+
+.hotelview-slot .hotelview-competition-hof-popup-body strong,
+.hotelview-slot .hotelview-competition-hof-popup-body span {
+    display: block;
+    margin: 0;
+    overflow: hidden;
+    color: #666;
+    text-align: left;
+    text-overflow: ellipsis;
+    text-shadow: none;
+    white-space: nowrap;
+}
+
+.hotelview-slot .hotelview-competition-hof-popup-body strong {
+    color: #000;
+    font-size: 11px;
+}
+
+.hotelview-competition-hof-points {
+    font: 700 11px Ubuntu, Arial, sans-serif;
+}
+
+.hotelview-slot .hotelview-competition-hof-rankdesc {
+    font-size: 9px;
+    line-height: 10px;
+    white-space: normal;
+}
+
+.hotelview-competition-hof-entry {
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-image: url(@/assets/images/hotelview/lobby.png);
-    background-repeat: no-repeat;
-    opacity: 0.1;
-    z-index: 0;
-    pointer-events: none;
+    top: calc(78px + var(--hof-offset, 0px));
+    left: calc(var(--hof-index) * 36px - 6px);
+    width: 48px;
+    height: 110px;
 }
 
-.hotel-sunset .nitro-hotel-view-picnic::before {
-    content: '';
+.hotelview-slot .hotelview-competition-hof-avatar {
+    position: relative;
+    display: block;
+    width: 48px;
+    height: 110px;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.hotelview-competition-hof-avatar .avatar-image {
+    background-position: 50% 100%;
+}
+
+.hotelview-slot .hotelview-competition-hof-room-link {
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-image: url(@/assets/images/hotelview/picnic.gif);
-    background-repeat: no-repeat;
-    opacity: 0.2;
-    z-index: 0;
-    pointer-events: none;
+    top: 90px;
+    left: 11px;
+    z-index: 2;
+    width: 26px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
 }
 
-.hotel-sunset .nitro-hotel-view-infobus::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-image: url(@/assets/images/hotelview/infobus.gif);
-    background-repeat: no-repeat;
-    opacity: 0.1;
-    z-index: 0;
-    pointer-events: none;
+/* CommunityGoalPrizesWidget (achievement_competition_prizes.xml): caption, info, the reward box. */
+.hotelview-competition-prizes {
+    width: 360px;
 }
 
-.hotel-sunset .nitro-hotel-view-peaceful::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-image: url(@/assets/images/hotelview/peacefulpark.gif);
-    background-repeat: no-repeat;
-    opacity: 0.1;
-    z-index: 0;
-    pointer-events: none;
+.hotelview-competition-prizes-box {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 6px 10px;
+    margin-top: 6px;
+    padding: 8px;
+    border: 1px solid #b6b6b6;
+    border-radius: 6px;
+    background: rgb(255 255 255 / 92%);
+    color: #000;
 }
 
-.hotel-sunset .nitro-hotel-view-pool::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-image: url(@/assets/images/hotelview/pool.gif);
-    background-repeat: no-repeat;
-    opacity: 0.1;
-    z-index: 0;
-    pointer-events: none;
+.hotelview-competition-prizes-reward {
+    max-width: 60px;
+    max-height: 125px;
+    align-self: end;
 }
 
-/* Evening: night building, dark teal sky + ground */
-.hotel-evening {
-    box-shadow: 0px 55px 0px 0px #163635;
-}
-.hotel-evening .hotelview {
-    background: linear-gradient(to bottom, transparent 1185px, #163635 1185px);
-}
-.hotel-evening .hotelview-background {
-    background-image: url(@/assets/images/hotelview/hotelview-night.png);
+.hotelview-slot .hotelview-competition-prizes-box strong,
+.hotelview-slot .hotelview-competition-prizes-box p,
+.hotelview-slot .hotelview-competition-prizes-box span {
+    color: #000;
+    text-align: left;
+    text-shadow: none;
 }
 
-/* Night: night building, dark teal sky + ground */
-.hotel-night {
-    box-shadow: 0px 55px 0px 0px #163635;
-}
-.hotel-night .hotelview {
-    background: linear-gradient(to bottom, transparent 1185px, #163635 1185px);
-}
-.hotel-night .hotelview-background {
-    background-image: url(@/assets/images/hotelview/hotelview-night.png);
+.hotelview-slot .hotelview-competition-prizes-reward-copy > strong {
+    margin: 0;
+    font-size: 10px;
+    text-transform: uppercase;
 }
 
-/* ─── Night / Evening room-widget sprite swaps ─────────────────────────── */
-
-.hotel-evening .nitro-hotel-view-rooftop,
-.hotel-night .nitro-hotel-view-rooftop {
-    background-image: url(@/assets/images/hotelview/night/night-rooftop.png);
+.hotelview-slot .hotelview-competition-prizes-reward-copy > p {
+    font-size: 11px;
 }
 
-.hotel-evening .nitro-hotel-view-rooftop-pool,
-.hotel-night .nitro-hotel-view-rooftop-pool {
-    background-image: url(@/assets/images/hotelview/night/night-rooftop_pool.gif);
+.hotelview-competition-prizes-ranks {
+    margin-top: 5px;
+    padding-top: 4px;
+    border-top: 2px solid #dcdcdc;
 }
 
-.hotel-evening .nitro-hotel-view-picnic,
-.hotel-night .nitro-hotel-view-picnic {
-    background-image: url(@/assets/images/hotelview/night/night-picnic.gif);
+.hotelview-competition-prizes-rank {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: 10px;
+    line-height: 15px;
 }
 
-.hotel-evening .nitro-hotel-view-infobus,
-.hotel-night .nitro-hotel-view-infobus {
-    background-image: url(@/assets/images/hotelview/night/night-infobus.gif);
+.hotelview-slot .hotelview-competition-prizes-rank strong {
+    margin: 0;
+    font-size: 11px;
 }
 
-.hotel-evening .nitro-hotel-view-pool,
-.hotel-night .nitro-hotel-view-pool {
-    background-image: url(@/assets/images/hotelview/night/night-pool.gif);
+.hotelview-competition-prizes-user {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border: 1px solid #c9c9c9;
+    border-radius: 5px;
 }
 
-.hotel-evening .nitro-hotel-view-lobby,
-.hotel-night .nitro-hotel-view-lobby {
-    background-image: url(@/assets/images/hotelview/night/night-lobby.png);
+.hotelview-competition-prizes-head {
+    flex: 0 0 33px;
+    width: 33px;
+    height: 34px;
 }
 
-.hotel-evening .nitro-hotel-view-peaceful,
-.hotel-night .nitro-hotel-view-peaceful {
-    background-image: url(@/assets/images/hotelview/night/night-park.png);
+.hotelview-slot .hotelview-competition-prizes-user strong {
+    margin: 0;
+    font-size: 11px;
+}
+
+.hotelview-slot .hotelview-competition-prizes-user p {
+    color: #666;
+    font-size: 10px;
+}
+
+.hotelview-competition-earned-prize {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.hotelview-competition-earned-prize-copy {
+    min-width: 0;
+    flex: 1;
 }

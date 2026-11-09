@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
  * Pure aggregation logic of the bulk path — modelled after the
  * `runBulk` reducer inside `useHousekeepingActions.ts`. The hook
  * itself is hard to drive cleanly in jsdom because it pulls
- * `useBetween`, `useNotification`, and the renderer-SDK mock through
+ * the shared state bridge, `useNotification`, and the renderer-SDK mock through
  * a long transitive import chain. The actual aggregation is the
  * interesting bit and isolating it keeps the test fast + readable.
  *

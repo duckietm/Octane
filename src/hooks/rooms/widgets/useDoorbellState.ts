@@ -1,6 +1,6 @@
-import { RoomSessionDoorbellEvent } from '@nitrots/nitro-renderer';
+import { RoomSessionDoorbellEvent } from '@octane/renderer';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { useNitroEvent } from '../../events';
+import { useOctaneEvent } from '../../events';
 
 /**
  * Reduces the three doorbell events (DOORBELL, RSDE_ACCEPTED, RSDE_REJECTED)
@@ -32,9 +32,9 @@ export const useDoorbellState = (): readonly string[] => {
         setUsers(next);
     }, []);
 
-    useNitroEvent<RoomSessionDoorbellEvent>(RoomSessionDoorbellEvent.DOORBELL, handleAdd);
-    useNitroEvent<RoomSessionDoorbellEvent>(RoomSessionDoorbellEvent.RSDE_ACCEPTED, handleRemove);
-    useNitroEvent<RoomSessionDoorbellEvent>(RoomSessionDoorbellEvent.RSDE_REJECTED, handleRemove);
+    useOctaneEvent<RoomSessionDoorbellEvent>(RoomSessionDoorbellEvent.DOORBELL, handleAdd);
+    useOctaneEvent<RoomSessionDoorbellEvent>(RoomSessionDoorbellEvent.RSDE_ACCEPTED, handleRemove);
+    useOctaneEvent<RoomSessionDoorbellEvent>(RoomSessionDoorbellEvent.RSDE_REJECTED, handleRemove);
 
     return users;
 };

@@ -3,6 +3,7 @@ import {
     GetAvatarRenderManager,
     GetCommunication,
     GetConfiguration,
+    GetDesiredResolution,
     GetLocalizationManager,
     GetRoomEngine,
     GetRoomSessionManager,
@@ -14,21 +15,22 @@ import {
     HabboWebTools,
     LegacyExternalInterface,
     LoadGameUrlEvent,
-    NitroEventType,
-    NitroLogger,
-    NitroVersion,
+    OctaneEventType,
+    OctaneLogger,
+    OctaneVersion,
     PrepareRenderer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
-import { ClearRememberLogin, GetRememberLogin, GetUIVersion, persistAccessTokenFromPayload, SetRememberLogin, StoreRememberLoginFromPayload } from './api';
+import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock, localizeWithFallback } from './api';
 import { Base } from './common';
 import { LoadingView } from './components/loading/LoadingView';
 import { LoginView } from './components/login/LoginView';
 import { MainView } from './components/MainView';
 import { ReconnectView } from './components/reconnect/ReconnectView';
-import { getConnectionFailureAction, useConnectionState, useMessageEvent } from './hooks';
+import { ClearStoredChatHistory, getConnectionFailureAction, shouldClearLoginAfterDisconnect, useConnectionState, useDevicePixelRatio, useMessageEvent, useOctaneEvent } from './hooks';
+import { SharedHookRegistry } from './state/useSharedHook';
 
-NitroVersion.UI_VERSION = GetUIVersion();
+OctaneVersion.UI_VERSION = GetUIVersion();
 
 const getViewportDimensions = () => {
     const viewport = window.visualViewport;
@@ -41,22 +43,8 @@ const getViewportDimensions = () => {
 const syncViewportCssVars = () => {
     const { width, height } = getViewportDimensions();
 
-    document.documentElement.style.setProperty('--nitro-app-width', `${width}px`);
-    document.documentElement.style.setProperty('--nitro-app-height', `${height}px`);
-};
-
-const preloadUrl = async (url: string): Promise<void> => {
-    if (!url) return;
-
-    // Split gamedata URLs are directories (end with '/'); fetching them as a
-    // file just 404s and wastes a connection at startup. The real split loader
-    // handles those — only warm up actual file URLs here.
-    if (url.split('?')[0].split('#')[0].endsWith('/')) return;
-
-    try {
-        const response = await fetch(url, { cache: 'force-cache' });
-        await response.arrayBuffer();
-    } catch {}
+    document.documentElement.style.setProperty('--octane-app-width', `${width}px`);
+    document.documentElement.style.setProperty('--octane-app-height', `${height}px`);
 };
 
 const preloadImage = (url: string): void => {
@@ -80,11 +68,12 @@ const hasRememberLogin = (): boolean => !!GetRememberLogin();
 
 export const App: FC<{}> = (props) => {
     const connectionState = useConnectionState();
+    const devicePixelRatio = useDevicePixelRatio();
     const [isReady, setIsReady] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [homeUrl, setHomeUrl] = useState('');
     const [showLogin, setShowLogin] = useState(false);
-    const [isEnteringHotel, setIsEnteringHotel] = useState(() => !!window.NitroConfig?.['sso.ticket'] || hasRememberLogin());
+    const [isEnteringHotel, setIsEnteringHotel] = useState(() => !!window.OctaneConfig?.['sso.ticket'] || hasRememberLogin());
     const [prepareTrigger, setPrepareTrigger] = useState(0);
     const [loadingProgress, setLoadingProgress] = useState(0);
     const [loadingTask, setLoadingTask] = useState('');
@@ -98,8 +87,9 @@ export const App: FC<{}> = (props) => {
             }
         } catch {}
 
+        // A loading text the external texts don't have yet may come from the config; it is optional there.
         try {
-            const fromConfig = GetConfiguration().getValue<string>(key, '');
+            const fromConfig = GetConfiguration().definitions.has(key) ? GetConfiguration().getValue<string>(key, '') : '';
             if (typeof fromConfig === 'string' && fromConfig.length) return fromConfig;
         } catch {}
 
@@ -109,9 +99,12 @@ export const App: FC<{}> = (props) => {
         setLoadingProgress((prev) => (value > prev ? value : prev));
         if (task !== undefined) setLoadingTask(task);
     }, []);
-    const warmupPromiseRef = useRef<Promise<void>>(null);
-    const rendererPromiseRef = useRef<Promise<any>>(null);
-    const gameInitPromiseRef = useRef<Promise<void> | null>(null);
+    // Each boot step runs once and is shared; a step that failed is dropped, so the next login retries it.
+    const [runBootStep] = useState(createBootSteps);
+    // The latest prepare() run; an older run that a new login replaced ends without touching the UI.
+    const prepareRunRef = useRef(0);
+    // Settles when the base texts are in: furnidata writes its names over them, so session data waits for it.
+    const localizationReadyRef = useRef<{ promise: Promise<void>; resolve: () => void }>(null);
     const bootstrapDoneRef = useRef(false);
     const lastPrepareTriggerRef = useRef<number | null>(null);
     const tickersStartedRef = useRef(false);
@@ -120,9 +113,11 @@ export const App: FC<{}> = (props) => {
     const previousConnectionPhaseRef = useRef(connectionState.phase);
 
     const clearStoredCredentials = useCallback(() => {
+        ClearStoredChatHistory();
         ClearRememberLogin();
+        clearAccessToken();
         try {
-            delete (window as any).NitroConfig?.['sso.ticket'];
+            delete (window as any).OctaneConfig?.['sso.ticket'];
         } catch {}
         try {
             GetConfiguration().setValue('sso.ticket', '');
@@ -137,40 +132,59 @@ export const App: FC<{}> = (props) => {
         } catch {}
     }, []);
 
+    // The heartbeat and the token renewal belong to a live session: on the session expired screen they kept firing
+    // every ten seconds and every minute until the page was closed.
+    const stopSessionTimers = useCallback(() => {
+        if (heartbeatIntervalRef.current !== null) window.clearInterval(heartbeatIntervalRef.current);
+        if (rememberRotateIntervalRef.current !== null) window.clearInterval(rememberRotateIntervalRef.current);
+        heartbeatIntervalRef.current = null;
+        rememberRotateIntervalRef.current = null;
+    }, []);
+
     const showSessionExpired = useCallback(() => {
-        console.warn('[App] showSessionExpired — diagnostic shown (mid-game close)');
+        OctaneLogger.log('[App] showSessionExpired — diagnostic shown (mid-game close)');
+        stopSessionTimers();
         clearStoredCredentials();
 
         const baseUrl = window.location.origin + '/';
         setHomeUrl(baseUrl);
-        setErrorMessage('Your session has expired.\nPlease log in again to enter the hotel.');
+        setErrorMessage(localizeWithFallback('octane.app.your_session_has_expired_please_log', 'Your session has expired.\nPlease log in again to enter the hotel.'));
         setIsReady(false);
         setShowLogin(false);
         setIsEnteringHotel(false);
-    }, [clearStoredCredentials]);
+    }, [clearStoredCredentials, stopSessionTimers]);
 
     const fallbackToLogin = useCallback(() => {
         const rawLoginEnabled = GetConfiguration().getValue<unknown>('login.screen.enabled', false);
         const loginScreenEnabled = rawLoginEnabled === true || rawLoginEnabled === 'true' || rawLoginEnabled === 1;
 
         if (!loginScreenEnabled) {
-            console.warn('[App] fallbackToLogin — login.screen.enabled=false, redirecting to home instead');
+            OctaneLogger.log('[App] fallbackToLogin — login.screen.enabled=false, redirecting to home instead');
             showSessionExpired();
             return;
         }
-        console.warn('[App] fallbackToLogin — surfacing login form, credentials cleared');
+        OctaneLogger.log('[App] fallbackToLogin — surfacing login form, credentials cleared');
+        stopSessionTimers();
         clearStoredCredentials();
         setHomeUrl('');
         setErrorMessage('');
         setIsReady(false);
         setShowLogin(true);
         setIsEnteringHotel(false);
-    }, [clearStoredCredentials, showSessionExpired]);
+    }, [clearStoredCredentials, showSessionExpired, stopSessionTimers]);
 
     const applySsoTicket = useCallback((ssoTicket: string) => {
         if (!ssoTicket) return;
-        window.NitroConfig['sso.ticket'] = ssoTicket;
+        ClearStoredChatHistory();
+        window.OctaneConfig['sso.ticket'] = ssoTicket;
         GetConfiguration().setValue('sso.ticket', ssoTicket);
+        void exchangeSsoTicketForAccessToken(ssoTicket);
+    }, []);
+
+    useEffect(() => {
+        const ssoTicket = window.OctaneConfig?.['sso.ticket'];
+
+        if (typeof ssoTicket === 'string' && ssoTicket.length) void exchangeSsoTicketForAccessToken(ssoTicket);
     }, []);
 
     const handleAuthenticated = useCallback(
@@ -184,18 +198,17 @@ export const App: FC<{}> = (props) => {
         [applySsoTicket]
     );
 
-    const tryRememberLogin = useCallback(async (): Promise<string> => {
+    const tryRememberLoginUnlocked = useCallback(async (): Promise<string> => {
         const remembered = GetRememberLogin();
 
-        console.warn('[App] tryRememberLogin start', {
+        OctaneLogger.log('[App] tryRememberLogin start', {
             hasRemembered: !!remembered,
-            hasToken: !!remembered?.token?.length,
-            hasStoredSso: !!remembered?.ssoTicket?.length
+            hasToken: !!remembered?.token?.length
         });
 
-        if (!remembered?.token?.length) {
+        if (!isRememberedLogin(remembered)) {
             if (remembered) ClearRememberLogin();
-            console.warn('[App] tryRememberLogin → no token, returning empty');
+            OctaneLogger.log('[App] tryRememberLogin → no token, returning empty');
             return '';
         }
 
@@ -208,9 +221,9 @@ export const App: FC<{}> = (props) => {
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-Requested-With': 'NitroRememberLogin'
+                    'X-Requested-With': 'OctaneRememberLogin'
                 },
-                body: JSON.stringify({ rememberToken: remembered.token })
+                body: JSON.stringify(rememberRequestBody(remembered))
             });
 
             let payload: Record<string, unknown> = {};
@@ -220,31 +233,38 @@ export const App: FC<{}> = (props) => {
 
             const ssoTicket = typeof payload.ssoTicket === 'string' ? payload.ssoTicket : typeof payload.sso === 'string' ? payload.sso : '';
 
-            console.warn('[App] tryRememberLogin → remember endpoint replied', {
+            OctaneLogger.log('[App] tryRememberLogin → remember endpoint replied', {
                 status: response.status,
                 ok: response.ok,
                 gotSsoTicket: !!ssoTicket
             });
 
             if (response.ok && ssoTicket) {
-                persistAccessTokenFromPayload(payload);
-                StoreRememberLoginFromPayload(payload, typeof payload.username === 'string' ? payload.username : remembered.username, ssoTicket);
+                persistAccessTokenFromPayload(payload, ssoTicket);
+                StoreRememberLoginFromPayload(payload, typeof payload.username === 'string' ? payload.username : remembered.username, remembered.cookie === true);
                 return ssoTicket;
+            }
+
+            // Only a refusal of the token forgets it: an emulator restarting or a dropped connection used to cost the
+            // player the remembered login.
+            if (isRememberRejection(response.status)) {
+                ClearRememberLoginIfStill(remembered.token);
+                OctaneLogger.log('[App] tryRememberLogin → token refused, cleared remember');
             }
         } catch (error) {
             console.warn('[App] tryRememberLogin → fetch threw', error);
         }
 
-        ClearRememberLogin();
-        console.warn('[App] tryRememberLogin → cleared remember, returning empty');
-
         return '';
     }, []);
 
-    const rotateRememberLogin = useCallback(async (): Promise<void> => {
+    // Remember and refresh rotate one shared token: every tab takes the same lock and reads the token inside it.
+    const tryRememberLogin = useCallback(() => withRememberLock(tryRememberLoginUnlocked), [tryRememberLoginUnlocked]);
+
+    const rotateRememberLoginUnlocked = useCallback(async (): Promise<void> => {
         const remembered = GetRememberLogin();
 
-        if (!remembered?.token?.length) return;
+        if (!isRememberedLogin(remembered)) return;
 
         try {
             const rawEndpoint = GetConfiguration().getValue<string>('login.refresh.endpoint', '${api.url}/api/auth/refresh');
@@ -255,9 +275,9 @@ export const App: FC<{}> = (props) => {
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-Requested-With': 'NitroRememberRotate'
+                    'X-Requested-With': 'OctaneRememberRotate'
                 },
-                body: JSON.stringify({ rememberToken: remembered.token })
+                body: JSON.stringify(rememberRequestBody(remembered))
             });
 
             let payload: Record<string, unknown> = {};
@@ -267,30 +287,35 @@ export const App: FC<{}> = (props) => {
 
             if (response.ok) {
                 persistAccessTokenFromPayload(payload);
-                StoreRememberLoginFromPayload(payload, remembered.username, remembered.ssoTicket);
+                StoreRememberLoginFromPayload(payload, remembered.username, remembered.cookie === true);
                 return;
             }
 
-            if (response.status === 400 || response.status === 401 || response.status === 403) ClearRememberLogin();
+            if (isRememberRejection(response.status)) ClearRememberLoginIfStill(remembered.token);
         } catch (error) {
-            NitroLogger.error('[LoginScreen] Remember rotation failed', error);
+            OctaneLogger.error('[LoginScreen] Remember rotation failed', error);
         }
     }, []);
+
+    const rotateRememberLogin = useCallback(() => withRememberLock(rotateRememberLoginUnlocked), [rotateRememberLoginUnlocked]);
 
     useEffect(() => {
         const previousPhase = previousConnectionPhaseRef.current;
         const currentPhase = connectionState.phase;
         previousConnectionPhaseRef.current = currentPhase;
 
-        const action = getConnectionFailureAction(previousPhase, currentPhase, isReady);
+        const action = getConnectionFailureAction(previousPhase, currentPhase, isReady, connectionState.disconnectReason);
 
-        if (action === 'login') {
+        if (action === 'kicked') {
+            // ReconnectView shows the reason over the hotel; only a ban forgets the stored login.
+            if (shouldClearLoginAfterDisconnect(connectionState.disconnectReason)) clearStoredCredentials();
+        } else if (action === 'login') {
             console.warn('[App] Connection failed before authentication completed — falling back to login');
             fallbackToLogin();
         } else if (action === 'expired') {
             showSessionExpired();
         }
-    }, [connectionState.phase, fallbackToLogin, isReady, showSessionExpired]);
+    }, [connectionState.phase, connectionState.disconnectReason, clearStoredCredentials, fallbackToLogin, isReady, showSessionExpired]);
 
     useMessageEvent<LoadGameUrlEvent>(LoadGameUrlEvent, (event) => {
         const parser = event.getParser();
@@ -300,16 +325,15 @@ export const App: FC<{}> = (props) => {
         LegacyExternalInterface.callGame('showGame', parser.url);
     });
 
-    const startRenderer = useCallback((width: number, height: number) => {
-        if (rendererPromiseRef.current) return rendererPromiseRef.current;
+    const startRenderer = useCallback((width: number, height: number): Promise<any> => runBootStep('renderer', () => {
 
-        const rawUseBackBuffer = window.NitroConfig?.['renderer.useBackBuffer'];
+        const rawUseBackBuffer = window.OctaneConfig?.['renderer.useBackBuffer'];
         const useBackBuffer = rawUseBackBuffer === undefined ? true : rawUseBackBuffer === true || rawUseBackBuffer === 'true';
 
-        rendererPromiseRef.current = PrepareRenderer({
+        return PrepareRenderer({
             width: Math.floor(width),
             height: Math.floor(height),
-            resolution: window.devicePixelRatio,
+            resolution: GetDesiredResolution(),
             autoDensity: true,
             backgroundAlpha: 0,
             preference: 'webgl',
@@ -318,35 +342,41 @@ export const App: FC<{}> = (props) => {
             roundPixels: true,
             useBackBuffer
         });
+    }), [runBootStep]);
 
-        return rendererPromiseRef.current;
+    const getLocalizationReady = useCallback(() => {
+        if (!localizationReadyRef.current) {
+            let resolve: () => void = null;
+            const promise = new Promise<void>((done) => (resolve = done));
+
+            localizationReadyRef.current = { promise, resolve };
+        }
+
+        return localizationReadyRef.current;
     }, []);
 
     const startWarmup = useCallback(
         (width: number, height: number) => {
-            if (warmupPromiseRef.current) return warmupPromiseRef.current;
-
-            warmupPromiseRef.current = (async () => {
+            return runBootStep('warmup', async () => {
                 await GetConfiguration().init();
-                bumpProgress(25, taskLabel('loader.waiting', 'Loading content...'));
+                bumpProgress(25, taskLabel('loader.waiting', localizeWithFallback('octane.app.loading_content', 'Loading content...')));
 
-                GetTicker().maxFPS = GetConfiguration().getValue<number>('system.fps.max', 24);
-                NitroLogger.LOG_DEBUG = GetConfiguration().getValue<boolean>('system.log.debug', true);
-                NitroLogger.LOG_WARN = GetConfiguration().getValue<boolean>('system.log.warn', false);
-                NitroLogger.LOG_ERROR = GetConfiguration().getValue<boolean>('system.log.error', false);
-                NitroLogger.LOG_EVENTS = GetConfiguration().getValue<boolean>('system.log.events', false);
-                NitroLogger.LOG_PACKETS = GetConfiguration().getValue<boolean>('system.log.packets', false);
+                // 0 = the display's refresh rate. A cap (the old 24 default) makes
+                // Pixi skip whole animation frames: on a 60 Hz display it ticks at an
+                // alternating 33/50 ms, so walking judders and the 24 Hz visual
+                // clock (system.fps.animation) is sampled unevenly. Animation cadence
+                // is time based, so a higher tick rate does not speed anything up.
+                GetTicker().maxFPS = GetConfiguration().getValue<number>('system.fps.max', 0);
+                OctaneLogger.LOG_DEBUG = GetConfiguration().getValue<boolean>('system.log.debug', true);
+                OctaneLogger.LOG_WARN = GetConfiguration().getValue<boolean>('system.log.warn', false);
+                OctaneLogger.LOG_ERROR = GetConfiguration().getValue<boolean>('system.log.error', false);
+                OctaneLogger.LOG_EVENTS = GetConfiguration().getValue<boolean>('system.log.events', false);
+                OctaneLogger.LOG_PACKETS = GetConfiguration().getValue<boolean>('system.log.packets', false);
 
-                startRenderer(width, height).catch((error) => NitroLogger.error('[LoginScreen] Renderer warmup failed', error));
+                startRenderer(width, height).catch((error) => OctaneLogger.error('[LoginScreen] Renderer warmup failed', error));
 
                 const interpolate = (value: string) => GetConfiguration().interpolate(value);
                 const assetUrls = asStringArray(GetConfiguration().getValue<unknown>('preload.assets.urls')).map(interpolate);
-                const gamedataUrls = [
-                    ...asStringArray(GetConfiguration().getValue<unknown>('external.texts.url')).map(interpolate),
-                    ...['furnidata.url', 'productdata.url', 'avatar.actions.url', 'avatar.figuredata.url', 'avatar.figuremap.url', 'avatar.effectmap.url']
-                        .map((key) => interpolate(GetConfiguration().getValue<string>(key, '')))
-                        .filter(Boolean)
-                ];
                 const loginImages = (GetConfiguration().getValue<Record<string, unknown>>('loginview', {})?.images as Record<string, string>) ?? {};
                 const loginImageUrls = [
                     loginImages.background,
@@ -360,13 +390,15 @@ export const App: FC<{}> = (props) => {
                     .map(interpolate);
 
                 loginImageUrls.forEach(preloadImage);
-                gamedataUrls.forEach((url) => preloadUrl(url));
 
                 const warmupTasks: { promise: Promise<any>; label: string }[] = [
-                    { promise: GetAssetManager().downloadAssets(assetUrls), label: taskLabel('loading.task.assets', 'Loading game assets...') },
-                    { promise: GetLocalizationManager().init(), label: taskLabel('loading.task.localization', 'Loading translations...') },
-                    { promise: GetAvatarRenderManager().init(), label: taskLabel('loading.task.avatar', 'Loading wardrobe...') },
-                    { promise: GetSoundManager().init(), label: taskLabel('loading.task.sounds', 'Loading sounds...') }
+                    { promise: runBootStep('assets', () => GetAssetManager().downloadAssets(assetUrls)), label: taskLabel('loading.task.assets', localizeWithFallback('octane.app.loading_game_assets', 'Loading game assets...')) },
+                    {
+                        promise: runBootStep('localization', () => GetLocalizationManager().init().then(() => getLocalizationReady().resolve())),
+                        label: taskLabel('loading.task.localization', localizeWithFallback('octane.app.loading_translations', 'Loading translations...'))
+                    },
+                    { promise: runBootStep('avatars', () => GetAvatarRenderManager().init()), label: taskLabel('loading.task.avatar', localizeWithFallback('octane.app.loading_wardrobe', 'Loading wardrobe...')) },
+                    { promise: runBootStep('sounds', () => GetSoundManager().init()), label: taskLabel('loading.task.sounds', localizeWithFallback('octane.app.loading_sounds', 'Loading sounds...')) }
                 ];
                 let warmupDone = 0;
                 const warmupStart = 25;
@@ -380,11 +412,9 @@ export const App: FC<{}> = (props) => {
                         })
                     )
                 );
-            })();
-
-            return warmupPromiseRef.current;
+            });
         },
-        [startRenderer, bumpProgress, taskLabel]
+        [runBootStep, startRenderer, bumpProgress, taskLabel, getLocalizationReady]
     );
 
     useEffect(() => {
@@ -409,9 +439,11 @@ export const App: FC<{}> = (props) => {
 
     useEffect(() => {
         const prepare = async (width: number, height: number) => {
-            console.warn('[App] prepare() start', {
-                hasNitroConfig: !!window.NitroConfig,
-                ssoTicketInConfig: !!window.NitroConfig?.['sso.ticket'],
+            const run = ++prepareRunRef.current;
+
+            OctaneLogger.log('[App] prepare() start', {
+                hasOctaneConfig: !!window.OctaneConfig,
+                ssoTicketInConfig: !!window.OctaneConfig?.['sso.ticket'],
                 hasRememberLocal: !!GetRememberLogin(),
                 hasUrlSso: !!new URLSearchParams(window.location.search).get('sso')
             });
@@ -422,25 +454,12 @@ export const App: FC<{}> = (props) => {
             bumpProgress(5, bootLabel);
 
             try {
-                if (!window.NitroConfig) throw new Error('NitroConfig is not defined!');
+                if (!window.OctaneConfig) throw new Error('OctaneConfig is not defined!');
 
-                let ssoTicket = window.NitroConfig['sso.ticket'];
+                let ssoTicket = window.OctaneConfig['sso.ticket'];
                 if (ssoTicket) GetConfiguration().setValue('sso.ticket', ssoTicket);
 
-                try {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const tokenParam = urlParams.get('token');
-                    const tokenExpParam = urlParams.get('token_exp');
-                    if (tokenParam && !GetRememberLogin()) {
-                        const parsedExpiry = Number(tokenExpParam || 0);
-                        const expiresAt = Number.isFinite(parsedExpiry) && parsedExpiry > 0 ? parsedExpiry : Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
-                        SetRememberLogin({ token: tokenParam, expiresAt });
-                    }
-                } catch (e) {
-                    console.warn('[App] failed to persist remember token from URL', e);
-                }
-
-                bumpProgress(10, taskLabel('loading.task.session', 'Verifying session...'));
+                bumpProgress(10, taskLabel('loading.task.session', localizeWithFallback('octane.app.verifying_session', 'Verifying session...')));
 
                 if (!ssoTicket || ssoTicket === '') {
                     let configInitError: unknown = null;
@@ -453,7 +472,7 @@ export const App: FC<{}> = (props) => {
                     const rawLoginEnabled = GetConfiguration().getValue<unknown>('login.screen.enabled', false);
                     const loginScreenEnabled = rawLoginEnabled === true || rawLoginEnabled === 'true' || rawLoginEnabled === 1;
 
-                    console.warn('[App] no SSO path — login gate', {
+                    OctaneLogger.log('[App] no SSO path — login gate', {
                         configInitError: configInitError ? String((configInitError as Error)?.message ?? configInitError) : null,
                         rawLoginEnabled,
                         rawLoginEnabledType: typeof rawLoginEnabled,
@@ -461,7 +480,7 @@ export const App: FC<{}> = (props) => {
                     });
 
                     if (configInitError) {
-                        NitroLogger.error('[LoginScreen] Failed to load renderer-config.json — cannot resolve login.screen.enabled', configInitError);
+                        OctaneLogger.error('[LoginScreen] Failed to load renderer-config.json — cannot resolve login.screen.enabled', configInitError);
                     }
 
                     if (loginScreenEnabled) {
@@ -474,7 +493,7 @@ export const App: FC<{}> = (props) => {
                         } else {
                             setIsReady(false);
                             setShowLogin(true);
-                            startWarmup(width, height).catch((error) => NitroLogger.error('[LoginScreen] Warmup failed', error));
+                            startWarmup(width, height).catch((error) => OctaneLogger.error('[LoginScreen] Warmup failed', error));
                             return;
                         }
                     } else {
@@ -492,26 +511,37 @@ export const App: FC<{}> = (props) => {
                     }
                 }
 
-                const renderer = await startRenderer(width, height);
-                bumpProgress(20, taskLabel('loading.task.renderer', 'Initializing renderer...'));
+                // Log in while the hotel loads. Messages after the login stay held by the connection
+                // until MainView has mounted and calls ready(), so no handler misses its packets.
+                // A login that failed is replaced by this one; finished boot steps are kept.
+                const connected = GetCommunication().init();
+
+                connected.catch(() => undefined);
+
+                await startRenderer(width, height);
+                bumpProgress(20, taskLabel('loading.task.renderer', localizeWithFallback('octane.app.initializing_renderer', 'Initializing renderer...')));
+
+                const sessionData = runBootStep('session-data', async () => {
+                    await getLocalizationReady().promise;
+                    await GetSessionDataManager().init();
+                });
+
+                sessionData.catch(() => undefined);
 
                 await startWarmup(width, height);
-                bumpProgress(70, taskLabel('loading.task.startsession', 'Starting session...'));
+                bumpProgress(70, taskLabel('loading.task.startsession', localizeWithFallback('octane.app.starting_session', 'Starting session...')));
+                await sessionData;
+                bumpProgress(78, taskLabel('loading.task.userdata', localizeWithFallback('octane.app.loading_user_data', 'Loading user data...')));
+                await runBootStep('room-sessions', () => GetRoomSessionManager().init());
+                bumpProgress(85, taskLabel('loading.task.rooms', localizeWithFallback('octane.app.loading_rooms', 'Loading rooms...')));
+                await runBootStep('room-engine', () => GetRoomEngine().init());
+                bumpProgress(92, taskLabel('loading.task.engine', localizeWithFallback('octane.app.loading_graphics_engine', 'Loading graphics engine...')));
+                await connected;
+                bumpProgress(98, taskLabel('generic.reconnecting', localizeWithFallback('octane.app.connecting_to_server', 'Connecting to server...')));
 
-                if (!gameInitPromiseRef.current) {
-                    gameInitPromiseRef.current = (async () => {
-                        await GetSessionDataManager().init();
-                        bumpProgress(78, taskLabel('loading.task.userdata', 'Loading user data...'));
-                        await GetRoomSessionManager().init();
-                        bumpProgress(85, taskLabel('loading.task.rooms', 'Loading rooms...'));
-                        await GetRoomEngine().init();
-                        bumpProgress(92, taskLabel('loading.task.engine', 'Loading graphics engine...'));
-                        await GetCommunication().init();
-                        bumpProgress(98, taskLabel('generic.reconnecting', 'Connecting to server...'));
-                    })();
-                }
+                if (run !== prepareRunRef.current) return;
 
-                await gameInitPromiseRef.current;
+                const renderer = await startRenderer(width, height);
 
                 if (!bootstrapDoneRef.current) {
                     bootstrapDoneRef.current = true;
@@ -525,8 +555,10 @@ export const App: FC<{}> = (props) => {
                 if (rememberRotateIntervalRef.current !== null) window.clearInterval(rememberRotateIntervalRef.current);
 
                 const rotateMinutes = Math.max(1, Number(GetConfiguration().getValue<unknown>('login.remember.rotate.interval.minutes', 15)) || 15);
-                if (GetRememberLogin()?.token?.length)
+                if (isRememberedLogin(GetRememberLogin()))
                     rememberRotateIntervalRef.current = window.setInterval(() => rotateRememberLogin(), rotateMinutes * 60 * 1000);
+                // Without a remembered login the access token is renewed from the session before it expires.
+                else rememberRotateIntervalRef.current = window.setInterval(() => void renewAccessTokenIfDue(), 60 * 1000);
 
                 if (!tickersStartedRef.current) {
                     tickersStartedRef.current = true;
@@ -540,7 +572,10 @@ export const App: FC<{}> = (props) => {
                 setShowLogin(false);
                 setIsEnteringHotel(false);
             } catch (err) {
-                NitroLogger.error('[App] Initialization failed — falling back to login', err);
+                // A newer login replaced this run (and its connection attempt): that one owns the screen now.
+                if (run !== prepareRunRef.current) return;
+
+                OctaneLogger.error('[App] Initialization failed — falling back to login', err);
                 onInitFailure();
             }
         };
@@ -556,16 +591,20 @@ export const App: FC<{}> = (props) => {
             if (heartbeatIntervalRef.current !== null) window.clearInterval(heartbeatIntervalRef.current);
             if (rememberRotateIntervalRef.current !== null) window.clearInterval(rememberRotateIntervalRef.current);
         };
-    }, [prepareTrigger, startWarmup, startRenderer, tryRememberLogin, applySsoTicket, rotateRememberLogin, bumpProgress, taskLabel]);
+    }, [prepareTrigger, runBootStep, startWarmup, startRenderer, getLocalizationReady, tryRememberLogin, applySsoTicket, rotateRememberLogin, bumpProgress, taskLabel]);
 
     return (
-        <Base fit overflow="hidden" className={`nitro-app-root ${!(window.devicePixelRatio % 1) ? 'image-rendering-pixelated' : ''}`}>
+        <Base fit overflow="hidden" className={`octane-app-root ${!(devicePixelRatio % 1) ? 'image-rendering-pixelated' : ''}`}>
             {!isReady && !showLogin && (
                 <LoadingView isError={errorMessage.length > 0} message={errorMessage} homeUrl={homeUrl} progress={loadingProgress} currentTask={loadingTask} />
             )}
             {!isReady && showLogin && <LoginView onAuthenticated={handleAuthenticated} isEntering={isEnteringHotel} />}
-            {isReady && <MainView />}
-            {isReady && <ReconnectView />}
+            {isReady && (
+                <SharedHookRegistry fallback={<LoadingView message={localizeWithFallback('octane.common.loading', 'Loading…')} />}>
+                    <MainView />
+                    <ReconnectView />
+                </SharedHookRegistry>
+            )}
             <Base id="draggable-windows-container" />
         </Base>
     );

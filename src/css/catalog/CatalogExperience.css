@@ -1,0 +1,1271 @@
+.octane-catalog-preview-details {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    z-index: 5;
+    width: 280px;
+    height: 64px;
+    max-height: 64px;
+    padding: 0;
+    overflow: hidden;
+    color: #fff;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    pointer-events: none;
+    background: none;
+    border-radius: 0;
+    text-shadow: none;
+}
+
+.octane-catalog-product-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+}
+
+.octane-catalog-product-details-name {
+    font-size: 12px;
+    line-height: 17px;
+    overflow-wrap: anywhere;
+}
+
+.octane-catalog-product-details-description {
+    display: block;
+    color: inherit;
+    font-size: 10px;
+    font-style: italic;
+    line-height: 15px;
+    overflow-wrap: anywhere;
+}
+
+.octane-catalog-product-details-duration {
+    display: block;
+    color: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 15px;
+}
+
+.octane-catalog-product-details-description:empty {
+    height: 4px;
+    min-height: 4px;
+    line-height: 4px;
+}
+
+/* standard switches both fields to solid white whenever the 3D room canvas is
+   visible. Keep explicit specificity here so generic muted-text utilities
+   cannot make the description disappear over the black preview stage. */
+.octane-catalog-offer-preview:not(.is-badge) .octane-catalog-product-details-name,
+.octane-catalog-offer-preview:not(.is-badge) .octane-catalog-product-details-description {
+    color: #fff !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+}
+
+.octane-catalog-product-details-badges {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    margin-top: 0;
+    color: inherit;
+    font-size: 10px;
+}
+
+.octane-catalog-product-capability {
+    display: block;
+    height: 16px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.octane-catalog-product-capability.is-no-trade,
+.octane-catalog-product-capability.is-no-trade img {
+    width: 40px;
+    height: 16px;
+}
+
+.octane-catalog-product-capability.is-no-recycle,
+.octane-catalog-product-capability.is-no-recycle img {
+    width: 28px;
+    height: 16px;
+}
+
+.octane-catalog-product-capability img {
+    display: block;
+    max-width: none;
+    max-height: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/*
+ * The plate is artwork of its own fixed size - `.unique-complete-plate` is the 170x29 of
+ * `catalog-info-amount-bg.png` - so this slot has nothing to decide: it takes the size of what
+ * it holds. Giving it a width of its own did not constrain the plate, it only overflowed it,
+ * which is how the plate still ended up under the arrows despite a reserved lane.
+ *
+ * `.octane-catalog-product-view` is pinned to the original's 360x240, so reading the placement
+ * from the right edge is the same as the original's `left: 186` - and stays right if that box
+ * is ever squeezed under its `max-width: 100%`.
+ *
+ * The 60px is a deliberate departure. The original lets the plaque run under the rotation
+ * arrows (186..360 against 300..354) because there it is artwork aligned to the left of a panel
+ * wider than its container, so the arrows land on the empty part. Ours is a plate with text
+ * across it, so it stops where they start: 54px of button and the 6px they are inset by, which
+ * puts its right edge at 300 - where the original puts rotate_avatar_left.
+ */
+.octane-catalog-preview-limited {
+    position: absolute;
+    top: 5px;
+    right: 60px;
+    z-index: 6;
+    pointer-events: none;
+}
+
+.octane-catalog-offer-preview.is-badge .octane-catalog-preview-details {
+    color: var(--catalog-standard-text, #222);
+    background: none;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.octane-catalog-grid.octane-catalog-grid-density-standard {
+    --octane-grid-column-min-width: 53px;
+}
+
+.octane-catalog-grid.octane-catalog-grid-density-compact {
+    --octane-grid-column-min-width: 45px;
+}
+
+.octane-catalog-grid.octane-catalog-grid-density-large {
+    --octane-grid-column-min-width: 68px;
+}
+
+.octane-catalog-default-layout .octane-catalog-grid-shell {
+    bottom: 60px;
+}
+
+.octane-catalog-default-layout .octane-catalog-price-row {
+    bottom: 30px;
+}
+
+.octane-catalog-default-layout .octane-catalog-purchase-row {
+    bottom: 0;
+}
+
+.octane-catalog-loading-state {
+    position: absolute;
+    inset: 31px 0 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--catalog-standard-text);
+    font-size: 11px;
+    font-weight: 700;
+    background: rgba(236, 236, 228, 0.78);
+}
+
+.octane-catalog-loading-state.is-error {
+    flex-direction: column;
+    padding: 24px;
+    text-align: center;
+}
+
+.octane-catalog-pet-customization-layout {
+    position: relative;
+    width: 100%;
+    height: 460px;
+    overflow: hidden;
+}
+
+.octane-catalog-pet-customization-preview {
+    position: absolute;
+    inset: 0 0 auto;
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+}
+
+.octane-catalog-pet-customization-preview > img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.octane-catalog-pet-customization-copy {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 3;
+    max-width: 164px;
+}
+
+.octane-catalog-pet-customization-price {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    z-index: 3;
+}
+
+.octane-catalog-pet-customization-grid {
+    position: absolute;
+    top: 245px;
+    left: 0;
+    width: 100%;
+    height: 180px;
+    overflow: auto;
+}
+
+.octane-catalog-pet-customization-purchase {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    height: 30px;
+    font-size: 11px;
+}
+
+.octane-catalog-pet-layout {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    height: 460px;
+    min-height: 460px;
+    margin: 0 auto;
+    overflow: hidden;
+    background: #e4e3db;
+    color: #242424;
+}
+
+.octane-catalog-pet-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 360px;
+    height: 240px;
+    background: #e4e3db;
+}
+
+.octane-catalog-pet-preview-image {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.octane-catalog-pet-preview-image .pet-image {
+    transform-origin: center;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-catalog-pet-preview-price {
+    position: absolute;
+    right: 7px;
+    bottom: 6px;
+    z-index: 3;
+    min-width: 54px;
+    padding: 4px 6px;
+    border: 2px solid #202020;
+    border-radius: 6px;
+    background: #d7b95d;
+    box-shadow: inset 0 0 0 1px #f7e6a8;
+}
+
+.octane-catalog-pet-preview-badge {
+    position: absolute;
+    top: 178px;
+    right: 13px;
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+}
+
+.octane-catalog-pet-editor {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    pointer-events: none;
+}
+
+.octane-catalog-pet-editor > * {
+    pointer-events: auto;
+}
+
+.octane-catalog-pet-layout--legacy .octane-catalog-pet-field {
+    position: absolute;
+    top: 225px;
+    left: 0;
+    width: 360px;
+}
+
+.octane-catalog-pet-layout--legacy .octane-catalog-pet-field > span,
+.octane-catalog-pet-layout--legacy .octane-catalog-pet-breed-selector > span,
+.octane-catalog-pet-layout--legacy .octane-catalog-pet-name-field > span:first-child {
+    margin-left: 10px;
+}
+
+.octane-catalog-pet-layout--legacy .octane-catalog-pet-color-grid {
+    height: 80px;
+    max-height: 80px;
+    padding: 0;
+}
+
+.octane-catalog-pet-layout--legacy .octane-catalog-pet-color-grid .octane-classic-scroll-area-viewport {
+    padding: 5px 22px 0 5px;
+}
+
+.octane-catalog-pet-layout--legacy .octane-catalog-pet-breed-selector {
+    position: absolute;
+    top: 326px;
+    left: 10px;
+    width: 340px;
+}
+
+.octane-catalog-pet-layout--legacy .octane-catalog-pet-purchase {
+    position: absolute;
+    top: 380px;
+    left: 10px;
+    width: 340px;
+}
+
+.octane-catalog-pet-layout--new .octane-catalog-pet-field {
+    position: absolute;
+    top: 245px;
+    left: 0;
+    width: 360px;
+}
+
+.octane-catalog-pet-layout--new .octane-catalog-pet-field > span {
+    order: 2;
+    margin: 0 12px;
+}
+
+.octane-catalog-pet-layout--new .octane-catalog-pet-color-grid {
+    order: 1;
+    height: 80px;
+    max-height: 80px;
+    padding: 0;
+}
+
+.octane-catalog-pet-layout--new .octane-catalog-pet-color-grid .octane-classic-scroll-area-viewport {
+    padding: 0 22px 0 5px;
+}
+
+.octane-catalog-pet-layout--new .octane-catalog-pet-purchase {
+    position: absolute;
+    top: 363px;
+    left: 10px;
+    width: 340px;
+}
+
+.octane-catalog-pet-field,
+.octane-catalog-pet-breed-selector,
+.octane-catalog-pet-name-field {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.octane-catalog-pet-field > span,
+.octane-catalog-pet-breed-selector > span,
+.octane-catalog-pet-name-field > span:first-child {
+    min-height: 15px;
+    line-height: 15px;
+}
+
+.octane-catalog-pet-layout--legacy .octane-catalog-pet-field {
+    gap: 0;
+}
+
+.octane-catalog-pet-layout--legacy .octane-catalog-pet-color-grid {
+    margin-top: 5px;
+}
+
+.octane-catalog-pet-layout--legacy .octane-catalog-pet-breed-selector,
+.octane-catalog-pet-layout--legacy .octane-catalog-pet-name-field {
+    gap: 3px;
+}
+
+.octane-catalog-pet-layout--new .octane-catalog-pet-name-field {
+    gap: 7px;
+}
+
+.octane-catalog-pet-breed-selector select,
+.octane-catalog-pet-breed-selector .octane-select-trigger,
+.octane-catalog-pet-name-field input {
+    width: 100%;
+    height: 25px;
+    border: 1px solid #777;
+    border-radius: 2px;
+    background: #fff;
+    color: #222;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 23px;
+}
+
+.octane-catalog-pet-breed-selector select,
+.octane-catalog-pet-breed-selector .octane-select-trigger {
+    min-width: 0;
+    padding: 0 5px;
+}
+
+.octane-catalog-pet-name-field input {
+    padding: 0 24px 0 6px;
+}
+
+.octane-catalog-pet-color-grid {
+    position: relative;
+    min-height: 26px;
+    max-height: 56px;
+    border: 1px solid #777;
+    border-radius: 6px;
+    background: #c9c9c3;
+    overflow: hidden;
+}
+
+.octane-catalog-pet-color-grid-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 27px);
+    align-content: start;
+    gap: 2px;
+    min-height: 100%;
+}
+
+.octane-classic-scroll-area-viewport {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.octane-classic-scroll-area {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.octane-catalog-item-grid-scroll-area:has(> .octane-classic-scrollbar[data-visible='true']) > .octane-classic-scroll-area-viewport,
+.octane-catalog-grid-virtual .octane-classic-scroll-area:has(> .octane-classic-scrollbar[data-visible='true']) > .octane-classic-scroll-area-viewport {
+    padding-right: 17px;
+}
+
+.octane-classic-scrollbar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: grid;
+    grid-template-rows: 16px minmax(0, 1fr) 16px;
+    width: 17px;
+    height: 100%;
+    z-index: 2;
+}
+
+.octane-classic-scrollbar[data-visible='false'] {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.octane-classic-scrollbar-button {
+    width: 17px;
+    height: 16px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-classic-scrollbar-button.is-up {
+    background-image: url('../../assets/images/scrollbar/up.png');
+}
+
+.octane-classic-scrollbar-button.is-up:hover {
+    background-image: url('../../assets/images/scrollbar/up_hover.png');
+}
+
+.octane-classic-scrollbar-button.is-up:active {
+    background-image: url('../../assets/images/scrollbar/up_active.png');
+}
+
+.octane-classic-scrollbar-button.is-down {
+    background-image: url('../../assets/images/scrollbar/down.png');
+}
+
+.octane-classic-scrollbar-button.is-down:hover {
+    background-image: url('../../assets/images/scrollbar/down_hover.png');
+}
+
+.octane-classic-scrollbar-button.is-down:active {
+    background-image: url('../../assets/images/scrollbar/down_active.png');
+}
+
+.octane-classic-scrollbar-track {
+    position: relative;
+    min-height: 0;
+    background: url('../../assets/images/scrollbar/background.png') repeat-y center;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-classic-scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 17px;
+    min-height: 12px;
+    border: 0;
+    border-radius: 0;
+    background: url('../../assets/images/scrollbar/thumb_middle.png') repeat-y center;
+    cursor: grab;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    touch-action: none;
+}
+
+.octane-classic-scrollbar-thumb::before,
+.octane-classic-scrollbar-thumb::after {
+    position: absolute;
+    right: 0;
+    left: 0;
+    height: 2px;
+    content: '';
+    background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-classic-scrollbar-thumb::before {
+    top: 0;
+    background-image: url('../../assets/images/scrollbar/thumb_top.png');
+}
+
+.octane-classic-scrollbar-thumb::after {
+    bottom: 0;
+    background-image: url('../../assets/images/scrollbar/thumb_bottom.png');
+}
+
+.octane-classic-scrollbar-thumb:hover {
+    background-image: url('../../assets/images/scrollbar/thumb_middle_hover.png');
+}
+
+.octane-classic-scrollbar-thumb:active {
+    background-image: url('../../assets/images/scrollbar/thumb_middle_active.png');
+    cursor: grabbing;
+}
+
+.octane-classic-scrollbar-thumb:active::before {
+    background-image: url('../../assets/images/scrollbar/thumb_top_active.png');
+}
+
+.octane-classic-scrollbar-thumb:active::after {
+    background-image: url('../../assets/images/scrollbar/thumb_bottom_active.png');
+}
+
+.octane-catalog-pet-color-swatch {
+    width: 27px;
+    min-width: 27px;
+    height: 22px;
+    min-height: 22px;
+    border: 1px solid #777;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+    cursor: pointer;
+}
+
+.octane-catalog-pet-color-swatch[aria-pressed='true'] {
+    border-color: #000;
+    box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px #000;
+}
+
+.octane-catalog-pet-color-swatch:disabled {
+    cursor: wait;
+    opacity: 0.72;
+}
+
+.octane-catalog-pet-color-swatch--locked,
+.octane-catalog-pet-color-swatch--locked:disabled {
+    position: relative;
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.octane-catalog-pet-color-swatch--locked::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: inherit;
+}
+
+.octane-catalog-pet-swatch-lock {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    font-size: 10px;
+    color: #ffd24a;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.9));
+    pointer-events: none;
+}
+
+.octane-catalog-pet-hc-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #b8860b;
+}
+
+.octane-catalog-pet-hc-note svg {
+    color: #ffb300;
+}
+
+.octane-catalog-pet-purchase {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.octane-catalog-pet-name-status {
+    position: absolute;
+    top: 50%;
+    right: 7px;
+    transform: translateY(-50%);
+    font-size: 10px;
+}
+
+.octane-catalog-pet-name-error {
+    color: #a10000;
+    font-size: 10px;
+    line-height: 12px;
+}
+
+.octane-catalog-pet-purchase-row {
+    position: absolute;
+    top: 49px;
+    left: -10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 360px;
+    height: 30px;
+    gap: 8px;
+}
+
+.octane-catalog-pet-purchase-row .octane-catalog-standard-buy-button {
+    min-width: 116px;
+}
+
+.octane-catalog-specialized-state,
+.octane-catalog-specialized-empty {
+    display: grid;
+    place-items: center;
+    min-height: 90px;
+    padding: 16px;
+    color: #555;
+    font-size: 11px;
+    text-align: center;
+}
+
+.octane-catalog-information-layout {
+    display: grid;
+    grid-template-rows: minmax(110px, 45%) 1fr;
+    height: 100%;
+    min-height: 0;
+    color: #000000;
+    background: #e4e3db;
+}
+
+.octane-catalog-information-images {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 0;
+    padding: 8px;
+    overflow: hidden;
+}
+
+.octane-catalog-information-images img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.octane-catalog-information-copy {
+    min-height: 0;
+    padding: 9px;
+    overflow: auto;
+    border-top: 1px solid #aaa;
+    background: #f7f7f2;
+    font-size: 11px;
+    line-height: 15px;
+}
+
+.octane-catalog-information-copy section + section {
+    margin-top: 8px;
+}
+
+.octane-catalog-sold-limited-layout {
+    display: grid;
+    grid-template-rows: 190px minmax(0, 1fr);
+    gap: 7px;
+    height: 100%;
+    min-height: 0;
+    padding: 7px;
+    color: #000000;
+    background: #e4e3db;
+}
+
+.octane-catalog-sold-limited-preview {
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid #aaa;
+    background: #c6c6c0;
+}
+
+.octane-catalog-sold-limited-preview > img {
+    max-width: 150px;
+    max-height: 130px;
+    object-fit: contain;
+}
+
+.octane-catalog-sold-limited-preview > .octane-catalog-product-details {
+    position: absolute;
+    top: 7px;
+    left: 8px;
+}
+
+.octane-catalog-sold-limited-preview > strong {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    padding: 4px 7px;
+    border: 1px solid #7a1b1b;
+    border-radius: 3px;
+    color: #fff;
+    background: #b43a36;
+    font-size: 10px;
+}
+
+.octane-catalog-sold-limited-grid {
+    min-height: 0;
+    overflow: auto;
+}
+
+.octane-card-shell.octane-catalog-purchase-confirm {
+    box-sizing: border-box;
+    width: 325px !important;
+    min-width: 325px !important;
+    max-width: 325px !important;
+    height: 253px !important;
+    min-height: 253px !important;
+    max-height: 253px !important;
+    resize: none !important;
+    outline: none;
+}
+
+.octane-card-shell.octane-catalog-purchase-confirm:has(.octane-catalog-purchase-confirm-content.has-disclaimer) {
+    height: 280px !important;
+    min-height: 280px !important;
+    max-height: 280px !important;
+}
+
+.octane-card-shell.octane-catalog-purchase-confirm:has(.octane-catalog-purchase-confirm-content.has-limited) {
+    height: 312px !important;
+    min-height: 312px !important;
+    max-height: 312px !important;
+}
+
+.octane-card-shell.octane-catalog-purchase-confirm:has(.octane-catalog-purchase-confirm-content.has-disclaimer.has-limited) {
+    height: 339px !important;
+    min-height: 339px !important;
+    max-height: 339px !important;
+}
+
+.draggable-window:has(> .octane-catalog-purchase-confirm) {
+    width: 325px !important;
+    min-width: 325px !important;
+    max-width: 325px !important;
+    height: 253px !important;
+    min-height: 253px !important;
+    max-height: 253px !important;
+}
+
+.draggable-window:has(> .octane-catalog-purchase-confirm .octane-catalog-purchase-confirm-content.has-disclaimer) {
+    height: 280px !important;
+    min-height: 280px !important;
+    max-height: 280px !important;
+}
+
+.draggable-window:has(> .octane-catalog-purchase-confirm .octane-catalog-purchase-confirm-content.has-limited) {
+    height: 312px !important;
+    min-height: 312px !important;
+    max-height: 312px !important;
+}
+
+.draggable-window:has(> .octane-catalog-purchase-confirm .octane-catalog-purchase-confirm-content.has-disclaimer.has-limited) {
+    height: 339px !important;
+    min-height: 339px !important;
+    max-height: 339px !important;
+}
+
+.octane-catalog-purchase-confirm,
+.octane-catalog-purchase-confirm * {
+    box-sizing: border-box;
+}
+
+.octane-card-shell.octane-catalog-purchase-confirm .octane-catalog-purchase-confirm-content.container-fluid {
+    position: absolute !important;
+    /* The 1px frame box resolves this to AIR outer-local x=1/y=33. */
+    top: 32px !important;
+    left: 0 !important;
+    z-index: 1;
+    display: block !important;
+    width: 323px !important;
+    min-width: 323px !important;
+    max-width: 323px !important;
+    height: 208px !important;
+    min-height: 208px !important;
+    max-height: 208px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+}
+
+.octane-card-shell.octane-catalog-purchase-confirm .octane-catalog-purchase-confirm-content.has-disclaimer.container-fluid {
+    height: 235px !important;
+    min-height: 235px !important;
+    max-height: 235px !important;
+}
+
+.octane-card-shell.octane-catalog-purchase-confirm .octane-catalog-purchase-confirm-content.has-limited.container-fluid {
+    height: 267px !important;
+    min-height: 267px !important;
+    max-height: 267px !important;
+}
+
+.octane-card-shell.octane-catalog-purchase-confirm .octane-catalog-purchase-confirm-content.has-disclaimer.has-limited.container-fluid {
+    height: 294px !important;
+    min-height: 294px !important;
+    max-height: 294px !important;
+}
+
+.octane-catalog-purchase-confirm-content :where(span, strong, label, input) {
+    color: #000000 !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+}
+
+.octane-catalog-purchase-confirm-preview {
+    --octane-catalog-purchase-confirm-image-border: url("../../assets/images/catalog/air/gift/image-border-f1f1f1.png");
+
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 126px;
+    height: 152px;
+    overflow: hidden;
+    background: transparent;
+}
+
+.octane-catalog-purchase-confirm-preview::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 6px solid transparent;
+    border-image-source: var(--octane-catalog-purchase-confirm-image-border);
+    border-image-slice: 6 fill;
+    border-image-width: 6px;
+    border-image-repeat: stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.octane-catalog-purchase-confirm-preview img,
+.octane-catalog-purchase-confirm-preview .furni-image {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: none;
+    height: auto;
+    max-height: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-catalog-purchase-confirm-properties {
+    position: absolute;
+    top: 8px;
+    left: 143px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    width: 176px;
+    min-height: 116px;
+}
+
+.octane-catalog-purchase-confirm-product,
+.octane-catalog-purchase-confirm-quantity,
+.octane-catalog-purchase-confirm-free-quantity {
+    margin: 0;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 19px;
+}
+
+.octane-catalog-purchase-confirm-product {
+    min-height: 35px;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+
+.octane-catalog-purchase-confirm-summary,
+.octane-catalog-purchase-confirm-cost,
+.octane-catalog-purchase-confirm-price,
+.octane-catalog-purchase-confirm-actions {
+    display: flex;
+    align-items: center;
+}
+
+.octane-catalog-purchase-confirm-limited {
+    position: absolute;
+    top: 181px;
+    left: 9px;
+    display: block;
+    width: 304px;
+    height: 49px;
+    padding: 0;
+    border: 0;
+    color: #000000;
+    background: transparent;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-catalog-purchase-confirm-content.has-disclaimer .octane-catalog-purchase-confirm-limited {
+    top: 208px;
+}
+
+.octane-catalog-purchase-confirm-limited::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border: 6px solid transparent;
+    border-image-source: url("../../assets/images/catalog/air/border-thin-dark-ebf9fc.png");
+    border-image-slice: 6 fill;
+    border-image-width: 6px;
+    border-image-repeat: stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.octane-catalog-purchase-confirm-limited > span {
+    position: absolute;
+    top: 9px;
+    z-index: 1;
+    left: 10px;
+    width: 233px;
+    height: 30px;
+}
+
+.octane-catalog-purchase-confirm-limited::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 260px;
+    z-index: 1;
+    width: 34px;
+    height: 37px;
+    background: url("../../assets/images/catalog/air/unique-item-large-tile-upright.png") 0 0 / 34px 37px no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-catalog-purchase-confirm-summary {
+    justify-content: flex-start;
+    width: 288px;
+    min-height: 22px;
+    color: #000000;
+    font-size: 14px;
+    line-height: 19px;
+}
+
+.octane-catalog-purchase-confirm-cost {
+    gap: 1px;
+}
+
+.octane-catalog-purchase-confirm-price {
+    gap: 1px;
+    height: 22px;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 19px;
+    white-space: nowrap;
+}
+
+.octane-catalog-purchase-confirm-price .octane-currency-icon {
+    width: 22px !important;
+    min-width: 22px !important;
+    height: 22px !important;
+    min-height: 22px !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+.octane-catalog-purchase-confirm-price[data-currency-type="-1"] .octane-currency-icon {
+    background-image: url("../../assets/images/catalog/air/currency-credit-big.png") !important;
+}
+
+.octane-catalog-purchase-confirm-price[data-currency-type="0"] .octane-currency-icon {
+    background-image: url("../../assets/images/catalog/air/currency-ducket-big.png") !important;
+}
+
+.octane-catalog-purchase-confirm-price[data-currency-type="5"] .octane-currency-icon {
+    background-image: url("../../assets/images/catalog/air/currency-diamond-big.png") !important;
+}
+
+.octane-catalog-purchase-confirm-disclaimer {
+    position: absolute;
+    top: 181px;
+    left: 0;
+    width: 311px;
+    height: 17px;
+    margin: 0;
+    color: #000000;
+    font-size: 12px !important;
+    font-weight: 400;
+    line-height: 17px;
+}
+
+.octane-catalog-purchase-confirm-disclaimer input,
+.octane-catalog-purchase-confirm-disclaimer .octane-checkbox {
+    position: absolute;
+    top: 0;
+    left: 13px;
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    padding: 0;
+    appearance: none;
+    border: 0;
+    border-radius: 0;
+    background: url("../../assets/images/catalog/air/gift/checkbox-default.png") 0 0 / 15px 15px no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-catalog-purchase-confirm-disclaimer input:checked,
+.octane-catalog-purchase-confirm-disclaimer .octane-checkbox[data-checked] {
+    background-image: url("../../assets/images/catalog/air/gift/checkbox-selected.png");
+}
+
+.octane-catalog-purchase-confirm-disclaimer input:focus-visible,
+.octane-catalog-purchase-confirm-disclaimer .octane-checkbox:focus-visible {
+    outline: 1px solid #000000;
+    outline-offset: 1px;
+}
+
+.octane-catalog-purchase-confirm-disclaimer span {
+    position: absolute;
+    top: 0;
+    left: 33px;
+    width: 278px;
+    min-height: 17px;
+}
+
+.octane-catalog-purchase-confirm-actions {
+    position: absolute;
+    top: 181px;
+    left: 13px;
+    width: 315px;
+    height: 27px;
+}
+
+.octane-catalog-purchase-confirm-content.has-disclaimer .octane-catalog-purchase-confirm-actions {
+    top: 208px;
+}
+
+.octane-catalog-purchase-confirm-content.has-limited .octane-catalog-purchase-confirm-actions {
+    top: 240px;
+}
+
+.octane-catalog-purchase-confirm-content.has-disclaimer.has-limited .octane-catalog-purchase-confirm-actions {
+    top: 267px;
+}
+
+.octane-catalog-purchase-confirm-button {
+    position: absolute !important;
+    top: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 110px !important;
+    min-width: 110px !important;
+    max-width: 110px !important;
+    height: 27px !important;
+    min-height: 27px !important;
+    max-height: 27px !important;
+    margin: 0 !important;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    font-size: 12px !important;
+    line-height: 17px !important;
+    text-shadow: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+
+.octane-catalog-purchase-confirm-button.is-cancel {
+    left: 0 !important;
+    padding: 0 8px !important;
+    border-width: 5px !important;
+    border-image-source: var(--habbo-skin-shiny) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    color: #000000 !important;
+    font-weight: 400 !important;
+}
+
+.octane-catalog-purchase-confirm-button.is-cancel:hover {
+    border-image-source: var(--habbo-skin-shiny-hover) !important;
+}
+
+.octane-catalog-purchase-confirm-button.is-cancel:active {
+    border-image-source: var(--habbo-skin-shiny-pressed) !important;
+}
+
+.octane-catalog-purchase-confirm-button.is-cancel:disabled {
+    border-image-source: var(--habbo-skin-shiny-disabled) !important;
+    color: #777777 !important;
+}
+
+.octane-catalog-purchase-confirm-button.is-buy {
+    left: 186px !important;
+    padding: 0 10px !important;
+    border-width: 5px !important;
+    border-image-source: var(--habbo-skin-shiny-thick-green) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+.octane-catalog-purchase-confirm-button.is-buy:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-green-hover) !important;
+}
+
+.octane-catalog-purchase-confirm-button.is-buy:active {
+    border-image-source: var(--habbo-skin-shiny-thick-green-pressed) !important;
+}
+
+.octane-catalog-purchase-confirm-button.is-buy:disabled {
+    border-image-source: var(--habbo-skin-shiny-thick-green-disabled) !important;
+    color: #eeeeee !important;
+}
+
+.octane-catalog-purchase-confirm-button:focus-visible {
+    outline: 1px solid #000000;
+    outline-offset: 1px;
+}
+
+.octane-catalog-window [role='option']:not([aria-selected='true']):focus-visible,
+.octane-catalog-window [role='treeitem']:focus-visible {
+    outline: 2px solid var(--catalog-standard-select);
+    outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .octane-catalog-window *,
+    .octane-catalog-purchase-confirm * {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* AIR 13 purchasable chat styles (PRODUCT_TYPE_CHAT_STYLE): the style is drawn as the
+   chat-style selector draws it, an empty bubble of that style. */
+.octane-chat-style-image {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 41px;
+    height: 25px;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-chat-style-image .chat-bubble {
+    display: block;
+    width: 38px;
+    min-width: 38px;
+    max-width: 38px;
+    min-height: 17px;
+    border-image-width: 12px 5px 5px 20px;
+    border-image-slice: 17 6 6 29 fill;
+    border-image-outset: 1px 0 0 0;
+    border-image-repeat: repeat repeat;
+}
+
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item > .octane-catalog-grid-chat-style-icon {
+    position: absolute;
+    top: 8px;
+    left: 6px;
+    z-index: 1;
+}
+
+.octane-catalog-offer-preview.is-chat-style .octane-catalog-chat-style-preview {
+    transform: scale(2);
+}
+
+/* HabboCatalogUtils.showExtraOnProduct(CHAT_STYLE): 60x42 catalogue_chatstyle_background. */
+.octane-catalog-addon-chat-style {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 42px;
+    z-index: 2;
+}
+
+.octane-catalog-addon-chat-style-background {
+    position: absolute;
+    inset: 0;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.octane-catalog-purchase-confirm-preview .octane-chat-style-image {
+    transform: scale(1.5);
+}

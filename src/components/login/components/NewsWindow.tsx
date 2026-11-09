@@ -1,6 +1,10 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
+import { useDraggableLoginWindow } from '../hooks/useDraggableLoginWindow';
 import { interpolate, t } from '../utils/i18n';
 import { resolveNewsImage, resolveNewsLink } from '../utils/news';
+import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../../api';
 
 interface NewsItem {
     id: number;
@@ -41,6 +45,8 @@ export const NewsWindow: FC<NewsWindowProps> = ({ newsUrl }) => {
     const [failed, setFailed] = useState(false);
     const [index, setIndex] = useState(0);
     const [autoTick, setAutoTick] = useState(0);
+    const stackRef = useRef<HTMLDivElement>(null);
+    const { style: dragStyle, dragging, handleProps } = useDraggableLoginWindow('news', stackRef);
 
     useEffect(() => {
         if (!newsUrl) {
@@ -104,67 +110,59 @@ export const NewsWindow: FC<NewsWindowProps> = ({ newsUrl }) => {
     };
 
     return (
-        <div className="login-news-stack">
-            <div className="news-card-wrapper" key={current.id}>
-                <span className="news-sparkle news-sparkle-1" aria-hidden="true">
-                    ★
-                </span>
-                <span className="news-sparkle news-sparkle-2" aria-hidden="true">
-                    ✦
-                </span>
-                <span className="news-sparkle news-sparkle-3" aria-hidden="true">
-                    ✧
-                </span>
-
-                <div className="news-new-badge" aria-hidden="true">
-                    <span>{t('nitro.login.news.new', 'NEW!')}</span>
-                </div>
-
-                <div className="nitro-login-card nitro-news-card">
-                    <div className="card-title news-ribbon">
-                        <span className="news-ribbon-text">{t('nitro.login.news.title', 'Hotel News')}</span>
-                    </div>
-                    <div className="card-body news-body">
-                        {safeImageSrc && (
-                            <div className="news-image">
-                                <img
-                                    src={safeImageSrc}
-                                    alt={current.title || 'news'}
-                                    onError={(e) => {
-                                        e.currentTarget.style.display = 'none';
-                                    }}
-                                />
-                            </div>
-                        )}
-                        <div className="news-headline">{current.title}</div>
-                        {current.body && <div className="news-text">{current.body}</div>}
-
-                        <div className="news-footer">
-                            {current.linkText && safeLinkUrl ? (
-                                <button type="button" className="ok-button news-link-button" onClick={openLink}>
-                                    {current.linkText}
-                                </button>
-                            ) : (
-                                <span />
-                            )}
-
-                            {hasMany && (
-                                <div className="news-pager">
-                                    <button type="button" className="arrow-btn" aria-label="Previous news" onClick={prev}>
-                                        &lsaquo;
-                                    </button>
-                                    <span className="news-counter">
-                                        {index + 1}/{items.length}
-                                    </span>
-                                    <button type="button" className="arrow-btn" aria-label="Next news" onClick={next}>
-                                        &rsaquo;
-                                    </button>
+        <NativeTextTree>
+            <div className={`login-news-stack${dragging ? ' is-dragging' : ''}`} ref={stackRef} style={dragStyle}>
+                <div className="news-card-wrapper" key={current.id}>
+                    <div className="octane-login-card octane-card-shell octane-news-card">
+                        <div
+                            className="card-title octane-card-header-shell login-drag-handle"
+                            title={t('nitro.login.window.drag_hint', 'Drag to move, double-click to reset')}
+                            {...handleProps}
+                        >
+                            <span className="octane-card-title">{t('nitro.login.news.title', 'Hotel News')}</span>
+                        </div>
+                        <div className="card-body octane-card-content-shell news-body">
+                            {safeImageSrc && (
+                                <div className="news-image">
+                                    <img
+                                        src={safeImageSrc}
+                                        alt={current.title || 'news'}
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                        }}
+                                    />
                                 </div>
                             )}
+                            <div className="news-headline">{current.title}</div>
+                            {current.body && <div className="news-text">{current.body}</div>}
+
+                            <div className="news-footer">
+                                {current.linkText && safeLinkUrl ? (
+                                    <BaseButton type="button" className="ok-button news-link-button" onClick={openLink}>
+                                        {current.linkText}
+                                    </BaseButton>
+                                ) : (
+                                    <span />
+                                )}
+
+                                {hasMany && (
+                                    <div className="news-pager">
+                                        <BaseButton type="button" className="arrow-btn" aria-label={localizeWithFallback('octane.login.previous_news', 'Previous news')} onClick={prev}>
+                                            &lsaquo;
+                                        </BaseButton>
+                                        <span className="news-counter">
+                                            {index + 1}/{items.length}
+                                        </span>
+                                        <BaseButton type="button" className="arrow-btn" aria-label={localizeWithFallback('octane.login.next_news', 'Next news')} onClick={next}>
+                                            &rsaquo;
+                                        </BaseButton>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

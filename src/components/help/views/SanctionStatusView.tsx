@@ -1,8 +1,23 @@
 import { FC } from 'react';
 import { FaArrowCircleRight } from 'react-icons/fa';
-import { CreateLinkEvent, LocalizeText } from '../../../api';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../common';
+import { CreateLinkEvent, localizeWithFallback, LocalizeText } from '../../../api';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { useHelp } from '../../../hooks';
+import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+
+const SERVER_DATE = /^\w{3} (\w{3}) (\d{1,2}) (\d{2}:\d{2}:\d{2}) [A-Z]{2,5} (\d{4})$/;
+
+/** The server sends a date as its own text ("Fri Oct 09 21:30:58 CEST 2026"); a text of another shape is left as it came. */
+export const formatServerDate = (text: string): string => {
+    const match = SERVER_DATE.exec((text ?? '').trim());
+
+    if (!match) return text;
+
+    const date = new Date(`${match[1]} ${match[2]} ${match[4]} ${match[3]}`);
+
+    return Number.isNaN(date.getTime()) ? text : date.toLocaleString();
+};
 
 export const SanctionSatusView: FC<{}> = (props) => {
     const { sanctionInfo = null, setSanctionInfo = null } = useHelp();
@@ -34,56 +49,58 @@ export const SanctionSatusView: FC<{}> = (props) => {
     if (!sanctionInfo) return null;
 
     return (
-        <NitroCardView className="nitro-help min-w-0 w-[min(420px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('help.sanction.info.title')} onCloseClick={() => setSanctionInfo(null)} />
-            <NitroCardContentView className="text-black">
-                <div className="flex min-h-[170px] flex-col">
-                    <div className="flex flex-col gap-1">
-                        {sanctionInfo.sanctionReason === 'cfh.reason.EMPTY' ? (
-                            <div className="font-bold">{LocalizeText('help.sanction.current.none')}</div>
-                        ) : (
-                            <>
-                                {(sanctionInfo.probationHoursLeft > 0 || sanctionInfo.isSanctionActive) && (
-                                    <div className="font-bold">{LocalizeText('help.sanction.probation.reminder')}</div>
-                                )}
-                                <div className={`font-bold ${sanctionInfo.isSanctionNew ? 'text-danger' : ''}`}>
-                                    {LocalizeText('help.sanction.last.sanction')}{' '}
-                                    {sanctionLocalization('current', sanctionInfo.sanctionName, sanctionInfo.sanctionLengthHours)}
+        <NativeTextTree>
+            <OctaneCardView className="octane-help octane-sanction-info min-w-0 w-[min(450px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" theme="primary-slim">
+                <OctaneCardHeaderView headerText={LocalizeText('help.sanction.info.title')} onCloseClick={() => setSanctionInfo(null)} />
+                <OctaneCardContentView className="text-black">
+                    <div className="flex min-h-[170px] flex-col">
+                        <div className="octane-sanction-info__body flex flex-col gap-1">
+                            {sanctionInfo.sanctionReason === 'cfh.reason.EMPTY' ? (
+                                <div className="font-bold">{LocalizeText('help.sanction.current.none')}</div>
+                            ) : (
+                                <>
+                                    {(sanctionInfo.probationHoursLeft > 0 || sanctionInfo.isSanctionActive) && (
+                                        <div className="font-bold">{LocalizeText('help.sanction.probation.reminder')}</div>
+                                    )}
+                                    <div className={`font-bold ${sanctionInfo.isSanctionNew ? 'text-danger' : ''}`}>
+                                        {LocalizeText('help.sanction.last.sanction')}{' '}
+                                        {sanctionLocalization('current', sanctionInfo.sanctionName, sanctionInfo.sanctionLengthHours)}
+                                    </div>
+                                    <div>
+                                        {LocalizeText('generic.start.time')} {formatServerDate(sanctionInfo.sanctionCreationTime)}
+                                    </div>
+                                    <div>
+                                        {LocalizeText('generic.reason')} {sanctionInfo.sanctionReason}
+                                    </div>
+                                    <div>
+                                        {LocalizeText('help.sanction.probation.days.left')} {Math.trunc(sanctionInfo.probationHoursLeft / 24) + 1}
+                                    </div>
+                                </>
+                            )}
+                            {sanctionInfo.hasCustomMute && !sanctionInfo.isSanctionActive && (
+                                <div className="font-bold">{LocalizeText('help.sanction.custom.mute')}</div>
+                            )}
+                            {sanctionInfo.tradeLockExpiryTime && sanctionInfo.tradeLockExpiryTime.length > 0 && (
+                                <div className="font-bold">
+                                    {LocalizeText('trade.locked.until')} {formatServerDate(sanctionInfo.tradeLockExpiryTime)}
                                 </div>
-                                <div>
-                                    {LocalizeText('generic.start.time')} {sanctionInfo.sanctionCreationTime}
-                                </div>
-                                <div>
-                                    {LocalizeText('generic.reason')} {sanctionInfo.sanctionReason}
-                                </div>
-                                <div>
-                                    {LocalizeText('help.sanction.probation.days.left')} {Math.trunc(sanctionInfo.probationHoursLeft / 24) + 1}
-                                </div>
-                            </>
-                        )}
-                        {sanctionInfo.hasCustomMute && !sanctionInfo.isSanctionActive && (
-                            <div className="font-bold">{LocalizeText('help.sanction.custom.mute')}</div>
-                        )}
-                        {sanctionInfo.tradeLockExpiryTime && sanctionInfo.tradeLockExpiryTime.length > 0 && (
-                            <div className="font-bold">
-                                {LocalizeText('trade.locked.until')} {sanctionInfo.tradeLockExpiryTime}
-                            </div>
-                        )}
-                        {sanctionInfo.sanctionReason !== 'cfh.reason.EMPTY' && (
-                            <div>{sanctionLocalization('next', sanctionInfo.nextSanctionName, sanctionInfo.nextSanctionLengthHours)}</div>
-                        )}
+                            )}
+                            {sanctionInfo.sanctionReason !== 'cfh.reason.EMPTY' && (
+                                <div>{sanctionLocalization('next', sanctionInfo.nextSanctionName, sanctionInfo.nextSanctionLengthHours)}</div>
+                            )}
+                        </div>
+                        <div className="mt-auto flex items-end justify-between gap-3 pt-3">
+                            <BaseButton type="button" className="help-link" onClick={() => CreateLinkEvent('habbopages/help')}>
+                                <FaArrowCircleRight className="help-link__icon" />
+                                {LocalizeText('help.main.faq.link.text')}
+                            </BaseButton>
+                            <BaseButton type="button" className="habbo-btn-green habbo-btn-green--auto" onClick={() => setSanctionInfo(null)}>
+                                {localizeWithFallback('generic.got.it', 'Got it')}
+                            </BaseButton>
+                        </div>
                     </div>
-                    <div className="mt-auto flex items-end justify-between gap-3 pt-3">
-                        <button type="button" className="help-link" onClick={() => CreateLinkEvent('habbopages/help')}>
-                            <FaArrowCircleRight className="help-link__icon" />
-                            {LocalizeText('help.main.faq.link.text')}
-                        </button>
-                        <button type="button" className="habbo-btn-green habbo-btn-green--auto" onClick={() => setSanctionInfo(null)}>
-                            {LocalizeText('habbo.way.ok.button')}
-                        </button>
-                    </div>
-                </div>
-            </NitroCardContentView>
-        </NitroCardView>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

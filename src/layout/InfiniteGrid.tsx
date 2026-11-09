@@ -1,7 +1,9 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { DetailedHTMLProps, Fragment, HTMLAttributes, ReactElement, Ref, RefObject, useEffect, useRef, useState } from 'react';
+import { ComponentPropsWithoutRef, CSSProperties, Fragment, ReactElement, ReactNode, Ref, RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ToggleButton } from '../common/ToggleButton';
+import { ClassicScrollAreaView } from '../common/scroll-area/ClassicScrollAreaView';
 import { classNames } from './classNames';
-import { NitroLimitedEditionStyledNumberView } from './limited-edition';
+import { OctaneLimitedEditionStyledNumberView } from './limited-edition';
 import { styleNames } from './styleNames';
 
 type Props<T> = {
@@ -12,24 +14,43 @@ type Props<T> = {
     squareItems?: boolean;
     itemMinWidth?: number;
     rowGap?: number;
+    columnGap?: number;
+    classicScrollbar?: boolean;
+    airColumnAdmission?: boolean;
+    onColumnCountChange?: (columnCount: number) => void;
     itemRender?: (item: T, index?: number) => ReactElement;
+    // Optional stable React key per item. Defaults to the grid position (index), which is fine
+    // for static lists but lets a cell's local state bleed to a different item when the list
+    // reorders - pass this for lists whose items are added/removed/reordered.
+    itemKey?: (item: T, index: number) => string | number;
 };
 
 const GRID_GAP_PX = 4;
 
-const useColumnMeasure = (itemMinWidth: number | null, columnCountProp: number): { parentRef: RefObject<HTMLDivElement | null>; columnCount: number } => {
+const useColumnMeasure = (
+    itemMinWidth: number | null,
+    columnCountProp: number,
+    columnGap: number = GRID_GAP_PX,
+    airColumnAdmission: boolean = false,
+    onColumnCountChange?: (columnCount: number) => void
+): { parentRef: RefObject<HTMLDivElement | null>; columnCount: number } => {
     const parentRef = useRef<HTMLDivElement>(null);
     const [measuredColumnCount, setMeasuredColumnCount] = useState<number>(columnCountProp);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!itemMinWidth || itemMinWidth <= 0) return;
 
         const element = parentRef.current;
         if (!element) return;
 
         const recompute = () => {
-            const width = element.clientWidth;
-            const cols = Math.max(1, Math.floor((width + GRID_GAP_PX) / (itemMinWidth + GRID_GAP_PX)));
+            const computedStyle = window.getComputedStyle(element);
+            const parsedLeft = Number.parseFloat(computedStyle.paddingLeft);
+            const parsedRight = Number.parseFloat(computedStyle.paddingRight);
+            const horizontalPadding = (Number.isFinite(parsedLeft) ? parsedLeft : 0) + (Number.isFinite(parsedRight) ? parsedRight : 0);
+            const width = element.clientWidth - horizontalPadding;
+            const admissionAllowance = airColumnAdmission ? columnGap * 2 : columnGap;
+            const cols = Math.max(1, Math.floor((width + admissionAllowance) / (itemMinWidth + columnGap)));
             setMeasuredColumnCount((prev) => (prev === cols ? prev : cols));
         };
 
@@ -39,40 +60,78 @@ const useColumnMeasure = (itemMinWidth: number | null, columnCountProp: number):
         observer.observe(element);
 
         return () => observer.disconnect();
-    }, [itemMinWidth]);
+    }, [airColumnAdmission, columnGap, itemMinWidth]);
 
     const columnCount = itemMinWidth && itemMinWidth > 0 ? measuredColumnCount : columnCountProp;
+
+    useLayoutEffect(() => onColumnCountChange?.(columnCount), [columnCount, onColumnCountChange]);
 
     return { parentRef, columnCount };
 };
 
 const InfiniteGridSquare = <T,>(props: Props<T>) => {
-    const { items = [], columnCount: columnCountProp = 4, itemMinWidth = null, itemRender = null } = props;
-    const { parentRef } = useColumnMeasure(itemMinWidth, columnCountProp);
+    const {
+        items = [],
+        columnCount: columnCountProp = 4,
+        itemMinWidth = null,
+        columnGap = GRID_GAP_PX,
+        airColumnAdmission = false,
+        onColumnCountChange,
+        itemRender = null,
+        itemKey = null,
+        classicScrollbar = false
+    } = props;
+    const { parentRef } = useColumnMeasure(itemMinWidth, columnCountProp, columnGap, airColumnAdmission, onColumnCountChange);
 
-    const autoFillStyle = itemMinWidth && itemMinWidth > 0 ? { gridTemplateColumns: `repeat(auto-fill, ${itemMinWidth}px)` } : null;
+    const autoFillStyle =
+        itemMinWidth && itemMinWidth > 0 ? { columnGap, gridTemplateColumns: `repeat(auto-fill, minmax(${itemMinWidth}px, 1fr))` } : { columnGap };
     const fixedColsClass = itemMinWidth && itemMinWidth > 0 ? '' : `grid-cols-${columnCountProp}`;
+
+    const content = (
+        <div className={`grid ${fixedColsClass} gap-1 w-full`} style={autoFillStyle ?? undefined}>
+            {items.map((item, index) => {
+                if (!item) return <Fragment key={`${index}-empty`} />;
+
+                return <Fragment key={itemKey ? itemKey(item, index) : `${index}-item`}>{itemRender(item, index)}</Fragment>;
+            })}
+        </div>
+    );
+
+    if (classicScrollbar) {
+        return (
+            <ClassicScrollAreaView className="size-full" viewportRef={parentRef}>
+                {content}
+            </ClassicScrollAreaView>
+        );
+    }
 
     return (
         <div ref={parentRef} className="overflow-y-auto size-full">
-            <div className={`grid ${fixedColsClass} gap-1 w-full`} style={autoFillStyle ?? undefined}>
-                {items.map((item, index) => {
-                    if (!item) return <Fragment key={`${index}-empty`} />;
-
-                    return <Fragment key={`${index}-item`}>{itemRender(item, index)}</Fragment>;
-                })}
-            </div>
+            {content}
         </div>
     );
 };
 
 const InfiniteGridVirtualized = <T,>(props: Props<T>) => {
-    const { items = [], columnCount: columnCountProp = 4, overscan = 5, estimateSize = 45, itemMinWidth = null, rowGap = null, itemRender = null } = props;
-    const { parentRef, columnCount } = useColumnMeasure(itemMinWidth, columnCountProp);
+    const {
+        items = [],
+        columnCount: columnCountProp = 4,
+        overscan = 5,
+        estimateSize = 45,
+        itemMinWidth = null,
+        rowGap = null,
+        columnGap = GRID_GAP_PX,
+        airColumnAdmission = false,
+        onColumnCountChange,
+        itemRender = null,
+        itemKey = null,
+        classicScrollbar = false
+    } = props;
+    const { parentRef, columnCount } = useColumnMeasure(itemMinWidth, columnCountProp, columnGap, airColumnAdmission, onColumnCountChange);
 
     const rowsContainerClassName = rowGap !== null ? 'flex flex-col w-full relative' : 'flex flex-col w-full *:pb-1 relative';
 
-    const autoFillStyle = itemMinWidth && itemMinWidth > 0 ? { gridTemplateColumns: `repeat(auto-fill, ${itemMinWidth}px)` } : null;
+    const autoFillStyle = itemMinWidth && itemMinWidth > 0 ? { gridTemplateColumns: `repeat(auto-fill, minmax(${itemMinWidth}px, 1fr))` } : null;
     const fixedColsClass = itemMinWidth && itemMinWidth > 0 ? '' : `grid-cols-${columnCountProp}`;
 
     const virtualizer = useVirtualizer({
@@ -87,6 +146,11 @@ const InfiniteGridVirtualized = <T,>(props: Props<T>) => {
 
         if (!element || !items) return;
 
+        if (classicScrollbar) {
+            element.style.removeProperty('padding-right');
+            return;
+        }
+
         const checkAndApplyPadding = () => {
             if (!element) return;
 
@@ -100,15 +164,54 @@ const InfiniteGridVirtualized = <T,>(props: Props<T>) => {
         return () => {
             window.removeEventListener('resize', checkAndApplyPadding);
         };
-    }, [items, parentRef]);
+    }, [items, parentRef, classicScrollbar]);
 
     useEffect(() => {
         if (!items || !items.length) return;
 
+        if (parentRef.current) parentRef.current.scrollLeft = 0;
         virtualizer.scrollToIndex(0);
     }, [items, virtualizer]);
 
     const virtualItems = virtualizer.getVirtualItems();
+
+    const content = virtualItems.map((virtualRow) => (
+        <div
+            key={virtualRow.key + 'a'}
+            ref={virtualizer.measureElement}
+            className={`grid ${fixedColsClass} gap-1 absolute top-0 left-0 last:pb-0 w-full`}
+            data-index={virtualRow.index}
+            style={{
+                ...(rowGap === null && { height: virtualRow.size }),
+                ...(autoFillStyle ?? {}),
+                ...(rowGap !== null && { paddingBottom: `${rowGap}px` }),
+                columnGap,
+                transform: `translateY(${virtualRow.start}px)`
+            }}
+        >
+            {Array.from(Array(columnCount)).map((e, i) => {
+                const index = i + virtualRow.index * columnCount;
+                const item = items[index];
+
+                if (!item) return <Fragment key={virtualRow.index + i + 'b'} />;
+
+                return <Fragment key={itemKey ? itemKey(item, index) : i}>{itemRender(item, index)}</Fragment>;
+            })}
+        </div>
+    ));
+
+    if (classicScrollbar) {
+        return (
+            <ClassicScrollAreaView
+                className="size-full"
+                contentClassName={rowsContainerClassName}
+                contentStyle={{ height: virtualizer.getTotalSize() }}
+                viewportRef={parentRef}
+            >
+                {content}
+            </ClassicScrollAreaView>
+        );
+    }
 
     return (
         <div ref={parentRef} className="overflow-y-auto size-full">
@@ -118,29 +221,7 @@ const InfiniteGridVirtualized = <T,>(props: Props<T>) => {
                     height: virtualizer.getTotalSize()
                 }}
             >
-                {virtualItems.map((virtualRow) => (
-                    <div
-                        key={virtualRow.key + 'a'}
-                        ref={virtualizer.measureElement}
-                        className={`grid ${fixedColsClass} gap-1 absolute top-0 left-0 last:pb-0 w-full`}
-                        data-index={virtualRow.index}
-                        style={{
-                            ...(rowGap === null && { height: virtualRow.size }),
-                            ...(autoFillStyle ?? {}),
-                            ...(rowGap !== null && { paddingBottom: `${rowGap}px` }),
-                            transform: `translateY(${virtualRow.start}px)`
-                        }}
-                    >
-                        {Array.from(Array(columnCount)).map((e, i) => {
-                            const index = i + virtualRow.index * columnCount;
-                            const item = items[index];
-
-                            if (!item) return <Fragment key={virtualRow.index + i + 'b'} />;
-
-                            return <Fragment key={i}>{itemRender(item, index)}</Fragment>;
-                        })}
-                    </div>
-                ))}
+                {content}
             </div>
         </div>
     );
@@ -161,8 +242,11 @@ type InfiniteGridItemProps = {
     itemUnseen?: boolean;
     itemHighlight?: boolean;
     disabled?: boolean;
-    ref?: Ref<HTMLDivElement>;
-} & DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+    ref?: Ref<HTMLButtonElement>;
+    className?: string;
+    style?: CSSProperties;
+    children?: ReactNode;
+} & Omit<ComponentPropsWithoutRef<typeof ToggleButton>, 'className' | 'style' | 'children' | 'disabled' | 'pressed' | 'defaultPressed'>;
 
 const InfiniteGridItem = ({
     ref,
@@ -211,11 +295,12 @@ const InfiniteGridItem = ({
     }, []);
 
     return (
-        <div
+        <ToggleButton
             ref={ref}
+            pressed={itemActive}
             className={classNames(
                 'flex flex-col items-center justify-center cursor-pointer overflow-hidden relative bg-center bg-no-repeat w-full rounded-md border-2',
-                itemImage && (!backgroundImageUrl || !backgroundImageUrl.length) && 'nitro-icon icon-loading',
+                itemImage && (!backgroundImageUrl || !backgroundImageUrl.length) && 'octane-icon icon-loading',
                 itemActive
                     ? itemColor
                         ? 'border-card-grid-item-active'
@@ -255,12 +340,12 @@ const InfiniteGridItem = ({
                         }}
                     />
                     <div className="absolute bottom-0 unique-item-counter">
-                        <NitroLimitedEditionStyledNumberView value={itemUniqueNumber} />
+                        <OctaneLimitedEditionStyledNumberView value={itemUniqueNumber} />
                     </div>
                 </>
             )}
             {children}
-        </div>
+        </ToggleButton>
     );
 };
 

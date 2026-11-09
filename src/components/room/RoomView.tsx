@@ -1,15 +1,24 @@
-import { GetEventDispatcher, GetRenderer, RoomObjectMouseEvent, RoomObjectTileMouseEvent, RoomSession } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, GetEventDispatcher, GetRenderer, GetRoomEngine, RoomObjectMouseEvent, RoomObjectTileMouseEvent, RoomSession } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC, useEffect, useRef } from 'react';
 import { DispatchMouseEvent, DispatchTouchEvent } from '../../api';
-import { useRoom } from '../../hooks';
+import { useRoom, useRoomKeyboardMovement } from '../../hooks';
 import { classNames } from '../../layout';
 import { RoomSpectatorView } from './spectator/RoomSpectatorView';
 import { RoomWidgetsView } from './widgets/RoomWidgetsView';
+import { WiredLabelOverlayView } from './widgets/wired-label/WiredLabelOverlayView';
+import { WiredLeaderboardOverlayView } from './widgets/wired-leaderboard/WiredLeaderboardOverlayView';
+import { WiredVariableFxView } from './widgets/wired-fx/WiredVariableFxView';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+
+/** One wheel step per this many ms: a trackpad sends dozens of wheel events per swipe. */
+const ROOM_WHEEL_STEP_MS = 120;
 
 export const RoomView: FC<{}> = (props) => {
     const { roomSession = null } = useRoom();
     const elementRef = useRef<HTMLDivElement>(null);
+
+    useRoomKeyboardMovement();
 
     useEffect(() => {
         if (!roomSession) return;
@@ -66,7 +75,7 @@ export const RoomView: FC<{}> = (props) => {
 
             const feedback = document.createElement('div');
 
-            feedback.className = 'nitro-room-touch-feedback';
+            feedback.className = 'octane-room-touch-feedback';
             feedback.style.left = `${lastTileTap.x}px`;
             feedback.style.top = `${lastTileTap.y}px`;
 
@@ -80,6 +89,34 @@ export const RoomView: FC<{}> = (props) => {
             if (event instanceof RoomObjectTileMouseEvent) window.setTimeout(showTouchFeedback, 0);
         };
 
+        let lastWheelStep = 0;
+
+        // As in the official client: the wheel turns furni being moved or placed, Ctrl + wheel zooms.
+        const onWheel = (event: WheelEvent) => {
+            if (!event.deltaY) return;
+
+            const zoom = event.ctrlKey || event.metaKey;
+
+            // Ctrl + wheel would otherwise zoom the whole page.
+            if (zoom) event.preventDefault();
+
+            const now = performance.now();
+
+            if (now - lastWheelStep < ROOM_WHEEL_STEP_MS) return;
+
+            if (zoom) {
+                lastWheelStep = now;
+                CreateLinkEvent(event.deltaY < 0 ? 'room-tools/zoom_in' : 'room-tools/zoom_out');
+                return;
+            }
+
+            if (GetRoomEngine().rotateActiveObjectPreview(event.deltaY > 0)) {
+                lastWheelStep = now;
+                event.preventDefault();
+            }
+        };
+
+        canvas.addEventListener('wheel', onWheel, { passive: false });
         canvas.addEventListener('touchstart', onTouchStart, { passive: true });
         canvas.addEventListener('touchmove', onTouchMove, { passive: true });
         canvas.addEventListener('touchend', onTouchEnd, { passive: true });
@@ -94,6 +131,7 @@ export const RoomView: FC<{}> = (props) => {
         element.appendChild(canvas);
 
         return () => {
+            canvas.removeEventListener('wheel', onWheel);
             canvas.removeEventListener('touchstart', onTouchStart);
             canvas.removeEventListener('touchmove', onTouchMove);
             canvas.removeEventListener('touchend', onTouchEnd);
@@ -102,19 +140,24 @@ export const RoomView: FC<{}> = (props) => {
     }, [roomSession]);
 
     return (
-        <AnimatePresence>
-            {
-                <motion.div className="w-full h-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                    <div ref={elementRef} className="w-full h-full">
-                        {roomSession instanceof RoomSession && (
-                            <>
-                                <RoomWidgetsView />
-                                {roomSession.isSpectator && <RoomSpectatorView />}
-                            </>
-                        )}
-                    </div>
-                </motion.div>
-            }
-        </AnimatePresence>
+        <NativeTextTree>
+            <AnimatePresence>
+                {
+                    <motion.div className="w-full h-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                        <div ref={elementRef} className="w-full h-full">
+                            <WiredLeaderboardOverlayView />
+                            <WiredLabelOverlayView />
+                            <WiredVariableFxView />
+                            {roomSession instanceof RoomSession && (
+                                <>
+                                    <RoomWidgetsView />
+                                    {roomSession.isSpectator && <RoomSpectatorView />}
+                                </>
+                            )}
+                        </div>
+                    </motion.div>
+                }
+            </AnimatePresence>
+        </NativeTextTree>
     );
 };

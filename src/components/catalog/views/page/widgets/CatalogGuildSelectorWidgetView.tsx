@@ -1,48 +1,72 @@
-import { CreateLinkEvent, GetSessionDataManager, StringDataType } from '@nitrots/nitro-renderer';
+import { CatalogGroupsComposer, CreateLinkEvent, GetSessionDataManager, HabboGroupEntryData, StringDataType } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { LocalizeText } from '../../../../../api';
+import { LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button, Flex } from '../../../../../common';
 import { useCatalogData, useCatalogUiState, useUserGroups } from '../../../../../hooks';
+import { Select } from '../../../../../common/Select';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 interface CatalogGuildSelectorWidgetViewProps {
-    ownerOnly?: boolean;
+    /** GuildForumSelectorCatalogWidget: the selector of the group forum page (layout guild_forum). */
+    forumSelector?: boolean;
 }
 
+/**
+ * GuildForumSelectorCatalogWidget.filterGroupMemberships: a forum terminal can be bought for a group that already has a
+ * forum, for a group the user owns, or for any group by staff (security level 4).
+ */
+export const filterGuildForumGroups = (groups: HabboGroupEntryData[], userId: number, isStaff: boolean): HabboGroupEntryData[] =>
+    groups.filter((group) => group.hasForum || group.ownerId === userId || isStaff);
+
+/** GuildSelectorCatalogWidget.populateAndSelectFavorite: the user's own pick, else the favourite group, else the first one. */
+export const getInitialGuildIndex = (groups: HabboGroupEntryData[], pickedIndex: number): number => {
+    if (pickedIndex >= 0 && pickedIndex < groups.length) return pickedIndex;
+
+    let favouriteIndex = -1;
+
+    groups.forEach((group, index) => {
+        if (group.favourite) favouriteIndex = index;
+    });
+
+    if (favouriteIndex >= 0) return favouriteIndex;
+
+    return groups.length ? 0 : -1;
+};
+
 export const CatalogGuildSelectorWidgetView: FC<CatalogGuildSelectorWidgetViewProps> = (props) => {
-    const { ownerOnly = false } = props;
-    const [selectedGroupIndex, setSelectedGroupIndex] = useState<number>(0);
+    const { forumSelector = false } = props;
+    // The entry the user picked from the drop menu; -1 until they pick one.
+    const [pickedIndex, setPickedIndex] = useState<number>(-1);
     const { currentOffer = null } = useCatalogData();
     const { setPurchaseOptions = null } = useCatalogUiState();
     const { data: allGroups = null } = useUserGroups();
 
-    const groups = useMemo(() => {
-        if (!allGroups || !ownerOnly) return allGroups;
-
-        const ownerId = GetSessionDataManager().userId;
-        const hasOwnerData = allGroups.some((group) => typeof (group as { ownerId?: number }).ownerId === 'number');
-
-        if (!hasOwnerData) return allGroups;
-
-        return allGroups.filter((group) => (group as { ownerId?: number }).ownerId === ownerId);
-    }, [allGroups, ownerOnly]);
-
+    // GuildMembershipsController.registerGuildSelectorWidget: every selector asks for the user's groups again.
     useEffect(() => {
-        if (groups && selectedGroupIndex >= groups.length) setSelectedGroupIndex(0);
-    }, [groups, selectedGroupIndex]);
+        SendMessageComposer(new CatalogGroupsComposer());
+    }, []);
 
+    const groups = useMemo(() => {
+        if (!allGroups || !forumSelector) return allGroups;
+
+        const sessionData = GetSessionDataManager();
+
+        return filterGuildForumGroups(allGroups, sessionData.userId, sessionData.hasSecurity(4));
+    }, [allGroups, forumSelector]);
+
+    const selectedIndex = groups ? getInitialGuildIndex(groups, pickedIndex) : -1;
+    const selectedGroup = selectedIndex >= 0 ? groups[selectedIndex] : null;
+
+    // selectGroup: the previewer gets ["0", group id, badge, colour 1, colour 2] and the purchase the group id as its extra parameter.
     const previewStuffData = useMemo(() => {
-        if (!groups || !groups.length) return null;
-
-        const group = groups[selectedGroupIndex];
-
-        if (!group) return null;
+        if (!selectedGroup) return null;
 
         const stuffData = new StringDataType();
 
-        stuffData.setValue(['0', group.groupId.toString(), group.badgeCode, group.colorA, group.colorB]);
+        stuffData.setValue(['0', selectedGroup.groupId.toString(), selectedGroup.badgeCode, selectedGroup.colorA, selectedGroup.colorB]);
 
         return stuffData;
-    }, [selectedGroupIndex, groups]);
+    }, [selectedGroup]);
 
     useEffect(() => {
         if (!currentOffer) return;
@@ -58,36 +82,40 @@ export const CatalogGuildSelectorWidgetView: FC<CatalogGuildSelectorWidgetViewPr
         });
     }, [currentOffer, previewStuffData, setPurchaseOptions]);
 
-    if (!groups || !groups.length) {
+    // The members-only note only replaces the selector when the user is in no group at all; a forum selector whose filter
+    // leaves nothing shows an empty drop menu, and the purchase waits for a group.
+    if (!allGroups || !allGroups.length) {
         return (
-            <div className="bg-[#5da0aa] rounded-lg p-2 text-black text-center">
-                {LocalizeText('catalog.guild_selector.members_only')}
-                <div className="mt-1">
-                    <Button classNames={['nitro-catalog-guild-join-btn']} onClick={() => CreateLinkEvent('navigator/search/hotel_view/group:')}>
-                        {LocalizeText('catalog.guild_selector.find_groups')}
-                    </Button>
+            <NativeTextTree>
+                <div className="bg-[#5da0aa] rounded-lg p-2 text-black text-center">
+                    {LocalizeText('catalog.guild_selector.members_only')}
+                    <div className="mt-1">
+                        <Button classNames={['octane-catalog-guild-join-btn']} onClick={() => CreateLinkEvent('navigator/search/hotel_view/group:')}>
+                            {LocalizeText('catalog.guild_selector.find_groups')}
+                        </Button>
+                    </div>
                 </div>
-            </div>
+            </NativeTextTree>
         );
     }
 
-    const selectedGroup = groups[selectedGroupIndex];
-
     return (
-        <div className="flex gap-1">
-            {!!selectedGroup && (
-                <Flex className="rounded border" overflow="hidden">
-                    <div className="h-full" style={{ width: '20px', backgroundColor: '#' + selectedGroup.colorA }} />
-                    <div className="h-full" style={{ width: '20px', backgroundColor: '#' + selectedGroup.colorB }} />
-                </Flex>
-            )}
-            <select className="form-select form-select-sm" value={selectedGroupIndex} onChange={(event) => setSelectedGroupIndex(parseInt(event.target.value))}>
-                {groups.map((group, index) => (
-                    <option key={index} value={index}>
-                        {group.groupName}
-                    </option>
-                ))}
-            </select>
-        </div>
+        <NativeTextTree>
+            <div className="flex gap-1">
+                {!!selectedGroup && (
+                    <Flex className="rounded border" overflow="hidden">
+                        <div className="h-full" style={{ width: '20px', backgroundColor: '#' + selectedGroup.colorA }} />
+                        <div className="h-full" style={{ width: '20px', backgroundColor: '#' + selectedGroup.colorB }} />
+                    </Flex>
+                )}
+                <Select className="form-select form-select-sm" value={selectedIndex} onChange={(event) => setPickedIndex(parseInt(event.target.value))}>
+                    {groups.map((group, index) => (
+                        <option key={group.groupId} value={index}>
+                            {group.groupName}
+                        </option>
+                    ))}
+                </Select>
+            </div>
+        </NativeTextTree>
     );
 };

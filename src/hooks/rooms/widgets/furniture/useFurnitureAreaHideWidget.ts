@@ -1,131 +1,174 @@
 import {
+    FurnitureMultiStateComposer,
     GetRoomEngine,
     RoomAreaSelectionManager,
     RoomEngineAreaHideStateEvent,
     RoomEngineTriggerWidgetEvent,
     RoomObjectVariable,
     SetObjectDataMessageComposer
-} from '@nitrots/nitro-renderer';
-import { useCallback, useEffect, useState } from 'react';
-import { CanManipulateFurniture, SendMessageComposer } from '../../../../api';
-import { useNitroEvent } from '../../../events';
+} from '@octane/renderer';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { IsAnyRoomController, SendMessageComposer } from '../../../../api';
+import { useOctaneEvent } from '../../../events';
 import { useRoom } from '../../useRoom';
+import { AreaHideSettings, buildAreaHideValues, canOpenAreaHide } from './useFurnitureAreaHideWidget.helpers';
 
+const EMPTY_SETTINGS: AreaHideSettings = {
+    rootX: 0,
+    rootY: 0,
+    width: 0,
+    length: 0,
+    invisibility: false,
+    wallItems: false,
+    inverted: false
+};
+
+/**
+ * AIR `AreaHideFurniWidget` (instant-apply build): every change of the area or of an option is
+ * saved at once, without touching the on/off state; the on/off button uses the furni like a
+ * double click on its switch, and the window stays open. While the area is hidden the settings
+ * are locked and the room shows no area selection.
+ */
 const useFurnitureAreaHideWidgetState = () => {
     const [objectId, setObjectId] = useState<number>(-1);
     const [category, setCategory] = useState<number>(-1);
     const [isOn, setIsOn] = useState<boolean>(false);
-    const [rootX, setRootX] = useState<number>(0);
-    const [rootY, setRootY] = useState<number>(0);
-    const [width, setWidth] = useState<number>(0);
-    const [length, setLength] = useState<number>(0);
-    const [invisibility, setInvisibility] = useState<boolean>(false);
-    const [wallItems, setWallItems] = useState<boolean>(false);
-    const [inverted, setInverted] = useState<boolean>(false);
+    const [settings, setSettings] = useState<AreaHideSettings>(EMPTY_SETTINGS);
+    const [selecting, setSelecting] = useState<boolean>(false);
+    const [selectionActive, setSelectionActive] = useState<boolean>(false);
     const { roomSession = null } = useRoom();
+    const latest = useRef({ objectId: -1, isOn: false, settings: EMPTY_SETTINGS });
+
+    useLayoutEffect(() => {
+        latest.current = { objectId, isOn, settings };
+    }, [objectId, isOn, settings]);
 
     const onClose = () => {
         setObjectId(-1);
         setCategory(-1);
         setIsOn(false);
-        setRootX(0);
-        setRootY(0);
-        setWidth(0);
-        setLength(0);
-        setInvisibility(false);
-        setWallItems(false);
-        setInverted(false);
+        setSettings(EMPTY_SETTINGS);
+        setSelecting(false);
+        setSelectionActive(false);
 
         GetRoomEngine().areaSelectionManager.deactivate();
     };
 
-    const saveChanges = useCallback(() => {
+    const saveSettings = (next: AreaHideSettings) => {
+        const { objectId: currentId, isOn: currentOn } = latest.current;
+
+        setSettings(next);
+        latest.current = { ...latest.current, settings: next };
+
+        if (currentId === -1 || currentOn) return;
+
+        SendMessageComposer(new SetObjectDataMessageComposer(currentId, buildAreaHideValues(currentOn, next)));
+    };
+
+    const updateSetting = (change: Partial<AreaHideSettings>) => saveSettings({ ...latest.current.settings, ...change });
+
+    const setInvisibility = (value: boolean) => updateSetting({ invisibility: value });
+    const setWallItems = (value: boolean) => updateSetting({ wallItems: value });
+    const setInverted = (value: boolean) => updateSetting({ inverted: value });
+
+    const toggleOnOff = () => {
         if (objectId === -1) return;
 
-        const nextState = isOn ? 0 : 1;
-        const data = new Map<string, string>();
+        SendMessageComposer(new FurnitureMultiStateComposer(objectId));
+    };
 
-        data.set('state', nextState.toString());
-        data.set('rootX', rootX.toString());
-        data.set('rootY', rootY.toString());
-        data.set('width', width.toString());
-        data.set('length', length.toString());
-        data.set('invisibility', invisibility ? '1' : '0');
-        data.set('wallItems', wallItems ? '1' : '0');
-        data.set('invert', inverted ? '1' : '0');
+    const startSelecting = () => {
+        if (isOn) return;
 
-        SendMessageComposer(new SetObjectDataMessageComposer(objectId, data));
+        setSelecting(true);
+        GetRoomEngine().areaSelectionManager.startSelecting();
+    };
 
-        onClose();
-    }, [objectId, isOn, rootX, rootY, width, length, invisibility, wallItems, inverted]);
+    const clearSelection = () => {
+        if (isOn) return;
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_AREA_HIDE, (event) => {
-        if (!CanManipulateFurniture(roomSession, event.objectId, event.category)) return;
+        GetRoomEngine().areaSelectionManager.clearHighlight();
+    };
 
-        setObjectId(event.objectId);
-        setCategory(event.category);
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_AREA_HIDE, (event) => {
+        if (!roomSession || !canOpenAreaHide(roomSession.isRoomOwner, roomSession.controllerLevel, IsAnyRoomController())) return;
 
         const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
 
+        if (!roomObject?.model) return;
+
         const model = roomObject.model;
         const data = model.getValue<number[]>(RoomObjectVariable.FURNITURE_DATA) || [];
+        const read = (key: string, index: number) => model.getValue<number>(key) ?? data[index] ?? 0;
 
+        setObjectId(event.objectId);
+        setCategory(event.category);
         setIsOn(roomObject.getState(0) === 1);
-        setRootX(model.getValue<number>(RoomObjectVariable.FURNITURE_AREA_HIDE_ROOT_X) ?? data[1] ?? 0);
-        setRootY(model.getValue<number>(RoomObjectVariable.FURNITURE_AREA_HIDE_ROOT_Y) ?? data[2] ?? 0);
-        setWidth(model.getValue<number>(RoomObjectVariable.FURNITURE_AREA_HIDE_WIDTH) ?? data[3] ?? 0);
-        setLength(model.getValue<number>(RoomObjectVariable.FURNITURE_AREA_HIDE_LENGTH) ?? data[4] ?? 0);
-        setInvisibility((model.getValue<number>(RoomObjectVariable.FURNITURE_AREA_HIDE_INVISIBILITY) ?? data[5] ?? 0) === 1);
-        setWallItems((model.getValue<number>(RoomObjectVariable.FURNITURE_AREA_HIDE_WALL_ITEMS) ?? data[6] ?? 0) === 1);
-        setInverted((model.getValue<number>(RoomObjectVariable.FURNITURE_AREA_HIDE_INVERT) ?? data[7] ?? 0) === 1);
+        setSelecting(false);
+        setSettings({
+            rootX: read(RoomObjectVariable.FURNITURE_AREA_HIDE_ROOT_X, 1),
+            rootY: read(RoomObjectVariable.FURNITURE_AREA_HIDE_ROOT_Y, 2),
+            width: read(RoomObjectVariable.FURNITURE_AREA_HIDE_WIDTH, 3),
+            length: read(RoomObjectVariable.FURNITURE_AREA_HIDE_LENGTH, 4),
+            invisibility: read(RoomObjectVariable.FURNITURE_AREA_HIDE_INVISIBILITY, 5) === 1,
+            wallItems: read(RoomObjectVariable.FURNITURE_AREA_HIDE_WALL_ITEMS, 6) === 1,
+            inverted: read(RoomObjectVariable.FURNITURE_AREA_HIDE_INVERT, 7) === 1
+        });
     });
 
-    useNitroEvent<RoomEngineAreaHideStateEvent>(RoomEngineAreaHideStateEvent.UPDATE_STATE_AREA_HIDE, (event) => {
+    useOctaneEvent<RoomEngineAreaHideStateEvent>(RoomEngineAreaHideStateEvent.UPDATE_STATE_AREA_HIDE, (event) => {
         if (objectId !== event.objectId) return;
 
         setCategory(event.category);
         setIsOn(event.isOn);
     });
 
+    // AIR updateAreaSelecting: the area selection is shown only while the area is not hidden.
     useEffect(() => {
         if (objectId === -1) return;
 
-        if (!isOn) {
-            const callback = (rootX: number, rootY: number, width: number, height: number) => {
-                setRootX(rootX);
-                setRootY(rootY);
-                setWidth(width);
-                setLength(height);
-            };
+        const selection = GetRoomEngine().areaSelectionManager;
 
-            if (GetRoomEngine().areaSelectionManager.activate(callback, RoomAreaSelectionManager.HIGHLIGHT_DARKEN)) {
-                GetRoomEngine().areaSelectionManager.setHighlight(rootX, rootY, width, length);
-            }
-        } else {
-            GetRoomEngine().areaSelectionManager.deactivate();
+        if (isOn) {
+            selection.deactivate();
+            setSelectionActive(false);
+            setSelecting(false);
+            return;
         }
-    }, [objectId, isOn, rootX, rootY, width, length]);
+
+        const callback = (rootX: number, rootY: number, width: number, length: number) => {
+            setSelecting(false);
+            saveSettings({ ...latest.current.settings, rootX, rootY, width, length });
+        };
+
+        if (selection.activate(callback, RoomAreaSelectionManager.HIGHLIGHT_DARKEN)) {
+            const { rootX, rootY, width, length } = latest.current.settings;
+
+            selection.setHighlight(rootX, rootY, width, length);
+        }
+
+        setSelectionActive(true);
+    }, [objectId, isOn]);
 
     return {
         objectId,
         category,
         isOn,
-        setIsOn,
-        rootX,
-        setRootX,
-        rootY,
-        setRootY,
-        width,
-        setWidth,
-        length,
-        setLength,
-        invisibility,
+        rootX: settings.rootX,
+        rootY: settings.rootY,
+        width: settings.width,
+        length: settings.length,
+        invisibility: settings.invisibility,
         setInvisibility,
-        wallItems,
+        wallItems: settings.wallItems,
         setWallItems,
-        inverted,
+        inverted: settings.inverted,
         setInverted,
-        saveChanges,
+        selecting,
+        selectionActive,
+        startSelecting,
+        clearSelection,
+        toggleOnOff,
         onClose
     };
 };

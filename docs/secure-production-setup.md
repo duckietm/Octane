@@ -1,6 +1,6 @@
 # Setup Secure Runtime in produzione
 
-Guida rapida per avviare Nitro con:
+Guida rapida per avviare Octane con:
 
 - configurazioni e gamedata serviti da `/nitro-sec/file`;
 - API `/api/*` cifrate dal wrapper runtime;
@@ -11,9 +11,14 @@ Negli esempi usa i tuoi domini reali al posto di:
 - `https://hotel.example.com`
 - `https://nitro.example.com:2096`
 
-## 1. Build Nitro
+Scorciatoia: `node install.mjs --secure=on --emulator-config=<percorso>/config.ini` imposta i flag di
+`client-mode.json` (sezione 2), genera `nitro.secure.master_key` e aggiorna `config.ini` (sezione 5, con backup).
+Senza `--emulator-config` stampa le righe da incollare. Una master key già impostata non viene mai sostituita.
+`nitro.secure.config.root` e `nitro.secure.gamedata.root` restano da impostare a mano.
 
-Nel repo `Nitro-V3`:
+## 1. Build Octane
+
+Nel repo `octane`:
 
 ```bash
 yarn build
@@ -40,7 +45,7 @@ src/
 File:
 
 ```txt
-Nitro-V3/dist/configuration/client-mode.json
+octane/dist/configuration/client-mode.json
 ```
 
 Configurazione produzione secure:
@@ -52,7 +57,7 @@ Configurazione produzione secure:
     "secureApiEnabled": true,
     "apiBaseUrl": "https://nitro.example.com:2096",
     "plainConfigBaseUrl": "https://hotel.example.com/configuration/",
-    "plainGamedataBaseUrl": "https://hotel.example.com/client/nitro/gamedata/"
+    "plainGamedataBaseUrl": "https://hotel.example.com/client/octane/gamedata/"
 }
 ```
 
@@ -63,13 +68,15 @@ Significato:
 - `secureApiEnabled: true` cifra automaticamente le chiamate `/api/*`.
 - `apiBaseUrl` deve puntare all'emulatore/API.
 - `plainConfigBaseUrl` e `plainGamedataBaseUrl` restano fallback quando spegni secure assets.
+- Se `/nitro-sec/bootstrap` non risponde con una chiave (secure spento sul server, emulatore vecchio, rete), il client carica config, gamedata e `/api` in chiaro invece di fallire, e riprova la via cifrata dopo 5 minuti. Con `nitro.secure.api.required=true` il server rifiuta comunque con 403 le chiamate in chiaro a `/api/auth/*` e `/api/badges/*`.
+- Il client rinnova la sua chiave ogni `nitro.secure.session_ttl_sec` secondi del server (tra 60 e 3600; 300 se il server non lo indica).
 
 ## 3. `configuration/renderer-config.json`
 
 File:
 
 ```txt
-Nitro-V3/dist/configuration/renderer-config.json
+octane/dist/configuration/renderer-config.json
 ```
 
 Valori importanti:
@@ -104,7 +111,7 @@ Se non usi ancora WebSocket crypto, metti:
 File:
 
 ```txt
-Nitro-V3/dist/configuration/ui-config.json
+octane/dist/configuration/ui-config.json
 ```
 
 Qui puoi lasciare immagini e camera su URL statici normali:
@@ -139,8 +146,8 @@ crypto.ws.enabled=1
 
 nitro.secure.assets.enabled=true
 nitro.secure.api.enabled=true
-nitro.secure.config.root=C:/inetpub/wwwroot/hotel/nitro/configuration
-nitro.secure.gamedata.root=C:/inetpub/wwwroot/hotel/nitro/client/nitro/gamedata
+nitro.secure.config.root=C:/inetpub/wwwroot/hotel/octane/configuration
+nitro.secure.gamedata.root=C:/inetpub/wwwroot/hotel/octane/client/octane/gamedata
 nitro.secure.master_key=change-this-to-a-long-random-secret
 
 login.remember.enabled=true
@@ -212,7 +219,7 @@ Per debug rapido, cambia solo `client-mode.json`:
     "secureApiEnabled": false,
     "apiBaseUrl": "https://nitro.example.com:2096",
     "plainConfigBaseUrl": "https://hotel.example.com/configuration/",
-    "plainGamedataBaseUrl": "https://hotel.example.com/client/nitro/gamedata/"
+    "plainGamedataBaseUrl": "https://hotel.example.com/client/octane/gamedata/"
 }
 ```
 
@@ -223,7 +230,7 @@ Poi fai hard refresh.
 File:
 
 ```txt
-Nitro-V3/dist/configuration/bootstrap.js
+octane/dist/configuration/bootstrap.js
 ```
 
 Questo è il primo loader quando usi la modalità secure esterna.
@@ -269,7 +276,7 @@ Quindi `asset-loader.js` deve esistere sempre nella cartella `configuration`.
 File:
 
 ```txt
-Nitro-V3/dist/configuration/asset-loader.js
+octane/dist/configuration/asset-loader.js
 ```
 
 Questo loader carica il bundle vero:
@@ -359,7 +366,89 @@ https://nitro.example.com:2096/nitro-sec/file?kind=config&file=...
 Quindi l'emulatore li legge da:
 
 ```ini
-nitro.secure.config.root=C:/inetpub/wwwroot/hotel/nitro/configuration
+nitro.secure.config.root=C:/inetpub/wwwroot/hotel/octane/configuration
 ```
 
 Se aggiungi nuovi file JSON/JS in `configuration` e vuoi proteggerli, devono essere richiesti passando dal secure endpoint o caricati tramite `bootstrap.js`.
+
+## 14. Content-Security-Policy
+
+Una CSP dice al browser da dove il client può caricare script, frame e connessioni: se un plugin, un annuncio o
+dell'HTML iniettato prova a caricare altro, il browser lo blocca. `index.html` porta solo le regole valide per ogni
+hotel (`object-src 'none'; base-uri 'self'`); la policy completa dipende dagli host dell'hotel e va negli header del
+web server.
+
+Base da adattare (sostituisci gli host d'esempio con quelli di `client-mode.json`, `renderer-config.json` e
+`ui-config.json`):
+
+```txt
+default-src 'self';
+script-src 'self' blob: 'unsafe-eval' https://challenges.cloudflare.com;
+style-src 'self' 'unsafe-inline';
+img-src 'self' data: blob: https://assets.example.com https://images.example.com;
+media-src 'self' blob: https://radio.example.com;
+connect-src 'self' https://api.example.com wss://game.example.com https://assets.example.com;
+frame-src https://challenges.cloudflare.com https://player.vimeo.com https://www.youtube-nocookie.com https://ads.example.net;
+font-src 'self' data:;
+object-src 'none';
+base-uri 'self';
+form-action 'self';
+frame-ancestors 'self' https://cms.example.com
+```
+
+- **`'unsafe-eval'`** serve oggi a PixiJS, che compila al volo le funzioni degli shader. Si potrà togliere quando il
+  renderer caricherà `pixi.js/unsafe-eval`.
+- **`blob:`** in `script-src` serve a `asset-loader.js`, che importa il bundle decompresso da un blob.
+- **Plugin esterni**: ogni host di `external.plugins` va aggiunto a `script-src`, e conviene elencarlo anche in
+  `external.plugins.allowed.hosts`.
+- **Annunci**: con `ads.frame.url` (sezione 15) basta il loro origin in `frame-src`; AdSense direttamente nel client
+  richiede invece i domini Google in `script-src`, `img-src`, `connect-src` e `frame-src`.
+- **`frame-ancestors`**: elenca il CMS che incorpora il client, oppure lascia `'self'`.
+
+Prima di applicarla, mettila come `Content-Security-Policy-Report-Only`: il browser segnala in console cosa avrebbe
+bloccato, senza bloccarlo. Quando la console è pulita su login, hotel view, stanza, catalogo e giochi, passa a
+`Content-Security-Policy`.
+
+IIS (`web.config` nella cartella del client):
+
+```xml
+<system.webServer>
+  <httpProtocol>
+    <customHeaders>
+      <add name="Content-Security-Policy-Report-Only" value="default-src 'self'; ..." />
+    </customHeaders>
+  </httpProtocol>
+</system.webServer>
+```
+
+nginx:
+
+```nginx
+add_header Content-Security-Policy-Report-Only "default-src 'self'; ..." always;
+```
+
+### Remember token in cookie
+
+Con `"login.remember.cookie": true` in `ui-config.json` il client chiede all'emulatore di tenere il remember token in
+un cookie HttpOnly su `/api/auth`, che nessuno script può leggere. Nel `config.ini` dell'emulatore:
+
+```ini
+login.remember.cookie.name=octane_remember
+# Strict se client e API sono sullo stesso sito; None se sono su siti diversi (solo https)
+login.remember.cookie.samesite=Strict
+login.remember.cookie.secure=true
+```
+
+Un emulatore che non conosce la modalità cookie risponde con il token nel JSON e il client lo salva come prima.
+
+## 15. Annunci su un origin separato
+
+Lo script di AdSense, caricato nel client, gira nello stesso origin della sessione. Per tenerlo fuori:
+
+1. pubblica `configuration/ads-frame.html.example`, rinominato `ads-frame.html`, su un altro origin
+   (es. `https://ads.example.net/ads-frame.html`), con il suo `ads.txt`;
+2. in `ui-config.json` imposta `"ads.frame.url": "https://ads.example.net/ads-frame.html"`.
+
+Il client mostra allora l'annuncio in un iframe sandbox che può aprire l'inserzionista in una nuova scheda ma non
+navigare il client, e passa l'unità pubblicitaria (da `ads.txt` e `adsense.json`) nella query. Senza `ads.frame.url`
+l'annuncio resta nel client come prima.

@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<skin name="plus_button_skin_3" version="0.0">
+
+	<!-- shared variables -->
+	
+	<variables>
+		<variable key="asset"	value="habbo_skin_ubuntu_png"	type="String" />
+	</variables>
+	
+	<!-- the following maps layouts for render states -->
+	
+	<states>
+		<state name="default"  layout="button_plus_3" template="default_button_mode_3" />
+		<state name="hovering" layout="button_plus_3" template="hovering_button_mode_3" />
+		<state name="pressed"  layout="button_plus_3" template="pressed_button_mode_3" />
+		<state name="disabled" layout="button_plus_3" template="disabled_button_mode_3" />
+	</states>
+	
+	<!-- templates defines regions in bitmap asset -->
+	
+	<templates>
+	
+		<template name="default_button_mode_3" asset="$asset">
+			<entities>
+				<entity name="button_plus" type="bitmap"><region><Rectangle x="356" y= "82" width="22" height="22" /></region></entity>
+			</entities>
+		</template>
+		
+		<template name="hovering_button_mode_3" asset="$asset">
+			<entities>
+				<entity name="button_plus" type="bitmap"><region><Rectangle x="382" y= "82" width="22" height="22" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="pressed_button_mode_3" asset="$asset">
+			<entities>
+				<entity name="button_plus" type="bitmap"><region><Rectangle x="408" y= "82" width="22" height="22" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="disabled_button_mode_3" asset="$asset">
+			<entities>
+				<entity name="button_plus" type="bitmap"><region><Rectangle x="434" y= "82" width="22" height="22" /></region></entity>
+			</entities>
+		</template>
+
+	</templates>
+	
+	<!-- markup for layout drawer -->
+	
+	<layouts>
+		<layout name="button_plus_3" transparent="true">
+			<entities>
+				<entity name="button_plus" id="0">
+					<region><Rectangle x="0" y="0" width="22" height="22" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+	</layouts>
+</skin>

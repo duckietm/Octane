@@ -1,7 +1,7 @@
-import { AvailableCommandsEvent, GetCommunication } from '@nitrots/nitro-renderer';
+import { AvailableCommandsEvent, GetCommunication } from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CommandDefinition, LocalizeText } from '../../../api';
-import { createNitroStore } from '../../../state/createNitroStore';
+import { createOctaneStore } from '../../../state/createOctaneStore';
 import { useMessageEvent } from '../../events';
 
 // Client-only commands are static; safe to keep at module scope. The
@@ -28,11 +28,12 @@ const CLIENT_COMMANDS: { key: string; descriptionKey: string }[] = [
     { key: 'floor', descriptionKey: 'chatcmd.client.floor' },
     { key: 'bcfloor', descriptionKey: 'chatcmd.client.floor' },
     { key: 'pickall', descriptionKey: 'chatcmd.client.pickall' },
+    { key: 'pickallbc', descriptionKey: 'chatcmd.client.pickallbc' },
     { key: 'ejectall', descriptionKey: 'chatcmd.client.ejectall' },
     { key: 'settings', descriptionKey: 'chatcmd.client.settings' },
     // Info
     { key: 'client', descriptionKey: 'chatcmd.client.info' },
-    { key: 'nitro', descriptionKey: 'chatcmd.client.info' }
+    { key: 'octane', descriptionKey: 'chatcmd.client.info' }
 ];
 
 /**
@@ -54,7 +55,7 @@ interface ChatCommandStore {
     markListenerRegistered: () => void;
 }
 
-const useChatCommandStore = createNitroStore<ChatCommandStore>()((set) => ({
+const useChatCommandStore = createOctaneStore<ChatCommandStore>()((set) => ({
     serverCommands: [],
     isListenerRegistered: false,
     setServerCommands: (commands) => set({ serverCommands: commands }),
@@ -102,14 +103,18 @@ export const useChatCommandSelector = (chatValue: string) => {
     });
 
     const allCommands = useMemo(() => {
-        const merged: CommandDefinition[] = [...serverCommands];
+        const byKey = new Map<string, CommandDefinition>();
 
-        for (const clientCmd of CLIENT_COMMANDS) {
-            if (merged.some((cmd) => cmd.key === clientCmd.key)) continue;
-            merged.push({ key: clientCmd.key, description: LocalizeText(clientCmd.descriptionKey) });
+        for (const cmd of serverCommands) {
+            if (!byKey.has(cmd.key)) byKey.set(cmd.key, cmd);
         }
 
-        return merged.sort((a, b) => a.key.localeCompare(b.key));
+        for (const clientCmd of CLIENT_COMMANDS) {
+            if (byKey.has(clientCmd.key)) continue;
+            byKey.set(clientCmd.key, { key: clientCmd.key, description: LocalizeText(clientCmd.descriptionKey) });
+        }
+
+        return [ ...byKey.values() ].sort((a, b) => a.key.localeCompare(b.key));
     }, [serverCommands]);
 
     const filterText = useMemo(() => {

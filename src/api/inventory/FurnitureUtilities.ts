@@ -1,10 +1,42 @@
-import { FurnitureListItemParser, GetRoomEngine, IObjectData } from '@nitrots/nitro-renderer';
+import { FurnitureListItemParser, GetRoomEngine, IObjectData, StringDataType } from '@octane/renderer';
 import { FurniCategory } from './FurniCategory';
 import { FurnitureItem } from './FurnitureItem';
 import { GroupItem } from './GroupItem';
 
 export const createGroupItem = (type: number, category: number, stuffData: IObjectData, extra: number = NaN) =>
     new GroupItem(type, category, GetRoomEngine(), stuffData, extra);
+
+export const getGuildFurniType = (spriteId: number, stuffData: IObjectData) => {
+    let type = spriteId.toString();
+
+    if (!(stuffData instanceof StringDataType)) return type;
+
+    let i = 1;
+
+    while (i < 5) {
+        type = type + (',' + stuffData.getValue(i));
+
+        i++;
+    }
+
+    return type;
+};
+
+export const getGroupItemKey = (group: GroupItem): string => {
+    let key = `${group.type}:${group.isWallItem ? 1 : 0}:${group.stuffData?.getLegacyString?.() ?? ''}`;
+
+    if (group.category === FurniCategory.GUILD_FURNI && group.stuffData) {
+        key = `${key}:${getGuildFurniType(group.type, group.stuffData)}`;
+    }
+
+    if (!group.isGroupable) {
+        const itemId = group.getLastItem?.()?.id;
+
+        if (itemId != null) key = `${key}:${itemId}`;
+    }
+
+    return key;
+};
 
 const addSingleFurnitureItem = (set: GroupItem[], item: FurnitureItem, unseen: boolean) => {
     const groupItems: GroupItem[] = [];
@@ -58,19 +90,25 @@ const addGroupableFurnitureItem = (set: GroupItem[], item: FurnitureItem, unseen
     }
 
     if (existingGroup) {
-        existingGroup.push(item);
+        const index = set.indexOf(existingGroup);
+
+        const clonedGroup = existingGroup.clone();
+
+        clonedGroup.push(item);
 
         if (unseen) {
-            existingGroup.hasUnseenItems = true;
-
-            const index = set.indexOf(existingGroup);
+            clonedGroup.hasUnseenItems = true;
 
             if (index >= 0) set.splice(index, 1);
 
-            set.unshift(existingGroup);
+            set.unshift(clonedGroup);
+        } else if (index >= 0) {
+            set[index] = clonedGroup;
+        } else {
+            set.push(clonedGroup);
         }
 
-        return existingGroup;
+        return clonedGroup;
     }
 
     existingGroup = createGroupItem(item.type, item.category, item.stuffData, item.extra);

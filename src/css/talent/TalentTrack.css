@@ -1,0 +1,789 @@
+/* Official friendbar/talent windows (talent_track, task_progress_dialog, level_up, citizenship_welcome, track_promo). */
+
+.icon-me-talents {
+    width: 32px;
+    height: 30px;
+    background-image: url("@/assets/images/talent/me_menu_me_talents.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+
+/* ---- Talent track (talent_track layout; the window is the desktop minus 100 px each side) ---- */
+
+.octane-talent-track.octane-air-modal__window {
+    width: calc(100vw - 200px) !important;
+    min-width: min(700px, calc(100vw - 16px));
+}
+
+/* frame: the panorama starts 20 px down and is 280 high, its scrollbar (10 px) right under it. */
+.octane-talent-track__viewport {
+    position: relative;
+    margin-top: 20px;
+}
+
+.octane-talent-track__panorama {
+    display: flex;
+    height: 290px;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.octane-talent-track__panorama > * {
+    flex: none;
+    height: 280px;
+}
+
+.octane-talent-track__end {
+    width: 100px;
+}
+
+.octane-talent-track__mask {
+    position: absolute;
+    top: 0;
+    width: 24px;
+    height: 280px;
+    pointer-events: none;
+}
+
+.octane-talent-track__mask.is-left {
+    left: 0;
+}
+
+.octane-talent-track__mask.is-right {
+    right: 0;
+}
+
+/* begin_helper / begin_citizenship: 250 x 280, everything placed as in the layout. */
+.octane-talent-begin {
+    position: relative;
+    width: 250px;
+}
+
+.octane-talent-begin__title {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 311px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 22px;
+}
+
+.octane-talent-begin__text {
+    position: absolute;
+    left: 20px;
+    top: 49px;
+    width: 230px;
+}
+
+.octane-talent-begin__label {
+    position: absolute;
+    width: 76px;
+    color: #333333;
+    font-size: 10px; /* talent.track.helper.begin.* labels: il_button, 10 px bold */
+    font-weight: 700;
+    line-height: 12px;
+    text-align: right;
+}
+
+.octane-talent-begin__label.is-citizenship {
+    left: 124px;
+    top: 166px;
+}
+
+.octane-talent-begin__label.is-register {
+    left: 89px;
+    top: 201px;
+}
+
+.octane-talent-begin__emblem {
+    position: absolute;
+    left: 203px;
+    top: 182px;
+}
+
+.octane-talent-begin__button {
+    position: absolute;
+    left: 54px;
+    top: 227px;
+    width: 200px;
+}
+
+.octane-talent-begin__avatar {
+    position: absolute;
+    left: 169px;
+    top: 144px;
+    width: 90px;
+    height: 130px;
+}
+
+.octane-talent-begin__check {
+    position: absolute;
+    left: 216px;
+    top: 172px;
+}
+
+/* level_pane: separator at y30, title (50,30), description (50,55), illustration (700,0), status list (10,100). */
+.octane-talent-level {
+    position: relative;
+    box-sizing: border-box;
+    min-width: 880px;
+    height: 280px;
+    padding: 100px 30px 0 10px;
+}
+
+.octane-talent-level::before {
+    content: "";
+    position: absolute;
+    left: 24px;
+    top: 30px;
+    bottom: 10px;
+    border-left: 1px solid #cccccc;
+}
+
+.octane-talent-level__title {
+    position: absolute;
+    left: 50px;
+    top: 30px;
+    font-size: 14px; /* level_title: il_heading_1, 14 px bold */
+    font-weight: 700;
+    line-height: 19px;
+    white-space: nowrap;
+}
+
+.octane-talent-level__description {
+    position: absolute;
+    left: 50px;
+    top: 55px;
+    width: 320px;
+    color: #333333;
+    font-size: 11px;
+    line-height: 14px;
+}
+
+.octane-talent-level__illustration {
+    position: absolute;
+    left: 700px;
+    top: 0;
+    width: 170px;
+    height: 120px;
+    object-fit: contain;
+    object-position: bottom center;
+    pointer-events: none;
+}
+
+.octane-talent-level__status {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    height: 180px;
+}
+
+/* level_reward: 350 x 180, its border 155 high from y20; it widens when its rewards need more room. */
+.octane-talent-reward {
+    position: relative;
+    flex: none;
+    min-width: 350px;
+    height: 180px;
+}
+
+.octane-talent-reward__border {
+    position: relative;
+    box-sizing: border-box;
+    min-width: 350px;
+    height: 155px;
+    margin-top: 20px;
+    padding: 80px 10px 0;
+    border-radius: 6px;
+    background: #bdbdbd;
+    color: #000000;
+}
+
+.octane-talent-reward.is-achieved .octane-talent-reward__border {
+    background: #4f7f2d;
+    color: #ffffff;
+}
+
+.octane-talent-reward__unlocked {
+    position: absolute;
+    left: 10px;
+    top: 8px;
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 12px;
+}
+
+.octane-talent-reward__description {
+    position: absolute;
+    left: 10px;
+    top: 22px;
+    width: 330px;
+    max-height: 54px;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+}
+
+.octane-talent-reward__list {
+    display: flex;
+    gap: 10px;
+}
+
+.octane-talent-reward__item {
+    position: relative;
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    height: 60px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.2);
+    color: #ffffff;
+}
+
+.octane-talent-reward__product {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 33px;
+    height: 33px;
+    margin: 14px;
+    border-radius: 4px;
+    background: #cccccc;
+}
+
+.octane-talent-reward__product img {
+    max-width: 31px;
+    max-height: 30px;
+}
+
+.octane-talent-reward__item.is-vip {
+    align-items: center;
+    width: 69px;
+    padding-left: 14px;
+}
+
+.octane-talent-reward__item.is-vip span {
+    margin-left: 6px;
+    font-weight: 700;
+}
+
+.octane-talent-reward__item.is-perk {
+    width: 200px;
+}
+
+.octane-talent-reward.is-locked .octane-talent-reward__item.is-perk {
+    background: #979797;
+}
+
+.octane-talent-reward__perk-icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+}
+
+.octane-talent-reward__perk-copy {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 9px 5px 0 0;
+    font-size: 11px; /* reward description: il_regular_white, 11 px */
+    line-height: 13px;
+}
+
+.octane-talent-reward__perk-copy span {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.octane-talent-reward__perk-title {
+    font-size: 10px; /* reward title: il_heading_3, 10 px bold */
+    font-weight: 700;
+    line-height: 13px;
+}
+
+.octane-talent-reward__stripe {
+    position: absolute;
+    left: 1px;
+    top: 21px;
+}
+
+.octane-talent-reward__check {
+    position: absolute;
+    right: 10px;
+    top: 11px;
+}
+
+/* level_task: two rows of 80, each task 210 x 80 with its border 60 high from y20. */
+.octane-talent-level__tasks {
+    display: flex;
+    flex-direction: column;
+}
+
+.octane-talent-level__task-row {
+    display: flex;
+    gap: 10px;
+    height: 80px;
+}
+
+.octane-talent-task {
+    position: relative;
+    display: block;
+    flex: none;
+    box-sizing: border-box;
+    width: 210px;
+    height: 60px;
+    margin-top: 20px;
+    padding: 0;
+    border: 1px solid #b6b6b6;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #000000;
+    font: inherit;
+    text-align: left;
+}
+
+.octane-talent-task.is-ongoing {
+    border: 2px solid #3d7fbf;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.octane-talent-task.is-locked {
+    border-color: #bdbdbd;
+    background: #bdbdbd;
+}
+
+.octane-talent-task__badge {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 58px;
+}
+
+.octane-talent-task.is-ongoing .octane-talent-task__badge {
+    top: 3px;
+    height: 45px;
+}
+
+.octane-talent-task__copy {
+    position: absolute;
+    left: 60px;
+    top: 9px;
+    width: 145px;
+}
+
+.octane-talent-task__title {
+    overflow: hidden;
+    font-size: 10px; /* task title: il_heading_3, 10 px bold */
+    font-weight: 700;
+    line-height: 15px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.octane-talent-task__description {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 11px; /* task description: no text_style, il_regular 11 px */
+    line-height: 13px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+.octane-talent-task__progress {
+    position: absolute;
+    left: 4px;
+    top: 46px;
+    width: 50px;
+    height: 6px;
+    background: url("@/assets/images/talent/talent_task_progress_bg.png") repeat-x;
+}
+
+.octane-talent-task__progress span {
+    display: block;
+    height: 100%;
+    background: url("@/assets/images/talent/talent_task_progress_fg.png") repeat-x;
+}
+
+.octane-talent-task__check {
+    position: absolute;
+    left: 182px;
+    top: -9px;
+}
+
+/* progress_container: 80 high under the scrollbar; the balloon hangs below it (frame is 445 high). */
+.octane-talent-progress {
+    position: relative;
+    height: 80px;
+    margin-bottom: 46px;
+}
+
+.octane-talent-progress__title {
+    position: absolute;
+    left: 24px;
+    top: 18px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 17px;
+}
+
+.octane-talent-progress__bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 40px;
+    height: 16px;
+    background: url("@/assets/images/talent/talent_unachieved_mid.png") repeat-x;
+}
+
+.octane-talent-progress__achieved {
+    height: 100%;
+    background: url("@/assets/images/talent/talent_achieved_mid.png") repeat-x;
+}
+
+.octane-talent-progress__divider {
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: 11px;
+    background: url("@/assets/images/talent/talent_unachieved_div.png");
+}
+
+.octane-talent-progress__divider.is-achieved {
+    background-image: url("@/assets/images/talent/talent_achieved_div.png");
+}
+
+/* The needle's middle sits on the position: needle (36,27) 33 x 34, glow (25,15) 55 x 55, balloon (42,64). */
+.octane-talent-progress__needle {
+    position: absolute;
+    top: -13px;
+    width: 33px;
+    height: 34px;
+    margin-left: -16px;
+}
+
+.octane-talent-progress__head {
+    position: relative;
+    width: 33px;
+    height: 34px;
+    overflow: hidden;
+}
+
+/* The shared .avatar-image box is 90 x 130; the needle's head fills the 33 x 34 widget instead. */
+.octane-talent-progress__head .avatar-image {
+    width: 100%;
+    height: 100%;
+}
+
+.octane-talent-progress__glow {
+    position: absolute;
+    left: -11px;
+    top: -12px;
+    width: 55px;
+    height: 55px;
+    pointer-events: none;
+}
+
+.octane-talent-progress__balloon {
+    position: absolute;
+    left: 6px;
+    top: 37px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: #a3201d;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 13px;
+    white-space: nowrap;
+}
+
+.octane-talent-progress__balloon::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: -5px;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #a3201d;
+    border-left: 5px solid transparent;
+}
+
+/* ---- Task dialogs ---- */
+
+.octane-talent-dialog__box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 6px;
+    background: #e2e2e2;
+}
+
+.octane-talent-dialog__top {
+    display: flex;
+    gap: 6px;
+}
+
+.octane-talent-dialog__instruction {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.octane-talent-dialog__hint {
+    padding-top: 8px;
+    border-top: 1px solid #c8c8c8;
+}
+
+.octane-talent-dialog__progress {
+    margin: 12px 0 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #dddddd;
+}
+
+.octane-talent-dialog__bar {
+    height: 16px;
+    background: url("@/assets/images/talent/talent_unachieved_mid.png") repeat-x;
+}
+
+.octane-talent-dialog__bar span {
+    display: block;
+    height: 100%;
+    background: url("@/assets/images/talent/talent_achieved_mid.png") repeat-x;
+}
+
+.octane-talent-dialog__buttons {
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+}
+
+.octane-talent-dialog__tour {
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+}
+
+.octane-talent-dialog__tour img {
+    width: 120px;
+}
+
+.octane-talent-dialog__tour > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.octane-talent-dialog__decline {
+    align-self: center;
+    margin-top: 8px;
+    border: 0;
+    background: transparent;
+    color: #1b79ab;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* ---- Level up ---- */
+
+.octane-talent-levelup {
+    width: min(430px, calc(100vw - 16px));
+}
+
+.octane-talent-levelup__title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.octane-talent-levelup__message {
+    color: #444444;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.octane-talent-levelup__box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    background: #e2e2e2;
+}
+
+.octane-talent-levelup__level {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.octane-talent-levelup__rewards {
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid #c8c8c8;
+}
+
+.octane-talent-levelup__rewards-title {
+    color: #333333;
+    font-size: 10px; /* levelup rewards label: il_border, 10 px bold 0x333333 */
+    font-weight: 700;
+}
+
+.octane-talent-levelup__reward-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.octane-talent-levelup__reward {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #222222; /* vip_length / perk_name: il_heading_2, 12 px bold 0x222222 */
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.octane-talent-levelup__reward img {
+    max-width: 35px;
+    max-height: 35px;
+}
+
+.octane-talent-levelup__plus {
+    padding: 0 6px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.octane-talent-levelup__button {
+    align-self: center;
+    margin-top: 8px;
+}
+
+.octane-talent-levelup__decoration {
+    position: absolute;
+    right: -150px;
+    bottom: 0;
+    width: 260px;
+    height: 260px;
+    object-fit: contain;
+    object-position: bottom center;
+    pointer-events: none;
+}
+
+/* ---- Citizenship welcome ---- */
+
+.octane-citizenship-popup__body {
+    display: flex;
+    gap: 10px;
+}
+
+.octane-citizenship-popup__copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.octane-citizenship-popup__heading {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.octane-citizenship-popup__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.octane-citizenship-popup__image {
+    flex: none;
+    width: 140px;
+    height: 193px;
+    object-fit: contain;
+}
+
+/* ---- Toolbar promo (track_promo, 192x29) ---- */
+
+.octane-talent-promo {
+    position: fixed;
+    right: 210px;
+    bottom: 62px;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 192px;
+    height: 29px;
+    padding: 0 0 0 10px;
+    border: 1px solid #686661;
+    border-radius: 6px;
+    background: #4e4c47;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.octane-talent-promo:hover {
+    background: #6c6a65;
+}
+
+.octane-talent-promo img {
+    width: 29px;
+    height: 29px;
+    padding: 3px;
+    border-radius: 0 6px 6px 0;
+    background: #596f8d;
+    object-fit: none;
+}
+
+/*
+ * Text as AIR draws the talent windows (talent_track, task_progress_dialog, level_up, citizenship_welcome,
+ * track_promo): Illumina (style 100/101) frames in regular Ubuntu (our `Ubuntu` face is the condensed cut). Texts
+ * without a text_style are il_regular 11 px; the buttons keep the shared il_button 10 px bold. The frame's own title
+ * bar (the shared card header) is left alone.
+ */
+.octane-talent-track,
+.octane-talent-dialog,
+.octane-citizenship-popup,
+.octane-talent-levelup,
+.octane-talent-promo {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.octane-talent-track .octane-air-modal__content,
+.octane-talent-dialog .octane-air-modal__content,
+.octane-citizenship-popup .octane-air-modal__content,
+.octane-talent-levelup .octane-card-content-shell {
+    font-size: 11px;
+    line-height: 14px;
+}
+
+/* talent_track frame_subtitle: il_frame_modal_title with font_size 11, 0xcccccc. */
+.octane-talent-track .octane-air-modal__subtitle {
+    color: #cccccc;
+    font-size: 11px;
+    line-height: 16px;
+}
+
+@layer base {
+    .octane-talent-track :where(*):not(svg, svg *, .octane-card-header-shell, .octane-card-header-shell *),
+    .octane-talent-dialog :where(*):not(svg, svg *, .octane-card-header-shell, .octane-card-header-shell *),
+    .octane-citizenship-popup :where(*):not(svg, svg *, .octane-card-header-shell, .octane-card-header-shell *),
+    .octane-talent-levelup .octane-card-content-shell :where(*):not(svg, svg *),
+    .octane-talent-promo :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}

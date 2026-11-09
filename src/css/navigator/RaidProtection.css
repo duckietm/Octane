@@ -1,0 +1,154 @@
+/* AIR raid_protection_settings_xml: a 430px style-3 frame, a 410px item list 10px in, 10px between items. */
+.octane-raid-protection {
+    width: min(430px, calc(100vw - 16px));
+}
+
+.octane-raid-protection__content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px !important;
+    color: #000000;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+/* advice_card: border style 2 tinted 0xefb8c1, the warning in u_regular 12px in from the sides. */
+.octane-raid-protection__advice {
+    padding: 10px 12px 9px;
+    border: 1px solid #efb8c1;
+    border-radius: 3px;
+    background: #fbe7ea;
+}
+
+/* protection_card / guard_card: border style 2 tinted 0xcecec7. */
+.octane-raid-protection__card {
+    display: flex;
+    flex-direction: column;
+    padding: 11px 12px 10px;
+    border: 1px solid #cecec7;
+    border-radius: 3px;
+}
+
+.octane-raid-protection__toggle {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    min-height: 20px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* The 1px 0xd8d8d1 rule at y=40, then the controls 12px further down. */
+.octane-raid-protection__separator {
+    height: 1px;
+    margin: 9px 0 11px;
+    background: #d8d8d1;
+}
+
+.octane-raid-protection__description {
+    margin: 6px 0 9px;
+}
+
+.octane-raid-protection__controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* A 184px bold label, the 190px dropmenu at x=196. */
+.octane-raid-protection__row {
+    display: grid;
+    grid-template-columns: minmax(0, 184px) minmax(0, 190px);
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 12px;
+    min-height: 24px;
+}
+
+.octane-raid-protection__row > span {
+    font-weight: 700;
+}
+
+/* WindowUtils.disableSection: the section greys out and stops taking input. */
+.octane-raid-protection__controls[data-disabled] > .octane-raid-protection__row > span,
+.octane-raid-protection__row[data-disabled] > span {
+    opacity: 0.5;
+}
+
+.octane-raid-protection__status {
+    min-height: 18px;
+}
+
+.octane-raid-protection__status .is-active {
+    color: #cc0000;
+}
+
+/* actions: the 56px style-3 cancel button on the left, the green button_thick save on the right. */
+.octane-raid-protection__actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 30px;
+}
+
+.octane-raid-protection__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    min-width: 49px;
+    padding: 0 10px;
+    border: 5px solid transparent;
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-raid-protection__button.is-cancel {
+    min-width: 56px;
+    border-image-source: var(--habbo-skin-shiny);
+    color: #000000;
+}
+
+.octane-raid-protection__button.is-cancel:hover {
+    border-image-source: var(--habbo-skin-shiny-hover);
+}
+
+.octane-raid-protection__button.is-cancel:active {
+    border-image-source: var(--habbo-skin-shiny-pressed);
+}
+
+.octane-raid-protection__button.is-save {
+    border-image-source: var(--habbo-skin-shiny-thick-green);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.octane-raid-protection__button.is-save:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-green-hover);
+}
+
+.octane-raid-protection__button.is-save:active {
+    border-image-source: var(--habbo-skin-shiny-thick-green-pressed);
+}
+
+.octane-raid-protection__button.is-save:disabled {
+    border-image-source: var(--habbo-skin-shiny-thick-green-disabled);
+    color: #eeeeee;
+    cursor: default;
+}
+
+.octane-raid-protection__button:focus-visible {
+    outline: 1px solid #000000;
+    outline-offset: 1px;
+}
+
+@media (max-width: 460px) {
+    .octane-raid-protection__row {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 4px;
+    }
+}

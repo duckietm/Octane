@@ -4,10 +4,11 @@ import {
     CallForHelpFromIMMessageComposer,
     CallForHelpFromPhotoMessageComposer,
     CallForHelpMessageComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC } from 'react';
-import { LocalizeText, ReportType, SendMessageComposer } from '../../../api';
+import { ChatEntryPlainText, GoToDesktop, LocalizeText, ReportType, SendMessageComposer } from '../../../api';
 import { Button, Text } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useHelp } from '../../../hooks';
 
 export const ReportSummaryView: FC<{}> = (props) => {
@@ -22,7 +23,7 @@ export const ReportSummaryView: FC<{}> = (props) => {
             case ReportType.ROOM: {
                 const reportedRoomId = activeReport.roomId <= 0 ? activeReport.reportedChats[0].roomId : activeReport.roomId;
 
-                activeReport.reportedChats.forEach((entry) => chats.push(entry.webId, entry.message));
+                activeReport.reportedChats.forEach((entry) => chats.push(entry.webId, ChatEntryPlainText(entry)));
 
                 SendMessageComposer(
                     new CallForHelpMessageComposer(activeReport.message, activeReport.cfhTopic, activeReport.reportedUserId, reportedRoomId, chats)
@@ -30,7 +31,7 @@ export const ReportSummaryView: FC<{}> = (props) => {
                 break;
             }
             case ReportType.IM:
-                activeReport.reportedChats.forEach((entry) => chats.push(entry.webId, entry.message));
+                activeReport.reportedChats.forEach((entry) => chats.push(entry.webId, ChatEntryPlainText(entry)));
 
                 SendMessageComposer(new CallForHelpFromIMMessageComposer(activeReport.message, activeReport.cfhTopic, activeReport.reportedUserId, chats));
                 break;
@@ -63,18 +64,22 @@ export const ReportSummaryView: FC<{}> = (props) => {
                 break;
         }
 
+        if (activeReport.leaveRoom) GoToDesktop();
+
         setActiveReport(null);
     };
 
     return (
-        <>
-            <div className="flex flex-col gap-1">
-                <Text fontSize={4}>{LocalizeText('help.cfh.button.send')}</Text>
-                <Text>{LocalizeText('help.main.summary')}</Text>
-            </div>
-            <Button variant="success" onClick={submitReport}>
-                {LocalizeText('guide.help.request.emergency.submit.button')}
-            </Button>
-        </>
+        <NativeTextTree>
+            <>
+                <div className="flex flex-col gap-1">
+                    <Text fontSize={4}>{LocalizeText('help.cfh.button.send')}</Text>
+                    <Text>{LocalizeText('help.main.summary')}</Text>
+                </div>
+                <Button variant="danger" onClick={submitReport}>
+                    {LocalizeText('guide.help.request.emergency.submit.button')}
+                </Button>
+            </>
+        </NativeTextTree>
     );
 };

@@ -1,5 +1,5 @@
-import { FC, Fragment, ReactNode } from 'react';
-import { classifyMentionToken } from '../../api/mentions/mentionTokens';
+import { FC, Fragment } from 'react';
+import { segmentMentionText } from '../../api/mentions/mentionSegments';
 
 interface MentionMessageViewProps {
     text: string;
@@ -19,19 +19,15 @@ export const MentionMessageView: FC<MentionMessageViewProps> = (props) => {
 
     if (!text) return <span className={className} />;
 
-    const nodes: ReactNode[] = text.split(/(\s+)/).map((segment, index) => {
-        if (segment.length === 0) return null;
-
-        const kind = /^\s+$/.test(segment) ? '' : classifyMentionToken(segment, ownUsername);
-
-        if (!kind) return <Fragment key={index}>{segment}</Fragment>;
-
-        return (
-            <span key={index} className={kind === 'self' ? 'mention-tag mention-tag--self' : 'mention-tag'}>
-                {segment}
+    const nodes = segmentMentionText(text, ownUsername).map((segment, index) =>
+        segment.kind ? (
+            <span key={index} className={segment.kind === 'self' ? 'mention-tag mention-tag--self' : 'mention-tag'}>
+                {segment.text}
             </span>
-        );
-    });
+        ) : (
+            <Fragment key={index}>{segment.text}</Fragment>
+        )
+    );
 
     return <span className={className}>{nodes}</span>;
 };

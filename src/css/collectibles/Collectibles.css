@@ -1,0 +1,1136 @@
+/* Official collectibles hub (collectible_view_xml, 500x600, frame colour 0x2a2a2a), reward box
+   (collectible_reward_xml, 424x570) and inventory collectibles tab. */
+
+.octane-collectibles-hub {
+    width: 500px;
+    max-width: calc(100vw - 16px);
+}
+
+.octane-collectibles-hub-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 560px;
+    max-height: calc(100vh - 60px);
+    background: #2a2a2a;
+    color: #fff;
+    font-size: 12px;
+    overflow: hidden;
+}
+
+/* collectible_view and collectible_reward are Ubuntu (style 3) frames; our `Ubuntu` face is the condensed cut. */
+.octane-collectibles-hub,
+.octane-collectibles-reward-box {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+@layer base {
+    :is(.octane-collectibles-hub, .octane-collectibles-reward-box) :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
+
+/* ---- header (collector_hub_header, 498x122) ---- */
+
+.octane-collectibles-header {
+    position: relative;
+    flex: 0 0 92px;
+    background: #0b162d;
+    overflow: hidden;
+}
+
+.octane-collectibles-header-gradient {
+    position: absolute;
+    inset: 0;
+    background: url("@/assets/images/collectibles/collectables_score_background_gradient.png") repeat-x left top;
+}
+
+.octane-collectibles-header-bg-left,
+.octane-collectibles-header-bg-right {
+    position: absolute;
+    width: 166px;
+    height: 286px;
+    opacity: 0.25;
+    background-repeat: no-repeat;
+}
+
+.octane-collectibles-header-bg-left {
+    left: 0;
+    top: 0;
+    background-image: url("@/assets/images/collectibles/collectables_score_background.png");
+}
+
+.octane-collectibles-header-bg-right {
+    right: 0;
+    top: -160px;
+    background-image: url("@/assets/images/collectibles/collectables_score_background_right.png");
+}
+
+.octane-collectibles-level-strip {
+    position: absolute;
+    left: 0;
+    top: 17px;
+    width: 300px;
+    height: 54px;
+    -webkit-mask: url("@/assets/images/collectibles/collectables_score_element2.png") repeat-x;
+    mask: url("@/assets/images/collectibles/collectables_score_element2.png") repeat-x;
+}
+
+.octane-collectibles-level-element {
+    position: absolute;
+    left: 299px;
+    top: 17px;
+    width: 92px;
+    height: 72px;
+    -webkit-mask: url("@/assets/images/collectibles/collectables_score_element.png") no-repeat;
+    mask: url("@/assets/images/collectibles/collectables_score_element.png") no-repeat;
+}
+
+.octane-collectibles-cabinet {
+    position: absolute;
+    left: -2px;
+    top: -1px;
+    width: 130px;
+    height: 128px;
+    background: url("@/assets/images/collectibles/collectables_cabinet_element.png") no-repeat;
+}
+
+.octane-collectibles-score {
+    position: absolute;
+    left: 116px;
+    top: 21px;
+    display: grid;
+    grid-template-columns: 158px auto;
+    row-gap: 8px;
+    /* current_score_key / current_hiscore_key / current_hiscore_value: 13 px with bold=false;
+       only current_score_value keeps its u_bold. */
+    font-size: 13px;
+    font-weight: 400;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.octane-collectibles-score > .octane-collectibles-score-value:nth-child(2) {
+    font-weight: 700;
+}
+
+.octane-collectibles-score-key {
+    text-align: right;
+    padding-right: 4px;
+}
+
+.octane-collectibles-level {
+    position: absolute;
+    left: 335px;
+    top: 2px;
+    width: 64px;
+    height: 68px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: url("@/assets/images/collectibles/collectables_level_bg.png") no-repeat center;
+}
+
+.octane-collectibles-level-value {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 22px;
+}
+
+.octane-collectibles-level-title {
+    font-size: 9px;
+    font-weight: bold;
+    opacity: 0.41;
+}
+
+.octane-collectibles-currency {
+    position: absolute;
+    left: 419px;
+    width: 70px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #a99490;
+    background: #3a2f29;
+    padding-left: 4px;
+}
+
+.octane-collectibles-currency.is-silver {
+    top: 18px;
+}
+
+.octane-collectibles-currency.is-emerald {
+    top: 48px;
+}
+
+.octane-collectibles-currency span {
+    flex: 1;
+    text-align: center;
+    padding-right: 18px;
+}
+
+.octane-collectibles-currency img {
+    position: absolute;
+    right: -2px;
+    top: -2px;
+    width: 24px;
+    height: 24px;
+    image-rendering: pixelated;
+}
+
+/* ---- tabs (top_view_select_tab_context) ---- */
+
+.octane-collectibles-tabs {
+    flex: 0 0 34px;
+    display: flex;
+    justify-content: center;
+    gap: 1px;
+    background: #0b162d;
+    padding-top: 2px;
+}
+
+.octane-collectibles-tab {
+    min-width: 46px;
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid #000;
+    border-bottom: 0;
+    border-radius: 6px 6px 0 0;
+    background: #b6bec5;
+    color: #000;
+    /* tab_button style 3: u_button_tab, 12 px regular. */
+    font-size: 12px;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.octane-collectibles-tab.is-active {
+    background: #dfdfe1;
+}
+
+.octane-collectibles-tab-content {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    padding: 4px 5px 5px;
+    overflow: hidden;
+}
+
+/* ---- shared pieces ---- */
+
+.octane-collectibles-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.octane-collectibles-loading-box {
+    width: 113px;
+    height: 116px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #a4a49f;
+    border-radius: 6px;
+}
+
+.octane-collectibles-loading-icon {
+    width: 75px;
+    height: 75px;
+    animation: octane-collectibles-turn 4s linear infinite;
+}
+
+@keyframes octane-collectibles-turn {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.octane-collectibles-empty {
+    padding: 28px 19px;
+    text-align: center;
+}
+
+.octane-collectibles-button {
+    height: 30px;
+    padding: 0 12px;
+    border: 1px solid #000;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* collect_button / claim_button / buy_button (style 5, color 0x01a101) and silver_buy_button / transfer_button /
+   claim_all / wallet buttons (style 5, color 0x2095d4): AIR's grey habbo_skin_button_shiny multiplied by the
+   element colour, white button_shiny_regular 12 px caption. */
+.octane-collectibles-button:is(.is-green, .is-blue) {
+    border: 5px solid transparent;
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    border-radius: 0;
+    background: transparent;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 400;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-collectibles-button.is-green {
+    border-image-source: var(--habbo-skin-shiny-tint-01a101);
+}
+
+.octane-collectibles-button.is-green:hover:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-tint-01a101-hover);
+}
+
+.octane-collectibles-button.is-green:active:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-tint-01a101-pressed);
+}
+
+.octane-collectibles-button.is-blue {
+    border-image-source: var(--habbo-skin-shiny-tint-2095d4);
+}
+
+.octane-collectibles-button.is-blue:hover:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-tint-2095d4-hover);
+}
+
+.octane-collectibles-button.is-blue:active:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-tint-2095d4-pressed);
+}
+
+/* ok_button is a style 3 button: button_shiny_regular, 12 px regular black. */
+.octane-collectibles-button.is-plain {
+    border: 5px solid transparent;
+    border-image-source: var(--habbo-skin-shiny);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    border-radius: 0;
+    background: transparent;
+    color: #000;
+    font-size: 12px;
+    font-weight: 400;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-collectibles-button.is-plain:hover:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-hover);
+}
+
+.octane-collectibles-button.is-plain:active:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-pressed);
+}
+
+.octane-collectibles-button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.octane-collectibles-button.is-green:disabled {
+    border-image-source: var(--habbo-skin-shiny-tint-01a101-disabled);
+    opacity: 1;
+}
+
+.octane-collectibles-button.is-blue:disabled {
+    border-image-source: var(--habbo-skin-shiny-tint-2095d4-disabled);
+    opacity: 1;
+}
+
+.octane-collectibles-split {
+    display: flex;
+    gap: 7px;
+    height: 100%;
+}
+
+.octane-collectibles-side {
+    flex: 0 0 184px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 0;
+}
+
+.octane-collectibles-select,
+.octane-collectibles-search {
+    width: 100%;
+    height: 24px;
+}
+
+.octane-collectibles-search {
+    padding: 0 4px;
+    border: 1px solid #000;
+    border-radius: 3px;
+    color: #000;
+}
+
+.octane-collectibles-navigation {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 4px;
+    padding: 4px 3px;
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.octane-collectibles-navigation-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 22px;
+    margin-bottom: 1px;
+    padding: 0 4px 0 9px;
+    border: 0;
+    border-radius: 3px;
+    background: #b4b4ae;
+    /* item_title: u_bold #666666 with a white top etching. */
+    color: #666666;
+    font-weight: 700;
+    text-shadow: 0 -1px 0 #fff;
+    text-align: left;
+    cursor: pointer;
+}
+
+.octane-collectibles-navigation-item.is-active {
+    background: linear-gradient(#82d1ed, #63c5e9);
+    /* The highlighted row (item_hilight_inner #63c5e9) carries white text, as in the catalogue. */
+    color: #ffffff;
+    text-shadow: none;
+}
+
+.octane-collectibles-navigation-hint {
+    position: absolute;
+    left: 0;
+    top: 1px;
+    width: 4px;
+    height: 19px;
+}
+
+.octane-collectibles-navigation-title {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.octane-collectibles-progress-pill {
+    min-width: 36px;
+    height: 14px;
+    padding: 0 2px;
+    border-radius: 3px;
+    color: #fff;
+    /* progress_text: 10 px regular white (the large one u_regular 12). */
+    font-size: 10px;
+    font-weight: 400;
+    text-align: center;
+    line-height: 14px;
+}
+
+.octane-collectibles-progress-pill.is-large {
+    min-width: 40px;
+    height: 26px;
+    line-height: 26px;
+    font-size: 12px;
+}
+
+/* ---- set / shop detail (collection_content, 290 wide) ---- */
+
+.octane-collectibles-collection {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.octane-collectibles-collection-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 30px;
+    padding: 0 2px 0 4px;
+    border: 1px solid #cbd1d8;
+    border-radius: 4px;
+    /* collection_header_container: a filled 0xcbd1d8 border. */
+    background: #cbd1d8;
+}
+
+/* collection_name: Ubuntu 16 px regular, black (no text_color). */
+.octane-collectibles-collection-name {
+    overflow: hidden;
+    color: #000000;
+    font-size: 16px;
+    font-weight: 400;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.octane-collectibles-preview {
+    position: relative;
+    flex: 0 0 260px;
+    border-radius: 4px;
+    background: #3d1f39;
+    overflow: hidden;
+}
+
+.octane-collectibles-preview-star,
+.octane-collectibles-reward-box-star {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    left: -5px;
+    top: -20px;
+    opacity: 0.35;
+    background: url("@/assets/images/collectibles/bg_star_300x300.png") no-repeat center;
+    animation: octane-collectibles-turn 18s linear infinite;
+    pointer-events: none;
+}
+
+.octane-collectibles-preview-image {
+    position: absolute;
+    inset: 26px 0 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.octane-collectibles-collection-default {
+    width: 108px;
+    height: 132px;
+    background: url("@/assets/images/collectibles/collectables_collection_default.png") no-repeat center;
+}
+
+.octane-collectibles-unknown {
+    image-rendering: pixelated;
+}
+
+.octane-collectibles-preview-name {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 26px;
+    background: rgba(0, 0, 0, 0.84);
+    /* preview_furni_name: u_regular 12 px white. */
+    font-weight: 400;
+    text-align: center;
+    line-height: 26px;
+}
+
+.octane-collectibles-preview-info {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    top: 34px;
+    display: none;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.octane-collectibles-preview:hover .octane-collectibles-preview-info,
+.octane-collectibles-preview-info.is-shop {
+    display: flex;
+}
+
+.octane-collectibles-preview-info.is-shop {
+    top: auto;
+    bottom: 40px;
+}
+
+.octane-collectibles-preview-info div {
+    display: flex;
+    justify-content: space-between;
+    padding: 1px 4px;
+    background: rgba(17, 11, 20, 0.73);
+}
+
+/* product_info_key: 0xeb8f01; product_info_value: white. */
+.octane-collectibles-preview-info div > span:first-child {
+    color: #eb8f01;
+}
+
+/* preview_reward_text / procuct_score_text: 11 px white. */
+.octane-collectibles-preview-bar {
+    font-size: 11px;
+    margin: 4px;
+    padding: 6px 4px;
+    border-radius: 3px;
+    background: #5a1003;
+}
+
+.octane-collectibles-preview > .octane-collectibles-preview-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.octane-collectibles-collection-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 60px;
+    padding-top: 3px;
+    background: rgba(0, 0, 0, 0.67);
+    text-align: center;
+    /* preview_score_text: u_regular 12 px white; the values carry their own <b>. */
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* preview_reward_text: 11 px regular white, centred. */
+.octane-collectibles-collection-progress .octane-collectibles-preview-bar {
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 14px;
+}
+
+.octane-collectibles-completion {
+    position: absolute;
+    inset: 0 0 60px;
+}
+
+.octane-collectibles-completion-header {
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+    background: rgba(0, 0, 0, 0.84);
+}
+
+/* completion_bonus: 11 px 0xffd300; reward_furni_name: u_regular 12 px white. */
+.octane-collectibles-completion-header > span:first-child {
+    color: #ffd300;
+    font-size: 11px;
+}
+
+.octane-collectibles-completion-name {
+    font-weight: 400;
+}
+
+.octane-collectibles-claim-button {
+    position: absolute;
+    right: 7px;
+    bottom: 4px;
+}
+
+.octane-collectibles-timer {
+    position: relative;
+    height: 18px;
+    margin-top: 4px;
+    border: 1px solid #112e31;
+    border-radius: 3px;
+    background: #112e31;
+    overflow: hidden;
+}
+
+.octane-collectibles-timer-fill {
+    height: 100%;
+    background: linear-gradient(#00910a 50%, #037c00 50%);
+}
+
+.octane-collectibles-timer-fill.is-expired {
+    background: linear-gradient(#ff3d2d 50%, #c01800 50%);
+}
+
+.octane-collectibles-timer-text {
+    position: absolute;
+    inset: 0;
+    text-align: center;
+    font-size: 11px;
+    line-height: 16px;
+}
+
+.octane-collectibles-buy-bar {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* price_text / mintlimit_text: u_bold 14 px. */
+.octane-collectibles-price {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.octane-collectibles-mint-limit {
+    margin-right: auto;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* stamp_pricing on the collect bar: u_regular 12 px; silver_cost_text by the stamps: 16 px, bold=false. */
+.octane-collectibles-mint .octane-collectibles-buy-bar .octane-collectibles-price {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.octane-collectibles-stamps .octane-collectibles-price {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+/* ---- product grids (itemgrid_collection, 52x61 cells) ---- */
+
+.octane-collectibles-item-grid,
+.octane-collectibles-mint-grid,
+.octane-inventory-collectibles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 52px);
+    grid-auto-rows: 61px;
+    gap: 2px;
+    align-content: start;
+    overflow-y: auto;
+}
+
+.octane-collectibles-item-grid {
+    flex: 1;
+    min-height: 0;
+}
+
+.octane-collectibles-item {
+    position: relative;
+    width: 50px;
+    height: 60px;
+    padding: 4px 2px 16px;
+    border: 1px solid #8f9db1;
+    border-radius: 4px;
+    background: #c8cdd3;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.octane-collectibles-item.is-selected {
+    border-color: #fff;
+    box-shadow: 0 0 0 1px #2b9ddf;
+}
+
+.octane-collectibles-item-amount {
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    bottom: 2px;
+    height: 12px;
+    border-radius: 2px;
+    background: #337c00;
+    color: #fff;
+    font-size: 10px;
+    line-height: 12px;
+    text-align: center;
+}
+
+.octane-collectibles-item-check {
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    width: 16px;
+    height: 16px;
+}
+
+/* ---- rewards tab ---- */
+
+.octane-collectibles-rewards {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.octane-collectibles-reward-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.octane-collectibles-reward-item {
+    display: flex;
+    gap: 8px;
+    padding: 4px;
+    border: 1px solid #a1a19b;
+    border-radius: 4px;
+    background: #3a3a3a;
+}
+
+.octane-collectibles-reward-icon {
+    position: relative;
+    width: 44px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.octane-collectibles-reward-amount {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: 0 3px;
+    border-radius: 2px;
+    background: #337c00;
+    font-size: 10px;
+}
+
+/* collection_text / expires_text: 10 px html with a bold key; item_name: u_bold 12 px white. */
+.octane-collectibles-reward-texts {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-size: 10px;
+}
+
+.octane-collectibles-reward-name {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.octane-collectibles-reward-footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+}
+
+/* ---- transfer / info / mint ---- */
+
+.octane-collectibles-transfer,
+.octane-collectibles-info,
+.octane-collectibles-mint {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+    padding: 6px 14px;
+}
+
+.octane-collectibles-transfer-safe {
+    width: 400px;
+    max-width: 100%;
+    height: 180px;
+    margin: 0 auto;
+    background: url("@/assets/images/collectibles/collectables_transfer_safe.png") no-repeat center / contain;
+}
+
+.octane-collectibles-transfer-form,
+.octane-collectibles-transfer-fee {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.octane-collectibles-transfer-form .octane-collectibles-search {
+    flex: 1;
+}
+
+/* transfer_fee_text: 16 px, bold=false. */
+.octane-collectibles-transfer-fee span {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.octane-collectibles-info-title,
+.octane-collectibles-mint-title {
+    font-weight: bold;
+}
+
+.octane-collectibles-info-text a {
+    color: #82d1ed;
+}
+
+.octane-collectibles-mint-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.octane-collectibles-mint-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    gap: 6px;
+}
+
+.octane-collectibles-mint-grid {
+    flex: 0 0 179px;
+}
+
+.octane-collectibles-mint-preview {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.octane-collectibles-preview.is-mint {
+    flex: 1;
+}
+
+.octane-collectibles-mint-lock {
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    top: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.octane-collectibles-mint-lock img {
+    width: 34px;
+    height: auto;
+}
+
+.octane-collectibles-preview.is-mint .octane-collectibles-timer {
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    bottom: 42px;
+}
+
+.octane-collectibles-mint-nofurni {
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    bottom: 64px;
+    text-align: center;
+}
+
+.octane-collectibles-stamps {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px;
+    border-radius: 4px;
+    background: #3a3a3a;
+}
+
+.octane-collectibles-stamps-icon {
+    width: 48px;
+    height: 40px;
+}
+
+.octane-collectibles-stamps-balance {
+    display: flex;
+    flex-direction: column;
+}
+
+/* stamps_header: 13 px, mint_token_balance: 30 px, both bold=false. */
+.octane-collectibles-stamps-balance > span:first-child {
+    font-size: 13px;
+}
+
+.octane-collectibles-stamps-value {
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.octane-collectibles-stamps-buy {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.octane-collectibles-select.is-small {
+    width: 60px;
+}
+
+/* ---- me menu ---- */
+
+.icon-me-collectibles {
+    width: 32px;
+    height: 30px;
+    background: url("@/assets/images/collectibles/me_menu_me_cabinet.png") no-repeat center;
+    image-rendering: pixelated;
+}
+
+/* ---- reward box (collectible_reward_xml) ---- */
+
+.octane-collectibles-reward-box {
+    width: 424px;
+    max-width: calc(100vw - 16px);
+}
+
+.octane-collectibles-reward-box-content {
+    position: relative;
+    height: 537px;
+    color: #fff;
+    overflow: hidden;
+}
+
+.octane-collectibles-reward-box-top {
+    position: relative;
+    height: 348px;
+}
+
+.octane-collectibles-reward-box-gradient {
+    position: absolute;
+    inset: 0;
+    opacity: 0.5;
+    background: url("@/assets/images/collectibles/collectables_score_background_gradient.png") repeat-x left top / auto 100%, rgba(0, 0, 0, 0.5);
+}
+
+.octane-collectibles-reward-box-title,
+.octane-collectibles-reward-box-name {
+    position: relative;
+    text-align: center;
+}
+
+.octane-collectibles-reward-box-title {
+    padding-top: 4px;
+    font-size: 18px;
+}
+
+.octane-collectibles-reward-box-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #f3cd03;
+}
+
+.octane-collectibles-reward-box-product {
+    position: absolute;
+    left: 62px;
+    top: 25px;
+    width: 300px;
+    height: 300px;
+}
+
+.octane-collectibles-reward-box-star {
+    left: 0;
+    top: 0;
+    opacity: 0.75;
+}
+
+.octane-collectibles-reward-box-image {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.octane-collectibles-reward-box-rarity {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 300px;
+    height: 86px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #440300;
+    background: url("@/assets/images/collectibles/collectables_reward_rarity_flag.png") no-repeat center;
+}
+
+.octane-collectibles-reward-box-rarity-title {
+    font-size: 14px;
+}
+
+.octane-collectibles-reward-box-rarity-text {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.octane-collectibles-reward-box-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    font-size: 14px;
+}
+
+.octane-collectibles-reward-box-bottom .octane-collectibles-button {
+    width: 120px;
+}
+
+/* ---- catalog page ---- */
+
+.octane-catalog-collectibles-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.octane-catalog-collectibles-link {
+    align-self: center;
+}
+
+/* ---- inventory tab ---- */
+
+.octane-inventory-collectibles {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    height: 100%;
+}
+
+.octane-inventory-collectibles-options {
+    display: flex;
+    gap: 6px;
+}
+
+.octane-inventory-collectibles-filter {
+    width: 140px;
+}
+
+.octane-inventory-collectibles-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    gap: 8px;
+}
+
+.octane-inventory-collectibles-grid {
+    flex: 1;
+}
+
+.octane-inventory-collectibles-preview {
+    flex: 0 0 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.octane-inventory-collectibles-image {
+    width: 180px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background: #3d1f39;
+}
+
+.octane-inventory-collectibles-name {
+    font-weight: bold;
+    text-align: center;
+}
+
+.octane-inventory-collectibles-state {
+    padding: 24px;
+    text-align: center;
+}

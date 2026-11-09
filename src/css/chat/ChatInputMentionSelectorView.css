@@ -11,7 +11,7 @@
     overflow: hidden;
     z-index: 1070;
     font-family: Volter, Volter_Goldfish, "Ubuntu", sans-serif;
-    image-rendering: pixelated;
+    image-rendering: var(--octane-pixel-art, pixelated);
 }
 
 .chat-input-mention-popover-header {
@@ -176,101 +176,44 @@
     color: #4a2b00;
 }
 
-.chat-input-command-popover {
+.chat-input-command-popover.octane-card-shell.octane-card-frame-3 {
     position: absolute;
     bottom: 100%;
     left: 0;
     width: 100%;
     margin-bottom: 4px;
-    background: #f2f2eb;
-    border: 2px solid #000;
-    border-radius: 10px;
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
-    overflow: hidden;
+    padding: 35px 2px 5px;
+    resize: none;
     z-index: 1070;
-    font-family: Volter, Volter_Goldfish, "Ubuntu", sans-serif;
-    image-rendering: pixelated;
-}
-
-.chat-input-command-popover-header {
-    height: 24px;
-    padding: 0 8px;
-    background: #2f8d4a;
-    border-bottom: 2px solid #000;
-    color: #fff;
-    text-shadow: 1px 1px 1px #000;
-    font-family: UbuntuCondensed, Ubuntu, sans-serif;
-    font-size: 13px;
-    line-height: 22px;
-    letter-spacing: 0.3px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.chat-input-command-popover-header-dot {
-    width: 8px;
-    height: 8px;
-    background: #ffdc4c;
-    border: 1px solid #000;
-    border-radius: 50%;
-    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.55);
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
 }
 
 .chat-input-command-popover-list {
-    max-height: 220px;
+    position: relative;
+    max-height: min(220px, calc(100dvh - 140px));
     overflow-y: auto;
-    padding: 4px;
+    padding: 0 4px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
 }
 
 .chat-input-command-row {
-    position: relative;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 4px 6px;
-    border-radius: 6px;
+    flex-shrink: 0;
+    min-height: 36px;
+    padding: 3px 6px;
     border: 1px solid transparent;
     cursor: pointer;
-    background: transparent;
-    transition: background 0.08s linear, border-color 0.08s linear;
 }
 
 .chat-input-command-row:hover {
-    background: rgba(47, 141, 74, 0.12);
+    background: var(--habbo-select-outer, #82d1ed);
 }
 
 .chat-input-command-row.is-selected {
-    background: #2f8d4a;
-    border-color: #000;
-    color: #fff;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.45);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
-
-.chat-input-command-row-tile {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    flex-shrink: 0;
-    border-radius: 6px;
-    border: 1px solid #000;
-    background: linear-gradient(180deg, #b6e6c4 0%, #5ec07d 100%);
-    color: #1a4a28;
-    font-weight: 700;
-    font-size: 14px;
-    font-family: UbuntuCondensed, Ubuntu, sans-serif;
-    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.45);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -1px 0 rgba(0, 0, 0, 0.12);
-}
-
-.chat-input-command-row.is-selected .chat-input-command-row-tile {
-    background: linear-gradient(180deg, #c8f0d5 0%, #7ed79a 100%);
+    background: var(--habbo-select, #63c5e9);
+    border-color: var(--habbo-select-outer, #82d1ed);
 }
 
 .chat-input-command-row-body {
@@ -278,34 +221,22 @@
     flex-direction: column;
     min-width: 0;
     flex: 1 1 auto;
-    gap: 0;
+}
+
+.chat-input-command-row-name,
+.chat-input-command-row-desc {
+    font-size: 12px;
+    line-height: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .chat-input-command-row-name {
-    font-family: UbuntuCondensed, Ubuntu, sans-serif;
-    font-size: 14px;
-    line-height: 1.1;
-    color: #2c2c2c;
+    color: #151515;
     font-weight: 700;
-    letter-spacing: 0.2px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.chat-input-command-row.is-selected .chat-input-command-row-name {
-    color: #fff;
 }
 
 .chat-input-command-row-desc {
-    font-size: 10px;
-    line-height: 1.1;
-    color: #6b6b6b;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.chat-input-command-row.is-selected .chat-input-command-row-desc {
-    color: #d9efde;
+    color: #555555;
 }

@@ -1,26 +1,32 @@
+import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
-import { Column, Grid, GridProps, Text } from '../../../common';
+import { LocalizeText } from '../../../api';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { OctaneButton } from '../../../layout';
 
-export interface InventoryCategoryEmptyViewProps extends GridProps {
+export interface InventoryCategoryEmptyViewProps {
     title: string;
     desc: string;
+    /** What the button does and says; it opens the catalog when left out. */
+    actionLabel?: string;
+    onAction?: () => void;
 }
 
 export const InventoryCategoryEmptyView: FC<InventoryCategoryEmptyViewProps> = (props) => {
-    const { title = '', desc = '', children = null, ...rest } = props;
+    const { title = '', desc = '', actionLabel = null, onAction = null } = props;
 
     return (
-        <Grid {...rest}>
-            <Column center overflow="hidden" size={5}>
-                <div className="w-[129px] h-[181px] bg-[url('@/assets/images/inventory/empty.png')] bg-no-repeat" />
-            </Column>
-            <Column justifyContent="center" overflow="hidden" size={7}>
-                <Text truncate fontSize={5} fontWeight="bold" overflow="unset">
-                    {title}
-                </Text>
-                <Text overflow="auto">{desc}</Text>
-            </Column>
-            {children}
-        </Grid>
+        <NativeTextTree>
+            <div className="octane-inventory-empty">
+                <div className="octane-inventory-empty-image" aria-hidden="true" />
+                <div className="octane-inventory-empty-copy">
+                    <div className="octane-inventory-empty-title">{title}</div>
+                    <div className="octane-inventory-empty-desc">{desc}</div>
+                </div>
+                <OctaneButton className="octane-inventory-empty-shop" onClick={onAction ?? (() => CreateLinkEvent('catalog/toggle/normal'))}>
+                    {actionLabel ?? LocalizeText('inventory.open.catalog')}
+                </OctaneButton>
+            </div>
+        </NativeTextTree>
     );
 };

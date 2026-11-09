@@ -1,12 +1,17 @@
 import { FC, ReactNode, useMemo } from 'react';
 import { NotificationBubbleType } from '../../api';
-import { useNotification } from '../../hooks';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useNotification, useTreasureHuntNotifications } from '../../hooks';
 import { GetAlertLayout } from './views/alert-layouts/GetAlertLayout';
 import { GetBubbleLayout } from './views/bubble-layouts/GetBubbleLayout';
 import { GetConfirmLayout } from './views/confirm-layouts/GetConfirmLayout';
+import { HotelAlertToastView } from './views/HotelAlertToastView';
+import { NewFeatureNotificationsView } from './views/NewFeatureNotificationsView';
 
 export const NotificationCenterView: FC<{}> = (props) => {
     const { alerts = [], bubbleAlerts = [], confirms = [], closeAlert = null, closeBubbleAlert = null, closeConfirm = null } = useNotification();
+
+    useTreasureHuntNotifications();
 
     const getAlerts = useMemo(() => {
         if (!alerts || !alerts.length) return null;
@@ -57,10 +62,16 @@ export const NotificationCenterView: FC<{}> = (props) => {
     }, [confirms, closeConfirm]);
 
     return (
-        <>
-            <div className="flex flex-col gap-1">{getBubbleAlerts}</div>
-            {getConfirms}
-            {getAlerts}
-        </>
+        <NativeTextTree>
+            <>
+                <div className="octane-rightside-notifications flex flex-col gap-1">
+                    <NewFeatureNotificationsView />
+                    {getBubbleAlerts}
+                </div>
+                <HotelAlertToastView />
+                {getConfirms}
+                {getAlerts}
+            </>
+        </NativeTextTree>
     );
 };

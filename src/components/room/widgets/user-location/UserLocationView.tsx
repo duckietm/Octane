@@ -1,4 +1,4 @@
-import { RoomObjectCategory } from '@nitrots/nitro-renderer';
+import { RoomObjectCategory } from '@octane/renderer';
 import { FC } from 'react';
 import { BaseProps } from '../../../../common';
 import { useRoom } from '../../../../hooks';

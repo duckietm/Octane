@@ -1,0 +1,23 @@
+/*
+ * The Sponsored window is Octane's own (no AIR layout). Its own text (the loading / not-configured hints and
+ * the error line) takes the AIR conventions: regular Ubuntu (HabboAirUbuntu; Octane's `Ubuntu` is the condensed
+ * cut), 12 px, hints in u_italic #666666, the error in its red. The ad itself is a third-party frame and is not
+ * styled; the shared card header keeps its own face.
+ */
+.octane-google-ads {
+    --octane-card-text: #000000;
+}
+
+.octane-google-ads .octane-card-content-shell {
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+/* u_italic: 12 px #666666. */
+.octane-google-ads .octane-google-ads__hint {
+    color: #666666;
+    font-size: 12px;
+    font-style: italic;
+}

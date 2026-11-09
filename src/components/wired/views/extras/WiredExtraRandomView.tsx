@@ -1,25 +1,28 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
-import { Slider, Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
+import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
 const MIN_PICK_AMOUNT = 1;
 const MIN_SKIP_EXECUTIONS = 0;
-const MAX_RANDOM_VALUE = 1000;
+/** AIR's sliders: picks 1..100, skips 0..100. */
+const MAX_RANDOM_VALUE = 100;
 
-const normalizePickAmount = (value: number) => {
-    if (isNaN(value)) return MIN_PICK_AMOUNT;
+const clampSlider = (value: number, min: number) => {
+    if (isNaN(value)) return min;
 
-    return Math.max(MIN_PICK_AMOUNT, Math.min(MAX_RANDOM_VALUE, Math.floor(value)));
+    return Math.max(min, Math.min(MAX_RANDOM_VALUE, Math.floor(value)));
 };
 
-const normalizeSkipExecutions = (value: number) => {
-    if (isNaN(value)) return MIN_SKIP_EXECUTIONS;
+const normalizePickAmount = (value: number) => clampSlider(value, MIN_PICK_AMOUNT);
+const normalizeSkipExecutions = (value: number) => clampSlider(value, MIN_SKIP_EXECUTIONS);
 
-    return Math.max(MIN_SKIP_EXECUTIONS, Math.min(MAX_RANDOM_VALUE, Math.floor(value)));
-};
-
+/**
+ * AIR's random add-on (class_4185): a picks slider, then a skips slider (leave out what the last N firings picked),
+ * neither with a number input; the value shows in the title. Ints `[skips, picks]`.
+ */
 export const WiredExtraRandomView: FC<{}> = () => {
     const { trigger = null, setIntParams = null, setStringParam = null } = useWired();
     const [pickAmount, setPickAmount] = useState(MIN_PICK_AMOUNT);
@@ -28,41 +31,39 @@ export const WiredExtraRandomView: FC<{}> = () => {
     useEffect(() => {
         if (!trigger) return;
 
-        setPickAmount(normalizePickAmount(trigger.intData.length > 0 ? trigger.intData[0] : MIN_PICK_AMOUNT));
-        setSkipExecutions(normalizeSkipExecutions(trigger.intData.length > 1 ? trigger.intData[1] : MIN_SKIP_EXECUTIONS));
+        const d = trigger.intData;
+
+        setSkipExecutions(normalizeSkipExecutions(d[0] ?? MIN_SKIP_EXECUTIONS));
+        setPickAmount(normalizePickAmount(d[1] ?? MIN_PICK_AMOUNT));
     }, [trigger]);
 
     const save = () => {
-        setIntParams([normalizePickAmount(pickAmount), normalizeSkipExecutions(skipExecutions)]);
+        setIntParams([normalizeSkipExecutions(skipExecutions), normalizePickAmount(pickAmount)]);
         setStringParam('');
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.pickamount', ['picks'], [pickAmount.toString()])}</Text>
-                    <Slider
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
+                <div className="flex flex-col gap-2">
+                    <WiredSliderSection
                         max={MAX_RANDOM_VALUE}
                         min={MIN_PICK_AMOUNT}
-                        step={1}
+                        numberInput={false}
+                        title={LocalizeText('wiredfurni.params.pickamount', ['picks'], [pickAmount.toString()])}
                         value={pickAmount}
-                        onChange={(value) => setPickAmount(normalizePickAmount(Array.isArray(value) ? value[0] : Number(value)))}
+                        onChange={(value) => setPickAmount(normalizePickAmount(value))}
                     />
-                    <Text small>{pickAmount}</Text>
-                </div>
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.skipactions', ['skips'], [skipExecutions.toString()])}</Text>
-                    <Slider
+                    <WiredSliderSection
                         max={MAX_RANDOM_VALUE}
                         min={MIN_SKIP_EXECUTIONS}
-                        step={1}
+                        numberInput={false}
+                        title={LocalizeText('wiredfurni.params.skipactions', ['skips'], [skipExecutions.toString()])}
                         value={skipExecutions}
-                        onChange={(value) => setSkipExecutions(normalizeSkipExecutions(Array.isArray(value) ? value[0] : Number(value)))}
+                        onChange={(value) => setSkipExecutions(normalizeSkipExecutions(value))}
                     />
-                    <Text small>{skipExecutions}</Text>
                 </div>
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

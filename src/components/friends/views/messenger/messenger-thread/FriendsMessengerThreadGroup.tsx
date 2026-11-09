@@ -1,119 +1,132 @@
-import { GetSessionDataManager } from '@nitrots/nitro-renderer';
-import { FC, useMemo } from 'react';
-import { GetGroupChatData, LocalizeText, MessengerGroupType, MessengerThread, MessengerThreadChat, MessengerThreadChatGroup } from '../../../../../api';
-import { Base, Flex, LayoutAvatarImageView } from '../../../../../common';
+import { GetSessionDataManager, MessengerMessageType } from '@octane/renderer';
+import { FC, useEffect, useMemo, useState } from 'react';
+import {
+    FriendlyTime,
+    GetGroupChatData,
+    LocalizeText,
+    MessengerGroupType,
+    MessengerThread,
+    MessengerThreadChat,
+    MessengerThreadChatGroup,
+    useHabbiconCatalog,
+    localizeWithFallback
+} from '../../../../../api';
+import MessengerCautionIcon from '../../../../../assets/images/friends/messenger_caution.png';
+import MessengerNotificationIcon from '../../../../../assets/images/friends/messenger_notification_icon.png';
+import { LayoutAvatarImageView, LayoutHabbiconImageView } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useFriends } from '../../../../../hooks';
 import { resolveAvatarFigure } from '../../friends-list/resolveAvatarFigure';
-import { getMessageStatusPresentation } from './messageStatus.helpers';
 import { MessengerMessageStatusView } from '../MessengerMessageStatusView';
+import { getMessageStatusPresentation } from './messageStatus.helpers';
 
-export const FriendsMessengerThreadGroup: FC<{ thread: MessengerThread; group: MessengerThreadChatGroup }> = (props) => {
-    const { thread = null, group = null } = props;
+const MessengerMessageTime: FC<{ date: Date }> = ({ date }) => {
+    const [now, setNow] = useState(() => Date.now());
+
+    useEffect(() => {
+        const timer = window.setInterval(() => setNow(Date.now()), 60000);
+
+        return () => window.clearInterval(timer);
+    }, []);
+
+    const elapsedSeconds = Math.max(0, Math.round((now - date.getTime()) / 1000));
+
+    return <div className="messenger-message-time">{FriendlyTime.format(elapsedSeconds, '.ago', 1)}</div>;
+};
+
+export const FriendsMessengerThreadGroup: FC<{ thread: MessengerThread; group: MessengerThreadChatGroup }> = ({ thread, group }) => {
     const { getFriend = null } = useFriends();
-
+    const habbicons = useHabbiconCatalog();
     const groupChatData = useMemo(() => group.type === MessengerGroupType.GROUP_CHAT && GetGroupChatData(group.chats[0].extraData), [group]);
+    const own =
+        (group.type === MessengerGroupType.PRIVATE_CHAT && group.userId === GetSessionDataManager().userId) ||
+        (!!groupChatData && group.chats.length > 0 && groupChatData.userId === GetSessionDataManager().userId);
 
-    const isOwnChat = useMemo(() => {
-        if (!thread || !group) return false;
-
-        if (group.type === MessengerGroupType.PRIVATE_CHAT && group.userId === GetSessionDataManager().userId) return true;
-
-        if (groupChatData && group.chats.length && groupChatData.userId === GetSessionDataManager().userId) return true;
-
-        return false;
-    }, [thread, group, groupChatData]);
-
-    if (!thread || !group) return null;
-
-    const lastChat = group.chats[group.chats.length - 1];
-    const showMessageStatus = isOwnChat && group.type === MessengerGroupType.PRIVATE_CHAT && lastChat.type === MessengerThreadChat.CHAT;
-    const messageStatus = getMessageStatusPresentation(lastChat.status);
-
-    if (!group.userId) {
+    if (!group.userId)
         return (
-            <>
-                {group.chats.map((chat, index) => {
-                    if (chat.type === MessengerThreadChat.SECURITY_NOTIFICATION) return null;
-
-                    return (
-                        <Flex key={index} fullWidth gap={2} justifyContent="start">
-                            <Base className="w-full text-break">
-                                {chat.type === MessengerThreadChat.ROOM_INVITE && (
-                                    <Flex alignItems="center" className="bg-light rounded mb-2 px-2 py-1 small text-black" gap={2}>
-                                        <Base className="messenger-notification-icon shrink-0" />
-                                        <Base>
-                                            {LocalizeText('messenger.invitation') + ' '}
-                                            {chat.message}
-                                        </Base>
-                                    </Flex>
-                                )}
-                            </Base>
-                        </Flex>
-                    );
-                })}
-            </>
+            <NativeTextTree>
+                <>
+                    {group.chats.map((chat, index) =>
+                        chat.type === MessengerThreadChat.ROOM_INVITE ? (
+                            <div key={index} className="messenger-notification">
+                                <img src={MessengerNotificationIcon} alt="" />
+                                <span>
+                                    {LocalizeText('messenger.invitation')} {chat.message}
+                                </span>
+                            </div>
+                        ) : chat.type === MessengerThreadChat.SECURITY_NOTIFICATION ? (
+                            // AIR msg_notification: warnings (moderation, refused messages, stored messages) with the caution icon.
+                            <div key={index} className="messenger-notification is-warning">
+                                <img src={MessengerCautionIcon} alt="" />
+                                <span>{chat.message}</span>
+                            </div>
+                        ) : chat.type === MessengerThreadChat.STATUS_NOTIFICATION ? (
+                            <div key={index} className="messenger-status-notification">
+                                {chat.message}
+                            </div>
+                        ) : null
+                    )}
+                </>
+            </NativeTextTree>
         );
-    }
+
+    const friend = getFriend?.(thread.participant.id);
+    const name = own ? GetSessionDataManager().userName : groupChatData?.username || thread.participant.name;
+    const figure = own
+        ? GetSessionDataManager().figure
+        : groupChatData?.figure || resolveAvatarFigure(friend?.figure || thread.participant.figure, friend?.gender ?? thread.participant.gender);
+    const renderMessage = (chat: MessengerThreadChat) => {
+        if (chat.type !== MessengerMessageType.Habbicon) return chat.message;
+
+        const id = Number(chat.message);
+        const entry = habbicons.entries.find((item) => item.id === id);
+        const mirror = !!entry?.dir && entry.dir !== (own ? 1 : -1);
+        return <LayoutHabbiconImageView id={id} size={80} mirror={mirror} className="messenger-habbicon-message" />;
+    };
 
     return (
-        <Flex fullWidth gap={2} justifyContent={isOwnChat ? 'end' : 'start'} className={'messenger-message-row ' + (isOwnChat ? 'own' : '')}>
-            <Base shrink className="message-avatar">
-                {group.type === MessengerGroupType.PRIVATE_CHAT && !isOwnChat && (
-                    <LayoutAvatarImageView
-                        direction={2}
-                        figure={resolveAvatarFigure(
-                            getFriend?.(thread.participant.id)?.figure || thread.participant.figure,
-                            getFriend?.(thread.participant.id)?.gender ?? thread.participant.gender
-                        )}
-                        headOnly={true}
-                        compactHead={true}
-                        compactHeadSize={24}
-                    />
+        <NativeTextTree>
+            <div className={`messenger-message-row${own ? ' own' : ''}`}>
+                {own && (
+                    <div className="message-avatar">
+                        <LayoutAvatarImageView direction={2} figure={figure} />
+                    </div>
                 )}
-                {groupChatData && !isOwnChat && <LayoutAvatarImageView direction={2} figure={groupChatData.figure} headOnly={true} compactHead={true} compactHeadSize={24} />}
-            </Base>
-            <Base className="messenger-message-body">
-                <Base className={'messenger-message-name ' + (isOwnChat ? 'text-end' : '')}>
-                    {isOwnChat && GetSessionDataManager().userName}
-                    {!isOwnChat && (groupChatData ? groupChatData.username : thread.participant.name)}:
-                </Base>
-                <Base className={'messenger-message-bubble messages-group-' + (isOwnChat ? 'right' : 'left')}>
-                    {group.chats.map((chat, index) => {
-                        if (!chat.showTranslation) {
-                            return (
-                                <Base key={index} className="text-break">
-                                    {chat.message}
-                                    {chat.offlineDelivered && <span className="messenger-offline-tag">{LocalizeText('messenger.offline.delivered')}</span>}
-                                </Base>
-                            );
-                        }
-
-                        return (
-                            <Base key={index} className="messenger-translation-block">
-                                <Base className="messenger-translation-row">
-                                    <span className="messenger-translation-label">original:</span>
-                                    <span className="text-break">{chat.originalMessage || chat.message}</span>
-                                </Base>
-                                <Base className="messenger-translation-row">
-                                    <span className="messenger-translation-label">translate:</span>
-                                    <span className="text-break">{chat.translatedMessage || chat.message}</span>
-                                </Base>
-                            </Base>
-                        );
-                    })}
-                </Base>
-                <Base className={'messenger-message-meta ' + (isOwnChat ? 'own' : '')}>
-                    <span className="messenger-message-time">{group.chats[0].date.toLocaleTimeString()}</span>
-                    {showMessageStatus && (
-                        <MessengerMessageStatusView isRead={messageStatus.isRead} />
-                    )}
-                </Base>
-            </Base>
-            {isOwnChat && (
-                <Base shrink className="message-avatar">
-                    <LayoutAvatarImageView direction={4} figure={GetSessionDataManager().figure} headOnly={true} compactHead={true} compactHeadSize={24} />
-                </Base>
-            )}
-        </Flex>
+                <div className="messenger-message-body">
+                    <div className="messenger-message-name">{name}:</div>
+                    <div className="messenger-message-bubble">
+                        {group.chats.map((chat, index) =>
+                            chat.failed ? (
+                                // Refused by the server: never reached the friend.
+                                <div key={index} className="messenger-message-failed" title={chat.failureText}>
+                                    <span className="messenger-message-failed-mark" aria-hidden="true">
+                                        !
+                                    </span>
+                                    {renderMessage(chat)}
+                                </div>
+                            ) : !chat.showTranslation ? (
+                                <div key={index}>{renderMessage(chat)}</div>
+                            ) : (
+                                <div key={index} className="messenger-translation-block">
+                                    <div>
+                                        <b>{localizeWithFallback('octane.friends.original', 'original:')}</b> {chat.originalMessage || chat.message}
+                                    </div>
+                                    <div>
+                                        <b>{localizeWithFallback('octane.friends.translate', 'translate:')}</b> {chat.translatedMessage || chat.message}
+                                    </div>
+                                </div>
+                            )
+                        )}
+                    </div>
+                    {/* AIR MainView: a combined block shows the time of its newest message. */}
+                    <MessengerMessageTime date={group.chats[group.chats.length - 1].date} />
+                </div>
+                {!own && (
+                    <div className="message-avatar">
+                        <LayoutAvatarImageView direction={4} figure={figure} />
+                    </div>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

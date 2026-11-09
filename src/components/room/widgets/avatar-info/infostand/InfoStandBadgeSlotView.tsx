@@ -1,9 +1,9 @@
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { FaPlus } from 'react-icons/fa';
 import { GetConfigurationValue, LocalizeText } from '../../../../../api';
-import { LayoutBadgeImageView } from '../../../../../common';
+import { LayoutBadgeImageView, Popover, PopoverContent } from '../../../../../common';
 import { useInventoryBadges } from '../../../../../hooks';
+import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 interface InfoStandBadgeSlotProps {
     slotIndex: number;
@@ -13,12 +13,9 @@ interface InfoStandBadgeSlotProps {
 
 const BadgeMiniPicker: FC<{
     onSelect: (badgeCode: string) => void;
-    onClose: () => void;
     activeBadgeCodes: (string | null)[];
-    position: { top: number; left: number };
-}> = ({ onSelect, onClose, activeBadgeCodes, position }) => {
+}> = ({ onSelect, activeBadgeCodes }) => {
     const { badgeCodes = [], requestBadges = null } = useInventoryBadges();
-    const ref = useRef<HTMLDivElement>(null);
     const [search, setSearch] = useState('');
 
     useEffect(() => {
@@ -29,50 +26,37 @@ const BadgeMiniPicker: FC<{
     const availableBadges = badgeCodes.filter((code) => !activeSet.has(code));
     const filtered = search.length > 0 ? availableBadges.filter((code) => code.toLowerCase().includes(search.toLowerCase())) : availableBadges;
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (ref.current && !ref.current.contains(event.target as Node)) onClose();
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [onClose]);
-
-    return createPortal(
-        <div
-            ref={ref}
-            className="fixed z-[9999] bg-[rgba(28,28,32,0.97)] border border-white/20 rounded-md p-2 shadow-lg min-w-[160px]"
-            style={{ top: position.top, left: position.left }}
-            onClick={(e) => e.stopPropagation()}
-        >
-            <input
-                autoFocus
-                className="w-full text-xs text-white bg-white/10 border border-white/20 rounded px-2 py-1 mb-2 outline-none focus:border-white/40"
-                placeholder={LocalizeText('catalog.search')}
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-            />
-            {badgeCodes.length === 0 ? (
-                <span className="text-xs text-white/40 text-center py-2 block">{LocalizeText('generic.loading')}</span>
-            ) : (
-                <div className="grid grid-cols-4 gap-1 max-h-[160px] overflow-y-auto">
-                    {filtered.slice(0, 40).map((code) => (
-                        <div
-                            key={code}
-                            className="flex items-center justify-center w-[36px] h-[36px] cursor-pointer rounded border border-transparent hover:border-white/40 hover:bg-white/10 transition-all"
-                            onClick={() => onSelect(code)}
-                        >
-                            <LayoutBadgeImageView badgeCode={code} />
-                        </div>
-                    ))}
-                    {filtered.length === 0 && (
-                        <span className="text-xs text-white/40 col-span-4 text-center py-2">{LocalizeText('generic.no_results_found')}</span>
-                    )}
-                </div>
-            )}
-        </div>,
-        document.body
+    return (
+        <NativeTextTree>
+            <div onClick={(e) => e.stopPropagation()}>
+                <input
+                    autoFocus
+                    className="w-full text-xs text-white bg-white/10 border border-white/20 rounded px-2 py-1 mb-2 outline-none focus:border-white/40"
+                    placeholder={LocalizeText('catalog.search')}
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+                {badgeCodes.length === 0 ? (
+                    <span className="text-xs text-white/40 text-center py-2 block">{LocalizeText('generic.loading')}</span>
+                ) : (
+                    <div className="grid grid-cols-4 gap-1 max-h-[160px] overflow-y-auto">
+                        {filtered.slice(0, 40).map((code) => (
+                            <BaseButton type="button"
+                                key={code}
+                                className="flex items-center justify-center w-[36px] h-[36px] cursor-pointer rounded border border-transparent hover:border-white/40 hover:bg-white/10 transition-all"
+                                onClick={() => onSelect(code)}
+                            >
+                                <LayoutBadgeImageView badgeCode={code} />
+                            </BaseButton>
+                        ))}
+                        {filtered.length === 0 && (
+                            <span className="text-xs text-white/40 col-span-4 text-center py-2">{LocalizeText('generic.no_results_found')}</span>
+                        )}
+                    </div>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };
 
@@ -81,9 +65,8 @@ export const InfoStandBadgeSlotView: FC<InfoStandBadgeSlotProps> = ({ slotIndex,
     const [isDragOver, setIsDragOver] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [justDropped, setJustDropped] = useState(false);
-    const [pickerPosition, setPickerPosition] = useState<{ top: number; left: number } | null>(null);
+    const [showPicker, setShowPicker] = useState(false);
     const slotRef = useRef<HTMLDivElement>(null);
-    const showPicker = pickerPosition !== null;
 
     const hookInitialized = activeBadgeCodes.length > 0;
 
@@ -151,17 +134,9 @@ export const InfoStandBadgeSlotView: FC<InfoStandBadgeSlotProps> = ({ slotIndex,
     );
 
     const handleSlotClick = useCallback(() => {
-        if (!isOwnUser || badgeCode || !slotRef.current) return;
+        if (!isOwnUser || badgeCode) return;
 
-        const rect = slotRef.current.getBoundingClientRect();
-        const pickerWidth = 180;
-        const gap = 8;
-        let left = rect.right + gap;
-
-        if (left + pickerWidth > window.innerWidth - gap) left = rect.left - pickerWidth - gap;
-        if (left < gap) left = gap;
-
-        setPickerPosition({ top: rect.top, left });
+        setShowPicker(true);
     }, [isOwnUser, badgeCode]);
 
     const handleDoubleClick = useCallback(() => {
@@ -173,7 +148,7 @@ export const InfoStandBadgeSlotView: FC<InfoStandBadgeSlotProps> = ({ slotIndex,
     const handlePickerSelect = useCallback(
         (code: string) => {
             setBadgeAtSlot(code, slotIndex);
-            setPickerPosition(null);
+            setShowPicker(false);
         },
         [setBadgeAtSlot, slotIndex]
     );
@@ -182,14 +157,12 @@ export const InfoStandBadgeSlotView: FC<InfoStandBadgeSlotProps> = ({ slotIndex,
         <div className="relative">
             <div
                 ref={slotRef}
-                className={`flex items-center justify-center relative w-[40px] h-[40px] bg-no-repeat bg-center transition-all duration-150
+                className={`octane-infostand__badge-slot flex items-center justify-center relative h-[42px] w-[42px] bg-no-repeat bg-center
                     ${isOwnUser && badgeCode ? 'cursor-grab active:cursor-grabbing' : ''}
-                    ${isOwnUser && !badgeCode ? 'cursor-pointer' : ''}
-                    ${isDragging ? 'opacity-30 scale-90' : ''}
-                    ${isOwnUser && !isDragging ? 'hover:scale-110 hover:brightness-125 hover:drop-shadow-[0_0_6px_rgba(255,255,255,0.3)]' : ''}
-                    ${isDragOver ? 'scale-110 ring-2 ring-blue-400/60 rounded-sm bg-blue-400/15 animate-pulse-glow' : ''}
-                    ${justDropped ? 'animate-drop-settle' : ''}
-                    ${isOwnUser && !badgeCode ? 'opacity-40 hover:opacity-70 border border-dashed border-white/20 rounded-sm' : ''}`}
+                    ${isOwnUser && !badgeCode ? 'is-empty cursor-pointer' : ''}
+                    ${isDragging ? 'opacity-30' : ''}
+                    ${isDragOver ? 'is-drag-over' : ''}
+                    ${justDropped ? 'animate-drop-settle' : ''}`}
                 draggable={isOwnUser && !!badgeCode}
                 onDragEnd={onDragEnd}
                 onDragLeave={onDragLeave}
@@ -202,17 +175,25 @@ export const InfoStandBadgeSlotView: FC<InfoStandBadgeSlotProps> = ({ slotIndex,
                 {badgeCode ? (
                     <LayoutBadgeImageView badgeCode={badgeCode} showInfo={true} showRarityInfo={true} highlightRarity={true} />
                 ) : (
-                    isOwnUser && <FaPlus className="text-white/30 text-[10px]" />
+                    isOwnUser && (
+                        <span className="octane-infostand__badge-slot-plus" aria-hidden="true">
+                            +
+                        </span>
+                    )
                 )}
             </div>
-            {showPicker && (
-                <BadgeMiniPicker
-                    activeBadgeCodes={activeBadgeCodes}
-                    onClose={() => setPickerPosition(null)}
-                    onSelect={handlePickerSelect}
-                    position={pickerPosition}
-                />
-            )}
+            <Popover open={showPicker} onOpenChange={setShowPicker}>
+                <PopoverContent
+                    align="start"
+                    anchor={slotRef}
+                    className="z-[9999] bg-[rgba(28,28,32,0.97)] border border-white/20 rounded-md p-2 shadow-lg min-w-[160px] w-[180px]"
+                    positionerClassName="z-[9999]"
+                    side="right"
+                    sideOffset={8}
+                >
+                    <BadgeMiniPicker activeBadgeCodes={activeBadgeCodes} onSelect={handlePickerSelect} />
+                </PopoverContent>
+            </Popover>
         </div>
     );
 };

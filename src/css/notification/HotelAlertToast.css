@@ -1,0 +1,141 @@
+.hotel-alert-toast {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    z-index: 1000;
+    cursor: pointer;
+    pointer-events: auto;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+}
+
+.hotel-alert-toast.phase-enter {
+    animation: hotel-alert-toast-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.hotel-alert-toast.phase-closing {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-14px);
+    transition:
+        opacity 0.45s ease,
+        transform 0.45s ease;
+}
+
+@keyframes hotel-alert-toast-pop {
+    0% {
+        transform: translateX(-50%) scale(0.3);
+        opacity: 0;
+    }
+
+    60% {
+        transform: translateX(-50%) scale(1.1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+    }
+}
+
+.hotel-alert-toast-circle {
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, #ffe27a 0%, #f9c626 55%, #d99a12 100%);
+    border: 2px solid #8a5a0e;
+    box-shadow:
+        inset 0 2px 0 rgba(255, 255, 255, 0.55),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.18);
+}
+
+.hotel-alert-toast.is-staff .hotel-alert-toast-circle {
+    background: radial-gradient(circle at 32% 28%, #cdeaff 0%, #5fb5ec 55%, #2f7fbd 100%);
+    border-color: #1d5a8c;
+}
+
+.hotel-alert-toast-circle img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.hotel-alert-toast-pill {
+    position: relative;
+    display: flex;
+    align-items: center;
+    max-width: 0;
+    min-height: 58px;
+    overflow: hidden;
+    margin-left: -29px;
+    border-radius: 18px;
+    background: rgba(28, 28, 32, 0.95);
+    border: 1px solid #8a5a0e;
+    box-shadow:
+        inset 0 3px 0 #22222799,
+        inset 0 -3px 0 #12121599;
+    transition: max-width 0.5s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.hotel-alert-toast.phase-open .hotel-alert-toast-pill,
+.hotel-alert-toast.phase-closing .hotel-alert-toast-pill {
+    max-width: min(420px, calc(100vw - 100px));
+}
+
+.hotel-alert-toast-body {
+    /* Regular Ubuntu like the AIR notifications; the inherited `Ubuntu` face is the condensed cut. */
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 18px 8px 40px;
+    width: min(340px, calc(100vw - 160px));
+}
+
+.hotel-alert-toast-title {
+    color: #f9c626;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+}
+
+.hotel-alert-toast-message {
+    color: #fff;
+    font-size: 13px;
+    line-height: 16px;
+    white-space: pre-line;
+    overflow-wrap: break-word;
+}
+
+.hotel-alert-toast.phase-open .hotel-alert-toast-pill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -70px;
+    width: 60px;
+    background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0.22) 50%, transparent 100%);
+    animation: hotel-alert-toast-shine 0.9s ease-out 0.5s 1 both;
+    pointer-events: none;
+}
+
+@keyframes hotel-alert-toast-shine {
+    from {
+        left: -70px;
+    }
+
+    to {
+        left: 110%;
+    }
+}

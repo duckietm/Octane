@@ -1,60 +1,75 @@
-import { GetRoomEngine, NitroRectangle, NitroTexture } from '@nitrots/nitro-renderer';
-import { FC, useRef } from 'react';
-import { LocalizeText, PlaySound, SoundNames } from '../../api';
-import { DraggableWindow } from '../draggable-window';
+import { GetRoomEngine, OctaneRectangle, OctaneTexture } from '@octane/renderer';
+import { FC, useEffect, useRef, useState } from 'react';
+import { blitRoomCanvasToViewfinder, getViewfinderRoomFrame, LocalizeText, PlaySound, SoundNames } from '../../api';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../card';
+import { BaseButton } from '../BaseButton';
 
 interface LayoutMiniCameraViewProps {
     roomId: number;
-    textureReceiver: (texture: NitroTexture) => Promise<void>;
+    // The frame is the viewfinder rectangle the picture was taken from (the AIR scene is captured from it).
+    textureReceiver: (texture: OctaneTexture, frame?: InstanceType<typeof OctaneRectangle>) => Promise<void>;
     onClose: () => void;
+    isSaving?: boolean;
 }
 
 export const LayoutMiniCameraView: FC<LayoutMiniCameraViewProps> = (props) => {
-    const { roomId = -1, textureReceiver = null, onClose = null } = props;
-    const elementRef = useRef<HTMLDivElement>(null);
+    const { roomId = -1, textureReceiver = null, onClose = null, isSaving = false } = props;
+    const elementRef = useRef<HTMLCanvasElement>(null);
+    const [isCapturing, setIsCapturing] = useState(false);
 
-    const getCameraBounds = () => {
-        if (!elementRef || !elementRef.current) return null;
+    useEffect(() => {
+        let frame = 0;
+        const tick = (now: number) => {
+            blitRoomCanvasToViewfinder(elementRef.current, 110, 110, 1000 / 24, now);
+            frame = window.requestAnimationFrame(tick);
+        };
 
-        const frameBounds = elementRef.current.getBoundingClientRect();
+        frame = window.requestAnimationFrame(tick);
 
-        return new NitroRectangle(Math.floor(frameBounds.x), Math.floor(frameBounds.y), Math.floor(frameBounds.width), Math.floor(frameBounds.height));
-    };
+        return () => window.cancelAnimationFrame(frame);
+    }, []);
 
-    const takePicture = () => {
+    const takePicture = async () => {
+        if (isCapturing || isSaving) return;
+
+        const frame = getViewfinderRoomFrame(elementRef.current, 110, 110);
+
+        if (!frame) return;
+
+        setIsCapturing(true);
         PlaySound(SoundNames.CAMERA_SHUTTER);
-        textureReceiver(GetRoomEngine().createTextureFromRoom(roomId, 1, getCameraBounds()));
+
+        try {
+            await textureReceiver(GetRoomEngine().createTextureFromRoom(roomId, 1, frame), frame);
+        } finally {
+            setIsCapturing(false);
+        }
     };
+
+    const isBusy = isCapturing || isSaving;
 
     return (
-        <DraggableWindow handleSelector=".nitro-room-thumbnail-camera">
-            <div className="nitro-room-thumbnail-camera w-[132px] h-[192px] bg-[url('@/assets/images/room-widgets/thumbnail-widget/thumbnail-camera-spritesheet.png')] px-2">
-                <div
-                    style={{
-                        position: 'relative',
-                        paddingBottom: '192px' // Matches the space needed to position buttons as per the design
-                    }}
-                >
-                    <div ref={elementRef} className="absolute mt-[30px] ml-[3px] w-[110px] h-[110px]" />
-                    <div
-                        style={{
-                            position: 'absolute',
-                            bottom: '10px',
-                            left: '10px',
-                            right: '10px',
-                            display: 'flex',
-                            justifyContent: 'space-between'
-                        }}
-                    >
-                        <button className="btn btn-sm btn-danger" style={{ width: '80px' }} onClick={onClose}>
-                            {LocalizeText('cancel')}
-                        </button>
-                        <button className="btn btn-sm btn-success" style={{ width: '80px' }} onClick={takePicture}>
-                            {LocalizeText('navigator.thumbeditor.save')}
-                        </button>
-                    </div>
+        <OctaneCardView
+            className="octane-room-thumbnail-camera"
+            role="dialog"
+            aria-label={LocalizeText('navigator.thumbnail.camera.title')}
+            frameStyle={3}
+            isResizable={false}
+        >
+            <OctaneCardHeaderView headerText={LocalizeText('navigator.thumbnail.camera.title')} onCloseClick={() => !isBusy && onClose()} />
+            <OctaneCardContentView className="octane-room-thumbnail-camera__content" aria-busy={isBusy}>
+                <div className="octane-room-thumbnail-camera__viewfinder">
+                    <canvas ref={elementRef} className="octane-camera-viewfinder" width={110} height={110} />
                 </div>
-            </div>
-        </DraggableWindow>
+                <div className="octane-room-thumbnail-camera__buttons">
+                    <BaseButton type="button" disabled={isBusy} onClick={onClose}>
+                        {LocalizeText('navigator.thumbnail.camera.title.cancel')}
+                    </BaseButton>
+                    <BaseButton type="button" disabled={isBusy} onClick={takePicture}>
+                        {LocalizeText('navigator.thumbnail.camera.title.capture')}
+                    </BaseButton>
+                </div>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

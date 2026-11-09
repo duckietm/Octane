@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { GenericErrorCode } from './nitro/session/GenericErrorCode';
+import { GenericErrorCode } from './octane/session/GenericErrorCode';
 
 const readSource = (relativePath: string) => readFileSync(resolve(process.cwd(), relativePath), 'utf8');
 

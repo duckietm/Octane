@@ -3,6 +3,30 @@
 
 @config "../../tailwind.config.js";
 
+@layer base {
+    /* Habbo text fields keep their look while typing: no focus ring and no focus border colour (undoes
+       @tailwindcss/forms). The caret still shows where you type. */
+    [type='text']:focus,
+    [type='email']:focus,
+    [type='url']:focus,
+    [type='password']:focus,
+    [type='number']:focus,
+    [type='date']:focus,
+    [type='datetime-local']:focus,
+    [type='month']:focus,
+    [type='search']:focus,
+    [type='tel']:focus,
+    [type='time']:focus,
+    [type='week']:focus,
+    [multiple]:focus,
+    textarea:focus,
+    select:focus {
+        --tw-ring-offset-shadow: 0 0 #0000;
+        --tw-ring-shadow: 0 0 #0000;
+        border-color: #6b7280;
+    }
+}
+
 @theme {
     --animate-pulse-glow: pulseGlow 1.2s ease-in-out infinite;
     --animate-pulse-glow-red: pulseGlowRed 1.2s ease-in-out infinite;
@@ -36,8 +60,23 @@
 }
 
 @font-face {
+    font-family: UbuntuRegular;
+    src: url("@/assets/webfonts/Ubuntu.ttf");
+}
+
+@font-face {
     font-family: UbuntuCondensed;
     src: local("Ubuntu Condensed"), local("Ubuntu");
+}
+
+:root {
+    --octane-pixel-art: auto;
+}
+
+@media (resolution: 1dppx), (resolution: 2dppx), (resolution: 3dppx) {
+    :root {
+        --octane-pixel-art: pixelated;
+    }
 }
 
 html,
@@ -51,23 +90,21 @@ body {
     -webkit-user-select: none;
     user-select: none;
     overscroll-behavior: none;
-    scrollbar-width: auto;
-    scrollbar-color: auto;
 }
 
 #root {
-    width: var(--nitro-app-width, 100vw);
-    height: var(--nitro-app-height, 100vh);
-    min-height: var(--nitro-app-height, 100vh);
+    width: var(--octane-app-width, 100vw);
+    height: var(--octane-app-height, 100vh);
+    min-height: var(--octane-app-height, 100vh);
     overflow: hidden;
 }
 
-.nitro-app-root {
+.octane-app-root {
     position: fixed;
     inset: 0;
-    width: var(--nitro-app-width, 100vw) !important;
-    height: var(--nitro-app-height, 100vh) !important;
-    min-height: var(--nitro-app-height, 100vh) !important;
+    width: var(--octane-app-width, 100vw) !important;
+    height: var(--octane-app-height, 100vh) !important;
+    min-height: var(--octane-app-height, 100vh) !important;
     overflow: hidden !important;
     overscroll-behavior: none;
 }
@@ -76,17 +113,17 @@ body {
     html,
     body,
     #root,
-    .nitro-app-root {
-        height: var(--nitro-app-height, 100dvh) !important;
-        min-height: var(--nitro-app-height, 100dvh) !important;
+    .octane-app-root {
+        height: var(--octane-app-height, 100dvh) !important;
+        min-height: var(--octane-app-height, 100dvh) !important;
     }
 }
 
 .image-rendering-pixelated {
-    image-rendering: pixelated;
+    image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.nitro-room-touch-feedback {
+.octane-room-touch-feedback {
     position: fixed;
     z-index: 35;
     width: 34px;
@@ -99,10 +136,10 @@ body {
     background: rgba(255, 255, 255, 0.18);
     transform: scale(0.35);
     opacity: 0.9;
-    animation: nitroRoomTouchFeedback 0.42s ease-out forwards;
+    animation: octaneRoomTouchFeedback 0.42s ease-out forwards;
 }
 
-@keyframes nitroRoomTouchFeedback {
+@keyframes octaneRoomTouchFeedback {
     to {
         transform: scale(1.15);
         opacity: 0;
@@ -113,131 +150,6 @@ body {
 *:focus,
 *:hover {
     @apply outline-0;
-}
-
-*::-webkit-scrollbar {
-    width: 18px !important;
-    height: 18px !important;
-    background-color: #bdbbb3 !important;
-}
-
-*::-webkit-scrollbar:horizontal {
-    height: 18px !important;
-}
-
-*::-webkit-scrollbar:not(:horizontal) {
-    width: 18px !important;
-}
-
-*::-webkit-scrollbar-track {
-    background-image: none !important;
-    background-color: #bdbbb3 !important;
-    box-shadow: inset 1px 0 0 #000000 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-}
-
-*::-webkit-scrollbar-thumb {
-    min-height: 24px !important;
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5'><rect x='0' y='0' width='8' height='2' fill='%23a0a0a0'/></svg>") center top / 8px 5px repeat-y,
-        #d9d9d9 !important;
-    border: 1px solid #000000 !important;
-    border-radius: 3px !important;
-    box-shadow: inset 0 0 0 2px #ffffff !important;
-    image-rendering: pixelated !important;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5'><rect x='0' y='0' width='8' height='2' fill='%23ababab'/></svg>") center top / 8px 5px repeat-y,
-        #e3e3e3 !important;
-}
-
-*::-webkit-scrollbar-thumb:active {
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5'><rect x='0' y='0' width='8' height='2' fill='%23606060'/></svg>") center top / 8px 5px repeat-y,
-        #bcbcbc !important;
-}
-
-*::-webkit-scrollbar-corner {
-    background: transparent !important;
-}
-
-*::-webkit-scrollbar-button:single-button:vertical:decrement {
-    display: block !important;
-    width: 18px !important;
-    height: 18px !important;
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='6'><polygon points='4.5,0 9,6 0,6' fill='%23222'/></svg>") center center / 9px 6px no-repeat,
-        #d9d9d9 !important;
-    border: 1px solid #000000 !important;
-    border-radius: 3px 3px 0 0 !important;
-    box-shadow:
-        inset 0 1px 0 #ffffff,
-        inset 1px 0 0 rgba(255, 255, 255, 0.6) !important;
-}
-*::-webkit-scrollbar-button:single-button:vertical:decrement:active {
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='6'><polygon points='4.5,0 9,6 0,6' fill='%23000'/></svg>") center center / 9px 6px no-repeat,
-        #bcbcbc !important;
-}
-
-*::-webkit-scrollbar-button:single-button:vertical:increment {
-    display: block !important;
-    width: 18px !important;
-    height: 18px !important;
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='6'><polygon points='0,0 9,0 4.5,6' fill='%23222'/></svg>") center center / 9px 6px no-repeat,
-        #d9d9d9 !important;
-    border: 1px solid #000000 !important;
-    border-radius: 0 0 3px 3px !important;
-    box-shadow:
-        inset 0 1px 0 #ffffff,
-        inset 1px 0 0 rgba(255, 255, 255, 0.6) !important;
-}
-*::-webkit-scrollbar-button:single-button:vertical:increment:active {
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='6'><polygon points='0,0 9,0 4.5,6' fill='%23000'/></svg>") center center / 9px 6px no-repeat,
-        #bcbcbc !important;
-}
-
-*::-webkit-scrollbar-button:single-button:horizontal:decrement {
-    display: block !important;
-    width: 18px !important;
-    height: 18px !important;
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='9'><polygon points='0,4.5 6,0 6,9' fill='%23222'/></svg>") center center / 6px 9px no-repeat,
-        #d9d9d9 !important;
-    border: 1px solid #000000 !important;
-    border-radius: 3px 0 0 3px !important;
-    box-shadow:
-        inset 0 1px 0 #ffffff,
-        inset 1px 0 0 rgba(255, 255, 255, 0.6) !important;
-}
-*::-webkit-scrollbar-button:single-button:horizontal:decrement:active {
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='9'><polygon points='0,4.5 6,0 6,9' fill='%23000'/></svg>") center center / 6px 9px no-repeat,
-        #bcbcbc !important;
-}
-
-*::-webkit-scrollbar-button:single-button:horizontal:increment {
-    display: block !important;
-    width: 18px !important;
-    height: 18px !important;
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='9'><polygon points='6,4.5 0,0 0,9' fill='%23222'/></svg>") center center / 6px 9px no-repeat,
-        #d9d9d9 !important;
-    border: 1px solid #000000 !important;
-    border-radius: 0 3px 3px 0 !important;
-    box-shadow:
-        inset 0 1px 0 #ffffff,
-        inset 1px 0 0 rgba(255, 255, 255, 0.6) !important;
-}
-*::-webkit-scrollbar-button:single-button:horizontal:increment:active {
-    background:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='9'><polygon points='6,4.5 0,0 0,9' fill='%23000'/></svg>") center center / 6px 9px no-repeat,
-        #bcbcbc !important;
 }
 
 @layer components {
@@ -348,6 +260,17 @@ body {
 
 }
 
+/* The fit variant stretches to its positioned parent via absolute inset-0.
+   The components-layer .avatar-image above pins a fixed 90x130 box, and with
+   inset-0 the explicit size wins the over-constrained resolution — anchoring
+   the image to the tile's TOP-LEFT corner instead of filling it. Unlayered
+   so it beats the layered rule; auto lets inset-0 (and per-surface bottom
+   offsets like the catalog price strip) size the box. */
+.avatar-image.avatar-image-fit {
+    width: auto;
+    height: auto;
+}
+
 .unique-item {
     .unique-bg-override {
         @apply z-2 bg-center bg-no-repeat;
@@ -410,16 +333,18 @@ body {
 }
 
 .unique-complete-plate {
+    box-sizing: border-box;
     width: 170px;
     height: 29px;
     background: url("@/assets/images/unique/catalog-info-amount-bg.png") no-repeat center;
     z-index: 1;
-    padding-top: 3px;
+    padding-top: 4px;
 
     .plate-container {
         margin-left: 45px;
         width: 100px;
         font-size: 10px;
+        line-height: 10px;
         color: black;
 
         > :first-child {
@@ -442,7 +367,7 @@ body {
 
     &.n-0 {
         width: 4px;
-        baseackground-position: -1px 0px;
+        background-position: -1px 0px;
     }
 
     &.n-1 {
@@ -492,7 +417,7 @@ body {
 }
 
 .layout-grid-item {
-    height: var(--nitro-grid-column-min-height, unset);
+    height: var(--octane-grid-column-min-height, unset);
     background-position: center;
     background-repeat: no-repeat;
     background-color: #cdd3d9;
@@ -504,7 +429,7 @@ body {
     border-color: #aeb7aa;
 }
 
-.nitro-friends-spritesheet {
+.octane-friends-spritesheet {
     background: url('@/assets/images/friends/friends-spritesheet.png') transparent no-repeat;
 
     &.icon-friendbar-visit {
@@ -604,224 +529,75 @@ body {
     }
 }
 
-.nitro-avatar-editor-wardrobe-figure-preview {
-    background-color: #677181;
-    overflow: hidden;
-    z-index: 1;
-
-    .avatar-image {
-        position: absolute;
-        bottom: 15px;
-        margin: 0 auto;
-        z-index: 4;
-    }
-
-    .avatar-shadow {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 25px;
-        width: 40px;
-        height: 20px;
-        margin: 0 auto;
-        border-radius: 100%;
-        background-color: rgba(0, 0, 0, 0.20);
-        z-index: 2;
-    }
-
-    &:after {
-        position: absolute;
-        content: '';
-        top: 75%;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        border-radius: 50%;
-        background-color: #677181;
-        box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.6);
-        transform: scale(2);
-    }
-
-    .button-container {
-        position: absolute;
-        bottom: 0;
-        z-index: 5;
-    }
-}
-
-.nitro-avatar-editor {
-
-
-    .category-item {
-        height: 32px;
-    }
-
-    .figure-preview-container {
-        position: relative;
-        height: 100%;
-        background-color: #677181;
-        overflow: hidden;
-        z-index: 1;
-
-        .arrow-container {
-            position: absolute;
-            width: 100%;
-            margin: 0 auto;
-            padding: 0 10px;
-            display: flex;
-            justify-content: space-between;
-            bottom: 12px;
-            z-index: 5;
-
-            .icon {
-                cursor: pointer;
-            }
-        }
-
-        .avatar-image {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 50px;
-            margin: 0 auto;
-            z-index: 4;
-        }
-
-        .avatar-spotlight {
-            position: absolute;
-            top: -10px;
-            left: 0;
-            right: 0;
-            margin: 0 auto;
-            opacity: 0.3;
-            pointer-events: none;
-            z-index: 3;
-        }
-
-        .avatar-shadow {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 15px;
-            width: 70px;
-            height: 30px;
-            margin: 0 auto;
-            border-radius: 100%;
-            background-color: rgba(0, 0, 0, 0.20);
-            z-index: 2;
-        }
-
-        &:after {
-            position: absolute;
-            content: '';
-            top: 75%;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            border-radius: 50%;
-            background-color: #677181;
-            box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.6);
-            transform: scale(2);
-        }
-    }
-}
-
-
 .fs-custom {
     font-size: var(--font-size, 16px);
 }
 
-.nitro-mod-tools,
-[class*="nitro-mod-tools-"] {
-    --mod-tools-bg: #ecece4;
-    --mod-tools-panel: #f7f7f2;
-    --mod-tools-panel-alt: #e5e5dc;
-    --mod-tools-line: #9d9d96;
-    --mod-tools-line-dark: #6f6f6a;
-    --mod-tools-accent: #418db0;
-    --mod-tools-text: #20201d;
-    --mod-tools-muted: #60605a;
-
-    color: var(--mod-tools-text);
+/* -------------------------------------------------------------------------- */
+/* Tooltip. habbo_skin_tooltip.xml cuts a 6px-corner bubble out of             */
+/* habbo_blue_skin (x 0-13, y 49-71: #232323 at 90%); text is u_tool_tip,      */
+/* Ubuntu 11 white. HintManager.as parks it 10px above or below the target,    */
+/* slides it in and bobs it 5px on |sin(t * 0.003)|, i.e. about once a second.  */
+/* -------------------------------------------------------------------------- */
+.octane-tooltip-positioner {
+    z-index: 9999;
+    pointer-events: none;
 }
 
-.nitro-mod-tools .nitro-card-content-shell,
-[class*="nitro-mod-tools-"] .nitro-card-content-shell {
-    background: var(--mod-tools-bg);
-    color: var(--mod-tools-text);
+.octane-tooltip {
+    box-sizing: border-box;
+    max-width: 260px;
+    padding: 0 1px;
+    border: 6px solid transparent;
+    border-image: url("@/assets/images/habbo-skin/slices/tooltip-blue.png") 6 fill / 6px stretch;
+    image-rendering: pixelated;
+    color: #ffffff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 13px;
+    text-align: center;
+    white-space: pre-line;
+    pointer-events: none;
+    user-select: none;
 }
 
-.nitro-mod-tools-user .mod-tools-action-button {
-    border: 2px solid #0e3f52 !important;
-    border-radius: 4px !important;
-    color: #fff !important;
-    background: linear-gradient(180deg, #67b6d3 0%, #418db0 48%, #2e6f8a 100%) !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.42),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-        0 1px 0 rgba(0, 0, 0, 0.18) !important;
-    font-weight: 700;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+.octane-tooltip[data-side='top'] {
+    animation: octane-tooltip-in-above 120ms ease-out, octane-tooltip-bob-above 1050ms ease-in-out 120ms infinite;
 }
 
-.nitro-mod-tools-user .mod-tools-action-button:hover {
-    background: linear-gradient(180deg, #79c5df 0%, #4a9bc0 48%, #3580a0 100%) !important;
+.octane-tooltip[data-side='bottom'] {
+    animation: octane-tooltip-in-below 120ms ease-out, octane-tooltip-bob-below 1050ms ease-in-out 120ms infinite;
 }
 
-.nitro-mod-tools-user .mod-tools-danger-button {
-    border: 2px solid #71110c !important;
-    border-radius: 4px !important;
-    color: #fff !important;
-    background: linear-gradient(180deg, #e96f65 0%, #bd271f 48%, #8f160f 100%) !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.38),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.24),
-        0 1px 0 rgba(0, 0, 0, 0.2) !important;
-    font-weight: 700;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.45);
+@keyframes octane-tooltip-in-above {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.nitro-mod-tools-user .mod-tools-danger-button:hover {
-    background: linear-gradient(180deg, #f07f75 0%, #cd3229 48%, #a31b14 100%) !important;
+@keyframes octane-tooltip-in-below {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.nitro-mod-tools :where(.bg-white, .bg-light, .bg-muted, .bg-card-grid-item, .bg-white\/70),
-[class*="nitro-mod-tools-"] :where(.bg-white, .bg-light, .bg-muted, .bg-card-grid-item, .bg-white\/70) {
-    background: var(--mod-tools-panel) !important;
-    color: var(--mod-tools-text) !important;
-    box-shadow: none !important;
+@keyframes octane-tooltip-bob-above {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
 }
 
-.nitro-mod-tools :where(.border, .border-muted, .border-card-grid-item-border, .border-white, .border-zinc-200, .border-amber-200, .border-amber-300, .border-sky-200),
-[class*="nitro-mod-tools-"] :where(.border, .border-muted, .border-card-grid-item-border, .border-white, .border-zinc-200, .border-amber-200, .border-amber-300, .border-sky-200) {
-    border-color: var(--mod-tools-line) !important;
-    box-shadow: none !important;
+@keyframes octane-tooltip-bob-below {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(5px); }
 }
 
-.nitro-mod-tools :where(.text-muted, .text-dark, .text-amber-800, .text-sky-700),
-[class*="nitro-mod-tools-"] :where(.text-muted, .text-dark, .text-amber-800, .text-sky-700) {
-    color: var(--mod-tools-muted) !important;
+@media (prefers-reduced-motion: reduce) {
+    .octane-tooltip[data-side='top'],
+    .octane-tooltip[data-side='bottom'] {
+        animation: none;
+    }
 }
 
-.nitro-mod-tools :where(input, select, textarea),
-[class*="nitro-mod-tools-"] :where(input, select, textarea) {
-    min-height: 22px;
-    border: 1px solid var(--mod-tools-line-dark) !important;
-    border-radius: 3px !important;
-    background: #fffdf4 !important;
-    color: var(--mod-tools-text) !important;
-    box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.65) !important;
-    font-size: 11px !important;
-}
-
-.nitro-mod-tools :where(input:focus, select:focus, textarea:focus),
-[class*="nitro-mod-tools-"] :where(input:focus, select:focus, textarea:focus) {
-    border-color: var(--mod-tools-accent) !important;
-    box-shadow: 0 0 0 2px rgba(47, 128, 151, 0.28), inset 0 1px 0 rgba(0, 0, 0, 0.16) !important;
-    outline: none !important;
-}
-
-.nitro-wired {
+.octane-wired {
     width: min(300px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -833,7 +609,7 @@ body {
     outline: none !important;
     overflow: hidden;
 
-    .nitro-wired__header {
+    .octane-wired__header {
         min-height: 21px !important;
         max-height: 21px !important;
         position: absolute !important;
@@ -846,7 +622,7 @@ body {
         padding: 0 !important;
         pointer-events: auto;
 
-        .nitro-card-title {
+        .octane-card-title {
             display: block;
             color: #000 !important;
             font-size: 11px !important;
@@ -865,7 +641,7 @@ body {
             content: none;
         }
 
-        .nitro-card-close-button {
+        .octane-card-close-button {
             right: 6px !important;
             width: 18px;
             height: 18px;
@@ -876,8 +652,8 @@ body {
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
 
-        .nitro-card-close-button::before,
-        .nitro-card-close-button::after {
+        .octane-card-close-button::before,
+        .octane-card-close-button::after {
             content: '';
             position: absolute;
             left: 50%;
@@ -890,16 +666,16 @@ body {
             transform-origin: center;
         }
 
-        .nitro-card-close-button::before {
+        .octane-card-close-button::before {
             transform: translate(-50%, -50%) rotate(45deg);
         }
 
-        .nitro-card-close-button::after {
+        .octane-card-close-button::after {
             transform: translate(-50%, -50%) rotate(-45deg);
         }
     }
 
-    .nitro-wired__content {
+    .octane-wired__content {
         position: relative;
         background: #efefef !important;
         border: 0 !important;
@@ -909,7 +685,7 @@ body {
         overflow: visible !important;
     }
 
-    .nitro-wired__body {
+    .octane-wired__body {
         display: flex;
         flex-direction: column;
         padding: 8px 10px 10px;
@@ -918,13 +694,13 @@ body {
         line-height: 1.2;
     }
 
-    .nitro-wired__section {
+    .octane-wired__section {
         display: flex;
         flex-direction: column;
         gap: 5px;
     }
 
-    .nitro-wired__summary {
+    .octane-wired__summary {
         position: relative;
         min-height: 56px;
         flex-direction: row;
@@ -936,7 +712,7 @@ body {
         color: #000;
     }
 
-    .nitro-wired__summary-bg {
+    .octane-wired__summary-bg {
         position: absolute;
         width: auto;
         height: auto;
@@ -947,32 +723,32 @@ body {
         -webkit-user-drag: none;
     }
 
-    .nitro-wired__summary-bg--left {
+    .octane-wired__summary-bg--left {
         left: 50%;
         transform: translate(-150%, -50%);
         opacity: 0.45;
     }
 
-    .nitro-wired__summary-bg--right {
+    .octane-wired__summary-bg--right {
         left: 50%;
         top: 72%;
         transform: translate(-46%, -50%);
         opacity: 0.24;
     }
 
-    .nitro-wired__summary-copy {
+    .octane-wired__summary-copy {
         position: relative;
         z-index: 1;
     }
 
-    .nitro-wired__summary-copy {
+    .octane-wired__summary-copy {
         display: flex;
         flex-direction: column;
         min-width: 0;
         gap: 1px;
     }
 
-    .nitro-wired__summary-kind {
+    .octane-wired__summary-kind {
         color: #000;
         font-size: 10px;
         font-weight: 700;
@@ -981,7 +757,7 @@ body {
         text-transform: uppercase;
     }
 
-    .nitro-wired__summary-title {
+    .octane-wired__summary-title {
         color: #4a4a4a !important;
         font-size: 15px !important;
         font-weight: 700 !important;
@@ -991,103 +767,37 @@ body {
         word-break: break-word;
     }
 
-    .nitro-wired__section--body {
+    .octane-wired__section--body {
         overflow: visible !important;
     }
 
-    .nitro-wired__section .font-bold:not(.nitro-wired__summary-title) {
+    .octane-wired__section .font-bold:not(.octane-wired__summary-title) {
         width: 100%;
         font-size: 13px !important;
         font-weight: 700 !important;
         text-align: left;
     }
 
-    .nitro-wired__summary-description,
-    .nitro-wired__furni-selector-description,
-    .nitro-wired__picker-label {
+    .octane-wired__summary-description,
+    .octane-wired__furni-selector-description,
+    .octane-wired__picker-label {
         font-size: 12px;
         line-height: 1.15;
     }
 
-    .nitro-wired__source-row,
-    .nitro-wired__give-var-section-title,
-    .nitro-wired__advanced-toggle {
+    .octane-wired__source-row,
+    .octane-wired__give-var-section-title,
+    .octane-wired__advanced-toggle {
         font-size: 12px;
     }
 
-    .nitro-wired__divider,
+    .octane-wired__divider,
     hr {
         height: 1px;
         border: 0;
         background: #bababa;
         box-shadow: 0 1px 0 #fff;
         margin: 0 !important;
-    }
-
-    .form-check-input,
-    input[type='checkbox'],
-    input[type='radio'] {
-        width: 18px;
-        height: 18px;
-        min-width: 18px;
-        appearance: none;
-        -webkit-appearance: none;
-        border: 1px solid #8e8e8e;
-        border-radius: 5px;
-        background: linear-gradient(180deg, #fcfcfc 0%, #ececec 100%);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-        cursor: pointer;
-        position: relative;
-    }
-
-    input[type='radio'] {
-        border-radius: 50%;
-    }
-
-    .form-check-input:focus,
-    input[type='checkbox']:focus,
-    input[type='radio']:focus {
-        outline: 1px solid #4b7ea1;
-        outline-offset: 1px;
-    }
-
-    .form-check-input[type='radio']:checked,
-    input[type='radio']:checked {
-        background:
-            radial-gradient(circle at center, #4a4a4a 0 34%, transparent 38%),
-            linear-gradient(180deg, #fcfcfc 0%, #ececec 100%);
-        border-color: #767676;
-    }
-
-    .form-check-input[type='checkbox']:checked,
-    input[type='checkbox']:checked {
-        background: linear-gradient(180deg, #d9d9d9 0%, #c8c8c8 100%);
-        border-color: #767676;
-    }
-
-    .form-check-input[type='checkbox']:checked::before,
-    .form-check-input[type='checkbox']:checked::after,
-    input[type='checkbox']:checked::before,
-    input[type='checkbox']:checked::after {
-        content: '';
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 12px;
-        height: 2px;
-        border-radius: 2px;
-        background: #111111;
-        transform-origin: center;
-    }
-
-    .form-check-input[type='checkbox']:checked::before,
-    input[type='checkbox']:checked::before {
-        transform: translate(-50%, -50%) rotate(45deg);
-    }
-
-    .form-check-input[type='checkbox']:checked::after,
-    input[type='checkbox']:checked::after {
-        transform: translate(-50%, -50%) rotate(-45deg);
     }
 
     .form-check {
@@ -1104,6 +814,7 @@ body {
     .form-select,
     input[type='text'],
     input[type='number'],
+    .octane-number-input,
     textarea {
         min-height: 24px;
         border: 1px solid #8d8d8d !important;
@@ -1115,9 +826,9 @@ body {
         padding: 3px 6px;
     }
 
-    .nitro-wired__button,
-    .nitro-wired__picker-button,
-    .nitro-slider-button {
+    .octane-wired__button,
+    .octane-wired__picker-button,
+    .octane-slider-button {
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -1133,33 +844,33 @@ body {
         padding-bottom: 0 !important;
     }
 
-    .nitro-wired__button:hover,
-    .nitro-wired__picker-button:hover,
-    .nitro-slider-button:hover {
+    .octane-wired__button:hover,
+    .octane-wired__picker-button:hover,
+    .octane-slider-button:hover {
         filter: brightness(1.04);
     }
 
-    .nitro-wired__button--primary {
+    .octane-wired__button--primary {
         border-color: var(--habbo-blue-header, #0e3f52) !important;
         background: linear-gradient(180deg, #5ba4c4 0%, #418db0 44%, #2e6f8a 100%) !important;
         color: #fff !important;
         text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
     }
 
-    &.nitro-card-shell {
+    &.octane-card-shell {
         resize: none !important;
     }
 
-    .nitro-wired__actions {
+    .octane-wired__actions {
         padding-top: 2px;
     }
 
-    .nitro-slider-wrapper {
+    .octane-slider-wrapper {
         align-items: center;
         gap: 4px;
     }
 
-    .nitro-wired__advanced-toggle {
+    .octane-wired__advanced-toggle {
         width: 100%;
         padding: 0 !important;
         border: 0;
@@ -1170,20 +881,24 @@ body {
         text-decoration: underline;
     }
 
-    .nitro-wired__advanced-body,
-    .nitro-wired__source-detail {
+    .octane-wired__advanced-body,
+    .octane-wired__source-detail {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-wired__source-row {
+    .octane-wired__advanced-body[hidden] {
+        display: none;
+    }
+
+    .octane-wired__source-row {
         display: flex;
         flex-direction: column;
         gap: 3px;
     }
 
-    .nitro-wired__selection-toggle {
+    .octane-wired__selection-toggle {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -1197,33 +912,33 @@ body {
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
     }
 
-    .nitro-wired__selection-toggle.is-active.nitro-wired__selection-toggle--primary {
+    .octane-wired__selection-toggle.is-active.octane-wired__selection-toggle--primary {
         border-color: #66793c;
         background: linear-gradient(180deg, #a5b56e 0%, #8ea25a 100%);
         color: #fff;
     }
 
-    .nitro-wired__selection-toggle.is-active.nitro-wired__selection-toggle--secondary {
+    .octane-wired__selection-toggle.is-active.octane-wired__selection-toggle--secondary {
         border-color: #6172b7;
         background: linear-gradient(180deg, #8d9bdd 0%, #7383cb 100%);
         color: #fff;
     }
 
-    .nitro-wired__selection-toggle:disabled {
+    .octane-wired__selection-toggle:disabled {
         opacity: 0.55;
     }
 
-    .nitro-wired__selection-toggle svg {
+    .octane-wired__selection-toggle svg {
         font-size: 10px;
         margin: 0;
     }
 
-    .nitro-wired__actions {
+    .octane-wired__actions {
         gap: 4px !important;
     }
 
-    .nitro-wired__picker-button,
-    .nitro-slider-button {
+    .octane-wired__picker-button,
+    .octane-slider-button {
         width: 22px;
         min-width: 22px !important;
         flex: 0 0 22px;
@@ -1231,41 +946,41 @@ body {
         padding-right: 0 !important;
     }
 
-    .nitro-wired__picker-button svg,
-    .nitro-slider-button svg {
+    .octane-wired__picker-button svg,
+    .octane-slider-button svg {
         margin: 0;
     }
 
-    .nitro-wired__picker-label {
+    .octane-wired__picker-label {
         min-width: 0;
         text-align: center;
         word-break: break-word;
     }
 
-    .nitro-wired__give-var {
+    .octane-wired__give-var {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-wired__give-var--trigger-variable {
+    .octane-wired__give-var--trigger-variable {
         width: min(244px, 100%);
     }
 
-    .nitro-wired__give-var-heading {
+    .octane-wired__give-var-heading {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 4px;
     }
 
-    .nitro-wired__give-var-targets {
+    .octane-wired__give-var-targets {
         display: inline-flex;
         align-items: center;
         gap: 2px;
     }
 
-    .nitro-wired__give-var-target {
+    .octane-wired__give-var-target {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -1279,261 +994,49 @@ body {
         transition: filter 0.12s ease-in-out;
     }
 
-    .nitro-wired__give-var-target:hover {
+    .octane-wired__give-var-target:hover {
         filter: brightness(0.98);
     }
 
-    .nitro-wired__give-var-target img {
+    .octane-wired__give-var-target img {
         width: auto;
         height: auto;
         max-width: 12px;
         max-height: 12px;
-        image-rendering: pixelated;
+        image-rendering: var(--octane-pixel-art, pixelated);
     }
 
-    .nitro-wired__give-var-target--furni.is-active {
+    .octane-wired__give-var-target--furni.is-active {
         background: linear-gradient(180deg, #f7db6d 0%, #ddb948 100%);
     }
 
-    .nitro-wired__give-var-target--user.is-active {
+    .octane-wired__give-var-target--user.is-active {
         background: linear-gradient(180deg, #74be68 0%, #4f9644 100%);
     }
 
-    .nitro-wired__give-var-target--global.is-active {
+    .octane-wired__give-var-target--global.is-active {
         background: linear-gradient(180deg, #7bc4f0 0%, #5497d2 100%);
     }
 
-    .nitro-wired__give-var-target--context.is-active {
+    .octane-wired__give-var-target--context.is-active {
         background: linear-gradient(180deg, #f0ad65 0%, #d68739 100%);
     }
 
-    .nitro-wired__give-var-target.is-active {
+    .octane-wired__give-var-target.is-active {
         border-color: #4d4d4d;
         box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.92);
     }
 
-    .nitro-wired__give-var-target:disabled {
+    .octane-wired__give-var-target:disabled {
         opacity: 0.72;
         cursor: default;
     }
 
-    .nitro-wired__give-var-select {
+    .octane-wired__give-var-select {
         min-height: 23px;
     }
 
-    .nitro-wired__variable-picker {
-        position: relative;
-        width: 100%;
-    }
-
-    .nitro-wired__variable-picker-trigger {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        min-height: 23px;
-        padding: 0 22px 0 8px;
-        border: 1px solid #8e8e8e;
-        border-radius: 4px;
-        background: linear-gradient(180deg, #ffffff 0%, #ededed 100%);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-        font-size: 11px;
-        text-align: left;
-        position: relative;
-    }
-
-    .nitro-wired__variable-picker-trigger::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        right: 8px;
-        width: 0;
-        height: 0;
-        margin-top: -2px;
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-top: 5px solid #555;
-    }
-
-    .nitro-wired__variable-picker-placeholder {
-        color: #7a7a7a;
-    }
-
-    .nitro-wired__variable-picker-panel {
-        position: absolute;
-        top: calc(100% + 2px);
-        left: 0;
-        z-index: 30;
-        width: 202px;
-        padding: 4px;
-        border: 1px solid #8e8e8e;
-        border-radius: 4px;
-        background: #f5f5f5;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        overflow: visible;
-    }
-
-    .nitro-wired__variable-picker-panel.is-portal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 5001;
-        margin: 0;
-        pointer-events: auto;
-    }
-
-    .nitro-wired__variable-picker-toolbar {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        padding-bottom: 4px;
-        border-bottom: 1px solid #d0d0d0;
-    }
-
-    .nitro-wired__variable-picker-mode {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 20px;
-        height: 20px;
-        padding: 0;
-        border: 1px solid transparent;
-        border-radius: 3px;
-        background: transparent;
-    }
-
-    .nitro-wired__variable-picker-mode.is-active {
-        border-color: #8e8e8e;
-        background: linear-gradient(180deg, #f3cc58 0%, #d2a93a 100%);
-    }
-
-    .nitro-wired__variable-picker-mode img {
-        width: auto;
-        height: auto;
-        max-width: 13px;
-        max-height: 13px;
-        image-rendering: pixelated;
-    }
-
-    .nitro-wired__variable-picker-search {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        min-height: 24px;
-        padding: 0 4px;
-        margin-top: 4px;
-        border: 1px solid #c4c4c4;
-        border-radius: 3px;
-        background: #fff;
-    }
-
-    .nitro-wired__variable-picker-search-icon {
-        width: auto;
-        height: auto;
-        max-width: 10px;
-        max-height: 10px;
-        opacity: 0.75;
-        image-rendering: pixelated;
-    }
-
-    .nitro-wired__variable-picker-search-input {
-        flex: 1 1 auto;
-        min-width: 0;
-        border: 0;
-        background: transparent;
-        font-size: 11px;
-        line-height: 1;
-        outline: none;
-    }
-
-    .nitro-wired__variable-picker-clear {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 14px;
-        height: 14px;
-        padding: 0;
-        border: 0;
-        background: transparent;
-    }
-
-    .nitro-wired__variable-picker-clear img {
-        width: auto;
-        height: auto;
-        max-width: 10px;
-        max-height: 10px;
-        image-rendering: pixelated;
-    }
-
-    .nitro-wired__variable-picker-list,
-    .nitro-wired__variable-picker-submenu {
-        display: flex;
-        flex-direction: column;
-        max-height: 140px;
-        margin-top: 4px;
-        overflow-y: auto;
-        border: 1px solid #c8c8c8;
-        border-radius: 3px;
-        background: #fff;
-    }
-
-    .nitro-wired__variable-picker-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 6px;
-        min-height: 20px;
-        padding: 0 6px;
-        border: 0;
-        background: transparent;
-        font-size: 11px;
-        text-align: left;
-    }
-
-    .nitro-wired__variable-picker-row:nth-child(even) {
-        background: #f3f3f3;
-    }
-
-    .nitro-wired__variable-picker-row:hover {
-        background: #dfe8f6;
-    }
-
-    .nitro-wired__variable-picker-row.is-selected {
-        background: #d7dfea;
-    }
-
-    .nitro-wired__variable-picker-row.is-disabled {
-        color: #7b7b7b;
-    }
-
-    .nitro-wired__variable-picker-row-label {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .nitro-wired__variable-picker-row-arrow {
-        flex: 0 0 auto;
-        font-size: 9px;
-    }
-
-    .nitro-wired__variable-picker-empty {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 86px;
-        color: #8a8a8a;
-    }
-
-    .nitro-wired__variable-picker-submenu {
-        position: fixed;
-        width: 120px;
-        margin-top: 0;
-        z-index: 5000;
-        pointer-events: auto;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
-    }
-
-    .nitro-wired__give-var-checkbox {
+    .octane-wired__give-var-checkbox {
         display: flex;
         align-items: center;
         gap: 4px;
@@ -1543,25 +1046,25 @@ body {
         line-height: 1;
     }
 
-    .nitro-wired__give-var-section {
+    .octane-wired__give-var-section {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-wired__give-var-section-title {
+    .octane-wired__give-var-section-title {
         font-size: 11px;
         font-weight: 700;
         line-height: 1.1;
     }
 
-    .nitro-wired__give-var-input-row {
+    .octane-wired__give-var-input-row {
         display: flex;
         align-items: center;
         gap: 6px;
     }
 
-    .nitro-wired__give-var-number {
+    .octane-wired__give-var-number {
         width: 48px;
         min-width: 48px;
         min-height: 18px !important;
@@ -1571,31 +1074,31 @@ body {
         text-align: center;
     }
 
-    .nitro-wired__give-var-number--blurred {
+    .octane-wired__give-var-number--blurred {
         filter: blur(0.8px) !important;
         opacity: 0.78;
         pointer-events: none;
     }
 
-    .nitro-wired__resizable-textarea {
+    .octane-wired__resizable-textarea {
         min-height: 140px !important;
         resize: vertical !important;
         overflow: auto;
     }
 
-    .nitro-wired__levelup {
+    .octane-wired__levelup {
         display: flex;
         flex-direction: column;
         gap: 6px;
     }
 
-    .nitro-wired__levelup-section {
+    .octane-wired__levelup-section {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-wired__levelup-section-header {
+    .octane-wired__levelup-section-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -1606,48 +1109,48 @@ body {
         text-align: left;
     }
 
-    .nitro-wired__levelup-chevron {
+    .octane-wired__levelup-chevron {
         font-size: 12px;
         line-height: 1;
         transform: rotate(180deg);
         transition: transform 0.12s ease;
     }
 
-    .nitro-wired__levelup-chevron.is-open {
+    .octane-wired__levelup-chevron.is-open {
         transform: rotate(0deg);
     }
 
-    .nitro-wired__levelup-section-body {
+    .octane-wired__levelup-section-body {
         display: flex;
         flex-direction: column;
         gap: 8px;
     }
 
-    .nitro-wired__levelup-mode-block {
+    .octane-wired__levelup-mode-block {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-wired__levelup-mode-block.is-inactive {
+    .octane-wired__levelup-mode-block.is-inactive {
         opacity: 0.72;
     }
 
-    .nitro-wired__levelup-mode-label {
+    .octane-wired__levelup-mode-label {
         display: flex;
         align-items: center;
         gap: 4px;
         cursor: pointer;
     }
 
-    .nitro-wired__levelup-fields {
+    .octane-wired__levelup-fields {
         display: flex;
         flex-direction: column;
         gap: 4px;
         padding-left: 22px;
     }
 
-    .nitro-wired__levelup-field-row {
+    .octane-wired__levelup-field-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -1655,7 +1158,7 @@ body {
         min-height: 20px;
     }
 
-    .nitro-wired__levelup-number {
+    .octane-wired__levelup-number {
         width: 74px;
         min-width: 74px;
         min-height: 20px !important;
@@ -1665,38 +1168,38 @@ body {
         text-align: center;
     }
 
-    .nitro-wired__levelup-textarea {
+    .octane-wired__levelup-textarea {
         min-height: 88px !important;
         resize: vertical !important;
         overflow: auto;
     }
 
-    .nitro-wired__levelup-preview {
+    .octane-wired__levelup-preview {
         max-height: 120px;
         overflow-y: auto;
         padding-right: 2px;
     }
 
-    .nitro-wired__levelup-preview-entry {
+    .octane-wired__levelup-preview-entry {
         padding: 1px 0;
         font-size: 11px;
         line-height: 1.25;
     }
 
-    .nitro-wired__levelup-subvariables {
+    .octane-wired__levelup-subvariables {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-wired__levelup-subvariable-row {
+    .octane-wired__levelup-subvariable-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 8px;
     }
 
-    .nitro-wired__levelup-subvariable-label {
+    .octane-wired__levelup-subvariable-label {
         display: flex;
         align-items: center;
         gap: 4px;
@@ -1705,7 +1208,7 @@ body {
         cursor: pointer;
     }
 
-    .nitro-wired__levelup-subvariable-token {
+    .octane-wired__levelup-subvariable-token {
         width: 96px;
         min-width: 96px;
         height: 20px;
@@ -1718,7 +1221,7 @@ body {
         line-height: 20px;
     }
 
-    .nitro-wired__placeholder-preview {
+    .octane-wired__placeholder-preview {
         display: flex;
         width: 100%;
         align-items: flex-start;
@@ -1731,39 +1234,44 @@ body {
         transition: background 0.12s ease, border-color 0.12s ease;
     }
 
-    .nitro-wired__placeholder-preview:hover {
+    .octane-wired__placeholder-preview:hover {
         background: linear-gradient(180deg, #ffffff 0%, #f4f4f4 100%);
         border-color: #909090;
     }
 
-    .nitro-wired__placeholder-preview.is-copied {
+    .octane-wired__placeholder-preview.is-copied {
         border-color: #73a753;
         background: linear-gradient(180deg, #f8fff2 0%, #eef9e2 100%);
     }
 
-    .nitro-wired__change-var-radio {
+    .octane-wired__change-var-radio {
         display: flex;
         align-items: center;
         gap: 4px;
     }
 
-    .nitro-wired__change-var-reference-block {
+    .octane-wired__change-var-reference-block {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    .nitro-slider {
+    .octane-slider {
         height: 16px;
     }
 
-    .nitro-slider .track {
+    .octane-slider .track {
         height: 4px;
         border-radius: 999px;
         border: 1px solid #9a9a9a;
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
 
+        /* the filled part lies inside the track: it fills it without a border of its own (no double line) */
         &.track-0 {
+            height: 100%;
+            border: 0;
+            border-radius: inherit;
+            box-shadow: none;
             background: linear-gradient(180deg, #7f9fb1 0%, #64889e 100%);
         }
 
@@ -1772,10 +1280,10 @@ body {
         }
     }
 
-    .nitro-slider .thumb {
+    /* Base UI centres the thumb on the track itself: no margin, or it sits below the line. */
+    .octane-slider .thumb {
         width: 12px;
         height: 12px;
-        margin-top: 3px;
         border-radius: 50%;
         border: 1px solid #7f7f7f;
         background: linear-gradient(180deg, #fefefe 0%, #dadada 100%);
@@ -1783,15 +1291,15 @@ body {
     }
 }
 
-.nitro-card-shell.nitro-wired {
+.octane-card-shell.octane-wired {
     border: 1px solid #8d8d8d !important;
     border-color: #8d8d8d !important;
     box-shadow: inset 0 0 0 1px #fff !important;
     outline: none !important;
 }
 
-.nitro-card-shell.nitro-wired .nitro-card-header-shell,
-.nitro-card-shell.nitro-wired .nitro-card-content-shell {
+.octane-card-shell.octane-wired .octane-card-header-shell,
+.octane-card-shell.octane-wired .octane-card-content-shell {
     border: 0 !important;
     box-shadow: none !important;
 }
@@ -1839,6 +1347,26 @@ body {
     &.part-selected {
         box-shadow: inset 0 0 0 3px #c5c3c0 !important;
         background-color: #b1b1b1 !important;
+    }
+
+    &.is-loading::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 35%, rgba(255, 255, 255, 0.65) 50%, rgba(255, 255, 255, 0) 65%);
+        background-size: 220% 100%;
+        background-repeat: no-repeat;
+        animation: avatar-parts-shimmer 1.1s ease-in-out infinite;
+        pointer-events: none;
+    }
+}
+
+@keyframes avatar-parts-shimmer {
+    0% {
+        background-position: 160% 0;
+    }
+    100% {
+        background-position: -60% 0;
     }
 }
 
@@ -1888,16 +1416,6 @@ body {
     .head  { background-image: url('@/assets/images/wardrobe/head.png'); }
     .torso { background-image: url('@/assets/images/wardrobe/torso.png'); }
     .legs  { background-image: url('@/assets/images/wardrobe/legs.png'); }
-
-    .tab-wardrobe {
-        width: 40px;
-        height: 28px;
-        background-size: 38px 28px;
-        background-image: url('@/assets/images/wardrobe/wardrobe.png');
-        background-repeat: no-repeat;
-        background-position: center;
-        filter: contrast(1.2) brightness(1.05);
-    }
 
     .tab-pets {
         width: 34px;
@@ -2015,54 +1533,13 @@ body {
     font-weight: bold;
 }
 
-.nitro-avatar-editor-wardrobe-container {
-    background-color: #cacaca;
-    border-radius: 0.3rem;
-    border: solid 1px #000;
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    padding: 10px 12px 10px 0;
-    overflow-y: auto;
-}
-
-.nitro-avatar-editor-wardrobe-figure-preview {
-    border-image-source: url('@/assets/images/avatareditor/wardrobe_user_bg.png');
-    border-image-slice: 4 4 4 4 fill;
-    border-image-width: 4px 4px 4px 4px;
-    background-color: transparent;
-    overflow: hidden;
-    position: relative;
-
-    .avatar-shadow {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 25px;
-        width: 40px;
-        height: 20px;
-        margin: 0 auto;
-        border-radius: 100%;
-        background-color: rgba(0, 0, 0, 0.20);
-        z-index: 2;
-    }
-
-    .button-container {
-        position: absolute;
-        bottom: 0;
-        z-index: 5;
-        width: 100%;
-    }
-}
-
 /* -------------------------------------------------------------------------- */
 /* Wired chest (Scrigno) — Sulake chest_generic / coins_chest / furni_chest UI  */
 /* -------------------------------------------------------------------------- */
-[class*='nitro-widget-chest'] {
+[class*='octane-widget-chest'] {
     color: #2e2e2e;
 
-    .nitro-chest__button {
+    .octane-chest__button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -2082,23 +1559,23 @@ body {
         white-space: nowrap;
     }
 
-    .nitro-chest__button:hover:not(:disabled) {
+    .octane-chest__button:hover:not(:disabled) {
         filter: brightness(0.98);
     }
 
-    .nitro-chest__button:active:not(:disabled) {
+    .octane-chest__button:active:not(:disabled) {
         background: linear-gradient(180deg, #e4e0d6 0%, #d8d4c8 100%);
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
     }
 
-    .nitro-chest__button:disabled {
+    .octane-chest__button:disabled {
         opacity: 0.5;
         cursor: default;
         pointer-events: none;
     }
 
     /* coins_chest_contents.xml withdraw_btn: 73×22 */
-    .nitro-chest__button--withdraw {
+    .octane-chest__button--withdraw {
         width: 73px;
         min-width: 73px;
         height: 22px;
@@ -2106,7 +1583,7 @@ body {
     }
 
     /* upgrade_capacity_btn — square icon control in footer */
-    .nitro-chest__button--icon {
+    .octane-chest__button--icon {
         width: 24px;
         min-width: 24px;
         height: 22px;
@@ -2117,7 +1594,7 @@ body {
     }
 
     /* Settings / notifications / upgrade sub-dialogs (wired UI builder style) */
-    .nitro-chest__button--dialog {
+    .octane-chest__button--dialog {
         min-height: 22px;
         padding: 0 12px;
         border: 1px solid #8e8e8e;
@@ -2127,7 +1604,7 @@ body {
         color: #000;
     }
 
-    .nitro-chest__button--dialog-primary {
+    .octane-chest__button--dialog-primary {
         min-height: 22px;
         padding: 0 12px;
         border: 1px solid #66793c;
@@ -2138,14 +1615,14 @@ body {
         text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
     }
 
-    .nitro-chest__button--dialog-primary:disabled {
+    .octane-chest__button--dialog-primary:disabled {
         border-color: #8e8e8e;
         background: linear-gradient(180deg, #fcfcfc 0%, #e8e8e8 46%, #d5d5d5 47%, #efefef 100%);
         color: #888;
         text-shadow: none;
     }
 
-    .nitro-chest__header-icon {
+    .octane-chest__header-icon {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -2159,11 +1636,11 @@ body {
         flex-shrink: 0;
     }
 
-    .nitro-chest__header-icon:hover {
+    .octane-chest__header-icon:hover {
         filter: brightness(0.97);
     }
 
-    .nitro-chest__input {
+    .octane-chest__input {
         box-sizing: border-box;
         border: 1px solid #b9b2a0;
         border-radius: 2px;
@@ -2173,47 +1650,47 @@ body {
         text-align: center;
     }
 
-    .nitro-chest__input--scene {
+    .octane-chest__input--scene {
         width: 27px;
         height: 19px;
         padding: 0;
         border-color: #d8c184;
     }
 
-    .nitro-chest__input--furni-withdraw {
+    .octane-chest__input--furni-withdraw {
         width: 36px;
         height: 22px;
         padding: 0;
     }
 
-    .nitro-chest__actions {
+    .octane-chest__actions {
         display: flex;
         align-items: center;
         gap: 4px;
     }
 
-    .nitro-chest__actions--footer {
+    .octane-chest__actions--footer {
         justify-content: space-between;
         gap: 8px;
     }
 
-    .nitro-chest__actions--dialog {
+    .octane-chest__actions--dialog {
         gap: 4px;
     }
 
-    .nitro-chest__actions--dialog .nitro-chest__button {
+    .octane-chest__actions--dialog .octane-chest__button {
         flex: 1 1 0;
     }
 }
 
 /* Wired chest (Scrigno) — Putyhef buttons + inputs from chest_generic / coins_chest_contents XML */
-.nitro-widget-chest,
-.nitro-widget-chest-settings,
-.nitro-widget-chest-notifications,
-.nitro-widget-chest-upgrade,
-.nitro-widget-chest-log,
-.nitro-widget-chest-confirm {
-    .nitro-chest__btn {
+.octane-widget-chest,
+.octane-widget-chest-settings,
+.octane-widget-chest-notifications,
+.octane-widget-chest-upgrade,
+.octane-widget-chest-log,
+.octane-widget-chest-confirm {
+    .octane-chest__btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -2234,34 +1711,34 @@ body {
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
     }
 
-    .nitro-chest__btn:hover:not(:disabled) {
+    .octane-chest__btn:hover:not(:disabled) {
         filter: brightness(0.98);
     }
 
-    .nitro-chest__btn:active:not(:disabled) {
+    .octane-chest__btn:active:not(:disabled) {
         background: linear-gradient(180deg, #dedad2 0%, #d5d0c8 48%, #cac5bd 49%, #d8d4cc 100%);
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
     }
 
-    .nitro-chest__btn:disabled {
+    .octane-chest__btn:disabled {
         opacity: 0.5;
         cursor: default;
         pointer-events: none;
     }
 
-    .nitro-chest__btn--fixed {
+    .octane-chest__btn--fixed {
         width: 73px;
         min-width: 73px;
         padding: 0;
     }
 
-    .nitro-chest__btn--wide {
+    .octane-chest__btn--wide {
         min-width: 73px;
         width: auto;
         max-width: 100%;
     }
 
-    .nitro-chest__btn--icon {
+    .octane-chest__btn--icon {
         min-width: 24px;
         width: 24px;
         height: 24px;
@@ -2276,7 +1753,7 @@ body {
         box-shadow: none;
     }
 
-    .nitro-chest__input {
+    .octane-chest__input {
         box-sizing: border-box;
         height: 22px;
         padding: 0 4px;
@@ -2288,21 +1765,21 @@ body {
         background: #fff;
     }
 
-    .nitro-chest__input--coin {
+    .octane-chest__input--coin {
         width: 27px;
         height: 19px;
         border-color: #d8c184;
     }
 
-    .nitro-chest__input--furni {
+    .octane-chest__input--furni {
         width: 36px;
     }
 
-    .nitro-chest__input--qty {
+    .octane-chest__input--qty {
         width: 72px;
     }
 
-    .nitro-chest__footer-row {
+    .octane-chest__footer-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -2310,13 +1787,13 @@ body {
         margin-top: 4px;
     }
 
-    .nitro-chest__footer-group {
+    .octane-chest__footer-group {
         display: flex;
         flex-wrap: wrap;
         gap: 4px;
     }
 
-    .nitro-chest__actions {
+    .octane-chest__actions {
         display: flex;
         flex-wrap: wrap;
         gap: 4px;
@@ -2327,6 +1804,7 @@ body {
     .form-select,
     input[type='text'],
     input[type='number'],
+    .octane-number-input,
     textarea {
         min-height: 22px;
         border: 1px solid #8d8d8d !important;
@@ -2339,13 +1817,13 @@ body {
     }
 
     /* furni_chest_contents.xml — grid + detail panel */
-    .nitro-chest__furni-body {
+    .octane-chest__furni-body {
         display: flex;
         gap: 10px;
         margin: 4px 0 0;
     }
 
-    .nitro-chest__grid-border {
+    .octane-chest__grid-border {
         width: 255px;
         flex-shrink: 0;
         border: 1px solid #e3e3e3;
@@ -2354,7 +1832,7 @@ body {
         overflow: hidden;
     }
 
-    .nitro-chest__search {
+    .octane-chest__search {
         position: relative;
         margin: 4px 5px 0;
         height: 24px;
@@ -2363,7 +1841,7 @@ body {
         background: #fff;
     }
 
-    .nitro-chest__search-placeholder {
+    .octane-chest__search-placeholder {
         position: absolute;
         left: 8px;
         top: 4px;
@@ -2373,7 +1851,7 @@ body {
         pointer-events: none;
     }
 
-    .nitro-chest__search-input {
+    .octane-chest__search-input {
         width: 100%;
         height: 22px;
         padding: 0 24px 0 8px;
@@ -2385,7 +1863,7 @@ body {
         text-align: left;
     }
 
-    .nitro-chest__search-clear {
+    .octane-chest__search-clear {
         position: absolute;
         right: 2px;
         top: 2px;
@@ -2400,7 +1878,7 @@ body {
         cursor: pointer;
     }
 
-    .nitro-chest__grid-scroll {
+    .octane-chest__grid-scroll {
         width: 100%;
         height: 232px;
         overflow-x: hidden;
@@ -2409,13 +1887,13 @@ body {
         box-sizing: border-box;
     }
 
-    .nitro-chest__grid {
+    .octane-chest__grid {
         display: flex;
         flex-wrap: wrap;
         gap: 3px;
     }
 
-    .nitro-chest__grid-empty {
+    .octane-chest__grid-empty {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -2423,7 +1901,7 @@ body {
         min-height: 120px;
     }
 
-    .nitro-chest__grid-cell {
+    .octane-chest__grid-cell {
         position: relative;
         width: 42px;
         height: 42px;
@@ -2431,7 +1909,7 @@ body {
         cursor: pointer;
     }
 
-    .nitro-chest__grid-cell-focus {
+    .octane-chest__grid-cell-focus {
         position: absolute;
         inset: 0;
         z-index: 3;
@@ -2442,7 +1920,7 @@ body {
         background: rgba(228, 231, 223, 0.35);
     }
 
-    .nitro-chest__grid-cell-inner {
+    .octane-chest__grid-cell-inner {
         position: absolute;
         left: 1px;
         top: 1px;
@@ -2454,7 +1932,7 @@ body {
         overflow: hidden;
     }
 
-    .nitro-chest__grid-icon {
+    .octane-chest__grid-icon {
         position: absolute;
         inset: 0;
         display: flex;
@@ -2463,17 +1941,17 @@ body {
         pointer-events: none;
     }
 
-    .nitro-chest__grid-ltd-bg {
+    .octane-chest__grid-ltd-bg {
         inset: 2px;
         width: 36px;
         height: 36px;
     }
 
-    .nitro-chest__grid-ltd-counter {
+    .octane-chest__grid-ltd-counter {
         height: 9px;
     }
 
-    .nitro-chest__grid-rarity {
+    .octane-chest__grid-rarity {
         top: 2px;
         right: 2px;
         z-index: 2;
@@ -2481,7 +1959,7 @@ body {
         transform-origin: top right;
     }
 
-    .nitro-chest__qty-badge {
+    .octane-chest__qty-badge {
         position: absolute;
         top: 2px;
         right: 2px;
@@ -2494,7 +1972,7 @@ body {
         box-sizing: border-box;
     }
 
-    .nitro-chest__qty-badge span {
+    .octane-chest__qty-badge span {
         display: block;
         min-width: 11px;
         height: 14px;
@@ -2509,14 +1987,14 @@ body {
         text-align: center;
     }
 
-    .nitro-chest__detail-panel {
+    .octane-chest__detail-panel {
         width: 175px;
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
     }
 
-    .nitro-chest__preview-box {
+    .octane-chest__preview-box {
         height: 211px;
         border: 1px solid #d8d8d8;
         border-radius: 3px;
@@ -2529,7 +2007,7 @@ body {
         box-sizing: border-box;
     }
 
-    .nitro-chest__preview-name {
+    .octane-chest__preview-name {
         width: 100%;
         text-align: center;
         font-size: 11px;
@@ -2538,7 +2016,7 @@ body {
         margin-bottom: 4px;
     }
 
-    .nitro-chest__preview-image {
+    .octane-chest__preview-image {
         flex: 1;
         display: flex;
         align-items: center;
@@ -2547,14 +2025,14 @@ body {
         min-height: 0;
     }
 
-    .nitro-chest__preview-placeholder {
+    .octane-chest__preview-placeholder {
         max-width: 100%;
         max-height: 100%;
         margin: auto;
-        image-rendering: pixelated;
+        image-rendering: var(--octane-pixel-art, pixelated);
     }
 
-    .nitro-chest__withdraw-row {
+    .octane-chest__withdraw-row {
         display: flex;
         align-items: center;
         justify-content: flex-end;
@@ -2563,38 +2041,99 @@ body {
         padding-right: 0;
     }
 
-    .nitro-chest__input--furni {
+    .octane-chest__input--furni {
         width: 30px;
         height: 19px;
         padding: 0;
     }
 
     /* chest_generic.xml footer band */
-    .nitro-chest__footer {
+    .octane-chest__footer {
         margin: 8px -10px -10px;
         padding: 8px 10px 10px;
         background: #dadada;
         border-top: 1px solid #c0c0c0;
     }
 
-    .nitro-chest__footer-capacity {
+    .octane-chest__footer-capacity {
         margin-bottom: 6px;
         padding-bottom: 6px;
         border-bottom: 1px solid #b0b0b0;
     }
 
-    .nitro-chest__btn--footer {
+    /* Locking sits above the capacity row, the way the official window stacks them. */
+    .octane-chest__locking {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 12px;
+        margin-bottom: 6px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #b0b0b0;
+    }
+
+    .octane-chest__option {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+    }
+
+    .octane-chest__option input:disabled {
+        cursor: default;
+    }
+
+    .octane-chest__info-button {
+        width: 16px;
+        height: 16px;
+        margin-left: auto;
+        border: 1px solid #7a4a1c;
+        border-radius: 50%;
+        background: #f7e6cf;
+        color: #7a4a1c;
+        font-size: 10px;
+        font-weight: bold;
+        line-height: 1;
+    }
+
+    .octane-chest__capacity-input {
+        width: 84px;
+        height: 22px;
+        padding: 0 6px;
+        font-size: 11px;
+    }
+
+    .octane-chest__rules {
+        margin: 0;
+        padding-left: 18px;
+        list-style: disc;
+    }
+
+    .octane-chest__upgrade-preview {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 64px;
+        height: 64px;
+        flex: 0 0 64px;
+    }
+
+    .octane-chest__upgrade-error {
+        color: #b03030;
+    }
+
+    .octane-chest__btn--footer {
         min-width: 73px;
         height: 30px;
         padding: 0 10px;
         font-size: 11px;
     }
 
-    .nitro-chest__footer-group .nitro-chest__btn--footer {
+    .octane-chest__footer-group .octane-chest__btn--footer {
         min-width: 89px;
     }
 
-    .nitro-chest__deposit-panel {
+    .octane-chest__deposit-panel {
         margin-top: 8px;
         padding: 8px;
         border: 1px solid #d8d8d8;
@@ -2602,12 +2141,12 @@ body {
         background: #f8f8f8;
     }
 
-    .nitro-chest__deposit-title {
+    .octane-chest__deposit-title {
         display: block;
         margin-bottom: 6px;
     }
 
-    .nitro-chest__deposit-grid {
+    .octane-chest__deposit-grid {
         max-height: 168px;
         overflow-y: auto;
         display: flex;
@@ -2615,7 +2154,7 @@ body {
         gap: 3px;
     }
 
-    .nitro-chest__deposit-cell {
+    .octane-chest__deposit-cell {
         position: relative;
         width: 42px;
         height: 42px;
@@ -2630,17 +2169,189 @@ body {
         justify-content: center;
     }
 
-    .nitro-chest__deposit-cell:disabled {
+    .octane-chest__deposit-cell:disabled {
         opacity: 0.45;
         cursor: not-allowed;
     }
 
-    .nitro-chest__deposit-cell:not(:disabled):hover {
+    .octane-chest__deposit-cell:not(:disabled):hover {
         border-color: #d69586;
     }
 
-    .nitro-chest__deposit-full {
+    .octane-chest__deposit-full {
         margin-top: 6px;
         color: #a33;
     }
+}
+
+/* AIR Ubuntu chest settings: bordered groups and 7px section spacing. */
+.octane-chest-settings .octane-card-content-shell { max-height: calc(100vh / 2.4 + 60px); overflow-y: auto; }
+.octane-chest-settings__section { display: grid; gap: 5px; min-width: 0; margin: 0; padding: 7px; border: 1px solid #b0b0a8; border-radius: 3px; }
+.octane-chest-settings__section > legend { float: none; width: auto; margin: 0; padding: 0 3px; font-size: 12px; font-weight: bold; }
+.octane-chest-settings__wired-notifications { display: grid; gap: 3px; min-width: 0; margin-top: 7px; padding: 7px 0 0; border: 0; border-top: 1px solid #b0b0a8; }
+.octane-chest-settings__wired-notifications:disabled { opacity: 0.5; }
+.octane-chest-settings select { width: 100%; min-width: 0; }
+
+/* Official BadgeImageWidget.playGlow: a 500ms run, strength 0 -> 1 (ease-in-out cubic), then
+   cleared. The overlay repeats the badge image on top of itself so the glow and tint follow
+   the badge's own pixels: outer glow (alpha .7, blur 4->8), inner glow, 48% tint plus a
+   brightness lift. Played once when the badge is set and again on every mouse-over. */
+.badge-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.badge-glow-run {
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0;
+    animation-name: badgeGlowRun;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+    animation-fill-mode: none;
+}
+
+/* The official ColorMatrixFilter mixes each channel 48% towards the tier colour at full
+   strength: a flat fill of that colour masked by the badge's own pixels, faded to 0.48. */
+.badge-glow-tint {
+    position: absolute;
+    inset: 0;
+    background-color: var(--badge-glow);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    opacity: 0;
+    animation-name: badgeGlowTint;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+    animation-fill-mode: none;
+}
+
+@keyframes badgeGlowTint {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0.48;
+    }
+}
+
+/* Hover breath: the outer glow only. The layer repeats the badge's own pixels unchanged, so
+   only the drop shadow around them is visible as it pulses. */
+.badge-glow-run--outline {
+    animation-name: badgeGlowOutline;
+}
+
+@keyframes badgeGlowOutline {
+    0% {
+        opacity: 0;
+        filter: drop-shadow(0 0 3px var(--badge-glow));
+    }
+    100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 4px var(--badge-glow)) drop-shadow(0 0 8px var(--badge-glow));
+    }
+}
+
+@keyframes badgeGlowRun {
+    0% {
+        opacity: 0;
+        filter: drop-shadow(0 0 4px var(--badge-glow)) brightness(1);
+    }
+    100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 4px var(--badge-glow)) drop-shadow(0 0 8px var(--badge-glow)) brightness(1.45) saturate(1.3);
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 6px rgba(59, 130, 246, 0.3); }
+    50%      { box-shadow: 0 0 14px rgba(59, 130, 246, 0.6); }
+}
+
+@keyframes pulseGlowRed {
+    0%, 100% { box-shadow: 0 0 6px rgba(239, 68, 68, 0.3); }
+    50%      { box-shadow: 0 0 14px rgba(239, 68, 68, 0.6); }
+}
+
+@keyframes dropSettle {
+    0%   { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+@keyframes pulseGlowGold {
+    0%, 100% { box-shadow: 0 0 6px rgba(255, 193, 7, 0.4); }
+    50%      { box-shadow: 0 0 14px rgba(255, 193, 7, 0.7); }
+}
+
+/* CollapsibleSection (common/CollapsibleSection.tsx): the Base UI stand-in for <details><summary>. */
+.octane-collapsible-trigger {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.octane-collapsible-trigger::before {
+    content: '';
+    flex: 0 0 auto;
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 6px solid currentColor;
+    transition: transform 0.12s ease;
+}
+
+.octane-collapsible-trigger[data-panel-open]::before {
+    transform: rotate(90deg);
+}
+
+.octane-collapsible-panel[hidden] {
+    display: none;
+}
+
+/* NativeLabel: a drawn raster folds its 2 px TextField gutter away so the text sits where the CSS put it; the browser-text
+   fallback (glyphs the native fonts lack) keeps its box. */
+.octane-native-label > [data-native-text]:not([data-native-text="fallback"]) {
+    margin: -2px !important;
+}
+
+/* A window's descendant rules (`.window-button span { position: absolute; top: 22px; left: 60px; overflow: hidden }`) also reach
+   the raster's own wrapper inside a NativeLabel and push the canvas out of view. Its geometry is the label's, never the window's. */
+.octane-native-label > [data-native-text] {
+    position: relative !important;
+    inset: auto !important;
+    float: none !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    overflow: visible !important;
+    transform: none !important;
+    z-index: auto !important;
+    opacity: 1 !important;
+    line-height: normal !important;
+    text-indent: 0 !important;
+}
+
+.octane-native-label > [data-native-text] > canvas {
+    position: static !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    transform: none !important;
 }

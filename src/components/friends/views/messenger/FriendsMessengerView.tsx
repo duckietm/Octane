@@ -1,27 +1,44 @@
-import { AddLinkEventTracker, FollowFriendMessageComposer, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
-import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { AddLinkEventTracker, FollowFriendMessageComposer, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
+import { FC, KeyboardEvent, UIEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import { GetUserProfile, LocalizeText, ReportType, SendMessageComposer } from '../../../../api';
-import { DraggableWindowPosition, LayoutAvatarImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { GetUserProfile, LocalizeText, ReportType, SendMessageComposer, useHabbiconCatalog } from '../../../../api';
+import { HabbiconsDmIcon } from '../../../../assets/images/habbicons';
+import { DraggableWindow, DraggableWindowPosition, LayoutAvatarImageView } from '../../../../common';
 import { useFriends, useHelp, useMessenger, useTranslation } from '../../../../hooks';
+import { isStaffChatIdentity } from '../../staffChatIdentity';
+import { StaffChatFrankIconView } from '../../StaffChatFrankIconView';
 import { resolveAvatarFigure } from '../friends-list/resolveAvatarFigure';
+import './FriendsMessengerView.css';
+import { FriendsMessengerHabbiconPickerView } from './FriendsMessengerHabbiconPickerView';
 import { FriendsMessengerThreadView } from './messenger-thread/FriendsMessengerThreadView';
-import { FriendsPersistentMessengerView } from './FriendsPersistentMessengerView';
+import { BaseButton } from '../../../../common/BaseButton';
+import { TabBar, TabBarTab } from '../../../../common/TabBar';
+import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+
+const MESSENGER_VISIBLE_AVATARS = 7;
+/** How long the window keeps its place for an older history page that was asked for. */
+const OLDER_PAGE_WAIT_MS = 5000;
 
 export const FriendsMessengerView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
     const [lastThreadId, setLastThreadId] = useState(-1);
     const [messageText, setMessageText] = useState('');
+    const [isHabbiconPickerVisible, setIsHabbiconPickerVisible] = useState(false);
+    const habbiconCatalog = useHabbiconCatalog();
+    const [avatarStartIndex, setAvatarStartIndex] = useState(0);
     const {
         visibleThreads = [],
         activeThread = null,
         getMessageThread = null,
         sendMessage = null,
+        sendHabbiconMessage,
         setActiveThreadId = null,
+        setWindowOpen = null,
+        loadOlderHistory = null,
         closeThread = null,
         typingUserIds = [],
-        sendTypingStatus = null,
-        persistentMessenger = null
+        sendTypingStatus = null
     } = useMessenger();
     const { getFriend = null } = useFriends();
     const { report = null } = useHelp();
@@ -29,6 +46,11 @@ export const FriendsMessengerView: FC<{}> = (props) => {
     const messagesBox = useRef<HTMLDivElement>(null);
     const isTypingRef = useRef<boolean>(false);
     const typingTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
+    // The scroll position to keep while an older history page goes in above the messages.
+    const stickToBottomRef = useRef(true);
+    const lastScrolledThreadRef = useRef(-1);
+    const sendingRef = useRef(false);
+    const olderPageAnchorRef = useRef<{ threadId: number; height: number; top: number; at: number }>(null);
 
     const stopTyping = () => {
         if (typingTimeoutRef.current) {
@@ -68,9 +90,11 @@ export const FriendsMessengerView: FC<{}> = (props) => {
     const openProfile = () => activeThread && activeThread.participant && GetUserProfile(activeThread.participant.id);
 
     const send = async () => {
-        if (!activeThread || !messageText.length) return;
+        if (!activeThread || !messageText.length || sendingRef.current) return;
 
         stopTyping();
+        // Own messages always bring the conversation to its newest line.
+        stickToBottomRef.current = true;
 
         const trimmedText = messageText.trimStart();
         const shouldTranslateOutgoing = settings.enabled && !!trimmedText.length && trimmedText.charAt(0) !== ':';
@@ -81,23 +105,40 @@ export const FriendsMessengerView: FC<{}> = (props) => {
             return;
         }
 
-        const translation = await translateOutgoing(messageText);
+        // Enter again while the translation is pending must not send the text twice.
+        sendingRef.current = true;
+
+        // The field is cleared now, so what is typed while the translation is pending stays for the next send.
+        const text = messageText;
+        setMessageText('');
+
+        let translation: Awaited<ReturnType<typeof translateOutgoing>> = null;
+
+        try {
+            translation = await translateOutgoing(text);
+        } finally {
+            sendingRef.current = false;
+        }
 
         if (translation && translation.translatedText?.length && translation.translatedText.length <= 255) {
             sendMessage(activeThread, GetSessionDataManager().userId, translation.translatedText, 0, null, undefined, translation);
-            setMessageText('');
             return;
         }
 
-        sendMessage(activeThread, GetSessionDataManager().userId, messageText);
-
-        setMessageText('');
+        sendMessage(activeThread, GetSessionDataManager().userId, text);
     };
 
     const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key !== 'Enter') return;
 
         void send();
+    };
+
+    const sendHabbicon = (habbiconId: number, keepOpen = false) => {
+        if (!activeThread || habbiconId <= 0) return;
+
+        sendHabbiconMessage(activeThread, habbiconId);
+        if (!keepOpen) setIsHabbiconPickerVisible(false);
     };
 
     useEffect(() => {
@@ -120,24 +161,10 @@ export const FriendsMessengerView: FC<{}> = (props) => {
 
                     const participantId = parseInt(parts[1]);
                     const friend = getFriend(participantId);
-                    if(!friend) return;
+                    if (!friend) return;
 
-                    if(participantId === -1)
-                    {
-                        const thread = getMessageThread(participantId);
-                        if(!thread) return;
-                        setActiveThreadId(thread.threadId);
-                        setIsVisible(true);
-                        return;
-                    }
-
-                    if(persistentMessenger)
-                    {
-                        persistentMessenger.actions.openDirectConversation(participantId, friend.name);
-                        setIsVisible(true);
-                        return;
-                    }
-
+                    // Staff Chat (participantId -1) and direct chats resolve the same
+                    // way — one path, so both open in the same messenger window.
                     const thread = getMessageThread(participantId);
 
                     if (!thread) return;
@@ -152,24 +179,70 @@ export const FriendsMessengerView: FC<{}> = (props) => {
         AddLinkEventTracker(linkTracker);
 
         return () => RemoveLinkEventTracker(linkTracker);
-    }, [getFriend, getMessageThread, persistentMessenger, setActiveThreadId]);
+    }, [getFriend, getMessageThread, setActiveThreadId]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!isVisible || !activeThread) return;
-        if(!messagesBox.current) return;
+        if (!messagesBox.current) return;
 
-        messagesBox.current.scrollTop = messagesBox.current.scrollHeight;
+        const box = messagesBox.current;
+        const anchor = olderPageAnchorRef.current;
+
+        // Forget the anchor on another conversation, or when the page never came (nothing older to add).
+        if (anchor && (anchor.threadId !== activeThread.threadId || Date.now() - anchor.at > OLDER_PAGE_WAIT_MS)) olderPageAnchorRef.current = null;
+
+        // An older page went in above: stay on the message that was in view.
+        if (olderPageAnchorRef.current) {
+            if (box.scrollHeight > anchor.height) {
+                box.scrollTop = box.scrollHeight - anchor.height + anchor.top;
+                olderPageAnchorRef.current = null;
+            }
+
+            return;
+        }
+
+        // Follow new lines only for a reader at the bottom, a newly selected conversation or an own message; someone
+        // reading older history stays where they are when a receipt or a line arrives.
+        const switched = lastScrolledThreadRef.current !== activeThread.threadId;
+
+        lastScrolledThreadRef.current = activeThread.threadId;
+
+        if (switched || stickToBottomRef.current) box.scrollTop = box.scrollHeight;
     }, [isVisible, activeThread]);
+
+    const onMessagesScroll = (event: UIEvent<HTMLDivElement>) => {
+        const box = event.currentTarget;
+
+        stickToBottomRef.current = box.scrollHeight - box.scrollTop - box.clientHeight < 24;
+
+        if (!activeThread || olderPageAnchorRef.current || box.scrollTop >= 48 || box.scrollHeight <= box.clientHeight) return;
+
+        const anchor = { threadId: activeThread.threadId, height: box.scrollHeight, top: box.scrollTop, at: Date.now() };
+
+        if (loadOlderHistory?.(activeThread)) olderPageAnchorRef.current = anchor;
+    };
+
+    // Stop typing when the conversation changes, not on every update of it (a clone after each line or receipt).
+    const activeThreadId = activeThread?.threadId ?? -1;
 
     useEffect(() => {
         return () => {
             stopTyping();
         };
-    }, [activeThread]);
+    }, [activeThreadId]);
+
+    useEffect(() => setWindowOpen?.(isVisible), [isVisible, setWindowOpen]);
+
+    // AIR MainView: the window hides once its last conversation is closed, and does not open without one.
+    useEffect(() => {
+        if (isVisible && !visibleThreads.length) setIsVisible(false);
+    }, [isVisible, visibleThreads.length]);
 
     useEffect(() => {
         if (isVisible && !activeThread) {
-            if (lastThreadId > 0) {
+            const lastThreadOpen = lastThreadId > 0 && visibleThreads.some((thread) => thread.threadId === lastThreadId);
+
+            if (lastThreadOpen) {
                 setActiveThreadId(lastThreadId);
             } else {
                 if (visibleThreads.length > 0) setActiveThreadId(visibleThreads[0].threadId);
@@ -184,59 +257,88 @@ export const FriendsMessengerView: FC<{}> = (props) => {
         }
     }, [isVisible, activeThread, lastThreadId, visibleThreads, setActiveThreadId]);
 
+    useEffect(() => {
+        const maximumStart = Math.max(0, visibleThreads.length - MESSENGER_VISIBLE_AVATARS);
+        const activeIndex = activeThread ? visibleThreads.findIndex((thread) => thread.threadId === activeThread.threadId) : -1;
+
+        setAvatarStartIndex((current) => {
+            const clamped = Math.min(current, maximumStart);
+
+            if (activeIndex < 0) return clamped;
+            if (activeIndex < clamped) return activeIndex;
+            if (activeIndex >= clamped + MESSENGER_VISIBLE_AVATARS) return Math.min(activeIndex - MESSENGER_VISIBLE_AVATARS + 1, maximumStart);
+
+            return clamped;
+        });
+    }, [activeThread, visibleThreads]);
+
+    const maximumAvatarStart = Math.max(0, visibleThreads.length - MESSENGER_VISIBLE_AVATARS);
+    const displayedThreads = visibleThreads.slice(avatarStartIndex, avatarStartIndex + MESSENGER_VISIBLE_AVATARS);
+    const scrollAvatars = (direction: -1 | 1) => setAvatarStartIndex((current) => Math.max(0, Math.min(maximumAvatarStart, current + direction)));
+
     if (!isVisible) return null;
 
-    if (persistentMessenger) {
-        return <FriendsPersistentMessengerView
-            messenger={persistentMessenger}
-            legacyStaffThread={activeThread?.participant?.id === -1 ? activeThread : null}
-            onClose={() => setIsVisible(false)}
-            onCloseStaff={() => activeThread && closeThread(activeThread.threadId)}
-            onSendStaff={(text) => activeThread && sendMessage(activeThread, GetSessionDataManager().userId, text)}
-        />;
-    }
-
     return (
-        <NitroCardView
-            className="messenger-card min-w-0 w-[min(440px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
-            theme="primary-slim"
-            uniqueKey={null}
-            windowPosition={DraggableWindowPosition.TOP_CENTER}
-            offsetTop={8}
-            isResizable={false}
-        >
-            <NitroCardHeaderView
-                headerText={LocalizeText('messenger.window.title', ['OPEN_CHAT_COUNT'], [visibleThreads.length.toString()])}
-                onCloseClick={(event) => setIsVisible(false)}
-            />
-            <NitroCardContentView className="text-black p-0" gap={0} overflow="hidden">
-                <div className="messenger-card-body">
-                    <div className="messenger-avatar-bar">
-                        {visibleThreads &&
-                            visibleThreads.length > 0 &&
-                            visibleThreads.map((thread) => {
-                                const isStaff = thread.participant.id <= 0;
-                                // Read the live look from the friend list (same source the friends
-                                // list renders) so offline friends show their real avatar instead
-                                // of the standard/anonymous one; resolveAvatarFigure is the final
-                                // fallback when the look is genuinely missing.
-                                const liveFriend = isStaff ? null : getFriend(thread.participant.id);
-                                const figure = isStaff
-                                    ? thread.participant.figure === 'ADM'
-                                        ? 'ha-3409-1413-70.lg-285-89.ch-3032-1334-109.sh-3016-110.hd-185-1359.ca-3225-110-62.wa-3264-62-62.fa-1206-90.hr-3322-1403'
-                                        : thread.participant.figure
-                                    : resolveAvatarFigure(liveFriend?.figure || thread.participant.figure, liveFriend?.gender ?? thread.participant.gender);
+        <NativeTextTree>
+            <>
+            <DraggableWindow handleSelector=".messenger-drag" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={8}>
+                <div className="messenger-window">
+                    <div className="messenger-drag" />
+                    <BaseButton className="messenger-minimize" onClick={() => setIsVisible(false)} />
+                    <div className="messenger-open-title">{LocalizeText('messenger.window.title', ['OPEN_CHAT_COUNT'], [visibleThreads.length.toString()])}</div>
+                    <div className="messenger-avatar-navigation">
+                        <BaseButton
+                            type="button"
+                            className="messenger-avatar-scroll left"
+                            data-action="scroll-left"
+                            aria-label={LocalizeText('generic.previous')}
+                            disabled={avatarStartIndex === 0}
+                            onClick={() => scrollAvatars(-1)}
+                        />
+                        <TabBar className="messenger-avatar-bar" value={activeThread?.threadId ?? null}>
+                            {displayedThreads.map((thread) => {
+                                const isStaff = isStaffChatIdentity(thread.participant);
+                                const liveFriend = thread.participant.id > 0 ? getFriend(thread.participant.id) : null;
+                                const figure = resolveAvatarFigure(
+                                    liveFriend?.figure || thread.participant.figure,
+                                    liveFriend?.gender ?? thread.participant.gender
+                                );
 
+                                // AIR MainView: hovering a head shows the friend's name.
                                 return (
-                                    <button
-                                        key={thread.threadId}
-                                        className={'messenger-avatar-tab' + (activeThread === thread ? ' active' : '') + (thread.unread ? ' unread' : '')}
-                                        onClick={(event) => setActiveThreadId(thread.threadId)}
-                                    >
-                                        <LayoutAvatarImageView figure={figure} headOnly={true} compactHead={true} compactHeadSize={36} compactHeadPadding={0} direction={isStaff ? 3 : 2} />
-                                    </button>
+                                    <Hint key={thread.threadId} content={thread.participant.name}>
+                                        <TabBarTab
+                                            value={thread.threadId}
+                                            data-participant-id={thread.participant.id}
+                                            className={'messenger-avatar-tab' + (activeThread === thread ? ' active' : '') + (thread.unread ? ' unread' : '')}
+                                            aria-label={thread.participant.name}
+                                            onClick={() => setActiveThreadId(thread.threadId)}
+                                        >
+                                            {isStaff ? (
+                                                <StaffChatFrankIconView size={35} className="staff-chat-frank" />
+                                            ) : (
+                                                <LayoutAvatarImageView
+                                                    figure={figure}
+                                                    headOnly={true}
+                                                    compactHead={true}
+                                                    compactHeadSize={35}
+                                                    compactHeadPadding={0}
+                                                    direction={thread.participant.id < 0 ? 3 : 2}
+                                                />
+                                            )}
+                                        </TabBarTab>
+                                    </Hint>
                                 );
                             })}
+                        </TabBar>
+                        <BaseButton
+                            type="button"
+                            className="messenger-avatar-scroll right"
+                            data-action="scroll-right"
+                            aria-label={LocalizeText('generic.next')}
+                            disabled={avatarStartIndex >= maximumAvatarStart}
+                            onClick={() => scrollAvatars(1)}
+                        />
                     </div>
 
                     {activeThread && (
@@ -248,27 +350,37 @@ export const FriendsMessengerView: FC<{}> = (props) => {
                                 <div className="messenger-actions">
                                     {activeThread.participant.id > 0 && (
                                         <>
-                                            <button className="messenger-btn icon-btn" onClick={followFriend}>
-                                                <div className="nitro-friends-spritesheet icon-follow" />
-                                            </button>
-                                            <button className="messenger-btn icon-btn" onClick={openProfile}>
-                                                <div className="nitro-friends-spritesheet icon-profile-sm" />
-                                            </button>
-                                            <button
-                                                className="messenger-btn danger"
-                                                onClick={() => report(ReportType.IM, { reportedUserId: activeThread.participant.id })}
-                                            >
-                                                {LocalizeText('messenger.window.button.report')}
-                                            </button>
+                                            <Hint content={LocalizeText('messenger.followfriend.tooltip')}>
+                                                <BaseButton
+                                                    className="messenger-btn icon-btn follow"
+                                                    aria-label={LocalizeText('messenger.followfriend.tooltip')}
+                                                    onClick={followFriend}
+                                                />
+                                            </Hint>
+                                            <Hint content={LocalizeText('infostand.profile.link.tooltip')}>
+                                                <BaseButton
+                                                    className="messenger-btn icon-btn profile"
+                                                    aria-label={LocalizeText('infostand.profile.link.tooltip')}
+                                                    onClick={openProfile}
+                                                />
+                                            </Hint>
+                                            <Hint content={LocalizeText('messenger.window.button.report.tooltip')}>
+                                                <BaseButton
+                                                    className="messenger-btn danger"
+                                                    onClick={() => report(ReportType.IM, { reportedUserId: activeThread.participant.id })}
+                                                >
+                                                    {LocalizeText('messenger.window.button.report')}
+                                                </BaseButton>
+                                            </Hint>
                                         </>
                                     )}
-                                    <button className="messenger-btn close-btn" onClick={(event) => closeThread(activeThread.threadId)}>
+                                    <BaseButton className="messenger-btn close-btn" onClick={(event) => closeThread(activeThread.threadId)}>
                                         <FaTimes />
-                                    </button>
+                                    </BaseButton>
                                 </div>
                             </div>
 
-                            <div ref={messagesBox} className="chat-messages">
+                            <div ref={messagesBox} className="chat-messages" onScroll={onMessagesScroll}>
                                 <FriendsMessengerThreadView thread={activeThread} />
                             </div>
 
@@ -279,22 +391,44 @@ export const FriendsMessengerView: FC<{}> = (props) => {
                             )}
 
                             <div className="messenger-input-row">
-                                <input
-                                    maxLength={255}
-                                    placeholder={LocalizeText('messenger.window.input.default', ['FRIEND_NAME'], [activeThread.participant.name])}
-                                    type="text"
-                                    value={messageText}
-                                    onChange={(event) => handleInputChange(event.target.value)}
-                                    onKeyDown={onKeyDown}
-                                />
-                                <button className="messenger-btn send" onClick={() => void send()}>
-                                    {LocalizeText('widgets.chatinput.say')}
-                                </button>
+                                {/* AIR illumina_input: the Say button sits inside the input's border, on its right. */}
+                                <div className="messenger-input-box">
+                                    <input
+                                        maxLength={120}
+                                        placeholder={LocalizeText('messenger.window.input.default', ['FRIEND_NAME'], [activeThread.participant.name])}
+                                        type="text"
+                                        value={messageText}
+                                        onChange={(event) => handleInputChange(event.target.value)}
+                                        onKeyDown={onKeyDown}
+                                    />
+                                    <BaseButton className="messenger-btn send" onClick={() => void send()}>
+                                        {LocalizeText('widgets.chatinput.say')}
+                                    </BaseButton>
+                                </div>
+                                <BaseButton
+                                    className="messenger-btn habbicon"
+                                    aria-label={LocalizeText('messenger.habbicons.tooltip')}
+                                    onMouseDown={(event) => event.stopPropagation()}
+                                    onClick={() => setIsHabbiconPickerVisible((value) => !value)}
+                                >
+                                    <img alt="" src={HabbiconsDmIcon} />
+                                </BaseButton>
                             </div>
+                            {isHabbiconPickerVisible && (
+                                <FriendsMessengerHabbiconPickerView
+                                    onClose={() => setIsHabbiconPickerVisible(false)}
+                                    onOpenHub={() => {
+                                        setIsHabbiconPickerVisible(false);
+                                        habbiconCatalog.setBookVisible(true);
+                                    }}
+                                    onSelect={sendHabbicon}
+                                />
+                            )}
                         </>
                     )}
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </DraggableWindow>
+            </>
+        </NativeTextTree>
     );
 };

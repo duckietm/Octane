@@ -179,12 +179,42 @@
 }
 
 .mention-row-actions {
-    display: none;
+    display: flex;
     gap: 4px;
 }
 
-.mention-row:hover .mention-row-time { display: none; }
-.mention-row:hover .mention-row-actions { display: flex; }
+/* The row is two parts side by side, so the actions are real buttons that keyboard and touch reach. */
+.mention-row-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: inherit;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.mention-row-main .mention-row-avatar {
+    display: block;
+}
+
+.mention-row-main:focus-visible,
+.mention-row-action:focus-visible,
+.mentions-filter:focus-visible,
+.mentions-refresh:focus-visible {
+    outline: 2px solid #418db0;
+    outline-offset: 1px;
+}
+
+.mentions-refresh:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
 
 .mention-row-action {
     width: 22px;
@@ -217,16 +247,9 @@
 }
 
 .mentions-empty-glyph {
-    width: 46px;
-    height: 46px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: rgba(30, 114, 149, 0.10);
-    color: #418db0;
-    font-size: 22px;
-    font-weight: 700;
+    width: 37px;
+    height: 37px;
+    background: url("@/assets/images/mentions/mentions-37.png") center / 37px 37px no-repeat;
 }
 
 .mentions-empty-text {
@@ -320,4 +343,295 @@
     letter-spacing: 0.6px;
     text-transform: uppercase;
     color: #9a978c;
+}
+
+/* The refresh / load-older buttons carry their label and wear AIR's grey `button` style 3
+   (habbo_skin_button_shiny) with a black caption. */
+.mentions-refresh {
+    box-sizing: border-box;
+    width: auto;
+    min-width: 0;
+    height: 24px;
+    padding: 0 6px;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 5px;
+    border-image-source: var(--habbo-skin-shiny);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: #000000;
+    font-family: UbuntuRegular, Ubuntu, sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+.mentions-refresh:hover:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-hover);
+}
+
+.mentions-refresh:active:not(:disabled) {
+    border-image-source: var(--habbo-skin-shiny-pressed);
+}
+
+.mentions-refresh:disabled {
+    border-image-source: var(--habbo-skin-shiny-disabled);
+    color: #8a8a8a;
+}
+
+/* ============================================================================
+   Refinement: the panel wears the flat, square chrome of the other hotel windows,
+   rows breathe and show two lines of the message, the actions are real buttons.
+   ============================================================================ */
+.mentions-search {
+    border-radius: 0;
+    border-color: #959595;
+    background: #ffffff;
+    box-shadow: none;
+}
+
+.mentions-filter {
+    border-radius: 0;
+    border-color: #959595;
+    background: #f3f1ea;
+    color: #3f3f3a;
+    font-weight: 400;
+}
+
+.mentions-filter.is-active {
+    border-color: #2f6f8c;
+    background: #418db0;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.mentions-group-label {
+    padding: 6px 2px 2px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    letter-spacing: 0.5px;
+}
+
+.mention-row {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 6px 8px 12px;
+    border-radius: 0;
+    border-width: 0 0 1px;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.mention-row.is-unread {
+    background: rgba(255, 210, 77, 0.18);
+    box-shadow: inset 3px 0 0 #418db0;
+}
+
+.mention-row-unread-dot {
+    display: none;
+}
+
+.mention-row-main {
+    align-items: flex-start;
+}
+
+.mention-row-avatar {
+    border-radius: 0;
+}
+
+.mention-row-head {
+    flex-wrap: wrap;
+    row-gap: 0;
+}
+
+.mention-row-name {
+    font-size: 13px;
+}
+
+.mention-row-room {
+    padding: 0 5px;
+    background: rgba(0, 0, 0, 0.07);
+    color: #5f5f58;
+    font-size: 10px;
+    line-height: 15px;
+}
+
+.mention-row-msg {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 16px;
+    color: #2f2f2b;
+}
+
+.mention-row-meta {
+    align-items: flex-end;
+    justify-content: space-between;
+    align-self: stretch;
+    gap: 6px;
+}
+
+.mention-row-time {
+    color: #77776f;
+    font-size: 11px;
+}
+
+/* go to and delete: AIR's grey `button` style 3 (habbo_skin_button_shiny), 22 px */
+.mention-row-action {
+    width: 24px;
+    height: 22px;
+    box-sizing: border-box;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 5px;
+    border-image-source: var(--habbo-skin-shiny);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    border-radius: 0;
+    background: none;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.mention-row-action:hover {
+    border-image-source: var(--habbo-skin-shiny-hover);
+    background: none;
+    color: #000000;
+}
+
+.mention-row-action.is-remove:hover {
+    border-image-source: var(--habbo-skin-shiny-hover);
+    background: none;
+    color: #b53636;
+}
+
+/* The head is the smooth, cropped one the friends list uses, not a pixelated enlargement of the
+   small image; the kind of mention is a labelled chip beside the name instead of a corner badge. */
+.mention-row-avatar {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #959595;
+    background: #e9e6da;
+    box-shadow: none;
+}
+
+.mention-row-avatar .avatar-image {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    transform: none !important;
+    background-position: center !important;
+    background-size: 100% 100% !important;
+    image-rendering: auto !important;
+}
+
+.mention-row-type {
+    display: none;
+}
+
+.mention-row-chip {
+    flex: none;
+    padding: 0 5px;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 15px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #ffffff;
+}
+
+.mention-row-chip.is-direct {
+    background: #418db0;
+}
+
+.mention-row-chip.is-room {
+    background: #d08a1e;
+}
+
+/* ============================================================================
+   AIR text pass. AIR has no mentions layout (no `mention` element in any habx window), so the panel
+   follows the AIR conventions: regular Ubuntu (our `Ubuntu` face is the condensed cut), u_regular /
+   u_bold 12 for the row, il_regular 11 for the room and time, u_small 10 for the chips, 12 px buttons.
+   ============================================================================ */
+.mentions-window {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+/* search field: u_regular 12 */
+.mentions-window .mentions-search input {
+    font-size: 12px;
+    color: #000000;
+}
+
+/* sender: u_bold 12 */
+.mentions-window .mention-row-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #000000;
+}
+
+/* message: u_regular 12 */
+.mentions-window .mention-row-msg {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 15px;
+    color: #000000;
+}
+
+/* room name: il_regular 11 */
+.mentions-window .mention-row-room {
+    font-size: 11px;
+}
+
+/* kind chip: u_small 10, bold on the coloured chip */
+.mentions-window .mention-row-chip {
+    font-size: 10px;
+}
+
+/* filter chips and the refresh / load-older buttons: 12 px buttons */
+.mentions-window .mentions-filter,
+.mentions-window .mentions-refresh {
+    font-size: 12px;
+}
+
+/* empty / loading / error line: u_regular 12 */
+.mentions-window .mentions-empty-text {
+    font-size: 12px;
+}
+
+@layer base {
+    .mentions-window :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    /* The shared Button carries an important 12.6 px size in the utilities layer. */
+    .mentions-window .mentions-markall {
+        font-size: 12px !important;
+    }
+
+    /* Mark all as read is no purchase: AIR's grey `button` style 3 (habbo_skin_button_shiny), 12 px regular
+       black, instead of the shared green Button skin. */
+    .mentions-window .mentions-markall.habbo-btn-primary {
+        border-image-source: var(--habbo-skin-shiny) !important;
+        color: #000000 !important;
+        font-weight: 400 !important;
+        text-shadow: none !important;
+    }
+
+    .mentions-window .mentions-markall.habbo-btn-primary:hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    .mentions-window .mentions-markall.habbo-btn-primary:active {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
 }

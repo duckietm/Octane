@@ -1,4 +1,5 @@
 import { FC, useEffect, useEffectEvent, useRef, useState } from 'react';
+import { loadTurnstileScript } from './loadTurnstileScript';
 
 declare global {
     interface Window {
@@ -35,14 +36,21 @@ export const TurnstileWidget: FC<TurnstileWidgetProps> = (props) => {
         if (scriptReady) return;
         if (typeof window === 'undefined') return;
 
-        const interval = window.setInterval(() => {
-            if (window.turnstile) {
-                setScriptReady(true);
-                window.clearInterval(interval);
-            }
-        }, 100);
+        let cancelled = false;
 
-        return () => window.clearInterval(interval);
+        // Fetched here rather than from index.html, so a hotel with the check off never
+        // loads Cloudflare's script at all - and a blocked one gives up instead of
+        // polling for as long as the login screen is open.
+        loadTurnstileScript().then((loaded) => {
+            if (cancelled) return;
+
+            if (loaded) setScriptReady(true);
+            else handleError();
+        });
+
+        return () => {
+            cancelled = true;
+        };
     }, [scriptReady]);
 
     useEffect(() => {

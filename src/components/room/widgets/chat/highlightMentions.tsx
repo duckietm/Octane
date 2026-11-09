@@ -1,4 +1,5 @@
-import { classifyMentionToken, MENTION_ROOM_ALIASES } from '../../../../api/mentions/mentionTokens';
+import { segmentMentionText } from '../../../../api/mentions/mentionSegments';
+import { MENTION_ROOM_ALIASES } from '../../../../api/mentions/mentionTokens';
 
 const TAG_CLASS = 'mention-tag';
 const SELF_CLASS = 'mention-tag mention-tag--self';
@@ -6,24 +7,9 @@ const SELF_CLASS = 'mention-tag mention-tag--self';
 const highlightTextChunk = (chunk: string, ownUsername: string, aliases: ReadonlyArray<string>): string => {
     if (chunk.indexOf('@') < 0) return chunk;
 
-    const segments = chunk.split(/(\s+)/);
-
-    let result = '';
-
-    for (const segment of segments) {
-        if (segment.length === 0) continue;
-
-        const kind = /^\s+$/.test(segment) ? '' : classifyMentionToken(segment, ownUsername, aliases);
-
-        if (!kind) {
-            result += segment;
-            continue;
-        }
-
-        result += `<span class="${kind === 'self' ? SELF_CLASS : TAG_CLASS}">${segment}</span>`;
-    }
-
-    return result;
+    return segmentMentionText(chunk, ownUsername, aliases)
+        .map((segment) => (segment.kind ? `<span class="${segment.kind === 'self' ? SELF_CLASS : TAG_CLASS}">${segment.text}</span>` : segment.text))
+        .join('');
 };
 
 /**

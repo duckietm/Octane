@@ -29,10 +29,11 @@
     --habbo-bc-outer: #ffb53c;
     --habbo-success: #00800b;
     --habbo-danger: #a81a12;
-    --habbo-buy-top: #ffe66b;
-    --habbo-buy-mid: #ffc828;
-    --habbo-buy-bottom: #f0a318;
-    --habbo-buy-text: #4a2b00;
+    --habbo-buy-top: #3dcc45;
+    --habbo-buy-mid: #1aa022;
+    --habbo-buy-bottom: #128818;
+    --habbo-buy-border: #0a5a10;
+    --habbo-buy-text: #ffffff;
     --habbo-frame-side: 10px;
     --habbo-frame-header-h: 33px;
     --habbo-frame-bottom: 10px;
@@ -55,109 +56,305 @@
     --habbo-purse-height: 77px;
 }
 
-/* Ubuntu shiny secondary (catalog secondary / preview / spinner) */
+/* AIR default button: Ubuntu gray 9-slice. */
 .habbo-btn-secondary,
 .habbo-btn-slice {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 22px;
-    padding: 2px 12px;
-    border: 2px solid var(--habbo-blue-header-border) !important;
-    border-radius: 4px !important;
-    background: linear-gradient(180deg, #f2f8fb 0%, #d4e6ef 44%, #a8c9d8 45%, #d9e9f0 100%) !important;
-    color: var(--habbo-text) !important;
+    min-height: 24px;
+    padding: 0 8px;
+    border: 3px solid transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-button) !important;
+    border-image-slice: 3 fill !important;
+    border-image-width: 3px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #111111 !important;
     font-size: 11px;
     font-weight: 700;
     line-height: 1.1;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 1px 0 rgba(0, 0, 0, 0.12);
+    text-shadow: none !important;
+    box-shadow: none !important;
     cursor: pointer;
-    transition: filter 0.1s ease;
+    image-rendering: var(--octane-pixel-art, pixelated);
 }
 
 .habbo-btn-secondary:hover,
 .habbo-btn-slice:hover {
-    filter: brightness(1.04);
-    background: linear-gradient(180deg, #ffffff 0%, #e0eff6 44%, #b8d5e4 45%, #e8f3f8 100%) !important;
+    border-image-source: var(--habbo-skin-button-hover) !important;
+    filter: none;
 }
 
 .habbo-btn-secondary:active,
 .habbo-btn-slice:active {
-    filter: brightness(0.96);
-    background: linear-gradient(180deg, #a8c9d8 0%, #d4e6ef 55%, #f2f8fb 100%) !important;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
+    border-image-source: var(--habbo-skin-button-pressed) !important;
+    filter: none;
+    box-shadow: none !important;
 }
 
 .habbo-btn-secondary:disabled,
-.habbo-btn-slice:disabled {
-    opacity: 0.55;
+.habbo-btn-slice:disabled,
+.habbo-btn-secondary.pointer-events-none,
+.habbo-btn-slice.pointer-events-none {
+    border-image-source: var(--habbo-skin-button-disabled) !important;
+    color: #777777 !important;
+    opacity: 1;
     cursor: not-allowed;
-    filter: grayscale(0.15);
+    filter: none;
 }
 
-/* Ubuntu shiny primary blue */
-.habbo-btn-primary {
+/* AIR green: container_button style 3 / intent 6 — shiny thick × #00aa00. */
+.habbo-btn-primary,
+.habbo-btn-buy,
+.habbo-btn-success,
+.habbo-btn-green {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 22px;
-    padding: 2px 12px;
-    border: 2px solid var(--habbo-blue-header) !important;
-    border-radius: 4px !important;
-    background: linear-gradient(180deg, var(--habbo-blue-highlight) 0%, var(--habbo-blue) 44%, var(--habbo-blue-dark) 100%) !important;
-    color: #fff !important;
+    min-height: 24px;
+    padding: 0 8px;
+    border-width: 5px !important;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny-thick-green) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #ffffff !important;
     font-size: 11px;
     font-weight: 700;
     line-height: 1.1;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.45);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 1px 0 rgba(0, 0, 0, 0.2);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35) !important;
+    box-shadow: none !important;
     cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.habbo-btn-primary:hover {
-    background: linear-gradient(180deg, #6eb8d4 0%, #4a9bc0 44%, #3580a0 100%) !important;
+.habbo-btn-primary:hover,
+.habbo-btn-buy:hover,
+.habbo-btn-success:hover,
+.habbo-btn-green:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-green-hover) !important;
+    filter: none;
 }
 
-.habbo-btn-primary:active {
-    background: linear-gradient(180deg, var(--habbo-blue-dark) 0%, var(--habbo-blue) 100%) !important;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.28);
+.habbo-btn-primary:active,
+.habbo-btn-buy:active,
+.habbo-btn-success:active,
+.habbo-btn-green:active {
+    border-image-source: var(--habbo-skin-shiny-thick-green-pressed) !important;
+    filter: none;
+    box-shadow: none !important;
 }
 
-/* Gold buy / confirm */
-.habbo-btn-buy {
-    border: 2px solid #8a5b00 !important;
-    border-radius: 4px !important;
-    background: linear-gradient(180deg, var(--habbo-buy-top) 0%, var(--habbo-buy-mid) 45%, var(--habbo-buy-bottom) 100%) !important;
-    color: var(--habbo-buy-text) !important;
-    font-weight: 700;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), inset 0 -2px 0 rgba(140, 75, 0, 0.35);
+.habbo-btn-primary:disabled,
+.habbo-btn-buy:disabled,
+.habbo-btn-success:disabled,
+.habbo-btn-green:disabled,
+.habbo-btn-primary.pointer-events-none,
+.habbo-btn-buy.pointer-events-none,
+.habbo-btn-success.pointer-events-none,
+.habbo-btn-green.pointer-events-none {
+    border-image-source: var(--habbo-skin-shiny-thick-green-disabled) !important;
+    color: #e8f8e8 !important;
+    opacity: 1;
+    cursor: not-allowed;
 }
 
-.habbo-btn-buy:hover {
-    background: linear-gradient(180deg, #fff080 0%, #ffd54d 45%, #f5ab1c 100%) !important;
-}
-
-.habbo-btn-buy:active {
-    background: linear-gradient(180deg, #f0a318 0%, #d98c0a 100%) !important;
-    box-shadow: inset 0 2px 0 rgba(140, 75, 0, 0.45);
-}
-
-.habbo-btn-success {
-    border: 2px solid #006d09 !important;
-    border-radius: 4px !important;
-    background: linear-gradient(180deg, #b6e86b 0%, #7fc828 45%, #4f9a18 100%) !important;
-    color: #fff !important;
-    font-weight: 700;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
-}
-
+/* AIR has no dedicated red button style; Octane danger uses shiny × purse logout #DE5347. */
 .habbo-btn-danger {
-    border: 2px solid #86150e !important;
-    border-radius: 4px !important;
-    background: linear-gradient(180deg, #e4665c 0%, var(--habbo-danger) 100%) !important;
-    color: #fff !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
+    padding: 0 8px;
+    border-width: 5px !important;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny-red) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-size: 11px;
     font-weight: 700;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
+    line-height: 1.1;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35) !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.habbo-btn-danger:hover {
+    border-image-source: var(--habbo-skin-shiny-red-hover) !important;
+    filter: none;
+}
+
+.habbo-btn-danger:active {
+    border-image-source: var(--habbo-skin-shiny-red-pressed) !important;
+    box-shadow: none !important;
+}
+
+/* Selected state.
+   Button adds the class `active` when a toggle is on - an open mod tool, the
+   selected catalog page, the current floorplan brush - but the skin only drew the
+   `:active` pseudo-class, which lasts as long as the mouse is down. So sixteen call
+   sites were saying "this one is on" and nothing showed it.
+   The pressed artwork says it best; the inset shadow keeps it apart from a click,
+   which is momentary. */
+.habbo-btn-primary.active,
+.habbo-btn-buy.active,
+.habbo-btn-success.active,
+.habbo-btn-green.active {
+    border-image-source: var(--habbo-skin-shiny-thick-green-pressed) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.34) !important;
+    filter: none;
+}
+
+.habbo-btn-secondary.active,
+.habbo-btn-slice.active {
+    border-image-source: var(--habbo-skin-button-pressed) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.28) !important;
+    filter: none;
+}
+
+.habbo-btn-danger.active {
+    border-image-source: var(--habbo-skin-shiny-red-pressed) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.34) !important;
+    filter: none;
+}
+
+/* Checkboxes and radios, drawn with the client's own artwork.
+   These rules used to live inside the .octane-wired block, so they only reached the
+   wired dialogs: everywhere else in the client a checkbox was whatever the browser
+   drew. The images come from the official client - the checkbox is the two states
+   of illumina_light_checkbox_basic, the radio is radio_button_off/on - so the size
+   is the artwork's own and must not be scaled. */
+input[type='checkbox'],
+.octane-checkbox,
+.form-check-input[type='checkbox'] {
+    width: 19px;
+    height: 20px;
+    min-width: 19px;
+    flex: 0 0 auto;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 0;
+    border-radius: 0;
+    background: var(--habbo-skin-checkbox) no-repeat center / 19px 20px;
+    box-shadow: none;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+input[type='checkbox']:checked,
+.octane-checkbox[data-checked],
+.form-check-input[type='checkbox']:checked {
+    background-image: var(--habbo-skin-checkbox-checked);
+}
+
+/* Base UI renders the box as a span (the real input is visually hidden). */
+.octane-checkbox {
+    display: inline-block;
+    padding: 0;
+}
+
+/* Windows that drew a plain native checkbox keep a plain box instead of the Habbo skin. */
+:is(.octane-catalog-admin-modal, .octane-catalog-admin-preview-persona, .octane-catalog-admin-bulk-grid, .octane-reward-track-admin, .octane-room-settings) .octane-checkbox {
+    position: relative;
+    box-sizing: border-box;
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    border: 1px solid #565650;
+    background: #fbfbf9;
+}
+
+:is(.octane-catalog-admin-modal, .octane-catalog-admin-preview-persona, .octane-catalog-admin-bulk-grid, .octane-reward-track-admin, .octane-room-settings) .octane-checkbox[data-checked]::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 0;
+    width: 4px;
+    height: 8px;
+    border: solid #111;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+input[type='radio'],
+.octane-radio,
+.form-check-input[type='radio'] {
+    width: 11px;
+    height: 12px;
+    min-width: 11px;
+    flex: 0 0 auto;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 0;
+    border-radius: 0;
+    background: var(--habbo-skin-radio) no-repeat center / 11px 12px;
+    box-shadow: none;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+input[type='radio']:checked,
+.octane-radio[data-checked],
+.form-check-input[type='radio']:checked {
+    background-image: var(--habbo-skin-radio-checked);
+}
+
+input[type='checkbox']:focus-visible,
+.octane-checkbox:focus-visible,
+.octane-radio:focus-visible,
+input[type='radio']:focus-visible {
+    outline: 1px solid #4b7ea1;
+    outline-offset: 1px;
+}
+
+input[type='checkbox']:disabled,
+.octane-checkbox[data-disabled],
+.octane-radio[data-disabled],
+input[type='radio']:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* Base UI renders the radio as an <i> inside its own one-item group. */
+.octane-radio {
+    display: inline-block;
+    padding: 0;
+}
+
+.octane-radio-group {
+    display: inline-flex;
+    flex: 0 0 auto;
+    vertical-align: middle;
+}
+
+/* Windows that drew a plain native radio keep a plain round dot instead of the Habbo skin. */
+:is(.octane-catalog-window, .octane-catalog-admin-modal, .octane-reward-track-admin, .octane-room-settings, .octane-login-card .room-template-option) .octane-radio {
+    position: relative;
+    box-sizing: border-box;
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    border: 1px solid #565650;
+    border-radius: 50%;
+    background: #fbfbf9;
+}
+
+:is(.octane-catalog-window, .octane-catalog-admin-modal, .octane-reward-track-admin, .octane-room-settings, .octane-login-card .room-template-option) .octane-radio[data-checked]::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: #111;
 }

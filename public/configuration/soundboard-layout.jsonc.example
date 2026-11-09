@@ -1,0 +1,30 @@
+{
+    // This file controls presentation only. Sound IDs, names, URLs, rank
+    // access, enabled state, ordering, and cooldown remain server-authoritative.
+    "categories": [
+        { "id": "reactions", "label": "Reactions" },
+        { "id": "effects", "label": "Effects" },
+    ],
+
+    // Supported tones: blue, green, gold, purple.
+    // Unknown sound IDs are ignored and server sounds missing here still appear.
+    // These IDs match a fresh seeded database. If the catalog already had
+    // entries, update them to the IDs assigned by your emulator database.
+    "sounds": [
+        { "id": 1, "category": "effects", "tone": "gold", "keywords": ["bell", "ding"] },
+        { "id": 2, "category": "reactions", "tone": "green", "keywords": ["clap", "cheer"] },
+        { "id": 3, "category": "effects", "tone": "gold", "keywords": ["bong", "chime"] },
+        { "id": 4, "category": "effects", "tone": "blue", "keywords": ["click", "button"] },
+        { "id": 5, "category": "reactions", "tone": "green", "keywords": ["confirm", "success"] },
+        { "id": 6, "category": "reactions", "tone": "purple", "keywords": ["error", "wrong"] },
+        { "id": 7, "category": "effects", "tone": "blue", "keywords": ["glass", "crystal"] },
+        { "id": 8, "category": "effects", "tone": "purple", "keywords": ["glitch", "digital"] },
+        { "id": 9, "category": "effects", "tone": "green", "keywords": ["open", "appear"] },
+        { "id": 10, "category": "effects", "tone": "gold", "keywords": ["close", "dismiss"] },
+        { "id": 11, "category": "effects", "tone": "blue", "keywords": ["pluck", "string"] },
+        { "id": 12, "category": "reactions", "tone": "purple", "keywords": ["question", "doubt"] },
+        { "id": 13, "category": "effects", "tone": "green", "keywords": ["select", "choose"] },
+        { "id": 14, "category": "effects", "tone": "gold", "keywords": ["switch", "toggle"] },
+        { "id": 15, "category": "effects", "tone": "blue", "keywords": ["tick", "clock"] },
+    ],
+}

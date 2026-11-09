@@ -1,4 +1,4 @@
-import { GetSellablePetPalettesComposer, SellablePetPalettesMessageEvent } from '@nitrots/nitro-renderer';
+import { GetSellablePetPalettesComposer, SellablePetPalettesMessageEvent } from '@octane/renderer';
 import { useCallback, useEffect, useState } from 'react';
 import { CatalogPetPalette, SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';

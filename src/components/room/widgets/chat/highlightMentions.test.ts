@@ -23,7 +23,7 @@ describe('highlightMentions', () => {
         for (const alias of MENTION_ROOM_ALIASES) {
             const out = highlightMentions(`hey @${alias}!`, 'Bob');
 
-            expect(out).toBe(`hey ${SELF(`@${alias}!`)}`);
+            expect(out).toBe(`hey ${SELF(`@${alias}`)}!`);
         }
     });
 
@@ -45,10 +45,10 @@ describe('highlightMentions', () => {
         expect(highlightMentions(text, 'Bob')).toBe(text);
     });
 
-    it('keeps trailing punctuation inside the span (mirrors server stripping)', () => {
+    it('leaves the punctuation after a mention outside the span', () => {
         const out = highlightMentions('watch out @Bob! seriously', 'Bob');
 
-        expect(out).toBe(`watch out ${SELF('@Bob!')} seriously`);
+        expect(out).toBe(`watch out ${SELF('@Bob')}! seriously`);
     });
 
     it('matches case-insensitively but preserves the original casing', () => {

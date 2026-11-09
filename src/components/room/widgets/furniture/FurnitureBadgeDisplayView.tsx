@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { LayoutTrophyView } from '../../../../common';
 import { useFurnitureBadgeDisplayWidget } from '../../../../hooks';
+import '../../../../css/room/FurniWindowsAAir.css';
 
 export const FurnitureBadgeDisplayView: FC<{}> = (props) => {
     const { objectId = -1, color = '1', badgeName = '', badgeDesc = '', date = '', senderName = '', onClose = null } = useFurnitureBadgeDisplayWidget();

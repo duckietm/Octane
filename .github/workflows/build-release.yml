@@ -10,59 +10,80 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
-  NITRO_SINGLE_BUNDLE: '1'
-  NITRO_JSON_MODE: 'legacy'
+  OCTANE_SINGLE_BUNDLE: '1'
+  OCTANE_JSON_MODE: 'legacy'
 
 jobs:
+  # The renderer lives in a private repo, so this workflow can only run where
+  # DUCKET_REPO_TOKEN is available. Without this gate actions/checkout fails with
+  # an opaque "Input required and not supplied: token" and turns the run red on
+  # every fork and on any repo that has not been given the secret.
+  check-access:
+    runs-on: ubuntu-latest
+    outputs:
+      has-token: ${{ steps.check.outputs.has-token }}
+    steps:
+      - name: Check for renderer access token
+        id: check
+        env:
+          DUCKET_REPO_TOKEN: ${{ secrets.DUCKET_REPO_TOKEN }}
+        run: |
+          if [ -n "$DUCKET_REPO_TOKEN" ]; then
+            echo "has-token=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has-token=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::DUCKET_REPO_TOKEN is not set — skipping the client release build."
+          fi
+
   build-release:
+    needs: check-access
+    if: needs.check-access.outputs.has-token == 'true'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout client
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
-          path: Nitro-V3
+          path: octane
 
       - name: Checkout renderer
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: duckethotel/ducket-render
           ref: main
-          path: Nitro_Render_V3
+          path: octane-renderer
           token: ${{ secrets.DUCKET_REPO_TOKEN }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: '22'
-          cache: yarn
-          cache-dependency-path: |
-            Nitro-V3/yarn.lock
-            Nitro_Render_V3/yarn.lock
+          node-version-file: 'octane/.nvmrc'
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install renderer dependencies
-        working-directory: Nitro_Render_V3
+        working-directory: octane-renderer
         run: yarn install --frozen-lockfile
-
-      - name: Link renderer
-        working-directory: Nitro_Render_V3
-        run: yarn link
 
       - name: Install client dependencies
-        working-directory: Nitro-V3
-        run: yarn install --frozen-lockfile
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+        working-directory: octane
+        run: corepack yarn install --immutable
 
       - name: Link renderer into client
-        working-directory: Nitro-V3
-        run: yarn link "@nitrots/nitro-renderer"
+        run: |
+          mkdir -p octane/node_modules/@octane
+          ln -sfn "${{ github.workspace }}/octane-renderer" octane/node_modules/@octane/renderer
 
       - name: Build client
-        working-directory: Nitro-V3
+        working-directory: octane
         run: yarn build
 
       - name: Read package version
         id: version
-        working-directory: Nitro-V3
+        working-directory: octane
         run: |
           VERSION=$(node -p "require('./package.json').version")
           SHORT_SHA=${GITHUB_SHA::7}
@@ -70,12 +91,12 @@ jobs:
           echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Package dist
-        working-directory: Nitro-V3
+        working-directory: octane
         run: |
           zip -r "../ducket-client-dist-${{ steps.version.outputs.short_sha }}.zip" dist
 
       - name: Publish release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: client-v${{ steps.version.outputs.version }}-${{ steps.version.outputs.short_sha }}
           name: Ducket Client ${{ steps.version.outputs.version }} (${{ steps.version.outputs.short_sha }})

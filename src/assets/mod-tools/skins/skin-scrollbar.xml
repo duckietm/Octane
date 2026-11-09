@@ -1,0 +1,392 @@
+<?xml version="1.0"?>
+<skin name="default_scrollbar_skin" version="0.0">
+
+	<!-- shared variables -->
+
+	<variables>
+
+		<variable key="color"	value="0xffffff"				type="uint"		/>
+		<variable key="blend"	value="1"						type="Number"	/>
+		<variable key="asset"	value="habbo_blue_skin_png"	type="String"	/>
+		<variable key="width"	value="17" 						type="uint"		/>
+		<variable key="height"	value="17" 						type="uint"		/>
+
+		<!-- button sizes -->
+
+		<variable key="button_up_width"		value="17" type="uint" />
+		<variable key="button_up_height"	value="16" type="uint" />
+		<variable key="button_down_width"	value="17" type="uint" />
+		<variable key="button_down_height"	value="16" type="uint" />
+		<variable key="button_left_width"	value="16" type="uint" />
+		<variable key="button_left_height"	value="17" type="uint" />
+		<variable key="button_right_width"	value="16" type="uint" />
+		<variable key="button_right_height"	value="17" type="uint" />
+
+	</variables>
+
+	<!-- the following maps layouts for render states -->
+
+	<states>
+
+		<state name="default" layout="scrollbar_horizontal"	template="null" />
+		<state name="default" layout="scrollbar_vertical"	template="null" />
+
+		<state name="default"  layout="scrollbar_button_up" template="button_up_default" />
+		<!-- <state name="active"   layout="scrollbar_button_up" template="button_up_default" /> -->
+		<state name="pressed"  layout="scrollbar_button_up" template="button_up_pressed" />
+		<state name="disabled" layout="scrollbar_button_up" template="button_up_passive" />
+
+		<state name="default"  layout="scrollbar_button_down" template="button_down_default" />
+		<!-- <state name="active"   layout="scrollbar_button_down" template="button_down_default" /> -->
+		<state name="pressed"  layout="scrollbar_button_down" template="button_down_pressed" />
+		<state name="disabled" layout="scrollbar_button_down" template="button_down_passive" />
+
+		<state name="default"  layout="scrollbar_button_left" template="button_left_default" />
+		<!-- <state name="active"   layout="scrollbar_button_left" template="button_left_default" /> -->
+		<state name="pressed"  layout="scrollbar_button_left" template="button_left_pressed" />
+		<state name="disabled" layout="scrollbar_button_left" template="button_left_passive" />
+
+		<state name="default"  layout="scrollbar_button_right" template="button_right_default" />
+		<!-- <state name="active"   layout="scrollbar_button_right" template="button_right_default" /> -->
+		<state name="pressed"  layout="scrollbar_button_right" template="button_right_pressed" />
+		<state name="disabled" layout="scrollbar_button_right" template="button_right_passive" />
+
+		<state name="default"  layout="scrollbar_lift_horizontal" template="lift_horizontal_default" />
+		<!-- <state name="active"   layout="scrollbar_lift_horizontal" template="lift_horizontal_default" /> -->
+		<state name="pressed"  layout="scrollbar_lift_horizontal" template="lift_horizontal_pressed" />
+		<state name="disabled" layout="scrollbar_lift_horizontal" template="lift_horizontal_disabled" />
+
+		<state name="default"  layout="scrollbar_lift_vertical" template="lift_vertical_default" />
+		<!-- <state name="active"   layout="scrollbar_lift_vertical" template="lift_vertical_default" /> -->
+		<state name="pressed"  layout="scrollbar_lift_vertical" template="lift_vertical_pressed" />
+		<state name="disabled" layout="scrollbar_lift_vertical" template="lift_vertical_disabled" />
+
+		<state name="default"  layout="scrollbar_track_horizontal" template="track_hor_default" />
+		<!-- <state name="active"   layout="scrollbar_track_horizontal" template="track_hor_default" /> -->
+		<state name="pressed"  layout="scrollbar_track_horizontal" template="track_hor_pressed" />
+		<state name="disabled" layout="scrollbar_track_horizontal" template="track_hor_passive" />
+
+		<state name="default"  layout="scrollbar_track_vertical" template="track_ver_default" />
+		<!-- <state name="active"   layout="scrollbar_track_vertical" template="track_ver_default" /> -->
+		<state name="pressed"  layout="scrollbar_track_vertical" template="track_ver_pressed" />
+		<state name="disabled" layout="scrollbar_track_vertical" template="track_ver_passive" />
+
+	</states>
+
+	<!-- templates defines regions in bitmap asset -->
+
+	<templates>
+
+		<template name="null" />
+
+		<!-- button up -->
+
+		<template name="button_up_default" asset="$asset">
+			<entities>
+				<entity name="button" type="bitmap"><region><Rectangle x="192" y="0" width="$button_up_width" height="$button_up_height" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="button_up_passive" asset="$asset">
+			<entities>
+				<entity name="button" type="bitmap"><region><Rectangle x="228"  y="0" width="$button_up_width" height="$button_up_height" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="button_up_pressed" asset="$asset">
+			<entities>
+				<entity name="button" type="bitmap"><region><Rectangle x="210" y="0"  width="$button_up_width" height="$button_up_height" /></region></entity>
+			</entities>
+		</template>
+
+		<!-- button down -->
+
+		<template name="button_down_default" asset="$asset">
+			<entities>
+				<entity name="button" type="bitmap"><region><Rectangle x="192" y="16" width="$button_down_width" height="$button_down_height" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="button_down_passive" asset="$asset">
+			<entities>
+				<entity name="button" type="bitmap"><region><Rectangle x="228"  y="16" width="$button_down_width" height="$button_down_height" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="button_down_pressed" asset="$asset">
+			<entities>
+				<entity name="button" type="bitmap"><region><Rectangle x="210" y="16" width="$button_down_width" height="$button_down_height" /></region></entity>
+			</entities>
+		</template>
+
+		<!-- button left -->
+
+		<template name="button_left_default" asset="$asset">
+			<entities>
+				<entity name="button" type="bitmap"><region><Rectangle x="246" y="0" width="$button_left_width" height="$button_left_height" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="button_left_passive" asset="$asset">
+			<entities>
+				<entity name="button" type="bitmap"><region><Rectangle x="279"  y="0" width="$button_left_width" height="$button_left_height" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="button_left_pressed" asset="$asset">
+			<entities>
+				<entity name="button" type="bitmap"><region><Rectangle x="246" y="18" width="$button_left_width" height="$button_left_height" /></region></entity>
+			</entities>
+		</template>
+
+		<!-- button right -->
+
+		<template name="button_right_default" asset="$asset">
+			<entities>
+				<entity name="button" type="bitmap"><region><Rectangle x="262" y="0" width="$button_right_width" height="$button_right_height" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="button_right_passive" asset="$asset">
+			<entities>
+				<entity name="button" type="bitmap"><region><Rectangle x="295"  y="0" width="$button_right_width" height="$button_right_height" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="button_right_pressed" asset="$asset">
+			<entities>
+				<entity name="button" type="bitmap"><region><Rectangle x="262" y="18" width="$button_right_width" height="$button_right_height" /></region></entity>
+			</entities>
+		</template>
+
+		<!-- lift vertical -->
+
+		<template name="lift_vertical_default" asset="$asset">
+			<entities>
+				<entity name="top" type="bitmap"><region><Rectangle x="312" y="0"  width="$width" height="2" /></region></entity>
+				<entity name="mid" type="bitmap"><region><Rectangle x="312" y="2"  width="$width" height="1" /></region></entity>
+				<entity name="btm" type="bitmap"><region><Rectangle x="312" y="22" width="$width" height="2" /></region></entity>
+				<entity name="grd" type="bitmap"><region><Rectangle x="317" y="7"  width="7" height="10" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="lift_vertical_pressed" asset="$asset">
+			<entities>
+				<entity name="top" type="bitmap"><region><Rectangle x="331" y="0"  width="$width" height="2" /></region></entity>
+				<entity name="mid" type="bitmap"><region><Rectangle x="331" y="2"  width="$width" height="1" /></region></entity>
+				<entity name="btm" type="bitmap"><region><Rectangle x="331" y="22" width="$width" height="2" /></region></entity>
+				<entity name="grd" type="bitmap"><region><Rectangle x="336" y="7"  width="7" height="10" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="lift_vertical_disabled" asset="$asset">
+			<entities>
+
+			</entities>
+		</template>
+
+		<!-- lift horizontal -->
+
+		<template name="lift_horizontal_default" asset="$asset">
+			<entities>
+				<entity name="lft" type="bitmap"><region><Rectangle x="350" y="0" width="2" height="$height" /></region></entity>
+				<entity name="cnt" type="bitmap"><region><Rectangle x="352" y="0" width="1" height="$height" /></region></entity>
+				<entity name="rgt" type="bitmap"><region><Rectangle x="372" y="0" width="2" height="$height" /></region></entity>
+				<entity name="grd" type="bitmap"><region><Rectangle x="358" y="5" width="10" height="7" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="lift_horizontal_pressed" asset="$asset">
+			<entities>
+				<entity name="lft" type="bitmap"><region><Rectangle x="350" y="19" width="2" height="$height" /></region></entity>
+				<entity name="cnt" type="bitmap"><region><Rectangle x="352" y="19" width="1" height="$height" /></region></entity>
+				<entity name="rgt" type="bitmap"><region><Rectangle x="372" y="19" width="2" height="$height" /></region></entity>
+				<entity name="grd" type="bitmap"><region><Rectangle x="358" y="24" width="10" height="7" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="lift_horizontal_disabled" asset="$asset">
+			<entities>
+
+			</entities>
+		</template>
+
+		<!-- track vertical -->
+
+		<template name="track_ver_default" asset="$asset">
+			<entities>
+				<entity name="track" type="bitmap"><region><Rectangle x="312" y="25" width="$width" height="1" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="track_ver_passive" asset="$asset">
+			<entities>
+				<entity name="track" type="bitmap"><region><Rectangle x="312"  y="25" width="$width" height="1" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="track_ver_pressed" asset="$asset">
+			<entities>
+				<entity name="track" type="bitmap"><region><Rectangle x="331" y="25"  width="$width" height="1" /></region></entity>
+			</entities>
+		</template>
+
+		<!-- track horizontal -->
+
+		<template name="track_hor_default" asset="$asset">
+			<entities>
+				<entity name="track" type="bitmap"><region><Rectangle x="375" y="0" width="1" height="17" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="track_hor_passive" asset="$asset">
+			<entities>
+				<entity name="track" type="bitmap"><region><Rectangle x="375"  y="19" width="1" height="$height" /></region></entity>
+			</entities>
+		</template>
+
+		<template name="track_hor_pressed" asset="$asset">
+			<entities>
+				<entity name="track" type="bitmap"><region><Rectangle x="375" y="0"  width="1" height="$height" /></region></entity>
+			</entities>
+		</template>
+
+	</templates>
+
+	<!-- markup for layout drawer -->
+
+	<layouts>
+
+		<!-- scrollbar -->
+
+		<layout name="scrollbar_horizontal" transparent="false">
+			<entities>
+				<entity name="track" id="0">
+					<region><Rectangle x="0" y="0" width="29" height="$height" /></region>
+					<scale horizontal="strech" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+
+		<layout name="scrollbar_vertical" transparent="false">
+			<entities>
+				<entity name="track" id="0">
+					<region><Rectangle x="0" y="0" width="$width" height="29" /></region>
+					<scale horizontal="fixed" vertical="strech" />
+				</entity>
+			</entities>
+		</layout>
+
+		<!-- track horizontal -->
+
+		<layout name="scrollbar_track_horizontal" transparent="false">
+			<entities>
+				<entity name="track" id="0">
+					<region><Rectangle x="0" y="0" width="1" height="$height" /></region>
+					<scale horizontal="strech" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+
+		<!-- track vertical -->
+
+		<layout name="scrollbar_track_vertical" transparent="false">
+			<entities>
+				<entity name="track" id="0">
+					<region><Rectangle x="0" y="0" width="$width" height="1" /></region>
+					<scale horizontal="fixed" vertical="strech" />
+				</entity>
+			</entities>
+		</layout>
+
+		<!-- button up -->
+
+		<layout name="scrollbar_button_up" transparent="true">
+			<entities>
+				<entity name="button" id="0">
+					<region><Rectangle x="0" y="0" width="$button_up_width" height="$button_up_height" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+
+		<!-- button down -->
+
+		<layout name="scrollbar_button_down" transparent="true">
+			<entities>
+				<entity name="button" id="0">
+					<region><Rectangle x="0" y="0" width="$button_down_width" height="$button_down_height" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+
+		<!-- button left -->
+
+		<layout name="scrollbar_button_left" transparent="true">
+			<entities>
+				<entity name="button" id="0">
+					<region><Rectangle x="0" y="0" width="$button_left_width" height="$button_left_height" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+
+		<!-- button right -->
+
+		<layout name="scrollbar_button_right" transparent="true">
+			<entities>
+				<entity name="button" id="0">
+					<region><Rectangle x="0" y="0" width="$button_right_width" height="$button_right_height" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+
+		<!-- button lift horizontal -->
+
+		<layout name="scrollbar_lift_horizontal" transparent="false">
+			<entities>
+				<entity name="lft" id="0">
+					<region><Rectangle x="0" y="0" width="2" height="$height" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+				<entity name="cnt" id="0">
+					<region><Rectangle x="2" y="0" width="20" height="$height" /></region>
+					<scale horizontal="strech" vertical="fixed" />
+				</entity>
+				<entity name="rgt" id="0">
+					<region><Rectangle x="22" y="0" width="2" height="$height" /></region>
+					<scale horizontal="move" vertical="fixed" />
+				</entity>
+				<entity name="grd" id="0">
+					<region><Rectangle x="8" y="5" width="10" height="7" /></region>
+					<scale horizontal="tiled" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+
+		<!-- button lift vertical -->
+
+		<layout name="scrollbar_lift_vertical" transparent="false">
+			<entities>
+				<entity name="top" id="0">
+					<region><Rectangle x="0" y="0" width="$width" height="2" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+				<entity name="mid" id="0">
+					<region><Rectangle x="0" y="2" width="$width" height="20" /></region>
+					<scale horizontal="fixed" vertical="strech" />
+				</entity>
+				<entity name="btm" id="0">
+					<region><Rectangle x="0" y="22" width="$width" height="2" /></region>
+					<scale horizontal="fixed" vertical="move" />
+				</entity>
+				<entity name="grd" id="0">
+					<region><Rectangle x="5" y="7" width="7" height="10" /></region>
+					<scale horizontal="fixed" vertical="tiled" />
+				</entity>
+			</entities>
+		</layout>
+	</layouts>
+</skin>

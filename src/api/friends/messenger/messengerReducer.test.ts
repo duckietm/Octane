@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { initialMessengerState, messengerReducer, selectMessageByClientId, selectMessages, selectMessengerIconState } from '.';
 import { MessengerIconState } from '../MessengerIconState';
+import { initialMessengerState, messengerReducer, selectMessageByClientId, selectMessages, selectMessengerIconState } from '.';
 
 describe('messengerReducer', () =>
 {

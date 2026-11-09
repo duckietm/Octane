@@ -1,4 +1,4 @@
-import { IPollQuestion } from '@nitrots/nitro-renderer';
+import { IPollQuestion } from '@octane/renderer';
 import { RoomWidgetUpdateEvent } from './RoomWidgetUpdateEvent';
 
 export class RoomWidgetPollUpdateEvent extends RoomWidgetUpdateEvent {

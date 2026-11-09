@@ -1,0 +1,32 @@
+/* HC extend confirmation (AIR extend_confirmation). Kept out of PurseView.css, whose purse chrome has no
+   shiny button skins. */
+
+/* extend_confirmation buy_now_button: a grey button_thick (style 3, habbo_skin_button_shiny_thick), 30 px high,
+   12 px bold black, not the green buy skin. */
+@layer base {
+    .octane-club-extend .octane-club-extend-buy {
+        min-width: 150px !important;
+        min-height: 30px !important;
+        padding: 0 8px !important;
+        border-width: 5px !important;
+        border-style: solid !important;
+        border-color: transparent !important;
+        border-image-source: var(--habbo-skin-shiny-thick) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        border-image-repeat: stretch !important;
+        background: transparent !important;
+        color: #000000 !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        text-shadow: none !important;
+    }
+
+    .octane-club-extend .octane-club-extend-buy:hover {
+        border-image-source: var(--habbo-skin-shiny-thick-hover) !important;
+    }
+
+    .octane-club-extend .octane-club-extend-buy:active {
+        border-image-source: var(--habbo-skin-shiny-thick-pressed) !important;
+    }
+}

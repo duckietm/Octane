@@ -1,45 +1,64 @@
-import { FC, useState } from 'react';
-import { LocalizeText } from '../../../../api';
-import { Button, Column, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { FC, useEffect, useState } from 'react';
+import { localizeWithFallback, LocalizeText } from '../../../../api';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useDoorbellActions, useDoorbellState } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
+import '../../../../css/room/RoomWidgetsSweepAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
+/* Official doorbell: the information in red, then a list of 20 px rows, each with the name and two
+   icon buttons, a green check to let the visitor in and a red cross to turn them away. */
 export const DoorbellWidgetView: FC = () => {
     const users = useDoorbellState();
     const { answer } = useDoorbellActions();
-    const [dismissed, setDismissed] = useState(false);
+    // Closing hides the visitors waiting now, not every later one: a single flag used to stay set, so whoever rang
+    // afterwards (the same friend an hour later included) was never shown.
+    const [dismissedUsers, setDismissedUsers] = useState<readonly string[]>([]);
 
-    const isVisible = !dismissed && users.length > 0;
+    useEffect(() => {
+        if (!users.length && dismissedUsers.length) setDismissedUsers([]);
+    }, [users, dismissedUsers]);
+
+    const isVisible = users.some((userName) => !dismissedUsers.includes(userName));
 
     if (!isVisible) return null;
 
     return (
-        <NitroCardView className="nitro-widget-doorbell" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('navigator.doorbell.title')} onCloseClick={() => setDismissed(true)} />
-            <NitroCardContentView gap={0} overflow="hidden">
-                <Column gap={2}>
-                    <Grid className="text-black font-bold	 border-bottom px-1 pb-1" gap={1}>
-                        <div className="col-span-6">{LocalizeText('generic.username')}</div>
-                        <div className="col-span-6" />
-                    </Grid>
-                </Column>
-                <Column className="striped-children" gap={0} overflow="auto">
-                    {users.map((userName) => (
-                        <Grid key={userName} alignItems="center" className="text-black border-bottom p-1" gap={1}>
-                            <div className="col-span-6">{userName}</div>
-                            <div className="col-span-6">
-                                <div className="flex items-center gap-1 justify-end">
-                                    <Button variant="success" onClick={() => answer(userName, true)}>
-                                        {LocalizeText('generic.accept')}
-                                    </Button>
-                                    <Button variant="danger" onClick={() => answer(userName, false)}>
-                                        {LocalizeText('generic.deny')}
-                                    </Button>
-                                </div>
+        <NativeTextTree>
+            <OctaneCardView className="octane-widget-doorbell" theme="primary-slim">
+                <OctaneCardHeaderView headerText={localizeWithFallback('widgets.doorbell.title', LocalizeText('navigator.doorbell.title'))} onCloseClick={() => setDismissedUsers(users)} />
+                <OctaneCardContentView gap={2} overflow="hidden">
+                    <div className="octane-doorbell-info">{localizeWithFallback('widgets.doorbell.info', 'These visitors are waiting at the door.')}</div>
+                    <div className="octane-doorbell-list">
+                        {users.map((userName) => (
+                            <div key={userName} className="octane-doorbell-row">
+                                <span className="octane-doorbell-name">{userName}</span>
+                                <Hint content={LocalizeText('generic.accept')}>
+                                    <BaseButton
+                                        aria-label={`${LocalizeText('generic.accept')} ${userName}`}
+                                        className="octane-doorbell-accept"
+                                        type="button"
+                                        onClick={() => answer(userName, true)}
+                                    >
+                                        ✓
+                                    </BaseButton>
+                                </Hint>
+                                <Hint content={LocalizeText('generic.deny')}>
+                                    <BaseButton
+                                        aria-label={`${LocalizeText('generic.deny')} ${userName}`}
+                                        className="octane-doorbell-deny"
+                                        type="button"
+                                        onClick={() => answer(userName, false)}
+                                    >
+                                        ✕
+                                    </BaseButton>
+                                </Hint>
                             </div>
-                        </Grid>
-                    ))}
-                </Column>
-            </NitroCardContentView>
-        </NitroCardView>
+                        ))}
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

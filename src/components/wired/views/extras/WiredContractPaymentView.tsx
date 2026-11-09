@@ -1,41 +1,40 @@
 import { FC, useEffect, useState } from 'react';
-import { WiredFurniType } from '../../../../api';
+import { WiredFurniType, localizeWithFallback } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
-import { CONTRACT_DIR_PAY, ContractTermRow, parseContractTerms, serializeContractTerms } from './contractTermWire';
-import { WiredContractTermRow } from './WiredContractTermRow';
+import { CONTRACT_DIR_PAY, ContractTermRow, emptyRow, parseContractRules, serializeContractRules } from './contractTermWire';
+import { WiredContractRulesEditor } from './WiredContractRulesEditor';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
+/** Payment: the player gives something and gets nothing back through the contract itself. */
 export const WiredContractPaymentView: FC<{}> = () => {
     const { trigger = null, setIntParams = null, setStringParam = null } = useWired();
-    const [row, setRow] = useState<ContractTermRow>({
-        direction: CONTRACT_DIR_PAY,
-        kind: 0,
-        currencyType: -1,
-        wallItem: false,
-        baseItemId: 0,
-        amount: 0,
-    });
+    const [giveRules, setGiveRules] = useState<ContractTermRow[][]>([[emptyRow(CONTRACT_DIR_PAY)]]);
 
     useEffect(() => {
         if (!trigger) return;
-        const parsed = parseContractTerms(trigger.intData ?? [], trigger.stringData ?? '');
-        if (parsed.length > 0) setRow(parsed[0]);
+
+        const parsed = parseContractRules(trigger.intData ?? [], trigger.stringData ?? '');
+        setGiveRules(parsed.giveRules.length ? parsed.giveRules : [[emptyRow(CONTRACT_DIR_PAY)]]);
     }, [trigger]);
 
     const save = () => {
-        const payload = serializeContractTerms([{ ...row, direction: CONTRACT_DIR_PAY }]);
+        const payload = serializeContractRules({ giveRules, getRule: [] });
         setIntParams(payload.intParams);
         setStringParam(payload.stringParam);
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID} save={save} cardStyle={{ width: 380 }}>
-            <div className="flex flex-col gap-2">
-                <Text bold>The user must PAY:</Text>
-                <WiredContractTermRow row={row} onChange={(patch) => setRow((prev) => ({ ...prev, ...patch }))} />
-                <Text small>Optional: pick a chest above to deposit the payment into (else it is removed).</Text>
-            </div>
-        </WiredExtraBaseView>
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID} save={save} cardStyle={{ width: 400 }}>
+                <div className="flex flex-col gap-2">
+                    <Text bold>{localizeWithFallback('octane.wired.the_user_must_pay', 'The user must PAY:')}</Text>
+                    <WiredContractRulesEditor direction={CONTRACT_DIR_PAY} rules={giveRules} onChange={setGiveRules} />
+                    <Text small>{localizeWithFallback('octane.wired.each_option_is_an_alternative_the', 'Each option is an alternative — the player pays whichever one they can.')}</Text>
+                    <Text small>Optional: pick a chest above to deposit the payment into (else it is removed).</Text>
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

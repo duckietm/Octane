@@ -1,7 +1,7 @@
-import { NitroEvent } from '@nitrots/nitro-renderer';
+import { OctaneEvent } from '@octane/renderer';
 import { CatalogWidgetEvent } from './CatalogWidgetEvent';
 
-export class CatalogPurchaseOverrideEvent extends NitroEvent {
+export class CatalogPurchaseOverrideEvent extends OctaneEvent {
     private _callback: Function;
 
     constructor(callback: Function) {

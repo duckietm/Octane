@@ -3,6 +3,8 @@ import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
+import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MIN_ALTITUDE = 0;
 const MAX_ALTITUDE = 80;
@@ -24,32 +26,19 @@ const formatAltitude = (value: number) => {
     return text.replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
 };
 
-const parseAltitude = (value: string) => {
-    if (!value || !value.trim().length) return 0;
-
-    const parsed = parseFloat(value);
-
-    if (isNaN(parsed)) return 0;
-
-    return clampAltitude(parsed);
-};
-
 export const WiredSelectorFurniAltitudeView: FC<{}> = () => {
     const { trigger = null, setIntParams = null, setStringParam = null } = useWired();
     const [comparison, setComparison] = useState(1);
-    const [filterExisting, setFilterExisting] = useState(false);
-    const [invert, setInvert] = useState(false);
     const [altitude, setAltitude] = useState(0);
     const [altitudeInput, setAltitudeInput] = useState('0');
 
     useEffect(() => {
         if (!trigger) return;
 
-        const nextAltitude = parseAltitude(trigger.stringData);
+        // Official layout: [altitude in hundredths, comparison].
+        const nextAltitude = clampAltitude((trigger.intData[0] ?? 0) / 100);
 
-        setComparison(trigger.intData.length > 0 ? trigger.intData[0] : 1);
-        setFilterExisting(trigger.intData.length > 1 ? trigger.intData[1] === 1 : false);
-        setInvert(trigger.intData.length > 2 ? trigger.intData[2] === 1 : false);
+        setComparison(trigger.intData.length > 1 ? trigger.intData[1] : 1);
         setAltitude(nextAltitude);
         setAltitudeInput(formatAltitude(nextAltitude));
     }, [trigger]);
@@ -84,72 +73,50 @@ export const WiredSelectorFurniAltitudeView: FC<{}> = () => {
     };
 
     const save = useCallback(() => {
-        setIntParams([comparison, filterExisting ? 1 : 0, invert ? 1 : 0]);
-        setStringParam(formatAltitude(altitude));
-    }, [altitude, comparison, filterExisting, invert, setIntParams, setStringParam]);
+        setIntParams([Math.round(altitude * 100), comparison]);
+        setStringParam('');
+    }, [altitude, comparison, setIntParams, setStringParam]);
 
     return (
-        <WiredSelectorBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            hideDelay={true}
-            cardStyle={{ width: 400 }}
-        >
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    {[0, 1, 2].map((value) => {
-                        return (
-                            <label key={value} className="flex items-center gap-1">
-                                <input
-                                    checked={comparison === value}
-                                    className="form-check-input"
-                                    name="furniAltitudeComparison"
-                                    type="radio"
-                                    onChange={() => setComparison(value)}
-                                />
-                                <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
-                            </label>
-                        );
-                    })}
+        <NativeTextTree>
+            <WiredSelectorBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                hideDelay={true}
+                cardStyle={{ width: 400 }}
+            >
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        {[0, 1, 2].map((value) => {
+                            return (
+                                <label key={value} className="flex items-center gap-1">
+                                    <Radio checked={comparison === value} name="furniAltitudeComparison" onCheckedChange={() => setComparison(value)} />
+                                    <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
+                                </label>
+                            );
+                        })}
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{LocalizeText('wiredfurni.params.setaltitude')}</Text>
+                        <input
+                            className="form-control form-control-sm"
+                            inputMode="decimal"
+                            type="text"
+                            value={altitudeInput}
+                            onBlur={() => setAltitudeInput(formatAltitude(altitude))}
+                            onChange={(event) => updateAltitudeInput(event.target.value)}
+                        />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                        <Slider max={MAX_ALTITUDE} min={MIN_ALTITUDE} step={ALTITUDE_STEP} value={altitude} onChange={(event) => updateAltitude(event as number)} />
+                        <Text small>{formatAltitude(altitude)}</Text>
+                    </div>
+
                 </div>
-
-                <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.setaltitude')}</Text>
-                    <input
-                        className="form-control form-control-sm"
-                        inputMode="decimal"
-                        type="text"
-                        value={altitudeInput}
-                        onBlur={() => setAltitudeInput(formatAltitude(altitude))}
-                        onChange={(event) => updateAltitudeInput(event.target.value)}
-                    />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                    <Slider max={MAX_ALTITUDE} min={MIN_ALTITUDE} step={ALTITUDE_STEP} value={altitude} onChange={(event) => updateAltitude(event as number)} />
-                    <Text small>{formatAltitude(altitude)}</Text>
-                </div>
-
-                <hr className="m-0 bg-dark" />
-
-                <Text bold>{LocalizeText('wiredfurni.params.selector_options_selector')}</Text>
-
-                <label className="flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        className="form-check-input"
-                        checked={filterExisting}
-                        onChange={(event) => setFilterExisting(event.target.checked)}
-                    />
-                    <Text small>{LocalizeText('wiredfurni.params.selector_option.0')}</Text>
-                </label>
-
-                <label className="flex items-center gap-2">
-                    <input type="checkbox" className="form-check-input" checked={invert} onChange={(event) => setInvert(event.target.checked)} />
-                    <Text small>{LocalizeText('wiredfurni.params.selector_option.1')}</Text>
-                </label>
-            </div>
-        </WiredSelectorBaseView>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

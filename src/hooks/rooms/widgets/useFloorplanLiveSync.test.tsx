@@ -11,8 +11,8 @@ import { buildLivePreviewPayload, LivePreviewPayload, livePreviewPayloadsEqual, 
 const applyMock = vi.fn<(model: string, wallHeight: number, scale: boolean) => boolean>();
 const thicknessMock = vi.fn<(roomId: number, wall: number, floor: number) => boolean>();
 
-vi.mock('@nitrots/nitro-renderer', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('@nitrots/nitro-renderer')>();
+vi.mock('@octane/renderer', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@octane/renderer')>();
 
     return {
         ...actual,
@@ -49,6 +49,7 @@ const baseState: FloorplanState = {
     brush: { h: 0, action: 'SET' },
     selection: new Set(),
     squareSelect: false,
+    pickUpBlocking: false,
     lease: { holder: null, me: false, expiresAt: null },
     seq: 0
 };

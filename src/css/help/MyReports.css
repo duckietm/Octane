@@ -1,0 +1,47 @@
+/* The table of the reports of the player: fixed columns, so a long message wraps inside its own
+   cell instead of pushing the status and the appeal out of the window. */
+.octane-my-reports__scroll {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.octane-my-reports__table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.octane-my-reports__table th {
+    padding: 0 6px 4px 0;
+    text-align: left;
+}
+
+.octane-my-reports__table td {
+    padding: 4px 6px 4px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+    vertical-align: top;
+    overflow-wrap: anywhere;
+}
+
+.octane-my-reports__table .is-date {
+    width: 118px;
+}
+
+.octane-my-reports__table .is-account {
+    width: 86px;
+    font-weight: 700;
+}
+
+.octane-my-reports__table .is-status {
+    width: 120px;
+}
+
+.octane-my-reports__table .is-reason {
+    color: #595959;
+}
+
+.octane-my-reports__appeal {
+    margin-top: 4px;
+}

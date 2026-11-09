@@ -1,6 +1,9 @@
 import { FC, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useFriends } from '../../hooks';
+import { useFriendBarNotificationEvents } from '../../hooks/friends/useFriendBarNotificationEvents';
+import { EpicPopupView } from './views/epic-popup/EpicPopupView';
 import { FriendBarView } from './views/friends-bar/FriendsBarView';
 import { FriendsListView } from './views/friends-list/FriendsListView';
 import { FriendsMessengerView } from './views/messenger/FriendsMessengerView';
@@ -10,6 +13,8 @@ const FRIEND_BAR_TARGET_IDS = ['toolbar-friend-bar-container-desktop'];
 export const FriendsView: FC<{}> = (props) => {
     const { settings = null, onlineFriends = [], requests = [] } = useFriends();
     const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+
+    useFriendBarNotificationEvents(onlineFriends);
 
     useEffect(() => {
         if (typeof document === 'undefined') return;
@@ -36,13 +41,16 @@ export const FriendsView: FC<{}> = (props) => {
         return () => observer.disconnect();
     }, []);
 
-    if (!settings) return null;
+    if (!settings) return <EpicPopupView />;
 
     return (
-        <>
-            {portalTarget && createPortal(<FriendBarView onlineFriends={onlineFriends} requestsCount={requests.length} />, portalTarget)}
-            <FriendsListView />
-            <FriendsMessengerView />
-        </>
+        <NativeTextTree>
+            <>
+                <EpicPopupView />
+                {portalTarget && createPortal(<FriendBarView onlineFriends={onlineFriends} requestsCount={requests.length} />, portalTarget)}
+                <FriendsListView />
+                <FriendsMessengerView />
+            </>
+        </NativeTextTree>
     );
 };

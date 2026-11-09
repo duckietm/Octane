@@ -1,0 +1,86 @@
+/*
+ * Furni Editor is Octane's own staff window (AIR has no layout for it). Its text follows the AIR conventions:
+ * regular Ubuntu (HabboAirUbuntu; Octane's `Ubuntu` is the condensed cut), u_regular 12 px pure black body,
+ * 14 px bold section titles, 11 px as the floor for small labels and badges, #666666 for hints, and the grey
+ * button_thick with u_bold 12 px black text (Save included: it is not a money action). Delete keeps the red
+ * danger skin. Layout, the code chips' mono face and the status colours stay; the shared card header and tabs
+ * keep their own face.
+ */
+.octane-furni-editor {
+    --octane-card-text: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.octane-furni-editor .octane-card-content-shell {
+    color: #000000;
+    font-size: 12px;
+}
+
+@layer base {
+    .octane-furni-editor
+        .octane-card-content-shell
+        :where(*):not(svg, svg *, .font-mono, .font-mono *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    /* il_regular 11 px is the floor: the 8-10 px labels, counters and badges come up to it (not the round help dot). */
+    .octane-furni-editor .octane-card-content-shell :where(.text-\[8px\], .text-\[9px\], .text-\[10px\]):not(svg, svg *, .cursor-help) {
+        font-size: 11px !important;
+    }
+
+    /* Inputs and body copy set in text-sm (14 px) are u_regular 12 px in AIR. */
+    .octane-furni-editor .octane-card-content-shell :where(.text-sm):not(svg, svg *) {
+        font-size: 12px !important;
+    }
+
+    /* Section titles: u_headline_small, 14 px bold black. */
+    .octane-furni-editor .octane-furni-editor__section-title {
+        color: #000000 !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        line-height: 17px !important;
+    }
+
+    /* Body text pure black; the slate greys that carried body text become black, the hint grey #666666. */
+    .octane-furni-editor .octane-card-content-shell :where(.text-slate-600, .text-slate-700, .text-slate-800) {
+        color: #000000 !important;
+    }
+
+    .octane-furni-editor .octane-card-content-shell :where(.text-slate-500) {
+        color: #666666 !important;
+    }
+
+    /* Buttons: Button's size is an important utility (12.6 px); AIR's button_thick is u_bold 12 px. */
+    .octane-furni-editor .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger) {
+        font-size: 12px !important;
+        font-weight: 700 !important;
+    }
+
+    /* Save / Cancel / Revert...: the grey button_thick (habbo_skin_button_shiny_thick), black text. */
+    .octane-furni-editor .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary) {
+        min-height: 30px !important;
+        padding: 0 8px !important;
+        border-width: 5px !important;
+        border-style: solid !important;
+        border-color: transparent !important;
+        border-image-source: var(--habbo-skin-shiny-thick) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        color: #000000 !important;
+        text-shadow: none !important;
+    }
+
+    .octane-furni-editor .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary):hover {
+        border-image-source: var(--habbo-skin-shiny-thick-hover) !important;
+    }
+
+    .octane-furni-editor .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary):active {
+        border-image-source: var(--habbo-skin-shiny-thick-pressed) !important;
+    }
+
+    .octane-furni-editor .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary):disabled,
+    .octane-furni-editor .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary).pointer-events-none {
+        border-image-source: var(--habbo-skin-shiny-thick-disabled) !important;
+        color: #777777 !important;
+    }
+}

@@ -1,7 +1,7 @@
-import { IObjectData, NitroEvent } from '@nitrots/nitro-renderer';
+import { IObjectData, OctaneEvent } from '@octane/renderer';
 import { IPurchasableOffer } from '../../api';
 
-export class SetRoomPreviewerStuffDataEvent extends NitroEvent {
+export class SetRoomPreviewerStuffDataEvent extends OctaneEvent {
     public static UPDATE_STUFF_DATA: string = 'SRPSA_UPDATE_STUFF_DATA';
 
     private _offer: IPurchasableOffer;

@@ -1,55 +1,32 @@
-import { NodeData, RoomControllerLevel, RoomObjectCategory, RoomObjectType } from '@nitrots/nitro-renderer';
+import { NodeData, RoomControllerLevel, RoomObjectCategory, RoomObjectType } from '@octane/renderer';
 import { BuilderFurniPlaceableStatus, CatalogNode, CatalogPage, CatalogType, ICatalogNode, ICatalogPage, IPurchasableOffer } from '../../api';
 
-/**
- * Pure helpers extracted from `useCatalog.ts`. Each function takes the
- * relevant pieces of state as inputs (instead of closing over them via
- * useCallback) so it can be unit-tested without rendering a React tree.
- *
- * Keep these dependency-free at the React layer: no `useState`, no
- * refs, no `vi.fn`-able side effects beyond what the renderer SDK
- * already exposes (`GetRoomEngine`, etc., which the call sites guard).
- */
-
-/**
- * The catalog has two top-level "types" — the regular catalog and the
- * Builders Club catalog. Anything else maps to NORMAL. Centralising
- * the coercion in one place keeps the switch from drifting between
- * call sites and the message-event handlers.
- */
 export const normalizeCatalogType = (type?: string): string => {
     if (type === CatalogType.BUILDER) return CatalogType.BUILDER;
 
     return CatalogType.NORMAL;
 };
 
-/**
- * Build the canonical product-key list for a purchasable offer. Used
- * by the resolved-offer cache so the same offer can be looked up by
- * either `productType:id:classId` or `productType:class:className`.
- */
-export const getOfferProductKeys = (offer: IPurchasableOffer | null | undefined): string[] => {
-    const keys: string[] = [];
-    const product = offer?.product;
+export const restoreCatalogActivePath = (rootNode: ICatalogNode, activePageId: number): ICatalogNode[] => {
+    const target = findNodeById(activePageId, rootNode, rootNode);
+    if (!target) return [];
 
-    if (!product) return keys;
+    const path: ICatalogNode[] = [];
+    let node: ICatalogNode | null = target;
 
-    if (product.productType && product.productClassId >= 0) {
-        keys.push(`${product.productType}:id:${product.productClassId}`);
+    while (node && node !== rootNode) {
+        path.unshift(node);
+        node = node.parent;
     }
 
-    if (product.productType && product.furnitureData?.className?.length) {
-        keys.push(`${product.productType}:class:${product.furnitureData.className}`);
+    for (const activeNode of path) {
+        activeNode.activate();
+        activeNode.open();
     }
 
-    return keys;
+    return path;
 };
 
-/**
- * Depth-first search by pageId. The root is excluded so callers never
- * select the synthetic "root" node by mistake. Recursive but bounded
- * by the tree the server sends (typically 3-4 levels deep).
- */
 export const findNodeById = (id: number, node: ICatalogNode | null, rootNode: ICatalogNode | null): ICatalogNode | null => {
     if (!node) return null;
     if (node.pageId === id && node !== rootNode) return node;
@@ -64,11 +41,24 @@ export const findNodeById = (id: number, node: ICatalogNode | null, rootNode: IC
 };
 
 /**
- * Depth-first search by pageName. Same exclusion of the root as
- * `findNodeById`.
+ * The first page named `name` under `node`, depth first. A path (`clothing/effects`) finds each name under the
+ * page found for the one before it, for a page name the catalogue uses more than once.
  */
 export const findNodeByName = (name: string, node: ICatalogNode | null, rootNode: ICatalogNode | null): ICatalogNode | null => {
     if (!node) return null;
+
+    if (name?.includes('/')) {
+        let found: ICatalogNode | null = node;
+
+        for (const part of name.split('/').filter((segment) => segment.length)) {
+            found = findNodeByName(part, found, found === node ? rootNode : found);
+
+            if (!found) return null;
+        }
+
+        return found === node ? null : found;
+    }
+
     if (node.pageName === name && node !== rootNode) return node;
 
     for (const child of node.children) {
@@ -80,12 +70,6 @@ export const findNodeByName = (name: string, node: ICatalogNode | null, rootNode
     return null;
 };
 
-/**
- * Lookup the list of catalog nodes a given offer appears under. When
- * `onlyVisible` is true the helper falls back to the full list if the
- * filtered subset is empty — matches the original behavior in
- * `getNodesByOfferId(offerId, true)`.
- */
 export const getNodesByOfferIdFromMap = (
     offerId: number,
     offersToNodes: Map<number, ICatalogNode[]> | null | undefined,
@@ -110,13 +94,20 @@ export const getNodesByOfferIdFromMap = (
 };
 
 /**
- * Turn the server-side NodeData tree into a CatalogNode tree paired
- * with an offerId → nodes index map. Pure (besides the `new
- * CatalogNode` construction).
- *
- * Original lived inline inside the `CatalogPagesListEvent` handler;
- * extracted so the reducer is testable without rendering the hook.
+ * The catalog page a purchase of this offer names: the offer's own page, or - for an offer opened from a search or
+ * a link, whose page is a placeholder - the first page that holds it. The page on screen is not it: the server
+ * refuses an offer that is not on the page named.
  */
+export const resolveOfferPageId = (offer: IPurchasableOffer, offersToNodes: Map<number, ICatalogNode[]> | null | undefined): number => {
+    const pageId = offer?.page?.pageId ?? -1;
+
+    if (pageId >= 0) return pageId;
+
+    const nodes = getNodesByOfferIdFromMap(offer?.offerId, offersToNodes, true) || getNodesByOfferIdFromMap(offer?.offerId, offersToNodes);
+
+    return nodes?.length ? nodes[0].pageId : -1;
+};
+
 export const buildCatalogNodeTree = (root: NodeData): { rootNode: ICatalogNode; offersToNodes: Map<number, ICatalogNode[]> } => {
     const offersToNodes: Map<number, ICatalogNode[]> = new Map();
 
@@ -138,19 +129,6 @@ export const buildCatalogNodeTree = (root: NodeData): { rootNode: ICatalogNode; 
     return { rootNode: walk(root, 0, null), offersToNodes };
 };
 
-/**
- * Pure-input version of the placement-status decision. The original
- * `getBuilderFurniPlaceableStatus` closes over a handful of state
- * slices + reads `GetRoomSession()` / `GetRoomEngine()` /
- * `GetSessionDataManager()` directly. Pulling those reads up to the
- * call site (the hook still does them) makes the rest of the
- * decision tree testable in isolation.
- *
- * `roomSession` may be null (user is in the hotel view, not a room).
- * `usersInRoomMinusSelf` is the number of non-moderator, non-self
- * users sharing the room — only consulted when `secondsLeft <= 0`,
- * because the limit-reached / not-in-room paths short-circuit first.
- */
 export interface BuilderPlacementStatusInput {
     offer: IPurchasableOffer | null | undefined;
     roomSession: { isGuildRoom: boolean; isRoomOwner: boolean; controllerLevel: number } | null;
@@ -159,8 +137,9 @@ export interface BuilderPlacementStatusInput {
     furniLimit: number;
     builderPlacementAllowedInCurrentRoom: boolean;
     builderPlacementBlockedByVisitors: boolean;
-    /** Count of non-moderator, non-self users in the room. Only consulted when `secondsLeft <= 0`. */
     visitorCount?: number;
+    /** Playtest refuses Builders Club placement (the hotel's own rule beyond AIR), as the server does. */
+    playTestRestricted?: boolean;
 }
 
 export const resolveBuilderFurniPlaceableStatus = (input: BuilderPlacementStatusInput): BuilderFurniPlaceableStatus => {
@@ -172,12 +151,15 @@ export const resolveBuilderFurniPlaceableStatus = (input: BuilderPlacementStatus
         furniLimit,
         builderPlacementAllowedInCurrentRoom,
         builderPlacementBlockedByVisitors,
-        visitorCount = 0
+        visitorCount = 0,
+        playTestRestricted = false
     } = input;
 
     if (!offer) return BuilderFurniPlaceableStatus.MISSING_OFFER;
 
     if (!roomSession) return BuilderFurniPlaceableStatus.NOT_IN_ROOM;
+
+    if (playTestRestricted) return BuilderFurniPlaceableStatus.NOT_ROOM_OWNER;
 
     const canUseGuildAdminFallback = roomSession.isGuildRoom && roomSession.controllerLevel >= RoomControllerLevel.GUILD_ADMIN && secondsLeft > 0;
 
@@ -206,7 +188,4 @@ export const replaceCatalogPageOffers = (page: ICatalogPage, offers: IPurchasabl
     return new CatalogPage(page.pageId, page.layoutCode, page.localization, offers, page.acceptSeasonCurrencyAsCredits, page.mode);
 };
 
-// Re-exports for the legacy categories so the call site in useCatalog
-// doesn't need to know whether the constant comes from the renderer
-// SDK enum or our own copy.
 export { RoomControllerLevel, RoomObjectCategory, RoomObjectType };

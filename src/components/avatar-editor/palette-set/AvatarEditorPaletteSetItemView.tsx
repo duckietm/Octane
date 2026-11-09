@@ -1,16 +1,17 @@
-import { IPartColor } from '@nitrots/nitro-renderer';
-import { FC } from 'react';
+import { IPartColor } from '@octane/renderer';
+import { ButtonHTMLAttributes, CSSProperties, FC } from 'react';
 import { ColorUtils, GetClubMemberLevel, GetConfigurationValue } from '../../../api';
-import { LayoutCurrencyIcon, LayoutGridItemProps } from '../../../common';
-import { InfiniteGrid } from '../../../layout';
+import hcSmallSrc from '../../../assets/images/avatareditor/air/hc-small.png';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { ToggleButton } from '../../../common/ToggleButton';
 
 export const AvatarEditorPaletteSetItem: FC<
     {
         partColor: IPartColor;
         isSelected: boolean;
-    } & LayoutGridItemProps
+    } & ButtonHTMLAttributes<HTMLButtonElement>
 > = (props) => {
-    const { partColor = null, isSelected = false, style = {}, ...rest } = props;
+    const { partColor = null, isSelected = false, className = '', style = {}, ...rest } = props;
 
     if (!partColor) return null;
 
@@ -18,19 +19,17 @@ export const AvatarEditorPaletteSetItem: FC<
     const isLocked = isHC && GetClubMemberLevel() < partColor.clubLevel;
 
     return (
-        <InfiniteGrid.Item
-            itemHighlight
-            className={`clear-bg${isLocked ? ' opacity-50' : ''}`}
-            itemActive={isSelected}
-            itemColor={ColorUtils.makeColorNumberHex(partColor.rgb & 0xffffff)}
-            style={{
-                aspectRatio: '1 / 1',
-                minHeight: '14px',
-                ...style
-            }}
-            {...rest}
-        >
-            {isHC && <LayoutCurrencyIcon className="absolute inset-e-1 bottom-1" type="hc" />}
-        </InfiniteGrid.Item>
+        <NativeTextTree>
+            <ToggleButton
+                type="button" pressed={isSelected}
+                className={`avatar-editor-palette-item${isSelected ? ' is-selected' : ''}${isLocked ? ' is-locked' : ''}${className ? ` ${className}` : ''}`}
+                style={style as CSSProperties}
+                {...(rest as Record<string, unknown>)}
+            >
+                <span className="avatar-editor-palette-color" style={{ backgroundColor: ColorUtils.makeColorNumberHex(partColor.rgb & 0xffffff) }} />
+                <span className="avatar-editor-palette-frame" />
+                {isHC && <img className="avatar-editor-palette-hc" src={hcSmallSrc} alt="" draggable={false} />}
+            </ToggleButton>
+        </NativeTextTree>
     );
 };

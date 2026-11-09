@@ -1,0 +1,46 @@
+/*
+ * Translation settings is Octane's own window (no AIR layout), so it follows the AIR conventions: regular Ubuntu
+ * (our `Ubuntu` face is the condensed cut), body text u_regular 12 px black, headings u_bold 12, and the plain grey
+ * `button` (habbo_skin_button_shiny) with 12 px regular black text. The 11 px hints stay as they are.
+ */
+.translation-settings-window .octane-card-content-shell {
+    color: #000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.translation-settings-window .translation-settings-window__refresh {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    height: 24px;
+    padding: 0 6px;
+    border: 5px solid transparent;
+    border-image-source: var(--habbo-skin-shiny);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    background: transparent;
+    color: #000;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.translation-settings-window .translation-settings-window__refresh:hover {
+    border-image-source: var(--habbo-skin-shiny-hover);
+}
+
+.translation-settings-window .translation-settings-window__refresh:active {
+    border-image-source: var(--habbo-skin-shiny-pressed);
+}
+
+@layer base {
+    .translation-settings-window .octane-card-content-shell :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}

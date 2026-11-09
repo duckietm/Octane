@@ -1,8 +1,10 @@
-import { GetConfiguration } from '@nitrots/nitro-renderer';
-import { FC, useMemo } from 'react';
-import loadingGif from '@/assets/images/loading/loading.gif';
-import nitroV3Logo from '@/assets/images/notifications/nitro_v3.png';
-import { Base, Column, Text } from '../../common';
+import { GetConfiguration } from '@octane/renderer';
+import { FC, useEffect, useMemo, useState } from 'react';
+import { AIR_SPLASH_BG, AIR_SPLASH_TOP, AIR_USER_PHOTOS } from '@/assets/images/loading/air';
+import octaneLogo from '@/assets/images/loading/octane-logo.png';
+import '@/css/loading/LoadingView.css';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { localizeWithFallback } from '../../api';
 
 interface LoadingViewProps {
     isError?: boolean;
@@ -12,123 +14,106 @@ interface LoadingViewProps {
     currentTask?: string;
 }
 
-const resolveConfigUrl = (key: string): string => {
-    try {
-        const raw = GetConfiguration().getValue<string>(key, '');
-        if (!raw) return '';
+/** AIR's English client.starting.revolving; a hotel sets its own in ui-config (the texts are not loaded yet). */
+const AIR_REVOLVING_TEXT =
+    'For science, you monster/Loading funny message…please wait./Would you like fries with that?/Follow the yellow duck./' +
+    'Time is just an illusion./Are we there yet?!/I like your t-shirt./Look left. Look right. Blink twice. Ta da!/' +
+    "It's not you, it's me./Shhh! I'm trying to think here./Loading pixel universe.";
 
-        const interpolated = GetConfiguration().interpolate(raw) || raw;
-        return interpolated;
-    } catch {
-        return '';
-    }
-};
+/** AIR changes the message each time its bar fills: about every 2.25 s. */
+const REVOLVING_INTERVAL_MS = 2250;
 
-const resolveConfigString = (key: string, fallback = ''): string => {
+/** A configuration value, without the missing-key warning: the loading screen runs before most config is read. */
+const configString = (key: string, fallback = ''): string => {
     try {
-        const raw = GetConfiguration().getValue<string>(key, '');
-        if (!raw) return fallback;
-        return raw;
+        const configuration = GetConfiguration();
+
+        if (!configuration.definitions.has(key)) return fallback;
+
+        const raw = configuration.getValue<string>(key, '');
+
+        return raw ? configuration.interpolate(raw) || raw : fallback;
     } catch {
         return fallback;
     }
 };
 
+const randomIndex = (length: number) => Math.floor(Math.random() * length);
+
+/**
+ * AIR HabboLoadingScreen: on its dark background the photo splash (PhotoSplashScreen: the frame, one of 30 user
+ * photos at 96, 51, the frame's top), 50 px under it a revolving message (client.starting.revolving), the 400 x 25
+ * bar and the percentage. Ours adds the hotel logo top left (280 wide; `loading.logo.url`) and the current task
+ * under the percentage. A failed load shows client.loading.failed with the error in AIR's error colour.
+ */
 export const LoadingView: FC<LoadingViewProps> = (props) => {
     const { isError = false, message = '', homeUrl = '', progress, currentTask = '' } = props;
 
-    const customLogoUrl = useMemo(() => resolveConfigUrl('loading.logo.url'), []);
-    const customBackground = useMemo(() => resolveConfigString('loading.background', ''), []);
-    const progressBarColor = useMemo(() => resolveConfigString('loading.progress.color', 'linear-gradient(90deg,#4f8cff,#2563eb)'), []);
+    const logoUrl = useMemo(() => configString('loading.logo.url') || octaneLogo, []);
+    const customBackground = useMemo(() => configString('loading.background'), []);
+    const photo = useMemo(() => AIR_USER_PHOTOS[randomIndex(AIR_USER_PHOTOS.length)], []);
+    const messages = useMemo(
+        () =>
+            configString('client.starting.revolving', AIR_REVOLVING_TEXT)
+                .split('/')
+                .map((text) => text.trim())
+                .filter(Boolean),
+        []
+    );
+    const [messageIndex, setMessageIndex] = useState(() => randomIndex(Math.max(1, messages.length)));
+
+    useEffect(() => {
+        if (isError || messages.length < 2) return;
+
+        const interval = window.setInterval(() => setMessageIndex((index) => (index + 1) % messages.length), REVOLVING_INTERVAL_MS);
+
+        return () => window.clearInterval(interval);
+    }, [isError, messages.length]);
 
     const clampedProgress = typeof progress === 'number' && Number.isFinite(progress) ? Math.max(0, Math.min(100, Math.round(progress))) : null;
-
-    const backgroundStyle = customBackground ? { background: customBackground } : undefined;
-
-    const backgroundClassName = customBackground ? 'fixed inset-0 z-[2147483000]' : 'fixed inset-0 z-[2147483000] bg-[radial-gradient(#1d1a24,#003a6b)]';
+    const headline = isError ? configString('client.loading.failed', localizeWithFallback('octane.loading.loading_failed', 'Loading failed')) : (messages[messageIndex] ?? message);
 
     return (
-        <Column fullHeight position="fixed" className={backgroundClassName} style={backgroundStyle}>
-            <img src={nitroV3Logo} alt="Nitro V3" draggable={false} className="absolute top-5 left-0 z-2 w-37.5 h-auto select-none pointer-events-none" />
-            <Base fullHeight className="container h-100">
-                <Column fullHeight alignItems="center" justifyContent="center">
-                    {isError && message && message.length ? (
-                        <Column alignItems="center" className="absolute bottom-[20px] left-1/2 z-[3] -translate-x-1/2 max-w-[80%]" gap={2}>
-                            <Text fontSizeCustom={20} variant="white" className="text-center [text-shadow:0px_4px_4px_rgba(0,0,0,0.25)]">
-                                {message}
-                            </Text>
+        <NativeTextTree>
+            <div className="octane-loading" style={customBackground ? { background: customBackground } : undefined}>
+                <img src={logoUrl} alt="Octane" draggable={false} className="octane-loading__logo" />
+                <div className="octane-loading__stack">
+                    <div className="octane-loading__splash" aria-hidden="true">
+                        <img src={AIR_SPLASH_BG} alt="" draggable={false} />
+                        {photo && <img src={photo} alt="" draggable={false} className="octane-loading__photo" />}
+                        <img src={AIR_SPLASH_TOP} alt="" draggable={false} />
+                    </div>
+                    <div className="octane-loading__text" role="status">
+                        {headline}
+                    </div>
+                    {isError ? (
+                        <div className="octane-loading__error">
+                            {message && <div>{message}</div>}
                             {homeUrl && (
-                                <a
-                                    href={homeUrl}
-                                    className="mt-3 px-6 py-3 rounded-lg bg-[#3b82f6] hover:bg-[#2563eb] text-white text-base font-semibold no-underline cursor-pointer transition-colors duration-200 [text-shadow:none]"
-                                >
-                                    Back to Hotel
+                                <a href={homeUrl} className="octane-loading__home">
+                                    {localizeWithFallback('octane.loading.back_to_hotel', 'Back to Hotel')}
                                 </a>
                             )}
-                        </Column>
+                        </div>
                     ) : (
                         <>
-                            <Column alignItems="center" justifyContent="center" className="z-[3] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                                <img
-                                    src={customLogoUrl || loadingGif}
-                                    alt=""
-                                    draggable={false}
-                                    className="block w-auto h-auto max-w-[80vw] max-h-[40vh] select-none pointer-events-none"
-                                />
-                                {message && message.length ? (
-                                    <Text
-                                        fontSizeCustom={22}
-                                        variant="white"
-                                        className="text-center mt-4 [text-shadow:0px_4px_4px_rgba(0,0,0,0.4)] tracking-wide"
-                                    >
-                                        {message}
-                                    </Text>
-                                ) : null}
-                            </Column>
-                            {clampedProgress !== null && (
-                                <Column alignItems="center" gap={2} className="absolute bottom-[8vh] left-1/2 -translate-x-1/2 z-[4] w-[min(900px,90vw)]">
-                                    <Base
-                                        className="relative w-full h-8 rounded-full overflow-hidden border border-white/30 shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
-                                        style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)' }}
-                                    >
-                                        <Base
-                                            className="h-full rounded-full transition-[width] duration-300 ease-out"
-                                            style={{ width: `${clampedProgress}%`, background: progressBarColor, boxShadow: '0 0 18px rgba(79,140,255,0.55)' }}
-                                        />
-                                        <Base
-                                            className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                                            style={{
-                                                fontFamily: '"Poppins","Segoe UI",system-ui,sans-serif',
-                                                fontWeight: 700,
-                                                fontSize: '16px',
-                                                color: '#fff',
-                                                letterSpacing: '0.08em',
-                                                textShadow: '0 2px 4px rgba(0,0,0,0.6)'
-                                            }}
-                                        >
-                                            {clampedProgress}%
-                                        </Base>
-                                    </Base>
-                                    <Base
-                                        className="text-center"
-                                        style={{
-                                            fontFamily: '"Poppins","Segoe UI",system-ui,sans-serif',
-                                            fontWeight: 500,
-                                            fontSize: '15px',
-                                            color: 'rgba(255,255,255,0.85)',
-                                            letterSpacing: '0.04em',
-                                            textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-                                            minHeight: '22px'
-                                        }}
-                                    >
-                                        {currentTask}
-                                    </Base>
-                                </Column>
-                            )}
+                            <div
+                                className="octane-loading__bar"
+                                role="progressbar"
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                                aria-valuenow={clampedProgress ?? undefined}
+                            >
+                                <div className="octane-loading__track">
+                                    <div className="octane-loading__fill" style={{ width: `${clampedProgress ?? 0}%` }} />
+                                </div>
+                            </div>
+                            <div className="octane-loading__percent">{clampedProgress !== null ? `${clampedProgress}%` : ''}</div>
+                            {currentTask && <div className="octane-loading__task">{currentTask}</div>}
                         </>
                     )}
-                </Column>
-            </Base>
-        </Column>
+                </div>
+            </div>
+        </NativeTextTree>
     );
 };

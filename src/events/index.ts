@@ -4,3 +4,4 @@ export * from './help';
 export * from './inventory';
 export * from './room-widgets';
 export * from './room-widgets/thumbnail';
+export * from './soundboard';

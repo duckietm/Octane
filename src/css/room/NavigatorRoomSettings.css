@@ -1,40 +1,58 @@
-.nitro-room-settings {
-    --room-settings-bg: #ecece4;
+.octane-room-settings {
+    --room-settings-bg: #e9e9e1;
     --room-settings-panel: #f7f7f2;
-    --room-settings-line: #9d9d96;
-    --room-settings-line-dark: #6f6f6a;
-    --room-settings-accent: #418db0;
-    --room-settings-text: #20201d;
+    --room-settings-line: #959595;
+    --room-settings-text: #111111;
     --room-settings-muted: #60605a;
 
-    width: min(420px, calc(100vw - 16px));
+    width: min(341px, calc(100vw - 16px)) !important;
+    height: min(520px, calc(100vh - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
-    max-height: calc(100vh - 16px);
+    max-height: none;
+    resize: none !important;
+    overflow: hidden !important;
     color: var(--room-settings-text);
 
     .list-container {
         height: 100px;
+        border: 1px solid var(--room-settings-line) !important;
+        background: #fbfbf9 !important;
+        box-shadow: none !important;
 
         .list-item {
             background-color: #ececec;
         }
     }
 
-    .nitro-card-tabs-shell {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        overflow-y: hidden;
+    .octane-room-settings-section {
+        border: 1px solid var(--room-settings-line);
+        background: var(--room-settings-panel);
+        padding: 6px;
     }
 
-    .nitro-card-tab-item {
-        flex: 0 0 auto;
-        white-space: nowrap;
+    .octane-room-settings-section > :first-child {
+        color: #111;
+        font-weight: 700;
     }
 
-    .nitro-card-content-shell {
+    button:not(.octane-select-trigger) {
+        min-height: 29px;
+        border-radius: 0 !important;
+        font-weight: 700;
+    }
+
+    .octane-card-content-shell {
+        flex: 1 1 0;
+        min-height: 0;
+        overflow: auto !important;
         background: var(--room-settings-bg);
         color: var(--room-settings-text);
+        padding: 8px 10px !important;
+    }
+
+    :where(input, select, .octane-select-trigger, textarea, button, label) {
+        pointer-events: auto !important;
     }
 
     :where(.bg-white, .bg-light, .bg-muted, .bg-card-grid-item) {
@@ -52,39 +70,37 @@
         color: var(--room-settings-muted) !important;
     }
 
-    :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
-        min-height: 22px;
-        border: 1px solid var(--room-settings-line-dark) !important;
-        border-radius: 3px !important;
-        background: #fffdf4 !important;
+    :where(input:not([type="checkbox"]):not([type="radio"]), select, .octane-select-trigger, textarea) {
+        min-height: 20px;
+        border: 1px solid var(--room-settings-line) !important;
+        border-radius: 0 !important;
+        background: #fbfbf9 !important;
         color: var(--room-settings-text) !important;
-        box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.65) !important;
-        font-size: 11px !important;
-    }
-
-    :where(input:focus, select:focus, textarea:focus) {
-        border-color: var(--room-settings-accent) !important;
-        box-shadow: 0 0 0 2px rgba(47, 128, 151, 0.28), inset 0 1px 0 rgba(0, 0, 0, 0.16) !important;
-        outline: none !important;
-    }
-
-    input[type="checkbox"],
-    input[type="radio"] {
-        min-height: 0;
-        color: var(--room-settings-accent);
-        accent-color: var(--room-settings-accent);
-        border-color: var(--room-settings-line-dark);
         box-shadow: none !important;
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+        font-size: 12px !important;
+    }
+
+    :where(input[type="checkbox"], input[type="radio"]) {
+        width: 13px;
+        height: 13px;
+        min-height: 13px;
+        min-width: 13px;
+        appearance: auto;
+        border: 1px solid #565650;
+        border-radius: 0;
+        background: #fbfbf9;
+        cursor: pointer;
     }
 }
 
 @media (max-width: 520px), (max-height: 520px) {
-    .nitro-room-settings {
+    .octane-room-settings {
         width: calc(100vw - 16px);
-        max-height: calc(100vh - 16px);
+        height: calc(100vh - 16px);
 
-        .nitro-card-content-shell {
-            max-height: calc(100vh - 84px);
+        .octane-card-content-shell {
+            max-height: none;
         }
 
         .col-span-6 {
@@ -94,5 +110,93 @@
         .h-full {
             height: auto;
         }
+    }
+}
+
+/* Five tabs share 341 px: less padding and an 11 px label, so Access and Moderation are not cut. */
+.octane-room-settings .octane-card-tabs .octane-card-tab-item,
+.octane-room-settings .octane-card-tabs-shell .octane-card-tab-item {
+    min-width: 0;
+    padding: 5px 9px 0 !important;
+    font-size: 11px;
+}
+
+/*
+ * ros_room_settings text styles: Ubuntu (the regular cut; our `Ubuntu` face is the condensed one) at 12 px,
+ * labels u_bold, texts and inputs u_regular, tab captions u_headline_small (14 px bold), the delete link
+ * 12 px bold #bb2200 underlined. Plain labels used to inherit the page's 16 px.
+ */
+.octane-room-settings .octane-card-content-shell {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.octane-room-settings .octane-card-content-shell :where(*):not(svg, svg *) {
+    font-family: inherit !important;
+    font-size: 12px !important;
+}
+
+.octane-room-settings .octane-card-content-shell .octane-room-settings-caption {
+    font-size: 14px !important;
+    line-height: 19px;
+}
+
+.octane-room-settings .octane-card-content-shell .octane-room-settings-delete {
+    color: #bb2200 !important;
+}
+
+/* The two tag fields share one row; they shrink to it rather than run past the window edge. */
+.octane-room-settings .octane-card-content-shell .form-control,
+.octane-room-settings .octane-card-content-shell :has(> .form-control) {
+    min-width: 0;
+}
+
+/*
+ * ros_room_settings buttons: builders_faq_button and moderation_unban_btn are the grey `button` (style 3,
+ * habbo_skin_button_shiny, button_shiny_regular 12 px black); remove_all_flat_ctrls is the grey button_thick
+ * (style 3, habbo_skin_button_shiny_thick, button_shiny_bold 12 px black). None of them is green or red. The
+ * Button's 12.6 px bold size is an important utility, which only an important rule in the base layer outranks.
+ */
+@layer base {
+    .octane-room-settings .octane-card-content-shell .habbo-btn-secondary {
+        border-width: 5px !important;
+        border-image-source: var(--habbo-skin-shiny) !important;
+        border-image-slice: 5 fill !important;
+        border-image-width: 5px !important;
+        color: #000000 !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+    }
+
+    .octane-room-settings .octane-card-content-shell .habbo-btn-secondary:hover {
+        border-image-source: var(--habbo-skin-shiny-hover) !important;
+    }
+
+    .octane-room-settings .octane-card-content-shell .habbo-btn-secondary:active {
+        border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    }
+
+    .octane-room-settings .octane-card-content-shell .habbo-btn-secondary.octane-room-settings-clear-rights {
+        min-height: 29px !important;
+        border-image-source: var(--habbo-skin-shiny-thick) !important;
+        font-weight: 700 !important;
+    }
+
+    .octane-room-settings .octane-card-content-shell .habbo-btn-secondary.octane-room-settings-clear-rights:hover {
+        border-image-source: var(--habbo-skin-shiny-thick-hover) !important;
+    }
+
+    .octane-room-settings .octane-card-content-shell .habbo-btn-secondary.octane-room-settings-clear-rights:active {
+        border-image-source: var(--habbo-skin-shiny-thick-pressed) !important;
+    }
+
+    .octane-room-settings .octane-card-content-shell .habbo-btn-secondary:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-disabled) !important;
+        color: #777777 !important;
+    }
+
+    .octane-room-settings .octane-card-content-shell .habbo-btn-secondary.octane-room-settings-clear-rights:is(:disabled, .pointer-events-none) {
+        border-image-source: var(--habbo-skin-shiny-thick-disabled) !important;
     }
 }

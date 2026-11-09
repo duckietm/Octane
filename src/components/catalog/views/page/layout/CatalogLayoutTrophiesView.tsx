@@ -1,107 +1,134 @@
-import { FC, useEffect, useState } from 'react';
-import { FaPen, FaTrophy } from 'react-icons/fa';
-import { LocalizeText, ProductTypeEnum, SanitizeHtml } from '../../../../../api';
-import { Text } from '../../../../../common';
-import { useCatalogData, useCatalogUiState } from '../../../../../hooks';
-import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';
-import { CatalogItemGridWidgetView } from '../widgets/CatalogItemGridWidgetView';
+import { FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { handleInternalLinkClick, LocalizeText, localizeWithFallback, SanitizeHtmlWithInternalLinks } from '../../../../../api';
+import { BaseButton } from '../../../../../common/BaseButton';
+import { LayoutFurniImageView } from '../../../../../common/layout/LayoutFurniImageView';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
+import { useCatalogActions, useCatalogData, useCatalogUiState } from '../../../../../hooks';
 import { CatalogPurchaseWidgetView } from '../widgets/CatalogPurchaseWidgetView';
 import { CatalogTotalPriceWidget } from '../widgets/CatalogTotalPriceWidget';
-import { CatalogViewProductWidgetView } from '../widgets/CatalogViewProductWidgetView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
+import { getTrophyMetal, groupTrophyOffers, pickTrophyOffer, TROPHY_METAL_COLOURS, TROPHY_METALS, TrophyMetal } from './catalogTrophies.helpers';
 
+/**
+ * AIR layout_trophies_xml with TrophyCatalogWidget, in AIR's order but stretched over the whole catalog page: the
+ * description (`trophy.description`, text 0) on top, the selected trophy (furni image, direction 2) with the previous /
+ * next model buttons in the preview that takes the free height, the metal swatches (gold, silver, bronze), the
+ * inscription label (`trophy.enscription`, text 1) and box, and the purchase row. Offers are grouped into models by
+ * name (`_g`, `_s`, `_b`); a model without the chosen metal shows its first offer.
+ */
 export const CatalogLayoutTrophiesView: FC<CatalogLayoutProps> = (props) => {
     const { page = null } = props;
-    const [trophyText, setTrophyText] = useState<string>('');
+    const [inscription, setInscription] = useState('');
+    const [modelIndex, setModelIndex] = useState(0);
+    const [metal, setMetal] = useState<TrophyMetal>('g');
     const { currentOffer = null } = useCatalogData();
+    const { selectCatalogOffer = null } = useCatalogActions();
     const { setPurchaseOptions = null } = useCatalogUiState();
+
+    const models = useMemo(() => groupTrophyOffers(page?.offers ?? []), [page]);
+    const offer = pickTrophyOffer(models[modelIndex] ?? models[0], metal);
+    const showModelButtons = models.length > 1;
+    const showMetals = models.some((model) => model.offers.size > 1);
+
+    // A new page starts on its first model in gold, or on the trophy the catalog opened it for (a search result).
+    const currentOfferRef = useRef(currentOffer);
+
+    useLayoutEffect(() => {
+        currentOfferRef.current = currentOffer;
+    });
+
+    useEffect(() => {
+        const opened = currentOfferRef.current;
+        const openedModel = opened ? models.findIndex((model) => Array.from(model.offers.values()).includes(opened)) : -1;
+
+        setModelIndex(Math.max(0, openedModel));
+        setMetal(openedModel >= 0 ? getTrophyMetal(opened.localizationId) || 'g' : 'g');
+    }, [models]);
+
+    useEffect(() => {
+        if (offer && offer !== currentOffer) selectCatalogOffer?.(offer);
+    }, [offer, currentOffer, selectCatalogOffer]);
 
     useEffect(() => {
         if (!currentOffer) return;
 
-        setPurchaseOptions((prevValue) => {
-            const newValue = { ...prevValue };
+        setPurchaseOptions?.((previous) => ({ ...previous, extraData: inscription }));
+    }, [currentOffer, inscription, setPurchaseOptions]);
 
-            newValue.extraData = trophyText;
+    const stepModel = (step: number) => {
+        if (!models.length) return;
 
-            return newValue;
-        });
-    }, [currentOffer, trophyText, setPurchaseOptions]);
+        setModelIndex((index) => (index + step + models.length) % models.length);
+    };
 
-    const canPurchase = currentOffer && trophyText.trim().length > 0;
+    const product = offer?.product;
 
     return (
-        <div className="flex flex-col h-full gap-2">
-            {/* Selected trophy card. shrink-0 + no overflow-hidden so the
-                 Buy button stays inside the panel even when the grid below
-                 holds many trophies. */}
-            {currentOffer ? (
-                <div className="nitro-catalog-trophy-card flex gap-0 bg-white rounded border-2 border-warning/40 shrink-0">
-                    {/* Preview */}
-                    <div className="nitro-catalog-trophy-preview w-[120px] min-w-[120px] relative flex items-center justify-center border-r-2 border-warning/30">
-                        {currentOffer.product.productType !== ProductTypeEnum.BADGE ? (
-                            <>
-                                <CatalogViewProductWidgetView />
-                                <CatalogAddOnBadgeWidgetView className="bg-muted rounded bottom-1 right-1 absolute" />
-                            </>
-                        ) : (
-                            <CatalogAddOnBadgeWidgetView className="scale-200" />
-                        )}
-                    </div>
-                    {/* Info */}
-                    <div className="flex flex-col flex-1 min-w-0 p-2 gap-1.5">
-                        <div className="flex items-center gap-1.5">
-                            <FaTrophy className="text-warning text-[11px]" />
-                            <Text className="text-[12px]! font-bold text-dark leading-tight">{currentOffer.localizationName}</Text>
-                        </div>
-                        <CatalogTotalPriceWidget />
-                        {!canPurchase && <span className="text-[9px] text-warning italic">{LocalizeText('catalog.trophies.write.hint')}</span>}
-                        <div className="flex gap-1.5">
-                            <CatalogPurchaseWidgetView />
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                <div className="flex items-start gap-3 p-2.5 bg-white rounded border-2 border-card-grid-item-border">
-                    {!!page.localization.getImage(1) && (
-                        <img alt="" className="w-[50px] h-[50px] object-contain rounded shrink-0 mt-0.5" src={page.localization.getImage(1)} />
-                    )}
-                    <div className="min-w-0">
-                        <div className="flex items-center gap-1.5 mb-1">
-                            <FaTrophy className="text-warning text-[11px]" />
-                            <span className="text-[12px] font-bold">{LocalizeText('catalog.trophies.title')}</span>
-                        </div>
-                        <Text
-                            className="text-[10px]! text-muted leading-relaxed"
-                            dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(0)) }}
+        <NativeTextTree>
+            <div className="octane-catalog-air-trophies">
+                <div
+                    className="octane-catalog-air-trophies__description"
+                    onClick={handleInternalLinkClick}
+                    dangerouslySetInnerHTML={{ __html: SanitizeHtmlWithInternalLinks(page?.localization?.getText(0) ?? '') }}
+                />
+                <div className="octane-catalog-air-trophies__preview">
+                    {!!product && (
+                        <LayoutFurniImageView
+                            direction={2}
+                            extraData={product.extraParam}
+                            productClassId={product.productClassId}
+                            productType={product.productType}
                         />
+                    )}
+                    {!!offer && <CatalogTotalPriceWidget className="octane-catalog-air-trophies__price" />}
+                    {showModelButtons && (
+                        <>
+                            <BaseButton
+                                aria-label={localizeWithFallback('catalog.trophies.previous', 'Previous')}
+                                className="octane-catalog-air-trophies__model is-previous"
+                                onClick={() => stepModel(-1)}
+                            >
+                                <FaChevronLeft />
+                            </BaseButton>
+                            <BaseButton
+                                aria-label={localizeWithFallback('catalog.trophies.next', 'Next')}
+                                className="octane-catalog-air-trophies__model is-next"
+                                onClick={() => stepModel(1)}
+                            >
+                                <FaChevronRight />
+                            </BaseButton>
+                        </>
+                    )}
+                </div>
+                {showMetals && (
+                    <div className="octane-catalog-air-trophies__metals" role="radiogroup">
+                        {TROPHY_METALS.map((value) => (
+                            <BaseButton
+                                key={value}
+                                role="radio"
+                                aria-checked={metal === value}
+                                aria-label={value}
+                                className={`octane-catalog-air-trophies__metal ${metal === value ? 'is-selected' : ''}`}
+                                style={{ backgroundColor: TROPHY_METAL_COLOURS[value] }}
+                                onClick={() => setMetal(value)}
+                            />
+                        ))}
                     </div>
-                </div>
-            )}
-
-            {/* Trophy inscription */}
-            <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-1.5">
-                    <FaPen className="text-[8px] text-warning" />
-                    <span className="text-[9px] font-bold text-muted uppercase tracking-wider">{LocalizeText('catalog.trophies.inscription')}</span>
-                    <span className={`text-[9px] ml-auto ${trophyText.length > 180 ? 'text-danger font-bold' : 'text-muted'}`}>{trophyText.length}/200</span>
-                </div>
-                <div className="relative">
+                )}
+                <div className="octane-catalog-air-trophies__inscription-label">{page?.localization?.getText(1) ?? ''}</div>
+                <div className="octane-catalog-air-trophies__inscription">
                     <textarea
-                        className={`nitro-catalog-trophy-inscription w-full h-[60px] text-[11px] rounded p-2 pr-3 resize-none focus:outline-none transition-all border-2 ${trophyText.length > 0 ? 'has-text' : ''}`}
                         maxLength={200}
                         placeholder={LocalizeText('catalog.trophies.inscription.placeholder')}
-                        value={trophyText}
-                        onChange={(event) => setTrophyText(event.target.value)}
+                        value={inscription}
+                        onChange={(event) => setInscription(event.target.value)}
                     />
-                    {trophyText.length > 0 && <FaTrophy className="absolute top-2 right-2 text-[10px] text-warning/30" />}
+                </div>
+                <div className="octane-catalog-air-trophies__purchase">
+                    <CatalogPurchaseWidgetView />
                 </div>
             </div>
-
-            {/* Trophy grid */}
-            <div className="flex-1 overflow-auto min-h-0">
-                <CatalogItemGridWidgetView columnCount={7} columnMinHeight={50} columnMinWidth={50} />
-            </div>
-        </div>
+        </NativeTextTree>
     );
 };

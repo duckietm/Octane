@@ -1,0 +1,41 @@
+/* Official badge_details: border style 0, list (0,6), fields (8,0), spacing 3. */
+.octane-badge-details {
+    position: fixed;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    box-sizing: border-box;
+    width: 263px;
+    padding: 6px 5px 6px 8px;
+    border-image: url('../../assets/images/habbo-skin/slices/border-white.png') 6 fill / 6px stretch;
+    color: #000;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    line-height: 12px;
+    font-weight: normal;
+    text-align: left;
+    pointer-events: none;
+    user-select: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-badge-details__rarity {
+    position: relative;
+    isolation: isolate;
+    box-sizing: border-box;
+    height: 17px;
+    padding: 2px 6px 2px 5px;
+}
+
+.octane-badge-details__rarity-label {
+    display: block;
+    width: max-content;
+}
+
+.octane-badge-details .octane-badge-details__rarity-skin {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+}

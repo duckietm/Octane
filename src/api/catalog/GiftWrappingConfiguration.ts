@@ -1,4 +1,4 @@
-import { GiftWrappingConfigurationParser } from '@nitrots/nitro-renderer';
+import { GiftWrappingConfigurationParser } from '@octane/renderer';
 
 export class GiftWrappingConfiguration {
     private _isEnabled: boolean = false;

@@ -1,0 +1,237 @@
+/* Campaign calendar, AIR layout `calendar` (habbo-toolbar campaign_calendar_xml): a navy 0x0e0f1f window,
+   heading `info_heading` (20 px ubuntu_condensed_title, 0x7ecaed) over `info_body` (u_regular 12, white).
+   Our `Ubuntu` face is the condensed cut, so the window takes the regular one and only the heading keeps `Ubuntu`. */
+.octane-campaign-calendar {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+.octane-campaign-calendar .octane-card-content-shell {
+    background: #0e0f1f;
+    color: #ffffff;
+}
+
+/* The 106 px info strip, the 463 px spinner and the margin under it: AIR's 607 px window. */
+.octane-campaign-calendar .octane-campaign-calendar__content {
+    position: relative;
+    height: 607px;
+    padding: 0;
+    gap: 0;
+}
+
+.octane-campaign-calendar__info {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    height: 106px;
+    flex-shrink: 0;
+}
+
+/* campaign_calendar_icon at (31, 32) */
+.octane-campaign-calendar__icon {
+    flex-shrink: 0;
+    width: 47px;
+    height: 51px;
+    margin: 32px 17px 0 31px;
+    background: url('@/assets/images/campaign/icon_advent.png') no-repeat;
+}
+
+/* the info itemlist at (95, 28), 500 px wide, heading over body 3 px apart */
+.octane-campaign-calendar__texts {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 500px;
+    min-width: 0;
+    margin-top: 28px;
+}
+
+.octane-campaign-calendar .octane-campaign-calendar__force-open {
+    position: absolute;
+    top: 38px;
+    right: 48px;
+    width: 120px;
+    height: 30px;
+}
+
+/* spinner_container at y 106, 463 high, with the day list 15 px down and 447 high */
+.octane-campaign-calendar__spinner {
+    position: relative;
+    height: 447px;
+    margin-top: 15px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.octane-campaign-calendar__track {
+    display: flex;
+    gap: 4px;
+    height: 100%;
+    transition: transform 0.25s ease-out;
+}
+
+/* gradient1 / gradient2: the window navy 0x0f1020, 0.6 to 0.2 left of the selected day and 0.2 to 0.6 right of it */
+.octane-campaign-calendar__shade {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    pointer-events: none;
+    transition: width 0.25s ease-out;
+}
+
+.octane-campaign-calendar__shade.is-left {
+    left: 0;
+    background: linear-gradient(to right, rgb(15 16 32 / 0.6), rgb(15 16 32 / 0.2));
+}
+
+.octane-campaign-calendar__shade.is-right {
+    right: 0;
+    background: linear-gradient(to right, rgb(15 16 32 / 0.2), rgb(15 16 32 / 0.6));
+}
+
+/* btn_back at (4, 325), btn_forward mirrored on the right: icons_back / icons_forward, 33x34 */
+.octane-campaign-calendar .octane-campaign-calendar__arrow {
+    position: absolute;
+    top: 325px;
+    z-index: 1;
+    width: 33px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    background: transparent no-repeat;
+    cursor: pointer;
+}
+
+.octane-campaign-calendar__arrow.is-back {
+    left: 4px;
+    background-image: url('@/assets/images/campaign/back.png');
+}
+
+.octane-campaign-calendar__arrow.is-forward {
+    right: 4px;
+    background-image: url('@/assets/images/campaign/forward.png');
+}
+
+.octane-campaign-calendar__arrow:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+/* btn_slot: a 202x447 day column on campaign_calendar_day_generic_bg */
+.octane-calendar-day {
+    position: relative;
+    flex: 0 0 202px;
+    width: 202px;
+    height: 447px;
+    background: url('@/assets/images/campaign/day_generic_bg.png') no-repeat;
+}
+
+/* btn_present at (7, 115), 192x192; its pictures are centred (pivot_point=center) */
+.octane-calendar-day .octane-calendar-day__present {
+    position: absolute;
+    top: 115px;
+    left: 7px;
+    width: 192px;
+    height: 192px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-calendar-day__present > * {
+    position: absolute;
+    inset: 0;
+    background-position: center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+}
+
+/* campaign_calendar_day_generic_button while closed, campaign_calendar_day_generic_activated once opened */
+.octane-calendar-day__bg {
+    background-image: url('@/assets/images/campaign/day_generic_button.png');
+}
+
+.octane-calendar-day__bg.is-opened {
+    background-image: url('@/assets/images/campaign/day_generic_activated.png');
+}
+
+/* campaign_calendar_opened */
+.octane-calendar-day__opened {
+    background-image: url('@/assets/images/campaign/opened.png');
+}
+
+/* bitmap_icon: the received product, centred and lifted 6 px; a 15 px currency icon is drawn at least 30 px */
+.octane-calendar-day__present > .octane-calendar-day__icon {
+    inset: auto;
+    top: calc(50% - 6px);
+    left: 50%;
+    min-width: 30px;
+    min-height: 30px;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transform: translate(-50%, -50%);
+    image-rendering: pixelated;
+}
+
+/* bitmap_lock: campaign_calendar_generic_lock centred in a 47x51 box at the slot's corner */
+.octane-calendar-day__lock {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 47px;
+    height: 51px;
+    background: url('@/assets/images/campaign/generic_lock.png') no-repeat center;
+    pointer-events: none;
+}
+
+/* CalendarItemWiggle: the selected day that can be opened jumps 10 px and settles. */
+.octane-calendar-day__bg.is-wiggling {
+    animation: octane-calendar-wiggle 0.8s ease-out;
+}
+
+@keyframes octane-calendar-wiggle {
+    0% { transform: translateY(-10px); }
+    30% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+    70% { transform: translateY(0); }
+    85% { transform: translateY(-2px); }
+    100% { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .octane-campaign-calendar__track,
+    .octane-campaign-calendar__shade { transition: none; }
+    .octane-calendar-day__bg.is-wiggling { animation: none; }
+}
+
+/* info_heading */
+.octane-campaign-calendar .octane-campaign-calendar__heading {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 26px;
+    color: #7ecaed;
+}
+
+/* info_body */
+.octane-campaign-calendar .octane-campaign-calendar__body {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 17px;
+    color: #ffffff;
+}
+
+@layer base {
+    .octane-campaign-calendar :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    .octane-campaign-calendar .octane-campaign-calendar__heading {
+        font-family: Ubuntu, UbuntuCondensed, sans-serif !important;
+    }
+
+    /* btn_force_open: a 120x30 AIR button, u_regular 12 */
+    .octane-campaign-calendar .octane-campaign-calendar__force-open {
+        font-size: 12px !important;
+    }
+}

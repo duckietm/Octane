@@ -1,6 +1,6 @@
-import { GroupBadgePartsComposer, GroupBadgePartsEvent } from '@nitrots/nitro-renderer';
+import { GroupBadgePartsComposer, GroupBadgePartsEvent } from '@octane/renderer';
 import { useEffect, useState } from 'react';
-import { useBetween } from 'use-between';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { IGroupCustomize, SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';
 
@@ -48,4 +48,6 @@ const useGroupState = () => {
     return { groupCustomize };
 };
 
-export const useGroup = () => useBetween(useGroupState);
+export const useGroup = () => useSharedHook(useGroupState);
+
+registerSharedHook(useGroupState);

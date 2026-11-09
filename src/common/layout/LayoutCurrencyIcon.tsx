@@ -10,7 +10,7 @@ export const LayoutCurrencyIcon: FC<CurrencyIconProps> = (props) => {
     const { type = '', classNames = [], style = {}, ...rest } = props;
 
     const getClassNames = useMemo(() => {
-        const newClassNames: string[] = ['nitro-currency-icon', 'bg-center bg-no-repeat w-[15px] h-[15px]'];
+        const newClassNames: string[] = ['octane-currency-icon', 'bg-center bg-no-repeat w-[15px] h-[15px]'];
 
         if (classNames.length) newClassNames.push(...classNames);
 

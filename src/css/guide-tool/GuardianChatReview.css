@@ -1,0 +1,461 @@
+/* The guardian's chat review windows (AIR guardian_chat_review_*) and the reporter's feedback
+   windows (chat_review_reporter_feedback, pending_bully_request). Sizes follow the AIR layouts. */
+
+.octane-guardian-review {
+    width: min(282px, calc(100vw - 16px));
+}
+
+.octane-guardian-link {
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #222222;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-guardian-separator {
+    margin: 6px 0;
+    border: 0;
+    border-top: 1px solid #c8c8c8;
+    border-bottom: 1px solid #ffffff;
+}
+
+.octane-guardian-countdown {
+    min-width: 54px;
+    padding: 4px 6px;
+    border: 1px solid #9a9a9a;
+    border-radius: 4px;
+    background: #2a2a2a;
+    color: #ffffff;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 18px;
+    font-variant-numeric: tabular-nums;
+    font-weight: bold;
+    line-height: 1;
+    text-align: center;
+}
+
+/* Offer */
+.octane-guardian-accept {
+    position: relative;
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 4px 0;
+    padding-top: 20px;
+}
+
+.octane-guardian-accept__countdown {
+    position: absolute;
+    top: -4px;
+    right: 8px;
+}
+
+.octane-guardian-accept__perpetrator {
+    align-self: start;
+    justify-self: center;
+    margin-top: 24px;
+}
+
+.octane-guardian-accept__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding-right: 6px;
+}
+
+/* request_title: il_heading_2 12 px bold. */
+.octane-guardian-accept__title {
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* request_type: plain text, black. */
+.octane-guardian-accept__type {
+    color: #000000;
+}
+
+.octane-guardian-accept__description {
+    max-height: 80px;
+    margin-top: 6px;
+    overflow-y: auto;
+}
+
+.octane-guardian-accept__button {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    justify-self: center;
+    width: 200px;
+    min-height: 40px;
+    /* the button label: il_button 10 px bold */
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.octane-guardian-accept__skip {
+    grid-column: 2;
+    justify-self: start;
+    margin: 4px 0 6px;
+}
+
+/* Vote and waiting for the voters */
+.octane-guardian-vote {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.octane-guardian-vote__countdown {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+/* subtitle: il_border 10 px bold 0x222222; incident_time: il_small 9 px. */
+.octane-guardian-vote__subtitle {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-top: 34px;
+    color: #222222;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.octane-guardian-vote__time {
+    font-size: 9px;
+    font-weight: normal;
+}
+
+.octane-guardian-vote__log {
+    height: 250px;
+    padding: 2px 8px;
+    overflow-y: auto;
+    border: 1px solid #b6b6b6;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.octane-guardian-vote__line {
+    display: flex;
+    gap: 7px;
+    padding: 3px 0;
+    border-bottom: 1px solid #e2e2e2;
+}
+
+.octane-guardian-vote__line img {
+    flex: none;
+    width: 16px;
+    height: 17px;
+    margin-top: 1px;
+}
+
+.octane-guardian-vote__message {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.octane-guardian-vote__line.is-suspect .octane-guardian-vote__message {
+    color: #a9322b;
+}
+
+.octane-guardian-vote__waiting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin: 80px 30px 0;
+    font-weight: bold;
+    text-align: center;
+}
+
+.octane-guardian-vote__panel {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 6px;
+}
+
+/* the vote question: il_border 10 px bold 0x222222. */
+.octane-guardian-vote__question {
+    color: #222222;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.octane-guardian-vote__choices {
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+/* While the others are still being found the vote is greyed out, AIR's 0xa0e2e2e2 sheet. */
+.octane-guardian-vote__panel.is-waiting .octane-guardian-vote__choices {
+    border-radius: 4px;
+    background: rgba(226, 226, 226, 0.63);
+}
+
+.octane-guardian-vote__panel.is-waiting .octane-guardian-vote__choice {
+    opacity: 0.45;
+}
+
+.octane-guardian-vote__choice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 76px;
+}
+
+.octane-guardian-vote__button {
+    width: 76px;
+    height: 77px;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    cursor: pointer;
+}
+
+.octane-guardian-vote__button:disabled {
+    cursor: default;
+}
+
+/* the vote captions: plain 11 px text, 0x444444. */
+.octane-guardian-vote__label {
+    width: 68px;
+    color: #444444;
+    font-weight: 400;
+    text-align: center;
+}
+
+.octane-guardian-vote__panel .octane-guardian-separator {
+    align-self: stretch;
+}
+
+/* Waiting for the results and the results */
+.octane-guardian-results {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: min(232px, calc(100vw - 32px));
+}
+
+/* waiting title: il_heading_1 14 px bold 0x888888; its description il_small 9 px. */
+.octane-guardian-results__waiting {
+    text-align: center;
+    font-size: 9px;
+}
+
+.octane-guardian-results__waiting-title {
+    color: #888888;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.octane-guardian-results__verdict {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 53px;
+    padding: 0 8px;
+    border-radius: 4px;
+    background: #ffffff;
+    /* result_text: il_heading_3 10 px bold */
+    font-size: 10px;
+    font-weight: bold;
+}
+
+/* votes heading: il_heading_3 10 px bold 0x444444. */
+.octane-guardian-results__heading {
+    color: #444444;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.octane-guardian-results__list {
+    border: 1px solid #b6b6b6;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.octane-guardian-results__row {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 46px;
+    padding: 0 12px 0 20px;
+    /* vote_text: il_heading_3 10 px bold */
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.octane-guardian-results__row + .octane-guardian-results__row {
+    border-top: 1px solid #e2e2e2;
+}
+
+.octane-guardian-results__icon {
+    flex: none;
+}
+
+.octane-guardian-results__balloon {
+    position: absolute;
+    top: 10px;
+    left: calc(100% + 8px);
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: #a3201d;
+    color: #ffffff;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.octane-guardian-results__balloon::before {
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    border: 5px solid transparent;
+    border-right-color: #a3201d;
+    transform: translateY(-50%);
+    content: '';
+}
+
+.octane-guardian-results__footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+
+/* Reporter feedback and pending report */
+.octane-guardian-feedback,
+.octane-guardian-pending {
+    width: min(369px, calc(100vw - 16px));
+}
+
+.octane-guardian-feedback .octane-card-content-shell,
+.octane-guardian-pending .octane-card-content-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.octane-guardian-feedback__content {
+    display: flex;
+    gap: 12px;
+}
+
+.octane-guardian-feedback__text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+/* chat_review_reporter_feedback caption_txt: il_heading_title 18 px bold 0x333333. */
+.octane-guardian-feedback__caption {
+    color: #333333;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 22px;
+}
+
+/* pending_bully_request subtitle: il_heading_1 14 px bold 0xc30000. */
+.octane-guardian-pending .octane-guardian-feedback__caption {
+    color: #c30000;
+    font-size: 14px;
+    line-height: 17px;
+}
+
+.octane-guardian-feedback__illustration {
+    flex: none;
+    align-self: flex-start;
+}
+
+.octane-guardian-feedback__note {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.octane-guardian-feedback__note img {
+    flex: none;
+}
+
+/* the report label and user_name: il_border 10 px bold (0x444444 for the label); room_name 0x444444. */
+.octane-guardian-pending__heading {
+    color: #444444;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.octane-guardian-pending__user b {
+    font-size: 10px;
+}
+
+.octane-guardian-pending__user span:not(.octane-guardian-pending__time) {
+    color: #444444;
+}
+
+.octane-guardian-pending__user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.octane-guardian-pending__avatar {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+}
+
+.octane-guardian-pending__time {
+    color: #666666;
+    font-size: 11px;
+}
+
+/*
+ * Text face and size: Illumina (style 100) frames in regular Ubuntu (our `Ubuntu` face is the condensed cut),
+ * plain text il_regular 11 px, button captions il_button 10 px bold. The guardian review windows also carry
+ * .octane-guide-tool, whose rules in GuideTool.css cover them; the reporter's feedback and pending windows are here.
+ */
+.octane-guardian-feedback .octane-card-content-shell,
+.octane-guardian-pending .octane-card-content-shell {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px;
+    line-height: 14px;
+}
+
+@layer base {
+    .octane-guardian-feedback .octane-card-content-shell :where(*):not(svg, svg *),
+    .octane-guardian-pending .octane-card-content-shell :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+
+    .octane-guardian-feedback .octane-card-content-shell button.font-bold,
+    .octane-guardian-feedback .octane-card-content-shell button.font-bold *,
+    .octane-guardian-pending .octane-card-content-shell button.font-bold,
+    .octane-guardian-pending .octane-card-content-shell button.font-bold * {
+        font-size: 10px !important;
+    }
+}

@@ -1,5 +1,6 @@
-import { FC, useMemo } from 'react';
-import { Base, Column, ColumnProps, Flex } from '..';
+import { Progress } from '@base-ui/react/progress';
+import { FC, MutableRefObject, useMemo } from 'react';
+import { Column, ColumnProps, Flex } from '..';
 
 interface LayoutProgressBarProps extends ColumnProps {
     text?: string;
@@ -9,6 +10,8 @@ interface LayoutProgressBarProps extends ColumnProps {
 
 export const LayoutProgressBar: FC<LayoutProgressBarProps> = (props) => {
     const { text = '', progress = 0, maxProgress = 100, position = 'relative', justifyContent = 'center', classNames = [], children = null, ...rest } = props;
+    const max = maxProgress > 0 ? maxProgress : 100;
+    const value = Math.max(0, Math.min(progress, max));
 
     const getClassNames = useMemo(() => {
         const newClassNames: string[] = [
@@ -22,17 +25,32 @@ export const LayoutProgressBar: FC<LayoutProgressBarProps> = (props) => {
     }, [classNames]);
 
     return (
-        <Column classNames={getClassNames} justifyContent={justifyContent} position={position} {...rest}>
+        <Progress.Root
+            aria-label={text || undefined}
+            max={max}
+            min={0}
+            value={value}
+            // The Column keeps its flex layout and classes; Root supplies role="progressbar" and the aria-value* attributes.
+            render={({ ref, ...rootProps }) => (
+                <Column
+                    classNames={getClassNames}
+                    innerRef={ref as MutableRefObject<HTMLDivElement>}
+                    justifyContent={justifyContent}
+                    position={position}
+                    {...rest}
+                    {...rootProps}
+                />
+            )}
+        >
             {text && text.length > 0 && (
                 <Flex center fit className="[text-shadow:0px_4px_4px_rgba(0,0,0,.25)] z-20" position="absolute">
                     {text}
                 </Flex>
             )}
-            <Base
-                className="h-full z-10 [transition:all_1s] rounded-[.125rem] bg-[repeating-linear-gradient(#2DABC2,#2DABC2_50%,#2B91A7_50%,#2B91A7_100%)]"
-                style={{ width: ~~(((progress - 0) * (100 - 0)) / (maxProgress - 0) + 0) + '%' }}
-            />
+            <Progress.Track className="h-full w-full">
+                <Progress.Indicator className="relative h-full z-10 [transition:all_1s] rounded-[.125rem] bg-[repeating-linear-gradient(#2DABC2,#2DABC2_50%,#2B91A7_50%,#2B91A7_100%)]" />
+            </Progress.Track>
             {children}
-        </Column>
+        </Progress.Root>
     );
 };

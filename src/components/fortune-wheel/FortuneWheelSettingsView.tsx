@@ -1,9 +1,13 @@
-import { IWheelAdminPrize, IWheelAdminPrizeEdit } from '@nitrots/nitro-renderer';
+import { IWheelAdminPrize, IWheelAdminPrizeEdit } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText } from '../../api';
-import { Column, Flex, Text } from '../../common';
+import { Button, Column, Flex, Text } from '../../common';
 import { useFortuneWheel } from '../../hooks';
-import { NitroCard } from '../../layout';
+import { OctaneCard } from '../../layout';
+import { Select } from '../../common/Select';
+import { NumberInput } from '../../common/NumberInput';
+import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface EditRow {
     id: number;
@@ -103,84 +107,62 @@ export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ on
         });
 
     return (
-        <NitroCard className="w-[480px] h-[520px]" uniqueKey="fortune-wheel-settings">
-            <NitroCard.Header headerText={LocalizeText('wheel.settings.title')} onCloseClick={onClose} />
-            <NitroCard.Content>
-                <Column gap={1} className="h-full p-1">
-                    <Flex gap={1} className="px-1 text-[11px] font-bold text-black/60">
-                        <span className="w-28">{LocalizeText('rarevalues.editor.type')}</span>
-                        <span className="w-16">{LocalizeText('rarevalues.editor.value')}</span>
-                        <span className="w-12">{LocalizeText('rarevalues.editor.weight')}</span>
-                        <span className="grow">{LocalizeText('rarevalues.editor.label')}</span>
-                        <span className="w-6" />
-                    </Flex>
-                    <Column gap={1} overflow="auto" className="grow">
-                        {editRows.map((row) => (
-                            <Flex key={row.id} alignItems="center" gap={1} className="border-b border-black/10 pb-1">
-                                <select
-                                    value={row.category}
-                                    onChange={(event) => updateRow(row.id, { category: event.target.value })}
-                                    className="w-28 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]"
-                                >
-                                    {CATEGORIES.map((cat) => (
-                                        <option key={cat.key} value={cat.key}>
-                                            {LocalizeText(cat.labelKey)}
-                                        </option>
-                                    ))}
-                                </select>
-                                <input
-                                    type="number"
-                                    value={row.num}
-                                    disabled={row.category === 'nothing'}
-                                    onChange={(event) => updateRow(row.id, { num: parseInt(event.target.value) || 0 })}
-                                    className="w-16 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34] disabled:opacity-40"
-                                />
-                                <input
-                                    type="number"
-                                    value={row.weight}
-                                    onChange={(event) => updateRow(row.id, { weight: parseInt(event.target.value) || 0 })}
-                                    className="w-12 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]"
-                                />
-                                <input
-                                    type="text"
-                                    value={row.label}
-                                    onChange={(event) => updateRow(row.id, { label: event.target.value })}
-                                    className="min-w-0 grow rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]"
-                                />
-                                <button
-                                    type="button"
-                                    title={LocalizeText('rarevalues.editor.remove')}
-                                    onClick={() => removeRow(row.id)}
-                                    className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded bg-[#d9534f] font-bold leading-none text-white hover:bg-[#c44440]"
-                                >
-                                    ×
-                                </button>
-                            </Flex>
-                        ))}
-                        {!editRows.length && (
-                            <Text small className="text-black/50">
-                                {LocalizeText('wheel.settings.empty')}
-                            </Text>
-                        )}
+        <NativeTextTree>
+            <OctaneCard className="w-[480px] h-[520px]" uniqueKey="fortune-wheel-settings">
+                <OctaneCard.Header headerText={LocalizeText('wheel.settings.title')} onCloseClick={onClose} />
+                <OctaneCard.Content>
+                    <Column gap={1} className="h-full p-1">
+                        <Flex gap={1} className="px-1 text-[11px] font-bold text-black/60">
+                            <span className="w-28">{LocalizeText('rarevalues.editor.type')}</span>
+                            <span className="w-16">{LocalizeText('rarevalues.editor.value')}</span>
+                            <span className="w-12">{LocalizeText('rarevalues.editor.weight')}</span>
+                            <span className="grow">{LocalizeText('rarevalues.editor.label')}</span>
+                            <span className="w-6" />
+                        </Flex>
+                        <Column gap={1} overflow="auto" className="grow">
+                            {editRows.map((row) => (
+                                <Flex key={row.id} alignItems="center" gap={1} className="border-b border-black/10 pb-1">
+                                    <Select
+                                        value={row.category}
+                                        onChange={(event) => updateRow(row.id, { category: event.target.value })}
+                                        className="w-28 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]"
+                                    >
+                                        {CATEGORIES.map((cat) => (
+                                            <option key={cat.key} value={cat.key}>
+                                                {LocalizeText(cat.labelKey)}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                    <NumberInput value={row.num} disabled={row.category === 'nothing'} onChange={(event) => updateRow(row.id, { num: parseInt(event.target.value) || 0 })} className="w-16 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34] disabled:opacity-40" />
+                                    <NumberInput value={row.weight} onChange={(event) => updateRow(row.id, { weight: parseInt(event.target.value) || 0 })} className="w-12 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]" />
+                                    <input
+                                        type="text"
+                                        value={row.label}
+                                        onChange={(event) => updateRow(row.id, { label: event.target.value })}
+                                        className="min-w-0 grow rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]"
+                                    />
+                                    <Hint content={LocalizeText('rarevalues.editor.remove')}>
+                                        <Button variant="danger" aria-label={LocalizeText('rarevalues.editor.remove')} onClick={() => removeRow(row.id)} classNames={['w-6 shrink-0 px-0!']}>
+                                            X
+                                        </Button>
+                                    </Hint>
+                                </Flex>
+                            ))}
+                            {!editRows.length && (
+                                <Text small className="text-black/50">
+                                    {LocalizeText('wheel.settings.empty')}
+                                </Text>
+                            )}
+                        </Column>
+                        <Button variant="secondary" disabled={editRows.length >= 64} onClick={addRow}>
+                            {LocalizeText('rarevalues.editor.add')}
+                        </Button>
+                        <Button variant="primary" disabled={!editRows.length} onClick={() => saveAdminPrizes?.(editRows.map(rowToEdit))}>
+                            {LocalizeText('rarevalues.editor.save')}
+                        </Button>
                     </Column>
-                    <button
-                        type="button"
-                        disabled={editRows.length >= 64}
-                        onClick={addRow}
-                        className="cursor-pointer rounded border border-dashed border-[#3a7bb5] px-4 py-1.5 text-sm font-bold text-[#3a7bb5] hover:bg-[#3a7bb5]/10 disabled:cursor-default disabled:opacity-40"
-                    >
-                        {LocalizeText('rarevalues.editor.add')}
-                    </button>
-                    <button
-                        type="button"
-                        disabled={!editRows.length}
-                        onClick={() => saveAdminPrizes?.(editRows.map(rowToEdit))}
-                        className="cursor-pointer rounded bg-[#3a7bb5] px-4 py-2 font-bold text-white hover:bg-[#336ea3] disabled:cursor-default disabled:opacity-40"
-                    >
-                        {LocalizeText('rarevalues.editor.save')}
-                    </button>
-                </Column>
-            </NitroCard.Content>
-        </NitroCard>
+                </OctaneCard.Content>
+            </OctaneCard>
+        </NativeTextTree>
     );
 };

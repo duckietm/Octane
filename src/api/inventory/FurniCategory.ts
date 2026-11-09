@@ -22,4 +22,8 @@ export class FurniCategory {
     public static MONSTERPLANT_REBREED: number = 21;
     public static MONSTERPLANT_FERTILIZE: number = 22;
     public static FIGURE_PURCHASABLE_SET: number = 23;
+    /** AIR class_1901: a wired furni chest (brown inventory overlay). */
+    public static FURNI_CHEST: number = 24;
+    /** AIR class_1901: a wired coins chest (gold inventory overlay). */
+    public static COINS_CHEST: number = 25;
 }

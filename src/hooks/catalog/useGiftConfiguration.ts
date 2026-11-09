@@ -1,7 +1,7 @@
-import { GetGiftWrappingConfigurationComposer, GiftWrappingConfigurationEvent } from '@nitrots/nitro-renderer';
+import { GetGiftWrappingConfigurationComposer, GiftWrappingConfigurationEvent } from '@octane/renderer';
 import { UseQueryResult } from '@tanstack/react-query';
 import { GiftWrappingConfiguration } from '../../api';
-import { useNitroQuery } from '../../api/nitro-query';
+import { useOctaneQuery } from '../../api/octane-query';
 
 /**
  * Wraps the GetGiftWrappingConfigurationComposer / GiftWrappingConfigurationEvent
@@ -17,8 +17,8 @@ import { useNitroQuery } from '../../api/nitro-query';
  * states.
  */
 export const useGiftConfiguration = (options: { enabled?: boolean } = {}): UseQueryResult<GiftWrappingConfiguration> =>
-    useNitroQuery<GiftWrappingConfigurationEvent, GiftWrappingConfiguration>({
-        key: ['nitro', 'catalog', 'giftConfiguration'],
+    useOctaneQuery<GiftWrappingConfigurationEvent, GiftWrappingConfiguration>({
+        key: ['octane', 'catalog', 'giftConfiguration'],
         request: () => new GetGiftWrappingConfigurationComposer(),
         parser: GiftWrappingConfigurationEvent,
         select: (event) => new GiftWrappingConfiguration(event.getParser()),

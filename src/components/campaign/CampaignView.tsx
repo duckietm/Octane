@@ -7,22 +7,25 @@ import {
     OpenCampaignCalendarDoorAsStaffComposer,
     OpenCampaignCalendarDoorComposer,
     RemoveLinkEventTracker
-} from '@nitrots/nitro-renderer';
-import { FC, useEffect, useState } from 'react';
+} from '@octane/renderer';
+import { FC, useEffect, useRef, useState } from 'react';
 import { CalendarItem, SendMessageComposer } from '../../api';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useMessageEvent } from '../../hooks';
 import { CalendarView } from './CalendarView';
 
 export const CampaignView: FC<{}> = (props) => {
     const [calendarData, setCalendarData] = useState<CampaignCalendarData>(null);
-    const [lastOpenAttempt, setLastOpenAttempt] = useState<number>(-1);
+    const pendingDoorRef = useRef(-1);
     const [receivedProducts, setReceivedProducts] = useState<Map<number, CalendarItem>>(new Map());
     const [isCalendarOpen, setCalendarOpen] = useState(false);
 
     const openPackage = (id: number, asStaff = false) => {
-        if (!calendarData) return;
+        // One door at a time: the answer names no door, so two quick clicks used to file the first door's prize under
+        // the second and leave the second closed.
+        if (!calendarData || pendingDoorRef.current !== -1) return;
 
-        setLastOpenAttempt(id);
+        pendingDoorRef.current = id;
 
         if (asStaff) {
             SendMessageComposer(new OpenCampaignCalendarDoorAsStaffComposer(calendarData.campaignName, id));
@@ -36,6 +39,7 @@ export const CampaignView: FC<{}> = (props) => {
 
         if (!parser) return;
 
+        pendingDoorRef.current = -1;
         setCalendarData(parser.calendarData);
     });
 
@@ -44,25 +48,38 @@ export const CampaignView: FC<{}> = (props) => {
 
         if (!parser) return;
 
-        const lastAttempt = lastOpenAttempt;
+        const lastAttempt = pendingDoorRef.current;
+        pendingDoorRef.current = -1;
+
+        if (lastAttempt === -1) return;
 
         if (parser.doorOpened) {
             setCalendarData((prev) => {
                 const copy = prev.clone();
-                copy.openedDays.push(lastOpenAttempt);
+                // clone() shares the opened days with the previous state: pushing into it changed that state too.
+                copy.openedDays = [...copy.openedDays, lastAttempt];
 
                 return copy;
             });
 
+            const reward = new CalendarItem(parser.productName, parser.customImage, parser.furnitureClassName, {
+                badgeCode: parser.badgeCode,
+                credits: parser.credits,
+                pixels: parser.pixels,
+                points: parser.points,
+                pointsType: parser.pointsType,
+                subscriptionType: parser.subscriptionType,
+                subscriptionDays: parser.subscriptionDays
+            });
+
             setReceivedProducts((prev) => {
                 const copy = new Map(prev);
-                copy.set(lastAttempt, new CalendarItem(parser.productName, parser.customImage, parser.furnitureClassName));
+                copy.set(lastAttempt, reward);
 
                 return copy;
             });
         }
 
-        setLastOpenAttempt(-1);
     });
 
     useEffect(() => {
@@ -87,19 +104,22 @@ export const CampaignView: FC<{}> = (props) => {
     }, []);
 
     return (
-        <>
-            {calendarData && isCalendarOpen && (
-                <CalendarView
-                    campaignName={calendarData.campaignName}
-                    currentDay={calendarData.currentDay}
-                    missedDays={calendarData.missedDays}
-                    numDays={calendarData.campaignDays}
-                    openedDays={calendarData.openedDays}
-                    openPackage={openPackage}
-                    receivedProducts={receivedProducts}
-                    onClose={() => setCalendarOpen(false)}
-                />
-            )}
-        </>
+        <NativeTextTree>
+            <>
+                {calendarData && isCalendarOpen && (
+                    <CalendarView
+                        campaignName={calendarData.campaignName}
+                        currentDay={calendarData.currentDay}
+                        missedDays={calendarData.missedDays}
+                        numDays={calendarData.campaignDays}
+                        openedDays={calendarData.openedDays}
+                        openedRewards={calendarData.openedRewards}
+                        openPackage={openPackage}
+                        receivedProducts={receivedProducts}
+                        onClose={() => setCalendarOpen(false)}
+                    />
+                )}
+            </>
+        </NativeTextTree>
     );
 };

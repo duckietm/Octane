@@ -1,3 +1,7 @@
+/**
+ * Official action codes (AIR ActionTypeCodes, build WIN63-202610131318). Codes from 1000 up are our
+ * own actions: 1000 plus the code they had before the official table, so they stay traceable.
+ */
 export class WiredActionLayoutCode {
     public static TOGGLE_FURNI_STATE: number = 0;
     public static RESET: number = 1;
@@ -25,90 +29,70 @@ export class WiredActionLayoutCode {
     public static BOT_FOLLOW_AVATAR: number = 25;
     public static BOT_CHANGE_FIGURE: number = 26;
     public static BOT_TALK_DIRECT_TO_AVTR: number = 27;
-    public static FURNI_AREA_SELECTOR: number = 28;
-    public static FURNI_NEIGHBORHOOD_SELECTOR: number = 29;
-    public static FURNI_BYTYPE_SELECTOR: number = 30;
-    public static USERS_AREA_SELECTOR: number = 31;
-    public static USERS_NEIGHBORHOOD_SELECTOR: number = 32;
-    public static SEND_SIGNAL: number = 33;
-    public static FREEZE: number = 34;
-    public static UNFREEZE: number = 35;
-    public static FURNI_TO_USER: number = 36;
-    public static USER_TO_FURNI: number = 37;
-    public static FURNI_TO_FURNI: number = 38;
-    public static SET_ALTITUDE: number = 39;
-    public static RELATIVE_MOVE: number = 40;
-    public static CONTROL_CLOCK: number = 41;
-    public static ADJUST_CLOCK: number = 42;
-    public static MOVE_ROTATE_USER: number = 43;
-    public static FURNI_ALTITUDE_SELECTOR: number = 44;
-    public static FURNI_ON_FURNI_SELECTOR: number = 45;
-    public static FURNI_PICKS_SELECTOR: number = 46;
-    public static FURNI_SIGNAL_SELECTOR: number = 47;
-    public static USERS_SIGNAL_SELECTOR: number = 48;
-    public static USERS_BY_TYPE_SELECTOR: number = 49;
-    public static USERS_TEAM_SELECTOR: number = 50;
-    public static USERS_BY_ACTION_SELECTOR: number = 51;
-    public static USERS_BY_NAME_SELECTOR: number = 52;
-    public static USERS_ON_FURNI_SELECTOR: number = 53;
-    public static USERS_GROUP_SELECTOR: number = 54;
-    public static USERS_HANDITEM_SELECTOR: number = 55;
-    public static FILTER_FURNI_EXTRA: number = 56;
-    public static FILTER_USER_EXTRA: number = 57;
-    public static MOVE_CARRY_USERS_EXTRA: number = 58;
-    public static MOVE_NO_ANIMATION_EXTRA: number = 59;
-    public static ANIMATION_TIME_EXTRA: number = 60;
-    public static MOVE_PHYSICS_EXTRA: number = 61;
-    public static UNSEEN_EXTRA: number = 62;
-    public static RANDOM_EXTRA: number = 63;
-    public static EXEC_IN_ORDER_EXTRA: number = 64;
-    public static EXECUTION_LIMIT_EXTRA: number = 65;
-    public static OR_EVAL_EXTRA: number = 66;
-    public static TEXT_OUTPUT_USERNAME_EXTRA: number = 67;
-    public static TEXT_OUTPUT_FURNI_NAME_EXTRA: number = 68;
-    public static GIVE_VARIABLE: number = 69;
-    public static USER_VARIABLE_EXTRA: number = 70;
-    public static FURNI_VARIABLE_EXTRA: number = 71;
-    public static ROOM_VARIABLE_EXTRA: number = 72;
-    public static REMOVE_VARIABLE: number = 73;
-    public static CHANGE_VARIABLE_VALUE: number = 74;
-    public static FURNI_WITH_VARIABLE_SELECTOR: number = 75;
-    public static USERS_WITH_VARIABLE_SELECTOR: number = 76;
-    public static FILTER_USERS_BY_VARIABLE_EXTRA: number = 77;
-    public static FILTER_FURNI_BY_VARIABLE_EXTRA: number = 78;
-    public static VARIABLE_TEXT_CONNECTOR_EXTRA: number = 79;
-    public static TEXT_OUTPUT_VARIABLE_EXTRA: number = 80;
-    public static VARIABLE_REFERENCE_EXTRA: number = 81;
-    public static VARIABLE_LEVELUP_SYSTEM_EXTRA: number = 82;
-    public static VARIABLE_ECHO_EXTRA: number = 83;
-    public static CONTEXT_VARIABLE_EXTRA: number = 84;
-    public static TEXT_INPUT_VARIABLE_EXTRA: number = 85;
-    public static NEG_CALL_ANOTHER_STACK: number = 86;
-    public static NEG_SEND_SIGNAL: number = 87;
-    public static SET_ROLLER_SPEED: number = 88;
-    public static BOT_DANCE: number = 89;
-    public static GIVE_POINTS_TYPE: number = 90;
-    public static GIVE_OR_TAKE_FURNI: number = 91;
-    public static PLAY_YOUTUBE: number = 92;
-    public static QUICK_BOPPER: number = 93;
-    public static SET_ROOM_AD: number = 94;
-    public static MOVE_FURNI_AS_GROUP: number = 95;
-    public static REMOTE_SELECTOR: number = 96;
-    public static MOVEMENT_CURVE_EXTRA: number = 97;
-    public static TIME_UTILITIES_EXTRA: number = 98;
-    public static GIVE_CURRENCY_FROM_CHEST: number = 99;
-    public static CURRENCY_CHEST: number = 100;
-    public static FURNI_CHEST: number = 101;
-    public static GIVE_FURNI_FROM_CHEST: number = 102;
-    public static SCAN_CHEST_FURNI_BY_TYPE: number = 103;
-    public static INIT_TRANSACTION: number = 104;
-    public static CANCEL_TRANSACTION: number = 105;
-    public static PLACE_FURNI: number = 106;
-    public static REMOVE_FURNI: number = 107;
-    public static QUEST_EXTRA: number = 108;
-    public static QUEST_CHAIN_EXTRA: number = 109;
-    public static CONTRACT_PAYMENT: number = 110;
-    public static CONTRACT_REWARD: number = 111;
-    public static CONTRACT_TRADE: number = 112;
-    public static CUSTOM_CONTRACT: number = 113;
+    public static CONTROL_CLOCK: number = 28;
+    public static SET_ALTITUDE: number = 29;
+    public static SEND_SIGNAL: number = 30;
+    public static FREEZE: number = 31;
+    public static UNFREEZE: number = 32;
+    public static RELATIVE_MOVE: number = 33;
+    public static FURNI_TO_FURNI: number = 34;
+    public static FURNI_TO_USER: number = 35;
+    public static NEG_CALL_ANOTHER_STACK: number = 36;
+    public static NEG_SEND_SIGNAL: number = 37;
+    public static ADJUST_CLOCK: number = 38;
+    public static GIVE_VARIABLE: number = 39;
+    public static REMOVE_VARIABLE: number = 40;
+    public static CHANGE_VARIABLE_VALUE: number = 41;
+    public static MOVE_ROTATE_USER: number = 42;
+    public static USER_TO_FURNI: number = 43;
+    public static TELEPORT_TO_ROOM: number = 44;
+    public static GIVE_CURRENCY_FROM_CHEST: number = 45;
+    public static GIVE_FURNI_FROM_CHEST: number = 46;
+    public static INIT_TRANSACTION: number = 47;
+    public static CANCEL_TRANSACTION: number = 48;
+    public static WRITE_TO_LOGS: number = 49;
+    /** AIR's negative code of Write to Logs; AIR ActionTypes.getByCode opens the same editor for it. */
+    public static WRITE_TO_LOGS_NEGATIVE: number = 50;
+    public static PROGRESS_ACHIEVEMENT: number = 51;
+    /** Official give effect (wf_act_give_effect). */
+    public static EFFECT_ID: number = 52;
+    public static OVERRIDE_HEIGHT: number = 53;
+    public static CLICK_SETTINGS: number = 54;
+    public static PLACE_FURNI: number = 55;
+    public static REMOVE_FURNI: number = 56;
+    public static MOVE_FURNI_AS_GROUP: number = 57;
+    public static PROGRESS_REWARD_TRACK: number = 58;
+    public static RESET_REWARD_TRACK: number = 59;
+    public static CHANGE_OPACITY: number = 61;
+    public static SET_FURNI_HIGHLIGHT: number = 62;
+    /** Official WIRED Link actions. */
+    public static SEND_LINK_MESSAGE: number = 63;
+    public static SEND_LINK_DATAFRAME: number = 64;
+
+    // Ours.
+    public static SET_ROLLER_SPEED: number = 1088;
+    public static BOT_DANCE: number = 1089;
+    public static GIVE_POINTS_TYPE: number = 1090;
+    public static GIVE_OR_TAKE_FURNI: number = 1091;
+    public static PLAY_YOUTUBE: number = 1092;
+    public static QUICK_BOPPER: number = 1093;
+    public static SET_ROOM_AD: number = 1094;
+    public static WALK_TO_FURNI: number = 1115;
+    public static USER_TARGET: number = 1116;
+    public static MOVE_USER_TILES: number = 1117;
+    public static EFFECT_AMOUNT: number = 1118;
+    public static EFFECT_BADGE: number = 1119;
+    public static EFFECT_TAG: number = 1120;
+    public static EFFECT_MESSAGE: number = 1122;
+    public static EFFECT_TEXT: number = 1123;
+    public static ALL_USERS_LEAVE_TEAM: number = 1124;
+    public static MODIFY_ARRAY: number = 1126;
+    /** Ours (wf_act_move_group_step): the selected furni step one tile in a compass direction. */
+    public static MOVE_FURNI_GROUP_STEP: number = 1154;
+    /** Ours (wf_act_spawn_furni): mint a new furni by base item id. */
+    public static SPAWN_FURNI: number = 1155;
+    /** Ours (wf_act_pickup_furni): pick the furni up into its owner's inventory. */
+    public static PICKUP_FURNI: number = 1156;
+    /** Ours (wf_act_give_handitem): it shared the official give effect's code (52). */
+    public static GIVE_HAND_ITEM: number = 1157;
 }

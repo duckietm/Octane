@@ -1,4 +1,4 @@
-import { MarkMessengerReadComposer, RequestMessengerHistoryComposer, SendMessengerMessageComposer } from '@nitrots/nitro-renderer';
+import { MarkMessengerReadComposer, RequestMessengerHistoryComposer, SendMessengerMessageComposer } from '@octane/renderer';
 import { MessengerMessage, MessengerState, selectMessageByClientId, selectMessages } from '../../../api';
 import { MessengerAction } from '../../../api/friends/messenger/messengerReducer';
 
@@ -17,7 +17,7 @@ export const createMessengerHistoryController = (
         const history = getState().historyByConversation[conversationId];
         if(history?.loading || history?.loaded) return;
         dispatch({ type: 'historyLoading', conversationId });
-        send(makeRequest(conversationId, 0, 30));
+        send(makeRequest(conversationId, 0, 50));
     },
     loadOlder(conversationId: number)
     {

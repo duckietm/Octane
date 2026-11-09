@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="issue_handler" width="750" height="615" version="0.1" uid="C61B90CB-91DD-EB1F-A5B9-A9AD191AF6C9">
+  <window>
+    <frame x="0" y="0" width="750" height="650" params="229377" style="0" caption="Issue%20handling" color="0xff418db0" width_min="750" width_max="750" height_min="390">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.34901960784313724" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <dropmenu x="410" y="15" width="320" height="20" params="17" style="100" name="cfh_topics" caption="CFH%20TOPICS%3A"/>
+        <container x="524" y="42" width="215" height="18" params="16" style="3" name="sanctioninfo" background="true" height_max="47">
+          <children>
+            <text x="0" y="0" width="215" height="17" params="16" style="3" name="sanction_label" width_max="215" height_max="20">
+              <variables>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="font_size" value="11" type="Number"/>
+              </variables>
+            </text>
+          </children>
+        </container>
+        <container x="290" y="15" width="444" height="75" params="16" style="0" name="buttons" caption="Issue%20handling">
+          <children>
+            <button x="0" y="0" width="110" height="22" params="131089" style="0" name="close_useless" caption="Close%20as%20useless" width_min="110" width_max="110" color="0xff9090"/>
+            <button x="0" y="50" width="110" height="22" params="131089" style="0" name="close_resolved" caption="Close%20as%20resolved" width_min="110" width_max="110"/>
+            <button x="316" y="50" width="110" height="22" params="131089" style="0" name="release" caption="Release" width_min="110" width_max="110"/>
+            <checkbox x="120" y="53" width="17" height="17" params="17" style="0" name="handle_next_checkbox" caption="Issue%20handling"/>
+            <label x="138" y="53" width="153" height="13" params="16" style="0" name="handle_next_text" caption="Automatically%20open%20next%20issue">
+              <variables>
+                <var key="text_color" value="0xffffff" type="hex"/>
+              </variables>
+            </label>
+            <button x="120" y="25" width="110" height="22" params="131089" style="0" name="close_sanction" caption="Default%20Sanction" width_min="110" width_max="110"/>
+          </children>
+        </container>
+        <itemlist_vertical x="0" y="0" width="285" height="624" params="2193" style="0" name="issue_cont" caption="Issue%20handling" background="true">
+          <children>
+            <container x="0" y="0" width="280" height="13" params="16" style="0" name="issues_header" caption="Issue%20handling" background="true">
+              <children>
+                <text x="0" y="0" width="78" height="13" params="786449" style="0" caption="Reporter">
+                  <variables>
+                    <var key="font_face" value="Volter Bold" type="String"/>
+                    <var key="text_color" value="0xffffff" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <text x="78" y="0" width="110" height="13" params="786449" style="0" caption="Category">
+                  <variables>
+                    <var key="font_face" value="Volter Bold" type="String"/>
+                    <var key="text_color" value="0xffffff" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <text x="188" y="0" width="60" height="13" params="786449" style="0" caption="Type">
+                  <variables>
+                    <var key="font_face" value="Volter Bold" type="String"/>
+                    <var key="text_color" value="0xffffff" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+                <text x="248" y="0" width="32" height="13" params="786449" style="0" caption="Open">
+                  <variables>
+                    <var key="font_face" value="Volter Bold" type="String"/>
+                    <var key="text_color" value="0xffffff" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <scrollable_itemlist_vertical x="0" y="16" width="280" height="70" params="17" style="0" name="issues_item_list" caption="Issue%20handling" color="0xffffffffff" background="true">
+              <children>
+                <region x="0" y="0" width="280" height="16" params="17" style="0" treshold="0">
+                  <children>
+                    <label x="0" y="0" width="78" height="13" params="16" style="0" name="reporter" caption="reporter" width_max="78"/>
+                    <text x="78" y="0" width="110" height="13" params="16" style="0" name="category" caption="category" width_max="110"/>
+                    <label x="188" y="0" width="60" height="13" params="16" style="0" name="type" caption="type" width_max="60"/>
+                    <label x="248" y="0" width="32" height="13" params="16" style="0" name="time_open" caption="00%3A00"/>
+                  </children>
+                </region>
+              </children>
+            </scrollable_itemlist_vertical>
+            <text x="95" y="89" width="100" height="13" params="786448" style="0" caption="Caller%20User%20Info">
+              <variables>
+                <var key="font_face" value="Volter Bold" type="String"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                <var key="sharpness" value="0" type="Number"/>
+                <var key="thickness" value="0" type="Number"/>
+                <var key="kerning" value="false" type="Boolean"/>
+                <var key="spacing" value="0" type="Number"/>
+                <var key="leading" value="0" type="Number"/>
+              </variables>
+            </text>
+            <container x="0" y="105" width="280" height="207" params="16" style="0" name="caller_user_info" caption="Issue%20handling"/>
+            <text x="111" y="291" width="60" height="14" params="786448" style="0" caption="Messages">
+              <variables>
+                <var key="font_face" value="Volter Bold" type="String"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                <var key="sharpness" value="0" type="Number"/>
+                <var key="thickness" value="0" type="Number"/>
+                <var key="kerning" value="false" type="Boolean"/>
+                <var key="spacing" value="0" type="Number"/>
+                <var key="leading" value="0" type="Number"/>
+              </variables>
+            </text>
+            <scrollable_itemlist_vertical x="0" y="307" width="280" height="70" params="17" style="0" name="msg_item_list" caption="Issue%20handling" color="0xffffffffff" background="true">
+              <children>
+                <input x="0" y="0" width="264" height="49" params="1" style="0" caption="%24%7B002_lorem_ipsum_content%7D" color="0xffffa2d6ea" background="true">
+                  <variables>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                    <var key="sharpness" value="0" type="Number"/>
+                    <var key="thickness" value="0" type="Number"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="kerning" value="false" type="Boolean"/>
+                    <var key="spacing" value="0" type="Number"/>
+                    <var key="leading" value="0" type="Number"/>
+                  </variables>
+                </input>
+              </children>
+            </scrollable_itemlist_vertical>
+            <text x="80" y="380" width="120" height="13" params="786449" style="0" name="reported_user_info_caption" caption="Reported%20User%20Info">
+              <variables>
+                <var key="font_face" value="Volter Bold" type="String"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                <var key="sharpness" value="0" type="Number"/>
+                <var key="thickness" value="0" type="Number"/>
+                <var key="kerning" value="false" type="Boolean"/>
+                <var key="spacing" value="0" type="Number"/>
+                <var key="leading" value="0" type="Number"/>
+              </variables>
+            </text>
+            <container x="0" y="396" width="280" height="207" params="16" style="0" name="reported_user_info" caption="Issue%20handling"/>
+          </children>
+          <variables>
+            <var key="spacing" value="3" type="int"/>
+          </variables>
+        </itemlist_vertical>
+        <container x="290" y="95" width="445" height="480" params="2064" style="3" name="chat_cont" caption="Chatlog" color="0x0418db0" background="true">
+          <children>
+            <itemlist_vertical x="0" y="0" width="420" height="475" params="2064" style="3" name="evidence_list" caption="Chatlog"/>
+            <scrollbar_vertical x="426" y="0" width="17" height="480" params="2065" style="3" name="scroller" caption="Chatlog">
+              <variables>
+                <var key="scrollable" value="evidence_list" type="String"/>
+              </variables>
+            </scrollbar_vertical>
+          </children>
+        </container>
+      </children>
+    </frame>
+  </window>
+</layout>

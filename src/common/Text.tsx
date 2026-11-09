@@ -1,5 +1,6 @@
 import { FC, useMemo } from 'react';
 import { Base, BaseProps } from './Base';
+import { nativeTextChildren } from './native-text/nativeTextChildren';
 import { ColorVariantType, FontSizeType, FontWeightType, TextAlignType } from './types';
 
 export interface TextProps extends BaseProps<HTMLDivElement> {
@@ -37,6 +38,7 @@ export const Text: FC<TextProps> = (props) => {
         wrap = false,
         noWrap = false,
         textBreak = false,
+        children = null,
         ...rest
     } = props;
 
@@ -75,5 +77,9 @@ export const Text: FC<TextProps> = (props) => {
 
     const style = fontSizeCustom ? ({ '--font-size': `${fontSizeCustom}px` } as React.CSSProperties) : undefined;
 
-    return <Base classNames={getClassNames} style={style} {...rest} />;
+    return (
+        <Base classNames={getClassNames} style={style} {...rest}>
+            {nativeTextChildren(children, `${getClassNames.join(' ')} ${rest.className ?? ''}`)}
+        </Base>
+    );
 };

@@ -1,0 +1,315 @@
+/*
+ * AIR make_marketplace_offer (habbo-inventory-com/make_marketplace_offer_xml.xml): frame 300x429,
+ * margins 6/30/6/6, so the main container is 288x393. Every position below is the layout's own
+ * x/y inside that container.
+ */
+.octane-card-shell.octane-marketplace-post-offer,
+.draggable-window:has(> .octane-marketplace-post-offer) {
+    box-sizing: border-box;
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important;
+    height: 429px !important;
+    min-height: 429px !important;
+    max-height: 429px !important;
+}
+
+.octane-card-shell.octane-marketplace-post-offer {
+    resize: none !important;
+}
+
+.octane-marketplace-post-offer,
+.octane-marketplace-post-offer * {
+    box-sizing: border-box;
+}
+
+.octane-card-shell.octane-marketplace-post-offer .octane-marketplace-post-offer-content.container-fluid {
+    position: absolute !important;
+    /* margin_top 30 / margin_left 6 through the 1px frame box, as in the purchase confirmation. */
+    top: 37px !important;
+    left: 5px !important;
+    z-index: 1;
+    display: block !important;
+    width: 288px !important;
+    min-width: 288px !important;
+    max-width: 288px !important;
+    height: 393px !important;
+    min-height: 393px !important;
+    max-height: 393px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-marketplace-post-offer-content :where(span, label, input, button) {
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+/* image_border: x10 y12 70x70, border style 105. */
+.octane-marketplace-post-offer-image {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    overflow: hidden;
+}
+
+.octane-marketplace-post-offer-image::before,
+.octane-marketplace-post-offer-input::before,
+.octane-marketplace-post-offer-final::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border: 6px solid transparent;
+    border-image-source: url("../../assets/images/catalog/air/gift/image-border-f1f1f1.png");
+    border-image-slice: 6 fill;
+    border-image-width: 6px;
+    border-image-repeat: stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.octane-marketplace-post-offer-image .furni-image,
+.octane-marketplace-post-offer-image img {
+    position: relative;
+    z-index: 1;
+    max-width: 70px;
+    max-height: 70px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* unique_item_overlay_widget / rarity_item_overlay_widget: x2 y2. */
+.octane-marketplace-post-offer-unique,
+.octane-marketplace-post-offer-rarity {
+    position: absolute !important;
+    top: 2px;
+    left: 2px;
+    z-index: 2;
+}
+
+/* furni_name: x88 y13 190x56, u_headline_medium, word wrap. */
+.octane-marketplace-post-offer-name {
+    position: absolute;
+    top: 13px;
+    left: 88px;
+    width: 190px;
+    height: 56px;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    /* u_headline_medium: 16 px bold. */
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 20px;
+}
+
+/* expiration_info: x10 y87 268x39, word wrap. */
+.octane-marketplace-post-offer-expiration {
+    position: absolute;
+    top: 87px;
+    left: 10px;
+    width: 268px;
+    height: 39px;
+    overflow: hidden;
+}
+
+/* price_request / amount_request: right-aligned, right edge at x209, u_headline_small. */
+.octane-marketplace-post-offer-label {
+    position: absolute;
+    left: 0;
+    width: 209px;
+    height: 19px;
+    overflow: hidden;
+    /* u_headline_small: 14 px bold. */
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 19px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.octane-marketplace-post-offer-label.is-price {
+    top: 131px;
+}
+
+.octane-marketplace-post-offer-label.is-amount {
+    top: 160px;
+}
+
+/* input_border / amount_input_border: x212, 66x26, style 105; the input sits at 8,3 (50x19). */
+.octane-marketplace-post-offer-input {
+    position: absolute;
+    left: 212px;
+    width: 66px;
+    height: 26px;
+}
+
+.octane-marketplace-post-offer-input.is-price {
+    top: 129px;
+}
+
+.octane-marketplace-post-offer-input.is-amount {
+    top: 158px;
+}
+
+.octane-marketplace-post-offer-input input {
+    position: absolute;
+    top: 3px;
+    left: 8px;
+    z-index: 1;
+    width: 50px;
+    height: 19px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    font-size: 12px;
+    line-height: 19px;
+}
+
+/* The itemlist at x10 y190, 268 wide, spacing 7: hidden lines take no room. */
+.octane-marketplace-post-offer-list {
+    position: absolute;
+    top: 190px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    width: 268px;
+}
+
+.octane-marketplace-post-offer-stat {
+    display: block;
+    width: 268px;
+    height: 18px;
+    /* The rows keep AIR's 18px, but the drawn text (22px) may reach below: g and p were cut off. */
+    overflow: visible;
+    line-height: 18px;
+    white-space: nowrap;
+}
+
+/* final_price_border: 268x54, the text centred at 6,11 (257x30). */
+.octane-marketplace-post-offer-final {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 268px;
+    height: 54px;
+    padding: 11px 5px 13px 6px;
+}
+
+.octane-marketplace-post-offer-final span {
+    position: relative;
+    z-index: 1;
+    width: 257px;
+    max-height: 30px;
+    overflow: hidden;
+    text-align: center;
+}
+
+/* buttons: Post at x0, Cancel at x138, both 130x28. */
+.octane-marketplace-post-offer-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 268px;
+    height: 30px;
+}
+
+.octane-marketplace-post-offer-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 130px !important;
+    height: 28px !important;
+    margin: 0 !important;
+    padding: 0 8px !important;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-width: 5px !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+    font-size: 12px !important;
+    line-height: 17px !important;
+    white-space: nowrap;
+    image-rendering: var(--octane-pixel-art, pixelated) !important;
+}
+
+/*
+ * copy_suggested_price_button: x130 (120 into the itemlist at x10), 138x24, growing with its text up to
+ * width_max 150 as AIR's button does, rightwards from x130. Longer captions (Dutch) keep their centre.
+ */
+.octane-marketplace-post-offer-button.is-copy {
+    align-self: flex-start;
+    width: auto !important;
+    min-width: 138px !important;
+    max-width: 150px !important;
+    height: 24px !important;
+    margin-left: 120px !important;
+    padding: 0 !important;
+    overflow: visible;
+}
+
+.octane-marketplace-post-offer-button:hover {
+    border-image-source: var(--habbo-skin-shiny-hover) !important;
+}
+
+.octane-marketplace-post-offer-button:active {
+    border-image-source: var(--habbo-skin-shiny-pressed) !important;
+}
+
+.octane-marketplace-post-offer-button:disabled {
+    border-image-source: var(--habbo-skin-shiny-disabled) !important;
+    color: #777777 !important;
+}
+
+.octane-marketplace-post-offer-button:focus-visible {
+    outline: 1px solid #000000;
+    outline-offset: 1px;
+}
+
+/* The card shell hands its condensed `Ubuntu` to spans, labels, inputs and buttons with a higher specificity than
+   the rule above; AIR's frame is the regular Ubuntu, so an important rule in the base layer puts it back. */
+@layer base {
+    .octane-marketplace-post-offer-content :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
+
+/*
+ * AIR make_nft_marketplace_offer (Collectibles marketplace): the same window without the amount line,
+ * frame 300x398, main container 288x362, the itemlist at y159.
+ */
+.octane-card-shell.octane-marketplace-post-offer.is-nft,
+.draggable-window:has(> .octane-marketplace-post-offer.is-nft) {
+    height: 398px !important;
+    min-height: 398px !important;
+    max-height: 398px !important;
+}
+
+.octane-card-shell.octane-marketplace-post-offer.is-nft .octane-marketplace-post-offer-content.container-fluid {
+    height: 362px !important;
+    min-height: 362px !important;
+    max-height: 362px !important;
+}
+
+.octane-marketplace-post-offer.is-nft .octane-marketplace-post-offer-list {
+    top: 159px;
+}

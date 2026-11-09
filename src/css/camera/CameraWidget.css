@@ -1,0 +1,1229 @@
+/* WIN63 camera_interface_xml. The official capture shell is bitmap chrome;
+   keep every live layer on integer pixels so the 320x320 crop stays sharp. */
+.octane-camera-capture {
+    position: relative;
+    box-sizing: border-box;
+    width: 340px;
+    min-width: 340px;
+    max-width: 340px;
+    height: 536px;
+    min-height: 536px;
+    max-height: 536px;
+    overflow: visible;
+    justify-content: flex-start !important;
+    color: #ffffff;
+    /* camera_interface is an AIR (style 3) window: regular Ubuntu, not our condensed `Ubuntu` face. Its visible
+       captions are NativeText rasters of the AIR text styles; this only covers DOM fallback text. */
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-capture__body {
+    position: relative;
+    z-index: 2;
+    box-sizing: border-box;
+    width: 340px;
+    height: 462px;
+    overflow: hidden;
+    flex: 0 0 462px;
+    background: url('../../assets/images/room-widgets/camera-widget/camera-spritesheet.png') -1px -1px no-repeat;
+    cursor: move;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-capture__body::before {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    width: 340px;
+    height: 462px;
+    background: url('../../assets/images/room-widgets/camera-widget/camera-spritesheet.png') -1px -1px no-repeat;
+    content: '';
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-capture__title {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    z-index: 8;
+    width: 340px;
+    height: 18px;
+    line-height: 0;
+    text-align: left;
+    pointer-events: none;
+    /* white glyphs on black: screen composites them like alpha over the diagonal header art */
+    mix-blend-mode: screen;
+}
+
+/* v75 frame 3 header buttons: help at (288,7), close at (312,7), 19x20 bitmaps */
+.octane-camera-capture__help,
+.octane-camera-capture__close {
+    position: absolute;
+    top: 7px;
+    z-index: 10;
+    box-sizing: border-box;
+    width: 19px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: no-repeat 0 0 / 19px 20px;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-capture__help {
+    left: 288px;
+    background-image: url('../../assets/images/habbo-skin/slices/help-3-default.png');
+}
+
+.octane-camera-capture__help:hover {
+    background-image: url('../../assets/images/habbo-skin/slices/help-3-hover.png');
+}
+
+.octane-camera-capture__help:active {
+    background-image: url('../../assets/images/habbo-skin/slices/help-3-pressed.png');
+}
+
+.octane-camera-capture__close {
+    left: 312px;
+    background-image: url('../../assets/images/habbo-skin/slices/close-3-default.png');
+}
+
+.octane-camera-capture__close:hover {
+    background-image: url('../../assets/images/habbo-skin/slices/close-3-hover.png');
+}
+
+.octane-camera-capture__close:active {
+    background-image: url('../../assets/images/habbo-skin/slices/close-3-pressed.png');
+}
+
+.octane-camera-capture .octane-camera-viewfinder {
+    position: absolute;
+    top: 36px;
+    left: 9px;
+    z-index: 1;
+    display: block;
+    width: 320px;
+    height: 320px;
+    overflow: hidden;
+    background: #000000;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    contain: strict;
+}
+
+.octane-camera-viewfinder__fallback,
+.octane-camera-viewfinder__photo {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 320px;
+    height: 320px;
+    border: 0;
+    object-fit: cover;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-viewfinder__stream {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: block;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    border: 0;
+    opacity: 0;
+    object-fit: fill;
+    transform-origin: 0 0;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    backface-visibility: hidden;
+    will-change: transform;
+}
+
+.octane-camera-viewfinder__stream--ready {
+    opacity: 1;
+}
+
+.octane-camera-capture__crosshair {
+    position: absolute;
+    top: 38px;
+    left: 10px;
+    z-index: 4;
+    width: 318px;
+    height: 318px;
+    background: url('../../assets/images/room-widgets/camera-widget/camera-spritesheet.png') -343px -1px no-repeat;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-capture__flash {
+    position: absolute;
+    top: 35px;
+    left: 9px;
+    z-index: 2;
+    width: 320px;
+    height: 320px;
+    background: #ffffff;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.octane-camera-capture__flash--active {
+    animation: octane-camera-flash 350ms linear forwards;
+}
+
+@keyframes octane-camera-flash {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.octane-camera-capture__preview-actions {
+    position: absolute;
+    top: 298px;
+    left: 11px;
+    z-index: 5;
+    display: flex;
+    width: 318px;
+    height: 58px;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: default;
+}
+
+/* camera_interface_xml button_editor: button_thick at y=308, 40 high, params accommodate + align centre, so it
+   shrinks to its label (habbo_window_layout_button_thick: 8px left/right margins) and stays centred. */
+.octane-camera-capture__editor-button {
+    position: relative;
+    display: inline-flex;
+    box-sizing: border-box;
+    top: 1px;
+    width: auto;
+    height: 40px;
+    padding: 0 3px;
+    align-items: center;
+    justify-content: center;
+    border: 5px solid transparent;
+    border-image: var(--habbo-skin-shiny-thick-green) 5 fill / 5px stretch;
+    background: none;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-capture__editor-button:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-green-hover);
+}
+
+.octane-camera-capture__editor-button:active {
+    border-image-source: var(--habbo-skin-shiny-thick-green-pressed);
+}
+
+.octane-camera-capture__editor-button:disabled {
+    background: none;
+}
+
+.octane-camera-capture__shutter {
+    position: absolute;
+    top: 362px;
+    left: 120px;
+    z-index: 6;
+    width: 98px;
+    height: 95px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-camera-capture__shutter::before {
+    position: absolute;
+    top: 1px;
+    left: 3px;
+    width: 94px;
+    height: 94px;
+    background: url('../../assets/images/room-widgets/camera-widget/camera-spritesheet.png') -343px -321px no-repeat;
+    content: '';
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-capture__shutter:hover::before,
+.octane-camera-capture__shutter:focus-visible::before {
+    background-position: -535px -321px;
+}
+
+.octane-camera-capture__shutter:active::before {
+    background-position: -439px -321px;
+}
+
+.octane-camera-capture__shutter:focus-visible,
+.octane-camera-capture__close:focus-visible,
+.octane-camera-roll button:focus-visible {
+    outline: 2px solid #ffd95a;
+    outline-offset: 2px;
+}
+
+/* camera_interface_xml slot_container: x=6, y=453, 328x82. */
+.octane-camera-roll {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    box-sizing: border-box;
+    width: 328px;
+    height: 82px;
+    margin-top: -9px;
+    padding: 14px 6px 8px;
+    flex: 0 0 82px;
+    gap: 6px;
+    border: 1px solid #000000;
+    border-radius: 0 0 9px 9px;
+    background: #bab8b4;
+    box-shadow: inset 1px 0 #ffffff, inset -1px -1px #ffffff;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-roll--hidden {
+    visibility: hidden;
+}
+
+.octane-camera-roll__slot {
+    position: relative;
+    box-sizing: border-box;
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+}
+
+.octane-camera-roll__slot-button {
+    position: absolute;
+    inset: 0;
+    display: block;
+    box-sizing: border-box;
+    width: 58px;
+    height: 58px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #000000;
+    border-radius: 0;
+    background: #d2d2d2;
+    cursor: pointer;
+}
+
+.octane-camera-roll__slot-button img {
+    display: block;
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    image-rendering: auto;
+}
+
+.octane-camera-roll__slot--active::before {
+    position: absolute;
+    top: -3px;
+    left: -1px;
+    z-index: 2;
+    width: 62px;
+    height: 62px;
+    background: url('../../assets/images/room-widgets/camera-widget/air/photo-border.png') 0 0 no-repeat;
+    content: '';
+    pointer-events: none;
+}
+
+.octane-camera-roll__delete {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    z-index: 4;
+    box-sizing: border-box;
+    width: 19px;
+    height: 21px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: url('../../assets/images/room-widgets/camera-widget/air/close.png') 0 0 no-repeat;
+    cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .octane-camera-capture__flash--active {
+        animation-duration: 1ms;
+    }
+}
+
+/* v75 camera_editor_xml: 586x517 frame 3 (colour 0x555555), content origin (3,36); effect rail 230x410 at (11,51)
+   and the 320x320 processed photograph at (249,10). */
+.octane-camera-editor.octane-card-shell.octane-card-frame-3 {
+    --octane-card-frame-3: url('../../assets/images/habbo-skin/slices/frame-ubuntu-3-camera.png');
+    --octane-card-frame-3-title: #484949;
+    --octane-card-frame-3-line: #000000;
+
+    box-sizing: border-box;
+    width: 586px;
+    min-width: 586px;
+    max-width: 586px;
+    height: 517px;
+    min-height: 517px;
+    max-height: 517px;
+    resize: none !important;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-editor.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-title {
+    top: 3px !important;
+    right: auto !important;
+    left: -6px !important;
+    width: 586px !important;
+    height: 18px !important;
+    line-height: 0 !important;
+    text-align: left;
+}
+
+.octane-camera-editor.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button {
+    right: 3px !important;
+}
+
+.octane-camera-editor__help {
+    position: absolute;
+    top: 2px;
+    right: 27px;
+    width: 19px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    background: url('../../assets/images/habbo-skin/slices/help-3-default.png') 0 0 / 19px 20px no-repeat;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-editor__help:hover {
+    background-image: url('../../assets/images/habbo-skin/slices/help-3-hover.png');
+}
+
+.octane-camera-editor__help:active {
+    background-image: url('../../assets/images/habbo-skin/slices/help-3-pressed.png');
+}
+
+.octane-camera-editor__layout {
+    position: relative;
+    width: 580px;
+    height: 478px;
+}
+
+.octane-camera-editor__effect-grid-frame {
+    position: absolute;
+    top: 51px;
+    left: 11px;
+    z-index: 1;
+    box-sizing: border-box;
+    width: 230px;
+    height: 410px;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 5px solid transparent;
+    border-image: url('../../assets/images/habbo-skin/slices/border-2-white.png') 5 fill / 5px stretch;
+}
+
+.octane-camera-editor__effect-tabs {
+    position: absolute;
+    top: 14px;
+    left: 28px;
+    z-index: 3;
+    display: flex;
+    width: 196px;
+    height: 37px;
+    gap: 6px;
+}
+
+.octane-camera-editor__effect-tab {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    width: 95px;
+    height: 37px;
+    margin: 0;
+    padding: 0 0 2px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #5d5d5a;
+    border-bottom: 0;
+    border-radius: 5px 5px 0 0;
+    background: #cccccc;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+.octane-camera-editor__effect-tab:hover {
+    background: #d9d9d5;
+}
+
+.octane-camera-editor__effect-tab--active {
+    padding-bottom: 0;
+    border: 2px solid #000000;
+    border-bottom-color: #ffffff;
+    background: #ffffff;
+    box-shadow: none;
+}
+
+.octane-camera-editor__effect-tab .octane-icon {
+    display: block;
+    width: 32px;
+    height: 21px;
+    margin: 0;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-editor__effect-tab .octane-icon:hover {
+    filter: none;
+    transform: none;
+}
+
+.octane-camera-editor__effect-tab .icon-camera-colormatrix {
+    background-image: url('../../assets/images/room-widgets/camera-widget/air/type-colormatrix.png');
+}
+
+.octane-camera-editor__effect-tab .icon-camera-composite {
+    background-image: url('../../assets/images/room-widgets/camera-widget/air/type-composite.png');
+}
+
+.octane-camera-effect-grid {
+    display: grid;
+    width: 200px;
+    grid-template-columns: repeat(3, 62px);
+    grid-auto-rows: 62px;
+    gap: 7px;
+}
+
+.octane-camera-effect {
+    position: relative;
+    box-sizing: border-box;
+    width: 62px;
+    height: 62px;
+}
+
+.octane-camera-effect__select {
+    position: absolute;
+    inset: 0;
+    display: block;
+    box-sizing: border-box;
+    width: 62px;
+    height: 62px;
+    margin: 0;
+    padding: 3px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: url('../../assets/images/room-widgets/camera-widget/air/effect-outline.png') 0 0 no-repeat;
+    cursor: pointer;
+}
+
+.octane-camera-effect__select img {
+    display: block;
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    image-rendering: auto;
+}
+
+.octane-camera-effect--active::before,
+.octane-camera-effect--selected::after {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 62px;
+    height: 62px;
+    content: '';
+    pointer-events: none;
+}
+
+.octane-camera-effect--active::before {
+    background: url('../../assets/images/room-widgets/camera-widget/air/effect-active.png') 0 0 no-repeat;
+}
+
+.octane-camera-effect--selected::after {
+    background: url('../../assets/images/room-widgets/camera-widget/air/effect-selected.png') 0 0 no-repeat;
+}
+
+.octane-camera-effect--locked .octane-camera-effect__select {
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+.octane-camera-effect__lock {
+    position: absolute;
+    top: 0;
+    left: 2px;
+    width: 59px;
+    height: 60px;
+    background: url('../../assets/images/room-widgets/camera-widget/air/effect-lock.png') 0 0 no-repeat;
+    font-size: 0;
+}
+
+.octane-camera-effect__remove {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 4;
+    display: flex;
+    width: 19px;
+    height: 19px;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: url('../../assets/images/room-widgets/camera-widget/air/close.png') 0 0 no-repeat;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.octane-camera-effect__remove svg {
+    display: none;
+}
+
+.octane-camera-editor__preview {
+    position: absolute;
+    top: 10px;
+    left: 249px;
+    width: 320px;
+    height: 320px;
+    overflow: hidden;
+    background: #000000;
+}
+
+.octane-camera-editor__preview img {
+    display: block;
+    width: 320px;
+    height: 320px;
+    object-fit: cover;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-editor__slider-panel {
+    position: absolute;
+    top: 271px;
+    left: 249px;
+    width: 320px;
+    height: 59px;
+    color: #eeeeee;
+}
+
+/* slider_bg_border: black border at blend 0.5 */
+.octane-camera-editor__slider-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 5px solid transparent;
+    border-image: url('../../assets/images/habbo-skin/slices/border-2-black.png') 5 fill / 5px stretch;
+    opacity: 0.5;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.octane-camera-editor__slider-label {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    width: 320px;
+    height: 18px;
+    line-height: 0;
+    text-align: left;
+    mix-blend-mode: screen;
+}
+
+.octane-camera-editor__slider .track.track-1 {
+    background: #000000 !important;
+}
+
+.octane-camera-editor__slider-panel > .octane-slider-wrapper {
+    position: absolute;
+    top: 27px;
+    left: 4px;
+    width: 312px;
+    height: 24px;
+}
+
+.octane-camera-editor__slider {
+    width: 312px;
+    height: 24px;
+    padding: 0 10px;
+}
+
+.octane-camera-editor__slider .track {
+    position: relative;
+    height: 8px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: #000000;
+    box-shadow: none;
+}
+
+.octane-camera-editor__slider .track.track-0 {
+    position: absolute;
+    top: 1px;
+    left: 2px;
+    height: 6px;
+    background: url('../../assets/images/room-widgets/camera-widget/air/slider-track.png') left center / 288px 6px no-repeat;
+}
+
+.octane-camera-editor__slider .thumb {
+    box-sizing: border-box;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: url('../../assets/images/room-widgets/camera-widget/air/slider-thumb.png') 0 0 no-repeat;
+    box-shadow: none;
+    font-size: 0;
+    line-height: 24px;
+}
+
+.octane-camera-editor__tool {
+    position: absolute;
+    top: 333px;
+    z-index: 2;
+    display: flex;
+    box-sizing: border-box;
+    width: 120px;
+    height: 24px;
+    margin: 0;
+    padding: 0 6px 0 0;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 3px;
+    border: 5px solid transparent;
+    border-image: url('../../assets/images/habbo-skin/slices/border-2-c7c6bf.png') 5 fill / 5px stretch;
+    background: none;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    line-height: 0;
+}
+
+.octane-camera-editor__tool--save {
+    left: 326px;
+}
+
+.octane-camera-editor__tool--zoom {
+    left: 450px;
+}
+
+.octane-camera-editor__tool > span:last-child {
+    margin-top: -1px;
+}
+
+.octane-camera-editor__tool-icon {
+    display: block;
+    flex: none;
+    background: no-repeat 0 0;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-camera-editor__tool--save .octane-camera-editor__tool-icon {
+    width: 16px;
+    height: 16px;
+    margin-top: -1px;
+    background-image: url('../../assets/images/room-widgets/camera-widget/air/download.png');
+}
+
+.octane-camera-editor__tool--zoom .octane-camera-editor__tool-icon {
+    width: 13px;
+    height: 22px;
+    margin-top: -4px;
+    background-image: url('../../assets/images/room-widgets/camera-widget/air/magnifier.png');
+}
+
+.octane-camera-editor__button-separator {
+    position: absolute;
+    top: 415px;
+    left: 249px;
+    width: 320px;
+    height: 1px;
+    background: #000000;
+}
+
+.octane-camera-button.octane-camera-editor__cancel,
+.octane-camera-button.octane-camera-editor__purchase {
+    position: absolute;
+    top: 426px;
+    width: 150px;
+    height: 28px;
+}
+
+.octane-camera-editor__cancel .octane-camera-button-label,
+.octane-camera-editor__purchase .octane-camera-button-label {
+    top: 5px !important;
+}
+
+.octane-camera-button.octane-camera-editor__cancel {
+    left: 255px;
+}
+
+.octane-camera-button.octane-camera-editor__purchase {
+    left: 413px;
+}
+
+/* v75 photo_purchase_confirmation_xml: frame 340 wide (colour 0x555555), list at (10,39), 6px item spacing, boxes 316 wide, buttons 110x27. */
+.octane-camera-checkout.octane-card-shell.octane-card-frame-3 {
+    --octane-card-frame-3: url('../../assets/images/habbo-skin/slices/frame-ubuntu-3-camera.png');
+    --octane-card-frame-3-title: #484949;
+    --octane-card-frame-3-line: #000000;
+
+    box-sizing: border-box;
+    width: 340px;
+    min-width: 340px;
+    max-width: 340px;
+    height: auto;
+    max-height: none;
+    padding: 39px 0 7px 10px;
+}
+
+.octane-camera-checkout.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-title {
+    top: 3px !important;
+    right: auto !important;
+    left: -6px !important;
+    width: 340px !important;
+    height: 18px !important;
+    line-height: 0 !important;
+    text-align: left;
+}
+
+.octane-camera-checkout.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button {
+    right: 3px !important;
+}
+
+.octane-camera-checkout__list {
+    display: flex;
+    width: 325px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    color: #000000;
+    line-height: 0;
+    image-rendering: pixelated;
+}
+
+.octane-camera-checkout__image {
+    position: relative;
+    flex: none;
+    width: 320px;
+    height: 320px;
+    background: #cccccc;
+}
+
+.octane-camera-checkout__image.is-failed {
+    background: #000000;
+}
+
+.octane-camera-checkout__image img {
+    position: absolute;
+    inset: 0;
+    width: 320px;
+    height: 320px;
+}
+
+.octane-camera-checkout__loading {
+    position: absolute;
+    top: 130px;
+    left: 33px;
+    display: flex;
+    width: 255px;
+    height: 44px;
+    justify-content: center;
+}
+
+.octane-camera-checkout__status {
+    flex: none;
+    width: 320px;
+    height: 17px;
+}
+
+/* an empty TextField keeps only its 2px gutters */
+.octane-camera-checkout__status.is-empty {
+    height: 4px;
+}
+
+.octane-camera-checkout__box {
+    position: relative;
+    flex: none;
+    box-sizing: border-box;
+    width: 316px;
+    height: 55px;
+}
+
+.octane-camera-checkout__box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 5px solid transparent;
+    border-image: url('../../assets/images/habbo-skin/slices/border-2-c7c6bf.png') 5 fill / 5px stretch;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.octane-camera-checkout__box.is-competition {
+    height: 62px;
+}
+
+.octane-camera-checkout__box.is-competition::before {
+    border-image-source: url('../../assets/images/habbo-skin/slices/border-2-4d1725.png');
+}
+
+.octane-camera-checkout__box.is-purchase.has-inventory-link {
+    height: 74px;
+}
+
+.octane-camera-checkout__box.is-publish {
+    height: 83px;
+}
+
+.octane-camera-checkout__box > * {
+    position: absolute;
+}
+
+.octane-camera-checkout__box-name {
+    top: 4px;
+    left: 6px;
+}
+
+.octane-camera-checkout__competition-info {
+    top: 25px;
+    left: 6px;
+}
+
+.octane-camera-checkout__publish-info {
+    top: 23px;
+    left: 6px;
+}
+
+.octane-camera-checkout__price-row {
+    top: 25px;
+    left: 6px;
+    display: flex;
+    height: 22px;
+    align-items: flex-start;
+}
+
+.octane-camera-checkout__price-row > span:first-child {
+    position: relative;
+    top: 1px;
+}
+
+.octane-camera-checkout__price-row.is-publish-price {
+    top: 57px;
+}
+
+.octane-camera-checkout__icon {
+    flex: none;
+    box-sizing: content-box;
+    width: 22px;
+    height: 22px;
+    padding-right: 8px;
+}
+
+/* TextField widths are fractional in the native itemlist: the first number and each 30x30 icon window sit a pixel earlier */
+.octane-camera-checkout__icon {
+    margin-left: -1px;
+}
+
+.octane-camera-checkout__price-row > span:nth-child(2) {
+    margin-left: -1px;
+}
+
+.octane-camera-checkout__inventory-row {
+    top: 49px;
+    left: 6px;
+    display: flex;
+    height: 25px;
+    align-items: flex-start;
+}
+
+.octane-camera-checkout__inventory-row > span:nth-child(2) {
+    margin-left: -1px;
+}
+
+.octane-camera-checkout__inventory-row > .octane-camera-checkout__link {
+    margin-left: -1px;
+}
+
+.octane-camera-checkout__link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #000000;
+    cursor: pointer;
+}
+
+.octane-camera-checkout__link.is-publish-link {
+    top: 59px;
+    left: 6px;
+}
+
+.octane-camera-button {
+    position: relative;
+    flex: none;
+    box-sizing: border-box;
+    width: 110px;
+    height: 27px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.octane-camera-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 5px solid transparent;
+    border-image: var(--habbo-skin-shiny) 5 fill / 5px stretch;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.octane-camera-button.is-gray::before {
+    clip-path: inset(0 0 1px 0);
+}
+
+.octane-camera-button.is-gray-dark::before {
+    clip-path: none;
+    border-image-source: url('../../assets/images/habbo-skin/slices/button-shiny-default-cccccc.png');
+}
+
+.octane-camera-button.is-gray-dark:not(:disabled):hover::before {
+    border-image-source: url('../../assets/images/habbo-skin/slices/button-shiny-hover-cccccc.png');
+}
+
+.octane-camera-button.is-gray-dark:not(:disabled):active::before {
+    border-image-source: url('../../assets/images/habbo-skin/slices/button-shiny-pressed-cccccc.png');
+}
+
+/* the 0x009e00 window colour darkens the thick skin to 0.9373 */
+.octane-camera-button.is-thick-green::before {
+    border-image: var(--habbo-skin-shiny-thick-green) 5 fill / 5px stretch;
+    filter: brightness(0.9373);
+}
+
+.octane-camera-button.is-thick-green:not(:disabled):hover::before {
+    border-image-source: var(--habbo-skin-shiny-thick-green-hover);
+}
+
+.octane-camera-button.is-thick-green:not(:disabled):active::before {
+    border-image-source: var(--habbo-skin-shiny-thick-green-pressed);
+}
+
+.octane-camera-button.is-thick-green:disabled::before {
+    border-image-source: var(--habbo-skin-shiny-thick-green-disabled);
+}
+
+.octane-camera-button.is-green::before {
+    border-image-source: var(--habbo-skin-shiny-green);
+}
+
+.octane-camera-button:not(:disabled):hover::before {
+    border-image-source: var(--habbo-skin-shiny-hover);
+}
+
+.octane-camera-button.is-green:not(:disabled):hover::before {
+    border-image-source: var(--habbo-skin-shiny-green-hover);
+}
+
+.octane-camera-button:not(:disabled):active::before {
+    border-image-source: var(--habbo-skin-shiny-pressed);
+}
+
+.octane-camera-button.is-green:not(:disabled):active::before {
+    border-image-source: var(--habbo-skin-shiny-green-pressed);
+}
+
+.octane-camera-button:disabled {
+    cursor: default;
+}
+
+.octane-camera-button:disabled::before {
+    border-image-source: var(--habbo-skin-shiny-disabled);
+}
+
+.octane-camera-button.is-green:disabled::before {
+    border-image-source: var(--habbo-skin-shiny-green-disabled);
+}
+
+.octane-camera-button-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 112px;
+    text-align: left;
+}
+
+.octane-camera-button.is-green .octane-camera-button-label {
+    top: 5px;
+}
+
+.octane-camera-button.is-gray .octane-camera-button-label {
+    top: 4px;
+}
+
+.octane-camera-checkout__box > .octane-camera-button {
+    position: absolute;
+}
+
+.octane-camera-button.is-buy-button {
+    top: 20px;
+    left: 199px;
+}
+
+.octane-camera-button.is-publish-button {
+    top: 50px;
+    left: 199px;
+}
+
+.octane-camera-button.is-competition-button {
+    top: 28px;
+    left: 199px;
+}
+
+.octane-camera-checkout__removal {
+    flex: none;
+    width: 320px;
+    height: 30px;
+}
+
+.octane-camera-checkout__spending {
+    position: relative;
+    flex: none;
+    width: 311px;
+    height: 17px;
+}
+
+.octane-camera-checkout__spending input {
+    position: absolute;
+    top: 0;
+    left: 13px;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+}
+
+.octane-camera-checkout__spending-text {
+    position: absolute;
+    top: 0;
+    left: 33px;
+}
+
+.octane-camera-checkout__buttons {
+    flex: none;
+    width: 325px;
+    height: 27px;
+}
+
+/* WIN63 iro_room_thumbnail_camera: Frame 3, 148x217, 110x110 bitmap. */
+.octane-room-thumbnail-camera {
+    box-sizing: border-box;
+    width: 148px;
+    min-width: 148px;
+    max-width: 148px;
+    height: 217px;
+    min-height: 217px;
+    max-height: 217px;
+}
+
+.octane-room-thumbnail-camera__content {
+    position: relative;
+    width: 144px;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.octane-room-thumbnail-camera__viewfinder {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    box-sizing: border-box;
+    width: 112px;
+    height: 112px;
+    border: 1px solid #000000;
+    background: #000000;
+}
+
+.octane-room-thumbnail-camera__viewfinder canvas {
+    display: block;
+    width: 110px;
+    height: 110px;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-thumbnail-camera__buttons {
+    position: absolute;
+    top: 138px;
+    left: 4px;
+    display: flex;
+    width: 135px;
+    height: 30px;
+    gap: 5px;
+}
+
+.octane-room-thumbnail-camera__buttons button {
+    box-sizing: border-box;
+    width: 65px;
+    height: 30px;
+    padding: 0;
+    border: 4px solid transparent;
+    border-image: url('../../assets/images/habbo-skin/slices/button-thick-default.png') 4 fill / 4px stretch;
+    background: transparent;
+    /* button_thick label: button_shiny_bold, 12px bold black regular Ubuntu. */
+    color: #000000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-thumbnail-camera__buttons button:hover {
+    border-image-source: url('../../assets/images/habbo-skin/slices/button-thick-hover.png');
+}
+
+.octane-room-thumbnail-camera__buttons button:active {
+    border-image-source: url('../../assets/images/habbo-skin/slices/button-thick-pressed.png');
+}
+
+.octane-room-thumbnail-camera__buttons button:disabled {
+    border-image-source: url('../../assets/images/habbo-skin/slices/button-thick-disabled.png');
+    color: #777777;
+    cursor: default;
+}
+
+
+/* camera_editor, photo_purchase_confirmation and iro_room_thumbnail_camera are AIR (style 3) frames in regular Ubuntu.
+   Their captions are NativeText rasters; this keeps any DOM text (and the thumbnail buttons) off the condensed cut. */
+.octane-camera-capture,
+.octane-camera-editor,
+.octane-camera-checkout,
+.octane-room-thumbnail-camera {
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+}
+
+@layer base {
+    .octane-camera-capture :where(*):not(svg, svg *),
+    .octane-camera-editor :where(*):not(svg, svg *),
+    .octane-camera-checkout :where(*):not(svg, svg *),
+    .octane-room-thumbnail-camera :where(*):not(svg, svg *) {
+        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    }
+}
