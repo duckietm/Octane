@@ -236,6 +236,20 @@ describe('pet catalog layout', () => {
         expect(screen.getByTestId('pet-image').closest('.octane-catalog-pet-preview')).toContainElement(screen.getByTestId('pet-price'));
     });
 
+    it('falls back to the pet asset palettes when the server sends none for a classic pet', async () => {
+        const currentOffer = offer(7);
+        vi.mocked(useCatalogData).mockReturnValue({ currentOffer, roomPreviewer } as any);
+        vi.mocked(useSellablePetPalette).mockReturnValue({ data: null } as any);
+
+        render(<CatalogLayoutPetView page={{ ...page, offers: [currentOffer] } as any} hideNavigation={() => undefined} />);
+
+        const image = await screen.findByTestId('pet-image');
+
+        expect(image).toHaveAttribute('data-type-id', '7');
+        expect(image).toHaveAttribute('data-palette-id', '0');
+        expect(screen.getByRole('button', { name: 'catalog.pets.choose.color 1' })).toBeInTheDocument();
+    });
+
     it('sends one approval request and purchases only after the matching approval succeeds', async () => {
         const currentOffer = offer(8);
         vi.mocked(useCatalogData).mockReturnValue({ currentOffer, roomPreviewer } as any);
