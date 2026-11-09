@@ -118,6 +118,11 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
     }
 });
 
+const HTML_ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+
+/** Escapes a plain text (a name a user chose) before it is put into a text that is then rendered as HTML. */
+export const EscapeHtml = (text: string): string => String(text ?? '').replace(/[&<>"']/g, (character) => HTML_ESCAPES[character]);
+
 /**
  * Sanitises the small HTML of chat, alerts, notifications and catalog texts. Names of users, bots and pets are not
  * HTML: render them as React text instead.

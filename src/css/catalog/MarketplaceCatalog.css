@@ -274,6 +274,78 @@
     height: 22px;
 }
 
+/*
+ * AIR's Collectibles marketplace layout (build of 4 November 2026): a 150 high search_container with the "Type"
+ * menu (offer_source_dropmenu) above the sort, and the search selector 320 wide at x20.
+ */
+.octane-marketplace-page.has-offer-source .octane-marketplace-selector {
+    width: 320px;
+    margin-left: 20px;
+}
+
+.octane-marketplace-search-container.has-offer-source {
+    flex-basis: 150px;
+    height: 150px;
+}
+
+/* marketplace_search_simple: "Type" right-aligned at (20,38) 88 wide, its 220px menu at (118,35); the sort below. */
+.octane-marketplace-search .marketplace-search-offer-source-title,
+.octane-marketplace-search.is-simple.has-offer-source .marketplace-search-sort-title {
+    position: absolute;
+    left: 20px;
+    width: 88px;
+    height: 17px;
+    color: #666666;
+    line-height: 17px;
+    text-align: right;
+}
+
+.octane-marketplace-search .marketplace-search-offer-source-title {
+    top: 38px;
+}
+
+.octane-marketplace-search.is-simple.has-offer-source .marketplace-search-sort-title {
+    top: 73px;
+}
+
+.octane-marketplace-search .marketplace-search-offer-source {
+    position: absolute;
+    top: 35px;
+    left: 118px;
+    width: 220px;
+}
+
+.octane-marketplace-search.is-simple.has-offer-source .marketplace-search-sort {
+    top: 70px;
+    left: 118px;
+}
+
+/* marketplace_search_advanced: offer_source_container at y60, the sort container moved to y89. */
+.marketplace-search-label.is-offer-source {
+    top: 63px;
+}
+
+.octane-marketplace-search.is-advanced.has-offer-source .marketplace-search-offer-source {
+    top: 60px;
+    left: 130px;
+}
+
+.octane-marketplace-search.is-advanced.has-offer-source .marketplace-search-label.is-sort {
+    top: 92px;
+}
+
+.octane-marketplace-search.is-advanced.has-offer-source .marketplace-search-sort {
+    top: 89px;
+}
+
+.octane-marketplace-search.has-offer-source .marketplace-search-combine {
+    top: 121px;
+}
+
+.octane-marketplace-search.is-advanced.has-offer-source .marketplace-search-button.octane-marketplace-button {
+    top: 119px;
+}
+
 /* status_text (2,155), u_small. */
 .octane-marketplace-status {
     display: block;

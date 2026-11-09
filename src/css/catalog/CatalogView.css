@@ -1511,8 +1511,12 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
+/* Two rows of 70px tiles. The grid inside has no height of its own, so it never scrolled: a third row spilled over
+   the preview and the purchase panel. The shell scrolls instead. */
 .octane-catalog-color-grid-shell {
     max-height: 154px;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .octane-catalog-badge-display-layout {
@@ -2319,9 +2323,18 @@
 
 /* The selected tile paints an opaque plate through ::before at z-index 0, so the
    habbicon has to be lifted over it the way the furni icon already is. */
+/* A habbicon sits in the same 36px icon box as a furni icon, scaled down to fit: drawn at its own size in the flow it
+   overflowed the tile and covered the price. */
 .octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item > .octane-catalog-grid-habbicon-icon {
-    position: relative;
+    position: absolute;
+    top: 2px;
+    left: 8px;
     z-index: 1;
+    width: 36px !important;
+    height: 36px !important;
+    margin: 0;
+    object-fit: contain !important;
+    pointer-events: none;
 }
 
 /* AIR gridItem_with_price: multiContainer is painted after the 36px image at
@@ -2367,7 +2380,7 @@
 .octane-catalog-window
     .octane-catalog-grid-density-standard
     .layout-grid-item.uses-base-grid-template:not(.unique-item)
-    > .octane-catalog-grid-offer-icon {
+    > :is(.octane-catalog-grid-offer-icon, .octane-catalog-grid-habbicon-icon) {
     top: 0;
     left: 0;
 }
@@ -2586,6 +2599,14 @@
     flex-direction: column;
     align-items: flex-end;
     row-gap: 1px;
+}
+
+/* An offer that arrives without a price still gets its plate, hidden but holding the strip it
+   would occupy, so the tile keeps the shape of its priced neighbours instead of re-centering the
+   icon over the whole box. visibility (not display) also keeps the bots pill from painting. */
+.octane-catalog-grid-price.is-empty-price {
+    visibility: hidden;
+    min-height: 13px;
 }
 
 .octane-catalog-grid-density-standard .octane-catalog-grid-price.is-single-price {

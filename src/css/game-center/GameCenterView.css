@@ -1,7 +1,6 @@
 @charset "UTF-8";
 /* Game center overlay + SnowWar arena styles.
-   Loaded via src/index.tsx like every other stylesheet — note that
-   src/components/index.scss is NOT part of the build (dead file). */
+   Loaded via src/index.tsx like every other stylesheet. */
 .game-center-main {
   position: absolute;
   inset: 0;

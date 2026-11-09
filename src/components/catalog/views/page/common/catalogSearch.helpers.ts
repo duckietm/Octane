@@ -25,7 +25,8 @@ export const findCatalogFurnitureMatches = (
     furnitureDatas: IFurnitureData[],
     query: string,
     catalogType: string,
-    limit: number = CATALOG_SEARCH_RESULT_LIMIT
+    limit: number = CATALOG_SEARCH_RESULT_LIMIT,
+    isOfferListed: (offerId: number) => boolean = null
 ): { furniture: IFurnitureData[]; furniLines: string[] } => {
     const normalizedQuery = normalizeCatalogSearchText(query);
     const furniture: IFurnitureData[] = [];
@@ -41,7 +42,10 @@ export const findCatalogFurnitureMatches = (
 
         if (item.furniLine) furniLines.add(item.furniLine);
 
-        const isBuyable = item.purchaseOfferId > -1 || item.rentOfferId > -1;
+        // AIR HabboCatalog.createSearchResultOffer: an offer counts only when the user's catalog index lists it, so a
+        // furni on a page they may not open (rank, club, disabled) is left out. Builders Club keeps its own check.
+        const listed = (offerId: number) => offerId > -1 && (!isOfferListed || catalogType === CatalogType.BUILDER || isOfferListed(offerId));
+        const isBuyable = listed(item.purchaseOfferId) || listed(item.rentOfferId);
 
         if (isBuyable && furniture.length < limit) furniture.push(item);
     }

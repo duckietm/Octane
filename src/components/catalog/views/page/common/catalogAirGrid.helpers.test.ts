@@ -1,6 +1,12 @@
 /* @vitest-environment jsdom */
 import { describe, expect, it } from 'vitest';
-import { getVisibleAirGridEntries } from './catalogAirGrid.helpers';
+import {
+    catalogPageUsesAirBaseTemplate,
+    getAirCatalogColumnCount,
+    getAirCatalogOfferDimensions,
+    getVisibleAirGridEntries,
+    layoutAirCatalogOffers
+} from './catalogAirGrid.helpers';
 
 describe('getVisibleAirGridEntries', () => {
     const entry = (index: number, y: number, height: number) => ({ offer: { offerId: index } as any, index, x: 0, y, width: 36, height });
@@ -19,5 +25,47 @@ describe('getVisibleAirGridEntries', () => {
     });
     it('handles an empty layout', () => {
         expect(getVisibleAirGridEntries([], 0, 100)).toEqual([]);
+    });
+});
+
+describe('the AIR box an offer is drawn in', () => {
+    const offer = (offerId: number, priced: boolean) =>
+        ({
+            offerId,
+            priceInCredits: priced ? 10 : 0,
+            priceInActivityPoints: 0
+        }) as any;
+
+    it('keeps the 36x36 base box for a page where nothing carries a price', () => {
+        const offers = [offer(1, false), offer(2, false)];
+
+        expect(catalogPageUsesAirBaseTemplate(offers, 'NORMAL')).toBe(true);
+        expect(layoutAirCatalogOffers(offers, 2, 'NORMAL').entries.map((entry) => entry.height)).toEqual([36, 36]);
+        expect(getAirCatalogColumnCount(offers, 80, 'NORMAL')).toBe(2);
+    });
+
+    it('gives an offer with a missing price the priced box when the page sells something else', () => {
+        const offers = [offer(1, true), offer(2, false)];
+
+        expect(catalogPageUsesAirBaseTemplate(offers, 'NORMAL')).toBe(false);
+        expect(layoutAirCatalogOffers(offers, 2, 'NORMAL').entries.map((entry) => ({ width: entry.width, height: entry.height }))).toEqual([
+            { width: 53, height: 74 },
+            { width: 53, height: 74 }
+        ]);
+    });
+
+    it('keeps every column of such a page on the same row baseline', () => {
+        const offers = [offer(1, true), offer(2, false), offer(3, true), offer(4, true), offer(5, false), offer(6, true)];
+
+        const { entries, height } = layoutAirCatalogOffers(offers, 3, 'NORMAL');
+
+        expect(entries.slice(0, 3).map((entry) => entry.y)).toEqual([0, 0, 0]);
+        expect(entries.slice(3).map((entry) => entry.y)).toEqual([74, 74, 74]);
+        expect(height).toBe(148);
+    });
+
+    it('still reads a single offer on its own when asked for', () => {
+        expect(getAirCatalogOfferDimensions(offer(1, false), 'NORMAL')).toEqual({ width: 36, height: 36 });
+        expect(getAirCatalogOfferDimensions(offer(1, true), 'NORMAL')).toEqual({ width: 53, height: 74 });
     });
 });

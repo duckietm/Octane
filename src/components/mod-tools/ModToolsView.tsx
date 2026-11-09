@@ -38,6 +38,7 @@ import { SendMessageView } from './views/SendMessageView';
 import { StartPanelView } from './views/StartPanelView';
 import { UserClassificationEntry, UserClassificationView } from './views/UserClassificationView';
 import { UserInfoView } from './views/UserInfoView';
+import { UserRecordKind, UserRecordsView } from './views/UserRecordsView';
 
 interface SelectedUser {
     userId: number;
@@ -302,6 +303,9 @@ export const ModToolsView: FC<{}> = () => {
                                 onOpenModAction={(userName) =>
                                     showWindow({ type: 'modAction', key: userName, ...MOD_WINDOW_SIZE.modAction, parent: entry, below: true, toggle: true, params: { userId: Number(entry.key) } })
                                 }
+                                onOpenRecords={(kind, userName) =>
+                                    showWindow({ type: 'userRecords', key: `${entry.key}:${kind}`, ...MOD_WINDOW_SIZE.userRecords, parent: entry, below: true, toggle: true, params: { userId: Number(entry.key), userName, kind } })
+                                }
                                 onOpenRoomVisits={() => showWindow({ type: 'roomVisits', key: entry.key, ...MOD_WINDOW_SIZE.roomVisits, parent: entry, below: true, toggle: true })}
                                 onOpenSendMessage={(userName) =>
                                     showWindow({ type: 'sendMessage', key: userName, ...MOD_WINDOW_SIZE.sendMessage, parent: entry, below: true, toggle: true, params: { userId: Number(entry.key) } })
@@ -362,6 +366,23 @@ export const ModToolsView: FC<{}> = () => {
                         );
                     }
 
+                    if (entry.type === 'userRecords') {
+                        return (
+                            <UserRecordsView
+                                key={key}
+                                height={entry.height}
+                                kind={Number(entry.params.kind) as UserRecordKind}
+                                userId={Number(entry.params.userId)}
+                                userName={String(entry.params.userName)}
+                                width={entry.width}
+                                x={entry.x}
+                                y={entry.y}
+                                onClose={() => closeWindow('userRecords', entry.key)}
+                                onResize={(width, height) => resizeWindow('userRecords', entry.key, width, height)}
+                            />
+                        );
+                    }
+
                     if (entry.type === 'issueBrowser') {
                         return (
                             <IssueBrowserView
@@ -395,6 +416,9 @@ export const ModToolsView: FC<{}> = () => {
                                 onEnterRoom={enterRoom}
                                 onOpenChatlog={(userId) => showWindow({ type: 'userChatlog', key: `${userId}`, ...MOD_WINDOW_SIZE.userChatlog, parent: entry, toggle: true })}
                                 onOpenModAction={(userId, userName) => showWindow({ type: 'modAction', key: userName, ...MOD_WINDOW_SIZE.modAction, parent: entry, toggle: true, params: { userId } })}
+                                onOpenRecords={(userId, kind, userName) =>
+                                    showWindow({ type: 'userRecords', key: `${userId}:${kind}`, ...MOD_WINDOW_SIZE.userRecords, parent: entry, toggle: true, params: { userId, userName, kind } })
+                                }
                                 onOpenRoomTool={(roomId) => showWindow({ type: 'roomTool', key: `${roomId}`, ...MOD_WINDOW_SIZE.roomTool, parent: null, toggle: true })}
                                 onOpenRoomVisits={(userId) => showWindow({ type: 'roomVisits', key: `${userId}`, ...MOD_WINDOW_SIZE.roomVisits, parent: entry, toggle: true })}
                                 onOpenSendMessage={(userId, userName) => showWindow({ type: 'sendMessage', key: userName, ...MOD_WINDOW_SIZE.sendMessage, parent: entry, toggle: true, params: { userId } })}

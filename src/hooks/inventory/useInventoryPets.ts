@@ -60,7 +60,11 @@ const useInventoryPetsState = () => {
     });
 
     useEffect(() => {
-        if (!petItems || !petItems.length) return;
+        if (!petItems || !petItems.length) {
+            setSelectedPet(null);
+
+            return;
+        }
 
         setSelectedPet((prevValue) => {
             let newValue = prevValue;

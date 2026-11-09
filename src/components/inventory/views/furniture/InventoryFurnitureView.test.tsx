@@ -7,7 +7,8 @@ const bed = { name: 'Bed', items: [], stuffData: {}, getLastItem: () => null } a
 vi.mock('../../../../hooks', () => ({
     useInventoryFurni: () => ({ groupItems: [bed], selectedItem: bed, setSelectedItem, activate: () => 1, deactivate: () => {} }),
     useInventoryUnseenTracker: () => ({ resetItems: () => {} }),
-    usePlayTestRestricted: () => false
+    usePlayTestRestricted: () => false,
+    useMarketplaceConfiguration: () => ({ data: null })
 }));
 vi.mock('../InventoryCategoryEmptyView', () => ({ InventoryCategoryEmptyView: () => <div className="empty-view" /> }));
 

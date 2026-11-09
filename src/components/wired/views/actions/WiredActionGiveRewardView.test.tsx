@@ -107,6 +107,19 @@ describe('WiredActionGiveRewardView', () => {
         expect(validateRewards([{ ...reward(10), rewardType: 'badge', rewardValue: 'A'.repeat(101) }], false)).toContain('more than 100');
     });
 
+    it('accepts only whole positive amounts and item ids the server can read', () => {
+        const reward = (rewardType: 'credits' | 'furni' | 'badge', rewardValue: string) => ({ rewardType, rewardValue, probability: 10, pointsType: 5 });
+        const message = 'Amounts and item ids must be whole numbers from 1 to 2147483647.';
+
+        expect(validateRewards([reward('credits', '25')], false)).toBeNull();
+        expect(validateRewards([reward('furni', '2147483647')], false)).toBeNull();
+        expect(validateRewards([reward('credits', '0')], false)).toBe(message);
+        expect(validateRewards([reward('credits', '-5')], false)).toBe(message);
+        expect(validateRewards([reward('credits', '1.5')], false)).toBe(message);
+        expect(validateRewards([reward('furni', '2147483648')], false)).toBe(message);
+        expect(validateRewards([reward('badge', 'ACH_1')], false)).toBeNull();
+    });
+
     it('blocks the save on an invalid probability', () => {
         trigger = { stringData: '1,furni#12,100;1,furni#13,50', intData: [0, 0, 0, 1] };
         render(<WiredActionGiveRewardView />);

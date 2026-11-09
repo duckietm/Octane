@@ -45,6 +45,17 @@ const trimArrayForQuota = <T>(value: T): T => {
     return value.slice(value.length - keep) as unknown as T;
 };
 
+// A stored value of another shape than the initial one (an old format, a hand-edited or corrupted entry) would reach
+// callers that rely on that shape - a history that is not an array threw on every render - so it is replaced by the
+// initial value. An initial null or undefined accepts any stored value.
+const matchesInitialShape = <T>(stored: unknown, initialValue: T): stored is T => {
+    if (initialValue === null || initialValue === undefined) return true;
+    if (Array.isArray(initialValue)) return Array.isArray(stored);
+    if (typeof initialValue === 'object') return !!stored && typeof stored === 'object' && !Array.isArray(stored);
+
+    return typeof stored === typeof initialValue;
+};
+
 interface UseLocalStorageOptions<T> {
     /**
      * Optional projection applied right before the value is written to
@@ -60,8 +71,11 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
 
     const [storedValue, setStoredValue] = useState<T>(() => {
         try {
-            const item = typeof window !== 'undefined' ? GetLocalStorage<T>(key) : undefined;
-            return item ?? initialValue;
+            const item = typeof window !== 'undefined' ? GetLocalStorage<unknown>(key) : undefined;
+
+            if (item === null || item === undefined) return initialValue;
+
+            return matchesInitialShape(item, initialValue) ? item : initialValue;
         } catch (error) {
             return initialValue;
         }
@@ -70,7 +84,8 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
     // Event bursts and async callbacks can hold a setter from an earlier render. Every update is resolved
     // against the latest value, including updates React has not rendered yet, so none erases a newer one.
     const storedValueRef = useRef(storedValue);
-    const pendingWriteRef = useRef<T | null>(null);
+    // Boxed so that null is a value like any other: an empty ref means no write is pending.
+    const pendingWriteRef = useRef<{ value: T } | null>(null);
     const writeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const optionsRef = useRef(options);
 
@@ -114,14 +129,13 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
     // JSON.stringify + setItem per message. We coalesce bursts into one
     // write per STORAGE_WRITE_DEBOUNCE_MS window with the latest value.
     const scheduleWrite = (value: T) => {
-        pendingWriteRef.current = value;
+        pendingWriteRef.current = { value };
         if (writeTimerRef.current) clearTimeout(writeTimerRef.current);
         writeTimerRef.current = setTimeout(() => {
             writeTimerRef.current = null;
-            if (pendingWriteRef.current !== null) {
-                flushWrite(pendingWriteRef.current);
-                pendingWriteRef.current = null;
-            }
+            const pending = pendingWriteRef.current;
+            pendingWriteRef.current = null;
+            if (pending) flushWrite(pending.value);
         }, STORAGE_WRITE_DEBOUNCE_MS);
     };
 
@@ -129,11 +143,12 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
     // burst of activity.
     useEffect(() => {
         const flushOnLeave = () => {
-            if (pendingWriteRef.current === null) return;
+            const pending = pendingWriteRef.current;
+            if (!pending) return;
             if (writeTimerRef.current) clearTimeout(writeTimerRef.current);
             writeTimerRef.current = null;
-            flushWrite(pendingWriteRef.current);
             pendingWriteRef.current = null;
+            flushWrite(pending.value);
         };
 
         window.addEventListener('pagehide', flushOnLeave);

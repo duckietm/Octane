@@ -1,4 +1,5 @@
-import react from '@vitejs/plugin-react';
+import babel from '@rolldown/plugin-babel';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
@@ -148,6 +149,15 @@ const ReactCompilerConfig = {
     target: '19'
 };
 
+// The compiler is for this client's components only: the renderer sources the aliases pull in are plain
+// TypeScript outside this folder, where the Babel plugin does not switch its TypeScript parser on.
+const clientSourcePattern = new RegExp('^' + resolve(import.meta.dirname, 'src')
+    .split(/[\\/]/)
+    .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('[\\\\/]') + '[\\\\/]');
+const reactCompiler = reactCompilerPreset(ReactCompilerConfig);
+reactCompiler.rolldown.filter.id = clientSourcePattern;
+
 const resolveJsonMode = () =>
 {
     // OCTANE_* is the current name; NITRO_* stays as a fallback for existing setups
@@ -179,13 +189,9 @@ process.stdout.write(`[vite] OCTANE_SINGLE_BUNDLE = ${ octaneSingleBundle ? '1' 
 export default defineConfig({
     base: process.env.VITE_BASE || './',
     plugins: [
-        react({
-            babel: {
-                plugins: [
-                    [ 'babel-plugin-react-compiler', ReactCompilerConfig ]
-                ]
-            }
-        }),
+        react(),
+        // plugin-react 6 no longer reads a `babel` option: the compiler runs through the Babel plugin.
+        babel({ presets: [ reactCompiler ] }),
         octaneAssetsServer()
     ],
     define: {
@@ -261,7 +267,6 @@ export default defineConfig({
             'pixi.js/advanced-blend-modes': resolve(rendererRoot, 'node_modules/pixi.js/lib/advanced-blend-modes/init.mjs'),
             'pixi.js': resolve(rendererRoot, 'node_modules/pixi.js'),
             'pixi-filters': resolve(rendererRoot, 'node_modules/pixi-filters'),
-            'howler': resolve(rendererRoot, 'node_modules/howler'),
         }
     },
     build: {
@@ -286,7 +291,7 @@ export default defineConfig({
                 // jodit ~250KB lazy-loaded only by admin news, etc.).
                 manualChunks: id =>
                 {
-                    // Vendor checks first — pixi.js/howler are aliased to
+                    // Vendor checks first — pixi.js and pixi-filters are aliased to
                     // ../octane-renderer/node_modules so they match
                     // `octane-renderer` too. Without this priority, they end
                     // up bundled into octane-renderer instead of getting their
@@ -294,8 +299,7 @@ export default defineConfig({
                     // avoid matching path fragments like `assets/pixi.js/`.
                     const norm = id.replace(/\\/g, '/');
                     if(norm.includes('pixi.js') || norm.includes('pixi-filters')) return 'vendor-pixi';
-                    if(norm.includes('howler')) return 'vendor-audio';
-                    if(norm.includes('@emoji-mart') || norm.includes('emojibase-data')) return 'vendor-emoji';
+                    if(norm.includes('@emoji-mart')) return 'vendor-emoji';
                     if(norm.includes('jodit') || norm.includes('@react-page')) return 'vendor-editor';
 
                     if(id.includes('Octane-Renderer') || id.includes(`${ rendererRoot }`))

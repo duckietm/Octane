@@ -122,8 +122,8 @@ const CatalogLayoutColorGroupingGridView: FC<CatalogLayoutColorGroupViewProps> =
         <NativeTextTree>
             <Column overflow="hidden">
                 {/* Top: two visible rows of furni tiles. Tile is 70px tall
-                   and the AutoGrid handles its own overflow if there are
-                   more than two rows worth of offers. */}
+                   and the shell scrolls when there are more than two rows
+                   worth of offers. */}
                 <div className="octane-catalog-color-grid-shell shrink-0">
                     {(!colorsShowing || !currentOffer || !colorableItems.has(currentOffer.product.furnitureData.className)) && (
                         <AutoGrid columnCount={7} columnMinHeight={70} columnMinWidth={45}>

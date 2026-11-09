@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import {
+    collectiblesMarketplaceText,
     GetImageIconUrlForProduct,
     getMarketplaceOfferText,
     getMarketplaceTimeLeftText,
@@ -28,7 +29,6 @@ const FALLBACKS: Record<string, string> = {
     buy: 'Buy',
     'catalog.marketplace.view_more': 'Furni info',
     'catalog.marketplace.offer.pick': 'Cancel',
-    'catalog.marketplace.offer.price_public_item': 'Price: %price% (Average: %average%)',
     'catalog.marketplace.offer.price_own_item': 'Price: %price% credits',
     'catalog.marketplace.offer_count': 'Offers: %count%',
     'catalog.marketplace.offer.sold': 'This furni has been sold!',
@@ -44,7 +44,7 @@ export const marketplaceText = (key: string): string => localizeWithFallback(key
 /** AIR `image_container`: 40x40, the unique label behind and the serial overlay on top for an LTD, the rarity overlay. */
 export const MarketplaceOfferImageView: FC<{ offerData: MarketplaceOfferData }> = ({ offerData }) => {
     const [failed, setFailed] = useState(false);
-    const isWall = offerData.furniType === MarketplaceOfferData.TYPE_WALL;
+    const isWall = offerData.isWallItem;
     const imageUrl = GetImageIconUrlForProduct(isWall ? ProductTypeEnum.WALL : ProductTypeEnum.FLOOR, offerData.furniId, offerData.extraData);
     const rarityLevel = offerData.stuffData?.rarityLevel ?? -1;
 
@@ -103,7 +103,9 @@ export const CatalogLayoutMarketplaceItemView: FC<MarketplaceItemViewProps> = (p
                     <span className="marketplace-row-desc">{getMarketplaceOfferText(offerData, 'desc')}</span>
                     {status !== MarketPlaceOfferState.EXPIRED && (
                         <span className="marketplace-row-price">
-                            {marketplaceText('catalog.marketplace.offer.price_own_item').replace('%price%', String(offerData.price))}
+                            {offerData.isNft
+                                ? `${offerData.price} ${collectiblesMarketplaceText('inventory.marketplace.currency.emeralds')}`
+                                : marketplaceText('catalog.marketplace.offer.price_own_item').replace('%price%', String(offerData.price))}
                         </span>
                     )}
                     <span className="marketplace-row-state">{getOwnStateText(offerData)}</span>
@@ -125,7 +127,16 @@ export const CatalogLayoutMarketplaceItemView: FC<MarketplaceItemViewProps> = (p
                 <MarketplaceOfferImageView offerData={offerData} />
                 <span className="marketplace-row-name">{name}</span>
                 <span className="marketplace-row-price is-public">
-                    {marketplaceText('catalog.marketplace.offer.price_public_item').replace('%price%', String(offerData.price)).replace('%average%', average)}
+                    {/* AIR (build of 4 November 2026) prices every row with its currency: Credits, or Emeralds for a collectible. */}
+                    {collectiblesMarketplaceText(
+                        'catalog.marketplace.offer.price_public_item.currency',
+                        ['price', 'currency', 'average'],
+                        [
+                            String(offerData.price),
+                            collectiblesMarketplaceText(offerData.isNft ? 'catalog.marketplace.offer.emeralds' : 'catalog.marketplace.offer.credits'),
+                            average
+                        ]
+                    )}
                 </span>
                 <span className="marketplace-row-count">
                     {marketplaceText('catalog.marketplace.offer_count').replace('%count%', String(offerData.offerCount))}

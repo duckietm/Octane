@@ -18,6 +18,7 @@ export * from './IProduct';
 export * from './IPurchasableOffer';
 export * from './IPurchaseOptions';
 export * from './MarketplaceChart';
+export * from './MarketplaceCollectibles';
 export * from './MarketplaceOfferData';
 export * from './MarketplaceOfferState';
 export * from './MarketplaceOffers';

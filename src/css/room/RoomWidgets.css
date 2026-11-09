@@ -213,14 +213,64 @@
     }
 }
 
-.octane-room-tools-info--enter {
+/* AIR room_tools_info: a 255x77 box (wider for a long name, up to 320) in 0x24231E at 80%, the name in the condensed
+   title style, the owner in 0x999999 under it, then up to two tags in 10px 0x1B79AB (0x47A8E6 on hover) inside a thin
+   0x1C2935 border. Scoped under the container so it outranks the shared .octane-room-tools-info rule above. */
+.octane-room-tools-container .octane-room-tools-info.octane-room-tools-info--enter {
     position: absolute;
     bottom: 0;
     left: calc(100% + 12px);
-    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: max-content;
+    min-width: 255px;
     max-width: 320px;
+    min-height: 77px;
+    padding: 6px 10px 6px;
+    border-radius: 6px;
+    background: rgba(36, 35, 30, 0.8);
     pointer-events: auto;
     cursor: pointer;
+
+    .octane-room-tools-info__name {
+        display: block;
+        color: #ffffff;
+        font-family: 'Ubuntu Condensed', Ubuntu, Arial, sans-serif;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 24px;
+    }
+
+    .octane-room-tools-info__owner {
+        display: block;
+        margin-top: 3px;
+        color: #999999;
+        font-family: Ubuntu, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 18px;
+    }
+
+    .octane-room-tools-info__tags {
+        display: flex;
+        gap: 4px;
+        margin-top: 4px;
+    }
+
+    .octane-room-tools-info__tag {
+        padding: 0 2px;
+        border: 1px solid #1c2935;
+        background: transparent;
+        color: #1b79ab;
+        font-size: 10px;
+        line-height: 13px;
+        cursor: pointer;
+
+        &:hover {
+            color: #47a8e6;
+        }
+    }
 }
 
 .octane-room-tools-history {

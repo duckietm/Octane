@@ -1,6 +1,6 @@
 import { GetSessionDataManager } from '@octane/renderer';
 import { LocalizeText } from '../utils/LocalizeText';
-import { MarketplaceOfferData } from './MarketplaceOfferData';
+import { isMarketplaceWallOffer, MarketplaceOfferData } from './MarketplaceOfferData';
 import { MarketPlaceOfferState } from './MarketplaceOfferState';
 import { getFurnidataText, getMarketplaceFurniTextKeys, pickMarketplaceFurniText } from './MarketplacePostOffer';
 import { MarketplaceSearchType } from './MarketplaceSearchType';
@@ -91,7 +91,7 @@ export const filterMarketplaceOwnOffers = <T extends { status: number }>(
 export const getMarketplaceOwnBottomButton = (category: number): 'recall' | 'seen' => (category === MarketPlaceOfferState.ONGOING ? 'recall' : 'seen');
 
 /** AIR MarketPlaceLogic.isPosterItem: a wall item with extra data whose product is the "poster" class. */
-export const isMarketplacePosterOffer = (offer: Pick<MarketplaceOfferData, 'furniType' | 'furniId' | 'extraData'>): boolean => {
+export const isMarketplacePosterOffer = (offer: Pick<MarketplaceOfferData, 'furniType' | 'furniId' | 'extraData'> & { nftFurniType?: number }): boolean => {
     if (!offer || offer.furniType !== MarketplaceOfferData.TYPE_WALL || !offer.extraData) return false;
 
     return GetSessionDataManager()?.getWallItemData?.(offer.furniId)?.className === 'poster';
@@ -102,10 +102,14 @@ export const isMarketplacePosterOffer = (offer: Pick<MarketplaceOfferData, 'furn
  * getDescriptionLocalizationKey), then the furnidata text (furni names are furnidata-driven here), then
  * the class name for the name. Never the raw `roomItem.name.<id>` key.
  */
-export const getMarketplaceOfferText = (offer: Pick<MarketplaceOfferData, 'furniType' | 'furniId' | 'extraData'>, field: 'name' | 'desc'): string => {
+export const getMarketplaceOfferText = (
+    offer: Pick<MarketplaceOfferData, 'furniType' | 'furniId' | 'extraData'> & { nftFurniType?: number },
+    field: 'name' | 'desc'
+): string => {
     if (!offer) return '';
 
-    const isWall = offer.furniType === MarketplaceOfferData.TYPE_WALL;
+    // AIR: a collectible is named by its furni kind (nftFurniType), like a floor or wall furni.
+    const isWall = isMarketplaceWallOffer(offer);
     const keys = getMarketplaceFurniTextKeys(isWall, offer.furniId, isMarketplacePosterOffer(offer) ? offer.extraData : null);
     const key = field === 'name' ? keys.name : keys.desc;
     const session = GetSessionDataManager();

@@ -62,6 +62,13 @@ const useInventoryBotsState = () => {
             newValue.splice(index, 1);
         }
 
+        // A bot the list already holds takes the data of the refresh: its name, figure or motto may have changed.
+        for (let index = 0; index < newValue.length; index++) {
+            const botData = parser.items.get(newValue[index].botData.id);
+
+            if (botData && botData !== newValue[index].botData) newValue[index] = { ...newValue[index], botData };
+        }
+
         for (const botData of addedDatas) {
             const botItem = { botData };
             const unseen = isUnseen(UnseenItemCategory.BOT, botData.id);
@@ -114,12 +121,17 @@ const useInventoryBotsState = () => {
     });
 
     useEffect(() => {
-        if (!botItems || !botItems.length) return;
+        if (!botItems || !botItems.length) {
+            setSelectedBot(null);
+
+            return;
+        }
 
         setSelectedBot((prevValue) => {
             let newValue = prevValue;
 
-            if (newValue && botItems.indexOf(newValue) === -1) newValue = null;
+            // A refreshed bot is a new item for the same id, so the selection follows the id.
+            if (newValue) newValue = botItems.find((item) => item.botData.id === newValue.botData.id) ?? null;
 
             if (!newValue) newValue = botItems[0];
 

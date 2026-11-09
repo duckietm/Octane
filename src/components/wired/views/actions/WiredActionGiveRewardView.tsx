@@ -28,6 +28,10 @@ const MAX_REWARDS = 20;
 const MAX_CODE_LENGTH = 100;
 const MIN_PRIZE_LIMIT = 1;
 const MAX_PRIZE_LIMIT = 1000;
+/** The server reads every amount and item id as a positive Java int (WiredManager.parsePositiveRewardInteger). */
+const MAX_REWARD_AMOUNT = 2147483647;
+
+const isRewardAmount = (value: string) => /^\d+$/.test(value) && Number(value) >= 1 && Number(value) <= MAX_REWARD_AMOUNT;
 
 // Official: hard-coded English options, 2 per row.
 const REWARD_INTERVALS: { value: number; label: string }[] = [
@@ -156,6 +160,7 @@ export const validateRewards = (rewards: RewardEntry[], unique: boolean): string
 
         if (rewardValue.includes(',')) return localizeWithFallback('octane.wired.product_badge_codes_must_not_contain', 'Product/badge codes must not contain \',\' characters.');
         if (rewardValue.includes(';')) return localizeWithFallback('octane.wired.product_badge_codes_must_not_contain_2', 'Product/badge codes must not contain \';\' characters.');
+        if (reward.rewardType !== 'badge' && !isRewardAmount(rewardValue)) return localizeWithFallback('octane.wired.reward_amounts_must_be_whole_numbers', 'Amounts and item ids must be whole numbers from 1 to %max%.', ['max'], [String(MAX_REWARD_AMOUNT)]);
         if (encodeRewardCode(reward, rewardValue).length > MAX_CODE_LENGTH) return localizeWithFallback('octane.wired.product_badge_codes_cannot_contain_more', 'Product/badge codes cannot contain more than %max_code_length% characters.', ['max_code_length'], [String(MAX_CODE_LENGTH)]);
 
         if (unique) continue;
@@ -360,6 +365,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                                             aria-label={getRewardValuePlaceholder(reward.rewardType)}
                                             placeholder={getRewardValuePlaceholder(reward.rewardType)}
                                             type={reward.rewardType === 'badge' ? 'text' : 'number'}
+                                            {...(reward.rewardType === 'badge' ? {} : { min: 1, max: MAX_REWARD_AMOUNT, step: 1 })}
                                             value={reward.rewardValue}
                                             onChange={(event) => updateReward(index, (prevValue) => ({ ...prevValue, rewardValue: event.target.value }))}
                                         />

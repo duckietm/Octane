@@ -1,6 +1,6 @@
 import { createOctaneStore } from '../../state/createOctaneStore';
 
-export type ModWindowType = 'issueHandler' | 'issueBrowser' | 'roomTool' | 'userInfo' | 'sendMessage' | 'modAction' | 'roomVisits' | 'userChatlog' | 'roomChatlog' | 'cfhChatlog' | 'userClassification';
+export type ModWindowType = 'issueHandler' | 'issueBrowser' | 'roomTool' | 'userInfo' | 'sendMessage' | 'modAction' | 'roomVisits' | 'userChatlog' | 'roomChatlog' | 'cfhChatlog' | 'userClassification' | 'userRecords';
 
 export const MOD_WINDOW_SIZE: Record<ModWindowType, { width: number; height: number }> = {
     roomTool: { width: 240, height: 437 },
@@ -8,6 +8,7 @@ export const MOD_WINDOW_SIZE: Record<ModWindowType, { width: number; height: num
     sendMessage: { width: 212, height: 168 },
     modAction: { width: 383, height: 295 },
     roomVisits: { width: 292, height: 224 },
+    userRecords: { width: 560, height: 240 },
     userClassification: { width: 292, height: 224 },
     userChatlog: { width: 480, height: 565 },
     roomChatlog: { width: 480, height: 565 },

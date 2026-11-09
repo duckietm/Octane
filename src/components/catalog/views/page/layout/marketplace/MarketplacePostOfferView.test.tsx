@@ -14,7 +14,9 @@ const mocks = vi.hoisted(() => ({
     balanceHandler: null as (event: any) => void,
     openUrl: vi.fn(),
     stats: null as any,
-    statsArgs: [] as number[][]
+    statsArgs: [] as number[][],
+    nftStatsArgs: [] as string[],
+    configuration: null as any
 }));
 
 vi.mock('@octane/renderer', async (importOriginal) => {
@@ -32,6 +34,7 @@ vi.mock('@octane/renderer', async (importOriginal) => {
         ...actual,
         GetMarketplaceCanMakeOfferComposer: composer('canMakeOffer'),
         MakeOfferMessageComposer: composer('makeOffer'),
+        MakeNftMarketplaceOfferComposer: composer('makeNftOffer'),
         MakeMultipleOffersMessageComposer: composer('makeMultipleOffers'),
         BuyMarketplaceTokensMessageComposer: composer('buyTokens'),
         MarketplaceCanMakeOfferResult: class MarketplaceCanMakeOfferResult {},
@@ -72,12 +75,17 @@ vi.mock('../../../../../../common', async (importOriginal) => {
 
 vi.mock('../../../../../../hooks', () => ({
     useMarketplaceConfiguration: () => ({
-        data: { minimumPrice: 5, maximumPrice: 1000, offerTime: 48, displayTime: 7, commission: 1, credits: 1, advertisements: 5 }
+        data: mocks.configuration ?? { minimumPrice: 5, maximumPrice: 1000, offerTime: 48, displayTime: 7, commission: 1, credits: 1, advertisements: 5 }
     }),
     useMarketplaceItemStats: (category: number, furniId: number) => {
         mocks.statsArgs.push([category, furniId]);
 
         return category ? mocks.stats : null;
+    },
+    useNftMarketplaceItemStats: (productCode: string) => {
+        mocks.nftStatsArgs.push(productCode);
+
+        return productCode ? mocks.stats : null;
     },
     useMessageEvent: (type: { name?: string }, handler: (event: any) => void) => {
         if (type?.name === 'NotEnoughBalanceMessageEvent') mocks.balanceHandler = handler;
@@ -114,8 +122,11 @@ describe('MarketplacePostOfferView', () => {
         mocks.openUrl.mockClear();
         mocks.stats = null;
         mocks.statsArgs.length = 0;
+        mocks.nftStatsArgs.length = 0;
+        mocks.configuration = null;
         vi.mocked(GetSessionDataManager).mockReturnValue({
-            getFloorItemData: (id: number) => (id === 2270 ? { name: 'Troon', className: 'throne' } : null),
+            getFloorItemData: (id: number) =>
+                id === 2270 ? { name: 'Troon', className: 'throne' } : id === 9002 ? { name: 'Bunny', className: 'nft_bunny' } : null,
             getWallItemData: () => null
         } as any);
     });
@@ -123,6 +134,59 @@ describe('MarketplacePostOfferView', () => {
     afterEach(() => {
         cleanup();
         vi.mocked(GetSessionDataManager).mockReset();
+    });
+
+    it('offers a collectible for emeralds in its own window while the Collectibles marketplace is on', () => {
+        mocks.configuration = {
+            minimumPrice: 5,
+            maximumPrice: 1000,
+            offerTime: 48,
+            displayTime: 7,
+            nftEnabled: true,
+            nftMinimumPrice: 10,
+            nftMaximumPrice: 500,
+            nftOfferMinutes: 10080,
+            nftSellingFeePercentage: 5,
+            nftHalfTaxLimit: 2147483647
+        };
+        render(<MarketplacePostOfferView />);
+
+        act(() => mocks.uiHandler({ item: furni(21, 9002), items: [furni(21, 9002), furni(22, 9002)] }));
+
+        // AIR startNftOfferMaking: no can-make-offer check, no amount line, prices in emeralds.
+        expect(mocks.send).not.toHaveBeenCalled();
+        expect(screen.getByTestId('marketplace-post-offer-name').textContent).toBe('Bunny');
+        expect(mocks.nftStatsArgs.at(-1)).toBe('nft_bunny');
+        expect(screen.queryByLabelText(/Amount/)).toBeNull();
+        expect(screen.getByText('Your offer will be visible to other users for 7 day(s).')).toBeTruthy();
+        expect(screen.getByTestId('marketplace-post-offer-final').textContent).toBe('You can make offers between 10 and 500 Emeralds.');
+
+        fireEvent.change(screen.getByLabelText('Asking price:'), { target: { value: '100' } });
+        expect(screen.getByTestId('marketplace-post-offer-final').textContent).toBe('Expected revenue per item: 95');
+
+        fireEvent.click(screen.getByRole('button', { name: 'Post offer' }));
+        expect(mocks.showConfirm.mock.calls[0][0]).toBe('You are selling Bunny. If someone buys this offer, you will receive: 95 Emerald(s).');
+
+        // The confirm holds the one-post-at-a-time guard for five seconds; let it go so later tests can post.
+        vi.useFakeTimers();
+        try {
+            act(() => mocks.showConfirm.mock.calls[0][1]());
+            vi.advanceTimersByTime(5000);
+        } finally {
+            vi.useRealTimers();
+        }
+        const sent = mocks.send.mock.calls.at(-1)[0];
+        expect(sent.name).toBe('makeNftOffer');
+        expect(sent.args).toEqual([1, 21, 100]);
+    });
+
+    it('sells a collectible as furni while the Collectibles marketplace is off', () => {
+        mocks.configuration = { minimumPrice: 5, maximumPrice: 1000, offerTime: 48, displayTime: 7, nftEnabled: false };
+        render(<MarketplacePostOfferView />);
+
+        act(() => mocks.uiHandler({ item: furni(21, 9002), items: [furni(21, 9002)] }));
+
+        expect(mocks.send.mock.calls[0][0].name).toBe('canMakeOffer');
     });
 
     it('asks whether selling is allowed, then opens with the furnidata name and the stats request', () => {
