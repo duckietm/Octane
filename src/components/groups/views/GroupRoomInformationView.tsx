@@ -114,7 +114,11 @@ export const GroupRoomInformationView: FC<{}> = (props) => {
     // The official leave: ask the server what leaving costs, then confirm (shared with the group windows).
     const leaveGroup = useGroupLeave(groupInformation?.id ?? 0);
 
-    const isRealOwner = groupInformation && groupInformation.ownerName === GetSessionDataManager().userName;
+    // Bail out before the handlers below: the React Compiler caches them on groupInformation's fields and reads
+    // those fields where the handlers are created, so a check further down came too late in a room without a group.
+    if (!groupInformation) return null;
+
+    const isRealOwner = groupInformation.ownerName === GetSessionDataManager().userName;
 
     const getButtonText = () => {
         if (isRealOwner) return 'group.manage';
@@ -144,8 +148,6 @@ export const GroupRoomInformationView: FC<{}> = (props) => {
 
         TryJoinGroup(groupInformation.id);
     };
-
-    if (!groupInformation) return null;
 
     return (
         <NativeTextTree>
