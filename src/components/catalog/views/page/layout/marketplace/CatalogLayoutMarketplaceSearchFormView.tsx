@@ -1,5 +1,12 @@
 import { FC } from 'react';
-import { localizeWithFallback, MARKETPLACE_MAX_PRICE_LENGTH, MARKETPLACE_MAX_SEARCH_LENGTH, MarketplaceSearchType } from '../../../../../../api';
+import {
+    collectiblesMarketplaceText,
+    localizeWithFallback,
+    MARKETPLACE_MAX_PRICE_LENGTH,
+    MARKETPLACE_MAX_SEARCH_LENGTH,
+    MARKETPLACE_OFFER_SOURCES,
+    MarketplaceSearchType
+} from '../../../../../../api';
 import { BaseButton, Checkbox } from '../../../../../../common';
 import { UbuntuDropmenuView } from '../../../../../../common/dropmenu/UbuntuDropmenuView';
 import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
@@ -20,6 +27,10 @@ export interface SearchFormViewProps {
     onCombineUniquesChange(value: boolean): void;
     onFormChange(form: MarketplaceSearchFormState): void;
     onSearch(): void;
+    /** AIR's "Type" menu (all / collectibles / furni), shown while the Collectibles marketplace is on. */
+    showOfferSource?: boolean;
+    offerSource?: number;
+    onOfferSourceChange?(offerSource: number): void;
 }
 
 /** English fallbacks for the search panel texts, used only when the external texts lack the key. */
@@ -46,11 +57,40 @@ const digits = (value: string) => value.replace(/[^0-9]/g, '').substring(0, MARK
  * marketplace_search_advanced, both 360x120.
  */
 export const SearchFormView: FC<SearchFormViewProps> = (props) => {
-    const { searchType, sortTypes = [], sortType, combineUniques, form, onSortChange, onCombineUniquesChange, onFormChange, onSearch } = props;
+    const {
+        searchType,
+        sortTypes = [],
+        sortType,
+        combineUniques,
+        form,
+        onSortChange,
+        onCombineUniquesChange,
+        onFormChange,
+        onSearch,
+        showOfferSource = false,
+        offerSource = 0,
+        onOfferSourceChange = null
+    } = props;
     const sortLabel = text('catalog.marketplace.sort_order');
     const options = sortTypes.map((type) => ({ value: type, label: text(`catalog.marketplace.sort.${type}`) }));
     const dropmenu = <UbuntuDropmenuView className="marketplace-search-sort" label={sortLabel} options={options} value={sortType} onSelect={onSortChange} />;
-    // AIR combine_uniques_checkbox at (10,92) with its caption at (29,91).
+    // AIR's Collectibles marketplace layout: the "Type" caption and its offer_source_dropmenu above the sort.
+    const offerSourceLabel = collectiblesMarketplaceText('catalog.marketplace.offer_source');
+    const offerSourceOptions = MARKETPLACE_OFFER_SOURCES.map((source) => ({
+        value: source,
+        label: collectiblesMarketplaceText(`catalog.marketplace.offer_source.${source}`)
+    }));
+    const offerSourceMenu = showOfferSource && (
+        <UbuntuDropmenuView
+            className="marketplace-search-offer-source"
+            label={offerSourceLabel}
+            options={offerSourceOptions}
+            value={offerSource}
+            onSelect={(value) => onOfferSourceChange?.(value)}
+        />
+    );
+    const layoutClass = showOfferSource ? ' has-offer-source' : '';
+    // AIR combine_uniques_checkbox at (10,92) with its caption at (29,91); (10,122) / (29,121) with the "Type" menu.
     const combine = (
         <label className="marketplace-search-combine">
             <Checkbox checked={combineUniques} onCheckedChange={onCombineUniquesChange} />
@@ -61,7 +101,9 @@ export const SearchFormView: FC<SearchFormViewProps> = (props) => {
     if (searchType !== MarketplaceSearchType.ADVANCED) {
         return (
             <NativeTextTree>
-                <div className="octane-marketplace-search is-simple">
+                <div className={`octane-marketplace-search is-simple${layoutClass}`}>
+                    {showOfferSource && <span className="marketplace-search-offer-source-title">{offerSourceLabel}</span>}
+                    {offerSourceMenu}
                     <span className="marketplace-search-sort-title">{sortLabel}</span>
                     {dropmenu}
                     {combine}
@@ -72,7 +114,7 @@ export const SearchFormView: FC<SearchFormViewProps> = (props) => {
 
     return (
         <NativeTextTree>
-            <div className="octane-marketplace-search is-advanced">
+            <div className={`octane-marketplace-search is-advanced${layoutClass}`}>
                 <label className="marketplace-search-label is-name" htmlFor="marketplace-search-input">
                     {text('catalog.marketplace.search_name')}
                 </label>
@@ -109,6 +151,8 @@ export const SearchFormView: FC<SearchFormViewProps> = (props) => {
                         onChange={(event) => onFormChange({ ...form, maxPrice: digits(event.target.value) })}
                     />
                 </span>
+                {showOfferSource && <span className="marketplace-search-label is-offer-source">{offerSourceLabel}</span>}
+                {offerSourceMenu}
                 <span className="marketplace-search-label is-sort">{sortLabel}</span>
                 {dropmenu}
                 {combine}

@@ -3,21 +3,28 @@ import {
     GetMarketplaceCanMakeOfferComposer,
     GetSessionDataManager,
     MakeMultipleOffersMessageComposer,
+    MakeNftMarketplaceOfferComposer,
     MakeOfferMessageComposer,
     MarketplaceCanMakeOfferResult,
     NotEnoughBalanceMessageEvent
 } from '@octane/renderer';
-import { FC, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import {
     checkMarketplaceOfferPrice,
+    collectiblesMarketplaceText,
     FurniCategory,
     FurnitureItem,
     GetConfigurationValue,
+    getCollectibleOfferDays,
+    getCollectibleOfferRevenue,
     getFurnidataText,
     getMarketplaceConfirmText,
+    getMarketplaceFurniClassName,
     getMarketplaceFurniTextKeys,
     getMarketplaceOfferRevenue,
     getMarketplaceStatsCategory,
+    isCollectiblesMarketplaceEnabled,
+    isMarketplaceCollectibleClass,
     isMarketplacePriceStatVisible,
     LocalizeText,
     localizeWithFallback,
@@ -40,7 +47,14 @@ import {
 import { BaseButton } from '../../../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
 import { CatalogPostMarketplaceOfferEvent } from '../../../../../../events';
-import { useMarketplaceConfiguration, useMarketplaceItemStats, useMessageEvent, useNotification, useUiEvent } from '../../../../../../hooks';
+import {
+    useMarketplaceConfiguration,
+    useMarketplaceItemStats,
+    useMessageEvent,
+    useNftMarketplaceItemStats,
+    useNotification,
+    useUiEvent
+} from '../../../../../../hooks';
 import { MarketplaceBuyTokensView, MarketplaceNoCreditsView } from './MarketplaceTokenDialogsView';
 
 let isPostingMarketplaceOffer = false;
@@ -103,24 +117,68 @@ export const MarketplacePostOfferView: FC<{}> = () => {
     const [priceText, setPriceText] = useState('');
     const [amountText, setAmountText] = useState('1');
     const [tokenDialog, setTokenDialog] = useState<'buy' | 'no_credits'>(null);
+    // AIR MarketplaceModel.startNftOfferMaking: a collectible waits for the configuration, then gets its own window.
+    const [collectibleCandidate, setCollectibleCandidate] = useState<{ item: FurnitureItem; items: FurnitureItem[]; productCode: string }>(null);
+    const [productCode, setProductCode] = useState<string>(null);
+    const isNft = !!productCode;
     const pendingOfferRef = useRef<{ item: FurnitureItem; items: FurnitureItem[] }>(null);
     // Set while a can-make-offer answer is due (after the check, or after buying tokens).
     const awaitingAnswerRef = useRef(false);
     const buyingTokensRef = useRef(false);
     const answerRequestRef = useRef(0);
-    const { data: configuration = null } = useMarketplaceConfiguration({ enabled: !!item || !!tokenDialog });
+    const { data: configuration = null } = useMarketplaceConfiguration({ enabled: !!item || !!tokenDialog || !!collectibleCandidate });
     const { showConfirm = null, simpleAlert = null } = useNotification();
     const maxAmount = Math.max(1, Math.min(items.length, MARKETPLACE_MAX_OFFER_AMOUNT));
     const uniqueNumber = item?.stuffData?.uniqueNumber ?? 0;
-    const stats = useMarketplaceItemStats(item ? getMarketplaceStatsCategory(item.isWallItem ? 2 : 1, uniqueNumber > 0) : 0, item ? item.type : 0);
+    const furniStats = useMarketplaceItemStats(
+        item && !isNft ? getMarketplaceStatsCategory(item.isWallItem ? 2 : 1, uniqueNumber > 0) : 0,
+        item && !isNft ? item.type : 0
+    );
+    const nftStats = useNftMarketplaceItemStats(item && isNft ? productCode : null);
+    const stats = isNft ? nftStats : furniStats;
+
+    // The furni marketplace's check: can this user make an offer (trade pass, tokens)?
+    const startFurniOffer = (offerItem: FurnitureItem, offerItems: FurnitureItem[]) => {
+        pendingOfferRef.current = { item: offerItem, items: offerItems };
+        awaitAnswer();
+        SendMessageComposer(new GetMarketplaceCanMakeOfferComposer());
+    };
+
+    // A collectible opens AIR's make_nft_marketplace_offer while the Collectibles marketplace is on, and the furni
+    // window otherwise, as before.
+    useEffect(() => {
+        if (!collectibleCandidate || !configuration) return;
+
+        const candidate = collectibleCandidate;
+
+        setCollectibleCandidate(null);
+
+        if (!isCollectiblesMarketplaceEnabled(configuration)) {
+            startFurniOffer(candidate.item, candidate.items);
+
+            return;
+        }
+
+        setItems([candidate.item]);
+        setPriceText('');
+        setAmountText('1');
+        setProductCode(candidate.productCode);
+        setItem(candidate.item);
+    }, [collectibleCandidate, configuration]);
 
     // Ask the server first, like Habbo: the window only opens when selling is allowed.
     useUiEvent<CatalogPostMarketplaceOfferEvent>(CatalogPostMarketplaceOfferEvent.POST_MARKETPLACE, (event) => {
-        if (!event.item || pendingOfferRef.current) return;
+        if (!event.item || pendingOfferRef.current || collectibleCandidate) return;
 
-        pendingOfferRef.current = { item: event.item, items: event.items };
-        awaitAnswer();
-        SendMessageComposer(new GetMarketplaceCanMakeOfferComposer());
+        const className = getMarketplaceFurniClassName(event.item.isWallItem, event.item.type);
+
+        if (isMarketplaceCollectibleClass(className)) {
+            setCollectibleCandidate({ item: event.item, items: event.items, productCode: className });
+
+            return;
+        }
+
+        startFurniOffer(event.item, event.items);
     });
 
     useMessageEvent<MarketplaceCanMakeOfferResult>(MarketplaceCanMakeOfferResult, (event) => {
@@ -142,6 +200,7 @@ export const MarketplacePostOfferView: FC<{}> = () => {
         pendingOfferRef.current = null;
 
         if (parser.resultCode === 1) {
+            setProductCode(null);
             setItems(pending.items.filter((value) => value.type === pending.item.type && value.isWallItem === pending.item.isWallItem));
             setPriceText('');
             setAmountText('1');
@@ -231,17 +290,21 @@ export const MarketplacePostOfferView: FC<{}> = () => {
 
     if (!configuration || !item) return null;
 
-    const minimumPrice = configuration.minimumPrice;
-    const maximumPrice = configuration.maximumPrice;
+    const minimumPrice = isNft ? configuration.nftMinimumPrice : configuration.minimumPrice;
+    const maximumPrice = isNft ? configuration.nftMaximumPrice : configuration.maximumPrice;
     const priceCheck = checkMarketplaceOfferPrice(priceText, minimumPrice, maximumPrice);
-    const revenue = getMarketplaceOfferRevenue(priceCheck.price);
+    const revenueOf = (price: number) => (isNft ? getCollectibleOfferRevenue(price, configuration) : getMarketplaceOfferRevenue(price));
+    const revenue = revenueOf(priceCheck.price);
     const furniName = getFurniName(item);
-    const expirationDays = String(configuration.offerTime / 24);
+    const expirationDays = String(isNft ? getCollectibleOfferDays(configuration) : configuration.offerTime / 24);
     const averageDays = String(configuration.displayTime);
     // AIR only hides the copy button once the stats say there is no suggestion.
     const showCopySuggested = stats ? stats.suggestedPrice > 0 : true;
 
-    const close = () => setItem(null);
+    const close = () => {
+        setItem(null);
+        setProductCode(null);
+    };
 
     // AIR checkPrice runs on every change of either input: the price is clamped to the maximum and the amount to 1..max.
     const onPriceChange = (value: string) => {
@@ -272,13 +335,21 @@ export const MarketplacePostOfferView: FC<{}> = () => {
         const offerAmount = parseMarketplaceOfferAmount(amountText, maxAmount);
         const offerItems = items.slice(0, offerAmount);
         const offerItem = item;
-        const confirmText = getMarketplaceConfirmText(offerAmount, furniName, askingPrice, getMarketplaceOfferRevenue(askingPrice));
+        const nftOffer = isNft;
+        const confirmText = getMarketplaceConfirmText(offerAmount, furniName, askingPrice, revenueOf(askingPrice));
+        const confirmMessage = nftOffer
+            ? collectiblesMarketplaceText(
+                  'inventory.marketplace.confirm_offer.info.emeralds',
+                  ['furniname', 'price'],
+                  [furniName, String(revenueOf(askingPrice))]
+              )
+            : text(confirmText.key, confirmText.parameters, confirmText.replacements);
 
         // AIR disposes the window and opens the confirmation in its place.
         close();
 
         showConfirm(
-            text(confirmText.key, confirmText.parameters, confirmText.replacements),
+            confirmMessage,
             () => {
                 if (isPostingMarketplaceOffer) return;
 
@@ -287,7 +358,9 @@ export const MarketplacePostOfferView: FC<{}> = () => {
 
                 const furniType = offerItem.isWallItem ? 2 : 1;
 
-                if (offerItems.length > 1)
+                // AIR MarketplaceModel.makeNftOffer: one collectible, its kind, the item and the price.
+                if (nftOffer) SendMessageComposer(new MakeNftMarketplaceOfferComposer(furniType, offerItem.id, askingPrice));
+                else if (offerItems.length > 1)
                     SendMessageComposer(
                         new MakeMultipleOffersMessageComposer(
                             askingPrice,
@@ -314,7 +387,7 @@ export const MarketplacePostOfferView: FC<{}> = () => {
     return (
         <NativeTextTree>
             <OctaneCardView
-                classNames={['octane-marketplace-post-offer']}
+                classNames={isNft ? ['octane-marketplace-post-offer', 'is-nft'] : ['octane-marketplace-post-offer']}
                 frameStyle={3}
                 isResizable={false}
                 theme="primary-slim"
@@ -359,19 +432,23 @@ export const MarketplacePostOfferView: FC<{}> = () => {
                             onChange={(event) => onPriceChange(event.target.value)}
                         />
                     </span>
-                    <label className="octane-marketplace-post-offer-label is-amount" htmlFor="marketplace-post-offer-amount">
-                        {text('sellinmarketplace.amount', ['max_amount'], [String(maxAmount)])}
-                    </label>
-                    <span className="octane-marketplace-post-offer-input is-amount">
-                        <input
-                            autoComplete="off"
-                            id="marketplace-post-offer-amount"
-                            inputMode="numeric"
-                            type="text"
-                            value={amountText}
-                            onChange={(event) => onAmountChange(event.target.value)}
-                        />
-                    </span>
+                    {!isNft && (
+                        <>
+                            <label className="octane-marketplace-post-offer-label is-amount" htmlFor="marketplace-post-offer-amount">
+                                {text('sellinmarketplace.amount', ['max_amount'], [String(maxAmount)])}
+                            </label>
+                            <span className="octane-marketplace-post-offer-input is-amount">
+                                <input
+                                    autoComplete="off"
+                                    id="marketplace-post-offer-amount"
+                                    inputMode="numeric"
+                                    type="text"
+                                    value={amountText}
+                                    onChange={(event) => onAmountChange(event.target.value)}
+                                />
+                            </span>
+                        </>
+                    )}
                     <div className="octane-marketplace-post-offer-list">
                         {stats && statLine('average', 'inventory.marketplace.make_offer.average_price', stats.averagePrice, averageDays)}
                         {stats && statLine('lowest', 'inventory.marketplace.make_offer.lowest_price', stats.lowestCurrentPrice)}
@@ -385,7 +462,13 @@ export const MarketplacePostOfferView: FC<{}> = () => {
                             <span>
                                 {priceCheck.valid
                                     ? `${text('sell.in.marketplace.revenue.label')}: ${revenue}`
-                                    : text('shop.marketplace.invalid.price', ['minPrice', 'maxPrice'], [String(minimumPrice), String(maximumPrice)])}
+                                    : isNft
+                                      ? collectiblesMarketplaceText(
+                                            'shop.marketplace.invalid.price.emeralds',
+                                            ['minPrice', 'maxPrice'],
+                                            [String(minimumPrice), String(maximumPrice)]
+                                        )
+                                      : text('shop.marketplace.invalid.price', ['minPrice', 'maxPrice'], [String(minimumPrice), String(maximumPrice)])}
                             </span>
                         </div>
                         <div className="octane-marketplace-post-offer-buttons">

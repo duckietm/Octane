@@ -1,25 +1,33 @@
 import {
     BuyMarketplaceOfferMessageComposer,
+    BuyNftMarketplaceOfferComposer,
     GetMarketplaceOffersMessageComposer,
     MarketPlaceOffersEvent,
-    MarketplaceBuyOfferResultEvent
+    MarketplaceBuyOfferResultEvent,
+    NftMarketplaceBuyResultEvent
 } from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
 import {
+    collectiblesMarketplaceText,
     getMarketplaceListStatusText,
     IMarketplaceSearchOptions,
+    isCollectiblesMarketplaceEnabled,
     LocalizeText,
     localizeWithFallback,
     MARKETPLACE_SORT_TYPES,
     MarketplaceOfferData,
+    MarketplaceOfferSource,
     MarketplaceSearchType,
+    NFT_BUY_RESULT_NOT_ENOUGH_EMERALDS,
+    NFT_BUY_RESULT_OWN_OFFER,
+    NFT_BUY_RESULT_SUCCESS,
     NotificationAlertType,
     parseMarketplacePriceInput,
     SendMessageComposer
 } from '../../../../../../api';
 import { BaseButton, ClassicScrollAreaView } from '../../../../../../common';
 import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
-import { useMessageEvent, useNotification, usePurse } from '../../../../../../hooks';
+import { useMarketplaceConfiguration, useMessageEvent, useNotification, usePurse } from '../../../../../../hooks';
 import { CatalogLayoutProps } from '../CatalogLayout.types';
 import { CatalogLayoutMarketplaceItemView, PUBLIC_OFFER } from './CatalogLayoutMarketplaceItemView';
 import { CatalogLayoutMarketplaceOfferDetailsView } from './CatalogLayoutMarketplaceOfferDetailsView';
@@ -45,6 +53,8 @@ const statusText = (key: string) => localizeWithFallback(key, STATUS_FALLBACKS[k
 
 const EMPTY_FORM: MarketplaceSearchFormState = { query: '', minPrice: '', maxPrice: '' };
 
+type SearchRequest = IMarketplaceSearchOptions & { combineUniques: boolean; offerSource?: number };
+
 /**
  * AIR layout_marketplace (ctlg_marketplace, MarketPlaceCatalogWidget): the three search tabs, the
  * 360x120 search_container, the status line at y 155 and the 340x58 offer rows from y 170. "Meubi Info"
@@ -59,21 +69,35 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
     const [totalItemsFound, setTotalItemsFound] = useState(0);
     const [offers, setOffers] = useState(new Map<number, MarketplaceOfferData>());
     const [detailsOffer, setDetailsOffer] = useState<MarketplaceOfferData>(null);
-    const lastSearchRef = useRef<IMarketplaceSearchOptions & { combineUniques: boolean }>(null);
+    const [offerSource, setOfferSource] = useState<number>(MarketplaceOfferSource.ALL);
+    const lastSearchRef = useRef<SearchRequest>(null);
+    const { data: configuration = null } = useMarketplaceConfiguration();
+    const collectiblesEnabled = isCollectiblesMarketplaceEnabled(configuration);
     const { getCurrencyAmount = null } = usePurse();
     const { simpleAlert = null, showConfirm = null } = useNotification();
     const isBuyingRef = useRef<boolean>(false);
     const sortTypes = MARKETPLACE_SORT_TYPES[searchType];
 
     // AIR MarketPlaceLogic.requestOffers: remember the search so a purchase can refresh it.
-    const requestOffers = (options: IMarketplaceSearchOptions & { combineUniques: boolean }) => {
+    const requestOffers = (options: SearchRequest) => {
         lastSearchRef.current = options;
         setSearching(true);
-        SendMessageComposer(new GetMarketplaceOffersMessageComposer(options.minPrice, options.maxPrice, options.query, options.type, options.combineUniques));
+        SendMessageComposer(
+            new GetMarketplaceOffersMessageComposer(
+                options.minPrice,
+                options.maxPrice,
+                options.query,
+                options.type,
+                options.combineUniques,
+                options.offerSource ?? MarketplaceOfferSource.ALL
+            )
+        );
     };
 
     // AIR doSearch: the inputs of the current panel (only the advanced one has them), the sort and the combine box.
-    const doSearch = (next: { searchType?: number; sortType?: number; combineUniques?: boolean; form?: MarketplaceSearchFormState } = {}) => {
+    const doSearch = (
+        next: { searchType?: number; sortType?: number; combineUniques?: boolean; form?: MarketplaceSearchFormState; offerSource?: number } = {}
+    ) => {
         const type = next.searchType ?? searchType;
         const values = type === MarketplaceSearchType.ADVANCED ? (next.form ?? form) : EMPTY_FORM;
 
@@ -82,7 +106,8 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
             maxPrice: parseMarketplacePriceInput(values.maxPrice),
             query: values.query,
             type: next.sortType ?? sortType,
-            combineUniques: next.combineUniques ?? combineUniques
+            combineUniques: next.combineUniques ?? combineUniques,
+            offerSource: next.offerSource ?? offerSource
         });
     };
 
@@ -111,6 +136,12 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
         if (searchType !== MarketplaceSearchType.ADVANCED) doSearch({ sortType: type });
     };
 
+    // AIR offer_source_dropmenu: a new "Type" searches again, on every tab.
+    const changeOfferSource = (value: number) => {
+        setOfferSource(value);
+        doSearch({ offerSource: value });
+    };
+
     // AIR combine_uniques_checkbox: every change searches again.
     const changeCombineUniques = (value: boolean) => {
         setCombineUniques(value);
@@ -135,9 +166,42 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
         SendMessageComposer(new BuyMarketplaceOfferMessageComposer(offerId));
     };
 
+    // AIR HabboCatalog.buyNftMarketPlaceOffer: a collectible is bought by its product code at the price shown.
+    const sendNftBuy = (offerData: MarketplaceOfferData) => {
+        if (isBuyingRef.current) return;
+
+        isBuyingRef.current = true;
+        buyTimeoutRef.current = setTimeout(releaseBuy, 15000);
+        SendMessageComposer(new BuyNftMarketplaceOfferComposer(offerData.productCode, offerData.price));
+    };
+
+    const showNotEnoughEmeralds = () =>
+        simpleAlert(
+            collectiblesMarketplaceText('catalog.alert.notenough.emeralds.description'),
+            NotificationAlertType.DEFAULT,
+            null,
+            null,
+            collectiblesMarketplaceText('catalog.alert.notenough.emeralds.title')
+        );
+
     useEffect(() => () => releaseBuy(), []);
 
     const purchaseItem = (offerData: MarketplaceOfferData) => {
+        // A collectible costs emeralds: the server checks the balance and answers NOT_ENOUGH_EMERALDS.
+        if (offerData.isNft) {
+            showConfirm(
+                LocalizeText('catalog.marketplace.confirm_header') +
+                    '\n' +
+                    collectiblesMarketplaceText('catalog.marketplace.confirm_price.emeralds', ['price'], [offerData.price.toString()]),
+                () => sendNftBuy(offerData),
+                null,
+                null,
+                null,
+                LocalizeText('catalog.marketplace.confirm_title')
+            );
+            return;
+        }
+
         if (offerData.price > getCurrencyAmount(-1)) {
             simpleAlert(
                 LocalizeText('catalog.alert.notenough.credits.description'),
@@ -178,7 +242,9 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
                 entry.price,
                 entry.status,
                 entry.averagePrice,
-                entry.offerCount
+                entry.offerCount,
+                entry.productCode,
+                entry.nftFurniType
             );
             offerEntry.timeLeftMinutes = entry.timeLeftMinutes;
             latestOffers.set(entry.offerId, offerEntry);
@@ -189,6 +255,38 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
         setOffers(latestOffers);
         // AIR: a new offer list closes the details panel (MarketPlaceCatalogWidget offersReceived -> hideDetails).
         setDetailsOffer(null);
+    });
+
+    // AIR MarketPlaceLogic.onNftBuyResult.
+    useMessageEvent<NftMarketplaceBuyResultEvent>(NftMarketplaceBuyResultEvent, (event) => {
+        const parser = event.getParser();
+
+        releaseBuy();
+
+        if (!parser) return;
+
+        if (parser.result === NFT_BUY_RESULT_SUCCESS) {
+            setDetailsOffer(null);
+            if (lastSearchRef.current) requestOffers(lastSearchRef.current);
+            return;
+        }
+
+        if (parser.result === NFT_BUY_RESULT_NOT_ENOUGH_EMERALDS) {
+            showNotEnoughEmeralds();
+            return;
+        }
+
+        simpleAlert(
+            collectiblesMarketplaceText(
+                parser.result === NFT_BUY_RESULT_OWN_OFFER ? 'catalog.marketplace.nft_own_offer' : 'catalog.marketplace.nft_purchase_failed'
+            ),
+            NotificationAlertType.DEFAULT,
+            null,
+            null,
+            collectiblesMarketplaceText('catalog.marketplace.operation_failed.topic')
+        );
+        // The offer may be gone or dearer now: show the current list.
+        if (lastSearchRef.current) requestOffers(lastSearchRef.current);
     });
 
     useMessageEvent<MarketplaceBuyOfferResultEvent>(MarketplaceBuyOfferResultEvent, (event) => {
@@ -273,7 +371,7 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
     // search form keeps its state and does not search again on the way back.
     return (
         <NativeTextTree>
-            <div className="octane-marketplace-page is-public">
+            <div className={`octane-marketplace-page is-public${collectiblesEnabled ? ' has-offer-source' : ''}`}>
                 {detailsOffer && (
                     <CatalogLayoutMarketplaceOfferDetailsView offerData={detailsOffer} onBack={() => setDetailsOffer(null)} onBuy={purchaseItem} />
                 )}
@@ -291,7 +389,7 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
                             </BaseButton>
                         ))}
                     </div>
-                    <div className="octane-marketplace-search-container">
+                    <div className={`octane-marketplace-search-container${collectiblesEnabled ? ' has-offer-source' : ''}`}>
                         <SearchFormView
                             key={searchType}
                             combineUniques={combineUniques}
@@ -303,6 +401,9 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
                             onFormChange={setForm}
                             onSearch={() => doSearch()}
                             onSortChange={changeSort}
+                            offerSource={offerSource}
+                            showOfferSource={collectiblesEnabled}
+                            onOfferSourceChange={changeOfferSource}
                         />
                     </div>
                     <span className="octane-marketplace-status" data-testid="marketplace-status" role="status">

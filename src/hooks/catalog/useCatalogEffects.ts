@@ -15,6 +15,7 @@ import {
     LegacyDataType,
     LimitedEditionSoldOutEvent,
     MarketplaceMakeOfferResult,
+    NftMarketplaceMakeOfferResultEvent,
     ProductOfferEvent,
     PurchaseErrorMessageEvent,
     PurchaseFromCatalogComposer,
@@ -288,14 +289,29 @@ export const useCatalogEffects = (): void => {
         state.selectCatalogOffer(offer);
     });
 
+    const showMakeOfferResult = (result: number) => {
+        if (!simpleAlert) return;
+
+        const title = LocalizeText(result === 1 ? 'inventory.marketplace.result.title.success' : 'inventory.marketplace.result.title.failure');
+
+        simpleAlert(LocalizeText(`inventory.marketplace.result.${result}`), NotificationAlertType.DEFAULT, null, null, title);
+    };
+
     useMessageEvent<MarketplaceMakeOfferResult>(MarketplaceMakeOfferResult, (event) => {
         const parser = event.getParser();
 
-        if (!parser || !simpleAlert) return;
+        if (!parser) return;
 
-        const title = LocalizeText(parser.result === 1 ? 'inventory.marketplace.result.title.success' : 'inventory.marketplace.result.title.failure');
+        showMakeOfferResult(parser.result);
+    });
 
-        simpleAlert(LocalizeText(`inventory.marketplace.result.${parser.result}`), NotificationAlertType.DEFAULT, null, null, title);
+    // AIR MarketplaceModel.endOfferMaking: a collectible's offer answers with the same result codes.
+    useMessageEvent<NftMarketplaceMakeOfferResultEvent>(NftMarketplaceMakeOfferResultEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser) return;
+
+        showMakeOfferResult(parser.result);
     });
 
     useMessageEvent<CatalogPublishedMessageEvent>(CatalogPublishedMessageEvent, () => {

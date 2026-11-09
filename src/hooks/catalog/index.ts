@@ -10,6 +10,7 @@ export * from './useClubOffers';
 export * from './useGiftConfiguration';
 export * from './useMarketplaceConfiguration';
 export * from './useMarketplaceItemStats';
+export * from './useNftMarketplaceItemStats';
 export * from './useSellablePetPalette';
 export * from './useScrollWindow';
 export * from './recolorableColorStore';

@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import {
+    collectiblesMarketplaceText,
     getMarketplaceOfferText,
     getMarketplaceStatsCategory,
     isMarketplaceChartAvailable,
@@ -10,7 +11,7 @@ import {
 } from '../../../../../../api';
 import { Button, LayoutFurniImageView, LayoutLimitedEditionCompactPlateView, Text } from '../../../../../../common';
 import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
-import { useMarketplaceConfiguration, useMarketplaceItemStats } from '../../../../../../hooks';
+import { useMarketplaceConfiguration, useMarketplaceItemStats, useNftMarketplaceItemStats } from '../../../../../../hooks';
 import { MarketplaceChartView } from './MarketplaceChartView';
 
 export interface CatalogLayoutMarketplaceOfferDetailsViewProps {
@@ -32,10 +33,14 @@ const CHART_TITLE_FALLBACKS: Record<MarketplaceChartType, string> = {
 export const CatalogLayoutMarketplaceOfferDetailsView: FC<CatalogLayoutMarketplaceOfferDetailsViewProps> = (props) => {
     const { offerData = null, onBack = null, onBuy = null } = props;
     const [chartType, setChartType] = useState<MarketplaceChartType>('price_development');
-    const stats = useMarketplaceItemStats(
-        offerData ? getMarketplaceStatsCategory(offerData.furniType, offerData.isUniqueLimitedItem) : 0,
-        offerData ? offerData.furniId : 0
+    const isNft = !!offerData?.isNft;
+    // AIR MarketPlaceLogic.requestItemStats: a collectible asks for its prices by product code.
+    const furniStats = useMarketplaceItemStats(
+        offerData && !isNft ? getMarketplaceStatsCategory(offerData.furniType, offerData.isUniqueLimitedItem) : 0,
+        offerData && !isNft ? offerData.furniId : 0
     );
+    const nftStats = useNftMarketplaceItemStats(isNft ? offerData.productCode : null);
+    const stats = isNft ? nftStats : furniStats;
     const { data: configuration = null } = useMarketplaceConfiguration();
 
     if (!offerData) return null;
@@ -69,7 +74,7 @@ export const CatalogLayoutMarketplaceOfferDetailsView: FC<CatalogLayoutMarketpla
                             direction={2}
                             extraData={offerData.extraData}
                             productClassId={offerData.furniId}
-                            productType={offerData.furniType === MarketplaceOfferData.TYPE_WALL ? ProductTypeEnum.WALL : ProductTypeEnum.FLOOR}
+                            productType={offerData.isWallItem ? ProductTypeEnum.WALL : ProductTypeEnum.FLOOR}
                         />
                         {offerData.isUniqueLimitedItem && (
                             <div className="marketplace-details-unique">
@@ -84,12 +89,14 @@ export const CatalogLayoutMarketplaceOfferDetailsView: FC<CatalogLayoutMarketpla
                         <Text bold>{getMarketplaceOfferText(offerData, 'name')}</Text>
                         <Text italics>{getMarketplaceOfferText(offerData, 'desc')}</Text>
                         <Text className="marketplace-details-price marketplace-details-small">
-                            {localizeWithFallback(
-                                'catalog.marketplace.offer_details.price',
-                                `Cheapest price: ${offerData.price} credits`,
-                                ['price'],
-                                [offerData.price.toString()]
-                            )}
+                            {isNft
+                                ? collectiblesMarketplaceText('catalog.marketplace.offer_details.price.emeralds', ['price'], [offerData.price.toString()])
+                                : localizeWithFallback(
+                                      'catalog.marketplace.offer_details.price',
+                                      `Cheapest price: ${offerData.price} credits`,
+                                      ['price'],
+                                      [offerData.price.toString()]
+                                  )}
                         </Text>
                         {stats && (
                             <Text className="marketplace-details-small">
@@ -102,12 +109,18 @@ export const CatalogLayoutMarketplaceOfferDetailsView: FC<CatalogLayoutMarketpla
                             </Text>
                         )}
                         <Text className="marketplace-details-small">
-                            {localizeWithFallback(
-                                'catalog.marketplace.offer_details.average_price',
-                                `Average price over the last ${averageDays} days: ${average} credits`,
-                                ['days', 'average'],
-                                [averageDays, average]
-                            )}
+                            {isNft
+                                ? collectiblesMarketplaceText(
+                                      'catalog.marketplace.offer_details.average_price.emeralds',
+                                      ['days', 'average'],
+                                      [averageDays, average]
+                                  )
+                                : localizeWithFallback(
+                                      'catalog.marketplace.offer_details.average_price',
+                                      `Average price over the last ${averageDays} days: ${average} credits`,
+                                      ['days', 'average'],
+                                      [averageDays, average]
+                                  )}
                         </Text>
                     </div>
                     <Button className="marketplace-details-buy" onClick={() => onBuy(offerData)}>

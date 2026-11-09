@@ -193,7 +193,8 @@
     display: block;
     width: 268px;
     height: 18px;
-    overflow: hidden;
+    /* The rows keep AIR's 18px, but the drawn text (22px) may reach below: g and p were cut off. */
+    overflow: visible;
     line-height: 18px;
     white-space: nowrap;
 }
@@ -251,11 +252,19 @@
     image-rendering: var(--octane-pixel-art, pixelated) !important;
 }
 
-/* copy_suggested_price_button: x130, 138x24. */
+/*
+ * copy_suggested_price_button: x130 (120 into the itemlist at x10), 138x24, growing with its text up to
+ * width_max 150 as AIR's button does, rightwards from x130. Longer captions (Dutch) keep their centre.
+ */
 .octane-marketplace-post-offer-button.is-copy {
-    align-self: flex-end;
-    width: 138px !important;
+    align-self: flex-start;
+    width: auto !important;
+    min-width: 138px !important;
+    max-width: 150px !important;
     height: 24px !important;
+    margin-left: 120px !important;
+    padding: 0 !important;
+    overflow: visible;
 }
 
 .octane-marketplace-post-offer-button:hover {
@@ -282,4 +291,25 @@
     .octane-marketplace-post-offer-content :where(*):not(svg, svg *) {
         font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
     }
+}
+
+/*
+ * AIR make_nft_marketplace_offer (Collectibles marketplace): the same window without the amount line,
+ * frame 300x398, main container 288x362, the itemlist at y159.
+ */
+.octane-card-shell.octane-marketplace-post-offer.is-nft,
+.draggable-window:has(> .octane-marketplace-post-offer.is-nft) {
+    height: 398px !important;
+    min-height: 398px !important;
+    max-height: 398px !important;
+}
+
+.octane-card-shell.octane-marketplace-post-offer.is-nft .octane-marketplace-post-offer-content.container-fluid {
+    height: 362px !important;
+    min-height: 362px !important;
+    max-height: 362px !important;
+}
+
+.octane-marketplace-post-offer.is-nft .octane-marketplace-post-offer-list {
+    top: 159px;
 }

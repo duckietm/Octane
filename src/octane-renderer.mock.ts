@@ -1334,6 +1334,12 @@ export class MapDataType {
 export class RecolorFurniComposer extends StubClass {}
 export class LimitedEditionSoldOutEvent extends MessageEvent {}
 export class MarketplaceMakeOfferResult extends MessageEvent {}
+export class NftMarketplaceMakeOfferResultEvent extends MessageEvent {}
+export class NftMarketplaceBuyResultEvent extends MessageEvent {}
+export class NftMarketplaceItemStatsEvent extends MessageEvent {}
+export class MakeNftMarketplaceOfferComposer extends RecordingComposer {}
+export class BuyNftMarketplaceOfferComposer extends RecordingComposer {}
+export class GetNftMarketplaceItemStatsComposer extends RecordingComposer {}
 export class ProductOfferEvent extends MessageEvent {}
 export class PurchaseFromCatalogComposer extends RecordingComposer {}
 export class RoomEngineObjectPlacedEvent extends StubClass {

@@ -65,4 +65,15 @@ describe('catalog search behavior', () => {
         expect(findCatalogFurnitureMatches(source, 'sedia', CatalogType.NORMAL).furniture.map((item) => item.id)).toEqual([2, 3]);
         expect(findCatalogFurnitureMatches(source, 'sedia', CatalogType.BUILDER).furniture.map((item) => item.id)).toEqual([1, 3]);
     });
+
+    it("leaves out a furni whose offer is not in the user's catalog index, as AIR does", () => {
+        const source = [
+            furniture({ id: 1, name: 'Open chair', purchaseOfferId: 10 }),
+            furniture({ id: 2, name: 'Staff chair', purchaseOfferId: 20 }),
+            furniture({ id: 3, name: 'Rent chair', purchaseOfferId: 30, rentOfferId: 31 })
+        ];
+        const listed = (offerId: number) => offerId === 10 || offerId === 31;
+
+        expect(findCatalogFurnitureMatches(source, 'chair', CatalogType.NORMAL, undefined, listed).furniture.map((item) => item.id)).toEqual([1, 3]);
+    });
 });

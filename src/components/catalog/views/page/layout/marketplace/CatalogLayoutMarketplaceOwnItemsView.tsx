@@ -104,7 +104,9 @@ export const CatalogLayoutMarketplaceOwnItemsView: FC<CatalogLayoutProps> = () =
                 offer.price,
                 offer.status,
                 offer.averagePrice,
-                offer.offerCount
+                offer.offerCount,
+                offer.productCode,
+                offer.nftFurniType
             );
 
             newOffer.timeLeftMinutes = offer.timeLeftMinutes;

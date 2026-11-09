@@ -13,7 +13,7 @@ import {
     PageLocalization,
     SearchResult
 } from '../../../../../api';
-import { useCatalogData, useCatalogUiState } from '../../../../../hooks';
+import { useCatalogActions, useCatalogData, useCatalogUiState } from '../../../../../hooks';
 import {
     CATALOG_SEARCH_DEBOUNCE_MS,
     findCatalogFurnitureMatches,
@@ -28,6 +28,7 @@ export const CatalogSearchView: FC<{}> = () => {
     const searchTimeout = useRef<ReturnType<typeof setTimeout>>(null);
     const { rootNode = null } = useCatalogData();
     const { currentType = null, setSearchResult = null, setCurrentPage = null } = useCatalogUiState();
+    const { getNodesByOfferId = null } = useCatalogActions();
 
     const runSearch = useCallback(
         (search: string) => {
@@ -37,7 +38,13 @@ export const CatalogSearchView: FC<{}> = () => {
 
             if (!furnitureDatas || !furnitureDatas.length) return;
 
-            const { furniture: foundFurniture, furniLines: foundFurniLines } = findCatalogFurnitureMatches(furnitureDatas, search, currentType);
+            const { furniture: foundFurniture, furniLines: foundFurniLines } = findCatalogFurnitureMatches(
+                furnitureDatas,
+                search,
+                currentType,
+                undefined,
+                getNodesByOfferId ? (offerId) => !!getNodesByOfferId(offerId, true)?.length : null
+            );
 
             const offers: IPurchasableOffer[] = [];
 
@@ -67,7 +74,7 @@ export const CatalogSearchView: FC<{}> = () => {
                 )
             );
         },
-        [currentType, rootNode, setCurrentPage, setSearchResult]
+        [currentType, getNodesByOfferId, rootNode, setCurrentPage, setSearchResult]
     );
 
     const scheduleSearch = useCallback(

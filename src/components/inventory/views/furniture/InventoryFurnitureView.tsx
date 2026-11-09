@@ -8,13 +8,15 @@ import {
     FurniCategory,
     getGroupItemKey,
     GroupItem,
+    isCollectiblesMarketplaceEnabled,
+    isMarketplaceCollectibleItem,
     LocalizeText,
     localizeWithFallback,
     UnseenItemCategory
 } from '../../../../api';
 import { LayoutLimitedEditionCompactPlateView, LayoutRarityLevelView, LayoutRoomPreviewerView } from '../../../../common';
 import { CatalogPostMarketplaceOfferEvent, DeleteItemConfirmEvent } from '../../../../events';
-import { useInventoryFurni, useInventoryUnseenTracker, usePlayTestRestricted } from '../../../../hooks';
+import { useInventoryFurni, useInventoryUnseenTracker, useMarketplaceConfiguration, usePlayTestRestricted } from '../../../../hooks';
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryFurnitureItemView } from './InventoryFurnitureItemView';
@@ -22,9 +24,15 @@ import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
-const attemptPlaceMarketplaceOffer = (groupItem: GroupItem) => {
+const attemptPlaceMarketplaceOffer = (groupItem: GroupItem, collectible = false) => {
     const item = groupItem.getLastItem();
     if (!item) return false;
+    // A collectible goes to the Collectibles marketplace, one at a time, whether or not it is sellable for credits.
+    if (collectible) {
+        if (item.locked) return false;
+        DispatchUiEvent(new CatalogPostMarketplaceOfferEvent(item, [item]));
+        return true;
+    }
     if (!item.sellable) return false;
     const sellable = groupItem.items.filter((value) => value.sellable && !value.locked);
     DispatchUiEvent(new CatalogPostMarketplaceOfferEvent(item, sellable));
@@ -49,6 +57,8 @@ export const InventoryFurnitureView: FC<{
     const tabItems = sectionGroupItems ?? groupItems;
     const { resetItems = null } = useInventoryUnseenTracker();
     const playTestRestricted = usePlayTestRestricted();
+    const { data: marketplaceConfiguration = null } = useMarketplaceConfiguration();
+    const selectedCollectible = !!selectedItem && isCollectiblesMarketplaceEnabled(marketplaceConfiguration) && isMarketplaceCollectibleItem(selectedItem);
 
     const [page, setPage] = useState(0);
     const pageCount = Math.floor(filteredGroupItems.length / 200) + 1;
@@ -251,8 +261,11 @@ export const InventoryFurnitureView: FC<{
                                         {localizeWithFallback('widget.furniture.button.use', 'Use')}
                                     </BaseButton>
                                 </div>
-                                {selectedItem.isSellable && (
-                                    <OctaneButton className="octane-inventory-btn-sell" onClick={() => attemptPlaceMarketplaceOffer(selectedItem)}>
+                                {(selectedItem.isSellable || selectedCollectible) && (
+                                    <OctaneButton
+                                        className="octane-inventory-btn-sell"
+                                        onClick={() => attemptPlaceMarketplaceOffer(selectedItem, selectedCollectible)}
+                                    >
                                         {LocalizeText('inventory.marketplace.sell')}
                                     </OctaneButton>
                                 )}
