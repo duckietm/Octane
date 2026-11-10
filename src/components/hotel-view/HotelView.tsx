@@ -20,6 +20,8 @@ import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
 import { NativeTextTransformScale } from '../../common/native-text/NativeTextTransformScale';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { WidgetErrorBoundary } from '../../common/error-boundary/WidgetErrorBoundary';
+import { HotelViewDragonAdoptionButton } from './widgets/HotelViewDragonAdoptionButton';
 import { HotelViewLiveSlotView } from './widgets/HotelViewLiveSlotView';
 
 interface HotelViewLandingData {
@@ -543,6 +545,7 @@ export const HotelView: FC = () => {
             {/* The left and right artwork stand on the bottom of the window, behind the see-through toolbar, as in AIR. */}
             {scene.leftUrl && <div className="hotelview-edge hotelview-edge-left"><img src={resolveImageUrl(scene.leftUrl, imageLibraryUrl, assetUrl)} alt="" /><LayoutAvatarImageView classNames={['hotelview-avatar']} figure={GetSessionDataManager().figure} gender={GetSessionDataManager().gender} direction={2} /></div>}
             {scene.rightUrl && <div className="hotelview-edge hotelview-edge-right"><img src={resolveImageUrl(scene.rightUrl, imageLibraryUrl, assetUrl)} alt="" /></div>}
+            <WidgetErrorBoundary name="HotelViewDragonAdoptionButton"><HotelViewDragonAdoptionButton /></WidgetErrorBoundary>
             <div ref={containerRef} className="hotelview-frame">
                 {!scene.leftUrl && <LayoutAvatarImageView classNames={['hotelview-avatar hotelview-avatar-fallback']} figure={GetSessionDataManager().figure} gender={GetSessionDataManager().gender} direction={2} />}
                 {scene.drapeUrl && <div className="hotelview-edge hotelview-edge-drape" style={getScenePositionStyle('drape')}><img src={resolveImageUrl(scene.drapeUrl, imageLibraryUrl, assetUrl)} alt="" />{landingData.canEdit && <Hint content={localizeWithFallback('octane.hotel_view.drag_drape', 'Drag drape')}>

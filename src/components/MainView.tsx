@@ -20,6 +20,7 @@ import { BadgeLeaderboardView } from './badge-leaderboard/BadgeLeaderboardView';
 import { CameraWidgetView } from './camera/CameraWidgetView';
 import { CampaignView } from './campaign/CampaignView';
 import { CatalogView } from './catalog/CatalogView';
+import { CursedDragonAdoptionView } from './catalog/cursed-dragon-adoption/CursedDragonAdoptionView';
 import { SpecialItemsDisplayView } from './catalog/special-items/SpecialItemsDisplayView';
 import { ChatHistoryView } from './chat-history/ChatHistoryView';
 import { CollectiblesHubView } from './collectibles/CollectiblesHubView';
@@ -219,6 +220,7 @@ export const MainView: FC<{}> = (props) =>
                 <WidgetErrorBoundary name="InventoryView"><InventoryView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="CatalogView"><CatalogView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="SpecialItemsDisplayView"><SpecialItemsDisplayView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="CursedDragonAdoptionView"><CursedDragonAdoptionView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="CollectiblesHubView"><CollectiblesHubView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="CollectiblesRewardBoxView"><CollectiblesRewardBoxView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="FriendsView"><FriendsView /></WidgetErrorBoundary>

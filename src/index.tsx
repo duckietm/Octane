@@ -125,6 +125,7 @@ import './css/catalog/MarketplacePostOfferView.css';
 import './css/catalog/MarketplaceTokenDialogs.css';
 import './css/catalog/VipBenefitsView.css';
 import './css/room/VipRequired.css';
+import './css/catalog/CursedDragonAdoption.css';
 import './css/catalog/SpecialItemsDisplay.css';
 import './css/catalog/CatalogAirText.css';
 import './css/collectibles/Collectibles.css';

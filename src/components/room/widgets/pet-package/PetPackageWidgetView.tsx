@@ -15,7 +15,10 @@ const PET_PACKAGE_PREVIEW: Record<string, { typeId: number; paletteId: number }>
     pterosaur_egg: { typeId: 33, paletteId: 0 },
     petbox_epic: { typeId: 32, paletteId: 0 },
     cowbox: { typeId: 35, paletteId: 5 },
-    cowbox_gold: { typeId: 35, paletteId: 28 }
+    cowbox_gold: { typeId: 35, paletteId: 28 },
+    // The cursed dragon adoption's crates: 1 holds the blue dragon, 2 the purple one.
+    drago_cursed_1_package: { typeId: 37, paletteId: 0 },
+    drago_cursed_2_package: { typeId: 37, paletteId: 1 }
 };
 
 export const PetPackageWidgetView: FC<{}> = (props) => {
