@@ -1,9 +1,9 @@
 import { CreateLinkEvent, PetRespectComposer, PetType } from '@octane/renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
-import { ConvertSeconds, GetConfigurationRecord, LocalizeText, SendMessageComposer } from '../../../../../api';
+import { confirmCompostPlant, ConvertSeconds, GetConfigurationRecord, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button, Column, Flex, LayoutCounterTimeView, LayoutPetImageView, LayoutRarityLevelView, Text, UserProfileIconView } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
-import { useRoom, useSessionInfo } from '../../../../../hooks';
+import { useNotification, useRoom, useSessionInfo } from '../../../../../hooks';
 import { InfoStandHeaderView } from './InfoStandHeaderView';
 import { InfoStandUnitIdView } from './InfoStandUnitIdView';
 
@@ -194,6 +194,7 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = ({ avatar
     const [remainingGrowTime, setRemainingGrowTime] = useState(0);
     const [remainingTimeToLive, setRemainingTimeToLive] = useState(0);
     const { roomSession = null } = useRoom();
+    const { showConfirm = null } = useNotification();
     const { petRespectRemaining = 0, respectPet = null } = useSessionInfo();
 
     useEffect(() => {
@@ -233,7 +234,7 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = ({ avatar
                         SendMessageComposer(new PetRespectComposer(avatarInfo.id));
                         break;
                     case 'compost':
-                        roomSession?.compostPlant(avatarInfo.id);
+                        confirmCompostPlant(showConfirm, () => roomSession?.compostPlant(avatarInfo.id));
                         break;
                     case 'pick_up':
                         roomSession?.pickupPet(avatarInfo.id);
@@ -245,7 +246,7 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = ({ avatar
                 console.error(`Failed to process action ${action}:`, error);
             }
         },
-        [avatarInfo, petRespectRemaining, respectPet, roomSession, onClose]
+        [avatarInfo, petRespectRemaining, respectPet, roomSession, onClose, showConfirm]
     );
 
     const buttons = [

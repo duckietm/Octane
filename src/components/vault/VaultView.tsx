@@ -12,7 +12,7 @@ import {
     RequestEarningsCenterComposer
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { LocalizeText, NotificationBubbleType, SendMessageComposer } from '../../api';
+import { GetConfigurationValue, LocalizeText, NotificationBubbleType, SendMessageComposer } from '../../api';
 import imgAchievements from '../../assets/images/vault/achievements.png';
 import imgBonusbag from '../../assets/images/vault/bonusbag.png';
 import imgDailygift from '../../assets/images/vault/dailygift.png';
@@ -24,8 +24,8 @@ import imgLevel from '../../assets/images/vault/levelprogression.png';
 import imgMarketplace from '../../assets/images/vault/marketplace.png';
 import imgSurprise from '../../assets/images/vault/surprise.png';
 import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
-import { useMessageEvent, useNotification } from '../../hooks';
-import { hasClaimableEarnings, useEarningsIndicatorStore } from '../../state/earningsIndicatorStore';
+import { useMessageEvent, useNotification, usePurse } from '../../hooks';
+import { ducketsToClaim, exceedsDucketLimit, hasClaimableEarnings, useEarningsIndicatorStore } from '../../state/earningsIndicatorStore';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
@@ -107,7 +107,8 @@ export const VaultView: FC<{}> = (props) => {
     const [pendingClaims, setPendingClaims] = useState<ReadonlySet<string>>(new Set());
     const claimingAll = pendingClaims.has(ALL_CLAIMS);
     const anyClaimable = useMemo(() => entries.some((entry) => entry.enabled && entry.claimable), [entries]) && pendingClaims.size === 0;
-    const { showSingleBubble = null } = useNotification();
+    const { showSingleBubble = null, showConfirm = null } = useNotification();
+    const { purse = null } = usePurse();
     const firstStatus = useRef(true);
 
     // AIR SessionDataManager asks for the income reward status at login, so the purse indicator knows of rewards
@@ -226,15 +227,38 @@ export const VaultView: FC<{}> = (props) => {
         return () => clearTimeout(timeout);
     }, [pendingClaims]);
 
-    const claimOne = useCallback((categoryKey: string) => {
-        setPendingClaims((prev) => new Set(prev).add(categoryKey));
-        SendMessageComposer(new ClaimEarningsRewardComposer(categoryKey));
-    }, []);
+    // AIR EarningsView: claiming over the ducket soft limit loses duckets, so that claim is confirmed first.
+    const confirmOverLimit = (categoryKey: string, claim: () => void) => {
+        const softLimit = GetConfigurationValue<number>('duckets.soft_limit', 0);
+        const current = purse?.activityPoints?.get(0) ?? 0;
 
-    const claimAll = useCallback(() => {
-        setPendingClaims(new Set([ALL_CLAIMS]));
-        SendMessageComposer(new ClaimAllEarningsRewardsComposer());
-    }, []);
+        if (!exceedsDucketLimit(ducketsToClaim(entries, categoryKey), current, softLimit)) {
+            claim();
+
+            return;
+        }
+
+        showConfirm(
+            localizeWithFallback('earning.exceeding_limit', 'Claiming these earnings takes you over the Ducket limit, so you will lose Duckets. Do you want to continue?'),
+            claim,
+            null,
+            null,
+            null,
+            localizeWithFallback('generic.alert.title', 'Notice')
+        );
+    };
+
+    const claimOne = (categoryKey: string) =>
+        confirmOverLimit(categoryKey, () => {
+            setPendingClaims((prev) => new Set(prev).add(categoryKey));
+            SendMessageComposer(new ClaimEarningsRewardComposer(categoryKey));
+        });
+
+    const claimAll = () =>
+        confirmOverLimit(null, () => {
+            setPendingClaims(new Set([ALL_CLAIMS]));
+            SendMessageComposer(new ClaimAllEarningsRewardsComposer());
+        });
 
     if (!isVisible) return null;
 

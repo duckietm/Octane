@@ -139,7 +139,8 @@
         -1,
         0,
         5,
-        105
+        105,
+        1001
     ],
     "currency.display.number.short": false,
     "currency.seasonal.color": "blue",
@@ -785,6 +786,10 @@
     "room.ranking.enabled": false,
     "room.queue.spectator.enabled": false,
     "roomenterad.habblet.enabled": false,
+    "duckets.soft_limit": 0,
+    "cursed_dragon_adoption.claim_id": "cursed_dragon_adoption",
+    "cursed_dragon_adoption.pet_type": 37,
+    "cursed_dragon_adoption.button.enabled": true,
     "furni.descriptions.enabled": true,
     "furni.location.enabled": true,
     "furni.location.require.access": true,

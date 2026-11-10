@@ -1,0 +1,254 @@
+/*
+ * AIR layout cursed_dragon_adoption: a 788 x 593 scene under the title bar. Coordinates are the layout's own. The
+ * window takes the scene's width plus its own frame: a fixed 788px left the frame's borders out, so the scene was a
+ * few pixels too wide for it and got a scrollbar. Only a screen narrower than the window scrolls.
+ */
+.octane-cursed-dragon {
+    width: fit-content;
+    min-width: 0;
+    max-width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+}
+
+.octane-cursed-dragon .octane-cursed-dragon__content {
+    display: block;
+    padding: 0;
+    overflow: auto;
+    background: #302b39;
+}
+
+.octane-cursed-dragon__scene {
+    position: relative;
+    width: 788px;
+    height: 593px;
+    overflow: hidden;
+    background: url('../../assets/images/cursed-dragon-adoption/background.png') no-repeat 0 0;
+    font-family: HabboAirUbuntu, Ubuntu, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+/* introduction: 0,0 788 x 180, background 0x25212e at 0xda / 255. */
+.octane-cursed-dragon__intro {
+    position: absolute;
+    left: 1px;
+    top: 0;
+    width: 786px;
+    height: 180px;
+    box-sizing: border-box;
+    background: rgba(37, 33, 46, 0.855);
+    border-bottom: 1px solid transparent;
+    border-image: linear-gradient(to right, #52818b 0, #52818b 50%, #8b6a9c 50%, #8b6a9c 100%) 1;
+}
+
+.octane-cursed-dragon__eyebrow {
+    position: absolute;
+    left: 28px;
+    top: 15px;
+    width: 532px;
+    color: #b9a8cd;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.octane-cursed-dragon__intro-title {
+    position: absolute;
+    left: 28px;
+    top: 37px;
+    width: 660px;
+    color: #fff8ff;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 30px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.octane-cursed-dragon__intro-body {
+    position: absolute;
+    left: 28px;
+    top: 78px;
+    width: 624px;
+    max-height: 96px;
+    overflow: hidden;
+    color: #d1c8d9;
+    line-height: 17px;
+    white-space: normal;
+}
+
+/* evil_frank: 33 x 85 drawn at zoom 2, blend 0.7. */
+.octane-cursed-dragon__frank {
+    position: absolute;
+    left: 698px;
+    top: 18px;
+    width: 66px;
+    height: 162px;
+    background: url('../../assets/images/cursed-dragon-adoption/evil_frank.png') no-repeat 0 0 / 66px 170px;
+    image-rendering: pixelated;
+    opacity: 0.7;
+}
+
+/* choice_hint: border 105,193 578 x 30, 0x231f2c at 0.9. */
+.octane-cursed-dragon__hint {
+    position: absolute;
+    left: 105px;
+    top: 193px;
+    width: 578px;
+    height: 30px;
+    box-sizing: border-box;
+    padding: 0 14px;
+    border-radius: 4px;
+    background: rgba(35, 31, 44, 0.9);
+    color: #e8e1ee;
+    font-weight: 700;
+    line-height: 30px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* blue_preview 5,222 and purple_preview 394,222: 389 x 370 each. */
+.octane-cursed-dragon__side {
+    position: absolute;
+    top: 222px;
+    width: 389px;
+    height: 370px;
+}
+
+.octane-cursed-dragon__side--blue {
+    left: 5px;
+}
+
+.octane-cursed-dragon__side--purple {
+    left: 394px;
+}
+
+/* package: 68 x 75 drawn at zoom 2 at 127,151. */
+.octane-cursed-dragon__package {
+    position: absolute;
+    left: 127px;
+    top: 151px;
+    width: 136px;
+    height: 150px;
+    background: no-repeat 0 0 / 136px 150px;
+    image-rendering: pixelated;
+}
+
+.octane-cursed-dragon__side--blue .octane-cursed-dragon__package {
+    background-image: url('../../assets/images/cursed-dragon-adoption/blue_package.png');
+}
+
+.octane-cursed-dragon__side--purple .octane-cursed-dragon__package {
+    background-image: url('../../assets/images/cursed-dragon-adoption/purple_package.png');
+}
+
+/* The dragon stands on the crate: its feet at the crate's centre, PERCH_Y (18) * zoom below the crate's top. */
+.octane-cursed-dragon__pet {
+    position: absolute;
+    left: 95px;
+    top: 27px;
+    width: 200px;
+    height: 160px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    pointer-events: none;
+    image-rendering: pixelated;
+}
+
+/* blue_choice 57,472 and purple_choice 446,472 of the scene: 286 x 84. */
+.octane-cursed-dragon__choice {
+    position: absolute;
+    left: 52px;
+    top: 250px;
+    width: 286px;
+    height: 84px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.octane-cursed-dragon__choice::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 0;
+    width: 258px;
+    height: 2px;
+}
+
+.octane-cursed-dragon__side--blue .octane-cursed-dragon__choice {
+    background: rgba(30, 32, 41, 0.9);
+}
+
+.octane-cursed-dragon__side--blue .octane-cursed-dragon__choice::before {
+    background: #6acdd2;
+}
+
+.octane-cursed-dragon__side--purple .octane-cursed-dragon__choice {
+    background: rgba(37, 31, 44, 0.9);
+}
+
+.octane-cursed-dragon__side--purple .octane-cursed-dragon__choice::before {
+    background: #ba91db;
+}
+
+.octane-cursed-dragon__name {
+    position: absolute;
+    left: 14px;
+    top: 10px;
+    width: 258px;
+    height: 21px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 21px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.octane-cursed-dragon__side--blue .octane-cursed-dragon__name {
+    color: #b9f0ee;
+}
+
+.octane-cursed-dragon__side--purple .octane-cursed-dragon__name {
+    color: #e7c6f9;
+}
+
+/* adopt button: 62,43 162 x 32, the shiny style in the dragon's colour. */
+.octane-cursed-dragon__adopt {
+    position: absolute;
+    left: 62px;
+    top: 43px;
+    width: 162px;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 28px;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28), inset 0 14px 0 rgba(255, 255, 255, 0.12);
+}
+
+.octane-cursed-dragon__side--blue .octane-cursed-dragon__adopt {
+    background: #278b91;
+}
+
+.octane-cursed-dragon__side--purple .octane-cursed-dragon__adopt {
+    background: #8b5fa6;
+}
+
+.octane-cursed-dragon__adopt:hover:not(:disabled) {
+    filter: brightness(1.12);
+}
+
+.octane-cursed-dragon__adopt:disabled {
+    cursor: default;
+    filter: grayscale(0.6) brightness(0.75);
+}

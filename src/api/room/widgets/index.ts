@@ -13,6 +13,7 @@ export * from './ChatBubbleUtilities';
 export * from './ChatMessageTypeEnum';
 export * from './ChooserSelectionVisualizer';
 export * from './CommandDefinition';
+export * from './confirmCompostPlant';
 export * from './DimmerFurnitureWidgetPresetItem';
 export * from './DoChatsOverlap';
 export * from './GetBotSkillWindowPosition';

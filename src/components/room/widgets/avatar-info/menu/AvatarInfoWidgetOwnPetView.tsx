@@ -8,8 +8,8 @@ import {
     RoomUnitGiveHandItemPetComposer
 } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { AvatarInfoPet, GetConfigurationValue, GetConfigurationRecord, GetOwnRoomObject, LocalizeText, SendMessageComposer } from '../../../../../api';
-import { useRoom, useSessionInfo } from '../../../../../hooks';
+import { AvatarInfoPet, confirmCompostPlant, GetConfigurationValue, GetConfigurationRecord, GetOwnRoomObject, LocalizeText, SendMessageComposer } from '../../../../../api';
+import { useNotification, useRoom, useSessionInfo } from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
@@ -30,6 +30,7 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
     const { avatarInfo = null, onClose = null } = props;
     const [mode, setMode] = useState(MODE_NORMAL);
     const { roomSession = null } = useRoom();
+    const { showConfirm = null } = useNotification();
     const { petRespectRemaining = 0, respectPet = null, chatStyleId = 0 } = useSessionInfo();
 
     // AIR PetMenuView / OwnPetMenuView: only handitem.give.pet.enabled, not the room's hand-item flag.
@@ -102,7 +103,7 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                     //
                     break;
                 case 'compost':
-                    roomSession.compostPlant(avatarInfo.id);
+                    confirmCompostPlant(showConfirm, () => roomSession.compostPlant(avatarInfo.id));
                     break;
                 case 'buy_saddle':
                     CreateLinkEvent('catalog/open/' + GetConfigurationRecord('catalog.links')['pets.buy_saddle']);

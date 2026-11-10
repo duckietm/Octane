@@ -2,6 +2,8 @@ import {
     AchievementNotificationMessageEvent,
     ActivityPointNotificationMessageEvent,
     BadgeReceivedEvent,
+    BlockResultEvent,
+    ChatStyleNotificationMessageEvent,
     ChestNotificationEvent,
     ClubGiftSelectedEvent,
     ConnectionErrorEvent,
@@ -87,6 +89,20 @@ export const prependSingleAlert = (alerts: NotificationAlertItem[], item: Notifi
 
 // Like the official client, a new item goes below the ones already shown.
 /** AIR HabboCatalog.onLtdRaffleResult: `notification.raffle.won` for a win, `notification.raffle.lost` otherwise. */
+/** AIR BlockedUsersManager.onBlockUpdate: the bubble for a block result, or null for a result AIR shows nothing for. */
+export const blockResultNotification = (result: number): string => {
+    if (result === 0) return localizeWithFallback('notification.unblocked_player', 'You have unblocked this player.');
+    if (result === 1) return localizeWithFallback('notification.blocked_player', 'You have blocked this player.');
+
+    return null;
+};
+
+/** AIR onChatStyleNotification: the bubble for a purchasable chat style that was added or removed. */
+export const chatStyleNotification = (added: boolean): string =>
+    added
+        ? localizeWithFallback('notification.chatstyles.added', 'You received a new chat bubble!')
+        : localizeWithFallback('notification.chatstyles.removed', 'This chat bubble has been removed.');
+
 export const ltdRaffleResultText = (hasWon: boolean): string =>
     hasWon
         ? localizeWithFallback('notification.raffle.won', 'You successfully bought an LTD!')
@@ -367,6 +383,18 @@ const useNotificationStore = () => {
 
         showSingleBubble(text1, NotificationBubbleType.RESPECT);
         showSingleBubble(text2, NotificationBubbleType.RESPECT);
+    });
+
+    // AIR BlockedUsersManager.onBlockUpdate: 0 took the player off the block list, 1 put them on it.
+    useMessageEvent<BlockResultEvent>(BlockResultEvent, (event) => {
+        const text = blockResultNotification(event.getParser().result);
+
+        if (text) showSingleBubble(text, NotificationBubbleType.INFO);
+    });
+
+    // AIR notifications onChatStyleNotification: a purchasable chat style was added to or taken from the account.
+    useMessageEvent<ChatStyleNotificationMessageEvent>(ChatStyleNotificationMessageEvent, (event) => {
+        showSingleBubble(chatStyleNotification(event.getParser().added), NotificationBubbleType.INFO);
     });
 
     useMessageEvent<HabboBroadcastMessageEvent>(HabboBroadcastMessageEvent, (event) => {
