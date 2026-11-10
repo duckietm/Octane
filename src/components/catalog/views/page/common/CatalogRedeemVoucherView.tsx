@@ -1,6 +1,6 @@
 import { RedeemVoucherMessageComposer, VoucherRedeemErrorMessageEvent, VoucherRedeemOkMessageEvent } from '@octane/renderer';
 import { FC, useState } from 'react';
-import { LocalizeText, SendMessageComposer } from '../../../../../api';
+import { LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../api';
 import { Button } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useMessageEvent, useNotification } from '../../../../../hooks';
@@ -17,7 +17,20 @@ export const CatalogRedeemVoucherView: FC<CatalogRedeemVoucherViewProps> = (prop
     const { simpleAlert = null } = useNotification();
 
     const redeemVoucher = () => {
-        if (!voucher || !voucher.length || isWaiting) return;
+        if (isWaiting) return;
+
+        // AIR RedeemItemCodeCatalogWidget: an empty field says so instead of doing nothing.
+        if (!voucher || !voucher.trim().length) {
+            simpleAlert(
+                localizeWithFallback('catalog.voucher.empty.desc', 'You did not enter a voucher code.'),
+                null,
+                null,
+                null,
+                localizeWithFallback('catalog.voucher.empty.title', 'No code')
+            );
+
+            return;
+        }
 
         SendMessageComposer(new RedeemVoucherMessageComposer(voucher));
 

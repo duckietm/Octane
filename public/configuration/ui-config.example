@@ -139,7 +139,8 @@
         -1,
         0,
         5,
-        105
+        105,
+        1001
     ],
     "currency.display.number.short": false,
     "currency.seasonal.color": "blue",
@@ -785,6 +786,7 @@
     "room.ranking.enabled": false,
     "room.queue.spectator.enabled": false,
     "roomenterad.habblet.enabled": false,
+    "duckets.soft_limit": 0,
     "furni.descriptions.enabled": true,
     "furni.location.enabled": true,
     "furni.location.require.access": true,

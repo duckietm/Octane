@@ -420,6 +420,8 @@ export class NotificationDialogMessageEvent extends MessageEvent {}
 export class PetLevelNotificationEvent extends MessageEvent {}
 export class PetReceivedMessageEvent extends MessageEvent {}
 export class RespectReceivedEvent extends MessageEvent {}
+export class BlockResultEvent extends MessageEvent {}
+export class ChatStyleNotificationMessageEvent extends MessageEvent {}
 export class RoomEnterEvent extends MessageEvent {}
 export class SimpleAlertMessageEvent extends MessageEvent {}
 export class UserBannedMessageEvent extends MessageEvent {}
@@ -530,6 +532,7 @@ export class CantConnectMessageParser extends StubClass {
     static readonly REASON_FULL = 1;
     static readonly REASON_QUEUE_ERROR = 2;
     static readonly REASON_BANNED = 3;
+    static readonly REASON_BLOCKED = 5;
 }
 
 export class LegacyExternalInterface {

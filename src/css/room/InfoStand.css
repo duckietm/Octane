@@ -36,6 +36,91 @@
   }
 }
 
+/* AIR use_product_widget_frame_plant_seed: a fixed 388px frame around the 386 x 180 use_product_plant_seed content. */
+.octane-plant-seed-confirm {
+  width: min(388px, calc(100vw - 16px));
+  min-width: 0;
+  max-width: calc(100vw - 16px);
+}
+
+.octane-plant-seed-confirm .octane-plant-seed-confirm__content {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 150px;
+  min-height: 150px;
+  padding: 0;
+  overflow: hidden;
+  color: #000000;
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.octane-plant-seed-confirm__preview {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 122px;
+  height: 130px;
+  background: url('@/assets/images/room-widgets/avatar-info/preview-background.png') no-repeat center;
+}
+
+.octane-plant-seed-confirm__plant {
+  width: 122px;
+  height: 130px;
+  background: url('@/assets/images/room-widgets/furni-context-menu/monsterplant-preview.png') no-repeat center;
+}
+
+.octane-plant-seed-confirm__description,
+.octane-plant-seed-confirm__info {
+  position: absolute;
+  left: 140px;
+  right: 10px;
+  max-width: 235px;
+  overflow: hidden;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.octane-plant-seed-confirm__description {
+  top: 15px;
+  max-height: 48px;
+}
+
+.octane-plant-seed-confirm__info {
+  top: 66px;
+  max-height: 34px;
+  font-style: italic;
+}
+
+.octane-plant-seed-confirm__cancel {
+  position: absolute;
+  left: 160px;
+  top: 118px;
+  max-width: 68px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #000000;
+  font-size: 13px;
+  line-height: 20px;
+  text-decoration: underline;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.octane-plant-seed-confirm .octane-plant-seed-confirm__save {
+  position: absolute;
+  right: 11px;
+  top: 112px;
+  min-width: 130px;
+  max-width: 145px;
+  height: 28px;
+}
+
 /* AIR user_view: border style-1 black 190px, list x=10 y=10 w=170. */
 .octane-infostand {
   position: relative;
