@@ -236,6 +236,29 @@ describe('pet catalog layout', () => {
         expect(screen.getByTestId('pet-image').closest('.octane-catalog-pet-preview')).toContainElement(screen.getByTestId('pet-price'));
     });
 
+    it('asks for the breeds of a classic pet by pet type, whatever the product data says', async () => {
+        // A hotel whose product data has no entry for the pet: nothing to read the code from.
+        const currentOffer = { localizationId: 'pet_3', offerId: 51, product: { productData: null } };
+        vi.mocked(useCatalogData).mockReturnValue({ currentOffer, roomPreviewer } as any);
+        vi.mocked(useSellablePetPalette).mockReturnValue({ data: { palettes: [palette(3, 0), palette(3, 1)] } } as any);
+
+        render(<CatalogLayoutPetView page={{ ...page, offers: [currentOffer] } as any} hideNavigation={() => undefined} />);
+
+        expect(await screen.findByTestId('pet-image')).toHaveAttribute('data-type-id', '3');
+        expect(vi.mocked(useSellablePetPalette)).toHaveBeenLastCalledWith('a0 pet3');
+    });
+
+    it('shows a classic pet from its own asset when the server lists no breeds', async () => {
+        const currentOffer = { localizationId: 'pet_3', offerId: 51, product: { productData: null } };
+        vi.mocked(useCatalogData).mockReturnValue({ currentOffer, roomPreviewer } as any);
+        vi.mocked(useSellablePetPalette).mockReturnValue({ data: null } as any);
+
+        render(<CatalogLayoutPetView page={{ ...page, offers: [currentOffer] } as any} hideNavigation={() => undefined} />);
+
+        expect(await screen.findByTestId('pet-image')).toHaveAttribute('data-palette-id', '0');
+        expect(screen.getByRole('combobox')).toBeInTheDocument();
+    });
+
     it('sends one approval request and purchases only after the matching approval succeeds', async () => {
         const currentOffer = offer(8);
         vi.mocked(useCatalogData).mockReturnValue({ currentOffer, roomPreviewer } as any);

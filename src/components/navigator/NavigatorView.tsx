@@ -19,7 +19,9 @@ import quicklinkAdd from '../../assets/images/navigator/air/quicklink-add.png';
 import randomRoomImg from '../../assets/images/navigator/air/random-room.png';
 import { DraggableWindow, WidgetErrorBoundary } from '../../common';
 import {
+    askForwardRoomId,
     useMessageEvent,
+    useNavigatorAskForward,
     useNavigatorData,
     useNavigatorRoomInfoPopupStore,
     useNavigatorSearch,
@@ -68,6 +70,7 @@ export const NavigatorView: FC<{}> = () => {
     const frameRef = useRef<HTMLDivElement>(null);
     const tabsRef = useRef<HTMLDivElement>(null);
     const resizeRef = useRef<{ y: number; height: number; scale: number } | null>(null);
+    const { askForward } = useNavigatorAskForward();
 
     useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.CREATED, () => {
         useNavigatorUiStore.getState().hide();
@@ -129,6 +132,14 @@ export const NavigatorView: FC<{}> = () => {
                         SendMessageComposer(new ConvertGlobalRoomIdMessageComposer(target));
                         return;
                     }
+                    case 'ask_forward': {
+                        // AIR: the room's name is asked for and the move confirmed first.
+                        const roomId = askForwardRoomId(parts[2]);
+
+                        if (roomId) askForward(roomId);
+
+                        return;
+                    }
                     case 'create':
                         store.openCreator();
                         return;
@@ -157,7 +168,7 @@ export const NavigatorView: FC<{}> = () => {
         };
         AddLinkEventTracker(linkTracker);
         return () => RemoveLinkEventTracker(linkTracker);
-    }, [navigatorData]);
+    }, [navigatorData, askForward]);
 
     useEffect(() => {
         if (!searchResult) return;
