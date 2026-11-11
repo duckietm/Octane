@@ -2724,6 +2724,7 @@
     "octane.login.previous_news": "Notizia precedente",
     "octane.login.next_news": "Notizia successiva",
     "octane.badge_leaderboard.close": "Chiudi",
+    "octane.badge_leaderboard.unavailable": "La classifica non è disponibile in questo momento.",
     "octane.customize.icons": "Icone",
     "octane.customize.prefix": "Prefisso",
     "octane.customize.settings": "Impostazioni",
