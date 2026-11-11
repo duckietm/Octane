@@ -1,9 +1,10 @@
-import { SelectClubGiftComposer } from '@octane/renderer';
-import { FC, useCallback, useMemo } from 'react';
+import { CatalogPageMessageOfferData, SelectClubGiftComposer } from '@octane/renderer';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../../../api';
 import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
-import { useClubGifts, useNotification, usePurse } from '../../../../../../hooks';
+import { useClubGifts, usePurse } from '../../../../../../hooks';
 import { CatalogLayoutProps } from '../CatalogLayout.types';
+import { ClubGiftConfirmView } from './ClubGiftConfirmView';
 import { ClubGiftText, getGiftRequirementText, getPastClubDaysText } from './clubGifts.helpers';
 import { VipGiftItem } from './VipGiftItemView';
 
@@ -27,7 +28,7 @@ const localizeClubGiftText = (text: ClubGiftText | null): string => {
 export const CatalogLayoutVipGiftsView: FC<CatalogLayoutProps> = (props) => {
     const { purse = null } = usePurse();
     const { data: clubGifts = null } = useClubGifts();
-    const { showConfirm = null } = useNotification();
+    const [pendingGift, setPendingGift] = useState<CatalogPageMessageOfferData | null>(null);
 
     const giftsAvailable = useCallback(() => {
         if (!clubGifts) return '';
@@ -43,29 +44,27 @@ export const CatalogLayoutVipGiftsView: FC<CatalogLayoutProps> = (props) => {
 
     const pastClubDaysText = purse ? localizeClubGiftText(getPastClubDaysText(purse.pastClubDays, purse.pastVipDays)) : '';
 
+    // AIR ClubGiftController.selectGift: the gift's own confirmation window; a second pick replaces the first.
     const selectGift = useCallback(
-        (localizationId: string) => {
-            showConfirm(
-                LocalizeText('catalog.club_gift.confirm'),
-                () => {
-                    if (isSelectingGift) return;
-
-                    isSelectingGift = true;
-
-                    // The server replies with a fresh ClubGiftInfoEvent after
-                    // accepting the selection; useClubGifts subscribes to that
-                    // event via useOctaneEventInvalidator, so giftsAvailable
-                    // refreshes from the authoritative source — no need to
-                    // mutate the parser locally.
-                    SendMessageComposer(new SelectClubGiftComposer(localizationId));
-
-                    setTimeout(() => (isSelectingGift = false), 5000);
-                },
-                null
-            );
-        },
-        [showConfirm]
+        (localizationId: string) => setPendingGift(clubGifts?.offers.find((offer) => offer.localizationId === localizationId) ?? null),
+        [clubGifts]
     );
+
+    const confirmGift = useCallback(() => {
+        const gift = pendingGift;
+
+        setPendingGift(null);
+
+        if (!gift || isSelectingGift) return;
+
+        isSelectingGift = true;
+
+        // The server answers with a fresh ClubGiftInfoEvent, which useClubGifts picks up: the number of gifts
+        // left comes from the server, not from a local count.
+        SendMessageComposer(new SelectClubGiftComposer(gift.localizationId));
+
+        setTimeout(() => (isSelectingGift = false), 5000);
+    }, [pendingGift]);
 
     const sortGifts = useMemo(() => {
         if (!clubGifts) return [];
@@ -97,6 +96,7 @@ export const CatalogLayoutVipGiftsView: FC<CatalogLayoutProps> = (props) => {
                         })}
                 </div>
                 <div className="octane-catalog-club-gifts__past">{pastClubDaysText}</div>
+                {pendingGift && <ClubGiftConfirmView offer={pendingGift} onCancel={() => setPendingGift(null)} onConfirm={confirmGift} />}
             </div>
         </NativeTextTree>
     );

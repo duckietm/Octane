@@ -1,35 +1,60 @@
-import { ClubGiftInfoEvent, ClubGiftInfoParser, GetClubGiftInfo } from '@octane/renderer';
-import { UseQueryResult } from '@tanstack/react-query';
-import { useOctaneEventInvalidator, useOctaneQuery } from '../../api/octane-query';
+import { CatalogPageMessageOfferData, ClubGiftData, ClubGiftInfoEvent, ClubGiftInfoParser, GetClubGiftInfo } from '@octane/renderer';
+import { useEffect, useState } from 'react';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
+import { SendMessageComposer } from '../../api';
+import { useMessageEvent } from '../events';
 
-const CLUB_GIFTS_KEY = ['octane', 'catalog', 'clubGifts'] as const;
+/** The club gift page's state as one message left it. */
+export interface ClubGiftsSnapshot {
+    daysUntilNextGift: number;
+    giftsAvailable: number;
+    offers: CatalogPageMessageOfferData[];
+    getOfferExtraData(offerId: number): ClubGiftData;
+}
 
 /**
- * Habbo Club gift availability (counts of pending gifts, days until
- * next gift, gift list). The server replies once to GetClubGiftInfo
- * and then pushes ClubGiftInfoEvent again every time the user claims
- * a gift via SelectClubGiftComposer — so the cache needs to be
- * invalidated on each push, not just hydrated by the first response.
- *
- * Pair the query with useOctaneEventInvalidator so unsolicited pushes
- * mark the slot stale; the next render of any consumer triggers a
- * re-fetch (which, since the server just pushed, will resolve almost
- * immediately with the fresh data the server already sent us).
- *
- * Replaces the previous useCatalog listener that stuffed
- * `parser` into `catalogOptions.clubGifts`.
+ * A copy of the parser's values. The renderer reuses one parser object for every ClubGiftInfoEvent, so keeping the
+ * parser itself would hand React the same object after each message and the page would not redraw: the number of
+ * gifts left stayed as it was after a gift was taken.
  */
-export const useClubGifts = (options: { enabled?: boolean } = {}): UseQueryResult<ClubGiftInfoParser> => {
-    const query = useOctaneQuery<ClubGiftInfoEvent, ClubGiftInfoParser>({
-        key: CLUB_GIFTS_KEY as unknown as string[],
-        request: () => new GetClubGiftInfo(),
-        parser: ClubGiftInfoEvent,
-        select: (event) => event.getParser(),
-        enabled: options.enabled,
-        staleTime: Infinity
-    });
+export const snapshotClubGifts = (parser: ClubGiftInfoParser | null | undefined): ClubGiftsSnapshot | null => {
+    if (!parser) return null;
 
-    useOctaneEventInvalidator<ClubGiftInfoEvent>(ClubGiftInfoEvent, CLUB_GIFTS_KEY as unknown as string[]);
+    const giftData = new Map(parser.giftData ?? []);
 
-    return query;
+    return {
+        daysUntilNextGift: parser.daysUntilNextGift ?? 0,
+        giftsAvailable: parser.giftsAvailable ?? 0,
+        offers: [...(parser.offers ?? [])],
+        getOfferExtraData: (offerId: number) => giftData.get(offerId) ?? null
+    };
 };
+
+/**
+ * Habbo Club gifts: how many may be taken, the days until the next one and the gift list. The server answers
+ * GetClubGiftInfo and sends the same message again after a gift is taken; every message replaces the state. Shared
+ * and registered, so the listener is there whichever window asks.
+ */
+const useClubGiftsState = () => {
+    const [data, setData] = useState<ClubGiftsSnapshot | null>(null);
+
+    useMessageEvent<ClubGiftInfoEvent>(ClubGiftInfoEvent, (event) => setData(snapshotClubGifts(event.getParser())));
+
+    return { data };
+};
+
+export const useClubGifts = (options: { enabled?: boolean } = {}): { data: ClubGiftsSnapshot | null } => {
+    const { enabled = true } = options;
+    const shared = useSharedHook(useClubGiftsState);
+
+    // Asked each time a consumer opens: the gifts may have changed since the last answer.
+    useEffect(() => {
+        if (!enabled) return;
+
+        SendMessageComposer(new GetClubGiftInfo());
+    }, [enabled]);
+
+    return { data: shared?.data ?? null };
+};
+
+registerSharedHook(useClubGiftsState);
