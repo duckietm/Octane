@@ -1,6 +1,6 @@
 import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
-import { attemptItemPlacement, CatalogPageName, LocalizeText } from '../../../../api';
+import { attemptItemPlacement, CatalogPageName, LocalizeText, localizeWithFallback } from '../../../../api';
 import { Button, Column, LayoutGiftTagView, LayoutImage, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useCatalogUiState, useFurniturePresentWidget, useInventoryFurni } from '../../../../hooks';
 import '../../../../css/room/FurniWindowsBAir.css';
@@ -15,6 +15,7 @@ export const FurnitureGiftOpeningView: FC<{}> = (props) => {
         isOwnerOfFurniture = false,
         senderName = null,
         senderFigure = null,
+        trustedSender = false,
         placedItemId = -1,
         placedItemType = null,
         placedInRoom = false,
@@ -54,6 +55,15 @@ export const FurnitureGiftOpeningView: FC<{}> = (props) => {
                 <OctaneCardContentView>
                     {placedItemId === -1 && (
                         <Column overflow="hidden">
+                            {/* AIR packagecard_new `warning`: staff gifts say so; any other gift warns about links in its message. */}
+                            <div className={`octane-gift-banner ${trustedSender ? 'is-trusted' : 'is-untrusted'}`}>
+                                {!trustedSender && <span className="octane-gift-banner__icon" />}
+                                <span className="octane-gift-banner__text">
+                                    {trustedSender
+                                        ? localizeWithFallback('gift.trusted.banner.text', 'This gift was sent to you by a staff member.')
+                                        : localizeWithFallback('gift.untrusted.banner.text', 'NEVER visit websites linked from gift messages. They are almost always scam sites that steal your account.')}
+                                </span>
+                            </div>
                             <div className="flex justify-center items-center overflow-auto">
                                 <LayoutGiftTagView figure={senderFigure} message={text} userName={senderName} />
                             </div>

@@ -1,14 +1,24 @@
-import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
+import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
-import { ChatEntryType } from '../../api';
-import { useChatHistory } from '../../hooks';
+import { ChatEntryType, IChatEntry, LocalizeText, localizeWithFallback } from '../../api';
+import { useChatHistory, useIgnoredUsersSnapshot, useNotification } from '../../hooks';
 import { ChatHistoryBubbleView } from './ChatHistoryBubbleView';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { Hint } from '../../common/Tooltip';
+
+/**
+ * AIR ChatHistoryScrollView.setIgnoreTarget: the ignore cross is offered on a line of another player who is not
+ * ignored yet. Lines restored without a player id (webId below 1) and the user's own lines get none.
+ */
+export const canIgnoreFromHistory = (entry: Pick<IChatEntry, 'type' | 'webId'>, ownUserId: number, ignoredUserIds: ReadonlyArray<number>): boolean =>
+    entry.type === ChatEntryType.TYPE_CHAT && entry.webId > 0 && entry.webId !== ownUserId && !ignoredUserIds.includes(entry.webId);
 
 export const ChatHistoryView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
     const { chatHistory = [] } = useChatHistory();
+    const ignoredUserIds = useIgnoredUsersSnapshot();
+    const { showConfirm = null } = useNotification();
     const elementRef = useRef<HTMLDivElement>(null);
     const prevChatLength = useRef<number>(0);
 
@@ -52,7 +62,22 @@ export const ChatHistoryView: FC<{}> = (props) => {
         return () => RemoveLinkEventTracker(linkTracker);
     }, []);
 
+    // AIR hitIgnore: confirm first (chat.ignore_user.confirm.*), then ignore the player.
+    const ignoreFromHistory = (entry: IChatEntry) => {
+        showConfirm(
+            LocalizeText('chat.ignore_user.confirm.info', ['username'], [entry.name ?? '']),
+            () => GetSessionDataManager().ignoreUser(entry.webId),
+            null,
+            null,
+            null,
+            LocalizeText('chat.ignore_user.confirm.title')
+        );
+    };
+
     if (!isVisible) return null;
+
+    const ownUserId = GetSessionDataManager().userId;
+    const ignoreLabel = localizeWithFallback('chat.ignore_user.confirm.title', 'Ignore user');
 
     return (
         <NativeTextTree>
@@ -66,6 +91,11 @@ export const ChatHistoryView: FC<{}> = (props) => {
                                 {row.type === ChatEntryType.TYPE_CHAT && (
                                     <div className="octane-chat-history-message">
                                         <ChatHistoryBubbleView entry={row} />
+                                        {canIgnoreFromHistory(row, ownUserId, ignoredUserIds) && (
+                                            <Hint content={ignoreLabel}>
+                                                <BaseButton aria-label={ignoreLabel} className="octane-chat-history-ignore" onClick={() => ignoreFromHistory(row)} />
+                                            </Hint>
+                                        )}
                                     </div>
                                 )}
                                 {row.type === ChatEntryType.TYPE_ROOM_INFO && (

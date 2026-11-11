@@ -58,6 +58,44 @@
     min-width: 0;
 }
 
+/* AIR ChatHistoryScrollView: the ignore cross sits 5px right of the hovered line, centred on it. */
+.octane-chat-history-ignore {
+    position: relative;
+    flex: 0 0 13px;
+    align-self: center;
+    width: 13px;
+    height: 13px;
+    margin: 0 0 0 5px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.octane-chat-history-ignore::before,
+.octane-chat-history-ignore::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 13px;
+    height: 3px;
+    border-radius: 1px;
+    background: #ffffff;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
+    transform: rotate(45deg);
+}
+
+.octane-chat-history-ignore::after {
+    transform: rotate(-45deg);
+}
+
+.octane-chat-history-row:hover .octane-chat-history-ignore,
+.octane-chat-history-ignore:focus-visible {
+    opacity: 1;
+}
+
 /* The live chat bubble (ChatWidgetMessageView layout="history"), in the flow of the list. */
 .octane-chat-history-bubble {
     min-width: 0;

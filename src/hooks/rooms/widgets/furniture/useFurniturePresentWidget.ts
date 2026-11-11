@@ -29,6 +29,8 @@ const useFurniturePresentWidgetState = () => {
     const [isOwnerOfFurniture, setIsOwnerOfFurniture] = useState(false);
     const [senderName, setSenderName] = useState<string>(null);
     const [senderFigure, setSenderFigure] = useState<string>(null);
+    // AIR `furniture_trusted_sender`: staff or the hotel sent the gift. Any other gift gets the scam warning.
+    const [trustedSender, setTrustedSender] = useState(false);
     const [placedItemId, setPlacedItemId] = useState(-1);
     const [placedItemType, setPlacedItemType] = useState<string>(null);
     const [placedInRoom, setPlacedInRoom] = useState(false);
@@ -49,6 +51,7 @@ const useFurniturePresentWidgetState = () => {
         setIsOwnerOfFurniture(false);
         setSenderName(null);
         setSenderFigure(null);
+        setTrustedSender(false);
         setPlacedItemId(-1);
         setPlacedItemType(null);
         setPlacedInRoom(false);
@@ -234,6 +237,7 @@ const useFurniturePresentWidgetState = () => {
         setIsOwnerOfFurniture(IsOwnerOfFurniture(roomObject));
         setSenderName(roomObject.model.getValue<string>(RoomObjectVariable.FURNITURE_PURCHASER_NAME) || null);
         setSenderFigure(roomObject.model.getValue<string>(RoomObjectVariable.FURNITURE_PURCHASER_FIGURE) || null);
+        setTrustedSender(roomObject.model.getValue<number>(RoomObjectVariable.FURNITURE_TRUSTED_SENDER) === 1);
     });
 
     useFurniRemovedEvent(objectId !== -1, (event) => {
@@ -258,6 +262,7 @@ const useFurniturePresentWidgetState = () => {
         isOwnerOfFurniture,
         senderName,
         senderFigure,
+        trustedSender,
         placedItemId,
         placedItemType,
         placedInRoom,

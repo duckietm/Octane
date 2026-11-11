@@ -71,7 +71,8 @@ const TEXT_TRANSLATION_LOCALES: ITranslationTextLocale[] = [
     { code: 'de', name: 'German', file: 'de' },
     { code: 'fr', name: 'French', file: 'fr' },
     { code: 'es', name: 'Spanish', file: 'es' },
-    { code: 'ar', name: 'Arabic', file: 'ar' }
+    { code: 'ar', name: 'Arabic', file: 'ar' },
+    { code: 'tr', name: 'Turkish', file: 'tr' }
 ];
 
 const resolveTextTranslationLocale = (value: string) =>

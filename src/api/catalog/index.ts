@@ -32,3 +32,4 @@ export * from './ProductTypeEnum';
 export * from './SearchResult';
 export * from './TargetedOfferUtilities';
 export * from './VipBenefits';
+export * from './CatalogCategoryIndex';

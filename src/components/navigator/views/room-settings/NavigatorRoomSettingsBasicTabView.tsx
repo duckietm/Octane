@@ -39,7 +39,7 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
     const [roomTag1, setRoomTag1] = useState<string>('');
     const [roomTag2, setRoomTag2] = useState<string>('');
     const [youtubeEnabled, setYoutubeEnabled] = useState(getYoutubeRoomEnabled());
-    const { showConfirm = null, simpleAlert = null } = useNotification();
+    const { showConfirm = null } = useNotification();
     const { categories, navigatorData } = useNavigatorData();
     const { roomMode: soundboardRoomMode, setRoomMode: setSoundboardRoomMode } = useSoundboard();
 
@@ -54,27 +54,25 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
     };
 
     const deleteRoom = () => {
-        // The server ignores deleting your home room, which looked like it worked.
-        if (navigatorData?.homeRoomId && roomData.roomId === navigatorData.homeRoomId) {
-            simpleAlert(
-                localizeWithFallback('navigator.delete.homeroom.body', 'This is your home room. Pick another home room before you delete it.'),
-                null,
-                null,
-                null,
-                localizeWithFallback('navigator.delete.homeroom.title', 'Home room')
-            );
-            return;
-        }
-
         const enteredRoom = navigatorData?.enteredGuestRoom;
         const isGroupBase = !!enteredRoom && enteredRoom.roomId === roomData.roomId && enteredRoom.habboGroupId > 0;
         const confirmMessage = LocalizeText('navigator.roomsettings.deleteroom.confirm.message', ['room_name'], [roomData.roomName]);
 
+        const isHomeRoom = !!navigatorData?.homeRoomId && roomData.roomId === navigatorData.homeRoomId;
+        const warnings: string[] = [];
+
+        // Deleting the home room leaves the user without one.
+        if (isHomeRoom) {
+            warnings.push(
+                localizeWithFallback('navigator.delete.homeroom.body', 'Warning: this is your home room. If you delete it you will have no home room until you choose another.')
+            );
+        }
+
+        // Deleting a group's room deletes the group with it.
+        if (isGroupBase) warnings.push(localizeWithFallback('group.deletebase.body', 'This room is the home of a group: the group will be deleted too.'));
+
         showConfirm(
-            // Deleting a group's room deletes the group with it.
-            isGroupBase
-                ? `${confirmMessage}\n\n${localizeWithFallback('group.deletebase.body', 'This room is the home of a group: the group will be deleted too.')}`
-                : confirmMessage,
+            [confirmMessage, ...warnings].join('\n\n'),
             () => {
                 SendMessageComposer(new RoomDeleteComposer(roomData.roomId));
 

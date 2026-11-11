@@ -686,3 +686,58 @@
     font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
   }
 }
+
+/* AIR no_groups (343 x 214): caption, picture 311 x 136 at 15,21, the info at 164 and the button 216 x 30 at 62,184. */
+.octane-extended-profile-no-groups {
+    position: relative;
+    display: block;
+    width: 343px;
+    max-width: 100%;
+    min-height: 214px;
+    margin: 0 auto;
+    color: #000;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.octane-extended-profile-no-groups__caption {
+    height: 17px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.octane-extended-profile-no-groups__picture {
+    display: block;
+    width: 311px;
+    max-width: calc(100% - 30px);
+    height: auto;
+    margin: 4px 15px 7px;
+    image-rendering: pixelated;
+}
+
+.octane-extended-profile-no-groups__info {
+    min-height: 17px;
+}
+
+.octane-extended-profile-no-groups__view {
+    display: flex;
+    width: 216px;
+    height: 30px;
+    margin: 3px 0 0 62px;
+    padding: 0 0 0 11px;
+    gap: 7px;
+    align-items: center;
+    border: 0;
+    background: transparent;
+    color: #000;
+    cursor: pointer;
+    font-size: 12px;
+    text-decoration: underline;
+}
+
+.octane-extended-profile-no-groups__view img {
+    width: 24px;
+    height: 17px;
+    image-rendering: pixelated;
+}

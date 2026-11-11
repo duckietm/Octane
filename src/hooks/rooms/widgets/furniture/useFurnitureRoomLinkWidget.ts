@@ -1,12 +1,25 @@
-import { GetGuestRoomResultEvent, GetRoomEngine, RoomEngineTriggerWidgetEvent, RoomObjectVariable } from '@octane/renderer';
-import { useState } from 'react';
-import { TryVisitRoom } from '../../../../api';
+import { CreateLinkEvent, GetGuestRoomMessageComposer, GetGuestRoomResultEvent, GetRoomEngine, RoomEngineTriggerWidgetEvent, RoomObjectVariable } from '@octane/renderer';
+import { useRef } from 'react';
+import { localizeWithFallback, SendMessageComposer } from '../../../../api';
 import { useMessageEvent, useOctaneEvent } from '../../../events';
+import { useNotification } from '../../../notification';
 
 const INTERNALLINK = 'internalLink';
 
+/**
+ * AIR FurnitureRoomLinkHandler: `room.link.confirmation.message` with the room's name and owner filled in. The pack
+ * writes the placeholders as `%%room_name%%` / `%%room_owner%%` and its line breaks as a literal "\n".
+ */
+export const roomLinkConfirmationMessage = (template: string, roomName: string, ownerName: string): string =>
+    (template ?? '')
+        .replace(/%%room_name%%/g, roomName ?? '')
+        .replace(/%%room_owner%%/g, ownerName ?? '')
+        .replace(/\\n/g, '\n');
+
 const useFurnitureRoomLinkWidgetState = () => {
-    const [roomIdToEnter, setRoomIdToEnter] = useState(0);
+    // The room a double-clicked link furni points at, until its room info arrives.
+    const pendingRoomId = useRef(0);
+    const { showConfirm = null } = useNotification();
 
     useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_ROOM_LINK, (event) => {
         const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
@@ -15,35 +28,47 @@ const useFurnitureRoomLinkWidgetState = () => {
 
         const data = roomObject.model.getValue<any>(RoomObjectVariable.FURNITURE_DATA);
 
-        let roomId = data[INTERNALLINK];
+        let link = data?.[INTERNALLINK];
 
-        if (!roomId || !roomId.length) roomId = roomObject.model.getValue<string>(RoomObjectVariable.FURNITURE_INTERNAL_LINK);
+        if (!link || !link.length) link = roomObject.model.getValue<string>(RoomObjectVariable.FURNITURE_INTERNAL_LINK);
 
-        if (!roomId || !roomId.length) return;
+        if (!link || !link.length) return;
 
-        roomId = parseInt(roomId, 10);
+        const roomId = parseInt(link, 10);
 
-        if (isNaN(roomId)) return;
+        if (isNaN(roomId) || roomId <= 0) return;
 
-        setRoomIdToEnter(roomId);
+        pendingRoomId.current = roomId;
 
-        // TryVisitRoom, i.e. (roomId, false, true), as AIR does. The server reads
-        // enterRoom as `a != 0 || b != 1`, so (false, false) asked it to *enter* without
-        // the client ever entering: the navigator took the answer as "we are now in that
-        // room" and pointed room info, settings, the word filter and favourites at the
-        // linked room, while the user stayed where they were and the double click did
-        // nothing.
-        TryVisitRoom(roomId);
+        // As AIR does: ask for the room's info only (false, false), then confirm with its name and owner. The
+        // navigator ignores an "entered" answer about a room the user is not in (adoptsEnteredRoom), so this no
+        // longer points room info, settings and favourites at the linked room.
+        SendMessageComposer(new GetGuestRoomMessageComposer(roomId, false, false));
     });
 
     useMessageEvent<GetGuestRoomResultEvent>(GetGuestRoomResultEvent, (event) => {
-        if (!roomIdToEnter) return;
+        const roomId = pendingRoomId.current;
 
-        const parser = event.getParser();
+        if (!roomId) return;
 
-        if (parser.data.roomId !== roomIdToEnter) return;
+        const data = event.getParser().data;
 
-        setRoomIdToEnter(0);
+        if (!data || data.roomId !== roomId) return;
+
+        pendingRoomId.current = 0;
+
+        showConfirm(
+            roomLinkConfirmationMessage(
+                localizeWithFallback('room.link.confirmation.message', 'You are about to go to another room. Are you sure?\\n\\nRoom: %%room_name%%\\nOwner: %%room_owner%%'),
+                data.roomName,
+                data.ownerName
+            ),
+            () => CreateLinkEvent(`navigator/goto/${roomId}`),
+            null,
+            null,
+            null,
+            localizeWithFallback('room.link.confirmation.title', 'Go to another room')
+        );
     });
 
     return {};

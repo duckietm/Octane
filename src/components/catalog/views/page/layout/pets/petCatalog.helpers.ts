@@ -19,6 +19,33 @@ export interface NewPetPaletteChoice<TPalette extends PetPaletteLike = PetPalett
 
 export const isLegacyPetType = (petType: number) => petType >= 0 && petType <= 7;
 
+/**
+ * The product code the server lists a pet's breeds for: `a0 pet<type>`, the pet's catalogue item name. It is built
+ * from the pet type and not read from the hotel's product data: a hotel whose product data has no entry for the pet
+ * asked for nothing, and the classic pets (types 0 to 7) then showed no preview and no breeds.
+ */
+export const petProductCode = (petType: number) => (Number.isInteger(petType) && petType >= 0 ? `a0 pet${petType}` : '');
+
+/**
+ * The palettes a pet's own asset holds, as sellable breeds: what the page offers when the server lists none (a hotel
+ * without `pet_breeds` rows for the pet). The palette id doubles as the breed id.
+ */
+export const derivePetPalettes = (
+    petType: number,
+    hasPalette: (petType: number, paletteId: number) => boolean,
+    maxPaletteId: number = 128
+): PetPaletteLike[] => {
+    const derived: PetPaletteLike[] = [];
+
+    for (let paletteId = 0; paletteId <= maxPaletteId; paletteId++) {
+        if (hasPalette(petType, paletteId)) {
+            derived.push({ breedId: paletteId, paletteId, rare: false, sellable: true, type: petType, clubOnly: false });
+        }
+    }
+
+    return derived;
+};
+
 export const getPetNameMaxLength = (petType: number) => (isLegacyPetType(petType) ? 15 : 16);
 
 export const filterPetPalettes = <TPalette extends PetPaletteLike>(petType: number, palettes: readonly TPalette[]) =>

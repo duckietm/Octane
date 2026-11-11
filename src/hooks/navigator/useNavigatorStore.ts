@@ -45,6 +45,7 @@ import {
     INavigatorData,
     INavigatorLiftedRoom,
     LocalizeText,
+    localizeWithFallback,
     NotificationAlertType,
     SendMessageComposer,
     toNavigatorLiftedRooms,
@@ -384,6 +385,15 @@ export const useNavigatorStore = () => {
                         break;
                     case CantConnectMessageParser.REASON_BANNED:
                         simpleAlert(LocalizeText('navigator.banned.text'), NotificationAlertType.DEFAULT, null, null, LocalizeText('navigator.banned.title'));
+                        break;
+                    case CantConnectMessageParser.REASON_BLOCKED:
+                        simpleAlert(
+                            localizeWithFallback('navigator.blocked.text', 'Sorry, the room owner has blocked you. You cannot enter this room.'),
+                            NotificationAlertType.DEFAULT,
+                            null,
+                            null,
+                            localizeWithFallback('navigator.blocked.title', 'Blocked by the room owner')
+                        );
                         break;
                     default:
                         simpleAlert(LocalizeText('room.queue.error.title'), NotificationAlertType.DEFAULT, null, null, LocalizeText('room.queue.error.title'));

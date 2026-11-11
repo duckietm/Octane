@@ -1420,3 +1420,56 @@
     min-width: 0;
     flex: 1;
 }
+
+/* The free cursed dragon button: pinned to the left edge of the home screen, above the scene. */
+.hotelview-dragon-adoption {
+    position: absolute;
+    left: 10px;
+    top: 38%;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 210px;
+    padding: 6px 12px 6px 6px;
+    border: 1px solid #000000;
+    border-radius: 6px;
+    background: rgba(37, 33, 46, 0.92);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18), 0 2px 0 rgba(0, 0, 0, 0.35);
+    color: #fff8ff;
+    text-align: left;
+    cursor: pointer;
+}
+
+.hotelview-dragon-adoption:hover {
+    background: rgba(52, 46, 64, 0.95);
+}
+
+.hotelview-dragon-adoption__crate {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 38px;
+    background: url('../../assets/images/cursed-dragon-adoption/blue_package.png') no-repeat center / 34px 38px;
+    image-rendering: pixelated;
+}
+
+.hotelview-dragon-adoption__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.hotelview-dragon-adoption__title {
+    color: #b9f0ee;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 16px;
+    white-space: nowrap;
+}
+
+.hotelview-dragon-adoption__info {
+    color: #d1c8d9;
+    font-size: 11px;
+    line-height: 14px;
+    white-space: nowrap;
+}

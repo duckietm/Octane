@@ -1,8 +1,10 @@
 import { FC } from 'react';
 import { CatalogType, GetConfigurationValue, LocalizeText, ProductTypeEnum, SanitizeHtml } from '../../../../../api';
+import { findActiveCatalogNode, isCatalogHeadingPage } from '../../../../../api/catalog/CatalogCategoryIndex';
 import { LayoutChatStyleImageView, Text } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
-import { getCatalogGridMetrics, useCatalogData, useCatalogDisplayPreferences, useCatalogUiState } from '../../../../../hooks';
+import { getCatalogGridMetrics, useCatalogActions, useCatalogData, useCatalogDisplayPreferences, useCatalogUiState } from '../../../../../hooks';
+import { useCatalogAdmin } from '../../../CatalogAdminContext';
 import { CatalogHeaderView } from '../../catalog-header/CatalogHeaderView';
 import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';
 import { CatalogAddOnChatStyleWidgetView } from '../widgets/CatalogAddOnChatStyleWidgetView';
@@ -16,11 +18,14 @@ import { CatalogSpinnerWidgetView } from '../widgets/CatalogSpinnerWidgetView';
 import { CatalogTotalPriceWidget } from '../widgets/CatalogTotalPriceWidget';
 import { CatalogViewProductWidgetView } from '../widgets/CatalogViewProductWidgetView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
+import { CatalogLayoutCategoryIndexView } from './CatalogLayoutCategoryIndexView';
 
 export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = (props) => {
     const { page = null } = props;
     const { currentOffer = null, roomPreviewer = null } = useCatalogData();
-    const { currentType = CatalogType.NORMAL } = useCatalogUiState();
+    const { currentType = CatalogType.NORMAL, activeNodes = null } = useCatalogUiState();
+    const { activateNode = null } = useCatalogActions();
+    const adminMode = useCatalogAdmin()?.adminMode ?? false;
     const { density = 'standard', showTilePrices = true } = useCatalogDisplayPreferences();
     const gridMetrics = getCatalogGridMetrics(density);
 
@@ -30,6 +35,14 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = (props) => {
         !!currentOffer?.bundlePurchaseAllowed &&
         currentType !== CatalogType.BUILDER &&
         GetConfigurationValue<boolean>('catalog.multiple.purchase.enabled', true);
+
+    // A heading page (no offers, only sub-pages) shows its sub-pages. Staff editing the catalogue keep the grid, so
+    // an offer can still be added to the page.
+    const headingNode = findActiveCatalogNode(activeNodes, page?.pageId ?? -1);
+
+    if (!adminMode && page && isCatalogHeadingPage(page.offers?.length ?? 0, headingNode)) {
+        return <CatalogLayoutCategoryIndexView node={headingNode} text={teaserText} onOpen={(node) => activateNode?.(node)} />;
+    }
 
     return (
         <NativeTextTree>

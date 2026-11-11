@@ -1,14 +1,19 @@
 /* @vitest-environment jsdom */
 
-import { AddLinkEventTracker } from '@octane/renderer';
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { AddLinkEventTracker, GetSessionDataManager } from '@octane/renderer';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChatEntryType, IChatEntry } from '../../api';
 import { useChatHistory } from '../../hooks';
-import { ChatHistoryView } from './ChatHistoryView';
+import { canIgnoreFromHistory, ChatHistoryView } from './ChatHistoryView';
+
+const showConfirm = vi.hoisted(() => vi.fn());
+const ignored = vi.hoisted(() => ({ ids: [] as number[] }));
 
 vi.mock('../../hooks', () => ({
     useChatHistory: vi.fn(),
+    useIgnoredUsersSnapshot: () => ignored.ids,
+    useNotification: () => ({ showConfirm }),
     useOnClickChat: () => ({ onClickChat: vi.fn() })
 }));
 
@@ -82,5 +87,48 @@ describe('ChatHistoryView room information', () => {
         expect(bubble.className).not.toContain('absolute');
         expect(bubble.querySelector('.chat-bubble').className).toContain('max-w-[335px]');
         expect(screen.getByText('dennis', { exact: false })).toBeInTheDocument();
+    });
+});
+
+describe('ChatHistoryView ignore cross', () => {
+    const ignoreUser = vi.fn();
+    const chatEntry = (webId: number, name: string): IChatEntry =>
+        roomInfoEntry({ id: webId, webId, entityId: webId, name, message: `hi from ${name}`, style: 0, chatType: 0, imageUrl: 'data:image/png;base64,AA==', type: ChatEntryType.TYPE_CHAT });
+
+    beforeEach(() => {
+        vi.mocked(AddLinkEventTracker).mockClear();
+        showConfirm.mockClear();
+        ignoreUser.mockClear();
+        ignored.ids = [];
+        HTMLElement.prototype.scrollTo = vi.fn();
+        vi.mocked(GetSessionDataManager).mockReturnValue({ userId: 1, ignoreUser } as never);
+    });
+
+    afterEach(cleanup);
+
+    it('offers the cross on lines of other players who are not ignored yet', () => {
+        expect(canIgnoreFromHistory({ type: ChatEntryType.TYPE_CHAT, webId: 7 }, 1, [])).toBe(true);
+        expect(canIgnoreFromHistory({ type: ChatEntryType.TYPE_CHAT, webId: 1 }, 1, [])).toBe(false);
+        expect(canIgnoreFromHistory({ type: ChatEntryType.TYPE_CHAT, webId: 7 }, 1, [7])).toBe(false);
+        expect(canIgnoreFromHistory({ type: ChatEntryType.TYPE_CHAT, webId: -1 }, 1, [])).toBe(false);
+        expect(canIgnoreFromHistory({ type: ChatEntryType.TYPE_ROOM_INFO, webId: 7 }, 1, [])).toBe(false);
+    });
+
+    it('asks first and ignores the player only after the confirmation', () => {
+        ignored.ids = [9];
+        renderVisibleHistory([chatEntry(1, 'me'), chatEntry(7, 'dennis'), chatEntry(9, 'muted')]);
+
+        const crosses = document.querySelectorAll('.octane-chat-history-ignore');
+
+        expect(crosses).toHaveLength(1);
+
+        fireEvent.click(crosses[0]);
+
+        expect(showConfirm).toHaveBeenCalledTimes(1);
+        expect(ignoreUser).not.toHaveBeenCalled();
+
+        showConfirm.mock.calls[0][1]();
+
+        expect(ignoreUser).toHaveBeenCalledWith(7);
     });
 });

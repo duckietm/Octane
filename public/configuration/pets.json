@@ -36,6 +36,7 @@
 		{ "id": 33, "lib": "pterosaur", "name": "Pterodactyl", "description": "" },
 		{ "id": 34, "lib": "velociraptor", "name": "Velociraptor", "description": "" },
 		{ "id": 35, "lib": "cow", "name": "Cow", "description": "" },
-		{ "id": 36, "lib": "dragondog", "name": "Dragon Dog", "description": "" }
+		{ "id": 36, "lib": "dragondog", "name": "Dragon Dog", "description": "" },
+		{ "id": 37, "lib": "curseddragon", "name": "Cursed Dragon", "description": "" }
 	]
 }

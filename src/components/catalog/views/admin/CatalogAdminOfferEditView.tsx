@@ -87,8 +87,12 @@ export const validateCatalogAdminOfferForm = (data: IOfferEditData, builderCatal
     if (!builderCatalog && !cleanItemIds) return localizeWithFallback('octane.catalog.item_ids_are_required', 'Item IDs are required.');
     if (cleanItemIds) {
         const entries = cleanItemIds.split(/[;,]/);
-        if (entries.some((entry) => !/^\d+(?::[1-9]\d*)?$/.test(entry) || Number(entry.split(':')[0]) <= 0)) {
-            return localizeWithFallback('octane.catalog.item_ids_must_use_the_format', 'Item IDs must use the format 123 or 123:2, separated by semicolons.');
+        // "@123" names a catalogue offer: the bundle sells what that offer sells and follows it.
+        if (entries.some((entry) => !/^@?\d+(?::[1-9]\d*)?$/.test(entry) || Number(entry.replace('@', '').split(':')[0]) <= 0)) {
+            return localizeWithFallback(
+                'octane.catalog.item_ids_must_use_the_format',
+                'Item IDs must use the format 123 or 123:2, separated by semicolons. Use @123 to add what catalogue offer 123 sells.'
+            );
         }
     }
 

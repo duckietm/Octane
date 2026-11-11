@@ -954,3 +954,132 @@
     color: #777;
     cursor: default;
 }
+
+/* AIR club_gift_confirmation (280 x 142; the container inside the frame is 268 x 110). */
+.octane-card-shell.octane-club-gift-confirm {
+    width: 275px !important;
+    min-width: 275px !important;
+    max-width: 275px !important;
+    height: 159px !important;
+    min-height: 159px !important;
+    max-height: 159px !important;
+    color: #000;
+    font-family: HabboAirUbuntu, Ubuntu, sans-serif;
+}
+
+.draggable-window:has(> .octane-club-gift-confirm) {
+    width: 275px !important;
+    min-width: 275px !important;
+    max-width: 275px !important;
+    height: 159px !important;
+    min-height: 159px !important;
+    max-height: 159px !important;
+}
+
+.octane-club-gift-confirm,
+.octane-club-gift-confirm * {
+    box-sizing: border-box;
+}
+
+.octane-club-gift-confirm > .octane-club-gift-confirm-content.octane-card-content-shell {
+    position: absolute;
+    top: 35px;
+    left: 2px;
+    display: block;
+    width: 268px;
+    height: 110px;
+    min-height: 110px !important;
+    max-height: 110px !important;
+    margin: 0;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #000;
+    font-family: HabboAirUbuntu, Ubuntu, sans-serif;
+    font-size: 12px;
+    line-height: normal;
+}
+
+/* image_border: 48 x 48 at 12,12, colour f1f1f1, the product icon centred in it. */
+.octane-club-gift-confirm-image {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    width: 48px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid #b6b6b6;
+    border-radius: 4px;
+    background: #f1f1f1;
+}
+
+.octane-club-gift-confirm-image > * {
+    width: 46px;
+    height: 46px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* item_name: 184 x 17 at 69,29, regular 12 px black. */
+.octane-club-gift-confirm-name {
+    position: absolute;
+    top: 29px;
+    left: 69px;
+    width: 184px;
+    height: 17px;
+    overflow: hidden;
+    color: #000;
+    font-family: HabboAirUbuntu, Ubuntu, sans-serif;
+    font-size: 12px;
+    line-height: 17px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* select_button 9,77 and cancel_button 137,77: 120 x 25 grey buttons. */
+.octane-club-gift-confirm-button {
+    position: absolute;
+    top: 77px;
+    width: 120px;
+    height: 25px;
+    margin: 0;
+    padding: 0 5px;
+    border: 5px solid transparent;
+    border-image-source: var(--habbo-skin-shiny);
+    border-image-slice: 5 fill;
+    border-image-width: 5px;
+    border-image-repeat: stretch;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #000;
+    cursor: pointer;
+    font-family: HabboAirUbuntu, Ubuntu, sans-serif;
+    font-size: 12px !important;
+    line-height: 15px;
+    text-align: center;
+    white-space: nowrap;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-club-gift-confirm-button.is-select {
+    left: 9px;
+    font-weight: 700;
+}
+
+.octane-club-gift-confirm-button.is-cancel {
+    left: 137px;
+}
+
+.octane-club-gift-confirm-button:hover {
+    border-image-source: var(--habbo-skin-shiny-hover);
+}
+
+.octane-club-gift-confirm-button:active {
+    border-image-source: var(--habbo-skin-shiny-pressed);
+}

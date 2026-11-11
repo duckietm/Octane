@@ -31,7 +31,7 @@ import vipReward from '../../assets/images/talent/talent_vip_reward.png';
 import { AirModalDialog, LayoutAvatarImageView, LayoutBadgeImageView } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { LibraryImageView } from '../help/habbo-way/HabboWayPagerView';
+import { TalentImageView } from './TalentImageView';
 
 export const getTalentTaskTitle = (badgeCode: string): string => LocalizeBadgeName(badgeCode).toUpperCase();
 
@@ -107,7 +107,7 @@ const TalentLevelView: FC<{ trackName: string; level: ITalentLevel; onSelectTask
             <div className="octane-talent-level" data-state={level.state}>
                 <div className="octane-talent-level__title">{localizeWithFallback(`talent.track.${trackName}.level.${level.level}.title`, '')}</div>
                 <div className="octane-talent-level__description">{localizeWithFallback(`talent.track.${trackName}.level.${level.level}.description`, '')}</div>
-                <LibraryImageView className="octane-talent-level__illustration" src={getTalentLevelImageUrl(library, trackName, level.level)} />
+                <TalentImageView className="octane-talent-level__illustration" src={getTalentLevelImageUrl(library, trackName, level.level)} />
                 <div className="octane-talent-level__status">
                     <div className={`octane-talent-reward ${achieved ? 'is-achieved' : 'is-locked'}`}>
                         <div className="octane-talent-reward__border">
@@ -124,7 +124,7 @@ const TalentLevelView: FC<{ trackName: string; level: ITalentLevel; onSelectTask
                                         ) : (
                                             <div key={`product-${index}`} className="octane-talent-reward__item">
                                                 <div className="octane-talent-reward__product">
-                                                    <LibraryImageView src={getTalentProductImageUrl(library, product.productCode)} />
+                                                    <TalentImageView productCode={product.productCode} src={getTalentProductImageUrl(library, product.productCode)} />
                                                 </div>
                                             </div>
                                         )
