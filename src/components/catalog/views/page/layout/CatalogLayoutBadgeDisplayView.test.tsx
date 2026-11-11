@@ -18,16 +18,18 @@ vi.mock('../../../../../common', () => ({
     )
 }));
 
-vi.mock('../../../../../hooks', () => ({ useCatalogData: vi.fn() }));
+vi.mock('../../../../../hooks', () => ({
+    getCatalogGridMetrics: () => ({ columnCount: 5, columnMinHeight: 74, columnMinWidth: 53 }),
+    useCatalogData: vi.fn(),
+    useCatalogDisplayPreferences: () => ({ density: 'standard', showTilePrices: true })
+}));
 
 vi.mock('../widgets/CatalogBadgeSelectorWidgetView', () => ({
     CatalogBadgeSelectorWidgetView: () => <div data-testid="badge-selector" />
 }));
 vi.mock('../widgets/CatalogFirstProductSelectorWidgetView', () => ({ CatalogFirstProductSelectorWidgetView: () => null }));
 vi.mock('../widgets/CatalogItemGridWidgetView', () => ({
-    CatalogItemGridWidgetView: ({ columnCount, columnMinHeight, columnMinWidth }: any) => (
-        <div data-column-count={columnCount} data-column-height={columnMinHeight} data-column-width={columnMinWidth} data-testid="offer-grid" />
-    )
+    CatalogItemGridWidgetView: ({ className }: any) => <div data-class={className} data-testid="offer-grid" />
 }));
 vi.mock('../widgets/CatalogLimitedItemWidgetView', () => ({ CatalogLimitedItemWidgetView: () => <div data-testid="limited-item" /> }));
 vi.mock('../widgets/CatalogPreviewControls', () => ({ CatalogPreviewControls: () => <div data-testid="preview-controls" /> }));
@@ -69,9 +71,9 @@ describe('badge display catalog layout', () => {
         expect(layout.querySelector('.octane-catalog-badge-picker')).toContainElement(screen.getByTestId('badge-selector'));
         expect(layout.querySelector('.octane-catalog-badge-preview')).toBeInTheDocument();
         expect(layout.querySelector('.octane-catalog-badge-purchase')).toBeInTheDocument();
-        expect(screen.getByTestId('offer-grid')).toHaveAttribute('data-column-count', '1');
-        expect(screen.getByTestId('offer-grid')).toHaveAttribute('data-column-height', '70');
-        expect(screen.getByTestId('offer-grid')).toHaveAttribute('data-column-width', '70');
+        // The page's own grid is the one every page uses, in the standard density.
+        expect(screen.getByTestId('offer-grid')).toHaveAttribute('data-class', expect.stringContaining('octane-catalog-grid-density-standard'));
+        expect(layout.querySelector('.octane-catalog-badge-select-label')).toHaveTextContent('catalog_selectbadge');
     });
 
     it('shows the page introduction until a product is available', () => {

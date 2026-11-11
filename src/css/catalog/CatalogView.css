@@ -1534,49 +1534,45 @@
     position: absolute;
     top: 245px;
     left: 0;
+    z-index: 1;
     width: 95px;
     height: 175px;
-    padding: 3px;
-    border: 1px solid #777;
-    border-radius: 4px;
-    background: #c9c9c3;
+    /* itemGridWidget: the frame every page's grid has, the grid 4 px inside it. */
+    padding: 4px;
+    border: 1px solid var(--catalog-standard-box-line);
+    border-radius: 5px;
+    background: var(--catalog-standard-box);
+    box-shadow: inset 0 0 0 2px var(--catalog-standard-box-edge);
     overflow: hidden;
 }
 
 .octane-catalog-badge-product-picker .octane-catalog-item-grid-scroll-area,
 .octane-catalog-badge-product-picker .octane-classic-scroll-area-viewport {
-    width: 87px;
-    height: 167px;
+    width: 85px;
+    height: 165px;
 }
 
-.octane-catalog-badge-product-picker .octane-classic-scroll-area-viewport {
-    padding-right: 17px;
-}
-
-.octane-catalog-badge-offer-list {
-    display: grid !important;
-    grid-template-columns: 70px !important;
-    grid-auto-rows: 70px !important;
-    align-content: start;
-    justify-content: start;
-    gap: 3px !important;
-    overflow: visible !important;
-}
-
-@layer utilities {
-    .octane-catalog-window .octane-catalog-badge-offer-list .layout-grid-item {
-        width: 70px !important;
-        min-width: 70px !important;
-        height: 70px !important;
-        min-height: 70px !important;
-        border-radius: 4px !important;
-    }
+/* ctlg_selectbadge: 190,401, u_small. It lies under the badge grid and shows where no tile covers it. */
+.octane-catalog-badge-select-label {
+    position: absolute;
+    top: 401px;
+    left: 190px;
+    z-index: 0;
+    width: 100px;
+    height: 15px;
+    overflow: hidden;
+    color: #000;
+    font-size: 10px;
+    line-height: 15px;
+    white-space: nowrap;
+    pointer-events: none;
 }
 
 .octane-catalog-badge-picker {
     position: absolute;
     top: 245px;
     left: 105px;
+    z-index: 1;
     width: 255px;
     height: 175px;
     overflow: hidden;
@@ -1827,6 +1823,12 @@
     color: #333;
     font-size: 10px;
     line-height: 20px;
+}
+
+/* search_placeholder: text colour 666666. */
+.octane-catalog-badge-search input::placeholder {
+    color: #666;
+    opacity: 1;
 }
 
 .octane-catalog-badge-search input:focus {
