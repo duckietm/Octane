@@ -3,7 +3,7 @@ import { GetConfigurationValue, localizeWithFallback, TALENT_TRACK_CITIZENSHIP }
 import { AirModalDialog } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { LibraryImageView } from '../help/habbo-way/HabboWayPagerView';
+import { TalentImageView } from './TalentImageView';
 
 interface CitizenshipPopupViewProps {
     onClose: () => void;
@@ -48,7 +48,7 @@ export const CitizenshipPopupView: FC<CitizenshipPopupViewProps> = ({ onClose, o
                             </BaseButton>
                         </div>
                     </div>
-                    <LibraryImageView className="octane-citizenship-popup__image" src={`${library}talent/welcome.png`} />
+                    <TalentImageView className="octane-citizenship-popup__image" src={`${library}talent/welcome.png`} />
                 </div>
             </AirModalDialog>
         </NativeTextTree>

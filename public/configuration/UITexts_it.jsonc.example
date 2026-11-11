@@ -3356,5 +3356,17 @@
     "first_login.room.title": "La tua prima stanza",
     "first_login.room.skip.title": "Nessuna stanza: creerò la mia",
     "first_login.room.skip.desc": "Puoi creare stanze dal navigatore quando vuoi.",
-    "first_login.done": "Fatto"
+    "first_login.done": "Fatto",
+    "navigator.delete.homeroom.body": "Attenzione: questa è la tua stanza principale. Se la elimini non avrai una stanza principale finché non ne scegli un'altra.",
+    "extendedprofile.nogroups.me": "Non fai ancora parte di nessun gruppo.",
+    "extendedprofile.nogroups.user": "Questo utente non fa parte di nessun gruppo.",
+    "extendedprofile.nogroups.info": "I gruppi riuniscono persone con gli stessi interessi.",
+    "extendedprofile.nogroups.viewgroups": "Vedi i gruppi",
+    "inventory.trading.minimized.trade_in_progress": "Scambio in corso",
+    "inventory.trading.minimized.continue_trade": "Continua lo scambio",
+    "respect.giving.failed.title": "Talent show",
+    "respect.giving.failed.caption": "Il tuo rispetto non è stato dato",
+    "respect.giving.failed.no.stage": "In un talent show puoi dare rispetto solo a un Habbo che è sul palco.",
+    "respect.giving.failed.no.audience": "Un talent show ha bisogno di un pubblico di almeno %users% Habbo prima di poter dare rispetto.",
+    "respect.giving.failed.button": "OK"
 }

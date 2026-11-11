@@ -3174,5 +3174,17 @@
     "first_login.room.title": "Your first room",
     "first_login.room.skip.title": "No room: I'll create my own",
     "first_login.room.skip.desc": "You can create rooms from the navigator whenever you like.",
-    "first_login.done": "Done"
+    "first_login.done": "Done",
+    "navigator.delete.homeroom.body": "Warning: this is your home room. If you delete it you will have no home room until you choose another.",
+    "extendedprofile.nogroups.me": "You are not a member of any group yet.",
+    "extendedprofile.nogroups.user": "This user is not a member of any group.",
+    "extendedprofile.nogroups.info": "Groups bring people with the same interests together.",
+    "extendedprofile.nogroups.viewgroups": "View groups",
+    "inventory.trading.minimized.trade_in_progress": "Trade in progress",
+    "inventory.trading.minimized.continue_trade": "Continue trade",
+    "respect.giving.failed.title": "Talent show",
+    "respect.giving.failed.caption": "Your respect was not given",
+    "respect.giving.failed.no.stage": "In a talent show you can only give respect to a Habbo who is on the stage.",
+    "respect.giving.failed.no.audience": "A talent show needs an audience of at least %users% Habbos before respect can be given.",
+    "respect.giving.failed.button": "OK"
 }

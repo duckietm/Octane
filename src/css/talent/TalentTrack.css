@@ -48,33 +48,41 @@
 
 .octane-talent-track__mask.is-left {
     left: 0;
+    /* The begin pane's text starts 20 px in: the fade must end before it, or it eats the first letters. */
+    width: 16px;
 }
 
 .octane-talent-track__mask.is-right {
     right: 0;
 }
 
-/* begin_helper / begin_citizenship: 250 x 280, everything placed as in the layout. */
+/* begin_helper / begin_citizenship: 250 x 280. The title and the description are AIR's vertical list at 20,20
+   (228 wide): a title that wraps pushes the description down instead of running over it. */
 .octane-talent-begin {
     position: relative;
+    box-sizing: border-box;
     width: 250px;
+    padding: 20px 2px 0 20px;
+    overflow: hidden;
 }
 
 .octane-talent-begin__title {
-    position: absolute;
-    left: 20px;
-    top: 20px;
-    width: 311px;
+    width: 228px;
+    margin-bottom: 6px;
     font-size: 18px;
     font-weight: 700;
     line-height: 22px;
+    white-space: normal;
+    overflow-wrap: break-word;
 }
 
+/* The description ends above the label and the button of the pane's foot (y 140). */
 .octane-talent-begin__text {
-    position: absolute;
-    left: 20px;
-    top: 49px;
-    width: 230px;
+    width: 228px;
+    max-height: 120px;
+    overflow: hidden;
+    white-space: normal;
+    overflow-wrap: break-word;
 }
 
 .octane-talent-begin__label {
@@ -103,11 +111,20 @@
     top: 182px;
 }
 
+/* citizenship_button: 200 x 43 at 54,227; a long caption wraps to its second line. The pane is 250 wide, so the
+   button ends at its edge. */
 .octane-talent-begin__button {
     position: absolute;
-    left: 54px;
+    left: 46px;
     top: 227px;
+    box-sizing: border-box;
     width: 200px;
+    height: 43px;
+    padding: 2px 6px;
+    overflow: hidden;
+    line-height: 14px;
+    white-space: normal;
+    text-align: center;
 }
 
 .octane-talent-begin__avatar {
@@ -399,7 +416,8 @@
     font-size: 11px; /* task description: no text_style, il_regular 11 px */
     line-height: 13px;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+    /* Two lines fit the 60 px card under the title; a third ran out of its bottom. */
+    -webkit-line-clamp: 2;
 }
 
 .octane-talent-task__progress {
@@ -786,4 +804,10 @@
     .octane-talent-promo :where(*):not(svg, svg *) {
         font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
     }
+}
+
+/* The begin pane's button caption: il_button, 10 px bold, whatever the window hands its buttons. */
+.octane-talent-track .octane-talent-begin .octane-talent-begin__button {
+    font-size: 10px;
+    font-weight: 700;
 }

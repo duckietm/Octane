@@ -3165,5 +3165,17 @@
     "first_login.room.title": "Ton premier appart",
     "first_login.room.skip.title": "Pas d'appart : je créerai le mien",
     "first_login.room.skip.desc": "Tu peux créer des apparts depuis le navigateur quand tu veux.",
-    "first_login.done": "Terminé"
+    "first_login.done": "Terminé",
+    "navigator.delete.homeroom.body": "Attention : c'est ton appart d'accueil. Si tu le supprimes, tu n'auras plus d'appart d'accueil tant que tu n'en choisis pas un autre.",
+    "extendedprofile.nogroups.me": "Tu n'es encore membre d'aucun groupe.",
+    "extendedprofile.nogroups.user": "Cet utilisateur n'est membre d'aucun groupe.",
+    "extendedprofile.nogroups.info": "Les groupes réunissent des personnes qui ont les mêmes centres d'intérêt.",
+    "extendedprofile.nogroups.viewgroups": "Voir les groupes",
+    "inventory.trading.minimized.trade_in_progress": "Échange en cours",
+    "inventory.trading.minimized.continue_trade": "Continuer l'échange",
+    "respect.giving.failed.title": "Concours de talents",
+    "respect.giving.failed.caption": "Ton respect n'a pas été donné",
+    "respect.giving.failed.no.stage": "Dans un concours de talents, tu ne peux donner du respect qu'à un Habbo qui est sur la scène.",
+    "respect.giving.failed.no.audience": "Un concours de talents a besoin d'un public d'au moins %users% Habbos avant de pouvoir donner du respect.",
+    "respect.giving.failed.button": "OK"
 }

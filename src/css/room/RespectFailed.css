@@ -1,0 +1,74 @@
+/* AIR respect_giving_failed_notification (369 x 220): the talent show's refusal of a respect. */
+.octane-card-shell.octane-respect-failed,
+.draggable-window:has(> .octane-respect-failed) {
+    width: 369px !important;
+    min-width: 369px !important;
+    max-width: calc(100vw - 16px) !important;
+}
+
+.octane-respect-failed .octane-respect-failed-content {
+    position: relative;
+    display: block;
+    min-height: 185px;
+    padding: 0 !important;
+    color: #000;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+/* caption_txt: 250 wide at 10,12, heading, colour 333333. */
+.octane-respect-failed-caption {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    width: 250px;
+    max-height: 36px;
+    overflow: hidden;
+    color: #333;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 18px;
+}
+
+/* body_txt: 250 x 100 at 10,49, wrapped. */
+.octane-respect-failed-body {
+    position: absolute;
+    top: 49px;
+    left: 10px;
+    width: 250px;
+    max-height: 78px;
+    overflow: hidden;
+    white-space: normal;
+}
+
+/* respectFailedNotificationBitmap: at 269,60, its own size. */
+.octane-respect-failed-picture {
+    position: absolute;
+    top: 30px;
+    right: 6px;
+    max-width: 95px;
+    max-height: 100px;
+    image-rendering: pixelated;
+}
+
+/* close: 140 x 50 at 141,130 (the big green button). */
+.octane-respect-failed-close {
+    position: absolute;
+    top: 130px;
+    left: 114px;
+    width: 140px;
+    height: 44px;
+    border: 2px solid #1e5c12;
+    border-radius: 6px;
+    background: #3aa82a;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35);
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.octane-respect-failed-close:hover {
+    background: #45bd33;
+}

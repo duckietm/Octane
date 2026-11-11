@@ -3165,5 +3165,17 @@
     "first_login.room.title": "Tu primera sala",
     "first_login.room.skip.title": "Sin sala: crearé la mía",
     "first_login.room.skip.desc": "Puedes crear salas desde el navegador cuando quieras.",
-    "first_login.done": "Listo"
+    "first_login.done": "Listo",
+    "navigator.delete.homeroom.body": "Atención: esta es tu sala de inicio. Si la eliminas, no tendrás sala de inicio hasta que elijas otra.",
+    "extendedprofile.nogroups.me": "Aún no eres miembro de ningún grupo.",
+    "extendedprofile.nogroups.user": "Este usuario no es miembro de ningún grupo.",
+    "extendedprofile.nogroups.info": "Los grupos reúnen a personas con los mismos intereses.",
+    "extendedprofile.nogroups.viewgroups": "Ver grupos",
+    "inventory.trading.minimized.trade_in_progress": "Intercambio en curso",
+    "inventory.trading.minimized.continue_trade": "Continuar el intercambio",
+    "respect.giving.failed.title": "Concurso de talentos",
+    "respect.giving.failed.caption": "Tu respeto no se ha dado",
+    "respect.giving.failed.no.stage": "En un concurso de talentos solo puedes dar respeto a un Habbo que esté en el escenario.",
+    "respect.giving.failed.no.audience": "Un concurso de talentos necesita un público de al menos %users% Habbos antes de poder dar respeto.",
+    "respect.giving.failed.button": "OK"
 }

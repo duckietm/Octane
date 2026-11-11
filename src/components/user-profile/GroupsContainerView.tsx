@@ -1,7 +1,10 @@
-import { GroupInformationComposer, GroupInformationEvent, GroupInformationParser, HabboGroupEntryData } from '@octane/renderer';
+import { CreateLinkEvent, GroupInformationComposer, GroupInformationEvent, GroupInformationParser, HabboGroupEntryData } from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
-import { LocalizeText, SanitizeHtml, SendMessageComposer, ToggleFavoriteGroup } from '../../api';
+import { LocalizeText, localizeWithFallback, SanitizeHtml, SendMessageComposer, ToggleFavoriteGroup } from '../../api';
+import groupPicture from '../../assets/images/groups/swf/ext_profile_grouppic.png';
+import groupBaseIcon from '../../assets/images/groups/swf/group_base_icon.png';
 import { Column, GridProps, LayoutBadgeImageView, LayoutGridItem } from '../../common';
+import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useMessageEvent } from '../../hooks';
 import { GroupInformationView } from '../groups/views/GroupInformationView';
@@ -11,6 +14,31 @@ interface GroupsContainerViewProps extends GridProps {
     groups: HabboGroupEntryData[];
     onLeaveGroup: () => void;
 }
+
+/**
+ * AIR no_groups (343 x 214): the caption (the user's own or another's), the group picture, the explanation and the
+ * button that opens the navigator's group rooms (performGuildBaseSearch). AIR loads the picture from the image
+ * library (guilds/ext_profile_grouppic.png); hotels rarely have that file, so it ships with the client.
+ */
+const NoGroupsView: FC<{ itsMe: boolean }> = ({ itsMe }) => (
+    <NativeTextTree>
+        <Column fullHeight className="octane-extended-profile-groups octane-extended-profile-no-groups">
+            <div className="octane-extended-profile-no-groups__caption">
+                {itsMe
+                    ? localizeWithFallback('extendedprofile.nogroups.me', 'You are not a member of any group yet.')
+                    : localizeWithFallback('extendedprofile.nogroups.user', 'This user is not a member of any group.')}
+            </div>
+            <img alt="" className="octane-extended-profile-no-groups__picture" src={groupPicture} />
+            <div className="octane-extended-profile-no-groups__info">
+                {localizeWithFallback('extendedprofile.nogroups.info', 'Groups bring people with the same interests together.')}
+            </div>
+            <BaseButton className="octane-extended-profile-no-groups__view" onClick={() => CreateLinkEvent('navigator/search/hotel_view/group:')}>
+                <img alt="" src={groupBaseIcon} />
+                <span>{localizeWithFallback('extendedprofile.nogroups.viewgroups', 'View groups')}</span>
+            </BaseButton>
+        </Column>
+    </NativeTextTree>
+);
 
 export const GroupsContainerView: FC<GroupsContainerViewProps> = (props) => {
     const { itsMe = null, groups = null, onLeaveGroup = null } = props;
@@ -47,19 +75,7 @@ export const GroupsContainerView: FC<GroupsContainerViewProps> = (props) => {
         }
     }, [groups]);
 
-    if (!groups || !groups.length) {
-        return (
-            <NativeTextTree>
-                <Column center fullHeight className="octane-extended-profile-groups">
-                    <div className="flex justify-center gap-2">
-                        <div className="no-group-spritesheet image-1" />
-                        <div className="no-group-spritesheet image-2" />
-                        <div className="no-group-spritesheet image-3" />
-                    </div>
-                </Column>
-            </NativeTextTree>
-        );
-    }
+    if (!groups || !groups.length) return <NoGroupsView itsMe={!!itsMe} />;
 
     return (
         <NativeTextTree>

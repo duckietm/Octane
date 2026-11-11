@@ -20,6 +20,7 @@ import { FurnitureMysteryTrophyOpenDialogView } from '../FurnitureMysteryTrophyO
 import { EffectBoxConfirmView } from './EffectBoxConfirmView';
 import { MonsterPlantSeedConfirmView } from './MonsterPlantSeedConfirmView';
 import { PurchasableClothingConfirmView } from './PurchasableClothingConfirmView';
+import { RespectFailedKind, RespectFailedView } from './RespectFailedView';
 import { VipRequiredKind, VipRequiredView } from './VipRequiredView';
 
 export const FurnitureContextMenuView: FC<{}> = (props) => {
@@ -37,13 +38,14 @@ export const FurnitureContextMenuView: FC<{}> = (props) => {
     } = useFurnitureContextMenuWidget();
     const { simpleAlert = null } = useNotification();
     const [vipRequired, setVipRequired] = useState<VipRequiredKind>(null);
+    const [respectFailed, setRespectFailed] = useState<RespectFailedKind>(null);
 
     useMessageEvent<CustomUserNotificationMessageEvent>(CustomUserNotificationMessageEvent, (event) => {
         const parser = event.getParser();
 
         if (!parser) return;
 
-        // HOPPER_NO_COSTUME = 1; HOPPER_NO_HC = 2; GATE_NO_HC = 3; STARS_NOT_CANDIDATE = 4 (not coded in Emulator); STARS_NOT_ENOUGH_USERS = 5 (not coded in Emulator);
+        // HOPPER_NO_COSTUME = 1; HOPPER_NO_HC = 2; GATE_NO_HC = 3; STARS_NOT_CANDIDATE = 4; STARS_NOT_ENOUGH_USERS = 5.
 
         switch (parser.count) {
             case 1:
@@ -63,6 +65,17 @@ export const FurnitureContextMenuView: FC<{}> = (props) => {
             case 3:
                 setVipRequired('gate');
                 break;
+            // AIR CustomUserNotificationWidgetHandler: 4 and 5 are the talent show's refusals of a respect.
+            case 4:
+            case 5: {
+                // The respect was counted as spent when it was sent; the server did not take it.
+                const session = GetSessionDataManager() as { refundRespect?: () => void };
+
+                if (typeof session?.refundRespect === 'function') session.refundRespect();
+
+                setRespectFailed(parser.count === 4 ? 'stage' : 'audience');
+                break;
+            }
         }
     });
 
@@ -72,6 +85,7 @@ export const FurnitureContextMenuView: FC<{}> = (props) => {
         <NativeTextTree>
             <>
                 {vipRequired && <VipRequiredView kind={vipRequired} onClose={() => setVipRequired(null)} />}
+                {respectFailed && <RespectFailedView kind={respectFailed} onClose={() => setRespectFailed(null)} />}
                 {confirmMode === MONSTERPLANT_SEED_CONFIRMATION && <MonsterPlantSeedConfirmView objectId={confirmingObjectId} onClose={closeConfirm} />}
                 {confirmMode === PURCHASABLE_CLOTHING_CONFIRMATION && <PurchasableClothingConfirmView objectId={confirmingObjectId} onClose={closeConfirm} />}
                 {confirmMode === EFFECTBOX_OPEN && <EffectBoxConfirmView objectId={confirmingObjectId} onClose={closeConfirm} />}

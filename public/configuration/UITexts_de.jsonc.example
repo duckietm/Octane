@@ -3172,5 +3172,17 @@
     "first_login.room.title": "Dein erster Raum",
     "first_login.room.skip.title": "Kein Raum: Ich erstelle meinen eigenen",
     "first_login.room.skip.desc": "Du kannst jederzeit Räume über den Navigator erstellen.",
-    "first_login.done": "Fertig"
+    "first_login.done": "Fertig",
+    "navigator.delete.homeroom.body": "Achtung: Das ist dein Heimatraum. Wenn du ihn löschst, hast du keinen Heimatraum mehr, bis du einen anderen wählst.",
+    "extendedprofile.nogroups.me": "Du bist noch in keiner Gruppe.",
+    "extendedprofile.nogroups.user": "Dieser Nutzer ist in keiner Gruppe.",
+    "extendedprofile.nogroups.info": "Gruppen bringen Leute mit denselben Interessen zusammen.",
+    "extendedprofile.nogroups.viewgroups": "Gruppen ansehen",
+    "inventory.trading.minimized.trade_in_progress": "Tausch läuft",
+    "inventory.trading.minimized.continue_trade": "Tausch fortsetzen",
+    "respect.giving.failed.title": "Talentshow",
+    "respect.giving.failed.caption": "Dein Respekt wurde nicht vergeben",
+    "respect.giving.failed.no.stage": "In einer Talentshow kannst du nur einem Habbo auf der Bühne Respekt geben.",
+    "respect.giving.failed.no.audience": "Eine Talentshow braucht ein Publikum von mindestens %users% Habbos, bevor Respekt vergeben werden kann.",
+    "respect.giving.failed.button": "OK"
 }

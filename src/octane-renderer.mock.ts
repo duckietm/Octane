@@ -590,6 +590,8 @@ export class GetGuestRoomMessageComposer extends StubClass {}
 export class GetProductOfferComposer extends StubClass {}
 export class GroupFavoriteComposer extends StubClass {}
 export class GroupInformationComposer extends StubClass {}
+export class GroupInformationEvent extends MessageEvent {}
+export class GroupInformationParser extends StubClass {}
 export class GroupJoinComposer extends StubClass {}
 export class GroupUnfavoriteComposer extends StubClass {}
 export class UserProfileComposer extends StubClass {}

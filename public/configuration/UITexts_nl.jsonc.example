@@ -3167,5 +3167,17 @@
     "first_login.room.title": "Jouw eerste kamer",
     "first_login.room.skip.title": "Geen kamer: ik maak er zelf een",
     "first_login.room.skip.desc": "Je kunt altijd kamers maken via de navigator.",
-    "first_login.done": "Klaar"
+    "first_login.done": "Klaar",
+    "navigator.delete.homeroom.body": "Let op: dit is je thuiskamer. Als je hem verwijdert heb je geen thuiskamer meer totdat je een andere kiest.",
+    "extendedprofile.nogroups.me": "Je bent nog geen lid van een groep.",
+    "extendedprofile.nogroups.user": "Deze gebruiker is geen lid van een groep.",
+    "extendedprofile.nogroups.info": "Groepen brengen mensen met dezelfde interesses samen.",
+    "extendedprofile.nogroups.viewgroups": "Bekijk groepen",
+    "inventory.trading.minimized.trade_in_progress": "Ruil bezig",
+    "inventory.trading.minimized.continue_trade": "Ga verder met ruilen",
+    "respect.giving.failed.title": "Talentenjacht",
+    "respect.giving.failed.caption": "Je respect is niet gegeven",
+    "respect.giving.failed.no.stage": "In een talentenjacht kun je alleen respect geven aan een Habbo die op het podium staat.",
+    "respect.giving.failed.no.audience": "Een talentenjacht heeft een publiek van minstens %users% Habbo's nodig voordat je respect kunt geven.",
+    "respect.giving.failed.button": "OK"
 }

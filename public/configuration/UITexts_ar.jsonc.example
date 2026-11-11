@@ -3165,5 +3165,17 @@
     "first_login.room.title": "غرفتك الأولى",
     "first_login.room.skip.title": "بدون غرفة: سأنشئ غرفتي بنفسي",
     "first_login.room.skip.desc": "يمكنك إنشاء الغرف من المتصفّح متى شئت.",
-    "first_login.done": "تم"
+    "first_login.done": "تم",
+    "navigator.delete.homeroom.body": "تنبيه: هذه غرفتك الرئيسية. إذا حذفتها فلن تكون لديك غرفة رئيسية حتى تختار غرفة أخرى.",
+    "extendedprofile.nogroups.me": "لست عضوًا في أي مجموعة بعد.",
+    "extendedprofile.nogroups.user": "هذا المستخدم ليس عضوًا في أي مجموعة.",
+    "extendedprofile.nogroups.info": "المجموعات تجمع الأشخاص أصحاب الاهتمامات المشتركة.",
+    "extendedprofile.nogroups.viewgroups": "عرض المجموعات",
+    "inventory.trading.minimized.trade_in_progress": "المبادلة جارية",
+    "inventory.trading.minimized.continue_trade": "متابعة المبادلة",
+    "respect.giving.failed.title": "عرض المواهب",
+    "respect.giving.failed.caption": "لم يُمنح احترامك",
+    "respect.giving.failed.no.stage": "في عرض المواهب يمكنك منح الاحترام فقط لهابو يقف على المسرح.",
+    "respect.giving.failed.no.audience": "يحتاج عرض المواهب إلى جمهور من %users% هابو على الأقل قبل منح الاحترام.",
+    "respect.giving.failed.button": "موافق"
 }
