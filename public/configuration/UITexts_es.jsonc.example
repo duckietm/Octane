@@ -3156,5 +3156,14 @@
     "catalog.marketplace.nft_purchase_failed": "No se pudo comprar el coleccionable. Inténtalo de nuevo.",
     "catalog.marketplace.operation_failed.topic": "La operación ha fallado",
     "purse.seasonal.currency.1001": "Esmeraldas",
-    "catalog.marketplace.nft_own_offer": "Esta es tu propia oferta. No puedes comprar tu propio coleccionable."
+    "catalog.marketplace.nft_own_offer": "Esta es tu propia oferta. No puedes comprar tu propio coleccionable.",
+    "first_login.title": "¡Bienvenido!",
+    "first_login.intro": "Dos cosas rápidas antes de empezar: tu look y tu primera sala.",
+    "first_login.look.title": "Tu look",
+    "first_login.look.desc": "Así te ven los demás. Puedes cambiarlo cuando quieras.",
+    "first_login.look.change": "Cambiar mi look",
+    "first_login.room.title": "Tu primera sala",
+    "first_login.room.skip.title": "Sin sala: crearé la mía",
+    "first_login.room.skip.desc": "Puedes crear salas desde el navegador cuando quieras.",
+    "first_login.done": "Listo"
 }

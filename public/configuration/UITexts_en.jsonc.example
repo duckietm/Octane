@@ -3165,5 +3165,14 @@
     "catalog.marketplace.nft_purchase_failed": "Unable to buy the Collectible. Please try again.",
     "catalog.marketplace.operation_failed.topic": "Operation failed",
     "purse.seasonal.currency.1001": "Emeralds",
-    "catalog.marketplace.nft_own_offer": "This is your own offer. You cannot buy your own Collectible."
+    "catalog.marketplace.nft_own_offer": "This is your own offer. You cannot buy your own Collectible.",
+    "first_login.title": "Welcome!",
+    "first_login.intro": "Two quick things before you start: your look and your first room.",
+    "first_login.look.title": "Your look",
+    "first_login.look.desc": "This is how others see you. You can change it at any time.",
+    "first_login.look.change": "Change my look",
+    "first_login.room.title": "Your first room",
+    "first_login.room.skip.title": "No room: I'll create my own",
+    "first_login.room.skip.desc": "You can create rooms from the navigator whenever you like.",
+    "first_login.done": "Done"
 }

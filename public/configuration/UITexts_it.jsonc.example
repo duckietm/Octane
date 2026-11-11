@@ -3347,5 +3347,14 @@
     "catalog.marketplace.nft_purchase_failed": "Impossibile comprare il collezionabile. Riprova.",
     "catalog.marketplace.operation_failed.topic": "Operazione non riuscita",
     "purse.seasonal.currency.1001": "Smeraldi",
-    "catalog.marketplace.nft_own_offer": "Questa è la tua offerta. Non puoi comprare il tuo collezionabile."
+    "catalog.marketplace.nft_own_offer": "Questa è la tua offerta. Non puoi comprare il tuo collezionabile.",
+    "first_login.title": "Benvenuto!",
+    "first_login.intro": "Due cose veloci prima di iniziare: il tuo look e la tua prima stanza.",
+    "first_login.look.title": "Il tuo look",
+    "first_login.look.desc": "Così ti vedono gli altri. Puoi cambiarlo quando vuoi.",
+    "first_login.look.change": "Cambia il mio look",
+    "first_login.room.title": "La tua prima stanza",
+    "first_login.room.skip.title": "Nessuna stanza: creerò la mia",
+    "first_login.room.skip.desc": "Puoi creare stanze dal navigatore quando vuoi.",
+    "first_login.done": "Fatto"
 }

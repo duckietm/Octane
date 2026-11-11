@@ -1,0 +1,149 @@
+/* The first-login setup of an account made outside Octane's register screen. */
+.octane-first-login {
+    width: 420px;
+    max-width: calc(100vw - 16px);
+}
+
+.octane-first-login .octane-first-login__content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+    color: #000;
+}
+
+/* Nothing in the window may be wider than it: the texts wrap instead of adding a scrollbar. */
+.octane-first-login__content > * {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.octane-first-login__intro {
+    font-size: 12px;
+    line-height: 16px;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+.octane-first-login__section {
+    padding: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.octane-first-login__look {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.octane-first-login__avatar {
+    position: relative;
+    flex: 0 0 64px;
+    width: 64px;
+    height: 110px;
+    overflow: hidden;
+}
+
+.octane-first-login__avatar > * {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+}
+
+.octane-first-login__look-body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+    min-width: 0;
+}
+
+.octane-first-login__heading,
+.octane-first-login__room-title {
+    font-weight: bold;
+}
+
+.octane-first-login__heading {
+    margin-bottom: 4px;
+}
+
+.octane-first-login__text {
+    font-size: 11px;
+    white-space: normal;
+    overflow-wrap: break-word;
+    opacity: 0.8;
+}
+
+.octane-first-login__rooms {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.octane-first-login__room {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+}
+
+.octane-first-login__room.is-selected {
+    border-color: #1e7295;
+    background: #e3f3fa;
+}
+
+.octane-first-login__thumb {
+    flex: 0 0 64px;
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 3px;
+    image-rendering: pixelated;
+}
+
+.octane-first-login__room-body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.octane-first-login__button {
+    padding: 4px 12px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    background: #f3f3f3;
+    color: #000;
+    cursor: pointer;
+}
+
+.octane-first-login__button:hover {
+    background: #fff;
+}
+
+.octane-first-login__footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.octane-first-login__done {
+    background: #00800b;
+    border-color: #004d07;
+    color: #fff;
+    font-weight: bold;
+}
+
+.octane-first-login__done:hover {
+    background: #00a00e;
+}

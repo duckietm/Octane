@@ -424,6 +424,8 @@ export class HasClaimedProductEvent extends MessageEvent {}
 export class ClaimProductResultEvent extends MessageEvent {}
 export class GetHasClaimedProductComposer extends StubClass {}
 export class ClaimFreeProductComposer extends StubClass {}
+export class FirstLoginSetupEvent extends MessageEvent {}
+export class FirstLoginSetupChooseComposer extends StubClass {}
 export class BlockResultEvent extends MessageEvent {}
 export class ChatStyleNotificationMessageEvent extends MessageEvent {}
 export class RoomEnterEvent extends MessageEvent {}

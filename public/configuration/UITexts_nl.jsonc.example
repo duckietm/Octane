@@ -3158,5 +3158,14 @@
     "catalog.marketplace.nft_purchase_failed": "De Collectible kon niet gekocht worden. Probeer het opnieuw.",
     "catalog.marketplace.operation_failed.topic": "Actie mislukt",
     "purse.seasonal.currency.1001": "Smaragden",
-    "catalog.marketplace.nft_own_offer": "Dit is je eigen aanbieding. Je kunt je eigen Collectible niet kopen."
+    "catalog.marketplace.nft_own_offer": "Dit is je eigen aanbieding. Je kunt je eigen Collectible niet kopen.",
+    "first_login.title": "Welkom!",
+    "first_login.intro": "Nog twee dingen voor je begint: je look en je eerste kamer.",
+    "first_login.look.title": "Jouw look",
+    "first_login.look.desc": "Zo zien anderen jou. Je kunt dit altijd weer aanpassen.",
+    "first_login.look.change": "Mijn look aanpassen",
+    "first_login.room.title": "Jouw eerste kamer",
+    "first_login.room.skip.title": "Geen kamer: ik maak er zelf een",
+    "first_login.room.skip.desc": "Je kunt altijd kamers maken via de navigator.",
+    "first_login.done": "Klaar"
 }

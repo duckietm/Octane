@@ -3163,5 +3163,14 @@
     "catalog.marketplace.nft_purchase_failed": "Das Sammelobjekt konnte nicht gekauft werden. Bitte versuche es erneut.",
     "catalog.marketplace.operation_failed.topic": "Vorgang fehlgeschlagen",
     "purse.seasonal.currency.1001": "Smaragde",
-    "catalog.marketplace.nft_own_offer": "Das ist dein eigenes Angebot. Du kannst dein eigenes Sammelobjekt nicht kaufen."
+    "catalog.marketplace.nft_own_offer": "Das ist dein eigenes Angebot. Du kannst dein eigenes Sammelobjekt nicht kaufen.",
+    "first_login.title": "Willkommen!",
+    "first_login.intro": "Zwei Dinge, bevor es losgeht: dein Look und dein erster Raum.",
+    "first_login.look.title": "Dein Look",
+    "first_login.look.desc": "So sehen dich die anderen. Du kannst ihn jederzeit ändern.",
+    "first_login.look.change": "Meinen Look ändern",
+    "first_login.room.title": "Dein erster Raum",
+    "first_login.room.skip.title": "Kein Raum: Ich erstelle meinen eigenen",
+    "first_login.room.skip.desc": "Du kannst jederzeit Räume über den Navigator erstellen.",
+    "first_login.done": "Fertig"
 }

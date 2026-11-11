@@ -3156,5 +3156,14 @@
     "catalog.marketplace.nft_purchase_failed": "Impossible d'acheter l'objet de collection. Réessaie.",
     "catalog.marketplace.operation_failed.topic": "Échec de l'opération",
     "purse.seasonal.currency.1001": "Émeraudes",
-    "catalog.marketplace.nft_own_offer": "C'est ta propre offre. Tu ne peux pas acheter ton propre objet de collection."
+    "catalog.marketplace.nft_own_offer": "C'est ta propre offre. Tu ne peux pas acheter ton propre objet de collection.",
+    "first_login.title": "Bienvenue !",
+    "first_login.intro": "Deux petites choses avant de commencer : ton look et ton premier appart.",
+    "first_login.look.title": "Ton look",
+    "first_login.look.desc": "C'est ainsi que les autres te voient. Tu peux le changer à tout moment.",
+    "first_login.look.change": "Changer mon look",
+    "first_login.room.title": "Ton premier appart",
+    "first_login.room.skip.title": "Pas d'appart : je créerai le mien",
+    "first_login.room.skip.desc": "Tu peux créer des apparts depuis le navigateur quand tu veux.",
+    "first_login.done": "Terminé"
 }

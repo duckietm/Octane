@@ -3156,5 +3156,14 @@
     "catalog.marketplace.nft_purchase_failed": "تعذّر شراء القطعة المقتناة. حاول مرة أخرى.",
     "catalog.marketplace.operation_failed.topic": "فشلت العملية",
     "purse.seasonal.currency.1001": "زمرد",
-    "catalog.marketplace.nft_own_offer": "هذا عرضك الخاص. لا يمكنك شراء قطعتك المقتناة."
+    "catalog.marketplace.nft_own_offer": "هذا عرضك الخاص. لا يمكنك شراء قطعتك المقتناة.",
+    "first_login.title": "مرحبًا!",
+    "first_login.intro": "أمران سريعان قبل أن تبدأ: مظهرك وغرفتك الأولى.",
+    "first_login.look.title": "مظهرك",
+    "first_login.look.desc": "هكذا يراك الآخرون. يمكنك تغييره في أي وقت.",
+    "first_login.look.change": "تغيير مظهري",
+    "first_login.room.title": "غرفتك الأولى",
+    "first_login.room.skip.title": "بدون غرفة: سأنشئ غرفتي بنفسي",
+    "first_login.room.skip.desc": "يمكنك إنشاء الغرف من المتصفّح متى شئت.",
+    "first_login.done": "تم"
 }
