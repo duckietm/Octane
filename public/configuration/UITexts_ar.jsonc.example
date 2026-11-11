@@ -2725,7 +2725,7 @@
     "octane.catalog.select_a_valid_catalog_page": "اختر صفحة متجر صالحة.",
     "octane.catalog.offer_name_is_required": "اسم العرض مطلوب.",
     "octane.catalog.item_ids_are_required": "معرّفات العناصر مطلوبة.",
-    "octane.catalog.item_ids_must_use_the_format": "يجب أن تكون المعرّفات بالصيغة 123 أو 123:2 مفصولة بفواصل منقوطة.",
+    "octane.catalog.item_ids_must_use_the_format": "يجب أن تكون المعرّفات بالصيغة 123 أو 123:2 مفصولة بفواصل منقوطة. استخدم @123 لإضافة ما يبيعه عرض الكتالوج 123.",
     "octane.catalog.prices_and_currency_type_cannot_be": "لا يمكن أن تكون الأسعار ونوع العملة سالبة.",
     "octane.catalog.quantity_must_be_between_1_and": "يجب أن تكون الكمية بين 1 و10000.",
     "octane.catalog.song_id_cannot_be_negative": "لا يمكن أن يكون معرّف الأغنية سالبًا.",

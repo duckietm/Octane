@@ -141,6 +141,10 @@ describe('catalog admin offer form state', () => {
 
         expect(validate(valid, false, 12)).toBeNull();
         expect(validate({ ...valid, itemIds: '100:0' }, false, 12)).toMatch(/item ids/i);
+        // A bundle may name catalogue offers (@id), alone or beside furni.
+        expect(validate({ ...valid, itemIds: '@12;@13:2;100' }, false, 12)).toBeNull();
+        expect(validate({ ...valid, itemIds: '@;100' }, false, 12)).toMatch(/item ids/i);
+        expect(validate({ ...valid, itemIds: '@0' }, false, 12)).toMatch(/item ids/i);
         expect(validate({ ...valid, limitedStack: 5 }, false, 12)).toMatch(/sold/i);
         expect(validate({ ...valid, catalogName: '   ' }, false, 12)).toMatch(/name/i);
     });

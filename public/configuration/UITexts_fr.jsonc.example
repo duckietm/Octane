@@ -2725,7 +2725,7 @@
     "octane.catalog.select_a_valid_catalog_page": "Choisis une page de boutique valide.",
     "octane.catalog.offer_name_is_required": "Le nom de l'offre est obligatoire.",
     "octane.catalog.item_ids_are_required": "Les ID des articles sont obligatoires.",
-    "octane.catalog.item_ids_must_use_the_format": "Les ID des articles doivent suivre le format 123 ou 123:2, séparés par des points-virgules.",
+    "octane.catalog.item_ids_must_use_the_format": "Les ID des articles doivent suivre le format 123 ou 123:2, séparés par des points-virgules. Utilise @123 pour ajouter ce que vend l'offre 123 du catalogue.",
     "octane.catalog.prices_and_currency_type_cannot_be": "Les prix et le type de monnaie ne peuvent pas être négatifs.",
     "octane.catalog.quantity_must_be_between_1_and": "La quantité doit être comprise entre 1 et 10 000.",
     "octane.catalog.song_id_cannot_be_negative": "L'ID de la musique ne peut pas être négatif.",
