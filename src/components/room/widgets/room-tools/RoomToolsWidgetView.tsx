@@ -254,6 +254,12 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
             linkReceived: (url: string) => {
                 const action = url.split('/')[1];
 
+                // Sent by every toolbar icon: the window it opens takes the space of the panel.
+                if (action === 'collapse') {
+                    setIsToolsOpen(false);
+                    return;
+                }
+
                 if (action === 'zoom_in' || action === 'zoom_out') onZoomLink(action);
             },
             eventUrlPrefix: 'room-tools/'

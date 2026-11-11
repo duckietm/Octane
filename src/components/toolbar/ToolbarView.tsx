@@ -60,6 +60,12 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const { isInRoom } = props;
     const [ isMeExpanded, setMeExpanded ] = useState(false);
     const [ isProgressionExpanded, setProgressionExpanded ] = useState(false);
+
+    // The me and progression popovers open over the room tools panel: fold it away.
+    useEffect(() =>
+    {
+        if(isMeExpanded || isProgressionExpanded) CreateLinkEvent('room-tools/collapse');
+    }, [ isMeExpanded, isProgressionExpanded ]);
     const [ isTouchLayout, setIsTouchLayout ] = useState(false);
     const [ leftCollapsed, setLeftCollapsed ] = useState(() => readCollapsedPreference(LEFT_COLLAPSED_STORAGE_KEY));
     const [ rightCollapsed, setRightCollapsed ] = useState(() => readCollapsedPreference(RIGHT_COLLAPSED_STORAGE_KEY));
