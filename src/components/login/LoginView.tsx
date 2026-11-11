@@ -10,6 +10,7 @@ import flagIt from '../../assets/images/flag_icon/flag_icon_it.png';
 import flagNl from '../../assets/images/flag_icon/flag_icon_nl.png';
 import flagDe from '../../assets/images/flag_icon/flag_icon_de.png';
 import flagAr from '../../assets/images/flag_icon/flag_icon_ar.png';
+import flagTr from '../../assets/images/flag_icon/flag_icon_tr.png';
 import { applyTextTranslationLocale } from '../../hooks/translation/useTranslation';
 import { configFileUrl } from '../../secure-assets';
 import { LoginModal } from './components/LoginModal';
@@ -84,7 +85,8 @@ const LOGIN_LOCALES: LoginLocale[] = [
     { code: 'fr', file: 'fr', label: 'Français', flag: flagFr },
     { code: 'nl', file: 'nl', label: 'Nederlands', flag: flagNl },
     { code: 'de', file: 'de', label: 'Deutsch', flag: flagDe },
-    { code: 'ar', file: 'ar', label: 'العربية', flag: flagAr }
+    { code: 'ar', file: 'ar', label: 'العربية', flag: flagAr },
+    { code: 'tr', file: 'tr', label: 'Türkçe', flag: flagTr }
 ];
 
 const normalizeLanguageCode = (value: string): string => {
