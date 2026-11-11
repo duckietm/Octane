@@ -4,6 +4,7 @@ export type { NavigatorRoomInfoAnchorKind, NavigatorRoomInfoPopupActions, Naviga
 export { useNavigatorRoomInfoPopupStore } from './navigatorRoomInfoPopupStore';
 export type { NavigatorUiActions, NavigatorUiState } from './navigatorUiStore';
 export { useNavigatorUiStore } from './navigatorUiStore';
+export { askForwardRoomId, useNavigatorAskForward } from './useNavigatorAskForward';
 export { useNavigatorData } from './useNavigatorData';
 export { useNavigatorFavourite } from './useNavigatorFavourite';
 export { useNavigatorSearch } from './useNavigatorSearch';

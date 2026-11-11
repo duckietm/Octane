@@ -14,12 +14,12 @@ import {
 import { FC, useEffect, useMemo, useState } from 'react';
 import {
     ensureBadgeLeaderboardLoaded,
-    filterFurnitureGroupItems,
     FURNI_MAIN_FILTER,
     FurniMainFilter,
     FurnitureSection,
-    inFurnitureSection,
+    filterFurnitureGroupItems,
     getCachedBadgeRarityStat,
+    inFurnitureSection,
     isObjectMoverRequested,
     LocalizeBadgeName,
     LocalizeText,
@@ -27,28 +27,29 @@ import {
     UnseenItemCategory
 } from '../../api';
 import { OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
-import { isCollectiblesEnabled } from '../../hooks/collectibles/useCollectibles';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import {
     useInventoryBadges,
     useInventoryFurni,
     useInventoryTrade,
-    useWiredTrading,
     useInventoryUnseenTracker,
     useMessageEvent,
-    useOctaneEvent
+    useOctaneEvent,
+    useWiredTrading
 } from '../../hooks';
+import { isCollectiblesEnabled } from '../../hooks/collectibles/useCollectibles';
 import { InventoryBadgeView } from './views/badge/InventoryBadgeView';
 import { InventoryBotView } from './views/bot/InventoryBotView';
 import { InventoryCollectiblesView } from './views/collectibles/InventoryCollectiblesView';
 import { InventoryFurnitureDeleteView } from './views/furniture/InventoryFurnitureDeleteView';
-import { InventoryTradeNameScamWarningView } from './views/furniture/InventoryTradeNameScamWarningView';
 import { InventoryFurnitureView } from './views/furniture/InventoryFurnitureView';
+import { InventoryTradeMinimizedView, isTradeInventoryTab } from './views/furniture/InventoryTradeMinimizedView';
+import { InventoryTradeNameScamWarningView } from './views/furniture/InventoryTradeNameScamWarningView';
 import { InventoryTradeView } from './views/furniture/InventoryTradeView';
 import { InventoryWiredTradeView } from './views/furniture/InventoryWiredTradeView';
 import { BADGE_MAIN_ACHIEVEMENTS, BADGE_MAIN_ALL, BADGE_MAIN_NORMAL, BADGE_RARITY_ALL, InventoryCategoryFilterView } from './views/InventoryCategoryFilterView';
 import { InventoryPetView } from './views/pet/InventoryPetView';
 import { InventoryPrefixView } from './views/prefix/InventoryPrefixView';
-import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const TAB_FURNITURE = 'inventory.furni';
 const TAB_BOTS = 'inventory.bots';
@@ -59,6 +60,8 @@ const TAB_COLLECTIBLES = 'inventory.collectibles';
 const TAB_RENTABLES = 'inventory.rentables';
 // The order of the official inventory, with the prefixes of this client last.
 const TABS = [TAB_FURNITURE, TAB_COLLECTIBLES, TAB_RENTABLES, TAB_PETS, TAB_BADGES, TAB_BOTS, TAB_PREFIXES];
+/** The tabs a trade is made on; on any other tab the trade is minimised (AIR TradingModel.categorySwitch). */
+const TRADE_TABS = [TAB_FURNITURE, TAB_COLLECTIBLES, TAB_RENTABLES];
 
 const SECTION_BY_TAB: Record<string, FurnitureSection> = {
     [TAB_FURNITURE]: 'furni',
@@ -162,7 +165,10 @@ export const InventoryView: FC<{}> = () => {
     }, [mainFilter, section]);
 
     // The items of the open tab (furni, collectibles or rentables): its empty view and filter bar go by these.
-    const sectionGroupItems = useMemo(() => (section ? inFurnitureSection(groupItems, section, collectiblesEnabled) : groupItems), [groupItems, section, collectiblesEnabled]);
+    const sectionGroupItems = useMemo(
+        () => (section ? inFurnitureSection(groupItems, section, collectiblesEnabled) : groupItems),
+        [groupItems, section, collectiblesEnabled]
+    );
 
     const filteredGroupItems = useMemo(() => {
         if (!section) return groupItems;
@@ -274,34 +280,40 @@ export const InventoryView: FC<{}> = () => {
         if (!isVisible && (isTrading || isWiredTrading)) setIsVisible(true);
     }, [isVisible, isTrading, isWiredTrading]);
 
+    // AIR TradingModel: a trade opens on the furni; the user may then look at another tab, which minimises the trade.
+    useEffect(() => {
+        if (isTrading) setCurrentTab(TAB_FURNITURE);
+    }, [isTrading]);
+
     if (!isVisible) return null;
 
-    const showFilter = !isTrading && !isWiredTrading && ((section !== null && sectionGroupItems.length > 0) || currentTab === TAB_BADGES);
+    const tradeMinimized = isTrading && !isTradeInventoryTab(currentTab, TRADE_TABS);
+    const showTrade = isTrading && !tradeMinimized;
+    const browsing = (!isTrading && !isWiredTrading) || tradeMinimized;
+    const showFilter = browsing && ((section !== null && sectionGroupItems.length > 0) || currentTab === TAB_BADGES);
+    const tabs = (
+        <OctaneCardTabsView classNames={['octane-inventory-tabs-shell']}>
+            {TABS.map((name) => (
+                <OctaneCardTabsItemView key={name} count={getTabUnseenCount(name, getCount)} isActive={currentTab === name} onClick={() => setCurrentTab(name)}>
+                    <span className="octane-inventory-tab-label">{tabLabel(name)}</span>
+                </OctaneCardTabsItemView>
+            ))}
+        </OctaneCardTabsView>
+    );
 
     return (
         <NativeTextTree>
             <>
                 <OctaneCardView
-                    className={`octane-inventory-window max-w-[calc(100vw-16px)] ${!isTrading && isWiredTrading ? 'is-wired-trading' : currentTab === TAB_BADGES ? 'has-badge-controls' : currentTab === TAB_PETS ? 'has-pet-controls' : ''}`}
+                    className={`octane-inventory-window max-w-[calc(100vw-16px)] ${showTrade ? 'is-trading' : !isTrading && isWiredTrading ? 'is-wired-trading' : currentTab === TAB_BADGES ? 'has-badge-controls' : currentTab === TAB_PETS ? 'has-pet-controls' : ''}`}
                     frameStyle={3}
                     resizeAxis="vertical"
                     uniqueKey="inventory"
                 >
                     <OctaneCardHeaderView headerText={LocalizeText('inventory.title')} onCloseClick={onClose} />
-                    {!isTrading && !isWiredTrading && (
+                    {browsing && (
                         <>
-                            <OctaneCardTabsView classNames={['octane-inventory-tabs-shell']}>
-                                {TABS.map((name) => (
-                                    <OctaneCardTabsItemView
-                                        key={name}
-                                        count={getTabUnseenCount(name, getCount)}
-                                        isActive={currentTab === name}
-                                        onClick={() => setCurrentTab(name)}
-                                    >
-                                        <span className="octane-inventory-tab-label">{tabLabel(name)}</span>
-                                    </OctaneCardTabsItemView>
-                                ))}
-                            </OctaneCardTabsView>
+                            {tabs}
                             <div className="octane-inventory-body">
                                 {showFilter && (
                                     <InventoryCategoryFilterView
@@ -339,11 +351,15 @@ export const InventoryView: FC<{}> = () => {
                             </div>
                         </>
                     )}
-                    {isTrading && (
-                        <div className="octane-inventory-body is-trade">
-                            <InventoryTradeView cancelTrade={onClose} />
-                        </div>
+                    {showTrade && (
+                        <>
+                            {tabs}
+                            <div className="octane-inventory-body is-trade">
+                                <InventoryTradeView cancelTrade={onClose} />
+                            </div>
+                        </>
                     )}
+                    {tradeMinimized && <InventoryTradeMinimizedView onCancel={onClose} onContinue={() => setCurrentTab(TAB_FURNITURE)} />}
                     {!isTrading && isWiredTrading && (
                         <div className="octane-inventory-body is-trade">
                             <InventoryWiredTradeView />

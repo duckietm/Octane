@@ -23,14 +23,7 @@ import { CatalogScrollAreaView } from '../../common/CatalogScrollAreaView';
 import { CatalogAddOnBadgeWidgetView } from '../../widgets/CatalogAddOnBadgeWidgetView';
 import { CatalogTotalPriceWidget } from '../../widgets/CatalogTotalPriceWidget';
 import { CatalogLayoutProps } from '../CatalogLayout.types';
-import {
-    buildNewPetPaletteChoices,
-    buildPetPurchaseExtraData,
-    filterPetPalettes,
-    getPetNameMaxLength,
-    isLegacyPetType,
-    PetPaletteLike,
-} from './petCatalog.helpers';
+import { buildNewPetPaletteChoices, buildPetPurchaseExtraData, derivePetPalettes, filterPetPalettes, getPetNameMaxLength, isLegacyPetType, PetPaletteLike, petProductCode } from './petCatalog.helpers';
 import { Select } from '../../../../../../common/Select';
 import { BaseButton } from '../../../../../../common/BaseButton';
 import { ToggleButton } from '../../../../../../common/ToggleButton';
@@ -57,7 +50,8 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
     activePageIdRef.current = page?.pageId ?? -1;
     const { currentOffer = null } = useCatalogData();
     const { setCurrentOffer = null } = useCatalogUiState();
-    const breed = (currentOffer?.product?.productData?.type as unknown as string) ?? '';
+    // Asked by pet type, not by the product data's entry: see petProductCode.
+    const breed = currentOffer ? petProductCode(petIndex) : '';
     const { data: petPalette = null } = useSellablePetPalette(breed);
     const legacyPet = isLegacyPetType(petIndex);
     const clubLevel = useUserDataSnapshot().clubLevel;
@@ -83,7 +77,11 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
             (palette) => !!GetRoomEngine().getPetColorResult(petIndex, palette.paletteId)
         );
 
-        return existing.length ? existing : sellablePalettes;
+        if (existing.length) return existing;
+        if (sellablePalettes.length) return sellablePalettes;
+
+        // The server listed no breeds: offer the ones the pet's asset holds, as the newer pets do.
+        return derivePetPalettes(petIndex, (type, paletteId) => !!GetRoomEngine().getPetColorResult(type, paletteId)) as typeof sellablePalettes;
     }, [legacyPet, petAssetRefreshKey, petIndex, sellablePalettes]);
 
     useEffect(() => {
@@ -110,15 +108,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
         let palettes: PetPaletteLike[] = sellablePalettes as unknown as PetPaletteLike[];
 
         if (!palettes.length) {
-            const derived: PetPaletteLike[] = [];
-
-            for (let paletteId = 0; paletteId <= 128; paletteId++) {
-                if (GetRoomEngine().getPetColorResult(petIndex, paletteId)) {
-                    derived.push({ breedId: paletteId, paletteId, rare: false, sellable: true, type: petIndex, clubOnly: false });
-                }
-            }
-
-            palettes = derived;
+            palettes = derivePetPalettes(petIndex, (type, paletteId) => !!GetRoomEngine().getPetColorResult(type, paletteId));
         }
 
         return buildNewPetPaletteChoices(petIndex, palettes, (type, paletteId) => GetRoomEngine().getPetColorResult(type, paletteId));

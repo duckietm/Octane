@@ -15,7 +15,7 @@ export interface VipGiftItemViewProps {
     onSelect(localizationId: string): void;
 }
 
-const getGiftFurniData = (offer: CatalogPageMessageOfferData) => {
+export const getGiftFurniData = (offer: CatalogPageMessageOfferData) => {
     const product = offer?.products?.[0];
 
     if (!product) return null;

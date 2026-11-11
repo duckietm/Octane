@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-    buildNewPetPaletteChoices,
-    buildPetPurchaseExtraData,
-    filterPetPalettes,
-    getPetNameMaxLength,
-    isLegacyPetType
-} from './petCatalog.helpers';
+import { buildNewPetPaletteChoices, buildPetPurchaseExtraData, derivePetPalettes, filterPetPalettes, getPetNameMaxLength, isLegacyPetType, petProductCode } from './petCatalog.helpers';
 
 const palette = (type: number, paletteId: number, sellable = true, breedId = paletteId) => ({
     breedId,
@@ -53,5 +47,21 @@ describe('pet catalog rules', () => {
 
     it('uses the fixed purchase color for new pets', () => {
         expect(buildPetPurchaseExtraData('Nova', 8, palette(8, 77), 0x123456)).toBe('Nova\n77\nFFFFFF');
+    });
+
+    it('names the product by pet type', () => {
+        expect(petProductCode(3)).toBe('a0 pet3');
+        expect(petProductCode(0)).toBe('a0 pet0');
+        expect(petProductCode(37)).toBe('a0 pet37');
+        expect(petProductCode(-1)).toBe('');
+        expect(petProductCode(Number.NaN)).toBe('');
+    });
+
+    it('offers the palettes the pet asset holds when the server lists none', () => {
+        const palettes = derivePetPalettes(3, (_type, paletteId) => paletteId === 0 || paletteId === 4);
+
+        expect(palettes.map((palette) => palette.paletteId)).toEqual([0, 4]);
+        expect(palettes.every((palette) => palette.sellable && palette.type === 3 && palette.breedId === palette.paletteId)).toBe(true);
+        expect(derivePetPalettes(3, () => false)).toEqual([]);
     });
 });

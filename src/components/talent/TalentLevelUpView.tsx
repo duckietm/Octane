@@ -5,7 +5,7 @@ import { LayoutBadgeImageView, OctaneCardContentView, OctaneCardHeaderView, Octa
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { ITalentLevelUp } from '../../hooks';
-import { LibraryImageView } from '../help/habbo-way/HabboWayPagerView';
+import { TalentImageView } from './TalentImageView';
 
 interface TalentLevelUpViewProps {
     levelUp: ITalentLevelUp;
@@ -35,7 +35,7 @@ export const TalentLevelUpView: FC<TalentLevelUpViewProps> = ({ levelUp, onClose
                 </div>
             ) : (
                 <div key={`product-${index}`} className="octane-talent-levelup__reward">
-                    <LibraryImageView src={getTalentProductImageUrl(library, product.productCode)} />
+                    <TalentImageView productCode={product.productCode} src={getTalentProductImageUrl(library, product.productCode)} />
                 </div>
             )
         )
@@ -78,7 +78,7 @@ export const TalentLevelUpView: FC<TalentLevelUpViewProps> = ({ levelUp, onClose
                     <BaseButton className="octane-talent-dialog__decline" type="button" onClick={onClose}>
                         {localizeWithFallback('alert.close.button', 'Close')}
                     </BaseButton>
-                    <LibraryImageView className="octane-talent-levelup__decoration" src={getTalentLevelUpImageUrl(library, track, level)} />
+                    <TalentImageView className="octane-talent-levelup__decoration" src={getTalentLevelUpImageUrl(library, track, level)} />
                 </OctaneCardContentView>
             </OctaneCardView>
         </NativeTextTree>

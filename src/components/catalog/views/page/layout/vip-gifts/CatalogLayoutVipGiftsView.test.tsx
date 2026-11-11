@@ -2,7 +2,7 @@ import { SelectClubGiftComposer } from '@octane/renderer';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SendMessageComposer } from '../../../../../../api';
-import { useClubGifts, useNotification, usePurse } from '../../../../../../hooks';
+import { useClubGifts, usePurse } from '../../../../../../hooks';
 import { CatalogLayoutVipGiftsView } from './CatalogLayoutVipGiftsView';
 
 const textOverrides = vi.hoisted(() => new Map<string, string>());
@@ -38,7 +38,6 @@ vi.mock('../../../../../../hooks', async (importOriginal) => {
     return {
         ...actual,
         useClubGifts: vi.fn(),
-        useNotification: vi.fn(),
         usePurse: vi.fn()
     };
 });
@@ -63,8 +62,6 @@ const clubGifts = (giftsAvailable: number, daysUntilNextGift = 0) => {
     };
 };
 
-const showConfirm = vi.fn();
-
 const renderView = () => render(<CatalogLayoutVipGiftsView page={{ layoutCode: 'club_gifts' } as any} hideNavigation={() => undefined} />);
 
 afterEach(cleanup);
@@ -72,7 +69,6 @@ afterEach(cleanup);
 beforeEach(() => {
     vi.clearAllMocks();
     textOverrides.clear();
-    vi.mocked(useNotification).mockReturnValue({ showConfirm } as any);
     vi.mocked(usePurse).mockReturnValue({ purse: { isVip: true, pastClubDays: 20, pastVipDays: 13 } } as any);
     vi.mocked(useClubGifts).mockReturnValue({ data: clubGifts(2) } as any);
 });
@@ -135,7 +131,7 @@ describe('club gifts page', () => {
 
         fireEvent.click(locked);
 
-        expect(showConfirm).not.toHaveBeenCalled();
+        expect(document.querySelector('.octane-club-gift-confirm')).toBeNull();
     });
 
     it('disables every select button when no gift is available', () => {
@@ -150,16 +146,32 @@ describe('club gifts page', () => {
         }
     });
 
-    it('sends the selection after the confirmation', () => {
-        showConfirm.mockImplementation((_message: string, onConfirm: () => void) => onConfirm());
-
+    it('asks in the gift window and sends the selection only on select', () => {
         renderView();
 
         fireEvent.click(screen.getAllByRole('button', { name: 'catalog.club_gift.select' })[0]);
 
-        expect(showConfirm).toHaveBeenCalledWith('catalog.club_gift.confirm', expect.any(Function), null);
+        const dialog = document.querySelector('.octane-club-gift-confirm') as HTMLElement;
+
+        expect(dialog).not.toBeNull();
+        expect(within(dialog).getByText('HC Sofa')).toBeInTheDocument();
+        expect(SendMessageComposer).not.toHaveBeenCalled();
+
+        fireEvent.click(within(dialog).getByRole('button', { name: 'catalog.club_gift.select' }));
+
         expect(SendMessageComposer).toHaveBeenCalledTimes(1);
         expect(vi.mocked(SendMessageComposer).mock.calls[0][0]).toBeInstanceOf(SelectClubGiftComposer);
         expect((vi.mocked(SendMessageComposer).mock.calls[0][0] as any).getMessageArray()).toEqual(['gift_one']);
+        expect(document.querySelector('.octane-club-gift-confirm')).toBeNull();
+    });
+
+    it('sends nothing when the gift window is cancelled', () => {
+        renderView();
+
+        fireEvent.click(screen.getAllByRole('button', { name: 'catalog.club_gift.select' })[0]);
+        fireEvent.click(within(document.querySelector('.octane-club-gift-confirm') as HTMLElement).getByRole('button', { name: 'cancel' }));
+
+        expect(SendMessageComposer).not.toHaveBeenCalled();
+        expect(document.querySelector('.octane-club-gift-confirm')).toBeNull();
     });
 });

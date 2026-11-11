@@ -56,9 +56,9 @@ describe('current catalog layout geometry', () => {
         });
     });
 
-    it('leaves a full 70 pixel offer column beside the classic scrollbar', () => {
-        expect(styleFor('octane-catalog-badge-product-picker')).toMatchObject({ padding: '3px' });
-        expect(styleFor('octane-classic-scroll-area-viewport', 'octane-catalog-badge-product-picker')).toMatchObject({ width: '87px' });
+    it('frames the badge display item grid 4 pixels inside its box, as the item grid widget does', () => {
+        expect(styleFor('octane-catalog-badge-product-picker')).toMatchObject({ padding: '4px', width: '95px', height: '175px' });
+        expect(styleFor('octane-classic-scroll-area-viewport', 'octane-catalog-badge-product-picker')).toMatchObject({ width: '85px' });
     });
 
     it('lets the sound machine regions expand with the catalog while preserving their vertical geometry', () => {
