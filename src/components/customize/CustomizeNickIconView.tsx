@@ -84,6 +84,21 @@ const PRESET_COLORS: string[] = [
     '#8D5524'
 ];
 
+// A server that never answers (an older emulator, a dropped packet) must not leave every button disabled.
+const LOADING_UNLOCK_MS = 8000;
+
+const ownershipLabel = (owned: boolean, active: boolean) => {
+    if (!owned) return localizeWithFallback('octane.customize.locked', 'Locked');
+
+    return active ? localizeWithFallback('octane.customize.owned_active', 'Owned - Active') : localizeWithFallback('octane.customize.owned', 'Owned');
+};
+
+const actionLabel = (owned: boolean, active: boolean) => {
+    if (!owned) return localizeWithFallback('octane.customize.buy', 'Buy');
+
+    return active ? localizeWithFallback('octane.customize.deactivate', 'Deactivate') : localizeWithFallback('octane.customize.activate', 'Activate');
+};
+
 export const CustomizeNickIconView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -106,10 +121,12 @@ export const CustomizeNickIconView: FC<{}> = () => {
     const [customPrefixEffect, setCustomPrefixEffect] = useState('');
     const [customPrefixFont, setCustomPrefixFont] = useState('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [purchaseError, setPurchaseError] = useState('');
 
-    useMessageEvent<CustomPrefixPurchaseFailedEvent>(CustomPrefixPurchaseFailedEvent, () => {
+    // A refused purchase unlocks the window and says why, instead of closing it.
+    useMessageEvent<CustomPrefixPurchaseFailedEvent>(CustomPrefixPurchaseFailedEvent, (event) => {
         setIsLoading(false);
-        setIsVisible(false);
+        setPurchaseError(event.getParser().message || localizeWithFallback('octane.customize.purchase_failed', 'The purchase could not be completed.'));
     });
 
     useMessageEvent<UserNickIconsEvent>(UserNickIconsEvent, (event) => {
@@ -199,9 +216,18 @@ export const CustomizeNickIconView: FC<{}> = () => {
     useEffect(() => {
         if (!isVisible) return;
 
+        setPurchaseError('');
         setIsLoading(true);
         SendMessageComposer(new RequestNickIconsComposer());
     }, [isVisible]);
+
+    useEffect(() => {
+        if (!isLoading) return;
+
+        const timeout = setTimeout(() => setIsLoading(false), LOADING_UNLOCK_MS);
+
+        return () => clearTimeout(timeout);
+    }, [isLoading]);
 
     const activeIcon = useMemo(() => iconItems.find((item) => item.active) || null, [iconItems]);
     const activePrefix = useMemo(() => prefixItems.find((item) => item.active) || null, [prefixItems]);
@@ -305,6 +331,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
     };
 
     const handleCombinedPrefixAction = (item: ICombinedPrefixItem) => {
+        setPurchaseError('');
         setIsLoading(true);
 
         if (item.owned) {
@@ -318,6 +345,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
     const handleCustomPrefixPurchase = () => {
         if (!customPrefixIsValid) return;
 
+        setPurchaseError('');
         setIsLoading(true);
         SendMessageComposer(new PurchasePrefixComposer(customPrefixText.trim(), customPrefixColor, customPrefixIcon, customPrefixEffect, customPrefixFont));
     };
@@ -364,6 +392,12 @@ export const CustomizeNickIconView: FC<{}> = () => {
                         </div>
                     </div>
 
+                    {!!purchaseError && (
+                        <div role="alert" className="rounded border border-[#c1121f]/40 bg-[#c1121f]/10 p-2 text-[11px] leading-4 text-[#7a0a12]">
+                            {purchaseError}
+                        </div>
+                    )}
+
                     {activeTab === 'icons' && (
                         <>
                             <div className="rounded border border-black/10 bg-black/5 p-2 text-[11px] leading-4">
@@ -385,7 +419,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                             )}
                                             {iconUrl && <img className="h-auto max-h-[28px] w-auto object-contain" src={iconUrl} alt={item.iconKey} />}
                                             <div className="flex flex-col items-center gap-1 text-center text-[11px]">
-                                                <span>{item.owned ? (item.active ? localizeWithFallback('octane.customize.owned_active', 'Owned - Active') : 'Owned') : 'Locked'}</span>
+                                                <span>{ownershipLabel(item.owned, item.active)}</span>
                                                 <span className="max-w-[140px] truncate">{item.displayName || `Icon #${item.iconKey}`}</span>
                                                 <span className="inline-flex items-center gap-1">
                                                     <LayoutCurrencyIcon type={item.pointsType} />
@@ -393,9 +427,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                                 </span>
                                             </div>
                                             <Button variant={item.owned ? 'secondary' : 'success'} disabled={isLoading} onClick={() => handleIconAction(item)}>
-                                                {!item.owned && 'Buy'}
-                                                {item.owned && !item.active && 'Activate'}
-                                                {item.owned && item.active && 'Deactivate'}
+                                                {actionLabel(item.owned, item.active)}
                                             </Button>
                                         </div>
                                     );
@@ -413,14 +445,14 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                         type="button"
                                         onClick={() => setActivePrefixSubTab('library')}
                                     >
-                                        Library
+                                        {localizeWithFallback('octane.customize.library', 'Library')}
                                     </BaseButton>
                                     <BaseButton
                                         className={`rounded px-3 py-1.5 text-[12px] font-bold transition-colors ${activePrefixSubTab === 'custom' ? 'bg-[#418db0] text-white' : 'bg-white text-black'}`}
                                         type="button"
                                         onClick={() => setActivePrefixSubTab('custom')}
                                     >
-                                        Custom
+                                        {localizeWithFallback('octane.customize.custom', 'Custom')}
                                     </BaseButton>
                                 </div>
                             </div>
@@ -452,10 +484,10 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                                     username="Username"
                                                 />
                                                 <div className="flex flex-col gap-1 text-[11px]">
-                                                    <span>{item.owned ? (item.active ? localizeWithFallback('octane.customize.owned_active', 'Owned - Active') : 'Owned') : 'Locked'}</span>
+                                                    <span>{ownershipLabel(item.owned, item.active)}</span>
                                                     <span className="truncate">
                                                         {item.displayName || item.text}
-                                                        {item.isCustom ? ' - Custom' : ''}
+                                                        {item.isCustom ? ` - ${localizeWithFallback('octane.customize.custom', 'Custom')}` : ''}
                                                     </span>
                                                     <span className="inline-flex items-center gap-1">
                                                         <LayoutCurrencyIcon type={item.pointsType} />
@@ -463,9 +495,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                                     </span>
                                                 </div>
                                                 <Button variant={item.owned ? 'secondary' : 'success'} disabled={isLoading} onClick={() => handleCombinedPrefixAction(item)}>
-                                                    {!item.owned && 'Buy'}
-                                                    {item.owned && !item.active && 'Activate'}
-                                                    {item.owned && item.active && 'Deactivate'}
+                                                    {actionLabel(item.owned, item.active)}
                                                 </Button>
                                             </div>
                                         ))}

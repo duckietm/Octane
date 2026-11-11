@@ -152,6 +152,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
             newValue.prefixColor = event.prefixColor;
             newValue.prefixIcon = event.prefixIcon;
             newValue.prefixEffect = event.prefixEffect;
+            newValue.prefixFont = event.prefixFont ?? '';
             newValue.displayOrder = event.displayOrder;
             newValue.backgroundId = event.backgroundId;
             newValue.standId = event.standId;
