@@ -22,22 +22,28 @@ const useInventoryPrefixesState = () => {
     const { isVisible = false, activate = null, deactivate = null } = useSharedVisibility();
     const { isUnseen = null, resetCategory = null } = useInventoryUnseenTracker();
 
+    // This list is the short one (no catalog id, display name or price): keep what the richer list already told us
+    // about the same prefix instead of dropping it.
     useMessageEvent<UserPrefixesEvent>(UserPrefixesEvent, (event) => {
         const parser = event.getParser();
-        const newPrefixes: IPrefixItem[] = parser.prefixes.map((p) => ({
-            id: p.id,
-            text: p.text,
-            color: p.color,
-            icon: p.icon || '',
-            effect: p.effect || '',
-            font: p.font || '',
-            active: p.active
-        }));
 
-        setPrefixes(newPrefixes);
+        setPrefixes((prevValue) => {
+            const known = new Map(prevValue.map((prefix) => [prefix.id, prefix]));
+            const next: IPrefixItem[] = parser.prefixes.map((p) => ({
+                ...known.get(p.id),
+                id: p.id,
+                text: p.text,
+                color: p.color,
+                icon: p.icon || '',
+                effect: p.effect || '',
+                font: p.font || '',
+                active: p.active
+            }));
 
-        const active = newPrefixes.find((p) => p.active) || null;
-        setActivePrefix(active);
+            setActivePrefix(next.find((p) => p.active) || null);
+
+            return next;
+        });
     });
 
     useMessageEvent<UserNickIconsEvent>(UserNickIconsEvent, (event) => {
@@ -73,7 +79,7 @@ const useInventoryPrefixesState = () => {
             active: false
         };
 
-        setPrefixes((prevValue) => [newPrefix, ...prevValue]);
+        setPrefixes((prevValue) => [newPrefix, ...prevValue.filter((prefix) => prefix.id !== newPrefix.id)]);
     });
 
     useMessageEvent<ActivePrefixUpdatedEvent>(ActivePrefixUpdatedEvent, (event) => {

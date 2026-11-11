@@ -117,6 +117,16 @@ describe('applyUserFigureUpdate', () => {
         expect(next.cardBackgroundId).toBe(9);
     });
 
+    it('carries the prefix font and the border on a live update', () => {
+        const state = buildAvatarInfoUser({ roomIndex: 3 });
+        const event = { roomIndex: 3, prefixFont: 'pixel', borderId: 6 } as any;
+
+        const next = applyUserFigureUpdate(state, event) as AvatarInfoUser;
+
+        expect(next.prefixFont).toBe('pixel');
+        expect(next.borderId).toBe(6);
+    });
+
     it('defaults cardBackgroundId to 0 when the server omits it', () => {
         const state = buildAvatarInfoUser({ roomIndex: 3, cardBackgroundId: 7 });
         const event = {
