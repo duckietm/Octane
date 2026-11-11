@@ -2542,6 +2542,7 @@
     "octane.login.previous_news": "Previous news",
     "octane.login.next_news": "Next news",
     "octane.badge_leaderboard.close": "Close",
+    "octane.badge_leaderboard.unavailable": "The leaderboard is not available right now.",
     "octane.customize.icons": "Icons",
     "octane.customize.prefix": "Prefix",
     "octane.customize.settings": "Settings",
