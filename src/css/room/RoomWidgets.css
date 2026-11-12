@@ -273,6 +273,16 @@
     }
 }
 
+/* AIR RoomToolsInfoCtrl: the box always sits 12px right of the rail's visible edge, on the rail's bottom line. With the
+   rail minimised that edge is the expand handle (13px here), and the box moves there in 100 ms, easing out. */
+.octane-room-tools-container .octane-room-tools-info.octane-room-tools-info--enter {
+    transition: left 100ms ease-out;
+}
+
+.octane-room-tools-container.is-collapsed .octane-room-tools-info.octane-room-tools-info--enter {
+    left: 25px;
+}
+
 .octane-room-tools-history {
     position: absolute;
     bottom: 0;

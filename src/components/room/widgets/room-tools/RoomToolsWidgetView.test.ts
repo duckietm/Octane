@@ -38,6 +38,10 @@ const css = readFileSync(join(process.cwd(), 'src/css/room/RoomWidgets.css'), 'u
         expect(source).not.toContain('initial={{ opacity: 0, x: -12 }}');
     });
 
+    it('starts with the rail minimised', () => {
+        expect(source).toContain('const [isToolsOpen, setIsToolsOpen] = useState<boolean>(false);');
+    });
+
     it('folds the rail when a toolbar entry is clicked', () => {
         const toolbarItem = readFileSync(join(process.cwd(), 'src/components/toolbar/ToolbarItemView.tsx'), 'utf8');
 
