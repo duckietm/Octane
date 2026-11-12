@@ -1944,3 +1944,16 @@
         width: 154px;
     }
 }
+
+/* Mystery box tracker: the official faq_link under the box and key, bold 0x00BEFF link text, centred. */
+.octane-mysterybox-faq-link {
+    display: block;
+    margin: 4px auto 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #00beff;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+}
