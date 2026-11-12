@@ -11,7 +11,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC, useEffect, useState } from 'react';
 import { GetConfigurationValue, IsTouchDevice, OpenUrl } from '../api';
-import { useAirLinkAliases, useMentionMessages, useOctaneEventReducer } from '../hooks';
+import { useAirLinkAliases, useMentionMessages, useNewUserPromos, useOctaneEventReducer } from '../hooks';
 import { AchievementsView } from './achievements/AchievementsView';
 import { GoogleAdsView } from './ads/GoogleAdsView';
 import { AvatarEditorView } from './avatar-editor';
@@ -21,6 +21,7 @@ import { CameraWidgetView } from './camera/CameraWidgetView';
 import { CampaignView } from './campaign/CampaignView';
 import { CatalogView } from './catalog/CatalogView';
 import { CursedDragonAdoptionView } from './catalog/cursed-dragon-adoption/CursedDragonAdoptionView';
+import { ErrorPopupView } from './error-popup/ErrorPopupView';
 import { FirstLoginSetupView } from './first-login-setup/FirstLoginSetupView';
 import { SpecialItemsDisplayView } from './catalog/special-items/SpecialItemsDisplayView';
 import { ChatHistoryView } from './chat-history/ChatHistoryView';
@@ -80,6 +81,7 @@ export const MainView: FC<{}> = (props) =>
 
     useMentionMessages();
     useAirLinkAliases();
+    useNewUserPromos();
 
     const { landingViewVisible } = useOctaneEventReducer<{ sessionId: number | null; landingViewVisible: boolean }, RoomSessionEvent>(
         [RoomSessionEvent.CREATED, RoomSessionEvent.ENDED],
@@ -228,6 +230,7 @@ export const MainView: FC<{}> = (props) =>
                 <WidgetErrorBoundary name="SpecialItemsDisplayView"><SpecialItemsDisplayView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="CursedDragonAdoptionView"><CursedDragonAdoptionView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="FirstLoginSetupView"><FirstLoginSetupView /></WidgetErrorBoundary>
+                <WidgetErrorBoundary name="ErrorPopupView"><ErrorPopupView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="CollectiblesHubView"><CollectiblesHubView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="CollectiblesRewardBoxView"><CollectiblesRewardBoxView /></WidgetErrorBoundary>
                 <WidgetErrorBoundary name="FriendsView"><FriendsView /></WidgetErrorBoundary>

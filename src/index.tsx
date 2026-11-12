@@ -127,6 +127,7 @@ import './css/catalog/VipBenefitsView.css';
 import './css/room/VipRequired.css';
 import './css/room/RespectFailed.css';
 import './css/room/RoomStats.css';
+import './css/notification/ErrorPopup.css';
 import './css/catalog/CursedDragonAdoption.css';
 import './css/first-login/FirstLoginSetup.css';
 import './css/catalog/SpecialItemsDisplay.css';

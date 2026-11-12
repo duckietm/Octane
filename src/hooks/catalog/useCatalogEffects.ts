@@ -38,6 +38,8 @@ import {
     LocalizeText,
     NO_RECOLOR,
     NotificationAlertType,
+    NotificationBubbleType,
+    localizeWithFallback,
     PageLocalization,
     PlacedObjectPurchaseData,
     PlaySound,
@@ -90,7 +92,7 @@ const scheduleWhenIdle = (run: () => void): void => {
 export const useCatalogEffects = (): void => {
     const queryClient = useQueryClient();
     const connectionState = useConnectionState();
-    const { simpleAlert = null, showConfirm = null } = useNotification();
+    const { simpleAlert = null, showConfirm = null, showSingleBubble = null } = useNotification();
     const [catalogSkipPurchaseConfirmation] = useCatalogSkipPurchaseConfirmation();
     const [catalogPlaceMultipleObjects, setCatalogPlaceMultipleObjectsPreference] = useCatalogPlaceMultipleItems();
     const wasAuthenticated = useRef(connectionState.authenticated);
@@ -320,6 +322,15 @@ export const useCatalogEffects = (): void => {
         // Every type: a publish while one catalog is open left the other types' indexes stale.
         invalidateAllCatalogIndexes();
         invalidateCatalogPages();
+
+        // Official HabboCatalog: say that the catalogue changed, in an alert while it is open and a bubble otherwise.
+        const description = localizeWithFallback('catalog.alert.published.description', 'The catalogue has been updated.');
+
+        if (useCatalogStore.getState().isVisible) {
+            simpleAlert?.(description, NotificationAlertType.DEFAULT, null, null, localizeWithFallback('catalog.alert.published.title', 'Catalogue updated'));
+        } else {
+            showSingleBubble?.(description, NotificationBubbleType.INFO);
+        }
     });
 
     useMessageEvent<BuildersClubFurniCountMessageEvent>(BuildersClubFurniCountMessageEvent, (event) => {

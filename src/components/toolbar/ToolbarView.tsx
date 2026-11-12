@@ -11,6 +11,7 @@ import { Flex, LayoutAvatarImageView, LayoutItemCountView } from '../../common';
 import { SoundboardRoomMessageEvent } from '../../events';
 import { useAchievements, useBuildHeight, useDailyTasks, useFriends, useHasPermission, useInventoryUnseenTracker, useMentionsSnapshot, useMessageEvent, useMessenger, useOctaneEvent, useOpenIssueCount, useRewardTracks, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
 import { BottomDockLayout, resolveBottomDockLayout } from './bottomDockLayout';
+import { ToolbarNavigatorItemView } from './ToolbarNavigatorItemView';
 import { ToolbarItemView } from './ToolbarItemView';
 import { ToolbarMeView } from './ToolbarMeView';
 import { ToolbarNewAdditionsLabel } from './ToolbarNewAdditionsLabel';
@@ -55,6 +56,21 @@ const readCollapsedPreference = (key: string): boolean =>
     }
 };
 
+const HIGHLIGHT_ANCHORS: Record<string, string> = { catalog: '.icon-catalog', navigator: '.icon-rooms', memenu: '.tb-memenu-avatar' };
+const HIGHLIGHT_MS = 4000;
+
+/** Pulses a toolbar icon for a few seconds, wherever it is on screen. */
+const highlightToolbarIcon = (name: string) =>
+{
+    const selector = HIGHLIGHT_ANCHORS[name];
+    const element = selector ? document.querySelector<HTMLElement>(selector) : null;
+
+    if(!element) return;
+
+    element.classList.add('octane-toolbar-hint');
+    window.setTimeout(() => element.classList.remove('octane-toolbar-hint'), HIGHLIGHT_MS);
+};
+
 export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
 {
     const { isInRoom } = props;
@@ -73,7 +89,12 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
         const linkTracker: ILinkEventTracker = {
             linkReceived: (url: string) =>
             {
-                if(url.split('/')[1] === 'memenu') setMeExpanded(value => !value);
+                const parts = url.split('/');
+
+                if(parts[1] === 'memenu') setMeExpanded(value => !value);
+
+                // toolbar/highlight/<catalog|navigator|memenu>: the official hint on that icon.
+                if(parts[1] === 'highlight') highlightToolbarIcon(parts[2]);
             },
             eventUrlPrefix: 'toolbar/'
         };
@@ -420,7 +441,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                                 : <ToolbarItemView icon="house" onClick={ () => CreateLinkEvent('navigator/goto/home') } className="tb-icon" /> }
                         </motion.div>
                         <motion.div variants={ itemVariants } className="tb-slot">
-                            <ToolbarItemView icon="rooms" onClick={ () => CreateLinkEvent('navigator/toggle') } className="tb-icon" />
+                            <ToolbarNavigatorItemView />
                         </motion.div>
                         { isInRoom &&
                             <motion.div variants={ itemVariants } className="relative tb-slot tb-slot-progression">
@@ -593,7 +614,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                                 : <ToolbarItemView icon="house" onClick={ () => CreateLinkEvent('navigator/goto/home') } className="tb-icon" /> }
                         </motion.div>
                         <motion.div variants={ itemVariants }>
-                            <ToolbarItemView icon="rooms" onClick={ () => CreateLinkEvent('navigator/toggle') } className="tb-icon" />
+                            <ToolbarNavigatorItemView />
                         </motion.div>
                         { GetConfigurationValue('game.center.enabled') &&
                             <motion.div variants={ itemVariants }>

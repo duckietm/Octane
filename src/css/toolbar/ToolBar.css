@@ -394,3 +394,71 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
+/* Official toolbar_hover: a 252px box in 0x79756E holding 238x20 rows in 0x57544D, white bold Ubuntu 12 with a
+   dark etch, opened beside the navigator icon. Here the toolbar is at the bottom, so the box opens above the icon;
+   it is placed on the page (left and bottom set inline), since the toolbar clips what is drawn inside an icon. */
+.octane-toolbar-navigator-hover {
+    position: fixed;
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    box-sizing: border-box;
+    width: 252px;
+    padding: 7px;
+    border: 1px solid #000000;
+    border-radius: 6px;
+    background: #79756e;
+    cursor: default;
+}
+
+/* The gap between the icon and the box stays part of the box, so the pointer can cross it. */
+.octane-toolbar-navigator-hover::after {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    content: '';
+}
+
+.octane-toolbar-navigator-hover__item {
+    display: block;
+    width: 100%;
+    height: 20px;
+    padding: 0 7px;
+    border: 0;
+    border-radius: 3px;
+    background: #57544d;
+    color: #ffffff;
+    font-family: Ubuntu, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 20px;
+    text-align: left;
+    text-shadow: 1px 1px 0 #000000;
+    cursor: pointer;
+}
+
+.octane-toolbar-navigator-hover__item:hover {
+    background: #6b675f;
+}
+
+/* toolbar/highlight: the hinted icon pulses with a light glow for a few seconds. */
+@keyframes octane-toolbar-hint {
+    0%,
+    100% {
+        filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+        transform: translateY(0);
+    }
+
+    50% {
+        filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.95));
+        transform: translateY(-3px);
+    }
+}
+
+.octane-toolbar-hint {
+    animation: octane-toolbar-hint 800ms ease-in-out 5;
+}

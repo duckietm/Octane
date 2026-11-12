@@ -2,6 +2,7 @@ import {
     AddLinkEventTracker,
     ConvertGlobalRoomIdMessageComposer,
     ForwardToSomeRoomMessageComposer,
+    RoomNetworkOpenConnectionMessageComposer,
     GetCategoriesWithUserCountMessageComposer,
     HabboWebTools,
     ILinkEventTracker,
@@ -133,6 +134,13 @@ export const NavigatorView: FC<{}> = () => {
                         SendMessageComposer(new ConvertGlobalRoomIdMessageComposer(target));
                         return;
                     }
+                    case 'network': {
+                        // Official HabboNavigator.goToRoomNetwork: hop into a room network (the hotel view's teaser).
+                        const networkId = Number.parseInt(parts[2] ?? '', 10);
+
+                        if (Number.isFinite(networkId) && networkId > 0) SendMessageComposer(new RoomNetworkOpenConnectionMessageComposer(networkId, 0));
+                        return;
+                    }
                     case 'ask_forward': {
                         // AIR: the room's name is asked for and the move confirmed first.
                         const roomId = askForwardRoomId(parts[2]);
@@ -155,6 +163,8 @@ export const NavigatorView: FC<{}> = () => {
                     case 'tab':
                         // Official getSearchCodeForTabLink: "me" is the My World tab.
                         if (parts[2]) store.setTab(parts[2] === 'me' ? 'myworld_view' : parts[2]);
+                        // navigator/tab/me/<list>: that list of the tab opened out (favorites, history, history_freq).
+                        if (parts[3]) store.setResultCollapsed(parts[3], false);
                         store.show();
                         return;
                     case 'me':
