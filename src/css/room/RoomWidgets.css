@@ -840,6 +840,45 @@
     transform: translateY(-1px);
 }
 
+.swf-chat-input .swf-chat-help-button {
+    position: absolute;
+    top: 50%;
+    right: -24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 1px solid #000000;
+    border-radius: 50%;
+    background: #f2f2f2;
+    color: #000000;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%);
+    transition: opacity 100ms ease-out;
+}
+
+/* The gap between the input and the button stays hoverable, so the pointer can reach it. */
+.swf-chat-input .swf-chat-help-button::before {
+    position: absolute;
+    top: -9px;
+    right: 100%;
+    width: 8px;
+    height: 38px;
+    content: '';
+}
+
+.swf-chat-input:hover .swf-chat-help-button,
+.swf-chat-input .swf-chat-help-button:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 /* Same surface as .swf-chat-style-menu; the picker keeps its own layout and takes the colours through its variables. */
 .swf-chat-emoji-popover {
     outline: 0;

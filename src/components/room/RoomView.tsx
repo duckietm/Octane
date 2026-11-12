@@ -5,6 +5,7 @@ import { DispatchMouseEvent, DispatchTouchEvent } from '../../api';
 import { useRoom, useRoomKeyboardMovement } from '../../hooks';
 import { classNames } from '../../layout';
 import { RoomSpectatorView } from './spectator/RoomSpectatorView';
+import { RoomStatsView } from './widgets/room-stats/RoomStatsView';
 import { RoomWidgetsView } from './widgets/RoomWidgetsView';
 import { WiredLabelOverlayView } from './widgets/wired-label/WiredLabelOverlayView';
 import { WiredLeaderboardOverlayView } from './widgets/wired-leaderboard/WiredLeaderboardOverlayView';
@@ -148,6 +149,7 @@ export const RoomView: FC<{}> = (props) => {
                             <WiredLeaderboardOverlayView />
                             <WiredLabelOverlayView />
                             <WiredVariableFxView />
+                            <RoomStatsView />
                             {roomSession instanceof RoomSession && (
                                 <>
                                     <RoomWidgetsView />
