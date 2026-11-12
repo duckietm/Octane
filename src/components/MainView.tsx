@@ -10,8 +10,8 @@ import {
 } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC, useEffect, useState } from 'react';
-import { GetConfigurationValue, IsTouchDevice } from '../api';
-import { useMentionMessages, useOctaneEventReducer } from '../hooks';
+import { GetConfigurationValue, IsTouchDevice, OpenUrl } from '../api';
+import { useAirLinkAliases, useMentionMessages, useOctaneEventReducer } from '../hooks';
 import { AchievementsView } from './achievements/AchievementsView';
 import { GoogleAdsView } from './ads/GoogleAdsView';
 import { AvatarEditorView } from './avatar-editor';
@@ -79,6 +79,7 @@ export const MainView: FC<{}> = (props) =>
     const [mentionsVisible, setMentionsVisible] = useState(false);
 
     useMentionMessages();
+    useAirLinkAliases();
 
     const { landingViewVisible } = useOctaneEventReducer<{ sessionId: number | null; landingViewVisible: boolean }, RoomSessionEvent>(
         [RoomSessionEvent.CREATED, RoomSessionEvent.ENDED],
@@ -124,9 +125,13 @@ export const MainView: FC<{}> = (props) =>
                         {
                             switch (parts[2])
                             {
-                                case 'credits':
-                                    //HabboWebTools.openWebPageAndMinimizeClient(this._windowManager.getProperty(ExternalVariables.WEB_SHOP_RELATIVE_URL));
+                                case 'credits': {
+                                    // Official HabbletLinkHandler: the web shop page.
+                                    const shopUrl = GetConfigurationValue<string>('web.shop.relativeUrl', '');
+
+                                    if (shopUrl) OpenUrl(shopUrl);
                                     break;
+                                }
                                 default: {
                                     const name = parts[2];
                                     HabboWebTools.openHabblet(name);

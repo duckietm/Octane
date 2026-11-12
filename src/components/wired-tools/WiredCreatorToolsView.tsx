@@ -1132,8 +1132,18 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                         }
                         return;
                     case 'logs':
-                        // The log action's header button: the room log window.
+                        // The log action's header button: the room log window. As the official menu does, a closed
+                        // menu is shown first, on its monitor tab.
+                        setIsVisible((prevValue) => {
+                            if (!prevValue) setActiveTab('monitor');
+
+                            return true;
+                        });
                         setIsRoomLogsOpen(true);
+                        return;
+                    case 'selfdonation':
+                        // selfdonation/open: the sandbox donation tool (the server decides who may use it).
+                        setIsSelfDonationOpen(true);
                         return;
                     case 'tab':
                         if (parts.length > 2) {

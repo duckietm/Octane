@@ -120,8 +120,9 @@ export const NavigatorView: FC<{}> = () => {
                             TryVisitRoom(homeRoomId);
                             return;
                         }
-                        if (target === 'random_friending_room') {
-                            SendMessageComposer(new ForwardToSomeRoomMessageComposer('random_friending_room'));
+                        // The official client forwards by name: the friending room and the predefined lobbies.
+                        if (target === 'random_friending_room' || target.startsWith('predefined_')) {
+                            SendMessageComposer(new ForwardToSomeRoomMessageComposer(target));
                             return;
                         }
                         const roomId = Number.parseInt(target, 10);
@@ -152,7 +153,8 @@ export const NavigatorView: FC<{}> = () => {
                         store.show();
                         return;
                     case 'tab':
-                        if (parts[2]) store.setTab(parts[2]);
+                        // Official getSearchCodeForTabLink: "me" is the My World tab.
+                        if (parts[2]) store.setTab(parts[2] === 'me' ? 'myworld_view' : parts[2]);
                         store.show();
                         return;
                     case 'me':

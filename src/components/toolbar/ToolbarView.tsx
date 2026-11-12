@@ -1,4 +1,4 @@
-import { CreateLinkEvent, Dispose, DropBounce, EaseOut, FindNewFriendsMessageComposer, JumpBy, Motions, OctaneToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, Wait, YouTubeRoomSettingsEvent } from '@octane/renderer';
+import { AddLinkEventTracker, CreateLinkEvent, Dispose, DropBounce, EaseOut, FindNewFriendsMessageComposer, ILinkEventTracker, JumpBy, Motions, OctaneToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, RemoveLinkEventTracker, Wait, YouTubeRoomSettingsEvent } from '@octane/renderer';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { CSSProperties, FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { GetConfigurationValue, isHousekeepingEnabled, localizeWithFallback, MessengerIconState, OpenMessengerChat, SendMessageComposer, setYoutubeRoomEnabled, VisitDesktop } from '../../api';
@@ -66,6 +66,22 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     {
         if(isMeExpanded || isProgressionExpanded) CreateLinkEvent('room-tools/collapse');
     }, [ isMeExpanded, isProgressionExpanded ]);
+
+    // Official ToolbarView.linkReceived: toolbar/memenu toggles the Me menu.
+    useEffect(() =>
+    {
+        const linkTracker: ILinkEventTracker = {
+            linkReceived: (url: string) =>
+            {
+                if(url.split('/')[1] === 'memenu') setMeExpanded(value => !value);
+            },
+            eventUrlPrefix: 'toolbar/'
+        };
+
+        AddLinkEventTracker(linkTracker);
+
+        return () => RemoveLinkEventTracker(linkTracker);
+    }, []);
     const [ isTouchLayout, setIsTouchLayout ] = useState(false);
     const [ leftCollapsed, setLeftCollapsed ] = useState(() => readCollapsedPreference(LEFT_COLLAPSED_STORAGE_KEY));
     const [ rightCollapsed, setRightCollapsed ] = useState(() => readCollapsedPreference(RIGHT_COLLAPSED_STORAGE_KEY));
