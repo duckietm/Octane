@@ -23,7 +23,7 @@ import { CatalogScrollAreaView } from '../../common/CatalogScrollAreaView';
 import { CatalogAddOnBadgeWidgetView } from '../../widgets/CatalogAddOnBadgeWidgetView';
 import { CatalogTotalPriceWidget } from '../../widgets/CatalogTotalPriceWidget';
 import { CatalogLayoutProps } from '../CatalogLayout.types';
-import { buildNewPetPaletteChoices, buildPetPurchaseExtraData, derivePetPalettes, filterPetPalettes, getPetNameMaxLength, isLegacyPetType, PetPaletteLike, petProductCode } from './petCatalog.helpers';
+import { buildNewPetPaletteChoices, buildPalettelessPetChoices, buildPetPurchaseExtraData, derivePetPalettes, filterPetPalettes, getPetNameMaxLength, isLegacyPetType, PetPaletteLike, petProductCode } from './petCatalog.helpers';
 import { Select } from '../../../../../../common/Select';
 import { BaseButton } from '../../../../../../common/BaseButton';
 import { ToggleButton } from '../../../../../../common/ToggleButton';
@@ -111,8 +111,15 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
             palettes = derivePetPalettes(petIndex, (type, paletteId) => !!GetRoomEngine().getPetColorResult(type, paletteId));
         }
 
-        return buildNewPetPaletteChoices(petIndex, palettes, (type, paletteId) => GetRoomEngine().getPetColorResult(type, paletteId));
-    }, [legacyPet, petAssetRefreshKey, petIndex, sellablePalettes]);
+        const choices = buildNewPetPaletteChoices(petIndex, palettes, (type, paletteId) => GetRoomEngine().getPetColorResult(type, paletteId));
+
+        if (choices.length || !petTypeName) return choices;
+
+        // Loaded, but the asset has no palettes (bunnies, pigeons): the pet has one look and is offered as it is.
+        const paletteNames = GetRoomContentLoader().getCollection?.(petTypeName)?.getPaletteNames?.();
+
+        return paletteNames && !paletteNames.length ? buildPalettelessPetChoices(petIndex, sellablePalettes as unknown as PetPaletteLike[]) : choices;
+    }, [legacyPet, petAssetRefreshKey, petIndex, petTypeName, sellablePalettes]);
 
     const selectablePalettes = useMemo(
         () => (legacyPet ? legacyBreeds : newPetChoices.map((choice) => choice.palette)),

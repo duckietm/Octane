@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildNewPetPaletteChoices, buildPetPurchaseExtraData, derivePetPalettes, filterPetPalettes, getPetNameMaxLength, isLegacyPetType, petProductCode } from './petCatalog.helpers';
+import { buildNewPetPaletteChoices, buildPalettelessPetChoices, buildPetPurchaseExtraData, derivePetPalettes, filterPetPalettes, getPetNameMaxLength, isLegacyPetType, petProductCode } from './petCatalog.helpers';
 
 const palette = (type: number, paletteId: number, sellable = true, breedId = paletteId) => ({
     breedId,
@@ -63,5 +63,21 @@ describe('pet catalog rules', () => {
         expect(palettes.map((palette) => palette.paletteId)).toEqual([0, 4]);
         expect(palettes.every((palette) => palette.sellable && palette.type === 3 && palette.breedId === palette.paletteId)).toBe(true);
         expect(derivePetPalettes(3, () => false)).toEqual([]);
+    });
+
+    it('offers a pet without palettes once, as it is drawn', () => {
+        expect(buildPalettelessPetChoices(18, [])).toEqual([
+            { colors: [0xffffff], palette: { breedId: 0, paletteId: 0, rare: false, sellable: true, type: 18, clubOnly: false } }
+        ]);
+    });
+
+    it('keeps the breeds the server lists for a pet without palettes', () => {
+        const listed = [
+            { breedId: 3, paletteId: 3, rare: false, sellable: true, type: 21 },
+            { breedId: 4, paletteId: 4, rare: false, sellable: false, type: 21 },
+            { breedId: 5, paletteId: 5, rare: false, sellable: true, type: 22 }
+        ];
+
+        expect(buildPalettelessPetChoices(21, listed)).toEqual([{ colors: [0xffffff], palette: listed[0] }]);
     });
 });
