@@ -24,12 +24,14 @@ import { FaEraser, FaTimes } from 'react-icons/fa';
 import { GrFormNextLink, GrRotateLeft, GrRotateRight } from 'react-icons/gr';
 import {
     AvatarInfoFurni,
+    BuilderFurniPlaceableStatus,
     CopyToClipboard,
     FriendlyTime,
     GetConfigurationValue,
     GetGroupInformation,
     getWiredChestInfostandData,
     IPhotoData,
+    IPurchasableOffer,
     isRecolorableClass,
     recolorOfData,
     isSafeExternalUrl,
@@ -73,6 +75,8 @@ import chestLockedIcon from '../../../../../assets/images/groups/native/forum_fo
 import { ImagePositionEditorView } from './ImagePositionEditorView';
 import { BRANDING_NUMBER_RANGES, brandingSaveMap, customVariablesSaveMap, infostandCustomVariableLabel, infostandCustomVariables, infostandFurniOwnerText, infostandFurniPanelClass, parseBrandingOptions, parseFurniHeight, unsavedCustomVariables } from './infostandFurni.helpers';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { canPlaceMore, requestPlaceMore } from '../../../../../hooks/catalog/buildersClubPlaceMore';
+import { useCatalogStore } from '../../../../../hooks/catalog/catalogStore';
 import { NumberInput } from '../../../../../common/NumberInput';
 import { Hint } from '../../../../../common/Tooltip';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
@@ -771,6 +775,25 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
         ? null
         : getWiredChestInfostandData(GetSessionDataManager().getFloorItemData(avatarInfo.spriteId)?.specialType ?? -1, avatarInfo.stuffData);
 
+    // Official bc_place_button: another copy of this Builders Club furni, straight onto the cursor.
+    const placeMoreFurniData = avatarInfo.isWallItem
+        ? GetSessionDataManager().getWallItemData(avatarInfo.spriteId)
+        : GetSessionDataManager().getFloorItemData(avatarInfo.spriteId);
+    const placeMoreOfferId = placeMoreFurniData?.bcOfferId ?? -1;
+    const showPlaceMore = canPlaceMore({
+        enabled: GetConfigurationValue<boolean>('infostand.place_more.enabled', false) === true,
+        buildersClubEnabled: GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true)),
+        bcOfferId: placeMoreOfferId,
+        availableForBuildersClub: avatarInfo.availableForBuildersClub,
+        placeable: useCatalogStore.getState().getBuilderFurniPlaceableStatus({} as IPurchasableOffer) === BuilderFurniPlaceableStatus.OKAY,
+        playTest: !!roomSession?.playTestMode
+    });
+
+    const placeMore = () => {
+        requestPlaceMore({ offerId: placeMoreOfferId, classId: avatarInfo.spriteId, wall: avatarInfo.isWallItem, extraParam: avatarInfo.extraParam ?? '' });
+        onClose();
+    };
+
     return (
         <NativeTextTree>
             <Column alignItems="end" gap={1}>
@@ -1270,6 +1293,11 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                     {showInspectButton && !roomSession?.playTestMode && (
                         <Button variant="dark" onClick={() => openInspectionForFurni(avatarInfo.id, avatarInfo.category)}>
                             {localizeWithFallback('octane.room.inspect', 'Inspect')}
+                        </Button>
+                    )}
+                    {showPlaceMore && (
+                        <Button variant="dark" onClick={placeMore}>
+                            {localizeWithFallback('infostand.button.place_more', 'Place more')}
                         </Button>
                     )}
                     {canMove && (

@@ -77,6 +77,7 @@ import {
     isOfferAllowedInCatalogType,
     ParserPage
 } from './useCatalogQueries';
+import { finishPlaceMore } from './buildersClubPlaceMore';
 import { useCatalogSkipPurchaseConfirmation } from './useCatalogSkipPurchaseConfirmation';
 
 /** BuildersClubPlacementWarning type of a floor placement; anything else is a wall placement. */
@@ -370,6 +371,9 @@ export const useCatalogEffects = (): void => {
 
     useOctaneEvent<RoomEngineObjectPlacedEvent>(RoomEngineObjectPlacedEvent.PLACED, (event) => {
         const state = useCatalogStore.getState();
+
+        // The infostand's "place more" put this furni on the cursor, not the catalogue.
+        if (!state.objectMoverRequested && finishPlaceMore(event)) return;
 
         if (!state.objectMoverRequested || event.type !== RoomEngineObjectPlacedEvent.PLACED) return;
 
