@@ -59,31 +59,34 @@ const useDailyTasksState = () => {
         if (added[0].isBonus) notify('dailytasks.bonus_available', 'A bonus task is available!');
     });
 
+    // The update is worked out from the latest list and applied once. It used to run inside the state updater, which
+    // React calls while rendering: the bubble it raised updated another component mid-render ("Cannot update a
+    // component while rendering a different component"), and the request and the bubble could go out twice.
+    const tasksRef = useRef(tasks);
+    tasksRef.current = tasks;
+
     useMessageEvent<DailyTaskUpdatedMessageEvent>(DailyTaskUpdatedMessageEvent, (event) => {
         const parser = event.getParser();
+        const task = tasksRef.current.find((existing) => existing.taskId === parser.taskId);
 
-        setTasks((prevValue) => {
-            const task = prevValue.find((existing) => existing.taskId === parser.taskId);
+        if (!task) {
+            requestTasks(true);
 
-            if (!task) {
-                requestTasks(true);
+            return;
+        }
 
-                return prevValue;
-            }
+        const previousStatus = task.status;
 
-            const previousStatus = task.status;
+        task.repeats = parser.repeats;
+        task.status = parser.status;
+        task.rawSecondsLeft = parser.secondsLeft;
 
-            task.repeats = parser.repeats;
-            task.status = parser.status;
-            task.rawSecondsLeft = parser.secondsLeft;
+        setTasks((prevValue) => [...prevValue]);
 
-            if (previousStatus !== parser.status) {
-                if (parser.status === DailyTaskData.STATUS_COMPLETED) notify('dailytasks.completed.caption', localizeWithFallback('octane.quests.daily_task_completed_claim_your_reward', 'Daily task completed - claim your reward!'));
-                else if (parser.status === DailyTaskData.STATUS_CLAIMED) notify('dailytasks.claimed.caption', localizeWithFallback('octane.quests.daily_task_reward_claimed', 'Daily task reward claimed!'));
-            }
+        if (previousStatus === parser.status) return;
 
-            return [...prevValue];
-        });
+        if (parser.status === DailyTaskData.STATUS_COMPLETED) notify('dailytasks.completed.caption', localizeWithFallback('octane.quests.daily_task_completed_claim_your_reward', 'Daily task completed - claim your reward!'));
+        else if (parser.status === DailyTaskData.STATUS_CLAIMED) notify('dailytasks.claimed.caption', localizeWithFallback('octane.quests.daily_task_reward_claimed', 'Daily task reward claimed!'));
     });
 
     const unseenCount = useMemo(() => tasks.filter((task) => task.status === DailyTaskData.STATUS_COMPLETED).length, [tasks]);

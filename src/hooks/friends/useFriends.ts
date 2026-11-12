@@ -38,6 +38,7 @@ import {
     SendMessageComposer,
     withUpdatedFriendCategories
 } from '../../api';
+import { shouldNotifyFriendOnline, useFriendOnlineNotificationStore } from './friendOnlineNotificationStore';
 import { useMessageEvent, useOctaneEvent } from '../events';
 import { useNotification } from '../notification';
 
@@ -252,7 +253,10 @@ const useFriendsStore = () => {
             const newFriend = new MessengerFriend();
             newFriend.populate(friend);
 
-            if (previousFriend && !previousFriend.online && newFriend.online) onlineNotifications.push(newFriend);
+            // The player chooses whose coming online is announced (Other settings).
+            const announce = shouldNotifyFriendOnline(useFriendOnlineNotificationStore.getState().preference, newFriend.relationshipStatus);
+
+            if (previousFriend && !previousFriend.online && newFriend.online && announce) onlineNotifications.push(newFriend);
         }
 
         setSettings((previous) => withUpdatedFriendCategories(previous, parser.categories));
@@ -336,7 +340,10 @@ const useFriendsStore = () => {
             1: 'friendlist.error.friendlistownlimit',
             2: 'friendlist.error.friendlistlimitofrequester',
             3: 'friendlist.error.friend_requests_disabled',
-            4: 'friendlist.error.requestnotfound'
+            4: 'friendlist.error.requestnotfound',
+            // Official showAlertView: one of the two has blocked the other.
+            7: 'friendlist.error.blocked_by_them',
+            8: 'friendlist.error.blocked_by_you'
         };
         const localizeKey = localizeKeys[errorCode];
 
@@ -347,7 +354,11 @@ const useFriendsStore = () => {
         if (requestedFriendId > 0) setSentRequests((prevValue) => prevValue.filter((userId) => userId !== requestedFriendId));
 
         lastRequestedFriendIdRef.current = -1;
-        simpleAlert(LocalizeText(localizeKey), NotificationAlertType.DEFAULT, null, null, LocalizeText('friendlist.alert.title'));
+        // The two blocked texts are newer than most hotels' text files.
+        const fallbacks: Record<number, string> = { 7: 'This Habbo has blocked you.', 8: 'You have blocked this Habbo.' };
+        const text = fallbacks[errorCode] ? localizeWithFallback(localizeKey, fallbacks[errorCode]) : LocalizeText(localizeKey);
+
+        simpleAlert(text, NotificationAlertType.DEFAULT, null, null, LocalizeText('friendlist.alert.title'));
     });
 
     useMessageEvent<NewFriendRequestEvent>(NewFriendRequestEvent, (event) => {

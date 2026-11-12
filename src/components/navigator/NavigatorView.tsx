@@ -2,6 +2,7 @@ import {
     AddLinkEventTracker,
     ConvertGlobalRoomIdMessageComposer,
     ForwardToSomeRoomMessageComposer,
+    RoomNetworkOpenConnectionMessageComposer,
     GetCategoriesWithUserCountMessageComposer,
     HabboWebTools,
     ILinkEventTracker,
@@ -120,8 +121,9 @@ export const NavigatorView: FC<{}> = () => {
                             TryVisitRoom(homeRoomId);
                             return;
                         }
-                        if (target === 'random_friending_room') {
-                            SendMessageComposer(new ForwardToSomeRoomMessageComposer('random_friending_room'));
+                        // The official client forwards by name: the friending room and the predefined lobbies.
+                        if (target === 'random_friending_room' || target.startsWith('predefined_')) {
+                            SendMessageComposer(new ForwardToSomeRoomMessageComposer(target));
                             return;
                         }
                         const roomId = Number.parseInt(target, 10);
@@ -130,6 +132,13 @@ export const NavigatorView: FC<{}> = () => {
                             return;
                         }
                         SendMessageComposer(new ConvertGlobalRoomIdMessageComposer(target));
+                        return;
+                    }
+                    case 'network': {
+                        // Official HabboNavigator.goToRoomNetwork: hop into a room network (the hotel view's teaser).
+                        const networkId = Number.parseInt(parts[2] ?? '', 10);
+
+                        if (Number.isFinite(networkId) && networkId > 0) SendMessageComposer(new RoomNetworkOpenConnectionMessageComposer(networkId, 0));
                         return;
                     }
                     case 'ask_forward': {
@@ -152,7 +161,10 @@ export const NavigatorView: FC<{}> = () => {
                         store.show();
                         return;
                     case 'tab':
-                        if (parts[2]) store.setTab(parts[2]);
+                        // Official getSearchCodeForTabLink: "me" is the My World tab.
+                        if (parts[2]) store.setTab(parts[2] === 'me' ? 'myworld_view' : parts[2]);
+                        // navigator/tab/me/<list>: that list of the tab opened out (favorites, history, history_freq).
+                        if (parts[3]) store.setResultCollapsed(parts[3], false);
                         store.show();
                         return;
                     case 'me':

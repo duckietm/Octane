@@ -24,12 +24,14 @@ import { FaEraser, FaTimes } from 'react-icons/fa';
 import { GrFormNextLink, GrRotateLeft, GrRotateRight } from 'react-icons/gr';
 import {
     AvatarInfoFurni,
+    BuilderFurniPlaceableStatus,
     CopyToClipboard,
     FriendlyTime,
     GetConfigurationValue,
     GetGroupInformation,
     getWiredChestInfostandData,
     IPhotoData,
+    IPurchasableOffer,
     isRecolorableClass,
     recolorOfData,
     isSafeExternalUrl,
@@ -73,6 +75,8 @@ import chestLockedIcon from '../../../../../assets/images/groups/native/forum_fo
 import { ImagePositionEditorView } from './ImagePositionEditorView';
 import { BRANDING_NUMBER_RANGES, brandingSaveMap, customVariablesSaveMap, infostandCustomVariableLabel, infostandCustomVariables, infostandFurniOwnerText, infostandFurniPanelClass, parseBrandingOptions, parseFurniHeight, unsavedCustomVariables } from './infostandFurni.helpers';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { canPlaceMore, requestPlaceMore } from '../../../../../hooks/catalog/buildersClubPlaceMore';
+import { useCatalogStore } from '../../../../../hooks/catalog/catalogStore';
 import { NumberInput } from '../../../../../common/NumberInput';
 import { Hint } from '../../../../../common/Tooltip';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
@@ -118,14 +122,13 @@ const InfoStandStat: FC<{ icon: ReactNode; label: string; value: string | number
             <Hint content={`${tooltip ?? label}: ${value} - ${localizeWithFallback('infostand.copy.tooltip', 'Click to copy')}`}>
                 <BaseButton
                     type="button"
-                    className={`group flex items-center gap-1 min-w-0 w-full rounded px-0.5 border-0 bg-transparent cursor-pointer transition-colors duration-100 hover:bg-[#ffffff14] active:bg-[#ffffff24] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#7ec8e3] ${iconAfter ? 'justify-end' : 'justify-start'}`}
+                    className={`group flex items-center gap-1.5 min-w-0 w-full h-[24px] rounded-[4px] border-0 bg-[#0000002e] shadow-[inset_0_0_0_1px_#ffffff0f] cursor-pointer transition-colors duration-100 hover:bg-[#ffffff14] active:bg-[#ffffff24] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#7ec8e3] ${iconAfter ? 'flex-row-reverse pl-1.5 pr-0.5' : 'pl-0.5 pr-1.5'}`}
                     onClick={() => void CopyToClipboard(String(value)).then((ok) => setCopied(ok))}
                 >
-                    {!iconAfter && icon}
-                    <Text small textBreak variant="white" className={`transition-colors duration-100 ${copied ? '!text-[#7ec8e3]' : 'group-hover:!text-[#7ec8e3]'}`}>
-                        {iconAfter ? `${shown}:` : `:${shown}`}
+                    {icon}
+                    <Text small truncate variant="white" className={`flex-1 min-w-0 font-bold tabular-nums transition-colors duration-100 ${iconAfter ? 'text-right' : 'text-left'} ${copied ? '!text-[#7ec8e3]' : 'group-hover:!text-[#7ec8e3]'}`}>
+                        {shown}
                     </Text>
-                    {iconAfter && icon}
                 </BaseButton>
             </Hint>
         </NativeTextTree>
@@ -772,6 +775,25 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
         ? null
         : getWiredChestInfostandData(GetSessionDataManager().getFloorItemData(avatarInfo.spriteId)?.specialType ?? -1, avatarInfo.stuffData);
 
+    // Official bc_place_button: another copy of this Builders Club furni, straight onto the cursor.
+    const placeMoreFurniData = avatarInfo.isWallItem
+        ? GetSessionDataManager().getWallItemData(avatarInfo.spriteId)
+        : GetSessionDataManager().getFloorItemData(avatarInfo.spriteId);
+    const placeMoreOfferId = placeMoreFurniData?.bcOfferId ?? -1;
+    const showPlaceMore = canPlaceMore({
+        enabled: GetConfigurationValue<boolean>('infostand.place_more.enabled', false) === true,
+        buildersClubEnabled: GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true)),
+        bcOfferId: placeMoreOfferId,
+        availableForBuildersClub: avatarInfo.availableForBuildersClub,
+        placeable: useCatalogStore.getState().getBuilderFurniPlaceableStatus({} as IPurchasableOffer) === BuilderFurniPlaceableStatus.OKAY,
+        playTest: !!roomSession?.playTestMode
+    });
+
+    const placeMore = () => {
+        requestPlaceMore({ offerId: placeMoreOfferId, classId: avatarInfo.spriteId, wall: avatarInfo.isWallItem, extraParam: avatarInfo.extraParam ?? '' });
+        onClose();
+    };
+
     return (
         <NativeTextTree>
             <Column alignItems="end" gap={1}>
@@ -1006,7 +1028,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                             {(showLocation || showIds) && (
                                 <>
                                     <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                                    <div className="grid grid-cols-2 gap-x-3 gap-y-0">
+                                    <div className="grid grid-cols-2 gap-x-1.5 gap-y-1">
                                         {showLocation && (
                                             <>
                                                 <InfoStandStat icon={<StatIcon src={statXIcon} />} label="X" value={itemLocation.x} />
@@ -1271,6 +1293,11 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                     {showInspectButton && !roomSession?.playTestMode && (
                         <Button variant="dark" onClick={() => openInspectionForFurni(avatarInfo.id, avatarInfo.category)}>
                             {localizeWithFallback('octane.room.inspect', 'Inspect')}
+                        </Button>
+                    )}
+                    {showPlaceMore && (
+                        <Button variant="dark" onClick={placeMore}>
+                            {localizeWithFallback('infostand.button.place_more', 'Place more')}
                         </Button>
                     )}
                     {canMove && (

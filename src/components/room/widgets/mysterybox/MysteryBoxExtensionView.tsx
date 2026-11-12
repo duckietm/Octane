@@ -1,7 +1,7 @@
 import { MysteryBoxKeysUpdateEvent } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import { ColorUtils, LocalizeText } from '../../../../api';
+import { ColorUtils, GetConfigurationValue, LocalizeText, OpenUrl } from '../../../../api';
 import { Flex, LayoutGridItem, Text } from '../../../../common';
 import { useOctaneEvent } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
@@ -27,6 +27,8 @@ export const MysteryBoxExtensionView: FC<{}> = (props) => {
         setKeyColor(event.keyColor);
         setBoxColor(event.boxColor);
     });
+
+    const faqUrl = GetConfigurationValue<string>('mysterybox.faq.url', '');
 
     const getRgbColor = (color: string) => {
         const colorInt = colorMap[color];
@@ -60,6 +62,12 @@ export const MysteryBoxExtensionView: FC<{}> = (props) => {
                                     </div>
                                 </LayoutGridItem>
                             </div>
+                            {/* Official faq_link: shown when the hotel sets mysterybox.faq.url. */}
+                            {!!faqUrl && (
+                                <BaseButton className="octane-mysterybox-faq-link" onClick={() => OpenUrl(faqUrl)}>
+                                    {LocalizeText('mysterybox.tracker.link')}
+                                </BaseButton>
+                            )}
                         </>
                     )}
                 </div>

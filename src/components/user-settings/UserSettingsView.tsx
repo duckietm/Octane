@@ -9,6 +9,7 @@ import {
     UserSettingsCameraFollowComposer,
     UserSettingsChatPreferencesComposer,
     UserSettingsEvent,
+    UserSettingsOnlineIndicatorComposer,
     UserSettingsOldChatComposer,
     UserSettingsPrivacyComposer,
     UserSettingsRoomInvitesComposer,
@@ -33,6 +34,7 @@ import { WordFilterSettingsView } from './WordFilterSettingsView';
 import { Checkbox } from '../../common/Checkbox';
 import { Radio } from '../../common/Radio';
 import { Select } from '../../common/Select';
+import { useFriendOnlineNotificationStore } from '../../hooks/friends/friendOnlineNotificationStore';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
@@ -169,6 +171,9 @@ export const UserSettingsView: FC<{}> = () => {
         );
     };
 
+    const friendOnlinePreference = useFriendOnlineNotificationStore((state) => state.preference);
+    const setFriendOnlinePreference = useFriendOnlineNotificationStore((state) => state.setPreference);
+
     useMessageEvent<UserSettingsEvent>(UserSettingsEvent, (event) => {
         const parser = event.getParser();
         const settingsEvent = new OctaneSettingsEvent();
@@ -179,6 +184,7 @@ export const UserSettingsView: FC<{}> = () => {
         settingsEvent.volumeSoundboard = parser.volumeSoundboard;
         settingsEvent.oldChat = parser.oldChat;
         settingsEvent.roomInvites = parser.roomInvites;
+        setFriendOnlinePreference(parser.onlineIndicatorPreference);
         settingsEvent.cameraFollow = parser.cameraFollow;
         settingsEvent.flags = parser.flags;
         settingsEvent.chatType = parser.chatType;
@@ -445,6 +451,23 @@ export const UserSettingsView: FC<{}> = () => {
                         <label className="air-settings-check-row">
                             <Checkbox checked={userSettings.roomInvites} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('room_invites', nextChecked)} />
                             <span>{localizeWithFallback('memenu.settings.other.ignore.room.invites', 'Ignore room invites')}</span>
+                        </label>
+                        <label className="air-settings-select-row">
+                            <span>{localizeWithFallback('memenu.settings.other.friend.online.notification', 'Friend online notifications')}</span>
+                            <Select
+                                aria-label={localizeWithFallback('memenu.settings.other.friend.online.notification', 'Friend online notifications')}
+                                value={friendOnlinePreference}
+                                onChange={(event) => {
+                                    const preference = Number(event.target.value);
+
+                                    setFriendOnlinePreference(preference);
+                                    SendMessageComposer(new UserSettingsOnlineIndicatorComposer(preference));
+                                }}
+                            >
+                                <option value={0}>{localizeWithFallback('memenu.settings.other.friend.online.notification.0', 'Everyone')}</option>
+                                <option value={1}>{localizeWithFallback('memenu.settings.other.friend.online.notification.1', 'Users in my relationship status')}</option>
+                                <option value={2}>{localizeWithFallback('memenu.settings.other.friend.online.notification.2', 'Nobody')}</option>
+                            </Select>
                         </label>
                         <label className="air-settings-check-row">
                             <Checkbox checked={userSettings.cameraFollow} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('camera_follow', nextChecked)} />

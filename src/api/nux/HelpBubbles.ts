@@ -1,7 +1,7 @@
 /**
  * Pure rules of AIR's ui/widget/uihelpbubbles (UiHelpBubblesWidget, UiHelpBubble,
  * UiHelpBubbleIconEnum): the `helpBubble/add/<KEY>/<text>[/<KEY>/<text>...]` and
- * `helpBubble/remove/<KEY>` links, the element each key points at and where the bubble goes.
+ * `helpBubble/remove/<KEY>` links (and this client's `helpBubble/hint/<KEY>/<text>`), the element each key points at and where the bubble goes.
  */
 
 /** UiHelpBubbleIconEnum: the server names a key, the client looks the element up by its value. */
@@ -84,6 +84,8 @@ export interface IHelpBubbleItem {
     name: string;
     /** The text, or the localization key that holds it. */
     text: string;
+    /** A bubble this client raised itself (`helpBubble/hint/...`): closing it tells the server nothing. */
+    local?: boolean;
 }
 
 export type HelpBubbleLink = { action: 'add'; items: IHelpBubbleItem[] } | { action: 'remove'; name: string } | null;
@@ -96,11 +98,16 @@ export const parseHelpBubbleLink = (link: string): HelpBubbleLink => {
 
     if (parts.length < 3) return null;
 
-    if (parts[1] === 'add') {
+    // `hint` is this client's own: the same bubbles, outside the server's new user script.
+    if (parts[1] === 'add' || parts[1] === 'hint') {
         const items: IHelpBubbleItem[] = [];
 
         for (let index = 2; index + 1 < parts.length; index += 2) {
-            items.push({ name: resolveHelpBubbleName(parts[index]), text: parts[index + 1] });
+            const item: IHelpBubbleItem = { name: resolveHelpBubbleName(parts[index]), text: parts[index + 1] };
+
+            if (parts[1] === 'hint') item.local = true;
+
+            items.push(item);
         }
 
         return items.length ? { action: 'add', items } : null;

@@ -1,6 +1,6 @@
 import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useMemo, useState } from 'react';
-import { BadgeLeaderboardBoard, BadgeLeaderboardEntry, BadgeRarityKey, fetchBadgeLeaderboard, getCachedBadgeLeaderboard, LocalizeText, localizeWithFallback } from '../../api';
+import { BadgeLeaderboardBoard, BadgeLeaderboardEntry, BadgeLeaderboardResponse, BadgeRarityKey, fetchBadgeLeaderboard, getCachedBadgeLeaderboard, LocalizeText, localizeWithFallback } from '../../api';
 import {
     badgeEmblemAchievement,
     badgeEmblemCommon,
@@ -59,6 +59,9 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
     const [version, setVersion] = useState(0);
     const [categoryIndex, setCategoryIndex] = useState(0);
     const [entryPageIndex, setEntryPageIndex] = useState(0);
+    // Held in state and filled from the reply itself: the module cache drops a reply that arrives after the session
+    // user changed, and reading it during render left the window blank with nothing to say why.
+    const [leaderboard, setLeaderboard] = useState<BadgeLeaderboardResponse>(() => getCachedBadgeLeaderboard());
 
     useEffect(() => {
         const linkTracker: ILinkEventTracker = {
@@ -99,8 +102,11 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
         setLoadError(null);
 
         fetchBadgeLeaderboard(version > 0)
-            .then(() => {
+            .then((payload) => {
                 if (cancelled) return;
+
+                if (payload?.leaderboards?.totalBadges) setLeaderboard(payload);
+                else setLoadError(localizeWithFallback('octane.badge_leaderboard.unavailable', 'The leaderboard is not available right now.'));
 
                 setIsLoading(false);
             })
@@ -115,8 +121,6 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
             cancelled = true;
         };
     }, [isVisible, version]);
-
-    const leaderboard = getCachedBadgeLeaderboard();
 
     const pages = useMemo<LeaderboardPage[]>(() => {
         if (!leaderboard) return [];

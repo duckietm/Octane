@@ -20,7 +20,7 @@ import {
     SendMessageComposer
 } from '../../../../../api';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
-import { useMessageEvent } from '../../../../../hooks';
+import { useMessageEvent, useWiredTools } from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
@@ -73,12 +73,16 @@ export const AvatarInfoWidgetRentableBotView: FC<AvatarInfoWidgetRentableBotView
     });
 
     const requestBotCommandConfiguration = (skillType: number) => SendMessageComposer(new RequestBotCommandConfigurationComposer(avatarInfo.webID, skillType));
+    const { openInspectionForUser, showInspectButton } = useWiredTools();
 
     const processAction = (name: string) => {
         let hideMenu = true;
 
         if (name) {
             switch (name) {
+                case 'inspect':
+                    openInspectionForUser(avatarInfo.roomIndex);
+                    break;
                 case 'donate_to_all':
                     requestBotCommandConfiguration(BotSkillsEnum.DONATE_TO_ALL);
                     SendMessageComposer(new BotSkillSaveComposer(avatarInfo.webID, BotSkillsEnum.DONATE_TO_ALL, ''));
@@ -202,6 +206,12 @@ export const AvatarInfoWidgetRentableBotView: FC<AvatarInfoWidgetRentableBotView
                                 <ContextMenuListItemView onClick={(event) => processAction('pick')}>{LocalizeText('avatar.widget.pick_up')}</ContextMenuListItemView>
                             )}
                         </>
+                    )}
+                    {/* Official wired_inspect: the creator tools' inspection, for whoever may open it. */}
+                    {showInspectButton && (
+                        <ContextMenuListItemView onClick={(event) => processAction('inspect')}>
+                            {localizeWithFallback('octane.room.inspect', 'Inspect')}
+                        </ContextMenuListItemView>
                     )}
                     {commandButtons.map((button) => (
                         <ContextMenuListItemView key={button.key} onClick={(event) => processCommandButton(button.link, button.proceedStep)}>

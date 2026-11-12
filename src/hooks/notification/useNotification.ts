@@ -49,6 +49,7 @@ import { countSimpleAlert } from '../../api/notification/SimpleAlertCounter';
 import { useMessageEvent } from '../events';
 import { useHotelAlertToastStore } from './hotelAlertToastStore';
 import { useHotelStatusNotifications } from './useHotelStatusNotifications';
+import { useOfficialNotices } from './useOfficialNotices';
 import { usePetNotifications } from './usePetNotifications';
 import { useRecyclerNotifications } from './useRecyclerNotifications';
 import { useWiredTransactionNotifications } from './useWiredTransactionNotifications';
@@ -370,6 +371,7 @@ const useNotificationStore = () => {
 
     useHotelStatusNotifications(simpleAlert);
     usePetNotifications(simpleAlert, showSingleBubble);
+    useOfficialNotices(simpleAlert, showSingleBubble);
     useWiredTransactionNotifications(simpleAlert, showSingleBubble);
     useRecyclerNotifications(showSingleBubble);
 
