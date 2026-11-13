@@ -1,8 +1,9 @@
 .octane-hotel-view {
     background: #27afcf;
     background-image: var(--hotel-view-background);
-    /* Anchored where the scene ends, as before; the repeat fills the strip behind the toolbar. */
-    background-position: left bottom var(--hotel-view-scene-bottom, 55px);
+    /* Stands on the bottom of the window, behind the see-through toolbar, like the left and right artwork: the
+       picture's own ground runs under the toolbar and nothing of a repeat shows there. */
+    background-position: left bottom;
     background-repeat: repeat;
     z-index: 0;
 }
