@@ -54,14 +54,12 @@ intent is captured below:
 manualChunks: id => {
     const norm = id.replace(/\\/g, '/');
 
-    // Vendors first — pixi.js / howler / emoji-mart / jodit are aliased
-    // to ../octane-renderer/node_modules, so they would otherwise be
+    // Vendors first — pixi.js and pixi-filters are aliased to
+    // ../octane-renderer/node_modules, so they would otherwise be
     // swallowed by the `octane-renderer` branch lower down and pulled
     // into the renderer chunk.
     if(norm.includes('pixi.js') || norm.includes('pixi-filters')) return 'vendor-pixi';
-    if(norm.includes('howler'))      return 'vendor-audio';
     if(norm.includes('@emoji-mart')) return 'vendor-emoji';
-    if(norm.includes('jodit') || norm.includes('@react-page')) return 'vendor-editor';
 
     if(id.includes('octane-renderer') || id.includes(`${ rendererRoot }`)) {
         if(id.includes('/packages/avatar/'))        return 'octane-renderer-avatar';
@@ -72,7 +70,7 @@ manualChunks: id => {
     }
 
     if(id.includes('node_modules')) {
-        if(id.includes('@octane/renderer') || id.includes('renderer3')) return 'octane-renderer';
+        if(id.includes('@octane/renderer')) return 'octane-renderer';
         if(id.match(/\/react(-dom)?\/|\/scheduler\//) || id.includes('react-error-boundary')) return 'vendor-react';
         if(id.includes('framer-motion')) return 'vendor-motion';
         if(id.includes('@tanstack'))     return 'vendor-query';
@@ -86,7 +84,7 @@ manualChunks: id => {
 
 Two practical points the comments don't make obvious:
 
-- **Vendor checks come first.** Pixi.js, howler, emoji-mart and jodit
+- **Vendor checks come first.** Pixi.js and pixi-filters
   are pulled in via an alias to `../octane-renderer/node_modules`,
   so their `id` matches `octane-renderer`. If the renderer branch
   runs before the vendor one, those modules end up bundled into the

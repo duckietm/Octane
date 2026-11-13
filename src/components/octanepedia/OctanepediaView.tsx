@@ -1,6 +1,6 @@
 import { AddLinkEventTracker, ILinkEventTracker, OctaneLogger, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
-import { GetConfigurationValue, OpenUrl, resolveHabboPageUrl, SanitizePageHtml } from '../../api';
+import { getActiveTextLocale, GetConfigurationValue, GetOptionalConfigurationValue, habboPageCandidates, OpenUrl, resolveHabboPageUrl, SanitizePageHtml } from '../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import '../../css/octanepedia/OctanepediaAirText.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
@@ -21,11 +21,11 @@ export const OctanepediaView: FC<{}> = (props) => {
     useEffect(() => {
         const latest = createLatestRequest();
 
-        const openPage = async (link: string, bundledLink: string | null) => {
+        const openPage = async (links: ReadonlyArray<string | null>) => {
             const signal = latest.start();
 
             try {
-                const text = await fetchHabboPage([link, bundledLink], signal);
+                const text = await fetchHabboPage(links, signal);
 
                 if (text === null || signal.aborted) return;
 
@@ -50,7 +50,7 @@ export const OctanepediaView: FC<{}> = (props) => {
             } catch (error) {
                 if (signal.aborted) return;
 
-                OctaneLogger.error(`Failed to fetch ${link}`);
+                OctaneLogger.error(`Failed to fetch help page ${links[0]}`);
             }
         };
 
@@ -62,15 +62,22 @@ export const OctanepediaView: FC<{}> = (props) => {
 
                 value.shift();
 
-                const link = resolveHabboPageUrl(GetConfigurationValue<string>('habbopages.url'), value.join('/'));
+                const path = value.join('/');
+                // A page is one file per language: the player's language first, then the hotel's, then English, then
+                // where pages were kept before. The hotel's own pages win; those shipped with the client stand in.
+                const candidates = habboPageCandidates(path, getActiveTextLocale(), GetOptionalConfigurationValue<string>('base.locale', 'en'));
+                const hotelBase = GetConfigurationValue<string>('habbopages.url');
+                const links = [
+                    ...candidates.map((candidate) => resolveHabboPageUrl(hotelBase, candidate)),
+                    ...candidates.map((candidate) => resolveHabboPageUrl(BUNDLED_PAGES, candidate, document.baseURI))
+                ].filter(Boolean);
 
-                if (!link) {
-                    OctaneLogger.warn(`Refused help page path "${value.join('/')}"`);
+                if (!links.length) {
+                    OctaneLogger.warn(`Refused help page path "${path}"`);
                     return;
                 }
 
-                // The hotel's own page wins; the pages that ship with the client stand in when it has none.
-                openPage(link, resolveHabboPageUrl(BUNDLED_PAGES, value.join('/'), document.baseURI));
+                openPage(links);
             },
             eventUrlPrefix: 'habbopages/'
         };

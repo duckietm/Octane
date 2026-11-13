@@ -1,7 +1,7 @@
 import { GetConfiguration, GetLocalizationManager, GetSessionDataManager, TranslationLanguagesEvent, TranslationLanguagesRequestComposer, TranslationResultEvent, TranslationTextRequestComposer } from '@octane/renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { LocalStorageKeys, SendMessageComposer } from '../../api';
+import { LocalStorageKeys, SendMessageComposer, setActiveTextLocale } from '../../api';
 import { parseJsonDocument } from '../../json/JsonDocumentParser';
 import { useMessageEvent } from '../events';
 import { useLocalStorage } from '../useLocalStorage';
@@ -196,6 +196,9 @@ export const applyTextTranslationLocale = async (languageCode: string): Promise<
     const localizationManager = GetLocalizationManager();
     const sessionDataManager = GetSessionDataManager();
     const selectedLocale = resolveTextTranslationLocale(languageCode || '');
+
+    // The help pages follow the same language as the texts.
+    setActiveTextLocale(selectedLocale?.file ?? '');
 
     if(!selectedLocale)
     {
