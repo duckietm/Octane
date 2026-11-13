@@ -51,6 +51,7 @@ import { NuxView } from './nux/NuxView';
 import { OctanebubbleHiddenView } from './octanebubblehidden/OctanebubbleHiddenView';
 import { OctanepediaView } from './octanepedia/OctanepediaView';
 import { ExternalPluginLoader } from './plugins/ExternalPluginLoader';
+import { PluginChannelListener } from './plugins/PluginChannelListener';
 import { DailyTasksView, NextQuestTimerView, QuestCompletedView, QuestsView, QuestTrackerView, RewardTrackView, SeasonalCalendarView } from './quests';
 import { RadioView } from './radio/RadioView';
 import { RareValuesView } from './rare-values/RareValuesView';
@@ -280,6 +281,9 @@ export const MainView: FC<{}> = (props) =>
                         <MentionsView onClose={() => setMentionsVisible(false)} />
                     </WidgetErrorBoundary>
                 )}
+                <WidgetErrorBoundary name="PluginChannelListener">
+                    <PluginChannelListener />
+                </WidgetErrorBoundary>
                 <WidgetErrorBoundary name="ExternalPluginLoader">
                     <ExternalPluginLoader />
                 </WidgetErrorBoundary>

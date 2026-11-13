@@ -1,5 +1,5 @@
 import { FurnitureStackHeightComposer, GetRoomEngine, TextureUtils } from '@octane/renderer';
-import { CreateLinkEvent, GetRoomSession, SendMessageComposer, VisitDesktop } from '../../api';
+import { CreateLinkEvent, GetRoomSession, PluginChannelListener, SendMessageComposer, VisitDesktop, sendPluginChannel, subscribePluginChannel } from '../../api';
 
 /**
  * Plugin descriptor registered by external plugin scripts.
@@ -49,6 +49,13 @@ export interface IOctanePluginApi {
     createWindow: (id: string, title: string, width: number) => HTMLDivElement | null;
     /** Destroy a floating window by id */
     destroyWindow: (id: string) => void;
+    /**
+     * Listen on a channel of the generic plugin channel: what a server plugin sends there, as a JSON object (null when
+     * it is not one) and as text. Gets the last message at once if one came before. Returns the function that stops.
+     */
+    onChannel: (channel: string, listener: PluginChannelListener) => () => void;
+    /** Answer the server plugin on a channel; false, sending nothing, for a bad channel name or a payload too long. */
+    sendChannel: (channel: string, data: unknown) => boolean;
 }
 
 // Internal plugin storage
@@ -57,8 +64,10 @@ const _listeners: Array<() => void> = [];
 const _windowCleanup = new Map<string, () => void>();
 // The windows each plugin opened through the API it received in onInit, closed when the plugin is removed.
 const _pluginWindows = new Map<string, Set<string>>();
+// The channel listeners each plugin added through that API, removed with it.
+const _pluginChannels = new Map<string, Set<() => void>>();
 
-// The API a plugin gets in onInit: the shared one, with the windows it opens recorded under its name.
+// The API a plugin gets in onInit: the shared one, with the windows and channel listeners it opens recorded under its name.
 function scopedApi(pluginName: string): IOctanePluginApi {
     return {
         ...pluginApi,
@@ -70,6 +79,16 @@ function scopedApi(pluginName: string): IOctanePluginApi {
                 _pluginWindows.set(pluginName, windows);
             }
             return content;
+        },
+        onChannel(channel: string, listener: PluginChannelListener) {
+            const stop = pluginApi.onChannel(channel, listener);
+            const stops = _pluginChannels.get(pluginName) ?? new Set<() => void>();
+            stops.add(stop);
+            _pluginChannels.set(pluginName, stops);
+            return () => {
+                stop();
+                stops.delete(stop);
+            };
         }
     };
 }
@@ -78,6 +97,10 @@ function destroyPluginWindows(pluginName: string) {
     const windows = _pluginWindows.get(pluginName);
     _pluginWindows.delete(pluginName);
     windows?.forEach((id) => pluginApi.destroyWindow(id));
+
+    const channels = _pluginChannels.get(pluginName);
+    _pluginChannels.delete(pluginName);
+    channels?.forEach((stop) => stop());
 }
 
 // One listener that throws must not stop the others from hearing the change.
@@ -183,6 +206,14 @@ const pluginApi: IOctanePluginApi = {
 
     visitDesktop() {
         VisitDesktop();
+    },
+
+    onChannel(channel: string, listener: PluginChannelListener) {
+        return subscribePluginChannel(channel, listener);
+    },
+
+    sendChannel(channel: string, data: unknown) {
+        return sendPluginChannel(channel, data);
     },
 
     createWindow(id: string, title: string, width: number): HTMLDivElement | null {
