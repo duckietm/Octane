@@ -39,6 +39,21 @@ export interface PlaceMoreAvailability {
     playTest: boolean;
 }
 
+/**
+ * The Builders Club offer that places a furni. Habbo's furnidata names it (`bcofferid`); most hotels' furnidata has
+ * only the furni's ordinary offer id, which their Builders Club catalogue sells it under too and which the server
+ * accepts as well, so that one stands in.
+ */
+export const resolvePlaceMoreOfferId = (furniture: { bcOfferId?: number; purchaseOfferId?: number } | null | undefined): number => {
+    const bcOfferId = furniture?.bcOfferId ?? -1;
+
+    if (Number.isInteger(bcOfferId) && bcOfferId >= 0) return bcOfferId;
+
+    const purchaseOfferId = furniture?.purchaseOfferId ?? -1;
+
+    return Number.isInteger(purchaseOfferId) && purchaseOfferId >= 0 ? purchaseOfferId : -1;
+};
+
 /** Official InfoStandFurniView.updatePurchaseButtonVisibility: when the button is offered. */
 export const canPlaceMore = ({ enabled, buildersClubEnabled, bcOfferId, availableForBuildersClub, placeable, playTest }: PlaceMoreAvailability): boolean =>
     enabled && buildersClubEnabled && !playTest && availableForBuildersClub && Number.isInteger(bcOfferId) && bcOfferId >= 0 && placeable;

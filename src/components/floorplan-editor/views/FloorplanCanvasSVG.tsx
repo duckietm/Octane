@@ -1,4 +1,4 @@
-import { Dispatch, FC, ReactElement, PointerEvent as ReactPointerEvent, useCallback, useEffect, useMemo, useRef, useState, WheelEvent } from 'react';
+import { Dispatch, FC, ReactElement, PointerEvent as ReactPointerEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, WheelEvent } from 'react';
 import { FaCrosshairs, FaExpand, FaMinus, FaPlus, FaSyncAlt } from 'react-icons/fa';
 import { tileToScreen, usePointerToTile } from '../hooks/usePointerToTile';
 import { useTool } from '../hooks/useTool';
@@ -16,16 +16,19 @@ type Props = {
     panMode?: boolean;
 };
 
-const VIEWBOX_W = 2048;
-const VIEWBOX_H = (MAX_NUM_TILE_PER_AXIS * TILE_SIZE) / 2;
+/** The drawable plan in SVG units: every tile of the largest room fits in it. */
+const WORLD_W = 2048;
+const WORLD_H = (MAX_NUM_TILE_PER_AXIS * TILE_SIZE) / 2;
 
 const ZOOM_MIN = 0.4;
 const ZOOM_MAX = 6;
 const ZOOM_STEP = 0.2;
 const FIT_PADDING = TILE_SIZE * 2;
 
-const GRID_FILL = '#242424';
-const GRID_LINE = '#000000';
+/** Screen pixels per SVG unit at zoom 1: the whole plan across the original 340 px wide view. */
+const BASE_SCALE = 340 / WORLD_W;
+/** The view before it has been measured (and in tests, where nothing is laid out). */
+const FALLBACK_VIEW = { w: 340, h: Math.round((340 * WORLD_H) / WORLD_W) };
 
 const clampZoom = (z: number): number => Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z));
 
@@ -70,72 +73,112 @@ const computeRoomBounds = (state: FloorplanState): { x: number; y: number; w: nu
     };
 };
 
-const GridPattern: FC<{ id: string }> = ({ id }) => {
-    const w = TILE_SIZE;
-    const h = TILE_SIZE / 2;
-    const [originX, originY] = tileToScreen(0, 0);
-    const diamond = (cx: number, cy: number) => `${cx},${cy - h / 2} ${cx + w / 2},${cy} ${cx},${cy + h / 2} ${cx - w / 2},${cy}`;
-
-    return (
-        <NativeTextTree>
-            <defs>
-                <pattern id={id} patternUnits="userSpaceOnUse" x={originX - w / 2} y={originY - h / 2} width={w} height={h}>
-                    <rect width={w} height={h} fill={GRID_LINE} />
-                    <polygon points={diamond(w / 2, h / 2)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
-                    <polygon points={diamond(0, 0)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
-                    <polygon points={diamond(w, 0)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
-                    <polygon points={diamond(0, h)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
-                    <polygon points={diamond(w, h)} fill={GRID_FILL} stroke={GRID_LINE} strokeWidth={1} />
-                </pattern>
-            </defs>
-        </NativeTextTree>
-    );
-};
-
 export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
+    const scrollRef = useRef<HTMLDivElement | null>(null);
     const [zoom, setZoom] = useState(1);
-    const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+    // The view is a real scroll box (AIR's plan has both scrollbars): the plan is as big as it is drawn, the SVG
+    // stays pinned over the visible part and draws exactly that part.
+    const [viewport, setViewport] = useState(FALLBACK_VIEW);
+    const [measured, setMeasured] = useState(false);
+    const [scroll, setScroll] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
     const [isPanning, setIsPanning] = useState(false);
     const [flipped, setFlipped] = useState(false);
-    const panStartRef = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
+    const panStartRef = useRef<{ x: number; y: number; left: number; top: number } | null>(null);
     const centeredRef = useRef(false);
+    // A point of the plan to bring to the middle of the view once the new zoom or size is laid out.
+    const pendingCenterRef = useRef<{ x: number; y: number } | null>(null);
+    const [centerTick, setCenterTick] = useState(0);
 
     const roomBounds = useMemo(() => computeRoomBounds(state), [state.tiles]);
 
-    const centerPanForRoom = useCallback((): { x: number; y: number } | null => {
-        if (!roomBounds) return null;
-        return {
-            x: roomBounds.x + roomBounds.w / 2 - VIEWBOX_W / 2,
-            y: roomBounds.y + roomBounds.h / 2 - VIEWBOX_H / 2
+    const scale = zoom * BASE_SCALE;
+    const visW = viewport.w / scale;
+    const visH = viewport.h / scale;
+    // A plan smaller than the view is centred in it; a bigger one scrolls.
+    const padX = Math.max(0, (visW - WORLD_W) / 2);
+    const padY = Math.max(0, (visH - WORLD_H) / 2);
+    const contentW = Math.max(viewport.w, Math.round(WORLD_W * scale));
+    const contentH = Math.max(viewport.h, Math.round(WORLD_H * scale));
+    const viewX = scroll.left / scale - padX;
+    const viewY = scroll.top / scale - padY;
+    const viewBox = `${viewX} ${viewY} ${visW} ${visH}`;
+
+    useLayoutEffect(() => {
+        const element = scrollRef.current;
+
+        if (!element) return;
+
+        const measure = () => {
+            const w = element.clientWidth;
+            const h = element.clientHeight;
+
+            if (!(w > 0 && h > 0)) return;
+
+            setViewport((previous) => (previous.w === w && previous.h === h ? previous : { w, h }));
+            setMeasured(true);
         };
-    }, [roomBounds]);
+
+        measure();
+
+        if (typeof ResizeObserver === 'undefined') return;
+
+        const observer = new ResizeObserver(measure);
+
+        observer.observe(element);
+
+        return () => observer.disconnect();
+    }, []);
+
+    const centerOn = useCallback((x: number, y: number) => {
+        pendingCenterRef.current = { x, y };
+        setCenterTick((tick) => tick + 1);
+    }, []);
+
+    useLayoutEffect(() => {
+        const element = scrollRef.current;
+        const target = pendingCenterRef.current;
+
+        if (!element || !target) return;
+
+        pendingCenterRef.current = null;
+        element.scrollLeft = Math.max(0, (target.x + padX) * scale - viewport.w / 2);
+        element.scrollTop = Math.max(0, (target.y + padY) * scale - viewport.h / 2);
+        setScroll({ left: element.scrollLeft, top: element.scrollTop });
+    }, [centerTick, scale, padX, padY, viewport.w, viewport.h]);
+
+    const centerOnRoom = useCallback(() => {
+        if (!roomBounds) return;
+
+        centerOn(roomBounds.x + roomBounds.w / 2, roomBounds.y + roomBounds.h / 2);
+    }, [roomBounds, centerOn]);
 
     const fitToRoom = useCallback(() => {
         if (!roomBounds) return;
-        const zoomFitX = VIEWBOX_W / roomBounds.w;
-        const zoomFitY = VIEWBOX_H / roomBounds.h;
-        const targetZoom = clampZoom(Math.min(zoomFitX, zoomFitY) * 0.95);
-        const next = centerPanForRoom();
-        if (!next) return;
-        setZoom(targetZoom);
-        setPan(next);
-    }, [roomBounds, centerPanForRoom]);
 
+        const zoomFitX = viewport.w / (roomBounds.w * BASE_SCALE);
+        const zoomFitY = viewport.h / (roomBounds.h * BASE_SCALE);
+
+        setZoom(clampZoom(Math.min(zoomFitX, zoomFitY) * 0.95));
+        centerOnRoom();
+    }, [roomBounds, viewport.w, viewport.h, centerOnRoom]);
+
+    // The first view of a room: fitted and centred, once the view has its real size.
     useEffect(() => {
-        if (centeredRef.current) return;
-        if (!roomBounds) return;
+        if (centeredRef.current || !roomBounds || !measured) return;
+
         centeredRef.current = true;
         fitToRoom();
-    }, [roomBounds, fitToRoom]);
+    }, [roomBounds, measured, fitToRoom]);
 
-    const visW = VIEWBOX_W / zoom;
-    const visH = VIEWBOX_H / zoom;
-    const baseX = (VIEWBOX_W - visW) / 2;
-    const baseY = (VIEWBOX_H - visH) / 2;
-    const viewX = baseX + pan.x;
-    const viewY = baseY + pan.y;
-    const viewBox = `${viewX} ${viewY} ${visW} ${visH}`;
+    /** Zooms around the middle of the view, so the part being looked at stays in place. */
+    const zoomBy = useCallback(
+        (step: number) => {
+            centerOn(viewX + visW / 2, viewY + visH / 2);
+            setZoom((current) => clampZoom(current + step));
+        },
+        [centerOn, viewX, viewY, visW, visH]
+    );
 
     const projection = usePointerToTile(svgRef, { width: visW, height: visH, x: viewX, y: viewY });
     const tool = useTool(state, dispatch, projection);
@@ -176,31 +219,34 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
         return out.length ? <g data-testid="selection-overlay">{out}</g> : null;
     }, [state.selection, state.tiles]);
 
-    const zoomIn = useCallback(() => setZoom((z) => clampZoom(z + ZOOM_STEP)), []);
-    const zoomOut = useCallback(() => setZoom((z) => clampZoom(z - ZOOM_STEP)), []);
+    const zoomIn = useCallback(() => zoomBy(ZOOM_STEP), [zoomBy]);
+    const zoomOut = useCallback(() => zoomBy(-ZOOM_STEP), [zoomBy]);
     const resetView = useCallback(() => {
         fitToRoom();
     }, [fitToRoom]);
 
-    const onWheel = useCallback((e: WheelEvent<SVGSVGElement>) => {
-        if (!(e.ctrlKey || e.metaKey)) return;
-        e.preventDefault();
-        setZoom((z) => clampZoom(z + (e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP)));
-    }, []);
+    // Ctrl + wheel zooms; a plain wheel scrolls the plan, as any scroll box does.
+    const onWheel = useCallback(
+        (e: WheelEvent<SVGSVGElement>) => {
+            if (!(e.ctrlKey || e.metaKey)) return;
+            e.preventDefault();
+            zoomBy(e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP);
+        },
+        [zoomBy]
+    );
 
     useEffect(() => {
         const onMove = (e: PointerEvent) => {
             const start = panStartRef.current;
-            if (!start) return;
-            const dx = e.clientX - start.x;
-            const dy = e.clientY - start.y;
-            const rect = svgRef.current?.getBoundingClientRect();
-            if (!rect) return;
-            const scale = visW / rect.width;
-            setPan({
-                x: start.panX - dx * scale,
-                y: start.panY - dy * scale
-            });
+            const element = scrollRef.current;
+
+            if (!start || !element) return;
+
+            // The plan follows the pointer; seen from the other side, left and right are swapped.
+            const dx = (e.clientX - start.x) * (flipped ? -1 : 1);
+
+            element.scrollLeft = start.left - dx;
+            element.scrollTop = start.top - (e.clientY - start.y);
         };
         const onUp = () => {
             panStartRef.current = null;
@@ -212,7 +258,7 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
             window.removeEventListener('pointermove', onMove);
             window.removeEventListener('pointerup', onUp);
         };
-    }, [visW]);
+    }, [flipped]);
 
     const isPanGesture = (e: ReactPointerEvent): boolean => e.button === 1 || (e.button === 0 && e.shiftKey) || (e.button === 0 && Boolean(panMode));
 
@@ -221,35 +267,43 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
     return (
         <NativeTextTree>
             <div className="fp-stage" data-testid="floorplan-2d">
-                <svg
-                    ref={svgRef}
-                    viewBox={viewBox}
-                    style={flipped ? { transform: 'scaleX(-1)' } : undefined}
-                    className={`block w-full h-full select-none bg-black [shape-rendering:crispEdges] ${cursorClass}`}
-                    onWheel={onWheel}
-                    onPointerDown={(e) => {
-                        if (isPanGesture(e)) {
-                            e.preventDefault();
-                            panStartRef.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y };
-                            setIsPanning(true);
-                            return;
-                        }
-                        tool.onPointerDown(e);
-                    }}
-                    onPointerMove={(e) => {
-                        if (panStartRef.current) return;
-                        tool.onPointerMove(e);
-                    }}
-                    onPointerUp={(e) => {
-                        if (panStartRef.current) return;
-                        tool.onPointerUp(e);
-                    }}
+                <div
+                    ref={scrollRef}
+                    className="fp-stage-scroll has-classic-scrollbar"
+                    data-testid="floorplan-scroll"
+                    onScroll={(event) => setScroll({ left: event.currentTarget.scrollLeft, top: event.currentTarget.scrollTop })}
                 >
-                    <GridPattern id="fp-grid" />
-                    <rect data-testid="floorplan-grid" x={viewX} y={viewY} width={visW} height={visH} fill="url(#fp-grid)" />
-                    {rows}
-                    {outOfBoundsOverlay}
-                </svg>
+                    <div className="fp-stage-content" style={{ width: contentW, height: contentH }}>
+                        <svg
+                            ref={svgRef}
+                            viewBox={viewBox}
+                            preserveAspectRatio="none"
+                            style={{ width: viewport.w, height: viewport.h, ...(flipped ? { transform: 'scaleX(-1)' } : null) }}
+                            className={`fp-stage-svg select-none bg-black [shape-rendering:crispEdges] ${cursorClass}`}
+                            onWheel={onWheel}
+                            onPointerDown={(e) => {
+                                if (isPanGesture(e)) {
+                                    e.preventDefault();
+                                    panStartRef.current = { x: e.clientX, y: e.clientY, left: scrollRef.current?.scrollLeft ?? 0, top: scrollRef.current?.scrollTop ?? 0 };
+                                    setIsPanning(true);
+                                    return;
+                                }
+                                tool.onPointerDown(e);
+                            }}
+                            onPointerMove={(e) => {
+                                if (panStartRef.current) return;
+                                tool.onPointerMove(e);
+                            }}
+                            onPointerUp={(e) => {
+                                if (panStartRef.current) return;
+                                tool.onPointerUp(e);
+                            }}
+                        >
+                            {rows}
+                            {outOfBoundsOverlay}
+                        </svg>
+                    </div>
+                </div>
                 <div className="fp-stage-buttons">
                     <Hint content={localizeWithFallback('octane.floorplan_editor.fit_room_to_view', 'Fit room to view')}><BaseButton aria-label={localizeWithFallback('octane.floorplan_editor.fit_room_to_view', 'Fit room to view')} type="button" data-testid="zoom-reset" className="fp-round-btn is-small" disabled={!roomBounds} onClick={resetView}>
                         <FaExpand size={10} />
@@ -259,10 +313,7 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
                         data-testid="zoom-recenter"
                         className="fp-round-btn is-small"
                         disabled={!roomBounds}
-                        onClick={() => {
-                            const next = centerPanForRoom();
-                            if (next) setPan(next);
-                        }}
+                        onClick={centerOnRoom}
                     >
                         <FaCrosshairs size={10} />
                     </BaseButton></Hint>

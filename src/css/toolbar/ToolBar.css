@@ -27,6 +27,17 @@
         0 2px 0 rgba(0, 0, 0, 0.22);
 }
 
+/* `toolbar.transparent: false`: the solid original bar, the same colours without the see-through. */
+.octane-toolbar-hobba.is-opaque {
+    border-top-color: rgb(96, 94, 95);
+    background: rgb(43, 42, 44);
+}
+
+.octane-toolbar-mobile-hobba.is-opaque {
+    border-color: rgb(0, 0, 0);
+    background: rgb(46, 45, 44);
+}
+
 .tb-nav-clip {
     overflow: visible;
 }

@@ -10,7 +10,7 @@ import {
     HotelViewLandingVoteComposer
 } from '@octane/renderer';
 import { CSSProperties, FC, FormEvent, PointerEvent, useEffect, useRef, useState } from 'react';
-import { GetConfigurationValue, SendMessageComposer, localizeWithFallback } from '../../api';
+import { GetConfigurationValue, GetOptionalConfigurationValue, SendMessageComposer, localizeWithFallback } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
 import { useMessageEvent } from '../../hooks';
 import { Checkbox } from '../../common/Checkbox';
@@ -60,7 +60,9 @@ interface HotelViewSlotDrag {
 
 // Left and right edge artwork is permanently pinned to the bottom corners via CSS and
 // cannot be moved, so only the drape and Hall of Fame are draggable scene targets.
-type HotelViewSceneDragTarget = 'drape' | 'hallOfFame';
+// The avatar stands on the left artwork (or on the scene when there is none) and can be placed there too; its
+// place is kept in the scene's left x / y, which the pinned left artwork itself never used.
+type HotelViewSceneDragTarget = 'drape' | 'hallOfFame' | 'avatar';
 
 interface HotelViewSceneDrag {
     target: HotelViewSceneDragTarget;
@@ -70,6 +72,8 @@ interface HotelViewSceneDrag {
     width: number;
     height: number;
     scaled: boolean;
+    /** The box the dragged thing is placed in, when it is not the scene's own container. */
+    root?: HTMLElement | null;
 }
 
 const HOTEL_VIEW_WIDTH = 1172;
@@ -78,6 +82,8 @@ const HOTEL_VIEW_HEIGHT = 822;
 const HOTEL_VIEW_SCENE_BOTTOM = 55;
 /** How long the stage's zoom has to stay put before its labels are drawn again at the new size. */
 const TEXT_SCALE_SETTLE_MS = 150;
+/** The scene fields a draggable thing's place is kept in. */
+const sceneKeyOf = (target: HotelViewSceneDragTarget): 'drape' | 'hallOfFame' | 'left' => (target === 'avatar' ? 'left' : target);
 const EMPTY_SCENE: IHotelViewLandingScene = { backgroundUrl: '', leftUrl: '', rightUrl: '', drapeUrl: '', leftX: -1, leftY: -1, rightX: -1, rightY: -1, drapeX: -1, drapeY: -1, hallOfFameX: -1, hallOfFameY: -1, hallOfFameEnabled: false, hallOfFameMode: 'latest_registered', hallOfFameCurrencyType: 0, hallOfFameUsers: [] };
 const HOTEL_VIEW_ACTIONS = [
     { value: 'catalog/open', get label() { return localizeWithFallback('octane.hotel_view.open_catalogue', 'Open catalogue'); } },
@@ -281,6 +287,8 @@ export const HotelView: FC = () => {
         '--hotel-view-scaled-height': `${HOTEL_VIEW_HEIGHT * scale}px`,
         '--hotel-view-scaled-width': `${HOTEL_VIEW_WIDTH * scale}px`
     } as CSSProperties;
+    // A solid toolbar (`toolbar.transparent: false`) hides whatever is behind it, so the view then ends on top of it.
+    const toolbarOpaque = GetOptionalConfigurationValue<boolean>('toolbar.transparent', true) === false;
     const containerStyle = {
         '--hotel-view-background': backgroundImage,
         '--hotel-view-scene-bottom': `${HOTEL_VIEW_SCENE_BOTTOM}px`,
@@ -435,7 +443,7 @@ export const HotelView: FC = () => {
     };
 
     const getSceneCoordinates = (target: HotelViewSceneDragTarget) => {
-        const key = target === 'hallOfFame' ? 'hallOfFame' : target;
+        const key = sceneKeyOf(target);
         const x = scene[`${key}X` as keyof IHotelViewLandingScene] as number;
         const y = scene[`${key}Y` as keyof IHotelViewLandingScene] as number;
 
@@ -468,8 +476,10 @@ export const HotelView: FC = () => {
 
     const startSceneDrag = (event: PointerEvent<HTMLButtonElement>, target: HotelViewSceneDragTarget) => {
         const isScaled = target === 'hallOfFame';
-        const dragRoot = isScaled ? hotelViewRef.current : containerRef.current;
-        const element = event.currentTarget.closest<HTMLElement>(target === 'hallOfFame' ? '.hotelview-hall-of-fame' : '.hotelview-edge');
+        const element = event.currentTarget.closest<HTMLElement>(target === 'hallOfFame' ? '.hotelview-hall-of-fame' : target === 'avatar' ? '.hotelview-avatar' : '.hotelview-edge');
+        // The avatar is placed inside whatever it stands in: the left artwork, or the scene without one.
+        const avatarRoot = target === 'avatar' ? (element?.parentElement ?? null) : null;
+        const dragRoot = avatarRoot ?? (isScaled ? hotelViewRef.current : containerRef.current);
         const rootRect = dragRoot?.getBoundingClientRect();
         const elementRect = element?.getBoundingClientRect();
 
@@ -485,14 +495,15 @@ export const HotelView: FC = () => {
             offsetY: (event.clientY - elementRect.top) / (isScaled ? scale : 1),
             width: elementRect.width / (isScaled ? scale : 1),
             height: elementRect.height / (isScaled ? scale : 1),
-            scaled: isScaled
+            scaled: isScaled,
+            root: avatarRoot
         });
     };
 
     const moveSceneDrag = (event: PointerEvent<HTMLButtonElement>) => {
         if (!sceneDrag || sceneDrag.pointerId !== event.pointerId) return;
 
-        const dragRoot = sceneDrag.scaled ? hotelViewRef.current : containerRef.current;
+        const dragRoot = sceneDrag.root ?? (sceneDrag.scaled ? hotelViewRef.current : containerRef.current);
         const rootRect = dragRoot?.getBoundingClientRect();
 
         if (!rootRect) return;
@@ -524,7 +535,7 @@ export const HotelView: FC = () => {
         const position = sceneDragPositionRef.current?.target === sceneDrag.target ? sceneDragPositionRef.current : null;
 
         if (position) {
-            const key = position.target === 'hallOfFame' ? 'hallOfFame' : position.target;
+            const key = sceneKeyOf(position.target);
             const updatedScene = {
                 ...scene,
                 [`${key}X`]: position.x,
@@ -540,16 +551,39 @@ export const HotelView: FC = () => {
         setSceneDragPosition(null);
     };
 
+    // The player's avatar. An admin gets a handle on it and drags it to where it should stand; until one does, it
+    // stands where the stylesheet puts it.
+    const renderSceneAvatar = (className: string) => (
+        <div className={className} style={getScenePositionStyle('avatar')}>
+            <LayoutAvatarImageView classNames={['hotelview-avatar-figure']} figure={GetSessionDataManager().figure} gender={GetSessionDataManager().gender} direction={2} />
+            {landingData.canEdit && (
+                <Hint content={localizeWithFallback('octane.hotel_view.drag_avatar', 'Drag avatar')}>
+                    <BaseButton
+                        aria-label={localizeWithFallback('octane.hotel_view.drag_avatar', 'Drag avatar')}
+                        type="button"
+                        className="hotelview-scene-drag-handle hotelview-avatar-drag-handle"
+                        onPointerDown={(event) => startSceneDrag(event, 'avatar')}
+                        onPointerMove={moveSceneDrag}
+                        onPointerUp={finishSceneDrag}
+                        onPointerCancel={finishSceneDrag}
+                    >
+                        ↕
+                    </BaseButton>
+                </Hint>
+            )}
+        </div>
+    );
+
     return (
         // AIR fills the landing view behind the see-through toolbar; the scene keeps its old box, 55 px up.
         <NativeTextTree>
-        <div className="octane-hotel-view block fixed w-full h-full" style={containerStyle}>
+        <div className={`octane-hotel-view block fixed w-full h-full${toolbarOpaque ? ' is-toolbar-opaque' : ''}`} style={containerStyle}>
             {/* The left and right artwork stand on the bottom of the window, behind the see-through toolbar, as in AIR. */}
-            {scene.leftUrl && <div className="hotelview-edge hotelview-edge-left"><img src={resolveImageUrl(scene.leftUrl, imageLibraryUrl, assetUrl)} alt="" /><LayoutAvatarImageView classNames={['hotelview-avatar']} figure={GetSessionDataManager().figure} gender={GetSessionDataManager().gender} direction={2} /></div>}
+            {scene.leftUrl && <div className="hotelview-edge hotelview-edge-left"><img src={resolveImageUrl(scene.leftUrl, imageLibraryUrl, assetUrl)} alt="" />{renderSceneAvatar('hotelview-avatar')}</div>}
             {scene.rightUrl && <div className="hotelview-edge hotelview-edge-right"><img src={resolveImageUrl(scene.rightUrl, imageLibraryUrl, assetUrl)} alt="" /></div>}
             <WidgetErrorBoundary name="HotelViewDragonAdoptionButton"><HotelViewDragonAdoptionButton /></WidgetErrorBoundary>
             <div ref={containerRef} className="hotelview-frame">
-                {!scene.leftUrl && <LayoutAvatarImageView classNames={['hotelview-avatar hotelview-avatar-fallback']} figure={GetSessionDataManager().figure} gender={GetSessionDataManager().gender} direction={2} />}
+                {!scene.leftUrl && renderSceneAvatar('hotelview-avatar hotelview-avatar-fallback')}
                 {scene.drapeUrl && <div className="hotelview-edge hotelview-edge-drape" style={getScenePositionStyle('drape')}><img src={resolveImageUrl(scene.drapeUrl, imageLibraryUrl, assetUrl)} alt="" />{landingData.canEdit && <Hint content={localizeWithFallback('octane.hotel_view.drag_drape', 'Drag drape')}>
                     <BaseButton aria-label={localizeWithFallback('octane.hotel_view.drag_drape', 'Drag drape')} type="button" className="hotelview-scene-drag-handle" onPointerDown={(event) => startSceneDrag(event, 'drape')} onPointerMove={moveSceneDrag} onPointerUp={finishSceneDrag} onPointerCancel={finishSceneDrag}>↕</BaseButton>
                 </Hint>}</div>}
@@ -704,6 +738,22 @@ export const HotelView: FC = () => {
                                     <label>{localizeWithFallback('octane.hotel_view.hall_of_fame_ranking', 'Hall of Fame ranking')}<Select value={editingScene.hallOfFameMode} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameMode: event.target.value })}><option value="latest_registered">{localizeWithFallback('octane.hotel_view.latest_registered_users', 'Latest registered users')}</option><option value="online_time">{localizeWithFallback('octane.hotel_view.most_online_time', 'Most online time')}</option><option value="achievement_score">{localizeWithFallback('octane.hotel_view.highest_achievement_score', 'Highest achievement score')}</option><option value="currency">{localizeWithFallback('octane.hotel_view.highest_currency_balance', 'Highest currency balance')}</option></Select></label>
                                     {editingScene.hallOfFameMode === 'currency' && <label>{localizeWithFallback('octane.hotel_view.currency_type', 'Currency type')}<NumberInput min="0" value={editingScene.hallOfFameCurrencyType} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameCurrencyType: Math.max(0, Number(event.target.value) || 0) })} /></label>}
                                 </>}
+                                {/* The avatar is placed by dragging it on the view; this puts it back where it stands by default (on Save). */}
+                                <div className="hotelview-editor-avatar-reset">
+                                    <span>
+                                        {editingScene.leftX < 0 || editingScene.leftY < 0
+                                            ? localizeWithFallback('octane.hotel_view.avatar_position_default', 'Avatar position: default')
+                                            : localizeWithFallback('octane.hotel_view.avatar_position_custom', 'Avatar position: custom')}
+                                    </span>
+                                    <BaseButton
+                                        type="button"
+                                        data-testid="hotelview-avatar-reset"
+                                        disabled={editingScene.leftX < 0 || editingScene.leftY < 0}
+                                        onClick={() => setEditingScene({ ...editingScene, leftX: -1, leftY: -1 })}
+                                    >
+                                        {localizeWithFallback('octane.hotel_view.reset_avatar_position', 'Reset avatar position')}
+                                    </BaseButton>
+                                </div>
                                 <footer><BaseButton type="button" onClick={() => setEditingScene(null)}>{localizeWithFallback('octane.hotel_view.cancel', 'Cancel')}</BaseButton><BaseButton type="submit">{localizeWithFallback('octane.hotel_view.save', 'Save')}</BaseButton></footer>
                             </form>
                         )}

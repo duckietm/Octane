@@ -268,15 +268,14 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
         <NativeTextTree>
             <>
                 {isVisible && (
-                    // AIR floor_plan_editor_bc: a 662x600 frame with the subtitle strip, the plan panel (draw mode, tile height,
+                    // AIR floor_plan_editor_bc: a 662x600 frame, which can be made bigger (the plan then gets the room), with the subtitle strip, the plan panel (draw mode, tile height,
                     // heightmap) on the left, the preview panel (enter direction, room options, wall height, preview) on the
                     // right and the reload / import-export / cancel / save buttons at the bottom.
                     <OctaneCardView
                         uniqueKey="floorpan-editor"
-                        className="w-[662px] h-[600px] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+                        className="w-[662px] h-[600px] min-w-[662px] min-h-[600px] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                         classNames={['octane-floorplan-window']}
                         theme="primary-slim"
-                        isResizable={false}
                     >
                         <OctaneCardHeaderView headerText={externalSession?.title ?? LocalizeText('floor.plan.editor.title')} onCloseClick={closeEditor} />
                         <OctaneCardContentView overflow="hidden" className="flex flex-col">

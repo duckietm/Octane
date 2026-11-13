@@ -2089,3 +2089,36 @@
 .octane-mysterybox-tracker__small.is-key {
     --octane-mysterybox-image: url("../../assets/images/mysterybox/key_small.png");
 }
+
+/* Official infostand purchase_buttons: a row of 23 px buttons, 5 px apart, sized to their content (place more
+   90 wide, buy 72); "Place more" and "Buy" carry an icon before their regular-weight text. The sizes are forced:
+   the button component and the infostand both set important sizes of their own. */
+.octane-infostand-purchase-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+}
+
+.octane-infostand-purchase-buttons button {
+    display: inline-flex !important;
+    flex: none;
+    gap: 2px;
+    align-items: center;
+    justify-content: center;
+    width: auto !important;
+    height: 23px !important;
+    min-height: 23px !important;
+    padding: 0 5px !important;
+    font-weight: 400 !important;
+    line-height: 1 !important;
+    white-space: nowrap;
+}
+
+.octane-infostand-purchase-buttons img {
+    flex: none;
+    width: auto;
+    height: auto;
+    max-height: 18px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}

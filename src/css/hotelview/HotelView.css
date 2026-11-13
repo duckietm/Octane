@@ -1,11 +1,22 @@
 .octane-hotel-view {
-    background: #27afcf;
+    background-color: #27afcf;
+    /* The picture always spans the window from its top down to its bottom (behind the see-through toolbar), keeping
+       its proportions, and repeats sideways only: a gradient runs over the whole height whatever the window size. */
     background-image: var(--hotel-view-background);
-    /* Stands on the bottom of the window, behind the see-through toolbar, like the left and right artwork: the
-       picture's own ground runs under the toolbar and nothing of a repeat shows there. */
     background-position: left bottom;
-    background-repeat: repeat;
+    background-repeat: repeat-x;
+    background-size: auto 100%;
     z-index: 0;
+}
+
+/* A solid toolbar (`toolbar.transparent: false`) shows nothing behind it, so the view ends on top of the 46 px bar
+   (and its 1 px top line): background and artwork stand there, and the scene keeps its distance from the bar.
+   Only where that bar is drawn: a touch layout has a floating bar instead. */
+@media not ((pointer: coarse) or (hover: none)) {
+    .octane-hotel-view.is-toolbar-opaque {
+        height: calc(100% - 47px) !important;
+        --hotel-view-scene-bottom: 8px !important;
+    }
 }
 
 /* The scene's box: the stage, edges, avatar and drag handles are laid out in it as they were in the old container. */
@@ -122,6 +133,19 @@
     height: 130px;
     z-index: 2;
     transform: translate(-50%, -50%);
+}
+
+/* The figure fills the avatar's box; the box is what is positioned (and what an admin drags). */
+.hotelview-avatar-figure {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.hotelview-avatar-drag-handle {
+    top: -6px;
+    left: -6px;
 }
 
 .hotelview-avatar-fallback {
@@ -925,7 +949,8 @@
     padding-top: 4px;
 }
 
-.hotelview-editor footer button {
+.hotelview-editor footer button,
+.hotelview-editor .hotelview-editor-avatar-reset button {
     width: 86px;
     height: 25px;
     margin: 0;
@@ -1473,4 +1498,18 @@
     font-size: 11px;
     line-height: 14px;
     white-space: nowrap;
+}
+
+/* Scene editor: the avatar's place and the button that puts it back. */
+.hotelview-editor-avatar-reset {
+    display: flex;
+    grid-column: 1 / -1;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hotelview-editor-avatar-reset button:disabled {
+    cursor: default;
+    opacity: 0.55;
 }

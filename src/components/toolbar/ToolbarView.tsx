@@ -1,7 +1,7 @@
 import { AddLinkEventTracker, CreateLinkEvent, Dispose, DropBounce, EaseOut, FindNewFriendsMessageComposer, ILinkEventTracker, JumpBy, Motions, OctaneToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, RemoveLinkEventTracker, Wait, YouTubeRoomSettingsEvent } from '@octane/renderer';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { CSSProperties, FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { GetConfigurationValue, isHousekeepingEnabled, localizeWithFallback, MessengerIconState, OpenMessengerChat, SendMessageComposer, setYoutubeRoomEnabled, VisitDesktop } from '../../api';
+import { GetConfigurationValue, GetOptionalConfigurationValue, isHousekeepingEnabled, localizeWithFallback, MessengerIconState, OpenMessengerChat, SendMessageComposer, setYoutubeRoomEnabled, VisitDesktop } from '../../api';
 import collapseLeftImg from '../../assets/images/toolbar/air/collapse-left.png';
 import collapseRightImg from '../../assets/images/toolbar/air/collapse-right.png';
 import dividerImg from '../../assets/images/toolbar/air/divider.png';
@@ -135,6 +135,8 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     };
     const { unreadCount: mentionsUnread = 0 } = useMentionsSnapshot();
     const mentionsEnabled = useMemo(() => GetConfigurationValue<boolean>('mentions_ui.enabled', true), []);
+    // The see-through bar is the default; a hotel can ask for the solid original bar with `toolbar.transparent: false`.
+    const toolbarOpaqueClass = useMemo(() => (GetOptionalConfigurationValue<boolean>('toolbar.transparent', true) === false ? ' is-opaque' : ''), []);
     const buildersClubEnabled = useMemo(() => GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true)), []);
     const fortuneWheelEnabled = useMemo(() => GetConfigurationValue<boolean>('toolbar.fortunewheel.enabled', true), []);
     const { openMonitor, showToolbarButton } = useWiredTools();
@@ -415,7 +417,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                     animate={ visibilityVariant }
                     variants={ shellVariants }
                     transition={ SHELL_TRANSITION }
-                    className={ `octane-toolbar octane-toolbar-hobba absolute bottom-0 left-0 right-0 z-[70] h-[46px] ${ desktopBlockClasses }` } />
+                    className={ `octane-toolbar octane-toolbar-hobba${ toolbarOpaqueClass } absolute bottom-0 left-0 right-0 z-[70] h-[46px] ${ desktopBlockClasses }` } />
 
                 <motion.div
                     ref={ leftDockRef }
@@ -604,7 +606,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                     animate={ visibilityVariant }
                     variants={ mobileNavVariants }
                     transition={ NAV_TRANSITION }
-                    className={ `absolute left-1/2 bottom-0 z-[71] flex w-[95vw] -translate-x-1/2 items-center overflow-visible ${ mobileOnlyClasses } ${ isInRoom ? 'octane-toolbar-mobile-hobba px-[6px] py-[4px] mb-[3px]' : '' }` }>
+                    className={ `absolute left-1/2 bottom-0 z-[71] flex w-[95vw] -translate-x-1/2 items-center overflow-visible ${ mobileOnlyClasses } ${ isInRoom ? `octane-toolbar-mobile-hobba${ toolbarOpaqueClass } px-[6px] py-[4px] mb-[3px]` : '' }` }>
                     <motion.div
                         variants={ containerVariants }
                         className="tb-bar-scroll flex h-full min-w-0 flex-1 items-center gap-2 overflow-x-auto overflow-y-visible px-1">
