@@ -63,6 +63,7 @@ vi.mock('../../api', () => ({
     NotificationBubbleType: { INFO: 'info' },
     pasteTriggerableData: vi.fn(),
     removeFurniFromWiredPicks: vi.fn(),
+    WIRED_RESET_EVENT: 'octane-wired-reset',
     resolveWiredQuantifier: (code: number | null, sent: number) => code ?? sent,
     resetTriggerableData: vi.fn(),
     SendMessageComposer: mocks.sendMessage,

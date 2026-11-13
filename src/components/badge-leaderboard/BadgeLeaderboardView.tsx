@@ -1,6 +1,17 @@
 import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useMemo, useState } from 'react';
-import { BadgeLeaderboardBoard, BadgeLeaderboardEntry, BadgeLeaderboardResponse, BadgeRarityKey, fetchBadgeLeaderboard, getCachedBadgeLeaderboard, LocalizeText, localizeWithFallback } from '../../api';
+import {
+    BadgeLeaderboardBoard,
+    BadgeLeaderboardEntry,
+    BadgeLeaderboardLinkTarget,
+    BadgeLeaderboardResponse,
+    BadgeRarityKey,
+    fetchBadgeLeaderboard,
+    getCachedBadgeLeaderboard,
+    LocalizeText,
+    localizeWithFallback,
+    parseBadgeLeaderboardLink
+} from '../../api';
 import {
     badgeEmblemAchievement,
     badgeEmblemCommon,
@@ -59,6 +70,8 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
     const [version, setVersion] = useState(0);
     const [categoryIndex, setCategoryIndex] = useState(0);
     const [entryPageIndex, setEntryPageIndex] = useState(0);
+    const [linkTarget, setLinkTarget] = useState<BadgeLeaderboardLinkTarget | null>(null);
+    const [linkPage, setLinkPage] = useState<number | null>(null);
     // Held in state and filled from the reply itself: the module cache drops a reply that arrives after the session
     // user changed, and reading it during render left the window blank with nothing to say why.
     const [leaderboard, setLeaderboard] = useState<BadgeLeaderboardResponse>(() => getCachedBadgeLeaderboard());
@@ -72,6 +85,9 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
 
                 switch (parts[1]) {
                     case 'show':
+                        // Official link arguments: list type, rarity tier and page; without them the board opens as it was.
+                        if (parts.length > 2) setLinkTarget(parseBadgeLeaderboardLink(parts.slice(2)));
+
                         setIsVisible(true);
                         return;
                     case 'hide':
@@ -178,6 +194,27 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
 
     useEffect(() => setEntryPageIndex(0), [categoryIndex]);
 
+    // A link's target is taken once the lists are there; the page is set after the list, in the same pass, so
+    // the reset above does not undo it.
+    useEffect(() => {
+        if (!linkTarget || !pages.length) return;
+
+        const index = pages.findIndex((page) => page.key === linkTarget.key);
+        const page = pages[index] ?? pages[0];
+        const lastPage = Math.max(0, Math.ceil((page?.board?.entries?.length ?? 0) / PAGE_SIZE) - 1);
+
+        setCategoryIndex(Math.max(0, index));
+        setLinkPage(Math.min(linkTarget.page, lastPage));
+        setLinkTarget(null);
+    }, [linkTarget, pages]);
+
+    useEffect(() => {
+        if (linkPage === null) return;
+
+        setEntryPageIndex(linkPage);
+        setLinkPage(null);
+    }, [linkPage]);
+
     const currentPage = pages[categoryIndex] || null;
     const allEntries = currentPage?.board?.entries || [];
     const viewerEntry = useMemo(() => {
@@ -264,7 +301,9 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
                         </div>
                         <div className="octane-badge-leaderboard__content">
                             {isLoading && !leaderboard && <div className="octane-badge-leaderboard__state">{LocalizeText('generic.loading')}</div>}
-                            {loadError && !leaderboard && <div className="octane-badge-leaderboard__state octane-badge-leaderboard__state--error">{loadError}</div>}
+                            {loadError && !leaderboard && (
+                                <div className="octane-badge-leaderboard__state octane-badge-leaderboard__state--error">{loadError}</div>
+                            )}
                             {currentPage && (
                                 <>
                                     <div className="octane-badge-leaderboard__info-card">
@@ -284,7 +323,12 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
                                             />
                                         ))}
                                         {showViewerEntry && (
-                                            <LeaderboardRow entry={viewerEntry} emblem={currentPage.emblem} rowIndex={pageStart + pageEntries.length} isCurrentUser={true} />
+                                            <LeaderboardRow
+                                                entry={viewerEntry}
+                                                emblem={currentPage.emblem}
+                                                rowIndex={pageStart + pageEntries.length}
+                                                isCurrentUser={true}
+                                            />
                                         )}
                                     </div>
                                     <img className="octane-badge-leaderboard__divider" src={leaderboardDivider} alt="" />

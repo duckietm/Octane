@@ -743,3 +743,83 @@
         display: none;
     }
 }
+
+/* AIR vip_quests_promo_xml: 193 wide, 216 open and 33 folded to its title. */
+.octane-purse-vip-quests {
+    position: relative;
+    box-sizing: border-box;
+    width: 193px;
+    min-height: 216px;
+    margin-top: 3px;
+    margin-left: auto;
+    padding: 3px 6px 0;
+    overflow: hidden;
+    pointer-events: all;
+    color: #000;
+    border: 7px solid transparent;
+    border-bottom-width: 8px;
+    border-image-source: url("../../assets/images/habbo-skin/slices/border-ubuntu-9.png");
+    border-image-slice: 28 28 32 28 fill;
+    border-image-width: 7px 7px 8px 7px;
+}
+
+.octane-purse-vip-quests.is-folded {
+    min-height: 33px;
+    height: 33px;
+}
+
+.octane-purse-vip-quests__title {
+    padding-right: 22px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #444;
+}
+
+.octane-purse-vip-quests__fold {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    font-weight: bold;
+    line-height: 18px;
+    color: #444;
+    cursor: pointer;
+    background: none;
+    border: 0;
+}
+
+.octane-purse-vip-quests__caption {
+    margin-top: 8px;
+    font-weight: bold;
+}
+
+.octane-purse-vip-quests__info {
+    margin-top: 5px;
+    font-size: 10px;
+}
+
+.octane-purse-vip-quests__button {
+    position: relative;
+    z-index: 1;
+    display: block;
+    margin-top: 8px;
+    padding: 4px 14px;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    background: #00813e;
+    border: 2px solid #000;
+    border-radius: 4px;
+}
+
+.octane-purse-vip-quests__image {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    max-width: 92px;
+    max-height: 97px;
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}

@@ -28,30 +28,31 @@ import {
     WiredFurniTriggerEvent,
     WiredFurniVariableEvent,
     WiredOpenEvent,
-    WiredSelectorDefinition,
-    WiredVariableDefinition,
     WiredSaveSuccessEvent,
-    WiredValidationErrorEvent
+    WiredSelectorDefinition,
+    WiredValidationErrorEvent,
+    WiredVariableDefinition
 } from '@octane/renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
     GetRoomSession,
     IsOwnerOfFloorFurniture,
+    isDualFurniPickingMode,
     LocalizeText,
     localizeWiredError,
     localizeWithFallback,
     NotificationBubbleType,
     pasteTriggerableData,
     removeFurniFromWiredPicks,
-    resolveWiredQuantifier,
     resetTriggerableData,
+    resolveWiredQuantifier,
     SendMessageComposer,
+    WIRED_RESET_EVENT,
     WiredClipboardEntry,
-    wiredClipboardKeyOf,
     WiredFurniType,
-    isDualFurniPickingMode,
     WiredSelectionVisualizer,
+    wiredClipboardKeyOf,
     wiredPickIdOf,
     wiredPickIndexOf,
     withoutWallPick,
@@ -551,6 +552,21 @@ export const useWiredState = () => {
         WiredSelectionVisualizer.clearSelectionShaderFromFurni([...entry.furniIds, ...(entry.furniIds2 ?? [])]);
         setTrigger(withTriggerableData(current, { ...entry, furniIds: [], furniIds2: [] }));
     }, [currentTriggerableEntry, setTrigger]);
+
+    // Official `:wiredreset` (UserDefinedRoomEventsCtrl.clearCache): the setup window closes and everything the
+    // client kept of the boxes is dropped, here the quick menu's clipboard.
+    useEffect(() => {
+        const reset = () => {
+            WiredSelectionVisualizer.clearAllSelectionShaders();
+            setPasteIntoMode(false);
+            setTrigger(null);
+            setClipboard(new Map());
+        };
+
+        window.addEventListener(WIRED_RESET_EVENT, reset);
+
+        return () => window.removeEventListener(WIRED_RESET_EVENT, reset);
+    }, [setPasteIntoMode, setTrigger]);
 
     /** Official close: the window goes and its picks lose their highlight. */
     const closeWired = useCallback(() => {

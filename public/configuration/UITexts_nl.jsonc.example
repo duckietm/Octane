@@ -3179,5 +3179,16 @@
     "respect.giving.failed.caption": "Je respect is niet gegeven",
     "respect.giving.failed.no.stage": "In een talentenjacht kun je alleen respect geven aan een Habbo die op het podium staat.",
     "respect.giving.failed.no.audience": "Een talentenjacht heeft een publiek van minstens %users% Habbo's nodig voordat je respect kunt geven.",
-    "respect.giving.failed.button": "OK"
+    "respect.giving.failed.button": "OK",
+    "chatcmd.client.pickallbc": "Alle Builders' Club-meubels oppakken",
+    "octane.badge_leaderboard.unavailable": "Het klassement is op dit moment niet beschikbaar.",
+    "octane.wired.reward_amounts_must_be_whole_numbers": "Aantallen en item-id's moeten hele getallen van 1 tot %max% zijn.",
+    "octane.customize.owned": "In bezit",
+    "octane.customize.locked": "Vergrendeld",
+    "octane.customize.buy": "Kopen",
+    "octane.customize.activate": "Activeren",
+    "octane.customize.deactivate": "Deactiveren",
+    "octane.customize.library": "Bibliotheek",
+    "octane.customize.custom": "Aangepast",
+    "octane.customize.purchase_failed": "De aankoop kon niet worden voltooid."
 }

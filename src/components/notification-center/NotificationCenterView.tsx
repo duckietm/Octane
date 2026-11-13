@@ -7,6 +7,7 @@ import { GetBubbleLayout } from './views/bubble-layouts/GetBubbleLayout';
 import { GetConfirmLayout } from './views/confirm-layouts/GetConfirmLayout';
 import { HotelAlertToastView } from './views/HotelAlertToastView';
 import { NewFeatureNotificationsView } from './views/NewFeatureNotificationsView';
+import { WiredClickSettingsToggleView } from './views/WiredClickSettingsToggleView';
 
 export const NotificationCenterView: FC<{}> = (props) => {
     const { alerts = [], bubbleAlerts = [], confirms = [], closeAlert = null, closeBubbleAlert = null, closeConfirm = null } = useNotification();
@@ -66,6 +67,7 @@ export const NotificationCenterView: FC<{}> = (props) => {
             <>
                 <div className="octane-rightside-notifications flex flex-col gap-1">
                     <NewFeatureNotificationsView />
+                    <WiredClickSettingsToggleView />
                     {getBubbleAlerts}
                 </div>
                 <HotelAlertToastView />

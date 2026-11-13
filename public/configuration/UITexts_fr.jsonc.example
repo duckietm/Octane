@@ -3177,5 +3177,18 @@
     "respect.giving.failed.caption": "Ton respect n'a pas été donné",
     "respect.giving.failed.no.stage": "Dans un concours de talents, tu ne peux donner du respect qu'à un Habbo qui est sur la scène.",
     "respect.giving.failed.no.audience": "Un concours de talents a besoin d'un public d'au moins %users% Habbos avant de pouvoir donner du respect.",
-    "respect.giving.failed.button": "OK"
+    "respect.giving.failed.button": "OK",
+    "chatcmd.client.pickallbc": "Ramasser tous les meubles du Builders' Club",
+    "reward_track.debug.copy_track_id.success": "ID de parcours copié dans le presse-papiers",
+    "reward_track.debug.copy_task_id.success": "ID de tâche copié dans le presse-papiers",
+    "octane.badge_leaderboard.unavailable": "Le classement n'est pas disponible pour le moment.",
+    "octane.wired.reward_amounts_must_be_whole_numbers": "Les quantités et les identifiants d'objet doivent être des nombres entiers de 1 à %max%.",
+    "octane.customize.owned": "Possédé",
+    "octane.customize.locked": "Verrouillé",
+    "octane.customize.buy": "Acheter",
+    "octane.customize.activate": "Activer",
+    "octane.customize.deactivate": "Désactiver",
+    "octane.customize.library": "Bibliothèque",
+    "octane.customize.custom": "Personnalisé",
+    "octane.customize.purchase_failed": "L'achat n'a pas pu être finalisé."
 }

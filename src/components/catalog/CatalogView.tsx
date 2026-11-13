@@ -113,6 +113,9 @@ const CatalogViewInner: FC<{}> = () => {
                         if (parts.length > 2) {
                             openCatalogByType(getCatalogTypeFromLink(parts[2]));
 
+                            // catalog/show/<type>/<page> (the official catalog/warehouse/<page>): that page of it.
+                            if (parts.length > 3) openPageByName(parts.slice(3).join('/'));
+
                             return;
                         }
 

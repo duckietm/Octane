@@ -3184,5 +3184,18 @@
     "respect.giving.failed.caption": "Dein Respekt wurde nicht vergeben",
     "respect.giving.failed.no.stage": "In einer Talentshow kannst du nur einem Habbo auf der Bühne Respekt geben.",
     "respect.giving.failed.no.audience": "Eine Talentshow braucht ein Publikum von mindestens %users% Habbos, bevor Respekt vergeben werden kann.",
-    "respect.giving.failed.button": "OK"
+    "respect.giving.failed.button": "OK",
+    "chatcmd.client.pickallbc": "Alle Builders' Club-Möbel aufheben",
+    "reward_track.debug.copy_track_id.success": "Track-ID in die Zwischenablage kopiert",
+    "reward_track.debug.copy_task_id.success": "Aufgaben-ID in die Zwischenablage kopiert",
+    "octane.badge_leaderboard.unavailable": "Die Bestenliste ist im Moment nicht verfügbar.",
+    "octane.wired.reward_amounts_must_be_whole_numbers": "Mengen und Item-IDs müssen ganze Zahlen von 1 bis %max% sein.",
+    "octane.customize.owned": "Im Besitz",
+    "octane.customize.locked": "Gesperrt",
+    "octane.customize.buy": "Kaufen",
+    "octane.customize.activate": "Aktivieren",
+    "octane.customize.deactivate": "Deaktivieren",
+    "octane.customize.library": "Bibliothek",
+    "octane.customize.custom": "Eigene",
+    "octane.customize.purchase_failed": "Der Kauf konnte nicht abgeschlossen werden."
 }

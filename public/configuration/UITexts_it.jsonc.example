@@ -3377,5 +3377,8 @@
     "respect.giving.failed.caption": "Il tuo rispetto non è stato dato",
     "respect.giving.failed.no.stage": "In un talent show puoi dare rispetto solo a un Habbo che è sul palco.",
     "respect.giving.failed.no.audience": "Un talent show ha bisogno di un pubblico di almeno %users% Habbo prima di poter dare rispetto.",
-    "respect.giving.failed.button": "OK"
+    "respect.giving.failed.button": "OK",
+    "chatcmd.client.pickallbc": "Raccogli tutti gli arredi del Builders' Club",
+    "reward_track.debug.copy_track_id.success": "ID percorso copiato negli appunti",
+    "reward_track.debug.copy_task_id.success": "ID attività copiato negli appunti"
 }

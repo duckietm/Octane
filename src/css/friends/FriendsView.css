@@ -2700,3 +2700,9 @@ button.swf-friends-section-header {
         color: #777 !important;
     }
 }
+
+/* The game button of a friend who is playing: a plain icon, like the chat, visit and profile icons beside it. */
+.friend-bar .friend-bar-friend.is-selected .friend-bar-action-game {
+    padding: 0;
+    cursor: pointer;
+}
