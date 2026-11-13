@@ -5,9 +5,38 @@ import { subscribePlugins } from './OctanePluginApi';
 
 import './OctanePluginApi';
 
+const PLUGIN_SCRIPT_ATTRIBUTE = 'data-octane-plugin';
+
+/**
+ * Adds a plugin script to the document head, once per URL. The element is created here rather than rendered by
+ * React: a `<script>` React renders on the client with load listeners is inserted inert and never runs.
+ */
+export const appendPluginScript = (script: PluginScript, target: Document = document): HTMLScriptElement | null => {
+    const existing = Array.from(target.querySelectorAll<HTMLScriptElement>(`script[${PLUGIN_SCRIPT_ATTRIBUTE}]`)).find(
+        (element) => element.getAttribute(PLUGIN_SCRIPT_ATTRIBUTE) === script.src
+    );
+
+    if (existing) return null;
+
+    const element = target.createElement('script');
+    element.async = true;
+    element.src = script.src;
+    element.setAttribute(PLUGIN_SCRIPT_ATTRIBUTE, script.src);
+
+    if (script.integrity) {
+        element.setAttribute('integrity', script.integrity);
+        element.setAttribute('crossorigin', 'anonymous');
+    }
+
+    element.addEventListener('load', () => console.log(`[OctanePlugins] Loaded: ${script.src}`));
+    element.addEventListener('error', () => console.warn(`[OctanePlugins] Failed to load: ${script.src}`));
+    target.head.appendChild(element);
+
+    return element;
+};
+
 export const ExternalPluginLoader: FC<{}> = () => {
     const [, forceUpdate] = useState(0);
-    const [pluginScripts, setPluginScripts] = useState<PluginScript[]>([]);
 
     useEffect(() => {
         return subscribePlugins(() => forceUpdate((n) => n + 1));
@@ -42,24 +71,10 @@ export const ExternalPluginLoader: FC<{}> = () => {
             '[OctanePlugins] Loading external plugins:',
             scripts.map((script) => script.src)
         );
-        setPluginScripts(scripts);
+
+        // A plugin registers itself once it runs; its script stays in the page for the whole session.
+        for (const script of scripts) appendPluginScript(script);
     }, []);
 
-    if (!pluginScripts.length) return null;
-
-    return (
-        <>
-            {pluginScripts.map((script) => (
-                <script
-                    key={script.src}
-                    async
-                    src={script.src}
-                    integrity={script.integrity}
-                    crossOrigin={script.integrity ? 'anonymous' : undefined}
-                    onLoad={() => console.log(`[OctanePlugins] Loaded: ${script.src}`)}
-                    onError={() => console.warn(`[OctanePlugins] Failed to load: ${script.src}`)}
-                />
-            ))}
-        </>
-    );
+    return null;
 };
