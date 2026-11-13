@@ -1,23 +1,12 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
-import { FC, useEffect, useMemo } from 'react';
-import { HK_TICKET_STATE_OPEN, HousekeepingTabId, HousekeepingUserSection, isHousekeepingEnabled, isHousekeepingTabOpen, LocalizeText } from '../../api';
-import { DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, WidgetErrorBoundary } from '../../common';
-import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { FC, lazy, Suspense, useEffect, useMemo } from 'react';
+import { HK_TICKET_STATE_OPEN, HousekeepingTabId, HousekeepingUserSection, isHousekeepingEnabled, isHousekeepingTabOpen } from '../../api';
 import { useHasPermission, useHousekeepingStore, useModTools } from '../../hooks';
-import { HousekeepingDangerConfirmView } from './HousekeepingDangerConfirmView';
-import { HousekeepingPasswordReveal } from './HousekeepingPasswordReveal';
-import { HousekeepingStatusBanner } from './HousekeepingStatusBanner';
-import { HousekeepingAuditTab } from './views/audit/HousekeepingAuditTab';
-import { HousekeepingBansTab } from './views/bans/HousekeepingBansTab';
-import { HousekeepingDashboardTab } from './views/dashboard/HousekeepingDashboardTab';
-import { HousekeepingHotelTab } from './views/hotel/HousekeepingHotelTab';
-import { HousekeepingLiveTab } from './views/live/HousekeepingLiveTab';
-import { HousekeepingPermissionsTab } from './views/permissions/HousekeepingPermissionsTab';
-import { HousekeepingRoomsTab } from './views/rooms/HousekeepingRoomsTab';
-import { HousekeepingNavGroup, HousekeepingSidebar } from './views/shell/HousekeepingSidebar';
-import { HousekeepingSoundboardTab } from './views/soundboard/HousekeepingSoundboardTab';
-import { HousekeepingSupportTab } from './views/support/HousekeepingSupportTab';
-import { HousekeepingUsersTab } from './views/users/HousekeepingUsersTab';
+import type { HousekeepingNavGroup } from './views/shell/HousekeepingSidebar';
+
+// The window and its tabs are loaded the first time an operator opens it: this view stays mounted for
+// everyone to listen for the links and permissions, but players never download the staff tools.
+const HousekeepingPanel = lazy(() => import('./HousekeepingPanel').then((module) => ({ default: module.HousekeepingPanel })));
 
 const TAB_IDS: HousekeepingTabId[] = Object.values(HousekeepingTabId);
 
@@ -210,58 +199,17 @@ export const HousekeepingView: FC = () => {
         return groups.map((group) => ({ ...group, items: group.items.filter((item) => available(item.id)) }));
     }, [holds, selectedUserIds.length, openTickets]);
 
-    const activeView = useMemo(() => {
-        switch (activeTab) {
-            case HousekeepingTabId.LIVE:
-                return <HousekeepingLiveTab />;
-            case HousekeepingTabId.ROOMS:
-                return <HousekeepingRoomsTab />;
-            case HousekeepingTabId.SUPPORT:
-                return <HousekeepingSupportTab />;
-            case HousekeepingTabId.BANS:
-                return <HousekeepingBansTab />;
-            case HousekeepingTabId.AUDIT:
-                return <HousekeepingAuditTab />;
-            case HousekeepingTabId.HOTEL:
-                return <HousekeepingHotelTab />;
-            case HousekeepingTabId.PERMISSIONS:
-                return <HousekeepingPermissionsTab />;
-            case HousekeepingTabId.SOUNDBOARD:
-                return canManageSoundboard ? <HousekeepingSoundboardTab /> : <HousekeepingUsersTab />;
-            case HousekeepingTabId.USERS:
-            case HousekeepingTabId.ECONOMY:
-                return <HousekeepingUsersTab />;
-            case HousekeepingTabId.DASHBOARD:
-            default:
-                return <HousekeepingDashboardTab />;
-        }
-    }, [activeTab, canManageSoundboard]);
-
     if (!hkEnabled || !isHk || !isVisible) return null;
 
     return (
-        <NativeTextTree>
-            <WidgetErrorBoundary name="HousekeepingView">
-                <OctaneCardView
-                    className={`octane-housekeeping w-[860px] h-[620px] max-h-[92vh] max-w-[96vw]`}
-                    theme="primary-slim"
-                    uniqueKey="housekeeping"
-                    windowPosition={DraggableWindowPosition.TOP_CENTER}
-                >
-                    <OctaneCardHeaderView headerText={LocalizeText('housekeeping.title')} onCloseClick={() => closePanel()} />
-                    <div className="relative flex min-h-0 grow text-black">
-                        <HousekeepingSidebar active={activeTab} groups={navGroups} onSelect={setActiveTab} />
-                        <div className="flex min-w-0 grow flex-col">
-                            <HousekeepingStatusBanner />
-                            <HousekeepingPasswordReveal />
-                            <OctaneCardContentView className="min-h-0 grow text-black" gap={2}>
-                                {activeView}
-                            </OctaneCardContentView>
-                        </div>
-                        <HousekeepingDangerConfirmView />
-                    </div>
-                </OctaneCardView>
-            </WidgetErrorBoundary>
-        </NativeTextTree>
+        <Suspense fallback={null}>
+            <HousekeepingPanel
+                activeTab={activeTab}
+                canManageSoundboard={canManageSoundboard}
+                navGroups={navGroups}
+                onClose={closePanel}
+                onSelectTab={setActiveTab}
+            />
+        </Suspense>
     );
 };
