@@ -287,8 +287,7 @@ export default defineConfig({
                 // Granular chunking: split the monolithic vendor / octane-renderer
                 // bundles into smaller chunks so the browser can fetch them in
                 // parallel and CF can cache each independently. Splits chosen
-                // by size impact (pixi ~600KB, react ~150KB, framer-motion ~100KB,
-                // jodit ~250KB lazy-loaded only by admin news, etc.).
+                // by size impact (pixi ~600KB, react ~150KB, framer-motion ~100KB).
                 manualChunks: id =>
                 {
                     // Vendor checks first — pixi.js and pixi-filters are aliased to
@@ -300,7 +299,6 @@ export default defineConfig({
                     const norm = id.replace(/\\/g, '/');
                     if(norm.includes('pixi.js') || norm.includes('pixi-filters')) return 'vendor-pixi';
                     if(norm.includes('@emoji-mart')) return 'vendor-emoji';
-                    if(norm.includes('jodit') || norm.includes('@react-page')) return 'vendor-editor';
 
                     if(id.includes('Octane-Renderer') || id.includes(`${ rendererRoot }`))
                     {
@@ -316,7 +314,7 @@ export default defineConfig({
 
                     if(id.includes('node_modules'))
                     {
-                        if(id.includes('@octane/renderer') || id.includes('renderer3')) return 'octane-renderer';
+                        if(id.includes('@octane/renderer')) return 'octane-renderer';
                         if(id.match(/\/react(-dom)?\/|\/scheduler\//) || id.includes('react-error-boundary')) return 'vendor-react';
                         if(id.includes('framer-motion')) return 'vendor-motion';
                         if(id.includes('@tanstack')) return 'vendor-query';
