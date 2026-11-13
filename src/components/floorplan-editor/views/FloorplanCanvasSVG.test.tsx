@@ -61,6 +61,23 @@ describe('FloorplanCanvasSVG', () => {
         (document as { elementFromPoint?: unknown }).elementFromPoint = prevEfp;
     });
 
+    it('draws no background grid, and sits in a scroll box as big as the plan', () => {
+        const { container } = render(<FloorplanCanvasSVG state={initialState} dispatch={() => {}} />);
+
+        expect(container.querySelector('pattern')).toBeNull();
+        expect(container.querySelector('[data-testid="floorplan-grid"]')).toBeNull();
+
+        const content = container.querySelector('.fp-stage-content') as HTMLElement;
+        const before = parseFloat(content.style.width);
+
+        fireEvent.click(container.querySelector('[data-testid="zoom-in"]') as Element);
+        fireEvent.click(container.querySelector('[data-testid="zoom-in"]') as Element);
+
+        // Zoomed in, the plan is bigger than the view: that is what the scrollbars scroll.
+        expect(parseFloat(content.style.width)).toBeGreaterThan(before);
+        expect(container.querySelector('[data-testid="floorplan-scroll"]')?.className).toContain('has-classic-scrollbar');
+    });
+
     it('zoom in/out buttons adjust the viewBox', () => {
         const { container } = render(<FloorplanCanvasSVG state={initialState} dispatch={() => {}} />);
         const svg = container.querySelector('svg') as SVGSVGElement;

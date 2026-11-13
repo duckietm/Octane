@@ -26,6 +26,8 @@ type Props<T> = {
     // When given, the grid scrolls back to the top only when this value changes, not whenever `items` is a new
     // array: a list that is refetched in place (a catalogue page) keeps its scroll position.
     scrollResetKey?: unknown;
+    // Brings the item at `index` into view once per `nonce` (a deep link that selected it).
+    reveal?: { index: number; nonce: number } | null;
 };
 
 const GRID_GAP_PX = 4;
@@ -129,7 +131,8 @@ const InfiniteGridVirtualized = <T,>(props: Props<T>) => {
         itemRender = null,
         itemKey = null,
         classicScrollbar = false,
-        scrollResetKey
+        scrollResetKey,
+        reveal = null
     } = props;
     const { parentRef, columnCount } = useColumnMeasure(itemMinWidth, columnCountProp, columnGap, airColumnAdmission, onColumnCountChange);
     const hasItems = !!items && items.length > 0;
@@ -179,6 +182,16 @@ const InfiniteGridVirtualized = <T,>(props: Props<T>) => {
         if (parentRef.current) parentRef.current.scrollLeft = 0;
         virtualizer.scrollToIndex(0);
     }, [scrollReset, hasItems, virtualizer]);
+
+    // After the reset above, so a page that opens on a chosen item ends on that item and not on its first row.
+    const revealNonce = reveal?.nonce ?? 0;
+    const revealRow = reveal && reveal.index >= 0 ? Math.floor(reveal.index / Math.max(1, columnCount)) : -1;
+
+    useEffect(() => {
+        if (!hasItems || revealRow < 0) return;
+
+        virtualizer.scrollToIndex(revealRow, { align: 'center' });
+    }, [revealNonce, revealRow, hasItems, virtualizer]);
 
     const virtualItems = virtualizer.getVirtualItems();
 

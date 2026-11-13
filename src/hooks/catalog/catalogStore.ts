@@ -16,6 +16,7 @@ import {
 import { createOctaneStore } from '../../state/createOctaneStore';
 import {
     findNodeById,
+    findDeepLinkedOffer,
     findNodeByName,
     getNodesByOfferIdFromMap,
     normalizeCatalogType,
@@ -43,6 +44,8 @@ export interface CatalogUiState {
     activeNodes: ICatalogNode[];
     pendingRequest: CatalogPendingRequest | null;
     pendingOfferId: number;
+    /** The offer a deep link selected and the grid still has to scroll to; the nonce tells two requests apart. */
+    revealOffer: { offerId: number; nonce: number } | null;
     pageOverride: ICatalogPage | null;
     currentOffer: IPurchasableOffer | null;
     searchResult: SearchResult | null;
@@ -124,6 +127,7 @@ export const INITIAL_CATALOG_UI_STATE: CatalogUiState = {
     activeNodes: [],
     pendingRequest: null,
     pendingOfferId: -1,
+    revealOffer: null,
     pageOverride: null,
     currentOffer: null,
     searchResult: null,
@@ -367,12 +371,13 @@ export const useCatalogStore = createOctaneStore<CatalogStoreState>((set, get) =
 
         set({ pendingOfferId: -1 });
 
-        for (const offer of page.offers) {
-            if (offer.offerId !== pendingOfferId) continue;
+        const offer = findDeepLinkedOffer(page.offers, pendingOfferId);
 
-            get().selectCatalogOffer(offer);
-            break;
-        }
+        if (!offer) return;
+
+        get().selectCatalogOffer(offer);
+        // The grid brings the chosen offer into view: a long page would otherwise open on its first rows.
+        set((state) => ({ revealOffer: { offerId: offer.offerId, nonce: (state.revealOffer?.nonce ?? 0) + 1 } }));
     },
 
     setSearchResult: (result) => {

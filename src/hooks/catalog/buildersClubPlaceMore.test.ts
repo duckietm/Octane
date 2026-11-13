@@ -47,6 +47,15 @@ describe('infostand place more', () => {
         }
     });
 
+    it("takes the furni's ordinary offer when the furnidata names no Builders Club offer", async () => {
+        const { resolvePlaceMoreOfferId } = await import('./buildersClubPlaceMore');
+
+        expect(resolvePlaceMoreOfferId({ bcOfferId: 40, purchaseOfferId: 7 })).toBe(40);
+        expect(resolvePlaceMoreOfferId({ bcOfferId: -1, purchaseOfferId: 7 })).toBe(7);
+        expect(resolvePlaceMoreOfferId({ bcOfferId: -1, purchaseOfferId: -1 })).toBe(-1);
+        expect(resolvePlaceMoreOfferId(null)).toBe(-1);
+    });
+
     it('puts the furni on the cursor under its offer and places it from the Builders Club', () => {
         expect(requestPlaceMore({ offerId: 12, classId: 345, wall: false, extraParam: 'x' })).toBe(true);
         expect(state.placements).toEqual([['catalog', -12, 10, 345, 'x']]);
