@@ -37,7 +37,7 @@ describe('fetchHabboPage', () => {
 
 describe('the bundled mystery box page', () => {
     it('has a title line with a size, then the page', () => {
-        const [first, ...rest] = readFileSync('public/habbopages/mysterybox/faq', 'utf8').split('\n');
+        const [first, ...rest] = readFileSync('public/habbopages/en/mysterybox/faq.html', 'utf8').split('\n');
 
         expect(first).toMatch(/^[^|<]+\|\d+;\d+$/);
         expect(rest.join('\n')).toContain('<h2>Mystery Box</h2>');
