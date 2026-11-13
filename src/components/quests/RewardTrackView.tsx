@@ -417,7 +417,6 @@ export const RewardTrackView: FC<{}> = () => {
             );
         }
         // the alert belongs to the reload, not to the open track
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [reloadCount]);
 
     useEffect(() => {

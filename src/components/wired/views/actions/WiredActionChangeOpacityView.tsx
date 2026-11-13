@@ -43,7 +43,6 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
 
     useEffect(() => {
         setState(read());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [trigger]);
 
     const update = (patch: Partial<WiredActionChangeOpacityState>) => setState((current) => ({ ...current, ...patch }));

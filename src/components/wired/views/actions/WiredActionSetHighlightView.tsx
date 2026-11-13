@@ -46,7 +46,6 @@ export const WiredActionSetHighlightView: FC<{}> = () => {
         // Official: a box already showing to everyone does not explain it again.
         if (next.audience === WIRED_HIGHLIGHT_AUDIENCE_EVERYONE) everyoneInfoShown.current = true;
         setState(next);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [trigger]);
 
     const update = (patch: Partial<WiredActionSetHighlightState>) => setState((current) => ({ ...current, ...patch }));
