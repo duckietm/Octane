@@ -458,6 +458,15 @@ export class RoomAreaSelectionManager extends StubClass {
     static readonly HIGHLIGHT_DARKEN = 'highlight_darken';
 }
 
+// Generic plugin channel: the message event and the action composer, which keeps what it sends.
+export class PluginChannelMessageEvent extends StubClass {}
+export class PluginChannelActionComposer {
+    constructor(
+        public readonly channel: string,
+        public readonly payload: string
+    ) {}
+}
+
 // Composers that keep their constructor arguments, so a test can read what was sent.
 export class SetObjectDataMessageComposer {
     constructor(

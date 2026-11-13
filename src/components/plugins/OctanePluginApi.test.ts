@@ -1,6 +1,7 @@
 /* @vitest-environment jsdom */
 
 import { describe, expect, it, vi } from 'vitest';
+import { publishPluginChannel } from '../../api/plugin-channel';
 import { getRegisteredPlugins, type IOctanePluginApi, pluginApi, subscribePlugins } from './OctanePluginApi';
 
 describe('plugin registration', () => {
@@ -73,5 +74,45 @@ describe('plugin registration', () => {
 
         expect(document.getElementById('octane-plugin-window-left-open')).toBeNull();
         error.mockRestore();
+    });
+
+    it('hands a plugin what its server plugin sends on a channel, and stops when the plugin is removed', () => {
+        const heard = vi.fn();
+        pluginApi.register({
+            name: 'channel-owner',
+            label: 'Channel owner',
+            onOpen: () => undefined,
+            onInit: (api) => {
+                api.onChannel('test.owner', heard);
+            }
+        });
+
+        publishPluginChannel('test.owner', { n: 1 }, '{"n":1}');
+        expect(heard).toHaveBeenCalledWith({ n: 1 }, '{"n":1}');
+
+        pluginApi.unregister('channel-owner');
+        publishPluginChannel('test.owner', { n: 2 }, '{"n":2}');
+
+        expect(heard).toHaveBeenCalledTimes(1);
+    });
+
+    it('lets a plugin stop listening on its own', () => {
+        const heard = vi.fn();
+        let api: IOctanePluginApi = null;
+        pluginApi.register({
+            name: 'channel-stopper',
+            label: 'Channel stopper',
+            onOpen: () => undefined,
+            onInit: (received) => {
+                api = received;
+            }
+        });
+
+        const stop = api.onChannel('test.stopper', heard);
+        stop();
+        publishPluginChannel('test.stopper', { n: 1 }, '{"n":1}');
+
+        expect(heard).not.toHaveBeenCalled();
+        pluginApi.unregister('channel-stopper');
     });
 });
