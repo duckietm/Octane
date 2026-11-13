@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { LocalizeBadgeName, LocalizeText, localizeWithFallback } from '../../../../api';
 import eventIcon from '../../../../assets/images/friends/air/friend_bar_event_notification_icon.png';
 import gameIcon from '../../../../assets/images/friends/air/game_center_snowball_notification_icon.png';
+import messengerIcon from '../../../../assets/images/friends/swf/friendlist_messenger.png';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { FriendBarNotification, FriendNotificationType } from '../../../../hooks/friends/friendBarNotifications.helpers';
@@ -38,6 +39,8 @@ export const friendNotificationTexts = (notification: FriendBarNotification): { 
                 message: localizedOr(`quests.${message}.name`, localizedOr(`quests.${campaign}.name`, message))
             };
         }
+        case FriendNotificationType.MESSENGER:
+            return { title: localizeWithFallback('friendbar.notify.messenger', 'sent you a message'), message };
         case FriendNotificationType.PLAYING_GAME:
             return { title: localizeWithFallback('friendbar.notify.game', 'is playing a game.'), message: localizedOr(`gamecenter.${message}.name`, message) };
         default:
@@ -69,7 +72,7 @@ export const FriendBarNotificationIconView: FC<{ notification: FriendBarNotifica
                         onClick();
                     }}
                 >
-                    <img src={game ? gameIcon : eventIcon} alt="" />
+                    <img src={game ? gameIcon : notification.type === FriendNotificationType.MESSENGER ? messengerIcon : eventIcon} alt="" />
                 </BaseButton>
             </motion.div>
         </NativeTextTree>

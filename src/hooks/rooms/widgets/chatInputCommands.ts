@@ -34,6 +34,10 @@ export interface ChatCommandEnv {
     visitUser(name: string): void;
     visitRoom(roomId: number): void;
     wiredRoomState(rollback: boolean): void;
+    /** Closes the wired setup window and forgets what the client kept of it. */
+    wiredReset(): void;
+    /** Hides or shows the pointer and the room's tile cursor. */
+    toggleMouse(): void;
     toggleFullscreen(): void;
     setFrameRate(fps: number): void;
     setLanguage(code: string): void;
@@ -98,6 +102,12 @@ export const runOfficialChatCommand = (command: string, argument: string, parts:
         case ':cam':
         case ':camera':
             if (env.cameraAllowed) env.createLink('camera/show');
+            return HANDLED;
+        case ':wiredreset':
+            env.wiredReset();
+            return HANDLED;
+        case ':hidemouse':
+            env.toggleMouse();
             return HANDLED;
         case ':fs':
         case ':fullscreen':

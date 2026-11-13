@@ -7,6 +7,8 @@ interface TalentImageViewProps extends Omit<ImgHTMLAttributes<HTMLImageElement>,
     src: string;
     /** A reward product's code: its furni icon is the last resort when the product has no picture. */
     productCode?: string;
+    /** A stand-in picture for when neither the library nor the client has this one. */
+    fallback?: string;
 }
 
 /**
@@ -14,11 +16,12 @@ interface TalentImageViewProps extends Omit<ImgHTMLAttributes<HTMLImageElement>,
  * with the client, then (for a reward product) the furni's icon. With nothing left the picture is hidden.
  */
 export const TalentImageView: FC<TalentImageViewProps> = (props) => {
-    const { src, productCode = '', ...rest } = props;
+    const { src, productCode = '', fallback = '', ...rest } = props;
     const sources = talentImageSources(
         src,
         TALENT_LIBRARY_IMAGES,
-        productCode ? talentProductIconUrl(GetConfigurationValue<string>('furni.asset.icon.url', ''), productCode) : ''
+        productCode ? talentProductIconUrl(GetConfigurationValue<string>('furni.asset.icon.url', ''), productCode) : '',
+        fallback
     );
     const [failed, setFailed] = useState<{ key: string; count: number }>({ key: src, count: 0 });
     // A new picture starts from its first source again.

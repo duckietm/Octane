@@ -40,8 +40,12 @@ export const translateAirLink = (link: string, ownUserId: number = 0): string | 
             return isId(parts[1]) ? `friends-messenger/${parts[1]}` : null;
         case 'discord':
             return parts[1] === 'settings' && parts[2] === 'open' ? 'discord-settings/show' : null;
-        case 'badge_leaderboard':
-            return 'badge-leaderboard/show';
+        case 'badge_leaderboard': {
+            // AIR: badge_leaderboard/<type>/<rarity>/<page>. The board opens on that list and page.
+            const args = parts.slice(1, 4).filter((part) => part !== '');
+
+            return args.length && args.every((part) => /^-?\d+$/.test(part)) ? `badge-leaderboard/show/${args.join('/')}` : 'badge-leaderboard/show';
+        }
         case 'wiredrewards':
             return parts[1] === 'open' && isId(parts[2]) ? `wiredchestreward/open/${parts[2]}` : null;
         case 'camera':
@@ -49,9 +53,11 @@ export const translateAirLink = (link: string, ownUserId: number = 0): string | 
         case 'inventory':
             if (parts[1] !== 'open') return null;
 
-            return parts[2] ? `inventory/show/${parts[2]}` : 'inventory/show';
+            // inventory/open[/<tab>[/<item>]]: the item (a badge code, a furni id) is passed on to be selected.
+            return parts[2] ? `inventory/show/${parts.slice(2).join('/')}` : 'inventory/show';
         case 'catalog':
-            if (parts[1] === 'warehouse') return 'catalog/show/bc';
+            // catalog/warehouse[/<page>]: the Builders Club catalogue, on that page when one is named.
+            if (parts[1] === 'warehouse') return parts[2] ? `catalog/show/bc/${parts.slice(2).join('/')}` : 'catalog/show/bc';
             if (parts[1] === 'club_buy') return 'habboUI/open/hccenter';
             if (parts[1] === 'habbicons') return 'habbicons/open';
 

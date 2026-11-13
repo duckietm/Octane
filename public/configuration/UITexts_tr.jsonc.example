@@ -3166,5 +3166,14 @@
     "respect.giving.failed.caption": "Saygın verilemedi",
     "respect.giving.failed.no.stage": "Yetenek gösterisinde yalnızca sahnedeki bir Habbo'ya saygı verebilirsin.",
     "respect.giving.failed.no.audience": "Saygı verilebilmesi için yetenek gösterisinde en az %users% Habbo'luk bir seyirci olmalı.",
-    "respect.giving.failed.button": "Tamam"
+    "respect.giving.failed.button": "Tamam",
+    "octane.badge_leaderboard.unavailable": "Sıralama tablosu şu anda kullanılamıyor.",
+    "octane.customize.owned": "Sahip olunan",
+    "octane.customize.locked": "Kilitli",
+    "octane.customize.buy": "Satın al",
+    "octane.customize.activate": "Etkinleştir",
+    "octane.customize.deactivate": "Devre dışı bırak",
+    "octane.customize.library": "Kütüphane",
+    "octane.customize.custom": "Özel",
+    "octane.customize.purchase_failed": "Satın alma tamamlanamadı."
 }

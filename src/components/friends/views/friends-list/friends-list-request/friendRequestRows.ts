@@ -33,5 +33,14 @@ export const markFriendRequestRows = (rows: FriendRequestRow[], requestIds: numb
     return rows.map((row) => (row.state === 'open' && ids.has(row.request.id) ? { ...row, state } : row));
 };
 
+/** AIR FriendRequestsView: an acceptance the server refused shows as failed on the rows of those requesters. */
+export const failFriendRequestRows = (rows: FriendRequestRow[], requesterIds: number[]): FriendRequestRow[] => {
+    const ids = new Set(requesterIds);
+
+    if (!rows.some((row) => row.state === 'accepted' && ids.has(row.request.requesterUserId))) return rows;
+
+    return rows.map((row) => (row.state === 'accepted' && ids.has(row.request.requesterUserId) ? { ...row, state: 'failed' } : row));
+};
+
 /** AIR FriendRequestsView.tabClicked: clicking the tab clears the answered rows. */
 export const clearAnsweredFriendRequestRows = (rows: FriendRequestRow[]): FriendRequestRow[] => rows.filter((row) => row.state === 'open');

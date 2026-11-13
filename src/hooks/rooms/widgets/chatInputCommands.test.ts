@@ -36,6 +36,8 @@ const makeEnv = (over: Partial<ChatCommandEnv> = {}, sessionOver: Record<string,
         visitUser: log('visitUser'),
         visitRoom: log('visitRoom'),
         wiredRoomState: log('wired'),
+        wiredReset: log('wiredReset'),
+        toggleMouse: log('mouse'),
         toggleFullscreen: log('fullscreen'),
         setFrameRate: log('fps'),
         setLanguage: log('lang'),
@@ -114,6 +116,14 @@ describe('official client-side chat commands', () => {
         run(':lang nl');
         run(':donate');
         expect(calls).toEqual(['drop', 'fullscreen', 'visitUser Frank', 'visitRoom 12', 'lang nl', 'link selfdonation/open']);
+    });
+
+    it('closes the wired setup and hides the mouse on the official commands', () => {
+        const { run, calls } = makeEnv();
+
+        expect(run(':wiredreset')).toBe(true);
+        expect(run(':hidemouse')).toBe(true);
+        expect(calls).toEqual(['wiredReset', 'mouse']);
     });
 
     it('asks before resetting scores, and only for those who may clear the room', () => {

@@ -7,10 +7,10 @@ import {
     GetTicker,
     HabboClubLevelEnum,
     RoomControllerLevel,
-    RoomUnitDropHandItemComposer,
     RoomRotatingEffect,
     RoomSettingsComposer,
     RoomShakingEffect,
+    RoomUnitDropHandItemComposer,
     RoomZoomEvent,
     TextureUtils,
     TriggerHabbiconComposer,
@@ -18,13 +18,28 @@ import {
     WiredRoomStateActionComposer
 } from '@octane/renderer';
 import { useCallback, useRef } from 'react';
-import { CanOpenFurniChooser, CanOpenUserChooser,ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, IsAnyRoomController, LocalizeText, localizeWithFallback, parseSignId, SendMessageComposer, TryVisitRoom, WIRED_PLAYTEST_TOGGLE_LINK } from '../../../api';
-import { usePerkAllowed } from '../../session/usePerkAllowances';
-import { runOfficialChatCommand } from './chatInputCommands';
-import { useRoomStatsStore } from './roomStatsStore';
+import {
+    CanOpenFurniChooser,
+    CanOpenUserChooser,
+    ChatMessageTypeEnum,
+    GetClubMemberLevel,
+    GetConfigurationValue,
+    IsAnyRoomController,
+    LocalizeText,
+    localizeWithFallback,
+    parseSignId,
+    SendMessageComposer,
+    TryVisitRoom,
+    toggleRoomMouseHidden,
+    WIRED_PLAYTEST_TOGGLE_LINK,
+    WIRED_RESET_EVENT
+} from '../../../api';
 import { useNotification } from '../../notification';
+import { usePerkAllowed } from '../../session/usePerkAllowances';
 import { useTranslation } from '../../translation';
 import { useRoom } from '../useRoom';
+import { runOfficialChatCommand } from './chatInputCommands';
+import { useRoomStatsStore } from './roomStatsStore';
 
 /**
  * Pure imperative dispatch for the chat-input widget. Exposes
@@ -93,6 +108,8 @@ export const useChatInputActions = () => {
                     visitUser: (name) => SendMessageComposer(new VisitUserComposer(name)),
                     visitRoom: TryVisitRoom,
                     wiredRoomState: (rollback) => SendMessageComposer(new WiredRoomStateActionComposer(rollback)),
+                    wiredReset: () => window.dispatchEvent(new CustomEvent(WIRED_RESET_EVENT)),
+                    toggleMouse: () => void toggleRoomMouseHidden(),
                     toggleFullscreen: () => {
                         if (document.fullscreenElement) void document.exitFullscreen?.();
                         else void document.documentElement.requestFullscreen?.().catch(() => undefined);
@@ -171,7 +188,7 @@ export const useChatInputActions = () => {
                     case ':habbicon': {
                         const habbiconId = parseInt(secondPart);
 
-                        if(Number.isFinite(habbiconId) && habbiconId > 0) SendMessageComposer(new TriggerHabbiconComposer(habbiconId));
+                        if (Number.isFinite(habbiconId) && habbiconId > 0) SendMessageComposer(new TriggerHabbiconComposer(habbiconId));
 
                         return null;
                     }
@@ -217,11 +234,7 @@ export const useChatInputActions = () => {
                         }
                         return null;
                     case ':pickall':
-                        if (
-                            roomSession?.isRoomOwner ||
-                            IsAnyRoomController() ||
-                            (roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.GUEST
-                        ) {
+                        if (roomSession?.isRoomOwner || IsAnyRoomController() || (roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.GUEST) {
                             showConfirm(
                                 LocalizeText('room.confirm.pick_all'),
                                 () => {
@@ -236,11 +249,7 @@ export const useChatInputActions = () => {
 
                         return null;
                     case ':pickallbc':
-                        if (
-                            roomSession?.isRoomOwner ||
-                            IsAnyRoomController() ||
-                            (roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.GUEST
-                        ) {
+                        if (roomSession?.isRoomOwner || IsAnyRoomController() || (roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.GUEST) {
                             showConfirm(
                                 LocalizeText('room.confirm.pick_all_bc'),
                                 () => {
@@ -255,11 +264,7 @@ export const useChatInputActions = () => {
 
                         return null;
                     case ':ejectall':
-                        if (
-                            roomSession?.isRoomOwner ||
-                            IsAnyRoomController() ||
-                            (roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.GUEST
-                        ) {
+                        if (roomSession?.isRoomOwner || IsAnyRoomController() || (roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.GUEST) {
                             showConfirm(
                                 LocalizeText('room.confirm.eject_all'),
                                 () => {

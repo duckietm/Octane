@@ -1,5 +1,5 @@
 import { Collapsible } from '@base-ui/react/collapsible';
-import {
+import { AcceptFriendResultEvent,
     AddLinkEventTracker,
     HabboSearchResultData,
     HabboSearchResultEvent,
@@ -17,7 +17,7 @@ import { FriendsRemoveConfirmationView } from './FriendsListRemoveConfirmationVi
 import { FriendsRoomInviteView } from './FriendsListRoomInviteView';
 import { FriendsSearchView } from './FriendsListSearchView';
 import { FriendsListGroupView } from './friends-list-group/FriendsListGroupView';
-import { clearAnsweredFriendRequestRows, FriendRequestRow, markFriendRequestRows, mergeFriendRequestRows } from './friends-list-request/friendRequestRows';
+import { clearAnsweredFriendRequestRows, FriendRequestRow, failFriendRequestRows, markFriendRequestRows, mergeFriendRequestRows } from './friends-list-request/friendRequestRows';
 import { FriendsListRequestView } from './friends-list-request/FriendsListRequestView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
@@ -67,6 +67,13 @@ export const FriendsListView: FC<{}> = (props) => {
     const offlineHeaderRow = 1 + (isOnlineExpanded ? filteredOnlineFriends.length : 0);
     const friendSearchPendingRef = useRef(false);
     const searchResultCount = searchFriendResults ? searchFriendResults.length + (searchOtherResults?.length ?? 0) : 0;
+
+    // The server refused some acceptances (a full friend list on either side, a request that is gone).
+    useMessageEvent<AcceptFriendResultEvent>(AcceptFriendResultEvent, (event) => {
+        const failed = event.getParser().failures.map((failure) => failure.senderId);
+
+        if (failed.length) setRequestRows((rows) => failFriendRequestRows(rows, failed));
+    });
 
     useMessageEvent<HabboSearchResultEvent>(HabboSearchResultEvent, (event) => {
         // The answer carries no request id and the mod tools and the housekeeping search the same way: only an answer

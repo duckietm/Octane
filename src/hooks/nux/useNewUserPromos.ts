@@ -1,6 +1,6 @@
 import { CreateLinkEvent, GetSessionDataManager } from '@octane/renderer';
 import { useEffect } from 'react';
-import { GetConfigurationValue, localizeWithFallback } from '../../api';
+import { GetConfigurationValue, GetOptionalConfigurationValue, localizeWithFallback } from '../../api';
 import { firstNewUserPromo, hasRoomPromo, NewUserPromo, newUserPromoLink, ROOM_PROMO } from '../../api/nux/NewUserPromos';
 
 const SHOWN_KEY = 'octane.new_user_promos.shown';
@@ -35,7 +35,7 @@ const showPromo = (promo: NewUserPromo) => CreateLinkEvent(newUserPromoLink(prom
  */
 export const useNewUserPromos = () => {
     useEffect(() => {
-        const wing = GetConfigurationValue<string>('new.user.wing', '');
+        const wing = GetOptionalConfigurationValue<string>('new.user.wing', '');
         const userId = GetSessionDataManager()?.userId ?? 0;
 
         if (!wing || !GetSessionDataManager()?.isNoob || userId <= 0 || readShown().includes(userId)) return;

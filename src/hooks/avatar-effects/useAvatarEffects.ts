@@ -5,11 +5,12 @@ import {
     AvatarEffectAddedEvent,
     AvatarEffectExpiredEvent,
     AvatarEffectSelectedEvent,
-    AvatarEffectsEvent
+    AvatarEffectsEvent,
+    RoomEnterEvent
 } from '@octane/renderer';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { SendMessageComposer } from '../../api';
+import { GetOptionalConfigurationValue, SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';
 
 /**
@@ -65,6 +66,19 @@ export const needsActivation = (effect: OwnedAvatarEffect | undefined): boolean 
 const useAvatarEffectsState = () => {
     const [effects, setEffects] = useState<OwnedAvatarEffect[]>([]);
     const [activeEffectType, setActiveEffectType] = useState(0);
+    // Official EffectsModel: the effect the player last put on, forgotten when they take it off or it runs out.
+    const lastUsedEffectRef = useRef(-1);
+    const effectsRef = useRef(effects);
+    effectsRef.current = effects;
+
+    // Official `effects.reactivate.on.room.entry`: the last effect goes back on the avatar in every room entered.
+    useMessageEvent<RoomEnterEvent>(RoomEnterEvent, () => {
+        const type = lastUsedEffectRef.current;
+
+        if (type <= 0 || GetOptionalConfigurationValue<boolean>('effects.reactivate.on.room.entry', false) !== true) return;
+
+        if (effectsRef.current.some(effect => effect.type === type)) SendMessageComposer(new AvatarEffectSelectedComposer(type));
+    });
 
     useMessageEvent<AvatarEffectsEvent>(AvatarEffectsEvent, event => {
         const parsed = event.getParser().effects.map<OwnedAvatarEffect>(effect => ({
@@ -102,6 +116,8 @@ const useAvatarEffectsState = () => {
 
         setEffects(prev => prev.filter(effect => effect.type !== type));
         setActiveEffectType(prev => (prev === type ? 0 : prev));
+
+        if (lastUsedEffectRef.current === type) lastUsedEffectRef.current = -1;
     });
 
     useMessageEvent<AvatarEffectActivatedEvent>(AvatarEffectActivatedEvent, event => {
@@ -123,6 +139,7 @@ const useAvatarEffectsState = () => {
         setActiveEffectType(type);
 
         if (type <= 0) {
+            lastUsedEffectRef.current = -1;
             SendMessageComposer(new AvatarEffectSelectedComposer(-1));
 
             return;
@@ -132,7 +149,10 @@ const useAvatarEffectsState = () => {
 
         if (needsActivation(owned)) SendMessageComposer(new AvatarEffectActivatedComposer(type));
 
-        if (owned) SendMessageComposer(new AvatarEffectSelectedComposer(type));
+        if (owned) {
+            lastUsedEffectRef.current = type;
+            SendMessageComposer(new AvatarEffectSelectedComposer(type));
+        }
     }, [ effects ]);
 
     const isOwned = useCallback((type: number) => effects.some(effect => effect.type === type), [ effects ]);

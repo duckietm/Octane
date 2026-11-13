@@ -2,6 +2,7 @@ import { FriendNotificationEvent } from '@octane/renderer';
 import { useEffect, useRef } from 'react';
 import { GetConfigurationValue, MessengerFriend } from '../../api';
 import { useMessageEvent } from '../events';
+import { FriendNotificationType } from './friendBarNotifications.helpers';
 import { useFriendBarNotificationsStore } from './friendBarNotificationsStore';
 
 /**
@@ -26,6 +27,8 @@ export const useFriendBarNotificationEvents = (onlineFriends: ReadonlyArray<Mess
 
         if (!parser || !GetConfigurationValue<boolean>('friendbar.notifications.enabled', true)) return;
         if (!onlineIdsRef.current.has(parser.avatarId)) return;
+        // The unread-message marker is the messenger's own: the server's packet never carries it.
+        if (parser.typeCode === FriendNotificationType.MESSENGER) return;
 
         receive(parser.avatarId, parser.typeCode, parser.message);
     });

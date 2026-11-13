@@ -1530,6 +1530,25 @@
     "talent.track.enabled": true,
     "talent.track.citizenship.enabled": true,
     "new.user.citizenship.popup.enabled": false,
+    // The "Welcome!" box under the purse when the citizenship track gives free club days.
+    // Its Start button begins the quest campaign named below (campaign_code in the quests table).
+    "citizenship.vip.quest.promotion.enabled": false,
+    "citizenship.vip.tutorial.quest.campaign.name": "",
+    "// ---- Official-client extras (all optional, off unless set) ----": "",
+    // The last avatar effect chosen in the effects list goes back on in every room entered.
+    "effects.reactivate.on.room.entry": false,
+    // The room snaps back to the centre when a drag ends.
+    "room.dragging.always_center": false,
+    // An uncaught client error opens a window with a copyable report; show_stacktrace adds the stack.
+    "error_handling.show_error": false,
+    "error_handling.show_stacktrace": false,
+    // "How does it work?" link of the mystery box panel: a help page ("habbopages/...") or a web address.
+    // Left out, it opens the page that ships with the client; an empty value hides the link.
+    "mysterybox.faq.url": "habbopages/mysterybox/faq",
+    // Welcome bubbles for a new player: "social" (navigator) or "quest" (progression); empty = none.
+    "new.user.wing": "",
+    // "Place more" button on the infostand of Builders Club furni (needs bcofferid in the furnidata).
+    "infostand.place_more.enabled": false,
     "talentpromo.track": "",
     "// ---- Notifications ----": "",
     "notification": {

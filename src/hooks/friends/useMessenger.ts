@@ -20,6 +20,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
+    GetConfigurationValue,
     getInstantMessageErrorTextKey,
     LocalizeText,
     localizeWithFallback,
@@ -37,6 +38,8 @@ import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
 import { IResolvedTranslation, useTranslation } from '../translation';
 import { useMessengerHistory, useMessengerRealtime } from './messenger';
+import { FriendNotificationType } from './friendBarNotifications.helpers';
+import { useFriendBarNotificationsStore } from './friendBarNotificationsStore';
 import { useFriends } from './useFriends';
 
 const useMessengerState = () => {
@@ -334,6 +337,10 @@ const useMessengerState = () => {
 
         sendMessage(thread, parser.senderId, parser.messageText, parser.secondsSinceSent, parser.extraData);
         if (thread.threadId === activeThreadId && parser.senderId > 0) SendMessageComposer(new MarkConsoleReadComposer(parser.senderId));
+        // AIR MessengerToken: a message that arrives while its chat is not open marks the sender's friend bar tab.
+        else if (parser.senderId > 0 && GetConfigurationValue<boolean>('friendbar.notifications.enabled', true)) {
+            useFriendBarNotificationsStore.getState().receive(parser.senderId, FriendNotificationType.MESSENGER, '');
+        }
     });
 
     // The server refused a console message (muted, flood, not a friend): the line was added
@@ -564,6 +571,9 @@ const useMessengerState = () => {
 
         const activeThreadValue = messageThreadsRef.current.find((thread) => thread.threadId === activeThreadId);
         const participantId = activeThreadValue?.participant?.id ?? 0;
+
+        // The chat is open: its unread marker leaves the friend bar.
+        if (participantId > 0) useFriendBarNotificationsStore.getState().removeType(participantId, FriendNotificationType.MESSENGER);
 
         setMessageThreads((prevValue) => {
             const newValue = [...prevValue];

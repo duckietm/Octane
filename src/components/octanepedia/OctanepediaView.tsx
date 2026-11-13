@@ -5,9 +5,12 @@ import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../
 import '../../css/octanepedia/OctanepediaAirText.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { getClickedAnchor } from './getClickedAnchor';
+import { fetchHabboPage } from './fetchHabboPage';
 import { createLatestRequest } from './latestRequest';
 
 const NEW_LINE_REGEX = /\n\r|\n|\r/gm;
+/** Help pages shipped in the client's own public folder. */
+const BUNDLED_PAGES = 'habbopages/';
 
 export const OctanepediaView: FC<{}> = (props) => {
     const [content, setContent] = useState<string>(null);
@@ -18,15 +21,13 @@ export const OctanepediaView: FC<{}> = (props) => {
     useEffect(() => {
         const latest = createLatestRequest();
 
-        const openPage = async (link: string) => {
+        const openPage = async (link: string, bundledLink: string | null) => {
             const signal = latest.start();
 
             try {
-                const response = await fetch(link, { signal });
+                const text = await fetchHabboPage([link, bundledLink], signal);
 
-                if (!response?.ok || signal.aborted) return;
-
-                const text = await response.text();
+                if (text === null || signal.aborted) return;
 
                 // A newer page was asked for meanwhile: this one is not shown over it.
                 if (signal.aborted) return;
@@ -68,7 +69,8 @@ export const OctanepediaView: FC<{}> = (props) => {
                     return;
                 }
 
-                openPage(link);
+                // The hotel's own page wins; the pages that ship with the client stand in when it has none.
+                openPage(link, resolveHabboPageUrl(BUNDLED_PAGES, value.join('/'), document.baseURI));
             },
             eventUrlPrefix: 'habbopages/'
         };

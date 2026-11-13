@@ -1147,6 +1147,18 @@ export class WiredGenerateWebApiKeyComposer extends RecordingComposer {}
 export class WiredAddonShareSynchronizeComposer extends RecordingComposer {}
 export class WiredWebApiKeyResultEvent extends StubClass {}
 export class WiredClickSettingsEvent extends StubClass {}
+export class MysteryBoxKeysUpdateEvent extends StubClass {
+    public static MYSTERY_BOX_KEYS_UPDATE = 'mbke_update';
+}
+export class WiredMenuErrorEvent extends StubClass {}
+export class WiredMenuErrorParser extends StubClass {
+    public static NOT_VARIABLE_OWNER = 7;
+}
+export class CitizenshipVipOfferPromoEnabledEvent extends StubClass {}
+export class StartCampaignMessageComposer {
+    constructor(public readonly campaignName: string) {}
+}
+export class ObjectTileCursorUpdateMessage extends StubClass {}
 export class WiredVariableFxConfigsEvent extends StubClass {}
 export class WiredVariableFxConfigsRemovedEvent extends StubClass {}
 export class WiredLeaderboardSnapshotEvent extends StubClass {}
@@ -1156,7 +1168,7 @@ export class WiredLabelsEvent extends StubClass {}
 export class WiredLabelsUpdateEvent extends StubClass {}
 export class WiredLabelSaveTextComposer extends RecordingComposer {}
 export class WiredLabelSaveSettingsComposer extends RecordingComposer {}
-export const WIRED_LABEL_COLORS = [ 4278912, 2651759, 4157508, 8416562, 8409402, 8404554, 6834048, 5592405 ];
+export const WIRED_LABEL_COLORS = [4278912, 2651759, 4157508, 8416562, 8409402, 8404554, 6834048, 5592405];
 export const WIRED_LABEL_VISIBILITY_EVERYONE = 0;
 export const WIRED_LABEL_VISIBILITY_WIRED_INSPECTORS = 1;
 export class WiredVariableFxStatusEvent extends StubClass {}
@@ -1173,7 +1185,10 @@ export class VariableFxStatusData {
         public readonly isInitialize = false
     ) {}
 
-    public static fromWire(status: { value: number; overrideMinValue: number | null; overrideMaxValue: number | null; extra: Record<string, string> }, initialize = false) {
+    public static fromWire(
+        status: { value: number; overrideMinValue: number | null; overrideMaxValue: number | null; extra: Record<string, string> },
+        initialize = false
+    ) {
         return new VariableFxStatusData(status.value, status.overrideMinValue, status.overrideMaxValue, { ...status.extra }, initialize);
     }
 }
@@ -1188,7 +1203,12 @@ export class VariableFxVisualizer {
         this.statuses.push(status);
     }
 
-    public static fromWire(config: unknown, status: { value: number; overrideMinValue: number | null; overrideMaxValue: number | null; extra: Record<string, string> }, _now: number, initialize = false) {
+    public static fromWire(
+        config: unknown,
+        status: { value: number; overrideMinValue: number | null; overrideMaxValue: number | null; extra: Record<string, string> },
+        _now: number,
+        initialize = false
+    ) {
         return new VariableFxVisualizer(config, VariableFxStatusData.fromWire(status, initialize));
     }
 

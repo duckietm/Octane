@@ -1,6 +1,6 @@
 import { GetSessionDataManager } from '@octane/renderer';
 import { FC, MutableRefObject, useEffect, useState } from 'react';
-import { GetConfigurationValue, localizeWithFallback } from '../../api';
+import { GetOptionalConfigurationValue, localizeWithFallback } from '../../api';
 import { buildErrorReport, ErrorReport } from '../../api/utils/ErrorReport';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
@@ -17,7 +17,7 @@ export const ErrorPopupView: FC = () => {
     const [report, setReport] = useState<ErrorReport | null>(null);
     const [silenced, setSilenced] = useState(false);
     const [doNotShow, setDoNotShow] = useState(false);
-    const enabled = GetConfigurationValue<boolean>('error_handling.show_error', false) === true;
+    const enabled = GetOptionalConfigurationValue<boolean>('error_handling.show_error', false) === true;
 
     useEffect(() => {
         if (!enabled || silenced) return;
@@ -29,7 +29,7 @@ export const ErrorPopupView: FC = () => {
                     current ??
                     buildErrorReport(
                         { message, stack, userId: GetSessionDataManager()?.userId ?? 0, hotel: window.location.host },
-                        GetConfigurationValue<boolean>('error_handling.show_stacktrace', false) === true
+                        GetOptionalConfigurationValue<boolean>('error_handling.show_stacktrace', false) === true
                     )
             );
 

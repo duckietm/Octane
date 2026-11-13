@@ -3177,5 +3177,18 @@
     "respect.giving.failed.caption": "لم يُمنح احترامك",
     "respect.giving.failed.no.stage": "في عرض المواهب يمكنك منح الاحترام فقط لهابو يقف على المسرح.",
     "respect.giving.failed.no.audience": "يحتاج عرض المواهب إلى جمهور من %users% هابو على الأقل قبل منح الاحترام.",
-    "respect.giving.failed.button": "موافق"
+    "respect.giving.failed.button": "موافق",
+    "chatcmd.client.pickallbc": "التقاط كل أثاث Builders' Club",
+    "reward_track.debug.copy_track_id.success": "تم نسخ معرّف المسار إلى الحافظة",
+    "reward_track.debug.copy_task_id.success": "تم نسخ معرّف المهمة إلى الحافظة",
+    "octane.badge_leaderboard.unavailable": "لوحة المتصدرين غير متاحة حالياً.",
+    "octane.wired.reward_amounts_must_be_whole_numbers": "يجب أن تكون الكميات ومعرّفات العناصر أعداداً صحيحة من 1 إلى %max%.",
+    "octane.customize.owned": "مملوك",
+    "octane.customize.locked": "مقفل",
+    "octane.customize.buy": "شراء",
+    "octane.customize.activate": "تفعيل",
+    "octane.customize.deactivate": "إلغاء التفعيل",
+    "octane.customize.library": "المكتبة",
+    "octane.customize.custom": "مخصص",
+    "octane.customize.purchase_failed": "تعذر إتمام عملية الشراء."
 }
