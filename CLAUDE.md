@@ -106,7 +106,7 @@ login/WebGL, so they're not usable for in-game verification.
 
 ## Stack snapshot
 
-- React 19.2.5, `react-dom` 19.2.5, `@types/react` 19.2.x.
+- React 19.3, `react-dom` 19.3, `@types/react` 19.3.x.
 - TypeScript: TS 6 (`typescript`) for the tools that need its JavaScript API (`@typescript-eslint/parser`,
   peer `<6.1`), and **TS 7** (the `typescript7` alias of `typescript@7`, run as
   `node node_modules/typescript7/bin/tsc`) for the `typecheck` script.
@@ -140,9 +140,9 @@ login/WebGL, so they're not usable for in-game verification.
 - Vite 8 + `@vitejs/plugin-react` 6 + `babel-plugin-react-compiler` 1.0.
 - Biome for lint and format; ESLint 10 + `@typescript-eslint/parser` 8 + `eslint-plugin-react-hooks@7`
   only for the Rules of Hooks gate (`yarn lint:hooks`).
-- TanStack Query 5 (`@tanstack/react-query` + devtools).
+- TanStack Query 5 (`@tanstack/react-query`; the devtools package is no longer installed).
 - Zustand 5.
-- Vitest 3 + jsdom + `@testing-library/react` + `@testing-library/jest-dom`.
+- Vitest 5 + jsdom + `@testing-library/react` + `@testing-library/jest-dom`.
 - `react-error-boundary` 6.
 
 ## Layout convention (DO NOT CHANGE)
