@@ -351,7 +351,6 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
 
         GetRoomEngine().saveBase64AsScreenshot(base64Url);
         // Sent once per opened dialog, like AIR; the other inputs belong to the same checkout.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [base64Url]);
 
     useEffect(() => {
