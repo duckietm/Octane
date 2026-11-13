@@ -105,6 +105,49 @@ describe('NativeTextTree child lists', () => {
     });
 });
 
+describe('NativeTextTree keeps what it does not convert', () => {
+    afterEach(() => {
+        cleanup();
+        forceNativeTextEnabled(null);
+        vi.restoreAllMocks();
+    });
+
+    it('does not remount a sibling when the first text appears next to it', () => {
+        forceNativeTextEnabled(true);
+        const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+        // Nothing to convert at first (as a catalogue page before an offer is chosen), then a text appears.
+        const layout = (chosen: boolean) => (
+            <NativeTextTree>
+                <div>
+                    <div>{chosen && <span>Prijs</span>}</div>
+                    <div>
+                        <input data-testid="grid" defaultValue="" />
+                    </div>
+                    {chosen && (
+                        <div>
+                            <span>Totaal</span>
+                        </div>
+                    )}
+                </div>
+            </NativeTextTree>
+        );
+        const { rerender } = render(layout(false));
+        const grid = screen.getByTestId('grid') as HTMLInputElement;
+
+        grid.value = 'scrolled';
+        rerender(layout(true));
+
+        expect(screen.getByTestId('grid')).toBe(grid);
+        expect((screen.getByTestId('grid') as HTMLInputElement).value).toBe('scrolled');
+        expect(screen.getAllByTestId('label').map((node) => node.textContent)).toEqual(['Prijs', 'Totaal']);
+
+        rerender(layout(false));
+
+        expect(screen.getByTestId('grid')).toBe(grid);
+        expect(error).not.toHaveBeenCalled();
+    });
+});
+
 describe('NativeTextTree labels beside text-less elements', () => {
     afterEach(() => {
         cleanup();
