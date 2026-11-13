@@ -1,5 +1,11 @@
 @import 'tailwindcss';
-@import url('https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Pixelify+Sans:wght@400..700&family=Vampiro+One&display=swap');
+/* The name prefix fonts, served with the client instead of from Google Fonts. */
+@import '@fontsource/cherry-bomb-one';
+@import '@fontsource/pixelify-sans/400.css';
+@import '@fontsource/pixelify-sans/500.css';
+@import '@fontsource/pixelify-sans/600.css';
+@import '@fontsource/pixelify-sans/700.css';
+@import '@fontsource/vampiro-one';
 
 @config "../../tailwind.config.js";
 

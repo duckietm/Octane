@@ -271,7 +271,9 @@ export default defineConfig({
     },
     build: {
         // Only tiny icons inline; bigger artwork as base64 in the JS chunks slows every cold boot.
-        assetsInlineLimit: 4096,
+        // Fonts never inline: a font split by unicode range has many small files, and inlined they
+        // would all land in the startup CSS instead of being fetched only for the characters shown.
+        assetsInlineLimit: (file) => (/\.(woff2?|ttf|otf)$/.test(file) ? false : undefined),
         chunkSizeWarningLimit: 200000,
         manifest: true,
         rollupOptions: {
