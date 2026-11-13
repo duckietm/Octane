@@ -8,6 +8,18 @@ import { ChatWidgetWindowView } from './ChatWidgetWindowView';
 const ROOM_ID = 7;
 const CHAT = 1;
 
+const scrollToIndex = vi.fn();
+
+// jsdom measures every element as 0x0, so the virtualizer is replaced by one that renders every row.
+vi.mock('@tanstack/react-virtual', () => ({
+    useVirtualizer: ({ count, getItemKey }: { count: number; getItemKey: (index: number) => string }) => ({
+        getTotalSize: () => count * 30,
+        getVirtualItems: () => Array.from({ length: count }, (_, index) => ({ index, key: getItemKey(index), size: 30, start: index * 30 })),
+        measureElement: vi.fn(),
+        scrollToIndex
+    })
+}));
+
 vi.mock('@octane/renderer', () => ({
     GetSessionDataManager: () => ({ userId: 1 }),
     RoomObjectType: { PET: 2 }
@@ -60,8 +72,6 @@ describe('ChatWidgetWindowView search', () => {
     afterEach(() => cleanup());
 
     it('starts empty, shows what is typed and filters the history by it', () => {
-        Element.prototype.scrollTo = vi.fn();
-
         const { container } = render(<ChatWidgetWindowView />);
         const input = screen.getByPlaceholderText('Search') as HTMLInputElement;
 
@@ -74,5 +84,16 @@ describe('ChatWidgetWindowView search', () => {
         expect(input.value).toBe('night');
         expect(container.textContent).not.toContain('hello there');
         expect(container.textContent).toContain('good night');
+    });
+
+    it('opens on the latest message and places rows at their measured offsets', () => {
+        scrollToIndex.mockClear();
+
+        const { container } = render(<ChatWidgetWindowView />);
+        const rows = container.querySelectorAll<HTMLElement>('[data-index]');
+
+        expect(scrollToIndex).toHaveBeenCalledWith(1, { align: 'end' });
+        expect(rows).toHaveLength(2);
+        expect(rows[1].style.top).toBe('30px');
     });
 });
