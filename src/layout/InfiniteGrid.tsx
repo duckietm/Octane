@@ -23,6 +23,9 @@ type Props<T> = {
     // for static lists but lets a cell's local state bleed to a different item when the list
     // reorders - pass this for lists whose items are added/removed/reordered.
     itemKey?: (item: T, index: number) => string | number;
+    // When given, the grid scrolls back to the top only when this value changes, not whenever `items` is a new
+    // array: a list that is refetched in place (a catalogue page) keeps its scroll position.
+    scrollResetKey?: unknown;
 };
 
 const GRID_GAP_PX = 4;
@@ -125,9 +128,13 @@ const InfiniteGridVirtualized = <T,>(props: Props<T>) => {
         onColumnCountChange,
         itemRender = null,
         itemKey = null,
-        classicScrollbar = false
+        classicScrollbar = false,
+        scrollResetKey
     } = props;
     const { parentRef, columnCount } = useColumnMeasure(itemMinWidth, columnCountProp, columnGap, airColumnAdmission, onColumnCountChange);
+    const hasItems = !!items && items.length > 0;
+    // Without a key every new `items` array resets the scroll, as before.
+    const scrollReset = scrollResetKey === undefined ? items : scrollResetKey;
 
     const rowsContainerClassName = rowGap !== null ? 'flex flex-col w-full relative' : 'flex flex-col w-full *:pb-1 relative';
 
@@ -167,11 +174,11 @@ const InfiniteGridVirtualized = <T,>(props: Props<T>) => {
     }, [items, parentRef, classicScrollbar]);
 
     useEffect(() => {
-        if (!items || !items.length) return;
+        if (!hasItems) return;
 
         if (parentRef.current) parentRef.current.scrollLeft = 0;
         virtualizer.scrollToIndex(0);
-    }, [items, virtualizer]);
+    }, [scrollReset, hasItems, virtualizer]);
 
     const virtualItems = virtualizer.getVirtualItems();
 

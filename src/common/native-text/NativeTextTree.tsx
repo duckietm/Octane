@@ -49,13 +49,13 @@ const textOf = (children: ReactNode): string | null => {
     return text.trim() ? text : null;
 };
 
-// A rebuilt child list keys its elements by position, the key React gives static children anyway, so nothing remounts and React
-// never warns about a list without keys (it does for children it did not create as a static list, e.g. after the React Compiler).
-const keyedByPosition = (children: ReactNode[]) =>
-    children.map((child, index) => (isValidElement(child) && child.key === null ? cloneElement(child, { key: `ntt${index}` }) : child));
-
+// A rebuilt child list is handed back as separate arguments, which is how React takes the children written in JSX: every
+// child keeps the place (and the implicit key) it had, and React does not ask for keys as it does for a list passed as one
+// array. Giving the rebuilt children keys of their own remounted them: an element is only rebuilt while something in it is
+// converted, so its children went from no key to a key the moment a text appeared under it. That threw away their state, e.g.
+// the catalogue's item grid jumped back to its first row when the first offer of a page was chosen.
 const withChildren = (element: ReactElement<ElementProps>, children: ReactNode) =>
-    cloneElement(element, undefined, Array.isArray(children) ? keyedByPosition(children) : children);
+    Array.isArray(children) ? cloneElement(element, undefined, ...children) : cloneElement(element, undefined, children);
 
 const sameChildren = (before: ReactNode, after: ReactNode) =>
     before === after ||

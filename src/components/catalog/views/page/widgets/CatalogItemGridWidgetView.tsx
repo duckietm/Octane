@@ -64,14 +64,20 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
     } as CSSProperties;
     const mixedLayout = useMemo(() => layoutAirCatalogOffers(offers, airColumnCount, currentType), [airColumnCount, currentType, offers]);
 
+    // The grid goes back to the top when another page is opened, not whenever the same page arrives again: the page
+    // is refetched in place (it goes stale after half a minute, and choosing an offer then refetches it), which gave
+    // a new page object and threw a long page back to its first row. A search result has no page id of its own, so
+    // there the result object itself is the key.
+    const pageScrollKey = currentPage && currentPage.pageId > -1 ? `${currentType}:${currentPage.pageId}` : currentPage;
+
     useLayoutEffect(() => {
         if (elementRef.current) {
             elementRef.current.scrollLeft = 0;
             elementRef.current.scrollTop = 0;
         }
-    }, [currentPage]);
+    }, [pageScrollKey]);
 
-    const scrollWindow = useScrollWindow(elementRef, usesAirMixedGridTemplate, currentPage);
+    const scrollWindow = useScrollWindow(elementRef, usesAirMixedGridTemplate, pageScrollKey);
     const clampedScrollTop = Math.min(scrollWindow.scrollTop, Math.max(0, mixedLayout.height - scrollWindow.viewportHeight));
     const visibleMixedEntries = useMemo(
         () => getVisibleAirGridEntries(mixedLayout.entries, clampedScrollTop, scrollWindow.viewportHeight),
@@ -236,6 +242,7 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
                         itemMinWidth={effectiveColumnMinWidth}
                         items={offers}
                         overscan={4}
+                        scrollResetKey={pageScrollKey}
                         rowGap={isAirStandardDensity ? 0 : 3}
                         onColumnCountChange={isAirStandardDensity ? setAirColumnCount : undefined}
                         itemRender={(offer, index) => (offer ? renderOfferTile(offer, index) : <></>)}
