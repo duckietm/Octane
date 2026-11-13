@@ -1,12 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { parseJsonDocument } from '../../json/JsonDocumentParser';
 
 const root = process.cwd();
 
 describe('Toolbar feature config', () => {
     it('keeps optional custom toolbar buttons behind global config flags', () => {
-        const config = JSON.parse(readFileSync(join(root, 'public/configuration/ui-config.example'), 'utf8'));
+        // The example is JSONC, read the way the client reads it.
+        const config = parseJsonDocument<Record<string, unknown>>(readFileSync(join(root, 'public/configuration/ui-config.example'), 'utf8'), 'jsonc');
         const source = readFileSync(join(root, 'src/components/toolbar/ToolbarView.tsx'), 'utf8');
 
         expect(config['buildersclub.enabled']).toBe(true);
