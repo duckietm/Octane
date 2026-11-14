@@ -1,4 +1,5 @@
 import { GetConfiguration } from '@octane/renderer';
+import { takePasswordResetTokenFromUrl } from './api/auth/passwordReset';
 import { adoptLoginTokenFromUrl, confirmSignInFromLink, positiveIdFromSearch } from './api/auth/urlToken';
 import { derivePetConfig, DerivedPetConfig, PetDefinition } from './api/octane/PetData';
 import { parseJsonDocument, UiJsonMode } from './json/JsonDocumentParser';
@@ -121,6 +122,13 @@ if (search.has('sso') || search.has('room') || search.has('friend')) {
         url.searchParams.delete('friend');
         window.history.replaceState(window.history.state, '', url.toString());
     } catch {}
+}
+
+// A password reset link first: on a `/reset-password` address its token travels as `?token=`, like a login token.
+try {
+    takePasswordResetTokenFromUrl();
+} catch (error) {
+    setBootDebug(`boot: password reset token from the address not kept ${error?.message || error}`);
 }
 
 try {

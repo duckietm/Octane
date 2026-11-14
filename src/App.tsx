@@ -21,7 +21,7 @@ import {
     PrepareRenderer
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
-import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock, localizeWithFallback } from './api';
+import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, getPendingPasswordResetToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock, localizeWithFallback } from './api';
 import { Base } from './common';
 import { LoadingView } from './components/loading/LoadingView';
 import { LoginView } from './components/login/LoginView';
@@ -484,7 +484,9 @@ export const App: FC<{}> = (props) => {
                     }
 
                     if (loginScreenEnabled) {
-                        const rememberedSsoTicket = await tryRememberLogin();
+                        // A password reset link asks for the new password on the login screen, also in a browser that
+                        // would otherwise sign in by itself.
+                        const rememberedSsoTicket = getPendingPasswordResetToken() ? null : await tryRememberLogin();
 
                         if (rememberedSsoTicket) {
                             ssoTicket = rememberedSsoTicket;

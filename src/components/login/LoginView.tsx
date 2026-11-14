@@ -2,7 +2,7 @@ import { GetAvatarRenderManager, GetConfiguration } from '@octane/renderer';
 import { FC, useActionState, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { FaDice } from 'react-icons/fa';
-import { ClearRememberLogin, GetConfigurationValue, GetOptionalConfigurationValue, GetRememberLogin, isRememberCookieMode, persistAccessTokenFromPayload, StoreRememberLoginFromPayload, localizeServerMessage } from '../../api';
+import { clearPendingPasswordResetToken, ClearRememberLogin, GetConfigurationValue, getPendingPasswordResetToken, GetOptionalConfigurationValue, GetRememberLogin, isRememberCookieMode, persistAccessTokenFromPayload, StoreRememberLoginFromPayload, localizeServerMessage } from '../../api';
 import flagEn from '../../assets/images/flag_icon/flag_icon_en.png';
 import flagEs from '../../assets/images/flag_icon/flag_icon_es.png';
 import flagFr from '../../assets/images/flag_icon/flag_icon_fr.png';
@@ -29,7 +29,7 @@ import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
-type DialogMode = 'login' | 'register' | 'forgot';
+type DialogMode = 'login' | 'register' | 'forgot' | 'reset';
 type LoginLocale = { code: string; file: string; label: string; flag: string };
 
 const interpolate = (value: string | null | undefined): string => {
@@ -166,7 +166,8 @@ export interface LoginViewProps {
 }
 
 export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = false }) => {
-    const [mode, setMode] = useState<DialogMode>('login');
+    // Opened from a password reset link: the new password is asked for straight away.
+    const [mode, setMode] = useState<DialogMode>(() => (getPendingPasswordResetToken() ? 'reset' : 'login'));
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -224,6 +225,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
     const registerUrl = GetConfigurationValue<string>('login.register.endpoint', '/api/auth/register');
     const roomTemplatesUrl = GetConfigurationValue<string>('login.room_templates.endpoint', '/api/auth/room-templates');
     const forgotUrl = GetConfigurationValue<string>('login.forgot.endpoint', '/api/auth/forgot-password');
+    const resetUrl = GetOptionalConfigurationValue<string>('login.reset.endpoint', '/api/auth/reset-password');
     const newsUrl = interpolate(GetConfigurationValue<string>('login.news.url', ''));
     const dragHint = t('nitro.login.window.drag_hint', 'Drag to move, double-click to reset');
     const languageWindowRef = useRef<HTMLDivElement>(null);
@@ -715,6 +717,54 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
         [turnstileEnabled, forgotUrl, postJson]
     );
 
+    // The second half of a reset: the token from the mail and the new password. The link works once, so whatever
+    // the answer, a rejected token is dropped and the player is sent back to ask for a new mail.
+    const handleResetSubmit = useCallback(
+        async (body: { newPassword: string; confirmPassword: string; turnstileToken: string }, onDialogReset: () => void) => {
+            if (turnstileEnabled && !body.turnstileToken) {
+                setError(t('nitro.login.error.turnstile', 'Please complete the security check.'));
+                return;
+            }
+
+            const token = getPendingPasswordResetToken();
+
+            if (!token) {
+                setError(t('nitro.login.reset.invalid', 'This reset link is invalid or has expired. Request a new one.'));
+                setMode('forgot');
+                return;
+            }
+
+            setError(null);
+            setInfo(null);
+            setSubmitting(true);
+
+            try {
+                const { ok, payload } = await postJson(resetUrl, {
+                    token,
+                    newPassword: body.newPassword,
+                    confirmPassword: body.confirmPassword,
+                    turnstileToken: turnstileEnabled ? body.turnstileToken : undefined
+                });
+
+                if (ok) {
+                    clearPendingPasswordResetToken();
+                    setInfo(tOrServer('nitro.login.reset.success', payload.message, 'Your password has been changed. You can now log in with it.'));
+                    setMode('login');
+                    return;
+                }
+
+                setError(localizeServerMessage(payload.error, t('nitro.login.error.reset_failed', 'Unable to change your password right now.')));
+                onDialogReset();
+            } catch {
+                setError(t('nitro.login.error.reset_unreachable', 'Unable to reach the password reset service.'));
+                onDialogReset();
+            } finally {
+                setSubmitting(false);
+            }
+        },
+        [turnstileEnabled, resetUrl, postJson]
+    );
+
     return (
         <NativeTextTree>
             <div className="octane-login-view" style={backgroundColor ? { background: backgroundColor } : undefined}>
@@ -897,6 +947,21 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                         turnstileEnabled={turnstileEnabled}
                         turnstileSiteKey={turnstileSiteKey}
                         roomTemplatesUrl={roomTemplatesUrl}
+                    />
+                )}
+
+                {mode === 'reset' && (
+                    <ResetDialog
+                        onCancel={() => {
+                            clearPendingPasswordResetToken();
+                            closeDialog();
+                        }}
+                        onSubmit={handleResetSubmit}
+                        submitting={submitting}
+                        error={error}
+                        info={info}
+                        turnstileEnabled={turnstileEnabled}
+                        turnstileSiteKey={turnstileSiteKey}
                     />
                 )}
 
@@ -1709,6 +1774,115 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
                         </div>
                     </form>
                 )}
+            </LoginModal>
+        </NativeTextTree>
+    );
+};
+
+interface ResetDialogProps extends DialogSharedProps {
+    onSubmit: (body: { newPassword: string; confirmPassword: string; turnstileToken: string }, onDialogReset: () => void) => Promise<void> | void;
+}
+
+const ResetSubmitButton: FC = () => {
+    const { pending } = useFormStatus();
+
+    return (
+        <NativeTextTree>
+            <BaseButton type="submit" className="ok-button" disabled={pending}>
+                {t('nitro.login.reset.save', 'Change password')}
+            </BaseButton>
+        </NativeTextTree>
+    );
+};
+
+/** Opened from the link of a reset mail: the new password, twice. */
+const ResetDialog: FC<ResetDialogProps> = (props) => {
+    const { onCancel, onSubmit, error, info, turnstileEnabled, turnstileSiteKey } = props;
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [localError, setLocalError] = useState<string | null>(null);
+    const [turnstileToken, setTurnstileToken] = useState('');
+    const [resetSignal, setResetSignal] = useState(0);
+
+    const resetWidget = useCallback(() => {
+        setTurnstileToken('');
+        setResetSignal((prev) => prev + 1);
+    }, []);
+
+    const resetAction = useCallback(
+        async (_prev: null, formData: FormData): Promise<null> => {
+            setLocalError(null);
+
+            const password = String(formData.get('newPassword') || '');
+            const confirmation = String(formData.get('confirmPassword') || '');
+
+            if (password.length < 8) {
+                setLocalError(t('nitro.login.error.password_short', 'Password must be at least 8 characters.'));
+                return null;
+            }
+
+            if (password !== confirmation) {
+                setLocalError(t('nitro.login.error.password_mismatch', 'The two passwords do not match.'));
+                return null;
+            }
+
+            await onSubmit({ newPassword: password, confirmPassword: confirmation, turnstileToken }, resetWidget);
+            return null;
+        },
+        [onSubmit, turnstileToken, resetWidget]
+    );
+
+    const [, submitResetAction] = useActionState<null, FormData>(resetAction, null);
+
+    return (
+        <NativeTextTree>
+            <LoginModal
+                title={t('nitro.login.reset.title', 'Choose a new password')}
+                titleId="reset-dialog-title"
+                closeLabel={t('generic.close', 'Close')}
+                onClose={onCancel}
+            >
+                <form className="card-body octane-card-content-shell" action={submitResetAction} autoComplete="on">
+                    <div className="field">
+                        <label htmlFor="reset-new-password">{t('nitro.login.reset.new_password.label', 'New password')}</label>
+                        <input
+                            id="reset-new-password"
+                            name="newPassword"
+                            type="password"
+                            maxLength={256}
+                            autoComplete="new-password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                    </div>
+                    <div className="field">
+                        <label htmlFor="reset-confirm-password">{t('nitro.login.reset.confirm_password.label', 'Repeat new password')}</label>
+                        <input
+                            id="reset-confirm-password"
+                            name="confirmPassword"
+                            type="password"
+                            maxLength={256}
+                            autoComplete="new-password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
+                    </div>
+                    {turnstileEnabled && (
+                        <TurnstileWidget
+                            siteKey={turnstileSiteKey}
+                            size="compact"
+                            onToken={setTurnstileToken}
+                            onExpire={() => setTurnstileToken('')}
+                            onError={() => setTurnstileToken('')}
+                            resetSignal={resetSignal}
+                        />
+                    )}
+                    {(localError || error) && <div className="error-line">{localError || error}</div>}
+                    {info && <div className="info-line">{info}</div>}
+                    <div className="submit-row">
+                        <ResetSubmitButton />
+                    </div>
+                </form>
             </LoginModal>
         </NativeTextTree>
     );
