@@ -4,6 +4,7 @@ import { localizeWithFallback } from '../../../api/utils/localizeWithFallback';
 import { getCatalogBundlePrice, ICatalogBundleDiscountRuleset } from '../../../api/catalog/CatalogBundleDiscount';
 import {
     LayoutAvatarImageView,
+    LayoutHabbiconImageView,
     LayoutChatStyleImageView,
     LayoutCurrencyIcon,
     LayoutFurniImageView,
@@ -102,6 +103,9 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                             />
                         ) : offer.product?.productType === ProductTypeEnum.CHAT_STYLE ? (
                             <LayoutChatStyleImageView styleId={offer.product.extraParam} />
+                        ) : offer.product?.productType === ProductTypeEnum.HABBICON ? (
+                            // A habbicon has no icon file either: it is drawn as on its catalogue tile.
+                            <LayoutHabbiconImageView id={offer.product.productClassId} />
                         ) : offer.product?.productType === ProductTypeEnum.ROBOT ? (
                             // A bot has no icon: it is shown as on its catalogue tile, by its figure.
                             <LayoutAvatarImageView direction={2} figure={offer.product.extraParam} />

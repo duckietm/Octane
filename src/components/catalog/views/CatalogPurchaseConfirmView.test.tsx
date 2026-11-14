@@ -13,6 +13,10 @@ vi.mock('../../../api', async () => {
     };
 });
 
+vi.mock('../../../common/layout/LayoutHabbiconImageView', () => ({
+    LayoutHabbiconImageView: ({ id }: { id: number }) => <i data-testid="habbicon" data-id={id} />
+}));
+
 afterEach(cleanup);
 
 const offer = {
@@ -39,6 +43,14 @@ describe('catalog purchase confirmation', () => {
         expect(screen.getByText('50')).toBeInTheDocument();
         expect(screen.getByText('+ 10')).toBeInTheDocument();
         expect(screen.queryByText('Una sedia molto comoda')).not.toBeInTheDocument();
+    });
+
+    it('draws a habbicon by its id, since it has no icon file', () => {
+        const habbicon = { ...offer, localizationName: 'frank_frank', product: { productType: 'habbicon', productClassId: 77, getIconUrl: () => null } };
+
+        render(<CatalogPurchaseConfirmView offer={habbicon} quantity={1} onCancel={() => undefined} onConfirm={() => undefined} />);
+
+        expect(screen.getByTestId('habbicon')).toHaveAttribute('data-id', '77');
     });
 
     it('supports explicit confirmation and Escape cancellation', () => {
