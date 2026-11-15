@@ -56,6 +56,22 @@ describe('plugin registration', () => {
         expect(document.getElementById('octane-plugin-window-owned')).toBeNull();
     });
 
+    it('draws a plugin window with the client card markup, closed by its close button', () => {
+        const content = pluginApi.createWindow('native-look', 'Native look', 320);
+        const overlay = document.getElementById('octane-plugin-window-native-look');
+        const card = overlay.querySelector('.octane-card');
+
+        expect(card.classList.contains('octane-card-shell')).toBe(true);
+        expect(card.classList.contains('theme-primary')).toBe(true);
+        expect((card as HTMLElement).style.width).toBe('320px');
+        expect(card.querySelector('.octane-card-header-shell.drag-handler .octane-card-title').textContent).toBe('Native look');
+        expect(content.classList.contains('octane-card-content-shell')).toBe(true);
+
+        (card.querySelector('.octane-card-close-button') as HTMLElement).click();
+
+        expect(document.getElementById('octane-plugin-window-native-look')).toBeNull();
+    });
+
     it('closes the windows of a plugin whose onClose throws', () => {
         const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         pluginApi.register({
