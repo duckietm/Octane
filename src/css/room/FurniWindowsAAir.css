@@ -1,5 +1,5 @@
 /*
- * AIR text for the furni windows: dimmer, background toner, stickies, trophies (general, badge display, Niko),
+ * AIR text for the furni windows: dimmer, background toner, stickies, trophies (general, badge display),
  * mannequin and custom stack height. Our `Ubuntu` face is the condensed cut; AIR's Ubuntu is the regular one,
  * which in Octane is HabboAirUbuntu. Style 0 texts are Volter 9 px (text_styles: regular / button_regular /
  * button_tab Volter, bold Volter Bold).
@@ -90,29 +90,6 @@
 
 @layer base {
     .octane-layout-trophy :where(*):not(svg, svg *) {
-        font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
-    }
-}
-
-/* ---------- niko_trophy: html_textbox, store_link and date are Ubuntu 12 px white, the link underlined. ---------- */
-.octane-niko-trophy {
-    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
-}
-
-.octane-niko-trophy .octane-niko-trophy-band {
-    font-size: 12px;
-    line-height: 15px;
-}
-
-.octane-niko-trophy .octane-niko-trophy-texts .octane-niko-trophy-link {
-    color: #fff;
-    font-size: 12px;
-    font-weight: 400;
-    text-decoration: underline;
-}
-
-@layer base {
-    .octane-niko-trophy :where(*):not(svg, svg *) {
         font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
     }
 }

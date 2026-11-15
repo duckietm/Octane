@@ -1,16 +1,13 @@
 import { FC } from 'react';
 import { LayoutTrophyView } from '../../../../common';
-import { TROPHY_VIEW_NIKO_GOLD, TROPHY_VIEW_NIKO_SILVER, useFurnitureTrophyWidget } from '../../../../hooks';
-import { FurnitureNikoTrophyView } from './FurnitureNikoTrophyView';
+import { useFurnitureTrophyWidget } from '../../../../hooks';
 import '../../../../css/room/FurniWindowsAAir.css';
 
-/** Official `TrophyFurniWidget.updateInterface`: the Niko views open `NikoTrophyView`, everything else the trophy card. */
+/** Official `TrophyFurniWidget.updateInterface`: the trophy card (the Niko app's trophy views are not part of this client). */
 export const FurnitureTrophyView: FC<{}> = (props) => {
-    const { objectId = -1, color = '1', senderName = '', date = '', message = '', view = 0, onClose = null } = useFurnitureTrophyWidget();
+    const { objectId = -1, color = '1', senderName = '', date = '', message = '', onClose = null } = useFurnitureTrophyWidget();
 
     if (objectId === -1) return null;
-
-    if (view === TROPHY_VIEW_NIKO_GOLD || view === TROPHY_VIEW_NIKO_SILVER) return <FurnitureNikoTrophyView date={date} view={view} onClose={onClose} />;
 
     return <LayoutTrophyView color={color} date={date} message={message} senderName={senderName} onCloseClick={onClose} />;
 };
