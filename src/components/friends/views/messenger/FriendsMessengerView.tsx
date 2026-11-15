@@ -1,9 +1,10 @@
 import { AddLinkEventTracker, FollowFriendMessageComposer, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, KeyboardEvent, UIEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import { GetUserProfile, LocalizeText, ReportType, SendMessageComposer, useHabbiconCatalog } from '../../../../api';
+import { GetGroupInformation, GetUserProfile, LocalizeText, ReportType, SendMessageComposer, TryVisitRoom, useHabbiconCatalog } from '../../../../api';
 import { HabbiconsDmIcon } from '../../../../assets/images/habbicons';
-import { DraggableWindow, DraggableWindowPosition, LayoutAvatarImageView } from '../../../../common';
+import { DraggableWindow, DraggableWindowPosition, LayoutAvatarImageView, LayoutBadgeImageView } from '../../../../common';
+import { groupChannelOf } from '../../groupChannel';
 import { useFriends, useHelp, useMessenger, useTranslation } from '../../../../hooks';
 import { isStaffChatIdentity } from '../../staffChatIdentity';
 import { StaffChatFrankIconView } from '../../StaffChatFrankIconView';
@@ -88,6 +89,8 @@ export const FriendsMessengerView: FC<{}> = (props) => {
 
     const followFriend = () => activeThread && activeThread.participant && SendMessageComposer(new FollowFriendMessageComposer(activeThread.participant.id));
     const openProfile = () => activeThread && activeThread.participant && GetUserProfile(activeThread.participant.id);
+    // A gang chat or another group channel: the group's room and information instead of following and the profile.
+    const activeChannel = activeThread ? groupChannelOf(activeThread.participant) : null;
 
     const send = async () => {
         if (!activeThread || !messageText.length || sendingRef.current) return;
@@ -298,6 +301,7 @@ export const FriendsMessengerView: FC<{}> = (props) => {
                         <TabBar className="messenger-avatar-bar" value={activeThread?.threadId ?? null}>
                             {displayedThreads.map((thread) => {
                                 const isStaff = isStaffChatIdentity(thread.participant);
+                                const channel = groupChannelOf(thread.participant);
                                 const liveFriend = thread.participant.id > 0 ? getFriend(thread.participant.id) : null;
                                 const figure = resolveAvatarFigure(
                                     liveFriend?.figure || thread.participant.figure,
@@ -316,6 +320,8 @@ export const FriendsMessengerView: FC<{}> = (props) => {
                                         >
                                             {isStaff ? (
                                                 <StaffChatFrankIconView size={35} className="staff-chat-frank" />
+                                            ) : channel ? (
+                                                <LayoutBadgeImageView badgeCode={channel.badgeCode} isGroup={true} className="messenger-group-channel-badge" />
                                             ) : (
                                                 <LayoutAvatarImageView
                                                     figure={figure}
@@ -348,6 +354,26 @@ export const FriendsMessengerView: FC<{}> = (props) => {
                                     {LocalizeText('messenger.window.separator', ['FRIEND_NAME'], [activeThread.participant.name])}
                                 </span>
                                 <div className="messenger-actions">
+                                    {activeChannel && (
+                                        <>
+                                            {activeChannel.roomId > 0 && (
+                                                <Hint content={LocalizeText('group.homeroominfo.title')}>
+                                                    <BaseButton
+                                                        className="messenger-btn icon-btn follow"
+                                                        aria-label={LocalizeText('group.homeroominfo.title')}
+                                                        onClick={() => TryVisitRoom(activeChannel.roomId)}
+                                                    />
+                                                </Hint>
+                                            )}
+                                            <Hint content={LocalizeText('group.window.title')}>
+                                                <BaseButton
+                                                    className="messenger-btn icon-btn profile"
+                                                    aria-label={LocalizeText('group.window.title')}
+                                                    onClick={() => GetGroupInformation(activeChannel.groupId)}
+                                                />
+                                            </Hint>
+                                        </>
+                                    )}
                                     {activeThread.participant.id > 0 && (
                                         <>
                                             <Hint content={LocalizeText('messenger.followfriend.tooltip')}>

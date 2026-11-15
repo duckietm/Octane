@@ -1,7 +1,7 @@
 import { CreateLinkEvent, FindNewFriendsMessageComposer, MouseEventType } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
-import { GetUserProfile, LocalizeText, localizeWithFallback, MessengerFriend, OpenMessengerChat, SendMessageComposer } from '../../../../api';
+import { GetGroupInformation, GetUserProfile, LocalizeText, localizeWithFallback, MessengerFriend, OpenMessengerChat, SendMessageComposer, TryVisitRoom } from '../../../../api';
 import { FriendBarNotification, FriendNotificationType } from '../../../../hooks/friends/friendBarNotifications.helpers';
 import { useFriendBarNotificationsStore } from '../../../../hooks/friends/friendBarNotificationsStore';
 import staffChatFrankIcon from '../../../../assets/images/friends/staff-chat-frank.svg';
@@ -13,6 +13,7 @@ import gameIcon from '../../../../assets/images/friends/air/game_center_snowball
 import searchFriendsIcon from '../../../../assets/images/friends/swf/search_friends_icon.png';
 import { LayoutAvatarImageView, LayoutBadgeImageView } from '../../../../common';
 import { useFriends } from '../../../../hooks';
+import { groupChannelOf } from '../../groupChannel';
 import { isStaffChatIdentity } from '../../staffChatIdentity';
 import { StaffChatFrankIconView } from '../../StaffChatFrankIconView';
 import { BaseButton } from '../../../../common/BaseButton';
@@ -99,6 +100,8 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
     }
 
     const isStaffChat = isStaffChatIdentity(friend);
+    // A gang chat or another group channel: its group's badge, room and information.
+    const channel = groupChannelOf(friend);
     const pieceStyle = { '--friend-bar-pieces-height': `${notifications.length * PIECE_HEIGHT}px` } as CSSProperties;
 
     const gameNotification = notifications.find(isGameNotification) ?? null;
@@ -154,7 +157,7 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
                     </div>
                 ) : (
                     <div className="friend-bar-item-head group friend-bar-item-head-group absolute left-[6px] top-1/2 -translate-y-1/2 z-10 flex h-[28px] w-[28px] items-center justify-center pointer-events-none">
-                        <LayoutBadgeImageView badgeCode="ADM" isGroup={false} className="block pointer-events-none drop-shadow-[1px_1px_0_rgba(0,0,0,0.6)]" />
+                        <LayoutBadgeImageView badgeCode={channel ? channel.badgeCode : 'ADM'} isGroup={!!channel} className="block pointer-events-none drop-shadow-[1px_1px_0_rgba(0,0,0,0.6)]" />
                     </div>
                 )}
                 {!isStaffChat && friend.id > 0 && (
@@ -228,7 +231,29 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
                                         }}
                                     ><img src={visitIcon} alt="" /></BaseButton>
                                 )}
-                                {!isStaffChat && (
+                                {channel && channel.roomId > 0 && (
+                                    <BaseButton
+                                        aria-label={localizeWithFallback('group.homeroominfo.title', 'Group room')}
+                                        className="cursor-pointer friend-bar-action-icon"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            TryVisitRoom(channel.roomId);
+                                            setVisible(false);
+                                        }}
+                                    ><img src={visitIcon} alt="" /></BaseButton>
+                                )}
+                                {channel && (
+                                    <BaseButton
+                                        aria-label={localizeWithFallback('group.window.title', 'Group')}
+                                        className="cursor-pointer friend-bar-action-icon"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            GetGroupInformation(channel.groupId);
+                                            setVisible(false);
+                                        }}
+                                    ><img src={profileIcon} alt="" /></BaseButton>
+                                )}
+                                {!isStaffChat && friend.id > 0 && (
                                     <BaseButton
                                         aria-label={localizeWithFallback('infostand.profile.link.tooltip', 'Click to view the profile')}
                                         className="cursor-pointer friend-bar-action-icon"
