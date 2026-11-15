@@ -5,7 +5,7 @@ const setSelectedItem = vi.fn();
 const bed = { name: 'Bed', items: [], stuffData: {}, getLastItem: () => null } as any;
 
 vi.mock('../../../../hooks', () => ({
-    useInventoryFurni: () => ({ groupItems: [bed], selectedItem: bed, setSelectedItem, activate: () => 1, deactivate: () => {} }),
+    useInventoryFurni: () => ({ groupItems: [bed], isLoaded: true, selectedItem: bed, setSelectedItem, activate: () => 1, deactivate: () => {} }),
     useInventoryUnseenTracker: () => ({ resetItems: () => {} }),
     usePlayTestRestricted: () => false,
     useMarketplaceConfiguration: () => ({ data: null })

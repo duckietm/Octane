@@ -26,6 +26,8 @@ import { useInventoryUnseenTracker } from './useInventoryUnseenTracker';
 
 const useInventoryFurniState = () => {
     const [needsUpdate, setNeedsUpdate] = useState(true);
+    // AIR shows its loading view until the first list arrives, and the empty view only after it.
+    const [isLoaded, setIsLoaded] = useState(false);
     const [groupItems, setGroupItems] = useState<GroupItem[]>([]);
     const [selectedItem, setSelectedItem] = useState<GroupItem>(null);
     const fragmentsRef = useRef<Map<number, FurnitureListItemParser>[] | null>(null);
@@ -105,6 +107,7 @@ const useInventoryFurniState = () => {
         const context = buildContext();
 
         updateGroupItems(applyMergedFurnitureList(groupItemsRef.current, merged, context));
+        setIsLoaded(true);
     });
 
     useMessageEvent<FurnitureListInvalidateEvent>(FurnitureListInvalidateEvent, () => {
@@ -180,6 +183,7 @@ const useInventoryFurniState = () => {
 
     return {
         isVisible,
+        isLoaded,
         groupItems,
         setGroupItems: updateGroupItems,
         selectedItem,

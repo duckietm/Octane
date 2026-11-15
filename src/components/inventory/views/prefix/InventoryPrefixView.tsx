@@ -6,6 +6,7 @@ import { ClassicScrollAreaView } from '../../../../common/scroll-area/ClassicScr
 import { useInventoryNickIcons, useInventoryPrefixes, useNotification } from '../../../../hooks';
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
+import { InventoryCategoryLoadingView } from '../InventoryCategoryLoadingView';
 import { TabBar, TabBarTab } from '../../../../common/TabBar';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
@@ -53,6 +54,7 @@ export const InventoryPrefixView: FC<{}> = () => {
     const [activeTab, setActiveTab] = useState<InventoryIdentityTab>('prefixes');
     const {
         prefixes = [],
+        isLoaded: prefixesLoaded = false,
         activePrefix = null,
         selectedPrefix = null,
         setSelectedPrefix = null,
@@ -64,6 +66,7 @@ export const InventoryPrefixView: FC<{}> = () => {
     } = useInventoryPrefixes();
     const {
         nickIcons = [],
+        isLoaded: nickIconsLoaded = false,
         activeNickIcon = null,
         selectedNickIcon = null,
         setSelectedNickIcon = null,
@@ -133,7 +136,9 @@ export const InventoryPrefixView: FC<{}> = () => {
                 </TabBar>
 
                 {activeTab === 'prefixes' &&
-                    (prefixes.length === 0 ? (
+                    (prefixes.length === 0 && !prefixesLoaded ? (
+                        <InventoryCategoryLoadingView />
+                    ) : prefixes.length === 0 ? (
                         <InventoryCategoryEmptyView
                             desc={localizeWithFallback('inventory.empty.prefixes.desc', 'Prefixes you buy show up here.')}
                             title={localizeWithFallback('inventory.empty.prefixes.title', 'You have no prefixes')}
@@ -194,7 +199,9 @@ export const InventoryPrefixView: FC<{}> = () => {
                     ))}
 
                 {activeTab === 'icons' &&
-                    (nickIcons.length === 0 ? (
+                    (nickIcons.length === 0 && !nickIconsLoaded ? (
+                        <InventoryCategoryLoadingView />
+                    ) : nickIcons.length === 0 ? (
                         <InventoryCategoryEmptyView
                             actionLabel={localizeWithFallback('inventory.empty.nickicons.action', 'Customize identity')}
                             desc={localizeWithFallback('inventory.empty.nickicons.desc', 'Icons are bought in the identity customizer.')}
