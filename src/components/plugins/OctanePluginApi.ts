@@ -45,7 +45,11 @@ export interface IOctanePluginApi {
     takeScreenshot: () => Promise<void>;
     /** Leave the room and go to hotel view */
     visitDesktop: () => void;
-    /** Create a draggable floating window and return its container element */
+    /**
+     * Create a draggable floating window with the client's own card markup and return its content element. Plugins
+     * style what they put inside with the client's classes: `habbo-btn-primary` / `-secondary` / `-danger` buttons,
+     * `octane-card-tabs-shell` with `octane-card-tab-item` (+ `-active`) and `octane-card-tab-item-label` tabs.
+     */
     createWindow: (id: string, title: string, width: number) => HTMLDivElement | null;
     /** Destroy a floating window by id */
     destroyWindow: (id: string) => void;
@@ -225,27 +229,34 @@ const pluginApi: IOctanePluginApi = {
         overlay.id = `octane-plugin-window-${id}`;
         overlay.style.cssText = 'position:fixed;z-index:500;top:50%;left:50%;transform:translate(-50%,-50%)';
 
-        // Card wrapper
+        // The same markup as OctaneCardView, so a plugin window looks and themes like the client's own windows.
         const card = document.createElement('div');
-        card.style.cssText = `width:${width}px;background:#2c3e50;border:1px solid #283F5D;border-radius:6px;box-shadow:0 8px 32px rgba(0,0,0,0.5);overflow:hidden;font-family:Ubuntu,sans-serif`;
+        card.className = 'octane-card octane-card-shell theme-primary has-classic-scrollbar resize-none flex flex-col relative overflow-hidden';
+        card.style.width = `${width}px`;
 
         // Header (draggable)
         const header = document.createElement('div');
-        header.style.cssText =
-            'display:flex;align-items:center;justify-content:center;position:relative;min-height:33px;background:linear-gradient(180deg,#3c6a8e 0%,#2a4f6e 100%);cursor:move;user-select:none';
+        header.className =
+            'octane-card-header-shell drag-handler relative flex flex-col items-center justify-center min-h-card-header max-h-card-header cursor-move select-none';
+
+        const titleRow = document.createElement('div');
+        titleRow.className = 'flex items-center justify-center w-full';
 
         const titleEl = document.createElement('span');
+        titleEl.className = 'octane-card-title text-white';
         titleEl.textContent = title;
-        titleEl.style.cssText = 'color:#fff;font-size:16px;text-shadow:0 1px 2px rgba(0,0,0,0.5)';
 
         const closeBtn = document.createElement('div');
-        closeBtn.style.cssText =
-            'position:absolute;right:8px;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;border-radius:50%;background:rgba(255,255,255,0.1)';
-        closeBtn.innerHTML = '✕';
+        closeBtn.className = 'absolute flex items-center justify-center cursor-pointer right-2 octane-card-close-button';
+        closeBtn.setAttribute('role', 'button');
+        closeBtn.setAttribute('aria-label', 'Close');
+        closeBtn.addEventListener('mousedown', (event) => event.stopPropagation());
         closeBtn.addEventListener('click', () => pluginApi.destroyWindow(id));
 
-        header.appendChild(titleEl);
-        header.appendChild(closeBtn);
+        titleRow.appendChild(titleEl);
+        titleRow.appendChild(closeBtn);
+
+        header.appendChild(titleRow);
 
         // Make draggable
         let isDragging = false;
@@ -276,9 +287,9 @@ const pluginApi: IOctanePluginApi = {
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
 
-        // Content area
+        // Content area, as OctaneCardContentView draws it.
         const content = document.createElement('div');
-        content.style.cssText = 'padding:16px';
+        content.className = 'container-fluid octane-card-content-shell flex flex-col h-full p-[10px] overflow-auto';
 
         card.appendChild(header);
         card.appendChild(content);
