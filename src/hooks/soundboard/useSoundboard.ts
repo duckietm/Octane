@@ -12,7 +12,7 @@ import {
 } from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { DispatchUiEvent, GetConfigurationValue, LocalizeText, NotificationBubbleType, SendMessageComposer, setSoundboardRoomEnabled } from '../../api';
+import { DispatchUiEvent, GetConfigurationValue, LocalizeText, NotificationBubbleType, SendMessageComposer } from '../../api';
 import { SoundboardRoomMessageEvent } from '../../events';
 import { useMessageEvent } from '../events';
 import { useNotificationActions } from '../notification';
@@ -81,7 +81,6 @@ export const useSoundboardState = () => {
             cooldownSecondsRef.current = Math.max(0, parser.cooldownSeconds);
             setRoomModeState(parser.roomMode);
             setServerSounds(parser.sounds);
-            setSoundboardRoomEnabled(parser.enabled);
 
             // Only a change made while the player is in the room is news; the first packet of a room is not.
             const noticeKey = roomModeNoticeKeys[parser.roomMode];
@@ -279,7 +278,6 @@ export const useSoundboardState = () => {
     const setRoomMode = useCallback((mode: number) => {
         knownRoomModeRef.current = mode;
         setRoomModeState(mode);
-        setSoundboardRoomEnabled(mode > 0);
         SendMessageComposer(new SoundboardSetEnabledComposer(mode));
     }, []);
 
@@ -299,7 +297,6 @@ export const useSoundboardState = () => {
         cooldownUntilRef.current = 0;
         cooldownSecondsRef.current = 0;
         legacyLoadStartedRef.current = false;
-        setSoundboardRoomEnabled(false);
     }, []);
 
     return {

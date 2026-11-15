@@ -80,9 +80,6 @@ export interface WiredBaseViewProps {
     allowScrolling?: boolean;
 }
 
-/** The official frame width (Illumina and Volter templates; the proto styles are 256). */
-export const WIRED_FRAME_WIDTH = 240;
-
 /** The Volter header's type icon (wired_type_icons_icon_<holder>). */
 const WIRED_TYPE_ICONS: Record<WiredHolderKind, string> = {
     trigger: wiredTypeIconTrigger,

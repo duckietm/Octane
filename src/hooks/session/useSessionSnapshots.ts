@@ -2,10 +2,8 @@ import {
     GetEventDispatcher,
     GetRoomSessionManager,
     GetSessionDataManager,
-    GetSoundManager,
     IRoomSessionSnapshot,
     IRoomUserData,
-    ISoundVolumesSnapshot,
     IUserDataSnapshot,
     OctaneEventType
 } from '@octane/renderer';
@@ -68,15 +66,8 @@ const DEFAULT_USER_DATA: Readonly<IUserDataSnapshot> = Object.freeze({
 
 const EMPTY_IGNORED_LIST: ReadonlyArray<number> = Object.freeze<number[]>([]) as ReadonlyArray<number>;
 const EMPTY_BLOCKED_LIST: ReadonlyArray<number> = Object.freeze<number[]>([]) as ReadonlyArray<number>;
-const EMPTY_GROUP_BADGES: ReadonlyMap<number, string> = new Map();
 const EMPTY_USER_LIST: ReadonlyArray<IRoomUserData> = Object.freeze<IRoomUserData[]>([]) as ReadonlyArray<IRoomUserData>;
 const EMPTY_PERMISSIONS: ReadonlyMap<string, number> = new Map();
-
-const DEFAULT_VOLUMES: Readonly<ISoundVolumesSnapshot> = Object.freeze({
-    system: 0.5,
-    furni: 0.5,
-    trax: 0.5
-}) as Readonly<ISoundVolumesSnapshot>;
 
 const subscribeTo =
     (eventType: string) =>
@@ -246,44 +237,6 @@ export const usePermissionValue = (key: string): number => {
 
     return useMemo(() => permissions.get(key) ?? 0, [permissions, key]);
 };
-
-/**
- * Reactive ambassador flag. Alias of
- * `useHasPermission('acc_ambassador')` — the snapshot also carries
- * an explicit `isAmbassador` boolean (legacy
- * `UserPermissionsComposer` field), but routing it through the
- * permission map keeps a single source of truth for runtime
- * promote/demote.
- */
-export const useIsAmbassador = (): boolean => useHasPermission('acc_ambassador');
-
-export const useGroupBadgesSnapshot = (): ReadonlyMap<number, string> =>
-    useExternalSnapshot(subscribeTo(OctaneEventType.GROUP_BADGES_UPDATED), () => {
-        const inner = GetSessionDataManager()?.groupInformationManager;
-
-        if (!inner || typeof inner.getGroupBadgesSnapshot !== 'function') return EMPTY_GROUP_BADGES;
-
-        return inner.getGroupBadgesSnapshot();
-    });
-
-/**
- * Returns the badge id for a given group, reactive. Empty string when
- * the badge isn't known (matches the legacy `getGroupBadge` fallback).
- */
-export const useGroupBadge = (groupId: number): string => {
-    const badges = useGroupBadgesSnapshot();
-
-    return useMemo(() => badges.get(groupId) ?? '', [badges, groupId]);
-};
-
-export const useVolumesSnapshot = (): Readonly<ISoundVolumesSnapshot> =>
-    useExternalSnapshot(subscribeTo(OctaneEventType.SOUND_VOLUMES_UPDATED), () => {
-        const manager = GetSoundManager();
-
-        if (!manager || typeof manager.getVolumesSnapshot !== 'function') return DEFAULT_VOLUMES;
-
-        return manager.getVolumesSnapshot();
-    });
 
 /**
  * Returns the active room's user list, reactive. Returns an empty

@@ -15,6 +15,7 @@ import { useOctaneEvent } from './useOctaneEvent';
  *
  * The selector closure is captured in a ref refreshed in commit, so
  * a new selector identity per render does not re-subscribe the listener.
+ * @public
  */
 export const useOctaneEventState = <T extends OctaneEvent, S>(
     type: string | string[],

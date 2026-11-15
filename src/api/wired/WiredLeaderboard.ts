@@ -8,6 +8,7 @@
  * like every other box: `user:<box id>` for the filter and the display names, `room:<box id>` for the
  * compared global, "0" for an empty slot. Older servers sent bare box ids, and the ids after the text
  * fields (29 TAB fields); both still read, as the same variables.
+ * @public
  */
 export const WIRED_LEADERBOARD_CODE = 1005;
 

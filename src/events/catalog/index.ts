@@ -4,8 +4,5 @@ export * from './CatalogPostMarketplaceOfferEvent';
 export * from './CatalogPurchasedEvent';
 export * from './CatalogPurchaseFailureEvent';
 export * from './CatalogPurchaseNotAllowedEvent';
-export * from './CatalogPurchaseOverrideEvent';
 export * from './CatalogPurchaseSoldOutEvent';
-export * from './CatalogSetRoomPreviewerStuffDataEvent';
-export * from './CatalogWidgetEvent';
 export * from './SetRoomPreviewerStuffDataEvent';

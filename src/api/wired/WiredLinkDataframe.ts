@@ -6,7 +6,6 @@
 export const LINK_DATAFRAME_MAX_ROWS = 12;
 export const LINK_DATAFRAME_MAX_KEY_LENGTH = 40;
 export const LINK_DATAFRAME_MAX_MESSAGE_BYTES = 200;
-export const LINK_DATAFRAME_MAX_TEXT_BYTES = 3000;
 export const LINK_MESSAGE_MAX_BYTES = 1000;
 
 /** Send row modes. */

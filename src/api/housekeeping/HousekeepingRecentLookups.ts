@@ -56,6 +56,4 @@ export const pushRecentLookup = (current: RecentLookupEntry[], entry: RecentLook
 
 export const persistRecentLookups = (entries: RecentLookupEntry[]): void => writeStore(entries);
 
-export const clearRecentLookups = (): void => writeStore([]);
-
 export const RECENT_LOOKUPS_LIMIT = MAX_ENTRIES;

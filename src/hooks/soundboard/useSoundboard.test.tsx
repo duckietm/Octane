@@ -51,8 +51,7 @@ vi.mock('../../api', () => ({
     GetConfigurationValue: vi.fn().mockReturnValue(''),
     LocalizeText: (key: string, names?: string[], values?: string[]) => `${key}:${values?.join(',') ?? ''}`,
     NotificationBubbleType: { SOUNDBOARD: 'soundboard' },
-    SendMessageComposer: mocks.sendMessage,
-    setSoundboardRoomEnabled: vi.fn()
+    SendMessageComposer: mocks.sendMessage
 }));
 
 // The manifest is its own shared source; this suite renders the soundboard

@@ -25,9 +25,6 @@ export type NewFeatureType = typeof NEW_FEATURE_TYPE_NORMAL | typeof NEW_FEATURE
 
 /** NewFeatureNotification.BG_COLOR_NORMAL. */
 export const NEW_FEATURE_BG_COLOR_NORMAL = '#686661';
-/** NewFeatureNotification.LINK_COLOR_NORMAL / LINK_COLOR_HIGHLIGHT. */
-export const NEW_FEATURE_LINK_COLOR_NORMAL = 0xffffff;
-export const NEW_FEATURE_LINK_COLOR_HIGHLIGHT = 0xbae1f9;
 
 /** SingularNotificationController: the first check 2 s after start, then up to 3 retries 2 s apart. */
 export const NEW_FEATURE_FIRST_CHECK_DELAY_MS = 2000;

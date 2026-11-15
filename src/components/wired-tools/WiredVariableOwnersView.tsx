@@ -9,7 +9,9 @@ import { calculateLastPage, NO_PAGE } from './WiredPaging.helpers';
 import { HOLDER_TYPE_FURNI, HOLDER_TYPE_ROOM, HOLDER_TYPE_USER, WiredHolderDescription, WiredVariableOwnersPanel } from './WiredVariableOwnersPanel';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
-export { HOLDER_TYPE_FURNI, HOLDER_TYPE_ROOM, HOLDER_TYPE_USER };
+export { HOLDER_TYPE_FURNI, HOLDER_TYPE_USER };
+/** @public */
+export { HOLDER_TYPE_ROOM };
 export type { WiredHolderDescription };
 
 /** Holders per page, as the official overview shows them. */

@@ -58,9 +58,7 @@ export const bulkAcceptRequestIds = (requests: MessengerRequest[]): number[] =>
 /**
  * Internal singleton store for friend-list state + actions. Public
  * consumers should use useFriendsState (read-only — friends arrays,
- * settings, derived online/offline split) or useFriendsActions
- * (imperative — request / response / follow / update). useFriends is
- * the legacy shim that composes both.
+ * settings, derived online/offline split) or useFriends.
  */
 const useFriendsStore = () => {
     const [friends, setFriends] = useState<MessengerFriend[]>([]);
@@ -478,42 +476,8 @@ export const useFriendsState = () => {
 };
 
 /**
- * Imperative slice of the friends store: request a new friendship,
- * respond to an incoming request, follow a friend, update an existing
- * relationship.
- */
-export const useFriendsActions = () => {
-    const {
-        showFriendListFullAlert,
-        requestFriend,
-        requestResponse,
-        requestResponseAll,
-        followFriend,
-        updateRelationship,
-        addCategory,
-        renameCategory,
-        removeCategory,
-        moveFriendToCategory
-    } = useSharedHook(useFriendsStore);
-
-    return {
-        showFriendListFullAlert,
-        requestFriend,
-        requestResponse,
-        requestResponseAll,
-        followFriend,
-        updateRelationship,
-        addCategory,
-        renameCategory,
-        removeCategory,
-        moveFriendToCategory
-    };
-};
-
-/**
- * @deprecated Prefer `useFriendsState` (read-only friends list) and
- * `useFriendsActions` (request / follow / update) directly. This shim
- * composes both into the historical `useFriends()` shape so the 16
+ * @deprecated Prefer `useFriendsState` (read-only friends list) for reads.
+ * This shim returns the historical `useFriends()` shape so the 16
  * existing consumers keep working unchanged.
  */
 export const useFriends = () => useSharedHook(useFriendsStore);

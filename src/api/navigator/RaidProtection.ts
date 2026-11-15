@@ -8,6 +8,7 @@ export const RAID_PROTECTION_BAN_DURATIONS = [ 300, 900, 1800, 3600, 10800, 2160
 export const RAID_PROTECTION_GUARD_DURATIONS = [ 300, 900, 1800, 3600, 10800 ] as const;
 
 export const RAID_PROTECTION_ACTION_KICK = 0;
+/** @public */
 export const RAID_PROTECTION_ACTION_TEMPORARY_BAN = 1;
 
 export const RAID_PROTECTION_SENSITIVITY_KEYS = [ 'low', 'medium', 'high' ] as const;

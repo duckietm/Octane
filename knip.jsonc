@@ -1,8 +1,15 @@
 {
     "$schema": "https://unpkg.com/knip@6/schema.json",
-    // bootstrap.ts is found through index.html by the Vite plugin.
-    "entry": ["src/index.tsx", "scripts/*.mjs", ".github/scripts/*.mjs", "install.mjs"],
+    // bootstrap.ts is found through index.html by the Vite plugin. The two mocks stand in for the renderer
+    // and pixi.js in the tests: vitest.config.mts aliases them, so no file imports them.
+    "entry": ["src/index.tsx", "src/octane-renderer.mock.ts", "src/pixi.mock.ts", "scripts/*.mjs", ".github/scripts/*.mjs", "install.mjs"],
     "project": ["src/**/*.{ts,tsx,css}", "scripts/**/*.mjs", ".github/scripts/*.mjs"],
+    // An export used inside its own file is alive code exported once too often, not dead code: report only
+    // what no file uses. A deliberate export nothing imports yet (a protocol value set, a documented hook
+    // pattern, a compatibility shim) carries a /** @public */ tag instead.
+    "ignoreExportsUsedInFile": true,
+    // A second name for the same value can be deliberate (WIRED_CMP_DEFAULT is WIRED_CMP_GREATER_EQUAL): reported, not failing.
+    "rules": { "duplicates": "warn" },
     "ignoreDependencies": [
         // Resolved through the tsconfig/Vite aliases from the sibling renderer checkout, not from package.json.
         "pixi.js",

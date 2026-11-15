@@ -14,7 +14,7 @@ import {
     sanitizeAliasList
 } from './useChatMentions.helpers';
 
-export type { MentionSuggestion, MentionSuggestionKind } from './useChatMentions.helpers';
+export type { MentionSuggestion } from './useChatMentions.helpers';
 
 export interface ChatMentionsState {
     visible: boolean;
