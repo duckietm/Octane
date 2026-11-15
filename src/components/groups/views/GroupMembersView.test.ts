@@ -22,7 +22,11 @@ describe('GroupMembersView member entry (AIR member_entry.xml)', () => {
 
         expect(since).toContain('width: auto !important;');
         expect(since).not.toMatch(/\bwidth:\s*\d+px/);
-        expect(lastRule('\\.octane-group-member-row__copy')).not.toMatch(/\bwidth:\s*\d+px/);
+        // The earlier block gives the copy box 94 px; a width wins over right, so the later one resets it.
+        const copy = lastRule('\\.octane-group-member-row__copy');
+
+        expect(copy).toContain('width: auto !important;');
+        expect(copy).not.toMatch(/\bwidth:\s*\d+px/);
     });
 
     it('shows the admin icon only for an admin or the owner, or to a viewer who manages the group', () => {

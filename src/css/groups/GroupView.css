@@ -1084,6 +1084,8 @@
     position: absolute !important;
     left: 38px !important;
     right: 3px !important;
+    /* The earlier block sets 94 px; a width would win over right and keep the date cut. */
+    width: auto !important;
     top: 1px !important;
     height: 32px !important;
     overflow: hidden !important;
