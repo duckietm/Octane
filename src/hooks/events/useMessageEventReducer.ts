@@ -19,6 +19,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
  *   );
  *
  * Closure stability via reducerRef refreshed in commit phase.
+ * @public
  */
 export const useMessageEventReducer = <S, T extends IMessageEvent>(
     eventType: typeof MessageEvent | (typeof MessageEvent)[],

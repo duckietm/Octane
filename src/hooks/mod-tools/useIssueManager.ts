@@ -115,4 +115,6 @@ export const useIssueManager = (): IssueManagerContext => {
     return context;
 };
 
-export { bundlesFor, ISSUE_STATE_OPEN };
+export { bundlesFor };
+/** @public */
+export { ISSUE_STATE_OPEN };

@@ -661,12 +661,6 @@ const CHEST_NOTIFICATION_KEYS = [
     'wiredchests.notification.wired',
 ];
 
-export const useNotificationState = () => {
-    const { alerts, bubbleAlerts, confirms } = useSharedHook(useNotificationStore);
-
-    return { alerts, bubbleAlerts, confirms };
-};
-
 export const useNotificationActions = () => {
     const { simpleAlert, showOctaneAlert, showTradeAlert, showConfirm, showSingleBubble, showMentionBubble, closeAlert, closeBubbleAlert, closeConfirm } =
         useSharedHook(useNotificationStore);

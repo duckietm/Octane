@@ -17,6 +17,7 @@ export const TABS: Array<{ key: WiredToolsTab; label: string }> = [
 export const MONITOR_LOG_ORDER: string[] = ['EXECUTION_CAP', 'DELAYED_EVENTS_CAP', 'EXECUTOR_OVERLOAD', 'MARKED_AS_HEAVY', 'KILLED', 'RECURSION_TIMEOUT', 'NO_TARGETS', 'UNREACHABLE', 'WIRED_LOG'];
 
 export const WIRED_MONITOR_ACTION_FETCH = 0;
+/** @public */
 export const WIRED_MONITOR_ACTION_CLEAR_LOGS = 1;
 export const WIRED_MONITOR_POLL_MS = 250;
 /** AIR WiredMenuMonitorTab.POLL_MONITOR_MS: the room stats request (1957) goes out this often while the tab is open. */

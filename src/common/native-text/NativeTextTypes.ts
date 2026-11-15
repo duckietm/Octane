@@ -12,23 +12,6 @@ interface ColorTransform {
 export type BytePixels = Uint8Array | Uint8ClampedArray;
 export type ColorChannels = readonly number[] | Uint8Array | Uint8ClampedArray;
 export type TextColor = number | ColorChannels;
-export interface TextRenderStyle {
-    fontFamily: string;
-    fontSize: number;
-    bold: boolean;
-    italic: boolean;
-    underline: boolean;
-    color: number;
-    antiAliasType: string;
-    gridFitType: string;
-    thickness: number;
-    sharpness: number;
-    kerning: boolean;
-    stageQuality: string;
-    leading: number;
-    letterSpacing: number;
-    colorTransform?: ColorTransform | undefined;
-}
 export interface TextPixelTarget {
     pixels: Uint8ClampedArray;
     width: number;

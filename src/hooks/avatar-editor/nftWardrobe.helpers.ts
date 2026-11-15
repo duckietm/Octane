@@ -4,6 +4,7 @@
  */
 
 export const NFT_CONTRACT_AVATAR = 'habbo:avatar';
+/** @public */
 export const NFT_CONTRACT_CLOTHES = 'habbo:clothes';
 export const NFT_CONTRACT_GENESIS = 'habbo:avatar_genesis';
 

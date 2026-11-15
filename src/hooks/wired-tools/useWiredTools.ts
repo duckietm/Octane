@@ -1,18 +1,6 @@
 import { useWiredToolsActions } from './useWiredToolsActions';
 import { useWiredToolsState } from './useWiredToolsState';
 
-export type {
-    IWiredAccountPreferences,
-    IWiredContextVariableDefinition,
-    IWiredFurniVariableAssignment,
-    IWiredFurniVariableDefinition,
-    IWiredRoomSettings,
-    IWiredRoomVariableAssignment,
-    IWiredRoomVariableDefinition,
-    IWiredUserVariableAssignment,
-    IWiredUserVariableDefinition
-} from './useWiredToolsStore';
-
 /**
  * @deprecated Prefer `useWiredToolsState` (read-only) and
  * `useWiredToolsActions` (imperative) directly. This shim composes

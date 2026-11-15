@@ -4,7 +4,10 @@
  * the way), picked furni the room links and teleporters.
  */
 
-/** A room link keeps its room in the furni's custom values under this key. */
+/**
+ * A room link keeps its room in the furni's custom values under this key.
+ * @public
+ */
 export const TELEPORT_TO_ROOM_LINK_KEY = 'internalLink';
 
 export const TELEPORT_TO_ROOM_ID_MAX_LENGTH = 10;
@@ -20,7 +23,10 @@ export const isValidTeleportRoomId = (value: string): boolean => {
     return id > 0 && id <= 2147483647;
 };
 
-/** The furni sold in pairs, one per room, that this box is meant to lead through. */
+/**
+ * The furni sold in pairs, one per room, that this box is meant to lead through.
+ * @public
+ */
 export const ROOM_LINKER_CLASSNAME = 'wf_room_linker';
 
 export const readTeleportToRoomParams = (intData: number[] | null | undefined): { userSource: number; furniSource: number } => ({

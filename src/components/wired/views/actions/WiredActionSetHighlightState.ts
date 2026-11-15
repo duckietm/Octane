@@ -4,10 +4,12 @@ export const WIRED_HIGHLIGHT_AUDIENCE_SOURCE_USERS = 0;
 export const WIRED_HIGHLIGHT_AUDIENCE_EVERYONE = 1;
 
 export const WIRED_HIGHLIGHT_OUTLINE = 0;
+/** @public */
 export const WIRED_HIGHLIGHT_SOFT_GLOW = 1;
 export const WIRED_HIGHLIGHT_DARKEN = 2;
 export const WIRED_HIGHLIGHT_COLOR_TINT = 3;
 export const WIRED_HIGHLIGHT_BRIGHTEN = 4;
+/** @public */
 export const WIRED_HIGHLIGHT_NEON_AURA = 5;
 export const WIRED_HIGHLIGHT_TYPES = [0, 1, 2, 3, 4, 5];
 

@@ -10,6 +10,7 @@ export const WIRED_ARRAY_SIMPLE_FIELD_ID = 1;
 export const WIRED_ARRAY_MAX_FIELDS = 8;
 
 export const WIRED_ARRAY_SOURCE_TRIGGER = 0;
+/** @public */
 export const WIRED_ARRAY_SOURCE_SELECTED = 100;
 
 /** WiredArrayRuntimeSupport.compare - the order is the server's, not alphabetical. */

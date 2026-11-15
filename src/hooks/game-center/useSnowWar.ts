@@ -194,8 +194,6 @@ const SNOWWAR_QUEUE_MAX_WAIT_MS = 120000;
 
 let CHAT_MESSAGE_ID = 0;
 
-export const GetSnowWarSimulation = (): SnowWarSimulation => SNOWWAR_SIMULATION;
-
 /** Map a parsed subturn event onto the simulation's positional event shape. */
 const toSimEvent = (event: {
     eventType: number;
