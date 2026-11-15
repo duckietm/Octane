@@ -1,7 +1,8 @@
 import { FC, MouseEvent, useState } from 'react';
-import { GetConfigurationValue, LocalizeText, MessengerFriend, OpenMessengerChat } from '../../../../../api';
-import { LayoutAvatarImageView, Popover, PopoverContent, PopoverTrigger, UserProfileIconView } from '../../../../../common';
+import { GetConfigurationValue, LocalizeText, MessengerFriend, OpenMessengerChat, TryVisitRoom } from '../../../../../api';
+import { LayoutAvatarImageView, LayoutBadgeImageView, Popover, PopoverContent, PopoverTrigger, UserProfileIconView } from '../../../../../common';
 import { useFriends } from '../../../../../hooks';
+import { groupChannelOf } from '../../../groupChannel';
 import { isStaffChatIdentity } from '../../../staffChatIdentity';
 import { StaffChatFrankIconView } from '../../../StaffChatFrankIconView';
 import { resolveAvatarFigure } from '../resolveAvatarFigure';
@@ -22,6 +23,8 @@ export const FriendsListGroupItemView: FC<{ friend: MessengerFriend; selected: b
     if (!friend) return null;
 
     const isStaffChat = isStaffChatIdentity(friend);
+    // A gang chat or another group channel: its group's badge, and a way to its room.
+    const channel = groupChannelOf(friend);
     const showRelationship = friend.id > 0 && GetConfigurationValue<boolean>('relationship.status.enabled', true) !== false;
     const canChat = canChatWithFriendListEntry(friend, GetConfigurationValue<boolean>('friend_list.persistent_message_status.enabled', true) !== false);
     // AIR refreshFriendEntry: "name (real name)" when the friend has a real name.
@@ -59,6 +62,8 @@ export const FriendsListGroupItemView: FC<{ friend: MessengerFriend; selected: b
                 <div className="hfl-friend-avatar">
                     {isStaffChat ? (
                         <StaffChatFrankIconView size={20} />
+                    ) : channel ? (
+                        <LayoutBadgeImageView badgeCode={channel.badgeCode} isGroup={true} scale={0.5} />
                     ) : (
                         <LayoutAvatarImageView
                             figure={resolveAvatarFigure(friend.figure, friend.gender)}
@@ -72,7 +77,7 @@ export const FriendsListGroupItemView: FC<{ friend: MessengerFriend; selected: b
                     )}
                 </div>
                 <span className="hfl-friend-profile" onClick={stop}>
-                    {!isStaffChat && <UserProfileIconView userId={friend.id} />}
+                    {!isStaffChat && friend.id > 0 && <UserProfileIconView userId={friend.id} />}
                 </span>
                 <span className="hfl-friend-name">{displayName}</span>
                 <div className="hfl-friend-actions" onClick={stop}>
@@ -92,6 +97,16 @@ export const FriendsListGroupItemView: FC<{ friend: MessengerFriend; selected: b
                                 </div>
                             </PopoverContent>
                         </Popover>
+                    )}
+                    {channel && channel.roomId > 0 && (
+                        <Hint content={LocalizeText('group.homeroominfo.title')}>
+                            <BaseButton
+                                aria-label={LocalizeText('group.homeroominfo.title')}
+                                type="button"
+                                className="hfl-action follow"
+                                onClick={() => TryVisitRoom(channel.roomId)}
+                            />
+                        </Hint>
                     )}
                     {canFollowFriendListEntry(friend) && (
                         <Hint content={LocalizeText('friendlist.tip.follow')}>
