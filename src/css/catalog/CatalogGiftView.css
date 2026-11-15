@@ -385,6 +385,12 @@
     font-size: 12px !important;
 }
 
+/* The rule above removes the outline; a keyboard user still sees which one has the focus. */
+.octane-catalog-gift-arrow:focus-visible {
+    outline: 1px dotted #000000;
+    outline-offset: -2px;
+}
+
 .octane-catalog-gift-arrow::before {
     content: "";
     position: absolute;
@@ -569,6 +575,12 @@
     font-size: 12px !important;
 }
 
+/* The rule above removes the outline; a keyboard user still sees which one has the focus. */
+.octane-catalog-gift-palette-item:focus-visible {
+    outline: 1px dotted #000000;
+    outline-offset: -2px;
+}
+
 .octane-catalog-gift-palette-item > * {
     position: absolute;
     inset: 0;
@@ -601,6 +613,13 @@
     color: #000000 !important;
     font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
     cursor: pointer;
+}
+
+/* The rule above removes the outline; a keyboard user still sees which one has the focus. */
+.octane-catalog-gift-cancel:focus-visible,
+.octane-catalog-gift-submit:focus-visible {
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
 }
 
 .octane-catalog-gift-cancel {

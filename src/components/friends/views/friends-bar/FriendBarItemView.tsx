@@ -161,7 +161,7 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
                     // AIR new_friend_entity region_profile (33 x 35 over the head): opens the friend's profile.
                     <BaseButton
                         type="button"
-                        aria-label={LocalizeText('infostand.profile.link.tooltip')}
+                        aria-label={localizeWithFallback('infostand.profile.link.tooltip', 'Click to view the profile')}
                         className="friend-bar-profile-region"
                         onClick={(event) => {
                             event.stopPropagation();
@@ -195,14 +195,15 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
                                 </div>
                             )}
                             <div className="friend-bar-actions-buttons">
-                                <div
+                                <BaseButton
+                                    aria-label={localizeWithFallback('friendlist.tip.im', 'Start chat')}
                                     className="cursor-pointer friend-bar-action-icon"
                                     onClick={(event) => {
                                         event.stopPropagation();
                                         OpenMessengerChat(friend.id);
                                         setVisible(false);
                                     }}
-                                ><img src={chatIcon} alt="" /></div>
+                                ><img src={chatIcon} alt="" /></BaseButton>
                                 {/* AIR FriendEntityTab: a friend who is playing a game gets btn_game where btn_visit would be. */}
                                 {!isStaffChat && gameNotification && (
                                     <BaseButton
@@ -217,24 +218,26 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
                                 )}
                                 {/* AIR NewFriendEntityTab.select: btn_visit only when the friend allows following. */}
                                 {!isStaffChat && !gameNotification && friend.online && friend.followingAllowed && (
-                                    <div
+                                    <BaseButton
+                                        aria-label={localizeWithFallback('friendlist.tip.follow', 'Go to the room this Habbo is in')}
                                         className="cursor-pointer friend-bar-action-icon"
                                         onClick={(event) => {
                                             event.stopPropagation();
                                             followFriend(friend);
                                             setVisible(false);
                                         }}
-                                    ><img src={visitIcon} alt="" /></div>
+                                    ><img src={visitIcon} alt="" /></BaseButton>
                                 )}
                                 {!isStaffChat && (
-                                    <div
+                                    <BaseButton
+                                        aria-label={localizeWithFallback('infostand.profile.link.tooltip', 'Click to view the profile')}
                                         className="cursor-pointer friend-bar-action-icon"
                                         onClick={(event) => {
                                             event.stopPropagation();
                                             GetUserProfile(friend.id);
                                             setVisible(false);
                                         }}
-                                    ><img src={profileIcon} alt="" /></div>
+                                    ><img src={profileIcon} alt="" /></BaseButton>
                                 )}
                             </div>
                         </motion.div>
