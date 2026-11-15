@@ -1229,6 +1229,35 @@
     border-top: 0;
 }
 
+/* A bot dialogue in the bot menu: what the bot says, then its options as menu buttons that wrap long labels. */
+.air-avatar-menu-dialogue {
+    box-sizing: border-box;
+    width: 103px;
+    margin: 0 0 3px 1px;
+    padding: 3px 4px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    font-family: AirAvatarMenuUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px;
+    line-height: 14px;
+    overflow-wrap: anywhere;
+}
+
+.air-avatar-menu-buttons > .octane-context-menu-item.air-avatar-menu-dialogue-option {
+    height: auto;
+    min-height: 26px;
+    flex: 0 0 auto;
+    padding: 5px 3px;
+    line-height: 13px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.air-avatar-menu-buttons > .octane-context-menu-item.air-avatar-menu-dialogue-option::before {
+    height: calc(100% + 9px);
+}
+
 .air-avatar-menu-buttons > .octane-context-menu-item:hover {
     background: transparent;
 }
