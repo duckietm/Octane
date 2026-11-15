@@ -92,7 +92,11 @@ export const FurniEditorView: FC<{}> = () => {
         if (!isVisible) return;
 
         const handler = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') setIsVisible(false);
+            if (e.key !== 'Escape') return;
+
+            // Closes the editor itself; the shared window Escape must not close another window as well.
+            e.preventDefault();
+            setIsVisible(false);
         };
 
         window.addEventListener('keydown', handler);
