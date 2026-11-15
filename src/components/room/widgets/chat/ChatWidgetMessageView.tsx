@@ -9,6 +9,15 @@ import { ChatNativeContent } from './ChatNativeContent';
 import { measureBubbleVisualOffsets } from './chatBubbleMetrics';
 import { highlightMentions } from './highlightMentions';
 
+const twoDigits = (value: number): string => value.toString().padStart(2, '0');
+
+/** The time a bubble shows on hover: hours, minutes and seconds on 24 hours, in the viewer's own time zone. */
+export const formatChatTime = (timestamp: number): string => {
+    const date = new Date(timestamp);
+
+    return `${twoDigits(date.getHours())}:${twoDigits(date.getMinutes())}:${twoDigits(date.getSeconds())}`;
+};
+
 interface ChatWidgetMessageViewProps {
     chat: ChatBubbleMessage;
     makeRoom: (chat: ChatBubbleMessage) => void;
@@ -260,6 +269,7 @@ const ChatWidgetMessageViewBase: FC<ChatWidgetMessageViewProps> = ({
                     />
                 )}
             </div>
+            {!inHistory && <span className="chat-bubble-time">{formatChatTime(chat.receivedAt)}</span>}
         </div>
     );
 };
