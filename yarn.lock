@@ -3325,7 +3325,6 @@ __metadata:
     postcss: "npm:^8.5.32"
     postcss-nested: "npm:^9.0.0"
     react: "npm:^19.3.1"
-    react-colorful: "npm:^5.8.1"
     react-dom: "npm:^19.3.1"
     react-error-boundary: "npm:^6.1.6"
     react-icons: "npm:^5.7.0"
@@ -3620,16 +3619,6 @@ __metadata:
   dependencies:
     hookified: "npm:^2.1.1"
   checksum: 10c0/4a39d45492c65a4b9795381acede1bd566028ce9764ead5b41d776b391a898bf0855dd2b59d724a6711fe253ba3cacf7c9a8832887cf9dc6d48a2c5e4997c82d
-  languageName: node
-  linkType: hard
-
-"react-colorful@npm:^5.8.1":
-  version: 5.8.1
-  resolution: "react-colorful@npm:5.8.1"
-  peerDependencies:
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-  checksum: 10c0/cd1705cdb218f9f43d376f36306968aa304e0d8018dcff198c798c2c56bf4873ea918580a57a0cceaab62ba7621663234ffad35f3d4ebd9198e65f926f9ec8fe
   languageName: node
   linkType: hard
 
