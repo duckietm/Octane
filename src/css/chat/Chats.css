@@ -1882,3 +1882,25 @@
 .octane-bubbles-hidden .newbubblehe {
     visibility: hidden !important;
 }
+
+/* The time a room bubble arrived, shown on its top right corner while the pointer is over it. */
+.bubble-container .chat-bubble-time {
+    position: absolute;
+    top: -15px;
+    right: -4px;
+    z-index: 2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #1d1d1d;
+    color: #fff;
+    font-size: 11px;
+    line-height: 1.2;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s ease-out;
+}
+
+.bubble-container:hover .chat-bubble-time {
+    opacity: 1;
+}
