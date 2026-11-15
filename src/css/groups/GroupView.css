@@ -492,10 +492,28 @@
 .octane-group-member-row__copy {
     position: absolute;
     left: 33px;
+    right: 2px;
     top: 1px;
-    width: 94px;
     height: 31px;
     overflow: hidden;
+}
+
+/* member_entry keeps block_region and remove_region (x 130-163) clear of the text. */
+.octane-group-member-row.has-actions .octane-group-member-row__copy {
+    right: 36px;
+}
+
+/* In member_entry the head, the name and the icons are a bitmap, a text and icons, not buttons: the window's
+   generic button skin must not reach them. */
+.octane-groups-window .octane-group-member-row button:not(.octane-card-header-close),
+.octane-groups-window .octane-group-member-row button:not(.octane-card-header-close):hover,
+.octane-groups-window .octane-group-member-row button:not(.octane-card-header-close):active {
+    min-height: 0;
+    padding: 0;
+    border: 0 !important;
+    border-image-source: none !important;
+    background: transparent !important;
+    text-align: left;
 }
 
 .octane-group-member-row__name {
@@ -516,7 +534,9 @@
     position: absolute;
     left: 17px;
     top: 14px;
-    width: 61px;
+    /* member_since_txt is auto_size left: it grows with its text instead of cutting the date. */
+    width: auto;
+    max-width: calc(100% - 17px);
     height: 15px;
     color: #666666 !important;
     font-size: 10px !important;

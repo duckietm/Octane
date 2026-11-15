@@ -302,8 +302,20 @@ export const GroupMembersView: FC<{}> = (props) => {
                     </div>
                     <Grid className="octane-group-members-list-grid" columnCount={2} overflow="auto">
                         {membersData.result.map((member, index) => {
+                            // member_entry: the admin icon only for an admin or the owner, or when the viewer manages the
+                            // group; block and remove keep the right of the entry when the viewer can use them.
+                            const showRankIcon =
+                                member.rank === GroupRank.OWNER || member.rank === GroupRank.ADMIN || (membersData.admin && member.rank === GroupRank.MEMBER);
+                            const hasActions = membersData.admin && member.rank !== GroupRank.OWNER && member.id !== GetSessionDataManager().userId;
+
                             return (
-                                <Flex key={index} alignItems="center" className="octane-group-member-row" gap={0} overflow="hidden">
+                                <Flex
+                                    key={index}
+                                    alignItems="center"
+                                    className={classNames('octane-group-member-row', hasActions && 'has-actions')}
+                                    gap={0}
+                                    overflow="hidden"
+                                >
                                     <BaseButton type="button" className="octane-group-member-row__avatar cursor-pointer" onClick={() => GetUserProfile(member.id)}>
                                         <LayoutAvatarImageView
                                             className="octane-group-member-row__head"
@@ -326,7 +338,7 @@ export const GroupMembersView: FC<{}> = (props) => {
                                         )}
                                     </Column>
                                     <div className="octane-group-member-row__actions">
-                                        {member.rank !== GroupRank.REQUESTED && member.rank !== GroupRank.BLOCKED && (
+                                        {showRankIcon && (
                                             <div className="flex items-center justify-center">
                                                 <Hint content={LocalizeText(getRankDescription(member))}><BaseButton type="button" aria-label={LocalizeText(getRankDescription(member))}
                                                     className={classNames(
