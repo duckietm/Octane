@@ -498,6 +498,19 @@
     overflow: hidden;
 }
 
+/* In member_entry the head, the name and the icons are a bitmap, a text and icons, not buttons: the window's
+   generic button skin must not reach them. */
+.octane-groups-window .octane-group-member-row button:not(.octane-card-header-close),
+.octane-groups-window .octane-group-member-row button:not(.octane-card-header-close):hover,
+.octane-groups-window .octane-group-member-row button:not(.octane-card-header-close):active {
+    min-height: 0;
+    padding: 0;
+    border: 0 !important;
+    border-image-source: none !important;
+    background: transparent !important;
+    text-align: left;
+}
+
 .octane-group-member-row__name {
     display: block;
     width: 77px;
@@ -1070,8 +1083,10 @@
 .octane-group-member-row__copy {
     position: absolute !important;
     left: 38px !important;
+    right: 3px !important;
+    /* The earlier block sets 94 px; a width would win over right and keep the date cut. */
+    width: auto !important;
     top: 1px !important;
-    width: 96px !important;
     height: 32px !important;
     overflow: hidden !important;
 }
@@ -1094,7 +1109,9 @@
     position: absolute !important;
     left: 11px !important;
     top: 15px !important;
-    width: 85px !important;
+    /* member_since_txt is auto_size left: it grows with its text instead of cutting the date. */
+    width: auto !important;
+    max-width: calc(100% - 11px) !important;
     height: 14px !important;
     color: #6a6a65 !important;
     font-size: 10px !important;
@@ -1102,13 +1119,14 @@
     line-height: 14px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
-    text-overflow: clip !important;
+    text-overflow: ellipsis !important;
 }
 
 .octane-group-member-row__actions {
     position: absolute !important;
     right: 3px !important;
-    top: 17px !important;
+    /* block_region and remove_region sit on the name line (y 1), leaving the date line free. */
+    top: 1px !important;
     width: 28px !important;
     height: 16px !important;
     display: flex !important;
