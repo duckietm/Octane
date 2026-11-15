@@ -281,7 +281,7 @@ export const FriendsMessengerView: FC<{}> = (props) => {
     return (
         <NativeTextTree>
             <>
-            <DraggableWindow handleSelector=".messenger-drag" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={8}>
+            <DraggableWindow uniqueKey="messenger" handleSelector=".messenger-drag" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={8}>
                 <div className="messenger-window">
                     <div className="messenger-drag" />
                     <BaseButton className="messenger-minimize" onClick={() => setIsVisible(false)} />

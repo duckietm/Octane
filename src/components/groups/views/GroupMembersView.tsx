@@ -274,7 +274,7 @@ export const GroupMembersView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-groups-window octane-group-members" theme="primary-slim" isResizable={false}>
+            <OctaneCardView uniqueKey="group-members" className="octane-groups-window octane-group-members" theme="primary-slim" isResizable={false}>
                 <OctaneCardHeaderView
                     headerText={LocalizeText('group.members.title', ['groupName'], [membersData ? membersData.groupTitle : ''])}
                     onCloseClick={(event) => setGroupId(-1)}
