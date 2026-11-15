@@ -14,11 +14,15 @@ describe('GroupMembersView member entry (AIR member_entry.xml)', () => {
         );
     });
 
-    it('lets the member-since date grow with its text', () => {
-        const since = css.match(/\.octane-group-member-row__since\s*\{[^}]*\}/s)?.[0] ?? '';
+    // GroupView.css styles the entry twice; the later block, all !important, is the one that applies.
+    const lastRule = (selector: string) => [...css.matchAll(new RegExp(`${selector}\\s*\\{[^}]*\\}`, 'gs'))].pop()?.[0] ?? '';
 
-        expect(since).toContain('width: auto;');
-        expect(since).not.toContain('width: 61px;');
+    it('lets the member-since date grow with its text', () => {
+        const since = lastRule('\\.octane-group-member-row__since');
+
+        expect(since).toContain('width: auto !important;');
+        expect(since).not.toMatch(/\bwidth:\s*\d+px/);
+        expect(lastRule('\\.octane-group-member-row__copy')).not.toMatch(/\bwidth:\s*\d+px/);
     });
 
     it('shows the admin icon only for an admin or the owner, or to a viewer who manages the group', () => {
@@ -30,6 +34,6 @@ describe('GroupMembersView member entry (AIR member_entry.xml)', () => {
 
     it('keeps the text clear of block and remove only when the viewer can use them', () => {
         expect(source).toContain("className={classNames('octane-group-member-row', hasActions && 'has-actions')}");
-        expect(css).toMatch(/\.octane-group-member-row\.has-actions \.octane-group-member-row__copy\s*\{[^}]*right:\s*36px;/s);
+        expect(css).toMatch(/\.octane-group-member-row\.has-actions \.octane-group-member-row__copy\s*\{[^}]*right:\s*33px !important;/s);
     });
 });

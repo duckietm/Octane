@@ -492,15 +492,10 @@
 .octane-group-member-row__copy {
     position: absolute;
     left: 33px;
-    right: 2px;
     top: 1px;
+    width: 94px;
     height: 31px;
     overflow: hidden;
-}
-
-/* member_entry keeps block_region and remove_region (x 130-163) clear of the text. */
-.octane-group-member-row.has-actions .octane-group-member-row__copy {
-    right: 36px;
 }
 
 /* In member_entry the head, the name and the icons are a bitmap, a text and icons, not buttons: the window's
@@ -534,9 +529,7 @@
     position: absolute;
     left: 17px;
     top: 14px;
-    /* member_since_txt is auto_size left: it grows with its text instead of cutting the date. */
-    width: auto;
-    max-width: calc(100% - 17px);
+    width: 61px;
     height: 15px;
     color: #666666 !important;
     font-size: 10px !important;
@@ -1090,10 +1083,15 @@
 .octane-group-member-row__copy {
     position: absolute !important;
     left: 38px !important;
+    right: 3px !important;
     top: 1px !important;
-    width: 96px !important;
     height: 32px !important;
     overflow: hidden !important;
+}
+
+/* The block and remove icons sit on the date line: the text stops before them only when they are shown. */
+.octane-group-member-row.has-actions .octane-group-member-row__copy {
+    right: 33px !important;
 }
 
 .octane-group-member-row__name {
@@ -1114,7 +1112,9 @@
     position: absolute !important;
     left: 11px !important;
     top: 15px !important;
-    width: 85px !important;
+    /* member_since_txt is auto_size left: it grows with its text instead of cutting the date. */
+    width: auto !important;
+    max-width: calc(100% - 11px) !important;
     height: 14px !important;
     color: #6a6a65 !important;
     font-size: 10px !important;
@@ -1122,7 +1122,7 @@
     line-height: 14px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
-    text-overflow: clip !important;
+    text-overflow: ellipsis !important;
 }
 
 .octane-group-member-row__actions {
