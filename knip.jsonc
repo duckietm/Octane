@@ -9,8 +9,6 @@
         // Type-only JSDoc import in postcss.config.js; the package comes with postcss tooling.
         "postcss-load-config",
         // scripts/catalog-stats.mjs is an optional local maintenance script run against the hotel database.
-        "mysql2",
-        // Only src/components/interface-settings/InterfaceColorTabView.tsx imports it, and nothing imports that view yet.
-        "react-colorful"
+        "mysql2"
     ]
 }
