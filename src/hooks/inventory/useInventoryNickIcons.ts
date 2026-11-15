@@ -7,6 +7,8 @@ import { useSharedVisibility } from '../useSharedVisibility';
 
 const useInventoryNickIconsState = () => {
     const [needsUpdate, setNeedsUpdate] = useState(true);
+    // AIR shows its loading view until the first list arrives, and the empty view only after it.
+    const [isLoaded, setIsLoaded] = useState(false);
     const [nickIcons, setNickIcons] = useState<INickIconItem[]>([]);
     const [activeNickIcon, setActiveNickIcon] = useState<INickIconItem | null>(null);
     const [selectedNickIcon, setSelectedNickIcon] = useState<INickIconItem | null>(null);
@@ -14,6 +16,8 @@ const useInventoryNickIconsState = () => {
 
     useMessageEvent<UserNickIconsEvent>(UserNickIconsEvent, (event) => {
         const parser = event.getParser();
+
+        setIsLoaded(true);
         const ownedNickIcons = parser.nickIcons
             .filter((icon) => icon.owned)
             .map((icon) => ({
@@ -59,6 +63,7 @@ const useInventoryNickIconsState = () => {
 
     return {
         nickIcons,
+        isLoaded,
         activeNickIcon,
         selectedNickIcon,
         setSelectedNickIcon,

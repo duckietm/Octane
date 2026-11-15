@@ -16,6 +16,8 @@ import { useInventoryUnseenTracker } from './useInventoryUnseenTracker';
 
 const useInventoryPrefixesState = () => {
     const [needsUpdate, setNeedsUpdate] = useState(true);
+    // AIR shows its loading view until the first list arrives, and the empty view only after it.
+    const [isLoaded, setIsLoaded] = useState(false);
     const [prefixes, setPrefixes] = useState<IPrefixItem[]>([]);
     const [activePrefix, setActivePrefix] = useState<IPrefixItem | null>(null);
     const [selectedPrefix, setSelectedPrefix] = useState<IPrefixItem | null>(null);
@@ -26,6 +28,8 @@ const useInventoryPrefixesState = () => {
     // about the same prefix instead of dropping it.
     useMessageEvent<UserPrefixesEvent>(UserPrefixesEvent, (event) => {
         const parser = event.getParser();
+
+        setIsLoaded(true);
 
         setPrefixes((prevValue) => {
             const known = new Map(prevValue.map((prefix) => [prefix.id, prefix]));
@@ -155,7 +159,7 @@ const useInventoryPrefixesState = () => {
         setNeedsUpdate(false);
     }, [isVisible, needsUpdate]);
 
-    return { prefixes, activePrefix, selectedPrefix, setSelectedPrefix, activatePrefix, deactivatePrefix, deletePrefix, activate, deactivate };
+    return { prefixes, isLoaded, activePrefix, selectedPrefix, setSelectedPrefix, activatePrefix, deactivatePrefix, deletePrefix, activate, deactivate };
 };
 
 export const useInventoryPrefixes = () => useSharedHook(useInventoryPrefixesState);

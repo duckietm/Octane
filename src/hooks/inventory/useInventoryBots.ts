@@ -15,6 +15,8 @@ import { useInventoryUnseenTracker } from './useInventoryUnseenTracker';
 
 const useInventoryBotsState = () => {
     const [needsUpdate, setNeedsUpdate] = useState(true);
+    // AIR shows its loading view until the first list arrives, and the empty view only after it.
+    const [isLoaded, setIsLoaded] = useState(false);
     const [botItems, setBotItems] = useState<IBotItem[]>([]);
     const [selectedBot, setSelectedBot] = useState<IBotItem>(null);
     const { isVisible = false, activate = null, deactivate = null } = useSharedVisibility();
@@ -32,6 +34,8 @@ const useInventoryBotsState = () => {
 
     useMessageEvent<BotInventoryMessageEvent>(BotInventoryMessageEvent, (event) => {
         const parser = event.getParser();
+
+        setIsLoaded(true);
         const newValue = [...botItemsRef.current];
         const existingIds = newValue.map((item) => item.botData.id);
         const addedDatas: BotData[] = [];
@@ -155,7 +159,7 @@ const useInventoryBotsState = () => {
         setNeedsUpdate(false);
     }, [isVisible, needsUpdate]);
 
-    return { botItems, selectedBot, setSelectedBot, activate, deactivate };
+    return { botItems, isLoaded, selectedBot, setSelectedBot, activate, deactivate };
 };
 
 export const useInventoryBots = () => useSharedHook(useInventoryBotsState);

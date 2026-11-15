@@ -164,6 +164,17 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
+/* AIR loading_container: 264 x 268 at (6, 27) of the window, the arrow centred and not stretched. */
+.octane-inventory-loading {
+    position: relative;
+    margin-left: 1px;
+    margin-top: -8px;
+    width: 264px;
+    height: 268px;
+    background: url('@/assets/images/inventory/air/inventory-download-icon.png') center no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
 .octane-inventory-empty-copy {
     position: absolute;
     left: 287px;
