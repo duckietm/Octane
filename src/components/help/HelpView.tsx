@@ -96,7 +96,7 @@ export const HelpView: FC<{}> = (props) => {
         <NativeTextTree>
             <>
                 {isVisible && (
-                    <OctaneCardView
+                    <OctaneCardView uniqueKey="help"
                         className={`octane-help min-w-0 ${isReporting ? 'w-[min(448px,calc(100vw-16px))]' : 'w-[min(420px,calc(100vw-16px))]'} max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]`}
                         theme="primary-slim"
                     >

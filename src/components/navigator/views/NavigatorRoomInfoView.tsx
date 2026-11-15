@@ -148,7 +148,7 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
 
     return (
         <NativeTextTree>
-            <OctaneCardView
+            <OctaneCardView uniqueKey="navigator-room-info"
                 className="octane-room-info min-w-0 w-[min(236px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                 isResizable={false}
             >

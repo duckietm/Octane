@@ -121,7 +121,7 @@ export const OctanepediaView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView
+            <OctaneCardView uniqueKey="octanepedia"
                 className="octanepedia w-[450px] h-[400px] max-w-[90vw] max-h-[85vh]"
                 style={dimensions ? { width: dimensions.width, height: dimensions.height } : {}}
                 theme="primary-slim">
