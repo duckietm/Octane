@@ -32,8 +32,8 @@ describe('GroupMembersView member entry (AIR member_entry.xml)', () => {
         expect(source).toContain('{showRankIcon && (');
     });
 
-    it('keeps the text clear of block and remove only when the viewer can use them', () => {
-        expect(source).toContain("className={classNames('octane-group-member-row', hasActions && 'has-actions')}");
-        expect(css).toMatch(/\.octane-group-member-row\.has-actions \.octane-group-member-row__copy\s*\{[^}]*right:\s*33px !important;/s);
+    it('puts block and remove on the name line, so the date keeps its whole line', () => {
+        expect(lastRule('\\.octane-group-member-row__actions')).toContain('top: 1px !important;');
+        expect(source).not.toContain('has-actions');
     });
 });

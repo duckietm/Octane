@@ -1089,11 +1089,6 @@
     overflow: hidden !important;
 }
 
-/* The block and remove icons sit on the date line: the text stops before them only when they are shown. */
-.octane-group-member-row.has-actions .octane-group-member-row__copy {
-    right: 33px !important;
-}
-
 .octane-group-member-row__name {
     display: block !important;
     width: 93px !important;
@@ -1128,7 +1123,8 @@
 .octane-group-member-row__actions {
     position: absolute !important;
     right: 3px !important;
-    top: 17px !important;
+    /* block_region and remove_region sit on the name line (y 1), leaving the date line free. */
+    top: 1px !important;
     width: 28px !important;
     height: 16px !important;
     display: flex !important;
