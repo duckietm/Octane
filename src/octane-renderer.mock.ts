@@ -467,6 +467,19 @@ export class PluginChannelActionComposer {
     ) {}
 }
 
+// Bot dialogues in the bot menu: the page event and the two composers, which keep what they send.
+export class BotDialogueEvent extends StubClass {}
+export class BotDialogueOpenComposer {
+    constructor(public readonly botId: number) {}
+}
+export class BotDialogueChooseComposer {
+    constructor(
+        public readonly botId: number,
+        public readonly nonce: number,
+        public readonly index: number
+    ) {}
+}
+
 // Composers that keep their constructor arguments, so a test can read what was sent.
 export class SetObjectDataMessageComposer {
     constructor(
