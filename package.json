@@ -10,6 +10,7 @@
     },
     "scripts": {
         "configure": "node scripts/configure-json.mjs",
+        "config:sync": "node scripts/sync-config.mjs",
         "prestart": "node scripts/configure-json.mjs --if-missing",
         "prebuild": "node scripts/configure-json.mjs --if-missing && node scripts/write-asset-loader.mjs",
         "start": "vite --host",
