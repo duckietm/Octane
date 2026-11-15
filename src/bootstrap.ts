@@ -1,6 +1,7 @@
 import { GetConfiguration } from '@octane/renderer';
 import { takePasswordResetTokenFromUrl } from './api/auth/passwordReset';
 import { adoptLoginTokenFromUrl, confirmSignInFromLink, positiveIdFromSearch } from './api/auth/urlToken';
+import configurationDefaults from './api/configuration/configurationDefaults.json';
 import { derivePetConfig, DerivedPetConfig, PetDefinition } from './api/octane/PetData';
 import { parseJsonDocument, UiJsonMode } from './json/JsonDocumentParser';
 import { configFileUrl, getClientMode, installSecureFetch } from './secure-assets';
@@ -176,6 +177,9 @@ appModule.catch(() => undefined);
 // the first paint triggers a flood of "Missing configuration key" warnings for
 // every key components read synchronously (asset.url, login.endpoint, …).
 // The UI bundle is already downloading meanwhile; it only mounts below.
+// A key the hotel's files leave out answers with its value from configuration-keys.json (yarn config:examples).
+GetConfiguration().registerDefaults(configurationDefaults);
+
 const configLoad = GetConfiguration().init();
 
 configLoad.catch(() => undefined);

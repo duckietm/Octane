@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -42,5 +43,46 @@ describe('configuration examples', () => {
         }
 
         expect([...undocumented]).toEqual([]);
+    });
+});
+
+// configuration-keys.json holds one value per key; a fallback written at a call must not tell another story.
+const literal = (text: string): { ok: boolean; value?: unknown } => {
+    const t = text.trim();
+
+    if (/^(true|false|null)$/.test(t) || /^-?\d+(\.\d+)?$/.test(t)) return { ok: true, value: JSON.parse(t) };
+    if (/^'(?:[^'\\]|\\.)*'$/.test(t)) return { ok: true, value: t.slice(1, -1) };
+    if (/^"(?:[^"\\]|\\.)*"$/.test(t)) return { ok: true, value: JSON.parse(t) };
+    if (/^\[\s*\]$/.test(t)) return { ok: true, value: [] };
+    if (/^\{\s*\}$/.test(t)) return { ok: true, value: {} };
+
+    return { ok: false };
+};
+
+describe('configuration-keys.json', () => {
+    type Entry = { key?: string; value?: unknown; runtime?: boolean };
+    const registry: Record<string, Entry[]> = JSON.parse(readFileSync(join(process.cwd(), 'configuration-keys.json'), 'utf8'));
+    const runtime = new Map(Object.values(registry).flat().filter((entry) => entry.key && entry.runtime).map((entry) => [entry.key, entry.value]));
+
+    it('is what the examples and the boot defaults were generated from (yarn config:examples)', () => {
+        expect(() => execFileSync(process.execPath, [join(process.cwd(), 'scripts', 'config-examples.mjs'), '--check'], { encoding: 'utf8' })).not.toThrow();
+    });
+
+    it('holds the same fallback the client writes at each call', () => {
+        const call = /\b(?:GetConfigurationValue|GetOptionalConfigurationValue|GetConfiguration\(\)\.getValue)\s*(?:<[^>]*>)?\(\s*['"]([A-Za-z0-9_.-]+)['"]\s*,\s*((?:'[^']*'|"[^"]*"|\[[^\]]*\]|[^,()])+?)\s*\)/g;
+        const disagreeing: string[] = [];
+
+        for (const file of sourceFiles(join(process.cwd(), 'src'))) {
+            for (const match of readFileSync(file, 'utf8').matchAll(call)) {
+                const parsed = literal(match[2]);
+
+                if (!parsed.ok || !runtime.has(match[1])) continue;
+                if (JSON.stringify(parsed.value) !== JSON.stringify(runtime.get(match[1]))) {
+                    disagreeing.push(`${match[1]}: ${match[2].trim()} vs ${JSON.stringify(runtime.get(match[1]))} (${file.slice(process.cwd().length + 1)})`);
+                }
+            }
+        }
+
+        expect(disagreeing).toEqual([]);
     });
 });
