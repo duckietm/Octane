@@ -71,7 +71,8 @@ export const UbuntuDropmenuView = <T extends string | number>({ label, value, op
     {
         if(disabled) return;
 
-        if(event.key === 'Escape') { setOpen(false); return; }
+        // Handled here, so the window around the menu does not close too.
+        if(event.key === 'Escape') { event.preventDefault(); setOpen(false); return; }
         if(event.key === 'ArrowDown' || event.key === 'ArrowUp')
         {
             event.preventDefault();
