@@ -1,6 +1,7 @@
 import { GetConfiguration } from '@octane/renderer';
 import { takePasswordResetTokenFromUrl } from './api/auth/passwordReset';
 import { adoptLoginTokenFromUrl, confirmSignInFromLink, positiveIdFromSearch } from './api/auth/urlToken';
+import { CONFIGURATION_BASE_FILE, resolveConfigurationFiles } from './api/configuration/configurationFiles';
 import configurationDefaults from './api/configuration/configurationDefaults.json';
 import { derivePetConfig, DerivedPetConfig, PetDefinition } from './api/octane/PetData';
 import { parseJsonDocument, UiJsonMode } from './json/JsonDocumentParser';
@@ -152,10 +153,20 @@ const clientMode = getClientMode();
 // The pet list, the configuration files and the UI bundle download together.
 const petConfigLoad = loadPetConfig();
 
+// config.jsonc lists the configuration files (one per category, under config/); a hotel without it keeps the two old files.
+const configurationFiles = await resolveConfigurationFiles(
+    async () => {
+        const response = await fetch(configFileUrl(CONFIGURATION_BASE_FILE, true));
+
+        return response.ok ? response.text() : null;
+    },
+    (text) => parseJsonDocument(text, 'jsonc', CONFIGURATION_BASE_FILE)
+);
+
 (window as any).OctaneSecureApiUrl = clientMode.apiBaseUrl || window.location.origin;
 (window as any).OctaneClientMode = clientMode;
 (window as any).OctaneConfig = {
-    'config.urls': [configFileUrl('renderer-config.json', true), configFileUrl('ui-config.json', true)],
+    'config.urls': configurationFiles.map((file) => configFileUrl(file, true)),
     'sso.ticket': ssoTicket,
     'forward.type': forwardRoomId ? 2 : -1,
     'forward.id': forwardRoomId,

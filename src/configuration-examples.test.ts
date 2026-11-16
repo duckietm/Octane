@@ -5,9 +5,16 @@ import { describe, expect, it } from 'vitest';
 
 const CONFIG_DIR = join(process.cwd(), 'public', 'configuration');
 
-// Both examples must stay strict JSON: a hotel built in the legacy JSON mode reads them without comments,
-// which is why their sections are "// ---- Section ----" keys and not real comments.
-const readExample = (name: string): Record<string, unknown> => JSON.parse(readFileSync(join(CONFIG_DIR, name), 'utf8'));
+// The example files are JSONC: whole-line // comments, read the way the client reads them.
+const parseJsonc = (text: string): Record<string, unknown> => JSON.parse(text.replace(/^\s*\/\/.*$/gm, '').replace(/,(\s*[}\]])/g, '$1'));
+
+/** Every file of config.example/, as [path relative to config.example/, keys]. */
+const exampleFiles = (dir = join(CONFIG_DIR, 'config.example'), prefix = ''): [string, Record<string, unknown>][] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry): [string, Record<string, unknown>][] =>
+        entry.isDirectory()
+            ? exampleFiles(join(dir, entry.name), `${prefix}${entry.name}/`)
+            : [[`${prefix}${entry.name}`, parseJsonc(readFileSync(join(dir, entry.name), 'utf8'))]]
+    );
 
 // Set by bootstrap.ts from the page address before the configuration files load: not a hotel setting.
 const SET_AT_BOOT = new Set(['config.urls', 'sso.ticket', 'forward.type', 'forward.id', 'friend.id']);
@@ -22,17 +29,41 @@ const sourceFiles = (dir: string): string[] =>
     });
 
 describe('configuration examples', () => {
-    const ui = readExample('ui-config.example');
-    const renderer = readExample('renderer-config.example');
+    const files = exampleFiles();
+    const base = parseJsonc(readFileSync(join(CONFIG_DIR, 'config.example.jsonc'), 'utf8'));
 
-    it('are strict JSON and keep no key in both files', () => {
-        const shared = Object.keys(ui).filter((key) => !key.startsWith('//') && key in renderer);
+    it('the base file lists exactly the example files, and no key sits in two of them', () => {
+        expect([...(base['config.files'] as string[])].sort()).toEqual(files.map(([file]) => `config/${file}`).sort());
 
-        expect(shared).toEqual([]);
+        const owner = new Map<string, string>();
+        const twice: string[] = [];
+
+        for (const [file, keys] of files) {
+            for (const key of Object.keys(keys)) {
+                if (owner.has(key)) twice.push(`${key}: ${owner.get(key)} and ${file}`);
+                owner.set(key, file);
+            }
+        }
+
+        expect(twice).toEqual([]);
+    });
+
+    it('carry a comment above every key', () => {
+        const uncommented: string[] = [];
+
+        for (const [file] of files) {
+            const lines = readFileSync(join(CONFIG_DIR, 'config.example', file), 'utf8').split(/\r?\n/);
+
+            lines.forEach((line, index) => {
+                if (/^ {4}"[^"]+":/.test(line) && !/^\s*\/\//.test(lines[index - 1] ?? '')) uncommented.push(`${file}: ${line.trim().split(':')[0]}`);
+            });
+        }
+
+        expect(uncommented).toEqual([]);
     });
 
     it('document every key the client reads by name', () => {
-        const documented = new Set([...Object.keys(ui), ...Object.keys(renderer)]);
+        const documented = new Set(files.flatMap(([, keys]) => Object.keys(keys)));
         const read = /\b(?:GetConfigurationValue|GetConfigurationRecord|GetConfiguration\(\)\.getValue)\s*(?:<[^>]*>)?\(\s*['"]([A-Za-z0-9_.-]+)['"]/g;
         const undocumented = new Set<string>();
 

@@ -1,7 +1,7 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaBars, FaCog } from 'react-icons/fa';
-import { CatalogType, GetConfigurationValue, LocalizeShortNumber, LocalizeText, localizeWithFallback, SanitizeHtml } from '../../api';
+import { CatalogType, GetConfigurationValue, isBuildersClubEnabled, LocalizeShortNumber, LocalizeText, localizeWithFallback, SanitizeHtml } from '../../api';
 import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { CssNativeText } from '../../common/native-text/CssNativeText';
@@ -60,7 +60,7 @@ const CatalogViewInner: FC<{}> = () => {
     const { purse = null } = usePurse();
     const displayedCurrencies = GetConfigurationValue<number[]>('system.currency.types', []);
     const activeCatalogNode = activeNodes?.[activeNodes.length - 1] ?? null;
-    const buildersClubEnabled = GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true));
+    const buildersClubEnabled = isBuildersClubEnabled();
     // Strip technical suffixes like "(BC)" or "(Hot)" but keep the
     // pageId hint the gameserver appends when the viewer has
     // ACC_CATALOG_IDS - that's a pure-numeric "(6)" trailer.

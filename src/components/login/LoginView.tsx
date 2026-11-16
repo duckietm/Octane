@@ -205,7 +205,8 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
             .sort((a, b) => a.slotNum - b.slotNum);
     }, [configuredLoginWidgets]);
 
-    const backgroundColor = loginImages['background.colour'] || GetConfigurationValue<string>('login_background.colour', '#6eadc8');
+    // getDefaultLoginImages() always sets background.colour; the AIR blue is only for a hotel that blanks it in loginview.images.
+    const backgroundColor = loginImages['background.colour'] || '#6eadc8';
     const background = interpolate(loginImages['background'] || GetConfigurationValue<string>('login_background', ''));
     const sun = interpolate(loginImages['sun'] || GetConfigurationValue<string>('login_sun', ''));
     const drape = interpolate(loginImages['drape'] || GetConfigurationValue<string>('login_drape', ''));

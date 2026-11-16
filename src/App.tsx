@@ -480,7 +480,7 @@ export const App: FC<{}> = (props) => {
                     });
 
                     if (configInitError) {
-                        OctaneLogger.error('[LoginScreen] Failed to load renderer-config.json — cannot resolve login.screen.enabled', configInitError);
+                        OctaneLogger.error('[LoginScreen] Failed to load the configuration files — cannot resolve login.screen.enabled', configInitError);
                     }
 
                     if (loginScreenEnabled) {
@@ -501,7 +501,7 @@ export const App: FC<{}> = (props) => {
                     } else {
                         if (configInitError) {
                             setHomeUrl(window.location.origin + '/');
-                            setErrorMessage(`Unable to load renderer-config.json.\n${String((configInitError as Error)?.message ?? configInitError)}`);
+                            setErrorMessage(`Unable to load the configuration files.\n${String((configInitError as Error)?.message ?? configInitError)}`);
                             setIsReady(false);
                             setShowLogin(false);
                             setIsEnteringHotel(false);

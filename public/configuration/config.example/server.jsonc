@@ -1,0 +1,388 @@
+{
+    // Server, assets and login: the addresses set at install, the login and loading screens, logging.
+
+
+    // ==== Server and connection ====
+    // Where the client connects (socket and API), packet signing, links to the hotel website and outside services.
+
+    // WebSocket address of the game server; the wired web API derives its base from it when unset.
+    "socket.url": "ws://localhost:2096",
+
+    // Base address of the web API; other keys use it as ${api.url}, and it derives the maintenance probe.
+    "api.url": "http://localhost:2096",
+
+    // Encrypts the WebSocket traffic; needs a secure page (HTTPS or localhost) and server support.
+    "crypto.ws.enabled": false,
+
+    // Requires the server's encryption hello to be signed; an unsigned or bad signature drops the connection.
+    "crypto.ws.signing.enabled": false,
+
+    // Pinned base64 signing public key; empty: fetched from login.server_key.endpoint.
+    "crypto.ws.signing.public_key": "",
+
+    // Refuses the version 1 encrypted session when the server does not accept the version 2 subprotocol.
+    "crypto.ws.require_v2": false,
+
+    // Client sends a pong on its own timer instead of only answering server pings.
+    "system.pong.manually": true,
+
+    // Milliseconds between manual pongs (with system.pong.manually on).
+    "system.pong.interval.ms": 20000,
+
+    // Hotel name shown in the Discord activity preview ("Playing %hotel%").
+    "hotel.name": "Hotel",
+
+    // Public address of the hotel site: room share links, YouTube furni and ${url.prefix} in texts.
+    "url.prefix": "",
+
+    // Page opened from the camera competition prompt when the email is not verified; empty: nothing opens.
+    "email.verification.url": "",
+
+    // Web shop page offered when credits run out; empty: only the not-enough-credits alert shows.
+    "web.shop.relativeUrl": "",
+
+    // Club page opened when the VIP benefits window is off (catalog.vip.benefits.enabled false).
+    "link.format.club": "",
+
+    // Page offered when duckets run out; empty: only the alert shows.
+    "link.format.duckets": "",
+
+    // External page of the collectibles catalog link when the collectibles hub is off; empty hides it.
+    "link.format.collectibles": "",
+
+    // Page of the unlock link in the purse safety-lock notice; empty hides the link.
+    "link.format.safetylock_unlock": "",
+
+    // Help page of the rentable bot chat settings; empty disables the help button.
+    "link.format.bots.help": "",
+
+    // Address of the emulator stats API; ${...} placeholders are resolved.
+    "emustats.endpoint": "${api.url}/api/emustats",
+
+    // Plugin scripts to load: URLs, or {url, integrity}; only same-origin or https.
+    "external.plugins": [],
+
+    // Hosts plugin scripts may come from; empty: any https host.
+    "external.plugins.allowed.hosts": [],
+
+    // Shows the ad window (publisher id from /ads.txt, slot from adsense.json).
+    "show.google.ads": false,
+
+    // Ad page on another origin shown in a sandboxed frame; empty: the ad script runs in the client page.
+    "ads.frame.url": "",
+
+
+    // ==== Assets and game data ====
+    // Base addresses of the game data, images, furni, pets, badges and texts. Most keys build on ${asset.url} or ${image.library.url}.
+
+    // Base address of the game assets; other keys use it as ${asset.url} (hotel view, soundboard).
+    "asset.url": "http://localhost/gamedata",
+
+    // Base address of the image library (c_images); many views and texts build image paths from it.
+    "image.library.url": "http://localhost/gamedata/c_images/",
+
+    // Base address of the client images: login defaults, room model previews, badge loading icon.
+    "images.url": "${asset.url}/images",
+
+    // Base address of the gamedata files; read only through ${gamedata.url} in other keys.
+    "gamedata.url": "${asset.url}",
+
+    // Address template of the client's own sound samples; %sample% is the sample name.
+    "sounds.url": "${asset.url}/sounds/%sample%.mp3",
+
+    // Language the base texts are written in; choosing it loads no translation pack. Default en.
+    "base.locale": "en",
+
+    // Text files to load, in order; later files override earlier ones. Required.
+    "external.texts.url": [
+        "${gamedata.url}/config/ExternalTexts.json?t=%timestamp%",
+        "${gamedata.url}/config/UITexts.jsonc?t=%timestamp%"
+    ],
+
+    // Translation pack address (%locale%, %timestamp%); empty: text_translate/ next to the first text file.
+    "external.texts.translation.url": "",
+
+    // Extra configuration keys texts may use as placeholders; their value replaces the placeholder.
+    "localization.placeholder.configuration.keys": [],
+
+    // Address template of trax and furni sound samples; %sample% is the sample id.
+    "external.samples.url": "${gamedata.url}/sounds/sound_machine_sample_%sample%.mp3",
+
+    // Address of the furniture data file. Required.
+    "furnidata.url": "${gamedata.url}/config/FurnitureData.json?t=%timestamp%",
+
+    // Furni name translation address (%locale%); empty: furniture_translate/ next to furnidata.
+    "furnidata.translation.url": "",
+
+    // Address of the product data file. Required.
+    "productdata.url": "${gamedata.url}/config/ProductData.json?t=%timestamp%",
+
+    // Address template of furni bundles; %libname% is the classname.
+    "furni.asset.url": "${asset.url}/furniture/%libname%.hab",
+
+    // Address template of furni icons (%libname%, %param%); empty: the catalog uses the product's own icon.
+    "furni.asset.icon.url": "http://localhost/gamedata/icons/%libname%%param%_icon.png",
+
+    // Address template of pet bundles; %libname% is the pet library.
+    "pet.asset.url": "${asset.url}/pets/%libname%.hab",
+
+    // Assets downloaded during loading, before the hotel opens; ${...} placeholders are resolved.
+    "preload.assets.urls": [
+        "${images.url}/loading_icon.png",
+        "${images.url}/clear_icon.png",
+        "${images.url}/big_arrow.png"
+    ],
+
+    // Address template of badge images; %badgename% is the badge code.
+    "badge.asset.url": "${image.library.url}album1584/%badgename%.gif",
+
+    // Address template of group badge parts (%part%); empty: group badges cannot be drawn locally.
+    "badge.asset.grouparts.url": "http://localhost/gamedata/badgeparts/badgepart_%part%.png",
+
+    // Imager address for group badges (%imagerdata%); the bare placeholder draws them in the client.
+    "group.badge.url": "%imagerdata%",
+
+    // Extra hosts room branding furni may load images from; others are refused.
+    "room.branding.image.hosts": [],
+
+    // Hosts furni photos and thumbnails may load from; null: youtube.com and ytimg.com.
+    "furni.external.image.hosts": [
+        "youtube.com",
+        "ytimg.com"
+    ],
+
+    // Base address of the help pages (habbopages); also a text placeholder.
+    "habbopages.url": "/gamedata/habbopages/",
+
+    // Group page opened from the guide tool forum link; %groupid% is guide.help.alpha.groupid.
+    "group.homepage.url": "${url.prefix}/groups/%groupid%/id",
+
+    // External page of the help Way link when habboway.enabled is false; empty: the built-in window.
+    "habboway.url": "${image.library.url}habboway",
+
+    // Notification image template; %image% is the type with dots as underscores.
+    "image.library.notifications.url": "${image.library.url}notifications/%image%.png",
+
+    // Achievement image template (%image%) for badges the client does not bundle; empty: none.
+    "achievements.images.url": "${image.library.url}Quests/%image%.png",
+
+    // Base address of quest images; empty: Quests/ in the image library.
+    "image.library.questing.url": "",
+
+    // Base address of daily task images; empty: dailytasks/ in the image library.
+    "image.library.dailytasks.url": "",
+
+    // Currency icon template; %type% is the currency type.
+    "currency.asset.icon.url": "${images.url}/wallet/%type%.png",
+
+    // Base address of catalog thumbnails (th_*.png) for wall, floor and landscape products.
+    "catalog.asset.url": "${image.library.url}catalogue",
+
+    // Catalog page image template (headers, teasers); %name% is the image name.
+    "catalog.asset.image.url": "${catalog.asset.url}/%name%.gif",
+
+    // Catalog page icon template; %name% is the icon id.
+    "catalog.asset.icon.url": "${catalog.asset.url}/icon_%name%.png",
+
+    // Room thumbnail template; %thumbnail% is the room id.
+    "thumbnails.url": "http://localhost/camera/photo/temp/thumb/%thumbnail%.png",
+
+
+    // ==== Login and account ====
+    // The login screen, its pictures, and the endpoints of login, registration, remember-me and the account settings.
+
+    // Shows the built-in login screen when no SSO ticket is given; off: session-expired page instead.
+    "login.screen.enabled": true,
+
+    // Address of the login API.
+    "login.endpoint": "${api.url}/api/auth/login",
+
+    // Address of the registration API.
+    "login.register.endpoint": "${api.url}/api/auth/register",
+
+    // Address of the forgot-password API.
+    "login.forgot.endpoint": "${api.url}/api/auth/forgot-password",
+
+    // Address of the logout API called by the purse logout button.
+    "login.logout.endpoint": "${api.url}/api/auth/logout",
+
+    // Address probed before login; 403, 5xx or no answer in 5 s means unreachable. Empty: no probe.
+    "login.health.endpoint": "${api.url}/api/health",
+
+    // HTTP method of the login health probe.
+    "login.health.method": "GET",
+
+    // Maintenance status address; empty: derived from api.url or login.endpoint (/api/maintenance).
+    "login.maintenance.endpoint": "${api.url}/api/maintenance",
+
+    // Address that checks whether a registration email is free.
+    "login.check-email.endpoint": "${api.url}/api/auth/check-email",
+
+    // Address that checks whether a registration username is free.
+    "login.check-username.endpoint": "${api.url}/api/auth/check-username",
+
+    // Address of the starter room templates offered at registration; empty: no room step data.
+    "login.room_templates.endpoint": "${api.url}/api/auth/room-templates",
+
+    // Address that turns a remembered login into an SSO ticket.
+    "login.remember.endpoint": "${api.url}/api/auth/remember",
+
+    // Renews the access token before it expires, when there is no remembered login.
+    "login.token-renew.endpoint": "${api.url}/api/auth/token/renew",
+
+    // Address of the server signing public key for encrypted sockets when none is pinned.
+    "login.server_key.endpoint": "${api.url}/api/auth/server-key",
+
+    // Address that exchanges the SSO ticket for an API access token.
+    "login.sso-token.endpoint": "${api.url}/api/auth/sso-token",
+
+    // Address that rotates the remembered-login token.
+    "login.refresh.endpoint": "${api.url}/api/auth/refresh",
+
+    // Address of the news window on the login screen; empty hides it.
+    "login.news.url": "${asset.url}/news/news.json",
+
+    // Cloudflare Turnstile check on login and registration; needs login.turnstile.sitekey.
+    "login.turnstile.enabled": false,
+
+    // Cloudflare Turnstile site key; empty disables the check.
+    "login.turnstile.sitekey": "1x00000000000000000000AA",
+
+    // Address of the change-password API in account settings.
+    "account.change-password.endpoint": "${api.url}/api/auth/change-password",
+
+    // Address of the change-email API in account settings.
+    "account.change-email.endpoint": "${api.url}/api/auth/change-email",
+
+    // Address of the change-username API in account settings.
+    "account.change-username.endpoint": "${api.url}/api/auth/change-username",
+
+    // Page opened after logout; empty: the client reloads.
+    "logout.redirect.url": "",
+
+    // Login screen setup: images (background, sun, drape, left, right) and widgets (slot.N.widget / conf).
+    "loginview": {
+        "images": {
+            "background": "${asset.url}/c_images/reception/stretch_blue.png",
+            "background.colour": "#6eadc8",
+            "sun": "${asset.url}/c_images/reception/sun.png",
+            "drape": "${asset.url}/c_images/reception/drape.png",
+            "left": "${asset.url}/c_images/reception/ts.png",
+            "right": "${asset.url}/c_images/reception/US_right.png",
+            "right.repeat": "${asset.url}/c_images/reception/US_top_right.png"
+        }
+    },
+
+    // Login background image, used when loginview.images has none and images.url is empty.
+    "login_background": "",
+
+    // Login sun image, used when loginview.images has none.
+    "login_sun": "",
+
+    // Login drape image, used when loginview.images has none and images.url is empty.
+    "login_drape": "",
+
+    // Login left image, used when loginview.images has none and images.url is empty.
+    "login_left": "",
+
+    // Login repeating right image, used when loginview.images has none.
+    "login_right.repeat": "",
+
+    // Login right image, used when loginview.images has none and images.url is empty.
+    "login_right": "",
+
+    // Minutes between remembered-login token rotations (minimum 1).
+    "login.remember.rotate.interval.minutes": 15,
+
+    // Asks the server to keep the remembered-login token in an HttpOnly cookie; the server must support it.
+    "login.remember.cookie": false,
+
+
+    // ==== Loading screen ====
+    // Texts and pictures shown while the client loads, before the external texts are in.
+
+    // Logo top left on the loading screen; empty: the built-in logo.
+    "loading.logo.url": "",
+
+    // CSS background of the loading screen; empty: the default.
+    "loading.background": "",
+
+    // Loading text at boot, used only when the texts lack this key.
+    "loader": "Loading...",
+
+    // Loading text after the configuration loads, used only when the texts lack this key.
+    "loader.waiting": "Loading content...",
+
+    // Loading text while connecting to the server, used only when the texts lack this key.
+    "generic.reconnecting": "Connecting to server...",
+
+    // Loading text while game assets download, used only when the texts lack this key.
+    "loading.task.assets": "Loading game assets...",
+
+    // Loading text while texts load, used only when the texts lack this key.
+    "loading.task.localization": "Loading translations...",
+
+    // Loading text while avatar data loads, used only when the texts lack this key.
+    "loading.task.avatar": "Loading wardrobe...",
+
+    // Loading text while sounds load, used only when the texts lack this key.
+    "loading.task.sounds": "Loading sounds...",
+
+    // Loading text while the renderer starts, used only when the texts lack this key.
+    "loading.task.renderer": "Initializing renderer...",
+
+    // Loading text while the room engine starts, used only when the texts lack this key.
+    "loading.task.engine": "Loading graphics engine...",
+
+    // Loading text while the session is checked, used only when the texts lack this key.
+    "loading.task.session": "Verifying session...",
+
+    // Loading text while the session starts, used only when the texts lack this key.
+    "loading.task.startsession": "Starting session...",
+
+    // Loading text while user data loads, used only when the texts lack this key.
+    "loading.task.userdata": "Loading user data...",
+
+    // Loading text while rooms load, used only when the texts lack this key.
+    "loading.task.rooms": "Loading rooms...",
+
+    // Loading text when loading completes, used only when the texts lack this key.
+    "onboarding.button.ready": "Ready!",
+
+    // Messages rotating on the loading screen, separated by "/", one about every 2.25 s.
+    "client.starting.revolving": "For science, you monster/Loading funny message…please wait./Would you like fries with that?/Follow the yellow duck./Time is just an illusion./Are we there yet?!/I like your t-shirt./Look left. Look right. Blink twice. Ta da!/It's not you, it's me./Shhh! I'm trying to think here./Loading pixel universe.",
+
+    // Loading screen headline when loading fails.
+    "client.loading.failed": "Loading failed",
+
+
+    // ==== Logging and performance ====
+    // Console logging, frame rate and the error window.
+
+    // Room animation frame rate (fps); also the cap :togglefps applies.
+    "system.fps.animation": 24,
+
+    // Render frame rate cap (fps); 0 = the display's refresh rate.
+    "system.fps.max": 60,
+
+    // Logs debug messages to the browser console, and the configuration files read.
+    "system.log.debug": true,
+
+    // Logs client warnings to the browser console.
+    "system.log.warn": true,
+
+    // Logs client errors to the browser console.
+    "system.log.error": true,
+
+    // Logs every event listener added and event dispatched to the console.
+    "system.log.events": false,
+
+    // Logs every incoming and outgoing packet to the console.
+    "system.log.packets": false,
+
+    // An uncaught client error opens a window with a copyable report.
+    "error_handling.show_error": false,
+
+    // The error window report includes the stack trace.
+    "error_handling.show_stacktrace": false
+}

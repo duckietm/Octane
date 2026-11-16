@@ -1,7 +1,7 @@
 import { AddLinkEventTracker, CreateLinkEvent, Dispose, DropBounce, EaseOut, FindNewFriendsMessageComposer, ILinkEventTracker, JumpBy, Motions, OctaneToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, RemoveLinkEventTracker, Wait, YouTubeRoomSettingsEvent } from '@octane/renderer';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { CSSProperties, FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { GetConfigurationValue, GetOptionalConfigurationValue, isHousekeepingEnabled, localizeWithFallback, MessengerIconState, OpenMessengerChat, SendMessageComposer, setYoutubeRoomEnabled, VisitDesktop } from '../../api';
+import { GetConfigurationValue, GetOptionalConfigurationValue, isBuildersClubEnabled, isHousekeepingEnabled, localizeWithFallback, MessengerIconState, OpenMessengerChat, SendMessageComposer, setYoutubeRoomEnabled, VisitDesktop } from '../../api';
 import collapseLeftImg from '../../assets/images/toolbar/air/collapse-left.png';
 import collapseRightImg from '../../assets/images/toolbar/air/collapse-right.png';
 import dividerImg from '../../assets/images/toolbar/air/divider.png';
@@ -137,7 +137,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const mentionsEnabled = useMemo(() => GetConfigurationValue<boolean>('mentions_ui.enabled', true), []);
     // The see-through bar is the default; a hotel can ask for the solid original bar with `toolbar.transparent: false`.
     const toolbarOpaqueClass = useMemo(() => (GetOptionalConfigurationValue<boolean>('toolbar.transparent', true) === false ? ' is-opaque' : ''), []);
-    const buildersClubEnabled = useMemo(() => GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true)), []);
+    const buildersClubEnabled = useMemo(() => isBuildersClubEnabled(), []);
     const fortuneWheelEnabled = useMemo(() => GetConfigurationValue<boolean>('toolbar.fortunewheel.enabled', true), []);
     const { openMonitor, showToolbarButton } = useWiredTools();
     const { enabled: soundboardEnabled, reset: resetSoundboard } = useSoundboard();

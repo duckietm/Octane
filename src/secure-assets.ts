@@ -244,7 +244,8 @@ export const secureUrl = (kind: 'config' | 'gamedata', file: string, cacheBust =
     const base = getApiBase();
     const version = cacheBust ? `&v=${encodeURIComponent(Date.now().toString(36))}` : '';
 
-    return `${base}/nitro-sec/file?kind=${encodeURIComponent(kind)}&file=${encodeURIComponent(file)}${version}`;
+    // The file name goes last, so a .jsonc URL still ends in .jsonc and the renderer parses it as JSONC in every mode.
+    return `${base}/nitro-sec/file?kind=${encodeURIComponent(kind)}${version}&file=${encodeURIComponent(file)}`;
 };
 
 export const configFileUrl = (file: string, cacheBust = false): string => {

@@ -1,81 +1,99 @@
 #!/usr/bin/env node
-// Adds the keys the shipped examples have and the hotel's own config files lack, so the client stops
-// logging "Missing configuration key". Existing values, comments and order are left as they are; the new
-// keys go at the top of the file with the example's value. `--check` only lists them.
+// Compares a hotel's configuration files (config.jsonc and the files it lists) with configuration-keys.json.
 //
-// The two files load into one store (renderer-config.json first, ui-config.json over it), so a key the hotel
-// keeps in the other file counts as present: adding the example's value to ui-config.json would override
-// the hotel's own choice. Keys of the hotel's files that no example knows are listed too (often an old or
-// misspelt name), and never touched.
+//   - missing keys: a key whose fallback the client already uses ("runtime") is added to its section with that
+//     value, so nothing changes but the file now shows it; any other missing key is only listed (its example value
+//     would change what the hotel does: copy it from config.example/ when wanted);
+//   - keys no code reads are listed (most are deprecated), never touched.
 //
-// Usage: yarn config:sync [--check]
+// A hotel still on renderer-config.json + ui-config.json is told to run yarn config:split first.
+//
+// Usage: yarn config:sync [--check]     --check writes nothing and exits 1 when a key is missing.
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
-import stripJsonComments from 'strip-json-comments';
-import { fileURLToPath } from 'url';
+import { CONFIG_DIR, configFilePath, fileOfCategory, loadRegistry, parseJsonc, sectionHeading } from './config-registry.mjs';
 
-const CONFIG_DIR = resolve(fileURLToPath(new URL('.', import.meta.url)), '..', 'public', 'configuration');
 const checkOnly = process.argv.slice(2).includes('--check');
+const basePath = resolve(CONFIG_DIR, 'config.jsonc');
 
-const PAIRS = [
-    { target: 'renderer-config.json', examples: [ 'renderer-config.example' ] },
-    { target: 'ui-config.json', examples: [ 'ui-config.example' ] }
-];
-
-const parseText = (text) => JSON.parse(stripJsonComments(text, { trailingCommas: true }));
-const parse = (file) => parseText(readFileSync(resolve(CONFIG_DIR, file), 'utf8'));
-
-let missingTotal = 0;
-
-// "// ---- Section ----" keys only group a file for reading; they are not settings.
-const settingKeys = (file) => (existsSync(resolve(CONFIG_DIR, file)) ? Object.keys(parse(file)).filter(key => !key.startsWith('//')) : []);
-const hotelKeys = new Set(PAIRS.flatMap(({ target }) => settingKeys(target)));
-const exampleKeys = new Set(PAIRS.flatMap(({ examples }) => examples.flatMap(settingKeys)));
-
-for(const { target, examples } of PAIRS)
+if(!existsSync(basePath))
 {
-    const example = examples.find(file => existsSync(resolve(CONFIG_DIR, file)));
-    const targetPath = resolve(CONFIG_DIR, target);
+    process.stdout.write('[sync-config] no config.jsonc: run "yarn config:split" to move renderer-config.json + ui-config.json into config/ first.\n');
+    process.exit(checkOnly ? 1 : 0);
+}
 
-    if(!example) continue;
+const registry = loadRegistry();
+const files = parseJsonc(readFileSync(basePath, 'utf8'))['config.files'] ?? [];
+const hotel = {};
+const fileOf = {};
 
-    if(!existsSync(targetPath))
+for(const file of files)
+{
+    const path = resolve(CONFIG_DIR, file);
+
+    if(!existsSync(path))
     {
-        process.stdout.write(`[sync-config] ${ target } does not exist: copy ${ example } to ${ target } first.\n`);
+        process.stdout.write(`[sync-config] ${ file } is listed in config.jsonc but missing: the client will fail to load the configuration.\n`);
+        process.exitCode = 1;
         continue;
     }
 
-    const own = parse(target);
-    const missing = Object.entries(parse(example)).filter(([ key ]) => !key.startsWith('//') && !hotelKeys.has(key));
-    const unknown = Object.keys(own).filter(key => !key.startsWith('//') && !exampleKeys.has(key));
+    for(const key of Object.keys(parseJsonc(readFileSync(path, 'utf8')))) { hotel[key] = true; fileOf[key] = file; }
+}
 
-    if(unknown.length) process.stdout.write(`[sync-config] ${ target }: ${ unknown.length } key(s) no example knows (kept): ${ unknown.join(', ') }\n`);
+const known = new Set();
+let missingTotal = 0;
+
+for(const category of Object.keys(registry))
+{
+    const target = configFilePath(fileOfCategory(category));
+    const [ head ] = registry[category];
+    const missing = registry[category].filter(entry => entry.key && (known.add(entry.key), !hotel[entry.key]));
+
+    if(!missing.length) continue;
 
     missingTotal += missing.length;
 
-    if(!missing.length)
+    const added = missing.filter(entry => entry.runtime);
+    const listed = missing.filter(entry => !entry.runtime);
+
+    process.stdout.write(`[sync-config] ${ target }, ${ head.title }: ${ missing.length } missing key(s)\n`);
+    for(const entry of listed) process.stdout.write(`    ${ entry.key }  (not added: copy it from config.example/${ target.slice('config/'.length) } if wanted)\n`);
+    for(const entry of added) process.stdout.write(`    ${ entry.key } = ${ JSON.stringify(entry.value) }${ checkOnly ? '' : '  (added, the value the client already uses)' }\n`);
+
+    if(checkOnly || !added.length) continue;
+
+    const path = resolve(CONFIG_DIR, target);
+
+    if(!existsSync(path) || !files.includes(target))
     {
-        process.stdout.write(`[sync-config] ${ target }: complete.\n`);
+        process.stdout.write(`    -> ${ target } is not among the files config.jsonc lists: add it there (see config.example.jsonc).\n`);
         continue;
     }
 
-    process.stdout.write(`[sync-config] ${ target }: ${ missing.length } missing key(s)\n`);
+    // Under the section's heading and its purpose line; a file without that heading gets the keys at its top.
+    const text = readFileSync(path, 'utf8');
+    const heading = text.indexOf(sectionHeading(head.title));
+    let at = text.indexOf('{') + 1;
 
-    for(const [ key, value ] of missing) process.stdout.write(`    ${ key } = ${ JSON.stringify(value) }\n`);
+    if(heading >= 0)
+    {
+        at = text.indexOf('\n', heading) + 1;
 
-    if(checkOnly) continue;
+        const purpose = text.slice(at).match(/^[ \t]*\/\/.*\r?\n/);
 
-    const text = readFileSync(targetPath, 'utf8');
-    const open = text.indexOf('{');
-    const lines = missing.map(([ key, value ]) => `    ${ JSON.stringify(key) }: ${ JSON.stringify(value) },`).join('\n');
-    // An empty object gets no trailing comma, so a strict JSON file stays strict JSON.
-    const updated = Object.keys(own).length
-        ? `${ text.slice(0, open + 1) }\n${ lines }${ text.slice(open + 1) }`
-        : `{\n${ lines.replace(/,$/, '') }\n}\n`;
+        if(purpose) at += purpose[0].length;
+    }
 
-    parseText(updated);
-    writeFileSync(targetPath, updated, 'utf8');
-    process.stdout.write(`    -> added to ${ target }\n`);
+    const lines = added.map(entry => `\n${ entry.comment ? `    // ${ entry.comment }\n` : '' }    ${ JSON.stringify(entry.key) }: ${ JSON.stringify(entry.value) },\n`).join('');
+    const updated = `${ text.slice(0, at) }${ lines }${ text.slice(at) }`;
+
+    parseJsonc(updated);
+    writeFileSync(path, updated, 'utf8');
 }
 
+const unknown = Object.keys(hotel).filter(key => !key.startsWith('//') && !known.has(key));
+
+if(unknown.length) process.stdout.write(`[sync-config] ${ unknown.length } key(s) no code reads (kept): ${ unknown.map(key => `${ key } (${ fileOf[key] })`).join(', ') }\n`);
+if(!missingTotal && !unknown.length) process.stdout.write('[sync-config] complete.\n');
 if(checkOnly && missingTotal) process.exitCode = 1;

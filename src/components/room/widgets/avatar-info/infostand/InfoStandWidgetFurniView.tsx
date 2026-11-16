@@ -27,7 +27,7 @@ import {
     BuilderFurniPlaceableStatus,
     CopyToClipboard,
     FriendlyTime,
-    GetConfigurationValue, GetOptionalConfigurationValue,
+    GetConfigurationValue, GetOptionalConfigurationValue, isBuildersClubEnabled,
     GetGroupInformation,
     getWiredChestInfostandData,
     IPhotoData,
@@ -784,7 +784,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
     const placeMoreOfferId = resolvePlaceMoreOfferId(placeMoreFurniData);
     const showPlaceMore = canPlaceMore({
         enabled: GetOptionalConfigurationValue<boolean>('infostand.place_more.enabled', false) === true,
-        buildersClubEnabled: GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true)),
+        buildersClubEnabled: isBuildersClubEnabled(),
         bcOfferId: placeMoreOfferId,
         availableForBuildersClub: avatarInfo.availableForBuildersClub,
         placeable: useCatalogStore.getState().getBuilderFurniPlaceableStatus({} as IPurchasableOffer) === BuilderFurniPlaceableStatus.OKAY,

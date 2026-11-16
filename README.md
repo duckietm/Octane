@@ -71,9 +71,9 @@ Both wrappers run `node install.mjs`, which you can also call directly. The inst
 2. Clones the renderer next to Octane (`../Octane-Renderer`) when it is not there yet
 3. Installs the renderer's dependencies
 4. Installs Octane's dependencies
-5. Copies `public/configuration/*.example` to `*.json` (existing files are kept)
+5. Copies `public/configuration/config.example.jsonc` to `config.jsonc`, the `config.example/` folder to `config/` and `client-mode.example.json` to `client-mode.json` (existing files are kept; a hotel still on `renderer-config.json` + `ui-config.json` has them moved into `config/` first, as `yarn config:split` does)
 6. Asks for the JSON parsing mode (JSONC recommended) and saves it in `.octane-build.json`
-7. Asks for your URLs and validates them
+7. Asks for your URLs and validates them, then writes `socket.url`, `api.url`, `url.prefix`, `asset.url`, `image.library.url`, `thumbnails.url` and `habbopages.url` in `config/server.jsonc` and `camera.url` in `config/features.jsonc`
 8. Asks whether to encrypt config, gamedata and `/api` (secure mode), sets the two flags in `client-mode.json`, and either patches the emulator's `config.ini` (backup first) or prints the lines to paste, with a freshly generated `nitro.secure.master_key`
 9. Builds the client
 10. Prints a summary
@@ -92,7 +92,6 @@ node install.mjs --non-interactive \
     --api-url=https://example.com \
     --asset-url=https://example.com/gamedata \
     --image-library-url=https://example.com/c_images \
-    --hof-furni-url=https://example.com/hof_furni \
     --camera-url=https://example.com/camera \
     --thumbnails-url=https://example.com/thumbnails \
     --habbopages-url=/habbopages \
@@ -132,12 +131,31 @@ Then copy the configuration examples (see below), set your URLs and build with `
 
 ## ⚙️ Configuration
 
-All runtime configuration lives in `public/configuration/`. Copy each `.example` you need to its real name:
+All runtime configuration lives in `public/configuration/`. Copy `config.example.jsonc` to `config.jsonc`, the
+`config.example/` folder to `config/`, and `client-mode.example.json` to `client-mode.json` (the installer does these); copy any other `<name>.example.json(c)` you need to `<name>.json(c)` by hand:
 
 | File | What to set |
 |---|---|
-| `renderer-config.json` | `socket.url`, `api.url`, `asset.url`, `image.library.url`, `hof.furni.url` and the asset URLs below |
-| `ui-config.json` | `camera.url`, `thumbnails.url`, `url.prefix`, `habbopages.url` |
+| `config.jsonc` | `config.files`: the files below to load, in order; a key in a later file wins over the same key in an earlier one |
+| `config/server.jsonc` | Server and connection (`socket.url`, `api.url`, `url.prefix`, `hotel.name`), Assets and game data (`asset.url`, `image.library.url`, `gamedata.url`, `thumbnails.url`, `habbopages.url`, `external.texts.url`, `furnidata.url` and the other asset URLs), Login and account (`login.*`, `account.*` endpoints), Loading screen (`loading.*`), Logging and performance (`system.log.*`, `system.fps.max`) |
+| `config/hotel.jsonc` | Avatar; Rooms, furni and navigator; Catalog, purse and currencies; Chat and mentions; Friends and groups; Quests, games, talents and help; and last, "Keys this client does not read" |
+| `config/features.jsonc` | Features on and off; Wired; Radio and soundboard; Camera (`camera.url`); Staff tools |
+| `config/data.jsonc` | the long tables: chat styles, camera effects, notification styles, room models, default figure data, recolorable palettes |
+| `client-mode.json` | `apiBaseUrl`, `plainConfigBaseUrl`, `plainGamedataBaseUrl` |
+| `UITexts_<lang>.jsonc` | the interface texts per language |
+
+`config.jsonc` and `config/` are git-ignored. Each file opens with a one-line comment on what it holds, each section with a
+`// ==== Title ====` heading and a line on its purpose, and every key has a `//` comment above it, so the files need the
+`jsonc` or `auto` mode below: `legacy` cannot read them. To find where a key lives, search `config.example/` for it.
+
+A hotel still on the old `renderer-config.json` + `ui-config.json` keeps working: when `config.jsonc` is missing,
+unreadable or lists nothing usable, the client loads those two files as before. Three commands help with the move:
+
+| Command | What it does |
+|---|---|
+| `yarn config:split` | Moves the old `renderer-config.json` + `ui-config.json` into `config.jsonc` + `config/`, keeping the hotel's values; writes the four files above, and keys no code reads go to the last section of `config/hotel.jsonc` ("Keys this client does not read"); the old files are left untouched |
+| `yarn config:sync [--check]` | Lists the keys missing from the hotel's `config/` files and adds those whose value the client already uses, under the right section heading |
+| `yarn config:examples` | Regenerates `config.example*` from `configuration-keys.json`, the one list of keys: edit that file, never the examples by hand |
 | `client-mode.json` | `apiBaseUrl`, `plainConfigBaseUrl`, `plainGamedataBaseUrl` |
 | `UITexts_<lang>.jsonc` | the interface texts per language |
 
