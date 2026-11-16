@@ -395,6 +395,9 @@
     // Maximum characters typed in the chat bar.
     "chat.input.maxlength": 100,
 
+    // Messages the chat history window keeps; the oldest go first.
+    "chat.history.max.items": 1000,
+
     // Chat area height as a fraction of the window (0-1); out of range uses 0.25.
     "chat.viewer.height.percentage": 0.25,
 
@@ -438,6 +441,9 @@
 
     // Shows the select-all box over a long online friends list.
     "friend_list.select_all.enabled": true,
+
+    // Online friends needed before the select-all box shows.
+    "friend_list.select_all.minimum": 5,
 
     // Shows the relationship icon on each friend list entry.
     "relationship.status.enabled": true,

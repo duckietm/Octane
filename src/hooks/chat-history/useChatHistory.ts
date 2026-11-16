@@ -1,12 +1,11 @@
 import { GetGuestRoomResultEvent, NewConsoleMessageEvent, RoomInviteEvent, RoomSessionEvent } from '@octane/renderer';
 import { useMemo, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { ChatEntryType, ChatHistoryCurrentDate, IChatEntry, IRoomHistoryEntry, MessengerHistoryCurrentDate } from '../../api';
+import { ChatEntryType, ChatHistoryCurrentDate, GetConfigurationValue, IChatEntry, IRoomHistoryEntry, MessengerHistoryCurrentDate } from '../../api';
 import { useMessageEvent, useOctaneEvent } from '../events';
 import { discardLocalStorage, useLocalStorage } from '../useLocalStorage';
 
 const ROOM_HISTORY_MAX = 10;
-const CHAT_HISTORY_MAX = 1000;
 const MESSENGER_HISTORY_MAX = 1000;
 
 let CHAT_HISTORY_COUNTER: number = 0;
@@ -61,7 +60,8 @@ const useChatHistoryState = () => {
 
             newValue.push(entry);
 
-            if (newValue.length > CHAT_HISTORY_MAX) newValue.shift();
+            // Several messages over a lowered limit all go, not one per new message.
+            while (newValue.length > GetConfigurationValue<number>('chat.history.max.items', 1000)) newValue.shift();
 
             return newValue;
         });

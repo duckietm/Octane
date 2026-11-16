@@ -5,7 +5,7 @@ import { CONFIGURATION_BASE_FILE, resolveConfigurationFiles } from './api/config
 import configurationDefaults from './api/configuration/configurationDefaults.json';
 import { derivePetConfig, DerivedPetConfig, PetDefinition } from './api/octane/PetData';
 import { parseJsonDocument, UiJsonMode } from './json/JsonDocumentParser';
-import { configFileUrl, getClientMode, installSecureFetch } from './secure-assets';
+import { configFileUrl, getClientMode, installSecureFetch, setRekeyEndpoints } from './secure-assets';
 
 declare const __OCTANE_JSON_MODE__: UiJsonMode | undefined;
 
@@ -205,6 +205,8 @@ try {
     await configLoad;
 
     if (petConfig) GetConfiguration().parseConfiguration(petConfig, true);
+
+    setRekeyEndpoints(['login.endpoint', 'login.remember.endpoint', 'login.logout.endpoint'].map((key) => GetConfiguration().getValue<string>(key, '')));
 
     setBootDebug('boot: configuration init done');
 } catch (error) {

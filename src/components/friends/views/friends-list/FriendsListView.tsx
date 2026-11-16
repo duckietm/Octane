@@ -27,8 +27,6 @@ import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 const ROOM_INVITE_INTERVAL_MS = 60000;
 /** AcceptFriendRequestEvent takes at most this many ids, see useFriends. */
 const MAXIMUM_BULK_REQUEST_RESPONSES = 100;
-/** AIR FriendsView: "select all" shows from this many friends. */
-const SELECT_ALL_MINIMUM = 5;
 
 export const FriendsListView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -62,7 +60,7 @@ export const FriendsListView: FC<{}> = (props) => {
     const filteredOnlineFriends = onlineFriends.filter(matchesFriendSearch);
     const filteredOfflineFriends = offlineFriends.filter(matchesFriendSearch);
     const showSelectAll =
-        isOnlineExpanded && filteredOnlineFriends.length >= SELECT_ALL_MINIMUM && GetConfigurationValue<boolean>('friend_list.select_all.enabled', true) !== false;
+        isOnlineExpanded && filteredOnlineFriends.length >= GetConfigurationValue<number>('friend_list.select_all.minimum', 5) && GetConfigurationValue<boolean>('friend_list.select_all.enabled', true) !== false;
     // AIR row order: the friends header (row 0), its friends when open, the offline header, its friends when open.
     const offlineHeaderRow = 1 + (isOnlineExpanded ? filteredOnlineFriends.length : 0);
     const friendSearchPendingRef = useRef(false);

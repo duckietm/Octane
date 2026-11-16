@@ -78,7 +78,7 @@ const getDefaultLoginImages = (): Record<string, string> => {
         right: `${imagesBase}/reception/background_right.png`
     };
 };
-const LOGIN_LOCALES: LoginLocale[] = [
+const ALL_LOGIN_LOCALES: LoginLocale[] = [
     { code: 'it', file: 'it', label: 'Italiano', flag: flagIt },
     { code: 'en', file: 'com', label: 'English', flag: flagEn },
     { code: 'es', file: 'es', label: 'Español', flag: flagEs },
@@ -88,6 +88,14 @@ const LOGIN_LOCALES: LoginLocale[] = [
     { code: 'ar', file: 'ar', label: 'العربية', flag: flagAr },
     { code: 'tr', file: 'tr', label: 'Türkçe', flag: flagTr }
 ];
+
+/** The login languages the hotel offers (`login.locales`); an empty list, or one naming none of them, offers all. */
+const getLoginLocales = (): LoginLocale[] => {
+    const codes = GetConfigurationValue<string[]>('login.locales', []);
+    const offered = Array.isArray(codes) ? ALL_LOGIN_LOCALES.filter((locale) => codes.includes(locale.code)) : [];
+
+    return offered.length ? offered : ALL_LOGIN_LOCALES;
+};
 
 const normalizeLanguageCode = (value: string): string => {
     if (!value) return '';
@@ -102,19 +110,19 @@ const normalizeLanguageCode = (value: string): string => {
 
 const resolveLoginLocale = (value: string): LoginLocale => {
     const normalized = normalizeLanguageCode(value);
-    const exactMatch = LOGIN_LOCALES.find((locale) => normalizeLanguageCode(locale.code) === normalized);
+    const exactMatch = getLoginLocales().find((locale) => normalizeLanguageCode(locale.code) === normalized);
 
     if (exactMatch) return exactMatch;
 
     const base = normalized.split('-')[0];
 
-    if (base === 'pt') return LOGIN_LOCALES.find((locale) => locale.file === 'br') || LOGIN_LOCALES[0];
+    if (base === 'pt') return getLoginLocales().find((locale) => locale.file === 'br') || getLoginLocales()[0];
 
-    return LOGIN_LOCALES.find((locale) => normalizeLanguageCode(locale.code).split('-')[0] === base) || LOGIN_LOCALES[0];
+    return getLoginLocales().find((locale) => normalizeLanguageCode(locale.code).split('-')[0] === base) || getLoginLocales()[0];
 };
 
 const getBrowserLocale = (): LoginLocale => {
-    if (typeof navigator === 'undefined') return LOGIN_LOCALES[0];
+    if (typeof navigator === 'undefined') return getLoginLocales()[0];
 
     return resolveLoginLocale(navigator.language || navigator.languages?.[0] || 'it');
 };
@@ -301,7 +309,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
 
     const changeLocaleSelection = useCallback(
         async (localeCode: string) => {
-            const locale = LOGIN_LOCALES.find((candidate) => candidate.code === localeCode);
+            const locale = getLoginLocales().find((candidate) => candidate.code === localeCode);
 
             if (!locale || localeApplying) return;
 
@@ -832,7 +840,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                                 aria-label={t('nitro.login.language.aria', 'Language selection')}
                                 onChange={(event) => void changeLocaleSelection(event.target.value)}
                             >
-                                {LOGIN_LOCALES.map((locale) => (
+                                {getLoginLocales().map((locale) => (
                                     <option key={locale.code} value={locale.code}>
                                         {locale.label}
                                     </option>

@@ -19,13 +19,18 @@
     "external.plugins.allowed.hosts": [],
     "show.google.ads": false,
     "ads.frame.url": "",
+    "sounds.url": "${asset.url}/sounds/%sample%.mp3",
     "base.locale": "en",
     "external.texts.url": [
         "${gamedata.url}/config/ExternalTexts.json?t=%timestamp%",
         "${gamedata.url}/config/UITexts.jsonc?t=%timestamp%"
     ],
     "localization.placeholder.configuration.keys": [],
+    "external.samples.url": "${gamedata.url}/sounds/sound_machine_sample_%sample%.mp3",
     "furnidata.url": "${gamedata.url}/config/FurnitureData.json?t=%timestamp%",
+    "productdata.url": "${gamedata.url}/config/ProductData.json?t=%timestamp%",
+    "furni.asset.url": "${asset.url}/furniture/%libname%.hab",
+    "pet.asset.url": "${asset.url}/pets/%libname%.hab",
     "preload.assets.urls": [
         "${images.url}/loading_icon.png",
         "${images.url}/clear_icon.png",
@@ -41,6 +46,7 @@
     "thumbnails.url": "",
     "login.screen.enabled": false,
     "login.endpoint": "/api/auth/login",
+    "login.locales": [],
     "login.register.endpoint": "/api/auth/register",
     "login.forgot.endpoint": "/api/auth/forgot-password",
     "login.reset.endpoint": "/api/auth/reset-password",
@@ -61,6 +67,35 @@
     "logout.redirect.url": "",
     "login.remember.rotate.interval.minutes": 15,
     "login.remember.cookie": false,
+    "avatar.actions.url": "${gamedata.url}/config/HabboAvatarActions.json?t=%timestamp%",
+    "avatar.figuremap.url": "${gamedata.url}/config/FigureMap.json?t=%timestamp%",
+    "avatar.effectmap.url": "${gamedata.url}/config/EffectMap.json?t=%timestamp%",
+    "avatar.asset.url": "${asset.url}/clothes/%libname%.hab",
+    "avatar.asset.effect.url": "${asset.url}/effect/%libname%.hab",
+    "avatar.mandatory.libraries": [
+        "bd:1",
+        "li:0"
+    ],
+    "avatar.mandatory.effect.libraries": [
+        "dance.1",
+        "dance.2",
+        "dance.3",
+        "dance.4"
+    ],
+    "avatar.default.actions": {
+        "actions": [
+            {
+                "id": "Default",
+                "state": "std",
+                "precedence": 1000,
+                "main": true,
+                "isDefault": true,
+                "geometryType": "vertical",
+                "activePartSet": "figure",
+                "assetPartDefinition": "std"
+            }
+        ]
+    },
     "avatar.wardrobe.max.slots": 10,
     "avatar.expression.67.enabled": false,
     "avatar.expressions_menu.enabled": true,
@@ -147,6 +182,7 @@
     "respect.replenish_cost_duckets": 50,
     "respect.talent.show.min.audience": "",
     "chat.input.maxlength": 100,
+    "chat.history.max.items": 1000,
     "chat.viewer.height.percentage": 0.25,
     "mentions_ui.enabled": true,
     "mentions_ui.sound": true,
@@ -166,6 +202,7 @@
     "friendbar.notifications.enabled": true,
     "friend_list.persistent_message_status.enabled": true,
     "friend_list.select_all.enabled": true,
+    "friend_list.select_all.minimum": 5,
     "relationship.status.enabled": true,
     "discord.enabled": false,
     "group.blocking.enabled": true,
@@ -621,6 +658,688 @@
             "isAmbassadorOnly": true
         }
     ],
+    "camera.available.effects": [
+        {
+            "name": "dark_sepia",
+            "colorMatrix": [
+                0.4,
+                0.4,
+                0.1,
+                0,
+                110,
+                0.3,
+                0.4,
+                0.1,
+                0,
+                30,
+                0.3,
+                0.2,
+                0.1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 0,
+            "enabled": true
+        },
+        {
+            "name": "increase_saturation",
+            "colorMatrix": [
+                2,
+                -0.5,
+                -0.5,
+                0,
+                0,
+                -0.5,
+                2,
+                -0.5,
+                0,
+                0,
+                -0.5,
+                -0.5,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 0,
+            "enabled": true
+        },
+        {
+            "name": "increase_contrast",
+            "colorMatrix": [
+                1.5,
+                0,
+                0,
+                0,
+                -50,
+                0,
+                1.5,
+                0,
+                0,
+                -50,
+                0,
+                0,
+                1.5,
+                0,
+                -50,
+                0,
+                0,
+                0,
+                1.5,
+                0
+            ],
+            "minLevel": 0,
+            "enabled": true
+        },
+        {
+            "name": "shadow_multiply_02",
+            "colorMatrix": [],
+            "minLevel": 0,
+            "blendMode": 2,
+            "enabled": true
+        },
+        {
+            "name": "color_1",
+            "colorMatrix": [
+                0.393,
+                0.769,
+                0.189,
+                0,
+                0,
+                0.349,
+                0.686,
+                0.168,
+                0,
+                0,
+                0.272,
+                0.534,
+                0.131,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 1,
+            "enabled": true
+        },
+        {
+            "name": "hue_bright_sat",
+            "colorMatrix": [
+                1,
+                0.6,
+                0.2,
+                0,
+                -50,
+                0.2,
+                1,
+                0.6,
+                0,
+                -50,
+                0.6,
+                0.2,
+                1,
+                0,
+                -50,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 1,
+            "enabled": true
+        },
+        {
+            "name": "hearts_hardlight_02",
+            "colorMatrix": [],
+            "minLevel": 1,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "texture_overlay",
+            "colorMatrix": [],
+            "minLevel": 1,
+            "blendMode": 4,
+            "enabled": true
+        },
+        {
+            "name": "pinky_nrm",
+            "colorMatrix": [],
+            "minLevel": 1,
+            "blendMode": 0,
+            "enabled": true
+        },
+        {
+            "name": "color_2",
+            "colorMatrix": [
+                0.333,
+                0.333,
+                0.333,
+                0,
+                0,
+                0.333,
+                0.333,
+                0.333,
+                0,
+                0,
+                0.333,
+                0.333,
+                0.333,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 2,
+            "enabled": true
+        },
+        {
+            "name": "night_vision",
+            "colorMatrix": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1.1,
+                0,
+                0,
+                -50,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 2,
+            "enabled": true
+        },
+        {
+            "name": "stars_hardlight_02",
+            "colorMatrix": [],
+            "minLevel": 2,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "coffee_mpl",
+            "colorMatrix": [],
+            "minLevel": 2,
+            "blendMode": 2,
+            "enabled": true
+        },
+        {
+            "name": "security_hardlight",
+            "colorMatrix": [],
+            "minLevel": 3,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "bluemood_mpl",
+            "colorMatrix": [],
+            "minLevel": 3,
+            "blendMode": 2,
+            "enabled": true
+        },
+        {
+            "name": "rusty_mpl",
+            "colorMatrix": [],
+            "minLevel": 3,
+            "blendMode": 2,
+            "enabled": true
+        },
+        {
+            "name": "decr_conrast",
+            "colorMatrix": [
+                0.5,
+                0,
+                0,
+                0,
+                50,
+                0,
+                0.5,
+                0,
+                0,
+                50,
+                0,
+                0,
+                0.5,
+                0,
+                50,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 4,
+            "enabled": true
+        },
+        {
+            "name": "green_2",
+            "colorMatrix": [
+                0.5,
+                0.5,
+                0.5,
+                0,
+                0,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                90,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 4,
+            "enabled": true
+        },
+        {
+            "name": "alien_hrd",
+            "colorMatrix": [],
+            "minLevel": 4,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "color_3",
+            "colorMatrix": [
+                0.609,
+                0.609,
+                0.082,
+                0,
+                0,
+                0.309,
+                0.609,
+                0.082,
+                0,
+                0,
+                0.309,
+                0.609,
+                0.082,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 5,
+            "enabled": true
+        },
+        {
+            "name": "color_4",
+            "colorMatrix": [
+                0.8,
+                -0.8,
+                1,
+                0,
+                70,
+                0.8,
+                -0.8,
+                1,
+                0,
+                70,
+                0.8,
+                -0.8,
+                1,
+                0,
+                70,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 5,
+            "enabled": true
+        },
+        {
+            "name": "toxic_hrd",
+            "colorMatrix": [],
+            "minLevel": 5,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "hypersaturated",
+            "colorMatrix": [
+                2,
+                -1,
+                0,
+                0,
+                0,
+                -1,
+                2,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 6,
+            "enabled": true
+        },
+        {
+            "name": "Yellow",
+            "colorMatrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 6,
+            "enabled": true
+        },
+        {
+            "name": "misty_hrd",
+            "colorMatrix": [],
+            "minLevel": 6,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "x_ray",
+            "colorMatrix": [
+                0,
+                1.2,
+                0,
+                0,
+                -100,
+                0,
+                2,
+                0,
+                0,
+                -120,
+                0,
+                2,
+                0,
+                0,
+                -120,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 7,
+            "enabled": true
+        },
+        {
+            "name": "decrease_saturation",
+            "colorMatrix": [
+                0.7,
+                0.2,
+                0.2,
+                0,
+                0,
+                0.2,
+                0.7,
+                0.2,
+                0,
+                0,
+                0.2,
+                0.2,
+                0.7,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 7,
+            "enabled": true
+        },
+        {
+            "name": "drops_mpl",
+            "colorMatrix": [],
+            "minLevel": 8,
+            "blendMode": 2,
+            "enabled": true
+        },
+        {
+            "name": "shiny_hrd",
+            "colorMatrix": [],
+            "minLevel": 9,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "glitter_hrd",
+            "colorMatrix": [],
+            "minLevel": 10,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "frame_gold",
+            "colorMatrix": [],
+            "minLevel": 10,
+            "blendMode": 0,
+            "enabled": true
+        },
+        {
+            "name": "frame_gray_4",
+            "colorMatrix": [],
+            "minLevel": 10,
+            "blendMode": 0,
+            "enabled": true
+        },
+        {
+            "name": "frame_black_2",
+            "colorMatrix": [],
+            "minLevel": 10,
+            "blendMode": 0,
+            "enabled": true
+        },
+        {
+            "name": "frame_wood_2",
+            "colorMatrix": [],
+            "minLevel": 10,
+            "blendMode": 0,
+            "enabled": true
+        },
+        {
+            "name": "finger_nrm",
+            "colorMatrix": [],
+            "minLevel": 10,
+            "blendMode": 0,
+            "enabled": true
+        },
+        {
+            "name": "color_5",
+            "colorMatrix": [
+                3.309,
+                0.609,
+                1.082,
+                0.2,
+                0,
+                0.309,
+                0.609,
+                0.082,
+                0,
+                0,
+                1.309,
+                0.609,
+                0.082,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 10,
+            "enabled": true
+        },
+        {
+            "name": "black_white_negative",
+            "colorMatrix": [
+                -0.5,
+                -0.5,
+                -0.5,
+                0,
+                0,
+                -0.5,
+                -0.5,
+                -0.5,
+                0,
+                0,
+                -0.5,
+                -0.5,
+                -0.5,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 10,
+            "enabled": true
+        },
+        {
+            "name": "blue",
+            "colorMatrix": [
+                0.5,
+                0.5,
+                0.5,
+                0,
+                -255,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                -170,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 10,
+            "enabled": true
+        },
+        {
+            "name": "red",
+            "colorMatrix": [
+                0.5,
+                0.5,
+                0.5,
+                0,
+                0,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                -170,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                -170,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 10,
+            "enabled": true
+        },
+        {
+            "name": "green",
+            "colorMatrix": [
+                0.5,
+                0.5,
+                0.5,
+                0,
+                -170,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                0,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                -170,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 10,
+            "enabled": true
+        }
+    ],
     "notification": {},
     "navigator.room.models": [
         {
@@ -798,5 +1517,477 @@
             "tileSize": 926,
             "name": "9"
         }
-    ]
+    ],
+    "avatar.default.figuredata": {
+        "palettes": [
+            {
+                "id": 1,
+                "colors": [
+                    {
+                        "id": 99999,
+                        "index": 1001,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "DDDDDD"
+                    },
+                    {
+                        "id": 99998,
+                        "index": 1001,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FAFAFA"
+                    }
+                ]
+            },
+            {
+                "id": 3,
+                "colors": [
+                    {
+                        "id": 10001,
+                        "index": 1001,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "EEEEEE"
+                    },
+                    {
+                        "id": 10002,
+                        "index": 1002,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FA3831"
+                    },
+                    {
+                        "id": 10003,
+                        "index": 1003,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FD92A0"
+                    },
+                    {
+                        "id": 10004,
+                        "index": 1004,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "2AC7D2"
+                    },
+                    {
+                        "id": 10005,
+                        "index": 1005,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "35332C"
+                    },
+                    {
+                        "id": 10006,
+                        "index": 1006,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "EFFF92"
+                    },
+                    {
+                        "id": 10007,
+                        "index": 1007,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "C6FF98"
+                    },
+                    {
+                        "id": 10008,
+                        "index": 1008,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FF925A"
+                    },
+                    {
+                        "id": 10009,
+                        "index": 1009,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "9D597E"
+                    },
+                    {
+                        "id": 10010,
+                        "index": 1010,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "B6F3FF"
+                    },
+                    {
+                        "id": 10011,
+                        "index": 1011,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "6DFF33"
+                    },
+                    {
+                        "id": 10012,
+                        "index": 1012,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "3378C9"
+                    },
+                    {
+                        "id": 10013,
+                        "index": 1013,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FFB631"
+                    },
+                    {
+                        "id": 10014,
+                        "index": 1014,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "DFA1E9"
+                    },
+                    {
+                        "id": 10015,
+                        "index": 1015,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "F9FB32"
+                    },
+                    {
+                        "id": 10016,
+                        "index": 1016,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "CAAF8F"
+                    },
+                    {
+                        "id": 10017,
+                        "index": 1017,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "C5C6C5"
+                    },
+                    {
+                        "id": 10018,
+                        "index": 1018,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "47623D"
+                    },
+                    {
+                        "id": 10019,
+                        "index": 1019,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "8A8361"
+                    },
+                    {
+                        "id": 10020,
+                        "index": 1020,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FF8C33"
+                    },
+                    {
+                        "id": 10021,
+                        "index": 1021,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "54C627"
+                    },
+                    {
+                        "id": 10022,
+                        "index": 1022,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "1E6C99"
+                    },
+                    {
+                        "id": 10023,
+                        "index": 1023,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "984F88"
+                    },
+                    {
+                        "id": 10024,
+                        "index": 1024,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "77C8FF"
+                    },
+                    {
+                        "id": 10025,
+                        "index": 1025,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FFC08E"
+                    },
+                    {
+                        "id": 10026,
+                        "index": 1026,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "3C4B87"
+                    },
+                    {
+                        "id": 10027,
+                        "index": 1027,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "7C2C47"
+                    },
+                    {
+                        "id": 10028,
+                        "index": 1028,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "D7FFE3"
+                    },
+                    {
+                        "id": 10029,
+                        "index": 1029,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "8F3F1C"
+                    },
+                    {
+                        "id": 10030,
+                        "index": 1030,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FF6393"
+                    },
+                    {
+                        "id": 10031,
+                        "index": 1031,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "1F9B79"
+                    },
+                    {
+                        "id": 10032,
+                        "index": 1032,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FDFF33"
+                    }
+                ]
+            }
+        ],
+        "setTypes": [
+            {
+                "type": "hd",
+                "paletteId": 1,
+                "mandatory_f_0": true,
+                "mandatory_f_1": true,
+                "mandatory_m_0": true,
+                "mandatory_m_1": true,
+                "sets": [
+                    {
+                        "id": 99999,
+                        "gender": "U",
+                        "club": 0,
+                        "colorable": true,
+                        "selectable": false,
+                        "preselectable": false,
+                        "sellable": false,
+                        "parts": [
+                            {
+                                "id": 1,
+                                "type": "bd",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            },
+                            {
+                                "id": 1,
+                                "type": "hd",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            },
+                            {
+                                "id": 1,
+                                "type": "lh",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            },
+                            {
+                                "id": 1,
+                                "type": "rh",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "bds",
+                "paletteId": 1,
+                "mandatory_f_0": false,
+                "mandatory_f_1": false,
+                "mandatory_m_0": false,
+                "mandatory_m_1": false,
+                "sets": [
+                    {
+                        "id": 10001,
+                        "gender": "U",
+                        "club": 0,
+                        "colorable": true,
+                        "selectable": false,
+                        "preselectable": false,
+                        "sellable": false,
+                        "parts": [
+                            {
+                                "id": 10001,
+                                "type": "bds",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            },
+                            {
+                                "id": 10001,
+                                "type": "lhs",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            },
+                            {
+                                "id": 10001,
+                                "type": "rhs",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            }
+                        ],
+                        "hiddenLayers": [
+                            {
+                                "partType": "bd"
+                            },
+                            {
+                                "partType": "rh"
+                            },
+                            {
+                                "partType": "lh"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "ss",
+                "paletteId": 3,
+                "mandatory_f_0": false,
+                "mandatory_f_1": false,
+                "mandatory_m_0": false,
+                "mandatory_m_1": false,
+                "sets": [
+                    {
+                        "id": 10010,
+                        "gender": "F",
+                        "club": 0,
+                        "colorable": true,
+                        "selectable": false,
+                        "preselectable": false,
+                        "sellable": false,
+                        "parts": [
+                            {
+                                "id": 10001,
+                                "type": "ss",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            }
+                        ],
+                        "hiddenLayers": [
+                            {
+                                "partType": "ch"
+                            },
+                            {
+                                "partType": "lg"
+                            },
+                            {
+                                "partType": "ca"
+                            },
+                            {
+                                "partType": "wa"
+                            },
+                            {
+                                "partType": "sh"
+                            },
+                            {
+                                "partType": "ls"
+                            },
+                            {
+                                "partType": "rs"
+                            },
+                            {
+                                "partType": "lc"
+                            },
+                            {
+                                "partType": "rc"
+                            },
+                            {
+                                "partType": "cc"
+                            },
+                            {
+                                "partType": "cp"
+                            }
+                        ]
+                    },
+                    {
+                        "id": 10011,
+                        "gender": "M",
+                        "club": 0,
+                        "colorable": true,
+                        "selectable": false,
+                        "preselectable": false,
+                        "sellable": false,
+                        "parts": [
+                            {
+                                "id": 10002,
+                                "type": "ss",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            }
+                        ],
+                        "hiddenLayers": [
+                            {
+                                "partType": "ch"
+                            },
+                            {
+                                "partType": "lg"
+                            },
+                            {
+                                "partType": "ca"
+                            },
+                            {
+                                "partType": "wa"
+                            },
+                            {
+                                "partType": "sh"
+                            },
+                            {
+                                "partType": "ls"
+                            },
+                            {
+                                "partType": "rs"
+                            },
+                            {
+                                "partType": "lc"
+                            },
+                            {
+                                "partType": "rc"
+                            },
+                            {
+                                "partType": "cc"
+                            },
+                            {
+                                "partType": "cp"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
 }

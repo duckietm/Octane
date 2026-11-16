@@ -105,7 +105,19 @@ let secureUnavailableUntil = 0;
 // Set once a bootstrap succeeded: from then on the login endpoints never fall back to the clear.
 let secureSessionEstablished = false;
 const SECURE_RETRY_MS = 5 * 60 * 1000;
+// The answers that start a new secure session: login, remembered login and logout. The configured addresses join the
+// defaults once the configuration is in (setRekeyEndpoints), so a hotel that moved them keeps the rekey.
 const REKEY_ENDPOINTS = new Set(['/api/auth/login', '/api/auth/remember', '/api/auth/logout']);
+
+export const setRekeyEndpoints = (addresses: string[]): void => {
+    for (const address of addresses) {
+        if (!address) continue;
+
+        try {
+            REKEY_ENDPOINTS.add(new URL(address, window.location.href).pathname);
+        } catch {}
+    }
+};
 
 let clientModeCache: OctaneClientMode | null = null;
 

@@ -200,6 +200,9 @@
     // Address of the login API.
     "login.endpoint": "${api.url}/api/auth/login",
 
+    // Language codes the login screen offers (it, en, es, fr, nl, de, ar, tr); empty: all of them.
+    "login.locales": [],
+
     // Address of the registration API.
     "login.register.endpoint": "${api.url}/api/auth/register",
 
