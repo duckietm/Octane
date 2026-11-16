@@ -1,4 +1,4 @@
-import { GetConfigurationValue } from '../octane';
+import { GetConfigurationValue, GetRenamedConfigurationValue } from '../octane';
 import { normalizeWebApiBaseUrl, resolveWebApiDocsUrl, resolveWebApiHotels, WebApiHotel, webApiBaseFromSocketUrl } from './WiredWebApi';
 
 /** `wired.webapi.url`, else the websocket's host and port. */
@@ -17,5 +17,5 @@ export const GetWebApiHotels = (): WebApiHotel[] => {
     return resolveWebApiHotels(GetConfigurationValue<unknown>('wired.webapi.hotels', null), base ? { name, url: base } : null);
 };
 
-/** `wired.webapi.docs_url`, default `<api base>/api/public/api-docs/`. */
-export const GetWebApiDocsUrl = (): string => resolveWebApiDocsUrl(GetConfigurationValue<string>('wired.webapi.docs_url', ''), GetDefaultWebApiBaseUrl());
+/** `wired.webapi.docs_url` (older name `wired.api.docs.link`), default `<api base>/api/public/api-docs/`. */
+export const GetWebApiDocsUrl = (): string => resolveWebApiDocsUrl(GetRenamedConfigurationValue<string>('wired.webapi.docs_url', 'wired.api.docs.link', ''), GetDefaultWebApiBaseUrl());

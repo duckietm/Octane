@@ -267,6 +267,7 @@
     "logout.redirect.url": "",
 
     // Login screen setup: images (background, sun, drape, left, right) and widgets (slot.N.widget / conf).
+    // Older name, still read: login_background, login_sun, login_drape, login_left, login_right.repeat, login_right.
     "loginview": {
         "images": {
             "background": "${asset.url}/c_images/reception/stretch_blue.png",
@@ -278,24 +279,6 @@
             "right.repeat": "${asset.url}/c_images/reception/US_top_right.png"
         }
     },
-
-    // Login background image, used when loginview.images has none and images.url is empty.
-    "login_background": "",
-
-    // Login sun image, used when loginview.images has none.
-    "login_sun": "",
-
-    // Login drape image, used when loginview.images has none and images.url is empty.
-    "login_drape": "",
-
-    // Login left image, used when loginview.images has none and images.url is empty.
-    "login_left": "",
-
-    // Login repeating right image, used when loginview.images has none.
-    "login_right.repeat": "",
-
-    // Login right image, used when loginview.images has none and images.url is empty.
-    "login_right": "",
 
     // Minutes between remembered-login token rotations (minimum 1).
     "login.remember.rotate.interval.minutes": 15,

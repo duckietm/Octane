@@ -42,7 +42,7 @@ import {
     CreateRoomSession,
     GenericErrorCode,
     GetConfigurationValue,
-    GetOptionalConfigurationValue,
+    GetRenamedConfigurationValue,
     INavigatorData,
     INavigatorLiftedRoom,
     LocalizeText,
@@ -194,8 +194,7 @@ export const useNavigatorStore = () => {
                     const isCreated = next.createdFlatId === parser.data.roomId;
                     // The data refreshes with every answer; the entry ad opens on the entry only, not on each refresh.
                     if (!isCreated && parser.data.displayRoomEntryAd && isFirstRoomEnter(parser.data.roomId)) {
-                        // roomenterad.habblet.enabled is the old name, still read for hotels that set it.
-                        const roomEnterAd = GetOptionalConfigurationValue<boolean>('roomenterad.octane.enabled', GetOptionalConfigurationValue<boolean>('roomenterad.habblet.enabled', false));
+                        const roomEnterAd = GetRenamedConfigurationValue<boolean>('roomenterad.octane.enabled', 'roomenterad.habblet.enabled', false);
 
                         if (roomEnterAd) HabboWebTools.openRoomEnterAd();
                     }

@@ -207,12 +207,13 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
 
     // getDefaultLoginImages() always sets background.colour; the AIR blue is only for a hotel that blanks it in loginview.images.
     const backgroundColor = loginImages['background.colour'] || '#6eadc8';
-    const background = interpolate(loginImages['background'] || GetConfigurationValue<string>('login_background', ''));
-    const sun = interpolate(loginImages['sun'] || GetConfigurationValue<string>('login_sun', ''));
-    const drape = interpolate(loginImages['drape'] || GetConfigurationValue<string>('login_drape', ''));
-    const left = interpolate(loginImages['left'] || GetConfigurationValue<string>('login_left', ''));
-    const rightRepeat = interpolate(loginImages['right.repeat'] || GetConfigurationValue<string>('login_right.repeat', ''));
-    const right = interpolate(loginImages['right'] || GetConfigurationValue<string>('login_right', ''));
+    // The flat login_* keys are the older names of loginview.images.
+    const background = interpolate(loginImages['background'] || GetOptionalConfigurationValue<string>('login_background', ''));
+    const sun = interpolate(loginImages['sun'] || GetOptionalConfigurationValue<string>('login_sun', ''));
+    const drape = interpolate(loginImages['drape'] || GetOptionalConfigurationValue<string>('login_drape', ''));
+    const left = interpolate(loginImages['left'] || GetOptionalConfigurationValue<string>('login_left', ''));
+    const rightRepeat = interpolate(loginImages['right.repeat'] || GetOptionalConfigurationValue<string>('login_right.repeat', ''));
+    const right = interpolate(loginImages['right'] || GetOptionalConfigurationValue<string>('login_right', ''));
     const widgetImageUrls = useMemo(
         () => loginWidgetSlots.map((slot) => (typeof slot.conf.image === 'string' ? interpolate(slot.conf.image) : '')).filter(Boolean),
         [loginWidgetSlots]

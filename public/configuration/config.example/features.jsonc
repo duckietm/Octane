@@ -90,13 +90,11 @@
     // Comma-separated darken percentages of the highlight box; empty: 0,10,...,100.
     "wired.furni_highlight.darken_levels": "",
 
-    // Address the web API box's docs link opens; empty: no link.
-    "wired.api.docs.link": "",
-
     // Web API base address; empty derives it from socket.url.
     "wired.webapi.url": "",
 
-    // Web API docs address; empty: <api base>/api/public/api-docs/.
+    // Web API docs address, opened from the web API box and the wired menu; empty: <api base>/api/public/api-docs/.
+    // Older name, still read: wired.api.docs.link.
     "wired.webapi.docs_url": "",
 
     // Hotels the variables explorer can connect to, as [{ name, url }]; null: this hotel only.
@@ -105,12 +103,6 @@
 
     // ==== Radio and soundboard ====
     // Radio stations and the soundboard.
-
-    // Address of the radio station list; empty tries radio.stations.url, then the bundled list.
-    "radio.url": "",
-
-    // Address of the older soundboard sound list; empty tries soundboard.sounds.url, then the bundled one.
-    "soundboard.url": "",
 
     // Soundboard clip address, %file% is the file; empty: nitro-assets/sounds/soundboard/%file%.
     "soundboard.asset.url": "",
@@ -121,13 +113,15 @@
     // Shows the radio player (not on touch devices).
     "radio_ui.enabled": false,
 
-    // Radio station list address, used when radio.url is empty.
+    // Address of the radio station list; empty: the list bundled with the client.
+    // Older name, still read: radio.url.
     "radio.stations.url": "",
 
     // Address of the soundboard pad layout.
     "soundboard.layout.url": "configuration/soundboard-layout.jsonc",
 
-    // Older soundboard sound list address, used when soundboard.url is empty.
+    // Address of the older soundboard sound list; empty: the list bundled with the client.
+    // Older name, still read: soundboard.url.
     "soundboard.sounds.url": "",
 
     // Base for relative soundboard clip addresses; empty uses asset.url.
@@ -143,13 +137,11 @@
     // "server": the server renders photos from the room scene; "upload": the browser renders and uploads.
     "camera.render.mode": "server",
 
-    // On: hides the publish button of the camera.
-    "camera.publish.disabled": false,
-
     // Shows the camera effects editor; off goes straight from shot to checkout.
     "camera.effects.enabled": true,
 
     // Off: hides the publish button of the camera.
+    // Older name, still read: camera.publish.disabled (inverted).
     "camera.photo.publishing.enabled": true,
 
     // Shows the photo competition entry in the camera checkout.

@@ -180,7 +180,8 @@
     // Shows the switch to spectator mode in the room queue window.
     "room.queue.spectator.enabled": false,
 
-    // Opens the room entry ad on first entry when the room asks for it; old name roomenterad.habblet.enabled.
+    // Opens the room entry ad on first entry when the room asks for it.
+    // Older name, still read: roomenterad.habblet.enabled.
     "roomenterad.octane.enabled": false,
 
     // Claim id of the dragon adoption offer; empty: the built-in default id.
@@ -258,13 +259,15 @@
     "badges.leaderboard.endpoint": "${api.url}/api/badges/leaderboard",
 
     // Shows Builders Club: toolbar button, catalog status, infostand "place more" and its pickup checks.
+    // Older name, still read: toolbar.buildersclub.enabled.
     "buildersclub.enabled": true,
 
     // On: everyone counts as VIP, so club-only clothes, colours and room limits are unlocked for all.
     "hc.disabled": false,
 
     // Shows the club extension offer under the purse.
-    "club.membership.extend.promotion.enabled": true,
+    // Older name, still read: club.membership.extend.promotion.enabled.
+    "club.membership.extend.vip.promotion.enabled": true,
 
     // Activity point types shown in the purse and the catalog header, e.g. [0, 5]; empty shows none.
     "system.currency.types": [

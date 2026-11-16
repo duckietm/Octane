@@ -38,6 +38,41 @@ export const loadRegistry = () =>
     return registry;
 };
 
+/**
+ * The old names the client still reads, by old name: { key, inverted?, field? }. `key` is the name that replaced it;
+ * `inverted` when the old switch meant the opposite; `field` when the old key is one field (a path) of the new object.
+ */
+export const oldNames = (registry) =>
+    new Map(Object.values(registry).flat().flatMap(entry => (entry.replaces ?? []).map(old => [ old.key, { ...old, key: entry.key } ])));
+
+/** Moves the old names in `values` to their new keys (a new key the hotel set wins); returns the old names moved. */
+export const renameOldKeys = (registry, values) =>
+{
+    const moved = [];
+
+    for(const [ oldKey, target ] of oldNames(registry))
+    {
+        if(!Object.prototype.hasOwnProperty.call(values, oldKey)) continue;
+
+        const value = target.inverted ? !values[oldKey] : values[oldKey];
+
+        if(target.field)
+        {
+            const holder = (values[target.key] && typeof values[target.key] === 'object') ? values[target.key] : (values[target.key] = {});
+            const parent = target.field.slice(0, -1).reduce((node, part) => ((node[part] && typeof node[part] === 'object') ? node[part] : (node[part] = {})), holder);
+            const last = target.field[target.field.length - 1];
+
+            if(!(last in parent)) parent[last] = value;
+        }
+        else if(!Object.prototype.hasOwnProperty.call(values, target.key)) values[target.key] = value;
+
+        delete values[oldKey];
+        moved.push(`${ oldKey } -> ${ target.key }${ target.field ? `.${ target.field.join('.') }` : '' }`);
+    }
+
+    return moved;
+};
+
 /** JSONC as these files use it: whole-line // comments and trailing commas. */
 export const parseJsonc = (text) => JSON.parse(text.replace(/^\s*\/\/.*$/gm, '').replace(/,(\s*[}\]])/g, '$1'));
 
@@ -75,6 +110,7 @@ export const renderFile = (registry, spec, valueOf, extra = []) =>
         {
             lines.push('');
             if(entry.comment) lines.push(`    // ${ entry.comment }`);
+            if(entry.replaces?.length) lines.push(`    // Older name, still read: ${ entry.replaces.map(old => old.key + (old.inverted ? ' (inverted)' : '')).join(', ') }.`);
             lines.push(`    ${ JSON.stringify(entry.key) }: ${ indent(JSON.stringify(entry.value, null, 4), '    ') }`);
             ends.push(lines.length - 1);
         }

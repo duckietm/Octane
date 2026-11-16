@@ -5,6 +5,7 @@
 //   - files config.jsonc lists that do not exist (the client would fail to load the configuration);
 //   - addresses an install fills in (the keys whose example is a template) that the hotel has not set;
 //   - keys set to the very value the client uses anyway: they can go, so a later client can improve that default;
+//   - old names the client still reads, with the key that replaced them;
 //   - keys no code reads (most are deprecated);
 //   - per file, how many keys keep the client's default (config.example/ shows them, with their comments).
 //
@@ -13,7 +14,7 @@
 // Usage: yarn config:sync [--check]     --check exits 1 when a file config.jsonc lists is missing.
 import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
-import { CONFIG_DIR, configFilePath, fileOfCategory, loadRegistry, parseJsonc } from './config-registry.mjs';
+import { CONFIG_DIR, configFilePath, fileOfCategory, loadRegistry, oldNames, parseJsonc } from './config-registry.mjs';
 
 const checkOnly = process.argv.slice(2).includes('--check');
 const basePath = resolve(CONFIG_DIR, 'config.jsonc');
@@ -70,13 +71,16 @@ for(const category of Object.keys(registry))
     }
 }
 
-const unknown = Object.keys(hotel).filter(key => key !== 'config.files' && !key.startsWith('//') && !known.has(key));
+const renamed = oldNames(registry);
+const old = Object.keys(hotel).filter(key => renamed.has(key));
+const unknown = Object.keys(hotel).filter(key => key !== 'config.files' && !key.startsWith('//') && !known.has(key) && !renamed.has(key));
 
 if(needsValue.length) out(`[sync-config] ${ needsValue.length } install address(es) your files do not set (copy them from config.example/ if the hotel uses them): ${ needsValue.join(', ') }`);
 if(sameAsDefault.length) out(`[sync-config] ${ sameAsDefault.length } key(s) set to the value the client uses anyway (they can go): ${ sameAsDefault.join(', ') }`);
+if(old.length) out(`[sync-config] ${ old.length } old name(s) still read, to rename: ${ old.map(key => { const target = renamed.get(key); return `${ key } -> ${ target.key }${ target.field ? `.${ target.field.join('.') }` : '' }${ target.inverted ? ' (inverted)' : '' } (${ fileOf[key] })`; }).join(', ') }`);
 if(unknown.length) out(`[sync-config] ${ unknown.length } key(s) no code reads (most are deprecated): ${ unknown.map(key => `${ key } (${ fileOf[key] })`).join(', ') }`);
 
 for(const [ target, count ] of Object.entries(atDefault)) out(`[sync-config] ${ target }: ${ count } key(s) keep the client's own value.`);
 
-if(!failing && !needsValue.length && !sameAsDefault.length && !unknown.length) out('[sync-config] complete.');
+if(!failing && !needsValue.length && !sameAsDefault.length && !old.length && !unknown.length) out('[sync-config] complete.');
 if(checkOnly && failing) process.exitCode = 1;

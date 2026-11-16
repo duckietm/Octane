@@ -64,7 +64,7 @@ describe('configuration examples', () => {
 
     it('document every key the client reads by name', () => {
         const documented = new Set(files.flatMap(([, keys]) => Object.keys(keys)));
-        const read = /\b(?:GetConfigurationValue|GetConfigurationRecord|GetConfiguration\(\)\.getValue)\s*(?:<[^>]*>)?\(\s*['"]([A-Za-z0-9_.-]+)['"]/g;
+        const read = /\b(?:GetConfigurationValue|GetConfigurationRecord|GetRenamedConfigurationValue|GetConfiguration\(\)\.getValue)\s*(?:<[^>]*>)?\(\s*['"]([A-Za-z0-9_.-]+)['"]/g;
         const undocumented = new Set<string>();
 
         for (const file of sourceFiles(join(process.cwd(), 'src'))) {
@@ -91,7 +91,7 @@ const literal = (text: string): { ok: boolean; value?: unknown } => {
 };
 
 describe('configuration-keys.json', () => {
-    type Entry = { key?: string; value?: unknown; runtime?: boolean };
+    type Entry = { key?: string; value?: unknown; runtime?: boolean; replaces?: { key: string }[] };
     const registry: Record<string, Entry[]> = JSON.parse(readFileSync(join(process.cwd(), 'configuration-keys.json'), 'utf8'));
     const entries = Object.values(registry).flat().filter((entry) => entry.key);
     const documented = new Map(entries.map((entry) => [entry.key, entry.value]));
@@ -117,6 +117,27 @@ describe('configuration-keys.json', () => {
         }
 
         expect(disagreeing).toEqual([]);
+    });
+
+    it('records every old name the client still reads under the key that replaced it', () => {
+        const renamedCall =
+            /\bGetRenamedConfigurationValue\s*(?:<[^>]*>)?\(\s*['"]([A-Za-z0-9_.-]+)['"]\s*,\s*['"]([A-Za-z0-9_.-]+)['"]\s*,\s*((?:'[^']*'|"[^"]*"|\[[^\]]*\]|[^,()])+?)\s*\)/g;
+        const replaces = new Map(entries.map((entry) => [entry.key, (entry.replaces ?? []).map((old) => old.key)]));
+        const problems: string[] = [];
+
+        for (const file of sourceFiles(join(process.cwd(), 'src'))) {
+            for (const match of readFileSync(file, 'utf8').matchAll(renamedCall)) {
+                const where = file.slice(process.cwd().length + 1);
+                const parsed = literal(match[3]);
+
+                if (!replaces.get(match[1])?.includes(match[2])) problems.push(`${match[2]} is not under ${match[1]}.replaces (${where})`);
+                if (parsed.ok && JSON.stringify(parsed.value) !== JSON.stringify(documented.get(match[1]))) {
+                    problems.push(`${match[1]}: ${match[3].trim()} vs ${JSON.stringify(documented.get(match[1]))} (${where})`);
+                }
+            }
+        }
+
+        expect(problems).toEqual([]);
     });
 
     // A read with no fallback gets undefined when the hotel leaves the key out, unless the value is registered at boot:
