@@ -43,8 +43,8 @@ export const parseJsonc = (text) => JSON.parse(text.replace(/^\s*\/\/.*$/gm, '')
 
 const indent = (text, by) => text.replace(/\n/g, `\n${ by }`);
 
-/** The heading line a section starts with; sync-config.mjs finds sections by it. */
-export const sectionHeading = (title) => `    // ==== ${ title } ====`;
+/** The heading line a section starts with. */
+const sectionHeading = (title) => `    // ==== ${ title } ====`;
 
 /**
  * One configuration file: a line on what it holds, then one section per category (heading, purpose, then each key

@@ -2,8 +2,8 @@
 // Moves a hotel's old renderer-config.json + ui-config.json into config.jsonc + config/ (server, hotel, features, data).
 //
 //   - each key the hotel set goes to its section with the hotel's value and the example's comment;
-//   - a key the hotel did not set is written only when it is a boot fallback ("runtime"): the client already uses that
-//     value, so nothing changes; the others are listed, to add from config.example/ when wanted;
+//   - a key the hotel did not set is left out: the client keeps its own default, and a later client may improve it.
+//     config.example/ shows every key with its comment, to copy the ones the hotel wants to change;
 //   - keys configuration-keys.json does not know go to the last section of config/hotel.jsonc (most are deprecated:
 //     check and delete them);
 //   - the old files are left where they are; with config.jsonc present the client no longer reads them.
@@ -50,7 +50,6 @@ export const splitConfiguration = ({ configDir = CONFIG_DIR, dry = false, log = 
         known.add(entry.key);
 
         if(Object.prototype.hasOwnProperty.call(hotel, entry.key)) return hotel[entry.key];
-        if(entry.runtime) return entry.value;
 
         notSet.push(entry.key);
 
@@ -83,7 +82,7 @@ export const splitConfiguration = ({ configDir = CONFIG_DIR, dry = false, log = 
 
     log(`[config-split] ${ dry ? 'would write' : 'wrote' } config.jsonc and ${ outputs.length - 1 } file(s) under config/ from ${ present.join(' + ') }.`);
     if(unknown.length) log(`[config-split] ${ unknown.length } key(s) no code reads went to the last section of config/hotel.jsonc: ${ unknown.join(', ') }`);
-    if(notSet.length) log(`[config-split] ${ notSet.length } key(s) your files did not set are left out (see config.example/): ${ notSet.join(', ') }`);
+    if(notSet.length) log(`[config-split] ${ notSet.length } key(s) your files did not set are left out and keep the client's default; config.example/ shows them all.`);
     log('[config-split] the old files were not touched; with config.jsonc present the client reads config/ instead.');
 
     return { written: outputs.map(([ file ]) => file), unknown, notSet, skipped: false };

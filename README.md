@@ -153,8 +153,8 @@ unreadable or lists nothing usable, the client loads those two files as before. 
 
 | Command | What it does |
 |---|---|
-| `yarn config:split` | Moves the old `renderer-config.json` + `ui-config.json` into `config.jsonc` + `config/`, keeping the hotel's values; writes the four files above, and keys no code reads go to the last section of `config/hotel.jsonc` ("Keys this client does not read"); the old files are left untouched |
-| `yarn config:sync [--check]` | Lists the keys missing from the hotel's `config/` files and adds those whose value the client already uses, under the right section heading |
+| `yarn config:split` | Moves the old `renderer-config.json` + `ui-config.json` into `config.jsonc` + `config/`, keeping the hotel's values and only the keys the hotel set (the rest keeps the client's own value, `config.example/` shows it); writes the four files above, and keys no code reads go to the last section of `config/hotel.jsonc` ("Keys this client does not read"); the old files are left untouched |
+| `yarn config:sync [--check]` | Reports, never writes: files `config.jsonc` lists that are missing (`--check` exits 1), install addresses not set, keys set to the value the client uses anyway (they can go), keys no code reads, and how many keys keep the client's own value |
 | `yarn config:examples` | Regenerates `config.example*` from `configuration-keys.json`, the one list of keys: edit that file, never the examples by hand |
 | `client-mode.json` | `apiBaseUrl`, `plainConfigBaseUrl`, `plainGamedataBaseUrl` |
 | `UITexts_<lang>.jsonc` | the interface texts per language |
