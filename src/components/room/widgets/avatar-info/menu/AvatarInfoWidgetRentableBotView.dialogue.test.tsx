@@ -21,6 +21,7 @@ vi.mock('@octane/renderer', () => {
         BotDialogueEvent: class {},
         BotDialogueOpenComposer: class extends Keep {},
         BotDialogueChooseComposer: class extends Keep {},
+        BotDialogueWindowEvent: class {},
         BotRemoveComposer: Keep,
         BotSkillSaveComposer: Keep,
         CreateLinkEvent: vi.fn(),
@@ -50,7 +51,7 @@ vi.mock('../../context-menu/ContextMenuView', () => ({
     ContextMenuView: ({ children }: { children: ReactNode }) => <div data-testid="menu">{children}</div>
 }));
 
-import { BotDialogueChooseComposer, BotDialogueEvent, BotDialogueOpenComposer } from '@octane/renderer';
+import { BotDialogueChooseComposer, BotDialogueEvent, BotDialogueOpenComposer, BotDialogueWindowEvent } from '@octane/renderer';
 import { AvatarInfoWidgetRentableBotView } from './AvatarInfoWidgetRentableBotView';
 
 afterEach(() => {
@@ -95,5 +96,28 @@ describe('AvatarInfoWidgetRentableBotView dialogue', () => {
         page(-7, 0, '', []);
 
         expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('gives way to the window of the bot when it has nothing else to show', () => {
+        const onClose = vi.fn();
+        const windowFor = (botId: number) => act(() => mocks.handlers.get(BotDialogueWindowEvent)?.({ getParser: () => ({ botId, nonce: 9, closed: false }) }));
+
+        render(<AvatarInfoWidgetRentableBotView avatarInfo={bot} onClose={onClose} />);
+        windowFor(-8);
+
+        expect(onClose).not.toHaveBeenCalled();
+
+        windowFor(-7);
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('stays open for the room owner when the window opens', () => {
+        const onClose = vi.fn();
+
+        render(<AvatarInfoWidgetRentableBotView avatarInfo={{ ...bot, amIOwner: true }} onClose={onClose} />);
+        act(() => mocks.handlers.get(BotDialogueWindowEvent)?.({ getParser: () => ({ botId: -7, nonce: 9, closed: false }) }));
+
+        expect(onClose).not.toHaveBeenCalled();
     });
 });

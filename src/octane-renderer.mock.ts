@@ -469,6 +469,15 @@ export class PluginChannelActionComposer {
 
 // Bot dialogues in the bot menu: the page event and the two composers, which keep what they send.
 export class BotDialogueEvent extends StubClass {}
+export class BotDialogueWindowEvent extends StubClass {}
+export class BotDialogueWindowChooseComposer {
+    constructor(
+        public readonly botId: number,
+        public readonly nonce: number,
+        public readonly index: number,
+        public readonly amount: number
+    ) {}
+}
 export class BotDialogueOpenComposer {
     constructor(public readonly botId: number) {}
 }

@@ -21,6 +21,7 @@ import { ChatWidgetView } from './chat/ChatWidgetView';
 import { ChatInputView } from './chat-input/ChatInputView';
 import { FurniChooserWidgetView } from './choosers/FurniChooserWidgetView';
 import { UserChooserWidgetView } from './choosers/UserChooserWidgetView';
+import { BotDialogueWindowView } from './bot-dialogue/BotDialogueWindowView';
 import { DoorbellWidgetView } from './doorbell/DoorbellWidgetView';
 import { FriendRequestWidgetView } from './friend-request/FriendRequestWidgetView';
 import { FurnitureWidgetsView } from './furniture/FurnitureWidgetsView';
@@ -260,6 +261,9 @@ export const RoomWidgetsView: FC<{}> = (props) => {
                 </WidgetErrorBoundary>
                 <WidgetErrorBoundary name="RoomKeybind">
                     <RoomKeybindView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="BotDialogueWindow">
+                    <BotDialogueWindowView />
                 </WidgetErrorBoundary>
                 <WidgetErrorBoundary name="DoorbellWidget">
                     <DoorbellWidgetView />

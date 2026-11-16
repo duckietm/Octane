@@ -3,6 +3,7 @@ import {
     BotDialogueChooseComposer,
     BotDialogueEvent,
     BotDialogueOpenComposer,
+    BotDialogueWindowEvent,
     BotRemoveComposer,
     BotSkillSaveComposer,
     CreateLinkEvent,
@@ -173,6 +174,16 @@ export const AvatarInfoWidgetRentableBotView: FC<AvatarInfoWidgetRentableBotView
 
     const canControl = avatarInfo.amIOwner || avatarInfo.amIAnyRoomController;
     const commandButtons = getRentableBotCommandButtons(avatarInfo.botSkillsWithCommands ?? []);
+
+    // A bot whose dialogue opens a window of its own: the window takes over, and the menu stays only for the room's
+    // controls (pick up, rotate...), the inspection or the bot's own buttons.
+    useMessageEvent<BotDialogueWindowEvent>(BotDialogueWindowEvent, (event) => {
+        const parser = event.getParser();
+
+        if (parser.botId !== botId || parser.closed) return;
+
+        if (!canControl && !showInspectButton && !commandButtons.length) onClose();
+    });
 
     // AIR RentableBotMenuView: in-client link and navigator search buttons open their link, a NUX proceed
     // button answers the bot with its step; every one of them closes the menu.
