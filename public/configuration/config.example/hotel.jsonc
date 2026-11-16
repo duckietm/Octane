@@ -361,8 +361,8 @@
     // Shows the name and description tooltip on badge images.
     "badge.descriptions.enabled": true,
 
-    // Comma-separated badge codes hidden from the catalog badge picker.
-    "badge.display.excluded.badgeCodes": "",
+    // Badge codes hidden from the badge picker of the catalog badge display, e.g. ["ADM", "MOD"].
+    "badge.display.excluded.badgeCodes": [],
 
     // Treats uncommon badges as their own rarity tier with a glow; off counts them as common.
     "badge_rarity.uncommon": false,
@@ -518,16 +518,13 @@
     // Seconds without chatting before a new player gets the "type here" chat bar hint.
     "nux.noob.chat.reminder.delay": 240,
 
-    // Set to "1" by the client once the chat reminder showed; "1" here skips it.
-    "nux.chat.reminder.shown": "",
-
     // Badge code prefixes (digits removed) never counted as unseen achievements.
     "achievements.unseen.ignored": [
         "ACH_AllTimeHotelPresence"
     ],
 
-    // Comma-separated badge codes shown with the "new" label in the achievements window.
-    "achievements.new": "",
+    // Badge codes shown with the "new" label in the achievements window.
+    "achievements.new": [],
 
     // Turns on the seasonal quest calendar.
     "seasonalQuestCalendar.enabled": false,
@@ -536,7 +533,7 @@
     "seasonalQuestCalendar.campaignPrefix": "xmas13",
 
     // Activity point type whose balance the seasonal calendar shows.
-    "seasonalQuestCalendar.currency": "0",
+    "seasonalQuestCalendar.currency": 0,
 
     // Most days the seasonal calendar shows; 0 uses the default 42.
     "seasonalQuestCalendar.maximum.entities": 42,

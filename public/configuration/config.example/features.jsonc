@@ -38,8 +38,8 @@
     // Mystery box "How does it work?" link: a habbopages/ page or web address; empty hides it.
     "mysterybox.faq.url": "habbopages/mysterybox/faq",
 
-    // Comma-separated keys of the new-feature notifications to show.
-    "notifications.new_feature.active": "rewardtrack_intro",
+    // Keys of the new-feature notifications to show, e.g. ["rewardtrack_intro"].
+    "notifications.new_feature.active": [],
 
     // Style of this notification: normal, promo or countdown.
     "notifications.new_feature.type.rewardtrack_intro": "promo",
@@ -60,8 +60,8 @@
     // Maximum characters of the kick message in the kick wired box.
     "wired.action.kick.from.room.max.length": 100,
 
-    // Comma-separated time zones the room and time conditions can pick; empty lists all known zones.
-    "wired.timezones": "",
+    // Timezones the room and the time / date wired conditions offer, e.g. ["Europe/Rome"]; empty: every zone the browser knows.
+    "wired.timezones": [],
 
     // Shows the self-donation button in the wired tools settings tab.
     "wired.selfdonation.enabled": false,
@@ -87,8 +87,8 @@
     // Capacity each furni chest upgrade adds.
     "wired.furni_chest.upgrade_capacity": 1000,
 
-    // Comma-separated darken percentages of the highlight box; empty: 0,10,...,100.
-    "wired.furni_highlight.darken_levels": "",
+    // Darken levels the furni highlight effect offers, e.g. [0, 25, 50, 75]; empty: the built-in levels.
+    "wired.furni_highlight.darken_levels": [],
 
     // Web API base address; empty derives it from socket.url.
     "wired.webapi.url": "",

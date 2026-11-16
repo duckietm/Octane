@@ -14,7 +14,7 @@ vi.mock('../../../../api', async () => {
 
     return {
         buildTimezoneOptions,
-        GetConfigurationValue: () => configuredZones,
+        GetConfigurationList: () => configuredZones.split(',').map((zone) => zone.trim()).filter(Boolean),
         LocalizeText: (key: string) => key,
         localizeWithFallback: (key: string, fallback: string) => fallback,
         WiredFurniType: { STUFF_SELECTION_OPTION_NONE: 0 }

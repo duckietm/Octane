@@ -3,7 +3,7 @@
  * SingularNotificationController.maybeShowNewFeatureNotification), as pure rules. Everything is driven by
  * hotel properties (AIR's external variables, our configuration):
  *
- *   notifications.new_feature.active                 comma list of keys
+ *   notifications.new_feature.active                 list of keys (or a comma list)
  *   notifications.new_feature.condition.<key>        "reward_track_incomplete:<track id>" (else always shown)
  *   notifications.new_feature.type.<key>             normal (default) | promo | countdown
  *   notifications.new_feature.expiry.<key>           server time ("yyyy-MM-dd HH:mm"): gone once it passed

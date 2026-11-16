@@ -21,6 +21,17 @@ export function GetRenamedConfigurationValue<T = string>(key: string, oldKey: st
 }
 
 /**
+ * A list setting, written as a JSON array or in the older form of one string with separators ("a,b,c"): either way
+ * its trimmed, non-empty entries.
+ */
+export function GetConfigurationList(key: string, separator = ','): string[] {
+    const value = GetConfiguration().getValue<unknown>(key, []);
+    const entries = Array.isArray(value) ? value : typeof value === 'string' ? value.split(separator) : [];
+
+    return entries.map((entry) => String(entry).trim()).filter(Boolean);
+}
+
+/**
  * A configuration value that is an object of settings (`hc.center`, `catalog.links`, ...), or an empty one when the
  * key is missing or holds something else, so reading one field of it never throws on a partial or older config.
  */
