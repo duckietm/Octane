@@ -293,6 +293,9 @@
     // Shows the page header image above the offer grid of default catalog pages.
     "catalog.headers": false,
 
+    // Shows each page's icon in front of its name on the catalog's top tabs; false: labels only, as in AIR.
+    "catalog.tab.icons": false,
+
     // Catalog page names that club, gift and pet buttons open (hc.buy_hc, hc.hc_gifts, pets.buy_food...).
     "catalog.links": {
         "hc.buy_hc": "habbo_club",

@@ -203,6 +203,7 @@
         {"key":"hc.center","comment":"Club center: which info boxes show (payday, gift, benefits) and the help pages their links open.","value":{"benefits.info":true,"payday.info":true,"gift.info":true,"benefits.habbopage":"habboclub","payday.habbopage":"hcpayday"}},
         {"key":"seasonalcurrencyindicator.page","comment":"Catalog page opened by clicking the seasonal currency row of the purse; empty: no page.","value":"","runtime":true},
         {"key":"catalog.headers","comment":"Shows the page header image above the offer grid of default catalog pages.","value":false},
+        {"key":"catalog.tab.icons","comment":"Shows each page's icon in front of its name on the catalog's top tabs; false: labels only, as in AIR.","value":false,"runtime":true},
         {"key":"catalog.links","comment":"Catalog page names that club, gift and pet buttons open (hc.buy_hc, hc.hc_gifts, pets.buy_food...).","value":{"hc.buy_hc":"habbo_club","hc.hc_gifts":"club_gifts","pets.buy_food":"pet_food","pets.buy_saddle":"saddles"}},
         {"key":"catalog.vip.benefits.enabled","comment":"Club benefits button opens the built-in benefits window; off opens link.format.club instead.","value":true,"runtime":true},
         {"key":"catalog.multiple.purchase.enabled","comment":"Shows the quantity spinner for offers that allow buying several at once.","value":true,"runtime":true},

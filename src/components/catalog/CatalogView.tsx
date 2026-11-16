@@ -67,6 +67,8 @@ const CatalogViewInner: FC<{}> = () => {
     const stripSwfTabSuffix = (label: string) => (label || '').replace(/\s*\(\D[^)]*\)\s*$/g, '').trim();
     const getSwfTabLabel = (label: string) => stripSwfTabSuffix(parseCatalogTabLabel(label).name);
     const tabsShellRef = useRef<HTMLDivElement>(null);
+    // AIR draws the top tabs as labels only; a hotel can add each page's icon in front of its name.
+    const showTabIcons = GetConfigurationValue<boolean>('catalog.tab.icons', false);
 
     const visibleRootTabCount = useMemo(() => {
         if (!rootNode?.children?.length) return 0;
@@ -233,6 +235,7 @@ const CatalogViewInner: FC<{}> = () => {
                                             }}
                                         >
                                             <div className="flex items-center gap-1">
+                                                {showTabIcons && <CatalogIconView icon={child.iconId} className="octane-catalog-tab-icon" />}
                                                 <span className="octane-catalog-tab-label">
                                                     <CssNativeText
                                                         colorKey={child.isActive}

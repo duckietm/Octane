@@ -104,6 +104,7 @@
     "currency.display.number.short": false,
     "activity.point.display.enabled": true,
     "seasonalcurrencyindicator.page": "",
+    "catalog.tab.icons": false,
     "catalog.vip.benefits.enabled": true,
     "catalog.multiple.purchase.enabled": true,
     "catalog.new.additions.page.open.disabled": false,
