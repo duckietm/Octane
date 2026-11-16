@@ -343,7 +343,7 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                                     {LocalizeText('infostand.button.friend')}
                                 </ContextMenuListItemView>
                             )}
-                            {shouldShowTrade(avatarInfo.canTrade, isBlocked, GetConfigurationValue('talent.track.citizenship.enabled', false)) && (
+                            {shouldShowTrade(avatarInfo.canTrade, isBlocked, GetConfigurationValue<boolean>('talent.track.citizenship.enabled', true)) && (
                                 <ContextMenuListItemView
                                     disabled={!!tradeBlockedKey}
                                     title={tradeBlockedKey ? LocalizeText(tradeBlockedKey) : undefined}

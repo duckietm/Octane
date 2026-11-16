@@ -163,7 +163,7 @@
     // Moderation tools and housekeeping.
 
     // Master switch of the housekeeping panel; staff permissions still apply.
-    "housekeeping.enabled": true,
+    "housekeeping.enabled": false,
 
     // Shows the action metrics section in the housekeeping audit tab.
     "housekeeping.telemetry.enabled": false,

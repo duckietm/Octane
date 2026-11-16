@@ -20,15 +20,30 @@
     "show.google.ads": false,
     "ads.frame.url": "",
     "base.locale": "en",
+    "external.texts.url": [
+        "${gamedata.url}/config/ExternalTexts.json?t=%timestamp%",
+        "${gamedata.url}/config/UITexts.jsonc?t=%timestamp%"
+    ],
     "localization.placeholder.configuration.keys": [],
+    "furnidata.url": "${gamedata.url}/config/FurnitureData.json?t=%timestamp%",
+    "preload.assets.urls": [
+        "${images.url}/loading_icon.png",
+        "${images.url}/clear_icon.png",
+        "${images.url}/big_arrow.png"
+    ],
     "group.badge.url": "%imagerdata%",
     "room.branding.image.hosts": [],
+    "habbopages.url": "/gamedata/habbopages/",
     "image.library.questing.url": "",
     "image.library.dailytasks.url": "",
+    "catalog.asset.url": "${image.library.url}catalogue",
+    "catalog.asset.image.url": "${catalog.asset.url}/%name%.gif",
+    "thumbnails.url": "",
     "login.screen.enabled": false,
     "login.endpoint": "/api/auth/login",
     "login.register.endpoint": "/api/auth/register",
     "login.forgot.endpoint": "/api/auth/forgot-password",
+    "login.reset.endpoint": "/api/auth/reset-password",
     "login.logout.endpoint": "/api/auth/logout",
     "login.health.method": "GET",
     "login.check-email.endpoint": "/api/auth/check-email",
@@ -68,6 +83,7 @@
     "furni.rotation.bounce.height": 0.0625,
     "room.zoom.enabled": true,
     "room.planes.direct": false,
+    "room.color.skip.transition": false,
     "room.camera.follow_user": true,
     "room.camera.move.speed": 12,
     "landing.view.roomcategory": "random_friending_room",
@@ -95,8 +111,14 @@
     "widget.dimmer.colorwheel": false,
     "trading.warning.enabled": true,
     "bot.name.max.length": 15,
+    "pet.package.name.max.length": 15,
     "room.dragging.always_center": false,
     "infostand.place_more.enabled": false,
+    "badges.custom.list.endpoint": "/api/badges/custom",
+    "badges.custom.create.endpoint": "/api/badges/custom",
+    "badges.custom.update.endpoint": "/api/badges/custom/%badgeId%",
+    "badges.custom.delete.endpoint": "/api/badges/custom/%badgeId%",
+    "badges.custom.texts.endpoint": "/api/badges/custom/texts",
     "badges.leaderboard.endpoint": "/api/badges/leaderboard",
     "hc.disabled": false,
     "club.membership.extend.promotion.enabled": true,
@@ -105,6 +127,12 @@
     "activity.point.display.enabled": true,
     "seasonalcurrencyindicator.page": "",
     "catalog.tab.icons": false,
+    "catalog.links": {
+        "hc.buy_hc": "habbo_club",
+        "hc.hc_gifts": "club_gifts",
+        "pets.buy_food": "pet_food",
+        "pets.buy_saddle": "saddles"
+    },
     "catalog.vip.benefits.enabled": true,
     "catalog.multiple.purchase.enabled": true,
     "catalog.new.additions.page.open.disabled": false,
@@ -127,6 +155,19 @@
     "chat.viewer.height.percentage": 0.25,
     "mentions_ui.enabled": true,
     "mentions_ui.sound": true,
+    "mentions_ui.aliases.everyone": [
+        "all",
+        "everyone",
+        "tutti"
+    ],
+    "mentions_ui.aliases.friends": [
+        "friends",
+        "amici"
+    ],
+    "mentions_ui.aliases.room": [
+        "room",
+        "stanza"
+    ],
     "friendbar.notifications.enabled": true,
     "friend_list.persistent_message_status.enabled": true,
     "friend_list.select_all.enabled": true,
@@ -134,10 +175,14 @@
     "discord.enabled": false,
     "group.blocking.enabled": true,
     "groupforum.poll.period": 300,
+    "collectibles.discord.link": "",
+    "wired.discord.link": "",
+    "origins.discord.link": "",
     "toolbar.hide.quests": false,
     "game.center.allowed.hosts": [],
     "games.highscores.enabled": true,
     "dailytasks.enabled": true,
+    "guides.enabled": false,
     "guide.help.alpha.groupid": 0,
     "guardians.enabled": true,
     "chatreviewreporterfeedbackctrl.enabled": true,
@@ -152,6 +197,7 @@
     "seasonalQuestCalendar.currency": "0",
     "seasonalQuestCalendar.maximum.entities": 42,
     "talent.track.enabled": true,
+    "talent.track.citizenship.enabled": true,
     "new.user.citizenship.popup.enabled": false,
     "new.user.promo.delay": 10,
     "new.user.promo.room.delay": 180,
@@ -174,6 +220,8 @@
     "wired.webapi.docs_url": "",
     "wired.webapi.hotels": null,
     "radio_ui.enabled": false,
+    "soundboard.layout.url": "configuration/soundboard-layout.jsonc",
+    "housekeeping.enabled": false,
     "housekeeping.telemetry.enabled": false,
     "housekeeping.audit.poll_interval_ms": 30000,
     "habboinfotool.url": "",
@@ -198,5 +246,562 @@
     "system.log.packets": false,
     "error_handling.show_error": false,
     "error_handling.show_stacktrace": false,
-    "notification": {}
+    "chat.styles": [
+        {
+            "styleId": 0,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 1,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 2,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 3,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 4,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 5,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 6,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 7,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 8,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 9,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 10,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 11,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 12,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 13,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 14,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 15,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 16,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 17,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 18,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 19,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 20,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 21,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 22,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 23,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 24,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 25,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 26,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 27,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 28,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 29,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 30,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 31,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 32,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 33,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 34,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 35,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 36,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 37,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 38,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 39,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 40,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 41,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 42,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 43,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 44,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 45,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 46,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 47,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 48,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 49,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 50,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 51,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 52,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 53,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        }
+    ],
+    "notification": {},
+    "navigator.room.models": [
+        {
+            "clubLevel": 0,
+            "tileSize": 104,
+            "name": "a"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 94,
+            "name": "b"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 36,
+            "name": "c"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 84,
+            "name": "d"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 80,
+            "name": "e"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 80,
+            "name": "f"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 416,
+            "name": "i"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 320,
+            "name": "j"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 448,
+            "name": "k"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 352,
+            "name": "l"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 384,
+            "name": "m"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 372,
+            "name": "n"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 80,
+            "name": "g"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 74,
+            "name": "h"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 416,
+            "name": "o"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 352,
+            "name": "p"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 304,
+            "name": "q"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 336,
+            "name": "r"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 748,
+            "name": "u"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 438,
+            "name": "v"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 540,
+            "name": "t"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 512,
+            "name": "w"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 396,
+            "name": "x"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 440,
+            "name": "y"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 456,
+            "name": "z"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 208,
+            "name": "0"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 1009,
+            "name": "1"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 1044,
+            "name": "2"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 183,
+            "name": "3"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 254,
+            "name": "4"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 1024,
+            "name": "5"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 801,
+            "name": "6"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 354,
+            "name": "7"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 888,
+            "name": "8"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 926,
+            "name": "9"
+        }
+    ]
 }

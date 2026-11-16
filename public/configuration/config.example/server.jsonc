@@ -32,6 +32,9 @@
     // Hotel name shown in the Discord activity preview ("Playing %hotel%").
     "hotel.name": "Hotel",
 
+    // Origin of the page that embeds the client in a frame, the only one it posts messages to; empty: none.
+    "legacy.parent.origin": "",
+
     // Public address of the hotel site: room share links, YouTube furni and ${url.prefix} in texts.
     "url.prefix": "",
 
@@ -202,6 +205,9 @@
 
     // Address of the forgot-password API.
     "login.forgot.endpoint": "${api.url}/api/auth/forgot-password",
+
+    // Address of the reset-password API, the page a reset link opens.
+    "login.reset.endpoint": "${api.url}/api/auth/reset-password",
 
     // Address of the logout API called by the purse logout button.
     "login.logout.endpoint": "${api.url}/api/auth/logout",

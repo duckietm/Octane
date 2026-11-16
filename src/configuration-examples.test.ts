@@ -93,7 +93,9 @@ const literal = (text: string): { ok: boolean; value?: unknown } => {
 describe('configuration-keys.json', () => {
     type Entry = { key?: string; value?: unknown; runtime?: boolean };
     const registry: Record<string, Entry[]> = JSON.parse(readFileSync(join(process.cwd(), 'configuration-keys.json'), 'utf8'));
-    const runtime = new Map(Object.values(registry).flat().filter((entry) => entry.key && entry.runtime).map((entry) => [entry.key, entry.value]));
+    const entries = Object.values(registry).flat().filter((entry) => entry.key);
+    const documented = new Map(entries.map((entry) => [entry.key, entry.value]));
+    const runtime = new Set(entries.filter((entry) => entry.runtime).map((entry) => entry.key));
 
     it('is what the examples and the boot defaults were generated from (yarn config:examples)', () => {
         expect(() => execFileSync(process.execPath, [join(process.cwd(), 'scripts', 'config-examples.mjs'), '--check'], { encoding: 'utf8' })).not.toThrow();
@@ -107,13 +109,33 @@ describe('configuration-keys.json', () => {
             for (const match of readFileSync(file, 'utf8').matchAll(call)) {
                 const parsed = literal(match[2]);
 
-                if (!parsed.ok || !runtime.has(match[1])) continue;
-                if (JSON.stringify(parsed.value) !== JSON.stringify(runtime.get(match[1]))) {
-                    disagreeing.push(`${match[1]}: ${match[2].trim()} vs ${JSON.stringify(runtime.get(match[1]))} (${file.slice(process.cwd().length + 1)})`);
+                if (!parsed.ok || !documented.has(match[1])) continue;
+                if (JSON.stringify(parsed.value) !== JSON.stringify(documented.get(match[1]))) {
+                    disagreeing.push(`${match[1]}: ${match[2].trim()} vs ${JSON.stringify(documented.get(match[1]))} (${file.slice(process.cwd().length + 1)})`);
                 }
             }
         }
 
         expect(disagreeing).toEqual([]);
+    });
+
+    // A read with no fallback gets undefined when the hotel leaves the key out, unless the value is registered at boot:
+    // the registry must not promise a value the client never applies.
+    it('does not promise a value the client never applies', () => {
+        const bare = /\b(?:GetConfigurationValue|GetConfiguration\(\)\.getValue)\s*(?:<[^>]*>)?\(\s*['"]([A-Za-z0-9_.-]+)['"]\s*\)/g;
+        const empty = (value: unknown) => value === '' || value === null || value === false || (Array.isArray(value) && !value.length);
+        const promised: string[] = [];
+
+        for (const file of sourceFiles(join(process.cwd(), 'src'))) {
+            for (const match of readFileSync(file, 'utf8').matchAll(bare)) {
+                const key = match[1];
+
+                if (!documented.has(key) || runtime.has(key) || empty(documented.get(key))) continue;
+
+                promised.push(`${key}: ${JSON.stringify(documented.get(key))} (${file.slice(process.cwd().length + 1)})`);
+            }
+        }
+
+        expect(promised).toEqual([]);
     });
 });

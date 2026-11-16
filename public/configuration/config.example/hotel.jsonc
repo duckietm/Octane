@@ -109,7 +109,10 @@
     "room.planes.direct": false,
 
     // Room colour changes (dimmer, backgrounds) apply at once instead of fading over 1.5 s.
-    "room.color.skip.transition": true,
+    "room.color.skip.transition": false,
+
+    // Pet type names, by type id; used only when pets.json is missing or empty.
+    "pet.types": [],
 
     // The room camera follows the own avatar when it walks off view.
     "room.camera.follow_user": true,
@@ -155,6 +158,12 @@
 
     // Profile overlay ids; infostand_backgrounds.json wins when it has this list.
     "overlays.data": [],
+
+    // Profile card background ids; empty uses backgrounds.data.
+    "cards.data": [],
+
+    // Profile border ids.
+    "borders.data": [],
 
     // Shows the room name card on first entry into a room.
     "room.enter.info.enabled": true,
@@ -398,17 +407,20 @@
     // Words after @ that mention everyone.
     "mentions_ui.aliases.everyone": [
         "all",
-        "everyone"
+        "everyone",
+        "tutti"
     ],
 
     // Words after @ that mention all your friends.
     "mentions_ui.aliases.friends": [
-        "friends"
+        "friends",
+        "amici"
     ],
 
     // Words after @ that mention everyone in the room.
     "mentions_ui.aliases.room": [
-        "room"
+        "room",
+        "stanza"
     ],
 
 
@@ -439,6 +451,15 @@
     // Seconds between polls for unread group forum messages; 0 or less uses 300.
     "groupforum.poll.period": 300,
 
+    // Invite link of the collectibles Discord server in the Discord settings; empty hides it.
+    "collectibles.discord.link": "",
+
+    // Invite link of the wired Discord server in the Discord settings; empty hides it.
+    "wired.discord.link": "",
+
+    // Invite link of the Origins Discord server in the Discord settings; empty hides it.
+    "origins.discord.link": "",
+
 
     // ==== Quests, games, talents and help ====
     // Quests and daily tasks, achievements, talents and citizenship, the game center, guides and help, new users.
@@ -459,7 +480,7 @@
     "dailytasks.enabled": true,
 
     // Guide help: the guide tool in the Me menu, the help request button and tour requests.
-    "guides.enabled": true,
+    "guides.enabled": false,
 
     // Group id of the guides group, opened from the guide tool and the talent track; 0: none.
     "guide.help.alpha.groupid": 0,
@@ -495,6 +516,9 @@
     "achievements.unseen.ignored": [
         "ACH_AllTimeHotelPresence"
     ],
+
+    // Comma-separated badge codes shown with the "new" label in the achievements window.
+    "achievements.new": "",
 
     // Turns on the seasonal quest calendar.
     "seasonalQuestCalendar.enabled": false,
