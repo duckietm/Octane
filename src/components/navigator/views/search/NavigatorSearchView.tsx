@@ -1,5 +1,5 @@
 import { NavigatorSearchComposer, NavigatorSearchResultSet } from '@octane/renderer';
-import { FC, FormEvent, useEffect, useState } from 'react';
+import { FC, FormEvent, KeyboardEvent, useEffect, useState } from 'react';
 import { INavigatorSearchFilter, LocalizeText, SearchFilterOptions, SendMessageComposer } from '../../../../api';
 import refreshIcon from '../../../../assets/images/navigator/air/refresh-search.png';
 import searchCloseIcon from '../../../../assets/images/navigator/air/search-close.png';
@@ -54,10 +54,27 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = (props) => {
 
     const submitSearch = (value = inputText) => {
         if (!topLevelContext) return;
-        useNavigatorUiStore.getState().setFilter(buildQuery(searchFilterIndex, value));
+
+        const query = buildQuery(searchFilterIndex, value);
+
+        // The same filter does not change the store, so the search is sent again directly.
+        if (query === currentFilter && tabCode) {
+            SendMessageComposer(new NavigatorSearchComposer(tabCode, query));
+            return;
+        }
+
+        useNavigatorUiStore.getState().setFilter(query);
     };
 
     const onSubmit = (event: FormEvent) => {
+        event.preventDefault();
+        submitSearch();
+    };
+
+    // The filter's hidden input counts as a second text field, so with no submit button on screen the browser never submits on Enter.
+    const onInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+        if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
+
         event.preventDefault();
         submitSearch();
     };
@@ -92,6 +109,7 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = (props) => {
                         type="text"
                         value={inputText}
                         onChange={(event) => setInputText(event.target.value)}
+                        onKeyDown={onInputKeyDown}
                     />
                     <BaseButton
                         type={hasQuery ? 'button' : 'submit'}
