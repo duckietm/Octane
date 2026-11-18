@@ -1,5 +1,6 @@
-import { HotelSettingsEvent, mockEventDispatcher } from '@octane/renderer';
+import { HotelSettingsEvent } from '@octane/renderer';
 import { describe, expect, it } from 'vitest';
+import { mockEventDispatcher } from '../../octane-renderer.mock';
 import { HotelSettings, useHotelSettingsStore } from '../../state/hotelSettingsStore';
 import { GetServerMentionAliases, ListenForHotelSettings, resolveMentionAliases, resolveServerLength } from './HotelSettings';
 
@@ -30,7 +31,6 @@ describe('hotel settings from the server', () => {
         ListenForHotelSettings();
         ListenForHotelSettings();
 
-        const event = new HotelSettingsEvent();
         const parser = {
             cameraUrl: 'http://hotel/camera/',
             chatMaxLength: 90,
@@ -41,7 +41,9 @@ describe('hotel settings from the server', () => {
             friendsAliases: ['amici'],
             roomAliases: ['room']
         };
-        (event as unknown as { getParser: () => typeof parser }).getParser = () => parser;
+        // The test build aliases the renderer to its mock, whose events take no callback and carry a type.
+        const event = new (HotelSettingsEvent as unknown as new () => { type: string; getParser: () => typeof parser })();
+        event.getParser = () => parser;
 
         mockEventDispatcher.dispatchEvent(event);
 
