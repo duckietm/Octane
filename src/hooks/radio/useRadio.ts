@@ -1,7 +1,7 @@
 import { loadGamedata } from '@octane/renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { GetConfigurationValue, IsTouchDevice } from '../../api';
+import { GetConfigurationValue, GetRenamedConfigurationValue, IsTouchDevice } from '../../api';
 
 export type RadioStation = {
     id: string;
@@ -34,7 +34,7 @@ const useRadioState = () => {
         if (loadStartedRef.current || IsTouchDevice() || !GetConfigurationValue<boolean>('radio_ui.enabled', false)) return;
         loadStartedRef.current = true;
 
-        const url = GetConfigurationValue<string>('radio.url') || GetConfigurationValue<string>('radio.stations.url') || 'configuration/radio-stations.jsonc';
+        const url = GetRenamedConfigurationValue<string>('radio.stations.url', 'radio.url', '') || 'configuration/radio-stations.jsonc';
 
         (async () => {
             try {

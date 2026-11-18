@@ -32,6 +32,7 @@ export * from './quests';
 export * from './room';
 export * from './room/events';
 export * from './room/widgets';
+export * from './settings';
 export * from './snowwar';
 export * from './talent';
 export * from './user';

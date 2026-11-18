@@ -6,6 +6,7 @@ vi.mock('../../../../api', () => ({
     CatalogType: { BUILDER: 'BUILDERS_CLUB', NORMAL: 'NORMAL' },
     FriendlyTime: { format: () => '84 dagen' },
     GetConfigurationValue: (_key: string, fallback: unknown) => fallback,
+    isBuildersClubEnabled: () => true,
     LocalizeText: (key: string, parameters: string[] = [], values: string[] = []) => {
         const texts: Record<string, string> = {
             'builder.header.title': 'Jouw BC status: %BCSTATUS%',

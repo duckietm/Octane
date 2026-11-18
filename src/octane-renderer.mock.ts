@@ -348,6 +348,7 @@ export class AvatarEffectExpiredEvent extends MessageEvent {}
 export class AvatarEffectActivatedEvent extends MessageEvent {}
 export class AvatarEffectSelectedEvent extends MessageEvent {}
 export class IsFirstLoginOfDayEvent extends MessageEvent {}
+export class HotelSettingsEvent extends MessageEvent {}
 export class NavigatorOpenRoomCreatorEvent extends MessageEvent {}
 export class NavigatorSearchesEvent extends MessageEvent {}
 export class NavigatorSearchEvent extends MessageEvent {}

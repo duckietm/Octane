@@ -22,6 +22,7 @@ import {
     GetCameraEffectDataJson,
     GetCameraRenderMode,
     GetConfigurationValue,
+    GetOptionalConfigurationValue,
     getPublishedPhotoUrl,
     LocalizeText,
     OpenUrl,
@@ -85,7 +86,8 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
     const { showConfirm = null, simpleAlert = null } = useNotification();
 
     const publishDisabled = useMemo(
-        () => GetConfigurationValue<boolean>('camera.publish.disabled', false) || !GetConfigurationValue<boolean>('camera.photo.publishing.enabled', true),
+        // camera.publish.disabled is the older, inverted name of camera.photo.publishing.enabled.
+        () => GetOptionalConfigurationValue<boolean>('camera.publish.disabled', false) || !GetConfigurationValue<boolean>('camera.photo.publishing.enabled', true),
         []
     );
     const competitionEnabled = useMemo(() => GetConfigurationValue<boolean>('camera.competition.enabled', false), []);

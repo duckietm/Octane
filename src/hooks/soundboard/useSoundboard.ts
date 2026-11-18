@@ -12,7 +12,7 @@ import {
 } from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { DispatchUiEvent, GetConfigurationValue, LocalizeText, NotificationBubbleType, SendMessageComposer } from '../../api';
+import { DispatchUiEvent, GetConfigurationValue, GetRenamedConfigurationValue, LocalizeText, NotificationBubbleType, SendMessageComposer } from '../../api';
 import { SoundboardRoomMessageEvent } from '../../events';
 import { useMessageEvent } from '../events';
 import { useNotificationActions } from '../notification';
@@ -193,9 +193,7 @@ export const useSoundboardState = () => {
         legacyLoadStartedRef.current = true;
         let cancelled = false;
         const url =
-            GetConfigurationValue<string>('soundboard.url') ||
-            GetConfigurationValue<string>('soundboard.sounds.url') ||
-            'configuration/soundboard-sounds.jsonc';
+            GetRenamedConfigurationValue<string>('soundboard.sounds.url', 'soundboard.url', '') || 'configuration/soundboard-sounds.jsonc';
 
         void loadGamedata<unknown>(url)
             .then((value) => {

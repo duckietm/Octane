@@ -353,7 +353,7 @@ export const GuideToolView: FC<{}> = (props) => {
                 case 'forum_link':
                     const url: string = GetConfigurationValue<string>('group.homepage.url', '').replace(
                         '%groupid%',
-                        GetConfigurationValue<string>('guide.help.alpha.groupid', '0')
+                        String(GetConfigurationValue<number>('guide.help.alpha.groupid', 0))
                     );
                     // A hotel without a group homepage set opened an empty tab; only a web URL is opened.
                     if (isSafeExternalUrl(url)) window.open(url, '_blank', 'noopener,noreferrer');

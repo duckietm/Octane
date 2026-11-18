@@ -2,10 +2,10 @@ import { RoomObjectCategory, RoomObjectOperationType } from '@octane/renderer';
 import { useCallback } from 'react';
 import {
     expandLocalizedText,
-    GetConfigurationValue,
     GetFurnitureDataForRoomObject,
     GetRoomSession,
     IsBuildersClubFurniId,
+    isBuildersClubEnabled,
     isWebApiBoxClassName,
     localizeWithFallback,
     ProcessRoomObjectOperation
@@ -34,9 +34,6 @@ export const needsWarehouseConfirm = (
     availableForBuildersClub: boolean | undefined,
     buildersClubEnabled: boolean
 ): boolean => buildersClubEnabled && IsBuildersClubFurniId(objectId) && !availableForBuildersClub;
-
-const isBuildersClubEnabled = (): boolean =>
-    GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true));
 
 /** Picking up a web api box first asks (`wiredfurni.web_api.pickup.*`); everything else goes straight through. */
 export const useFurniPickupGuard = () => {

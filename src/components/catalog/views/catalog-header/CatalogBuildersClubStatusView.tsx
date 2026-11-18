@@ -1,6 +1,6 @@
 import { GetTickerTime } from '@octane/renderer';
 import { FC, ReactNode, useEffect, useMemo, useState } from 'react';
-import { CatalogType, FriendlyTime, GetConfigurationValue, LocalizeText, localizeWithFallback } from '../../../../api';
+import { CatalogType, FriendlyTime, isBuildersClubEnabled, LocalizeText, localizeWithFallback } from '../../../../api';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useCatalogData, useCatalogUiState } from '../../../../hooks';
 
@@ -26,7 +26,7 @@ export const CatalogBuildersClubStatusView: FC = () => {
     const { currentType = CatalogType.NORMAL } = useCatalogUiState();
     const [ticker, setTicker] = useState(() => GetTickerTime());
     const buildersClubEnabled = useMemo(
-        () => GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true)),
+        () => isBuildersClubEnabled(),
         []
     );
 

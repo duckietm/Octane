@@ -136,7 +136,7 @@ const [ loadingProgress, setLoadingProgress ] = useState(0);
 const [ loadingTask, setLoadingTask ] = useState('');
 
 const taskLabel = useCallback((key: string, fallback: string): string => {
-    // … reads from renderer-config so the strings are translatable
+    // … reads from the configuration so the strings are translatable
 });
 
 const bumpProgress = useCallback((value: number, task?: string) => {
@@ -161,10 +161,10 @@ const bumpProgress = useCallback((value: number, task?: string) => {
 | 100 | `setIsReady(true)` about to fire | `Pronto!` |
 
 The labels are config-driven — `taskLabel('loading.task.boot', 'Avvio in corso...')`
-reads `loading.task.*` keys from the renderer-config and falls back
-to the Italian baseline if unset. To localise, add the keys to
-`public/configuration/renderer-config.json` (see the `.example`
-file for the full list).
+reads `loading.task.*` keys from the configuration and falls back
+to the Italian baseline if unset. To localise, set the keys in
+the "Loading screen" section of `public/configuration/config/server.jsonc`
+(see the same section of `config.example/server.jsonc` for the full list).
 
 Logo and background are also configurable via the same mechanism —
 `loading.logo.url`, `loading.background`, `loading.progress.color`.
@@ -221,7 +221,7 @@ visited before, the stored token wins and the URL one is ignored.
 Once stored, the existing `tryRememberLogin()` machinery picks it up
 on every reconnect: it POSTs to
 `${api.url}/api/auth/remember` (configurable via the
-`login.remember.endpoint` renderer-config key), receives a fresh
+`login.remember.endpoint` key in `config/server.jsonc`), receives a fresh
 SSO ticket back, and rotates the connection. See the CMS doc for the
 server endpoint's contract.
 

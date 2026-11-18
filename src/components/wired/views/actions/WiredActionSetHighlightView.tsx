@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
-import { GetConfigurationValue, LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
+import { GetConfigurationList, LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useNotification, useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -35,7 +35,7 @@ const hexColor = (color: number) => `#${(color & 0xFFFFFF).toString(16).padStart
 export const WiredActionSetHighlightView: FC<{}> = () => {
     const { trigger = null, setFurniIds = null, setIntParams = null, setSourceTypes = null } = useWired();
     const { simpleAlert = null } = useNotification();
-    const darkenLevels = useMemo(() => wiredHighlightDarkenLevels(GetConfigurationValue<string>('wired.furni_highlight.darken_levels', '')), []);
+    const darkenLevels = useMemo(() => wiredHighlightDarkenLevels(GetConfigurationList('wired.furni_highlight.darken_levels')), []);
     const read = () => normalizeWiredActionSetHighlight(trigger?.intData, trigger?.furniSourceTypes, trigger?.userSourceTypes, darkenLevels);
     const [state, setState] = useState<WiredActionSetHighlightState>(read);
     const everyoneInfoShown = useRef(false);

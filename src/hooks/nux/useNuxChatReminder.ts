@@ -1,15 +1,30 @@
-import { GetConfiguration, GetSessionDataManager } from '@octane/renderer';
+import { GetSessionDataManager } from '@octane/renderer';
 import { useEffect, useRef, useState } from 'react';
 import { GetConfigurationValue } from '../../api';
 
-const SHOWN_KEY = 'nux.chat.reminder.shown';
+// Shown once per session: kept in sessionStorage, not in the hotel's configuration.
+const SHOWN_KEY = 'octane.nux.chat.reminder.shown';
+
+const wasShown = (): boolean => {
+    try {
+        return window.sessionStorage.getItem(SHOWN_KEY) === '1';
+    } catch {
+        return false;
+    }
+};
+
+const markShown = (): void => {
+    try {
+        window.sessionStorage.setItem(SHOWN_KEY, '1');
+    } catch {}
+};
 /** RoomChatInputView: the chat bar wiggles ten times, 500 ms apart. */
 export const NUX_CHAT_REMINDER_WIGGLE_MS = 5000;
 
 /**
  * AIR RoomChatInputView.highlightChatInput: a new user who has not chatted for
  * `nux.noob.chat.reminder.delay` seconds (240) gets "you can type here" in the chat bar, which
- * wiggles under a hint. It happens once per session (`nux.chat.reminder.shown`).
+ * wiggles under a hint. It happens once per session.
  */
 export const useNuxChatReminder = (hasTyped: boolean) => {
     const [reminding, setReminding] = useState(false);
@@ -21,7 +36,7 @@ export const useNuxChatReminder = (hasTyped: boolean) => {
 
         if (hasTyped) typedRef.current = true;
         if (typedRef.current || !(session?.isNoob || session?.isRealNoob)) return;
-        if (GetConfigurationValue<string>(SHOWN_KEY, '') === '1') return;
+        if (wasShown()) return;
 
         const delay = GetConfigurationValue<number>('nux.noob.chat.reminder.delay', 240) * 1000;
         const timeout = window.setTimeout(() => {
@@ -38,7 +53,7 @@ export const useNuxChatReminder = (hasTyped: boolean) => {
 
         const timeout = window.setTimeout(() => {
             setWiggling(false);
-            GetConfiguration().setValue(SHOWN_KEY, '1');
+            markShown();
         }, NUX_CHAT_REMINDER_WIGGLE_MS);
 
         return () => window.clearTimeout(timeout);
@@ -48,7 +63,7 @@ export const useNuxChatReminder = (hasTyped: boolean) => {
     const dismiss = () => {
         if (!reminding) return;
 
-        GetConfiguration().setValue(SHOWN_KEY, '1');
+        markShown();
         setReminding(false);
         setWiggling(false);
     };

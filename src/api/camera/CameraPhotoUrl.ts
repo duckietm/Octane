@@ -1,4 +1,5 @@
 import { GetOptionalConfigurationValue } from '../octane/GetConfigurationValue';
+import { GetHotelSettings } from '../settings/HotelSettings';
 import { isSafeExternalUrl } from '../utils/isSafeExternalUrl';
 
 // Stored photos are `<userId>_<timestamp>.png` (plus a `_small` thumbnail) in the hotel's camera folder.
@@ -44,9 +45,16 @@ export const getCameraPhotoUrl = (url: string, bases: readonly string[]): string
     return '';
 };
 
-/** getCameraPhotoUrl against the hotel's configured photo folders (`camera.url`, `stories.image_url_base`). */
+/**
+ * getCameraPhotoUrl against the hotel's photo folders: the configured ones (`camera.url`, `stories.image_url_base`)
+ * and the one the server publishes photos under, once it sent it.
+ */
 export const GetAllowedCameraPhotoUrl = (url: string): string =>
-    getCameraPhotoUrl(url, [GetOptionalConfigurationValue<string>('camera.url', ''), GetOptionalConfigurationValue<string>('stories.image_url_base', '')]);
+    getCameraPhotoUrl(url, [
+        GetOptionalConfigurationValue<string>('camera.url', ''),
+        GetOptionalConfigurationValue<string>('stories.image_url_base', ''),
+        GetHotelSettings()?.cameraUrl ?? ''
+    ]);
 
 /**
  * The link to a published photo. The server answers with an id (the hotel's photo page is built from it) or,

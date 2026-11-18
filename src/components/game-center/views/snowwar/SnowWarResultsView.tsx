@@ -2,7 +2,7 @@ import { Game2GetAccountGameStatusMessageComposer } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import {
     CreateLinkEvent,
-    GetConfigurationValue,
+    GetConfigurationRecord,
     getGamesLeftStatus,
     getOfficialTeamReference,
     getRematchButton,
@@ -81,7 +81,7 @@ export const SnowWarResultsView: FC = () => {
 
     // AIR onGetMore (mode 1 = VIP): close the results, then open the club center.
     const openClubCenter = () => {
-        const links = GetConfigurationValue<Record<string, string>>('catalog.links', {});
+        const links = GetConfigurationRecord('catalog.links');
         exitGame();
         CreateLinkEvent(`catalog/open/${links?.['hc.buy_hc'] ?? 'habbo_club'}`);
     };

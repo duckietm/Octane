@@ -3,8 +3,10 @@ import { FC, useState } from 'react';
 import {
     BotSkillsEnum,
     GetConfigurationValue,
+    GetHotelSettings,
     LocalizeText,
     localizeWithFallback,
+    resolveServerLength,
     RoomWidgetUpdateRentableBotTextSkillEvent,
     SendMessageComposer
 } from '../../../../api';
@@ -46,7 +48,11 @@ export const AvatarInfoRentableBotTextSkillView: FC<AvatarInfoRentableBotTextSki
                 <input
                     autoFocus
                     className="air-bot-skill-input air-bot-skill-name-input"
-                    maxLength={isMotto ? GetConfigurationValue<number>('motto.max.length', 38) : GetConfigurationValue<number>('bot.name.max.length', 15)}
+                    maxLength={
+                        isMotto
+                            ? resolveServerLength(GetHotelSettings(), 'mottoMaxLength', GetConfigurationValue<number>('motto.max.length', 38))
+                            : resolveServerLength(GetHotelSettings(), 'botNameMaxLength', GetConfigurationValue<number>('bot.name.max.length', 15))
+                    }
                     type="text"
                     value={text}
                     onChange={(event) => setText(event.target.value)}
