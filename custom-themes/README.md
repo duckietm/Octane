@@ -8,7 +8,7 @@ fallback automatico al default (solo quel pezzo).
 ## Dove vivono
 - **Questa cartella (`custom-themes/`) è solo il TEMPLATE di riferimento**, versionata su git.
 - I temi **veri** stanno sul server in `public/octane/custom-themes/` (serviti via
-  l'url configurato in ui-config `theme.base.url`, es. `/client/octane/custom-themes`).
+  l'url configurato in `theme.base.url`, es. `/client/octane/custom-themes`; vedi la nota sotto).
   NON vanno su git → vedi `.gitignore` (`public/custom-themes/`).
 
 ## Struttura
@@ -29,12 +29,16 @@ custom-themes/
 5. Carica la cartella in `public/octane/custom-themes/` sul server. **Nessun rebuild.**
 
 ## Default hotel-wide (admin)
-In `ui-config.json`:
+Nella configurazione del client (un file di `public/configuration/config/` elencato da `config.jsonc`; prima era
+`ui-config.json`):
 - `theme.base.url`  → dove sono serviti i temi
 - `theme.default`   → id del tema attivo di default (vuoto = nessuno)
 - `theme.default.pieces` → array di id pezzi attivi di default
 
 Ogni utente può comunque sovrascrivere da Impostazioni → Temi (salvato in localStorage).
+
+> Nota: queste tre chiavi non fanno parte degli esempi forniti in `public/configuration/config.example/`
+> (e non sono in `configuration-keys.json`), quindi `yarn config:sync` non le aggiunge: se le usi, scrivile a mano.
 
 > Nota: i temi ri-skinnano solo la **grafica** (CSS). Non cambiano la struttura
 > dei componenti né il comportamento.

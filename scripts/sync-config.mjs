@@ -1,67 +1,86 @@
 #!/usr/bin/env node
-// Adds the keys the shipped examples have and the hotel's own config files lack, so the client stops
-// logging "Missing configuration key". Existing values, comments and order are left as they are; the new
-// keys go at the top of the file with the example's value. `--check` only lists them.
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+// Compares a hotel's configuration files (config.jsonc and the files it lists) with configuration-keys.json. It only
+// reports, it never writes: the hotel's files hold the keys the hotel chose, everything else keeps the client's default.
+//
+//   - files config.jsonc lists that do not exist (the client would fail to load the configuration);
+//   - addresses an install fills in (the keys whose example is a template) that the hotel has not set;
+//   - keys set to the very value the client uses anyway: they can go, so a later client can improve that default;
+//   - old names the client still reads, with the key that replaced them;
+//   - keys no code reads (most are deprecated);
+//   - per file, how many keys keep the client's default (config.example/ shows them, with their comments).
+//
+// A hotel still on renderer-config.json + ui-config.json is told to run yarn config:split first.
+//
+// Usage: yarn config:sync [--check]     --check exits 1 when a file config.jsonc lists is missing.
+import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
-import stripJsonComments from 'strip-json-comments';
-import { fileURLToPath } from 'url';
+import { CONFIG_DIR, configFilePath, fileOfCategory, loadRegistry, oldNames, parseJsonc } from './config-registry.mjs';
 
-const CONFIG_DIR = resolve(fileURLToPath(new URL('.', import.meta.url)), '..', 'public', 'configuration');
 const checkOnly = process.argv.slice(2).includes('--check');
+const basePath = resolve(CONFIG_DIR, 'config.jsonc');
+const out = (line) => process.stdout.write(`${ line }\n`);
 
-const PAIRS = [
-    { target: 'renderer-config.json', examples: [ 'renderer-config.example' ] },
-    { target: 'ui-config.json', examples: [ 'ui-config.example' ] }
-];
-
-const parseText = (text) => JSON.parse(stripJsonComments(text, { trailingCommas: true }));
-const parse = (file) => parseText(readFileSync(resolve(CONFIG_DIR, file), 'utf8'));
-
-let missingTotal = 0;
-
-for(const { target, examples } of PAIRS)
+if(!existsSync(basePath))
 {
-    const example = examples.find(file => existsSync(resolve(CONFIG_DIR, file)));
-    const targetPath = resolve(CONFIG_DIR, target);
-
-    if(!example) continue;
-
-    if(!existsSync(targetPath))
-    {
-        process.stdout.write(`[sync-config] ${ target } does not exist: copy ${ example } to ${ target } first.\n`);
-        continue;
-    }
-
-    const own = parse(target);
-    // "// ---- Section ----" keys only group the example for reading; they are not settings.
-    const missing = Object.entries(parse(example)).filter(([ key ]) => !key.startsWith('//') && !(key in own));
-
-    missingTotal += missing.length;
-
-    if(!missing.length)
-    {
-        process.stdout.write(`[sync-config] ${ target }: complete.\n`);
-        continue;
-    }
-
-    process.stdout.write(`[sync-config] ${ target }: ${ missing.length } missing key(s)\n`);
-
-    for(const [ key, value ] of missing) process.stdout.write(`    ${ key } = ${ JSON.stringify(value) }\n`);
-
-    if(checkOnly) continue;
-
-    const text = readFileSync(targetPath, 'utf8');
-    const open = text.indexOf('{');
-    const lines = missing.map(([ key, value ]) => `    ${ JSON.stringify(key) }: ${ JSON.stringify(value) },`).join('\n');
-    // An empty object gets no trailing comma, so a strict JSON file stays strict JSON.
-    const updated = Object.keys(own).length
-        ? `${ text.slice(0, open + 1) }\n${ lines }${ text.slice(open + 1) }`
-        : `{\n${ lines.replace(/,$/, '') }\n}\n`;
-
-    parseText(updated);
-    writeFileSync(targetPath, updated, 'utf8');
-    process.stdout.write(`    -> added to ${ target }\n`);
+    out('[sync-config] no config.jsonc: run "yarn config:split" to move renderer-config.json + ui-config.json into config/ first.');
+    process.exit(checkOnly ? 1 : 0);
 }
 
-if(checkOnly && missingTotal) process.exitCode = 1;
+const registry = loadRegistry();
+const files = parseJsonc(readFileSync(basePath, 'utf8'))['config.files'] ?? [];
+const hotel = {};
+const fileOf = {};
+let failing = 0;
+
+for(const file of files)
+{
+    const path = resolve(CONFIG_DIR, file);
+
+    if(!existsSync(path))
+    {
+        out(`[sync-config] ${ file } is listed in config.jsonc but missing: the client will fail to load the configuration.`);
+        failing++;
+        continue;
+    }
+
+    const values = parseJsonc(readFileSync(path, 'utf8'));
+
+    for(const key of Object.keys(values)) { hotel[key] = values[key]; fileOf[key] = file; }
+}
+
+const known = new Set();
+const needsValue = [];
+const sameAsDefault = [];
+const atDefault = {};
+
+for(const category of Object.keys(registry))
+{
+    const target = configFilePath(fileOfCategory(category));
+
+    for(const entry of registry[category])
+    {
+        if(!entry.key) continue;
+
+        known.add(entry.key);
+
+        const set = Object.prototype.hasOwnProperty.call(hotel, entry.key);
+
+        if(!set && ('example' in entry)) needsValue.push(`${ entry.key } (${ target })`);
+        else if(!set) atDefault[target] = (atDefault[target] ?? 0) + 1;
+        else if(entry.runtime && JSON.stringify(hotel[entry.key]) === JSON.stringify(entry.value)) sameAsDefault.push(`${ entry.key } (${ fileOf[entry.key] })`);
+    }
+}
+
+const renamed = oldNames(registry);
+const old = Object.keys(hotel).filter(key => renamed.has(key));
+const unknown = Object.keys(hotel).filter(key => key !== 'config.files' && !key.startsWith('//') && !known.has(key) && !renamed.has(key));
+
+if(needsValue.length) out(`[sync-config] ${ needsValue.length } install address(es) your files do not set (copy them from config.example/ if the hotel uses them): ${ needsValue.join(', ') }`);
+if(sameAsDefault.length) out(`[sync-config] ${ sameAsDefault.length } key(s) set to the value the client uses anyway (they can go): ${ sameAsDefault.join(', ') }`);
+if(old.length) out(`[sync-config] ${ old.length } old name(s) still read, to rename: ${ old.map(key => { const target = renamed.get(key); return `${ key } -> ${ target.key }${ target.field ? `.${ target.field.join('.') }` : '' }${ target.inverted ? ' (inverted)' : '' } (${ fileOf[key] })`; }).join(', ') }`);
+if(unknown.length) out(`[sync-config] ${ unknown.length } key(s) no code reads (most are deprecated): ${ unknown.map(key => `${ key } (${ fileOf[key] })`).join(', ') }`);
+
+for(const [ target, count ] of Object.entries(atDefault)) out(`[sync-config] ${ target }: ${ count } key(s) keep the client's own value.`);
+
+if(!failing && !needsValue.length && !sameAsDefault.length && !old.length && !unknown.length) out('[sync-config] complete.');
+if(checkOnly && failing) process.exitCode = 1;

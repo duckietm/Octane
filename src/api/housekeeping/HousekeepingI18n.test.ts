@@ -1,16 +1,18 @@
 import { readdirSync, readFileSync, statSync } from 'fs';
 import { join, resolve } from 'path';
 import { describe, expect, it } from 'vitest';
+import { parseJsonDocument } from '../../json/JsonDocumentParser';
 
 const ROOT = resolve(__dirname, '..', '..', '..');
-const EN_PATH = join(ROOT, 'public', 'configuration', 'housekeeping-texts-en.example');
-const IT_PATH = join(ROOT, 'public', 'configuration', 'housekeeping-texts-it.example');
+// The housekeeping texts ship inside the interface texts, the files the client loads.
+const EN_PATH = join(ROOT, 'public', 'configuration', 'UITexts_en.jsonc.example');
+const IT_PATH = join(ROOT, 'public', 'configuration', 'UITexts_it.jsonc.example');
 
-const loadDict = (path: string): Record<string, string> => {
-    const raw = readFileSync(path, 'utf8');
-
-    return JSON.parse(raw);
-};
+/** The `housekeeping.*` entries of one UITexts file. */
+const loadDict = (path: string): Record<string, string> =>
+    Object.fromEntries(
+        Object.entries(parseJsonDocument<Record<string, string>>(readFileSync(path, 'utf8'), 'jsonc')).filter(([key]) => key.startsWith('housekeeping.'))
+    );
 
 // Walk every .ts/.tsx file under src/ and extract every quoted
 // `housekeeping.<...>` literal. Doesn't catch fully dynamic keys
@@ -56,11 +58,11 @@ const collectReferencedKeys = (): Set<string> => {
 };
 
 describe('housekeeping i18n dictionaries', () => {
-    it('EN parses as valid JSON', () => {
+    it('EN parses as valid JSONC', () => {
         expect(() => loadDict(EN_PATH)).not.toThrow();
     });
 
-    it('IT parses as valid JSON', () => {
+    it('IT parses as valid JSONC', () => {
         expect(() => loadDict(IT_PATH)).not.toThrow();
     });
 

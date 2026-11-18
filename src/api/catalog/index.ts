@@ -11,6 +11,7 @@ export * from './FurnitureOffer';
 export * from './GetImageIconUrlForProduct';
 export * from './GiftWrappingConfiguration';
 export * from './ICatalogNode';
+export * from './isBuildersClubEnabled';
 export * from './ICatalogPage';
 export * from './IMarketplaceSearchOptions';
 export * from './IPageLocalization';

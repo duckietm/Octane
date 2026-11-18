@@ -34,6 +34,7 @@ vi.mock('../../../api', () => ({
     GetCameraEffectDataJson: mocks.getCameraEffectDataJson,
     GetCameraRenderMode: () => mocks.renderMode,
     GetConfigurationValue: (_key: string, fallback: unknown) => fallback,
+    GetOptionalConfigurationValue: (_key: string, fallback: unknown) => fallback,
     LocalizeText: (key: string) => key,
     OpenUrl: vi.fn(),
     SendMessageComposer: mocks.sendMessageComposer

@@ -1,6 +1,6 @@
 import { GetRoomEngine, RoomChatSettings, RoomObjectCategory } from '@octane/renderer';
 import { CSSProperties, FC, memo, useEffect, useMemo, useRef, useState } from 'react';
-import { ChatBubbleMessage, GetConfigurationValue, localizeWithFallback } from '../../../../api';
+import { ChatBubbleMessage, GetConfigurationValue, GetServerMentionAliases, localizeWithFallback } from '../../../../api';
 import { UserIdentityView } from '../../../../common';
 import { useOnClickChat } from '../../../../hooks';
 import { useUserDataSnapshot } from '../../../../hooks/session/useSessionSnapshots';
@@ -45,7 +45,7 @@ const ChatWidgetMessageViewBase: FC<ChatWidgetMessageViewProps> = ({
 
     const mentionsHighlightOn = GetConfigurationValue<boolean>('mentions_ui.enabled', true);
 
-    const highlight = (html: string): string => (mentionsHighlightOn ? highlightMentions(html, ownUsername) : html);
+    const highlight = (html: string): string => (mentionsHighlightOn ? highlightMentions(html, ownUsername, GetServerMentionAliases() ?? undefined) : html);
 
     const formattedText = useMemo(() => highlight(`${chat.formattedText}`), [chat.formattedText, ownUsername, mentionsHighlightOn]);
     const originalFormattedText = useMemo(

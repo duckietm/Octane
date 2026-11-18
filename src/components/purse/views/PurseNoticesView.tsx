@@ -8,7 +8,7 @@ import {
     UserInfoEvent
 } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { GetConfigurationValue, GetOptionalConfigurationValue, localizeWithFallback, OpenUrl, SendMessageComposer } from '../../../api';
+import { GetConfigurationRecord, GetOptionalConfigurationValue, localizeWithFallback, OpenUrl, SendMessageComposer } from '../../../api';
 import hcIcon from '../../../assets/images/purse-swf/icons/1801_hc_icon_png$2f8b554609e9c5cbbdc46bcbe5764be5-210881771.png';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
@@ -59,7 +59,7 @@ export const PurseNoticesView: FC<{}> = () => {
     });
 
     const openClubGifts = () => {
-        const page = GetConfigurationValue<Record<string, string>>('catalog.links', {})?.['hc.hc_gifts'] || 'club_gifts';
+        const page = GetConfigurationRecord('catalog.links')['hc.hc_gifts'] || 'club_gifts';
 
         CreateLinkEvent(`catalog/open/${page}`);
         setClubGiftVisible(false);

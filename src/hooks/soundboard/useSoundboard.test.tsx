@@ -49,6 +49,7 @@ vi.mock('@octane/renderer', () => {
 vi.mock('../../api', () => ({
     DispatchUiEvent: vi.fn(),
     GetConfigurationValue: vi.fn().mockReturnValue(''),
+    GetRenamedConfigurationValue: vi.fn().mockReturnValue(''),
     LocalizeText: (key: string, names?: string[], values?: string[]) => `${key}:${values?.join(',') ?? ''}`,
     NotificationBubbleType: { SOUNDBOARD: 'soundboard' },
     SendMessageComposer: mocks.sendMessage

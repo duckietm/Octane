@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { GetConfigurationValue } from '../../../../../api';
+import { GetConfigurationList } from '../../../../../api';
 import { useCatalogData, useCatalogUiState, useInventoryBadges } from '../../../../../hooks';
 import { CatalogBadgeSelectorWidgetView } from './CatalogBadgeSelectorWidgetView';
 
@@ -23,7 +23,7 @@ const rendererTypes = vi.hoisted(() => {
 vi.mock('@octane/renderer', () => ({ StringDataType: rendererTypes.StringDataType }));
 
 vi.mock('../../../../../api', () => ({
-    GetConfigurationValue: vi.fn(),
+    GetConfigurationList: vi.fn(),
     LocalizeBadgeDescription: (code: string) => ({ BETA: 'Builder helper', GAMMA: 'Music fan' })[code] ?? '',
     LocalizeBadgeName: (code: string) => ({ ALPHA: 'Alpha badge', BETA: 'Beta badge', GAMMA: 'Gamma badge' })[code] ?? code,
     LocalizeText: (key: string) => key,
@@ -63,7 +63,7 @@ beforeEach(() => {
     vi.clearAllMocks();
     badgeCodes = ['ALPHA', 'BETA', 'GAMMA'];
     purchaseOptions = { extraData: null, extraParamRequired: false, previewStuffData: null };
-    vi.mocked(GetConfigurationValue).mockReturnValue('GAMMA' as any);
+    vi.mocked(GetConfigurationList).mockReturnValue(['GAMMA']);
     vi.mocked(useCatalogData).mockReturnValue({ currentOffer: { offerId: 10 } } as any);
     vi.mocked(useCatalogUiState).mockReturnValue({ setPurchaseOptions } as any);
     vi.mocked(useInventoryBadges).mockImplementation(

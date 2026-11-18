@@ -1,9 +1,11 @@
 import { GetConfiguration } from '@octane/renderer';
 import { takePasswordResetTokenFromUrl } from './api/auth/passwordReset';
 import { adoptLoginTokenFromUrl, confirmSignInFromLink, positiveIdFromSearch } from './api/auth/urlToken';
+import { CONFIGURATION_BASE_FILE, resolveConfigurationFiles } from './api/configuration/configurationFiles';
+import configurationDefaults from './api/configuration/configurationDefaults.json';
 import { derivePetConfig, DerivedPetConfig, PetDefinition } from './api/octane/PetData';
 import { parseJsonDocument, UiJsonMode } from './json/JsonDocumentParser';
-import { configFileUrl, getClientMode, installSecureFetch } from './secure-assets';
+import { configFileUrl, getClientMode, installSecureFetch, setRekeyEndpoints } from './secure-assets';
 
 declare const __OCTANE_JSON_MODE__: UiJsonMode | undefined;
 
@@ -151,10 +153,20 @@ const clientMode = getClientMode();
 // The pet list, the configuration files and the UI bundle download together.
 const petConfigLoad = loadPetConfig();
 
+// config.jsonc lists the configuration files (one per category, under config/); a hotel without it keeps the two old files.
+const configurationFiles = await resolveConfigurationFiles(
+    async () => {
+        const response = await fetch(configFileUrl(CONFIGURATION_BASE_FILE, true));
+
+        return response.ok ? response.text() : null;
+    },
+    (text) => parseJsonDocument(text, 'jsonc', CONFIGURATION_BASE_FILE)
+);
+
 (window as any).OctaneSecureApiUrl = clientMode.apiBaseUrl || window.location.origin;
 (window as any).OctaneClientMode = clientMode;
 (window as any).OctaneConfig = {
-    'config.urls': [configFileUrl('renderer-config.json', true), configFileUrl('ui-config.json', true)],
+    'config.urls': configurationFiles.map((file) => configFileUrl(file, true)),
     'sso.ticket': ssoTicket,
     'forward.type': forwardRoomId ? 2 : -1,
     'forward.id': forwardRoomId,
@@ -176,6 +188,9 @@ appModule.catch(() => undefined);
 // the first paint triggers a flood of "Missing configuration key" warnings for
 // every key components read synchronously (asset.url, login.endpoint, …).
 // The UI bundle is already downloading meanwhile; it only mounts below.
+// A key the hotel's files leave out answers with its value from configuration-keys.json (yarn config:examples).
+GetConfiguration().registerDefaults(configurationDefaults);
+
 const configLoad = GetConfiguration().init();
 
 configLoad.catch(() => undefined);
@@ -190,6 +205,8 @@ try {
     await configLoad;
 
     if (petConfig) GetConfiguration().parseConfiguration(petConfig, true);
+
+    setRekeyEndpoints(['login.endpoint', 'login.remember.endpoint', 'login.logout.endpoint'].map((key) => GetConfiguration().getValue<string>(key, '')));
 
     setBootDebug('boot: configuration init done');
 } catch (error) {

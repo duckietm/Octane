@@ -14,7 +14,7 @@ import {
 import { CSSProperties, FC, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import {
     CreateLinkEvent,
-    GetConfigurationValue,
+    GetWebApiDocsUrl,
     LocalizeText,
     localizeWithFallback,
     NotificationBubbleType,
@@ -175,7 +175,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
                 CreateLinkEvent('wired-tools/logs');
                 return;
             case 'web_api_docs': {
-                const link = GetConfigurationValue<string>('wired.api.docs.link', '');
+                const link = GetWebApiDocsUrl();
 
                 if (link) OpenUrl(link);
                 return;

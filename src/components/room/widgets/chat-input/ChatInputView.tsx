@@ -7,12 +7,14 @@ import {
     GetClubMemberLevel,
     GetConfigurationValue,
     HasSessionPermission,
+    resolveServerLength,
     LocalizeText,
     localizeWithFallback,
     ResolveChatStyleIds,
     RoomWidgetUpdateChatInputContentEvent
 } from '../../../../api';
 import { Text } from '../../../../common';
+import { useHotelSettingsStore } from '../../../../state/hotelSettingsStore';
 import { BaseButton } from '../../../../common/BaseButton';
 import { useChatCommandSelector, useChatInputWidget, useChatMentions, useNuxChatReminder, usePurchasableChatStyles, useRoom, useSessionInfo, useUiEvent } from '../../../../hooks';
 import { ChatInputCommandSelectorView } from './ChatInputCommandSelectorView';
@@ -53,7 +55,8 @@ export const ChatInputView: FC<{}> = (props) => {
     const chatModeIdWhisper = useMemo(() => LocalizeText('widgets.chatinput.mode.whisper'), []);
     const chatModeIdShout = useMemo(() => LocalizeText('widgets.chatinput.mode.shout'), []);
     const chatModeIdSpeak = useMemo(() => LocalizeText('widgets.chatinput.mode.speak'), []);
-    const maxChatLength = useMemo(() => GetConfigurationValue<number>('chat.input.maxlength', 100), []);
+    const hotelSettings = useHotelSettingsStore((state) => state.settings);
+    const maxChatLength = useMemo(() => resolveServerLength(hotelSettings, 'chatMaxLength', GetConfigurationValue<number>('chat.input.maxlength', 100)), [hotelSettings]);
 
     const anotherInputHasFocus = useCallback(() => {
         const activeElement = document.activeElement;

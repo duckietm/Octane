@@ -1,0 +1,567 @@
+{
+    // The hotel: avatars, rooms, catalog, chat, friends and quests.
+
+
+    // ==== Avatar ====
+    // Figure data and avatar assets, the avatar editor, effects, expressions and badges on the avatar.
+
+    // Address of the avatar actions file. Required.
+    "avatar.actions.url": "${gamedata.url}/config/HabboAvatarActions.json?t=%timestamp%",
+
+    // Address of the figure data file; also feeds the registration avatar step. Required.
+    "avatar.figuredata.url": "${gamedata.url}/config/FigureData.json?t=%timestamp%",
+
+    // Address of the figure map (clothing library list). Required.
+    "avatar.figuremap.url": "${gamedata.url}/config/FigureMap.json?t=%timestamp%",
+
+    // Address of the avatar effect map. Required.
+    "avatar.effectmap.url": "${gamedata.url}/config/EffectMap.json?t=%timestamp%",
+
+    // Address template of clothing bundles; %libname% is the library.
+    "avatar.asset.url": "${asset.url}/clothes/%libname%.hab",
+
+    // Address template of avatar effect bundles; %libname% is the library.
+    "avatar.asset.effect.url": "${asset.url}/effect/%libname%.hab",
+
+    // Effect icon template in the avatar editor; %type% is the effect id. Empty: no icons.
+    "avatareditor.effects.icon.url": "${image.library.url}fx_icons/fx_icon_%type%.png",
+
+    // Clothing libraries loaded before any avatar is drawn (hh_human_face is always added).
+    "avatar.mandatory.libraries": [
+        "bd:1",
+        "li:0"
+    ],
+
+    // Effect libraries loaded before any effect is drawn.
+    "avatar.mandatory.effect.libraries": [
+        "dance.1",
+        "dance.2",
+        "dance.3",
+        "dance.4"
+    ],
+
+    // Built-in avatar actions applied before the actions file loads.
+    "avatar.default.actions": {
+        "actions": [
+            {
+                "id": "Default",
+                "state": "std",
+                "precedence": 1000,
+                "main": true,
+                "isDefault": true,
+                "geometryType": "vertical",
+                "activePartSet": "figure",
+                "assetPartDefinition": "std"
+            }
+        ]
+    },
+
+    // Number of wardrobe slots in the avatar editor.
+    "avatar.wardrobe.max.slots": 10,
+
+    // Enables the extra VIP expression 67 in the avatar menu and the :67 command.
+    "avatar.expression.67.enabled": true,
+
+    // Own avatar menu shows an expressions submenu; off: a single wave entry.
+    "avatar.expressions_menu.enabled": true,
+
+    // Shows the signs entry in the own avatar menu.
+    "avatar.signs.enabled": true,
+
+    // Shows the sit and stand entries in the own avatar menu.
+    "avatar.sitting.enabled": true,
+
+    // Avatar editor also lists sellable clothing the user does not own.
+    "avatareditor.show.unowned.sellables": false,
+
+    // Shows the effects tab in the avatar editor (never in a clothing change booth).
+    "effects.in.avatar.editor": true,
+
+    // Catalog page opened by the buy button of the avatar editor effects tab.
+    "avatareditor.effects.buy.button.catalog.page.name": "",
+
+    // Number of badges a user can wear; above 5 the infostand drops the group badge slot.
+    "user.badges.max.slots": 5,
+
+    // Maximum motto length in characters (users and bots).
+    "motto.max.length": 38,
+
+    // The last avatar effect chosen in the effects list goes back on in every room entered.
+    "effects.reactivate.on.room.entry": false,
+
+
+    // ==== Rooms, furni and navigator ====
+    // Room view, camera and zoom, furni behaviour, the hotel view, room entry and the navigator.
+
+    // Shows the selection arrow over the selected avatar.
+    "enable.avatar.arrow": false,
+
+    // Frames of the bounce when a furni is rotated.
+    "furni.rotation.bounce.steps": 20,
+
+    // Height of the furni rotation bounce, in tile heights.
+    "furni.rotation.bounce.height": 0.0625,
+
+    // Room zoom scales the canvas; off: zoom buttons rescale the room geometry instead.
+    "room.zoom.enabled": true,
+
+    // Draws walls and floors straight from their tiles instead of baked textures (WebGL2 only).
+    "room.planes.direct": false,
+
+    // Room colour changes (dimmer, backgrounds) apply at once instead of fading over 1.5 s.
+    "room.color.skip.transition": false,
+
+    // Pet type names, by type id; used only when pets.json is missing or empty.
+    "pet.types": [],
+
+    // The room camera follows the own avatar when it walks off view.
+    "room.camera.follow_user": true,
+
+    // Divisor of the camera glide speed; higher is slower and smoother.
+    "room.camera.move.speed": 12,
+
+    // Room category the daily quest widget's go-to-room button forwards to; empty: no forward.
+    "landing.view.roomcategory": "random_friending_room",
+
+    // The room network the hotel view's room hopper teaser opens (its button goes to navigator/network/<id>); 0 = none.
+    "landing.view.roomhopper.network.id": 0,
+
+    // Shows the action button of the community goal widget.
+    "landing.view.community.interactive": true,
+
+    // Catalog page the community goal button opens; empty: the slot's own link.
+    "landing.view.community.catalog.target": "",
+
+    // Hall of fame entries show a link to the player's competition room.
+    "landing.view.communitygoalhof.hasroomlink": false,
+
+    // Hall of fame schedule used when the slot names no goal; empty: the active community goal.
+    "landing.view.dynamic.slot.6.conf": "",
+
+    // Shows the room raid protection settings and controls.
+    "raid.protection.enabled": true,
+
+    // Shows the drop hand item entry in the own avatar menu.
+    "handitem.drop.enabled": true,
+
+    // Shows the give hand item entry in the menu of another user.
+    "handitem.give.enabled": true,
+
+    // Shows the give hand item entry in the pet menu.
+    "handitem.give.pet.enabled": true,
+
+    // Profile background ids; infostand_backgrounds.json wins when it has this list.
+    "backgrounds.data": [],
+
+    // Profile stand ids; infostand_backgrounds.json wins when it has this list.
+    "stands.data": [],
+
+    // Profile overlay ids; infostand_backgrounds.json wins when it has this list.
+    "overlays.data": [],
+
+    // Profile card background ids; empty uses backgrounds.data.
+    "cards.data": [],
+
+    // Profile border ids.
+    "borders.data": [],
+
+    // Shows the room name card on first entry into a room.
+    "room.enter.info.enabled": true,
+
+    // Milliseconds before the room entry card hides (minimum 1000).
+    "room.enter.info.collapse.delay": 5000,
+
+    // Shows the report room button in the navigator room info (not to the owner).
+    "room.report.enabled": true,
+
+    // Shows the room ranking entry in the navigator room info.
+    "room.ranking.enabled": false,
+
+    // Shows the switch to spectator mode in the room queue window.
+    "room.queue.spectator.enabled": false,
+
+    // Opens the room entry ad on first entry when the room asks for it.
+    // Older name, still read: roomenterad.habblet.enabled.
+    "roomenterad.octane.enabled": false,
+
+    // Claim id of the dragon adoption offer; empty: the built-in default id.
+    "cursed_dragon_adoption.claim_id": "cursed_dragon_adoption",
+
+    // Pet type shown and adopted in the dragon adoption window.
+    "cursed_dragon_adoption.pet_type": 37,
+
+    // Shows the dragon adoption button on the hotel view when the offer is available.
+    "cursed_dragon_adoption.button.enabled": true,
+
+    // Shows the furni description in the infostand.
+    "furni.descriptions.enabled": true,
+
+    // Shows the furni position in the infostand.
+    "furni.location.enabled": true,
+
+    // Furni position shows only to users who may move the furni.
+    "furni.location.require.access": true,
+
+    // Crackable furni classnames shown as plants (water and death timers) in the infostand.
+    "furni.plant.classnames": [
+        "jungle_c16_flowera1",
+        "jungle_c16_flowera2",
+        "jungle_c16_flowera3",
+        "jungle_c16_flowerb1",
+        "jungle_c16_flowerb2",
+        "jungle_c16_flowerb3",
+        "jungle_c16_flowerc1",
+        "jungle_c16_flowerc2",
+        "jungle_c16_flowerc3",
+        "jungle_c16_flowerd1",
+        "jungle_c16_flowerd2",
+        "jungle_c16_flowerd3"
+    ],
+
+    // Dimmer offers a free colour picker instead of the preset colours.
+    "widget.dimmer.colorwheel": false,
+
+    // Trade window shows the item and credit totals and the credit furni warning.
+    "trading.warning.enabled": true,
+
+    // Maximum rentable bot name length in characters.
+    "bot.name.max.length": 15,
+
+    // Maximum pet name length in the pet package window.
+    "pet.package.name.max.length": 15,
+
+    // The room snaps back to the centre when a drag ends.
+    "room.dragging.always_center": false,
+
+    // "Place more" button on the infostand of furni the Builders Club sells, for players who may build with it.
+    "infostand.place_more.enabled": false,
+
+
+    // ==== Catalog, purse and currencies ====
+    // Catalog pages and purchases, currencies and the purse, club, collectibles, custom badges and Builders Club.
+
+    // Address that lists the player's custom badges; ${...} placeholders are resolved.
+    "badges.custom.list.endpoint": "${api.url}/api/badges/custom",
+
+    // Address a new custom badge is posted to; ${...} placeholders are resolved.
+    "badges.custom.create.endpoint": "${api.url}/api/badges/custom",
+
+    // Address a custom badge is updated at; %badgeId% is the badge, ${...} placeholders are resolved.
+    "badges.custom.update.endpoint": "${api.url}/api/badges/custom/%badgeId%",
+
+    // Address a custom badge is deleted at; %badgeId% is the badge, ${...} placeholders are resolved.
+    "badges.custom.delete.endpoint": "${api.url}/api/badges/custom/%badgeId%",
+
+    // Address of the custom badge names and descriptions; ${...} placeholders are resolved.
+    "badges.custom.texts.endpoint": "${api.url}/api/badges/custom/texts",
+
+    // Address of the badge leaderboard; ${...} placeholders are resolved.
+    "badges.leaderboard.endpoint": "${api.url}/api/badges/leaderboard",
+
+    // Shows Builders Club: toolbar button, catalog status, infostand "place more" and its pickup checks.
+    // Older name, still read: toolbar.buildersclub.enabled.
+    "buildersclub.enabled": true,
+
+    // On: everyone counts as VIP, so club-only clothes, colours and room limits are unlocked for all.
+    "hc.disabled": false,
+
+    // Shows the club extension offer under the purse.
+    // Older name, still read: club.membership.extend.promotion.enabled.
+    "club.membership.extend.vip.promotion.enabled": true,
+
+    // Activity point types shown in the purse and the catalog header, e.g. [0, 5]; empty shows none.
+    "system.currency.types": [
+        -1,
+        0,
+        5,
+        105,
+        1001
+    ],
+
+    // Purse amounts shortened (12.3k); off shows the whole number.
+    "currency.display.number.short": false,
+
+    // Text key for the name of currency type 0 (duckets) in purchase and gift alerts.
+    "activitypoint.name.0": "duckets",
+
+    // Text key for the name of currency type 5 (diamonds) in purchase and gift alerts.
+    "activitypoint.name.5": "diamonds",
+
+    // Shows the achievement score in the user infostand.
+    "activity.point.display.enabled": true,
+
+    // Club center: which info boxes show (payday, gift, benefits) and the help pages their links open.
+    "hc.center": {
+        "benefits.info": true,
+        "payday.info": true,
+        "gift.info": true,
+        "benefits.habbopage": "habboclub",
+        "payday.habbopage": "hcpayday"
+    },
+
+    // Catalog page opened by clicking the seasonal currency row of the purse; empty: no page.
+    "seasonalcurrencyindicator.page": "",
+
+    // Shows the page header image above the offer grid of default catalog pages.
+    "catalog.headers": false,
+
+    // Shows each page's icon in front of its name on the catalog's top tabs; false: labels only, as in AIR.
+    "catalog.tab.icons": false,
+
+    // Catalog page names that club, gift and pet buttons open (hc.buy_hc, hc.hc_gifts, pets.buy_food...).
+    "catalog.links": {
+        "hc.buy_hc": "habbo_club",
+        "hc.hc_gifts": "club_gifts",
+        "pets.buy_food": "pet_food",
+        "pets.buy_saddle": "saddles"
+    },
+
+    // Club benefits button opens the built-in benefits window; off opens link.format.club instead.
+    "catalog.vip.benefits.enabled": true,
+
+    // Shows the quantity spinner for offers that allow buying several at once.
+    "catalog.multiple.purchase.enabled": true,
+
+    // On: the catalog no longer opens on the new additions page when there are new items.
+    "catalog.new.additions.page.open.disabled": false,
+
+    // Gift card image name under image.library.url/Giftcards/; empty uses the built-in blank card.
+    "catalog.gift_wrapping_new.gift_card": "",
+
+    // Index of the gift box preselected in the gift window; out of range falls back to 0.
+    "catalog.purchase.gift_wrapping.default_box_index": 0,
+
+    // Catalog page offered when a pet is too tired to breed; empty: no page link.
+    "gotobreedingnestfailure.catalogpage.food": "",
+
+    // Catalog page offered when a pet cannot reach a breeding nest; empty: no page link.
+    "gotobreedingnestfailure.catalogpage.nests": "",
+
+    // Furni of the chests showcase: "key,furni,classname" entries separated by ";".
+    "special_items.chests.items": "wf_storage_furni1,furni,wf_storage_furni1;wf_storage_furni2,furni,wf_storage_furni2;wf_storage_furni_starter,furni,wf_storage_furni_starter;wf_storage_coins1,furni,wf_storage_coins1;wf_storage_coins2,furni,wf_storage_coins2;wf_act_give_furni,furni,wf_act_give_furni;wf_act_give_currency,furni,wf_act_give_currency;wf_cnd_chest_has_items,furni,wf_cnd_chest_has_items;wf_cnd_chest_has_item_type,furni,wf_cnd_chest_has_item_type;wf_xtra_scan_chest_furni_by_type,furni,wf_xtra_scan_chest_furni_by_type;wf_act_init_transaction,furni,wf_act_init_transaction;wf_act_cancel_transaction,furni,wf_act_cancel_transaction;wf_trg_transaction_complete,furni,wf_trg_transaction_complete;wf_trg_transaction_fail,furni,wf_trg_transaction_fail;wf_contract_payment,furni,wf_contract_payment;wf_contract_reward,furni,wf_contract_reward;wf_contract_trade,furni,wf_contract_trade;wf_xtra_custom_contract,furni,wf_xtra_custom_contract",
+
+    // Free gift claimed after viewing every chests showcase item; empty: no claim.
+    "special_items.chests.free_claim": "chests_starter",
+
+    // Turns on collectibles (the hub and the editor's collectible looks); the server must allow them too.
+    "collectibles.enabled": true,
+
+    // Shows the shop tab of the collectibles hub.
+    "nft.shop.enabled": true,
+
+    // Shows the minting tab of the collectibles hub and loads mint tokens.
+    "nft.minting.enabled": false,
+
+    // Shows the transfer tab of the collectibles hub and loads the transfer fee.
+    "collectibles.transfer.enabled": false,
+
+    // Lets emerald credit furni be redeemed; off: their exchange window never opens.
+    "nft.credit.converting.enabled": true,
+
+    // Shows the name and description tooltip on badge images.
+    "badge.descriptions.enabled": true,
+
+    // Badge codes hidden from the badge picker of the catalog badge display, e.g. ["ADM", "MOD"].
+    "badge.display.excluded.badgeCodes": [],
+
+    // Treats uncommon badges as their own rarity tier with a glow; off counts them as common.
+    "badge_rarity.uncommon": false,
+
+    // Duckets above which claiming earnings asks first, since the surplus is lost; 0: never asks.
+    "duckets.soft_limit": 0,
+
+    // Purchases (catalog, club, camera) need a ticked credit spending disclaimer first.
+    "disclaimer.credit_spending.enabled": false,
+
+
+    // ==== Chat and mentions ====
+    // Chat input and history, respect, and @mentions.
+
+    // Shows the emoji picker in the chat bar and loads emoji shortcodes.
+    "chat.emoji.enabled": true,
+
+    // Respect received: "enabled" plays the sound named in "sound".
+    "respect.options": {
+        "enabled": false,
+        "sound": "sound_respect_received"
+    },
+
+    // Duckets a respect replenish costs; below that balance an alert shows. 0: no check.
+    "respect.replenish_cost_duckets": 50,
+
+    // Talent show: the number put in the "not enough audience" respect text; empty leaves it out.
+    "respect.talent.show.min.audience": "",
+
+    // Maximum characters typed in the chat bar.
+    "chat.input.maxlength": 100,
+
+    // Messages the chat history window keeps; the oldest go first.
+    "chat.history.max.items": 1000,
+
+    // Chat area height as a fraction of the window (0-1); out of range uses 0.25.
+    "chat.viewer.height.percentage": 0.25,
+
+    // Chat bubble style ids hidden from the style picker.
+    "chat.styles.disabled": [],
+
+    // @mentions: the toolbar button, the mentions window, highlighted names and mention toasts.
+    "mentions_ui.enabled": true,
+
+    // Plays a sound when you are mentioned.
+    "mentions_ui.sound": true,
+
+    // Words after @ that mention everyone.
+    "mentions_ui.aliases.everyone": [
+        "all",
+        "everyone",
+        "tutti"
+    ],
+
+    // Words after @ that mention all your friends.
+    "mentions_ui.aliases.friends": [
+        "friends",
+        "amici"
+    ],
+
+    // Words after @ that mention everyone in the room.
+    "mentions_ui.aliases.room": [
+        "room",
+        "stanza"
+    ],
+
+
+    // ==== Friends and groups ====
+    // Friend list and friend bar, relationships, groups and forums, Discord.
+
+    // Marks a friend's bar tab for their messages, room events, achievements and games.
+    "friendbar.notifications.enabled": true,
+
+    // Offline friends who can get stored messages keep the chat button; off: online only.
+    "friend_list.persistent_message_status.enabled": true,
+
+    // Shows the select-all box over a long online friends list.
+    "friend_list.select_all.enabled": true,
+
+    // Online friends needed before the select-all box shows.
+    "friend_list.select_all.minimum": 5,
+
+    // Shows the relationship icon on each friend list entry.
+    "relationship.status.enabled": true,
+
+    // Shows the Discord settings row in the settings menu.
+    "discord.enabled": false,
+
+    // Loads and shows a player's tags in the user infostand.
+    "user.tags.enabled": false,
+
+    // Lets group admins block members and filter blocked users in the members list.
+    "group.blocking.enabled": true,
+
+    // Seconds between polls for unread group forum messages; 0 or less uses 300.
+    "groupforum.poll.period": 300,
+
+    // Invite link of the collectibles Discord server in the Discord settings; empty hides it.
+    "collectibles.discord.link": "",
+
+    // Invite link of the wired Discord server in the Discord settings; empty hides it.
+    "wired.discord.link": "",
+
+    // Invite link of the Origins Discord server in the Discord settings; empty hides it.
+    "origins.discord.link": "",
+
+
+    // ==== Quests, games, talents and help ====
+    // Quests and daily tasks, achievements, talents and citizenship, the game center, guides and help, new users.
+
+    // Hides the quests entry of the toolbar progression menu.
+    "toolbar.hide.quests": true,
+
+    // Shows the game center button on the toolbar.
+    "game.center.enabled": false,
+
+    // Hosts a game center game may load from; empty allows any http(s) host.
+    "game.center.allowed.hosts": [],
+
+    // Shows the leaderboard on game center tiles.
+    "games.highscores.enabled": true,
+
+    // Shows the daily tasks entry of the toolbar progression menu.
+    "dailytasks.enabled": true,
+
+    // Guide help: the guide tool in the Me menu, the help request button and tour requests.
+    "guides.enabled": false,
+
+    // Group id of the guides group, opened from the guide tool and the talent track; 0: none.
+    "guide.help.alpha.groupid": 0,
+
+    // Bully reports go to the Guardians for review instead of straight to moderators.
+    "guardians.enabled": true,
+
+    // The reporter is told the outcome of a chat review.
+    "chatreviewreporterfeedbackctrl.enabled": true,
+
+    // Help opens the built-in Way guide; off with habboway.url set opens that address instead.
+    "habboway.enabled": true,
+
+    // Number of pages in the Way guide before the quiz page.
+    "help.habboway.page.count": 6,
+
+    // On: the safety booklet ends with a thank-you page instead of the safety quiz.
+    "safety_quiz.disabled": false,
+
+    // Offers new players a lobby room to join.
+    "nux.lobbies.enabled": false,
+
+    // Seconds in the home room before the lobby offer appears.
+    "nux.noob.lobby.popup.delay": 70,
+
+    // Seconds without chatting before a new player gets the "type here" chat bar hint.
+    "nux.noob.chat.reminder.delay": 240,
+
+    // Badge code prefixes (digits removed) never counted as unseen achievements.
+    "achievements.unseen.ignored": [
+        "ACH_AllTimeHotelPresence"
+    ],
+
+    // Badge codes shown with the "new" label in the achievements window.
+    "achievements.new": [],
+
+    // Turns on the seasonal quest calendar.
+    "seasonalQuestCalendar.enabled": false,
+
+    // Quest campaign prefix shown in the seasonal calendar instead of the quest list.
+    "seasonalQuestCalendar.campaignPrefix": "xmas13",
+
+    // Activity point type whose balance the seasonal calendar shows.
+    "seasonalQuestCalendar.currency": 0,
+
+    // Most days the seasonal calendar shows; 0 uses the default 42.
+    "seasonalQuestCalendar.maximum.entities": 42,
+
+    // Talent tracks: the Me menu entry, the guide tool link and the citizenship popup.
+    "talent.track.enabled": true,
+
+    // Citizenship track; also keeps the trade option visible (greyed with a reason) in the menu.
+    "talent.track.citizenship.enabled": true,
+
+    // Shows a new player the citizenship track popup shortly after login.
+    "new.user.citizenship.popup.enabled": false,
+
+    // Seconds after login before a new player's first welcome bubble.
+    "new.user.promo.delay": 10,
+
+    // Seconds after login before the "you have a room of your own" bubble.
+    "new.user.promo.room.delay": 180,
+
+    // Shows the box under the purse when citizenship gives free club days; Start runs the quest below.
+    "citizenship.vip.quest.promotion.enabled": false,
+
+    // Quest campaign code the VIP quests box starts; empty: the button only closes the box.
+    "citizenship.vip.tutorial.quest.campaign.name": "",
+
+    // Welcome bubbles: "social" (navigator) or "quest" (progression); empty: none.
+    "new.user.wing": "",
+
+    // Talent track promoted by a strip in the toolbar; empty: no strip.
+    "talentpromo.track": ""
+}

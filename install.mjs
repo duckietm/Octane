@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
-import { copyFile, readFile, writeFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { existsSync, readdirSync } from 'node:fs';
 import { basename, dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { platform } from 'node:os';
 import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
 import { DEFAULT_JSON_MODE, normalizeJsonModeAnswer, VALID_JSON_MODES } from './scripts/json-mode.mjs';
+import { splitConfiguration } from './scripts/config-split.mjs';
 import {
     buildIniSnippet,
     cleanPathAnswer,
@@ -39,7 +40,6 @@ const KEY_SPECS = {
     'api.url':              { type: 'url',       schemes: ['http:', 'https:'], flag: 'api-url' },
     'asset.url':            { type: 'url',       schemes: ['http:', 'https:'], flag: 'asset-url' },
     'image.library.url':    { type: 'url',       schemes: ['http:', 'https:'], flag: 'image-library-url' },
-    'hof.furni.url':        { type: 'url',       schemes: ['http:', 'https:'], flag: 'hof-furni-url' },
     'camera.url':           { type: 'url',       schemes: ['http:', 'https:'], flag: 'camera-url' },
     'thumbnails.url':       { type: 'url',       schemes: ['http:', 'https:'], flag: 'thumbnails-url' },
     'url.prefix':           { type: 'pathOrUrl', schemes: ['http:', 'https:'], flag: 'url-prefix' },
@@ -53,19 +53,17 @@ const FLAG_TO_KEY = Object.fromEntries(
     Object.entries(KEY_SPECS).map(([key, spec]) => [spec.flag, key])
 );
 
+// config.jsonc lists the configuration files; each URL below lives in the file named here.
 const CONFIG_FILES = [
+    { example: 'config.example.jsonc', target: 'config.jsonc', keys: [] },
     {
-        example: 'renderer-config.example',
-        target: 'renderer-config.json',
-        keys: ['socket.url', 'api.url', 'asset.url', 'image.library.url', 'hof.furni.url']
+        example: 'config.example/server.jsonc',
+        target: 'config/server.jsonc',
+        keys: ['socket.url', 'api.url', 'url.prefix', 'asset.url', 'image.library.url', 'thumbnails.url', 'habbopages.url']
     },
+    { example: 'config.example/features.jsonc', target: 'config/features.jsonc', keys: ['camera.url'] },
     {
-        example: 'ui-config.example',
-        target: 'ui-config.json',
-        keys: ['camera.url', 'thumbnails.url', 'url.prefix', 'habbopages.url']
-    },
-    {
-        example: 'client-mode.example',
+        example: 'client-mode.example.json',
         target: 'client-mode.json',
         keys: ['apiBaseUrl', 'plainConfigBaseUrl', 'plainGamedataBaseUrl']
     }
@@ -284,7 +282,7 @@ function printUsage() {
         '  2. Resolve the renderer dir (--renderer-dir / OCTANE_RENDERER_DIR / interactive prompt / auto-detect ' + RENDERER_DIR_CANDIDATES.join(' or ') + '), cloning to ../' + DEFAULT_RENDERER_DIR_NAME + ' if absent',
         '  3. yarn install + yarn link in the renderer',
         '  4. yarn install + yarn link "@octane/renderer" in this project',
-        '  5. Copy public/configuration/*.example -> *.json (keeps existing files)',
+        '  5. Copy the configuration examples to their real names (keeps existing files)',
         '  6. Choose JSON parsing mode (jsonc recommended) -> writes .octane-build.json',
         '  7. Prompt for URLs and patch the JSON config files',
         '  8. Secure mode: patch client-mode.json, generate the emulator master key, check /nitro-sec/bootstrap',
@@ -467,34 +465,67 @@ async function chooseJsonMode(opts) {
     ok('JSON mode set to ' + chosen + ' -> wrote .octane-build.json');
     if (chosen === 'legacy') {
         warn('Legacy mode is strict: config files must be valid standard JSON (no comments, no trailing commas).');
+        warn('The configuration files in config/ carry a comment above each key: legacy mode cannot read them. Choose jsonc or auto.');
     }
 }
 
+// The configuration files are JSONC: read them without their comments, and change a value in place so the comments stay.
+const readJsonc = (raw) => JSON.parse(raw.replace(/^\s*\/\/.*$/gm, '').replace(/,(\s*[}\]])/g, '$1'));
+
+function setJsoncString(raw, key, value) {
+    const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pattern = new RegExp('("' + escaped + '"\\s*:\\s*)"(?:[^"\\\\]|\\\\.)*"');
+    if (pattern.test(raw)) return raw.replace(pattern, (_, head) => head + JSON.stringify(value));
+    const open = raw.indexOf('{');
+    return raw.slice(0, open + 1) + '\n    ' + JSON.stringify(key) + ': ' + JSON.stringify(value) + ',' + raw.slice(open + 1);
+}
+
+// Every example file, the base one and the whole config.example folder, as [example, target] pairs.
+function configFilePairs() {
+    const pairs = [['config.example.jsonc', 'config.jsonc']];
+    const walk = (dir) => {
+        for (const entry of readdirSync(join(CONFIG_DIR, dir), { withFileTypes: true })) {
+            const path = dir + '/' + entry.name;
+            if (entry.isDirectory()) walk(path);
+            else pairs.push([path, path.replace(/^config\.example\//, 'config/')]);
+        }
+    };
+    walk('config.example');
+    for (const entry of CONFIG_FILES) if (!pairs.some(([example]) => example === entry.example)) pairs.push([entry.example, entry.target]);
+    return pairs;
+}
+
 async function copyConfigs() {
-    for (const entry of CONFIG_FILES) {
-        const src = join(CONFIG_DIR, entry.example);
-        const dst = join(CONFIG_DIR, entry.target);
+    // A hotel still on renderer-config.json + ui-config.json keeps its values: they move into config/ first.
+    const hasOldFiles = existsSync(join(CONFIG_DIR, 'ui-config.json')) || existsSync(join(CONFIG_DIR, 'renderer-config.json'));
+    if (hasOldFiles && !existsSync(join(CONFIG_DIR, 'config.jsonc'))) splitConfiguration({ configDir: CONFIG_DIR, log: info });
+    for (const [example, target] of configFilePairs()) {
+        const src = join(CONFIG_DIR, example);
+        const dst = join(CONFIG_DIR, target);
         if (!existsSync(src)) {
             throw new Error('Missing example file: ' + src);
         }
         if (existsSync(dst)) {
-            warn(entry.target + ' already exists - keeping existing file (URL overrides will still patch it).');
-            summary.configsKept.push(entry.target);
+            summary.configsKept.push(target);
         } else {
+            await mkdir(dirname(dst), { recursive: true });
             await copyFile(src, dst);
-            ok('Created ' + entry.target);
-            summary.configsCreated.push(entry.target);
+            summary.configsCreated.push(target);
         }
     }
+    if (summary.configsKept.length) warn(summary.configsKept.length + ' configuration file(s) already exist - kept as they are (URL overrides will still patch them).');
+    if (summary.configsCreated.length) ok('Created ' + summary.configsCreated.length + ' configuration file(s)');
 }
 
 async function applyOverridesNonInteractive(opts) {
     for (const entry of CONFIG_FILES) {
+        if (!entry.keys.length) continue;
         const dst = join(CONFIG_DIR, entry.target);
         const raw = await readFile(dst, 'utf8');
+        let text = raw;
         let obj;
         try {
-            obj = JSON.parse(raw);
+            obj = readJsonc(raw);
         } catch (e) {
             throw new Error('Could not parse ' + entry.target + ' as JSON: ' + e.message);
         }
@@ -508,12 +539,13 @@ async function applyOverridesNonInteractive(opts) {
                 }
                 if (obj[key] !== value) {
                     obj[key] = value;
+                    text = setJsoncString(text, key, value);
                     changed = true;
                 }
             }
         }
         if (changed) {
-            await writeFile(dst, JSON.stringify(obj, null, 4) + '\n');
+            await writeFile(dst, text);
             ok('Updated ' + entry.target + ' (from CLI flags)');
             summary.configsPatched.push(entry.target);
         }
@@ -539,11 +571,13 @@ async function promptConfigs(opts) {
     activeReadline = rl;
     try {
         for (const entry of CONFIG_FILES) {
+            if (!entry.keys.length) continue;
             const dst = join(CONFIG_DIR, entry.target);
             const raw = await readFile(dst, 'utf8');
+            let text = raw;
             let obj;
             try {
-                obj = JSON.parse(raw);
+                obj = readJsonc(raw);
             } catch (e) {
                 throw new Error('Could not parse ' + entry.target + ' as JSON: ' + e.message);
             }
@@ -557,7 +591,7 @@ async function promptConfigs(opts) {
                     if (!result.valid) {
                         throw new Error('Invalid value for --' + spec.flag + '=' + JSON.stringify(value) + ': ' + result.error);
                     }
-                    if (obj[key] !== value) { obj[key] = value; changed = true; }
+                    if (obj[key] !== value) { obj[key] = value; text = setJsoncString(text, key, value); changed = true; }
                     console.log('    ' + c.dim + key + ' = ' + value + '  (from --' + spec.flag + ')' + c.reset);
                     continue;
                 }
@@ -573,12 +607,13 @@ async function promptConfigs(opts) {
                         continue;
                     }
                     obj[key] = trimmed;
+                    text = setJsoncString(text, key, trimmed);
                     changed = true;
                     break;
                 }
             }
             if (changed) {
-                await writeFile(dst, JSON.stringify(obj, null, 4) + '\n');
+                await writeFile(dst, text);
                 ok('Updated ' + entry.target);
                 summary.configsPatched.push(entry.target);
             } else {
