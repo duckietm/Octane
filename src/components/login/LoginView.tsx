@@ -64,6 +64,26 @@ const interpolate = (value: string | null | undefined): string => {
     });
 };
 
+/**
+ * The address of a login API: the configured key when the hotel set one, else the path under api.url, else under the
+ * login endpoint's origin. Null when none of them makes an address.
+ */
+const resolveAuthApiUrl = (configKey: string, path: string, loginUrl: string): { url: string; source: string } | null => {
+    const configured = interpolate(GetConfigurationValue<string>(configKey, ''));
+
+    if (configured) return { url: configured, source: configKey };
+
+    const apiUrl = interpolate(GetConfigurationValue<string>('api.url', '')).replace(/\/+$/, '');
+
+    try {
+        if (/^https?:\/\//i.test(apiUrl)) return { url: `${apiUrl}${path}`, source: `derived from api.url "${apiUrl}"` };
+
+        return { url: new URL(path, new URL(loginUrl, window.location.href)).toString(), source: `derived from login.endpoint "${loginUrl}"` };
+    } catch {
+        return null;
+    }
+};
+
 const CHAT_TRANSLATION_SETTINGS_KEY = 'chatTranslationSettings';
 const getDefaultLoginImages = (): Record<string, string> => {
     const imagesBase = (GetConfigurationValue<string>('images.url', '') || '').replace(/\/$/, '');
@@ -180,6 +200,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [maintenance, setMaintenance] = useState<{ enabled: boolean; message: string } | null>(null);
+    const [serverTurnstile, setServerTurnstile] = useState<{ enabled: boolean; sitekey: string } | null>(null);
     const [info, setInfo] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [loginTurnstileToken, setLoginTurnstileToken] = useState('');
@@ -244,8 +265,9 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
     const languageWindow = useDraggableLoginWindow('language', languageWindowRef);
     const authWindow = useDraggableLoginWindow('auth', authWindowRef);
     const registerWindow = useDraggableLoginWindow('register', registerWindowRef);
-    const turnstileSiteKey = GetConfigurationValue<string>('login.turnstile.sitekey', '');
-    const rawTurnstileEnabled = GetConfigurationValue<unknown>('login.turnstile.enabled', false);
+    // What the server says about Turnstile wins over the hotel's configuration: it is the side that verifies.
+    const turnstileSiteKey = serverTurnstile?.sitekey || GetConfigurationValue<string>('login.turnstile.sitekey', '');
+    const rawTurnstileEnabled = serverTurnstile ? serverTurnstile.enabled : GetConfigurationValue<unknown>('login.turnstile.enabled', false);
     const turnstileEnabled =
         (rawTurnstileEnabled === true || rawTurnstileEnabled === 'true' || rawTurnstileEnabled === 1 || rawTurnstileEnabled === '1') && !!turnstileSiteKey;
 
@@ -435,24 +457,11 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
     }, [healthUrl, healthMethod]);
 
     useEffect(() => {
-        let url = interpolate(GetConfigurationValue<string>('login.maintenance.endpoint', ''));
-        let source = 'login.maintenance.endpoint';
+        const address = resolveAuthApiUrl('login.maintenance.endpoint', '/api/maintenance', loginUrl);
 
-        if (!url) {
-            const apiUrl = interpolate(GetConfigurationValue<string>('api.url', '')).replace(/\/+$/, '');
+        if (!address) return;
 
-            try {
-                if (/^https?:\/\//i.test(apiUrl)) {
-                    url = `${apiUrl}/api/maintenance`;
-                    source = `derived from api.url "${apiUrl}"`;
-                } else {
-                    url = new URL('/api/maintenance', new URL(loginUrl, window.location.href)).toString();
-                    source = `derived from login.endpoint "${loginUrl}"`;
-                }
-            } catch {
-                return;
-            }
-        }
+        const { url, source } = address;
 
         const controller = new AbortController();
         const reportProbeFailure = (detail: string) => {
@@ -487,6 +496,34 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
             } catch (error) {
                 if (!controller.signal.aborted) reportProbeFailure(String((error as Error)?.message ?? error));
             }
+        })();
+
+        return () => controller.abort();
+    }, [loginUrl]);
+
+    // The login page's public settings (GET /api/public-settings); a server without the route keeps the configuration.
+    useEffect(() => {
+        const address = resolveAuthApiUrl('login.public_settings.endpoint', '/api/public-settings', loginUrl);
+
+        if (!address) return;
+
+        const controller = new AbortController();
+
+        (async () => {
+            try {
+                const response = await fetch(address.url, { credentials: 'omit', signal: controller.signal });
+
+                if (!response.ok) return;
+
+                const payload = (await response.json()) as { turnstile?: { enabled?: unknown; sitekey?: unknown } };
+
+                if (controller.signal.aborted || !payload?.turnstile) return;
+
+                setServerTurnstile({
+                    enabled: payload.turnstile.enabled === true,
+                    sitekey: typeof payload.turnstile.sitekey === 'string' ? payload.turnstile.sitekey : ''
+                });
+            } catch {}
         })();
 
         return () => controller.abort();

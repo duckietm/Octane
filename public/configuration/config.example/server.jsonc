@@ -224,6 +224,9 @@
     // Maintenance status address; empty: derived from api.url or login.endpoint (/api/maintenance).
     "login.maintenance.endpoint": "${api.url}/api/maintenance",
 
+    // Address of the login page's public settings (Turnstile on or off and its site key); empty: /api/public-settings under api.url.
+    "login.public_settings.endpoint": "",
+
     // Address that checks whether a registration email is free.
     "login.check-email.endpoint": "${api.url}/api/auth/check-email",
 

@@ -52,6 +52,7 @@
     "login.reset.endpoint": "/api/auth/reset-password",
     "login.logout.endpoint": "/api/auth/logout",
     "login.health.method": "GET",
+    "login.public_settings.endpoint": "",
     "login.check-email.endpoint": "/api/auth/check-email",
     "login.check-username.endpoint": "/api/auth/check-username",
     "login.room_templates.endpoint": "/api/auth/room-templates",

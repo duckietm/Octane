@@ -15,10 +15,12 @@ import {
     ensureBadgeLeaderboardLoaded,
     GetConfigurationValue,
     getBadgesRank,
+    GetHotelSettings,
     GetGroupInformation,
     GetUserProfile,
     LocalizeText,
     localizeWithFallback,
+    resolveServerLength,
     SendMessageComposer
 } from '../../../../../api';
 import homeIcon from '../../../../../assets/images/infostand/home-icon.png';
@@ -95,7 +97,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     }, []);
 
     const saveMotto = (motto: string) => {
-        if (!isEditingMotto || motto.length > GetConfigurationValue<number>('motto.max.length', 38) || !roomSession) return;
+        if (!isEditingMotto || motto.length > resolveServerLength(GetHotelSettings(), 'mottoMaxLength', GetConfigurationValue<number>('motto.max.length', 38)) || !roomSession) return;
 
         roomSession.sendMottoMessage(motto);
         setIsEditingMotto(false);
@@ -212,7 +214,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     if (!avatarInfo) return null;
 
     const isOwnUser = avatarInfo.type === AvatarInfoUser.OWN_USER;
-    const mottoMaxLength = GetConfigurationValue<number>('motto.max.length', 38);
+    const mottoMaxLength = resolveServerLength(GetHotelSettings(), 'mottoMaxLength', GetConfigurationValue<number>('motto.max.length', 38));
     const showAchievementScore = GetConfigurationValue<boolean>('activity.point.display.enabled', true);
     const hasRelationships = !!relationships?.relationshipStatusMap.length;
 

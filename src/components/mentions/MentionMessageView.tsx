@@ -1,5 +1,6 @@
 import { FC, Fragment } from 'react';
 import { segmentMentionText } from '../../api/mentions/mentionSegments';
+import { GetServerMentionAliases } from '../../api/settings/HotelSettings';
 
 interface MentionMessageViewProps {
     text: string;
@@ -19,7 +20,7 @@ export const MentionMessageView: FC<MentionMessageViewProps> = (props) => {
 
     if (!text) return <span className={className} />;
 
-    const nodes = segmentMentionText(text, ownUsername).map((segment, index) =>
+    const nodes = segmentMentionText(text, ownUsername, GetServerMentionAliases() ?? undefined).map((segment, index) =>
         segment.kind ? (
             <span key={index} className={segment.kind === 'self' ? 'mention-tag mention-tag--self' : 'mention-tag'}>
                 {segment.text}

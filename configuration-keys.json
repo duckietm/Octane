@@ -74,6 +74,7 @@
         {"key":"login.health.endpoint","comment":"Address probed before login; 403, 5xx or no answer in 5 s means unreachable. Empty: no probe.","value":"","example":"${api.url}/api/health"},
         {"key":"login.health.method","comment":"HTTP method of the login health probe.","value":"GET","runtime":true},
         {"key":"login.maintenance.endpoint","comment":"Maintenance status address; empty: derived from api.url or login.endpoint (/api/maintenance).","value":"","example":"${api.url}/api/maintenance"},
+        {"key":"login.public_settings.endpoint","comment":"Address of the login page's public settings (Turnstile on or off and its site key); empty: /api/public-settings under api.url.","value":"","runtime":true},
         {"key":"login.check-email.endpoint","comment":"Address that checks whether a registration email is free.","value":"/api/auth/check-email","example":"${api.url}/api/auth/check-email","runtime":true},
         {"key":"login.check-username.endpoint","comment":"Address that checks whether a registration username is free.","value":"/api/auth/check-username","example":"${api.url}/api/auth/check-username","runtime":true},
         {"key":"login.room_templates.endpoint","comment":"Address of the starter room templates offered at registration; empty: no room step data.","value":"/api/auth/room-templates","example":"${api.url}/api/auth/room-templates","runtime":true},

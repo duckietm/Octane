@@ -21,7 +21,7 @@ import {
     PrepareRenderer
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
-import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, getPendingPasswordResetToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock, localizeWithFallback } from './api';
+import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, getPendingPasswordResetToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, ListenForHotelSettings, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock, localizeWithFallback } from './api';
 import { Base } from './common';
 import { LoadingView } from './components/loading/LoadingView';
 import { LoginView } from './components/login/LoginView';
@@ -516,6 +516,7 @@ export const App: FC<{}> = (props) => {
                 // Log in while the hotel loads. Messages after the login stay held by the connection
                 // until MainView has mounted and calls ready(), so no handler misses its packets.
                 // A login that failed is replaced by this one; finished boot steps are kept.
+                ListenForHotelSettings();
                 const connected = GetCommunication().init();
 
                 connected.catch(() => undefined);
