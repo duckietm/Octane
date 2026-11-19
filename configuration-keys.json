@@ -22,6 +22,7 @@
         {"key":"emustats.endpoint","comment":"Address of the emulator stats API; ${...} placeholders are resolved.","value":"${api.url}/api/emustats","runtime":true},
         {"key":"external.plugins","comment":"Plugin scripts to load: URLs, or {url, integrity}; only same-origin or https.","value":[],"runtime":true},
         {"key":"external.plugins.allowed.hosts","comment":"Hosts plugin scripts may come from; empty: any https host.","value":[],"runtime":true},
+        {"key":"external.plugins.server.url","comment":"Where the emulator lists the client scripts of its plugins, loaded on their own; empty: only external.plugins load.","value":"${api.url}/api/client-plugins","runtime":true},
         {"key":"show.google.ads","comment":"Shows the ad window (publisher id from /ads.txt, slot from adsense.json).","value":false,"runtime":true},
         {"key":"ads.frame.url","comment":"Ad page on another origin shown in a sandboxed frame; empty: the ad script runs in the client page.","value":"","runtime":true}
     ],

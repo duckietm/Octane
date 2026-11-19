@@ -1,6 +1,7 @@
+import { GetConfiguration } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { GetOptionalConfigurationValue } from '../../api/octane/GetConfigurationValue';
-import { PluginEntry, PluginScript, resolvePluginScripts } from '../../api/utils/resolvePluginScripts';
+import { PluginEntry, PluginScript, resolvePluginScripts, serverPluginEntries } from '../../api/utils/resolvePluginScripts';
 import { subscribePlugins } from './OctanePluginApi';
 
 import './OctanePluginApi';
@@ -35,6 +36,54 @@ export const appendPluginScript = (script: PluginScript, target: Document = docu
     return element;
 };
 
+/** Where the emulator lists the client scripts of its plugins (`external.plugins.server.url`); empty turns it off. */
+const pluginListUrl = (): string => {
+    const configured = GetOptionalConfigurationValue<string>('external.plugins.server.url', '${api.url}/api/client-plugins');
+
+    if (typeof configured !== 'string' || !configured.trim()) return '';
+
+    try {
+        return GetConfiguration().interpolate(configured.trim());
+    } catch {
+        return configured.trim();
+    }
+};
+
+/**
+ * The scripts of the plugins installed on the emulator. Each comes with its integrity, and the emulator's origin is
+ * trusted like the client's own; an endpoint that is missing or answers with something else loads nothing.
+ */
+export const fetchServerPluginScripts = async (
+    endpoint: string,
+    allowedHosts: readonly string[],
+    clientOrigin: string,
+    warn: (message: string) => void,
+    fetcher: typeof fetch = fetch
+): Promise<PluginScript[]> => {
+    let url: URL;
+
+    try {
+        url = new URL(endpoint, clientOrigin);
+    } catch {
+        warn(`external.plugins.server.url is not a URL: ${endpoint}`);
+        return [];
+    }
+
+    try {
+        const response = await fetcher(url.href, { headers: { Accept: 'application/json' }, credentials: 'omit' });
+
+        // An emulator without the endpoint, or a dev server answering with its page, lists no plugins.
+        if (!response.ok || !(response.headers.get('content-type') || '').includes('json')) return [];
+
+        const entries = serverPluginEntries(await response.json(), url.href, warn);
+
+        return resolvePluginScripts(entries, allowedHosts, clientOrigin, warn, [url.origin]);
+    } catch (e) {
+        warn(`could not read the plugin list at ${url.href}: ${e instanceof Error ? e.message : String(e)}`);
+        return [];
+    }
+};
+
 export const ExternalPluginLoader: FC<{}> = () => {
     const [, forceUpdate] = useState(0);
 
@@ -45,35 +94,51 @@ export const ExternalPluginLoader: FC<{}> = () => {
     useEffect(() => {
         let entries: PluginEntry[] = [];
         let allowedHosts: string[] = [];
+        let serverUrl = '';
 
-        // Both keys are optional (no plugins is the default), so a config without them does not warn.
+        // Every key is optional (no plugins is the default), so a config without them does not warn.
         try {
             entries = GetOptionalConfigurationValue<PluginEntry[]>('external.plugins', []) || [];
             allowedHosts = GetOptionalConfigurationValue<string[]>('external.plugins.allowed.hosts', []) || [];
+            serverUrl = pluginListUrl();
         } catch (e) {
             console.warn('[OctanePlugins] Could not read external.plugins config:', e);
             return;
         }
 
-        if (!Array.isArray(entries) || !entries.length) {
-            console.log('[OctanePlugins] No external plugins configured');
-            return;
-        }
-
-        const scripts = resolvePluginScripts(
-            entries,
-            Array.isArray(allowedHosts) ? allowedHosts : [],
-            window.location.origin,
-            (message) => console.warn(`[OctanePlugins] ${message}`)
-        );
-
-        console.log(
-            '[OctanePlugins] Loading external plugins:',
-            scripts.map((script) => script.src)
-        );
+        const hosts = Array.isArray(allowedHosts) ? allowedHosts : [];
+        const warn = (message: string) => console.warn(`[OctanePlugins] ${message}`);
 
         // A plugin registers itself once it runs; its script stays in the page for the whole session.
-        for (const script of scripts) appendPluginScript(script);
+        if (Array.isArray(entries) && entries.length) {
+            const scripts = resolvePluginScripts(entries, hosts, window.location.origin, warn);
+
+            console.log(
+                '[OctanePlugins] Loading configured plugins:',
+                scripts.map((script) => script.src)
+            );
+
+            for (const script of scripts) appendPluginScript(script);
+        }
+
+        if (!serverUrl) return;
+
+        let cancelled = false;
+
+        fetchServerPluginScripts(serverUrl, hosts, window.location.origin, warn).then((scripts) => {
+            if (cancelled || !scripts.length) return;
+
+            console.log(
+                '[OctanePlugins] Loading the emulator plugins:',
+                scripts.map((script) => script.src)
+            );
+
+            for (const script of scripts) appendPluginScript(script);
+        });
+
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
     return null;

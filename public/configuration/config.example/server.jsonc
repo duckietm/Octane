@@ -68,6 +68,9 @@
     // Hosts plugin scripts may come from; empty: any https host.
     "external.plugins.allowed.hosts": [],
 
+    // Where the emulator lists the client scripts of its plugins, loaded on their own; empty: only external.plugins load.
+    "external.plugins.server.url": "${api.url}/api/client-plugins",
+
     // Shows the ad window (publisher id from /ads.txt, slot from adsense.json).
     "show.google.ads": false,
 

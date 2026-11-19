@@ -18,7 +18,8 @@ export const resolvePluginScripts = (
     entries: readonly PluginEntry[],
     allowedHosts: readonly string[],
     clientOrigin: string,
-    warn: (message: string) => void = () => {}
+    warn: (message: string) => void = () => {},
+    trustedOrigins: readonly string[] = []
 ): PluginScript[] => {
     const hosts = allowedHosts.map((host) => String(host).trim().toLowerCase()).filter(Boolean);
     const scripts: PluginScript[] = [];
@@ -35,7 +36,9 @@ export const resolvePluginScripts = (
             continue;
         }
 
-        const sameOrigin = target.origin === clientOrigin;
+        // The emulator that lists its plugins' scripts is trusted as the client's own origin: it may be http in
+        // development and is not one of the hosts the hotel lists for scripts served elsewhere.
+        const sameOrigin = target.origin === clientOrigin || trustedOrigins.includes(target.origin);
 
         if (!sameOrigin && target.protocol !== 'https:') {
             warn(`skipped, only this origin or https: ${target.href}`);
@@ -58,4 +61,38 @@ export const resolvePluginScripts = (
     }
 
     return scripts;
+};
+
+/**
+ * The plugin entries the emulator lists at its client plugins endpoint, `{ plugins: [{ name, url, integrity }] }`,
+ * with each URL resolved against the endpoint. An entry without a well-formed integrity is skipped: the emulator
+ * always sends one, so a missing one means the answer is not the emulator's.
+ */
+export const serverPluginEntries = (body: unknown, endpoint: string, warn: (message: string) => void = () => {}): PluginEntry[] => {
+    const plugins = (body as { plugins?: unknown } | null)?.plugins;
+
+    if (!Array.isArray(plugins)) {
+        warn(`the plugin list at ${endpoint} is not { plugins: [...] }`);
+        return [];
+    }
+
+    const entries: PluginEntry[] = [];
+
+    for (const plugin of plugins) {
+        const url = typeof plugin?.url === 'string' ? plugin.url.trim() : '';
+        const integrity = typeof plugin?.integrity === 'string' ? plugin.integrity.trim() : '';
+
+        if (!url || !INTEGRITY.test(integrity)) {
+            warn(`skipped a listed plugin without a URL or an integrity: ${JSON.stringify(plugin)}`);
+            continue;
+        }
+
+        try {
+            entries.push({ url: new URL(url, endpoint).href, integrity });
+        } catch {
+            warn(`skipped, not a URL: ${url}`);
+        }
+    }
+
+    return entries;
 };
