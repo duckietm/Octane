@@ -17,6 +17,7 @@
     "emustats.endpoint": "${api.url}/api/emustats",
     "external.plugins": [],
     "external.plugins.allowed.hosts": [],
+    "external.plugins.server.url": "${api.url}/api/client-plugins",
     "show.google.ads": false,
     "ads.frame.url": "",
     "sounds.url": "${asset.url}/sounds/%sample%.mp3",

@@ -421,6 +421,9 @@ frame-ancestors 'self' https://cms.example.com
 - **`blob:`** in `script-src` is for `asset-loader.js`, which imports the unpacked bundle from a blob.
 - **External plugins**: every `external.plugins` host must be added to `script-src`, and should also be listed in
   `external.plugins.allowed.hosts`.
+- **Emulator plugins**: the scripts plugins ship in their jars come from the emulator (`external.plugins.server.url`,
+  `${api.url}/api/client-plugins` by default), so the `api.url` host goes in `script-src` too. Each carries its
+  integrity; leave that key empty to load none.
 - **Ads**: with `ads.frame.url` (section 15) their origin in `frame-src` is enough; AdSense straight in the client
   needs the Google domains in `script-src`, `img-src`, `connect-src` and `frame-src` instead.
 - **`frame-ancestors`**: list the CMS that embeds the client, or keep `'self'`.
