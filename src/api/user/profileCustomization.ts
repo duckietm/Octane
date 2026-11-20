@@ -1,13 +1,29 @@
-import { RoomUnitBackgroundComposer, UserProfileParser } from '@octane/renderer';
+import { KEEP_PROFILE_CUSTOMIZATION, RoomUnitBackgroundComposer, UserProfileParser } from '@octane/renderer';
 import { configFileUrl } from '../../secure-assets';
 import { GetConfigurationValue, GetOptionalConfigurationValue, SendMessageComposer } from '../octane';
 import { GetUserProfile } from './GetUserProfile';
 
-/** One banner of the gallery: its id and the picture, a path below images.url or a full URL. */
+/**
+ * One banner of the gallery: its id, the picture (a path below images.url or a full URL) and the
+ * part of it the banner shows. Gallery pictures are pixel art, shown at their own size so they stay
+ * sharp: "position" picks the part, as a CSS background-position.
+ */
 export interface ProfileBannerEntry {
     id: number;
     image: string;
+    position?: string;
 }
+
+export const DEFAULT_PROFILE_BANNER_POSITION = 'left 72%';
+
+const PROFILE_BANNER_SKY = 'linear-gradient(180deg, #6fb3dc 0%, #b9e0f2 100%)';
+
+/** The style of a gallery banner: the picture at its own size over a sky gradient that fills the rest. */
+export const profileGalleryBannerStyle = (entry: ProfileBannerEntry): { backgroundImage: string; backgroundPosition: string; backgroundSize: string } => ({
+    backgroundImage: `url(${resolveProfileBannerUrl(entry.image)}), ${PROFILE_BANNER_SKY}`,
+    backgroundPosition: `${entry.position ?? DEFAULT_PROFILE_BANNER_POSITION}, 0 0`,
+    backgroundSize: 'auto, 100% 100%'
+});
 
 /** The accent palette of the profile window. Id 0 is the default look and has no colour. */
 export const PROFILE_ACCENTS: ReadonlyArray<{ id: number; color: string }> = [
@@ -43,9 +59,12 @@ export interface ProfileCustomizationData {
     banners: ProfileBannerEntry[];
     cards: number[];
     borders: number[];
+    backgrounds: number[];
+    stands: number[];
+    overlays: number[];
 }
 
-type RawData = Partial<Record<'banners.data' | 'cards.data' | 'backgrounds.data' | 'borders.data', unknown[]>>;
+type RawData = Partial<Record<'banners.data' | 'cards.data' | 'backgrounds.data' | 'borders.data' | 'stands.data' | 'overlays.data', unknown[]>>;
 
 const readIds = (list: unknown[] | undefined, field: string): number[] =>
     (Array.isArray(list) ? list : [])
@@ -54,14 +73,22 @@ const readIds = (list: unknown[] | undefined, field: string): number[] =>
 
 export const parseProfileCustomizationData = (raw: RawData | null): ProfileCustomizationData => {
     const banners = (Array.isArray(raw?.['banners.data']) ? raw['banners.data'] : [])
-        .map((item) => ({ id: Number((item as Record<string, unknown>)?.bannerId), image: String((item as Record<string, unknown>)?.image ?? '') }))
-        .filter((entry) => Number.isInteger(entry.id) && entry.id > 0 && entry.image.length > 0);
+        .map((item) => {
+            const entry = item as Record<string, unknown>;
+
+            return { id: Number(entry?.bannerId), image: String(entry?.image ?? ''), position: typeof entry?.position === 'string' ? entry.position : undefined };
+        })
+        .filter((entry) => Number.isInteger(entry.id) && entry.id > 0 && entry.image.length > 0)
+        .map((entry) => (entry.position ? entry : { id: entry.id, image: entry.image }));
     const cards = readIds(raw?.['cards.data']?.length ? raw['cards.data'] : raw?.['backgrounds.data'], 'backgroundId');
 
     return {
         banners: banners.length ? banners : [...DEFAULT_PROFILE_BANNERS],
         cards: cards.length ? cards : [0],
-        borders: readIds(raw?.['borders.data'], 'borderId')
+        borders: readIds(raw?.['borders.data'], 'borderId'),
+        backgrounds: readIds(raw?.['backgrounds.data'], 'backgroundId'),
+        stands: readIds(raw?.['stands.data'], 'standId'),
+        overlays: readIds(raw?.['overlays.data'], 'overlayId')
     };
 };
 
@@ -80,7 +107,9 @@ export const loadProfileCustomizationData = (): Promise<ProfileCustomizationData
             const fallback: RawData = {
                 'cards.data': GetOptionalConfigurationValue<unknown[]>('cards.data', []),
                 'backgrounds.data': GetOptionalConfigurationValue<unknown[]>('backgrounds.data', []),
-                'borders.data': GetOptionalConfigurationValue<unknown[]>('borders.data', [])
+                'borders.data': GetOptionalConfigurationValue<unknown[]>('borders.data', []),
+                'stands.data': GetOptionalConfigurationValue<unknown[]>('stands.data', []),
+                'overlays.data': GetOptionalConfigurationValue<unknown[]>('overlays.data', [])
             };
             cachedData = parseProfileCustomizationData(json && typeof json === 'object' ? { ...fallback, ...(json as RawData) } : fallback);
 
@@ -101,30 +130,32 @@ export const resolveProfileBannerUrl = (image: string): string => {
     return `${GetConfigurationValue<string>('images.url', '')}/${image}`;
 };
 
-export const findProfileBannerUrl = (banners: ReadonlyArray<ProfileBannerEntry>, bannerId: number): string => {
-    if (!bannerId) return '';
+export const findProfileBanner = (banners: ReadonlyArray<ProfileBannerEntry>, bannerId: number): ProfileBannerEntry | null =>
+    (bannerId && banners.find((banner) => banner.id === bannerId)) || null;
 
-    const entry = banners.find((banner) => banner.id === bannerId);
+export const findProfileBannerUrl = (banners: ReadonlyArray<ProfileBannerEntry>, bannerId: number): string => {
+    const entry = findProfileBanner(banners, bannerId);
 
     return entry ? resolveProfileBannerUrl(entry.image) : '';
 };
 
-export type ProfileCustomizationChange = Partial<Record<'card' | 'border' | 'banner' | 'accent', number>>;
+export type ProfileCustomizationChange = Partial<Record<'background' | 'stand' | 'overlay' | 'card' | 'border' | 'banner' | 'accent', number>>;
 
 /**
- * Saves one change of the own profile window. The infostand values travel in the same message,
- * so they are sent as they are now; the profile is asked for again to show the result.
+ * Saves one change of the own profile window. The infostand values travel in the same message, so
+ * they are sent as they are now; banner and accent are left to the server unless they change. The
+ * profile is asked for again to show the result.
  */
 export const sendProfileCustomization = (profile: UserProfileParser, change: ProfileCustomizationChange): void => {
     SendMessageComposer(
         new RoomUnitBackgroundComposer(
-            profile.backgroundId ?? 0,
-            profile.standId ?? 0,
-            profile.overlayId ?? 0,
+            change.background ?? profile.backgroundId ?? 0,
+            change.stand ?? profile.standId ?? 0,
+            change.overlay ?? profile.overlayId ?? 0,
             change.card ?? profile.cardBackgroundId ?? 0,
             change.border ?? profile.borderId ?? 0,
-            change.banner ?? profile.bannerId ?? 0,
-            change.accent ?? profile.accentId ?? 0
+            change.banner ?? KEEP_PROFILE_CUSTOMIZATION,
+            change.accent ?? KEEP_PROFILE_CUSTOMIZATION
         )
     );
     GetUserProfile(profile.id);

@@ -748,12 +748,35 @@
   flex: 0 0 auto;
   height: 110px;
   background-color: #8fc8e8;
-  background-image: none;
   background-repeat: no-repeat;
-  background-size: cover;
-  background-position: left 62%;
   border-bottom: 2px solid var(--profile-accent, #afafaf);
+}
+
+/* Gallery banners are pixel art: shown at their own size, never resampled, over a sky that fills
+   whatever the picture leaves transparent. */
+.octane-extended-profile__banner--gallery {
+  background-color: #8fc8e8;
+  background-image: linear-gradient(180deg, #6fb3dc 0%, #b9e0f2 100%);
+  background-size: auto;
   image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* An uploaded banner was cropped to 1280 x 220 in the editor: it fills the strip at half size. */
+.octane-extended-profile__banner--custom {
+  background-size: cover;
+  background-position: center;
+  image-rendering: auto;
+}
+
+.octane-extended-profile__banner--empty {
+  background: repeating-linear-gradient(45deg, #e4e1d6, #e4e1d6 8px, #efede4 8px, #efede4 16px);
+}
+
+.octane-extended-profile-window__content--custom-background {
+  background-size: cover !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+  image-rendering: auto;
 }
 
 .octane-extended-profile__banner-edit {
@@ -841,11 +864,10 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 56px;
+  height: 64px;
   background-color: #8fc8e8;
   background-repeat: no-repeat;
-  background-size: cover;
-  background-position: left 62%;
+  background-size: auto;
   image-rendering: var(--octane-pixel-art, pixelated);
 }
 
@@ -878,4 +900,162 @@
 
 .octane-profile-customize__swatch--none {
   background: linear-gradient(135deg, #fff 45%, #d23c3c 45%, #d23c3c 55%, #fff 55%);
+}
+
+/* The customiser: the profile top as it is now, the upload row, the sections and the picture editor. */
+.octane-profile-customize__preview {
+  position: relative;
+  flex: 0 0 auto;
+  background: #ece8dc;
+  border-bottom: 1px solid var(--profile-accent, #afafaf);
+}
+
+.octane-profile-customize__preview .octane-extended-profile__banner {
+  height: 96px;
+}
+
+.octane-profile-customize__preview-identity {
+  position: absolute;
+  left: 12px;
+  bottom: 6px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.octane-profile-customize__preview-avatar {
+  position: relative;
+  width: 54px;
+  height: 84px;
+  overflow: hidden;
+  border-radius: 3px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.octane-profile-customize__preview-avatar .avatar-image {
+  transform: scale(0.75);
+  transform-origin: bottom center;
+}
+
+.octane-profile-customize__preview-name {
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 700;
+  color: #222;
+}
+
+.octane-profile-customize__upload {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #d5d1c4;
+}
+
+.octane-profile-customize__upload-current {
+  width: 72px;
+  height: 24px;
+  border: 1px solid #8d8d8d;
+  border-radius: 3px;
+  background-size: cover;
+  background-position: center;
+}
+
+.octane-profile-customize__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.octane-profile-customize__section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.octane-profile-customize__message {
+  margin: 0;
+  padding: 4px 8px;
+  border-radius: 3px;
+  background: #fde8e8;
+  color: #8a1f1f;
+  font-size: 12px;
+}
+
+.octane-profile-image-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.octane-profile-image-editor__canvas {
+  width: 100%;
+  border: 1px solid #8d8d8d;
+  border-radius: 3px;
+  background: repeating-conic-gradient(#e4e1d6 0% 25%, #f4f2ea 0% 50%) 50% / 16px 16px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.octane-profile-image-editor__canvas:active {
+  cursor: grabbing;
+}
+
+.octane-profile-image-editor--background .octane-profile-image-editor__canvas {
+  width: auto;
+  height: 240px;
+  align-self: center;
+}
+
+.octane-profile-image-editor__canvas.is-pixelated {
+  image-rendering: pixelated;
+}
+
+.octane-profile-image-editor__hint {
+  margin: 0;
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+}
+
+.octane-profile-image-editor__zoom {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.octane-profile-image-editor__actions,
+.octane-profile-image-editor__footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.octane-profile-image-editor__footer {
+  justify-content: flex-end;
+}
+
+.octane-profile-image-editor__pixelated {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.octane-profile-image-editor__error {
+  margin: 0;
+  color: #8a1f1f;
+  font-size: 12px;
+}
+
+.octane-profile-customize.has-profile-accent .octane-card-header-shell {
+  background: var(--profile-accent);
 }

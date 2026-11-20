@@ -4,12 +4,16 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const sendProfileCustomization = vi.hoisted(() => vi.fn());
+const removeProfileImage = vi.hoisted(() => vi.fn(() => Promise.resolve(true)));
 
 vi.mock('../../api', async (importOriginal) => ({
     ...(await importOriginal<Record<string, unknown>>()),
     loadProfileCustomizationData: () =>
-        Promise.resolve({ banners: [{ id: 1, image: 'reception/nl.png' }], cards: [0, 3], borders: [2] }),
+        Promise.resolve({ banners: [{ id: 1, image: 'reception/nl.png' }], cards: [0, 3], borders: [2], backgrounds: [0, 1], stands: [0], overlays: [0] }),
     resolveProfileBannerUrl: (image: string) => `https://assets/${image}`,
+    profileImageUrl: (file: string) => `https://assets/profile-images/${file}`,
+    removeProfileImage,
+    uploadProfileImage: vi.fn(),
     sendProfileCustomization
 }));
 
@@ -21,6 +25,26 @@ describe('ProfileCustomizeView', () => {
     afterEach(() => {
         cleanup();
         sendProfileCustomization.mockClear();
+        removeProfileImage.mockClear();
+    });
+
+    it('removes the uploaded banner before a gallery banner replaces it', async () => {
+        const withUpload = { ...profile, bannerImage: '9_banner_0123456789abcdef.jpg' };
+
+        render(<ProfileCustomizeView userProfile={withUpload as never} onClose={() => undefined} />);
+
+        fireEvent.click(await screen.findByRole('button', { name: 'Banner 1' }));
+
+        await vi.waitFor(() => expect(sendProfileCustomization).toHaveBeenCalledWith(withUpload, { banner: 1 }));
+        expect(removeProfileImage).toHaveBeenCalledWith('banner');
+    });
+
+    it('offers an upload button on the banner and background tabs', async () => {
+        render(<ProfileCustomizeView userProfile={profile as never} onClose={() => undefined} />);
+
+        expect(await screen.findByRole('button', { name: 'Upload a picture' })).toBeInTheDocument();
+        fireEvent.click(screen.getByText('Background'));
+        expect(screen.getByRole('button', { name: 'Upload a picture' })).toBeInTheDocument();
     });
 
     it('saves the banner picked from the gallery', async () => {

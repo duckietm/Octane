@@ -15,7 +15,6 @@ import {
 import { CSSProperties, FC, useEffect, useState } from 'react';
 import {
     CreateLinkEvent,
-    findProfileBannerUrl,
     getProfileAccentColor,
     GetRoomSession,
     GetUserProfile,
@@ -24,6 +23,7 @@ import {
     LocalizeText,
     localizeWithFallback,
     ProfileBannerEntry,
+    profileImageUrl,
     SanitizeHtml,
     SendMessageComposer
 } from '../../api';
@@ -35,6 +35,7 @@ import { OctaneCard } from '../../layout';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
 import { GroupsContainerView } from './GroupsContainerView';
+import { ProfileBannerView } from './ProfileBannerView';
 import { ProfileCustomizeView } from './ProfileCustomizeView';
 import { UserContainerView } from './UserContainerView';
 
@@ -163,9 +164,15 @@ export const UserProfileView: FC<{}> = () => {
     if (!userProfile) return null;
 
     const cardBackgroundId = userProfile.cardBackgroundId ?? 0;
-    const cardBackgroundClass = cardBackgroundId ? `profile-card-background card-background-${cardBackgroundId}` : '';
+    const customBackground = userProfile.backgroundImage ?? '';
+    // An uploaded background wins over the card background picked from the list.
+    const cardBackgroundClass = customBackground
+        ? 'profile-card-background octane-extended-profile-window__content--custom-background'
+        : cardBackgroundId
+          ? `profile-card-background card-background-${cardBackgroundId}`
+          : '';
+    const contentStyle = customBackground ? ({ backgroundImage: `url(${profileImageUrl(customBackground)})` } as CSSProperties) : undefined;
     const isOwnProfile = userProfile.id === GetSessionDataManager().userId;
-    const bannerUrl = findProfileBannerUrl(banners, bannerId);
     const accentColor = getProfileAccentColor(userProfile.accentId ?? 0);
     const accentStyle = accentColor ? ({ '--profile-accent': accentColor } as CSSProperties) : undefined;
     const customizeLabel = localizeWithFallback('extendedprofile.customize.title', 'Customise profile');
@@ -178,7 +185,7 @@ export const UserProfileView: FC<{}> = () => {
                 uniqueKey="octane-user-profile"
             >
                 <OctaneCard.Header headerText={LocalizeText('extendedprofile.caption')} onCloseClick={onClose} />
-                <OctaneCard.Content className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}`}>
+                <OctaneCard.Content className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}`} style={contentStyle}>
                     {isBlocked && (
                         // Official blocked_container: the drama text, whose "event:profile/unblock" link
                         // opens the unblock confirm (it carries no href, so it is never followed as a
@@ -206,17 +213,15 @@ export const UserProfileView: FC<{}> = () => {
                             <img className="octane-extended-profile__blocked-frank" src={frankStop} alt="" draggable={false} />
                         </div>
                     )}
-                    {bannerUrl && (
-                        <div className="octane-extended-profile__banner" style={{ backgroundImage: `url(${bannerUrl})` }}>
-                            {isOwnProfile && (
-                                <Hint content={customizeLabel}>
-                                    <BaseButton aria-label={customizeLabel} className="octane-extended-profile__banner-edit" type="button" onClick={() => setIsCustomizing((value) => !value)}>
-                                        <img src={pencilIcon} alt="" draggable={false} />
-                                    </BaseButton>
-                                </Hint>
-                            )}
-                        </div>
-                    )}
+                    <ProfileBannerView userProfile={userProfile} banners={banners}>
+                        {isOwnProfile && (
+                            <Hint content={customizeLabel}>
+                                <BaseButton aria-label={customizeLabel} className="octane-extended-profile__banner-edit" type="button" onClick={() => setIsCustomizing((value) => !value)}>
+                                    <img src={pencilIcon} alt="" draggable={false} />
+                                </BaseButton>
+                            </Hint>
+                        )}
+                    </ProfileBannerView>
                     <div className="px-[10px] pt-[8px]">
                         <UserContainerView
                             userBadges={userBadges}
