@@ -370,6 +370,12 @@
     // ------------------------------------------------------------------------
     "extendedprofile.blocked": "<b>Drama-Level:</b> 100%!<br><b>Nutzer:</b> blockiert.<br><b>Gleichgewicht:</b> wiederhergestellt.<br><br><u><a href=\"event:profile/unblock\">Klicke hier</a></u>, um das Chaos zu entfesseln.",
     "extendedprofile.nogroups.info": "Gruppen bringen Leute mit denselben Interessen zusammen.",
+    "extendedprofile.customize.title": "Profil anpassen",
+    "extendedprofile.customize.banner": "Banner",
+    "extendedprofile.customize.background": "Hintergrund",
+    "extendedprofile.customize.border": "Rahmen",
+    "extendedprofile.customize.accent": "Farbe",
+    "extendedprofile.customize.none": "Keins",
     "extendedprofile.nogroups.me": "Du bist noch in keiner Gruppe.",
     "extendedprofile.nogroups.user": "Dieser Nutzer ist in keiner Gruppe.",
     "extendedprofile.nogroups.viewgroups": "Gruppen ansehen",

@@ -165,6 +165,11 @@
     // Profile border ids.
     "borders.data": [],
 
+    // Profile window banners are listed in infostand_backgrounds.json as "banners.data":
+    // [{ "bannerId": 1, "image": "reception/nl.png" }, ...]. "image" is read below images.url
+    // unless it is a full URL. Without that list the hotel view pictures in images/reception are
+    // offered as banners 1-8. Each id also needs a 'banner' row in the infostand_backgrounds table.
+
     // Shows the room name card on first entry into a room.
     "room.enter.info.enabled": true,
 

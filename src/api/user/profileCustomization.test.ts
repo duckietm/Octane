@@ -1,0 +1,92 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const sent = vi.hoisted(() => [] as unknown[][]);
+const profileRequests = vi.hoisted(() => [] as number[]);
+
+vi.mock('../octane', () => ({
+    GetConfigurationValue: (key: string) => (key === 'images.url' ? 'https://assets/images' : null),
+    GetOptionalConfigurationValue: (_key: string, value: unknown) => value,
+    SendMessageComposer: (composer: { getMessageArray(): unknown[] }) => sent.push(composer.getMessageArray())
+}));
+vi.mock('@octane/renderer', () => ({
+    RoomUnitBackgroundComposer: class {
+        private readonly data: number[];
+
+        constructor(...data: number[]) {
+            this.data = data;
+        }
+
+        getMessageArray() {
+            return this.data;
+        }
+    }
+}));
+vi.mock('./GetUserProfile',() => ({ GetUserProfile: (id: number) => profileRequests.push(id) }));
+
+import {
+    DEFAULT_PROFILE_BANNERS,
+    findProfileBannerUrl,
+    getProfileAccentColor,
+    parseProfileCustomizationData,
+    resolveProfileBannerUrl,
+    sendProfileCustomization
+} from './profileCustomization';
+
+describe('parseProfileCustomizationData', () => {
+    it('reads the banners, cards and borders the hotel lists', () => {
+        const data = parseProfileCustomizationData({
+            'banners.data': [{ bannerId: 3, image: 'reception/nl.png' }, { bannerId: 0, image: 'x.png' }, { bannerId: 4 }],
+            'cards.data': [{ backgroundId: 0 }, { backgroundId: 7 }],
+            'borders.data': [1, { borderId: 17 }]
+        });
+
+        expect(data.banners).toEqual([{ id: 3, image: 'reception/nl.png' }]);
+        expect(data.cards).toEqual([0, 7]);
+        expect(data.borders).toEqual([1, 17]);
+    });
+
+    it('falls back to the hotel view pictures and the background list', () => {
+        const data = parseProfileCustomizationData({ 'backgrounds.data': [{ backgroundId: 2 }] });
+
+        expect(data.banners).toEqual(DEFAULT_PROFILE_BANNERS);
+        expect(data.cards).toEqual([2]);
+        expect(data.borders).toEqual([]);
+    });
+});
+
+describe('profile banner URLs', () => {
+    it('reads a relative picture below images.url and keeps full URLs', () => {
+        expect(resolveProfileBannerUrl('reception/nl.png')).toBe('https://assets/images/reception/nl.png');
+        expect(resolveProfileBannerUrl('https://cdn/banner.png')).toBe('https://cdn/banner.png');
+        expect(resolveProfileBannerUrl('/banners/1.png')).toBe('/banners/1.png');
+    });
+
+    it('finds no picture for banner 0 or an id the list does not have', () => {
+        expect(findProfileBannerUrl(DEFAULT_PROFILE_BANNERS, 0)).toBe('');
+        expect(findProfileBannerUrl(DEFAULT_PROFILE_BANNERS, 999)).toBe('');
+        expect(findProfileBannerUrl(DEFAULT_PROFILE_BANNERS, 1)).toBe('https://assets/images/reception/nl.png');
+    });
+});
+
+describe('profile accents', () => {
+    it('has no colour for the default look', () => {
+        expect(getProfileAccentColor(0)).toBeNull();
+        expect(getProfileAccentColor(1)).toMatch(/^#[0-9a-f]{6}$/);
+    });
+});
+
+describe('sendProfileCustomization', () => {
+    beforeEach(() => {
+        sent.length = 0;
+        profileRequests.length = 0;
+    });
+
+    it('sends the change with every other value as it is, then asks for the profile again', () => {
+        const profile = { id: 9, backgroundId: 1, standId: 2, overlayId: 3, cardBackgroundId: 4, borderId: 5, bannerId: 6, accentId: 7 };
+
+        sendProfileCustomization(profile as never, { banner: 2 });
+
+        expect(sent).toEqual([[1, 2, 3, 4, 5, 2, 7]]);
+        expect(profileRequests).toEqual([9]);
+    });
+});

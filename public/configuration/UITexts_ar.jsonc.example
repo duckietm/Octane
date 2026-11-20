@@ -370,6 +370,12 @@
     // ------------------------------------------------------------------------
     "extendedprofile.blocked": "<b>مستوى الدراما:</b> 100%!<br><b>المستخدم:</b> محظور.<br><b>التوازن:</b> مستعاد.<br><br><u><a href=\"event:profile/unblock\">انقر هنا</a></u> لإطلاق الفوضى.",
     "extendedprofile.nogroups.info": "المجموعات تجمع الأشخاص أصحاب الاهتمامات المشتركة.",
+    "extendedprofile.customize.title": "تخصيص الملف الشخصي",
+    "extendedprofile.customize.banner": "لافتة",
+    "extendedprofile.customize.background": "الخلفية",
+    "extendedprofile.customize.border": "الإطار",
+    "extendedprofile.customize.accent": "اللون",
+    "extendedprofile.customize.none": "لا شيء",
     "extendedprofile.nogroups.me": "لست عضوًا في أي مجموعة بعد.",
     "extendedprofile.nogroups.user": "هذا المستخدم ليس عضوًا في أي مجموعة.",
     "extendedprofile.nogroups.viewgroups": "عرض المجموعات",

@@ -370,6 +370,12 @@
     // ------------------------------------------------------------------------
     "extendedprofile.blocked": "<b>Drama seviyesi:</b> %100!<br><b>Kullanıcı:</b> engellendi.<br><b>Denge:</b> yeniden sağlandı.<br><br>Kaosu serbest bırakmak için <u><a href=\"event:profile/unblock\">buraya tıkla</a></u>.",
     "extendedprofile.nogroups.info": "Gruplar aynı ilgi alanlarına sahip insanları bir araya getirir.",
+    "extendedprofile.customize.title": "Profili özelleştir",
+    "extendedprofile.customize.banner": "Afiş",
+    "extendedprofile.customize.background": "Arka plan",
+    "extendedprofile.customize.border": "Çerçeve",
+    "extendedprofile.customize.accent": "Renk",
+    "extendedprofile.customize.none": "Yok",
     "extendedprofile.nogroups.me": "Henüz hiçbir grubun üyesi değilsin.",
     "extendedprofile.nogroups.user": "Bu kullanıcı hiçbir grubun üyesi değil.",
     "extendedprofile.nogroups.viewgroups": "Grupları gör",
