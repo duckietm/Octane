@@ -93,6 +93,17 @@ describe('guild forum page', () => {
         expect(screen.getByRole('button', { name: 'purchase' })).toBeEnabled();
     });
 
+    it('keeps the group selector reachable before an article is picked', () => {
+        vi.mocked(useCatalogData).mockReturnValue({ currentOffer: null } as any);
+        vi.mocked(useUserGroups).mockReturnValue({ data: [] } as any);
+        selectGroup(null);
+        renderView();
+
+        expect(screen.getByTestId('guild-selector')).toBeInTheDocument();
+        expect(screen.queryByTestId('guild-badge')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'purchase' })).not.toBeInTheDocument();
+    });
+
     it('offers nothing to buy without a selectable guild', () => {
         vi.mocked(useUserGroups).mockReturnValue({ data: [] } as any);
         selectGroup(null);
