@@ -1,6 +1,6 @@
 import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
-import { handleInternalLinkClick, LocalizeText, SanitizeHtmlWithInternalLinks } from '../../../../../api';
+import { handleInternalLinkClick, localizeWithFallback, SanitizeHtmlWithInternalLinks } from '../../../../../api';
 import { Button } from '../../../../../common/Button';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { CatalogLayoutProps } from './CatalogLayout.types';
@@ -29,7 +29,7 @@ export const CatalogLayouGuildFrontpageView: FC<CatalogLayoutProps> = (props) =>
                     dangerouslySetInnerHTML={{ __html: SanitizeHtmlWithInternalLinks(page?.localization?.getText(1) ?? '') }}
                 />
                 <Button classNames={['octane-catalog-air-info__guild-buy']} onClick={() => CreateLinkEvent('groups/create')}>
-                    {LocalizeText('catalog.start.guild.purchase.button')}
+                    {localizeWithFallback('catalog.start.guild.purchase.button', 'Buy a group')}
                 </Button>
                 {!!teaser && <img alt="" draggable={false} className="octane-catalog-air-info__guild-teaser" src={teaser} />}
             </div>

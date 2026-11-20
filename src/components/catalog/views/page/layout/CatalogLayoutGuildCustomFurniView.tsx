@@ -90,12 +90,12 @@ export const CatalogLayouGuildCustomFurniView: FC<CatalogLayoutProps> = () => {
                             tintColor={tintColor}
                         />
                     </div>
-                    {!!currentOffer && (
-                        <div className="flex shrink-0 flex-col gap-1">
-                            <CatalogGuildSelectorWidgetView />
-                            {hasGroups && <CatalogPurchaseWidgetView noGiftOption={true} />}
-                        </div>
-                    )}
+                    {/* The selector also shows the "start a group" route when nothing is picked yet, so a player
+                        without a group does not have to select a product first to find it. */}
+                    <div className="flex shrink-0 flex-col gap-1">
+                        <CatalogGuildSelectorWidgetView />
+                        {!!currentOffer && hasGroups && <CatalogPurchaseWidgetView noGiftOption={true} />}
+                    </div>
                 </Column>
             </>
         </NativeTextTree>

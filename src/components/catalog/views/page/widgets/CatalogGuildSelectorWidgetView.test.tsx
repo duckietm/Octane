@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { CreateLinkEvent } from '@octane/renderer';
 import { useCatalogData, useCatalogUiState, useUserGroups } from '../../../../../hooks';
 import { CatalogGuildSelectorWidgetView, filterGuildForumGroups, getInitialGuildIndex } from './CatalogGuildSelectorWidgetView';
 
@@ -30,6 +31,7 @@ vi.mock('@octane/renderer', () => ({
 
 vi.mock('../../../../../api', () => ({
     LocalizeText: (key: string) => key,
+    localizeWithFallback: (key: string, fallback: string) => fallback ?? key,
     SendMessageComposer: (composer: unknown) => renderer.send(composer)
 }));
 
@@ -141,5 +143,15 @@ describe('CatalogGuildSelectorWidgetView', () => {
 
         expect(screen.getByText('catalog.guild_selector.members_only')).toBeInTheDocument();
         expect(purchaseOptions.extraData).toBeNull();
+    });
+
+    it('lets a player without any group start one from here', () => {
+        withGroups([]);
+        render(<CatalogGuildSelectorWidgetView forumSelector />);
+
+        vi.mocked(CreateLinkEvent).mockClear();
+        fireEvent.click(screen.getByRole('button', { name: 'Create a group' }));
+
+        expect(vi.mocked(CreateLinkEvent)).toHaveBeenCalledWith('groups/create');
     });
 });
