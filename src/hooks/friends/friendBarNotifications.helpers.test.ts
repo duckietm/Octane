@@ -5,6 +5,7 @@ import {
     FriendNotificationType as Type,
     orderFriendsForBar,
     pruneFriendNotifications,
+    removeFriendNotificationType,
     receiveFriendNotification
 } from './friendBarNotifications.helpers';
 
@@ -49,8 +50,23 @@ describe('AIR friend bar activity (HabboFriendBarData.makeNotification + friend 
         expect(state.byFriend[5].map((entry) => entry.type)).toEqual([Type.PLAYING_GAME]);
     });
 
-    it('ignores messenger and unknown types', () => {
-        expect(receiveFriendNotification(emptyFriendBarNotifications, 5, Type.MESSENGER, '')).toBe(emptyFriendBarNotifications);
+    it('marks an unread message once, keeps it when the tab closes and leaves the bar order alone', () => {
+        let state = receiveFriendNotification(emptyFriendBarNotifications, 1, Type.ROOM_EVENT, 'A');
+        state = receiveFriendNotification(state, 5, Type.MESSENGER, '');
+
+        expect(state.byFriend[5].map((entry) => entry.type)).toEqual([Type.MESSENGER]);
+        expect(state.byFriend[5][0].viewOnce).toBe(false);
+        expect(state.order).toEqual([1]);
+        expect(receiveFriendNotification(state, 5, Type.MESSENGER, '')).toBe(state);
+        expect(dismissViewedNotifications(state, 5)).toBe(state);
+
+        const opened = removeFriendNotificationType(state, 5, Type.MESSENGER);
+
+        expect(opened.byFriend[5]).toBeUndefined();
+        expect(removeFriendNotificationType(opened, 5, Type.MESSENGER)).toBe(opened);
+    });
+
+    it('ignores unknown types', () => {
         expect(receiveFriendNotification(emptyFriendBarNotifications, 5, 99, 'x')).toBe(emptyFriendBarNotifications);
         expect(receiveFriendNotification(emptyFriendBarNotifications, 0, Type.ROOM_EVENT, 'x')).toBe(emptyFriendBarNotifications);
     });

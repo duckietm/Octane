@@ -53,4 +53,3 @@ export const InlineDialog: FC<InlineDialogProps> = (props) => {
 };
 
 export const InlineDialogTitle = BaseDialog.Title;
-export const InlineDialogClose = BaseDialog.Close;

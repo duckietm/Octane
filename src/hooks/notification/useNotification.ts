@@ -49,6 +49,7 @@ import { countSimpleAlert } from '../../api/notification/SimpleAlertCounter';
 import { useMessageEvent } from '../events';
 import { useHotelAlertToastStore } from './hotelAlertToastStore';
 import { useHotelStatusNotifications } from './useHotelStatusNotifications';
+import { useOfficialNotices } from './useOfficialNotices';
 import { usePetNotifications } from './usePetNotifications';
 import { useRecyclerNotifications } from './useRecyclerNotifications';
 import { useWiredTransactionNotifications } from './useWiredTransactionNotifications';
@@ -370,6 +371,7 @@ const useNotificationStore = () => {
 
     useHotelStatusNotifications(simpleAlert);
     usePetNotifications(simpleAlert, showSingleBubble);
+    useOfficialNotices(simpleAlert, showSingleBubble);
     useWiredTransactionNotifications(simpleAlert, showSingleBubble);
     useRecyclerNotifications(showSingleBubble);
 
@@ -658,12 +660,6 @@ const CHEST_NOTIFICATION_KEYS = [
     'wiredchests.notification.empty',
     'wiredchests.notification.wired',
 ];
-
-export const useNotificationState = () => {
-    const { alerts, bubbleAlerts, confirms } = useSharedHook(useNotificationStore);
-
-    return { alerts, bubbleAlerts, confirms };
-};
 
 export const useNotificationActions = () => {
     const { simpleAlert, showOctaneAlert, showTradeAlert, showConfirm, showSingleBubble, showMentionBubble, closeAlert, closeBubbleAlert, closeConfirm } =

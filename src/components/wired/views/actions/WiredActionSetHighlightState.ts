@@ -4,10 +4,12 @@ export const WIRED_HIGHLIGHT_AUDIENCE_SOURCE_USERS = 0;
 export const WIRED_HIGHLIGHT_AUDIENCE_EVERYONE = 1;
 
 export const WIRED_HIGHLIGHT_OUTLINE = 0;
+/** @public */
 export const WIRED_HIGHLIGHT_SOFT_GLOW = 1;
 export const WIRED_HIGHLIGHT_DARKEN = 2;
 export const WIRED_HIGHLIGHT_COLOR_TINT = 3;
 export const WIRED_HIGHLIGHT_BRIGHTEN = 4;
+/** @public */
 export const WIRED_HIGHLIGHT_NEON_AURA = 5;
 export const WIRED_HIGHLIGHT_TYPES = [0, 1, 2, 3, 4, 5];
 
@@ -57,11 +59,10 @@ const clampInteger = (value: number, minimum: number, maximum: number) => {
 
 const hasSource = (options: { value: number }[], value: number) => options.some((option) => option.value === value);
 
-/** The darken levels, from the hotel's comma list when it has one. */
-export const wiredHighlightDarkenLevels = (configured?: string) => {
-    const levels = (configured || '')
-        .split(',')
-        .map((value) => parseInt(value, 10))
+/** The darken levels, from the hotel's list (or older comma separated string) when it has one. */
+export const wiredHighlightDarkenLevels = (configured?: string | (string | number)[]) => {
+    const levels = (Array.isArray(configured) ? configured : (configured || '').split(','))
+        .map((value) => parseInt(String(value), 10))
         .filter((value) => Number.isFinite(value));
 
     return levels.length ? levels : DEFAULT_DARKEN_LEVELS;

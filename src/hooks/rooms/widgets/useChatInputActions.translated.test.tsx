@@ -17,6 +17,7 @@ vi.mock('../../translation', () => ({
         enqueueOutgoingTranslation: () => undefined
     })
 }));
+vi.mock('../../session/usePerkAllowances', () => ({ usePerkAllowed: () => false }));
 vi.mock('../useRoom', () => ({ useRoom: () => ({ roomSession: state.session }) }));
 
 import { ChatMessageTypeEnum } from '../../../api';

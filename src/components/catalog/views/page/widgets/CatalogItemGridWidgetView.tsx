@@ -4,6 +4,7 @@ import { CatalogType, IPurchasableOffer, localizeWithFallback } from '../../../.
 import { AutoGrid, AutoGridProps, ClassicScrollAreaView } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogActions, useCatalogData, useCatalogUiState, useInventoryFurni, useScrollWindow } from '../../../../../hooks';
+import { useCatalogStore } from '../../../../../hooks/catalog/catalogStore';
 import { replaceCatalogPageOffers } from '../../../../../hooks/catalog/useCatalog.helpers';
 import { useCatalogAdmin } from '../../../CatalogAdminContext';
 import { CatalogGridOfferView } from '../common/CatalogGridOfferView';
@@ -64,14 +65,20 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
     } as CSSProperties;
     const mixedLayout = useMemo(() => layoutAirCatalogOffers(offers, airColumnCount, currentType), [airColumnCount, currentType, offers]);
 
+    // The grid goes back to the top when another page is opened, not whenever the same page arrives again: the page
+    // is refetched in place (it goes stale after half a minute, and choosing an offer then refetches it), which gave
+    // a new page object and threw a long page back to its first row. A search result has no page id of its own, so
+    // there the result object itself is the key.
+    const pageScrollKey = currentPage && currentPage.pageId > -1 ? `${currentType}:${currentPage.pageId}` : currentPage;
+
     useLayoutEffect(() => {
         if (elementRef.current) {
             elementRef.current.scrollLeft = 0;
             elementRef.current.scrollTop = 0;
         }
-    }, [currentPage]);
+    }, [pageScrollKey]);
 
-    const scrollWindow = useScrollWindow(elementRef, usesAirMixedGridTemplate, currentPage);
+    const scrollWindow = useScrollWindow(elementRef, usesAirMixedGridTemplate, pageScrollKey);
     const clampedScrollTop = Math.min(scrollWindow.scrollTop, Math.max(0, mixedLayout.height - scrollWindow.viewportHeight));
     const visibleMixedEntries = useMemo(
         () => getVisibleAirGridEntries(mixedLayout.entries, clampedScrollTop, scrollWindow.viewportHeight),
@@ -85,6 +92,46 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
         [visibleMixedEntries, mixedLayout, dragIndex]
     );
     const { isVisible: inventoryVisible = false } = useInventoryFurni();
+
+    // A deep link (the infostand's "buy", a `catalog/open/offerId/…` link) selected an offer of this page: bring it
+    // into view. Declared after the page's scroll reset, so it wins over it; handled once per request.
+    const revealOffer = useCatalogStore((state) => state.revealOffer);
+    const revealedNonceRef = useRef(0);
+    const revealIndex = revealOffer ? offers.findIndex((offer) => offer.offerId === revealOffer.offerId) : -1;
+    const revealNonce = revealOffer?.nonce ?? 0;
+
+    useLayoutEffect(() => {
+        if (revealIndex < 0 || revealedNonceRef.current === revealNonce) return;
+
+        // The virtual grid scrolls itself (it owns the scroll element); see the `reveal` prop below.
+        if (useVirtualGrid) {
+            revealedNonceRef.current = revealNonce;
+            return;
+        }
+
+        const element = elementRef.current;
+
+        if (!element) return;
+
+        if (usesAirMixedGridTemplate) {
+            const entry = mixedLayout.entries.find((candidate) => candidate.index === revealIndex);
+
+            if (!entry) return;
+
+            element.scrollTop = Math.max(0, entry.y - (element.clientHeight - entry.height) / 2);
+        } else {
+            const tile = element.querySelector<HTMLElement>(`[data-offer-index="${revealIndex}"]`);
+
+            if (!tile) return;
+
+            const tileRect = tile.getBoundingClientRect();
+            const viewRect = element.getBoundingClientRect();
+
+            element.scrollTop = Math.max(0, element.scrollTop + (tileRect.top - viewRect.top) - (element.clientHeight - tileRect.height) / 2);
+        }
+
+        revealedNonceRef.current = revealNonce;
+    }, [revealIndex, revealNonce, useVirtualGrid, usesAirMixedGridTemplate, mixedLayout]);
 
     useLayoutEffect(() => {
         if (!isAirStandardDensity || !offers.length) {
@@ -167,6 +214,7 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
                 key={offer.offerId}
                 className={`${isDragging ? 'opacity-40' : ''} ${isDropTarget ? 'ring-2 ring-primary ring-offset-1 rounded' : ''}`}
                 data-air-offer-index={airPosition ? index : undefined}
+                data-offer-index={index}
                 draggable={adminMode}
                 style={
                     airPosition
@@ -236,6 +284,8 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
                         itemMinWidth={effectiveColumnMinWidth}
                         items={offers}
                         overscan={4}
+                        scrollResetKey={pageScrollKey}
+                        reveal={revealIndex >= 0 ? { index: revealIndex, nonce: revealNonce } : null}
                         rowGap={isAirStandardDensity ? 0 : 3}
                         onColumnCountChange={isAirStandardDensity ? setAirColumnCount : undefined}
                         itemRender={(offer, index) => (offer ? renderOfferTile(offer, index) : <></>)}

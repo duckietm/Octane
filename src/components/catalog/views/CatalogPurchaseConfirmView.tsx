@@ -3,6 +3,8 @@ import { GetConfigurationValue, IPurchasableOffer, LocalizeText, ProductTypeEnum
 import { localizeWithFallback } from '../../../api/utils/localizeWithFallback';
 import { getCatalogBundlePrice, ICatalogBundleDiscountRuleset } from '../../../api/catalog/CatalogBundleDiscount';
 import {
+    LayoutAvatarImageView,
+    LayoutHabbiconImageView,
     LayoutChatStyleImageView,
     LayoutCurrencyIcon,
     LayoutFurniImageView,
@@ -88,6 +90,8 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                 <OctaneCardHeaderView headerText={title} onCloseClick={onCancel} />
                 <OctaneCardContentView classNames={contentClassNames} overflow="hidden">
                     <div className="octane-catalog-purchase-confirm-preview">
+                        {/* Official PurchaseConfirmationDialog.setImage: the picture at its own size, centred in the
+                            126x152 box and cut off at its edge. */}
                         {isFurniture ? (
                             <LayoutFurniImageView
                                 aria-label={offer.localizationName}
@@ -96,10 +100,15 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                                 productClassId={offer.product.productClassId}
                                 productType={offer.product.productType}
                                 role="img"
-                                scale={0.5}
                             />
                         ) : offer.product?.productType === ProductTypeEnum.CHAT_STYLE ? (
                             <LayoutChatStyleImageView styleId={offer.product.extraParam} />
+                        ) : offer.product?.productType === ProductTypeEnum.HABBICON ? (
+                            // A habbicon has no icon file either: it is drawn as on its catalogue tile.
+                            <LayoutHabbiconImageView id={offer.product.productClassId} />
+                        ) : offer.product?.productType === ProductTypeEnum.ROBOT ? (
+                            // A bot has no icon: it is shown as on its catalogue tile, by its figure.
+                            <LayoutAvatarImageView direction={2} figure={offer.product.extraParam} />
                         ) : (
                             !!iconUrl && <img alt={offer.localizationName} src={iconUrl} />
                         )}

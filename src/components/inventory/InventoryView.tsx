@@ -11,7 +11,7 @@ import {
     RoomPreviewer,
     RoomSessionEvent
 } from '@octane/renderer';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { useRef, FC, useEffect, useMemo, useState } from 'react';
 import {
     ensureBadgeLeaderboardLoaded,
     FURNI_MAIN_FILTER,
@@ -136,8 +136,11 @@ export const InventoryView: FC<{}> = () => {
     const { isTrading = false, stopTrading = null } = useInventoryTrade();
     const { isOpen: isWiredTrading = false, cancel: cancelWiredTrade = null } = useWiredTrading();
     const { getCount = null } = useInventoryUnseenTracker();
-    const { groupItems = [] } = useInventoryFurni();
-    const { badgeCodes = [] } = useInventoryBadges();
+    const { groupItems = [], setSelectedItem = null } = useInventoryFurni();
+    const { badgeCodes = [], setSelectedBadgeCode = null } = useInventoryBadges();
+    // The link tracker below is registered once: it reads the latest inventory through this ref.
+    const linkTargetsRef = useRef({ groupItems, badgeCodes, setSelectedItem, setSelectedBadgeCode });
+    linkTargetsRef.current = { groupItems, badgeCodes, setSelectedItem, setSelectedBadgeCode };
 
     useEffect(() => {
         setSearchValue('');
@@ -249,6 +252,20 @@ export const InventoryView: FC<{}> = () => {
                     case 'show':
                         setIsVisible(true);
                         if (parts[2] && TAB_BY_CODE[parts[2]]) setCurrentTab(TAB_BY_CODE[parts[2]]);
+
+                        // inventory/show/<tab>/<item> (the official inventory/open/<tab>/<item>): that badge or furni selected.
+                        if (parts[3]) {
+                            const targets = linkTargetsRef.current;
+
+                            if (parts[2] === 'badges') {
+                                if (targets.badgeCodes.includes(parts[3])) targets.setSelectedBadgeCode?.(parts[3]);
+                            } else if (parts[2] === 'furni' || parts[2] === 'furniture') {
+                                const itemId = Number.parseInt(parts[3], 10);
+                                const group = Number.isFinite(itemId) ? targets.groupItems.find((groupItem) => !!groupItem.getItemById(itemId)) : null;
+
+                                if (group) targets.setSelectedItem?.(group);
+                            }
+                        }
                         return;
                     case 'hide':
                         setIsVisible(false);

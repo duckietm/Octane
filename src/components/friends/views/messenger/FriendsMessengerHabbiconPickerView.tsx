@@ -61,6 +61,9 @@ export const FriendsMessengerHabbiconPickerView: FC<{
         const closeOnEscape = (event: KeyboardEvent) => {
             if (event.key !== 'Escape') return;
 
+            // The picker takes the key, so the messenger window behind it stays open.
+            event.preventDefault();
+
             if (search) {
                 setSearch('');
                 return;

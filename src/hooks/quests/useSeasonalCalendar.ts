@@ -38,7 +38,7 @@ const readBoolean = (value: unknown): boolean => value === true || value === 'tr
 export const getSeasonalCalendarSettings = () => ({
     enabled: readBoolean(GetConfigurationValue<unknown>('seasonalQuestCalendar.enabled', false)),
     prefix: String(GetConfigurationValue<string>('seasonalQuestCalendar.campaignPrefix', '') ?? ''),
-    currency: Number(GetConfigurationValue<string>('seasonalQuestCalendar.currency', '0')) || 0,
+    currency: Number(GetConfigurationValue<number | string>('seasonalQuestCalendar.currency', 0)) || 0,
     maximumEntities: Number(GetConfigurationValue<number>('seasonalQuestCalendar.maximum.entities', SEASONAL_DEFAULT_MAXIMUM_ENTITIES)) || SEASONAL_DEFAULT_MAXIMUM_ENTITIES
 });
 

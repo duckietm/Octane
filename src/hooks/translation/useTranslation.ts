@@ -1,7 +1,7 @@
 import { GetConfiguration, GetLocalizationManager, GetSessionDataManager, TranslationLanguagesEvent, TranslationLanguagesRequestComposer, TranslationResultEvent, TranslationTextRequestComposer } from '@octane/renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { LocalStorageKeys, SendMessageComposer } from '../../api';
+import { LocalStorageKeys, SendMessageComposer, setActiveTextLocale } from '../../api';
 import { parseJsonDocument } from '../../json/JsonDocumentParser';
 import { useMessageEvent } from '../events';
 import { useLocalStorage } from '../useLocalStorage';
@@ -197,6 +197,9 @@ export const applyTextTranslationLocale = async (languageCode: string): Promise<
     const sessionDataManager = GetSessionDataManager();
     const selectedLocale = resolveTextTranslationLocale(languageCode || '');
 
+    // The help pages follow the same language as the texts.
+    setActiveTextLocale(selectedLocale?.file ?? '');
+
     if(!selectedLocale)
     {
         localizationManager.clearOverrideValues();
@@ -208,7 +211,7 @@ export const applyTextTranslationLocale = async (languageCode: string): Promise<
       // The base ExternalTexts/UITexts files are already written in one language,
     // so loading an override pack for that same language would be redundant.
     // Which language that is depends on the hotel: set `base.locale` in
-    // renderer-config.json (defaults to English).
+    // the configuration (config/server.jsonc; defaults to English).
     const baseLocale = normalizeLanguageCode(GetConfiguration().getValue<string>('base.locale') || 'en') || 'en';
 
     if(selectedLocale.file === baseLocale)

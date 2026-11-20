@@ -54,14 +54,12 @@ intent is captured below:
 manualChunks: id => {
     const norm = id.replace(/\\/g, '/');
 
-    // Vendors first — pixi.js / howler / emoji-mart / jodit are aliased
-    // to ../octane-renderer/node_modules, so they would otherwise be
+    // Vendors first — pixi.js and pixi-filters are aliased to
+    // ../octane-renderer/node_modules, so they would otherwise be
     // swallowed by the `octane-renderer` branch lower down and pulled
     // into the renderer chunk.
     if(norm.includes('pixi.js') || norm.includes('pixi-filters')) return 'vendor-pixi';
-    if(norm.includes('howler'))      return 'vendor-audio';
     if(norm.includes('@emoji-mart')) return 'vendor-emoji';
-    if(norm.includes('jodit') || norm.includes('@react-page')) return 'vendor-editor';
 
     if(id.includes('octane-renderer') || id.includes(`${ rendererRoot }`)) {
         if(id.includes('/packages/avatar/'))        return 'octane-renderer-avatar';
@@ -72,7 +70,7 @@ manualChunks: id => {
     }
 
     if(id.includes('node_modules')) {
-        if(id.includes('@octane/renderer') || id.includes('renderer3')) return 'octane-renderer';
+        if(id.includes('@octane/renderer')) return 'octane-renderer';
         if(id.match(/\/react(-dom)?\/|\/scheduler\//) || id.includes('react-error-boundary')) return 'vendor-react';
         if(id.includes('framer-motion')) return 'vendor-motion';
         if(id.includes('@tanstack'))     return 'vendor-query';
@@ -86,7 +84,7 @@ manualChunks: id => {
 
 Two practical points the comments don't make obvious:
 
-- **Vendor checks come first.** Pixi.js, howler, emoji-mart and jodit
+- **Vendor checks come first.** Pixi.js and pixi-filters
   are pulled in via an alias to `../octane-renderer/node_modules`,
   so their `id` matches `octane-renderer`. If the renderer branch
   runs before the vendor one, those modules end up bundled into the
@@ -138,7 +136,7 @@ const [ loadingProgress, setLoadingProgress ] = useState(0);
 const [ loadingTask, setLoadingTask ] = useState('');
 
 const taskLabel = useCallback((key: string, fallback: string): string => {
-    // … reads from renderer-config so the strings are translatable
+    // … reads from the configuration so the strings are translatable
 });
 
 const bumpProgress = useCallback((value: number, task?: string) => {
@@ -163,10 +161,10 @@ const bumpProgress = useCallback((value: number, task?: string) => {
 | 100 | `setIsReady(true)` about to fire | `Pronto!` |
 
 The labels are config-driven — `taskLabel('loading.task.boot', 'Avvio in corso...')`
-reads `loading.task.*` keys from the renderer-config and falls back
-to the Italian baseline if unset. To localise, add the keys to
-`public/configuration/renderer-config.json` (see the `.example`
-file for the full list).
+reads `loading.task.*` keys from the configuration and falls back
+to the Italian baseline if unset. To localise, set the keys in
+the "Loading screen" section of `public/configuration/config/server.jsonc`
+(see the same section of `config.example/server.jsonc` for the full list).
 
 Logo and background are also configurable via the same mechanism —
 `loading.logo.url`, `loading.background`, `loading.progress.color`.
@@ -223,7 +221,7 @@ visited before, the stored token wins and the URL one is ignored.
 Once stored, the existing `tryRememberLogin()` machinery picks it up
 on every reconnect: it POSTs to
 `${api.url}/api/auth/remember` (configurable via the
-`login.remember.endpoint` renderer-config key), receives a fresh
+`login.remember.endpoint` key in `config/server.jsonc`), receives a fresh
 SSO ticket back, and rotates the connection. See the CMS doc for the
 server endpoint's contract.
 

@@ -65,7 +65,7 @@ const octaneAssetsServer = () => ({
 //   1. AUTH_PROXY_TARGET (cmd: set AUTH_PROXY_TARGET=...; PowerShell:
 //      $env:AUTH_PROXY_TARGET='...'; the `VAR=value yarn start` form is
 //      Unix-only),
-//   2. "api.url" in public/configuration/renderer-config.json(c) — the same
+//   2. "api.url" in public/configuration/config/server.jsonc (or the old renderer-config.json) — the same
 //      address the client itself is configured with,
 //   3. http://127.0.0.1:2096 (127.0.0.1 rather than localhost: Node may
 //      resolve localhost to ::1 while the emulator listens on IPv4 only).
@@ -73,7 +73,7 @@ const readConfiguredApiUrl = () =>
 {
     const configurationRoot = resolve(import.meta.dirname, 'public', 'configuration');
 
-    for(const fileName of [ 'renderer-config.json', 'renderer-config.jsonc' ])
+    for(const fileName of [ 'config/server.jsonc', 'renderer-config.json', 'renderer-config.jsonc' ])
     {
         const filePath = resolve(configurationRoot, fileName);
 
@@ -227,7 +227,7 @@ export default defineConfig({
 
                         console.error(
                             `[octane] /api proxy: ${ req?.url || '' } -> ${ authProxyTarget } failed (${ code }); ${ hint }. ` +
-                            'Override the target with AUTH_PROXY_TARGET or "api.url" in public/configuration/renderer-config.json.');
+                            'Override the target with AUTH_PROXY_TARGET or "api.url" in public/configuration/config/server.jsonc.');
                     });
                 }
             }
@@ -271,7 +271,9 @@ export default defineConfig({
     },
     build: {
         // Only tiny icons inline; bigger artwork as base64 in the JS chunks slows every cold boot.
-        assetsInlineLimit: 4096,
+        // Fonts never inline: a font split by unicode range has many small files, and inlined they
+        // would all land in the startup CSS instead of being fetched only for the characters shown.
+        assetsInlineLimit: (file) => (/\.(woff2?|ttf|otf)$/.test(file) ? false : undefined),
         chunkSizeWarningLimit: 200000,
         manifest: true,
         rollupOptions: {
@@ -287,8 +289,7 @@ export default defineConfig({
                 // Granular chunking: split the monolithic vendor / octane-renderer
                 // bundles into smaller chunks so the browser can fetch them in
                 // parallel and CF can cache each independently. Splits chosen
-                // by size impact (pixi ~600KB, react ~150KB, framer-motion ~100KB,
-                // jodit ~250KB lazy-loaded only by admin news, etc.).
+                // by size impact (pixi ~600KB, react ~150KB, framer-motion ~100KB).
                 manualChunks: id =>
                 {
                     // Vendor checks first — pixi.js and pixi-filters are aliased to
@@ -300,7 +301,6 @@ export default defineConfig({
                     const norm = id.replace(/\\/g, '/');
                     if(norm.includes('pixi.js') || norm.includes('pixi-filters')) return 'vendor-pixi';
                     if(norm.includes('@emoji-mart')) return 'vendor-emoji';
-                    if(norm.includes('jodit') || norm.includes('@react-page')) return 'vendor-editor';
 
                     if(id.includes('Octane-Renderer') || id.includes(`${ rendererRoot }`))
                     {
@@ -316,7 +316,7 @@ export default defineConfig({
 
                     if(id.includes('node_modules'))
                     {
-                        if(id.includes('@octane/renderer') || id.includes('renderer3')) return 'octane-renderer';
+                        if(id.includes('@octane/renderer')) return 'octane-renderer';
                         if(id.match(/\/react(-dom)?\/|\/scheduler\//) || id.includes('react-error-boundary')) return 'vendor-react';
                         if(id.includes('framer-motion')) return 'vendor-motion';
                         if(id.includes('@tanstack')) return 'vendor-query';

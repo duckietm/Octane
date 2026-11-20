@@ -43,7 +43,8 @@ export const useHelpBubbles = () => {
         if (!current) return;
 
         if (isLast) {
-            SendMessageComposer(new NewUserExperienceScriptProceedComposer(NewUserExperienceScriptProceedComposer.VERIFY));
+            // Only the server's own script waits for an answer: this client's hints end silently.
+            if (queue.some((item) => !item.local)) SendMessageComposer(new NewUserExperienceScriptProceedComposer(NewUserExperienceScriptProceedComposer.VERIFY));
             setQueue([]);
             setIndex(0);
             return;

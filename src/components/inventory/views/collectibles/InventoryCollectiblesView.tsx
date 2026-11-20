@@ -13,6 +13,7 @@ import {
 } from '../../../../hooks/collectibles/collectibles.helpers';
 import { getCollectibleProductName, useCollectibles } from '../../../../hooks/collectibles/useCollectibles';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { InventoryCategoryLoadingView } from '../InventoryCategoryLoadingView';
 
 const nameOf = (group: CollectibleGroup) => getCollectibleProductName(group.product);
 
@@ -40,15 +41,7 @@ export const InventoryCollectiblesView: FC = () => {
     const shown = useMemo(() => filterCollectibleGroups(groups, filterIndex, search, nameOf), [groups, filterIndex, search]);
     const selected = shown.find((group) => group.productCode === selectedCode) ?? shown[0] ?? null;
 
-    if (inventory === null) {
-        return (
-            <NativeTextTree>
-                <div className="octane-inventory-collectibles-state" role="status">
-                    {localizeWithFallback('generic.loading', 'Loading...')}
-                </div>
-            </NativeTextTree>
-        );
-    }
+    if (inventory === null) return <InventoryCategoryLoadingView />;
 
     if (!groups.length) {
         return (

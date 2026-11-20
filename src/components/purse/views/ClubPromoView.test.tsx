@@ -6,6 +6,8 @@ const mocks = vi.hoisted(() => ({ sent: [] as unknown[], config: {} as Record<st
 vi.mock('../../../api', async (importOriginal) => ({
     ...(await importOriginal<typeof import('../../../api')>()),
     GetOptionalConfigurationValue: (key: string, fallback: unknown) => (key in mocks.config ? mocks.config[key] : fallback),
+    GetRenamedConfigurationValue: (key: string, oldKey: string, fallback: unknown) =>
+        key in mocks.config ? mocks.config[key] : oldKey in mocks.config ? mocks.config[oldKey] : fallback,
     localizeWithFallback: (key: string) => key,
     SendMessageComposer: (composer: unknown) => mocks.sent.push(composer)
 }));

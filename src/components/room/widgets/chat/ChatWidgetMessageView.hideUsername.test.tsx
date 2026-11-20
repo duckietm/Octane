@@ -13,7 +13,8 @@ vi.mock('@octane/renderer', () => ({
 }));
 
 vi.mock('../../../../api', () => ({
-    GetConfigurationValue: (_key: string, fallback: unknown) => fallback
+    GetConfigurationValue: (_key: string, fallback: unknown) => fallback,
+    GetServerMentionAliases: () => null
 }));
 
 vi.mock('../../../../common', () => ({

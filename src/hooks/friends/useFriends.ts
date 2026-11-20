@@ -38,6 +38,7 @@ import {
     SendMessageComposer,
     withUpdatedFriendCategories
 } from '../../api';
+import { shouldNotifyFriendOnline, useFriendOnlineNotificationStore } from './friendOnlineNotificationStore';
 import { useMessageEvent, useOctaneEvent } from '../events';
 import { useNotification } from '../notification';
 
@@ -57,9 +58,7 @@ export const bulkAcceptRequestIds = (requests: MessengerRequest[]): number[] =>
 /**
  * Internal singleton store for friend-list state + actions. Public
  * consumers should use useFriendsState (read-only — friends arrays,
- * settings, derived online/offline split) or useFriendsActions
- * (imperative — request / response / follow / update). useFriends is
- * the legacy shim that composes both.
+ * settings, derived online/offline split) or useFriends.
  */
 const useFriendsStore = () => {
     const [friends, setFriends] = useState<MessengerFriend[]>([]);
@@ -252,7 +251,10 @@ const useFriendsStore = () => {
             const newFriend = new MessengerFriend();
             newFriend.populate(friend);
 
-            if (previousFriend && !previousFriend.online && newFriend.online) onlineNotifications.push(newFriend);
+            // The player chooses whose coming online is announced (Other settings).
+            const announce = shouldNotifyFriendOnline(useFriendOnlineNotificationStore.getState().preference, newFriend.relationshipStatus);
+
+            if (previousFriend && !previousFriend.online && newFriend.online && announce) onlineNotifications.push(newFriend);
         }
 
         setSettings((previous) => withUpdatedFriendCategories(previous, parser.categories));
@@ -336,7 +338,10 @@ const useFriendsStore = () => {
             1: 'friendlist.error.friendlistownlimit',
             2: 'friendlist.error.friendlistlimitofrequester',
             3: 'friendlist.error.friend_requests_disabled',
-            4: 'friendlist.error.requestnotfound'
+            4: 'friendlist.error.requestnotfound',
+            // Official showAlertView: one of the two has blocked the other.
+            7: 'friendlist.error.blocked_by_them',
+            8: 'friendlist.error.blocked_by_you'
         };
         const localizeKey = localizeKeys[errorCode];
 
@@ -347,7 +352,11 @@ const useFriendsStore = () => {
         if (requestedFriendId > 0) setSentRequests((prevValue) => prevValue.filter((userId) => userId !== requestedFriendId));
 
         lastRequestedFriendIdRef.current = -1;
-        simpleAlert(LocalizeText(localizeKey), NotificationAlertType.DEFAULT, null, null, LocalizeText('friendlist.alert.title'));
+        // The two blocked texts are newer than most hotels' text files.
+        const fallbacks: Record<number, string> = { 7: 'This Habbo has blocked you.', 8: 'You have blocked this Habbo.' };
+        const text = fallbacks[errorCode] ? localizeWithFallback(localizeKey, fallbacks[errorCode]) : LocalizeText(localizeKey);
+
+        simpleAlert(text, NotificationAlertType.DEFAULT, null, null, LocalizeText('friendlist.alert.title'));
     });
 
     useMessageEvent<NewFriendRequestEvent>(NewFriendRequestEvent, (event) => {
@@ -467,42 +476,8 @@ export const useFriendsState = () => {
 };
 
 /**
- * Imperative slice of the friends store: request a new friendship,
- * respond to an incoming request, follow a friend, update an existing
- * relationship.
- */
-export const useFriendsActions = () => {
-    const {
-        showFriendListFullAlert,
-        requestFriend,
-        requestResponse,
-        requestResponseAll,
-        followFriend,
-        updateRelationship,
-        addCategory,
-        renameCategory,
-        removeCategory,
-        moveFriendToCategory
-    } = useSharedHook(useFriendsStore);
-
-    return {
-        showFriendListFullAlert,
-        requestFriend,
-        requestResponse,
-        requestResponseAll,
-        followFriend,
-        updateRelationship,
-        addCategory,
-        renameCategory,
-        removeCategory,
-        moveFriendToCategory
-    };
-};
-
-/**
- * @deprecated Prefer `useFriendsState` (read-only friends list) and
- * `useFriendsActions` (request / follow / update) directly. This shim
- * composes both into the historical `useFriends()` shape so the 16
+ * @deprecated Prefer `useFriendsState` (read-only friends list) for reads.
+ * This shim returns the historical `useFriends()` shape so the 16
  * existing consumers keep working unchanged.
  */
 export const useFriends = () => useSharedHook(useFriendsStore);

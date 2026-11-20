@@ -10,15 +10,36 @@ import {
     RoomRotatingEffect,
     RoomSettingsComposer,
     RoomShakingEffect,
+    RoomUnitDropHandItemComposer,
     RoomZoomEvent,
     TextureUtils,
-    TriggerHabbiconComposer
+    TriggerHabbiconComposer,
+    VisitUserComposer,
+    WiredRoomStateActionComposer
 } from '@octane/renderer';
 import { useCallback, useRef } from 'react';
-import { CanOpenFurniChooser, CanOpenUserChooser,ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, IsAnyRoomController, LocalizeText, parseSignId, SendMessageComposer, WIRED_PLAYTEST_TOGGLE_LINK } from '../../../api';
+import {
+    CanOpenFurniChooser,
+    CanOpenUserChooser,
+    ChatMessageTypeEnum,
+    GetClubMemberLevel,
+    GetConfigurationValue,
+    IsAnyRoomController,
+    LocalizeText,
+    localizeWithFallback,
+    parseSignId,
+    SendMessageComposer,
+    TryVisitRoom,
+    toggleRoomMouseHidden,
+    WIRED_PLAYTEST_TOGGLE_LINK,
+    WIRED_RESET_EVENT
+} from '../../../api';
 import { useNotification } from '../../notification';
+import { usePerkAllowed } from '../../session/usePerkAllowances';
 import { useTranslation } from '../../translation';
 import { useRoom } from '../useRoom';
+import { runOfficialChatCommand } from './chatInputCommands';
+import { useRoomStatsStore } from './roomStatsStore';
 
 /**
  * Pure imperative dispatch for the chat-input widget. Exposes
@@ -37,7 +58,8 @@ import { useRoom } from '../useRoom';
  */
 export const useChatInputActions = () => {
     const { showOctaneAlert = null, showConfirm = null } = useNotification();
-    const { settings, translateOutgoing, enqueueOutgoingTranslation } = useTranslation();
+    const { settings, translateOutgoing, enqueueOutgoingTranslation, updateSettings = null } = useTranslation();
+    const cameraAllowed = usePerkAllowed('CAMERA');
     const { roomSession = null } = useRoom();
     // Translated lines leave in the order they were typed and only in the room they were typed in: each waits for
     // the one before it, and one whose room has changed meanwhile is dropped.
@@ -70,9 +92,39 @@ export const useChatInputActions = () => {
                     }
                 }
 
+                const consumed = runOfficialChatCommand(firstPart.toLowerCase(), secondPart, parts, {
+                    session: roomSession,
+                    securityLevel: GetSessionDataManager().securityLevel ?? 0,
+                    isAmbassador: !!GetSessionDataManager().isAmbassador,
+                    isAnyRoomController: IsAnyRoomController(),
+                    cameraAllowed,
+                    createLink: CreateLinkEvent,
+                    confirm: (message, onConfirm, title) => showConfirm?.(message, onConfirm, null, null, null, title),
+                    localize: localizeWithFallback,
+                    specialCommand: (command) => GetSessionDataManager().sendSpecialCommandMessage(command),
+                    dropHandItem: () => SendMessageComposer(new RoomUnitDropHandItemComposer()),
+                    ignoreUser: (userId) => GetSessionDataManager().ignoreUser(userId),
+                    unignoreUser: (userId) => GetSessionDataManager().unignoreUser(userId),
+                    visitUser: (name) => SendMessageComposer(new VisitUserComposer(name)),
+                    visitRoom: TryVisitRoom,
+                    wiredRoomState: (rollback) => SendMessageComposer(new WiredRoomStateActionComposer(rollback)),
+                    wiredReset: () => window.dispatchEvent(new CustomEvent(WIRED_RESET_EVENT)),
+                    toggleMouse: () => void toggleRoomMouseHidden(),
+                    toggleFullscreen: () => {
+                        if (document.fullscreenElement) void document.exitFullscreen?.();
+                        else void document.documentElement.requestFullscreen?.().catch(() => undefined);
+                    },
+                    setFrameRate: (fps) => {
+                        GetTicker().maxFPS = fps;
+                    },
+                    setLanguage: (code) => updateSettings?.({ uiTextLanguage: code })
+                });
+
+                if (consumed) return null;
+
                 switch (firstPart.toLowerCase()) {
                     case ':shake':
-                        RoomShakingEffect.init(2500, 5000);
+                        RoomShakingEffect.init(250, 5000);
                         RoomShakingEffect.turnVisualizationOn();
 
                         return null;
@@ -136,7 +188,7 @@ export const useChatInputActions = () => {
                     case ':habbicon': {
                         const habbiconId = parseInt(secondPart);
 
-                        if(Number.isFinite(habbiconId) && habbiconId > 0) SendMessageComposer(new TriggerHabbiconComposer(habbiconId));
+                        if (Number.isFinite(habbiconId) && habbiconId > 0) SendMessageComposer(new TriggerHabbiconComposer(habbiconId));
 
                         return null;
                     }
@@ -182,7 +234,7 @@ export const useChatInputActions = () => {
                         }
                         return null;
                     case ':pickall':
-                        if (roomSession?.isRoomOwner || IsAnyRoomController()) {
+                        if (roomSession?.isRoomOwner || IsAnyRoomController() || (roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.GUEST) {
                             showConfirm(
                                 LocalizeText('room.confirm.pick_all'),
                                 () => {
@@ -197,11 +249,7 @@ export const useChatInputActions = () => {
 
                         return null;
                     case ':pickallbc':
-                        if (
-                            roomSession?.isRoomOwner ||
-                            IsAnyRoomController() ||
-                            (roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.GUEST
-                        ) {
+                        if (roomSession?.isRoomOwner || IsAnyRoomController() || (roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.GUEST) {
                             showConfirm(
                                 LocalizeText('room.confirm.pick_all_bc'),
                                 () => {
@@ -216,15 +264,12 @@ export const useChatInputActions = () => {
 
                         return null;
                     case ':ejectall':
-                        if (
-                            roomSession?.isRoomOwner ||
-                            IsAnyRoomController() ||
-                            (roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.GUEST
-                        ) {
+                        if (roomSession?.isRoomOwner || IsAnyRoomController() || (roomSession?.controllerLevel ?? 0) >= RoomControllerLevel.GUEST) {
                             showConfirm(
                                 LocalizeText('room.confirm.eject_all'),
                                 () => {
-                                    GetSessionDataManager().sendSpecialCommandMessage(':ejectall');
+                                    // The whole line: the official client forwards the argument too.
+                                    GetSessionDataManager().sendSpecialCommandMessage(text);
                                 },
                                 null,
                                 null,
@@ -261,6 +306,10 @@ export const useChatInputActions = () => {
                     case ':playtest':
                         // AIR ChatInputWidgetHandler: flips the wired menu playtest preference, with its notification.
                         CreateLinkEvent(WIRED_PLAYTEST_TOGGLE_LINK);
+                        return null;
+                    case ':showstats':
+                        // Official setFpsCounterEnabled: the ping / fps / frame time readout. Typed again, it goes away.
+                        useRoomStatsStore.getState().toggle();
                         return null;
                     case ':togglefps': {
                         if (GetTicker().maxFPS > 0) GetTicker().maxFPS = 0;
@@ -335,7 +384,7 @@ export const useChatInputActions = () => {
 
             return null;
         },
-        [roomSession, settings, translateOutgoing, enqueueOutgoingTranslation, showConfirm, showOctaneAlert]
+        [roomSession, settings, translateOutgoing, enqueueOutgoingTranslation, showConfirm, showOctaneAlert, cameraAllowed, updateSettings]
     );
 
     return { sendChat };

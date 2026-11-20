@@ -74,21 +74,30 @@ but the files must really exist under:
 octane/public/client/octane/gamedata/
 ```
 
-## 3. `public/configuration/renderer-config.json`
+## 3. `public/configuration/config.jsonc` and `config/`
 
-File:
+Files:
 
 ```txt
-octane/public/configuration/renderer-config.json
+octane/public/configuration/config.jsonc
+octane/public/configuration/config/
 ```
 
-Minimum local values:
+Copy `config.example.jsonc` to `config.jsonc` and the `config.example` folder to `config/` (the installer does it
+for you). `config.jsonc` lists the files to load in `"config.files"`, in order: for the same key, the later file
+wins. The files are JSONC, with a `//` comment above every key: they need the `jsonc` or `auto` mode, the `legacy`
+mode cannot read them.
+
+Minimum local values, each in the file and under the `// ==== ... ====` section that holds it.
+
+`config/server.jsonc` (server, assets and login sections):
 
 ```json
 {
     "socket.url": "ws://localhost:2096",
     "api.url": "http://localhost:2096",
     "crypto.ws.enabled": false,
+
     "gamedata.url": "https://hotel.example.com/client/octane/gamedata",
     "external.texts.url": [
         "${gamedata.url}/ExternalTexts.json",
@@ -96,10 +105,7 @@ Minimum local values:
     ],
     "furnidata.url": "${gamedata.url}/FurnitureData.json?t=%timestamp%",
     "productdata.url": "${gamedata.url}/ProductData.json?t=%timestamp%",
-    "avatar.actions.url": "${gamedata.url}/HabboAvatarActions.json?t=%timestamp%",
-    "avatar.figuredata.url": "${gamedata.url}/FigureData.json?t=%timestamp%",
-    "avatar.figuremap.url": "${gamedata.url}/FigureMap.json?t=%timestamp%",
-    "avatar.effectmap.url": "${gamedata.url}/EffectMap.json?t=%timestamp%",
+
     "login.endpoint": "${api.url}/api/auth/login",
     "login.register.endpoint": "${api.url}/api/auth/register",
     "login.forgot.endpoint": "${api.url}/api/auth/forgot-password",
@@ -109,8 +115,19 @@ Minimum local values:
     "login.health.method": "GET",
     "login.check-email.endpoint": "${api.url}/api/auth/check-email",
     "login.check-username.endpoint": "${api.url}/api/auth/check-username",
-    "login.register.imaging.url": "${api.url}/api/avatar/imaging",
-    "login.news.url": "${api.url}/api/auth/news",
+    "login.news.url": "${api.url}/api/auth/news"
+}
+```
+
+`config/hotel.jsonc` (avatar and catalog sections):
+
+```json
+{
+    "avatar.actions.url": "${gamedata.url}/HabboAvatarActions.json?t=%timestamp%",
+    "avatar.figuredata.url": "${gamedata.url}/FigureData.json?t=%timestamp%",
+    "avatar.figuremap.url": "${gamedata.url}/FigureMap.json?t=%timestamp%",
+    "avatar.effectmap.url": "${gamedata.url}/EffectMap.json?t=%timestamp%",
+
     "badges.custom.list.endpoint": "${api.url}/api/badges/custom",
     "badges.custom.create.endpoint": "${api.url}/api/badges/custom",
     "badges.custom.update.endpoint": "${api.url}/api/badges/custom/%badgeId%",
@@ -124,12 +141,12 @@ Important:
 - Do not use `https://localhost:2096/nitro-sec/file` locally if `secureAssetsEnabled=false`.
 - Do not use `ws://192.168.x.x/:2096`; it is malformed. Use `ws://localhost:2096` or `ws://192.168.x.x:2096`.
 
-## 4. `public/configuration/ui-config.json`
+## 4. Login images in `config/server.jsonc`
 
 File:
 
 ```txt
-octane/public/configuration/ui-config.json
+octane/public/configuration/config/server.jsonc
 ```
 
 For the login view, you can use remote plain images:
@@ -154,7 +171,7 @@ If you see `ERR_NAME_NOT_RESOLVED`, the configured domain does not exist or is n
 
 Login news should come from the database through the emulator.
 
-In renderer config use:
+In `config/server.jsonc` (section `Login and account`) use:
 
 ```json
 "login.news.url": "${api.url}/api/auth/news"
@@ -202,7 +219,7 @@ Recommendation: use `localhost`, not `192.168.x.x`, because cookies and API sess
 
 ## 7. Common errors
 
-### `Unable to load renderer-config.json`
+### `Unable to load the configuration files.`
 
 Check:
 
@@ -215,6 +232,9 @@ It must contain:
 ```json
 "secureAssetsEnabled": false
 ```
+
+Then check that every file listed in `"config.files"` of `config.jsonc` exists under `config/`, and that the
+JSON mode is `jsonc` or `auto` (`yarn configure`): the `legacy` mode cannot read the comments in the files.
 
 ### `Invalid JSON ... Unexpected token '<'`
 
@@ -259,7 +279,7 @@ Error: connect ECONNREFUSED 127.0.0.1:2096
 ```
 
 The proxy target is, in this order: the `AUTH_PROXY_TARGET` environment
-variable, then `"api.url"` from `public/configuration/renderer-config.json`,
+variable, then `"api.url"` from `public/configuration/config/server.jsonc` (or, when it is missing, from the old `renderer-config.json`),
 then `http://127.0.0.1:2096`. Every failed call also prints a one-line
 `[octane] /api proxy: ... failed (ECONNREFUSED)` diagnosis with the target.
 
@@ -268,7 +288,7 @@ Check, in this order:
 - the emulator is running and its log shows
   `WebSocket server started on 0.0.0.0:2096 (SSL: false)`;
 - `ws.host` is `0.0.0.0` (or `127.0.0.1`), not only the LAN IP;
-- `"api.url"` in `renderer-config.json` points at the emulator's real
+- `"api.url"` in `config/server.jsonc` points at the emulator's real
   address and port (the proxy follows it);
 - if that log line says `SSL: true` (an `ssl/cert.pem` + `privkey.pem` pair
   next to the emulator), the port speaks TLS and the target must be
@@ -292,7 +312,7 @@ probe on unmount and is harmless.
 
 ### Walking looks choppy or the speed seems to change
 
-`system.fps.max` in `renderer-config.json` caps the render loop, and the
+`system.fps.max` in `config/server.jsonc` (section `Logging and performance`) caps the render loop, and the
 client used to default it to 24 when the key was missing. Pixi then ticks
 at an alternating 33/50 ms on a 60 Hz display, so avatars move in uneven
 steps and the walk animation is sampled irregularly. The default is now

@@ -8,8 +8,8 @@ import {
     RoomUnitGiveHandItemPetComposer
 } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { AvatarInfoPet, confirmCompostPlant, GetConfigurationValue, GetConfigurationRecord, GetOwnRoomObject, LocalizeText, SendMessageComposer } from '../../../../../api';
-import { useNotification, useRoom, useSessionInfo } from '../../../../../hooks';
+import { AvatarInfoPet, confirmCompostPlant, GetConfigurationValue, GetConfigurationRecord, GetOwnRoomObject, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../api';
+import { useNotification, useRoom, useSessionInfo, useWiredTools } from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
@@ -30,6 +30,7 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
     const { avatarInfo = null, onClose = null } = props;
     const [mode, setMode] = useState(MODE_NORMAL);
     const { roomSession = null } = useRoom();
+    const { openInspectionForUser, showInspectButton } = useWiredTools();
     const { showConfirm = null } = useNotification();
     const { petRespectRemaining = 0, respectPet = null, chatStyleId = 0 } = useSessionInfo();
 
@@ -55,6 +56,9 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
 
         if (name) {
             switch (name) {
+                case 'inspect':
+                    openInspectionForUser(avatarInfo.roomIndex);
+                    break;
                 case 'respect':
                     respectPet(avatarInfo.id);
 
@@ -222,6 +226,12 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                     {canGiveHandItem && (
                         <ContextMenuListItemView onClick={(event) => processAction('pass_hand_item')}>
                             {LocalizeText('infostand.button.pass_hand_item')}
+                        </ContextMenuListItemView>
+                    )}
+                    {/* Official wired_inspect: the creator tools' inspection, for whoever may open it. */}
+                    {showInspectButton && (
+                        <ContextMenuListItemView onClick={(event) => processAction('inspect')}>
+                            {localizeWithFallback('octane.room.inspect', 'Inspect')}
                         </ContextMenuListItemView>
                     )}
                 </div>

@@ -44,6 +44,7 @@ export const WIRED_FX_SHOW_DURATION_MAX_MS = 20000;
 export const WIRED_FX_SHOW_DURATION_DEFAULT_MS = 3000;
 export const WIRED_FX_SEGMENTS_MAX = 100;
 export const WIRED_FX_DEFAULT_MAX_VALUE = 100;
+/** @public */
 export const WIRED_FX_PARAM_COUNT = 23;
 
 /** AIR's server renderer ids (VariableFxRendererType); the config's renderer id picks how a value is drawn. */
@@ -64,7 +65,10 @@ export const WIRED_FX_RENDERER = {
     NUMBER_FREEZE: 201
 } as const;
 
-/** The status extras the server writes per value. */
+/**
+ * The status extras the server writes per value.
+ * @public
+ */
 export const WIRED_FX_STATUS_EXTRA = {
     CURRENT_LEVEL: 'current_level',
     MAX_LEVEL: 'max_level',

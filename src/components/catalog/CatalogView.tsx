@@ -1,7 +1,7 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaBars, FaCog } from 'react-icons/fa';
-import { CatalogType, GetConfigurationValue, LocalizeShortNumber, LocalizeText, localizeWithFallback, SanitizeHtml } from '../../api';
+import { CatalogType, GetConfigurationValue, isBuildersClubEnabled, LocalizeShortNumber, LocalizeText, localizeWithFallback, SanitizeHtml } from '../../api';
 import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { CssNativeText } from '../../common/native-text/CssNativeText';
@@ -60,13 +60,15 @@ const CatalogViewInner: FC<{}> = () => {
     const { purse = null } = usePurse();
     const displayedCurrencies = GetConfigurationValue<number[]>('system.currency.types', []);
     const activeCatalogNode = activeNodes?.[activeNodes.length - 1] ?? null;
-    const buildersClubEnabled = GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true));
+    const buildersClubEnabled = isBuildersClubEnabled();
     // Strip technical suffixes like "(BC)" or "(Hot)" but keep the
     // pageId hint the gameserver appends when the viewer has
     // ACC_CATALOG_IDS - that's a pure-numeric "(6)" trailer.
     const stripSwfTabSuffix = (label: string) => (label || '').replace(/\s*\(\D[^)]*\)\s*$/g, '').trim();
     const getSwfTabLabel = (label: string) => stripSwfTabSuffix(parseCatalogTabLabel(label).name);
     const tabsShellRef = useRef<HTMLDivElement>(null);
+    // AIR draws the top tabs as labels only; a hotel can add each page's icon in front of its name.
+    const showTabIcons = GetConfigurationValue<boolean>('catalog.tab.icons', false);
 
     const visibleRootTabCount = useMemo(() => {
         if (!rootNode?.children?.length) return 0;
@@ -112,6 +114,9 @@ const CatalogViewInner: FC<{}> = () => {
                     case 'show':
                         if (parts.length > 2) {
                             openCatalogByType(getCatalogTypeFromLink(parts[2]));
+
+                            // catalog/show/<type>/<page> (the official catalog/warehouse/<page>): that page of it.
+                            if (parts.length > 3) openPageByName(parts.slice(3).join('/'));
 
                             return;
                         }
@@ -230,6 +235,7 @@ const CatalogViewInner: FC<{}> = () => {
                                             }}
                                         >
                                             <div className="flex items-center gap-1">
+                                                {showTabIcons && <CatalogIconView icon={child.iconId} className="octane-catalog-tab-icon" />}
                                                 <span className="octane-catalog-tab-label">
                                                     <CssNativeText
                                                         colorKey={child.isActive}

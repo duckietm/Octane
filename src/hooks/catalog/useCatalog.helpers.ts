@@ -189,3 +189,26 @@ export const replaceCatalogPageOffers = (page: ICatalogPage, offers: IPurchasabl
 };
 
 export { RoomControllerLevel, RoomObjectCategory, RoomObjectType };
+
+/**
+ * The offer of a page that a deep link (`catalog/open/offerId/<id>`) means. The link carries the furni's own offer
+ * id (furnidata `offerid`), which is what the catalogue index maps to pages, while a page's offers are numbered by
+ * catalogue item: so an exact id match comes first, and then the offer whose product is that furni.
+ */
+export const findDeepLinkedOffer = (offers: readonly IPurchasableOffer[] | null | undefined, offerId: number): IPurchasableOffer | null => {
+    if (!offers || !(offerId > -1)) return null;
+
+    const exact = offers.find((offer) => offer.offerId === offerId);
+
+    if (exact) return exact;
+
+    return (
+        offers.find((offer) =>
+            (offer.products ?? []).some((product) => {
+                const furniture = product?.furnitureData;
+
+                return !!furniture && (furniture.purchaseOfferId === offerId || furniture.rentOfferId === offerId);
+            })
+        ) ?? null
+    );
+};

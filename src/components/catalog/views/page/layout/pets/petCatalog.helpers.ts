@@ -77,6 +77,21 @@ export const buildNewPetPaletteChoices = <TPalette extends PetPaletteLike>(
     return choices;
 };
 
+/**
+ * Choices for a pet whose asset carries no palettes at all (the bunnies, the pigeons): it has one look, drawn as it
+ * is. The server's breeds are kept when it lists some; otherwise the pet is offered once, as palette 0.
+ */
+export const buildPalettelessPetChoices = <TPalette extends PetPaletteLike>(
+    petType: number,
+    palettes: readonly TPalette[]
+): NewPetPaletteChoice<TPalette | PetPaletteLike>[] => {
+    const sellable: (TPalette | PetPaletteLike)[] = filterPetPalettes(petType, palettes);
+
+    if (!sellable.length) sellable.push({ breedId: 0, paletteId: 0, rare: false, sellable: true, type: petType, clubOnly: false });
+
+    return sellable.slice(0, 20).map((palette) => ({ colors: [0xffffff], palette }));
+};
+
 const toColorHex = (color: number) => Math.max(0, Math.min(0xffffff, color)).toString(16).toUpperCase().padStart(6, '0');
 
 export const buildPetPurchaseExtraData = (name: string, petType: number, palette: PetPaletteLike, selectedColor: number) => {

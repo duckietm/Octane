@@ -21,7 +21,7 @@ import {
     PrepareRenderer
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
-import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock, localizeWithFallback } from './api';
+import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, getPendingPasswordResetToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, ListenForHotelSettings, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock, localizeWithFallback } from './api';
 import { Base } from './common';
 import { LoadingView } from './components/loading/LoadingView';
 import { LoginView } from './components/login/LoginView';
@@ -480,11 +480,13 @@ export const App: FC<{}> = (props) => {
                     });
 
                     if (configInitError) {
-                        OctaneLogger.error('[LoginScreen] Failed to load renderer-config.json — cannot resolve login.screen.enabled', configInitError);
+                        OctaneLogger.error('[LoginScreen] Failed to load the configuration files — cannot resolve login.screen.enabled', configInitError);
                     }
 
                     if (loginScreenEnabled) {
-                        const rememberedSsoTicket = await tryRememberLogin();
+                        // A password reset link asks for the new password on the login screen, also in a browser that
+                        // would otherwise sign in by itself.
+                        const rememberedSsoTicket = getPendingPasswordResetToken() ? null : await tryRememberLogin();
 
                         if (rememberedSsoTicket) {
                             ssoTicket = rememberedSsoTicket;
@@ -499,7 +501,7 @@ export const App: FC<{}> = (props) => {
                     } else {
                         if (configInitError) {
                             setHomeUrl(window.location.origin + '/');
-                            setErrorMessage(`Unable to load renderer-config.json.\n${String((configInitError as Error)?.message ?? configInitError)}`);
+                            setErrorMessage(`Unable to load the configuration files.\n${String((configInitError as Error)?.message ?? configInitError)}`);
                             setIsReady(false);
                             setShowLogin(false);
                             setIsEnteringHotel(false);
@@ -514,6 +516,7 @@ export const App: FC<{}> = (props) => {
                 // Log in while the hotel loads. Messages after the login stay held by the connection
                 // until MainView has mounted and calls ready(), so no handler misses its packets.
                 // A login that failed is replaced by this one; finished boot steps are kept.
+                ListenForHotelSettings();
                 const connected = GetCommunication().init();
 
                 connected.catch(() => undefined);

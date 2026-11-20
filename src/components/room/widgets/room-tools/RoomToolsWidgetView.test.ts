@@ -38,6 +38,20 @@ const css = readFileSync(join(process.cwd(), 'src/css/room/RoomWidgets.css'), 'u
         expect(source).not.toContain('initial={{ opacity: 0, x: -12 }}');
     });
 
+    it('starts with the rail minimised', () => {
+        expect(source).toContain('const [isToolsOpen, setIsToolsOpen] = useState<boolean>(false);');
+    });
+
+    it('folds the rail when a toolbar entry is clicked', () => {
+        const toolbarItem = readFileSync(join(process.cwd(), 'src/components/toolbar/ToolbarItemView.tsx'), 'utf8');
+
+        const toolbar = readFileSync(join(process.cwd(), 'src/components/toolbar/ToolbarView.tsx'), 'utf8');
+
+        expect(toolbarItem).toContain("CreateLinkEvent('room-tools/collapse')");
+        expect(toolbar).toMatch(/if\(isMeExpanded \|\| isProgressionExpanded\) CreateLinkEvent\('room-tools\/collapse'\);/);
+        expect(source).toMatch(/action === 'collapse'\)\s*\{\s*setIsToolsOpen\(false\);/);
+    });
+
     it('anchors the collapsed handle to the viewport edge', () => {
         expect(css).toMatch(/&\.is-collapsed\s*\{[^}]*width:\s*158px;/s);
         expect(css).toMatch(/&\.is-collapsed\s+\.room-tools-collapse-toggle\s*\{[^}]*transform:\s*translateY\(-50%\);/s);

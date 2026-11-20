@@ -1,6 +1,7 @@
 /* @vitest-environment jsdom */
 
 import { describe, expect, it, vi } from 'vitest';
+import { publishPluginChannel } from '../../api/plugin-channel';
 import { getRegisteredPlugins, type IOctanePluginApi, pluginApi, subscribePlugins } from './OctanePluginApi';
 
 describe('plugin registration', () => {
@@ -55,6 +56,22 @@ describe('plugin registration', () => {
         expect(document.getElementById('octane-plugin-window-owned')).toBeNull();
     });
 
+    it('draws a plugin window with the client card markup, closed by its close button', () => {
+        const content = pluginApi.createWindow('native-look', 'Native look', 320);
+        const overlay = document.getElementById('octane-plugin-window-native-look');
+        const card = overlay.querySelector('.octane-card');
+
+        expect(card.classList.contains('octane-card-shell')).toBe(true);
+        expect(card.classList.contains('theme-primary')).toBe(true);
+        expect((card as HTMLElement).style.width).toBe('320px');
+        expect(card.querySelector('.octane-card-header-shell.drag-handler .octane-card-title').textContent).toBe('Native look');
+        expect(content.classList.contains('octane-card-content-shell')).toBe(true);
+
+        (card.querySelector('.octane-card-close-button') as HTMLElement).click();
+
+        expect(document.getElementById('octane-plugin-window-native-look')).toBeNull();
+    });
+
     it('closes the windows of a plugin whose onClose throws', () => {
         const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         pluginApi.register({
@@ -73,5 +90,45 @@ describe('plugin registration', () => {
 
         expect(document.getElementById('octane-plugin-window-left-open')).toBeNull();
         error.mockRestore();
+    });
+
+    it('hands a plugin what its server plugin sends on a channel, and stops when the plugin is removed', () => {
+        const heard = vi.fn();
+        pluginApi.register({
+            name: 'channel-owner',
+            label: 'Channel owner',
+            onOpen: () => undefined,
+            onInit: (api) => {
+                api.onChannel('test.owner', heard);
+            }
+        });
+
+        publishPluginChannel('test.owner', { n: 1 }, '{"n":1}');
+        expect(heard).toHaveBeenCalledWith({ n: 1 }, '{"n":1}');
+
+        pluginApi.unregister('channel-owner');
+        publishPluginChannel('test.owner', { n: 2 }, '{"n":2}');
+
+        expect(heard).toHaveBeenCalledTimes(1);
+    });
+
+    it('lets a plugin stop listening on its own', () => {
+        const heard = vi.fn();
+        let api: IOctanePluginApi = null;
+        pluginApi.register({
+            name: 'channel-stopper',
+            label: 'Channel stopper',
+            onOpen: () => undefined,
+            onInit: (received) => {
+                api = received;
+            }
+        });
+
+        const stop = api.onChannel('test.stopper', heard);
+        stop();
+        publishPluginChannel('test.stopper', { n: 1 }, '{"n":1}');
+
+        expect(heard).not.toHaveBeenCalled();
+        pluginApi.unregister('channel-stopper');
     });
 });

@@ -8,12 +8,13 @@ const state = vi.hoisted(() => ({
     currentType: 'NORMAL',
     isMod: false,
     adminMode: false,
-    setAdminMode: vi.fn()
+    setAdminMode: vi.fn(),
+    config: {} as Record<string, unknown>
 }));
 
 vi.mock('../../api', async (importOriginal) => ({
     ...(await importOriginal<Record<string, unknown>>()),
-    GetConfigurationValue: (_key: string, fallback: unknown) => fallback,
+    GetConfigurationValue: (key: string, fallback: unknown) => (key in state.config ? state.config[key] : fallback),
     LocalizeText: (key: string) => key
 }));
 
@@ -49,7 +50,9 @@ vi.mock('./views/admin/CatalogAdminOfferEditView', () => ({ CatalogAdminOfferEdi
 vi.mock('./views/admin/CatalogAdminPageEditView', () => ({ CatalogAdminPageEditView: () => null }));
 vi.mock('./views/CatalogLoadingStateView', () => ({ CatalogLoadingStateView: () => null }));
 vi.mock('./views/catalog-header/CatalogBuildersClubStatusView', () => ({ CatalogBuildersClubStatusView: () => null }));
-vi.mock('./views/catalog-icon/CatalogIconView', () => ({ CatalogIconView: () => null }));
+vi.mock('./views/catalog-icon/CatalogIconView', () => ({
+    CatalogIconView: ({ icon, className }: { icon: number; className?: string }) => <i className={className} data-icon={icon} />
+}));
 vi.mock('./views/gift/CatalogGiftView', () => ({ CatalogGiftView: () => null }));
 vi.mock('./views/navigation/CatalogBreadcrumbView', () => ({ CatalogBreadcrumbView: () => null }));
 vi.mock('./views/navigation/CatalogNavigationView', () => ({ CatalogNavigationView: () => null }));
@@ -63,6 +66,7 @@ import { CatalogView } from './CatalogView';
 afterEach(() => {
     cleanup();
     state.setAdminMode.mockReset();
+    state.config = {};
 });
 
 describe('CatalogView', () => {
@@ -74,6 +78,20 @@ describe('CatalogView', () => {
         expect(document.querySelector('.octane-catalog-tabs-shell')).not.toBeNull();
         expect(document.querySelector('.octane-catalog-tab-label')).toHaveTextContent('Meubels');
         expect(screen.getByText('catalog.title')).toBeInTheDocument();
+    });
+
+    it('draws the tabs as labels only unless catalog.tab.icons asks for the page icons', () => {
+        state.currentType = 'NORMAL';
+        state.isMod = false;
+        render(<CatalogView />);
+
+        expect(document.querySelector('.octane-catalog-tab-icon')).toBeNull();
+
+        cleanup();
+        state.config = { 'catalog.tab.icons': true };
+        render(<CatalogView />);
+
+        expect(document.querySelector('.octane-card-tab-item .octane-catalog-tab-icon')).toHaveAttribute('data-icon', '0');
     });
 
     it('draws the Builders Club warehouse as AIR does: its own title and no tab row', () => {

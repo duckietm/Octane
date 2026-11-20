@@ -23,7 +23,7 @@ export const FurniturePlaylistEditorWidgetView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-playlist-editor-widget" theme="primary-slim">
+            <OctaneCardView uniqueKey="playlist-editor" className="octane-playlist-editor-widget" theme="primary-slim">
                 <OctaneCardHeaderView headerText={LocalizeText('playlist.editor.title')} onCloseClick={onClose} />
                 <OctaneCardContentView>
                     <div className="playlist-editor-layout flex flex-row gap-1 h-full min-h-0">

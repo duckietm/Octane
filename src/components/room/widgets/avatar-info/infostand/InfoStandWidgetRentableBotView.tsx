@@ -1,8 +1,9 @@
-import { BotRemoveComposer } from '@octane/renderer';
+import { BotRemoveComposer, GetRoomEngine, RoomObjectCategory, RoomObjectOperationType } from '@octane/renderer';
 import { FC, useMemo } from 'react';
 import { AvatarInfoRentableBot, BotSkillsEnum, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button, Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserProfileIconView } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
+import { useRoom } from '../../../../../hooks';
 import { InfoStandHeaderView } from './InfoStandHeaderView';
 import { InfoStandUnitIdView } from './InfoStandUnitIdView';
 
@@ -21,6 +22,17 @@ export const InfoStandWidgetRentableBotView: FC<InfoStandWidgetRentableBotViewPr
 
         return true;
     }, [avatarInfo]);
+
+    const { roomSession = null } = useRoom();
+
+    // Official InfoStandRentableBotView: an owned bot is moved and turned like furni by whoever has rights in the
+    // room, owns the bot or controls any room, and never in play-test mode.
+    const canArrange =
+        avatarInfo.ownerId > -1 &&
+        !roomSession?.playTestMode &&
+        (avatarInfo.roomControllerLevel >= 1 || avatarInfo.amIOwner || avatarInfo.amIAnyRoomController);
+
+    const arrangeBot = (operation: string) => GetRoomEngine().processRoomObjectOperation(avatarInfo.roomIndex, RoomObjectCategory.UNIT, operation);
 
     const pickupBot = () => SendMessageComposer(new BotRemoveComposer(avatarInfo.webID));
 
@@ -76,11 +88,23 @@ export const InfoStandWidgetRentableBotView: FC<InfoStandWidgetRentableBotViewPr
                         </div>
                     </div>
                 </div>
-                {canPickup && (
-                    <div className="flex justify-end">
-                        <Button variant="dark" onClick={pickupBot}>
-                            {LocalizeText('infostand.button.pickup')}
-                        </Button>
+                {(canArrange || canPickup) && (
+                    <div className="flex justify-end gap-1">
+                        {canArrange && (
+                            <>
+                                <Button variant="dark" onClick={() => arrangeBot(RoomObjectOperationType.OBJECT_MOVE)}>
+                                    {LocalizeText('infostand.button.move')}
+                                </Button>
+                                <Button variant="dark" onClick={() => arrangeBot(RoomObjectOperationType.OBJECT_ROTATE_POSITIVE)}>
+                                    {LocalizeText('infostand.button.rotate')}
+                                </Button>
+                            </>
+                        )}
+                        {canPickup && (
+                            <Button variant="dark" onClick={pickupBot}>
+                                {LocalizeText('infostand.button.pickup')}
+                            </Button>
+                        )}
                     </div>
                 )}
             </div>

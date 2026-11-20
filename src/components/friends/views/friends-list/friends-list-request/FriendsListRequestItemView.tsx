@@ -1,12 +1,18 @@
 import { FC } from 'react';
-import { LocalizeText, MessengerRequest } from '../../../../../api';
+import { LocalizeText, localizeWithFallback, MessengerRequest } from '../../../../../api';
 import { UserProfileIconView } from '../../../../../common';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { Hint } from '../../../../../common/Tooltip';
 
-/** AIR FriendRequest states: open, accepted, declined. */
-export type FriendRequestRowState = 'open' | 'accepted' | 'declined';
+/** AIR FriendRequest states: open, accepted, declined, and failed when the server refused the acceptance. */
+export type FriendRequestRowState = 'open' | 'accepted' | 'declined' | 'failed';
+
+const ANSWERED_TEXT: Record<Exclude<FriendRequestRowState, 'open'>, [key: string, fallback: string]> = {
+    accepted: ['friendlist.request.accepted', 'Accepted'],
+    declined: ['friendlist.request.declined', 'Declined'],
+    failed: ['friendlist.request.failed', 'Failed']
+};
 
 interface FriendsListRequestItemViewProps {
     request: MessengerRequest;
@@ -38,7 +44,7 @@ export const FriendsListRequestItemView: FC<FriendsListRequestItemViewProps> = (
                         </Hint>
                     </div>
                 ) : (
-                    <span className="hfl-request-info">{LocalizeText(state === 'accepted' ? 'friendlist.request.accepted' : 'friendlist.request.declined')}</span>
+                    <span className="hfl-request-info">{localizeWithFallback(ANSWERED_TEXT[state][0], ANSWERED_TEXT[state][1])}</span>
                 )}
             </div>
         </NativeTextTree>

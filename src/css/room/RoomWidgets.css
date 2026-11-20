@@ -273,6 +273,16 @@
     }
 }
 
+/* AIR RoomToolsInfoCtrl: the box always sits 12px right of the rail's visible edge, on the rail's bottom line. With the
+   rail minimised that edge is the expand handle (13px here), and the box moves there in 100 ms, easing out. */
+.octane-room-tools-container .octane-room-tools-info.octane-room-tools-info--enter {
+    transition: left 100ms ease-out;
+}
+
+.octane-room-tools-container.is-collapsed .octane-room-tools-info.octane-room-tools-info--enter {
+    left: 25px;
+}
+
 .octane-room-tools-history {
     position: absolute;
     bottom: 0;
@@ -830,6 +840,45 @@
     transform: translateY(-1px);
 }
 
+.swf-chat-input .swf-chat-help-button {
+    position: absolute;
+    top: 50%;
+    right: -24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 1px solid #000000;
+    border-radius: 50%;
+    background: #f2f2f2;
+    color: #000000;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%);
+    transition: opacity 100ms ease-out;
+}
+
+/* The gap between the input and the button stays hoverable, so the pointer can reach it. */
+.swf-chat-input .swf-chat-help-button::before {
+    position: absolute;
+    top: -9px;
+    right: 100%;
+    width: 8px;
+    height: 38px;
+    content: '';
+}
+
+.swf-chat-input:hover .swf-chat-help-button,
+.swf-chat-input .swf-chat-help-button:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 /* Same surface as .swf-chat-style-menu; the picker keeps its own layout and takes the colours through its variables. */
 .swf-chat-emoji-popover {
     outline: 0;
@@ -1178,6 +1227,35 @@
 
 .air-avatar-menu-buttons > .octane-context-menu-item + .octane-context-menu-item {
     border-top: 0;
+}
+
+/* A bot dialogue in the bot menu: what the bot says, then its options as menu buttons that wrap long labels. */
+.air-avatar-menu-dialogue {
+    box-sizing: border-box;
+    width: 103px;
+    margin: 0 0 3px 1px;
+    padding: 3px 4px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    font-family: AirAvatarMenuUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px;
+    line-height: 14px;
+    overflow-wrap: anywhere;
+}
+
+.air-avatar-menu-buttons > .octane-context-menu-item.air-avatar-menu-dialogue-option {
+    height: auto;
+    min-height: 26px;
+    flex: 0 0 auto;
+    padding: 5px 3px;
+    line-height: 13px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.air-avatar-menu-buttons > .octane-context-menu-item.air-avatar-menu-dialogue-option::before {
+    height: calc(100% + 9px);
 }
 
 .air-avatar-menu-buttons > .octane-context-menu-item:hover {
@@ -1894,4 +1972,182 @@
     .octane-room-queue-button {
         width: 154px;
     }
+}
+
+/* Mystery box tracker: the official faq_link under the box and key, bold 0x00BEFF link text, centred. */
+.octane-mysterybox-faq-link {
+    display: block;
+    margin: 4px auto 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #00beff;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Official mystery_box_toolbar_extension: 192 x 137 (25 minimised), a dark box with a grey title bar. The right
+   side column lets clicks through to the room, so the tracker takes them back for itself. */
+.octane-mysterybox-tracker {
+    box-sizing: border-box;
+    width: 192px;
+    padding: 3px;
+    color: #fff;
+    pointer-events: auto;
+    background: #201e19;
+    border: 1px solid #676767;
+    border-radius: 4px;
+}
+
+.octane-mysterybox-tracker__head {
+    display: flex;
+    align-items: center;
+    height: 20px;
+    padding-left: 2px;
+    background: #676767;
+}
+
+.octane-mysterybox-tracker__title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 10px;
+    font-weight: bold;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.octane-mysterybox-tracker__fold {
+    flex: none;
+    width: 20px;
+    height: 19px;
+    padding: 0;
+    cursor: pointer;
+    background: url("../../assets/images/mysterybox/minimize_unetched.png") center no-repeat;
+    border: 0;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-mysterybox-tracker__fold.is-minimised {
+    background-image: url("../../assets/images/mysterybox/maximize_unetched.png");
+}
+
+.octane-mysterybox-tracker__body {
+    padding: 5px 6px 2px;
+}
+
+.octane-mysterybox-tracker__description {
+    min-height: 30px;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-mysterybox-tracker__slots {
+    display: flex;
+    gap: 11px;
+    justify-content: center;
+    margin-top: 6px;
+}
+
+.octane-mysterybox-tracker__slot {
+    position: relative;
+    width: 39px;
+    height: 39px;
+    background: url("../../assets/images/mysterybox/tracker_border.png") center no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* A base bitmap multiplied by the colour, the way the official bitmap tint works: the picture, then the colour
+   multiplied over it and cut to the picture's own shape. */
+.octane-mysterybox-tracker__base,
+.octane-mysterybox-tracker__overlay,
+.octane-mysterybox-tracker__small {
+    position: absolute;
+    inset: 0;
+    background: var(--octane-mysterybox-image) center no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-mysterybox-tracker__base::after,
+.octane-mysterybox-tracker__small::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background-color: var(--octane-mysterybox-tint, #fff);
+    mix-blend-mode: multiply;
+    mask: var(--octane-mysterybox-image) center no-repeat;
+    -webkit-mask: var(--octane-mysterybox-image) center no-repeat;
+}
+
+.octane-mysterybox-tracker__base,
+.octane-mysterybox-tracker__small {
+    isolation: isolate;
+}
+
+.octane-mysterybox-tracker__base.is-box {
+    --octane-mysterybox-image: url("../../assets/images/mysterybox/box_base.png");
+}
+
+.octane-mysterybox-tracker__overlay.is-box {
+    --octane-mysterybox-image: url("../../assets/images/mysterybox/box_overlay.png");
+}
+
+.octane-mysterybox-tracker__base.is-key {
+    --octane-mysterybox-image: url("../../assets/images/mysterybox/key_base.png");
+}
+
+.octane-mysterybox-tracker__overlay.is-key {
+    --octane-mysterybox-image: url("../../assets/images/mysterybox/key_overlay.png");
+}
+
+.octane-mysterybox-tracker__small {
+    position: relative;
+    inset: auto;
+    flex: none;
+    width: 20px;
+    height: 20px;
+}
+
+.octane-mysterybox-tracker__small.is-box {
+    --octane-mysterybox-image: url("../../assets/images/mysterybox/box_small.png");
+}
+
+.octane-mysterybox-tracker__small.is-key {
+    --octane-mysterybox-image: url("../../assets/images/mysterybox/key_small.png");
+}
+
+/* Official infostand purchase_buttons: a row of 23 px buttons, 5 px apart, sized to their content (place more
+   90 wide, buy 72); "Place more" and "Buy" carry an icon before their regular-weight text. The sizes are forced:
+   the button component and the infostand both set important sizes of their own. */
+.octane-infostand-purchase-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+}
+
+.octane-infostand-purchase-buttons button {
+    display: inline-flex !important;
+    flex: none;
+    gap: 2px;
+    align-items: center;
+    justify-content: center;
+    width: auto !important;
+    height: 23px !important;
+    min-height: 23px !important;
+    padding: 0 5px !important;
+    font-weight: 400 !important;
+    line-height: 1 !important;
+    white-space: nowrap;
+}
+
+.octane-infostand-purchase-buttons img {
+    flex: none;
+    width: auto;
+    height: auto;
+    max-height: 18px;
+    image-rendering: var(--octane-pixel-art, pixelated);
 }

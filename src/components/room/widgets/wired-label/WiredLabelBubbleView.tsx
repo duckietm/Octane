@@ -174,7 +174,10 @@ export const WiredLabelBubbleView: FC<WiredLabelBubbleViewProps> = (props) => {
                 onMouseEnter={() => setOverBubble(true)}
                 onMouseLeave={() => setOverBubble(false)}
                 onKeyDown={(event) => {
-                    if (event.key === 'Escape') onClose();
+                    if (event.key !== 'Escape') return;
+
+                    event.preventDefault();
+                    onClose();
                 }}>
                 <textarea
                     ref={inputRef}

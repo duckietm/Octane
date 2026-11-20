@@ -13,12 +13,19 @@ export const WIRED_SHARE_ANCHOR_AVATAR = 1;
 
 export const WIRED_SHARE_STATUS_OK = 0;
 
+/** @public */
 export const WIRED_IMPORT_ENTRY_CONFIGURE = 1;
+/** @public */
 export const WIRED_IMPORT_ENTRY_PLACE = 2;
+/** @public */
 export const WIRED_IMPORT_ENTRY_MISSING = 3;
+/** @public */
 export const WIRED_IMPORT_ENTRY_REFUSED = 4;
+/** @public */
 export const WIRED_IMPORT_ENTRY_BLOCKED = 5;
+/** @public */
 export const WIRED_IMPORT_ENTRY_UNSUPPORTED = 6;
+/** @public */
 export const WIRED_IMPORT_ENTRY_UNCHANGED = 7;
 
 const ERROR_FALLBACKS: Record<number, string> = {

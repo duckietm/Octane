@@ -1,14 +1,15 @@
 import { CreateLinkEvent, FindNewFriendsMessageComposer, MouseEventType } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
-import { GetUserProfile, LocalizeText, MessengerFriend, OpenMessengerChat, SendMessageComposer } from '../../../../api';
-import { FriendBarNotification } from '../../../../hooks/friends/friendBarNotifications.helpers';
+import { GetUserProfile, LocalizeText, localizeWithFallback, MessengerFriend, OpenMessengerChat, SendMessageComposer } from '../../../../api';
+import { FriendBarNotification, FriendNotificationType } from '../../../../hooks/friends/friendBarNotifications.helpers';
 import { useFriendBarNotificationsStore } from '../../../../hooks/friends/friendBarNotificationsStore';
 import staffChatFrankIcon from '../../../../assets/images/friends/staff-chat-frank.svg';
 import addFriendsIcon from '../../../../assets/images/friends/swf/add_friends_icon.png';
 import chatIcon from '../../../../assets/images/friends/swf/friendlist_chat.png';
 import profileIcon from '../../../../assets/images/friends/swf/friendlist_eye.png';
 import visitIcon from '../../../../assets/images/friends/swf/friendlist_go_room.png';
+import gameIcon from '../../../../assets/images/friends/air/game_center_snowball_notification_icon.png';
 import searchFriendsIcon from '../../../../assets/images/friends/swf/search_friends_icon.png';
 import { LayoutAvatarImageView, LayoutBadgeImageView } from '../../../../common';
 import { useFriends } from '../../../../hooks';
@@ -100,9 +101,20 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
     const isStaffChat = isStaffChatIdentity(friend);
     const pieceStyle = { '--friend-bar-pieces-height': `${notifications.length * PIECE_HEIGHT}px` } as CSSProperties;
 
+    const gameNotification = notifications.find(isGameNotification) ?? null;
+    const gameName = gameNotification ? localizeWithFallback(`gamecenter.${gameNotification.message}.name`, gameNotification.message ?? '') : '';
+    const gameLabel = localizeWithFallback('friend.bar.game', 'Play %game%', ['game'], [gameName]);
+
     const onNotificationIconClick = (notification: FriendBarNotification) => {
         if (isGameNotification(notification)) {
             CreateLinkEvent('games/show');
+            setVisible(false);
+            return;
+        }
+
+        // The unread-message marker opens the chat, which also takes the marker away.
+        if (notification.type === FriendNotificationType.MESSENGER) {
+            OpenMessengerChat(friend.id);
             setVisible(false);
             return;
         }
@@ -149,7 +161,7 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
                     // AIR new_friend_entity region_profile (33 x 35 over the head): opens the friend's profile.
                     <BaseButton
                         type="button"
-                        aria-label={LocalizeText('infostand.profile.link.tooltip')}
+                        aria-label={localizeWithFallback('infostand.profile.link.tooltip', 'Click to view the profile')}
                         className="friend-bar-profile-region"
                         onClick={(event) => {
                             event.stopPropagation();
@@ -183,34 +195,49 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
                                 </div>
                             )}
                             <div className="friend-bar-actions-buttons">
-                                <div
+                                <BaseButton
+                                    aria-label={localizeWithFallback('friendlist.tip.im', 'Start chat')}
                                     className="cursor-pointer friend-bar-action-icon"
                                     onClick={(event) => {
                                         event.stopPropagation();
                                         OpenMessengerChat(friend.id);
                                         setVisible(false);
                                     }}
-                                ><img src={chatIcon} alt="" /></div>
+                                ><img src={chatIcon} alt="" /></BaseButton>
+                                {/* AIR FriendEntityTab: a friend who is playing a game gets btn_game where btn_visit would be. */}
+                                {!isStaffChat && gameNotification && (
+                                    <BaseButton
+                                        aria-label={gameLabel}
+                                        className="cursor-pointer friend-bar-action-icon friend-bar-action-game"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            CreateLinkEvent('games/show');
+                                            setVisible(false);
+                                        }}
+                                    ><img src={gameIcon} alt="" /></BaseButton>
+                                )}
                                 {/* AIR NewFriendEntityTab.select: btn_visit only when the friend allows following. */}
-                                {!isStaffChat && friend.online && friend.followingAllowed && (
-                                    <div
+                                {!isStaffChat && !gameNotification && friend.online && friend.followingAllowed && (
+                                    <BaseButton
+                                        aria-label={localizeWithFallback('friendlist.tip.follow', 'Go to the room this Habbo is in')}
                                         className="cursor-pointer friend-bar-action-icon"
                                         onClick={(event) => {
                                             event.stopPropagation();
                                             followFriend(friend);
                                             setVisible(false);
                                         }}
-                                    ><img src={visitIcon} alt="" /></div>
+                                    ><img src={visitIcon} alt="" /></BaseButton>
                                 )}
                                 {!isStaffChat && (
-                                    <div
+                                    <BaseButton
+                                        aria-label={localizeWithFallback('infostand.profile.link.tooltip', 'Click to view the profile')}
                                         className="cursor-pointer friend-bar-action-icon"
                                         onClick={(event) => {
                                             event.stopPropagation();
                                             GetUserProfile(friend.id);
                                             setVisible(false);
                                         }}
-                                    ><img src={profileIcon} alt="" /></div>
+                                    ><img src={profileIcon} alt="" /></BaseButton>
                                 )}
                             </div>
                         </motion.div>

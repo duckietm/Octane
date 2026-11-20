@@ -1,5 +1,8 @@
 import {
     BotCommandConfigurationEvent,
+    BotDialogueChooseComposer,
+    BotDialogueEvent,
+    BotDialogueOpenComposer,
     BotRemoveComposer,
     BotSkillSaveComposer,
     CreateLinkEvent,
@@ -7,7 +10,7 @@ import {
     RoomObjectCategory,
     RoomObjectType
 } from '@octane/renderer';
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
     AvatarInfoRentableBot,
     BotSkillsEnum,
@@ -20,7 +23,7 @@ import {
     SendMessageComposer
 } from '../../../../../api';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
-import { useMessageEvent } from '../../../../../hooks';
+import { useMessageEvent, useWiredTools } from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
@@ -30,8 +33,45 @@ interface AvatarInfoWidgetRentableBotViewProps {
     onClose: () => void;
 }
 
+/** A page of the bot's dialogue: what the bot says, the options, and the code the server matches a choice against. */
+interface BotDialoguePage {
+    nonce: number;
+    text: string;
+    options: string[];
+}
+
 export const AvatarInfoWidgetRentableBotView: FC<AvatarInfoWidgetRentableBotViewProps> = (props) => {
     const { avatarInfo = null, onClose = null } = props;
+    const [dialogue, setDialogue] = useState<BotDialoguePage>(null);
+    const botId = avatarInfo?.webID;
+
+    // The menu asks the bot's dialogue, if it has one; a bot without one stays silent and the menu is as before.
+    useEffect(() => {
+        setDialogue(null);
+
+        if (botId) SendMessageComposer(new BotDialogueOpenComposer(botId));
+    }, [botId]);
+
+    useMessageEvent<BotDialogueEvent>(BotDialogueEvent, (event) => {
+        const parser = event.getParser();
+
+        if (parser.botId !== botId) return;
+
+        if (parser.closed) {
+            setDialogue(null);
+            onClose();
+            return;
+        }
+
+        setDialogue({ nonce: parser.nonce, text: parser.text, options: [...parser.options] });
+    });
+
+    // The server matches the choice against the page it showed; the next page replaces this one.
+    const chooseOption = (index: number) => {
+        if (!dialogue) return;
+
+        SendMessageComposer(new BotDialogueChooseComposer(botId, dialogue.nonce, index));
+    };
 
     useMessageEvent<BotCommandConfigurationEvent>(BotCommandConfigurationEvent, (event) => {
         const parser = event.getParser();
@@ -73,12 +113,16 @@ export const AvatarInfoWidgetRentableBotView: FC<AvatarInfoWidgetRentableBotView
     });
 
     const requestBotCommandConfiguration = (skillType: number) => SendMessageComposer(new RequestBotCommandConfigurationComposer(avatarInfo.webID, skillType));
+    const { openInspectionForUser, showInspectButton } = useWiredTools();
 
     const processAction = (name: string) => {
         let hideMenu = true;
 
         if (name) {
             switch (name) {
+                case 'inspect':
+                    openInspectionForUser(avatarInfo.roomIndex);
+                    break;
                 case 'donate_to_all':
                     requestBotCommandConfiguration(BotSkillsEnum.DONATE_TO_ALL);
                     SendMessageComposer(new BotSkillSaveComposer(avatarInfo.webID, BotSkillsEnum.DONATE_TO_ALL, ''));
@@ -153,6 +197,13 @@ export const AvatarInfoWidgetRentableBotView: FC<AvatarInfoWidgetRentableBotView
             >
                 <ContextMenuHeaderView>{avatarInfo.name}</ContextMenuHeaderView>
                 <div className="air-avatar-menu-buttons">
+                    {dialogue && dialogue.text && <div className="air-avatar-menu-dialogue">{dialogue.text}</div>}
+                    {dialogue &&
+                        dialogue.options.map((option, index) => (
+                            <ContextMenuListItemView key={`${dialogue.nonce}-${index}`} classNames={['air-avatar-menu-dialogue-option']} onClick={() => chooseOption(index)}>
+                                {option}
+                            </ContextMenuListItemView>
+                        ))}
                     {canControl && (
                         <>
                             {avatarInfo.botSkills.indexOf(BotSkillsEnum.DONATE_TO_ALL) >= 0 && (
@@ -202,6 +253,12 @@ export const AvatarInfoWidgetRentableBotView: FC<AvatarInfoWidgetRentableBotView
                                 <ContextMenuListItemView onClick={(event) => processAction('pick')}>{LocalizeText('avatar.widget.pick_up')}</ContextMenuListItemView>
                             )}
                         </>
+                    )}
+                    {/* Official wired_inspect: the creator tools' inspection, for whoever may open it. */}
+                    {showInspectButton && (
+                        <ContextMenuListItemView onClick={(event) => processAction('inspect')}>
+                            {localizeWithFallback('octane.room.inspect', 'Inspect')}
+                        </ContextMenuListItemView>
                     )}
                     {commandButtons.map((button) => (
                         <ContextMenuListItemView key={button.key} onClick={(event) => processCommandButton(button.link, button.proceedStep)}>

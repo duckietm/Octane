@@ -3,6 +3,7 @@ import { FC, useMemo } from 'react';
 import { LayoutAvatarImageView } from '../../../common';
 import { DraggableWindow } from '../../../common/draggable-window';
 import { NativeText } from '../../../common/native-text/NativeText';
+import { useFittedNativeText } from '../../../common/native-text/useFittedNativeText';
 import { resolveAvatarFigure } from '../../friends/views/friends-list/resolveAvatarFigure';
 import { resolveAvatarGender } from '../../friends/views/friends-list/resolveAvatarGender';
 import { nativeNumber, parseNativeLayout } from '../native/NativeLayout';
@@ -68,6 +69,8 @@ export interface StartPanelProps {
 }
 
 const DISABLED = 0x666666;
+/** From the label's left edge (24) to just before the clear cross (141). */
+const USER_CAPTION_WIDTH = 115;
 
 /**
  * AIR StartPanelCtrl (start_panel): room tool, room chatlog, user info and ticket browser regions, each greyed while it cannot be used. Kept from the
@@ -81,17 +84,20 @@ export const StartPanelView: FC<StartPanelProps> = (props) => {
         onRoomTool, onChatlog, onUserInfo, onTicketQueue, onClose, x, y, onMove
     } = props;
     const node = useMemo(() => parseNativeLayout(startPanelXml), []);
+    // The caption is drawn as wide as it is, and the row ends at the clear cross: a long name is cut with "..."
+    // (the whole caption stays in the row's tooltip).
+    const fittedUserCaption = useFittedNativeText(userCaption, 'il_button', USER_CAPTION_WIDTH);
     const showHead = !!selectedUser?.figure?.includes('hd-');
     // a disabled button greys its label (0x666666), an enabled one is black
     const labelColor = (enabled: boolean) => (enabled ? 0 : DISABLED);
     const states: NativeNodeStates = {
         room_tool_but: { enabled: canUseRoomTool, title: canUseRoomTool ? undefined : noRoomHint },
         chatlog_but: { enabled: canUseChatlog, title: canUseChatlog ? undefined : noRoomHint },
-        userinfo_but: { enabled: canUseUserInfo },
+        userinfo_but: { enabled: canUseUserInfo, title: fittedUserCaption !== userCaption ? userCaption : undefined },
         ticket_queue_but: { enabled: canUseTicketQueue },
         'room_tool_but/offence_name': { textColor: labelColor(canUseRoomTool) },
         'chatlog_but/offence_name': { textColor: labelColor(canUseChatlog) },
-        'userinfo_but/offence_name': { textColor: labelColor(canUseUserInfo), caption: userCaption },
+        'userinfo_but/offence_name': { textColor: labelColor(canUseUserInfo), caption: fittedUserCaption },
         'ticket_queue_but/offence_name': { textColor: labelColor(canUseTicketQueue), caption: openIssueCount > 0 ? `Ticket browser (${openIssueCount > 99 ? '99+' : openIssueCount})` : undefined }
     };
     const handlers: NativeNodeHandlers = { room_tool_but: { onClick: onRoomTool }, chatlog_but: { onClick: onChatlog }, userinfo_but: { onClick: onUserInfo }, ticket_queue_but: { onClick: onTicketQueue } };

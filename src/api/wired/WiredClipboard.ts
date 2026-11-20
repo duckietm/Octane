@@ -1,4 +1,12 @@
-import { ConditionDefinition, TriggerDefinition, Triggerable, WiredActionDefinition, WiredAddonDefinition, WiredSelectorDefinition, WiredVariableDefinition } from '@octane/renderer';
+import {
+    ConditionDefinition,
+    Triggerable,
+    TriggerDefinition,
+    WiredActionDefinition,
+    WiredAddonDefinition,
+    WiredSelectorDefinition,
+    WiredVariableDefinition
+} from '@octane/renderer';
 
 /** Which of the three holders a box belongs to; a clipboard entry only pastes into the same holder and code. */
 export type WiredHolder = 'action' | 'condition' | 'trigger' | 'addon' | 'selector' | 'variable' | 'unknown';
@@ -151,3 +159,6 @@ export const removeFurniFromWiredPicks = (openBoxId: number, furniIds: number[],
 
     return { closesEditor: false, furniIds: changed ? nextFurniIds : furniIds, furniIds2: changed ? nextFurniIds2 : furniIds2, changed };
 };
+
+/** Window event behind the `:wiredreset` chat command: the wired setup closes and forgets its session data. */
+export const WIRED_RESET_EVENT = 'octane-wired-reset';

@@ -1,6 +1,6 @@
 import { HabboClubExtendConfirmMessageComposer } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { GetOptionalConfigurationValue, IPurse, localizeWithFallback, SendMessageComposer } from '../../../api';
+import { GetRenamedConfigurationValue, IPurse, localizeWithFallback, SendMessageComposer } from '../../../api';
 import extendHilite from '../../../assets/images/purse/air/extend_hilite.png';
 import hcIcon from '../../../assets/images/purse-swf/icons/1801_hc_icon_png$2f8b554609e9c5cbbdc46bcbe5764be5-210881771.png';
 import { BaseButton } from '../../../common/BaseButton';
@@ -12,10 +12,8 @@ const SWEEP_INTERVAL_MS = 15000;
 export const isClubPromoVisible = (purse: IPurse | null, hcDisabled: boolean): boolean => {
     if (!purse || hcDisabled || !purse.isExpiring || purse.clubLevel < 1) return false;
 
-    // AIR's switch, with our older one as its default.
-    const ours = GetOptionalConfigurationValue<boolean>('club.membership.extend.promotion.enabled', true);
-
-    return GetOptionalConfigurationValue<boolean>('club.membership.extend.vip.promotion.enabled', ours) !== false;
+    // AIR's switch; club.membership.extend.promotion.enabled is its older name.
+    return GetRenamedConfigurationValue<boolean>('club.membership.extend.vip.promotion.enabled', 'club.membership.extend.promotion.enabled', true) !== false;
 };
 
 /**

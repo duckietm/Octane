@@ -33,7 +33,6 @@ describe('GetConfigurationRecord', () => {
     it('is what the views read settings objects through', () => {
         const files = [
             'src/components/hc-center/HcCenterView.tsx',
-            'src/components/hotel-view/RoomWidgetView.tsx',
             'src/hooks/rooms/widgets/useChatWidget.ts',
             'src/components/room/widgets/avatar-info/infostand/InfoStandWidgetPetView.tsx',
             'src/components/room/widgets/avatar-info/menu/AvatarInfoWidgetOwnPetView.tsx'

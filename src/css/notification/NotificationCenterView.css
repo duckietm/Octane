@@ -1416,3 +1416,23 @@
     font-size: 9px;
     line-height: 10px;
 }
+
+/* The staying wired click-settings notice: text above, the "ignore" switch below. */
+.octane-click-settings-toggle .octane-notification-item__text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.octane-click-settings-toggle__switch {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+/* :hidemouse — the official client hides the pointer everywhere until the command is given again. */
+body.octane-hide-mouse,
+body.octane-hide-mouse * {
+    cursor: none !important;
+}

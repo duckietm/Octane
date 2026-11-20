@@ -1,6 +1,6 @@
 import { GetRoomEngine, RoomChatSettings, RoomObjectCategory } from '@octane/renderer';
 import { CSSProperties, FC, memo, useEffect, useMemo, useRef, useState } from 'react';
-import { ChatBubbleMessage, GetConfigurationValue, localizeWithFallback } from '../../../../api';
+import { ChatBubbleMessage, GetConfigurationValue, GetServerMentionAliases, localizeWithFallback } from '../../../../api';
 import { UserIdentityView } from '../../../../common';
 import { useOnClickChat } from '../../../../hooks';
 import { useUserDataSnapshot } from '../../../../hooks/session/useSessionSnapshots';
@@ -8,6 +8,15 @@ import { CHAT_TEXT_SIZE_EVENT, CHAT_TEXT_SIZE_PIXELS, ChatTextSize, getStoredCha
 import { ChatNativeContent } from './ChatNativeContent';
 import { measureBubbleVisualOffsets } from './chatBubbleMetrics';
 import { highlightMentions } from './highlightMentions';
+
+const twoDigits = (value: number): string => value.toString().padStart(2, '0');
+
+/** The time a bubble shows on hover: hours, minutes and seconds on 24 hours, in the viewer's own time zone. */
+export const formatChatTime = (timestamp: number): string => {
+    const date = new Date(timestamp);
+
+    return `${twoDigits(date.getHours())}:${twoDigits(date.getMinutes())}:${twoDigits(date.getSeconds())}`;
+};
 
 interface ChatWidgetMessageViewProps {
     chat: ChatBubbleMessage;
@@ -36,7 +45,7 @@ const ChatWidgetMessageViewBase: FC<ChatWidgetMessageViewProps> = ({
 
     const mentionsHighlightOn = GetConfigurationValue<boolean>('mentions_ui.enabled', true);
 
-    const highlight = (html: string): string => (mentionsHighlightOn ? highlightMentions(html, ownUsername) : html);
+    const highlight = (html: string): string => (mentionsHighlightOn ? highlightMentions(html, ownUsername, GetServerMentionAliases() ?? undefined) : html);
 
     const formattedText = useMemo(() => highlight(`${chat.formattedText}`), [chat.formattedText, ownUsername, mentionsHighlightOn]);
     const originalFormattedText = useMemo(
@@ -260,6 +269,7 @@ const ChatWidgetMessageViewBase: FC<ChatWidgetMessageViewProps> = ({
                     />
                 )}
             </div>
+            {!inHistory && <span className="chat-bubble-time">{formatChatTime(chat.receivedAt)}</span>}
         </div>
     );
 };

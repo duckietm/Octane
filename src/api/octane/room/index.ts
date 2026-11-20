@@ -5,7 +5,6 @@ export * from './GetOwnRoomObject';
 export * from './GetRoomObjectBounds';
 export * from './GetRoomObjectScreenLocation';
 export * from './GetRoomTileScreenLocation';
-export * from './InitializeRoomInstanceRenderingCanvas';
 export * from './IsFurnitureSelectionDisabled';
 export * from './ProcessRoomObjectOperation';
 export * from './SetActiveRoomId';

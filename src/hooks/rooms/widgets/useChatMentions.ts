@@ -1,6 +1,7 @@
 import { GetSessionDataManager } from '@octane/renderer';
 import { RefObject, useCallback, useMemo, useState } from 'react';
-import { GetConfigurationValue, LocalizeText } from '../../../api';
+import { GetConfigurationValue, LocalizeText, resolveMentionAliases } from '../../../api';
+import { useHotelSettingsStore } from '../../../state/hotelSettingsStore';
 import { useRoomUserListSnapshot } from '../../session/useSessionSnapshots';
 import {
     buildChatMentionSuggestions,
@@ -14,7 +15,7 @@ import {
     sanitizeAliasList
 } from './useChatMentions.helpers';
 
-export type { MentionSuggestion, MentionSuggestionKind } from './useChatMentions.helpers';
+export type { MentionSuggestion } from './useChatMentions.helpers';
 
 export interface ChatMentionsState {
     visible: boolean;
@@ -48,15 +49,18 @@ export const useChatMentions = (
 
     const mentionContext = useMemo(() => computeMentionContext(chatValue, commandSelectorVisible), [chatValue, commandSelectorVisible]);
 
+    const hotelSettings = useHotelSettingsStore((state) => state.settings);
     const aliases = useMemo<MentionAlias[]>(() => {
         const out: MentionAlias[] = [];
         const seen = new Set<string>();
         const scopes: MentionAliasScope[] = ['everyone', 'friends', 'room'];
 
         for (const scope of scopes) {
-            const list = sanitizeAliasList(
-                GetConfigurationValue<unknown>(MENTION_ALIAS_CONFIG_KEY[scope], MENTION_ALIAS_DEFAULTS[scope]),
-                MENTION_ALIAS_DEFAULTS[scope]
+            // The words the server accepts, once it sent them; until then the hotel's configured ones.
+            const list = resolveMentionAliases(
+                hotelSettings,
+                scope,
+                sanitizeAliasList(GetConfigurationValue<unknown>(MENTION_ALIAS_CONFIG_KEY[scope], MENTION_ALIAS_DEFAULTS[scope]), MENTION_ALIAS_DEFAULTS[scope])
             );
 
             for (const key of list) {
@@ -70,7 +74,7 @@ export const useChatMentions = (
         }
 
         return out;
-    }, []);
+    }, [hotelSettings]);
 
     const suggestions = useMemo<MentionSuggestion[]>(() => {
         if (!mentionContext) return [];

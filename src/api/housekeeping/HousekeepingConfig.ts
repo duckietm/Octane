@@ -51,17 +51,6 @@ export const HOUSEKEEPING_TAB_PERMISSIONS: Partial<Record<HousekeepingTabId, str
     [HousekeepingTabId.SOUNDBOARD]: 'acc_soundboard_manage'
 };
 
-/** Every permission a tab can need, so a view can read them all at once. */
-export const HOUSEKEEPING_AREA_PERMISSIONS = [
-    'acc_hk_users',
-    'acc_hk_rooms',
-    'acc_hk_bans',
-    'acc_hk_economy',
-    'acc_hk_hotel',
-    'acc_hk_permissions',
-    'acc_soundboard_manage'
-] as const;
-
 export const isHousekeepingTabOpen = (tab: HousekeepingTabId, holds: (permission: string) => boolean): boolean => {
     const permission = HOUSEKEEPING_TAB_PERMISSIONS[tab];
 

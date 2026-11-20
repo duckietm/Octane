@@ -138,13 +138,14 @@ jobs:
         working-directory: octane
         run: yarn lint:hooks
 
-      # Dependency gate: a package.json entry nothing imports, or an import
-      # package.json does not list. Unused files and exports are reported by a
-      # plain `yarn knip` locally but do not fail CI. Runs after the renderer
-      # symlink so the tsconfig aliases resolve as they do on a developer machine.
-      - name: Knip (dependencies)
+      # Dead code gate: a file nothing imports, an export no file uses, a
+      # package.json entry nothing imports, or an import package.json does not
+      # list. A deliberate export nothing imports yet carries /** @public */
+      # (see knip.jsonc). Runs after the renderer symlink so the tsconfig
+      # aliases resolve as they do on a developer machine.
+      - name: Knip
         working-directory: octane
-        run: yarn knip --dependencies
+        run: yarn knip
 
       - name: Vitest
         working-directory: octane

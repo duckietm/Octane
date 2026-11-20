@@ -10,6 +10,8 @@ let petMsgFragments: Map<number, PetData>[] = null;
 
 const useInventoryPetsState = () => {
     const [needsUpdate, setNeedsUpdate] = useState(true);
+    // AIR shows its loading view until the first list arrives, and the empty view only after it.
+    const [isLoaded, setIsLoaded] = useState(false);
     const [petItems, setPetItems] = useState<IPetItem[]>([]);
     const [selectedPet, setSelectedPet] = useState<IPetItem>(null);
     const { isVisible = false, activate = null, deactivate = null } = useSharedVisibility();
@@ -33,6 +35,7 @@ const useInventoryPetsState = () => {
         });
 
         petMsgFragments = null;
+        setIsLoaded(true);
     });
 
     useMessageEvent<PetAddedToInventoryEvent>(PetAddedToInventoryEvent, (event) => {
@@ -93,7 +96,7 @@ const useInventoryPetsState = () => {
         setNeedsUpdate(false);
     }, [isVisible, needsUpdate]);
 
-    return { petItems, selectedPet, setSelectedPet, activate, deactivate };
+    return { petItems, isLoaded, selectedPet, setSelectedPet, activate, deactivate };
 };
 
 export const useInventoryPets = () => useSharedHook(useInventoryPetsState);

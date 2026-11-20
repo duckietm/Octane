@@ -88,7 +88,13 @@ const defaultLookups: OfferLookups = {
     getFurnitureData: GetFurnitureData
 };
 
-export const buildPurchasableOffer = (offer: ParserOffer, lookups: OfferLookups = defaultLookups): IPurchasableOffer | null => {
+/**
+ * The layouts whose offer sells something that is not a product (a room event): such an offer carries no products,
+ * and dropping it left the page with nothing to buy.
+ */
+const PRODUCTLESS_OFFER_LAYOUTS = ['roomads'];
+
+export const buildPurchasableOffer = (offer: ParserOffer, lookups: OfferLookups = defaultLookups, allowNoProducts: boolean = false): IPurchasableOffer | null => {
     const products: IProduct[] = [];
     const productData = lookups.getProductData(offer.localizationId);
 
@@ -110,7 +116,7 @@ export const buildPurchasableOffer = (offer: ParserOffer, lookups: OfferLookups 
         );
     }
 
-    if (!products.length) return null;
+    if (!products.length && !allowNoProducts) return null;
 
     return new Offer(
         offer.offerId,
@@ -140,7 +146,7 @@ export const selectCatalogPage = (parser: ParserPage, type: string, lookups: Off
     const offers: IPurchasableOffer[] = [];
 
     for (const parserOffer of parser.offers) {
-        const offer = buildPurchasableOffer(parserOffer, lookups);
+        const offer = buildPurchasableOffer(parserOffer, lookups, PRODUCTLESS_OFFER_LAYOUTS.includes(parser.layoutCode));
 
         if (offer && isOfferAllowedInCatalogType(offer, type)) offers.push(offer);
     }

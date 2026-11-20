@@ -16,28 +16,38 @@ import { useInventoryUnseenTracker } from './useInventoryUnseenTracker';
 
 const useInventoryPrefixesState = () => {
     const [needsUpdate, setNeedsUpdate] = useState(true);
+    // AIR shows its loading view until the first list arrives, and the empty view only after it.
+    const [isLoaded, setIsLoaded] = useState(false);
     const [prefixes, setPrefixes] = useState<IPrefixItem[]>([]);
     const [activePrefix, setActivePrefix] = useState<IPrefixItem | null>(null);
     const [selectedPrefix, setSelectedPrefix] = useState<IPrefixItem | null>(null);
     const { isVisible = false, activate = null, deactivate = null } = useSharedVisibility();
     const { isUnseen = null, resetCategory = null } = useInventoryUnseenTracker();
 
+    // This list is the short one (no catalog id, display name or price): keep what the richer list already told us
+    // about the same prefix instead of dropping it.
     useMessageEvent<UserPrefixesEvent>(UserPrefixesEvent, (event) => {
         const parser = event.getParser();
-        const newPrefixes: IPrefixItem[] = parser.prefixes.map((p) => ({
-            id: p.id,
-            text: p.text,
-            color: p.color,
-            icon: p.icon || '',
-            effect: p.effect || '',
-            font: p.font || '',
-            active: p.active
-        }));
 
-        setPrefixes(newPrefixes);
+        setIsLoaded(true);
 
-        const active = newPrefixes.find((p) => p.active) || null;
-        setActivePrefix(active);
+        setPrefixes((prevValue) => {
+            const known = new Map(prevValue.map((prefix) => [prefix.id, prefix]));
+            const next: IPrefixItem[] = parser.prefixes.map((p) => ({
+                ...known.get(p.id),
+                id: p.id,
+                text: p.text,
+                color: p.color,
+                icon: p.icon || '',
+                effect: p.effect || '',
+                font: p.font || '',
+                active: p.active
+            }));
+
+            setActivePrefix(next.find((p) => p.active) || null);
+
+            return next;
+        });
     });
 
     useMessageEvent<UserNickIconsEvent>(UserNickIconsEvent, (event) => {
@@ -73,7 +83,7 @@ const useInventoryPrefixesState = () => {
             active: false
         };
 
-        setPrefixes((prevValue) => [newPrefix, ...prevValue]);
+        setPrefixes((prevValue) => [newPrefix, ...prevValue.filter((prefix) => prefix.id !== newPrefix.id)]);
     });
 
     useMessageEvent<ActivePrefixUpdatedEvent>(ActivePrefixUpdatedEvent, (event) => {
@@ -149,7 +159,7 @@ const useInventoryPrefixesState = () => {
         setNeedsUpdate(false);
     }, [isVisible, needsUpdate]);
 
-    return { prefixes, activePrefix, selectedPrefix, setSelectedPrefix, activatePrefix, deactivatePrefix, deletePrefix, activate, deactivate };
+    return { prefixes, isLoaded, activePrefix, selectedPrefix, setSelectedPrefix, activatePrefix, deactivatePrefix, deletePrefix, activate, deactivate };
 };
 
 export const useInventoryPrefixes = () => useSharedHook(useInventoryPrefixesState);

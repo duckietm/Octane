@@ -1,5 +1,6 @@
 import { FC, useMemo } from 'react';
 import {
+    GetConfigurationList,
     GetConfigurationValue,
     LocalizeText,
     localizeWithFallback,
@@ -72,7 +73,7 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
     const serverTimeZone = roomSession?.hotelTimeZone || 'UTC';
     const selectedTimeZone = roomSettings.timezone || serverTimeZone;
     const timezoneOptions = useMemo(
-        () => buildTimezoneOptions(selectedTimeZone, serverTimeZone, GetConfigurationValue<string>('wired.timezones', '')),
+        () => buildTimezoneOptions(selectedTimeZone, serverTimeZone, GetConfigurationList('wired.timezones')),
         [selectedTimeZone, serverTimeZone]
     );
     const showSelfDonation = !!onOpenSelfDonation && GetConfigurationValue<boolean>('wired.selfdonation.enabled', false);

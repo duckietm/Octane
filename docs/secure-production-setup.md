@@ -64,39 +64,55 @@ Configurazione produzione secure:
 Significato:
 
 - `distObfuscationEnabled: true` carica `app.js.dat` e `app.css.dat`.
-- `secureAssetsEnabled: true` carica `renderer-config.json`, `ui-config.json` e gamedata da `/nitro-sec/file`.
+- `secureAssetsEnabled: true` carica `config.jsonc`, i file di `config/` che elenca e gamedata da `/nitro-sec/file`.
 - `secureApiEnabled: true` cifra automaticamente le chiamate `/api/*`.
 - `apiBaseUrl` deve puntare all'emulatore/API.
 - `plainConfigBaseUrl` e `plainGamedataBaseUrl` restano fallback quando spegni secure assets.
 - Se `/nitro-sec/bootstrap` non risponde con una chiave (secure spento sul server, emulatore vecchio, rete), il client carica config, gamedata e `/api` in chiaro invece di fallire, e riprova la via cifrata dopo 5 minuti. Con `nitro.secure.api.required=true` il server rifiuta comunque con 403 le chiamate in chiaro a `/api/auth/*` e `/api/badges/*`.
 - Il client rinnova la sua chiave ogni `nitro.secure.session_ttl_sec` secondi del server (tra 60 e 3600; 300 se il server non lo indica).
 
-## 3. `configuration/renderer-config.json`
+## 3. `configuration/config.jsonc` e `configuration/config/`
 
 File:
 
 ```txt
-octane/dist/configuration/renderer-config.json
+octane/dist/configuration/config.jsonc
+octane/dist/configuration/config/
 ```
 
-Valori importanti:
+`config.jsonc` elenca in `"config.files"` i file di `config/` da caricare, in ordine (per la stessa chiave vince il
+file che viene dopo). Si parte da `config.example.jsonc` e dalla cartella `config.example`. I file sono JSONC, con un
+commento `//` sopra ogni chiave: la modalità JSON deve essere `jsonc` o `auto`, non `legacy`. Sono quattro:
+`config/server.jsonc` (server, asset, login, caricamento, log), `config/hotel.jsonc` (avatar, stanze, catalogo, chat,
+amici, quest), `config/features.jsonc` (funzioni accese e spente, wired, radio, camera, strumenti staff) e
+`config/data.jsonc` (le tabelle lunghe). Ogni sezione si apre con un titolo `// ==== ... ====`.
+
+Valori importanti in `config/server.jsonc` (sezioni `Server and connection` e `Assets and game data`):
 
 ```json
 {
     "socket.url": "wss://nitro.example.com:2096",
     "api.url": "https://nitro.example.com:2096",
+    "crypto.ws.enabled": true,
+
     "gamedata.url": "https://nitro.example.com:2096/nitro-sec/file?kind=gamedata&file=",
     "external.texts.url": [
         "${gamedata.url}/ExternalTexts.json",
         "${gamedata.url}/UITexts.json"
     ],
     "furnidata.url": "${gamedata.url}/FurnitureData.json?t=%timestamp%",
-    "productdata.url": "${gamedata.url}/ProductData.json?t=%timestamp%",
+    "productdata.url": "${gamedata.url}/ProductData.json?t=%timestamp%"
+}
+```
+
+In `config/hotel.jsonc` (sezione `Avatar`):
+
+```json
+{
     "avatar.actions.url": "${gamedata.url}/HabboAvatarActions.json?t=%timestamp%",
     "avatar.figuredata.url": "${gamedata.url}/FigureData.json?t=%timestamp%",
     "avatar.figuremap.url": "${gamedata.url}/FigureMap.json?t=%timestamp%",
-    "avatar.effectmap.url": "${gamedata.url}/EffectMap.json?t=%timestamp%",
-    "crypto.ws.enabled": true
+    "avatar.effectmap.url": "${gamedata.url}/EffectMap.json?t=%timestamp%"
 }
 ```
 
@@ -106,21 +122,25 @@ Se non usi ancora WebSocket crypto, metti:
 "crypto.ws.enabled": false
 ```
 
-## 4. `configuration/ui-config.json`
+## 4. Camera e immagini: `config/features.jsonc` e `config/server.jsonc`
 
 File:
 
 ```txt
-octane/dist/configuration/ui-config.json
+octane/dist/configuration/config/features.jsonc
+octane/dist/configuration/config/server.jsonc
 ```
 
-Qui puoi lasciare immagini e camera su URL statici normali:
+Qui puoi lasciare immagini e camera su URL statici normali. In `config/features.jsonc` (sezione `Camera`):
 
 ```json
-{
-    "camera.url": "https://hotel.example.com/client/camera/",
-    "thumbnails.url": "https://hotel.example.com/client/camera/thumbnail/%thumbnail%.png"
-}
+"camera.url": "https://hotel.example.com/client/camera/"
+```
+
+In `config/server.jsonc` (sezione `Assets and game data`):
+
+```json
+"thumbnails.url": "https://hotel.example.com/client/camera/thumbnail/%thumbnail%.png"
 ```
 
 Le immagini non sensibili possono rimanere statiche. I JSON/gamedata invece passano dal secure endpoint.
@@ -157,7 +177,7 @@ login.remember.jwt.secret=change-this-too-if-you-use-remember-me
 
 Note:
 
-- `nitro.secure.config.root` deve puntare alla cartella dove ci sono `renderer-config.json`, `ui-config.json`, `client-mode.json`.
+- `nitro.secure.config.root` deve puntare alla cartella dove ci sono `config.jsonc`, la cartella `config/` e `client-mode.json` (il server accetta le sottocartelle).
 - `nitro.secure.gamedata.root` deve puntare alla cartella live dei gamedata.
 - I file vengono letti live da disco: se cambi un JSON, un nuovo refresh pagina legge la nuova versione.
 - `nitro.secure.master_key` deve restare segreta e stabile. Non metterla nei file pubblici.
@@ -198,7 +218,7 @@ Senza questo, il browser può dare 404 anche se il file esiste davvero.
 
 - `client-mode.json` ha `secureAssetsEnabled=true`.
 - `client-mode.json` ha `secureApiEnabled=true`.
-- `renderer-config.json` usa `/nitro-sec/file?kind=gamedata&file=`.
+- `gamedata.url` in `config/server.jsonc` usa `/nitro-sec/file?kind=gamedata&file=`.
 - `api.url` punta a `https://nitro.example.com:2096`.
 - `socket.url` punta a `wss://nitro.example.com:2096`.
 - `config.ini` ha `nitro.secure.config.root` corretto.
@@ -342,8 +362,8 @@ La cartella `configuration` deve contenere:
 asset-loader.js
 bootstrap.js
 client-mode.json
-renderer-config.json
-ui-config.json
+config.jsonc
+config/                   server.json, hotel.json, features.json, data.json (elencati in config.jsonc)
 adsense.json              opzionale
 hotlooks.json             se usi register hot looks
 UITexts.json              se usi testi UI separati
@@ -378,8 +398,8 @@ dell'HTML iniettato prova a caricare altro, il browser lo blocca. `index.html` p
 hotel (`object-src 'none'; base-uri 'self'`); la policy completa dipende dagli host dell'hotel e va negli header del
 web server.
 
-Base da adattare (sostituisci gli host d'esempio con quelli di `client-mode.json`, `renderer-config.json` e
-`ui-config.json`):
+Base da adattare (sostituisci gli host d'esempio con quelli di `client-mode.json` e dei file di `config/`, in
+particolare `config/server.jsonc`):
 
 ```txt
 default-src 'self';
@@ -401,6 +421,9 @@ frame-ancestors 'self' https://cms.example.com
 - **`blob:`** in `script-src` serve a `asset-loader.js`, che importa il bundle decompresso da un blob.
 - **Plugin esterni**: ogni host di `external.plugins` va aggiunto a `script-src`, e conviene elencarlo anche in
   `external.plugins.allowed.hosts`.
+- **Plugin dell'emulatore**: gli script che i plugin portano nel jar arrivano dall'emulatore
+  (`external.plugins.server.url`, di default `${api.url}/api/client-plugins`), quindi anche l'host di `api.url` va
+  in `script-src`. Ognuno ha la sua integrità; per non caricarne nessuno lascia vuota quella chiave.
 - **Annunci**: con `ads.frame.url` (sezione 15) basta il loro origin in `frame-src`; AdSense direttamente nel client
   richiede invece i domini Google in `script-src`, `img-src`, `connect-src` e `frame-src`.
 - **`frame-ancestors`**: elenca il CMS che incorpora il client, oppure lascia `'self'`.
@@ -429,7 +452,7 @@ add_header Content-Security-Policy-Report-Only "default-src 'self'; ..." always;
 
 ### Remember token in cookie
 
-Con `"login.remember.cookie": true` in `ui-config.json` il client chiede all'emulatore di tenere il remember token in
+Con `"login.remember.cookie": true` in `config/server.jsonc` il client chiede all'emulatore di tenere il remember token in
 un cookie HttpOnly su `/api/auth`, che nessuno script può leggere. Nel `config.ini` dell'emulatore:
 
 ```ini
@@ -445,9 +468,9 @@ Un emulatore che non conosce la modalità cookie risponde con il token nel JSON 
 
 Lo script di AdSense, caricato nel client, gira nello stesso origin della sessione. Per tenerlo fuori:
 
-1. pubblica `configuration/ads-frame.html.example`, rinominato `ads-frame.html`, su un altro origin
+1. pubblica `configuration/ads-frame.example.html`, rinominato `ads-frame.html`, su un altro origin
    (es. `https://ads.example.net/ads-frame.html`), con il suo `ads.txt`;
-2. in `ui-config.json` imposta `"ads.frame.url": "https://ads.example.net/ads-frame.html"`.
+2. in `config/server.jsonc` imposta `"ads.frame.url": "https://ads.example.net/ads-frame.html"`.
 
 Il client mostra allora l'annuncio in un iframe sandbox che può aprire l'inserzionista in una nuova scheda ma non
 navigare il client, e passa l'unità pubblicitaria (da `ads.txt` e `adsense.json`) nella query. Senza `ads.frame.url`

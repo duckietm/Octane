@@ -1,9 +1,9 @@
 /**
- * The timezones the room (and the time / date conditions) can pick: the hotel's own list from `wired.timezones` (comma separated)
+ * The timezones the room (and the time / date conditions) can pick: the hotel's own list from `wired.timezones` (a list, or the older comma separated string)
  * when it has one, otherwise everything the browser knows, with the room's current zone and the
  * hotel's server zone always present.
  */
-export const buildTimezoneOptions = (current: string, hotelZone: string, configured: string): string[] => {
+export const buildTimezoneOptions = (current: string, hotelZone: string, configured: string | string[]): string[] => {
     const zones: string[] = [];
     const add = (zone: string) => {
         const trimmed = (zone || '').trim();
@@ -14,9 +14,8 @@ export const buildTimezoneOptions = (current: string, hotelZone: string, configu
     add(current);
     add(hotelZone);
 
-    const fromConfig = (configured || '')
-        .split(',')
-        .map((zone) => zone.trim())
+    const fromConfig = (Array.isArray(configured) ? configured : (configured || '').split(','))
+        .map((zone) => String(zone).trim())
         .filter(Boolean);
 
     if (fromConfig.length) {

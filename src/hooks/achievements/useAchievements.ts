@@ -10,7 +10,7 @@ import {
 } from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { AchievementCategory, AchievementUtilities, GetOptionalConfigurationValue, SendMessageComposer } from '../../api';
+import { AchievementCategory, AchievementUtilities, GetConfigurationList, SendMessageComposer } from '../../api';
 import { useMessageEvent, useOctaneEvent } from '../events';
 
 const copyAchievement = (achievement: AchievementData): AchievementData => Object.assign(Object.create(AchievementData.prototype), achievement);
@@ -30,7 +30,7 @@ const useAchievementsState = () => {
         const archive = new AchievementCategory('archive');
         const wiredGames = new AchievementCategory('wired_games');
         const newAchievements = new AchievementCategory('new');
-        const newCodes = GetOptionalConfigurationValue<string>('achievements.new', '').split(',');
+        const newCodes = GetConfigurationList('achievements.new');
         categories.set(archive.code, archive);
         categories.set(wiredGames.code, wiredGames);
 

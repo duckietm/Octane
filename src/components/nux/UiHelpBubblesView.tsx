@@ -105,11 +105,18 @@ export const UiHelpBubblesView: FC = () => {
 
     return createPortal(
         <div className="octane-help-bubbles">
-            {/* ui_help_modal: the desktop is dimmed around the element, which stays clickable. */}
-            <div className="octane-help-bubbles__dim" style={{ left: 0, top: 0, right: 0, height: Math.max(0, hole.top) }} />
-            <div className="octane-help-bubbles__dim" style={{ left: 0, top: hole.bottom, right: 0, bottom: 0 }} />
-            <div className="octane-help-bubbles__dim" style={{ left: 0, top: hole.top, width: Math.max(0, hole.left), height: hole.bottom - hole.top }} />
-            <div className="octane-help-bubbles__dim" style={{ left: hole.right, top: hole.top, right: 0, height: hole.bottom - hole.top }} />
+            {/* ui_help_modal: the desktop is dimmed around the element, which stays clickable. Only for the server's
+                new user script, which walks the player through the client step by step. A hint this client raises
+                itself (the welcome bubbles) is just a pointer: it must not lock the rest of the client, or every
+                click beside it (the catalogue icon next to the navigator, for one) is swallowed. */}
+            {!current.local && (
+                <>
+                    <div className="octane-help-bubbles__dim" style={{ left: 0, top: 0, right: 0, height: Math.max(0, hole.top) }} />
+                    <div className="octane-help-bubbles__dim" style={{ left: 0, top: hole.bottom, right: 0, bottom: 0 }} />
+                    <div className="octane-help-bubbles__dim" style={{ left: 0, top: hole.top, width: Math.max(0, hole.left), height: hole.bottom - hole.top }} />
+                    <div className="octane-help-bubbles__dim" style={{ left: hole.right, top: hole.top, right: 0, height: hole.bottom - hole.top }} />
+                </>
+            )}
             <div
                 ref={bubbleRef}
                 className="octane-help-bubble"

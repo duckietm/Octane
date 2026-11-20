@@ -64,6 +64,45 @@ describe('BadgeLeaderboardView category dropdown', () => {
     });
 });
 
+describe('BadgeLeaderboardView loading', () => {
+    beforeEach(() => vi.mocked(AddLinkEventTracker).mockClear());
+    afterEach(cleanup);
+
+    it('shows the boards once the first load finishes with an empty cache', async () => {
+        const api = await import('../../api');
+        let loaded = false;
+
+        // The module cache stays empty until the request answers, as it does on the first open after a login.
+        vi.mocked(api.getCachedBadgeLeaderboard).mockImplementation(() => (loaded ? response : null));
+        vi.mocked(api.fetchBadgeLeaderboard).mockImplementationOnce(async () => {
+            loaded = true;
+
+            return response;
+        });
+
+        try {
+            render(<BadgeLeaderboardView />);
+            open();
+
+            expect(await screen.findByRole('combobox')).toHaveTextContent('badge_leaderboard.title.total_badges');
+            expect(document.querySelector('.octane-badge-leaderboard__info-card')).not.toBeNull();
+        } finally {
+            vi.mocked(api.getCachedBadgeLeaderboard).mockImplementation(() => response);
+        }
+    });
+
+    it('says the leaderboard is unavailable when the reply has no boards', async () => {
+        const api = await import('../../api');
+
+        vi.mocked(api.getCachedBadgeLeaderboard).mockReturnValueOnce(null);
+        vi.mocked(api.fetchBadgeLeaderboard).mockResolvedValueOnce({} as BadgeLeaderboardResponse);
+        render(<BadgeLeaderboardView />);
+        open();
+
+        expect(await screen.findByText('The leaderboard is not available right now.')).toBeInTheDocument();
+    });
+});
+
 describe('BadgeLeaderboardView ranking', () => {
     const entry = (userId: number, rank: number, score: number) => ({ userId, rank, score, username: `user${userId}`, figure: '' });
     const names = () => Array.from(document.querySelectorAll('.octane-badge-leaderboard__username')).map((node) => node.textContent);

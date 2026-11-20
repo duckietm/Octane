@@ -1,8 +1,8 @@
 import { CreateLinkEvent, DisconnectMessageComposer, GetCommunication } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-    clearAccessToken,
     ClearRememberLogin,
+    clearAccessToken,
     FriendlyTime,
     GetConfigurationValue,
     GetOptionalConfigurationValue,
@@ -17,15 +17,16 @@ import hcIcon from '../../assets/images/purse-swf/icons/1801_hc_icon_png$2f8b554
 import logoutIcon from '../../assets/images/purse-swf/icons/1936_logout_icon_png$6a29fdff1e5e3cdd3c6290cec5c962b4-234470554.png';
 import settingsIcon from '../../assets/images/purse-swf/icons/2291_settings_icon_png$c9dcf215bb7a7e35a3f128c7c60151bc1008066621.png';
 import { Column } from '../../common';
+import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { Hint } from '../../common/Tooltip';
 import { ClearStoredChatHistory, usePurse } from '../../hooks';
 import { useEarningsIndicatorStore } from '../../state/earningsIndicatorStore';
 import { ClubExtendView } from './views/ClubExtendView';
 import { ClubPromoView, isClubPromoVisible } from './views/ClubPromoView';
 import { CurrencyView } from './views/CurrencyView';
 import { SeasonalView } from './views/SeasonalView';
-import { BaseButton } from '../../common/BaseButton';
-import { Hint } from '../../common/Tooltip';
-import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useVipQuestsPromo, VipQuestsPromoView } from './views/VipQuestsPromoView';
 
 /** How long logout waits for the server before going on: the local credentials are already gone. */
 const LOGOUT_TIMEOUT_MS = 3000;
@@ -33,6 +34,7 @@ const LOGOUT_TIMEOUT_MS = 3000;
 export const PurseView: FC<{}> = (props) => {
     const { purse = null, hcDisabled = false } = usePurse();
     const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
+    const vipQuestsPromo = useVipQuestsPromo();
     const earningsUnseen = useEarningsIndicatorStore((state) => state.showing);
 
     // AIR SettingsExtension: one row per settings window, each closing the menu.
@@ -196,7 +198,8 @@ export const PurseView: FC<{}> = (props) => {
     ].filter(Boolean);
 
     // AIR ClubDiscountPromoExtension: the renewal offer while the membership runs out.
-    const showClubPromo = isClubPromoVisible(purse, hcDisabled);
+    // AIR: the quests box takes the club renewal bar's place.
+    const showClubPromo = !vipQuestsPromo.visible && isClubPromoVisible(purse, hcDisabled);
 
     return (
         <NativeTextTree>
@@ -290,6 +293,7 @@ export const PurseView: FC<{}> = (props) => {
                     </div>
                 </div>
                 {showClubPromo && <ClubPromoView purse={purse} />}
+                {vipQuestsPromo.visible && <VipQuestsPromoView onClose={vipQuestsPromo.close} />}
                 <ClubExtendView />
                 {settingsMenuOpen && (
                     <div className="octane-purse-menu" role="menu">

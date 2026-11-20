@@ -102,6 +102,7 @@ export const RoomWidgetsView: FC<{}> = (props) => {
     useOctaneEvent<RoomEngineObjectEvent>(
         [
             RoomEngineTriggerWidgetEvent.REQUEST_TEASER,
+            RoomEngineTriggerWidgetEvent.REQUEST_PLACEHOLDER,
             RoomEngineTriggerWidgetEvent.REQUEST_ECOTRONBOX,
             RoomEngineTriggerWidgetEvent.REQUEST_CLOTHING_CHANGE,
             RoomEngineTriggerWidgetEvent.REQUEST_PLAYLIST_EDITOR,
@@ -128,7 +129,14 @@ export const RoomWidgetsView: FC<{}> = (props) => {
                     // Handled by useFurnitureEcotronBoxWidget (official EcotronBoxFurniWidget).
                     break;
                 case RoomEngineTriggerWidgetEvent.REQUEST_PLACEHOLDER:
-                    //widgetHandler.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(RoomWidgetFurniToWidgetMessage.REQUEST_PLACEHOLDER, objectId, category, event.roomId));
+                    // Official PlaceholderWidget: a furni whose function is not there yet says so when it is used.
+                    simpleAlert(
+                        localizeWithFallback('widget.placeholder.message', 'Coming soon!'),
+                        NotificationAlertType.DEFAULT,
+                        null,
+                        null,
+                        localizeWithFallback('widget.placeholder.title', 'This feature is not yet available!')
+                    );
                     break;
                 case RoomEngineTriggerWidgetEvent.REQUEST_CLOTHING_CHANGE:
                     //widgetHandler.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(RoomWidgetFurniToWidgetMessage.REQUEST_CLOTHING_CHANGE, objectId, category, event.roomId));

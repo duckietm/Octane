@@ -1,6 +1,6 @@
-import { CreateLinkEvent, PetRespectComposer, PetType } from '@octane/renderer';
+import { CreateLinkEvent, GetRoomEngine, PetRespectComposer, PetType, RoomObjectCategory, RoomObjectOperationType } from '@octane/renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
-import { confirmCompostPlant, ConvertSeconds, GetConfigurationRecord, LocalizeText, SendMessageComposer } from '../../../../../api';
+import { confirmCompostPlant, ConvertSeconds, GetConfigurationRecord, IsAnyRoomController, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button, Column, Flex, LayoutCounterTimeView, LayoutPetImageView, LayoutRarityLevelView, Text, UserProfileIconView } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useNotification, useRoom, useSessionInfo } from '../../../../../hooks';
@@ -33,6 +33,7 @@ interface AvatarInfoPet {
     maximumTimeToLive?: number;
     rarityLevel?: number;
     isOwner?: boolean;
+    roomIndex?: number;
 }
 
 interface InfoStandWidgetPetViewProps {
@@ -239,6 +240,13 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = ({ avatar
                     case 'pick_up':
                         roomSession?.pickupPet(avatarInfo.id);
                         break;
+                    case 'move':
+                        GetRoomEngine().processRoomObjectOperation(avatarInfo.roomIndex, RoomObjectCategory.UNIT, RoomObjectOperationType.OBJECT_MOVE);
+                        break;
+                    case 'rotate':
+                        GetRoomEngine().processRoomObjectOperation(avatarInfo.roomIndex, RoomObjectCategory.UNIT, RoomObjectOperationType.OBJECT_ROTATE_POSITIVE);
+                        hideMenu = false;
+                        break;
                 }
 
                 if (hideMenu) onClose();
@@ -249,7 +257,25 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = ({ avatar
         [avatarInfo, petRespectRemaining, respectPet, roomSession, onClose, showConfirm]
     );
 
+    // Official InfoStandPetView: a monster plant is moved and turned like furni, by whoever has rights in the room,
+    // owns the plant or controls any room, and never in play-test mode.
+    const canArrangePlant =
+        avatarInfo.petType === PetType.MONSTERPLANT &&
+        typeof avatarInfo.roomIndex === 'number' &&
+        !roomSession?.playTestMode &&
+        ((roomSession?.controllerLevel ?? 0) >= 1 || !!avatarInfo.isOwner || IsAnyRoomController());
+
     const buttons = [
+        {
+            action: 'move',
+            label: LocalizeText('infostand.button.move'),
+            condition: canArrangePlant
+        },
+        {
+            action: 'rotate',
+            label: LocalizeText('infostand.button.rotate'),
+            condition: canArrangePlant
+        },
         {
             action: 'buyfood',
             label: LocalizeText('infostand.button.buyfood'),

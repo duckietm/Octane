@@ -69,7 +69,7 @@ jobs:
             | ($c.message | split("\n")[0]) as $title
             | ($c.message | split("\n")[1:] | join("\n")) as $body
             | {
-                username: "Ocatane - Main",
+                username: "Octane - Main",
                 avatar_url: "https://images.habbo.com/c_images/album1584/FR450.gif",
                 embeds: [
                   {

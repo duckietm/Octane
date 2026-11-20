@@ -1,4 +1,4 @@
-import { GetSessionDataManager, HabboClubLevelEnum, SecurityLevel } from '@octane/renderer';
+import { CreateLinkEvent, GetSessionDataManager, HabboClubLevelEnum, SecurityLevel } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
@@ -7,11 +7,15 @@ import {
     GetClubMemberLevel,
     GetConfigurationValue,
     HasSessionPermission,
+    resolveServerLength,
     LocalizeText,
+    localizeWithFallback,
     ResolveChatStyleIds,
     RoomWidgetUpdateChatInputContentEvent
 } from '../../../../api';
 import { Text } from '../../../../common';
+import { useHotelSettingsStore } from '../../../../state/hotelSettingsStore';
+import { BaseButton } from '../../../../common/BaseButton';
 import { useChatCommandSelector, useChatInputWidget, useChatMentions, useNuxChatReminder, usePurchasableChatStyles, useRoom, useSessionInfo, useUiEvent } from '../../../../hooks';
 import { ChatInputCommandSelectorView } from './ChatInputCommandSelectorView';
 import { ChatInputEmojiSelectorView } from './ChatInputEmojiSelectorView';
@@ -51,7 +55,8 @@ export const ChatInputView: FC<{}> = (props) => {
     const chatModeIdWhisper = useMemo(() => LocalizeText('widgets.chatinput.mode.whisper'), []);
     const chatModeIdShout = useMemo(() => LocalizeText('widgets.chatinput.mode.shout'), []);
     const chatModeIdSpeak = useMemo(() => LocalizeText('widgets.chatinput.mode.speak'), []);
-    const maxChatLength = useMemo(() => GetConfigurationValue<number>('chat.input.maxlength', 100), []);
+    const hotelSettings = useHotelSettingsStore((state) => state.settings);
+    const maxChatLength = useMemo(() => resolveServerLength(hotelSettings, 'chatMaxLength', GetConfigurationValue<number>('chat.input.maxlength', 100)), [hotelSettings]);
 
     const anotherInputHasFocus = useCallback(() => {
         const activeElement = document.activeElement;
@@ -373,6 +378,15 @@ export const ChatInputView: FC<{}> = (props) => {
             )}
             <ChatInputHabbiconSelectorView />
             <ChatInputEmojiSelectorView addChatEmoji={addChatEmoji} />
+            {/* Official RoomChatInputView: a help button, shown while the pointer is over the input, opens the
+                chat commands page. */}
+            <BaseButton
+                aria-label={localizeWithFallback('widgets.chatinput.help', 'Chat commands')}
+                className="swf-chat-help-button"
+                onClick={() => CreateLinkEvent('habbopages/chat/commands')}
+            >
+                ?
+            </BaseButton>
         </div>,
         portalTarget
     );

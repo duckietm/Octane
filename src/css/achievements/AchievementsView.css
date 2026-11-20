@@ -414,6 +414,12 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
+/* The rule above removes the outline; a keyboard user still sees which one has the focus. */
+.octane-achievements-air .air-achievement-tile:focus-visible {
+    outline: 1px dotted #000000;
+    outline-offset: -2px;
+}
+
 .octane-achievements-air .air-achievement-tile::before {
     position: absolute;
     inset: 0;

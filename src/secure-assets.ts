@@ -105,7 +105,19 @@ let secureUnavailableUntil = 0;
 // Set once a bootstrap succeeded: from then on the login endpoints never fall back to the clear.
 let secureSessionEstablished = false;
 const SECURE_RETRY_MS = 5 * 60 * 1000;
+// The answers that start a new secure session: login, remembered login and logout. The configured addresses join the
+// defaults once the configuration is in (setRekeyEndpoints), so a hotel that moved them keeps the rekey.
 const REKEY_ENDPOINTS = new Set(['/api/auth/login', '/api/auth/remember', '/api/auth/logout']);
+
+export const setRekeyEndpoints = (addresses: string[]): void => {
+    for (const address of addresses) {
+        if (!address) continue;
+
+        try {
+            REKEY_ENDPOINTS.add(new URL(address, window.location.href).pathname);
+        } catch {}
+    }
+};
 
 let clientModeCache: OctaneClientMode | null = null;
 
@@ -244,7 +256,8 @@ export const secureUrl = (kind: 'config' | 'gamedata', file: string, cacheBust =
     const base = getApiBase();
     const version = cacheBust ? `&v=${encodeURIComponent(Date.now().toString(36))}` : '';
 
-    return `${base}/nitro-sec/file?kind=${encodeURIComponent(kind)}&file=${encodeURIComponent(file)}${version}`;
+    // The file name goes last, so a .jsonc URL still ends in .jsonc and the renderer parses it as JSONC in every mode.
+    return `${base}/nitro-sec/file?kind=${encodeURIComponent(kind)}${version}&file=${encodeURIComponent(file)}`;
 };
 
 export const configFileUrl = (file: string, cacheBust = false): string => {

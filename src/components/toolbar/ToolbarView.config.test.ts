@@ -1,20 +1,21 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { parseJsonDocument } from '../../json/JsonDocumentParser';
 
 const root = process.cwd();
 
 describe('Toolbar feature config', () => {
     it('keeps optional custom toolbar buttons behind global config flags', () => {
-        const config = JSON.parse(readFileSync(join(root, 'public/configuration/ui-config.example'), 'utf8'));
+        // The examples are JSONC, read the way the client reads them.
+        const example = (file: string) =>
+            parseJsonDocument<Record<string, unknown>>(readFileSync(join(root, 'public/configuration/config.example', file), 'utf8'), 'jsonc');
+        const config = { ...example('hotel.jsonc'), ...example('features.jsonc') };
         const source = readFileSync(join(root, 'src/components/toolbar/ToolbarView.tsx'), 'utf8');
 
         expect(config['buildersclub.enabled']).toBe(true);
-        expect(config['toolbar.buildersclub.enabled']).toBe(true);
         expect(config['toolbar.fortunewheel.enabled']).toBe(true);
-        expect(source).toContain(
-            "GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true))"
-        );
+        expect(source).toContain('isBuildersClubEnabled()');
         expect(source).toContain("GetConfigurationValue<boolean>('toolbar.fortunewheel.enabled', true)");
         expect((source.match(/buildersClubEnabled/g) ?? []).length).toBeGreaterThanOrEqual(2);
         expect(source.match(/fortuneWheelEnabled\s*&&/g)).toHaveLength(2);

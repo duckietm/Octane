@@ -21,10 +21,6 @@ export const MARKETPLACE_SORT_TYPES: Record<number, number[]> = {
 export const MARKETPLACE_MAX_SEARCH_LENGTH = 40;
 export const MARKETPLACE_MAX_PRICE_LENGTH = 10;
 
-/** AIR usable_used / usable_unused text colours (0xFFCC0000 / 0xFF1D4A39). */
-export const MARKETPLACE_USED_TEXT_COLOR = '#cc0000';
-export const MARKETPLACE_UNUSED_TEXT_COLOR = '#1d4a39';
-
 /** AIR doSearch: an empty price input is "no limit" (-1). */
 export const parseMarketplacePriceInput = (text: string): number => {
     const digits = (text ?? '').replace(/[^0-9]/g, '');

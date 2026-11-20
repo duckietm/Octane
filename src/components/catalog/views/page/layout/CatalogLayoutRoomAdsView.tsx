@@ -6,23 +6,27 @@ import {
     RoomEntryData
 } from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
-import { LocalizeText, SendMessageComposer } from '../../../../../api';
+import { LocalizeText, localizeWithFallback, NotificationAlertType, SendMessageComposer } from '../../../../../api';
 import { Button } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { Select } from '../../../../../common/Select';
-import { useCatalogUiState, useMessageEvent, useNavigatorData, useRoomPromote } from '../../../../../hooks';
+import { useCatalogUiState, useMessageEvent, useNavigatorData, useNotification, useRoomPromote } from '../../../../../hooks';
 import { OctaneInput } from '../../../../../layout';
 import { CatalogPriceDisplayWidgetView } from '../widgets/CatalogPriceDisplayWidgetView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
 export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
     const { page = null } = props;
+    const { simpleAlert = null } = useNotification();
     const [eventName, setEventName] = useState<string>('');
     const [eventDesc, setEventDesc] = useState<string>('');
     const [roomId, setRoomId] = useState<number>(-1);
     const [extended, setExtended] = useState<boolean>(false);
     const [categoryId, setCategoryId] = useState<number>(1);
-    const { categories } = useNavigatorData();
+    // The server only accepts one of its event categories (navigator.eventcategories). The menu listed the room
+    // categories instead, whose ids are a different set, so a purchase could be refused without a word.
+    const { categories: roomCategories, eventCategories = null } = useNavigatorData();
+    const categories = eventCategories?.length ? eventCategories.filter((category) => category.visible) : roomCategories;
     const { setIsVisible = null } = useCatalogUiState();
     const { promoteInformation, isExtended, setIsExtended } = useRoomPromote();
     const promoteData = promoteInformation?.data ?? null;
@@ -71,6 +75,20 @@ export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
 
         const pageId = page.pageId;
         const offerId = page.offers.length >= 1 ? page.offers[0].offerId : -1;
+
+        // Without an offer the server has nothing to sell and answers nothing: say so instead of going quiet.
+        if (offerId < 0) {
+            isPurchasingAd.current = false;
+            simpleAlert?.(
+                localizeWithFallback('octane.catalog.roomads.no_offer', 'This page has no room event offer yet. Ask the hotel staff to add one.'),
+                NotificationAlertType.DEFAULT,
+                null,
+                null,
+                localizeWithFallback('catalog.alert.purchaseerror.title', 'Purchase failed')
+            );
+
+            return;
+        }
         const flatId = roomId;
         const name = eventName;
         const desc = eventDesc;
@@ -81,9 +99,15 @@ export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
     };
 
     useEffect(() => {
-        // TODO: someone needs to fix this for morningstar
         SendMessageComposer(new GetUserEventCatsMessageComposer());
     }, []);
+
+    // The menu always shows a category that can be chosen: the first one, when the current id is not on the list.
+    useEffect(() => {
+        if (!categories?.length || categories.some((category) => category.id === categoryId)) return;
+
+        setCategoryId(categories[0].id);
+    }, [categories, categoryId]);
 
     const invalid = !eventName || !eventDesc || roomId === -1;
     const offer = page?.offers?.[0] ?? null;
@@ -106,7 +130,7 @@ export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
                         {categories &&
                             categories.map((cat, index) => (
                                 <option key={index} value={cat.id}>
-                                    {LocalizeText(cat.name)}
+                                    {localizeWithFallback(cat.name, cat.name)}
                                 </option>
                             ))}
                     </Select>

@@ -90,7 +90,8 @@
 
 .fp-panels {
     display: grid;
-    grid-template-columns: 344px 289px;
+    /* AIR: a bigger window widens the plan; the preview panel keeps its 289. */
+    grid-template-columns: minmax(344px, 1fr) 289px;
     gap: 12px;
     flex: 1 1 auto;
     min-height: 0;
@@ -466,10 +467,31 @@
     overflow: hidden;
 }
 
+/* The plan is a scroll box with both of AIR's scrollbars always there; its content is as big as the plan is
+   drawn, and the SVG stays pinned over the visible part. */
+.fp-stage-scroll {
+    position: absolute;
+    inset: 0;
+    overflow: scroll;
+    background: #000000;
+}
+
+.fp-stage-content {
+    position: relative;
+}
+
+.fp-stage-svg {
+    position: sticky;
+    top: 0;
+    left: 0;
+    display: block;
+}
+
 .fp-stage-buttons {
     position: absolute;
     top: 8px;
-    right: 8px;
+    /* Clear of the vertical scrollbar. */
+    right: 25px;
     z-index: 10;
     display: flex;
     align-items: center;

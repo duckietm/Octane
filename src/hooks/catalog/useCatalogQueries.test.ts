@@ -138,6 +138,13 @@ describe('selectCatalogPage', () => {
         expect(data.page.offers.map((offer) => offer.offerId)).toEqual([1]);
     });
 
+    it('keeps the product-less offer of a room event page, which sells no furni', () => {
+        const data = selectCatalogPage(parserPage({ layoutCode: 'roomads', offers: [parserOffer(8, [])] }) as any, CatalogType.NORMAL, lookups);
+
+        expect(data.page.offers.map((offer) => offer.offerId)).toEqual([8]);
+        expect(data.page.offers[0].product).toBeNull();
+    });
+
     it('passes the front page items through', () => {
         const items = [{ type: 1 }] as any;
         const data = selectCatalogPage(parserPage({ frontPageItems: items }) as any, CatalogType.NORMAL, lookups);

@@ -1,0 +1,16 @@
+/* Room statistics (`:showstats`): the official orange Verdana readout, right aligned. It sits at the top of the room
+   view just left of the purse (230px wide, 4px from the right edge), where nothing covers it. */
+.octane-room-stats {
+    position: absolute;
+    top: 6px;
+    right: 242px;
+    z-index: 70;
+    width: 120px;
+    color: #ff5500;
+    font-family: Verdana, sans-serif;
+    font-size: 11px;
+    line-height: 14px;
+    text-align: right;
+    white-space: pre;
+    pointer-events: none;
+}

@@ -4,12 +4,14 @@ import {
     emptyFriendBarNotifications,
     FriendBarNotificationsState,
     pruneFriendNotifications,
-    receiveFriendNotification
+    receiveFriendNotification,
+    removeFriendNotificationType
 } from './friendBarNotifications.helpers';
 
 interface FriendBarNotificationsStore extends FriendBarNotificationsState {
     receive: (friendId: number, type: number, message: string) => void;
     dismissViewed: (friendId: number) => void;
+    removeType: (friendId: number, type: number) => void;
     prune: (onlineIds: ReadonlyArray<number>) => void;
     reset: () => void;
 }
@@ -19,6 +21,7 @@ export const useFriendBarNotificationsStore = createOctaneStore<FriendBarNotific
     ...emptyFriendBarNotifications,
     receive: (friendId, type, message) => set((state) => receiveFriendNotification(state, friendId, type, message)),
     dismissViewed: (friendId) => set((state) => dismissViewedNotifications(state, friendId)),
+    removeType: (friendId, type) => set((state) => removeFriendNotificationType(state, friendId, type)),
     prune: (onlineIds) => set((state) => pruneFriendNotifications(state, onlineIds)),
     reset: () => set(emptyFriendBarNotifications)
 }));

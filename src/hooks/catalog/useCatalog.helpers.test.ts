@@ -2,6 +2,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { BuilderFurniPlaceableStatus } from '../../api/catalog/BuilderFurniPlaceableStatus';
 import { CatalogType } from '../../api/catalog/CatalogType';
+import type { IPurchasableOffer } from '../../api/catalog/IPurchasableOffer';
 import {
     buildCatalogNodeTree,
     findNodeById,
@@ -355,5 +356,34 @@ describe('resolveOfferPageId', () => {
 
         expect(source).not.toContain('new PurchaseFromCatalogComposer(state.pageId,');
         expect(source).toContain('resolveOfferPageId(purchasableOffer, readCatalogIndex(state.currentType)?.offersToNodes)');
+    });
+});
+
+describe('findDeepLinkedOffer', () => {
+    const offer = (offerId: number, purchaseOfferId = -1, rentOfferId = -1) =>
+        ({ offerId, products: [{ furnitureData: { purchaseOfferId, rentOfferId } }] }) as unknown as IPurchasableOffer;
+
+    it('takes the offer with that id', async () => {
+        const { findDeepLinkedOffer } = await import('./useCatalog.helpers');
+        const offers = [offer(10, 500), offer(500, 900)];
+
+        expect(findDeepLinkedOffer(offers, 500)).toBe(offers[1]);
+    });
+
+    it("falls back to the offer whose furni has that offer id, to buy or to rent", async () => {
+        const { findDeepLinkedOffer } = await import('./useCatalog.helpers');
+        const offers = [offer(10, 500), offer(11, 600), offer(12, -1, 700)];
+
+        expect(findDeepLinkedOffer(offers, 600)).toBe(offers[1]);
+        expect(findDeepLinkedOffer(offers, 700)).toBe(offers[2]);
+    });
+
+    it('answers null for an unknown or missing id, and for an offer without products', async () => {
+        const { findDeepLinkedOffer } = await import('./useCatalog.helpers');
+
+        expect(findDeepLinkedOffer([offer(10, 500)], 999)).toBeNull();
+        expect(findDeepLinkedOffer([offer(10, 500)], -1)).toBeNull();
+        expect(findDeepLinkedOffer([{ offerId: 3 } as unknown as IPurchasableOffer], 5)).toBeNull();
+        expect(findDeepLinkedOffer(null, 5)).toBeNull();
     });
 });

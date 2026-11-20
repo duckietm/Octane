@@ -97,7 +97,7 @@ export const CalendarView: FC<CalendarViewProps> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-campaign-calendar" theme="primary-slim" style={{ width: spinnerWidth }}>
+            <OctaneCardView uniqueKey="campaign-calendar" className="octane-campaign-calendar" theme="primary-slim" style={{ width: spinnerWidth }}>
                 <OctaneCardHeaderView
                     headerText={localizeWithFallback(`campaign.calendar.${campaignName}.title`, localizeWithFallback('campaign.calendar.title', 'Calendar'))}
                     onCloseClick={onClose}

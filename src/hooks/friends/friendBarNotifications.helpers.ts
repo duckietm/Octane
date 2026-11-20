@@ -36,7 +36,8 @@ const TOKEN_TYPES: ReadonlyArray<number> = [
     FriendNotificationType.ROOM_EVENT,
     FriendNotificationType.ACHIEVEMENT,
     FriendNotificationType.QUEST,
-    FriendNotificationType.PLAYING_GAME
+    FriendNotificationType.PLAYING_GAME,
+    FriendNotificationType.MESSENGER
 ];
 
 const withFriend = (state: FriendBarNotificationsState, friendId: number, list: FriendBarNotification[]): FriendBarNotificationsState['byFriend'] => {
@@ -76,13 +77,33 @@ export const receiveFriendNotification = (state: FriendBarNotificationsState, fr
         return { ...state, byFriend: withFriend(state, friendId, current.map((entry) => (entry === existing ? { ...entry, message: text } : entry))) };
     }
 
-    const notification: FriendBarNotification = { id: state.nextId, type, message: text, viewOnce: type !== FriendNotificationType.PLAYING_GAME };
+    // AIR HabboFriendBarData.onNewConsoleMessage: an unread message stays on the tab until the chat is opened, and
+    // does not move the friend to the front of the bar.
+    const messenger = type === FriendNotificationType.MESSENGER;
+
+    if (messenger && existing) return state;
+
+    const notification: FriendBarNotification = {
+        id: state.nextId,
+        type,
+        message: text,
+        viewOnce: !messenger && type !== FriendNotificationType.PLAYING_GAME
+    };
 
     return {
         byFriend: withFriend(state, friendId, [notification, ...current.filter((entry) => entry.type !== type)]),
-        order: [friendId, ...state.order.filter((id) => id !== friendId)],
+        order: messenger ? state.order : [friendId, ...state.order.filter((id) => id !== friendId)],
         nextId: state.nextId + 1
     };
+};
+
+/** Takes one kind of notification off a friend's tab (the unread-message marker, once the chat is opened). */
+export const removeFriendNotificationType = (state: FriendBarNotificationsState, friendId: number, type: number): FriendBarNotificationsState => {
+    const current = state.byFriend[friendId];
+
+    if (!current || !current.some((entry) => entry.type === type)) return state;
+
+    return { ...state, byFriend: withFriend(state, friendId, current.filter((entry) => entry.type !== type)) };
 };
 
 /** AIR entity `deselect`: closing an open tab drops the notifications that are shown once. */

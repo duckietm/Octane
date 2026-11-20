@@ -3,7 +3,6 @@ import { IPollQuestion } from '@octane/renderer';
 /** Habbo's poll question types; 5 (rating) and 6 (binary) are skipped like the official client does. */
 export const POLL_QUESTION_RADIO = 1;
 export const POLL_QUESTION_CHECKBOX = 2;
-export const POLL_QUESTION_TEXT = 3;
 export const POLL_QUESTION_TEXT_ALT = 4;
 
 /** Choice type 0 never branches. */

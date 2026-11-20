@@ -1,0 +1,10 @@
+{
+    // The configuration files the client loads, in this order. A key set in a later file wins over the same key in
+    // an earlier one. Copy this file to config.jsonc and the config.example folder to config/, then edit the copies.
+    "config.files": [
+        "config/server.jsonc",
+        "config/hotel.jsonc",
+        "config/features.jsonc",
+        "config/data.jsonc"
+    ]
+}

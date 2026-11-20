@@ -1,7 +1,8 @@
 import { FC, useState } from 'react';
-import { LocalizeText } from '../../../../api';
+import { LocalizeText, localizeWithFallback, NotificationAlertType } from '../../../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { useNotification } from '../../../../hooks';
 
 interface FriendsRoomInviteViewProps {
     selectedFriendsIds: number[];
@@ -12,6 +13,7 @@ interface FriendsRoomInviteViewProps {
 export const FriendsRoomInviteView: FC<FriendsRoomInviteViewProps> = (props) => {
     const { selectedFriendsIds = null, onCloseClick = null, sendRoomInvite = null } = props;
     const [roomInviteMessage, setRoomInviteMessage] = useState<string>('');
+    const { simpleAlert = null } = useNotification();
 
     return (
         <NativeTextTree>
@@ -39,9 +41,24 @@ export const FriendsRoomInviteView: FC<FriendsRoomInviteViewProps> = (props) => 
                     <div className="octane-friends-room-invite-actions">
                         <Button
                             fullWidth
-                            disabled={roomInviteMessage.length === 0 || selectedFriendsIds.length === 0}
+                            disabled={selectedFriendsIds.length === 0}
                             variant="secondary"
-                            onClick={() => sendRoomInvite(roomInviteMessage)}
+                            onClick={() => {
+                                // AIR RoomInviteView.sendMsg: an empty invite is answered with an alert, not sent.
+                                if (!roomInviteMessage.trim().length) {
+                                    simpleAlert?.(
+                                        localizeWithFallback('friendlist.invite.emptyalert.text', 'Please write a message for your invitation.'),
+                                        NotificationAlertType.DEFAULT,
+                                        null,
+                                        null,
+                                        localizeWithFallback('friendlist.invite.emptyalert.title', 'Room invitation')
+                                    );
+
+                                    return;
+                                }
+
+                                sendRoomInvite(roomInviteMessage);
+                            }}
                         >
                             {LocalizeText('friendlist.invite.send')}
                         </Button>

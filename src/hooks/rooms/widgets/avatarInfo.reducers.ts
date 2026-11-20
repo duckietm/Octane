@@ -50,11 +50,13 @@ export const applyUserFigureUpdate = (state: IAvatarInfo | null, event: RoomSess
     next.prefixColor = event.prefixColor;
     next.prefixIcon = event.prefixIcon;
     next.prefixEffect = event.prefixEffect;
+    next.prefixFont = event.prefixFont ?? '';
     next.displayOrder = event.displayOrder;
     next.backgroundId = event.backgroundId;
     next.standId = event.standId;
     next.overlayId = event.overlayId;
     next.cardBackgroundId = event.cardBackgroundId ?? 0;
+    next.borderId = event.borderId ?? 0;
 
     return next;
 };
