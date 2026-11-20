@@ -74,7 +74,8 @@ describe('GroupsView links', () => {
 
         act(() => groupsTracker().linkReceived('groups/manage/42'));
 
-        const composer = sendMessage.mock.calls.find(([sent]) => sent instanceof GroupSettingsComposer)?.[0] as GroupSettingsComposer;
+        // The renderer's composer keeps its arguments private; the mock above exposes groupId.
+        const composer = sendMessage.mock.calls.find(([sent]) => sent instanceof GroupSettingsComposer)?.[0] as { groupId: number } | undefined;
 
         expect(composer?.groupId).toBe(42);
     });
