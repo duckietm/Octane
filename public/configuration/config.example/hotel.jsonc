@@ -165,6 +165,12 @@
     // Profile border ids.
     "borders.data": [],
 
+    // Where the profile window uploads (POST) and removes (DELETE) a banner or background picture.
+    "profile.images.endpoint": "${api.url}/api/profile/image",
+
+    // Address of an uploaded profile picture; %file% is the file name the profile carries.
+    "profile.images.url": "${api.url}/profile-images/%file%",
+
     // Shows the room name card on first entry into a room.
     "room.enter.info.enabled": true,
 

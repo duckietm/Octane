@@ -30,10 +30,13 @@ interface UserContainerViewProps {
     /** Official block_button / blocked_container: the user is on the session block list. */
     isBlocked?: boolean;
     onToggleBlock?: () => void;
+    /** Opens the customiser of the own profile window (banner, background, border, accent). */
+    onCustomize?: () => void;
 }
 
 export const UserContainerView: FC<UserContainerViewProps> = (props) => {
-    const { userProfile = null, userBadges = [], userRelationships = null, onOpenRooms = null, onClose = null, isBlocked = false, onToggleBlock = null } = props;
+    const { userProfile = null, userBadges = [], userRelationships = null, onOpenRooms = null, onClose = null, isBlocked = false, onToggleBlock = null, onCustomize = null } = props;
+    const borderId = userProfile.borderId ?? 0;
 
     const [requestSent, setRequestSent] = useState(userProfile.requestSent);
     const isOwnProfile = userProfile.id === GetSessionDataManager().userId;
@@ -93,10 +96,13 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                 <div className="octane-extended-profile__top">
                     <div className="octane-extended-profile__left">
                         <div className="octane-extended-profile__identity">
-                            <div className={`octane-extended-profile__avatar-shell profile-background ${infostandBackgroundClass}`}>
-                                <div className={`octane-extended-profile__avatar-stand profile-stand ${infostandStandClass}`} />
-                                <LayoutAvatarImageView figure={userProfile.figure} direction={2} classNames={['octane-extended-profile__avatar-image']} />
-                                <div className={`octane-extended-profile__avatar-overlay profile-overlay ${infostandOverlayClass}`} />
+                            <div className="octane-extended-profile__avatar-frame">
+                                <div className={`octane-extended-profile__avatar-shell profile-background ${infostandBackgroundClass}`}>
+                                    <div className={`octane-extended-profile__avatar-stand profile-stand ${infostandStandClass}`} />
+                                    <LayoutAvatarImageView figure={userProfile.figure} direction={2} classNames={['octane-extended-profile__avatar-image']} />
+                                    <div className={`octane-extended-profile__avatar-overlay profile-overlay ${infostandOverlayClass}`} />
+                                </div>
+                                {borderId > 0 && <div className={`infostand-border border-${borderId}`} data-testid="profile-border" />}
                             </div>
                             <div className="octane-extended-profile__identity-copy">
                                 <UserIdentityView
@@ -159,6 +165,11 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                                 <BaseButton className="octane-extended-profile__link" type="button" onClick={() => CreateLinkEvent('inventory/show/badges')}>
                                     {LocalizeText('extended.profile.change.badges')}
                                 </BaseButton>
+                                {onCustomize && (
+                                    <BaseButton className="octane-extended-profile__link" type="button" onClick={onCustomize}>
+                                        {localizeWithFallback('extendedprofile.customize.title', 'Customise profile')}
+                                    </BaseButton>
+                                )}
                             </div>
                         )}
 

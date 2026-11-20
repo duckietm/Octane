@@ -12,22 +12,31 @@ import {
     UserProfileParser,
     UserRelationshipsComposer
 } from '@octane/renderer';
-import { FC, useState } from 'react';
+import { CSSProperties, FC, useEffect, useState } from 'react';
 import {
     CreateLinkEvent,
+    getProfileAccentColor,
     GetRoomSession,
     GetUserProfile,
     isProfileHiddenFromViewer,
+    loadProfileCustomizationData,
     LocalizeText,
     localizeWithFallback,
+    ProfileBannerEntry,
+    profileImageUrl,
     SanitizeHtml,
     SendMessageComposer
 } from '../../api';
+import pencilIcon from '../../assets/images/infostand/pencil-icon.png';
 import { frankStop } from '../../assets/images/user-profile';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useIsUserBlocked, useMessageEvent, useNotification, useOctaneEvent } from '../../hooks';
 import { OctaneCard } from '../../layout';
+import { BaseButton } from '../../common/BaseButton';
+import { Hint } from '../../common/Tooltip';
 import { GroupsContainerView } from './GroupsContainerView';
+import { ProfileBannerView } from './ProfileBannerView';
+import { ProfileCustomizeView } from './ProfileCustomizeView';
 import { UserContainerView } from './UserContainerView';
 
 export const UserProfileView: FC<{}> = () => {
@@ -38,11 +47,29 @@ export const UserProfileView: FC<{}> = () => {
     // block list (BlockedUsersManager), not off the ignore list.
     const isBlocked = useIsUserBlocked(userProfile?.id ?? -1);
     const { showConfirm = null } = useNotification();
+    const [isCustomizing, setIsCustomizing] = useState(false);
+    const [banners, setBanners] = useState<ProfileBannerEntry[]>([]);
+    const bannerId = userProfile?.bannerId ?? 0;
+
+    useEffect(() => {
+        if (!bannerId) return;
+
+        let cancelled = false;
+
+        loadProfileCustomizationData().then((data) => {
+            if (!cancelled) setBanners(data.banners);
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [bannerId]);
 
     const onClose = () => {
         setUserProfile(null);
         setUserBadges([]);
         setUserRelationships(null);
+        setIsCustomizing(false);
     };
 
     // Official blockUser / unblockUser by user id, each behind its confirm
@@ -107,6 +134,7 @@ export const UserProfileView: FC<{}> = () => {
         if (!isSameProfile) {
             setUserBadges([]);
             setUserRelationships(null);
+            setIsCustomizing(false);
         }
 
         SendMessageComposer(new UserCurrentBadgesComposer(parser.id));
@@ -136,13 +164,28 @@ export const UserProfileView: FC<{}> = () => {
     if (!userProfile) return null;
 
     const cardBackgroundId = userProfile.cardBackgroundId ?? 0;
-    const cardBackgroundClass = cardBackgroundId ? `profile-card-background card-background-${cardBackgroundId}` : '';
+    const customBackground = userProfile.backgroundImage ?? '';
+    // An uploaded background wins over the card background picked from the list.
+    const cardBackgroundClass = customBackground
+        ? 'profile-card-background octane-extended-profile-window__content--custom-background'
+        : cardBackgroundId
+          ? `profile-card-background card-background-${cardBackgroundId}`
+          : '';
+    const contentStyle = customBackground ? ({ backgroundImage: `url(${profileImageUrl(customBackground)})` } as CSSProperties) : undefined;
+    const isOwnProfile = userProfile.id === GetSessionDataManager().userId;
+    const accentColor = getProfileAccentColor(userProfile.accentId ?? 0);
+    const accentStyle = accentColor ? ({ '--profile-accent': accentColor } as CSSProperties) : undefined;
+    const customizeLabel = localizeWithFallback('extendedprofile.customize.title', 'Customise profile');
 
     return (
         <NativeTextTree>
-            <OctaneCard className="octane-extended-profile-window w-[640px] h-[720px] max-w-[96vw] max-h-[92vh]" uniqueKey="octane-user-profile">
+            <OctaneCard
+                className={`octane-extended-profile-window w-[640px] h-[720px] max-w-[96vw] max-h-[92vh]${accentColor ? ' has-profile-accent' : ''}`}
+                style={accentStyle}
+                uniqueKey="octane-user-profile"
+            >
                 <OctaneCard.Header headerText={LocalizeText('extendedprofile.caption')} onCloseClick={onClose} />
-                <OctaneCard.Content className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}`}>
+                <OctaneCard.Content className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}`} style={contentStyle}>
                     {isBlocked && (
                         // Official blocked_container: the drama text, whose "event:profile/unblock" link
                         // opens the unblock confirm (it carries no href, so it is never followed as a
@@ -170,6 +213,15 @@ export const UserProfileView: FC<{}> = () => {
                             <img className="octane-extended-profile__blocked-frank" src={frankStop} alt="" draggable={false} />
                         </div>
                     )}
+                    <ProfileBannerView userProfile={userProfile} banners={banners}>
+                        {isOwnProfile && (
+                            <Hint content={customizeLabel}>
+                                <BaseButton aria-label={customizeLabel} className="octane-extended-profile__banner-edit" type="button" onClick={() => setIsCustomizing((value) => !value)}>
+                                    <img src={pencilIcon} alt="" draggable={false} />
+                                </BaseButton>
+                            </Hint>
+                        )}
+                    </ProfileBannerView>
                     <div className="px-[10px] pt-[8px]">
                         <UserContainerView
                             userBadges={userBadges}
@@ -179,6 +231,7 @@ export const UserProfileView: FC<{}> = () => {
                             onToggleBlock={toggleBlock}
                             onOpenRooms={onOpenRooms}
                             onClose={onClose}
+                            onCustomize={() => setIsCustomizing((value) => !value)}
                         />
                     </div>
                     <div className="octane-extended-profile-window__body octane-extended-profile-window__body--groups flex-1 overflow-hidden px-[10px] pb-[10px] pt-[6px]">
@@ -199,6 +252,7 @@ export const UserProfileView: FC<{}> = () => {
                     </div>
                 </OctaneCard.Content>
             </OctaneCard>
+            {isOwnProfile && isCustomizing && <ProfileCustomizeView userProfile={userProfile} onClose={() => setIsCustomizing(false)} />}
         </NativeTextTree>
     );
 };
