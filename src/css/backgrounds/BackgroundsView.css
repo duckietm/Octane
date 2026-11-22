@@ -1742,7 +1742,8 @@
  * The avatar picture is 90 x 130 with the point between its feet at row 116, drawn at the top of the place;
  * stands and effects are 68 x 135 pictures drawn at the top as well (the effects are clothes, rings and
  * floors made for the avatar there). A stand moves the avatar so its feet land on the centre of the
- * platform, measured for each stand as a row of its picture (--stand-feet), and the effect moves with it.
+ * platform, measured for each stand as a row of its picture (--stand-feet). The effects worn by the avatar
+ * (5 swim ring, 6 suit, 7 dress, 8 football kit) move with it; 0-4 cover the whole picture like glass and stay.
  */
 .profile-stand.stand-1 ~ * { --stand-feet: 103; }
 .profile-stand.stand-2 ~ * { --stand-feet: 105; }
@@ -1767,7 +1768,7 @@
 .profile-stand.stand-21 ~ * { --stand-feet: 104; }
 
 .profile-stand ~ .avatar-image,
-.profile-stand ~ .profile-overlay {
+.profile-stand ~ .profile-overlay:is(.overlay-5, .overlay-6, .overlay-7, .overlay-8) {
   transform: translateY(calc((var(--stand-feet, 116) - 116) * 1px));
 }
 
