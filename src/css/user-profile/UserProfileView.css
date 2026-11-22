@@ -1246,4 +1246,8 @@ html.octane-user-accent-light .octane-card-shell.octane-card-frame-3.has-profile
   align-content: start;
   grid-auto-rows: max-content;
   height: auto !important;
+  /* Tiles have a fixed size and the columns share the width: each tile sits in the middle of its column, with
+     the same space between rows as between columns. */
+  justify-items: center;
+  gap: 8px !important;
 }
