@@ -25,7 +25,7 @@ export const ProfileCustomizePreviewView: FC<ProfileCustomizePreviewViewProps> =
                 standId={userProfile.standId}
                 overlayId={userProfile.overlayId}
                 borderId={userProfile.borderId}
-                scale={0.6}
+                scale={0.7}
             />
             <span className="octane-profile-customize__preview-name">{userProfile.username}</span>
         </div>

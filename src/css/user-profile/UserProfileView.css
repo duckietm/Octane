@@ -908,6 +908,7 @@ html .octane-card-shell.octane-card-frame-3.octane-profile-customize.has-profile
 .octane-profile-customize__preview {
   position: relative;
   flex: 0 0 auto;
+  padding-bottom: 6px;
   background: #ece8dc;
   border-bottom: 1px solid var(--profile-accent, #afafaf);
 }
@@ -916,13 +917,22 @@ html .octane-card-shell.octane-card-frame-3.octane-profile-customize.has-profile
   height: 96px;
 }
 
+/* The picture overlaps the bottom of the banner like a profile photo; the name sits beside it, under the banner. */
 .octane-profile-customize__preview-identity {
-  position: absolute;
-  left: 12px;
-  bottom: 6px;
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: flex-end;
-  gap: 8px;
+  gap: 10px;
+  margin-top: -54px;
+  padding-left: 14px;
+  pointer-events: none;
+}
+
+.octane-profile-customize__preview-identity .octane-extended-profile__avatar-shell {
+  outline: 2px solid #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
 }
 
 .octane-extended-profile__avatar-scaled {
@@ -938,10 +948,13 @@ html .octane-card-shell.octane-card-frame-3.octane-profile-customize.has-profile
 }
 
 .octane-profile-customize__preview-name {
-  padding: 2px 6px;
+  margin-bottom: 2px;
+  padding: 3px 10px;
+  border-left: 3px solid var(--profile-accent, #367997);
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.9);
-  font-size: 13px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
   font-weight: 700;
   color: #222;
 }
