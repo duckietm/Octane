@@ -403,7 +403,7 @@
     "extendedprofile.customize.border": "الإطار",
     "extendedprofile.customize.border.colours": "ألوان",
     "extendedprofile.customize.border.decorated": "مزخرفة",
-    "extendedprofile.customize.border.hint": "الإطار حول شخصيتك: في ملفك الشخصي وفي لوحة المعلومات عندما ينقر عليك أحد في الغرفة.",
+    "extendedprofile.customize.border.hint": "لون يحيط بشخصيتك، أو إطار مزخرف حول صورتك: في ملفك وفي لوحة المعلومات عندما ينقر عليك أحد في الغرفة.",
     "extendedprofile.customize.library": "صورك",
     "extendedprofile.customize.library.delete": "احذف هذه الصورة",
     "extendedprofile.customize.library.delete.confirm": "انقر مرة أخرى لحذفها نهائياً",

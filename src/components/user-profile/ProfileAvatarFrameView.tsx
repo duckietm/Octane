@@ -1,4 +1,5 @@
 import { CSSProperties, FC } from 'react';
+import { isOutlineBorder, profileOutlineClass } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
 
 /** The profile picture's size at scale 1, as the profile window draws it. */
@@ -20,13 +21,14 @@ interface ProfileAvatarFrameViewProps {
  */
 export const ProfileAvatarFrameView: FC<ProfileAvatarFrameViewProps> = ({ figure, backgroundId = 0, standId = 0, overlayId = 0, borderId = 0, scale = 1 }) => {
     const frame = (
-        <div className="octane-extended-profile__avatar-frame">
+        <div className={`octane-extended-profile__avatar-frame ${profileOutlineClass(borderId)}`}>
             <div className={`octane-extended-profile__avatar-shell profile-background background-${backgroundId ?? 'default'}`}>
                 <div className={`octane-extended-profile__avatar-stand profile-stand stand-${standId ?? 'default'}`} />
                 <LayoutAvatarImageView figure={figure} direction={2} classNames={['octane-extended-profile__avatar-image']} />
                 <div className={`octane-extended-profile__avatar-overlay profile-overlay overlay-${overlayId ?? 'default'}`} />
             </div>
-            {!!borderId && <div className={`infostand-border border-${borderId}`} data-testid="profile-border" />}
+            {/* A colour border outlines the character itself; a decorated one is a frame around the picture. */}
+            {!!borderId && !isOutlineBorder(borderId) && <div className={`infostand-border border-${borderId}`} data-testid="profile-border" />}
         </div>
     );
 

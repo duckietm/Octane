@@ -1410,7 +1410,22 @@ html.octane-user-accent-light .octane-card-shell.octane-card-frame-3.has-profile
   background-color: #1d2a44;
 }
 
+/* A colour border outlines the character: its choice is a dot of the colour. */
+.octane-profile-customize__border-chip.profile-border:not(.is-decorated):not(.border-0) {
+  width: 30px;
+  height: 30px;
+  border-width: 15px;
+  border-radius: 50%;
+}
+
+.octane-profile-customize__border-cell > .octane-profile-customize__option:has(.profile-border:not(.is-decorated):not(.border-0)) {
+  border-radius: 50%;
+}
+
 .octane-profile-customize__border-chip.profile-border.border-0 {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   border: 2px dashed #8d8d8d;
   background-color: #f4f2ea;
 }

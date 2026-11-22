@@ -403,7 +403,7 @@
     "extendedprofile.customize.border": "Border",
     "extendedprofile.customize.border.colours": "Colours",
     "extendedprofile.customize.border.decorated": "Decorated",
-    "extendedprofile.customize.border.hint": "The frame around your character: in your profile and in the infostand when someone clicks you in a room.",
+    "extendedprofile.customize.border.hint": "A colour that outlines your character, or a decorated frame around your picture: in your profile and in the infostand when someone clicks you in a room.",
     "extendedprofile.customize.library": "Your pictures",
     "extendedprofile.customize.library.delete": "Delete this picture",
     "extendedprofile.customize.library.delete.confirm": "Click again to delete it for good",

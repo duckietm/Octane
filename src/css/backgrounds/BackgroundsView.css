@@ -1741,3 +1741,36 @@
 .profile-border.border-23 { background-image: url('@/assets/images/backgrounds/borders/border_23.webp'); }
 .profile-border.border-24 { background-image: url('@/assets/images/backgrounds/borders/border_24.webp'); }
 .profile-border.border-25 { background-image: url('@/assets/images/backgrounds/borders/border_25.webp'); }
+
+/* Colour borders (1-16) outline the character itself, in the profile picture and in the infostand: a hard
+   2 px line that follows the sprite, then a soft glow of the same colour. Stand and effect are other layers,
+   so only the figure is outlined. */
+.octane-avatar-outline.outline-1 { --avatar-outline: #ef4444; }
+.octane-avatar-outline.outline-2 { --avatar-outline: #f97316; }
+.octane-avatar-outline.outline-3 { --avatar-outline: #eab308; }
+.octane-avatar-outline.outline-4 { --avatar-outline: #84cc16; }
+.octane-avatar-outline.outline-5 { --avatar-outline: #22c55e; }
+.octane-avatar-outline.outline-6 { --avatar-outline: #14b8a6; }
+.octane-avatar-outline.outline-7 { --avatar-outline: #06b6d4; }
+.octane-avatar-outline.outline-8 { --avatar-outline: #3b82f6; }
+.octane-avatar-outline.outline-9 { --avatar-outline: #6366f1; }
+.octane-avatar-outline.outline-10 { --avatar-outline: #a855f7; }
+.octane-avatar-outline.outline-11 { --avatar-outline: #ec4899; }
+.octane-avatar-outline.outline-12 { --avatar-outline: #f43f5e; }
+.octane-avatar-outline.outline-13 { --avatar-outline: #92400e; }
+.octane-avatar-outline.outline-14 { --avatar-outline: #d4a020; }
+.octane-avatar-outline.outline-15 { --avatar-outline: #cbd5e1; }
+.octane-avatar-outline.outline-16 { --avatar-outline: #1f2937; }
+
+.octane-avatar-outline .avatar-image {
+  filter:
+    drop-shadow(1px 0 0 var(--avatar-outline))
+    drop-shadow(-1px 0 0 var(--avatar-outline))
+    drop-shadow(0 1px 0 var(--avatar-outline))
+    drop-shadow(0 -1px 0 var(--avatar-outline))
+    drop-shadow(1px 0 0 var(--avatar-outline))
+    drop-shadow(-1px 0 0 var(--avatar-outline))
+    drop-shadow(0 1px 0 var(--avatar-outline))
+    drop-shadow(0 -1px 0 var(--avatar-outline))
+    drop-shadow(0 0 4px color-mix(in srgb, var(--avatar-outline) 70%, transparent));
+}

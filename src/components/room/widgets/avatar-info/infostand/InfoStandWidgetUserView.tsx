@@ -18,8 +18,10 @@ import {
     GetHotelSettings,
     GetGroupInformation,
     GetUserProfile,
+    isOutlineBorder,
     LocalizeText,
     localizeWithFallback,
+    profileOutlineClass,
     resolveServerLength,
     SendMessageComposer
 } from '../../../../../api';
@@ -231,7 +233,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                 >
                     {/* Native text reads its colour when it is drawn: a new tone draws it again. */}
                     <Fragment key={infostandTone ?? 'plain'}>
-                    {borderId ? <Base className={`infostand-border ${infostandBorderClass}`} /> : null}
+                    {borderId && !isOutlineBorder(borderId) ? <Base className={`infostand-border ${infostandBorderClass}`} /> : null}
                     <BaseButton type="button" className="octane-infostand__close" aria-label={localizeWithFallback('octane.room.close', 'Close')} onClick={onClose} />
                     <div className="octane-infostand__header">
                         <BaseButton
@@ -260,7 +262,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                     </div>
                     <div className="octane-infostand__rule" />
                     <div className="octane-infostand__figure-row">
-                        <BaseButton type="button" className={`octane-infostand__avatar-well profile-background ${infostandBackgroundClass}`} onClick={handleProfileClick}>
+                        <BaseButton type="button" className={`octane-infostand__avatar-well profile-background ${infostandBackgroundClass} ${profileOutlineClass(borderId)}`} onClick={handleProfileClick}>
                             <Base position="absolute" className={`profile-stand ${infostandStandClass}`} />
                             <LayoutAvatarImageView direction={2} figure={avatarInfo.figure} />
                             <Base position="absolute" className={`profile-overlay ${infostandOverlayClass}`} />

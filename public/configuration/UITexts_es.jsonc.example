@@ -403,7 +403,7 @@
     "extendedprofile.customize.border": "Borde",
     "extendedprofile.customize.border.colours": "Colores",
     "extendedprofile.customize.border.decorated": "Decorados",
-    "extendedprofile.customize.border.hint": "El marco alrededor de tu personaje: en tu perfil y en el infostand cuando alguien te pulsa en una sala.",
+    "extendedprofile.customize.border.hint": "Un color que perfila a tu personaje, o un marco decorado alrededor de tu imagen: en tu perfil y en el infostand cuando alguien te pulsa en una sala.",
     "extendedprofile.customize.library": "Tus imágenes",
     "extendedprofile.customize.library.delete": "Eliminar esta imagen",
     "extendedprofile.customize.library.delete.confirm": "Haz clic otra vez para eliminarla del todo",
