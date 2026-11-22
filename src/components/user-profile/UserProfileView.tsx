@@ -244,7 +244,8 @@ export const UserProfileView: FC<{}> = () => {
                             </Hint>
                         )}
                     </ProfileBannerView>
-                    <div className="px-[10px] pt-[8px]">
+                    {/* Native text reads its colour when it is drawn: a new background tone draws it again. */}
+                    <div key={backgroundTone ?? 'plain'} className="px-[10px] pt-[8px]">
                         <UserContainerView
                             userBadges={userBadges}
                             userProfile={userProfile}

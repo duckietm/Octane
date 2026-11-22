@@ -646,3 +646,18 @@ html.octane-user-accent .octane-card-shell.octane-card-frame-3 {
 html.octane-user-accent .octane-card-shell:not(.octane-card-frame-3) > .octane-card-header-shell {
     background: var(--octane-user-accent);
 }
+
+/* The frame image draws the title's rim in its own blue (a light 2px edge, then the base colour) around the
+   26px title strip. With an accent the title layer grows over that rim: a lighter edge of the accent, the
+   accent inside it, the dark line, then the fill - leaving the body's white side edges of the image visible. */
+html.octane-user-accent .octane-card-shell.octane-card-frame-3::after,
+html .octane-card-shell.octane-card-frame-3.has-profile-accent::after {
+    --octane-card-frame-3-rim: color-mix(in srgb, var(--octane-card-frame-3-title) 78%, #ffffff);
+
+    inset: 1px 1px 4px;
+    background:
+        linear-gradient(var(--octane-card-frame-3-title), var(--octane-card-frame-3-title)) 2px 2px / calc(100% - 4px) 29px no-repeat,
+        linear-gradient(var(--octane-card-frame-3-rim), var(--octane-card-frame-3-rim)) 0 0 / 100% 31px no-repeat,
+        linear-gradient(var(--octane-card-frame-3-line), var(--octane-card-frame-3-line)) 0 31px / 100% 1px no-repeat,
+        linear-gradient(var(--octane-card-frame-3-fill), var(--octane-card-frame-3-fill)) 2px 32px / calc(100% - 4px) calc(100% - 32px) no-repeat;
+}

@@ -8,7 +8,7 @@ import {
     RoomSessionUserFigureUpdateEvent,
     UserRelationshipsComposer
 } from '@octane/renderer';
-import React, { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { Dispatch, FC, FocusEvent, Fragment, KeyboardEvent, SetStateAction, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
     AvatarInfoUser,
     CloneObject,
@@ -228,6 +228,8 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                     ref={infostandRef}
                     className={`octane-infostand pointer-events-auto z-30 profile-card-background ${infostandCardBackgroundClass}${infostandTone ? ` has-${infostandTone}-background` : ''}`}
                 >
+                    {/* Native text reads its colour when it is drawn: a new tone draws it again. */}
+                    <Fragment key={infostandTone ?? 'plain'}>
                     {borderId ? <Base className={`infostand-border ${infostandBorderClass}`} /> : null}
                     <BaseButton type="button" className="octane-infostand__close" aria-label={localizeWithFallback('octane.room.close', 'Close')} onClick={onClose} />
                     <div className="octane-infostand__header">
@@ -390,6 +392,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                             <InfoStandWidgetUserTagsView tags={GetSessionDataManager().tags} />
                         </Column>
                     )}
+                    </Fragment>
                 </div>
                 {isVisible && avatarInfo.type === AvatarInfoUser.OWN_USER && (
                     <div className="backgrounds-view-container">
