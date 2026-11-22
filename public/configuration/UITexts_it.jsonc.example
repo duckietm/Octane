@@ -403,7 +403,7 @@
     "extendedprofile.customize.border": "Bordo",
     "extendedprofile.customize.border.colours": "Colori",
     "extendedprofile.customize.border.decorated": "Decorati",
-    "extendedprofile.customize.border.hint": "Un colore che contorna il tuo personaggio, oppure una cornice decorata attorno alla foto: nel tuo profilo e nell'infostand quando qualcuno ti clicca in stanza.",
+    "extendedprofile.customize.border.hint": "La cornice attorno al tuo personaggio: nel tuo profilo e nell'infostand quando qualcuno ti clicca in stanza.",
     "extendedprofile.customize.library": "Le tue immagini",
     "extendedprofile.customize.library.delete": "Elimina questa immagine",
     "extendedprofile.customize.library.delete.confirm": "Clicca di nuovo per eliminarla definitivamente",

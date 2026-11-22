@@ -42,15 +42,6 @@ export const PROFILE_ACCENTS: ReadonlyArray<{ id: number; color: string }> = [
     { id: 12, color: '#1f2329' }
 ];
 
-/** Borders 1-16 are colours drawn as an outline that follows the character; the rest are decorated frames. */
-export const LAST_OUTLINE_BORDER = 16;
-
-export const isOutlineBorder = (borderId: number | null | undefined): boolean => !!borderId && borderId > 0 && borderId <= LAST_OUTLINE_BORDER;
-
-/** The classes that outline the character in a colour border; '' for none or a decorated frame. */
-export const profileOutlineClass = (borderId: number | null | undefined): string =>
-    isOutlineBorder(borderId) ? `octane-avatar-outline outline-${borderId}` : '';
-
 /** An accent of the user's own colour: this bit over the colour as 0xRRGGBB (the server checks the same bit). */
 export const PROFILE_CUSTOM_ACCENT = 0x1000000;
 

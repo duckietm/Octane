@@ -403,7 +403,7 @@
     "extendedprofile.customize.border": "Çerçeve",
     "extendedprofile.customize.border.colours": "Renkler",
     "extendedprofile.customize.border.decorated": "Süslü",
-    "extendedprofile.customize.border.hint": "Karakterinin çevresini çizen bir renk ya da resminin etrafında süslü bir çerçeve: profilinde ve biri seni odada tıkladığında bilgi kutusunda.",
+    "extendedprofile.customize.border.hint": "Karakterinin çevresindeki çerçeve: profilinde ve biri seni odada tıkladığında bilgi panelinde.",
     "extendedprofile.customize.library": "Resimlerin",
     "extendedprofile.customize.library.delete": "Bu resmi sil",
     "extendedprofile.customize.library.delete.confirm": "Kalıcı olarak silmek için tekrar tıkla",

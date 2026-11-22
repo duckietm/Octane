@@ -36,7 +36,7 @@
   height: 135px;
   position: relative;
   overflow: hidden;
-  border-radius: 3px;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -799,15 +799,15 @@
   flex: 0 0 auto;
 }
 
-/* The infostand borders sit 22px outside a card; around the profile picture they hug it: the border starts
-   at the picture's edge (no gap) and its inner corners follow the picture's 3 px corners. */
+/* The infostand borders sit 22px outside a card; around the profile picture they hug its frame: the border
+   starts at the picture's edge (no gap) and its inner corners follow the picture's 6 px corners. */
 .octane-extended-profile__avatar-frame .infostand-border {
   top: -3px;
   bottom: -3px;
   left: -3px;
   right: -3px;
   border-width: 3px;
-  border-radius: 6px;
+  border-radius: 9px;
 }
 
 .octane-extended-profile__avatar-frame .infostand-border.border-17,
@@ -1410,22 +1410,7 @@ html.octane-user-accent-light .octane-card-shell.octane-card-frame-3.has-profile
   background-color: #1d2a44;
 }
 
-/* A colour border outlines the character: its choice is a dot of the colour. */
-.octane-profile-customize__border-chip.profile-border:not(.is-decorated):not(.border-0) {
-  width: 30px;
-  height: 30px;
-  border-width: 15px;
-  border-radius: 50%;
-}
-
-.octane-profile-customize__border-cell > .octane-profile-customize__option:has(.profile-border:not(.is-decorated):not(.border-0)) {
-  border-radius: 50%;
-}
-
 .octane-profile-customize__border-chip.profile-border.border-0 {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
   border: 2px dashed #8d8d8d;
   background-color: #f4f2ea;
 }

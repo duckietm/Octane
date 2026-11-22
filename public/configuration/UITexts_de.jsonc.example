@@ -403,7 +403,7 @@
     "extendedprofile.customize.border": "Rahmen",
     "extendedprofile.customize.border.colours": "Farben",
     "extendedprofile.customize.border.decorated": "Verziert",
-    "extendedprofile.customize.border.hint": "Eine Farbe, die deine Figur umrandet, oder ein verzierter Rahmen um dein Bild: in deinem Profil und im Infostand, wenn dich jemand im Raum anklickt.",
+    "extendedprofile.customize.border.hint": "Der Rahmen um deine Figur: in deinem Profil und in der Infostand, wenn dich jemand im Raum anklickt.",
     "extendedprofile.customize.library": "Deine Bilder",
     "extendedprofile.customize.library.delete": "Dieses Bild löschen",
     "extendedprofile.customize.library.delete.confirm": "Nochmals klicken, um es endgültig zu löschen",

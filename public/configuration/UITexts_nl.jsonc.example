@@ -403,7 +403,7 @@
     "extendedprofile.customize.border": "Rand",
     "extendedprofile.customize.border.colours": "Kleuren",
     "extendedprofile.customize.border.decorated": "Versierd",
-    "extendedprofile.customize.border.hint": "Een kleur die je personage omlijnt, of een versierde lijst om je foto: in je profiel en in de infostand als iemand je in een kamer aanklikt.",
+    "extendedprofile.customize.border.hint": "De rand rond je figuur: in je profiel en in de infostand als iemand je in een kamer aanklikt.",
     "extendedprofile.customize.library": "Jouw afbeeldingen",
     "extendedprofile.customize.library.delete": "Deze afbeelding verwijderen",
     "extendedprofile.customize.library.delete.confirm": "Klik nogmaals om haar definitief te verwijderen",

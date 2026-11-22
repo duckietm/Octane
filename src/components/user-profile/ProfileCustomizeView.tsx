@@ -71,7 +71,7 @@ const TAB_HINTS: Record<ProfileCustomizeTab, [string, string]> = {
     avatar: ['extendedprofile.customize.avatar.hint', 'What stands behind and around your character, in your profile and in the room infostand.'],
     border: [
         'extendedprofile.customize.border.hint',
-        'A colour that outlines your character, or a decorated frame around your picture: in your profile and in the infostand when someone clicks you in a room.'
+        'The frame around your character: in your profile and in the infostand when someone clicks you in a room.'
     ],
     accent: [
         'extendedprofile.customize.accent.hint',

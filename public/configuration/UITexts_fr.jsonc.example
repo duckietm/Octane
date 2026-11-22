@@ -403,7 +403,7 @@
     "extendedprofile.customize.border": "Bordure",
     "extendedprofile.customize.border.colours": "Couleurs",
     "extendedprofile.customize.border.decorated": "Décorés",
-    "extendedprofile.customize.border.hint": "Une couleur qui entoure ton personnage, ou un cadre décoré autour de ton image : dans ton profil et dans l'infostand quand quelqu'un clique sur toi dans un appart.",
+    "extendedprofile.customize.border.hint": "Le cadre autour de ton personnage : dans ton profil et dans l'infostand quand quelqu'un clique sur toi dans un appart.",
     "extendedprofile.customize.library": "Tes images",
     "extendedprofile.customize.library.delete": "Supprimer cette image",
     "extendedprofile.customize.library.delete.confirm": "Clique encore pour la supprimer définitivement",
