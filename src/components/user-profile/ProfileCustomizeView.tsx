@@ -312,7 +312,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                                 </Button>
                             )
                         )}
-                        <Grid gap={1} columnCount={2} className="octane-profile-customize__grid">
+                        <Grid gap={1} columnCount={2} fullHeight={false} className="octane-profile-customize__grid">
                             {option(
                                 0,
                                 !customBanner && banner === 0,
@@ -344,7 +344,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                         <div className="octane-profile-customize__sections">
                             {section(
                                 localizeWithFallback('extendedprofile.customize.background.tints', 'Colours'),
-                                <Grid gap={1} columnCount={8} className="octane-profile-customize__grid">
+                                <Grid gap={1} columnCount={8} fullHeight={false} className="octane-profile-customize__grid">
                                     {cardOption(0)}
                                     {tints.map(cardOption)}
                                 </Grid>
@@ -352,7 +352,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                             {patterns.length > 0 &&
                                 section(
                                     localizeWithFallback('extendedprofile.customize.background.patterns', 'Patterns'),
-                                    <Grid gap={1} columnCount={8} className="octane-profile-customize__grid">
+                                    <Grid gap={1} columnCount={8} fullHeight={false} className="octane-profile-customize__grid">
                                         {patterns.map(cardOption)}
                                     </Grid>
                                 )}
@@ -382,7 +382,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                                 </ToggleButton>
                             ))}
                         </div>
-                        <Grid gap={1} columnCount={7} className="octane-profile-customize__grid">
+                        <Grid gap={1} columnCount={7} fullHeight={false} className="octane-profile-customize__grid">
                             {ids[avatarPart].map((id) => (
                                 <ProfilePreviewView
                                     key={id}
@@ -407,7 +407,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                     <div className="octane-profile-customize__sections">
                         {section(
                             localizeWithFallback('extendedprofile.customize.border.colours', 'Colours'),
-                            <Grid gap={1} columnCount={8} className="octane-profile-customize__grid">
+                            <Grid gap={1} columnCount={8} fullHeight={false} className="octane-profile-customize__grid">
                                 {borderOption(0)}
                                 {ids.filter((id) => id <= LAST_COLOUR_BORDER).map(borderOption)}
                             </Grid>
@@ -415,7 +415,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                         {ids.some((id) => id > LAST_COLOUR_BORDER) &&
                             section(
                                 localizeWithFallback('extendedprofile.customize.border.decorated', 'Decorated'),
-                                <Grid gap={1} columnCount={6} className="octane-profile-customize__grid">
+                                <Grid gap={1} columnCount={6} fullHeight={false} className="octane-profile-customize__grid">
                                     {ids.filter((id) => id > LAST_COLOUR_BORDER).map(borderOption)}
                                 </Grid>
                             )}
@@ -435,7 +435,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                 );
 
                 return (
-                    <Grid gap={1} columnCount={4} className="octane-profile-customize__grid">
+                    <Grid gap={1} columnCount={4} fullHeight={false} className="octane-profile-customize__grid">
                         {option(0, accent === 0, swatch(null), noneLabel, () => choose({ accent: 0 }, accent, null), localizeWithFallback('extendedprofile.customize.accent.default', 'Standard'))}
                         {PROFILE_ACCENTS.map((entry) => {
                             const name = localizeWithFallback(`extendedprofile.customize.accent.${entry.id}`, ACCENT_NAMES[entry.id] ?? `${entry.id}`);

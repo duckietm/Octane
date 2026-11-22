@@ -1238,3 +1238,12 @@ html.octane-user-accent-light .octane-card-shell.octane-card-frame-3.has-profile
   color: #ffffff !important;
   text-shadow: none;
 }
+
+/* The choice grids keep their rows at the top, as tall as their tiles: stretched to the panel's height a short
+   list spread its rows apart. */
+.octane-profile-customize__grid {
+  flex: 0 0 auto;
+  align-content: start;
+  grid-auto-rows: max-content;
+  height: auto !important;
+}
