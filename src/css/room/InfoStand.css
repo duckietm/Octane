@@ -307,17 +307,17 @@
     display: flex;
     gap: 5px;
     min-width: 170px;
-    min-height: 132px;
+    min-height: 135px;
   }
 
   .octane-infostand__avatar-well {
     position: relative;
     display: flex;
-    flex: 0 0 67px;
-    align-items: flex-end;
+    flex: 0 0 68px;
+    align-items: flex-start;
     justify-content: center;
-    width: 67px;
-    height: 130px;
+    width: 68px;
+    height: 135px;
     overflow: hidden;
     border-radius: 0;
     background-color: transparent;
