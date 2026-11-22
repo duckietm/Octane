@@ -1360,8 +1360,16 @@ html.octane-user-accent-light .octane-card-shell.octane-card-frame-3.has-profile
   border-radius: 0;
 }
 
+/* A border is drawn outside the picture (12 px for the decorated ones): every choice is the same card, with
+   room around the picture so the whole border shows. */
 .octane-profile-customize__border-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 92px;
   padding: 0;
+  background: #f4f2ea;
 }
 
 /* The user's earlier uploads, with a cross to delete one. */

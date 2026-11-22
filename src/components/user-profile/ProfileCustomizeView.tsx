@@ -508,7 +508,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                 standId={userProfile.standId}
                 overlayId={userProfile.overlayId}
                 borderId={id}
-                scale={0.42}
+                scale={0.5}
             />
         </span>
     );
@@ -755,7 +755,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                     <div className="octane-profile-customize__sections">
                         {section(
                             localizeWithFallback('extendedprofile.customize.border.colours', 'Colours'),
-                            <Grid gap={1} columnCount={8} fullHeight={false} className="octane-profile-customize__grid">
+                            <Grid gap={1} columnCount={7} fullHeight={false} className="octane-profile-customize__grid">
                                 {borderOption(0)}
                                 {ids.filter((id) => id <= LAST_COLOUR_BORDER).map(borderOption)}
                             </Grid>
@@ -763,7 +763,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                         {ids.some((id) => id > LAST_COLOUR_BORDER) &&
                             section(
                                 localizeWithFallback('extendedprofile.customize.border.decorated', 'Decorated'),
-                                <Grid gap={1} columnCount={6} fullHeight={false} className="octane-profile-customize__grid">
+                                <Grid gap={1} columnCount={7} fullHeight={false} className="octane-profile-customize__grid">
                                     {ids.filter((id) => id > LAST_COLOUR_BORDER).map(borderOption)}
                                 </Grid>
                             )}
