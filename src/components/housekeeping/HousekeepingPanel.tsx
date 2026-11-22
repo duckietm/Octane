@@ -7,6 +7,7 @@ import { HousekeepingPasswordReveal } from './HousekeepingPasswordReveal';
 import { HousekeepingStatusBanner } from './HousekeepingStatusBanner';
 import { HousekeepingAuditTab } from './views/audit/HousekeepingAuditTab';
 import { HousekeepingBansTab } from './views/bans/HousekeepingBansTab';
+import { HousekeepingProfileImagesTab } from './views/profile-images/HousekeepingProfileImagesTab';
 import { HousekeepingDashboardTab } from './views/dashboard/HousekeepingDashboardTab';
 import { HousekeepingHotelTab } from './views/hotel/HousekeepingHotelTab';
 import { HousekeepingLiveTab } from './views/live/HousekeepingLiveTab';
@@ -40,6 +41,8 @@ export const HousekeepingPanel: FC<HousekeepingPanelProps> = ({ activeTab, navGr
                 return <HousekeepingSupportTab />;
             case HousekeepingTabId.BANS:
                 return <HousekeepingBansTab />;
+            case HousekeepingTabId.PROFILE_IMAGES:
+                return <HousekeepingProfileImagesTab />;
             case HousekeepingTabId.AUDIT:
                 return <HousekeepingAuditTab />;
             case HousekeepingTabId.HOTEL:

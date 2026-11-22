@@ -25,11 +25,14 @@ interface ProfileImageEditorViewProps {
     pixelArt?: boolean;
     busy?: boolean;
     onCancel: () => void;
-    onSave: (bytes: Uint8Array) => void;
+    /** An animated GIF banner: saved as the original plus its placement, so the server places every frame. */
+    animated?: boolean;
+    /** The cropped still (JPEG), or for an animation the placement the server applies to every frame. */
+    onSave: (bytes: Uint8Array | null, placement: ProfileImagePlacement & { pixelated: boolean }) => void;
 }
 
 /** Places an uploaded picture in the banner or background frame: drag to move, zoom, fill, fit, centre. */
-export const ProfileImageEditorView: FC<ProfileImageEditorViewProps> = ({ kind, image, pixelArt = false, busy = false, onCancel, onSave }) => {
+export const ProfileImageEditorView: FC<ProfileImageEditorViewProps> = ({ kind, image, pixelArt = false, animated = false, busy = false, onCancel, onSave }) => {
     const frame = PROFILE_IMAGE_SIZE[kind];
     const size = { width: image.naturalWidth, height: image.naturalHeight };
     const minScale = fitScale(size, frame);
@@ -54,7 +57,21 @@ export const ProfileImageEditorView: FC<ProfileImageEditorViewProps> = ({ kind, 
         if (!context) return;
 
         drawProfileImage(context, image, size, frame, placement, { pixelated });
-    }, [image, placement, pixelated]);
+
+        if (!animated) return;
+
+        // A GIF plays only while its element is in the page: kept there out of sight, its current frame is drawn
+        // ten times a second, so the preview moves as the saved banner will.
+        image.classList.add('octane-profile-image-editor__source');
+        document.body.appendChild(image);
+
+        const timer = window.setInterval(() => drawProfileImage(context, image, size, frame, placement, { pixelated }), 100);
+
+        return () => {
+            window.clearInterval(timer);
+            image.remove();
+        };
+    }, [image, placement, pixelated, animated]);
 
     /** Frame pixels per screen pixel: the canvas is drawn at full size and shown smaller. */
     const frameRatio = () => {
@@ -116,6 +133,12 @@ export const ProfileImageEditorView: FC<ProfileImageEditorViewProps> = ({ kind, 
 
         setError(null);
 
+        if (animated) {
+            onSave(null, { ...placement, pixelated });
+
+            return;
+        }
+
         const bytes = await encodeProfileImage(canvas.current);
 
         if (!bytes) {
@@ -124,7 +147,7 @@ export const ProfileImageEditorView: FC<ProfileImageEditorViewProps> = ({ kind, 
             return;
         }
 
-        onSave(bytes);
+        onSave(bytes, { ...placement, pixelated });
     };
 
     // The slider is logarithmic, so the step from fit to fill feels as long as the step from fill to the maximum.

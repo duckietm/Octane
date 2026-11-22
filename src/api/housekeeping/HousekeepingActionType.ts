@@ -36,6 +36,8 @@ export const HousekeepingTabId = {
     AUDIT: 'audit',
     SUPPORT: 'support',
     BANS: 'bans',
+    /** Pictures players uploaded to their profile, to review and remove. */
+    PROFILE_IMAGES: 'profile_images',
     HOTEL: 'hotel',
     /** Every permission against every rank. */
     PERMISSIONS: 'permissions',

@@ -5,13 +5,18 @@ import {
     getProfileAccentColor,
     isLightProfileAccent,
     loadProfileCustomizationData,
+    loadProfileOptions,
     localizeWithFallback,
     PROFILE_ACCENTS,
     PROFILE_IMAGE_ACCEPT,
+    PROFILE_IMAGE_MAX_BYTES,
     PROFILE_IMAGE_MAX_SOURCE_BYTES,
     ProfileCustomizationChange,
     ProfileCustomizationData,
     ProfileImageKind,
+    ProfileImagePlacement,
+    profileOptionState,
+    ProfileOptions,
     profileGalleryBannerStyle,
     profileImageUrl,
     removeProfileImage,
@@ -21,6 +26,8 @@ import {
 } from '../../api';
 import { Button, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView, Text } from '../../common';
 import { ToggleButton } from '../../common/ToggleButton';
+import { Hint } from '../../common/Tooltip';
+import { FaLock } from 'react-icons/fa';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { ProfilePreviewView } from '../backgrounds/ProfilePreviewView';
 import { ProfileAvatarFrameView } from './ProfileAvatarFrameView';
@@ -75,6 +82,14 @@ const ACCENT_NAMES: Record<number, string> = {
     12: 'Black'
 };
 
+type OptionCategory = keyof ProfileOptions['categories'];
+
+const LOCK_FALLBACKS: Record<string, string> = {
+    hc: 'Only for Habbo Club members.',
+    ambassador: 'Only for ambassadors.',
+    rank: 'Not available for your rank.'
+};
+
 // The server drops a change that follows the previous one within half a second.
 const SEND_COOLDOWN_MS = 600;
 
@@ -101,7 +116,9 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
     const [activeTab, setActiveTab] = useState<ProfileCustomizeTab>('banner');
     const [avatarPart, setAvatarPart] = useState<AvatarPart>('background');
     const [data, setData] = useState<ProfileCustomizationData | null>(null);
-    const [editing, setEditing] = useState<{ kind: ProfileImageKind; image: HTMLImageElement; pixelArt: boolean } | null>(null);
+    const [options, setOptions] = useState<ProfileOptions | null>(null);
+    // `gif` holds the original of an animated banner: the server places every frame where the editor says.
+    const [editing, setEditing] = useState<{ kind: ProfileImageKind; image: HTMLImageElement; pixelArt: boolean; gif?: Uint8Array } | null>(null);
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
     const fileInput = useRef<HTMLInputElement>(null);
@@ -114,6 +131,9 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
 
         loadProfileCustomizationData().then((loaded) => {
             if (!cancelled) setData(loaded);
+        });
+        loadProfileOptions().then((loaded) => {
+            if (!cancelled) setOptions(loaded);
         });
 
         return () => {
@@ -165,7 +185,11 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
         setMessage(null);
 
         try {
-            setEditing({ kind: 'banner', image: await loadImage(url), pixelArt: !customBanner });
+            // An animated banner is moved from its saved GIF, so it stays animated.
+            const animated = customBanner.endsWith('.gif');
+            const [image, original] = await Promise.all([loadImage(url), animated ? fetch(url).then((response) => response.arrayBuffer()) : Promise.resolve(null)]);
+
+            setEditing({ kind: 'banner', image, pixelArt: !customBanner, gif: original ? new Uint8Array(original) : undefined });
         } catch {
             setMessage(localizeWithFallback('extendedprofile.customize.upload.failed', 'The picture could not be saved. Try again later.'));
         }
@@ -198,20 +222,31 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
             return;
         }
 
+        const kind = uploadKind.current;
+        const animated = kind === 'banner' && file.type === 'image/gif';
+
+        // An animated banner is sent as it is, so it must fit the upload by itself.
+        if (animated && file.size > PROFILE_IMAGE_MAX_BYTES) {
+            setMessage(localizeWithFallback('extendedprofile.customize.upload.gif_too_large', 'An animated banner can be at most 450 KB.'));
+
+            return;
+        }
+
         const url = URL.createObjectURL(file);
 
-        loadImage(url)
-            .then((image) => setEditing({ kind: uploadKind.current, image, pixelArt: false }))
+        Promise.all([loadImage(url), animated ? file.arrayBuffer() : Promise.resolve(null)])
+            .then(([image, original]) => setEditing({ kind, image, pixelArt: false, gif: original ? new Uint8Array(original) : undefined }))
             .catch(() => setMessage(invalidPicture()))
-            .finally(() => URL.revokeObjectURL(url));
+            // A GIF keeps playing from its address while it is placed; a still is read at once.
+            .finally(() => !animated && URL.revokeObjectURL(url));
     };
 
-    const saveUpload = async (bytes: Uint8Array) => {
+    const saveUpload = async (bytes: Uint8Array | null, placement: ProfileImagePlacement & { pixelated: boolean }) => {
         if (!editing) return;
 
         setBusy(true);
 
-        const result = await uploadProfileImage(editing.kind, bytes);
+        const result = editing.gif ? await uploadProfileImage(editing.kind, editing.gif, placement) : await uploadProfileImage(editing.kind, bytes);
 
         setBusy(false);
 
@@ -231,19 +266,46 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
         setBusy(false);
     };
 
-    const option = (key: string | number, selected: boolean, content: ReactNode, name: string, onClick: () => void, caption?: string) => (
-        <ToggleButton
-            key={key}
-            aria-label={name}
-            className={`octane-profile-customize__option${selected ? ' is-selected' : ''}`}
-            pressed={selected}
-            disabled={busy}
-            onClick={onClick}
-        >
-            {content}
-            {caption && <span className="octane-profile-customize__caption">{caption}</span>}
-        </ToggleButton>
-    );
+    /** Why a choice is locked, as the user reads it. */
+    const lockText = (reason: string) => localizeWithFallback(`extendedprofile.customize.locked.${reason}`, LOCK_FALLBACKS[reason] ?? LOCK_FALLBACKS.rank);
+
+    /**
+     * One choice. With `category` the hotel's rules apply: a choice the hotel does not list is not shown, and one the
+     * user may not pick (HC, rank, ambassador) shows a lock and why, instead of being silently ignored by the server.
+     */
+    const option = (key: string | number, selected: boolean, content: ReactNode, name: string, onClick: () => void, caption?: string, category?: OptionCategory) => {
+        const state = category ? profileOptionState(options, category, Number(key)) : { hidden: false, lock: null };
+
+        if (state.hidden) return null;
+
+        const button = (
+            <ToggleButton
+                key={key}
+                aria-label={state.lock ? `${name} - ${lockText(state.lock)}` : name}
+                className={`octane-profile-customize__option${selected ? ' is-selected' : ''}${state.lock ? ' is-locked' : ''}`}
+                pressed={selected}
+                disabled={busy || !!state.lock}
+                onClick={onClick}
+            >
+                {content}
+                {caption && <span className="octane-profile-customize__caption">{caption}</span>}
+                {state.lock && (
+                    <span className="octane-profile-customize__lock">
+                        <FaLock size={9} />
+                        {state.lock === 'hc' ? 'HC' : ''}
+                    </span>
+                )}
+            </ToggleButton>
+        );
+
+        return state.lock ? (
+            <Hint key={key} content={lockText(state.lock)}>
+                {button}
+            </Hint>
+        ) : (
+            button
+        );
+    };
 
     const section = (title: string, children: ReactNode) => (
         <div className="octane-profile-customize__section">
@@ -318,7 +380,9 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                                 !customBanner && banner === 0,
                                 <span className="octane-profile-customize__banner octane-profile-customize__banner--none">{noneLabel}</span>,
                                 noneLabel,
-                                () => choose({ banner: 0 }, banner, 'banner')
+                                () => choose({ banner: 0 }, banner, 'banner'),
+                                undefined,
+                                'banner'
                             )}
                             {data.banners.map((entry) =>
                                 option(
@@ -326,7 +390,9 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                                     !customBanner && entry.id === banner,
                                     <span className="octane-profile-customize__banner" style={profileGalleryBannerStyle(entry)} />,
                                     `${label('banner')} ${entry.id}`,
-                                    () => choose({ banner: entry.id }, banner, 'banner')
+                                    () => choose({ banner: entry.id }, banner, 'banner'),
+                                    undefined,
+                                    'banner'
                                 )
                             )}
                         </Grid>
@@ -334,7 +400,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                 );
             case 'card': {
                 const cardOption = (id: number) =>
-                    option(id, !customBackground && id === card, cardTile(id), id ? `${label('card')} ${id}` : noneLabel, () => choose({ card: id }, card, 'background'));
+                    option(id, !customBackground && id === card, cardTile(id), id ? `${label('card')} ${id}` : noneLabel, () => choose({ card: id }, card, 'background'), undefined, 'card');
                 const tints = data.cards.filter((id) => id > 0 && id <= LAST_TINT_CARD);
                 const patterns = data.cards.filter((id) => id > LAST_TINT_CARD);
 
@@ -383,7 +449,12 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                             ))}
                         </div>
                         <Grid gap={1} columnCount={7} fullHeight={false} className="octane-profile-customize__grid">
-                            {ids[avatarPart].map((id) => (
+                            {ids[avatarPart].map((id) => {
+                                const state = profileOptionState(options, avatarPart, id);
+
+                                if (state.hidden) return null;
+
+                                const preview = (
                                 <ProfilePreviewView
                                     key={id}
                                     figure={userProfile.figure}
@@ -391,16 +462,31 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                                     standId={avatarPart === 'stand' ? id : current.stand}
                                     overlayId={avatarPart === 'overlay' ? id : current.overlay}
                                     selected={id === current[avatarPart]}
-                                    onClick={() => choose({ [avatarPart]: id }, current[avatarPart], null)}
+                                    onClick={state.lock ? undefined : () => choose({ [avatarPart]: id }, current[avatarPart], null)}
                                 />
-                            ))}
+                                );
+
+                                return state.lock ? (
+                                    <Hint key={id} content={lockText(state.lock)}>
+                                        <span className="octane-profile-customize__locked-preview">
+                                            {preview}
+                                            <span className="octane-profile-customize__lock">
+                                                <FaLock size={9} />
+                                                {state.lock === 'hc' ? 'HC' : ''}
+                                            </span>
+                                        </span>
+                                    </Hint>
+                                ) : (
+                                    preview
+                                );
+                            })}
                         </Grid>
                     </>
                 );
             }
             case 'border': {
                 const border = userProfile.borderId ?? 0;
-                const borderOption = (id: number) => option(id, id === border, borderTile(id), id ? `${label('border')} ${id}` : noneLabel, () => choose({ border: id }, border, null));
+                const borderOption = (id: number) => option(id, id === border, borderTile(id), id ? `${label('border')} ${id}` : noneLabel, () => choose({ border: id }, border, null), undefined, 'border');
                 const ids = data.borders.filter((id) => id > 0);
 
                 return (
@@ -440,7 +526,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                         {PROFILE_ACCENTS.map((entry) => {
                             const name = localizeWithFallback(`extendedprofile.customize.accent.${entry.id}`, ACCENT_NAMES[entry.id] ?? `${entry.id}`);
 
-                            return option(entry.id, entry.id === accent, swatch(entry.color), name, () => choose({ accent: entry.id }, accent, null), name);
+                            return option(entry.id, entry.id === accent, swatch(entry.color), name, () => choose({ accent: entry.id }, accent, null), name, 'accent');
                         })}
                     </Grid>
                 );
@@ -466,7 +552,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                                 ? localizeWithFallback('extendedprofile.customize.upload.banner_title', 'Place your banner')
                                 : localizeWithFallback('extendedprofile.customize.upload.background_title', 'Place your background')}
                         </Text>
-                        <ProfileImageEditorView kind={editing.kind} image={editing.image} pixelArt={editing.pixelArt} busy={busy} onCancel={() => setEditing(null)} onSave={saveUpload} />
+                        <ProfileImageEditorView kind={editing.kind} image={editing.image} pixelArt={editing.pixelArt} animated={!!editing.gif} busy={busy} onCancel={() => setEditing(null)} onSave={saveUpload} />
                         {message && <p className="octane-profile-customize__message">{message}</p>}
                     </OctaneCardContentView>
                 ) : (

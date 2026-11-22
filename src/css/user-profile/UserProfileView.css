@@ -1251,3 +1251,52 @@ html.octane-user-accent-light .octane-card-shell.octane-card-frame-3.has-profile
   justify-items: center;
   gap: 8px !important;
 }
+
+/* A choice the user may not pick (HC, rank, ambassador): dimmed, with a lock and the reason in its tooltip. */
+.octane-profile-customize__option {
+  position: relative;
+}
+
+.octane-profile-customize__option.is-locked {
+  cursor: not-allowed;
+}
+
+.octane-profile-customize__option.is-locked > :not(.octane-profile-customize__lock),
+.octane-profile-customize__locked-preview > :not(.octane-profile-customize__lock) {
+  filter: grayscale(0.7);
+  opacity: 0.55;
+}
+
+.octane-profile-customize__locked-preview {
+  position: relative;
+  display: inline-flex;
+  cursor: not-allowed;
+}
+
+.octane-profile-customize__lock {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 4px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffd75e;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+/* The GIF being placed stays in the page so it keeps playing, out of sight. */
+.octane-profile-image-editor__source {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
