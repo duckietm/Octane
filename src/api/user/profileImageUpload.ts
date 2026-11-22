@@ -44,7 +44,8 @@ const REFUSALS: Record<string, [string, string]> = {
     invalid: ['extendedprofile.customize.upload.invalid', 'Choose a PNG, JPEG, GIF or WebP picture smaller than 15 MB.'],
     rate_limited: ['extendedprofile.customize.upload.rate_limited', 'You changed your picture a moment ago. Try again in a few minutes.'],
     blocked: ['extendedprofile.customize.upload.blocked', 'You cannot upload profile pictures.'],
-    disabled: ['extendedprofile.customize.upload.disabled', 'Uploading profile pictures is turned off in this hotel.']
+    disabled: ['extendedprofile.customize.upload.disabled', 'Uploading profile pictures is turned off in this hotel.'],
+    locked: ['extendedprofile.customize.style.locked', 'You cannot use this pattern.']
 };
 
 const refusal = (code: string): string => {
@@ -87,7 +88,12 @@ export const uploadProfileImage = async (
         : {};
 
     try {
-        const response = await fetch(endpoint(kind, extra), { method: 'POST', credentials: 'include', headers: headers(type), body: new Blob([bytes.slice().buffer], { type }) });
+        const response = await fetch(endpoint(kind, extra), {
+            method: 'POST',
+            credentials: 'include',
+            headers: headers(type),
+            body: new Blob([bytes.slice().buffer], { type })
+        });
 
         if (!response.ok) return { ok: false, message: refusal(await readCode(response)) };
 
@@ -118,11 +124,65 @@ export interface ProfileOptions {
     categories: Partial<Record<'background' | 'stand' | 'overlay' | 'card' | 'border' | 'banner' | 'accent', Record<string, string>>>;
 }
 
-const optionsUrl = (): string => {
+/** Another call of the same service, next to the upload: options, library, select, style. */
+const serviceUrl = (name: string, query: Record<string, string> = {}): string => {
     const upload = interpolate(GetConfiguration().getValue<string>('profile.images.endpoint', '${api.url}/profile-images/upload'));
+    const search = new URLSearchParams(query).toString();
 
-    return upload.replace(/\/upload(\?.*)?$/, '/options');
+    return upload.replace(/\/upload(\?.*)?$/, `/${name}`) + (search ? `?${search}` : '');
 };
+
+const optionsUrl = (): string => serviceUrl('options');
+
+/** One picture the user uploaded before and may put back on their profile. */
+export interface ProfileLibraryPicture {
+    id: number;
+    file: string;
+}
+
+/** The user's own uploads of one kind, newest first; empty when the server cannot say. */
+export const loadProfileLibrary = async (kind: ProfileImageKind): Promise<ProfileLibraryPicture[]> => {
+    try {
+        const response = await fetch(serviceUrl('library', { kind }), { method: 'GET', credentials: 'include', headers: headers() });
+
+        if (!response.ok) return [];
+
+        const body = (await response.json()) as { items?: unknown };
+
+        if (!Array.isArray(body.items)) return [];
+
+        return body.items
+            .filter((item): item is { id: number; file: string } => typeof item?.id === 'number' && typeof item?.file === 'string')
+            .map((item) => ({ id: item.id, file: item.file }));
+    } catch {
+        return [];
+    }
+};
+
+const writeCall = async (url: string, method: 'POST' | 'DELETE'): Promise<ProfileImageUploadResult> => {
+    try {
+        const response = await fetch(url, { method, credentials: 'include', headers: headers() });
+
+        if (!response.ok) return { ok: false, message: refusal(await readCode(response)) };
+
+        refreshOwnProfile();
+
+        return { ok: true };
+    } catch {
+        return { ok: false, message: refusal('') };
+    }
+};
+
+/** Puts one of the user's earlier uploads back on their profile. */
+export const selectProfileImage = (kind: ProfileImageKind, id: number): Promise<ProfileImageUploadResult> =>
+    writeCall(serviceUrl('select', { kind, id: String(id) }), 'POST');
+
+/** Deletes one of the user's earlier uploads for good. */
+export const forgetProfileImage = (kind: ProfileImageKind, id: number): Promise<ProfileImageUploadResult> =>
+    writeCall(serviceUrl('library', { kind, id: String(id) }), 'DELETE');
+
+/** Saves the user's own background ("rrggbb;rrggbb;angle;pattern"), or clears it with ''. */
+export const saveProfileBackgroundStyle = (value: string): Promise<ProfileImageUploadResult> => writeCall(serviceUrl('style', { value }), 'POST');
 
 /** What the signed-in user may pick; null when the server cannot say, and then every choice stays open. */
 export const loadProfileOptions = async (): Promise<ProfileOptions | null> => {
@@ -140,7 +200,11 @@ export const loadProfileOptions = async (): Promise<ProfileOptions | null> => {
 };
 
 /** Whether a choice shows, and its lock: hidden when the hotel does not list it, locked with a reason when the user may not pick it. */
-export const profileOptionState = (options: ProfileOptions | null, category: keyof ProfileOptions['categories'], id: number): { hidden: boolean; lock: string | null } => {
+export const profileOptionState = (
+    options: ProfileOptions | null,
+    category: keyof ProfileOptions['categories'],
+    id: number
+): { hidden: boolean; lock: string | null } => {
     if (!options?.enforced || id === 0) return { hidden: false, lock: null };
 
     const listed = options.categories[category];

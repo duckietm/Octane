@@ -17,16 +17,20 @@ import {
     applyUserAccent,
     CreateLinkEvent,
     getProfileAccentColor,
-    isLightProfileAccent,
     GetRoomSession,
     GetUserProfile,
+    hasProfileFeature,
+    isLightProfileAccent,
     isProfileHiddenFromViewer,
     loadProfileCustomizationData,
     LocalizeText,
     localizeWithFallback,
+    parseProfileBackgroundStyle,
+    PROFILE_FEATURE_BANNER,
+    profileBackgroundStyleCss,
     ProfileBannerEntry,
-    restoreUserAccent,
     profileImageUrl,
+    restoreUserAccent,
     SanitizeHtml,
     SendMessageComposer
 } from '../../api';
@@ -59,7 +63,9 @@ export const UserProfileView: FC<{}> = () => {
     const shownProfileId = useRef(0);
     const contentRef = useRef<HTMLDivElement>(null);
     // The window body's own colour, under a background picture that does not cover it all.
-    const backgroundKey = userProfile ? userProfile.backgroundImage || (userProfile.cardBackgroundId ? `card-${userProfile.cardBackgroundId}` : '') : '';
+    const backgroundKey = userProfile
+        ? userProfile.backgroundImage || userProfile.backgroundStyle || (userProfile.cardBackgroundId ? `card-${userProfile.cardBackgroundId}` : '')
+        : '';
     const backgroundTone = useBackgroundTone(contentRef, backgroundKey, { r: 236, g: 232, b: 220 });
     const [banners, setBanners] = useState<ProfileBannerEntry[]>([]);
     const bannerId = userProfile?.bannerId ?? 0;
@@ -210,13 +216,21 @@ export const UserProfileView: FC<{}> = () => {
 
     const cardBackgroundId = userProfile.cardBackgroundId ?? 0;
     const customBackground = userProfile.backgroundImage ?? '';
-    // An uploaded background wins over the card background picked from the list.
+    // An uploaded background wins over the user's own style, which wins over the card background picked from the list.
+    const ownStyle = customBackground ? null : parseProfileBackgroundStyle(userProfile.backgroundStyle);
     const cardBackgroundClass = customBackground
         ? 'profile-card-background octane-extended-profile-window__content--custom-background'
-        : cardBackgroundId
-          ? `profile-card-background card-background-${cardBackgroundId}`
-          : '';
-    const contentStyle = customBackground ? ({ backgroundImage: `url(${profileImageUrl(customBackground)})` } as CSSProperties) : undefined;
+        : ownStyle
+          ? 'octane-extended-profile-window__content--styled'
+          : cardBackgroundId
+            ? `profile-card-background card-background-${cardBackgroundId}`
+            : '';
+    const contentStyle = customBackground
+        ? ({ backgroundImage: `url(${profileImageUrl(customBackground)})` } as CSSProperties)
+        : ownStyle
+          ? (profileBackgroundStyleCss(ownStyle) as CSSProperties)
+          : undefined;
+    const showBanner = hasProfileFeature(userProfile, PROFILE_FEATURE_BANNER);
     const isOwnProfile = userProfile.id === GetSessionDataManager().userId;
     const accentColor = getProfileAccentColor(userProfile.accentId ?? 0);
     const accentStyle = accentColor ? ({ '--profile-accent': accentColor } as CSSProperties) : undefined;
@@ -236,6 +250,12 @@ export const UserProfileView: FC<{}> = () => {
                         className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}${backgroundTone ? ` has-${backgroundTone}-background` : ''}`}
                         style={contentStyle}
                     >
+                        {ownStyle && ownStyle.pattern > 0 && (
+                            <span
+                                aria-hidden
+                                className={`octane-extended-profile__style-pattern profile-card-background card-background-${ownStyle.pattern}`}
+                            />
+                        )}
                         {isBlocked && (
                             // Official blocked_container: the drama text, whose "event:profile/unblock" link
                             // opens the unblock confirm (it carries no href, so it is never followed as a
@@ -263,21 +283,23 @@ export const UserProfileView: FC<{}> = () => {
                                 <img className="octane-extended-profile__blocked-frank" src={frankStop} alt="" draggable={false} />
                             </div>
                         )}
-                        <ProfileBannerView userProfile={userProfile} banners={banners}>
-                            {isOwnProfile && isCustomizing && <ProfileBannerMoveButton onMove={() => setMoveBannerRequest((value) => value + 1)} />}
-                            {isOwnProfile && (
-                                <Hint content={customizeLabel}>
-                                    <BaseButton
-                                        aria-label={customizeLabel}
-                                        className="octane-extended-profile__banner-edit"
-                                        type="button"
-                                        onClick={() => setIsCustomizing((value) => !value)}
-                                    >
-                                        <img src={pencilIcon} alt="" draggable={false} />
-                                    </BaseButton>
-                                </Hint>
-                            )}
-                        </ProfileBannerView>
+                        {showBanner && (
+                            <ProfileBannerView userProfile={userProfile} banners={banners}>
+                                {isOwnProfile && isCustomizing && <ProfileBannerMoveButton onMove={() => setMoveBannerRequest((value) => value + 1)} />}
+                                {isOwnProfile && (
+                                    <Hint content={customizeLabel}>
+                                        <BaseButton
+                                            aria-label={customizeLabel}
+                                            className="octane-extended-profile__banner-edit"
+                                            type="button"
+                                            onClick={() => setIsCustomizing((value) => !value)}
+                                        >
+                                            <img src={pencilIcon} alt="" draggable={false} />
+                                        </BaseButton>
+                                    </Hint>
+                                )}
+                            </ProfileBannerView>
+                        )}
                         {/* Native text reads its colour when it is drawn: a new background tone draws it again. */}
                         <div key={backgroundTone ?? 'plain'} className="px-[10px] pt-[8px]">
                             <UserContainerView

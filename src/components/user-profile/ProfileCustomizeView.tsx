@@ -1,7 +1,23 @@
 import { UserProfileParser } from '@octane/renderer';
 import { ChangeEvent, CSSProperties, FC, ReactNode, useEffect, useRef, useState } from 'react';
 import {
+    customProfileAccentId,
     findProfileBanner,
+    forgetProfileImage,
+    formatProfileBackgroundStyle,
+    hasProfileFeature,
+    isCustomProfileAccent,
+    loadProfileLibrary,
+    parseProfileBackgroundStyle,
+    PROFILE_BACKGROUND_ANGLES,
+    PROFILE_FEATURE_BANNER,
+    PROFILE_FEATURE_THEME,
+    PROFILE_FEATURE_UPLOAD,
+    ProfileBackgroundStyle,
+    profileBackgroundStyleCss,
+    ProfileLibraryPicture,
+    saveProfileBackgroundStyle,
+    selectProfileImage,
     getProfileAccentColor,
     isLightProfileAccent,
     loadProfileCustomizationData,
@@ -27,7 +43,8 @@ import {
 import { Button, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView, Text } from '../../common';
 import { ToggleButton } from '../../common/ToggleButton';
 import { Hint } from '../../common/Tooltip';
-import { FaLock } from 'react-icons/fa';
+import { FaLock, FaTimes } from 'react-icons/fa';
+import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { ProfilePreviewView } from '../backgrounds/ProfilePreviewView';
 import { ProfileAvatarFrameView } from './ProfileAvatarFrameView';
@@ -47,10 +64,19 @@ const TAB_LABELS: Record<ProfileCustomizeTab, [string, string]> = {
 
 const TAB_HINTS: Record<ProfileCustomizeTab, [string, string]> = {
     banner: ['extendedprofile.customize.banner.hint', 'Pick a picture from the gallery or upload your own. Drag the banner above to move it.'],
-    card: ['extendedprofile.customize.background.hint', 'The picture or shade behind the content of your profile window. Everyone who opens your profile sees it.'],
+    card: [
+        'extendedprofile.customize.background.hint',
+        'The picture or shade behind the content of your profile window. Everyone who opens your profile sees it.'
+    ],
     avatar: ['extendedprofile.customize.avatar.hint', 'What stands behind and around your character, in your profile and in the room infostand.'],
-    border: ['extendedprofile.customize.border.hint', 'The frame around your character: in your profile and in the infostand when someone clicks you in a room.'],
-    accent: ['extendedprofile.customize.accent.hint', 'The colour of the title bar of every window in your client, and of your profile for everyone who opens it.']
+    border: [
+        'extendedprofile.customize.border.hint',
+        'The frame around your character: in your profile and in the infostand when someone clicks you in a room.'
+    ],
+    accent: [
+        'extendedprofile.customize.accent.hint',
+        'The colour of the title bar of every window in your client, and of your profile for everyone who opens it.'
+    ]
 };
 
 const AVATAR_PARTS = ['background', 'stand', 'overlay'] as const;
@@ -90,6 +116,20 @@ const LOCK_FALLBACKS: Record<string, string> = {
     rank: 'Not available for your rank.'
 };
 
+/** The arrow of each gradient angle, as CSS reads it (0 points up). */
+const ANGLE_ARROWS: Record<number, string> = {
+    0: '\u2191',
+    45: '\u2197',
+    90: '\u2192',
+    135: '\u2198',
+    180: '\u2193',
+    225: '\u2199',
+    270: '\u2190',
+    315: '\u2196'
+};
+
+const DEFAULT_STYLE: ProfileBackgroundStyle = { from: '#1e7cb8', to: '#0b2a40', angle: 135, pattern: 0 };
+
 // The server drops a change that follows the previous one within half a second.
 const SEND_COOLDOWN_MS = 600;
 
@@ -125,6 +165,17 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
     const uploadKind = useRef<ProfileImageKind>('banner');
     const lastSent = useRef(0);
     const handledMoveRequest = useRef(moveBannerRequest);
+    const [library, setLibrary] = useState<Record<ProfileImageKind, ProfileLibraryPicture[]>>({ banner: [], background: [] });
+    // A delete in the library asks for a second click on the same picture.
+    const [armedDelete, setArmedDelete] = useState<number | null>(null);
+    const savedStyle = parseProfileBackgroundStyle(userProfile.backgroundStyle);
+    const [styleDraft, setStyleDraft] = useState<ProfileBackgroundStyle>(() => savedStyle ?? DEFAULT_STYLE);
+    const [accentDraft, setAccentDraft] = useState(() => getProfileAccentColor(userProfile.accentId ?? 0) ?? '#1e7cb8');
+    const canBanner = hasProfileFeature(userProfile, PROFILE_FEATURE_BANNER);
+    const canUpload = hasProfileFeature(userProfile, PROFILE_FEATURE_UPLOAD);
+    const canTheme = hasProfileFeature(userProfile, PROFILE_FEATURE_THEME);
+    const tabs = TABS.filter((tab) => (tab !== 'banner' || canBanner) && (tab !== 'accent' || canTheme));
+    const shownTab = tabs.includes(activeTab) ? activeTab : tabs[0];
 
     useEffect(() => {
         let cancelled = false;
@@ -143,12 +194,28 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
 
     const customBanner = userProfile.bannerImage ?? '';
     const customBackground = userProfile.backgroundImage ?? '';
+
+    // The user's earlier uploads, read again whenever the picture on the profile changes.
+    useEffect(() => {
+        if (!canUpload) return;
+
+        let cancelled = false;
+
+        Promise.all([loadProfileLibrary('banner'), loadProfileLibrary('background')]).then(([banner, background]) => {
+            if (!cancelled) setLibrary({ banner, background });
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [canUpload, customBanner, customBackground]);
     const galleryBanner = data ? findProfileBanner(data.banners, userProfile.bannerId ?? 0) : null;
     const hasBanner = !!customBanner || !!galleryBanner;
 
     const noneLabel = localizeWithFallback('extendedprofile.customize.none', 'None');
     const label = (tab: ProfileCustomizeTab) => localizeWithFallback(TAB_LABELS[tab][0], TAB_LABELS[tab][1]);
-    const invalidPicture = () => localizeWithFallback('extendedprofile.customize.upload.invalid', 'Choose a PNG, JPEG, GIF or WebP picture smaller than 15 MB.');
+    const invalidPicture = () =>
+        localizeWithFallback('extendedprofile.customize.upload.invalid', 'Choose a PNG, JPEG, GIF or WebP picture smaller than 15 MB.');
 
     const send = (change: ProfileCustomizationChange) => {
         const now = Date.now();
@@ -173,7 +240,42 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
             setBusy(false);
         }
 
+        // The own style is drawn over the gallery background: picking one from the gallery clears it.
+        if (replaces === 'background' && savedStyle) await saveProfileBackgroundStyle('');
+
         send(change);
+    };
+
+    const report = (result: { ok: true } | { ok: false; message: string }) => setMessage('message' in result ? result.message : null);
+
+    const pickFromLibrary = async (kind: ProfileImageKind, picture: ProfileLibraryPicture) => {
+        setBusy(true);
+        report(await selectProfileImage(kind, picture.id));
+        setBusy(false);
+    };
+
+    const deleteFromLibrary = async (kind: ProfileImageKind, picture: ProfileLibraryPicture) => {
+        if (armedDelete !== picture.id) {
+            setArmedDelete(picture.id);
+
+            return;
+        }
+
+        setArmedDelete(null);
+        setBusy(true);
+        report(await forgetProfileImage(kind, picture.id));
+        setLibrary((current) => ({ ...current, [kind]: current[kind].filter((entry) => entry.id !== picture.id) }));
+        setBusy(false);
+    };
+
+    /** Saves the own background; an uploaded one would cover it, so that one goes back to the library first. */
+    const applyStyle = async (style: ProfileBackgroundStyle | null) => {
+        setBusy(true);
+
+        if (style && customBackground) await removeProfileImage('background');
+
+        report(await saveProfileBackgroundStyle(style ? formatProfileBackgroundStyle(style) : ''));
+        setBusy(false);
     };
 
     /** Opens the editor on the banner the profile shows now, uploaded or from the gallery, to move or zoom it. */
@@ -187,7 +289,10 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
         try {
             // An animated banner is moved from its saved GIF, so it stays animated.
             const animated = customBanner.endsWith('.gif');
-            const [image, original] = await Promise.all([loadImage(url), animated ? fetch(url).then((response) => response.arrayBuffer()) : Promise.resolve(null)]);
+            const [image, original] = await Promise.all([
+                loadImage(url),
+                animated ? fetch(url).then((response) => response.arrayBuffer()) : Promise.resolve(null)
+            ]);
 
             setEditing({ kind: 'banner', image, pixelArt: !customBanner, gif: original ? new Uint8Array(original) : undefined });
         } catch {
@@ -273,7 +378,15 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
      * One choice. With `category` the hotel's rules apply: a choice the hotel does not list is not shown, and one the
      * user may not pick (HC, rank, ambassador) shows a lock and why, instead of being silently ignored by the server.
      */
-    const option = (key: string | number, selected: boolean, content: ReactNode, name: string, onClick: () => void, caption?: string, category?: OptionCategory) => {
+    const option = (
+        key: string | number,
+        selected: boolean,
+        content: ReactNode,
+        name: string,
+        onClick: () => void,
+        caption?: string,
+        category?: OptionCategory
+    ) => {
         const state = category ? profileOptionState(options, category, Number(key)) : { hidden: false, lock: null };
 
         if (state.hidden) return null;
@@ -318,20 +431,65 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
 
     const uploadRow = (kind: ProfileImageKind, custom: string, extra?: ReactNode) => (
         <div className="octane-profile-customize__upload">
-            <Button variant="primary" disabled={busy} onClick={() => pickFile(kind)}>
-                {localizeWithFallback('extendedprofile.customize.upload', 'Upload a picture')}
-            </Button>
+            {canUpload && (
+                <Button variant="primary" disabled={busy} onClick={() => pickFile(kind)}>
+                    {localizeWithFallback('extendedprofile.customize.upload', 'Upload a picture')}
+                </Button>
+            )}
             {extra}
             {custom && (
-                <>
-                    <span className="octane-profile-customize__upload-current" style={{ backgroundImage: `url(${profileImageUrl(custom)})` }} />
-                    <Button variant="danger" disabled={busy} onClick={() => removeUpload(kind)}>
-                        {localizeWithFallback('extendedprofile.customize.upload.remove', 'Remove picture')}
-                    </Button>
-                </>
+                <Button variant="danger" disabled={busy} onClick={() => removeUpload(kind)}>
+                    {localizeWithFallback('extendedprofile.customize.upload.remove', 'Remove picture')}
+                </Button>
             )}
         </div>
     );
+
+    /** The user's earlier uploads of one kind: a click puts one back, the cross deletes it (a second click confirms). */
+    const librarySection = (kind: ProfileImageKind, current: string) =>
+        canUpload &&
+        library[kind].length > 0 &&
+        section(
+            localizeWithFallback('extendedprofile.customize.library', 'Your pictures'),
+            <Grid
+                gap={1}
+                columnCount={kind === 'banner' ? 2 : 6}
+                fullHeight={false}
+                className={`octane-profile-customize__grid${kind === 'banner' ? ' octane-profile-customize__grid--wide' : ''}`}
+            >
+                {library[kind].map((picture) => {
+                    const deleteLabel =
+                        armedDelete === picture.id
+                            ? localizeWithFallback('extendedprofile.customize.library.delete.confirm', 'Click again to delete it for good')
+                            : localizeWithFallback('extendedprofile.customize.library.delete', 'Delete this picture');
+
+                    return (
+                        <span key={picture.id} className="octane-profile-customize__library-item">
+                            {option(
+                                `library-${picture.id}`,
+                                picture.file === current,
+                                <span
+                                    className={`octane-profile-customize__library-picture octane-profile-customize__library-picture--${kind}`}
+                                    style={{ backgroundImage: `url(${profileImageUrl(picture.file)})` }}
+                                />,
+                                localizeWithFallback('extendedprofile.customize.library', 'Your pictures'),
+                                () => picture.file !== current && void pickFromLibrary(kind, picture)
+                            )}
+                            <Hint content={deleteLabel}>
+                                <BaseButton
+                                    aria-label={deleteLabel}
+                                    className={`octane-profile-customize__library-delete${armedDelete === picture.id ? ' is-armed' : ''}`}
+                                    disabled={busy}
+                                    onClick={() => void deleteFromLibrary(kind, picture)}
+                                >
+                                    <FaTimes size={9} />
+                                </BaseButton>
+                            </Hint>
+                        </span>
+                    );
+                })}
+            </Grid>
+        );
 
     /** A small profile window in the card background's colours, so a choice reads as the window it makes. */
     const cardTile = (id: number) => (
@@ -361,7 +519,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
         const banner = userProfile.bannerId ?? 0;
         const card = userProfile.cardBackgroundId ?? 0;
 
-        switch (activeTab) {
+        switch (shownTab) {
             case 'banner':
                 return (
                     <>
@@ -374,6 +532,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                                 </Button>
                             )
                         )}
+                        {librarySection('banner', customBanner)}
                         <Grid gap={1} columnCount={2} fullHeight={false} className="octane-profile-customize__grid octane-profile-customize__grid--wide">
                             {option(
                                 0,
@@ -400,14 +559,108 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                 );
             case 'card': {
                 const cardOption = (id: number) =>
-                    option(id, !customBackground && id === card, cardTile(id), id ? `${label('card')} ${id}` : noneLabel, () => choose({ card: id }, card, 'background'), undefined, 'card');
+                    option(
+                        id,
+                        !customBackground && !savedStyle && id === card,
+                        cardTile(id),
+                        id ? `${label('card')} ${id}` : noneLabel,
+                        () => (savedStyle && id === card ? void applyStyle(null) : choose({ card: id }, card, 'background')),
+                        undefined,
+                        'card'
+                    );
                 const tints = data.cards.filter((id) => id > 0 && id <= LAST_TINT_CARD);
-                const patterns = data.cards.filter((id) => id > LAST_TINT_CARD);
+                const patterns = data.cards
+                    .filter((id) => id > LAST_TINT_CARD)
+                    .filter((id) => !profileOptionState(options, 'card', id).hidden && !profileOptionState(options, 'card', id).lock);
+                const styleActive = !customBackground && !!savedStyle && formatProfileBackgroundStyle(savedStyle) === formatProfileBackgroundStyle(styleDraft);
 
                 return (
                     <>
                         {uploadRow('background', customBackground)}
                         <div className="octane-profile-customize__sections">
+                            {librarySection('background', customBackground)}
+                            {section(
+                                localizeWithFallback('extendedprofile.customize.style', 'Your own style'),
+                                <div className="octane-profile-customize__style">
+                                    <span className="octane-profile-customize__style-preview" style={profileBackgroundStyleCss(styleDraft)}>
+                                        {styleDraft.pattern > 0 && (
+                                            <span
+                                                className={`octane-profile-customize__style-pattern profile-card-background card-background-${styleDraft.pattern}`}
+                                            />
+                                        )}
+                                        <span className="octane-profile-customize__card-header" />
+                                        <span className="octane-profile-customize__card-panel" />
+                                    </span>
+                                    <div className="octane-profile-customize__style-controls">
+                                        <div className="octane-profile-customize__style-row">
+                                            <label className="octane-profile-customize__colour">
+                                                <input
+                                                    type="color"
+                                                    value={styleDraft.from}
+                                                    onChange={(event) => setStyleDraft((draft) => ({ ...draft, from: event.target.value }))}
+                                                />
+                                                {localizeWithFallback('extendedprofile.customize.style.from', 'Colour 1')}
+                                            </label>
+                                            <label className="octane-profile-customize__colour">
+                                                <input
+                                                    type="color"
+                                                    value={styleDraft.to}
+                                                    onChange={(event) => setStyleDraft((draft) => ({ ...draft, to: event.target.value }))}
+                                                />
+                                                {localizeWithFallback('extendedprofile.customize.style.to', 'Colour 2')}
+                                            </label>
+                                        </div>
+                                        <div
+                                            className="octane-profile-customize__style-row"
+                                            role="group"
+                                            aria-label={localizeWithFallback('extendedprofile.customize.style.angle', 'Direction')}
+                                        >
+                                            {PROFILE_BACKGROUND_ANGLES.map((angle) => (
+                                                <ToggleButton
+                                                    key={angle}
+                                                    aria-label={`${localizeWithFallback('extendedprofile.customize.style.angle', 'Direction')} ${angle}`}
+                                                    className={`octane-profile-customize__angle${styleDraft.angle === angle ? ' is-selected' : ''}`}
+                                                    pressed={styleDraft.angle === angle}
+                                                    onClick={() => setStyleDraft((draft) => ({ ...draft, angle }))}
+                                                >
+                                                    {ANGLE_ARROWS[angle]}
+                                                </ToggleButton>
+                                            ))}
+                                        </div>
+                                        {patterns.length > 0 && (
+                                            <div
+                                                className="octane-profile-customize__style-patterns"
+                                                role="group"
+                                                aria-label={localizeWithFallback('extendedprofile.customize.style.pattern', 'Pattern')}
+                                            >
+                                                {[0, ...patterns].map((id) => (
+                                                    <ToggleButton
+                                                        key={id}
+                                                        aria-label={
+                                                            id
+                                                                ? `${localizeWithFallback('extendedprofile.customize.style.pattern', 'Pattern')} ${id}`
+                                                                : noneLabel
+                                                        }
+                                                        className={`octane-profile-customize__pattern${styleDraft.pattern === id ? ' is-selected' : ''}${id ? ` profile-card-background card-background-${id}` : ' octane-profile-customize__pattern--none'}`}
+                                                        pressed={styleDraft.pattern === id}
+                                                        onClick={() => setStyleDraft((draft) => ({ ...draft, pattern: id }))}
+                                                    />
+                                                ))}
+                                            </div>
+                                        )}
+                                        <div className="octane-profile-customize__style-row">
+                                            <Button variant="success" disabled={busy || styleActive} onClick={() => void applyStyle(styleDraft)}>
+                                                {localizeWithFallback('extendedprofile.customize.style.apply', 'Apply style')}
+                                            </Button>
+                                            {savedStyle && (
+                                                <Button variant="secondary" disabled={busy} onClick={() => void applyStyle(null)}>
+                                                    {localizeWithFallback('extendedprofile.customize.style.remove', 'Remove style')}
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                             {section(
                                 localizeWithFallback('extendedprofile.customize.background.tints', 'Colours'),
                                 <Grid gap={1} columnCount={8} fullHeight={false} className="octane-profile-customize__grid">
@@ -455,15 +708,15 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                                 if (state.hidden) return null;
 
                                 const preview = (
-                                <ProfilePreviewView
-                                    key={id}
-                                    figure={userProfile.figure}
-                                    backgroundId={avatarPart === 'background' ? id : current.background}
-                                    standId={avatarPart === 'stand' ? id : current.stand}
-                                    overlayId={avatarPart === 'overlay' ? id : current.overlay}
-                                    selected={id === current[avatarPart]}
-                                    onClick={state.lock ? undefined : () => choose({ [avatarPart]: id }, current[avatarPart], null)}
-                                />
+                                    <ProfilePreviewView
+                                        key={id}
+                                        figure={userProfile.figure}
+                                        backgroundId={avatarPart === 'background' ? id : current.background}
+                                        standId={avatarPart === 'stand' ? id : current.stand}
+                                        overlayId={avatarPart === 'overlay' ? id : current.overlay}
+                                        selected={id === current[avatarPart]}
+                                        onClick={state.lock ? undefined : () => choose({ [avatarPart]: id }, current[avatarPart], null)}
+                                    />
                                 );
 
                                 return state.lock ? (
@@ -486,7 +739,16 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
             }
             case 'border': {
                 const border = userProfile.borderId ?? 0;
-                const borderOption = (id: number) => option(id, id === border, borderTile(id), id ? `${label('border')} ${id}` : noneLabel, () => choose({ border: id }, border, null), undefined, 'border');
+                const borderOption = (id: number) =>
+                    option(
+                        id,
+                        id === border,
+                        borderTile(id),
+                        id ? `${label('border')} ${id}` : noneLabel,
+                        () => choose({ border: id }, border, null),
+                        undefined,
+                        'border'
+                    );
                 const ids = data.borders.filter((id) => id > 0);
 
                 return (
@@ -520,15 +782,56 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                     </span>
                 );
 
-                return (
-                    <Grid gap={1} columnCount={4} fullHeight={false} className="octane-profile-customize__grid">
-                        {option(0, accent === 0, swatch(null), noneLabel, () => choose({ accent: 0 }, accent, null), localizeWithFallback('extendedprofile.customize.accent.default', 'Standard'))}
-                        {PROFILE_ACCENTS.map((entry) => {
-                            const name = localizeWithFallback(`extendedprofile.customize.accent.${entry.id}`, ACCENT_NAMES[entry.id] ?? `${entry.id}`);
+                const ownAccent = customProfileAccentId(accentDraft);
 
-                            return option(entry.id, entry.id === accent, swatch(entry.color), name, () => choose({ accent: entry.id }, accent, null), name, 'accent');
-                        })}
-                    </Grid>
+                return (
+                    <div className="octane-profile-customize__sections">
+                        {section(
+                            localizeWithFallback('extendedprofile.customize.accent.custom', 'Your colour'),
+                            <div className="octane-profile-customize__style-row">
+                                <span className={`octane-profile-customize__own-accent${isCustomProfileAccent(accent) ? ' is-selected' : ''}`}>
+                                    {swatch(accentDraft)}
+                                </span>
+                                <label className="octane-profile-customize__colour">
+                                    <input type="color" value={accentDraft} onChange={(event) => setAccentDraft(event.target.value)} />
+                                    {localizeWithFallback('extendedprofile.customize.accent.custom.pick', 'Pick a colour')}
+                                </label>
+                                <Button
+                                    variant="success"
+                                    disabled={busy || !ownAccent || ownAccent === accent}
+                                    onClick={() => choose({ accent: ownAccent }, accent, null)}
+                                >
+                                    {localizeWithFallback('extendedprofile.customize.accent.custom.apply', 'Apply colour')}
+                                </Button>
+                            </div>
+                        )}
+                        {section(
+                            localizeWithFallback('extendedprofile.customize.accent.palette', 'Ready-made'),
+                            <Grid gap={1} columnCount={4} fullHeight={false} className="octane-profile-customize__grid">
+                                {option(
+                                    0,
+                                    accent === 0,
+                                    swatch(null),
+                                    noneLabel,
+                                    () => choose({ accent: 0 }, accent, null),
+                                    localizeWithFallback('extendedprofile.customize.accent.default', 'Standard')
+                                )}
+                                {PROFILE_ACCENTS.map((entry) => {
+                                    const name = localizeWithFallback(`extendedprofile.customize.accent.${entry.id}`, ACCENT_NAMES[entry.id] ?? `${entry.id}`);
+
+                                    return option(
+                                        entry.id,
+                                        entry.id === accent,
+                                        swatch(entry.color),
+                                        name,
+                                        () => choose({ accent: entry.id }, accent, null),
+                                        name,
+                                        'accent'
+                                    );
+                                })}
+                            </Grid>
+                        )}
+                    </div>
                 );
             }
         }
@@ -544,7 +847,13 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                 style={accentColor ? ({ '--profile-accent': accentColor } as CSSProperties) : undefined}
             >
                 <OctaneCardHeaderView headerText={localizeWithFallback('extendedprofile.customize.title', 'Customise profile')} onCloseClick={onClose} />
-                <ProfileCustomizePreviewView userProfile={userProfile} banners={data?.banners ?? []} onMoveBanner={hasBanner && !editing ? () => void moveBanner() : undefined} />
+                {canBanner && (
+                    <ProfileCustomizePreviewView
+                        userProfile={userProfile}
+                        banners={data?.banners ?? []}
+                        onMoveBanner={hasBanner && !editing ? () => void moveBanner() : undefined}
+                    />
+                )}
                 {editing ? (
                     <OctaneCardContentView gap={1} className="overflow-auto">
                         <Text bold small>
@@ -552,20 +861,28 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                                 ? localizeWithFallback('extendedprofile.customize.upload.banner_title', 'Place your banner')
                                 : localizeWithFallback('extendedprofile.customize.upload.background_title', 'Place your background')}
                         </Text>
-                        <ProfileImageEditorView kind={editing.kind} image={editing.image} pixelArt={editing.pixelArt} animated={!!editing.gif} busy={busy} onCancel={() => setEditing(null)} onSave={saveUpload} />
+                        <ProfileImageEditorView
+                            kind={editing.kind}
+                            image={editing.image}
+                            pixelArt={editing.pixelArt}
+                            animated={!!editing.gif}
+                            busy={busy}
+                            onCancel={() => setEditing(null)}
+                            onSave={saveUpload}
+                        />
                         {message && <p className="octane-profile-customize__message">{message}</p>}
                     </OctaneCardContentView>
                 ) : (
                     <>
                         <OctaneCardTabsView>
-                            {TABS.map((tab) => (
-                                <OctaneCardTabsItemView key={tab} isActive={activeTab === tab} onClick={() => setActiveTab(tab)}>
+                            {tabs.map((tab) => (
+                                <OctaneCardTabsItemView key={tab} isActive={shownTab === tab} onClick={() => setActiveTab(tab)}>
                                     {label(tab)}
                                 </OctaneCardTabsItemView>
                             ))}
                         </OctaneCardTabsView>
                         <OctaneCardContentView gap={1} className="overflow-auto">
-                            <p className="octane-profile-customize__hint">{localizeWithFallback(TAB_HINTS[activeTab][0], TAB_HINTS[activeTab][1])}</p>
+                            <p className="octane-profile-customize__hint">{localizeWithFallback(TAB_HINTS[shownTab][0], TAB_HINTS[shownTab][1])}</p>
                             {message && <p className="octane-profile-customize__message">{message}</p>}
                             {renderTab()}
                         </OctaneCardContentView>

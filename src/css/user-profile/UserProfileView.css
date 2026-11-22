@@ -1305,3 +1305,211 @@ html.octane-user-accent-light .octane-card-shell.octane-card-frame-3.has-profile
   opacity: 0;
   pointer-events: none;
 }
+
+/* The user's own background: their gradient on the window, and a gallery pattern laid faintly over it. */
+.octane-extended-profile-window__content--styled {
+  position: relative;
+  isolation: isolate;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.octane-extended-profile-window__content--styled .octane-extended-profile-window__body {
+  background: transparent;
+}
+
+.octane-extended-profile__style-pattern,
+.octane-profile-customize__style-pattern {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Choices are the picture itself: a thin edge instead of a frame around it, and a ring outside when picked. */
+.octane-profile-customize__option {
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  overflow: hidden;
+  background: transparent;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.12s ease;
+}
+
+.octane-profile-customize__option:hover:not(:disabled) {
+  box-shadow: 0 0 0 2px rgba(30, 124, 184, 0.55);
+}
+
+.octane-profile-customize__option.is-selected {
+  border-color: transparent;
+  box-shadow:
+    0 0 0 2px #1e7cb8,
+    0 0 0 4px rgba(30, 124, 184, 0.3);
+}
+
+/* A choice with a name under it (the themes) keeps a light card behind the name. */
+.octane-profile-customize__option:has(.octane-profile-customize__caption) {
+  padding: 4px 4px 3px;
+  background: #efede4;
+}
+
+.octane-profile-customize__banner,
+.octane-profile-customize__card {
+  border-radius: 0;
+}
+
+.octane-profile-customize__border-tile {
+  padding: 0;
+}
+
+/* The user's earlier uploads, with a cross to delete one. */
+.octane-profile-customize__library-item {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.octane-profile-customize__library-item > .octane-profile-customize__option {
+  width: 100%;
+}
+
+.octane-profile-customize__library-picture {
+  display: block;
+  width: 100%;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.octane-profile-customize__library-picture--banner {
+  height: 64px;
+}
+
+.octane-profile-customize__library-picture--background {
+  height: 72px;
+}
+
+.octane-profile-customize__library-delete {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 50%;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+
+.octane-profile-customize__library-delete:hover,
+.octane-profile-customize__library-delete.is-armed {
+  background: #c8352b;
+}
+
+/* The own style: a preview window beside the colours, the direction and the pattern. */
+.octane-profile-customize__style {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.octane-profile-customize__style-preview {
+  position: relative;
+  isolation: isolate;
+  flex: 0 0 auto;
+  width: 96px;
+  height: 118px;
+  overflow: hidden;
+  border-radius: 5px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.octane-profile-customize__style-controls {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.octane-profile-customize__style-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.octane-profile-customize__colour {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.octane-profile-customize__colour input[type='color'] {
+  width: 34px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
+
+.octane-profile-customize__angle {
+  width: 26px;
+  height: 26px;
+  border: 1px solid #8d8d8d;
+  border-radius: 4px;
+  background: #efede4;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.octane-profile-customize__angle.is-selected {
+  border-color: #1e7cb8;
+  color: #ffffff;
+  background: #1e7cb8;
+}
+
+.octane-profile-customize__style-patterns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.octane-profile-customize__pattern {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.octane-profile-customize__pattern--none {
+  background: linear-gradient(135deg, #ffffff 45%, #d23c3c 45%, #d23c3c 55%, #ffffff 55%);
+}
+
+.octane-profile-customize__pattern.is-selected {
+  box-shadow:
+    0 0 0 2px #1e7cb8,
+    0 0 0 4px rgba(30, 124, 184, 0.3);
+}
+
+.octane-profile-customize__own-accent {
+  display: inline-flex;
+  border-radius: 5px;
+}
+
+.octane-profile-customize__own-accent.is-selected {
+  box-shadow:
+    0 0 0 2px #1e7cb8,
+    0 0 0 4px rgba(30, 124, 184, 0.3);
+}

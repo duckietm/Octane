@@ -25,10 +25,18 @@ vi.mock('@octane/renderer', () => ({
 vi.mock('./GetUserProfile',() => ({ GetUserProfile: (id: number) => profileRequests.push(id) }));
 
 import {
+    customProfileAccentId,
     DEFAULT_PROFILE_BANNERS,
     findProfileBannerUrl,
+    formatProfileBackgroundStyle,
     getProfileAccentColor,
+    hasProfileFeature,
+    isLightProfileAccent,
+    parseProfileBackgroundStyle,
     parseProfileCustomizationData,
+    PROFILE_FEATURE_BANNER,
+    PROFILE_FEATURE_THEME,
+    profileBackgroundStyleCss,
     resolveProfileBannerUrl,
     sendProfileCustomization
 } from './profileCustomization';
@@ -99,5 +107,33 @@ describe('sendProfileCustomization', () => {
         sendProfileCustomization(profile as never, { stand: 8 });
 
         expect(sent).toEqual([[1, 8, 3, 4, 5, -1, -1]]);
+    });
+});
+
+describe('own colours', () => {
+    it('keeps a freely picked accent in the id and reads it back', () => {
+        const id = customProfileAccentId('#FFEE00');
+
+        expect(id).toBe(0x1000000 | 0xffee00);
+        expect(getProfileAccentColor(id)).toBe('#ffee00');
+        expect(isLightProfileAccent(id)).toBe(true);
+        expect(customProfileAccentId('red')).toBe(0);
+    });
+
+    it('reads only a well-formed background style, and writes it back the same', () => {
+        const style = parseProfileBackgroundStyle('1e7cb8;0b2a40;135;21');
+
+        expect(style).toEqual({ from: '#1e7cb8', to: '#0b2a40', angle: 135, pattern: 21 });
+        expect(formatProfileBackgroundStyle(style!)).toBe('1e7cb8;0b2a40;135;21');
+        expect(profileBackgroundStyleCss(style!).backgroundImage).toBe('linear-gradient(135deg, #1e7cb8, #0b2a40)');
+        expect(parseProfileBackgroundStyle('')).toBeNull();
+        expect(parseProfileBackgroundStyle('1e7cb8;0b2a40;30;0')).toBeNull();
+        expect(parseProfileBackgroundStyle('1e7cb8;0b2a40;0;0);url(x')).toBeNull();
+    });
+
+    it('has every feature on when the server reports none', () => {
+        expect(hasProfileFeature({ features: undefined } as never, PROFILE_FEATURE_BANNER)).toBe(true);
+        expect(hasProfileFeature({ features: 2 } as never, PROFILE_FEATURE_BANNER)).toBe(false);
+        expect(hasProfileFeature({ features: 4 } as never, PROFILE_FEATURE_THEME)).toBe(true);
     });
 });

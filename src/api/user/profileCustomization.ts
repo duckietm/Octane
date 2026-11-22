@@ -42,7 +42,61 @@ export const PROFILE_ACCENTS: ReadonlyArray<{ id: number; color: string }> = [
     { id: 12, color: '#1f2329' }
 ];
 
-export const getProfileAccentColor = (accentId: number): string | null => PROFILE_ACCENTS.find((accent) => accent.id === accentId)?.color ?? null;
+/** An accent of the user's own colour: this bit over the colour as 0xRRGGBB (the server checks the same bit). */
+export const PROFILE_CUSTOM_ACCENT = 0x1000000;
+
+export const isCustomProfileAccent = (accentId: number): boolean => (accentId & 0x7f000000) === PROFILE_CUSTOM_ACCENT;
+
+/** The accent id of a colour picked freely, from "#rrggbb". */
+export const customProfileAccentId = (color: string): number => {
+    const match = /^#?([0-9a-f]{6})$/i.exec(color.trim());
+
+    return match ? PROFILE_CUSTOM_ACCENT | parseInt(match[1], 16) : 0;
+};
+
+export const getProfileAccentColor = (accentId: number): string | null => {
+    if (isCustomProfileAccent(accentId)) return `#${(accentId & 0xffffff).toString(16).padStart(6, '0')}`;
+
+    return PROFILE_ACCENTS.find((accent) => accent.id === accentId)?.color ?? null;
+};
+
+/** The features the hotel has on for profiles, as the server reports them in the profile. */
+export const PROFILE_FEATURE_BANNER = 1;
+export const PROFILE_FEATURE_UPLOAD = 2;
+export const PROFILE_FEATURE_THEME = 4;
+
+export const hasProfileFeature = (profile: Pick<UserProfileParser, 'features'> | null | undefined, feature: number): boolean =>
+    ((profile?.features ?? PROFILE_FEATURE_BANNER | PROFILE_FEATURE_UPLOAD | PROFILE_FEATURE_THEME) & feature) !== 0;
+
+/** A background of the user's own: two colours, the angle of the gradient between them, a gallery pattern over it. */
+export interface ProfileBackgroundStyle {
+    from: string;
+    to: string;
+    angle: number;
+    /** A card background of the gallery laid over the colours, 0 for none. */
+    pattern: number;
+}
+
+export const PROFILE_BACKGROUND_ANGLES: ReadonlyArray<number> = [0, 45, 90, 135, 180, 225, 270, 315];
+
+const BACKGROUND_STYLE = /^([0-9a-f]{6});([0-9a-f]{6});(0|45|90|135|180|225|270|315);([0-9]{1,4})$/;
+
+/** Reads the style the server sends ("rrggbb;rrggbb;angle;pattern"); null for none or anything else. */
+export const parseProfileBackgroundStyle = (value: string | null | undefined): ProfileBackgroundStyle | null => {
+    const match = BACKGROUND_STYLE.exec((value ?? '').trim().toLowerCase());
+
+    if (!match) return null;
+
+    return { from: `#${match[1]}`, to: `#${match[2]}`, angle: Number(match[3]), pattern: Number(match[4]) };
+};
+
+export const formatProfileBackgroundStyle = (style: ProfileBackgroundStyle): string =>
+    [style.from.replace('#', ''), style.to.replace('#', ''), style.angle, style.pattern].join(';').toLowerCase();
+
+/** The gradient of a style; only the parsed hex colours reach the CSS. */
+export const profileBackgroundStyleCss = (style: ProfileBackgroundStyle): { backgroundImage: string } => ({
+    backgroundImage: `linear-gradient(${style.angle}deg, ${style.from}, ${style.to})`
+});
 
 /** True when an accent is light enough that the title on it must be dark to be read. */
 export const isLightProfileAccent = (accentId: number): boolean => {
@@ -85,7 +139,11 @@ export const parseProfileCustomizationData = (raw: RawData | null): ProfileCusto
         .map((item) => {
             const entry = item as Record<string, unknown>;
 
-            return { id: Number(entry?.bannerId), image: String(entry?.image ?? ''), position: typeof entry?.position === 'string' ? entry.position : undefined };
+            return {
+                id: Number(entry?.bannerId),
+                image: String(entry?.image ?? ''),
+                position: typeof entry?.position === 'string' ? entry.position : undefined
+            };
         })
         .filter((entry) => Number.isInteger(entry.id) && entry.id > 0 && entry.image.length > 0)
         .map((entry) => (entry.position ? entry : { id: entry.id, image: entry.image }));
