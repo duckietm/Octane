@@ -1252,6 +1252,11 @@ html.octane-user-accent-light .octane-card-shell.octane-card-frame-3.has-profile
   gap: 8px !important;
 }
 
+/* Banner tiles have no width of their own: they fill their column. */
+.octane-profile-customize__grid--wide {
+  justify-items: stretch;
+}
+
 /* A choice the user may not pick (HC, rank, ambassador): dimmed, with a lock and the reason in its tooltip. */
 .octane-profile-customize__option {
   position: relative;

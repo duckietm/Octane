@@ -374,7 +374,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                                 </Button>
                             )
                         )}
-                        <Grid gap={1} columnCount={2} fullHeight={false} className="octane-profile-customize__grid">
+                        <Grid gap={1} columnCount={2} fullHeight={false} className="octane-profile-customize__grid octane-profile-customize__grid--wide">
                             {option(
                                 0,
                                 !customBanner && banner === 0,

@@ -33,6 +33,7 @@ import {
 import pencilIcon from '../../assets/images/infostand/pencil-icon.png';
 import { frankStop } from '../../assets/images/user-profile';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useProfileCustomizeStore } from '../../state/profileCustomizeStore';
 import { useBackgroundTone, useIsUserBlocked, useMessageEvent, useNotification, useOctaneEvent } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { BaseButton } from '../../common/BaseButton';
@@ -153,6 +154,9 @@ export const UserProfileView: FC<{}> = () => {
             setUserRelationships(null);
             setIsCustomizing(false);
         }
+
+        // Asked for by the infostand's edit button: the own profile opens on its customiser.
+        if (parser.id === ownUserId && useProfileCustomizeStore.getState().take()) setIsCustomizing(true);
 
         SendMessageComposer(new UserCurrentBadgesComposer(parser.id));
         SendMessageComposer(new UserRelationshipsComposer(parser.id));

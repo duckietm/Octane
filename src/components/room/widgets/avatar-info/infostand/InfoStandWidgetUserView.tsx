@@ -27,13 +27,13 @@ import homeIcon from '../../../../../assets/images/infostand/home-icon.png';
 import pencilIcon from '../../../../../assets/images/infostand/pencil-icon.png';
 import { Base, Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserIdentityView } from '../../../../../common';
 import { useBackgroundTone, useIsUserBlocked, useMessageEvent, useOctaneEvent, useRoom } from '../../../../../hooks';
-import { BackgroundsView } from '../../../../backgrounds/BackgroundsView';
 import { InfoStandBadgeSlotView } from './InfoStandBadgeSlotView';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
 import { InfoStandWidgetUserTagsView } from './InfoStandWidgetUserTagsView';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { Hint } from '../../../../../common/Tooltip';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
+import { useProfileCustomizeStore } from '../../../../../state/profileCustomizeStore';
 
 interface InfoStandWidgetUserViewProps {
     avatarInfo: AvatarInfoUser;
@@ -57,7 +57,6 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     const [overlayId, setOverlayId] = useState<number>(null);
     const [cardBackgroundId, setCardBackgroundId] = useState<number>(null);
     const [borderId, setBorderId] = useState<number>(null);
-    const [isVisible, setIsVisible] = useState(false);
     const [badgesRank, setBadgesRank] = useState<{ userId: number; rank: number }>(null);
     const { roomSession = null } = useRoom();
     const webID = avatarInfo?.webID ?? 0;
@@ -96,7 +95,9 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
 
     const handleEditClick = useCallback((event: React.MouseEvent) => {
         event.stopPropagation();
-        setIsVisible((prev) => !prev);
+        // The own profile opens straight on its customiser, where background, stand, frame and border are chosen.
+        useProfileCustomizeStore.getState().request();
+        GetUserProfile(GetSessionDataManager().userId);
     }, []);
 
     const saveMotto = (motto: string) => {
@@ -394,23 +395,6 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                     )}
                     </Fragment>
                 </div>
-                {isVisible && avatarInfo.type === AvatarInfoUser.OWN_USER && (
-                    <div className="backgrounds-view-container">
-                        <BackgroundsView
-                            setIsVisible={setIsVisible}
-                            selectedBackground={backgroundId}
-                            setSelectedBackground={setBackgroundId}
-                            selectedStand={standId}
-                            setSelectedStand={setStandId}
-                            selectedOverlay={overlayId}
-                            setSelectedOverlay={setOverlayId}
-                            selectedCardBackground={cardBackgroundId}
-                            setSelectedCardBackground={setCardBackgroundId}
-                            selectedBorder={borderId}
-                            setSelectedBorder={setBorderId}
-                        />
-                    </div>
-                )}
             </>
         </NativeTextTree>
     );
