@@ -14,6 +14,7 @@ import {
 } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useState } from 'react';
 import {
+    applyUserAccent,
     CreateLinkEvent,
     getProfileAccentColor,
     GetRoomSession,
@@ -23,6 +24,7 @@ import {
     LocalizeText,
     localizeWithFallback,
     ProfileBannerEntry,
+    restoreUserAccent,
     profileImageUrl,
     SanitizeHtml,
     SendMessageComposer
@@ -122,8 +124,16 @@ export const UserProfileView: FC<{}> = () => {
         setUserRelationships(parser);
     });
 
+    // The user's profile accent colours every window of their client, from the moment they log in.
+    useEffect(() => {
+        restoreUserAccent(GetSessionDataManager().userId);
+    }, []);
+
     useMessageEvent<UserProfileEvent>(UserProfileEvent, (event) => {
         const parser = event.getParser();
+        const ownUserId = GetSessionDataManager().userId;
+
+        if (parser.id === ownUserId) applyUserAccent(ownUserId, parser.accentId ?? 0);
 
         let isSameProfile = false;
 

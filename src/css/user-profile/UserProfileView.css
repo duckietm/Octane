@@ -824,8 +824,9 @@
   right: -12px;
 }
 
-.octane-extended-profile-window.has-profile-accent .octane-card-header-shell {
-  background: var(--profile-accent);
+.octane-extended-profile-window.has-profile-accent,
+.octane-profile-customize.has-profile-accent {
+  --octane-card-frame-3-title: var(--profile-accent);
 }
 
 .octane-extended-profile-window.has-profile-accent .octane-extended-profile__separator {
@@ -923,21 +924,16 @@
   gap: 8px;
 }
 
-.octane-profile-customize__preview-avatar {
+.octane-extended-profile__avatar-scaled {
   position: relative;
-  width: 54px;
-  height: 84px;
-  overflow: hidden;
-  border-radius: 3px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  border: 1px solid rgba(0, 0, 0, 0.25);
+  flex: 0 0 auto;
 }
 
-.octane-profile-customize__preview-avatar .avatar-image {
-  transform: scale(0.75);
-  transform-origin: bottom center;
+.octane-extended-profile__avatar-scaled-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
 }
 
 .octane-profile-customize__preview-name {
@@ -1056,9 +1052,6 @@
   font-size: 12px;
 }
 
-.octane-profile-customize.has-profile-accent .octane-card-header-shell {
-  background: var(--profile-accent);
-}
 
 /* While customising, the banner is one big button that opens the editor to move it. */
 .octane-extended-profile__banner-move {
@@ -1120,7 +1113,7 @@
   position: absolute;
   inset: 0 0 auto 0;
   height: 9px;
-  background: var(--profile-accent, #1e7cb8);
+  background: #367997;
 }
 
 .octane-profile-customize__card-panel {
@@ -1134,73 +1127,49 @@
   background: rgba(255, 255, 255, 0.55);
 }
 
-/* A border tried on the user's own head. */
+/* A border tried on the user's own picture, as the profile shows it. */
 .octane-profile-customize__border-tile {
-  position: relative;
-  display: block;
-  width: 48px;
-  height: 56px;
-  margin: 6px;
-}
-
-.octane-profile-customize__border-avatar {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  border-radius: 4px;
-  background: #d6d3cb;
+  padding: 6px 7px;
 }
 
-.octane-profile-customize__border-tile .infostand-border {
-  top: -4px;
-  bottom: -4px;
-  left: -4px;
-  right: -4px;
-  border-width: 3px;
-  border-radius: 6px;
-}
-
-.octane-profile-customize__border-tile .infostand-border.border-17,
-.octane-profile-customize__border-tile .infostand-border.border-18,
-.octane-profile-customize__border-tile .infostand-border.border-19,
-.octane-profile-customize__border-tile .infostand-border.border-20,
-.octane-profile-customize__border-tile .infostand-border.border-21,
-.octane-profile-customize__border-tile .infostand-border.border-22,
-.octane-profile-customize__border-tile .infostand-border.border-23,
-.octane-profile-customize__border-tile .infostand-border.border-24,
-.octane-profile-customize__border-tile .infostand-border.border-25 {
-  top: -10px;
-  bottom: -10px;
-  left: -10px;
-  right: -10px;
-}
-
-/* An accent shown as the parts it colours: the title bar and a separator. */
+/* A theme shown as a small window with its title bar in the colour. */
 .octane-profile-customize__accent-sample {
   display: flex;
   flex-direction: column;
-  gap: 6px;
   width: 100px;
-  height: 40px;
-  padding: 0 0 6px;
+  height: 46px;
   overflow: hidden;
-  border: 1px solid #afafaf;
-  border-radius: 3px;
-  background: #ece8dc;
+  border: 1px solid #030f18;
+  border-radius: 4px;
+  background: #e9e9e1;
 }
 
 .octane-profile-customize__accent-bar {
-  height: 12px;
-  background: #1e7cb8;
+  position: relative;
+  flex: 0 0 13px;
+  background: #367997;
+  border-bottom: 1px solid #030f18;
 }
 
-.octane-profile-customize__accent-line {
-  height: 2px;
-  margin: 0 8px;
-  background: #afafaf;
+.octane-profile-customize__accent-close {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: #c0392b;
+}
+
+.octane-profile-customize__accent-body {
+  flex: 1;
+  margin: 4px;
+  border: 1px solid #c9c6bc;
+  border-radius: 2px;
+  background: #fff;
 }
 
 /* Background, stand and effect of the picture: one at a time, chosen with these segments. */

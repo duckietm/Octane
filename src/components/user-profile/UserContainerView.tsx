@@ -13,7 +13,8 @@ import {
 } from '../../api';
 import { badgeEmblemDefault } from '../../assets/images/leaderboard_badge';
 import { block as profileBlockIcon, level as profileLevelIcon, rooms as profileRoomsIcon } from '../../assets/images/user-profile';
-import { LayoutAvatarImageView, LayoutBadgeImageView, Text, UserIdentityView } from '../../common';
+import { LayoutBadgeImageView, Text, UserIdentityView } from '../../common';
+import { ProfileAvatarFrameView } from './ProfileAvatarFrameView';
 import { RelationshipsContainerView } from './RelationshipsContainerView';
 import { BaseButton } from '../../common/BaseButton';
 import { ToggleButton } from '../../common/ToggleButton';
@@ -43,9 +44,6 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
     // "Hide my profile": the server left the counts, last login and relationships out.
     const profileHidden = isProfileHiddenFromViewer(userProfile, GetSessionDataManager().userId);
     const canSendFriendRequest = !requestSent && !isOwnProfile && !userProfile.isMyFriend && !userProfile.requestSent;
-    const infostandBackgroundClass = `background-${userProfile.backgroundId ?? 'default'}`;
-    const infostandStandClass = `stand-${userProfile.standId ?? 'default'}`;
-    const infostandOverlayClass = `overlay-${userProfile.overlayId ?? 'default'}`;
     const selectedBadges = useMemo(() => [...userBadges].slice(0, 5), [userBadges]);
     const totalBadges = (userProfile as any).totalBadges ?? userBadges.length ?? 0;
 
@@ -96,14 +94,13 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                 <div className="octane-extended-profile__top">
                     <div className="octane-extended-profile__left">
                         <div className="octane-extended-profile__identity">
-                            <div className="octane-extended-profile__avatar-frame">
-                                <div className={`octane-extended-profile__avatar-shell profile-background ${infostandBackgroundClass}`}>
-                                    <div className={`octane-extended-profile__avatar-stand profile-stand ${infostandStandClass}`} />
-                                    <LayoutAvatarImageView figure={userProfile.figure} direction={2} classNames={['octane-extended-profile__avatar-image']} />
-                                    <div className={`octane-extended-profile__avatar-overlay profile-overlay ${infostandOverlayClass}`} />
-                                </div>
-                                {borderId > 0 && <div className={`infostand-border border-${borderId}`} data-testid="profile-border" />}
-                            </div>
+                            <ProfileAvatarFrameView
+                                figure={userProfile.figure}
+                                backgroundId={userProfile.backgroundId}
+                                standId={userProfile.standId}
+                                overlayId={userProfile.overlayId}
+                                borderId={borderId}
+                            />
                             <div className="octane-extended-profile__identity-copy">
                                 <UserIdentityView
                                     className="octane-extended-profile__username"

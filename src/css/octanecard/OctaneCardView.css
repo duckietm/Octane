@@ -637,3 +637,12 @@
 
 .octane-card-shell.octane-card-frame-3 > .octane-card-resize-handle.is-vertical { cursor: ns-resize; }
 .octane-card-shell.octane-card-frame-3 > .octane-card-resize-handle.is-horizontal { cursor: ew-resize; }
+
+/* The accent a user picked for their profile colours the title bar of every window in their client. */
+html.octane-user-accent .octane-card-shell.octane-card-frame-3 {
+    --octane-card-frame-3-title: var(--octane-user-accent);
+}
+
+html.octane-user-accent .octane-card-shell:not(.octane-card-frame-3) > .octane-card-header-shell {
+    background: var(--octane-user-accent);
+}

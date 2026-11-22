@@ -18,10 +18,11 @@ import {
     sendProfileCustomization,
     uploadProfileImage
 } from '../../api';
-import { Button, Grid, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView, Text } from '../../common';
+import { Button, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView, Text } from '../../common';
 import { ToggleButton } from '../../common/ToggleButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { ProfilePreviewView } from '../backgrounds/ProfilePreviewView';
+import { ProfileAvatarFrameView } from './ProfileAvatarFrameView';
 import { ProfileCustomizePreviewView } from './ProfileCustomizePreviewView';
 import { ProfileImageEditorView } from './ProfileImageEditorView';
 
@@ -33,15 +34,15 @@ const TAB_LABELS: Record<ProfileCustomizeTab, [string, string]> = {
     card: ['extendedprofile.customize.background', 'Background'],
     avatar: ['extendedprofile.customize.avatar', 'Picture'],
     border: ['extendedprofile.customize.border', 'Border'],
-    accent: ['extendedprofile.customize.accent', 'Colour']
+    accent: ['extendedprofile.customize.accent', 'Theme']
 };
 
 const TAB_HINTS: Record<ProfileCustomizeTab, [string, string]> = {
     banner: ['extendedprofile.customize.banner.hint', 'Pick a picture from the gallery or upload your own. Drag the banner above to move it.'],
-    card: ['extendedprofile.customize.background.hint', 'The background behind the whole profile window.'],
-    avatar: ['extendedprofile.customize.avatar.hint', 'What stands behind and around your character, here and in the room infostand.'],
-    border: ['extendedprofile.customize.border.hint', 'A frame around your character, here and in the room infostand.'],
-    accent: ['extendedprofile.customize.accent.hint', 'Colours the title bar, the separators and the selected group.']
+    card: ['extendedprofile.customize.background.hint', 'The picture or shade behind the content of your profile window. Everyone who opens your profile sees it.'],
+    avatar: ['extendedprofile.customize.avatar.hint', 'What stands behind and around your character, in your profile and in the room infostand.'],
+    border: ['extendedprofile.customize.border.hint', 'The frame around your character: in your profile and in the infostand when someone clicks you in a room.'],
+    accent: ['extendedprofile.customize.accent.hint', 'The colour of the title bar of every window in your client, and of your profile for everyone who opens it.']
 };
 
 const AVATAR_PARTS = ['background', 'stand', 'overlay'] as const;
@@ -277,12 +278,17 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
         </span>
     );
 
+    /** A border tried on the user's own picture, exactly as the profile shows it. */
     const borderTile = (id: number) => (
         <span className="octane-profile-customize__border-tile">
-            <span className="octane-profile-customize__border-avatar">
-                <LayoutAvatarImageView figure={userProfile.figure} direction={2} headOnly />
-            </span>
-            {id > 0 && <span className={`infostand-border border-${id}`} />}
+            <ProfileAvatarFrameView
+                figure={userProfile.figure}
+                backgroundId={userProfile.backgroundId}
+                standId={userProfile.standId}
+                overlayId={userProfile.overlayId}
+                borderId={id}
+                scale={0.42}
+            />
         </span>
     );
 
@@ -417,10 +423,13 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
             }
             case 'accent': {
                 const accent = userProfile.accentId ?? 0;
+                // A small window with its title bar in the colour: what the theme changes.
                 const swatch = (color: string | null) => (
                     <span className="octane-profile-customize__accent-sample">
-                        <span className="octane-profile-customize__accent-bar" style={color ? { backgroundColor: color } : undefined} />
-                        <span className="octane-profile-customize__accent-line" style={color ? { backgroundColor: color } : undefined} />
+                        <span className="octane-profile-customize__accent-bar" style={color ? { backgroundColor: color } : undefined}>
+                            <span className="octane-profile-customize__accent-close" />
+                        </span>
+                        <span className="octane-profile-customize__accent-body" />
                     </span>
                 );
 

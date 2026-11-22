@@ -66,7 +66,7 @@ describe('ProfileCustomizeView', () => {
     it('offers the accent palette on its own tab', async () => {
         render(<ProfileCustomizeView userProfile={profile as never} onClose={() => undefined} />);
 
-        fireEvent.click(screen.getByText('Colour'));
+        fireEvent.click(screen.getByText('Theme'));
         fireEvent.click(await screen.findByRole('button', { name: 'Gold' }));
 
         expect(sendProfileCustomization).toHaveBeenCalledWith(profile, { accent: 4 });
