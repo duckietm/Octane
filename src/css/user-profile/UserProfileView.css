@@ -1360,16 +1360,66 @@ html.octane-user-accent-light .octane-card-shell.octane-card-frame-3.has-profile
   border-radius: 0;
 }
 
-/* A border is drawn outside the picture (12 px for the decorated ones): every choice is the same card, with
-   room around the picture so the whole border shows. */
-.octane-profile-customize__border-tile {
+/* Borders: the picture once, large and sharp, with the border picked or under the pointer; beside it the
+   borders on their own, as small frames for the colours and as their artwork for the decorated ones. */
+.octane-profile-customize__border-layout {
   display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.octane-profile-customize__border-preview {
+  display: flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 62px;
-  height: 92px;
-  padding: 0;
+  width: 112px;
+  height: 175px;
+  border-radius: 6px;
   background: #f4f2ea;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.octane-profile-customize__border-layout > .octane-profile-customize__sections {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.octane-profile-customize__border-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px;
+}
+
+.octane-profile-customize__border-cell {
+  display: inline-flex;
+}
+
+.octane-profile-customize__border-cell > .octane-profile-customize__option {
+  border-radius: 7px;
+}
+
+.octane-profile-customize__border-chip.profile-border {
+  display: block;
+  width: 30px;
+  height: 40px;
+  border-width: 4px;
+  border-radius: 6px;
+  background: #1d2a44;
+}
+
+.octane-profile-customize__border-chip.profile-border.border-0 {
+  border: 2px dashed #8d8d8d;
+  background: #f4f2ea;
+}
+
+.octane-profile-customize__border-chip.profile-border.is-decorated {
+  width: 44px;
+  height: 58px;
+  border: 0;
+  background-color: #1d2a44;
+  background-size: 100% 100%;
 }
 
 /* The user's earlier uploads, with a cross to delete one. */

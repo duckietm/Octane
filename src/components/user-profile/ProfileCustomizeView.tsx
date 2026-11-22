@@ -165,6 +165,8 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
     const uploadKind = useRef<ProfileImageKind>('banner');
     const lastSent = useRef(0);
     const handledMoveRequest = useRef(moveBannerRequest);
+    // The border under the pointer, shown on the picture before it is picked.
+    const [hoverBorder, setHoverBorder] = useState<number | null>(null);
     const [library, setLibrary] = useState<Record<ProfileImageKind, ProfileLibraryPicture[]>>({ banner: [], background: [] });
     // A delete in the library asks for a second click on the same picture.
     const [armedDelete, setArmedDelete] = useState<number | null>(null);
@@ -500,17 +502,9 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
     );
 
     /** A border tried on the user's own picture, exactly as the profile shows it. */
-    const borderTile = (id: number) => (
-        <span className="octane-profile-customize__border-tile">
-            <ProfileAvatarFrameView
-                figure={userProfile.figure}
-                backgroundId={userProfile.backgroundId}
-                standId={userProfile.standId}
-                overlayId={userProfile.overlayId}
-                borderId={id}
-                scale={0.5}
-            />
-        </span>
+    /** A border on its own: the colour as a small frame, a decorated one as its artwork. */
+    const borderChip = (id: number) => (
+        <span className={`octane-profile-customize__border-chip profile-border border-${id}${id > LAST_COLOUR_BORDER ? ' is-decorated' : ''}`} />
     );
 
     const renderTab = () => {
@@ -739,34 +733,59 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
             }
             case 'border': {
                 const border = userProfile.borderId ?? 0;
-                const borderOption = (id: number) =>
-                    option(
+                const borderOption = (id: number) => {
+                    const choice = option(
                         id,
                         id === border,
-                        borderTile(id),
+                        borderChip(id),
                         id ? `${label('border')} ${id}` : noneLabel,
                         () => choose({ border: id }, border, null),
                         undefined,
                         'border'
                     );
+
+                    return (
+                        choice && (
+                            <span
+                                key={id}
+                                className="octane-profile-customize__border-cell"
+                                onPointerEnter={() => setHoverBorder(id)}
+                                onPointerLeave={() => setHoverBorder(null)}
+                            >
+                                {choice}
+                            </span>
+                        )
+                    );
+                };
                 const ids = data.borders.filter((id) => id > 0);
 
                 return (
-                    <div className="octane-profile-customize__sections">
-                        {section(
-                            localizeWithFallback('extendedprofile.customize.border.colours', 'Colours'),
-                            <Grid gap={1} columnCount={7} fullHeight={false} className="octane-profile-customize__grid">
-                                {borderOption(0)}
-                                {ids.filter((id) => id <= LAST_COLOUR_BORDER).map(borderOption)}
-                            </Grid>
-                        )}
-                        {ids.some((id) => id > LAST_COLOUR_BORDER) &&
-                            section(
-                                localizeWithFallback('extendedprofile.customize.border.decorated', 'Decorated'),
-                                <Grid gap={1} columnCount={7} fullHeight={false} className="octane-profile-customize__grid">
-                                    {ids.filter((id) => id > LAST_COLOUR_BORDER).map(borderOption)}
-                                </Grid>
+                    <div className="octane-profile-customize__border-layout">
+                        <div className="octane-profile-customize__border-preview">
+                            <ProfileAvatarFrameView
+                                figure={userProfile.figure}
+                                backgroundId={userProfile.backgroundId}
+                                standId={userProfile.standId}
+                                overlayId={userProfile.overlayId}
+                                borderId={hoverBorder ?? border}
+                            />
+                        </div>
+                        <div className="octane-profile-customize__sections">
+                            {section(
+                                localizeWithFallback('extendedprofile.customize.border.colours', 'Colours'),
+                                <div className="octane-profile-customize__border-chips">
+                                    {borderOption(0)}
+                                    {ids.filter((id) => id <= LAST_COLOUR_BORDER).map(borderOption)}
+                                </div>
                             )}
+                            {ids.some((id) => id > LAST_COLOUR_BORDER) &&
+                                section(
+                                    localizeWithFallback('extendedprofile.customize.border.decorated', 'Decorated'),
+                                    <div className="octane-profile-customize__border-chips">
+                                        {ids.filter((id) => id > LAST_COLOUR_BORDER).map(borderOption)}
+                                    </div>
+                                )}
+                        </div>
                     </div>
                 );
             }
