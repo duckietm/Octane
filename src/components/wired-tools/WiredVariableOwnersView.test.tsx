@@ -50,7 +50,7 @@ const holder = (entityType: number, entityId: number, entityName: string, value:
 });
 
 const deliverPage = (page: { variableId?: string; totalEntries: number; currentPage: number; elements: any[]; userTypeFilter?: number; sortTypeFilter?: number }) => {
-    const parser = { variableId: 'user:42', userTypeFilter: 0, sortTypeFilter: -1, ...page };
+    const parser = { variableId: 'user:42', userTypeFilter: -1, sortTypeFilter: 0, ...page };
 
     act(() => {
         for (const handler of mocks.handlers) handler({ getParser: () => parser });
@@ -135,15 +135,16 @@ describe('WiredVariableOwnersView', () => {
 
         const [userTypeSelect, sortSelect] = screen.getAllByRole('combobox');
 
-        selectOption(sortSelect, 'Highest value');
-        expect(mocks.send.mock.calls[0][0].getMessageArray()).toEqual(['user:42', 1, 50, 0, 1]);
+        // AIR's order: the sort, then the user type.
+        selectOption(sortSelect, 'Latest creation');
+        expect(mocks.send.mock.calls[0][0].getMessageArray()).toEqual(['user:42', 1, 50, 3, -1]);
 
         vi.advanceTimersByTime(400);
-        selectOption(userTypeSelect, 'In the room');
-        expect(mocks.send.mock.calls[1][0].getMessageArray()).toEqual(['user:42', 1, 50, 1, 1]);
+        selectOption(userTypeSelect, 'Bot');
+        expect(mocks.send.mock.calls[1][0].getMessageArray()).toEqual(['user:42', 1, 50, 3, 4]);
 
-        deliverPage({ totalEntries: 0, currentPage: 1, elements: [], userTypeFilter: 1, sortTypeFilter: 2 });
-        expect(userTypeSelect).toHaveTextContent('In the room');
-        expect(sortSelect).toHaveTextContent('Name');
+        deliverPage({ totalEntries: 0, currentPage: 1, elements: [], userTypeFilter: 2, sortTypeFilter: 5 });
+        expect(userTypeSelect).toHaveTextContent('Pet');
+        expect(sortSelect).toHaveTextContent('Latest update');
     });
 });

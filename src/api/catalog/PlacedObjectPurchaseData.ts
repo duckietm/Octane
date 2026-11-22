@@ -10,7 +10,9 @@ export class PlacedObjectPurchaseData {
         public readonly x: number,
         public readonly y: number,
         public readonly direction: number,
-        public readonly offer: IPurchasableOffer
+        public readonly offer: IPurchasableOffer,
+        /** What the buyer picked on the page (a group, a badge), when the offer asks for it. */
+        public readonly pickedExtraParam: string | null = null
     ) {}
 
     public get offerId(): number {
@@ -30,6 +32,6 @@ export class PlacedObjectPurchaseData {
     }
 
     public get extraParam(): string {
-        return this.offer.product.extraParam;
+        return this.pickedExtraParam ?? this.offer.product.extraParam;
     }
 }

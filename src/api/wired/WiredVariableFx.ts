@@ -123,6 +123,13 @@ export const WIRED_FX_STATUS_BAR_THEMES: { icon: string; color: string | null; m
     { icon: 'droplet', color: '#4aabf5', metallic: false }
 ];
 
+/** English names of the status bar themes, in the order of their ids, for a hotel without the texts. */
+const STATUS_BAR_NAMES = [
+    'Energy', 'Shield', 'Magic', 'Food', 'Stamina', 'Poison', 'Mana', 'Health', 'Gold', 'Gems', 'Fame',
+    'Reputation', 'Cooldown', 'Time left', 'Burn', 'Freeze', 'Battery', 'Repair', 'Stealth', 'Upgrading',
+    'Star power', 'Water'
+];
+
 const STYLES: Record<number, IWiredVariableFxStyle[]> = {
     [WIRED_FX_CATEGORY.HEALTH_POINTS]: [
         style(0, 'wiredfurni.params.variablefx.style.health_points.0', 'Health bar', WIRED_FX_RENDERER.HEALTH_BAR),
@@ -131,27 +138,28 @@ const STYLES: Record<number, IWiredVariableFxStyle[]> = {
         style(3, 'wiredfurni.params.variablefx.style.health_points.3', 'Single heart', WIRED_FX_RENDERER.SINGLE_HEART)
     ],
     [WIRED_FX_CATEGORY.PROGRESS_BAR]: [
-        style(0, 'wiredfurni.params.variablefx.style.plain', 'Plain', WIRED_FX_RENDERER.PLAIN),
-        style(1, 'wiredfurni.params.variablefx.style.block', 'Blocks', WIRED_FX_RENDERER.BLOCK),
-        style(2, 'wiredfurni.params.variablefx.style.striped', 'Striped', WIRED_FX_RENDERER.STRIPED),
-        style(3, 'wiredfurni.params.variablefx.style.arrow', 'Arrows', WIRED_FX_RENDERER.ARROW),
-        style(4, 'wiredfurni.params.variablefx.style.classic_mini', 'Classic mini', WIRED_FX_RENDERER.CLASSIC_MINI)
+        style(0, 'wiredfurni.params.variablefx.style.progress_bar.0', 'Plain', WIRED_FX_RENDERER.PLAIN),
+        style(1, 'wiredfurni.params.variablefx.style.progress_bar.1', 'Blocks', WIRED_FX_RENDERER.BLOCK),
+        style(2, 'wiredfurni.params.variablefx.style.progress_bar.2', 'Striped', WIRED_FX_RENDERER.STRIPED),
+        style(3, 'wiredfurni.params.variablefx.style.progress_bar.3', 'Arrows', WIRED_FX_RENDERER.ARROW),
+        style(4, 'wiredfurni.params.variablefx.style.progress_bar.4', 'Classic mini', WIRED_FX_RENDERER.CLASSIC_MINI)
     ],
     [WIRED_FX_CATEGORY.LEVELLING_PROGRESS]: [
-        style(0, 'wiredfurni.params.variablefx.style.level_with_progress', 'Level badge with bar', WIRED_FX_RENDERER.LEVEL_WITH_PROGRESS),
-        style(1, 'wiredfurni.params.variablefx.style.level_details', 'Level details', WIRED_FX_RENDERER.LEVEL_DETAILS)
+        style(0, 'wiredfurni.params.variablefx.style.levelling_progress.0', 'Level badge with bar', WIRED_FX_RENDERER.LEVEL_WITH_PROGRESS),
+        style(1, 'wiredfurni.params.variablefx.style.levelling_progress.1', 'Level details', WIRED_FX_RENDERER.LEVEL_DETAILS)
     ],
+    // Named by the hotel texts, as every style is: `wiredfurni.params.variablefx.style.<category>.<id>`.
     [WIRED_FX_CATEGORY.STATUS_BAR]: WIRED_FX_STATUS_BAR_THEMES.map((theme, index) =>
-        style(index, `wiredfurni.params.variablefx.icon.${theme.icon}`, theme.icon.replace(/_/g, ' '), WIRED_FX_RENDERER.BLOCK)
+        style(index, `wiredfurni.params.variablefx.style.status_bar.${index}`, STATUS_BAR_NAMES[index] ?? theme.icon.replace(/_/g, ' '), WIRED_FX_RENDERER.BLOCK)
     ),
     [WIRED_FX_CATEGORY.BOSS_BAR]: [
-        style(0, 'wiredfurni.params.variablefx.style.boss_skull', 'Boss bar with skulls', WIRED_FX_RENDERER.BOSS),
-        style(1, 'wiredfurni.params.variablefx.style.boss_plain', 'Boss bar', WIRED_FX_RENDERER.BOSS)
+        style(0, 'wiredfurni.params.variablefx.style.boss_bar.0', 'Boss bar with skulls', WIRED_FX_RENDERER.BOSS),
+        style(1, 'wiredfurni.params.variablefx.style.boss_bar.1', 'Boss bar', WIRED_FX_RENDERER.BOSS)
     ],
     [WIRED_FX_CATEGORY.NUMBER_DISPLAY]: [
-        style(0, 'wiredfurni.params.variablefx.style.freeze_style', 'Freeze style', WIRED_FX_RENDERER.NUMBER_FREEZE),
-        style(1, 'wiredfurni.params.variablefx.style.shalimar', 'Shalimar', WIRED_FX_RENDERER.NUMBER_STYLED),
-        style(2, 'wiredfurni.params.variablefx.style.blocky', 'Blocky', WIRED_FX_RENDERER.NUMBER_STYLED)
+        style(0, 'wiredfurni.params.variablefx.style.number_display.0', 'Freeze style', WIRED_FX_RENDERER.NUMBER_FREEZE),
+        style(1, 'wiredfurni.params.variablefx.style.number_display.1', 'Shalimar', WIRED_FX_RENDERER.NUMBER_STYLED),
+        style(2, 'wiredfurni.params.variablefx.style.number_display.2', 'Blocky', WIRED_FX_RENDERER.NUMBER_STYLED)
     ]
 };
 

@@ -133,7 +133,6 @@ export const NavigatorRoomSettingsRightsTabView: FC<NavigatorRoomSettingsTabView
                         <Button
                             classNames={['octane-room-settings-clear-rights']}
                             variant="secondary"
-                            disabled={!filteredUsersWithRights.size}
                             onClick={() => roomData && guardedSend('removeAll', new RemoveAllRightsMessageComposer(roomData.roomId))}
                         >
                             {LocalizeText('navigator.flatctrls.clear')}

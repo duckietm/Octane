@@ -161,7 +161,10 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                         onChange={(event) => handleChange('category', event.target.value)}
                     >
                         {categories &&
-                            categories.map((category) => (
+                            // As AIR: the visible categories that are not automatic, plus the room's own one.
+                            categories
+                                .filter((category) => (category.visible || category.id === roomData.categoryId) && !category.automatic)
+                                .map((category) => (
                                 <option key={category.id} value={category.id}>
                                     {LocalizeText(category.name)}
                                 </option>
