@@ -810,6 +810,12 @@
   border-radius: 9px;
 }
 
+/*
+ * The decorated frames are pictures of about 215 x 280, made for the wider infostand card. Around the photo
+ * they are nine-sliced: each corner (a third of the picture each way, with its decorations) keeps its shape at
+ * 42 % of its size and only the straight middle of each side stretches; each frame stands off the photo by the
+ * thickness of its own line, so its inner edge meets the photo.
+ */
 .octane-extended-profile__avatar-frame .infostand-border.border-17,
 .octane-extended-profile__avatar-frame .infostand-border.border-18,
 .octane-extended-profile__avatar-frame .infostand-border.border-19,
@@ -819,10 +825,95 @@
 .octane-extended-profile__avatar-frame .infostand-border.border-23,
 .octane-extended-profile__avatar-frame .infostand-border.border-24,
 .octane-extended-profile__avatar-frame .infostand-border.border-25 {
-  top: -12px;
-  bottom: -12px;
-  left: -12px;
-  right: -12px;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 0;
+  border-radius: 0;
+  background: none;
+  border-image-slice: 34%;
+  border-image-repeat: stretch;
+  border-image-outset: 0;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-17 {
+  top: -7px;
+  right: -7px;
+  bottom: -6px;
+  left: -7px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_17.webp');
+  border-image-width: 40px 32px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-18 {
+  top: -4px;
+  right: -7px;
+  bottom: -5px;
+  left: -4px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_18.webp');
+  border-image-width: 39px 31px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-19 {
+  top: -3px;
+  right: -6px;
+  bottom: -7px;
+  left: -6px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_19.webp');
+  border-image-width: 39px 31px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-20 {
+  top: -11px;
+  right: -5px;
+  bottom: -2px;
+  left: -4px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_20.webp');
+  border-image-width: 39px 29px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-21 {
+  top: -10px;
+  right: -8px;
+  bottom: -2px;
+  left: -6px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_21.webp');
+  border-image-width: 41px 31px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-22 {
+  top: -4px;
+  right: -5px;
+  bottom: -4px;
+  left: -4px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_22.webp');
+  border-image-width: 39px 30px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-23 {
+  top: -9px;
+  right: -8px;
+  bottom: -8px;
+  left: -8px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_23.webp');
+  border-image-width: 41px 33px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-24 {
+  top: -5px;
+  right: -9px;
+  bottom: -5px;
+  left: -8px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_24.webp');
+  border-image-width: 41px 33px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-25 {
+  top: -8px;
+  right: -4px;
+  bottom: -4px;
+  left: -4px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_25.webp');
+  border-image-width: 40px 30px;
 }
 
 /* The accent of the profile being viewed wins over the viewer's own theme (html.octane-user-accent). */
