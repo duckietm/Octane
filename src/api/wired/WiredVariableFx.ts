@@ -93,9 +93,18 @@ export interface IWiredVariableFxStyle {
     key: string;
     fallback: string;
     rendererId: number;
+    /** The icon group the style menu lists it under ("xmas26"), from the icon the style carries; absent for most. */
+    group?: string;
 }
 
-const style = (styleId: number, key: string, fallback: string, rendererId: number): IWiredVariableFxStyle => ({ styleId, key, fallback, rendererId });
+/** The group of a dotted icon id ("xmas26.tree" is in "xmas26"), or undefined. */
+const iconGroupOf = (icon: string | null | undefined): string | undefined => (icon && icon.indexOf('.') > 0 ? icon.substring(0, icon.indexOf('.')) : undefined);
+
+const style = (styleId: number, key: string, fallback: string, rendererId: number, icon: string | null = null): IWiredVariableFxStyle => {
+    const group = iconGroupOf(icon);
+
+    return group ? { styleId, key, fallback, rendererId, group } : { styleId, key, fallback, rendererId };
+};
 
 /** The status bar themes, in the server's order; the style id is the index. */
 export const WIRED_FX_STATUS_BAR_THEMES: { icon: string; color: string | null; metallic: boolean }[] = [
@@ -120,7 +129,16 @@ export const WIRED_FX_STATUS_BAR_THEMES: { icon: string; color: string | null; m
     { icon: 'stealth', color: '#6254a8', metallic: false },
     { icon: 'upgrading', color: '#6bdc34', metallic: false },
     { icon: 'star_power', color: '#ffd900', metallic: true },
-    { icon: 'droplet', color: '#4aabf5', metallic: false }
+    { icon: 'droplet', color: '#4aabf5', metallic: false },
+    { icon: 'xmas26.tree', color: '#368349', metallic: false },
+    { icon: 'xmas26.snowball', color: '#acdafa', metallic: false }
+];
+
+/** English names of the status bar themes, in the order of their ids, for a hotel without the texts. */
+const STATUS_BAR_NAMES = [
+    'Energy', 'Shield', 'Magic', 'Food', 'Stamina', 'Poison', 'Mana', 'Health', 'Gold', 'Gems', 'Fame',
+    'Reputation', 'Cooldown', 'Time left', 'Burn', 'Freeze', 'Battery', 'Repair', 'Stealth', 'Upgrading',
+    'Star power', 'Water', 'Christmas tree', 'Snowball'
 ];
 
 const STYLES: Record<number, IWiredVariableFxStyle[]> = {
@@ -131,27 +149,29 @@ const STYLES: Record<number, IWiredVariableFxStyle[]> = {
         style(3, 'wiredfurni.params.variablefx.style.health_points.3', 'Single heart', WIRED_FX_RENDERER.SINGLE_HEART)
     ],
     [WIRED_FX_CATEGORY.PROGRESS_BAR]: [
-        style(0, 'wiredfurni.params.variablefx.style.plain', 'Plain', WIRED_FX_RENDERER.PLAIN),
-        style(1, 'wiredfurni.params.variablefx.style.block', 'Blocks', WIRED_FX_RENDERER.BLOCK),
-        style(2, 'wiredfurni.params.variablefx.style.striped', 'Striped', WIRED_FX_RENDERER.STRIPED),
-        style(3, 'wiredfurni.params.variablefx.style.arrow', 'Arrows', WIRED_FX_RENDERER.ARROW),
-        style(4, 'wiredfurni.params.variablefx.style.classic_mini', 'Classic mini', WIRED_FX_RENDERER.CLASSIC_MINI)
+        style(0, 'wiredfurni.params.variablefx.style.progress_bar.0', 'Plain', WIRED_FX_RENDERER.PLAIN),
+        style(1, 'wiredfurni.params.variablefx.style.progress_bar.1', 'Blocks', WIRED_FX_RENDERER.BLOCK),
+        style(2, 'wiredfurni.params.variablefx.style.progress_bar.2', 'Striped', WIRED_FX_RENDERER.STRIPED),
+        style(3, 'wiredfurni.params.variablefx.style.progress_bar.3', 'Arrows', WIRED_FX_RENDERER.ARROW),
+        style(4, 'wiredfurni.params.variablefx.style.progress_bar.4', 'Classic mini', WIRED_FX_RENDERER.CLASSIC_MINI)
     ],
     [WIRED_FX_CATEGORY.LEVELLING_PROGRESS]: [
-        style(0, 'wiredfurni.params.variablefx.style.level_with_progress', 'Level badge with bar', WIRED_FX_RENDERER.LEVEL_WITH_PROGRESS),
-        style(1, 'wiredfurni.params.variablefx.style.level_details', 'Level details', WIRED_FX_RENDERER.LEVEL_DETAILS)
+        style(0, 'wiredfurni.params.variablefx.style.levelling_progress.0', 'Level badge with bar', WIRED_FX_RENDERER.LEVEL_WITH_PROGRESS),
+        style(1, 'wiredfurni.params.variablefx.style.levelling_progress.1', 'Level details', WIRED_FX_RENDERER.LEVEL_DETAILS)
     ],
+    // Named by the hotel texts, as every style is: `wiredfurni.params.variablefx.style.<category>.<id>`.
     [WIRED_FX_CATEGORY.STATUS_BAR]: WIRED_FX_STATUS_BAR_THEMES.map((theme, index) =>
-        style(index, `wiredfurni.params.variablefx.icon.${theme.icon}`, theme.icon.replace(/_/g, ' '), WIRED_FX_RENDERER.BLOCK)
+        style(index, `wiredfurni.params.variablefx.style.status_bar.${index}`, STATUS_BAR_NAMES[index] ?? theme.icon.replace(/_/g, ' '), WIRED_FX_RENDERER.BLOCK, theme.icon)
     ),
     [WIRED_FX_CATEGORY.BOSS_BAR]: [
-        style(0, 'wiredfurni.params.variablefx.style.boss_skull', 'Boss bar with skulls', WIRED_FX_RENDERER.BOSS),
-        style(1, 'wiredfurni.params.variablefx.style.boss_plain', 'Boss bar', WIRED_FX_RENDERER.BOSS)
+        style(0, 'wiredfurni.params.variablefx.style.boss_bar.0', 'Boss bar with skulls', WIRED_FX_RENDERER.BOSS),
+        style(1, 'wiredfurni.params.variablefx.style.boss_bar.1', 'Boss bar', WIRED_FX_RENDERER.BOSS),
+        style(2, 'wiredfurni.params.variablefx.style.boss_bar.2', 'Snowman boss bar', WIRED_FX_RENDERER.BOSS, 'xmas26.snowman')
     ],
     [WIRED_FX_CATEGORY.NUMBER_DISPLAY]: [
-        style(0, 'wiredfurni.params.variablefx.style.freeze_style', 'Freeze style', WIRED_FX_RENDERER.NUMBER_FREEZE),
-        style(1, 'wiredfurni.params.variablefx.style.shalimar', 'Shalimar', WIRED_FX_RENDERER.NUMBER_STYLED),
-        style(2, 'wiredfurni.params.variablefx.style.blocky', 'Blocky', WIRED_FX_RENDERER.NUMBER_STYLED)
+        style(0, 'wiredfurni.params.variablefx.style.number_display.0', 'Freeze style', WIRED_FX_RENDERER.NUMBER_FREEZE),
+        style(1, 'wiredfurni.params.variablefx.style.number_display.1', 'Shalimar', WIRED_FX_RENDERER.NUMBER_STYLED),
+        style(2, 'wiredfurni.params.variablefx.style.number_display.2', 'Blocky', WIRED_FX_RENDERER.NUMBER_STYLED)
     ]
 };
 
@@ -185,8 +205,93 @@ export const WIRED_FX_ICONS = [
     'wooden_logs',
     'misc_heart',
     'misc_skull',
-    'misc_star'
+    'misc_star',
+    // Campaign sets: the part before the dot is the group the picker lists them under.
+    'ranch.aubergine',
+    'ranch.carrot',
+    'ranch.corn',
+    'ranch.egg',
+    'ranch.grape',
+    'ranch.potato',
+    'ranch.pumpkin',
+    'ranch.sapling',
+    'ranch.tomato',
+    'ranch.wheat',
+    'xmas26.bauble_red',
+    'xmas26.bauble_blue',
+    'xmas26.bauble_green',
+    'xmas26.bauble_gold',
+    'xmas26.bell',
+    'xmas26.candycane',
+    'xmas26.coal',
+    'xmas26.cookie',
+    'xmas26.gingerbreadman',
+    'xmas26.ice_cube',
+    'xmas26.key',
+    'xmas26.list',
+    'xmas26.present_green',
+    'xmas26.present_red',
+    'xmas26.present_blue',
+    'xmas26.present_purple',
+    'xmas26.present_pink',
+    'xmas26.present_orange',
+    'xmas26.present_gold',
+    'xmas26.santahat',
+    'xmas26.snowball',
+    'xmas26.stocking',
+    'xmas26.ticket_red',
+    'xmas26.ticket_blue',
+    'xmas26.ticket_orange',
+    'xmas26.ticket_green',
+    'xmas26.tree'
 ];
+
+/** English names of the icon groups, for a hotel without the texts. */
+export const WIRED_FX_ICON_GROUP_NAMES: Record<string, string> = {
+    ranch: '(Ranch Campaign)',
+    xmas26: '(Christmas 2026)'
+};
+
+/** One entry of the icon picker: an icon, or a named group of icons. */
+export interface IWiredFxIconOption {
+    id: string;
+    /** The group's icons; absent for a plain icon. */
+    children?: string[];
+}
+
+/**
+ * AIR's grouped icon menu: an icon whose id carries a dot ("xmas26.tree") is listed under the group named by
+ * the part before it, in the place of the group's first icon.
+ */
+export const groupWiredFxIcons = (icons: readonly string[]): IWiredFxIconOption[] => {
+    const options: IWiredFxIconOption[] = [];
+    const groups = new Map<string, IWiredFxIconOption>();
+
+    for (const icon of icons) {
+        const dot = icon.indexOf('.');
+
+        if (dot < 0) {
+            options.push({ id: icon });
+            continue;
+        }
+
+        const groupId = icon.substring(0, dot);
+        let group = groups.get(groupId);
+
+        if (!group) {
+            group = { id: groupId, children: [] };
+            groups.set(groupId, group);
+            options.push(group);
+        }
+
+        group.children.push(icon);
+    }
+
+    return options;
+};
+
+/** The English name of an icon without a hotel text: "xmas26.bauble_red" reads "bauble red". */
+export const wiredFxIconFallbackName = (icon: string): string => icon.substring(icon.indexOf('.') + 1).replace(/_/g, ' ');
 
 /** AIR's colour ids: the plain palette, the metallic ones (100-104) and the dynamic ones (1000-1002). */
 export const WIRED_FX_COLOR = {
@@ -286,7 +391,9 @@ const APPEARANCES: Record<number, Record<number, IWiredVariableFxAppearance>> = 
     },
     [WIRED_FX_CATEGORY.BOSS_BAR]: {
         0: appearance([C.RED], C.RED, [W.LARGE, W.EXTRA_LARGE, W.HUGE], W.EXTRA_LARGE),
-        1: appearance([...PLAIN_COLORS, C.DYNAMIC_RED_TO_GREEN, C.DYNAMIC_TEAM], C.RED, [W.LARGE, W.EXTRA_LARGE, W.HUGE], W.EXTRA_LARGE)
+        1: appearance([...PLAIN_COLORS, C.DYNAMIC_RED_TO_GREEN, C.DYNAMIC_TEAM], C.RED, [W.LARGE, W.EXTRA_LARGE, W.HUGE], W.EXTRA_LARGE),
+        // The Christmas 2026 snowman boss: its blue is baked in.
+        2: appearance([WIRED_FX_COLOR_NOT_APPLICABLE], WIRED_FX_COLOR_NOT_APPLICABLE, [W.LARGE, W.EXTRA_LARGE, W.HUGE], W.EXTRA_LARGE)
     },
     [WIRED_FX_CATEGORY.NUMBER_DISPLAY]: {
         0: appearance([C.RED, C.GREEN, C.BLUE, C.YELLOW, C.WHITE, C.DYNAMIC_TEAM], C.GREEN, [W.NOT_APPLICABLE], W.NOT_APPLICABLE),

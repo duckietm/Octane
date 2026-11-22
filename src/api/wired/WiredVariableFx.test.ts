@@ -4,6 +4,9 @@ import {
     defaultWiredVariableFxParams,
     IWiredVariableFxConfigLike,
     sanitizeWiredVariableFxAppearance,
+    groupWiredFxIcons,
+    wiredFxIconFallbackName,
+    WIRED_FX_ICONS,
     WIRED_FX_COLOR,
     WIRED_FX_WIDTH,
     wiredVariableFxAppearance,
@@ -53,7 +56,13 @@ describe('WiredVariableFx helpers', () => {
         expect(wiredVariableFxStyles(WIRED_FX_CATEGORY.PROGRESS_BAR)).toHaveLength(5);
         expect(wiredVariableFxStyles(WIRED_FX_CATEGORY.LEVELLING_PROGRESS)).toHaveLength(2);
         expect(wiredVariableFxStyles(WIRED_FX_CATEGORY.STATUS_BAR)).toHaveLength(WIRED_FX_STATUS_BAR_THEMES.length);
-        expect(wiredVariableFxStyles(WIRED_FX_CATEGORY.BOSS_BAR)).toHaveLength(2);
+        expect(wiredVariableFxStyles(WIRED_FX_CATEGORY.STATUS_BAR)).toHaveLength(24);
+        expect(wiredVariableFxStyles(WIRED_FX_CATEGORY.BOSS_BAR)).toHaveLength(3);
+        // The Christmas 2026 styles sit in their campaign's group.
+        expect(wiredVariableFxStyles(WIRED_FX_CATEGORY.BOSS_BAR)[2].group).toBe('xmas26');
+        expect(wiredVariableFxStyles(WIRED_FX_CATEGORY.STATUS_BAR)[22].group).toBe('xmas26');
+        expect(wiredVariableFxStyles(WIRED_FX_CATEGORY.STATUS_BAR)[21].group).toBeUndefined();
+        expect(wiredVariableFxAppearance(WIRED_FX_CATEGORY.BOSS_BAR, 2).colors).toEqual([-1]);
         expect(wiredVariableFxStyles(WIRED_FX_CATEGORY.NUMBER_DISPLAY)).toHaveLength(3);
         expect(wiredVariableFxStyles(99)).toBe(wiredVariableFxStyles(WIRED_FX_CATEGORY.PROGRESS_BAR));
     });
@@ -75,6 +84,16 @@ describe('WiredVariableFx helpers', () => {
         expect(readWiredVariableFxParams(writeWiredVariableFxParams({ ...params, defaultMin: -5, source: 1 }), WIRED_FX_CATEGORY.PROGRESS_BAR).defaultMin).toBe(-5);
         expect(writeWiredVariableFxParams({ ...params, overrideMaxTarget: 1 })[17]).toBe(-10);
         expect(readWiredVariableFxParams([], WIRED_FX_CATEGORY.BOSS_BAR)).toEqual(defaultWiredVariableFxParams());
+    });
+
+    it('groups the campaign icons under the part before the dot', () => {
+        const options = groupWiredFxIcons(['fish', 'ranch.egg', 'gold', 'ranch.corn', 'xmas26.tree']);
+
+        expect(options).toEqual([{ id: 'fish' }, { id: 'ranch', children: ['ranch.egg', 'ranch.corn'] }, { id: 'gold' }, { id: 'xmas26', children: ['xmas26.tree'] }]);
+        expect(wiredFxIconFallbackName('xmas26.bauble_red')).toBe('bauble red');
+        expect(wiredFxIconFallbackName('wooden_logs')).toBe('wooden logs');
+        expect(WIRED_FX_ICONS).toContain('xmas26.santahat');
+        expect(WIRED_FX_ICONS).toContain('ranch.aubergine');
     });
 
     it('round-trips the string tokens and strips stray tabs', () => {

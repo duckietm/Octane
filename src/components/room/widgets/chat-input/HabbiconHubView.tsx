@@ -15,19 +15,19 @@ export const HabbiconPrice: FC<{ priceCredits: number; priceActivityPoints: numb
     priceActivityPoints,
     activityPointType
 }) => (
-    <span className="habbicon-price">
-        {priceCredits > 0 && (
-            <>
-                {priceCredits}
+    // AIR 1.0.31: one row per currency, the credits above the points. The credits row also shows for a free one.
+    <span className="habbicon-price is-rows">
+        {(priceCredits > 0 || priceActivityPoints <= 0) && (
+            <span className="habbicon-price-row">
+                {Math.max(0, priceCredits)}
                 <LayoutCurrencyIcon type={-1} />
-            </>
+            </span>
         )}
-        {priceCredits > 0 && priceActivityPoints > 0 && ' + '}
         {priceActivityPoints > 0 && (
-            <>
+            <span className="habbicon-price-row">
                 {priceActivityPoints}
                 <LayoutCurrencyIcon type={activityPointType} />
-            </>
+            </span>
         )}
     </span>
 );

@@ -14,6 +14,7 @@ import {
     HabbiconInfoEvent,
     HabbiconShopDataEvent,
     HabbiconState,
+    NotEnoughBalanceMessageEvent,
     PurchaseErrorMessageEvent,
     PurchaseNotAllowedMessageEvent,
     PurchaseOKMessageEvent,
@@ -214,6 +215,15 @@ const useHabbiconCatalogState = () => {
         setPending(null);
         setError(localizeWithFallback(`habbicon.error.${code}`, PURCHASE_ERRORS[code] || PURCHASE_ERRORS[5]));
     };
+
+    // AIR 1.0.31: a purchase refused for lack of credits or points closes the confirmation; the purse alert says why.
+    useMessageEvent<NotEnoughBalanceMessageEvent>(NotEnoughBalanceMessageEvent, () => {
+        if (!pendingRef.current) return;
+
+        pendingRef.current = null;
+        setPending(null);
+        setPurchase(null);
+    });
 
     useMessageEvent<PurchaseErrorMessageEvent>(PurchaseErrorMessageEvent, (event) => purchaseFailed(event.getParser().code));
 

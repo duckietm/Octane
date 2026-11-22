@@ -411,8 +411,21 @@ export const useCatalogEffects = (): void => {
             return;
         }
 
+        // What the page asked the buyer to pick (the group of a group furni) is bought with the dropped furni too.
+        const pickedExtraParam = state.purchaseOptions.extraParamRequired && state.purchaseOptions.extraData ? state.purchaseOptions.extraData : null;
+
         state.setPlacedObjectPurchaseData(
-            new PlacedObjectPurchaseData(event.roomId, event.objectId, event.category, event.wallLocation, event.x, event.y, event.direction, purchasableOffer)
+            new PlacedObjectPurchaseData(
+                event.roomId,
+                event.objectId,
+                event.category,
+                event.wallLocation,
+                event.x,
+                event.y,
+                event.direction,
+                purchasableOffer,
+                pickedExtraParam
+            )
         );
 
         switch (state.currentType) {
@@ -459,7 +472,7 @@ export const useCatalogEffects = (): void => {
                 if (catalogSkipPurchaseConfirmation && !(product && product.isUniqueLimitedItem)) {
                     const pageId = resolveOfferPageId(purchasableOffer, readCatalogIndex(state.currentType)?.offersToNodes);
 
-                    SendMessageComposer(new PurchaseFromCatalogComposer(pageId, purchasableOffer.offerId, product.extraParam, 1));
+                    SendMessageComposer(new PurchaseFromCatalogComposer(pageId, purchasableOffer.offerId, pickedExtraParam ?? product.extraParam, 1));
                 }
 
                 if (state.catalogPlaceMultipleObjects) state.requestOfferToMover(purchasableOffer);
