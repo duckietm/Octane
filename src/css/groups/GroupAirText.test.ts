@@ -32,4 +32,14 @@ describe('group windows text (groups_info_window, Member Entry)', () => {
             /\.octane-groups-window \.octane-groups-button:not\(\.octane-group-room-info__button\) \{[^}]*var\(--habbo-skin-shiny\) !important;[^}]*color: #000000 !important;\s*font-size: 12px !important;\s*font-weight: 400 !important/
         );
     });
+    it('stacks the member rows from the top, each as tall as a row, however few members there are', () => {
+        const rules = [...read('GroupView.css').matchAll(/\.octane-group-members-list-grid \{([^}]*)\}/g)].map((match) => match[1]);
+
+        expect(rules.length).toBeGreaterThan(0);
+
+        for (const rule of rules) {
+            expect(rule).toMatch(/grid-template-rows: none !important;/);
+            expect(rule).toMatch(/align-content: start/);
+        }
+    });
 });

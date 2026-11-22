@@ -442,7 +442,9 @@
     height: 277px;
     display: grid !important;
     grid-template-columns: repeat(2, 164px) !important;
+    grid-template-rows: none !important;
     grid-auto-rows: 35px;
+    align-content: start;
     gap: 0 0 !important;
     padding: 0;
     border: 0;
@@ -1033,7 +1035,10 @@
     height: 272px !important;
     display: grid !important;
     grid-template-columns: 169px 169px !important;
+    /* Grid sets one 1fr row: the first pair of members took the whole height and the next ones sat at the bottom. */
+    grid-template-rows: none !important;
     grid-auto-rows: 39px !important;
+    align-content: start !important;
     gap: 0 1px !important;
     padding: 0 !important;
     border: 0 !important;
