@@ -22,11 +22,6 @@
   outline-color: #3d8fba;
 }
 
-/* Same lift as in the info panel, so the feet land on the platform of the stand. */
-.profile-preview .profile-stand:is(.stand-1, .stand-2, .stand-3, .stand-4, .stand-5, .stand-6, .stand-7, .stand-8, .stand-9, .stand-10, .stand-11, .stand-12, .stand-13, .stand-14, .stand-15, .stand-16, .stand-17, .stand-18, .stand-21) ~ .avatar-image {
-  transform: translateY(-8px);
-}
-
 @keyframes fadeIn {
   to { opacity: 1; }
 }
@@ -1741,3 +1736,48 @@
 .profile-border.border-23 { background-image: url('@/assets/images/backgrounds/borders/border_23.webp'); }
 .profile-border.border-24 { background-image: url('@/assets/images/backgrounds/borders/border_24.webp'); }
 .profile-border.border-25 { background-image: url('@/assets/images/backgrounds/borders/border_25.webp'); }
+
+/*
+ * The avatar on its stand, the same in the profile picture, the infostand and the picker.
+ * The avatar picture is 90 x 130 with the point between its feet at row 116, drawn at the top of the place;
+ * stands and effects are 68 x 135 pictures drawn at the top as well (the effects are clothes, rings and
+ * floors made for the avatar there). A stand moves the avatar so its feet land on the centre of the
+ * platform, measured for each stand as a row of its picture (--stand-feet), and the effect moves with it.
+ */
+.profile-stand.stand-1 ~ * { --stand-feet: 103; }
+.profile-stand.stand-2 ~ * { --stand-feet: 105; }
+.profile-stand.stand-3 ~ * { --stand-feet: 105; }
+.profile-stand.stand-4 ~ * { --stand-feet: 105; }
+.profile-stand.stand-5 ~ * { --stand-feet: 105; }
+.profile-stand.stand-6 ~ * { --stand-feet: 105; }
+.profile-stand.stand-7 ~ * { --stand-feet: 104; }
+.profile-stand.stand-8 ~ * { --stand-feet: 104; }
+.profile-stand.stand-9 ~ * { --stand-feet: 104; }
+.profile-stand.stand-10 ~ * { --stand-feet: 104; }
+.profile-stand.stand-11 ~ * { --stand-feet: 103; }
+.profile-stand.stand-12 ~ * { --stand-feet: 105; }
+.profile-stand.stand-13 ~ * { --stand-feet: 105; }
+.profile-stand.stand-14 ~ * { --stand-feet: 104; }
+.profile-stand.stand-15 ~ * { --stand-feet: 103; }
+.profile-stand.stand-16 ~ * { --stand-feet: 107; }
+.profile-stand.stand-17 ~ * { --stand-feet: 108; }
+.profile-stand.stand-18 ~ * { --stand-feet: 105; }
+.profile-stand.stand-19 ~ * { --stand-feet: 114; }
+.profile-stand.stand-20 ~ * { --stand-feet: 106; }
+.profile-stand.stand-21 ~ * { --stand-feet: 104; }
+
+.profile-stand ~ .avatar-image,
+.profile-stand ~ .profile-overlay {
+  transform: translateY(calc((var(--stand-feet, 116) - 116) * 1px));
+}
+
+/* The 130 px wells (infostand, picker) draw stand and effect at the top like the 135 px profile picture,
+   and centre the background on the same rows, so all three line up the same way. */
+:is(.octane-infostand__avatar-well, .profile-preview) > :is(.profile-stand, .profile-overlay) {
+  top: 0;
+  left: 0;
+}
+
+:is(.octane-infostand__avatar-well, .profile-preview).profile-background {
+  background-position: center calc(50% + 2.5px);
+}

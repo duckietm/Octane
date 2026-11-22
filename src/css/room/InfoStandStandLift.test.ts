@@ -5,10 +5,16 @@ import { describe, expect, it } from 'vitest';
 const read = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
 describe('avatar on a profile stand', () => {
-    // The stand pictures put the centre of their platform at row ~105 of 135; 8 px puts the feet on it, 14 px left them floating.
-    it('lifts the avatar 8 px in the infostand and in the background picker', () => {
-        for (const path of ['src/css/room/InfoStand.css', 'src/css/backgrounds/BackgroundsView.css']) {
-            expect(read(path)).toMatch(/\.stand-21\) ~ \.avatar-image \{\s*transform: translateY\(-8px\);/);
-        }
+    const css = read('src/css/backgrounds/BackgroundsView.css');
+
+    // Rows of the platform centre in each 135 px stand picture, measured against the avatar's feet (row 116).
+    it('lands the feet on the platform of every stand', () => {
+        for (let id = 1; id <= 21; id++) expect(css).toMatch(new RegExp(`\\.profile-stand\\.stand-${id} ~ \\* \\{ --stand-feet: \\d+; \\}`));
+        expect(css).toMatch(/\.profile-stand ~ \.avatar-image,\s*\.profile-stand ~ \.profile-overlay \{\s*transform: translateY\(calc\(\(var\(--stand-feet, 116\) - 116\) \* 1px\)\);/);
+    });
+
+    it('has no fixed lift left in the infostand or the picker', () => {
+        expect(read('src/css/room/InfoStand.css')).not.toMatch(/translateY\(-8px\)/);
+        expect(css).not.toMatch(/~ \.avatar-image \{\s*transform: translateY\(-8px\)/);
     });
 });
