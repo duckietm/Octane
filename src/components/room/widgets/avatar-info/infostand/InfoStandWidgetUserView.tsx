@@ -26,7 +26,7 @@ import {
 import homeIcon from '../../../../../assets/images/infostand/home-icon.png';
 import pencilIcon from '../../../../../assets/images/infostand/pencil-icon.png';
 import { Base, Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserIdentityView } from '../../../../../common';
-import { useIsUserBlocked, useMessageEvent, useOctaneEvent, useRoom } from '../../../../../hooks';
+import { useBackgroundTone, useIsUserBlocked, useMessageEvent, useOctaneEvent, useRoom } from '../../../../../hooks';
 import { BackgroundsView } from '../../../../backgrounds/BackgroundsView';
 import { InfoStandBadgeSlotView } from './InfoStandBadgeSlotView';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
@@ -82,10 +82,13 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
 
     const shownBadgesRank = packetBadgesRank > 0 ? packetBadgesRank : badgesRank && badgesRank.userId === webID ? badgesRank.rank : -1;
 
+    const infostandRef = useRef<HTMLDivElement>(null);
     const infostandBackgroundClass = `background-${backgroundId ?? 'default'}`;
     const infostandStandClass = `stand-${standId ?? 'default'}`;
     const infostandOverlayClass = `overlay-${overlayId ?? 'default'}`;
     const infostandCardBackgroundClass = cardBackgroundId ? `card-background-${cardBackgroundId}` : '';
+    // A light card background needs dark text: the infostand's own text is white on its black frame.
+    const infostandTone = useBackgroundTone(infostandRef, cardBackgroundId ? `card-${cardBackgroundId}` : '', { r: 61, g: 61, b: 61 });
     const infostandBorderClass = borderId ? `border-${borderId}` : '';
     const handleProfileClick = useCallback(() => {
         GetUserProfile(avatarInfo.webID);
@@ -221,7 +224,10 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     return (
         <NativeTextTree>
             <>
-                <div className={`octane-infostand pointer-events-auto z-30 profile-card-background ${infostandCardBackgroundClass}`}>
+                <div
+                    ref={infostandRef}
+                    className={`octane-infostand pointer-events-auto z-30 profile-card-background ${infostandCardBackgroundClass}${infostandTone ? ` has-${infostandTone}-background` : ''}`}
+                >
                     {borderId ? <Base className={`infostand-border ${infostandBorderClass}`} /> : null}
                     <BaseButton type="button" className="octane-infostand__close" aria-label={localizeWithFallback('octane.room.close', 'Close')} onClick={onClose} />
                     <div className="octane-infostand__header">

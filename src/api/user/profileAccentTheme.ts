@@ -1,8 +1,10 @@
-import { getProfileAccentColor } from './profileCustomization';
+import { getProfileAccentColor, isLightProfileAccent } from './profileCustomization';
 
 /** The class and variable that colour every window of the client in the user's own accent. */
 export const USER_ACCENT_CLASS = 'octane-user-accent';
 export const USER_ACCENT_VARIABLE = '--octane-user-accent';
+/** Added with a light accent, so the window titles turn dark. */
+export const USER_ACCENT_LIGHT_CLASS = 'octane-user-accent-light';
 
 const storageKey = (userId: number) => `octane.profile.accent.${userId}`;
 
@@ -17,9 +19,10 @@ export const applyUserAccent = (userId: number, accentId: number, root: HTMLElem
     if (color) {
         root.style.setProperty(USER_ACCENT_VARIABLE, color);
         root.classList.add(USER_ACCENT_CLASS);
+        root.classList.toggle(USER_ACCENT_LIGHT_CLASS, isLightProfileAccent(accentId));
     } else {
         root.style.removeProperty(USER_ACCENT_VARIABLE);
-        root.classList.remove(USER_ACCENT_CLASS);
+        root.classList.remove(USER_ACCENT_CLASS, USER_ACCENT_LIGHT_CLASS);
     }
 
     if (!userId) return;

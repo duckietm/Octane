@@ -12,11 +12,12 @@ import {
     UserProfileParser,
     UserRelationshipsComposer
 } from '@octane/renderer';
-import { CSSProperties, FC, useEffect, useState } from 'react';
+import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import {
     applyUserAccent,
     CreateLinkEvent,
     getProfileAccentColor,
+    isLightProfileAccent,
     GetRoomSession,
     GetUserProfile,
     isProfileHiddenFromViewer,
@@ -32,7 +33,7 @@ import {
 import pencilIcon from '../../assets/images/infostand/pencil-icon.png';
 import { frankStop } from '../../assets/images/user-profile';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { useIsUserBlocked, useMessageEvent, useNotification, useOctaneEvent } from '../../hooks';
+import { useBackgroundTone, useIsUserBlocked, useMessageEvent, useNotification, useOctaneEvent } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
@@ -52,6 +53,10 @@ export const UserProfileView: FC<{}> = () => {
     const { showConfirm = null } = useNotification();
     const [isCustomizing, setIsCustomizing] = useState(false);
     const [moveBannerRequest, setMoveBannerRequest] = useState(0);
+    const contentRef = useRef<HTMLDivElement>(null);
+    // The window body's own colour, under a background picture that does not cover it all.
+    const backgroundKey = userProfile ? userProfile.backgroundImage || (userProfile.cardBackgroundId ? `card-${userProfile.cardBackgroundId}` : '') : '';
+    const backgroundTone = useBackgroundTone(contentRef, backgroundKey, { r: 236, g: 232, b: 220 });
     const [banners, setBanners] = useState<ProfileBannerEntry[]>([]);
     const bannerId = userProfile?.bannerId ?? 0;
 
@@ -192,12 +197,16 @@ export const UserProfileView: FC<{}> = () => {
     return (
         <NativeTextTree>
             <OctaneCard
-                className={`octane-extended-profile-window w-[640px] h-[720px] max-w-[96vw] max-h-[92vh]${accentColor ? ' has-profile-accent' : ''}`}
+                className={`octane-extended-profile-window w-[640px] h-[720px] max-w-[96vw] max-h-[92vh]${accentColor ? ' has-profile-accent' : ''}${isLightProfileAccent(userProfile.accentId ?? 0) ? ' has-light-accent' : ''}`}
                 style={accentStyle}
                 uniqueKey="octane-user-profile"
             >
                 <OctaneCard.Header headerText={LocalizeText('extendedprofile.caption')} onCloseClick={onClose} />
-                <OctaneCard.Content className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}`} style={contentStyle}>
+                <OctaneCard.Content
+                    ref={contentRef}
+                    className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}${backgroundTone ? ` has-${backgroundTone}-background` : ''}`}
+                    style={contentStyle}
+                >
                     {isBlocked && (
                         // Official blocked_container: the drama text, whose "event:profile/unblock" link
                         // opens the unblock confirm (it carries no href, so it is never followed as a

@@ -824,8 +824,9 @@
   right: -12px;
 }
 
-.octane-extended-profile-window.has-profile-accent,
-.octane-profile-customize.has-profile-accent {
+/* The accent of the profile being viewed wins over the viewer's own theme (html.octane-user-accent). */
+html .octane-card-shell.octane-card-frame-3.octane-extended-profile-window.has-profile-accent,
+html .octane-card-shell.octane-card-frame-3.octane-profile-customize.has-profile-accent {
   --octane-card-frame-3-title: var(--profile-accent);
 }
 
@@ -1193,4 +1194,65 @@
   background: var(--profile-accent, #1e7cb8);
   color: #fff;
   font-weight: 700;
+}
+
+/* Text on a background the player chose: light with a shadow on a dark one, dark on a light one. The tone is
+   measured from the background itself (useBackgroundTone). Panels with their own fill keep their colours. */
+/* Every text of the top of the profile that sits on the background: the identity, the meta lines and their
+   labels, the status, the friends and relationships. Buttons, badge slots and parts coloured on purpose (a
+   prefix, a segment with its own colour) keep theirs. */
+.octane-extended-profile-window__content.has-dark-background :is(
+    .octane-extended-profile__identity-copy,
+    .octane-extended-profile__right,
+    .octane-extended-profile__actions
+  ),
+.octane-extended-profile-window__content.has-dark-background :is(
+    .octane-extended-profile__identity-copy,
+    .octane-extended-profile__right,
+    .octane-extended-profile__actions
+  )
+  :where(*):not(button, button *, .prefix, .prefix *, [style*='color'], [style*='color'] *, img) {
+  color: #f5f5f5 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+.octane-extended-profile-window__content.has-dark-background .octane-extended-profile__relationship-subcopy {
+  color: #d6d6d6 !important;
+}
+
+.octane-extended-profile-window__content.has-dark-background .octane-extended-profile__link {
+  color: #9fd0ff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+.octane-extended-profile-window__content.has-dark-background .octane-extended-profile__separator {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.octane-extended-profile-window__content.has-light-background :is(
+    .octane-extended-profile__identity-copy,
+    .octane-extended-profile__right,
+    .octane-extended-profile__actions
+  ),
+.octane-extended-profile-window__content.has-light-background :is(
+    .octane-extended-profile__identity-copy,
+    .octane-extended-profile__right,
+    .octane-extended-profile__actions
+  )
+  :where(*):not(button, button *, .prefix, .prefix *, [style*='color'], [style*='color'] *, img) {
+  color: #111111 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+/* Window titles on a light accent: the frame's white title would not read. */
+html.octane-user-accent-light .octane-card-shell .octane-card-header-shell .octane-card-title,
+html .octane-card-shell.octane-card-frame-3.has-light-accent > .octane-card-header-shell .octane-card-title {
+  color: #111111 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* A profile with a dark accent keeps a white title even when the viewer's own theme is light. */
+html.octane-user-accent-light .octane-card-shell.octane-card-frame-3.has-profile-accent:not(.has-light-accent) > .octane-card-header-shell .octane-card-title {
+  color: #ffffff !important;
+  text-shadow: none;
 }

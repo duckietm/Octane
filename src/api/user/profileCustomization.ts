@@ -1,5 +1,6 @@
 import { KEEP_PROFILE_CUSTOMIZATION, RoomUnitBackgroundComposer, UserProfileParser } from '@octane/renderer';
 import { configFileUrl } from '../../secure-assets';
+import { parseCssColors, toneOf } from '../utils/backgroundTone';
 import { GetConfigurationValue, GetOptionalConfigurationValue, SendMessageComposer } from '../octane';
 import { GetUserProfile } from './GetUserProfile';
 
@@ -42,6 +43,14 @@ export const PROFILE_ACCENTS: ReadonlyArray<{ id: number; color: string }> = [
 ];
 
 export const getProfileAccentColor = (accentId: number): string | null => PROFILE_ACCENTS.find((accent) => accent.id === accentId)?.color ?? null;
+
+/** True when an accent is light enough that the title on it must be dark to be read. */
+export const isLightProfileAccent = (accentId: number): boolean => {
+    const color = getProfileAccentColor(accentId);
+    const [rgb] = color ? parseCssColors(color) : [];
+
+    return !!rgb && toneOf(rgb) === 'light';
+};
 
 /** The banners used when the hotel's infostand_backgrounds.json has no "banners.data": its own hotel view pictures. */
 export const DEFAULT_PROFILE_BANNERS: ReadonlyArray<ProfileBannerEntry> = [

@@ -32,3 +32,4 @@ export * from './SetLocalStorage';
 export * from './SoundNames';
 export * from './TrailingThrottle';
 export * from './WindowSaveOptions';
+export * from './backgroundTone';

@@ -3,6 +3,7 @@ import { ChangeEvent, CSSProperties, FC, ReactNode, useEffect, useRef, useState 
 import {
     findProfileBanner,
     getProfileAccentColor,
+    isLightProfileAccent,
     loadProfileCustomizationData,
     localizeWithFallback,
     PROFILE_ACCENTS,
@@ -453,7 +454,7 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
         <NativeTextTree>
             <OctaneCardView
                 uniqueKey="octane-profile-customize"
-                className={`octane-profile-customize w-[600px] h-[600px] max-w-[96vw] max-h-[90vh]${accentColor ? ' has-profile-accent' : ''}`}
+                className={`octane-profile-customize w-[600px] h-[600px] max-w-[96vw] max-h-[90vh]${accentColor ? ' has-profile-accent' : ''}${isLightProfileAccent(userProfile.accentId ?? 0) ? ' has-light-accent' : ''}`}
                 style={accentColor ? ({ '--profile-accent': accentColor } as CSSProperties) : undefined}
             >
                 <OctaneCardHeaderView headerText={localizeWithFallback('extendedprofile.customize.title', 'Customise profile')} onCloseClick={onClose} />

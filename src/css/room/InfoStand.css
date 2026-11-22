@@ -628,3 +628,15 @@
 .octane-infostand-area .octane-infostand__identity {
     font-weight: 700 !important;
 }
+
+/* Text on the card background the player chose: the infostand's text is white for its black frame, so a light
+   background turns it dark, and a dark patterned one gets a shadow. Buttons and inputs keep their own colours. */
+.octane-infostand.has-light-background,
+.octane-infostand.has-light-background :where(*):not(button, button *, input, textarea, .infostand-border) {
+  color: #141414 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.octane-infostand.has-dark-background :where(*):not(button, button *, input, textarea) {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
