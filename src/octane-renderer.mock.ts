@@ -348,6 +348,7 @@ export class AvatarEffectExpiredEvent extends MessageEvent {}
 export class AvatarEffectActivatedEvent extends MessageEvent {}
 export class AvatarEffectSelectedEvent extends MessageEvent {}
 export class IsFirstLoginOfDayEvent extends MessageEvent {}
+export class HotelSettingsEvent extends MessageEvent {}
 export class NavigatorOpenRoomCreatorEvent extends MessageEvent {}
 export class NavigatorSearchesEvent extends MessageEvent {}
 export class NavigatorSearchEvent extends MessageEvent {}
@@ -456,6 +457,28 @@ export class RoomEngineAreaHideStateEvent extends StubClass {
 
 export class RoomAreaSelectionManager extends StubClass {
     static readonly HIGHLIGHT_DARKEN = 'highlight_darken';
+}
+
+// Generic plugin channel: the message event and the action composer, which keeps what it sends.
+export class PluginChannelMessageEvent extends StubClass {}
+export class PluginChannelActionComposer {
+    constructor(
+        public readonly channel: string,
+        public readonly payload: string
+    ) {}
+}
+
+// Bot dialogues in the bot menu: the page event and the two composers, which keep what they send.
+export class BotDialogueEvent extends StubClass {}
+export class BotDialogueOpenComposer {
+    constructor(public readonly botId: number) {}
+}
+export class BotDialogueChooseComposer {
+    constructor(
+        public readonly botId: number,
+        public readonly nonce: number,
+        public readonly index: number
+    ) {}
 }
 
 // Composers that keep their constructor arguments, so a test can read what was sent.

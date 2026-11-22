@@ -1,0 +1,1904 @@
+{
+    // The long tables: chat styles, camera effects, notification styles, room models, default figure, palettes. Rarely edited.
+
+
+    // ==== Chat bubble styles ====
+    // Data: the chat bubble styles a user may pick.
+
+    // Chat bubble styles offered, with rank, club, ambassador and purchase rules per style.
+    "chat.styles": [
+        {
+            "styleId": 0,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 1,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 2,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 3,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 4,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 5,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 6,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 7,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 8,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 9,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 10,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 11,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 12,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 13,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 14,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 15,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 16,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 17,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 18,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 19,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 20,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 21,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 22,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 23,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 24,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 25,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 26,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 27,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 28,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 29,
+            "minRank": 0,
+            "isSystemStyle": false,
+            "isHcOnly": true,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 30,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 31,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 32,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 33,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 34,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 35,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 36,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 37,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 38,
+            "minRank": 5,
+            "isSystemStyle": true,
+            "isHcOnly": false,
+            "isAmbassadorOnly": false
+        },
+        {
+            "styleId": 39,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 40,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 41,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 42,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 43,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 44,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 45,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 46,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 47,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 48,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 49,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 50,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 51,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 52,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        },
+        {
+            "styleId": 53,
+            "minRank": 5,
+            "isSystemStyle": false,
+            "isHcOnly": false,
+            "isAmbassadorOnly": true
+        }
+    ],
+
+
+    // ==== Camera effects ====
+    // Data: the colour filters and overlays of the camera editor.
+
+    // Camera effects: name, minimum level, colour matrix or image, enabled.
+    "camera.available.effects": [
+        {
+            "name": "dark_sepia",
+            "colorMatrix": [
+                0.4,
+                0.4,
+                0.1,
+                0,
+                110,
+                0.3,
+                0.4,
+                0.1,
+                0,
+                30,
+                0.3,
+                0.2,
+                0.1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 0,
+            "enabled": true
+        },
+        {
+            "name": "increase_saturation",
+            "colorMatrix": [
+                2,
+                -0.5,
+                -0.5,
+                0,
+                0,
+                -0.5,
+                2,
+                -0.5,
+                0,
+                0,
+                -0.5,
+                -0.5,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 0,
+            "enabled": true
+        },
+        {
+            "name": "increase_contrast",
+            "colorMatrix": [
+                1.5,
+                0,
+                0,
+                0,
+                -50,
+                0,
+                1.5,
+                0,
+                0,
+                -50,
+                0,
+                0,
+                1.5,
+                0,
+                -50,
+                0,
+                0,
+                0,
+                1.5,
+                0
+            ],
+            "minLevel": 0,
+            "enabled": true
+        },
+        {
+            "name": "shadow_multiply_02",
+            "colorMatrix": [],
+            "minLevel": 0,
+            "blendMode": 2,
+            "enabled": true
+        },
+        {
+            "name": "color_1",
+            "colorMatrix": [
+                0.393,
+                0.769,
+                0.189,
+                0,
+                0,
+                0.349,
+                0.686,
+                0.168,
+                0,
+                0,
+                0.272,
+                0.534,
+                0.131,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 1,
+            "enabled": true
+        },
+        {
+            "name": "hue_bright_sat",
+            "colorMatrix": [
+                1,
+                0.6,
+                0.2,
+                0,
+                -50,
+                0.2,
+                1,
+                0.6,
+                0,
+                -50,
+                0.6,
+                0.2,
+                1,
+                0,
+                -50,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 1,
+            "enabled": true
+        },
+        {
+            "name": "hearts_hardlight_02",
+            "colorMatrix": [],
+            "minLevel": 1,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "texture_overlay",
+            "colorMatrix": [],
+            "minLevel": 1,
+            "blendMode": 4,
+            "enabled": true
+        },
+        {
+            "name": "pinky_nrm",
+            "colorMatrix": [],
+            "minLevel": 1,
+            "blendMode": 0,
+            "enabled": true
+        },
+        {
+            "name": "color_2",
+            "colorMatrix": [
+                0.333,
+                0.333,
+                0.333,
+                0,
+                0,
+                0.333,
+                0.333,
+                0.333,
+                0,
+                0,
+                0.333,
+                0.333,
+                0.333,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 2,
+            "enabled": true
+        },
+        {
+            "name": "night_vision",
+            "colorMatrix": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1.1,
+                0,
+                0,
+                -50,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 2,
+            "enabled": true
+        },
+        {
+            "name": "stars_hardlight_02",
+            "colorMatrix": [],
+            "minLevel": 2,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "coffee_mpl",
+            "colorMatrix": [],
+            "minLevel": 2,
+            "blendMode": 2,
+            "enabled": true
+        },
+        {
+            "name": "security_hardlight",
+            "colorMatrix": [],
+            "minLevel": 3,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "bluemood_mpl",
+            "colorMatrix": [],
+            "minLevel": 3,
+            "blendMode": 2,
+            "enabled": true
+        },
+        {
+            "name": "rusty_mpl",
+            "colorMatrix": [],
+            "minLevel": 3,
+            "blendMode": 2,
+            "enabled": true
+        },
+        {
+            "name": "decr_conrast",
+            "colorMatrix": [
+                0.5,
+                0,
+                0,
+                0,
+                50,
+                0,
+                0.5,
+                0,
+                0,
+                50,
+                0,
+                0,
+                0.5,
+                0,
+                50,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 4,
+            "enabled": true
+        },
+        {
+            "name": "green_2",
+            "colorMatrix": [
+                0.5,
+                0.5,
+                0.5,
+                0,
+                0,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                90,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 4,
+            "enabled": true
+        },
+        {
+            "name": "alien_hrd",
+            "colorMatrix": [],
+            "minLevel": 4,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "color_3",
+            "colorMatrix": [
+                0.609,
+                0.609,
+                0.082,
+                0,
+                0,
+                0.309,
+                0.609,
+                0.082,
+                0,
+                0,
+                0.309,
+                0.609,
+                0.082,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 5,
+            "enabled": true
+        },
+        {
+            "name": "color_4",
+            "colorMatrix": [
+                0.8,
+                -0.8,
+                1,
+                0,
+                70,
+                0.8,
+                -0.8,
+                1,
+                0,
+                70,
+                0.8,
+                -0.8,
+                1,
+                0,
+                70,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 5,
+            "enabled": true
+        },
+        {
+            "name": "toxic_hrd",
+            "colorMatrix": [],
+            "minLevel": 5,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "hypersaturated",
+            "colorMatrix": [
+                2,
+                -1,
+                0,
+                0,
+                0,
+                -1,
+                2,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 6,
+            "enabled": true
+        },
+        {
+            "name": "Yellow",
+            "colorMatrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 6,
+            "enabled": true
+        },
+        {
+            "name": "misty_hrd",
+            "colorMatrix": [],
+            "minLevel": 6,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "x_ray",
+            "colorMatrix": [
+                0,
+                1.2,
+                0,
+                0,
+                -100,
+                0,
+                2,
+                0,
+                0,
+                -120,
+                0,
+                2,
+                0,
+                0,
+                -120,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 7,
+            "enabled": true
+        },
+        {
+            "name": "decrease_saturation",
+            "colorMatrix": [
+                0.7,
+                0.2,
+                0.2,
+                0,
+                0,
+                0.2,
+                0.7,
+                0.2,
+                0,
+                0,
+                0.2,
+                0.2,
+                0.7,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 7,
+            "enabled": true
+        },
+        {
+            "name": "drops_mpl",
+            "colorMatrix": [],
+            "minLevel": 8,
+            "blendMode": 2,
+            "enabled": true
+        },
+        {
+            "name": "shiny_hrd",
+            "colorMatrix": [],
+            "minLevel": 9,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "glitter_hrd",
+            "colorMatrix": [],
+            "minLevel": 10,
+            "blendMode": 9,
+            "enabled": true
+        },
+        {
+            "name": "frame_gold",
+            "colorMatrix": [],
+            "minLevel": 10,
+            "blendMode": 0,
+            "enabled": true
+        },
+        {
+            "name": "frame_gray_4",
+            "colorMatrix": [],
+            "minLevel": 10,
+            "blendMode": 0,
+            "enabled": true
+        },
+        {
+            "name": "frame_black_2",
+            "colorMatrix": [],
+            "minLevel": 10,
+            "blendMode": 0,
+            "enabled": true
+        },
+        {
+            "name": "frame_wood_2",
+            "colorMatrix": [],
+            "minLevel": 10,
+            "blendMode": 0,
+            "enabled": true
+        },
+        {
+            "name": "finger_nrm",
+            "colorMatrix": [],
+            "minLevel": 10,
+            "blendMode": 0,
+            "enabled": true
+        },
+        {
+            "name": "color_5",
+            "colorMatrix": [
+                3.309,
+                0.609,
+                1.082,
+                0.2,
+                0,
+                0.309,
+                0.609,
+                0.082,
+                0,
+                0,
+                1.309,
+                0.609,
+                0.082,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 10,
+            "enabled": true
+        },
+        {
+            "name": "black_white_negative",
+            "colorMatrix": [
+                -0.5,
+                -0.5,
+                -0.5,
+                0,
+                0,
+                -0.5,
+                -0.5,
+                -0.5,
+                0,
+                0,
+                -0.5,
+                -0.5,
+                -0.5,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 10,
+            "enabled": true
+        },
+        {
+            "name": "blue",
+            "colorMatrix": [
+                0.5,
+                0.5,
+                0.5,
+                0,
+                -255,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                -170,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 10,
+            "enabled": true
+        },
+        {
+            "name": "red",
+            "colorMatrix": [
+                0.5,
+                0.5,
+                0.5,
+                0,
+                0,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                -170,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                -170,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 10,
+            "enabled": true
+        },
+        {
+            "name": "green",
+            "colorMatrix": [
+                0.5,
+                0.5,
+                0.5,
+                0,
+                -170,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                0,
+                0.5,
+                0.5,
+                0.5,
+                0,
+                -170,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "minLevel": 10,
+            "enabled": true
+        }
+    ],
+
+
+    // ==== Notification styles ====
+    // Data: how each server notification is shown.
+
+    // Per notification type (notification.<type>): delivery, display, title and image overrides.
+    "notification": {
+        "notification.admin.transient": {
+            "display": "POP_UP",
+            "image": "${image.library.url}/album1358/frank_wave_001.gif"
+        },
+        "notification.builders_club.membership_expired": {
+            "display": "POP_UP"
+        },
+        "notification.builders_club.membership_expires": {
+            "display": "POP_UP",
+            "image": "${image.library.url}/notifications/builders_club_room_locked_small.png"
+        },
+        "notification.builders_club.membership_extended": {
+            "delivery": "PERSISTENT",
+            "display": "POP_UP"
+        },
+        "notification.builders_club.membership_made": {
+            "delivery": "PERSISTENT",
+            "display": "POP_UP",
+            "image": "${image.library.url}/notifications/builders_club_membership_extended.png"
+        },
+        "notification.builders_club.membership_renewed": {
+            "delivery": "PERSISTENT",
+            "display": "POP_UP",
+            "image": "${image.library.url}/notifications/builders_club_membership_extended.png"
+        },
+        "notification.builders_club.room_locked": {
+            "display": "BUBBLE",
+            "image": "${image.library.url}/notifications/builders_club_room_locked_small.png"
+        },
+        "notification.builders_club.room_unlocked": {
+            "display": "BUBBLE"
+        },
+        "notification.builders_club.visit_denied_for_owner": {
+            "display": "BUBBLE",
+            "image": "${image.library.url}/notifications/builders_club_room_locked_small.png"
+        },
+        "notification.builders_club.visit_denied_for_visitor": {
+            "display": "POP_UP",
+            "image": "${image.library.url}/notifications/builders_club_room_locked.png"
+        },
+        "notification.campaign.credit.donation": {
+            "display": "BUBBLE"
+        },
+        "notification.campaign.product.donation": {
+            "display": "BUBBLE"
+        },
+        "notification.casino.too_many_dice.placement": {
+            "display": "POP_UP"
+        },
+        "notification.casino.too_many_dice": {
+            "display": "POP_UP"
+        },
+        "notification.cfh.created": {
+            "display": "POP_UP",
+            "title": ""
+        },
+        "notification.feed.enabled": false,
+        "notification.hotel.event": {
+            "image": "${image.library.url}web_promo_small/spromo_Games_Bundle.png",
+            "sound": "messenger_new_thread"
+        },
+        "notification.hotel.event.ended": {
+            "image": "${image.library.url}web_promo_small/spromo_Games_Bundle.png",
+            "sound": "messenger_new_thread"
+        },
+        "notification.floorplan_editor.error": {
+            "display": "POP_UP"
+        },
+        "notification.forums.delivered": {
+            "delivery": "PERSISTENT",
+            "display": "POP_UP"
+        },
+        "notification.forums.forum_settings_updated": {
+            "display": "BUBBLE"
+        },
+        "notification.forums.message.hidden": {
+            "display": "BUBBLE"
+        },
+        "notification.forums.message.restored": {
+            "display": "BUBBLE"
+        },
+        "notification.forums.thread.hidden": {
+            "display": "BUBBLE"
+        },
+        "notification.forums.thread.locked": {
+            "display": "BUBBLE"
+        },
+        "notification.forums.thread.pinned": {
+            "display": "BUBBLE"
+        },
+        "notification.forums.thread.restored": {
+            "display": "BUBBLE"
+        },
+        "notification.forums.thread.unlocked": {
+            "display": "BUBBLE"
+        },
+        "notification.forums.thread.unpinned": {
+            "display": "BUBBLE"
+        },
+        "notification.furni_placement_error": {
+            "display": "BUBBLE"
+        },
+        "notification.gifting.valentine": {
+            "delivery": "PERSISTENT",
+            "display": "BUBBLE",
+            "image": "${image.library.url}/notifications/polaroid_photo.png"
+        },
+        "notification.items.enabled": true,
+        "notification.mute.forbidden.time": {
+            "display": "BUBBLE"
+        },
+        "notification.npc.gift.received": {
+            "display": "BUBBLE",
+            "image": "${image.library.url}/album1584/X1517.gif"
+        }
+    },
+
+
+    // ==== Room models ====
+    // Data: the room models offered when a room is created.
+
+    // Room models in the room creator: name, tile size, club level (negative: staff only).
+    "navigator.room.models": [
+        {
+            "clubLevel": 0,
+            "tileSize": 104,
+            "name": "a"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 94,
+            "name": "b"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 36,
+            "name": "c"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 84,
+            "name": "d"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 80,
+            "name": "e"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 80,
+            "name": "f"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 416,
+            "name": "i"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 320,
+            "name": "j"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 448,
+            "name": "k"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 352,
+            "name": "l"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 384,
+            "name": "m"
+        },
+        {
+            "clubLevel": 0,
+            "tileSize": 372,
+            "name": "n"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 80,
+            "name": "g"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 74,
+            "name": "h"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 416,
+            "name": "o"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 352,
+            "name": "p"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 304,
+            "name": "q"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 336,
+            "name": "r"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 748,
+            "name": "u"
+        },
+        {
+            "clubLevel": 1,
+            "tileSize": 438,
+            "name": "v"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 540,
+            "name": "t"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 512,
+            "name": "w"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 396,
+            "name": "x"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 440,
+            "name": "y"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 456,
+            "name": "z"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 208,
+            "name": "0"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 1009,
+            "name": "1"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 1044,
+            "name": "2"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 183,
+            "name": "3"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 254,
+            "name": "4"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 1024,
+            "name": "5"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 801,
+            "name": "6"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 354,
+            "name": "7"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 888,
+            "name": "8"
+        },
+        {
+            "clubLevel": 2,
+            "tileSize": 926,
+            "name": "9"
+        }
+    ],
+
+
+    // ==== Default figure data ====
+    // Data: the figure data used before the hotel figure data loads.
+
+    // Built-in figure data applied before avatar.figuredata.url loads.
+    "avatar.default.figuredata": {
+        "palettes": [
+            {
+                "id": 1,
+                "colors": [
+                    {
+                        "id": 99999,
+                        "index": 1001,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "DDDDDD"
+                    },
+                    {
+                        "id": 99998,
+                        "index": 1001,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FAFAFA"
+                    }
+                ]
+            },
+            {
+                "id": 3,
+                "colors": [
+                    {
+                        "id": 10001,
+                        "index": 1001,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "EEEEEE"
+                    },
+                    {
+                        "id": 10002,
+                        "index": 1002,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FA3831"
+                    },
+                    {
+                        "id": 10003,
+                        "index": 1003,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FD92A0"
+                    },
+                    {
+                        "id": 10004,
+                        "index": 1004,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "2AC7D2"
+                    },
+                    {
+                        "id": 10005,
+                        "index": 1005,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "35332C"
+                    },
+                    {
+                        "id": 10006,
+                        "index": 1006,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "EFFF92"
+                    },
+                    {
+                        "id": 10007,
+                        "index": 1007,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "C6FF98"
+                    },
+                    {
+                        "id": 10008,
+                        "index": 1008,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FF925A"
+                    },
+                    {
+                        "id": 10009,
+                        "index": 1009,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "9D597E"
+                    },
+                    {
+                        "id": 10010,
+                        "index": 1010,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "B6F3FF"
+                    },
+                    {
+                        "id": 10011,
+                        "index": 1011,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "6DFF33"
+                    },
+                    {
+                        "id": 10012,
+                        "index": 1012,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "3378C9"
+                    },
+                    {
+                        "id": 10013,
+                        "index": 1013,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FFB631"
+                    },
+                    {
+                        "id": 10014,
+                        "index": 1014,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "DFA1E9"
+                    },
+                    {
+                        "id": 10015,
+                        "index": 1015,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "F9FB32"
+                    },
+                    {
+                        "id": 10016,
+                        "index": 1016,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "CAAF8F"
+                    },
+                    {
+                        "id": 10017,
+                        "index": 1017,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "C5C6C5"
+                    },
+                    {
+                        "id": 10018,
+                        "index": 1018,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "47623D"
+                    },
+                    {
+                        "id": 10019,
+                        "index": 1019,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "8A8361"
+                    },
+                    {
+                        "id": 10020,
+                        "index": 1020,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FF8C33"
+                    },
+                    {
+                        "id": 10021,
+                        "index": 1021,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "54C627"
+                    },
+                    {
+                        "id": 10022,
+                        "index": 1022,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "1E6C99"
+                    },
+                    {
+                        "id": 10023,
+                        "index": 1023,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "984F88"
+                    },
+                    {
+                        "id": 10024,
+                        "index": 1024,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "77C8FF"
+                    },
+                    {
+                        "id": 10025,
+                        "index": 1025,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FFC08E"
+                    },
+                    {
+                        "id": 10026,
+                        "index": 1026,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "3C4B87"
+                    },
+                    {
+                        "id": 10027,
+                        "index": 1027,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "7C2C47"
+                    },
+                    {
+                        "id": 10028,
+                        "index": 1028,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "D7FFE3"
+                    },
+                    {
+                        "id": 10029,
+                        "index": 1029,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "8F3F1C"
+                    },
+                    {
+                        "id": 10030,
+                        "index": 1030,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FF6393"
+                    },
+                    {
+                        "id": 10031,
+                        "index": 1031,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "1F9B79"
+                    },
+                    {
+                        "id": 10032,
+                        "index": 1032,
+                        "club": 0,
+                        "selectable": false,
+                        "hexCode": "FDFF33"
+                    }
+                ]
+            }
+        ],
+        "setTypes": [
+            {
+                "type": "hd",
+                "paletteId": 1,
+                "mandatory_f_0": true,
+                "mandatory_f_1": true,
+                "mandatory_m_0": true,
+                "mandatory_m_1": true,
+                "sets": [
+                    {
+                        "id": 99999,
+                        "gender": "U",
+                        "club": 0,
+                        "colorable": true,
+                        "selectable": false,
+                        "preselectable": false,
+                        "sellable": false,
+                        "parts": [
+                            {
+                                "id": 1,
+                                "type": "bd",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            },
+                            {
+                                "id": 1,
+                                "type": "hd",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            },
+                            {
+                                "id": 1,
+                                "type": "lh",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            },
+                            {
+                                "id": 1,
+                                "type": "rh",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "bds",
+                "paletteId": 1,
+                "mandatory_f_0": false,
+                "mandatory_f_1": false,
+                "mandatory_m_0": false,
+                "mandatory_m_1": false,
+                "sets": [
+                    {
+                        "id": 10001,
+                        "gender": "U",
+                        "club": 0,
+                        "colorable": true,
+                        "selectable": false,
+                        "preselectable": false,
+                        "sellable": false,
+                        "parts": [
+                            {
+                                "id": 10001,
+                                "type": "bds",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            },
+                            {
+                                "id": 10001,
+                                "type": "lhs",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            },
+                            {
+                                "id": 10001,
+                                "type": "rhs",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            }
+                        ],
+                        "hiddenLayers": [
+                            {
+                                "partType": "bd"
+                            },
+                            {
+                                "partType": "rh"
+                            },
+                            {
+                                "partType": "lh"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "ss",
+                "paletteId": 3,
+                "mandatory_f_0": false,
+                "mandatory_f_1": false,
+                "mandatory_m_0": false,
+                "mandatory_m_1": false,
+                "sets": [
+                    {
+                        "id": 10010,
+                        "gender": "F",
+                        "club": 0,
+                        "colorable": true,
+                        "selectable": false,
+                        "preselectable": false,
+                        "sellable": false,
+                        "parts": [
+                            {
+                                "id": 10001,
+                                "type": "ss",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            }
+                        ],
+                        "hiddenLayers": [
+                            {
+                                "partType": "ch"
+                            },
+                            {
+                                "partType": "lg"
+                            },
+                            {
+                                "partType": "ca"
+                            },
+                            {
+                                "partType": "wa"
+                            },
+                            {
+                                "partType": "sh"
+                            },
+                            {
+                                "partType": "ls"
+                            },
+                            {
+                                "partType": "rs"
+                            },
+                            {
+                                "partType": "lc"
+                            },
+                            {
+                                "partType": "rc"
+                            },
+                            {
+                                "partType": "cc"
+                            },
+                            {
+                                "partType": "cp"
+                            }
+                        ]
+                    },
+                    {
+                        "id": 10011,
+                        "gender": "M",
+                        "club": 0,
+                        "colorable": true,
+                        "selectable": false,
+                        "preselectable": false,
+                        "sellable": false,
+                        "parts": [
+                            {
+                                "id": 10002,
+                                "type": "ss",
+                                "colorable": true,
+                                "index": 0,
+                                "colorindex": 1
+                            }
+                        ],
+                        "hiddenLayers": [
+                            {
+                                "partType": "ch"
+                            },
+                            {
+                                "partType": "lg"
+                            },
+                            {
+                                "partType": "ca"
+                            },
+                            {
+                                "partType": "wa"
+                            },
+                            {
+                                "partType": "sh"
+                            },
+                            {
+                                "partType": "ls"
+                            },
+                            {
+                                "partType": "rs"
+                            },
+                            {
+                                "partType": "lc"
+                            },
+                            {
+                                "partType": "rc"
+                            },
+                            {
+                                "partType": "cc"
+                            },
+                            {
+                                "partType": "cp"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+
+
+    // ==== Recolorable Builders Club palettes ====
+    // Data: the colour palettes of the recolorable Builders Club furni, and which furni use which palette.
+
+    // Hex colours of the artdeco1 palette for recolourable Builders Club furni; empty: built-in.
+    "recolorable_bc.palette.artdeco1": "",
+
+    // Hex colours of the classic palette for recolourable Builders Club furni; empty: built-in.
+    "recolorable_bc.palette.classic": "",
+
+    // Hex colours of the default palette for recolourable furni not mapped elsewhere; empty: built-in.
+    "recolorable_bc.palette.default": "",
+
+    // Hex colours of the grass palette for recolourable Builders Club furni; empty: built-in.
+    "recolorable_bc.palette.grass": "",
+
+    // Hex colours of the industrial palette for recolourable Builders Club furni; empty: built-in.
+    "recolorable_bc.palette.industrial": "",
+
+    // Hex colours of the metal palette for recolourable Builders Club furni; empty: built-in.
+    "recolorable_bc.palette.metal": "",
+
+    // Hex colours of the metalcrate palette for recolourable Builders Club furni; empty: built-in.
+    "recolorable_bc.palette.metalcrate": "",
+
+    // Hex colours of the redbrick palette for recolourable Builders Club furni; empty: built-in.
+    "recolorable_bc.palette.redbrick": "",
+
+    // Hex colours of the sand palette for recolourable Builders Club furni; empty: built-in.
+    "recolorable_bc.palette.sand": "",
+
+    // Hex colours of the stone palette for recolourable Builders Club furni; empty: built-in.
+    "recolorable_bc.palette.stone": "",
+
+    // Hex colours of the water palette for recolourable Builders Club furni; empty: built-in.
+    "recolorable_bc.palette.water": "",
+
+    // Hex colours of the wood palette for recolourable Builders Club furni; empty: built-in.
+    "recolorable_bc.palette.wood": "",
+
+    // Which palette each recolourable classname uses: palette=class,class;... Empty: built-in; empty: Habbo's.
+    "recolorable_bc.palette_to_furni": ""
+}

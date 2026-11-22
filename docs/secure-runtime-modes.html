@@ -68,7 +68,7 @@
                             </thead>
                             <tbody class="divide-y divide-slate-800">
                                 <tr class="bg-slate-900/60">
-                                    <td class="px-4 py-3"><code>public/configuration/client-mode.example</code></td>
+                                    <td class="px-4 py-3"><code>public/configuration/client-mode.example.json</code></td>
                                     <td class="px-4 py-3">Template per i toggle runtime</td>
                                     <td class="px-4 py-3 text-slate-300">Da copiare in <code>configuration/client-mode.json</code> nel deploy reale, che resta ignorato da Git</td>
                                 </tr>
@@ -93,7 +93,7 @@
                 </section>
 
                 <section id="client-mode" class="rounded-3xl border border-slate-800 bg-slate-900/70 p-8">
-                    <h2 class="text-2xl font-bold text-white">client-mode.example</h2>
+                    <h2 class="text-2xl font-bold text-white">client-mode.example.json</h2>
                     <p class="mt-3 text-sm leading-7 text-slate-300">È il punto centrale per attivare o disattivare il comportamento runtime senza dover modificare il codice.</p>
 <pre class="mt-5 overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/90 p-5 text-sm text-cyan-300"><code>{
     "distObfuscationEnabled": true,
@@ -220,7 +220,7 @@ nitro.secure.master_key=change-me-to-a-long-random-secret</code></pre>
                 <section id="checklist" class="rounded-3xl border border-slate-800 bg-slate-900/70 p-8">
                     <h2 class="text-2xl font-bold text-white">Checklist finale</h2>
                     <div class="mt-5 grid gap-3">
-                        <div class="rounded-2xl border border-slate-800 bg-slate-950/60 px-5 py-4 text-sm text-slate-300">Hai creato i file reali partendo da <code>client-mode.example</code>, <code>renderer-config.example</code> e <code>ui-config.example</code></div>
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/60 px-5 py-4 text-sm text-slate-300">Hai creato i file reali partendo da <code>client-mode.example.json</code>, <code>renderer-config.example</code> e <code>ui-config.example</code></div>
                         <div class="rounded-2xl border border-slate-800 bg-slate-950/60 px-5 py-4 text-sm text-slate-300">Gli URL pubblici stanno nei file config, non nei componenti React</div>
                         <div class="rounded-2xl border border-slate-800 bg-slate-950/60 px-5 py-4 text-sm text-slate-300">Hai deployato sia i file plain sia i <code>.dat</code></div>
                         <div class="rounded-2xl border border-slate-800 bg-slate-950/60 px-5 py-4 text-sm text-slate-300">Il server espone correttamente il MIME type per <code>.dat</code></div>

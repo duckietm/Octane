@@ -36,23 +36,6 @@ export const GetSubscriptionProductIcon = (id: number) => {
     return '';
 };
 
-export const GetOfferNodes = (offerNodes: Map<number, ICatalogNode[]>, offerId: number) => {
-    if (!offerNodes) return [];
-
-    const nodes = offerNodes.get(offerId);
-    const allowedNodes: ICatalogNode[] = [];
-
-    if (nodes && nodes.length) {
-        for (const node of nodes) {
-            if (!node || !node.isVisible) continue;
-
-            allowedNodes.push(node);
-        }
-    }
-
-    return allowedNodes;
-};
-
 export const FilterCatalogNode = (search: string, furniLines: string[], node: ICatalogNode, nodes: ICatalogNode[]) => {
     if (!node) return;
 

@@ -38,27 +38,27 @@ export const CatalogLayouGuildForumView: FC<CatalogLayoutProps> = (props) => {
                             className="octane-catalog-forum-text grow! min-h-0 overflow-auto text-black"
                             dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(1)) }}
                         />
-                        {!!currentOffer && (
-                            <div className="flex shrink-0 flex-col gap-1">
-                                <Flex alignItems="center" gap={2}>
-                                    <CatalogGuildBadgeWidgetView className="shrink-0" />
-                                    <CatalogTotalPriceWidget />
-                                    <div className="grow! min-w-0">
-                                        <CatalogGuildSelectorWidgetView forumSelector />
-                                    </div>
-                                </Flex>
-                                {selectedGroupHasForum && (
-                                    <div className="octane-catalog-forum-warning text-center text-[11px] text-[#a81a12]" role="alert">
-                                        {LocalizeText('catalog.alert.group_has_forum')}
-                                    </div>
-                                )}
-                                {hasGroups && (
-                                    <div className="flex justify-center">
-                                        <CatalogPurchaseWidgetView noGiftOption={true} />
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                        {/* The forum selector keeps its "start a group" route visible before an article is picked; the
+                            badge, price and purchase stay tied to the picked offer. */}
+                        <div className="flex shrink-0 flex-col gap-1">
+                            <Flex alignItems="center" gap={2}>
+                                {!!currentOffer && <CatalogGuildBadgeWidgetView className="shrink-0" />}
+                                {!!currentOffer && <CatalogTotalPriceWidget />}
+                                <div className="grow! min-w-0">
+                                    <CatalogGuildSelectorWidgetView forumSelector />
+                                </div>
+                            </Flex>
+                            {!!currentOffer && selectedGroupHasForum && (
+                                <div className="octane-catalog-forum-warning text-center text-[11px] text-[#a81a12]" role="alert">
+                                    {LocalizeText('catalog.alert.group_has_forum')}
+                                </div>
+                            )}
+                            {!!currentOffer && hasGroups && (
+                                <div className="flex justify-center">
+                                    <CatalogPurchaseWidgetView noGiftOption={true} />
+                                </div>
+                            )}
+                        </div>
                     </Column>
                     <Column alignItems="center" overflow="hidden" size={4}>
                         {!!teaserImage && <LayoutImage className="max-w-full" imageUrl={teaserImage} />}

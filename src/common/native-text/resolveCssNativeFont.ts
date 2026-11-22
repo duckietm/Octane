@@ -69,6 +69,3 @@ export const resolveCssNativeFont = (css: CssFontSource): CssNativeFont | null =
 
     return { style, transform, wrap };
 };
-
-export const sameCssNativeFont = (a: CssNativeFont | null, b: CssNativeFont | null) =>
-    a === b || (!!a && !!b && a.transform === b.transform && a.wrap === b.wrap && JSON.stringify(a.style) === JSON.stringify(b.style));

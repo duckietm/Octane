@@ -8,5 +8,6 @@ import { usePollActions } from './usePollActions';
  *
  * Kept only to preserve the `{ startPoll, rejectPoll, answerPoll }`
  * shape for any out-of-tree consumer; remove once nothing imports it.
+ * @public
  */
 export const usePollWidget = () => usePollActions();

@@ -16,7 +16,6 @@ describe('furni window text (AIR)', () => {
             'FurnitureSpamWallPostItView',
             'FurnitureTrophyView',
             'FurnitureBadgeDisplayView',
-            'FurnitureNikoTrophyView',
             'FurnitureMannequinView',
             'FurnitureStackHeightView'
         ]) {
@@ -41,11 +40,9 @@ describe('furni window text (AIR)', () => {
         expect(css).toMatch(/\.octane-stickie \.stickie-context textarea\.context-text \{[^}]*font-family: Volter[^}]*font-size: 9px;[^}]*font-style: normal/);
     });
 
-    it('sets trophies, badge displays and the Niko trophy in regular Ubuntu 12 px', () => {
+    it('sets trophies and badge displays in regular Ubuntu 12 px', () => {
         expect(css).toMatch(/\.octane-layout-trophy \{[^}]*HabboAirUbuntu[^}]*font-size: 12px/);
         expect(css).toMatch(/\.octane-layout-trophy :where\(\*\):not\(svg, svg \*\) \{[^}]*HabboAirUbuntu/);
-        expect(css).toMatch(/\.octane-niko-trophy-band \{[^}]*font-size: 12px/);
-        expect(css).toMatch(/\.octane-niko-trophy-link \{[^}]*color: #fff;[^}]*text-decoration: underline/);
     });
 
     it('gives the mannequin its 13 px texts and 12 px bold buttons', () => {

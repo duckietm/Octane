@@ -92,6 +92,26 @@ describe('AIR friend bar paging', () => {
         await waitFor(() => expect(container.querySelectorAll('.friend-bar-action-icon')).toHaveLength(1));
     });
 
+    it('makes chat, follow and profile buttons a keyboard can reach and name', async () => {
+        const friend = { ...makeFriend(1, 'Alice'), followingAllowed: true } as MessengerFriend;
+        const { container } = render(<FriendBarView onlineFriends={[friend]} />);
+
+        await waitFor(() => expect(container.querySelector('.friend-bar-tab')).not.toBeNull());
+
+        fireEvent.click(container.querySelector<HTMLButtonElement>('.friend-bar-tab'));
+
+        await waitFor(() => expect(container.querySelectorAll('.friend-bar-action-icon')).toHaveLength(3));
+
+        const actions = [...container.querySelectorAll('.friend-bar-action-icon')];
+
+        expect(actions.map((action) => action.tagName)).toEqual(['BUTTON', 'BUTTON', 'BUTTON']);
+        expect(actions.map((action) => action.getAttribute('aria-label'))).toEqual([
+            'Start chat',
+            'Go to the room this Habbo is in',
+            'Click to view the profile'
+        ]);
+    });
+
     it('shows friend activity as AIR tokens: icon on the tab, message pieces while open, gone once closed', async () => {
         const friends = [makeFriend(1, 'Alice'), makeFriend(2, 'Bruno'), makeFriend(3, 'Carla')];
         const store = useFriendBarNotificationsStore.getState();

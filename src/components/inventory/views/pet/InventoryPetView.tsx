@@ -8,6 +8,7 @@ import { ClassicScrollAreaView } from '../../../../common/scroll-area/ClassicScr
 import { useInventoryPets, useInventoryUnseenTracker, useNotification, usePlayTestRestricted } from '../../../../hooks';
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
+import { InventoryCategoryLoadingView } from '../InventoryCategoryLoadingView';
 import { InventoryPetImageView } from './InventoryPetImageView';
 import { InventoryPetItemView } from './InventoryPetItemView';
 import { BaseButton } from '../../../../common/BaseButton';
@@ -19,7 +20,7 @@ export const InventoryPetView: FC<{
 }> = (props) => {
     const { roomSession = null } = props;
     const [isVisible, setIsVisible] = useState(false);
-    const { petItems = null, selectedPet = null, setSelectedPet, activate = null, deactivate = null } = useInventoryPets();
+    const { petItems = null, isLoaded = false, selectedPet = null, setSelectedPet, activate = null, deactivate = null } = useInventoryPets();
     const { isUnseen = null, removeUnseen = null } = useInventoryUnseenTracker();
     const { showConfirm = null } = useNotification();
     const playTestRestricted = usePlayTestRestricted();
@@ -92,6 +93,8 @@ export const InventoryPetView: FC<{
     }, []);
 
     if (!petItems || !petItems.length) {
+        if (!isLoaded) return <InventoryCategoryLoadingView />;
+
         return <InventoryCategoryEmptyView desc={LocalizeText('inventory.empty.pets.desc')} title={LocalizeText('inventory.empty.pets.title')} />;
     }
 

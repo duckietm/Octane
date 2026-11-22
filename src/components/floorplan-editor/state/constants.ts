@@ -1,6 +1,5 @@
 export {
     COLORMAP,
-    FloorAction,
     HEIGHT_SCHEME,
     MAX_NUM_TILE_PER_AXIS,
     TILE_SIZE

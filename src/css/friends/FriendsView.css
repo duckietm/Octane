@@ -2210,11 +2210,17 @@ button.swf-friends-section-header {
     display: flex;
     width: 23px;
     height: 21px;
+    padding: 0;
     align-items: center;
     justify-content: center;
     border: 0;
     background: transparent;
     box-shadow: none;
+}
+
+.friend-bar .friend-bar-friend.is-selected .friend-bar-action-icon:focus-visible {
+    outline: 1px dotted #000000;
+    outline-offset: 0;
 }
 
 .friend-bar .friend-bar-friend.is-selected .friend-bar-action-icon img {

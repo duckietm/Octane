@@ -6,6 +6,7 @@ import { ClassicScrollAreaView } from '../../../../common/scroll-area/ClassicScr
 import { useInventoryBots, useInventoryUnseenTracker, usePlayTestRestricted } from '../../../../hooks';
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
+import { InventoryCategoryLoadingView } from '../InventoryCategoryLoadingView';
 import { InventoryBotImageView } from './InventoryBotImageView';
 import { InventoryBotItemView } from './InventoryBotItemView';
 
@@ -15,7 +16,7 @@ export const InventoryBotView: FC<{
 }> = (props) => {
     const { roomSession = null } = props;
     const [isVisible, setIsVisible] = useState(false);
-    const { botItems = [], selectedBot = null, activate = null, deactivate = null } = useInventoryBots();
+    const { botItems = [], isLoaded = false, selectedBot = null, activate = null, deactivate = null } = useInventoryBots();
     const { isUnseen = null, removeUnseen = null } = useInventoryUnseenTracker();
     const playTestRestricted = usePlayTestRestricted();
 
@@ -36,6 +37,8 @@ export const InventoryBotView: FC<{
     }, []);
 
     if (!botItems || !botItems.length) {
+        if (!isLoaded) return <InventoryCategoryLoadingView />;
+
         return <InventoryCategoryEmptyView desc={LocalizeText('inventory.empty.bots.desc')} title={LocalizeText('inventory.empty.bots.title')} />;
     }
 

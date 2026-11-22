@@ -233,7 +233,7 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
 
     return (
         <NativeTextTree>
-            <DraggableWindow>
+            <DraggableWindow uniqueKey="camera-capture">
                 <Column center className="octane-camera-capture" gap={0}>
                     <div className="octane-camera-capture__body drag-handler">
                         <div className="octane-camera-capture__title">

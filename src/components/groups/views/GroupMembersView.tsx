@@ -274,7 +274,7 @@ export const GroupMembersView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-groups-window octane-group-members" theme="primary-slim" isResizable={false}>
+            <OctaneCardView uniqueKey="group-members" className="octane-groups-window octane-group-members" theme="primary-slim" isResizable={false}>
                 <OctaneCardHeaderView
                     headerText={LocalizeText('group.members.title', ['groupName'], [membersData ? membersData.groupTitle : ''])}
                     onCloseClick={(event) => setGroupId(-1)}
@@ -302,6 +302,10 @@ export const GroupMembersView: FC<{}> = (props) => {
                     </div>
                     <Grid className="octane-group-members-list-grid" columnCount={2} overflow="auto">
                         {membersData.result.map((member, index) => {
+                            // member_entry: the admin icon only for an admin or the owner, or when the viewer manages the group.
+                            const showRankIcon =
+                                member.rank === GroupRank.OWNER || member.rank === GroupRank.ADMIN || (membersData.admin && member.rank === GroupRank.MEMBER);
+
                             return (
                                 <Flex key={index} alignItems="center" className="octane-group-member-row" gap={0} overflow="hidden">
                                     <BaseButton type="button" className="octane-group-member-row__avatar cursor-pointer" onClick={() => GetUserProfile(member.id)}>
@@ -326,7 +330,7 @@ export const GroupMembersView: FC<{}> = (props) => {
                                         )}
                                     </Column>
                                     <div className="octane-group-member-row__actions">
-                                        {member.rank !== GroupRank.REQUESTED && member.rank !== GroupRank.BLOCKED && (
+                                        {showRankIcon && (
                                             <div className="flex items-center justify-center">
                                                 <Hint content={LocalizeText(getRankDescription(member))}><BaseButton type="button" aria-label={LocalizeText(getRankDescription(member))}
                                                     className={classNames(

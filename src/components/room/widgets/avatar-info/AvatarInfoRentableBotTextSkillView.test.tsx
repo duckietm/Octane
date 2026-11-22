@@ -19,6 +19,8 @@ vi.mock('../../../../api', () => ({
     BotSkillsEnum: { CHANGE_BOT_NAME: 5, CHANGE_BOT_MOTTO: 9 },
     GetBotSkillWindowPosition: () => ({ x: 0, y: 0 }),
     GetConfigurationValue: (_key: string, fallback: unknown) => fallback,
+    GetHotelSettings: () => null,
+    resolveServerLength: (_settings: unknown, _field: string, configured: number) => configured,
     GetRoomObjectBounds: () => null,
     GetRoomSession: () => null,
     LocalizeText: (key: string) => key,

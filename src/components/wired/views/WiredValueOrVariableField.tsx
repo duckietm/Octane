@@ -24,9 +24,12 @@ export const WIRED_VALUE_TARGETS: Array<{ key: WiredVariablePickerTarget; value:
     { key: 'context', value: -20 }
 ];
 
+/** @public */
 export const WIRED_VALUE_TARGET_FURNI = 0;
+/** @public */
 export const WIRED_VALUE_TARGET_USER = 1;
 export const WIRED_VALUE_TARGET_GLOBAL = -10;
+/** @public */
 export const WIRED_VALUE_TARGET_CONTEXT = -20;
 
 export const normalizeWiredValueTarget = (value: number) => (WIRED_VALUE_TARGETS.some((target) => target.value === value) ? value : 0);

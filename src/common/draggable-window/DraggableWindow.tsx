@@ -21,6 +21,50 @@ const BOUNDS_THRESHOLD_TOP: number = 0;
 const BOUNDS_THRESHOLD_LEFT: number = 0;
 const DRAG_OUTSIDE_PERCENT: number = 0.8;
 const DRAG_START_THRESHOLD_PX: number = 3;
+const CLOSE_BUTTON_SELECTOR: string = '.octane-card-close-button';
+const TEXT_FIELD_SELECTOR: string = 'input, textarea, select, [contenteditable=""], [contenteditable="true"]';
+
+/**
+ * Escape closes the window on top by pressing its own close button, so every window keeps its own close
+ * behaviour. Nothing happens while the user types in a field, or when anything else handled the key and
+ * prevented its default (Base UI does when it closes a menu, select or dialog). That is checked once the
+ * whole dispatch is over, so listeners registered after this one are seen too. Windows without the
+ * standard close button are skipped.
+ */
+const closeTopWindowOnEscape = (event: KeyboardEvent): void => {
+    if (event.key !== 'Escape' || event.defaultPrevented || event.isComposing) return;
+
+    const target = event.target as HTMLElement | null;
+
+    if (target?.closest?.(TEXT_FIELD_SELECTOR)) return;
+
+    window.setTimeout(() => {
+        if (event.defaultPrevented) return;
+
+        for (let index = CURRENT_WINDOWS.length - 1; index >= 0; index--) {
+            const closeButton = CURRENT_WINDOWS[index].querySelector<HTMLElement>(CLOSE_BUTTON_SELECTOR);
+
+            if (!closeButton) continue;
+
+            closeButton.click();
+
+            return;
+        }
+    }, 0);
+};
+
+const trackWindow = (element: HTMLElement): void => {
+    if (!CURRENT_WINDOWS.length) window.addEventListener('keydown', closeTopWindowOnEscape);
+
+    CURRENT_WINDOWS.push(element);
+};
+
+const untrackWindow = (element: HTMLElement): void => {
+    const index = CURRENT_WINDOWS.indexOf(element);
+
+    if (index >= 0) CURRENT_WINDOWS.splice(index, 1);
+    if (!CURRENT_WINDOWS.length) window.removeEventListener('keydown', closeTopWindowOnEscape);
+};
 
 export interface DraggableWindowProps {
     uniqueKey?: Key;
@@ -120,13 +164,10 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
         const element = elementRef.current as HTMLElement;
         if (!element) return;
 
-        CURRENT_WINDOWS.push(element);
+        trackWindow(element);
         bringToTop();
 
-        return () => {
-            const index = CURRENT_WINDOWS.indexOf(element);
-            if (index >= 0) CURRENT_WINDOWS.splice(index, 1);
-        };
+        return () => untrackWindow(element);
     }, [handleSelector, windowPosition, uniqueKey, disableDrag, offsetLeft, offsetTop, bringToTop]);
 
     useLayoutEffect(() => {
@@ -242,6 +283,24 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
             dragHandler.removeEventListener('pointercancel', onPointerEnd);
         };
     }, [dragHandler, uniqueKey, clampPosition, hasInitialPosition, onPositionChange]);
+
+    // A smaller browser window or another monitor must not leave a window out of reach.
+    useEffect(() => {
+        const keepInView = () => {
+            if (dragRef.current?.active) return;
+
+            const clampedPos = clampPosition(offsetRef.current.x, offsetRef.current.y);
+
+            if (clampedPos.x === offsetRef.current.x && clampedPos.y === offsetRef.current.y) return;
+
+            offsetRef.current = clampedPos;
+            setOffset(clampedPos);
+        };
+
+        window.addEventListener('resize', keepInView);
+
+        return () => window.removeEventListener('resize', keepInView);
+    }, [clampPosition]);
 
     useEffect(() => {
         if (!uniqueKey || hasInitialPosition) return;

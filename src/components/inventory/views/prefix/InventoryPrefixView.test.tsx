@@ -37,6 +37,7 @@ vi.mock('../InventoryCategoryEmptyView', () => ({
 vi.mock('../../../../hooks', () => ({
     useInventoryPrefixes: () => ({
         prefixes: state.prefixes,
+        isLoaded: true,
         activePrefix: null,
         selectedPrefix: state.selectedPrefix,
         setSelectedPrefix,
@@ -46,7 +47,7 @@ vi.mock('../../../../hooks', () => ({
         activate: () => 1,
         deactivate: vi.fn()
     }),
-    useInventoryNickIcons: () => ({ nickIcons: [], activate: () => 1, deactivate: vi.fn() }),
+    useInventoryNickIcons: () => ({ nickIcons: [], isLoaded: true, activate: () => 1, deactivate: vi.fn() }),
     useNotification: () => ({ showConfirm: vi.fn() })
 }));
 

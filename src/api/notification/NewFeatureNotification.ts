@@ -3,7 +3,7 @@
  * SingularNotificationController.maybeShowNewFeatureNotification), as pure rules. Everything is driven by
  * hotel properties (AIR's external variables, our configuration):
  *
- *   notifications.new_feature.active                 comma list of keys
+ *   notifications.new_feature.active                 list of keys (or a comma list)
  *   notifications.new_feature.condition.<key>        "reward_track_incomplete:<track id>" (else always shown)
  *   notifications.new_feature.type.<key>             normal (default) | promo | countdown
  *   notifications.new_feature.expiry.<key>           server time ("yyyy-MM-dd HH:mm"): gone once it passed
@@ -25,9 +25,6 @@ export type NewFeatureType = typeof NEW_FEATURE_TYPE_NORMAL | typeof NEW_FEATURE
 
 /** NewFeatureNotification.BG_COLOR_NORMAL. */
 export const NEW_FEATURE_BG_COLOR_NORMAL = '#686661';
-/** NewFeatureNotification.LINK_COLOR_NORMAL / LINK_COLOR_HIGHLIGHT. */
-export const NEW_FEATURE_LINK_COLOR_NORMAL = 0xffffff;
-export const NEW_FEATURE_LINK_COLOR_HIGHLIGHT = 0xbae1f9;
 
 /** SingularNotificationController: the first check 2 s after start, then up to 3 retries 2 s apart. */
 export const NEW_FEATURE_FIRST_CHECK_DELAY_MS = 2000;

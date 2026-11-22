@@ -1,6 +1,6 @@
 import { GetRoomContentLoader } from '@octane/renderer';
 import { FC, useEffect } from 'react';
-import { GetConfigurationValue, LocalizeText } from '../../../../api';
+import { GetConfigurationValue, GetHotelSettings, LocalizeText, resolveServerLength } from '../../../../api';
 import { Button, LayoutPetImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { usePetPackageWidget } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
@@ -74,7 +74,7 @@ export const PetPackageWidgetView: FC<{}> = (props) => {
                                     <div className="flex items-center bg-white rounded py-1 px-2 input-pet-package-container">
                                         <input
                                             className="min-h-[calc(1.5em+ .5rem+2px)] px-[.5rem] py-[.25rem] rounded-[.2rem] form-control-sm input-pet-package w-full min-w-0 text-[#888888] placeholder:text-[#8a8a8a]"
-                                            maxLength={GetConfigurationValue('pet.package.name.max.length')}
+                                            maxLength={resolveServerLength(GetHotelSettings(), 'petNameMaxLength', GetConfigurationValue<number>('pet.package.name.max.length', 15))}
                                             placeholder={
                                                 objectType === 'gnome_box'
                                                     ? LocalizeText('widgets.gnomepackage.name.select')

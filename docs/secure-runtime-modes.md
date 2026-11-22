@@ -3,7 +3,7 @@
 Questa doc riassume tutti i dati da impostare per:
 
 - offuscamento bundle `dist` (`app.js` / `app.css` → `.dat`)
-- secure assets runtime (`configuration/renderer-config.json`, `configuration/ui-config.json`, `gamedata`)
+- secure assets runtime (`configuration/config.jsonc`, i file di `configuration/config/`, `gamedata`)
 - secure API runtime (`/api/*`)
 - fallback plain quando vuoi spegnere tutto senza togliere il codice
 
@@ -30,7 +30,7 @@ Questo file controlla tutto a runtime.
 
 - `secureAssetsEnabled`
   - `true`: `bootstrap.ts` e `secure-assets.ts` usano `/nitro-sec/file`
-  - `false`: `configuration/renderer-config.json`, `configuration/ui-config.json` e gamedata vengono letti in plain
+  - `false`: `configuration/config.jsonc`, i file di `configuration/config/` e gamedata vengono letti in plain
 
 - `secureApiEnabled`
   - `true`: il wrapper `fetch` cifra le chiamate `/api/*`
@@ -55,13 +55,17 @@ Questo file controlla tutto a runtime.
 
 - installa il secure fetch wrapper
 - legge `window.__octaneClientMode`
-- costruisce `OctaneConfig['config.urls']`
+- legge `configuration/config.jsonc` e la sua lista `"config.files"` (`src/api/configuration/configurationFiles.ts`)
+- costruisce `OctaneConfig['config.urls']` con quei file, nello stesso ordine (per la stessa chiave vince il file che viene dopo)
+
+Se `config.jsonc` manca, non si legge o non elenca nulla di utilizzabile, carica i vecchi `renderer-config.json` +
+`ui-config.json` come prima: un hotel che non ha ancora spostato la configurazione continua a funzionare.
 
 ### Comportamento attuale
 
 - se `secureAssetsEnabled=true`
-  - usa `secureUrl('config', 'renderer-config.json', true)`
-  - usa `secureUrl('config', 'ui-config.json', true)`
+  - usa `secureUrl('config', 'config.jsonc', true)` per la base
+  - usa `secureUrl('config', <file>, true)` per ogni file elencato, es. `config/server.jsonc` (il server accetta le sottocartelle)
 
 - se `secureAssetsEnabled=false`
   - usa i file plain con cache bust (`?v=...`)
@@ -95,15 +99,17 @@ Qui vive tutta la logica runtime:
 
 Normalmente non serve toccarlo, a meno che tu non voglia cambiare il protocollo secure.
 
-## 4. `octane/public/configuration/renderer-config.json`
+## 4. `octane/public/configuration/config/server.jsonc`
 
-Questo file continua a definire i path usati dal renderer.
+Le sezioni `Server and connection` e `Assets and game data` di questo file definiscono i path usati dal renderer
+(prima stavano in `renderer-config.json`). Il file è JSONC, con un commento `//` sopra ogni chiave: la modalità JSON
+deve essere `jsonc` o `auto`.
 
 ### Da controllare
 
-- `api.url`
-- `socket.url`
-- `gamedata.url`
+- `api.url` (sezione `Server and connection`)
+- `socket.url` (sezione `Server and connection`)
+- `gamedata.url` (da qui in giù, sezione `Assets and game data`)
 - `external.texts.url`
 - `external.texts.translation.url`
 - `furnidata.url`
@@ -129,14 +135,15 @@ Conviene usare i path plain classici, per esempio:
 
 oppure lasciare il renderer configurato com’è e demandare il fallback a `secure-assets.ts`.
 
-## 5. `octane/public/configuration/ui-config.json`
+## 5. Gli altri file di `octane/public/configuration/config/`: `hotel.json`, `features.json`, `data.json`
 
-Qui non c’è logica secure, ma è uno dei file caricati da `config.urls`.
+Qui non c’è logica secure, ma sono file caricati da `config.urls` (quello che prima stava in `ui-config.json`).
+Per sapere in quale file sta una chiave, cercala in `config.example/`.
 
-Se `secureAssetsEnabled=true`, arriva da `/nitro-sec/file`.
-Se `secureAssetsEnabled=false`, arriva dal file statico con `?v=...`.
+Se `secureAssetsEnabled=true`, arrivano da `/nitro-sec/file`.
+Se `secureAssetsEnabled=false`, arrivano dai file statici con `?v=...`.
 
-Quindi basta mantenerlo corretto come contenuto, non serve altro.
+Quindi basta mantenerli corretti come contenuto, non serve altro.
 
 ## 6. `octane/scripts/write-asset-loader.mjs`
 
@@ -194,7 +201,7 @@ nitro.secure.master_key=change-me-to-a-long-random-secret
   - abilita il layer secure per `/api/*`
 
 - `nitro.secure.config.root`
-  - cartella dove leggere `configuration/renderer-config.json` e `configuration/ui-config.json`
+  - cartella dove leggere `configuration/config.jsonc` e la cartella `configuration/config/`: deve contenerle entrambe
 
 - `nitro.secure.gamedata.root`
   - cartella dove leggere il gamedata live
@@ -274,8 +281,8 @@ nitro.secure.api.enabled=false
 Per cambiare:
 
 - `configuration/client-mode.json`
-- `configuration/renderer-config.json`
-- `configuration/ui-config.json`
+- `configuration/config.jsonc`
+- i file di `configuration/config/`
 - gamedata live
 - `config.ini`
 

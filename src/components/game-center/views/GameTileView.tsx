@@ -5,6 +5,7 @@ import {
     ColorUtils,
     CreateLinkEvent,
     formatSnowWarBlockCountdown,
+    GetConfigurationRecord,
     GetConfigurationValue,
     getGamesLeftStatus,
     getSnowWarTokenPrice,
@@ -67,7 +68,7 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
 
     const openClubCenter = () =>
     {
-        const links = GetConfigurationValue<Record<string, string>>('catalog.links', {});
+        const links = GetConfigurationRecord('catalog.links');
         CreateLinkEvent(`catalog/open/${links?.['hc.buy_hc'] ?? 'habbo_club'}`);
     };
 

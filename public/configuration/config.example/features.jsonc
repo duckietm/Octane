@@ -1,0 +1,186 @@
+{
+    // Features switched on and off, wired, radio, camera and the staff tools.
+
+
+    // ==== Features on and off ====
+    // Toolbar buttons, habicons and other switches of the interface, new-feature notifications.
+
+    // Turns on habbicons and loads their catalog.
+    "habbicons.enabled": true,
+
+    // Base address of the habbicon assets; empty: habbicons load nothing.
+    "habbicons.asset.root": "/habbicons",
+
+    // Folder appended to habbicons.asset.root, to bust caches; empty: none.
+    "habbicons.asset.hash": "default",
+
+    // true: the see-through bottom bar; false: the solid original bar.
+    "toolbar.transparent": true,
+
+    // Shows the fortune wheel button on the toolbar and mounts the wheel.
+    "toolbar.fortunewheel.enabled": true,
+
+    // Shows the stories button on the toolbar outside rooms.
+    "toolbar.stories.enabled": false,
+
+    // Shows the "new" label on the catalog button when there are new items.
+    "toolbar.new_additions.notification.enabled": true,
+
+    // Labels drawn with AIR's native text renderer; false uses browser text everywhere.
+    "ui.native.text.enabled": true,
+
+    // Shows the word filter row in the settings menu.
+    "user.custom.filter.enabled": true,
+
+    // Short hotel and staff alerts show as a toast instead of a dialog.
+    "hotel_alert_animated": false,
+
+    // Mystery box "How does it work?" link: a habbopages/ page or web address; empty hides it.
+    "mysterybox.faq.url": "habbopages/mysterybox/faq",
+
+    // Keys of the new-feature notifications to show, e.g. ["rewardtrack_intro"].
+    "notifications.new_feature.active": [],
+
+    // Style of this notification: normal, promo or countdown.
+    "notifications.new_feature.type.rewardtrack_intro": "promo",
+
+    // Shown only while "reward_track_incomplete:<track>" holds; empty: always.
+    "notifications.new_feature.condition.rewardtrack_intro": "reward_track_incomplete:introduction",
+
+    // Picture of this notification: a bundled asset name or an address.
+    "notifications.new_feature.image.rewardtrack_intro": "reward_track_small_icon",
+
+    // Client link the notification's open button follows.
+    "notifications.new_feature.internal_link.rewardtrack_intro": "reward_track/open/introduction",
+
+
+    // ==== Wired ====
+    // Wired limits, chests, the web API.
+
+    // Maximum characters of the kick message in the kick wired box.
+    "wired.action.kick.from.room.max.length": 100,
+
+    // Timezones the room and the time / date wired conditions offer, e.g. ["Europe/Rome"]; empty: every zone the browser knows.
+    "wired.timezones": [],
+
+    // Shows the self-donation button in the wired tools settings tab.
+    "wired.selfdonation.enabled": false,
+
+    // Largest amount the self-donation tool can give at once.
+    "wired.selfdonation.max.amount": 500,
+
+    // Capacity of a starter coins chest.
+    "wired.coins_chest.starter_capacity": 100,
+
+    // Capacity of a coins chest before any upgrade.
+    "wired.coins_chest.initial_capacity": 5000,
+
+    // Capacity each coins chest upgrade adds.
+    "wired.coins_chest.upgrade_capacity": 5000,
+
+    // Capacity of a starter furni chest.
+    "wired.furni_chest.starter_capacity": 100,
+
+    // Capacity of a furni chest before any upgrade.
+    "wired.furni_chest.initial_capacity": 1000,
+
+    // Capacity each furni chest upgrade adds.
+    "wired.furni_chest.upgrade_capacity": 1000,
+
+    // Darken levels the furni highlight effect offers, e.g. [0, 25, 50, 75]; empty: the built-in levels.
+    "wired.furni_highlight.darken_levels": [],
+
+    // Web API base address; empty derives it from socket.url.
+    "wired.webapi.url": "",
+
+    // Web API docs address, opened from the web API box and the wired menu; empty: <api base>/api/public/api-docs/.
+    // Older name, still read: wired.api.docs.link.
+    "wired.webapi.docs_url": "",
+
+    // Hotels the variables explorer can connect to, as [{ name, url }]; null: this hotel only.
+    "wired.webapi.hotels": null,
+
+
+    // ==== Radio and soundboard ====
+    // Radio stations and the soundboard.
+
+    // Soundboard clip address, %file% is the file; empty: nitro-assets/sounds/soundboard/%file%.
+    "soundboard.asset.url": "",
+
+    // Address of the sound manifest; empty: nitro-assets/gamedata/SoundData.json.
+    "soundboard.manifest.url": "",
+
+    // Shows the radio player (not on touch devices).
+    "radio_ui.enabled": false,
+
+    // Address of the radio station list; empty: the list bundled with the client.
+    // Older name, still read: radio.url.
+    "radio.stations.url": "",
+
+    // Address of the soundboard pad layout.
+    "soundboard.layout.url": "configuration/soundboard-layout.jsonc",
+
+    // Address of the older soundboard sound list; empty: the list bundled with the client.
+    // Older name, still read: soundboard.url.
+    "soundboard.sounds.url": "",
+
+    // Base for relative soundboard clip addresses; empty uses asset.url.
+    "soundboard.url.prefix": "",
+
+
+    // ==== Camera ====
+    // Photos: where they are stored, rendering, effects, publishing.
+
+    // Address of the camera photo store; also a trusted host for photo furni images.
+    "camera.url": "http://localhost/camera/photo/temp",
+
+    // "server": the server renders photos from the room scene; "upload": the browser renders and uploads.
+    "camera.render.mode": "server",
+
+    // Shows the camera effects editor; off goes straight from shot to checkout.
+    "camera.effects.enabled": true,
+
+    // Off: hides the publish button of the camera.
+    // Older name, still read: camera.publish.disabled (inverted).
+    "camera.photo.publishing.enabled": true,
+
+    // Shows the photo competition entry in the camera checkout.
+    "camera.competition.enabled": false,
+
+    // Address photo previews load from, before camera.url; also an allowed photo host.
+    "stories.image_url_base": "",
+
+
+    // ==== Staff tools ====
+    // Moderation tools and housekeeping.
+
+    // Master switch of the housekeeping panel; staff permissions still apply.
+    "housekeeping.enabled": false,
+
+    // Shows the action metrics section in the housekeeping audit tab.
+    "housekeeping.telemetry.enabled": false,
+
+    // Ms between audit log refreshes while the panel is open; min 5000, 0 turns it off.
+    "housekeeping.audit.poll_interval_ms": 30000,
+
+    // Sanction templates of the housekeeping panel; null or invalid uses the built-in ones.
+    "housekeeping.sanction_templates": null,
+
+    // Canned ticket replies as [{ id, text }]; null or invalid uses the built-in ones.
+    "housekeeping.ticket_replies": null,
+
+    // Ticket escalation steps as [{ after, templateId }]; null or invalid uses the built-in ones.
+    "housekeeping.escalation": null,
+
+    // External user tool address, the user name is appended; empty opens the housekeeping user page.
+    "habboinfotool.url": "",
+
+    // External room admin address, the room id is appended; empty opens the housekeeping room page.
+    "roomadmin.url": "",
+
+    // Comma-separated "topic=sanction" pairs picking the sanction per report topic; 0 is the fallback.
+    "cfh.topic_id.to.sanction_type_id": "",
+
+    // Address of the photo admin tool linked from photo reports; empty: no link.
+    "stories.admin.tool.base.url": ""
+}

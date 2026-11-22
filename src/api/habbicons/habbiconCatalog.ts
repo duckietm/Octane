@@ -34,7 +34,6 @@ export type HabbiconSet = {
 
 export const HABBICON_CELL_SIZE = 42;
 export const HABBICON_GRID_COLUMNS = 5;
-export const HABBICON_RECENT_LIMIT = 10;
 export const getHabbiconsBaseUrl = () => {
     const root = GetConfigurationValue<string>('habbicons.asset.root', '');
     const hash = GetConfigurationValue<string>('habbicons.asset.hash', '');

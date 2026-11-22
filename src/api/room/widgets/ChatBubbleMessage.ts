@@ -31,6 +31,8 @@ export class ChatBubbleMessage {
     public showTranslation: boolean = false;
     public translationDetectedLanguage: string = '';
     public translationTargetLanguage: string = '';
+    /** When the client received the message: the chat packets carry no time of their own. */
+    public receivedAt: number = Date.now();
 
     private _top: number = 0;
     private _left: number = 0;

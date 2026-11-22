@@ -30,6 +30,11 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../../api', () => ({
     GetConfigurationValue: (key: string, fallback: unknown) => (key in mocks.config ? mocks.config[key] : fallback),
+    GetConfigurationList: (key: string) => {
+        const value = mocks.config[key];
+
+        return Array.isArray(value) ? value : typeof value === 'string' ? value.split(',').map((entry) => entry.trim()).filter(Boolean) : [];
+    },
     LocalizeText: (key: string) => key,
     localizeWithFallback: (key: string, fallback: string) => fallback,
     NotificationBubbleType: { INFO: 'info' },

@@ -1,6 +1,6 @@
 import { StringDataType } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { GetConfigurationValue, LocalizeBadgeDescription, LocalizeBadgeName, LocalizeText, localizeWithFallback } from '../../../../../api';
+import { GetConfigurationList, LocalizeBadgeDescription, LocalizeBadgeName, LocalizeText, localizeWithFallback } from '../../../../../api';
 import { AutoGrid, AutoGridProps, ClassicScrollAreaView, LayoutBadgeImageView, LayoutGridItem } from '../../../../../common';
 import { useCatalogData, useCatalogUiState, useInventoryBadges } from '../../../../../hooks';
 import { BaseButton } from '../../../../../common/BaseButton';
@@ -20,12 +20,7 @@ export const CatalogBadgeSelectorWidgetView: FC<CatalogBadgeSelectorWidgetViewPr
 
     const excludedBadgeCodes = useMemo(
         () =>
-            new Set(
-                GetConfigurationValue<string>('badge.display.excluded.badgeCodes', '')
-                    .split(',')
-                    .map((badgeCode) => badgeCode.trim())
-                    .filter(Boolean)
-            ),
+            new Set(GetConfigurationList('badge.display.excluded.badgeCodes')),
         []
     );
 

@@ -1,5 +1,5 @@
 import { FC, useMemo } from 'react';
-import { buildTimezoneOptions, GetConfigurationValue, LocalizeText, localizeWithFallback } from '../../../../api';
+import { buildTimezoneOptions, GetConfigurationList, LocalizeText, localizeWithFallback } from '../../../../api';
 import { Text } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Select } from '../../../../common/Select';
@@ -30,7 +30,7 @@ export const resolveConditionTimezone = (value: string, roomZone: string) => (va
 export const WiredConditionTimezoneSection: FC<WiredConditionTimezoneSectionProps> = ({ value, onChange }) => {
     const { hotelZone, roomZone } = useWiredRoomTimezone();
     const selected = resolveConditionTimezone(value, roomZone);
-    const options = useMemo(() => buildTimezoneOptions(selected, hotelZone, GetConfigurationValue<string>('wired.timezones', '')), [hotelZone, selected]);
+    const options = useMemo(() => buildTimezoneOptions(selected, hotelZone, GetConfigurationList('wired.timezones')), [hotelZone, selected]);
 
     if (options.length <= 1) return null;
 

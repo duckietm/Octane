@@ -627,5 +627,4 @@ export const Native0Scrollbar: FC<Native0ScrollbarProps> = ({ x, y, height, view
     );
 };
 
-export const NATIVE0_DROPMENU = SKINS.dropmenu;
 export { blueAtlas as NATIVE0_ATLAS };

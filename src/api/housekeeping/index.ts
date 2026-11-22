@@ -4,7 +4,6 @@ export * from './HousekeepingApi';
 export * from './HousekeepingConfig';
 export * from './HousekeepingFormatters';
 export * from './HousekeepingHotelTools';
-export * from './HousekeepingHttpClient';
 export * from './HousekeepingMetrics';
 export * from './HousekeepingPermissions';
 export * from './HousekeepingRecentLookups';

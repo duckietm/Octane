@@ -43,6 +43,8 @@ Thumbs.db
 # Local runtime config copies
 /public/configuration/renderer-config.json
 /public/configuration/ui-config.json
+/public/configuration/config.jsonc
+/public/configuration/config/
 /public/configuration/client-mode.json
 /public/configuration/adsense.json
 /public/configuration/hotlooks.json

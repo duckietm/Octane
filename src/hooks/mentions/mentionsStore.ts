@@ -36,8 +36,6 @@ const commit = (list: IMentionEntry[], status?: MentionsStatus): void => {
 
 const current = (): ReadonlyArray<IMentionEntry> => useMentionsStore.getState().mentions;
 
-export const subscribeMentions = (onChange: () => void): (() => void) => useMentionsStore.subscribe(onChange);
-
 export const getMentionsSnapshot = (): ReadonlyArray<IMentionEntry> => current();
 
 export const getUnreadCount = (): number => useMentionsStore.getState().unreadCount;

@@ -8,10 +8,10 @@ import {
     PurchaseErrorMessageEvent
 } from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
-import { CreateLinkEvent, GroupBadgePart, HasHabboClub, IGroupData, LocalizeText, SendMessageComposer } from '../../../api';
+import { CreateLinkEvent, GroupBadgePart, HasHabboClub, IGroupData, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../api';
 import creditIcon from '../../../assets/images/groups/native/gcreate_icon_credit.png';
 import vipIcon from '../../../assets/images/groups/native/icon-vip-square.png';
-import { useMessageEvent } from '../../../hooks';
+import { useMessageEvent, useNotification } from '../../../hooks';
 import { flatText, GroupBox, GroupButton, GroupText } from './GroupNativeLayout';
 import { GroupManagementWindow } from './GroupManagementWindow';
 import { GroupTabBadgeView } from './tabs/GroupTabBadgeView';
@@ -34,6 +34,7 @@ export const GroupCreatorView: FC<GroupCreatorViewProps> = (props) => {
     const [availableRooms, setAvailableRooms] = useState<{ id: number; name: string }[]>(null);
     const [purchaseCost, setPurchaseCost] = useState<number>(0);
     const hasClub = HasHabboClub();
+    const { simpleAlert = null } = useNotification();
     const buyPendingRef = useRef(false);
     const buyTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
@@ -59,7 +60,12 @@ export const GroupCreatorView: FC<GroupCreatorViewProps> = (props) => {
         // The badge step does not let a badge without a base through; a list that still lacks one is never sent.
         const badge = GroupBadgePart.serialize(groupData.groupBadgeParts);
 
-        if (!badge) return;
+        // A badge without a base (or with no layers at all) is never sent: the server reads the first triple as the base.
+        if (!badge) {
+            simpleAlert(localizeWithFallback('group.edit.error.no.badge.base', 'Choose a base for the badge.'));
+
+            return;
+        }
 
         buyPendingRef.current = true;
         buyTimeoutRef.current = setTimeout(releaseBuy, BUY_ANSWER_TIMEOUT_MS);
@@ -180,10 +186,10 @@ export const GroupCreatorView: FC<GroupCreatorViewProps> = (props) => {
                     </GroupBox>
                 )}
                 {currentTab === 4 && (
-                    <GroupBox height={39} kind={hasClub ? 'yellow' : 'gray'} width={248} x={126} y={410}>
+                    <GroupBox height={39} kind="yellow" width={248} x={126} y={410}>
                         <img alt="" className="octane-group-native__buy-icon" draggable={false} src={creditIcon} />
                         <GroupText
-                            background={hasClub ? 0xffc300 : 0xaaaaaa}
+                            background={0xffc300}
                             height={34}
                             overrides={flatText(13)}
                             text={LocalizeText('group.create.confirm.buyinfo', ['amount'], [purchaseCost.toString()])}
@@ -192,7 +198,10 @@ export const GroupCreatorView: FC<GroupCreatorViewProps> = (props) => {
                             x={37}
                             y={3}
                         />
-                        <GroupButton disabled={!hasClub} height={29} labelShift={2} label={LocalizeText('group.create.confirm.buy')} width={72} x={172} y={5} onClick={buyGroup} />
+                        {/* AIR disables this without VIP; the server decides whether the hotel sells groups to a
+                            non-VIP player, and its refusal is shown through GuildEditFailedMessageEvent. A dead grey
+                            button only hides that a purchase could have gone through. */}
+                        <GroupButton height={29} labelShift={2} label={LocalizeText('group.create.confirm.buy')} width={72} x={172} y={5} onClick={buyGroup} />
                     </GroupBox>
                 )}
                 {currentTab < 4 && <GroupButton height={29} label={LocalizeText('group.create.nextstep')} width={120} x={256} y={423} onClick={nextStep} />}

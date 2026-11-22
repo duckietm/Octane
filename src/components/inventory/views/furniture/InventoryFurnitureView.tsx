@@ -19,6 +19,7 @@ import { CatalogPostMarketplaceOfferEvent, DeleteItemConfirmEvent } from '../../
 import { useInventoryFurni, useInventoryUnseenTracker, useMarketplaceConfiguration, usePlayTestRestricted } from '../../../../hooks';
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
+import { InventoryCategoryLoadingView } from '../InventoryCategoryLoadingView';
 import { InventoryFurnitureItemView } from './InventoryFurnitureItemView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
@@ -53,7 +54,7 @@ export const InventoryFurnitureView: FC<{
 }> = (props) => {
     const { roomSession = null, roomPreviewer = null, filteredGroupItems = [], sectionGroupItems = null } = props;
     const [isVisible, setIsVisible] = useState(false);
-    const { groupItems = [], selectedItem = null, setSelectedItem = null, activate = null, deactivate = null } = useInventoryFurni();
+    const { groupItems = [], isLoaded = false, selectedItem = null, setSelectedItem = null, activate = null, deactivate = null } = useInventoryFurni();
     const tabItems = sectionGroupItems ?? groupItems;
     const { resetItems = null } = useInventoryUnseenTracker();
     const playTestRestricted = usePlayTestRestricted();
@@ -146,6 +147,8 @@ export const InventoryFurnitureView: FC<{
     }, []);
 
     if (!tabItems || !tabItems.length) {
+        if (!isLoaded) return <InventoryCategoryLoadingView />;
+
         return <InventoryCategoryEmptyView desc={LocalizeText('inventory.empty.desc')} title={LocalizeText('inventory.empty.title')} />;
     }
 

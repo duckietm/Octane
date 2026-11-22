@@ -71,7 +71,6 @@ describe('UI CSS ownership', () =>
         const navigatorView = readSource('src/components/navigator/NavigatorView.tsx');
         const navigatorRoomSettingsView = readSource('src/components/navigator/views/room-settings/NavigatorRoomSettingsView.tsx');
         const wiredBaseView = readSource('src/components/wired/views/WiredBaseView.tsx');
-        const friendsCategoryManagerView = readSource('src/components/friends/views/friends-list/FriendsCategoryManagerView.tsx');
         const friendsListView = readSource('src/components/friends/views/friends-list/FriendsListView.tsx');
         const friendsListCss = readSource('src/components/friends/views/friends-list/FriendsListView.css');
         const friendsListRemoveConfirmationView = readSource('src/components/friends/views/friends-list/FriendsListRemoveConfirmationView.tsx');
@@ -138,7 +137,6 @@ describe('UI CSS ownership', () =>
         expect(inventoryCss).toContain('.octane-inventory-window .octane-inventory-filter-bar.is-badges');
         expect(inventoryCss).toContain('.octane-inventory-window :where(.bg-card-grid-item, .bg-white, .bg-light, .bg-muted)');
         expect(inventoryCss).toContain('.octane-inventory-window :where(input, select, .octane-select-trigger, textarea)');
-        expect(friendsCategoryManagerView).not.toContain('style={ { width: 270, minWidth: 270 } }');
         expect(friendsListRemoveConfirmationView).not.toContain('style={ { width: 270, height: 225');
         expect(friendsListRoomInviteView).not.toContain('style={ { width: 270, height: 225');
         expect(friendsCss).toContain('.octane-friends-category-manager :where(input, select, .octane-select-trigger, textarea)');

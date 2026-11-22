@@ -1,5 +1,5 @@
 import { NativeTextRenderer, layoutNativeText, layoutNormalText, prepareNativeBundle, swfGlyphHasInk } from './NativeTextRenderer';
-import { NativeBundle, NativeFont, NativeRenderOptions, RasterCache } from './NativeTextTypes';
+import { NativeBundle, NativeFont, RasterCache } from './NativeTextTypes';
 
 const fontAssets = {
     regular: new URL('../../assets/native-fonts/ubuntu_regular.json', import.meta.url).href,
@@ -86,29 +86,6 @@ export function supportsNativeText(font: NativeFont, text: string): boolean {
 export function measureNativeText(font: NativeFont, text: string, style: NativeFontStyle): number {
     const layout = style.antiAliasType === 'normal' ? layoutNormalText : layoutNativeText;
     return layout(font, text, style.size, style.kerning ?? true).textWidth;
-}
-
-/** v75 uses AIR glyph profiles, DefineFont3 advances and retained premultiplied pixels. */
-export function renderNativeText(loaded: LoadedFont, text: string, style: NativeFontStyle) {
-    const options: NativeRenderOptions = {
-        size: style.size,
-        color: style.color ?? 0,
-        background: style.background ?? 0xffffff,
-        fontStyle: style.italic ? 'italic' : 'normal',
-        antiAliasType: style.antiAliasType ?? 'advanced',
-        gridFitType: 'pixel',
-        thickness: style.thickness ?? 0,
-        sharpness: style.sharpness ?? 0,
-        kerning: style.kerning ?? true,
-        stageQuality: 'high',
-        renderingPipeline: 'habbo-retained',
-        textDecoration: style.underline ? 'underline' : null,
-        etchingColor: style.etchingColor,
-        etchingPosition: style.etchingPosition
-    };
-    const rendered = loaded.renderer.render(text, options);
-    const pixels = style.background === undefined ? unpremultiplyPixels(rendered.retainedPixels) : unpremultiplyPixels(rendered.pixels);
-    return { ...rendered, pixels };
 }
 
 /** Retained text pixels are premultiplied; a canvas takes straight alpha. Returns a copy. */

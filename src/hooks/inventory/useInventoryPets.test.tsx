@@ -27,7 +27,8 @@ vi.mock('../events', () => ({ useMessageEvent: (type: unknown, handler: (event: 
 vi.mock('../useSharedVisibility', () => ({ useSharedVisibility: () => ({ isVisible: false, activate: vi.fn(), deactivate: vi.fn() }) }));
 vi.mock('./useInventoryUnseenTracker', () => ({ useInventoryUnseenTracker: () => ({ isUnseen: () => false, resetCategory: () => false }) }));
 
-import { PetAddedToInventoryEvent, PetRemovedFromInventory } from '@octane/renderer';
+import { PetAddedToInventoryEvent, PetInventoryEvent, PetRemovedFromInventory } from '@octane/renderer';
+import { mergePetFragments } from '../../api';
 import { useInventoryPets } from './useInventoryPets';
 
 describe('useInventoryPets', () => {
@@ -42,5 +43,22 @@ describe('useInventoryPets', () => {
 
         expect(result.current.petItems).toEqual([]);
         expect(result.current.selectedPet).toBeNull();
+    });
+
+    it('reports the list as loaded only once the whole inventory has arrived', () => {
+        const { result } = renderHook(() => useInventoryPets());
+        const parser = { fragment: new Map(), totalFragments: 2, fragmentNumber: 0 };
+
+        expect(result.current.isLoaded).toBe(false);
+
+        vi.mocked(mergePetFragments).mockReturnValueOnce(null);
+        act(() => handlers.get(PetInventoryEvent)({ getParser: () => parser }));
+
+        expect(result.current.isLoaded).toBe(false);
+
+        vi.mocked(mergePetFragments).mockReturnValueOnce(new Map());
+        act(() => handlers.get(PetInventoryEvent)({ getParser: () => ({ ...parser, fragmentNumber: 1 }) }));
+
+        expect(result.current.isLoaded).toBe(true);
     });
 });

@@ -245,7 +245,7 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-camera-editor" frameStyle={3} isResizable={false} style={{ resize: 'none' }}>
+            <OctaneCardView uniqueKey="camera-editor" className="octane-camera-editor" frameStyle={3} isResizable={false} style={{ resize: 'none' }}>
                 <div className="octane-card-header-shell">
                     <span className="octane-card-title">
                         <CameraCenteredText

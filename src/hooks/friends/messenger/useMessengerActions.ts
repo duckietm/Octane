@@ -3,6 +3,7 @@ import { SendMessageComposer as SendPacket } from '../../../api';
 import { createMessengerActionsController } from './messengerControllers';
 import { useMessengerStore } from './useMessengerStore';
 
+/** @public */
 export const useMessengerActions = () =>
 {
     const { getState, dispatch } = useMessengerStore();

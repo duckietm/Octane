@@ -1,6 +1,6 @@
 import { CatalogGroupsComposer, CreateLinkEvent, GetSessionDataManager, HabboGroupEntryData, StringDataType } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { LocalizeText, SendMessageComposer } from '../../../../../api';
+import { LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../api';
 import { Button, Flex } from '../../../../../common';
 import { useCatalogData, useCatalogUiState, useUserGroups } from '../../../../../hooks';
 import { Select } from '../../../../../common/Select';
@@ -89,9 +89,14 @@ export const CatalogGuildSelectorWidgetView: FC<CatalogGuildSelectorWidgetViewPr
             <NativeTextTree>
                 <div className="bg-[#5da0aa] rounded-lg p-2 text-black text-center">
                     {LocalizeText('catalog.guild_selector.members_only')}
-                    <div className="mt-1">
+                    <div className="mt-1 flex flex-wrap justify-center gap-1">
                         <Button classNames={['octane-catalog-guild-join-btn']} onClick={() => CreateLinkEvent('navigator/search/hotel_view/group:')}>
                             {LocalizeText('catalog.guild_selector.find_groups')}
+                        </Button>
+                        {/* The buy button lives on the guild frontpage (layout guilds); the group furni and forum pages only
+                            said "members only", so a player without a group had no way to start one from here. */}
+                        <Button classNames={['octane-catalog-guild-join-btn']} onClick={() => CreateLinkEvent('groups/create')}>
+                            {localizeWithFallback('catalog.start.guild.purchase.button', 'Create a group')}
                         </Button>
                     </div>
                 </div>

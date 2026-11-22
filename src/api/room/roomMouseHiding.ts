@@ -7,8 +7,6 @@ const hiddenCursors = new WeakSet<object>();
 let hidden = false;
 let toggleCount = 0;
 
-export const isRoomMouseHidden = (): boolean => hidden;
-
 /**
  * Official `:hidemouse`: the pointer and the room's tile cursor go away, and come back when the command is given
  * again. Meant for filming and screenshots.
