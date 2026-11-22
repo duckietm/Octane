@@ -506,7 +506,8 @@ export const RewardTrackView: FC<{}> = () => {
                                         <span className="octane-reward-track-rewards-sky" />
                                         <img src={prizesStarsImage} alt="" draggable={false} className="octane-reward-track-rewards-stars" />
                                         <RewardTrackBandView premium={false} />
-                                        <RewardTrackBandView premium />
+                                        {/* AIR 1.0.31: no premium band on a track without a premium pass. */}
+                                        {track.hasPremiumConfig && <RewardTrackBandView premium />}
                                         <RewardTrackMainBar x={layout.xFor(points, currentPage)} snapKey={`${tracksVersion}:${track.id}:${currentPage}`} />
                                         <div className="octane-reward-track-points-band" />
                                         <div className="octane-reward-track-indicators">

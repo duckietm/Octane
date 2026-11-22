@@ -8,7 +8,10 @@ import {
     resolveWiredVariableFxRenderer,
     sanitizeWiredVariableFxAppearance,
     WIRED_FX_CATEGORY,
+    groupWiredFxIcons,
+    WIRED_FX_ICON_GROUP_NAMES,
     WIRED_FX_ICONS,
+    wiredFxIconFallbackName,
     WIRED_FX_LEVEL_BARS,
     WIRED_FX_NUMBER_ALIGNMENTS,
     WIRED_FX_OVERRIDE_TARGET,
@@ -168,18 +171,35 @@ export const WiredExtraVariableFxView: FC<WiredExtraVariableFxViewProps> = (prop
         setStringParam(writeWiredVariableFxTokens(tokens));
     };
 
-    const select = (label: string, value: number, options: { value: number; key: string; fallback: string }[], onChange: (value: number) => void) => (
-        <div className="flex flex-col gap-1">
-            <Text bold>{label}</Text>
-            <Select className="form-select form-select-sm" value={value} onChange={(event) => onChange(Number(event.target.value))}>
-                {options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                        {localizeWithFallback(option.key, option.fallback)}
-                    </option>
-                ))}
-            </Select>
-        </div>
-    );
+    // Options that name a group (a campaign's styles) are listed under it, in the place of the group's first one.
+    const select = (label: string, value: number, options: { value: number; key: string; fallback: string; group?: string }[], onChange: (value: number) => void) => {
+        const option = (entry: { value: number; key: string; fallback: string }) => (
+            <option key={entry.value} value={entry.value}>
+                {localizeWithFallback(entry.key, entry.fallback)}
+            </option>
+        );
+        const listed = new Set<string>();
+
+        return (
+            <div className="flex flex-col gap-1">
+                <Text bold>{label}</Text>
+                <Select className="form-select form-select-sm" value={value} onChange={(event) => onChange(Number(event.target.value))}>
+                    {options.map((entry) => {
+                        if (!entry.group) return option(entry);
+                        if (listed.has(entry.group)) return null;
+
+                        listed.add(entry.group);
+
+                        return (
+                            <optgroup key={`group-${entry.group}`} label={localizeWithFallback(`wiredfurni.params.variablefx.icon.${entry.group}`, WIRED_FX_ICON_GROUP_NAMES[entry.group] ?? entry.group)}>
+                                {options.filter((other) => other.group === entry.group).map(option)}
+                            </optgroup>
+                        );
+                    })}
+                </Select>
+            </div>
+        );
+    };
 
     const overrideRow = (
         label: string,
@@ -302,7 +322,7 @@ export const WiredExtraVariableFxView: FC<WiredExtraVariableFxViewProps> = (prop
                     {select(
                         localizeWithFallback('wiredfurni.params.variablefx.style', 'Style'),
                         params.styleId,
-                        styles.map((entry) => ({ value: entry.styleId, key: entry.key, fallback: entry.fallback })),
+                        styles.map((entry) => ({ value: entry.styleId, key: entry.key, fallback: entry.fallback, group: entry.group })),
                         (styleId) => patch({ styleId, ...sanitizeWiredVariableFxAppearance(category, styleId, params.colorId, params.widthId) })
                     )}
 
@@ -327,11 +347,21 @@ export const WiredExtraVariableFxView: FC<WiredExtraVariableFxViewProps> = (prop
                             <Text bold>{localizeWithFallback('wiredfurni.params.variablefx.icon', 'Icon')}</Text>
                             <Select className="form-select form-select-sm" data-testid="fx-icon" value={tokens.icon} onChange={(event) => patchTokens({ icon: event.target.value })}>
                                 <option value="">{localizeWithFallback('wiredfurni.params.variablefx.icon.none', 'None')}</option>
-                                {WIRED_FX_ICONS.map((icon) => (
-                                    <option key={icon} value={icon}>
-                                        {localizeWithFallback(`wiredfurni.params.variablefx.icon.${icon}`, icon.replace(/_/g, ' '))}
-                                    </option>
-                                ))}
+                                {groupWiredFxIcons(WIRED_FX_ICONS).map((option) =>
+                                    option.children ? (
+                                        <optgroup key={option.id} label={localizeWithFallback(`wiredfurni.params.variablefx.icon.${option.id}`, WIRED_FX_ICON_GROUP_NAMES[option.id] ?? option.id)}>
+                                            {option.children.map((icon) => (
+                                                <option key={icon} value={icon}>
+                                                    {localizeWithFallback(`wiredfurni.params.variablefx.icon.${icon}`, wiredFxIconFallbackName(icon))}
+                                                </option>
+                                            ))}
+                                        </optgroup>
+                                    ) : (
+                                        <option key={option.id} value={option.id}>
+                                            {localizeWithFallback(`wiredfurni.params.variablefx.icon.${option.id}`, wiredFxIconFallbackName(option.id))}
+                                        </option>
+                                    )
+                                )}
                             </Select>
                             {category === WIRED_FX_CATEGORY.NUMBER_DISPLAY && tokens.icon && (
                                 <Select className="form-select form-select-sm" value={params.categoryExtra} onChange={(event) => patch({ categoryExtra: Number(event.target.value) })}>
