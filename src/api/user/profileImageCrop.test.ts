@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clampPlacement, fillScale, fitScale, initialPlacement, leavesEmptyBands, placedRect, PROFILE_IMAGE_MAX_ZOOM, zoomPlacement } from './profileImageCrop';
+import { clampPlacement, fillScale, fitScale, initialPlacement, leavesEmptyBands, placedRect, PROFILE_IMAGE_MAX_ZOOM, snapPixelScale, zoomPlacement } from './profileImageCrop';
 
 const frame = { width: 1280, height: 220 };
 const photo = { width: 4000, height: 3000 };
@@ -43,5 +43,20 @@ describe('profile image placement', () => {
         expect(zoomed.scale).toBeCloseTo(start.scale * 2);
         expect(zoomed.centerX).toBeCloseTo(640);
         expect(zoomed.centerY).toBeCloseTo(110);
+    });
+});
+
+describe('sharp pixel zoom', () => {
+    it('snaps to whole scales and whole fractions', () => {
+        expect(snapPixelScale(2.4, 0.1, 10)).toBe(2);
+        expect(snapPixelScale(1.6, 0.1, 10)).toBe(2);
+        expect(snapPixelScale(0.45, 0.1, 10)).toBe(0.5);
+        expect(snapPixelScale(0.3, 0.1, 10)).toBeCloseTo(1 / 3);
+    });
+
+    it('stays within the limits on a sharp scale', () => {
+        expect(snapPixelScale(1, 1.07, 8.5)).toBe(2);
+        expect(snapPixelScale(9, 1.07, 8.5)).toBe(8);
+        expect(snapPixelScale(0.2, 0.26, 4)).toBeCloseTo(1 / 3);
     });
 });

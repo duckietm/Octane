@@ -2,20 +2,25 @@ import { UserProfileParser } from '@octane/renderer';
 import { FC } from 'react';
 import { ProfileBannerEntry } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
+import { ProfileBannerMoveButton } from './ProfileBannerMoveButton';
 import { ProfileBannerView } from './ProfileBannerView';
 
 interface ProfileCustomizePreviewViewProps {
     userProfile: UserProfileParser;
     banners: ReadonlyArray<ProfileBannerEntry>;
+    /** When set, dragging or clicking the banner opens the editor to move it. */
+    onMoveBanner?: () => void;
 }
 
 /** The top of the profile window as it looks now, above the customiser's choices. */
-export const ProfileCustomizePreviewView: FC<ProfileCustomizePreviewViewProps> = ({ userProfile, banners }) => {
+export const ProfileCustomizePreviewView: FC<ProfileCustomizePreviewViewProps> = ({ userProfile, banners, onMoveBanner }) => {
     const borderId = userProfile.borderId ?? 0;
 
     return (
         <div className="octane-profile-customize__preview">
-            <ProfileBannerView userProfile={userProfile} banners={banners} placeholder className="octane-profile-customize__preview-banner" />
+            <ProfileBannerView userProfile={userProfile} banners={banners} placeholder className="octane-profile-customize__preview-banner">
+                {onMoveBanner && <ProfileBannerMoveButton onMove={onMoveBanner} />}
+            </ProfileBannerView>
             <div className="octane-profile-customize__preview-identity">
                 <div className="octane-extended-profile__avatar-frame">
                     <div className={`octane-profile-customize__preview-avatar profile-background background-${userProfile.backgroundId ?? 'default'}`}>

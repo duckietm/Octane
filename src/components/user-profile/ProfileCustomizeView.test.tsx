@@ -67,8 +67,28 @@ describe('ProfileCustomizeView', () => {
         render(<ProfileCustomizeView userProfile={profile as never} onClose={() => undefined} />);
 
         fireEvent.click(screen.getByText('Colour'));
-        fireEvent.click(await screen.findByRole('button', { name: 'Colour 4' }));
+        fireEvent.click(await screen.findByRole('button', { name: 'Gold' }));
 
         expect(sendProfileCustomization).toHaveBeenCalledWith(profile, { accent: 4 });
+    });
+});
+
+describe('ProfileCustomizeView picture tab', () => {
+    afterEach(() => {
+        cleanup();
+        sendProfileCustomization.mockClear();
+    });
+
+    it('shows one part of the picture at a time', async () => {
+        render(<ProfileCustomizeView userProfile={profile as never} onClose={() => undefined} />);
+
+        fireEvent.click(screen.getByText('Picture'));
+        await screen.findByRole('button', { name: 'Stand' });
+
+        expect(document.querySelectorAll('.profile-preview')).toHaveLength(2);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Stand' }));
+
+        expect(document.querySelectorAll('.profile-preview')).toHaveLength(1);
     });
 });

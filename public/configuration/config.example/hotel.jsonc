@@ -166,7 +166,7 @@
     "borders.data": [],
 
     // Where the profile window uploads (POST) and removes (DELETE) a banner or background picture.
-    "profile.images.endpoint": "${api.url}/api/profile/image",
+    "profile.images.endpoint": "${api.url}/profile-images/upload",
 
     // Address of an uploaded profile picture; %file% is the file name the profile carries.
     "profile.images.url": "${api.url}/profile-images/%file%",

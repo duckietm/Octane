@@ -35,6 +35,7 @@ import { OctaneCard } from '../../layout';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
 import { GroupsContainerView } from './GroupsContainerView';
+import { ProfileBannerMoveButton } from './ProfileBannerMoveButton';
 import { ProfileBannerView } from './ProfileBannerView';
 import { ProfileCustomizeView } from './ProfileCustomizeView';
 import { UserContainerView } from './UserContainerView';
@@ -48,6 +49,7 @@ export const UserProfileView: FC<{}> = () => {
     const isBlocked = useIsUserBlocked(userProfile?.id ?? -1);
     const { showConfirm = null } = useNotification();
     const [isCustomizing, setIsCustomizing] = useState(false);
+    const [moveBannerRequest, setMoveBannerRequest] = useState(0);
     const [banners, setBanners] = useState<ProfileBannerEntry[]>([]);
     const bannerId = userProfile?.bannerId ?? 0;
 
@@ -214,6 +216,7 @@ export const UserProfileView: FC<{}> = () => {
                         </div>
                     )}
                     <ProfileBannerView userProfile={userProfile} banners={banners}>
+                        {isOwnProfile && isCustomizing && <ProfileBannerMoveButton onMove={() => setMoveBannerRequest((value) => value + 1)} />}
                         {isOwnProfile && (
                             <Hint content={customizeLabel}>
                                 <BaseButton aria-label={customizeLabel} className="octane-extended-profile__banner-edit" type="button" onClick={() => setIsCustomizing((value) => !value)}>
@@ -252,7 +255,7 @@ export const UserProfileView: FC<{}> = () => {
                     </div>
                 </OctaneCard.Content>
             </OctaneCard>
-            {isOwnProfile && isCustomizing && <ProfileCustomizeView userProfile={userProfile} onClose={() => setIsCustomizing(false)} />}
+            {isOwnProfile && isCustomizing && <ProfileCustomizeView userProfile={userProfile} moveBannerRequest={moveBannerRequest} onClose={() => setIsCustomizing(false)} />}
         </NativeTextTree>
     );
 };

@@ -13,7 +13,7 @@ const interpolate = (value: string): string => {
 };
 
 const endpoint = (kind: ProfileImageKind): string => {
-    const base = interpolate(GetConfiguration().getValue<string>('profile.images.endpoint', '${api.url}/api/profile/image'));
+    const base = interpolate(GetConfiguration().getValue<string>('profile.images.endpoint', '${api.url}/profile-images/upload'));
 
     return `${base}${base.includes('?') ? '&' : '?'}kind=${kind}`;
 };

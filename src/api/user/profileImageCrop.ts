@@ -82,6 +82,22 @@ export const placedRect = (image: Size, placement: ProfileImagePlacement) => {
     return { x: placement.centerX - width / 2, y: placement.centerY - height / 2, width, height };
 };
 
+/**
+ * Pixel art stays sharp only at whole-number scales (2x, 3x) or whole fractions (1/2, 1/3): any other
+ * scale gives pixels of uneven width. Snaps a scale to the nearest of those, within the limits.
+ */
+export const snapPixelScale = (scale: number, minScale: number, maxScale: number): number => {
+    const snapped = scale >= 1 ? Math.round(scale) : 1 / Math.round(1 / scale);
+    const inRange = Math.min(maxScale, Math.max(minScale, snapped));
+
+    if (inRange === snapped) return snapped;
+
+    // The nearest sharp scale lies outside the limits: take the closest one inside them.
+    if (snapped > maxScale) return maxScale >= 1 ? Math.max(1, Math.floor(maxScale)) : 1 / Math.ceil(1 / maxScale);
+
+    return minScale >= 1 ? Math.ceil(minScale) : 1 / Math.floor(1 / minScale);
+};
+
 /** True when the picture leaves part of the frame empty. */
 export const leavesEmptyBands = (image: Size, frame: Size, placement: ProfileImagePlacement): boolean =>
     image.width * placement.scale < frame.width - 0.5 || image.height * placement.scale < frame.height - 0.5;

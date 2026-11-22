@@ -1059,3 +1059,169 @@
 .octane-profile-customize.has-profile-accent .octane-card-header-shell {
   background: var(--profile-accent);
 }
+
+/* While customising, the banner is one big button that opens the editor to move it. */
+.octane-extended-profile__banner-move {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.15);
+  cursor: move;
+  opacity: 0.85;
+  transition: background 0.15s ease;
+}
+
+.octane-extended-profile__banner-move:hover {
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 1;
+}
+
+.octane-extended-profile__banner-move-label {
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.octane-profile-customize__hint {
+  margin: 0;
+  font-size: 12px;
+  color: #555;
+}
+
+.octane-profile-customize__option {
+  flex-direction: column;
+  gap: 3px;
+}
+
+.octane-profile-customize__caption {
+  font-size: 11px;
+  line-height: 1;
+  color: #333;
+}
+
+/* A card background shown as the small window it makes: a title strip and a panel on it. */
+.octane-profile-customize__card {
+  position: relative;
+  display: block;
+  width: 52px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: 3px;
+  background-color: #ece8dc;
+}
+
+.octane-profile-customize__card-header {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 9px;
+  background: var(--profile-accent, #1e7cb8);
+}
+
+.octane-profile-customize__card-panel {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  height: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+/* A border tried on the user's own head. */
+.octane-profile-customize__border-tile {
+  position: relative;
+  display: block;
+  width: 48px;
+  height: 56px;
+  margin: 6px;
+}
+
+.octane-profile-customize__border-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #d6d3cb;
+}
+
+.octane-profile-customize__border-tile .infostand-border {
+  top: -4px;
+  bottom: -4px;
+  left: -4px;
+  right: -4px;
+  border-width: 3px;
+  border-radius: 6px;
+}
+
+.octane-profile-customize__border-tile .infostand-border.border-17,
+.octane-profile-customize__border-tile .infostand-border.border-18,
+.octane-profile-customize__border-tile .infostand-border.border-19,
+.octane-profile-customize__border-tile .infostand-border.border-20,
+.octane-profile-customize__border-tile .infostand-border.border-21,
+.octane-profile-customize__border-tile .infostand-border.border-22,
+.octane-profile-customize__border-tile .infostand-border.border-23,
+.octane-profile-customize__border-tile .infostand-border.border-24,
+.octane-profile-customize__border-tile .infostand-border.border-25 {
+  top: -10px;
+  bottom: -10px;
+  left: -10px;
+  right: -10px;
+}
+
+/* An accent shown as the parts it colours: the title bar and a separator. */
+.octane-profile-customize__accent-sample {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100px;
+  height: 40px;
+  padding: 0 0 6px;
+  overflow: hidden;
+  border: 1px solid #afafaf;
+  border-radius: 3px;
+  background: #ece8dc;
+}
+
+.octane-profile-customize__accent-bar {
+  height: 12px;
+  background: #1e7cb8;
+}
+
+.octane-profile-customize__accent-line {
+  height: 2px;
+  margin: 0 8px;
+  background: #afafaf;
+}
+
+/* Background, stand and effect of the picture: one at a time, chosen with these segments. */
+.octane-profile-customize__segments {
+  display: flex;
+  gap: 4px;
+}
+
+.octane-profile-customize__segment {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid #8d8d8d;
+  border-radius: 4px;
+  background: #efede4;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.octane-profile-customize__segment.is-selected {
+  border-color: var(--profile-accent, #1e7cb8);
+  background: var(--profile-accent, #1e7cb8);
+  color: #fff;
+  font-weight: 700;
+}

@@ -166,7 +166,7 @@
         {"key":"overlays.data","comment":"Profile overlay ids; infostand_backgrounds.json wins when it has this list.","value":[]},
         {"key":"cards.data","comment":"Profile card background ids; empty uses backgrounds.data.","value":[]},
         {"key":"borders.data","comment":"Profile border ids.","value":[]},
-        {"key":"profile.images.endpoint","comment":"Where the profile window uploads (POST) and removes (DELETE) a banner or background picture.","value":"${api.url}/api/profile/image"},
+        {"key":"profile.images.endpoint","comment":"Where the profile window uploads (POST) and removes (DELETE) a banner or background picture.","value":"${api.url}/profile-images/upload"},
         {"key":"profile.images.url","comment":"Address of an uploaded profile picture; %file% is the file name the profile carries.","value":"${api.url}/profile-images/%file%"},
         {"key":"room.enter.info.enabled","comment":"Shows the room name card on first entry into a room.","value":true,"runtime":true},
         {"key":"room.enter.info.collapse.delay","comment":"Milliseconds before the room entry card hides (minimum 1000).","value":5000,"runtime":true},

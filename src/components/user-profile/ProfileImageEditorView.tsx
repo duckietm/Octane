@@ -1,4 +1,4 @@
-import { FC, PointerEvent, useCallback, useEffect, useRef, useState, WheelEvent } from 'react';
+import { FC, PointerEvent, useEffect, useRef, useState, WheelEvent } from 'react';
 import {
     clampPlacement,
     drawProfileImage,
@@ -8,6 +8,7 @@ import {
     initialPlacement,
     localizeWithFallback,
     PROFILE_IMAGE_MAX_ZOOM,
+    snapPixelScale,
     PROFILE_IMAGE_SIZE,
     ProfileImageKind,
     ProfileImagePlacement,
@@ -20,24 +21,32 @@ interface ProfileImageEditorViewProps {
     kind: ProfileImageKind;
     /** The decoded picture the user picked. */
     image: HTMLImageElement;
+    /** Starts with sharp pixels on, for a gallery picture that is pixel art. */
+    pixelArt?: boolean;
     busy?: boolean;
     onCancel: () => void;
     onSave: (bytes: Uint8Array) => void;
 }
 
 /** Places an uploaded picture in the banner or background frame: drag to move, zoom, fill, fit, centre. */
-export const ProfileImageEditorView: FC<ProfileImageEditorViewProps> = ({ kind, image, busy = false, onCancel, onSave }) => {
+export const ProfileImageEditorView: FC<ProfileImageEditorViewProps> = ({ kind, image, pixelArt = false, busy = false, onCancel, onSave }) => {
     const frame = PROFILE_IMAGE_SIZE[kind];
     const size = { width: image.naturalWidth, height: image.naturalHeight };
-    const canvas = useRef<HTMLCanvasElement>(null);
-    const drag = useRef<{ x: number; y: number; placement: ProfileImagePlacement } | null>(null);
-    const [placement, setPlacement] = useState<ProfileImagePlacement>(() => initialPlacement(size, frame));
-    // A small picture (pixel art, a sprite) is usually meant to stay sharp when enlarged.
-    const [pixelated, setPixelated] = useState(() => size.width * 2 <= frame.width || size.height * 2 <= frame.height);
-    const [error, setError] = useState<string | null>(null);
-
     const minScale = fitScale(size, frame);
     const maxScale = fillScale(size, frame) * PROFILE_IMAGE_MAX_ZOOM;
+    const canvas = useRef<HTMLCanvasElement>(null);
+    const drag = useRef<{ x: number; y: number; placement: ProfileImagePlacement } | null>(null);
+    // Pixel art, or a small picture (a sprite) that is usually meant to stay sharp when enlarged.
+    const [pixelated, setPixelated] = useState(() => pixelArt || size.width * 2 <= frame.width || size.height * 2 <= frame.height);
+    const [placement, setPlacement] = useState<ProfileImagePlacement>(() => {
+        const start = initialPlacement(size, frame);
+
+        return pixelated ? clampPlacement(size, frame, { ...start, scale: snapPixelScale(start.scale, minScale, maxScale) }) : start;
+    });
+    const [error, setError] = useState<string | null>(null);
+
+    /** With sharp pixels on, every zoom lands on a scale that keeps the pixels even. */
+    const sharpen = (scale: number) => (pixelated ? snapPixelScale(scale, minScale, maxScale) : scale);
 
     useEffect(() => {
         const context = canvas.current?.getContext('2d');
@@ -81,12 +90,26 @@ export const ProfileImageEditorView: FC<ProfileImageEditorViewProps> = ({ kind, 
     const onWheel = (event: WheelEvent<HTMLCanvasElement>) => {
         const bounds = event.currentTarget.getBoundingClientRect();
         const ratio = frameRatio();
-        const factor = event.deltaY < 0 ? 1.1 : 1 / 1.1;
+        const anchorX = (event.clientX - bounds.left) * ratio;
+        const anchorY = (event.clientY - bounds.top) * ratio;
 
-        setPlacement((current) => zoomPlacement(size, frame, current, current.scale * factor, (event.clientX - bounds.left) * ratio, (event.clientY - bounds.top) * ratio));
+        setPlacement((current) => {
+            // A sharp-pixel zoom steps from one whole scale to the next, so each wheel notch moves one step.
+            const next = pixelated
+                ? sharpen(event.deltaY < 0 ? (current.scale >= 1 ? current.scale + 1 : 1 / (Math.round(1 / current.scale) - 1)) : current.scale > 1 ? current.scale - 1 : 1 / (Math.round(1 / current.scale) + 1))
+                : current.scale * (event.deltaY < 0 ? 1.1 : 1 / 1.1);
+
+            return zoomPlacement(size, frame, current, next, anchorX, anchorY);
+        });
     };
 
-    const setScale = useCallback((scale: number) => setPlacement((current) => zoomPlacement(size, frame, current, scale)), []);
+    const setScale = (scale: number) => setPlacement((current) => zoomPlacement(size, frame, current, sharpen(scale)));
+
+    const togglePixelated = (checked: boolean) => {
+        setPixelated(checked);
+
+        if (checked) setPlacement((current) => zoomPlacement(size, frame, current, snapPixelScale(current.scale, minScale, maxScale)));
+    };
 
     const save = async () => {
         if (!canvas.current) return;
@@ -138,7 +161,7 @@ export const ProfileImageEditorView: FC<ProfileImageEditorViewProps> = ({ kind, 
                     {localizeWithFallback('extendedprofile.customize.upload.center', 'Centre')}
                 </Button>
                 <label className="octane-profile-image-editor__pixelated">
-                    <Checkbox checked={pixelated} onCheckedChange={(checked: boolean) => setPixelated(!!checked)} />
+                    <Checkbox checked={pixelated} onCheckedChange={(checked: boolean) => togglePixelated(!!checked)} />
                     {localizeWithFallback('extendedprofile.customize.upload.pixelated', 'Sharp pixels')}
                 </label>
             </div>
