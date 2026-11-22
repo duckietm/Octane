@@ -26,6 +26,7 @@ vi.mock('./GetUserProfile',() => ({ GetUserProfile: (id: number) => profileReque
 
 import {
     customProfileAccentId,
+    figureUnderOverlay,
     DEFAULT_PROFILE_BANNERS,
     findProfileBannerUrl,
     formatProfileBackgroundStyle,
@@ -135,5 +136,20 @@ describe('own colours', () => {
         expect(hasProfileFeature({ features: undefined } as never, PROFILE_FEATURE_BANNER)).toBe(true);
         expect(hasProfileFeature({ features: 2 } as never, PROFILE_FEATURE_BANNER)).toBe(false);
         expect(hasProfileFeature({ features: 4 } as never, PROFILE_FEATURE_THEME)).toBe(true);
+    });
+});
+
+describe('figureUnderOverlay', () => {
+    const figure = 'hd-180-1.hr-828-61.ch-210-66.lg-270-82.sh-290-80.ha-1002-70.cc-260-62';
+
+    it('takes the clothes off under an outfit effect and keeps head, hair and hat', () => {
+        expect(figureUnderOverlay(figure, 7)).toBe('hd-180-1.hr-828-61.ha-1002-70');
+        expect(figureUnderOverlay(figure, 8)).toBe('hd-180-1.hr-828-61.ha-1002-70');
+    });
+
+    it('leaves the figure as it is under any other effect', () => {
+        expect(figureUnderOverlay(figure, 0)).toBe(figure);
+        expect(figureUnderOverlay(figure, 5)).toBe(figure);
+        expect(figureUnderOverlay(figure, null)).toBe(figure);
     });
 });

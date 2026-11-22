@@ -17,6 +17,7 @@ import {
     getBadgesRank,
     GetHotelSettings,
     GetGroupInformation,
+    figureUnderOverlay,
     GetUserProfile,
     LocalizeText,
     localizeWithFallback,
@@ -262,7 +263,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                     <div className="octane-infostand__figure-row">
                         <BaseButton type="button" className={`octane-infostand__avatar-well profile-background ${infostandBackgroundClass}`} onClick={handleProfileClick}>
                             <Base position="absolute" className={`profile-stand ${infostandStandClass}`} />
-                            <LayoutAvatarImageView direction={2} figure={avatarInfo.figure} />
+                            <LayoutAvatarImageView direction={2} figure={figureUnderOverlay(avatarInfo.figure, overlayId)} />
                             <Base position="absolute" className={`profile-overlay ${infostandOverlayClass}`} />
                         </BaseButton>
                         {avatarInfo.type === AvatarInfoUser.OWN_USER && (

@@ -42,6 +42,23 @@ export const PROFILE_ACCENTS: ReadonlyArray<{ id: number; color: string }> = [
     { id: 12, color: '#1f2329' }
 ];
 
+/**
+ * Effects that are whole outfits (6 suit, 7 dress, 8 football kit): they are drawn with a body and pose of their
+ * own, so the user's clothes would show around them. Under one of them the avatar is drawn without its clothes;
+ * head, hair, hat and face accessories stay.
+ */
+export const PROFILE_COSTUME_OVERLAYS: ReadonlyArray<number> = [6, 7, 8];
+
+const CLOTHING_PARTS = /^(ch|cc|ca|cp|lg|sh|wa)-/;
+
+export const figureUnderOverlay = (figure: string, overlayId: number | null | undefined): string =>
+    overlayId && PROFILE_COSTUME_OVERLAYS.includes(overlayId)
+        ? figure
+              .split('.')
+              .filter((part) => !CLOTHING_PARTS.test(part))
+              .join('.')
+        : figure;
+
 /** An accent of the user's own colour: this bit over the colour as 0xRRGGBB (the server checks the same bit). */
 export const PROFILE_CUSTOM_ACCENT = 0x1000000;
 

@@ -1,4 +1,5 @@
 import { CSSProperties, FC } from 'react';
+import { figureUnderOverlay } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
 
 /** The profile picture's size at scale 1, as the profile window draws it. */
@@ -23,7 +24,7 @@ export const ProfileAvatarFrameView: FC<ProfileAvatarFrameViewProps> = ({ figure
         <div className="octane-extended-profile__avatar-frame">
             <div className={`octane-extended-profile__avatar-shell profile-background background-${backgroundId ?? 'default'}`}>
                 <div className={`octane-extended-profile__avatar-stand profile-stand stand-${standId ?? 'default'}`} />
-                <LayoutAvatarImageView figure={figure} direction={2} classNames={['octane-extended-profile__avatar-image']} />
+                <LayoutAvatarImageView figure={figureUnderOverlay(figure, overlayId)} direction={2} classNames={['octane-extended-profile__avatar-image']} />
                 <div className={`octane-extended-profile__avatar-overlay profile-overlay overlay-${overlayId ?? 'default'}`} />
             </div>
             {!!borderId && <div className={`infostand-border border-${borderId}`} data-testid="profile-border" />}
