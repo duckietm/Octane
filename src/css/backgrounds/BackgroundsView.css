@@ -1,22 +1,12 @@
-.backgrounds-view-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 100;
-  pointer-events: none;
-}
-
-/* One choice of the picker, drawn like the avatar well of the info panel (67 x 130). */
+/* One choice of the picker, drawn like the avatar well of the info panel (68 x 135). */
 .profile-preview {
   position: relative;
   display: flex;
-  flex: 0 0 67px;
-  align-items: flex-end;
+  flex: 0 0 68px;
+  align-items: flex-start;
   justify-content: center;
-  width: 67px;
-  height: 130px;
+  width: 68px;
+  height: 135px;
   overflow: hidden;
   border-radius: 6px;
   outline: 2px solid transparent;
@@ -30,11 +20,6 @@
 
 .profile-preview.is-selected {
   outline-color: #3d8fba;
-}
-
-/* Same lift as in the info panel, so the feet land on the platform of the stand. */
-.profile-preview .profile-stand:is(.stand-1, .stand-2, .stand-3, .stand-4, .stand-5, .stand-6, .stand-7, .stand-8, .stand-9, .stand-10, .stand-11, .stand-12, .stand-13, .stand-14, .stand-15, .stand-16, .stand-17, .stand-18, .stand-21) ~ .avatar-image {
-  transform: translateY(-8px);
 }
 
 @keyframes fadeIn {
@@ -1751,28 +1736,193 @@
 .profile-border.border-23 { background-image: url('@/assets/images/backgrounds/borders/border_23.webp'); }
 .profile-border.border-24 { background-image: url('@/assets/images/backgrounds/borders/border_24.webp'); }
 .profile-border.border-25 { background-image: url('@/assets/images/backgrounds/borders/border_25.webp'); }
+
 /*
- * Profile background picker text. AIR has no layout for this Octane window, so it follows the AIR
- * conventions: regular Ubuntu (our `Ubuntu` face is the condensed cut), u_button_tab 12 px tabs and
- * u_headline_small 14 px bold for the "Select an Option" prompt (as AIR's catalogue "Select an item").
+ * The avatar on its stand, the same in the profile picture, the infostand and the picker.
+ * The avatar picture is 90 x 130 with the point between its feet at row 116, drawn at the top of the place;
+ * stands and effects are 68 x 135 pictures drawn at the top as well (the effects are clothes, rings and
+ * floors made for the avatar there). A stand moves the avatar so its feet land on the centre of the
+ * platform, measured for each stand as a row of its picture (--stand-feet). The effects worn by the avatar
+ * (5 swim ring, 6 suit, 7 dress, 8 football kit) move with it; 0-4 cover the whole picture like glass and stay.
  */
-.octane-backgrounds-window {
-  font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
-  font-size: 12px;
+.profile-stand.stand-1 ~ * { --stand-feet: 103; }
+.profile-stand.stand-2 ~ * { --stand-feet: 105; }
+.profile-stand.stand-3 ~ * { --stand-feet: 105; }
+.profile-stand.stand-4 ~ * { --stand-feet: 105; }
+.profile-stand.stand-5 ~ * { --stand-feet: 105; }
+.profile-stand.stand-6 ~ * { --stand-feet: 105; }
+.profile-stand.stand-7 ~ * { --stand-feet: 104; }
+.profile-stand.stand-8 ~ * { --stand-feet: 104; }
+.profile-stand.stand-9 ~ * { --stand-feet: 104; }
+.profile-stand.stand-10 ~ * { --stand-feet: 104; }
+.profile-stand.stand-11 ~ * { --stand-feet: 103; }
+.profile-stand.stand-12 ~ * { --stand-feet: 105; }
+.profile-stand.stand-13 ~ * { --stand-feet: 105; }
+.profile-stand.stand-14 ~ * { --stand-feet: 104; }
+.profile-stand.stand-15 ~ * { --stand-feet: 103; }
+.profile-stand.stand-16 ~ * { --stand-feet: 107; }
+.profile-stand.stand-17 ~ * { --stand-feet: 108; }
+.profile-stand.stand-18 ~ * { --stand-feet: 105; }
+.profile-stand.stand-19 ~ * { --stand-feet: 114; }
+.profile-stand.stand-20 ~ * { --stand-feet: 106; }
+.profile-stand.stand-21 ~ * { --stand-feet: 104; }
+
+.profile-stand ~ .avatar-image,
+.profile-stand ~ .profile-overlay:is(.overlay-5, .overlay-6, .overlay-7, .overlay-8) {
+  transform: translateY(calc((var(--stand-feet, var(--bg-feet, 116)) - 116) * 1px));
 }
 
-@layer base {
-  .octane-backgrounds-window :where(*):not(svg, svg *) {
-    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
-  }
+/* The infostand well and the picker are 68 x 135 like the profile picture and draw every layer from the top,
+   so the three places show the same pixels. */
+:is(.octane-infostand__avatar-well, .profile-preview) > :is(.profile-stand, .profile-overlay) {
+  top: 0;
+  left: 0;
 }
 
-.octane-backgrounds-window .octane-card-tab-item {
-  font-size: 12px !important;
+/*
+ * Backgrounds at whole pixels. They come in 68 x 135 (with the same rounded rim as the stands and the glass
+ * effects), 68 x 170, 67 x 170, 68 x 180 and 67 x 130; centred, the taller ones landed on half pixels and moved a
+ * pixel between places. Each is placed on the row its centre rounds down to, and a 67 px one is drawn twice, 1 px
+ * apart, so its edge fills the last column. --bg-feet is the row of the centre of a pedestal or plate drawn in the
+ * background, measured on each picture: without a stand the avatar stands on it.
+ */
+.profile-background {
+  background-position: 0 0;
 }
 
-.octane-backgrounds-window__prompt {
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 18px;
-}
+.profile-background.background-36 { background-image: url('@/assets/images/backgrounds/background/bg_36.gif'), url('@/assets/images/backgrounds/background/bg_36.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-53 { background-position: 0 -18px; }
+.profile-background.background-54 { background-image: url('@/assets/images/backgrounds/background/bg_54.gif'), url('@/assets/images/backgrounds/background/bg_54.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-55 { background-image: url('@/assets/images/backgrounds/background/bg_55.gif'), url('@/assets/images/backgrounds/background/bg_55.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 112; }
+.profile-background.background-56 { background-image: url('@/assets/images/backgrounds/background/bg_56.gif'), url('@/assets/images/backgrounds/background/bg_56.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 99; }
+.profile-background.background-57 { background-image: url('@/assets/images/backgrounds/background/bg_57.gif'), url('@/assets/images/backgrounds/background/bg_57.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-58 { background-image: url('@/assets/images/backgrounds/background/bg_58.gif'), url('@/assets/images/backgrounds/background/bg_58.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 104; }
+.profile-background.background-59 { background-image: url('@/assets/images/backgrounds/background/bg_59.gif'), url('@/assets/images/backgrounds/background/bg_59.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 102; }
+.profile-background.background-60 { background-image: url('@/assets/images/backgrounds/background/bg_60.gif'), url('@/assets/images/backgrounds/background/bg_60.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 105; }
+.profile-background.background-61 { background-image: url('@/assets/images/backgrounds/background/bg_61.gif'), url('@/assets/images/backgrounds/background/bg_61.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-62 { background-image: url('@/assets/images/backgrounds/background/bg_62.gif'), url('@/assets/images/backgrounds/background/bg_62.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 103; }
+.profile-background.background-63 { background-image: url('@/assets/images/backgrounds/background/bg_63.gif'), url('@/assets/images/backgrounds/background/bg_63.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 102; }
+.profile-background.background-64 { background-image: url('@/assets/images/backgrounds/background/bg_64.gif'), url('@/assets/images/backgrounds/background/bg_64.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 104; }
+.profile-background.background-65 { background-position: 0 -18px; }
+.profile-background.background-66 { background-image: url('@/assets/images/backgrounds/background/bg_66.gif'), url('@/assets/images/backgrounds/background/bg_66.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 95; }
+.profile-background.background-67 { background-image: url('@/assets/images/backgrounds/background/bg_67.gif'), url('@/assets/images/backgrounds/background/bg_67.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-68 { background-image: url('@/assets/images/backgrounds/background/bg_68.gif'), url('@/assets/images/backgrounds/background/bg_68.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-69 { background-image: url('@/assets/images/backgrounds/background/bg_69.gif'), url('@/assets/images/backgrounds/background/bg_69.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-70 { background-image: url('@/assets/images/backgrounds/background/bg_70.gif'), url('@/assets/images/backgrounds/background/bg_70.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 108; }
+.profile-background.background-71 { background-image: url('@/assets/images/backgrounds/background/bg_71.gif'), url('@/assets/images/backgrounds/background/bg_71.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 104; }
+.profile-background.background-72 { background-image: url('@/assets/images/backgrounds/background/bg_72.gif'), url('@/assets/images/backgrounds/background/bg_72.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 108; }
+.profile-background.background-73 { background-image: url('@/assets/images/backgrounds/background/bg_73.gif'), url('@/assets/images/backgrounds/background/bg_73.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 108; }
+.profile-background.background-74 { background-image: url('@/assets/images/backgrounds/background/bg_74.gif'), url('@/assets/images/backgrounds/background/bg_74.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 108; }
+.profile-background.background-75 { background-image: url('@/assets/images/backgrounds/background/bg_75.gif'), url('@/assets/images/backgrounds/background/bg_75.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-76 { background-image: url('@/assets/images/backgrounds/background/bg_76.gif'), url('@/assets/images/backgrounds/background/bg_76.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-77 { background-image: url('@/assets/images/backgrounds/background/bg_77.gif'), url('@/assets/images/backgrounds/background/bg_77.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 113; }
+.profile-background.background-78 { background-image: url('@/assets/images/backgrounds/background/bg_78.gif'), url('@/assets/images/backgrounds/background/bg_78.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-79 { background-image: url('@/assets/images/backgrounds/background/bg_79.gif'), url('@/assets/images/backgrounds/background/bg_79.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-80 { background-image: url('@/assets/images/backgrounds/background/bg_80.gif'), url('@/assets/images/backgrounds/background/bg_80.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-81 { background-position: 0 -23px; --bg-feet: 114; }
+.profile-background.background-82 { background-image: url('@/assets/images/backgrounds/background/bg_82.gif'), url('@/assets/images/backgrounds/background/bg_82.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-83 { background-image: url('@/assets/images/backgrounds/background/bg_83.gif'), url('@/assets/images/backgrounds/background/bg_83.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-84 { background-position: 0 -23px; }
+.profile-background.background-85 { background-position: 0 -18px; --bg-feet: 112; }
+.profile-background.background-86 { background-image: url('@/assets/images/backgrounds/background/bg_86.png'), url('@/assets/images/backgrounds/background/bg_86.png'); background-position: 0 -18px, 1px -18px; --bg-feet: 105; }
+.profile-background.background-87 { background-position: 0 -18px; --bg-feet: 108; }
+.profile-background.background-88 { background-image: url('@/assets/images/backgrounds/background/bg_88.gif'), url('@/assets/images/backgrounds/background/bg_88.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-89 { background-position: 0 -18px; --bg-feet: 112; }
+.profile-background.background-90 { background-image: url('@/assets/images/backgrounds/background/bg_90.gif'), url('@/assets/images/backgrounds/background/bg_90.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-91 { background-image: url('@/assets/images/backgrounds/background/bg_91.gif'), url('@/assets/images/backgrounds/background/bg_91.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-92 { background-position: 0 -23px; }
+.profile-background.background-93 { background-position: 0 -23px; }
+.profile-background.background-94 { background-position: 0 -23px; }
+.profile-background.background-95 { background-position: 0 -23px; }
+.profile-background.background-96 { background-position: 0 -23px; }
+.profile-background.background-97 { background-position: 0 -23px; }
+.profile-background.background-98 { background-position: 0 -23px; }
+.profile-background.background-99 { background-position: 0 -23px; }
+.profile-background.background-100 { background-position: 0 -23px; }
+.profile-background.background-101 { background-image: url('@/assets/images/backgrounds/background/bg_101.png'), url('@/assets/images/backgrounds/background/bg_101.png'); background-position: 0 -18px, 1px -18px; --bg-feet: 109; }
+.profile-background.background-102 { background-position: 0 -23px; }
+.profile-background.background-103 { background-position: 0 -23px; }
+.profile-background.background-104 { background-position: 0 -23px; }
+.profile-background.background-105 { background-position: 0 -23px; }
+.profile-background.background-106 { background-position: 0 -23px; }
+.profile-background.background-107 { background-position: 0 -23px; --bg-feet: 106; }
+.profile-background.background-108 { background-position: 0 -23px; }
+.profile-background.background-109 { background-position: 0 -23px; }
+.profile-background.background-110 { background-position: 0 -23px; }
+.profile-background.background-111 { background-position: 0 -23px; }
+.profile-background.background-112 { background-position: 0 -23px; }
+.profile-background.background-113 { background-position: 0 -23px; }
+.profile-background.background-114 { background-position: 0 -23px; }
+.profile-background.background-115 { background-position: 0 -23px; }
+.profile-background.background-116 { background-position: 0 -23px; }
+.profile-background.background-117 { background-position: 0 -23px; }
+.profile-background.background-118 { background-position: 0 -23px; }
+.profile-background.background-119 { background-position: 0 -23px; }
+.profile-background.background-120 { background-position: 0 -23px; }
+.profile-background.background-121 { background-position: 0 -23px; }
+.profile-background.background-122 { background-position: 0 -23px; }
+.profile-background.background-123 { background-position: 0 -23px; }
+.profile-background.background-124 { background-position: 0 -23px; --bg-feet: 116; }
+.profile-background.background-125 { background-image: url('@/assets/images/backgrounds/background/bg_125.gif'), url('@/assets/images/backgrounds/background/bg_125.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-126 { background-image: url('@/assets/images/backgrounds/background/bg_126.gif'), url('@/assets/images/backgrounds/background/bg_126.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 105; }
+.profile-background.background-127 { background-position: 0 -23px; }
+.profile-background.background-128 { background-position: 0 -23px; }
+.profile-background.background-129 { background-position: 0 -23px; }
+.profile-background.background-130 { background-position: 0 -23px; }
+.profile-background.background-131 { background-image: url('@/assets/images/backgrounds/background/bg_131.gif'), url('@/assets/images/backgrounds/background/bg_131.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-132 { background-position: 0 -23px; --bg-feet: 113; }
+.profile-background.background-133 { background-position: 0 -23px; }
+.profile-background.background-134 { background-position: 0 -23px; --bg-feet: 111; }
+.profile-background.background-135 { background-position: 0 -23px; --bg-feet: 106; }
+.profile-background.background-136 { background-position: 0 -23px; }
+.profile-background.background-137 { background-position: 0 -23px; }
+.profile-background.background-138 { background-position: 0 -23px; }
+.profile-background.background-139 { background-position: 0 -23px; }
+.profile-background.background-140 { background-image: url('@/assets/images/backgrounds/background/bg_140.gif'), url('@/assets/images/backgrounds/background/bg_140.gif'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-141 { background-position: 0 -18px; --bg-feet: 114; }
+.profile-background.background-142 { background-position: 0 -23px; --bg-feet: 114; }
+.profile-background.background-143 { background-position: 0 -23px; --bg-feet: 112; }
+.profile-background.background-144 { background-position: 0 -23px; --bg-feet: 112; }
+.profile-background.background-145 { background-position: 0 -23px; }
+.profile-background.background-146 { background-position: 0 -23px; }
+.profile-background.background-147 { background-position: 0 -23px; }
+.profile-background.background-148 { background-position: 0 -23px; }
+.profile-background.background-149 { background-position: 0 -23px; }
+.profile-background.background-150 { background-position: 0 -23px; --bg-feet: 107; }
+.profile-background.background-151 { background-image: url('@/assets/images/backgrounds/background/bg_151.gif'), url('@/assets/images/backgrounds/background/bg_151.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 97; }
+.profile-background.background-152 { background-position: 0 -23px; --bg-feet: 110; }
+.profile-background.background-153 { background-position: 0 -23px; --bg-feet: 112; }
+.profile-background.background-154 { background-position: 0 -23px; --bg-feet: 112; }
+.profile-background.background-155 { background-position: 0 -23px; --bg-feet: 112; }
+.profile-background.background-156 { background-position: 0 -23px; --bg-feet: 112; }
+.profile-background.background-157 { background-position: 0 -23px; --bg-feet: 110; }
+.profile-background.background-158 { background-position: 0 -23px; --bg-feet: 110; }
+.profile-background.background-159 { background-position: 0 -23px; --bg-feet: 110; }
+.profile-background.background-160 { background-position: 0 -23px; --bg-feet: 109; }
+.profile-background.background-161 { background-position: 0 -23px; --bg-feet: 112; }
+.profile-background.background-162 { background-position: 0 -23px; --bg-feet: 110; }
+.profile-background.background-163 { background-position: 0 -23px; --bg-feet: 110; }
+.profile-background.background-164 { background-position: 0 -23px; --bg-feet: 110; }
+.profile-background.background-165 { background-position: 0 -23px; --bg-feet: 110; }
+.profile-background.background-166 { background-position: 0 -23px; --bg-feet: 112; }
+.profile-background.background-167 { background-position: 0 -23px; --bg-feet: 112; }
+.profile-background.background-168 { background-position: 0 -23px; --bg-feet: 112; }
+.profile-background.background-169 { background-position: 0 -23px; --bg-feet: 112; }
+.profile-background.background-170 { background-image: url('@/assets/images/backgrounds/background/bg_170.png'), url('@/assets/images/backgrounds/background/bg_170.png'); background-position: 0 -18px, 1px -18px; --bg-feet: 107; }
+.profile-background.background-171 { background-image: url('@/assets/images/backgrounds/background/bg_171.png'), url('@/assets/images/backgrounds/background/bg_171.png'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-172 { background-image: url('@/assets/images/backgrounds/background/bg_172.png'), url('@/assets/images/backgrounds/background/bg_172.png'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-173 { background-image: url('@/assets/images/backgrounds/background/bg_173.png'), url('@/assets/images/backgrounds/background/bg_173.png'); background-position: 0 -18px, 1px -18px; --bg-feet: 105; }
+.profile-background.background-174 { background-image: url('@/assets/images/backgrounds/background/bg_174.png'), url('@/assets/images/backgrounds/background/bg_174.png'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-175 { background-image: url('@/assets/images/backgrounds/background/bg_175.png'), url('@/assets/images/backgrounds/background/bg_175.png'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-176 { background-image: url('@/assets/images/backgrounds/background/bg_176.png'), url('@/assets/images/backgrounds/background/bg_176.png'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-177 { background-image: url('@/assets/images/backgrounds/background/bg_177.gif'), url('@/assets/images/backgrounds/background/bg_177.gif'); background-position: 0 2px, 1px 2px; --bg-feet: 104; }
+.profile-background.background-178 { background-image: url('@/assets/images/backgrounds/background/bg_178.png'), url('@/assets/images/backgrounds/background/bg_178.png'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-179 { background-image: url('@/assets/images/backgrounds/background/bg_179.png'), url('@/assets/images/backgrounds/background/bg_179.png'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-180 { background-image: url('@/assets/images/backgrounds/background/bg_180.png'), url('@/assets/images/backgrounds/background/bg_180.png'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-181 { background-image: url('@/assets/images/backgrounds/background/bg_181.png'), url('@/assets/images/backgrounds/background/bg_181.png'); background-position: 0 -18px, 1px -18px; --bg-feet: 113; }
+.profile-background.background-182 { background-image: url('@/assets/images/backgrounds/background/bg_182.png'), url('@/assets/images/backgrounds/background/bg_182.png'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-183 { background-image: url('@/assets/images/backgrounds/background/bg_183.png'), url('@/assets/images/backgrounds/background/bg_183.png'); background-position: 0 -18px, 1px -18px; --bg-feet: 113; }
+.profile-background.background-184 { background-image: url('@/assets/images/backgrounds/background/bg_184.png'), url('@/assets/images/backgrounds/background/bg_184.png'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-185 { background-image: url('@/assets/images/backgrounds/background/bg_185.png'), url('@/assets/images/backgrounds/background/bg_185.png'); background-position: 0 -18px, 1px -18px; --bg-feet: 104; }
+.profile-background.background-186 { background-image: url('@/assets/images/backgrounds/background/bg_186.png'), url('@/assets/images/backgrounds/background/bg_186.png'); background-position: 0 -18px, 1px -18px; }
+.profile-background.background-187 { background-image: url('@/assets/images/backgrounds/background/bg_187.gif'), url('@/assets/images/backgrounds/background/bg_187.gif'); background-position: 0 -18px, 1px -18px; --bg-feet: 107; }

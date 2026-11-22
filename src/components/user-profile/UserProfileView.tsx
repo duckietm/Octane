@@ -12,22 +12,40 @@ import {
     UserProfileParser,
     UserRelationshipsComposer
 } from '@octane/renderer';
-import { FC, useState } from 'react';
+import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import {
+    applyUserAccent,
     CreateLinkEvent,
+    getProfileAccentColor,
     GetRoomSession,
     GetUserProfile,
+    hasProfileFeature,
+    isLightProfileAccent,
     isProfileHiddenFromViewer,
+    loadProfileCustomizationData,
     LocalizeText,
     localizeWithFallback,
+    parseProfileBackgroundStyle,
+    PROFILE_FEATURE_BANNER,
+    profileBackgroundStyleCss,
+    ProfileBannerEntry,
+    profileImageUrl,
+    restoreUserAccent,
     SanitizeHtml,
     SendMessageComposer
 } from '../../api';
+import pencilIcon from '../../assets/images/infostand/pencil-icon.png';
 import { frankStop } from '../../assets/images/user-profile';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { useIsUserBlocked, useMessageEvent, useNotification, useOctaneEvent } from '../../hooks';
+import { useProfileCustomizeStore } from '../../state/profileCustomizeStore';
+import { useBackgroundTone, useIsUserBlocked, useMessageEvent, useNotification, useOctaneEvent } from '../../hooks';
 import { OctaneCard } from '../../layout';
+import { BaseButton } from '../../common/BaseButton';
+import { Hint } from '../../common/Tooltip';
 import { GroupsContainerView } from './GroupsContainerView';
+import { ProfileBannerMoveButton } from './ProfileBannerMoveButton';
+import { ProfileBannerView } from './ProfileBannerView';
+import { ProfileCustomizeView } from './ProfileCustomizeView';
 import { UserContainerView } from './UserContainerView';
 
 export const UserProfileView: FC<{}> = () => {
@@ -38,11 +56,40 @@ export const UserProfileView: FC<{}> = () => {
     // block list (BlockedUsersManager), not off the ignore list.
     const isBlocked = useIsUserBlocked(userProfile?.id ?? -1);
     const { showConfirm = null } = useNotification();
+    const [isCustomizing, setIsCustomizing] = useState(false);
+    const [moveBannerRequest, setMoveBannerRequest] = useState(0);
+    // Opened from the infostand's edit button: the customiser alone, without the profile window behind it.
+    const [customizeOnly, setCustomizeOnly] = useState(false);
+    const shownProfileId = useRef(0);
+    const contentRef = useRef<HTMLDivElement>(null);
+    // The window body's own colour, under a background picture that does not cover it all.
+    const backgroundKey = userProfile
+        ? userProfile.backgroundImage || userProfile.backgroundStyle || (userProfile.cardBackgroundId ? `card-${userProfile.cardBackgroundId}` : '')
+        : '';
+    const backgroundTone = useBackgroundTone(contentRef, backgroundKey, { r: 236, g: 232, b: 220 });
+    const [banners, setBanners] = useState<ProfileBannerEntry[]>([]);
+    const bannerId = userProfile?.bannerId ?? 0;
+
+    useEffect(() => {
+        if (!bannerId) return;
+
+        let cancelled = false;
+
+        loadProfileCustomizationData().then((data) => {
+            if (!cancelled) setBanners(data.banners);
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [bannerId]);
 
     const onClose = () => {
         setUserProfile(null);
         setUserBadges([]);
         setUserRelationships(null);
+        setIsCustomizing(false);
+        setCustomizeOnly(false);
     };
 
     // Official blockUser / unblockUser by user id, each behind its confirm
@@ -56,12 +103,22 @@ export const UserProfileView: FC<{}> = () => {
 
         showConfirm(
             // The pack stores the line breaks as literal "\n".
-            localizeWithFallback(`${key}.desc`, isBlocked ? localizeWithFallback('octane.user_profile.unblock_this_user', 'Unblock this user?') : localizeWithFallback('octane.user_profile.block_this_user', 'Block this user?')).replace(/\\n/g, '\n'),
+            localizeWithFallback(
+                `${key}.desc`,
+                isBlocked
+                    ? localizeWithFallback('octane.user_profile.unblock_this_user', 'Unblock this user?')
+                    : localizeWithFallback('octane.user_profile.block_this_user', 'Block this user?')
+            ).replace(/\\n/g, '\n'),
             apply,
             null,
             null,
             null,
-            localizeWithFallback(`${key}.title`, isBlocked ? localizeWithFallback('octane.user_profile.unblock_user', 'Unblock user') : localizeWithFallback('octane.user_profile.block_user', 'Block user'))
+            localizeWithFallback(
+                `${key}.title`,
+                isBlocked
+                    ? localizeWithFallback('octane.user_profile.unblock_user', 'Unblock user')
+                    : localizeWithFallback('octane.user_profile.block_user', 'Block user')
+            )
         );
     };
 
@@ -93,8 +150,16 @@ export const UserProfileView: FC<{}> = () => {
         setUserRelationships(parser);
     });
 
+    // The user's profile accent colours every window of their client, from the moment they log in.
+    useEffect(() => {
+        restoreUserAccent(GetSessionDataManager().userId);
+    }, []);
+
     useMessageEvent<UserProfileEvent>(UserProfileEvent, (event) => {
         const parser = event.getParser();
+        const ownUserId = GetSessionDataManager().userId;
+
+        if (parser.id === ownUserId) applyUserAccent(ownUserId, parser.accentId ?? 0);
 
         let isSameProfile = false;
 
@@ -107,6 +172,15 @@ export const UserProfileView: FC<{}> = () => {
         if (!isSameProfile) {
             setUserBadges([]);
             setUserRelationships(null);
+            setIsCustomizing(false);
+        }
+
+        // Asked for by the infostand's edit button: the customiser opens by itself, unless the profile is already shown.
+        if (parser.id === ownUserId && useProfileCustomizeStore.getState().take()) {
+            setCustomizeOnly(shownProfileId.current !== parser.id);
+            setIsCustomizing(true);
+        } else {
+            setCustomizeOnly(false);
         }
 
         SendMessageComposer(new UserCurrentBadgesComposer(parser.id));
@@ -133,72 +207,138 @@ export const UserProfileView: FC<{}> = () => {
         GetUserProfile(userData.webID);
     });
 
+    // The profile window on screen, so a request from the infostand knows whether to open the customiser by itself.
+    useEffect(() => {
+        shownProfileId.current = userProfile && !customizeOnly ? userProfile.id : 0;
+    }, [userProfile, customizeOnly]);
+
     if (!userProfile) return null;
 
     const cardBackgroundId = userProfile.cardBackgroundId ?? 0;
-    const cardBackgroundClass = cardBackgroundId ? `profile-card-background card-background-${cardBackgroundId}` : '';
+    const customBackground = userProfile.backgroundImage ?? '';
+    // An uploaded background wins over the user's own style, which wins over the card background picked from the list.
+    const ownStyle = customBackground ? null : parseProfileBackgroundStyle(userProfile.backgroundStyle);
+    const cardBackgroundClass = customBackground
+        ? 'profile-card-background octane-extended-profile-window__content--custom-background'
+        : ownStyle
+          ? 'octane-extended-profile-window__content--styled'
+          : cardBackgroundId
+            ? `profile-card-background card-background-${cardBackgroundId}`
+            : '';
+    const contentStyle = customBackground
+        ? ({ backgroundImage: `url(${profileImageUrl(customBackground)})` } as CSSProperties)
+        : ownStyle
+          ? (profileBackgroundStyleCss(ownStyle) as CSSProperties)
+          : undefined;
+    const showBanner = hasProfileFeature(userProfile, PROFILE_FEATURE_BANNER);
+    const isOwnProfile = userProfile.id === GetSessionDataManager().userId;
+    const accentColor = getProfileAccentColor(userProfile.accentId ?? 0);
+    const accentStyle = accentColor ? ({ '--profile-accent': accentColor } as CSSProperties) : undefined;
+    const customizeLabel = localizeWithFallback('extendedprofile.customize.title', 'Customise profile');
 
     return (
         <NativeTextTree>
-            <OctaneCard className="octane-extended-profile-window w-[640px] h-[720px] max-w-[96vw] max-h-[92vh]" uniqueKey="octane-user-profile">
-                <OctaneCard.Header headerText={LocalizeText('extendedprofile.caption')} onCloseClick={onClose} />
-                <OctaneCard.Content className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}`}>
-                    {isBlocked && (
-                        // Official blocked_container: the drama text, whose "event:profile/unblock" link
-                        // opens the unblock confirm (it carries no href, so it is never followed as a
-                        // page), and Frank's stop sign.
-                        <div className="octane-extended-profile__blocked-overlay">
-                            <div
-                                className="octane-extended-profile__blocked-text"
-                                dangerouslySetInnerHTML={{
-                                    __html: SanitizeHtml(
-                                        localizeWithFallback(
-                                            'extendedprofile.blocked',
-                                            'You are blocking this user. <a href="event:profile/unblock">Unblock</a>'
-                                        )
-                                            .split(' href="event:profile/unblock"')
-                                            .join('')
-                                    )
-                                }}
-                                onClick={(event) => {
-                                    if (!(event.target as HTMLElement).closest('a')) return;
-
-                                    event.preventDefault();
-                                    toggleBlock();
-                                }}
+            {!customizeOnly && (
+                <OctaneCard
+                    className={`octane-extended-profile-window w-[640px] h-[720px] max-w-[96vw] max-h-[92vh]${accentColor ? ' has-profile-accent' : ''}${isLightProfileAccent(userProfile.accentId ?? 0) ? ' has-light-accent' : ''}`}
+                    style={accentStyle}
+                    uniqueKey="octane-user-profile"
+                >
+                    <OctaneCard.Header headerText={LocalizeText('extendedprofile.caption')} onCloseClick={onClose} />
+                    <OctaneCard.Content
+                        ref={contentRef}
+                        className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}${backgroundTone ? ` has-${backgroundTone}-background` : ''}`}
+                        style={contentStyle}
+                    >
+                        {ownStyle && ownStyle.pattern > 0 && (
+                            <span
+                                aria-hidden
+                                className={`octane-extended-profile__style-pattern profile-card-background card-background-${ownStyle.pattern}`}
                             />
-                            <img className="octane-extended-profile__blocked-frank" src={frankStop} alt="" draggable={false} />
-                        </div>
-                    )}
-                    <div className="px-[10px] pt-[8px]">
-                        <UserContainerView
-                            userBadges={userBadges}
-                            userProfile={userProfile}
-                            userRelationships={userRelationships}
-                            isBlocked={isBlocked}
-                            onToggleBlock={toggleBlock}
-                            onOpenRooms={onOpenRooms}
-                            onClose={onClose}
-                        />
-                    </div>
-                    <div className="octane-extended-profile-window__body octane-extended-profile-window__body--groups flex-1 overflow-hidden px-[10px] pb-[10px] pt-[6px]">
-                        <div className="octane-extended-profile-window__panel h-full p-2">
-                            {isProfileHiddenFromViewer(userProfile, GetSessionDataManager().userId) ? (
-                                <p className="octane-extended-profile__hidden-notice">
-                                    {localizeWithFallback('profile.full_profile_hidden', 'The full profile of this user is hidden')}
-                                </p>
-                            ) : (
-                                <GroupsContainerView
-                                    fullWidth
-                                    groups={userProfile.groups}
-                                    itsMe={userProfile.id === GetSessionDataManager().userId}
-                                    onLeaveGroup={onLeaveGroup}
+                        )}
+                        {isBlocked && (
+                            // Official blocked_container: the drama text, whose "event:profile/unblock" link
+                            // opens the unblock confirm (it carries no href, so it is never followed as a
+                            // page), and Frank's stop sign.
+                            <div className="octane-extended-profile__blocked-overlay">
+                                <div
+                                    className="octane-extended-profile__blocked-text"
+                                    dangerouslySetInnerHTML={{
+                                        __html: SanitizeHtml(
+                                            localizeWithFallback(
+                                                'extendedprofile.blocked',
+                                                'You are blocking this user. <a href="event:profile/unblock">Unblock</a>'
+                                            )
+                                                .split(' href="event:profile/unblock"')
+                                                .join('')
+                                        )
+                                    }}
+                                    onClick={(event) => {
+                                        if (!(event.target as HTMLElement).closest('a')) return;
+
+                                        event.preventDefault();
+                                        toggleBlock();
+                                    }}
                                 />
-                            )}
+                                <img className="octane-extended-profile__blocked-frank" src={frankStop} alt="" draggable={false} />
+                            </div>
+                        )}
+                        {showBanner && (
+                            <ProfileBannerView userProfile={userProfile} banners={banners}>
+                                {isOwnProfile && isCustomizing && <ProfileBannerMoveButton onMove={() => setMoveBannerRequest((value) => value + 1)} />}
+                                {isOwnProfile && (
+                                    <Hint content={customizeLabel}>
+                                        <BaseButton
+                                            aria-label={customizeLabel}
+                                            className="octane-extended-profile__banner-edit"
+                                            type="button"
+                                            onClick={() => setIsCustomizing((value) => !value)}
+                                        >
+                                            <img src={pencilIcon} alt="" draggable={false} />
+                                        </BaseButton>
+                                    </Hint>
+                                )}
+                            </ProfileBannerView>
+                        )}
+                        {/* Native text reads its colour when it is drawn: a new background tone draws it again. */}
+                        <div key={backgroundTone ?? 'plain'} className="px-[10px] pt-[8px]">
+                            <UserContainerView
+                                userBadges={userBadges}
+                                userProfile={userProfile}
+                                userRelationships={userRelationships}
+                                isBlocked={isBlocked}
+                                onToggleBlock={toggleBlock}
+                                onOpenRooms={onOpenRooms}
+                                onClose={onClose}
+                                onCustomize={() => setIsCustomizing((value) => !value)}
+                            />
                         </div>
-                    </div>
-                </OctaneCard.Content>
-            </OctaneCard>
+                        <div className="octane-extended-profile-window__body octane-extended-profile-window__body--groups flex-1 overflow-hidden px-[10px] pb-[10px] pt-[6px]">
+                            <div className="octane-extended-profile-window__panel h-full p-2">
+                                {isProfileHiddenFromViewer(userProfile, GetSessionDataManager().userId) ? (
+                                    <p className="octane-extended-profile__hidden-notice">
+                                        {localizeWithFallback('profile.full_profile_hidden', 'The full profile of this user is hidden')}
+                                    </p>
+                                ) : (
+                                    <GroupsContainerView
+                                        fullWidth
+                                        groups={userProfile.groups}
+                                        itsMe={userProfile.id === GetSessionDataManager().userId}
+                                        onLeaveGroup={onLeaveGroup}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    </OctaneCard.Content>
+                </OctaneCard>
+            )}
+            {isOwnProfile && isCustomizing && (
+                <ProfileCustomizeView
+                    userProfile={userProfile}
+                    moveBannerRequest={moveBannerRequest}
+                    onClose={() => (customizeOnly ? onClose() : setIsCustomizing(false))}
+                />
+            )}
         </NativeTextTree>
     );
 };

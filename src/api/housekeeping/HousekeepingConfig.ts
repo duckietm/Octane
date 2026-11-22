@@ -29,6 +29,7 @@ export const HOUSEKEEPING_TABS: readonly HousekeepingTabId[] = [
     HousekeepingTabId.ROOMS,
     HousekeepingTabId.SUPPORT,
     HousekeepingTabId.BANS,
+    HousekeepingTabId.PROFILE_IMAGES,
     HousekeepingTabId.AUDIT,
     HousekeepingTabId.HOTEL,
     HousekeepingTabId.PERMISSIONS,
@@ -46,6 +47,7 @@ export const HOUSEKEEPING_TAB_PERMISSIONS: Partial<Record<HousekeepingTabId, str
     [HousekeepingTabId.AUDIT]: 'acc_hk_users',
     [HousekeepingTabId.ROOMS]: 'acc_hk_rooms',
     [HousekeepingTabId.BANS]: 'acc_hk_bans',
+    [HousekeepingTabId.PROFILE_IMAGES]: 'acc_hk_profile_images',
     [HousekeepingTabId.HOTEL]: 'acc_hk_hotel',
     [HousekeepingTabId.PERMISSIONS]: 'acc_hk_permissions',
     [HousekeepingTabId.SOUNDBOARD]: 'acc_soundboard_manage'
