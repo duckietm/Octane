@@ -229,6 +229,7 @@ export const useWiredToolsStore = () => {
             setAccountPreferences({
                 ...DEFAULT_ACCOUNT_PREFERENCES,
                 ...(parsedValue || {}),
+                playTestMode: false,
                 wiredStyle: normalizeWiredStyle(parsedValue?.wiredStyle)
             });
         } catch {
@@ -358,7 +359,7 @@ export const useWiredToolsStore = () => {
         serverPreferencesAppliedRef.current = true;
         setAccountPreferences((prevValue) => ({
             ...prevValue,
-            playTestMode: stored.playTestMode,
+            // The stored playtest value never switches the mode on: only the checkbox and :playtest do, in a session.
             showToolbarButton: stored.showToolbarButton,
             showInspectButton: stored.showInspectButton,
             showSystemNotifications: stored.showSystemNotifications,
@@ -455,10 +456,10 @@ export const useWiredToolsStore = () => {
 
     /** Re-reads every box from storage, discarding edits that were never saved, then rebuilds the stacks. */
     const rollbackRoomWired = useCallback(() => {
-        if (!roomSettings.canModify) return;
+        if (!roomSettings.canManageSettings) return;
 
         SendMessageComposer(new WiredRoomStateActionComposer(true));
-    }, [roomSettings.canModify]);
+    }, [roomSettings.canManageSettings]);
 
     const updateUserVariableValue = useCallback(
         (userId: number, variableItemId: number, value: number) => {

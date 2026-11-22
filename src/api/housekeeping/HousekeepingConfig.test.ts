@@ -12,6 +12,7 @@ describe('HOUSEKEEPING_TABS', () => {
             HousekeepingTabId.ROOMS,
             HousekeepingTabId.SUPPORT,
             HousekeepingTabId.BANS,
+            HousekeepingTabId.PROFILE_IMAGES,
             HousekeepingTabId.AUDIT,
             HousekeepingTabId.HOTEL,
             HousekeepingTabId.PERMISSIONS,
@@ -38,6 +39,8 @@ describe('isHousekeepingTabOpen', () => {
         expect(isHousekeepingTabOpen(HousekeepingTabId.AUDIT, holding())).toBe(false);
         expect(isHousekeepingTabOpen(HousekeepingTabId.AUDIT, holding('acc_hk_users'))).toBe(true);
         expect(isHousekeepingTabOpen(HousekeepingTabId.BANS, holding('acc_hk_users'))).toBe(false);
+        expect(isHousekeepingTabOpen(HousekeepingTabId.PROFILE_IMAGES, holding('acc_hk_bans'))).toBe(false);
+        expect(isHousekeepingTabOpen(HousekeepingTabId.PROFILE_IMAGES, holding('acc_hk_profile_images'))).toBe(true);
         expect(isHousekeepingTabOpen(HousekeepingTabId.PERMISSIONS, holding('acc_hk_permissions'))).toBe(true);
         expect(isHousekeepingTabOpen(HousekeepingTabId.SOUNDBOARD, holding('acc_soundboard_manage'))).toBe(true);
     });

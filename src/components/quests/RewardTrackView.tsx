@@ -51,7 +51,7 @@ import rewardGiftIcon from '../../assets/images/reward-track/reward-gift.png';
 import rewardGiftPremiumIcon from '../../assets/images/reward-track/reward-gift-premium.png';
 import taskListIcon from '../../assets/images/reward-track/task-list.png';
 import { GetRewardTrackTaskIconUrl } from '../../assets/images/reward-track/tasks';
-import { Button, DraggableWindowPosition, LayoutAvatarImageView, LayoutBadgeImageView, LayoutCurrencyIcon, LayoutFurniIconImageView, Text } from '../../common';
+import { Button, DraggableWindowPosition, LayoutAvatarImageView, LayoutBadgeImageView, LayoutCurrencyIcon, LayoutFurniIconImageView, LayoutHabbiconImageView, Text } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { Hint } from '../../common/Tooltip';
@@ -80,6 +80,9 @@ const RewardIcon: FC<{ rewardTypeId: string; extraParams: string; productItemTyp
 
     // A furni prize: the server sends its sprite id and "<s|i>:<name>" (floor or wall, then the items_base name).
     if (type === 'furni') return <LayoutFurniIconImageView productType={extraParams.startsWith('i:') ? 'i' : 's'} productClassId={productItemTypeId} className="octane-reward-track-prize-furni" />;
+
+    // A Habbicon prize: its id is the product item type.
+    if (type === 'habbicon') return <LayoutHabbiconImageView id={productItemTypeId} size={40} />;
 
     return <div className="octane-reward-track-prize-generic">{rewardTypeId}</div>;
 };
@@ -503,7 +506,8 @@ export const RewardTrackView: FC<{}> = () => {
                                         <span className="octane-reward-track-rewards-sky" />
                                         <img src={prizesStarsImage} alt="" draggable={false} className="octane-reward-track-rewards-stars" />
                                         <RewardTrackBandView premium={false} />
-                                        <RewardTrackBandView premium />
+                                        {/* AIR 1.0.31: no premium band on a track without a premium pass. */}
+                                        {track.hasPremiumConfig && <RewardTrackBandView premium />}
                                         <RewardTrackMainBar x={layout.xFor(points, currentPage)} snapKey={`${tracksVersion}:${track.id}:${currentPage}`} />
                                         <div className="octane-reward-track-points-band" />
                                         <div className="octane-reward-track-indicators">

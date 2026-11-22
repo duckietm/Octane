@@ -8,7 +8,7 @@ import {
     RoomSessionUserFigureUpdateEvent,
     UserRelationshipsComposer
 } from '@octane/renderer';
-import React, { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { Dispatch, FC, FocusEvent, Fragment, KeyboardEvent, SetStateAction, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
     AvatarInfoUser,
     CloneObject,
@@ -17,6 +17,7 @@ import {
     getBadgesRank,
     GetHotelSettings,
     GetGroupInformation,
+    figureUnderOverlay,
     GetUserProfile,
     LocalizeText,
     localizeWithFallback,
@@ -26,14 +27,14 @@ import {
 import homeIcon from '../../../../../assets/images/infostand/home-icon.png';
 import pencilIcon from '../../../../../assets/images/infostand/pencil-icon.png';
 import { Base, Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserIdentityView } from '../../../../../common';
-import { useIsUserBlocked, useMessageEvent, useOctaneEvent, useRoom } from '../../../../../hooks';
-import { BackgroundsView } from '../../../../backgrounds/BackgroundsView';
+import { useBackgroundTone, useIsUserBlocked, useMessageEvent, useOctaneEvent, useRoom } from '../../../../../hooks';
 import { InfoStandBadgeSlotView } from './InfoStandBadgeSlotView';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
 import { InfoStandWidgetUserTagsView } from './InfoStandWidgetUserTagsView';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { Hint } from '../../../../../common/Tooltip';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
+import { useProfileCustomizeStore } from '../../../../../state/profileCustomizeStore';
 
 interface InfoStandWidgetUserViewProps {
     avatarInfo: AvatarInfoUser;
@@ -57,7 +58,6 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     const [overlayId, setOverlayId] = useState<number>(null);
     const [cardBackgroundId, setCardBackgroundId] = useState<number>(null);
     const [borderId, setBorderId] = useState<number>(null);
-    const [isVisible, setIsVisible] = useState(false);
     const [badgesRank, setBadgesRank] = useState<{ userId: number; rank: number }>(null);
     const { roomSession = null } = useRoom();
     const webID = avatarInfo?.webID ?? 0;
@@ -82,10 +82,13 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
 
     const shownBadgesRank = packetBadgesRank > 0 ? packetBadgesRank : badgesRank && badgesRank.userId === webID ? badgesRank.rank : -1;
 
+    const infostandRef = useRef<HTMLDivElement>(null);
     const infostandBackgroundClass = `background-${backgroundId ?? 'default'}`;
     const infostandStandClass = `stand-${standId ?? 'default'}`;
     const infostandOverlayClass = `overlay-${overlayId ?? 'default'}`;
     const infostandCardBackgroundClass = cardBackgroundId ? `card-background-${cardBackgroundId}` : '';
+    // A light card background needs dark text: the infostand's own text is white on its black frame.
+    const infostandTone = useBackgroundTone(infostandRef, cardBackgroundId ? `card-${cardBackgroundId}` : '', { r: 61, g: 61, b: 61 });
     const infostandBorderClass = borderId ? `border-${borderId}` : '';
     const handleProfileClick = useCallback(() => {
         GetUserProfile(avatarInfo.webID);
@@ -93,7 +96,9 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
 
     const handleEditClick = useCallback((event: React.MouseEvent) => {
         event.stopPropagation();
-        setIsVisible((prev) => !prev);
+        // The own profile opens straight on its customiser, where background, stand, frame and border are chosen.
+        useProfileCustomizeStore.getState().request();
+        GetUserProfile(GetSessionDataManager().userId);
     }, []);
 
     const saveMotto = (motto: string) => {
@@ -221,7 +226,12 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     return (
         <NativeTextTree>
             <>
-                <div className={`octane-infostand pointer-events-auto z-30 profile-card-background ${infostandCardBackgroundClass}`}>
+                <div
+                    ref={infostandRef}
+                    className={`octane-infostand pointer-events-auto z-30 profile-card-background ${infostandCardBackgroundClass}${infostandTone ? ` has-${infostandTone}-background` : ''}`}
+                >
+                    {/* Native text reads its colour when it is drawn: a new tone draws it again. */}
+                    <Fragment key={infostandTone ?? 'plain'}>
                     {borderId ? <Base className={`infostand-border ${infostandBorderClass}`} /> : null}
                     <BaseButton type="button" className="octane-infostand__close" aria-label={localizeWithFallback('octane.room.close', 'Close')} onClick={onClose} />
                     <div className="octane-infostand__header">
@@ -253,7 +263,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                     <div className="octane-infostand__figure-row">
                         <BaseButton type="button" className={`octane-infostand__avatar-well profile-background ${infostandBackgroundClass}`} onClick={handleProfileClick}>
                             <Base position="absolute" className={`profile-stand ${infostandStandClass}`} />
-                            <LayoutAvatarImageView direction={2} figure={avatarInfo.figure} />
+                            <LayoutAvatarImageView direction={2} figure={figureUnderOverlay(avatarInfo.figure, overlayId)} />
                             <Base position="absolute" className={`profile-overlay ${infostandOverlayClass}`} />
                         </BaseButton>
                         {avatarInfo.type === AvatarInfoUser.OWN_USER && (
@@ -384,24 +394,8 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                             <InfoStandWidgetUserTagsView tags={GetSessionDataManager().tags} />
                         </Column>
                     )}
+                    </Fragment>
                 </div>
-                {isVisible && avatarInfo.type === AvatarInfoUser.OWN_USER && (
-                    <div className="backgrounds-view-container">
-                        <BackgroundsView
-                            setIsVisible={setIsVisible}
-                            selectedBackground={backgroundId}
-                            setSelectedBackground={setBackgroundId}
-                            selectedStand={standId}
-                            setSelectedStand={setStandId}
-                            selectedOverlay={overlayId}
-                            setSelectedOverlay={setOverlayId}
-                            selectedCardBackground={cardBackgroundId}
-                            setSelectedCardBackground={setCardBackgroundId}
-                            selectedBorder={borderId}
-                            setSelectedBorder={setBorderId}
-                        />
-                    </div>
-                )}
             </>
         </NativeTextTree>
     );

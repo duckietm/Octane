@@ -44,7 +44,6 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             <Text small>{LocalizeText('navigator.roomsettings.chat_settings.info')}</Text>
                             <Select
                                 className="form-select form-select-sm"
-                                disabled={!isHC}
                                 value={roomData.chatSettings.mode}
                                 onChange={(event) => handleChange('bubble_mode', event.target.value)}
                             >
@@ -53,7 +52,6 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             </Select>
                             <Select
                                 className="form-select form-select-sm"
-                                disabled={!isHC}
                                 value={roomData.chatSettings.weight}
                                 onChange={(event) => handleChange('chat_weight', event.target.value)}
                             >
@@ -69,7 +67,6 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             </Select>
                             <Select
                                 className="form-select form-select-sm"
-                                disabled={!isHC}
                                 value={roomData.chatSettings.speed}
                                 onChange={(event) => handleChange('bubble_speed', event.target.value)}
                             >
@@ -79,7 +76,6 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             </Select>
                             <Select
                                 className="form-select form-select-sm"
-                                disabled={!isHC}
                                 value={roomData.chatSettings.protection}
                                 onChange={(event) => handleChange('flood_protection', event.target.value)}
                             >
@@ -90,7 +86,6 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             <Text small>{LocalizeText('navigator.roomsettings.chat_settings.hearing.distance')}</Text>
                             <OctaneInput
                                 className="form-control-sm"
-                                disabled={!isHC}
                                 min="0"
                                 type="number"
                                 value={chatDistance}

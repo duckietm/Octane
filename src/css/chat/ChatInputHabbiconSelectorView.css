@@ -876,6 +876,20 @@
     white-space: nowrap;
 }
 
+/* AIR 1.0.31 habbicon_hub reward_buy_credits_row / reward_buy_activity_points_row and the purchase confirmation's
+   price_credits_row / price_activity_points_row: a row per currency, the amounts right aligned before their icon. */
+.habbicon-price.is-rows {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.habbicon-price-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
 /* habbicon_view reward_action_button, reward_buy_button, habbicon_popup_action_button and habbicon_popup_buy_button:
    plain buttons style 5, color 0x01a101: the grey habbo_skin_button_shiny multiplied by 0x01a101, white
    button_shiny_regular 12 px caption. */

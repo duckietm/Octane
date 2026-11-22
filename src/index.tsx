@@ -41,6 +41,7 @@ import './css/soundboard/Soundboard.css';
 
 import './css/common/Buttons.css';
 import './css/common/UbuntuDropmenu.css';
+import './css/common/HierarchicalDropdown.css';
 import './css/habbo/HabboSkin.css';
 import './css/common/PrefixEffects.css';
 

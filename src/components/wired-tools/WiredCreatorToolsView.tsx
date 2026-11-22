@@ -78,7 +78,7 @@ import {
 import { useInventoryTrade, useMessageEvent, useNotification, useObjectSelectedEvent, useRoom, useWiredObjectInspection, useWiredTools, useWiredVariableCatalog, useWiredVariableHolders, WIRED_VARIABLE_HOLDERS_POLL_MS } from '../../hooks';
 import { isPersistedWiredVariable, WIRED_VARIABLE_TYPE_CREATED, WIRED_VARIABLE_TYPE_INTERNAL, wiredVariablePickerRows } from '../../api/wired/WiredVariableCatalog';
 import { WIRED_OFFICIAL_TARGET_FURNI, WIRED_OFFICIAL_TARGET_USER } from '../../api/wired/WiredVariableTargets';
-import { VARIABLES_TYPE_TARGET, wiredVariablePropertyRows, wiredVariableToDefinition } from './WiredVariableCatalog.helpers';
+import { VARIABLES_TYPE_TARGET, wiredVariableAvailabilityLabel, wiredVariablePropertyRows, wiredVariableToDefinition } from './WiredVariableCatalog.helpers';
 import { WiredChestsTabView } from './WiredChestsTabView';
 import { WiredShareTabView } from './WiredShareTabView';
 import { isRecolorableFurniKey, parseRecolorableFurniValue, recolorableFurniVariables } from './WiredRecolorableFurni.helpers';
@@ -451,6 +451,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         if (targetType === 'context') return localizeWithFallback('octane.wired_tools.current_wired_execution', 'Current wired execution');
         if (value === 11) return localizeWithFallback('wiredfurni.params.variables.availability.11', 'Permanent, shared between rooms');
         if (value === 10) return localizeWithFallback('wiredfurni.params.variables.availability.10', 'Permanent');
+        // 20 and 21 (a reference, an echo) have their own official text.
+        if (value >= 20) return wiredVariableAvailabilityLabel(value);
 
         // Official availability 0 (user in the room) and 1 (room active).
         return targetType === 'furni' || targetType === 'global'

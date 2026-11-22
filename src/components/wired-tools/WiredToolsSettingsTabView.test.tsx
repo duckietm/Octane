@@ -68,7 +68,7 @@ vi.mock('../../hooks', () => ({
     })
 }));
 
-import { buildTimezoneOptions, WiredToolsSettingsTabView } from './WiredToolsSettingsTabView';
+import { buildTimezoneOptions, impliedWiredAccess, WiredToolsSettingsTabView } from './WiredToolsSettingsTabView';
 
 describe('WiredToolsSettingsTabView', () => {
     beforeEach(() => {
@@ -123,6 +123,16 @@ describe('WiredToolsSettingsTabView', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Reload' }));
         expect(mocks.showConfirm).toHaveBeenCalledTimes(1);
         expect(mocks.reloadRoomWired).toHaveBeenCalledTimes(1);
+    });
+
+    it('marks the boxes another one implies (official updatePermissionsUI)', () => {
+        // Group members modify: group admins modify, and both read boxes.
+        expect(impliedWiredAccess(4, 0)).toEqual({ modify: 8, inspect: 12 });
+        // Everyone reads: every other read box.
+        expect(impliedWiredAccess(0, 1)).toEqual({ modify: 0, inspect: 14 });
+        // Users with rights modify: their read box only.
+        expect(impliedWiredAccess(2, 0)).toEqual({ modify: 0, inspect: 2 });
+        expect(impliedWiredAccess(0, 0)).toEqual({ modify: 0, inspect: 0 });
     });
 
     it('labels the permission levels with the official keys', () => {

@@ -44,6 +44,7 @@ export const HousekeepingView: FC = () => {
     const canUsers = useHasPermission('acc_hk_users');
     const canRooms = useHasPermission('acc_hk_rooms');
     const canBans = useHasPermission('acc_hk_bans');
+    const canProfileImages = useHasPermission('acc_hk_profile_images');
     const canHotel = useHasPermission('acc_hk_hotel');
     const canPermissions = useHasPermission('acc_hk_permissions');
     const holds = useMemo(() => {
@@ -51,13 +52,14 @@ export const HousekeepingView: FC = () => {
             acc_hk_users: canUsers,
             acc_hk_rooms: canRooms,
             acc_hk_bans: canBans,
+            acc_hk_profile_images: canProfileImages,
             acc_hk_hotel: canHotel,
             acc_hk_permissions: canPermissions,
             acc_soundboard_manage: canManageSoundboard
         };
 
         return (permission: string) => held[permission] === true;
-    }, [canUsers, canRooms, canBans, canHotel, canPermissions, canManageSoundboard]);
+    }, [canUsers, canRooms, canBans, canProfileImages, canHotel, canPermissions, canManageSoundboard]);
     // Config gate on top of the permission: `housekeeping.enabled`
     // (boolean, default false) is the master switch for the whole module.
     // Config is read after `await GetConfiguration().init()` in
@@ -180,6 +182,7 @@ export const HousekeepingView: FC = () => {
                     { id: HousekeepingTabId.ROOMS, icon: 'icon-rooms', labelKey: 'housekeeping.tab.rooms' },
                     { id: HousekeepingTabId.SUPPORT, icon: 'icon-help', labelKey: 'housekeeping.tab.support', count: openTickets },
                     { id: HousekeepingTabId.BANS, icon: 'icon-modtools', labelKey: 'housekeeping.tab.bans' },
+                    { id: HousekeepingTabId.PROFILE_IMAGES, icon: 'icon-camera', labelKey: 'housekeeping.tab.profile_images' },
                     { id: HousekeepingTabId.AUDIT, icon: 'icon-message', labelKey: 'housekeeping.tab.audit' }
                 ]
             },

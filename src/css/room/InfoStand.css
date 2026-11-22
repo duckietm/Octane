@@ -307,32 +307,22 @@
     display: flex;
     gap: 5px;
     min-width: 170px;
-    min-height: 132px;
+    min-height: 135px;
   }
 
   .octane-infostand__avatar-well {
     position: relative;
     display: flex;
-    flex: 0 0 67px;
-    align-items: flex-end;
+    flex: 0 0 68px;
+    align-items: flex-start;
     justify-content: center;
-    width: 67px;
-    height: 130px;
+    width: 68px;
+    height: 135px;
     overflow: hidden;
     border-radius: 0;
     background-color: transparent;
     cursor: pointer;
     z-index: 1;
-
-    /*
-     * The avatar is drawn with its feet 17px above the bottom of the well, while the
-     * centre of a stand's platform sits about 8px higher than that: without this the feet sink
-     * into the platform. Stands 0 (no platform), 19 and 20 (full-height pictures) keep
-     * the plain position.
-     */
-    .profile-stand:is(.stand-1, .stand-2, .stand-3, .stand-4, .stand-5, .stand-6, .stand-7, .stand-8, .stand-9, .stand-10, .stand-11, .stand-12, .stand-13, .stand-14, .stand-15, .stand-16, .stand-17, .stand-18, .stand-21) ~ .avatar-image {
-      transform: translateY(-8px);
-    }
   }
 
   .octane-infostand__badges {
@@ -627,4 +617,18 @@
 .octane-infostand-area .octane-infostand__name,
 .octane-infostand-area .octane-infostand__identity {
     font-weight: 700 !important;
+}
+
+/* Text on the card background the player chose: the infostand's text is white for its black frame, so a light
+   background turns it dark, and a dark patterned one gets a shadow. Buttons and inputs keep their own colours. */
+.octane-infostand.has-light-background,
+.octane-infostand.has-light-background :where(*):not(button, button *, input, textarea, .infostand-border, .prefix, .prefix *, [style*='color'], [style*='color'] *),
+.octane-infostand.has-light-background .octane-infostand__profile-link :where(*):not(.prefix, .prefix *, [style*='color'], [style*='color'] *) {
+  color: #141414 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.octane-infostand.has-dark-background :where(*):not(button, button *, input, textarea),
+.octane-infostand.has-dark-background .octane-infostand__profile-link :where(*) {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }

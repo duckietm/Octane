@@ -36,7 +36,7 @@
   height: 135px;
   position: relative;
   overflow: hidden;
-  border-radius: 3px;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -740,4 +740,926 @@
     width: 24px;
     height: 17px;
     image-rendering: pixelated;
+}
+
+/* Profile window customisation: the banner, the avatar border and the accent colour. */
+.octane-extended-profile__banner {
+  position: relative;
+  flex: 0 0 auto;
+  height: 110px;
+  background-color: #8fc8e8;
+  background-repeat: no-repeat;
+  border-bottom: 2px solid var(--profile-accent, #afafaf);
+}
+
+/* Gallery banners are pixel art: shown at their own size, never resampled, over a sky that fills
+   whatever the picture leaves transparent. */
+.octane-extended-profile__banner--gallery {
+  background-color: #8fc8e8;
+  background-image: linear-gradient(180deg, #6fb3dc 0%, #b9e0f2 100%);
+  background-size: auto;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* An uploaded banner was cropped to 1280 x 220 in the editor: it fills the strip at half size. */
+.octane-extended-profile__banner--custom {
+  background-size: cover;
+  background-position: center;
+  image-rendering: auto;
+}
+
+.octane-extended-profile__banner--empty {
+  background: repeating-linear-gradient(45deg, #e4e1d6, #e4e1d6 8px, #efede4 8px, #efede4 16px);
+}
+
+.octane-extended-profile-window__content--custom-background {
+  background-size: cover !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+  image-rendering: auto;
+}
+
+.octane-extended-profile__banner-edit {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid #8d8d8d;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.octane-extended-profile__avatar-frame {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* The infostand borders sit 22px outside a card; around the profile picture they hug its frame: the border
+   starts at the picture's edge (no gap) and its inner corners follow the picture's 6 px corners. */
+.octane-extended-profile__avatar-frame .infostand-border {
+  top: -3px;
+  bottom: -3px;
+  left: -3px;
+  right: -3px;
+  border-width: 3px;
+  border-radius: 9px;
+}
+
+/*
+ * The decorated frames are pictures of about 215 x 280, made for the wider infostand card. Around the photo
+ * they are nine-sliced: each corner (a third of the picture each way, with its decorations) keeps its shape at
+ * 42 % of its size and only the straight middle of each side stretches; each frame stands off the photo by the
+ * thickness of its own line, so its inner edge meets the photo.
+ */
+.octane-extended-profile__avatar-frame .infostand-border.border-17,
+.octane-extended-profile__avatar-frame .infostand-border.border-18,
+.octane-extended-profile__avatar-frame .infostand-border.border-19,
+.octane-extended-profile__avatar-frame .infostand-border.border-20,
+.octane-extended-profile__avatar-frame .infostand-border.border-21,
+.octane-extended-profile__avatar-frame .infostand-border.border-22,
+.octane-extended-profile__avatar-frame .infostand-border.border-23,
+.octane-extended-profile__avatar-frame .infostand-border.border-24,
+.octane-extended-profile__avatar-frame .infostand-border.border-25 {
+  border-style: solid;
+  border-color: transparent;
+  border-width: 0;
+  border-radius: 0;
+  background: none;
+  border-image-slice: 34%;
+  border-image-repeat: stretch;
+  border-image-outset: 0;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-17 {
+  top: -7px;
+  right: -7px;
+  bottom: -6px;
+  left: -7px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_17.webp');
+  border-image-width: 40px 32px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-18 {
+  top: -4px;
+  right: -7px;
+  bottom: -5px;
+  left: -4px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_18.webp');
+  border-image-width: 39px 31px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-19 {
+  top: -3px;
+  right: -6px;
+  bottom: -7px;
+  left: -6px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_19.webp');
+  border-image-width: 39px 31px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-20 {
+  top: -11px;
+  right: -5px;
+  bottom: -2px;
+  left: -4px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_20.webp');
+  border-image-width: 39px 29px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-21 {
+  top: -10px;
+  right: -8px;
+  bottom: -2px;
+  left: -6px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_21.webp');
+  border-image-width: 41px 31px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-22 {
+  top: -4px;
+  right: -5px;
+  bottom: -4px;
+  left: -4px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_22.webp');
+  border-image-width: 39px 30px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-23 {
+  top: -9px;
+  right: -8px;
+  bottom: -8px;
+  left: -8px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_23.webp');
+  border-image-width: 41px 33px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-24 {
+  top: -5px;
+  right: -9px;
+  bottom: -5px;
+  left: -8px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_24.webp');
+  border-image-width: 41px 33px;
+}
+
+.octane-extended-profile__avatar-frame .infostand-border.border-25 {
+  top: -8px;
+  right: -4px;
+  bottom: -4px;
+  left: -4px;
+  border-image-source: url('@/assets/images/backgrounds/borders/border_25.webp');
+  border-image-width: 40px 30px;
+}
+
+/* The accent of the profile being viewed wins over the viewer's own theme (html.octane-user-accent). */
+html .octane-card-shell.octane-card-frame-3.octane-extended-profile-window.has-profile-accent,
+html .octane-card-shell.octane-card-frame-3.octane-profile-customize.has-profile-accent {
+  --octane-card-frame-3-title: var(--profile-accent);
+}
+
+.octane-extended-profile-window.has-profile-accent .octane-extended-profile__separator {
+  background: var(--profile-accent);
+}
+
+.octane-extended-profile-window.has-profile-accent .octane-extended-profile__summary-bar,
+.octane-extended-profile-window.has-profile-accent .octane-extended-profile-window__panel {
+  border-color: var(--profile-accent);
+}
+
+.octane-extended-profile-window.has-profile-accent .layout-grid-item.active {
+  background: color-mix(in srgb, var(--profile-accent) 35%, #fff);
+  box-shadow: inset 0 0 0 2px var(--profile-accent);
+}
+
+/* The customiser window: banner strips, card and border tiles, colour swatches. */
+.octane-profile-customize__option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 4px;
+  border: 1px solid #8d8d8d;
+  background: #efede4;
+  cursor: pointer;
+}
+
+.octane-profile-customize__option.is-selected {
+  border-color: #1e7cb8;
+  box-shadow: inset 0 0 0 2px #1e7cb8;
+}
+
+.octane-profile-customize__banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 64px;
+  background-color: #8fc8e8;
+  background-repeat: no-repeat;
+  background-size: auto;
+  image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-profile-customize__banner--none {
+  background: repeating-linear-gradient(45deg, #e4e1d6, #e4e1d6 6px, #efede4 6px, #efede4 12px);
+  color: #555;
+  font-size: 12px;
+}
+
+.octane-profile-customize__card {
+  width: 44px;
+  height: 56px;
+  border-radius: 4px;
+}
+
+.octane-profile-customize__border {
+  width: 44px;
+  height: 56px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.octane-profile-customize__swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.octane-profile-customize__swatch--none {
+  background: linear-gradient(135deg, #fff 45%, #d23c3c 45%, #d23c3c 55%, #fff 55%);
+}
+
+/* The customiser: the profile top as it is now, the upload row, the sections and the picture editor. */
+.octane-profile-customize__preview {
+  position: relative;
+  flex: 0 0 auto;
+  background: #ece8dc;
+  border-bottom: 1px solid var(--profile-accent, #afafaf);
+}
+
+.octane-profile-customize__preview .octane-extended-profile__banner {
+  height: 96px;
+}
+
+.octane-extended-profile__avatar-scaled {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.octane-extended-profile__avatar-scaled-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+
+.octane-profile-customize__upload {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #d5d1c4;
+}
+
+.octane-profile-customize__upload-current {
+  width: 72px;
+  height: 24px;
+  border: 1px solid #8d8d8d;
+  border-radius: 3px;
+  background-size: cover;
+  background-position: center;
+}
+
+.octane-profile-customize__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.octane-profile-customize__section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.octane-profile-customize__message {
+  margin: 0;
+  padding: 4px 8px;
+  border-radius: 3px;
+  background: #fde8e8;
+  color: #8a1f1f;
+  font-size: 12px;
+}
+
+.octane-profile-image-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.octane-profile-image-editor__canvas {
+  width: 100%;
+  border: 1px solid #8d8d8d;
+  border-radius: 3px;
+  background: repeating-conic-gradient(#e4e1d6 0% 25%, #f4f2ea 0% 50%) 50% / 16px 16px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.octane-profile-image-editor__canvas:active {
+  cursor: grabbing;
+}
+
+.octane-profile-image-editor--background .octane-profile-image-editor__canvas {
+  width: auto;
+  height: 240px;
+  align-self: center;
+}
+
+.octane-profile-image-editor__canvas.is-pixelated {
+  image-rendering: pixelated;
+}
+
+.octane-profile-image-editor__hint {
+  margin: 0;
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+}
+
+.octane-profile-image-editor__zoom {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.octane-profile-image-editor__actions,
+.octane-profile-image-editor__footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.octane-profile-image-editor__footer {
+  justify-content: flex-end;
+}
+
+.octane-profile-image-editor__pixelated {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.octane-profile-image-editor__error {
+  margin: 0;
+  color: #8a1f1f;
+  font-size: 12px;
+}
+
+
+/* While customising, the banner is one big button that opens the editor to move it. */
+.octane-extended-profile__banner-move {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.15);
+  cursor: move;
+  opacity: 0.85;
+  transition: background 0.15s ease;
+}
+
+.octane-extended-profile__banner-move:hover {
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 1;
+}
+
+.octane-extended-profile__banner-move-label {
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.octane-profile-customize__hint {
+  margin: 0;
+  font-size: 12px;
+  color: #555;
+}
+
+.octane-profile-customize__option {
+  flex-direction: column;
+  gap: 3px;
+}
+
+.octane-profile-customize__caption {
+  font-size: 11px;
+  line-height: 1;
+  color: #333;
+}
+
+/* A card background shown as the small window it makes: a title strip and a panel on it. */
+.octane-profile-customize__card {
+  position: relative;
+  display: block;
+  width: 52px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: 3px;
+  background-color: #ece8dc;
+}
+
+.octane-profile-customize__card-header {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 9px;
+  background: #367997;
+}
+
+.octane-profile-customize__card-panel {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  height: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+/* A border tried on the user's own picture, as the profile shows it. */
+.octane-profile-customize__border-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 7px;
+}
+
+/* A theme shown as a small window with its title bar in the colour. */
+.octane-profile-customize__accent-sample {
+  display: flex;
+  flex-direction: column;
+  width: 100px;
+  height: 46px;
+  overflow: hidden;
+  border: 1px solid #030f18;
+  border-radius: 4px;
+  background: #e9e9e1;
+}
+
+.octane-profile-customize__accent-bar {
+  position: relative;
+  flex: 0 0 13px;
+  background: #367997;
+  border-bottom: 1px solid #030f18;
+}
+
+.octane-profile-customize__accent-close {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: #c0392b;
+}
+
+.octane-profile-customize__accent-body {
+  flex: 1;
+  margin: 4px;
+  border: 1px solid #c9c6bc;
+  border-radius: 2px;
+  background: #fff;
+}
+
+/* Background, stand and effect of the picture: one at a time, chosen with these segments. */
+.octane-profile-customize__segments {
+  display: flex;
+  gap: 4px;
+}
+
+.octane-profile-customize__segment {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid #8d8d8d;
+  border-radius: 4px;
+  background: #efede4;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.octane-profile-customize__segment.is-selected {
+  border-color: var(--profile-accent, #1e7cb8);
+  background: var(--profile-accent, #1e7cb8);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Text on a background the player chose: light with a shadow on a dark one, dark on a light one. The tone is
+   measured from the background itself (useBackgroundTone). Panels with their own fill keep their colours. */
+/* Every text of the top of the profile that sits on the background: the identity, the meta lines and their
+   labels, the status, the friends and relationships. Buttons, badge slots and parts coloured on purpose (a
+   prefix, a segment with its own colour) keep theirs. */
+.octane-extended-profile-window__content.has-dark-background :is(
+    .octane-extended-profile__identity-copy,
+    .octane-extended-profile__right,
+    .octane-extended-profile__actions
+  ),
+.octane-extended-profile-window__content.has-dark-background :is(
+    .octane-extended-profile__identity-copy,
+    .octane-extended-profile__right,
+    .octane-extended-profile__actions
+  )
+  :where(*):not(button, button *, .prefix, .prefix *, [style*='color'], [style*='color'] *, img) {
+  color: #f5f5f5 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+.octane-extended-profile-window__content.has-dark-background .octane-extended-profile__relationship-subcopy {
+  color: #d6d6d6 !important;
+}
+
+.octane-extended-profile-window__content.has-dark-background .octane-extended-profile__link {
+  color: #9fd0ff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+.octane-extended-profile-window__content.has-dark-background .octane-extended-profile__separator {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.octane-extended-profile-window__content.has-light-background :is(
+    .octane-extended-profile__identity-copy,
+    .octane-extended-profile__right,
+    .octane-extended-profile__actions
+  ),
+.octane-extended-profile-window__content.has-light-background :is(
+    .octane-extended-profile__identity-copy,
+    .octane-extended-profile__right,
+    .octane-extended-profile__actions
+  )
+  :where(*):not(button, button *, .prefix, .prefix *, [style*='color'], [style*='color'] *, img) {
+  color: #111111 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+/* Window titles on a light accent: the frame's white title would not read. */
+html.octane-user-accent-light .octane-card-shell .octane-card-header-shell .octane-card-title,
+html .octane-card-shell.octane-card-frame-3.has-light-accent > .octane-card-header-shell .octane-card-title {
+  color: #111111 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* A profile with a dark accent keeps a white title even when the viewer's own theme is light. */
+html.octane-user-accent-light .octane-card-shell.octane-card-frame-3.has-profile-accent:not(.has-light-accent) > .octane-card-header-shell .octane-card-title {
+  color: #ffffff !important;
+  text-shadow: none;
+}
+
+/* The choice grids keep their rows at the top, as tall as their tiles: stretched to the panel's height a short
+   list spread its rows apart. */
+.octane-profile-customize__grid {
+  flex: 0 0 auto;
+  align-content: start;
+  grid-auto-rows: max-content;
+  height: auto !important;
+  /* Tiles have a fixed size and the columns share the width: each tile sits in the middle of its column, with
+     the same space between rows as between columns. */
+  justify-items: center;
+  gap: 8px !important;
+}
+
+/* Banner tiles have no width of their own: they fill their column. */
+.octane-profile-customize__grid--wide {
+  justify-items: stretch;
+}
+
+/* A choice the user may not pick (HC, rank, ambassador): dimmed, with a lock and the reason in its tooltip. */
+.octane-profile-customize__option {
+  position: relative;
+}
+
+.octane-profile-customize__option.is-locked {
+  cursor: not-allowed;
+}
+
+.octane-profile-customize__option.is-locked > :not(.octane-profile-customize__lock),
+.octane-profile-customize__locked-preview > :not(.octane-profile-customize__lock) {
+  filter: grayscale(0.7);
+  opacity: 0.55;
+}
+
+.octane-profile-customize__locked-preview {
+  position: relative;
+  display: inline-flex;
+  cursor: not-allowed;
+}
+
+.octane-profile-customize__lock {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 4px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffd75e;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+/* The GIF being placed stays in the page so it keeps playing, out of sight. */
+.octane-profile-image-editor__source {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The user's own background: their gradient on the window, and a gallery pattern laid faintly over it. */
+.octane-extended-profile-window__content--styled {
+  position: relative;
+  isolation: isolate;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.octane-extended-profile-window__content--styled .octane-extended-profile-window__body {
+  background: transparent;
+}
+
+.octane-extended-profile__style-pattern,
+.octane-profile-customize__style-pattern {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Choices are the picture itself: a thin edge instead of a frame around it, and a ring outside when picked. */
+.octane-profile-customize__option {
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  overflow: hidden;
+  background: transparent;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.12s ease;
+}
+
+.octane-profile-customize__option:hover:not(:disabled) {
+  box-shadow: 0 0 0 2px rgba(30, 124, 184, 0.55);
+}
+
+.octane-profile-customize__option.is-selected {
+  border-color: transparent;
+  box-shadow:
+    0 0 0 2px #1e7cb8,
+    0 0 0 4px rgba(30, 124, 184, 0.3);
+}
+
+/* A choice with a name under it (the themes) keeps a light card behind the name. */
+.octane-profile-customize__option:has(.octane-profile-customize__caption) {
+  padding: 4px 4px 3px;
+  background: #efede4;
+}
+
+.octane-profile-customize__banner,
+.octane-profile-customize__card {
+  border-radius: 0;
+}
+
+/* Borders: the picture once, large and sharp, with the border picked or under the pointer; beside it the
+   borders on their own, as small frames for the colours and as their artwork for the decorated ones. */
+.octane-profile-customize__border-layout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.octane-profile-customize__border-preview {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 112px;
+  height: 175px;
+  border-radius: 6px;
+  background: #f4f2ea;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.octane-profile-customize__border-layout > .octane-profile-customize__sections {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.octane-profile-customize__border-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px;
+}
+
+.octane-profile-customize__border-cell {
+  display: inline-flex;
+}
+
+.octane-profile-customize__border-cell > .octane-profile-customize__option {
+  border-radius: 7px;
+}
+
+.octane-profile-customize__border-chip.profile-border {
+  display: block;
+  width: 30px;
+  height: 40px;
+  border-width: 4px;
+  border-radius: 6px;
+  background-color: #1d2a44;
+}
+
+.octane-profile-customize__border-chip.profile-border.border-0 {
+  border: 2px dashed #8d8d8d;
+  background-color: #f4f2ea;
+}
+
+.octane-profile-customize__border-chip.profile-border.is-decorated {
+  width: 44px;
+  height: 58px;
+  border: 0;
+  background-color: #1d2a44;
+  background-size: 100% 100%;
+}
+
+/* The user's earlier uploads, with a cross to delete one. */
+.octane-profile-customize__library-item {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.octane-profile-customize__library-item > .octane-profile-customize__option {
+  width: 100%;
+}
+
+.octane-profile-customize__library-picture {
+  display: block;
+  width: 100%;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.octane-profile-customize__library-picture--banner {
+  height: 64px;
+}
+
+.octane-profile-customize__library-picture--background {
+  height: 72px;
+}
+
+.octane-profile-customize__library-delete {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 50%;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+
+.octane-profile-customize__library-delete:hover,
+.octane-profile-customize__library-delete.is-armed {
+  background: #c8352b;
+}
+
+/* The own style: a preview window beside the colours, the direction and the pattern. */
+.octane-profile-customize__style {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.octane-profile-customize__style-preview {
+  position: relative;
+  isolation: isolate;
+  flex: 0 0 auto;
+  width: 96px;
+  height: 118px;
+  overflow: hidden;
+  border-radius: 5px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.octane-profile-customize__style-controls {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.octane-profile-customize__style-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.octane-profile-customize__colour {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.octane-profile-customize__colour input[type='color'] {
+  width: 34px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
+
+.octane-profile-customize__angle {
+  width: 26px;
+  height: 26px;
+  border: 1px solid #8d8d8d;
+  border-radius: 4px;
+  background: #efede4;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.octane-profile-customize__angle.is-selected {
+  border-color: #1e7cb8;
+  color: #ffffff;
+  background: #1e7cb8;
+}
+
+.octane-profile-customize__style-patterns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.octane-profile-customize__pattern {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.octane-profile-customize__pattern--none {
+  background: linear-gradient(135deg, #ffffff 45%, #d23c3c 45%, #d23c3c 55%, #ffffff 55%);
+}
+
+.octane-profile-customize__pattern.is-selected {
+  box-shadow:
+    0 0 0 2px #1e7cb8,
+    0 0 0 4px rgba(30, 124, 184, 0.3);
+}
+
+.octane-profile-customize__own-accent {
+  display: inline-flex;
+  border-radius: 5px;
+}
+
+.octane-profile-customize__own-accent.is-selected {
+  box-shadow:
+    0 0 0 2px #1e7cb8,
+    0 0 0 4px rgba(30, 124, 184, 0.3);
 }

@@ -104,6 +104,7 @@ export const validateRewardTrackPrizeInput = (input: RewardTrackRulePrize, rewar
     if (rewardTypes.length && !rewardTypes.includes(type)) errors.rewardType = localizeWithFallback('octane.quests.pick_a_reward_type', 'Pick a reward type');
 
     if (type === 'badge' && !input.extraParams.trim()) errors.extraParams = localizeWithFallback('octane.quests.the_badge_code', 'The badge code');
+    if (type === 'habbicon' && !(Number(input.extraParams.trim()) > 0)) errors.extraParams = localizeWithFallback('octane.quests.the_habbicon_id', 'The Habbicon id');
     if (type === 'furni') {
         if (!input.extraParams.trim()) errors.extraParams = localizeWithFallback('octane.quests.the_furni_name_items_base_item', 'The furni name (items_base.item_name)');
         if (input.rewardAmount < 1 || input.rewardAmount > REWARD_TRACK_MAX_FURNI_PER_PRIZE) errors.rewardAmount = `1 to ${REWARD_TRACK_MAX_FURNI_PER_PRIZE} copies`;

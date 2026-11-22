@@ -26,6 +26,7 @@ import {
     HousekeepingReloadComposer,
     HousekeepingRequestListComposer,
     HousekeepingResetUserPasswordComposer,
+    HousekeepingRemoveProfileImageComposer,
     HousekeepingRevokeBanComposer,
     HousekeepingRoomData,
     HousekeepingRoomDetailEvent,
@@ -391,6 +392,9 @@ const wordFilterViaPacket = (action: 'add' | 'remove', word: string, replacement
 
 const revokeBanViaPacket = (banId: number): Promise<IHousekeepingActionResult> => runHkAction(new HousekeepingRevokeBanComposer(banId), 'ban.revoke');
 
+const removeProfileImageViaPacket = (pictureId: number, block: boolean): Promise<IHousekeepingActionResult> =>
+    runHkAction(new HousekeepingRemoveProfileImageComposer(pictureId, block), 'profile_image.remove');
+
 const reloadViaPacket = (target: HousekeepingReloadTarget): Promise<IHousekeepingActionResult> =>
     runHkAction(new HousekeepingReloadComposer(target), `hotel.reload.${target}`);
 
@@ -532,6 +536,7 @@ export const HousekeepingApi = {
     userNote: (action: 'add' | 'delete', userId: number, noteId: number, note = '') => userNoteViaPacket(action, userId, noteId, note),
     reload: (target: HousekeepingReloadTarget) => reloadViaPacket(target),
     revokeBan: (banId: number) => revokeBanViaPacket(banId),
+    removeProfileImage: (pictureId: number, block: boolean) => removeProfileImageViaPacket(pictureId, block),
     listActionLog: (limit: number, signal?: AbortSignal) => listActionLogViaPacket(limit, signal),
     requestList: (listKey: string, targetId: number, signal?: AbortSignal, reveal?: boolean) => requestListViaPacket(listKey, targetId, signal, reveal),
     setLockdown: (enabled: boolean) => runHkAction(new HousekeepingLockdownComposer(enabled), 'hotel.lockdown')

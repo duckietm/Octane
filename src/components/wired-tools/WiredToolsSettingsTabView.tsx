@@ -36,6 +36,20 @@ const toggleMaskBit = (mask: number, bit: number): number => (mask & bit ? mask 
 const normalizeAccessMask = (mask: number): number => ((mask & WIRED_ACCESS_GROUP_MEMBERS) !== 0 ? mask | WIRED_ACCESS_GROUP_ADMINS : mask);
 
 /**
+ * Official updatePermissionsUI: the boxes another one implies, which show checked and cannot be changed. Group
+ * members imply group admins; "everyone" implies every other read box; each modify box implies its read box.
+ */
+export const impliedWiredAccess = (modifyMask: number, inspectMask: number): { modify: number; inspect: number } => {
+    const modify = (modifyMask & WIRED_ACCESS_GROUP_MEMBERS) !== 0 ? WIRED_ACCESS_GROUP_ADMINS : 0;
+    let inspect = (modifyMask | modify) & (WIRED_ACCESS_USERS_WITH_RIGHTS | WIRED_ACCESS_GROUP_MEMBERS | WIRED_ACCESS_GROUP_ADMINS);
+
+    if ((inspectMask & WIRED_ACCESS_GROUP_MEMBERS) !== 0) inspect |= WIRED_ACCESS_GROUP_ADMINS;
+    if ((inspectMask & WIRED_ACCESS_EVERYONE) !== 0) inspect |= WIRED_ACCESS_USERS_WITH_RIGHTS | WIRED_ACCESS_GROUP_MEMBERS | WIRED_ACCESS_GROUP_ADMINS;
+
+    return { modify, inspect };
+};
+
+/**
  * Official WiredMenuSettingsTab: one checkbox per room controller level, bit `1 << level`, labelled
  * `wiredmenu.settings.permission_level.<level>` (0 everyone, 1 rights, 2 group members, 3 group admins).
  */
@@ -68,6 +82,8 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
 
     const canManageSettings = roomSettings.canManageSettings;
     const canChangeRoomState = roomSettings.isLoaded && roomSettings.canModify;
+    // AIR enables Rollback for the room owner and staff only; Reload for anyone who may modify the wired.
+    const canRollBackRoomState = roomSettings.isLoaded && canManageSettings;
     const inspectOptions = buildInspectOptions();
     const modifyOptions = buildModifyOptions();
     const serverTimeZone = roomSession?.hotelTimeZone || 'UTC';
@@ -103,7 +119,7 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
     };
 
     const rollbackRoomState = () => {
-        if (!canChangeRoomState) return;
+        if (!canRollBackRoomState) return;
 
         if (!showConfirm) {
             rollbackRoomWired();
@@ -125,9 +141,12 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
         );
     };
 
-    const renderAccessOption = (option: RoomAccessOption, mask: number, onToggle: (bit: number) => void) => {
-        const checked = (mask & option.bit) !== 0;
-        const disabled = !roomSettings.isLoaded || !canManageSettings;
+    const implied = impliedWiredAccess(roomSettings.modifyMask, roomSettings.inspectMask);
+
+    const renderAccessOption = (option: RoomAccessOption, mask: number, impliedMask: number, onToggle: (bit: number) => void) => {
+        const isImplied = (impliedMask & option.bit) !== 0;
+        const checked = isImplied || (mask & option.bit) !== 0;
+        const disabled = isImplied || !roomSettings.isLoaded || !canManageSettings;
 
         return (
             <label key={option.label} className={`flex items-center gap-2 text-[12px] ${disabled ? 'text-[#8c877d]' : 'text-[#222]'}`}>
@@ -146,13 +165,13 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
                         <Text bold small>
                             {localizeWithFallback('wiredmenu.settings.room_settings.modify_rights', 'Who can modify Wired:')}
                         </Text>
-                        {modifyOptions.map((option) => renderAccessOption(option, roomSettings.modifyMask, updateModifyMask))}
+                        {modifyOptions.map((option) => renderAccessOption(option, roomSettings.modifyMask, implied.modify, updateModifyMask))}
                     </div>
                     <div className="rounded bg-[#dfddd7] p-3 flex flex-col gap-2">
                         <Text bold small>
                             {localizeWithFallback('wiredmenu.settings.room_settings.read_rights', 'Who can inspect Wired:')}
                         </Text>
-                        {inspectOptions.map((option) => renderAccessOption(option, roomSettings.inspectMask, updateInspectMask))}
+                        {inspectOptions.map((option) => renderAccessOption(option, roomSettings.inspectMask, implied.inspect, updateInspectMask))}
                     </div>
                     <div className="rounded bg-[#dfddd7] p-3 flex flex-col gap-2">
                         <Text bold small>
@@ -187,7 +206,7 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
                             </Button>
                             <Button
                                 classNames={['flex-1', 'octane-wired-menu__roll-back']}
-                                disabled={!canChangeRoomState}
+                                disabled={!canRollBackRoomState}
                                 variant="danger"
                                 onClick={rollbackRoomState}
                             >
