@@ -1,6 +1,7 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { chooseHierarchicalOption } from '../../../../test-utils/chooseHierarchicalOption';
 import { selectOption } from '../../../../test-utils/selectOption';
 import { WIRED_FX_CATEGORY } from '../../../../api';
 
@@ -149,9 +150,20 @@ describe('WiredExtraVariableFxView', () => {
 
     it('only shows the icon picker where the server reads one', () => {
         const { unmount } = render(<WiredExtraVariableFxView category={WIRED_FX_CATEGORY.BOSS_BAR} />);
-        selectOption(screen.getByTestId('fx-icon'), 'misc skull');
+        chooseHierarchicalOption(screen.getByTestId('fx-icon'), 'misc skull');
         baseProps.save();
         expect(setStringParam).toHaveBeenCalledWith('\t\t\tmisc_skull');
+        expect(screen.getByTestId('fx-icon')).toHaveTextContent('misc skull');
+
+        // A campaign icon sits in its campaign's column and shows with its path.
+        chooseHierarchicalOption(screen.getByTestId('fx-icon'), '(Christmas 2026)', 'santahat');
+        baseProps.save();
+        expect(setStringParam).toHaveBeenLastCalledWith('\t\t\txmas26.santahat');
+        expect(screen.getByTestId('fx-icon')).toHaveTextContent('(Christmas 2026) > santahat');
+
+        // So does the campaign's boss bar in the style menu.
+        chooseHierarchicalOption(screen.getByTestId('fx-style'), '(Christmas 2026)', 'Snowman boss bar');
+        expect(screen.getByTestId('fx-style')).toHaveTextContent('(Christmas 2026) > Snowman boss bar');
         unmount();
 
         render(<WiredExtraVariableFxView category={WIRED_FX_CATEGORY.PROGRESS_BAR} />);

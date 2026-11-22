@@ -1,4 +1,5 @@
 import { FC, useEffect, useMemo, useState } from 'react';
+import { CollapsibleSection } from '../../../../common/CollapsibleSection';
 import {
     IWiredVariableFxParams,
     IWiredVariableFxTokens,
@@ -35,6 +36,7 @@ import {
     writeWiredVariableFxTokens
 } from '../../../../api';
 import { Text } from '../../../../common';
+import { HierarchicalDropdown, IHierarchicalDropdownOption } from '../../../../common/HierarchicalDropdown';
 import { useWired, useWiredTools } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredVariablePicker } from '../WiredVariablePicker';
@@ -171,35 +173,61 @@ export const WiredExtraVariableFxView: FC<WiredExtraVariableFxViewProps> = (prop
         setStringParam(writeWiredVariableFxTokens(tokens));
     };
 
-    // Options that name a group (a campaign's styles) are listed under it, in the place of the group's first one.
-    const select = (label: string, value: number, options: { value: number; key: string; fallback: string; group?: string }[], onChange: (value: number) => void) => {
-        const option = (entry: { value: number; key: string; fallback: string }) => (
-            <option key={entry.value} value={entry.value}>
-                {localizeWithFallback(entry.key, entry.fallback)}
-            </option>
-        );
-        const listed = new Set<string>();
+    const select = (label: string, value: number, options: { value: number; key: string; fallback: string }[], onChange: (value: number) => void) => (
+        <div className="flex flex-col gap-1">
+            <Text bold>{label}</Text>
+            <Select className="form-select form-select-sm" value={value} onChange={(event) => onChange(Number(event.target.value))}>
+                {options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                        {localizeWithFallback(option.key, option.fallback)}
+                    </option>
+                ))}
+            </Select>
+        </div>
+    );
 
-        return (
-            <div className="flex flex-col gap-1">
-                <Text bold>{label}</Text>
-                <Select className="form-select form-select-sm" value={value} onChange={(event) => onChange(Number(event.target.value))}>
-                    {options.map((entry) => {
-                        if (!entry.group) return option(entry);
-                        if (listed.has(entry.group)) return null;
+    // AIR 1.0.31: the style and icon menus are hierarchical. A campaign's entries sit in a column of their own,
+    // opened from the row that names the campaign, in the place of its first entry.
+    const groupLabel = (group: string) => localizeWithFallback(`wiredfurni.params.variablefx.icon.${group}`, WIRED_FX_ICON_GROUP_NAMES[group] ?? group);
 
-                        listed.add(entry.group);
+    const grouped = (entries: { label: string; value: string; group?: string }[]): IHierarchicalDropdownOption[] => {
+        const result: IHierarchicalDropdownOption[] = [];
+        const branches = new Map<string, IHierarchicalDropdownOption>();
 
-                        return (
-                            <optgroup key={`group-${entry.group}`} label={localizeWithFallback(`wiredfurni.params.variablefx.icon.${entry.group}`, WIRED_FX_ICON_GROUP_NAMES[entry.group] ?? entry.group)}>
-                                {options.filter((other) => other.group === entry.group).map(option)}
-                            </optgroup>
-                        );
-                    })}
-                </Select>
-            </div>
-        );
+        for (const entry of entries) {
+            const leaf = { label: entry.label, value: entry.value };
+
+            if (!entry.group) {
+                result.push(leaf);
+                continue;
+            }
+
+            let branch = branches.get(entry.group);
+
+            if (!branch) {
+                branch = { label: groupLabel(entry.group), children: [] };
+                branches.set(entry.group, branch);
+                result.push(branch);
+            }
+
+            branch.children.push(leaf);
+        }
+
+        return result;
     };
+
+    const styleOptions = grouped(styles.map((entry) => ({ label: localizeWithFallback(entry.key, entry.fallback), value: String(entry.styleId), group: entry.group })));
+
+    const iconOptions = grouped([
+        { label: localizeWithFallback('wiredfurni.params.variablefx.icon.none', 'None'), value: '' },
+        ...groupWiredFxIcons(WIRED_FX_ICONS).flatMap((option) =>
+            (option.children ?? [option.id]).map((icon) => ({
+                label: localizeWithFallback(`wiredfurni.params.variablefx.icon.${icon}`, wiredFxIconFallbackName(icon)),
+                value: icon,
+                group: option.children ? option.id : undefined
+            }))
+        )
+    ]);
 
     const overrideRow = (
         label: string,
@@ -319,12 +347,20 @@ export const WiredExtraVariableFxView: FC<WiredExtraVariableFxViewProps> = (prop
                         </div>
                     )}
 
-                    {select(
-                        localizeWithFallback('wiredfurni.params.variablefx.style', 'Style'),
-                        params.styleId,
-                        styles.map((entry) => ({ value: entry.styleId, key: entry.key, fallback: entry.fallback, group: entry.group })),
-                        (styleId) => patch({ styleId, ...sanitizeWiredVariableFxAppearance(category, styleId, params.colorId, params.widthId) })
-                    )}
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{localizeWithFallback('wiredfurni.params.variablefx.style', 'Style')}</Text>
+                        <HierarchicalDropdown
+                            aria-label={localizeWithFallback('wiredfurni.params.variablefx.style', 'Style')}
+                            data-testid="fx-style"
+                            options={styleOptions}
+                            value={String(params.styleId)}
+                            onChange={(next) => {
+                                const styleId = Number(next);
+
+                                patch({ styleId, ...sanitizeWiredVariableFxAppearance(category, styleId, params.colorId, params.widthId) });
+                            }}
+                        />
+                    </div>
 
                     {rendererOptions.length > 1 &&
                         select(
@@ -345,24 +381,13 @@ export const WiredExtraVariableFxView: FC<WiredExtraVariableFxViewProps> = (prop
                     {showsIcon && (
                         <div className="flex flex-col gap-1">
                             <Text bold>{localizeWithFallback('wiredfurni.params.variablefx.icon', 'Icon')}</Text>
-                            <Select className="form-select form-select-sm" data-testid="fx-icon" value={tokens.icon} onChange={(event) => patchTokens({ icon: event.target.value })}>
-                                <option value="">{localizeWithFallback('wiredfurni.params.variablefx.icon.none', 'None')}</option>
-                                {groupWiredFxIcons(WIRED_FX_ICONS).map((option) =>
-                                    option.children ? (
-                                        <optgroup key={option.id} label={localizeWithFallback(`wiredfurni.params.variablefx.icon.${option.id}`, WIRED_FX_ICON_GROUP_NAMES[option.id] ?? option.id)}>
-                                            {option.children.map((icon) => (
-                                                <option key={icon} value={icon}>
-                                                    {localizeWithFallback(`wiredfurni.params.variablefx.icon.${icon}`, wiredFxIconFallbackName(icon))}
-                                                </option>
-                                            ))}
-                                        </optgroup>
-                                    ) : (
-                                        <option key={option.id} value={option.id}>
-                                            {localizeWithFallback(`wiredfurni.params.variablefx.icon.${option.id}`, wiredFxIconFallbackName(option.id))}
-                                        </option>
-                                    )
-                                )}
-                            </Select>
+<HierarchicalDropdown
+                                aria-label={localizeWithFallback('wiredfurni.params.variablefx.icon', 'Icon')}
+                                data-testid="fx-icon"
+                                options={iconOptions}
+                                value={tokens.icon ?? ''}
+                                onChange={(icon) => patchTokens({ icon })}
+                            />
                             {category === WIRED_FX_CATEGORY.NUMBER_DISPLAY && tokens.icon && (
                                 <Select className="form-select form-select-sm" value={params.categoryExtra} onChange={(event) => patch({ categoryExtra: Number(event.target.value) })}>
                                     {WIRED_FX_NUMBER_ALIGNMENTS.map((alignment, index) => (
@@ -455,10 +480,7 @@ export const WiredExtraVariableFxView: FC<WiredExtraVariableFxViewProps> = (prop
                         </>
                     )}
 
-                    <details className="flex flex-col gap-1">
-                        <summary>
-                            <Text bold>{localizeWithFallback('wiredfurni.params.variablefx.stack_order', 'Order in the fx stack')}</Text>
-                        </summary>
+                    <CollapsibleSection className="flex flex-col gap-1" title={<Text bold>{localizeWithFallback('wiredfurni.params.variablefx.stack_order', 'Order in the fx stack')}</Text>}>
                         <Text small={true}>
                             {localizeWithFallback('wiredfurni.params.variablefx.stack_order.info', 'Higher values place this fx lower in the object\'s fx stack.')}
                         </Text>
@@ -469,7 +491,7 @@ export const WiredExtraVariableFxView: FC<WiredExtraVariableFxViewProps> = (prop
                             value={params.stackOrder ?? 0}
                             onChange={(event) => patch({ stackOrder: Math.max(-2147483648, Math.min(2147483647, toInt(event.target.value, 0))) })}
                         />
-                    </details>
+                    </CollapsibleSection>
 
                     {category === WIRED_FX_CATEGORY.LEVELLING_PROGRESS && (
                         <Text small={true}>

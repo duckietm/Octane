@@ -49,6 +49,12 @@ const ALIGN: Record<string, Measurement['align']> = { center: 'center', right: '
 // Width changes this small are a scrollbar coming or going, not a resized container.
 const SCROLLBAR_SLACK = 24;
 
+// Whether the environment lays elements out at all (jsdom does not: there nothing ever has a box).
+const hasLayout = () => document.documentElement.getClientRects().length > 0;
+
+// Narrower than this, a box holding wrapped text has not been laid out yet.
+const UNSIZED_WIDTH = 8;
+
 // The width the browser wraps in: the parent's content box (the label is an inline run inside it).
 const contentWidth = (element: HTMLElement) => {
     const css = getComputedStyle(element);
@@ -98,6 +104,27 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
         const lines = countLines(host);
         const lineHeight = parseFloat(css.lineHeight);
         const parentCss = host.parentElement ? getComputedStyle(host.parentElement) : null;
+
+        // Text that is not laid out cannot be measured. In a panel that is still hidden it has no boxes at all and would be
+        // taken for one line, so it would never wrap once shown; in a box without a width (the body of a closed <details>) the
+        // browser breaks it after every letter and the label would freeze one letter wide. It stays browser text until its box
+        // is shown and has its width, and is measured then.
+        const box = host.parentElement;
+        const laidOut = () =>
+            host.getClientRects().length > 0 && !(countLines(host) > 1 && !parentCss?.display.startsWith('inline') && !!box && box.clientWidth < UNSIZED_WIDTH);
+
+        if (box && typeof ResizeObserver !== 'undefined' && hasLayout() && !laidOut()) {
+            const observer = new ResizeObserver(() => {
+                if (!laidOut()) return;
+
+                observer.disconnect();
+                setResizeTick((tick) => tick + 1);
+            });
+
+            observer.observe(box);
+
+            return () => observer.disconnect();
+        }
         const ellipsisBox =
             lines === 1 && !!parentCss && parentCss.textOverflow === 'ellipsis' && parentCss.overflowX !== 'visible' && !parentCss.display.startsWith('inline');
 

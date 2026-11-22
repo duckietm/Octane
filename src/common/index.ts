@@ -19,6 +19,7 @@ export * from './Radio';
 export * from './Select';
 export * from './ToggleButton';
 export * from './ListSelect';
+export * from './HierarchicalDropdown';
 export * from './BaseButton';
 export * from './NumberInput';
 export * from './TabBar';
