@@ -6,6 +6,7 @@ export * from './GetClubMemberLevel';
 export * from './GetFurnitureData';
 export * from './GetFurnitureDataForRoomObject';
 export * from './GetOwnPosture';
+export * from './GetUseProductFurniData';
 export * from './GetProductDataForLocalization';
 export * from './GetRoomSession';
 export * from './GetSessionDataManager';

@@ -150,9 +150,13 @@ export interface IWiredChestLayout {
     depositKey: string;
 }
 
+/** AIR onCapacityChange: a capacity typed above the chest's maximum snaps to the maximum while typing. */
+export const snapChestCapacityDraft = (digits: string, maxCapacity: number): string => (digits.length && parseInt(digits, 10) > maxCapacity ? String(maxCapacity) : digits);
+
 /** AIR WiredChestWrapperView.updateLayout. */
 export const getWiredChestLayout = (canRead: boolean, wiredEnabled: boolean, kind: WiredChestKind): IWiredChestLayout => {
-    const depositKey = kind === WIRED_CHEST_KIND_FURNI ? 'wiredchests.start_deposit' : 'wiredchests.initial_deposit';
+    // AIR captions the button with the same text for coin and furni chests.
+    const depositKey = 'wiredchests.start_deposit';
 
     if (!canRead) {
         return {

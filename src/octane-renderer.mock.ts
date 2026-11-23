@@ -502,6 +502,20 @@ export class FurnitureMultiStateComposer {
     ) {}
 }
 
+export class RoomEngineUseProductEvent {
+    static readonly USE_PRODUCT_FROM_ROOM = 'REUPE_USE_PRODUCT_FROM_ROOM';
+    static readonly USE_PRODUCT_FROM_INVENTORY = 'REUPE_USE_PRODUCT_FROM_INVENTORY';
+
+    constructor(
+        public readonly type: string,
+        public readonly roomId: number,
+        public readonly objectId: number,
+        public readonly category: number,
+        public readonly inventoryStripId: number = -1,
+        public readonly furnitureTypeId: number = -1
+    ) {}
+}
+
 export class RoomEngineObjectEvent extends StubClass {
     static readonly MOUSE_ENTER = 'REOE_MOUSE_ENTER';
     static readonly MOUSE_LEAVE = 'REOE_MOUSE_LEAVE';

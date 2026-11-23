@@ -9,8 +9,9 @@ import {
     RoomObjectVariable
 } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { FurniCategory, GetFurnitureDataForRoomObject, LocalizeText, UseProductItem } from '../../../../api';
-import { Button, Column, Flex, LayoutPetImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
+import { FurniCategory, GetUseProductFurniData, LocalizeText, UseProductItem } from '../../../../api';
+import { useProductRequestId } from '../../../../hooks/rooms/widgets/avatarInfo.products';
+import { Button, LayoutPetImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useRoom } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
@@ -43,7 +44,8 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
     };
 
     const useProduct = () => {
-        roomSession.usePetProduct(item.requestRoomObjectId, petData.webID);
+        // A product used from the inventory is named by its inventory item id.
+        roomSession.usePetProduct(useProductRequestId(item), petData.webID);
 
         onClose();
     };
@@ -229,7 +231,7 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
 
         setPetData(userData);
 
-        const furniData = GetFurnitureDataForRoomObject(roomSession.roomId, item.requestRoomObjectId, RoomObjectCategory.FLOOR);
+        const furniData = GetUseProductFurniData(roomSession.roomId, item);
 
         if (!furniData) return;
 
@@ -266,72 +268,92 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
 
     if (!petData) return null;
 
+    const productName = furniData?.name ?? '';
+
+    // AIR use_product_widget_frame_monsterplant* around use_product_{revive,rebreed,fertilize}_monsterplant (290 wide):
+    // the plant with its name, rarity and owner in a 130 px column, the two texts in a second one, and a row of two
+    // 130 x 30 buttons. The window has its own title and button caption per product.
+    const plantCopy =
+        mode === PRODUCT_PAGE_REVIVE
+            ? { title: 'useproduct.widget.title.monsterplant', text: 'useproduct.widget.text.revive_monsterplant', info: 'useproduct.widget.info.revive_monsterplant', save: 'useproduct.widget.revive' }
+            : mode === PRODUCT_PAGE_REBREED
+              ? { title: 'useproduct.widget.title.monsterplant_rebreed', text: 'useproduct.widget.text.rebreed_monsterplant', info: 'useproduct.widget.info.rebreed_monsterplant', save: 'useproduct.widget.rebreed' }
+              : mode === PRODUCT_PAGE_FERTILIZE
+                ? { title: 'useproduct.widget.title.monsterplant_fertilize', text: 'useproduct.widget.text.fertilize_monsterplant', info: 'useproduct.widget.info.fertilize_monsterplant', save: 'useproduct.widget.fertilize' }
+                : null;
+
+    if (plantCopy) {
+        return (
+            <NativeTextTree>
+                <OctaneCardView className="octane-use-product-plant" isResizable={false}>
+                    <OctaneCardHeaderView headerText={LocalizeText(plantCopy.title, ['name'], [petData.name])} onCloseClick={onClose} />
+                    <OctaneCardContentView className="octane-use-product-plant__content" overflow="hidden">
+                        <div className="octane-use-product-plant__columns">
+                            <div className="octane-use-product-plant__plant">
+                                <div className="octane-use-product-plant__line">{LocalizeText('useproduct.widget.monsterplant.plant.name', ['name'], [petData.name])}</div>
+                                <BaseButton type="button" className="octane-use-product-plant__preview" onClick={selectRoomObject}>
+                                    {getPetImage}
+                                </BaseButton>
+                                <div className="octane-use-product-plant__line">
+                                    {LocalizeText('useproduct.widget.monsterplant.plant.raritylevel', ['level'], [String(petData.rarityLevel ?? 0)])}
+                                </div>
+                                <div className="octane-use-product-plant__line">
+                                    {LocalizeText('useproduct.widget.monsterplant.plant.description', ['name'], [petData.ownerName ?? ''])}
+                                </div>
+                            </div>
+                            <div className="octane-use-product-plant__texts">
+                                <div className="octane-use-product-plant__description">{LocalizeText(plantCopy.text, ['productName'], [productName])}</div>
+                                <div className="octane-use-product-plant__info">{LocalizeText(plantCopy.info)}</div>
+                            </div>
+                        </div>
+                        <div className="octane-use-product-plant__buttons">
+                            <Button variant="secondary" onClick={onClose}>
+                                {LocalizeText('useproduct.widget.cancel')}
+                            </Button>
+                            <Button variant="success" onClick={useProduct}>
+                                {LocalizeText(plantCopy.save)}
+                            </Button>
+                        </div>
+                    </OctaneCardContentView>
+                </OctaneCardView>
+            </NativeTextTree>
+        );
+    }
+
+    const horseCopy =
+        mode === PRODUCT_PAGE_SHAMPOO
+            ? 'shampoo'
+            : mode === PRODUCT_PAGE_CUSTOM_PART
+              ? 'custompart'
+              : mode === PRODUCT_PAGE_CUSTOM_PART_SHAMPOO
+                ? 'custompartshampoo'
+                : mode === PRODUCT_PAGE_SADDLE
+                  ? 'saddle'
+                  : null;
+
+    // AIR use_product_widget_frame (388 wide) around use_product_{shampoo,custom_part,custom_part_shampoo,saddle}
+    // (386 x 180): the preview at 10,10, the two wrapped texts 200 wide at x 140, the underlined cancel link and the
+    // thick Use button on one line. The same geometry as the plant seed window.
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-use-product-confirmation">
+            <OctaneCardView className="octane-plant-seed-confirm octane-use-product-horse" isResizable={false}>
                 <OctaneCardHeaderView headerText={LocalizeText('useproduct.widget.title', ['name'], [petData.name])} onCloseClick={onClose} />
-                <OctaneCardContentView center>
-                    <Flex gap={2} overflow="hidden">
-                        <div className="flex flex-col">
-                            <BaseButton type="button" className="product-preview cursor-pointer" onClick={selectRoomObject}>
-                                {getPetImage}
-                            </BaseButton>
-                        </div>
-                        <Column justifyContent="between" overflow="auto">
-                            <Column gap={2}>
-                                {mode === PRODUCT_PAGE_SHAMPOO && (
-                                    <>
-                                        <Text>{LocalizeText('useproduct.widget.text.shampoo', ['productName'], [furniData.name])}</Text>
-                                        <Text>{LocalizeText('useproduct.widget.info.shampoo')}</Text>
-                                    </>
-                                )}
-                                {mode === PRODUCT_PAGE_CUSTOM_PART && (
-                                    <>
-                                        <Text>{LocalizeText('useproduct.widget.text.custompart', ['productName'], [furniData.name])}</Text>
-                                        <Text>{LocalizeText('useproduct.widget.info.custompart')}</Text>
-                                    </>
-                                )}
-                                {mode === PRODUCT_PAGE_CUSTOM_PART_SHAMPOO && (
-                                    <>
-                                        <Text>{LocalizeText('useproduct.widget.text.custompartshampoo', ['productName'], [furniData.name])}</Text>
-                                        <Text>{LocalizeText('useproduct.widget.info.custompartshampoo')}</Text>
-                                    </>
-                                )}
-                                {mode === PRODUCT_PAGE_SADDLE && (
-                                    <>
-                                        <Text>{LocalizeText('useproduct.widget.text.saddle', ['productName'], [furniData.name])}</Text>
-                                        <Text>{LocalizeText('useproduct.widget.info.saddle')}</Text>
-                                    </>
-                                )}
-                                {mode === PRODUCT_PAGE_REVIVE && (
-                                    <>
-                                        <Text>{LocalizeText('useproduct.widget.text.revive_monsterplant', ['productName'], [furniData.name])}</Text>
-                                        <Text>{LocalizeText('useproduct.widget.info.revive_monsterplant')}</Text>
-                                    </>
-                                )}
-                                {mode === PRODUCT_PAGE_REBREED && (
-                                    <>
-                                        <Text>{LocalizeText('useproduct.widget.text.rebreed_monsterplant', ['productName'], [furniData.name])}</Text>
-                                        <Text>{LocalizeText('useproduct.widget.info.rebreed_monsterplant')}</Text>
-                                    </>
-                                )}
-                                {mode === PRODUCT_PAGE_FERTILIZE && (
-                                    <>
-                                        <Text>{LocalizeText('useproduct.widget.text.fertilize_monsterplant', ['productName'], [furniData.name])}</Text>
-                                        <Text>{LocalizeText('useproduct.widget.info.fertilize_monsterplant')}</Text>
-                                    </>
-                                )}
-                            </Column>
-                            <div className="flex items-center justify-between">
-                                <Button variant="danger" onClick={onClose}>
-                                    {LocalizeText('useproduct.widget.cancel')}
-                                </Button>
-                                <Button variant="success" onClick={useProduct}>
-                                    {LocalizeText('useproduct.widget.use')}
-                                </Button>
-                            </div>
-                        </Column>
-                    </Flex>
+                <OctaneCardContentView className="octane-plant-seed-confirm__content" overflow="hidden">
+                    <BaseButton type="button" className="octane-plant-seed-confirm__preview octane-use-product-horse__preview" onClick={selectRoomObject}>
+                        {getPetImage}
+                    </BaseButton>
+                    {horseCopy && (
+                        <>
+                            <div className="octane-plant-seed-confirm__description">{LocalizeText(`useproduct.widget.text.${horseCopy}`, ['productName'], [productName])}</div>
+                            <div className="octane-plant-seed-confirm__info">{LocalizeText(`useproduct.widget.info.${horseCopy}`)}</div>
+                        </>
+                    )}
+                    <BaseButton className="octane-plant-seed-confirm__cancel" onClick={onClose}>
+                        {LocalizeText('useproduct.widget.cancel')}
+                    </BaseButton>
+                    <Button className="octane-plant-seed-confirm__save" variant="success" onClick={useProduct}>
+                        {LocalizeText('useproduct.widget.use')}
+                    </Button>
                 </OctaneCardContentView>
             </OctaneCardView>
         </NativeTextTree>

@@ -2190,6 +2190,35 @@ body {
     }
 }
 
+.octane-chest__info-bubble-positioner {
+    z-index: 1100;
+}
+
+/* AIR lock_info_bubble: 385 px wide, 8 px inside. */
+.octane-chest__info-bubble {
+    box-sizing: border-box;
+    width: 385px;
+    max-height: 90vh;
+    padding: 8px;
+    overflow-y: auto;
+    border: 1px solid #000000;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #000000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    outline: none;
+}
+
+.octane-chest__info-bubble .octane-chest__rules {
+    margin: 0;
+    padding-left: 18px;
+    list-style: disc;
+}
+
+.octane-chest__info-bubble .octane-chest__title {
+    font-size: 14px;
+}
+
 /* AIR Ubuntu chest settings: bordered groups and 7px section spacing. */
 .octane-chest-settings .octane-card-content-shell { max-height: calc(100vh / 2.4 + 60px); overflow-y: auto; }
 .octane-chest-settings__section { display: grid; gap: 5px; min-width: 0; margin: 0; padding: 7px; border: 1px solid #b0b0a8; border-radius: 3px; }

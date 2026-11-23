@@ -10,7 +10,7 @@ import {
     RecyclerStatusMessageEvent
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../../api';
+import { GetConfigurationValue, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../../api';
 import frankDontKnow from '../../../../../../assets/images/catalog/air/recycler/frank-dont-know.png';
 import recyclerIndicator from '../../../../../../assets/images/catalog/air/recycler/indicator.png';
 import recyclerMachine from '../../../../../../assets/images/catalog/air/recycler/machine.png';
@@ -19,7 +19,7 @@ import recyclerPointerBase from '../../../../../../assets/images/catalog/air/rec
 import recyclerTitle from '../../../../../../assets/images/catalog/air/recycler/title.png';
 import { BaseButton } from '../../../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
-import { useInventoryFurni, useMessageEvent } from '../../../../../../hooks';
+import { useInventoryFurni, useInventoryTrade, useMessageEvent, useNotification, usePurse, useRoom } from '../../../../../../hooks';
 import { useRecyclerEngineAnimation } from '../../../../../../hooks/catalog/useRecyclerEngineAnimation';
 import { CatalogLayoutProps } from '../CatalogLayout.types';
 import {
@@ -32,6 +32,10 @@ import {
 } from './recycler.helpers';
 
 const OPERATION_TIMEOUT_MS = 12000;
+// RecyclerCatalogWidget: the needle swings back 650 ms after an abort and 1 s after a finished run.
+const ABORT_RESET_MS = 650;
+const FINISH_RESET_MS = 1000;
+const DUCKETS = 0;
 
 /** AIR recyclerWidget_xml: the slot rows sit 0, 44 and 90 px down the slots box, four 37 px apart per row. */
 const SLOT_ROWS = [0, 44, 90];
@@ -45,14 +49,27 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = () => {
     const [finished, setFinished] = useState(false);
     const [failed, setFailed] = useState(false);
     const [chooserOpen, setChooserOpen] = useState(false);
-    const engine = useRecyclerEngineAnimation(processing);
     const operationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const configurationRequestIdRef = useRef(`recycler-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     const [slotCount, setSlotCount] = useState(() => normalizeRecyclerSlotCount(8));
+    const slotsRef = useRef(slots);
+
+    useLayoutEffect(() => {
+        slotsRef.current = slots;
+    });
+
     const selectedIds = useMemo(() => new Set(slots.map((slot) => slot.itemId)), [slots]);
     const eligibleIds = useMemo(() => getRecyclerEligibleItemIds(groupItems), [groupItems]);
     const choices = useMemo(() => getRecyclerInventoryChoices(groupItems, selectedIds), [groupItems, selectedIds]);
     const enabled = status !== RecyclerStatusMessageEvent.SYSTEM_STATUS_DISABLED;
+    const { roomSession = null } = useRoom();
+    const { isTrading = false } = useInventoryTrade();
+    const { getCurrencyAmount = null } = usePurse();
+    const { simpleAlert = null } = useNotification();
+    const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    // RecyclerLogic.ducketCost / timeout: what a run costs and how long the button waits after one.
+    const ducketCost = Math.max(0, Number(GetConfigurationValue<number>('recycler.ducket_cost', 0)) || 0);
+    const waitSeconds = Math.max(0, Number(GetConfigurationValue<number>('recycler.timeout_seconds', 10)) || 0);
 
     const clearOperationTimeout = useCallback(() => {
         if (!operationTimeoutRef.current) return;
@@ -65,7 +82,8 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = () => {
         const parser = event.getParser();
 
         setStatus(parser.recyclerStatus);
-        setSecondsLeft(Math.max(0, parser.recyclerTimeoutSeconds));
+        // The wait the button already counts down (setNextRecycleAllowedTimestamp) is not cut short by the status.
+        setSecondsLeft((current) => Math.max(current, parser.recyclerTimeoutSeconds, 0));
     });
 
     useMessageEvent<CatalogRuntimeConfigurationEvent>(CatalogRuntimeConfigurationEvent, (event) => {
@@ -127,15 +145,52 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = () => {
     }, [eligibleIds]);
 
     const addChoice = (choice: RecyclerInventoryChoice) => {
-        if (processing) return;
+        if (processing || engine.busy) return;
 
         setFinished(false);
         setFailed(false);
         setSlots((current) => addRecyclerSlot(current, choice, slotCount, eligibleIds));
     };
 
+    // RecyclerCatalogWidget.onAnimationComplete: the slots are sent when the machine has run, the button then waits.
+    const sendRecycle = () => {
+        const validSlots = reconcileRecyclerSlots(slotsRef.current, eligibleIds);
+
+        scheduleReset(FINISH_RESET_MS);
+
+        if (validSlots.length !== slotCount) {
+            setSlots(validSlots);
+            return;
+        }
+
+        setProcessing(true);
+        setSecondsLeft(waitSeconds);
+        SendMessageComposer(new RecycleItemsMessageComposer(...validSlots.map((slot) => new RecycleItemsEntry(slot.itemId))));
+        clearOperationTimeout();
+        operationTimeoutRef.current = setTimeout(() => setProcessing(false), OPERATION_TIMEOUT_MS);
+    };
+
+    const engine = useRecyclerEngineAnimation(sendRecycle);
+
+    const scheduleReset = (delay: number) => {
+        if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+
+        resetTimeoutRef.current = setTimeout(engine.reset, delay);
+    };
+
+    useEffect(
+        () => () => {
+            if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+        },
+        []
+    );
+
+    // RecyclerLogic.isReadyToRecycle: only in a room, with every slot filled.
+    const canStart = enabled && !!roomSession && !processing && !engine.busy && secondsLeft <= 0 && slots.length === slotCount;
+
+    // RecyclerCatalogWidget.onRecycleButtonClick: an open trade and the ducket cost are checked, then the machine runs.
     const recycle = () => {
-        if (processing || !enabled || secondsLeft > 0) return;
+        if (!canStart) return;
 
         const validSlots = reconcileRecyclerSlots(slots, eligibleIds);
 
@@ -144,17 +199,30 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = () => {
             return;
         }
 
+        if (isTrading) {
+            simpleAlert?.(LocalizeText('recycler.alert.trading'), null, null, null, LocalizeText('generic.alert.title'));
+            return;
+        }
+
+        if (ducketCost > 0 && (getCurrencyAmount?.(DUCKETS) ?? 0) < ducketCost) {
+            simpleAlert?.(LocalizeText('catalog.alert.notenough.activitypoints.title.0'), null, null, null, LocalizeText('generic.alert.title'));
+            return;
+        }
+
         setFinished(false);
         setFailed(false);
-        setProcessing(true);
-        SendMessageComposer(new RecycleItemsMessageComposer(...validSlots.map((slot) => new RecycleItemsEntry(slot.itemId))));
-        clearOperationTimeout();
-        operationTimeoutRef.current = setTimeout(() => setProcessing(false), OPERATION_TIMEOUT_MS);
+        engine.start();
+    };
+
+    // onAbortClick: the run stops where it is and nothing is sent.
+    const abort = () => {
+        engine.stop();
+        scheduleReset(ABORT_RESET_MS);
     };
 
     const statusText = !enabled
         ? LocalizeText('recycler.info.closed')
-        : processing
+        : processing || engine.busy
           ? LocalizeText('recycler.info.processing')
           : finished
             ? LocalizeText('recycler.info.finished')
@@ -162,7 +230,7 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = () => {
               ? localizeWithFallback('recycler.info.failed', 'Recycling failed. Your furni are still in the recycler.')
               : LocalizeText('recycler.info.ready');
 
-    const slotsLocked = processing || !enabled;
+    const slotsLocked = processing || engine.busy || !enabled;
 
     const onSlot = (index: number) => {
         if (slotsLocked) return;
@@ -193,7 +261,7 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = () => {
                     draggable={false}
                     className="octane-catalog-air-recycler__machine"
                     src={recyclerMachine}
-                    style={{ transform: `translate(${engine.shakeX}px, ${engine.shakeY}px)` }}
+                    style={{ transform: `translate(${engine.frame.shakeX}px, ${engine.frame.shakeY}px)` }}
                 />
                 <div className="octane-catalog-air-recycler__widget">
                     {enabled ? (
@@ -203,7 +271,7 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = () => {
                             </div>
                             <BaseButton
                                 className="octane-catalog-standard-button octane-catalog-air-recycler__recycle"
-                                disabled={processing || secondsLeft > 0 || slots.length !== slotCount}
+                                disabled={!canStart}
                                 type="button"
                                 onClick={recycle}
                             >
@@ -236,9 +304,14 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = () => {
                             <div className="octane-catalog-air-recycler__frame is-indicator">
                                 <img alt="" draggable={false} className="octane-catalog-air-recycler__dial" src={recyclerIndicator} />
                                 <div className="octane-catalog-air-recycler__pointer">
-                                    <img alt="" draggable={false} src={recyclerPointerArrow} style={{ transform: `rotate(${engine.angle}deg)` }} />
+                                    <img alt="" draggable={false} src={recyclerPointerArrow} style={{ transform: `rotate(${engine.frame.angle}deg)` }} />
                                     <img alt="" draggable={false} src={recyclerPointerBase} />
                                 </div>
+                                {engine.busy && (
+                                    <BaseButton className="octane-catalog-air-recycler__abort" type="button" onClick={abort}>
+                                        {LocalizeText('catalog.recycler.button.abort')}
+                                    </BaseButton>
+                                )}
                             </div>
                         </>
                     ) : (
@@ -269,7 +342,7 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = () => {
                                         key={choice.itemId}
                                         aria-label={choice.name}
                                         className="octane-catalog-air-recycler__choice"
-                                        disabled={processing || slots.length >= slotCount}
+                                        disabled={processing || engine.busy || slots.length >= slotCount}
                                         type="button"
                                         onClick={() => choose(choice)}
                                     >

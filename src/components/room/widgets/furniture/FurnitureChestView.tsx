@@ -32,6 +32,7 @@ import {
     GetConfigurationValue,
     GetRoomSession,
     getWiredChestLayout,
+    snapChestCapacityDraft,
     getWiredChestMaxCapacity,
     getWiredChestOptions,
     getWiredChestRights,
@@ -71,6 +72,7 @@ import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { Popover, PopoverContent } from '../../../../common/FloatingPopover';
 import '../../../../css/room/FurniWindowsCAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
@@ -180,7 +182,9 @@ export const FurnitureChestView: FC = () => {
     const [confirmWithdrawAll, setConfirmWithdrawAll] = useState(false);
     const [confirmLock, setConfirmLock] = useState<null | boolean>(null);
     const [showLockInfo, setShowLockInfo] = useState(false);
+    const lockInfoButtonRef = useRef<HTMLButtonElement>(null);
     const [upgradeResult, setUpgradeResult] = useState('');
+    const closeRef = useRef<(() => void) | null>(null);
     /** null shows the saved capacity; a string is what the owner is typing. */
     const [capacityDraft, setCapacityDraft] = useState<string | null>(null);
     const [furniSearchDraft, setFurniSearchDraft] = useState('');
@@ -200,6 +204,8 @@ export const FurnitureChestView: FC = () => {
     const isStarter = isStarterChest(chestObject.className);
     const capacityMax = getWiredChestMaxCapacity(kind, isStarter, stuff.capacityLevel, configNumber);
     const capacity = stuff.capacity > 0 ? Math.min(stuff.capacity, capacityMax) : capacityMax;
+    // AIR's "space used" shows the capacity the chest stores, not one cut down to the current maximum.
+    const storedCapacity = stuff.capacity > 0 ? stuff.capacity : capacityMax;
     const used = isFurni ? storedFurniItems.length : coins;
     const isOwner = chestObject.ownerId > 0 && chestObject.ownerId === GetSessionDataManager().userId;
     const rights = getWiredChestRights({
@@ -211,6 +217,28 @@ export const FurnitureChestView: FC = () => {
         data: stuff,
     });
     const layout = getWiredChestLayout(rights.canRead, stuff.wiredEnabled, kind);
+
+    // AIR viewingChestUpdated: a viewer who loses the right to read the chest is shown out, unless everyone may
+    // open it. Only a lost right counts, so a window that is still loading its data stays open.
+    const mayView = rights.canRead || stuff.everyoneCanOpen;
+    const couldViewRef = useRef(false);
+
+    useEffect(() => {
+        if (itemId < 0) {
+            couldViewRef.current = false;
+
+            return;
+        }
+
+        if (couldViewRef.current && !mayView) {
+            couldViewRef.current = false;
+            closeRef.current?.();
+
+            return;
+        }
+
+        couldViewRef.current = mayView;
+    }, [itemId, mayView]);
 
     const furniEntries = useMemo(() => (isFurni ? groupStoredFurni(storedFurniItems) : []), [isFurni, storedFurniItems]);
 
@@ -417,6 +445,7 @@ export const FurnitureChestView: FC = () => {
         setStoredFurniItems([]);
         setCoins(0);
     };
+    closeRef.current = close;
     const openSettings = () => {
         setName(stuff.name);
         setDescription(stuff.description);
@@ -739,8 +768,8 @@ export const FurnitureChestView: FC = () => {
                                 <Hint content={localizeWithFallback('wiredchests.lock_info.title', 'About locking')}><BaseButton aria-label={localizeWithFallback('wiredchests.lock_info.title', 'About locking')}
                                     type="button"
                                     className="octane-chest__info-button"
-                               
-                                    onClick={() => setShowLockInfo((v) => !v)}
+                                    ref={lockInfoButtonRef}
+                                    onClick={() => setShowLockInfo(true)}
                                 >
                                     i
                                 </BaseButton></Hint>
@@ -757,7 +786,7 @@ export const FurnitureChestView: FC = () => {
                                         type="text"
                                         disabled={!isOwner}
                                         value={capacityDraft ?? String(capacity)}
-                                        onChange={(e) => setCapacityDraft(e.target.value.replace(NON_DIGITS, ''))}
+                                        onChange={(e) => setCapacityDraft(snapChestCapacityDraft(e.target.value.replace(NON_DIGITS, ''), capacityMax))}
                                         onBlur={commitCapacity}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') commitCapacity();
@@ -783,7 +812,7 @@ export const FurnitureChestView: FC = () => {
                                 </Flex>
                             </Flex>
                             <Text small style={{ opacity: 0.6 }}>
-                                {LocalizeText('wiredchests.space_used2', ['count', 'total'], [String(used), String(capacity)])}
+                                {LocalizeText('wiredchests.space_used2', ['count', 'total'], [String(used), String(storedCapacity)])}
                             </Text>
                             </>}
                             <div className="octane-chest__footer-row">
@@ -1125,35 +1154,31 @@ export const FurnitureChestView: FC = () => {
                     </OctaneCardView>
                 )}
 
-                {showLockInfo && (
-                    <OctaneCardView className="octane-widget-chest-info" theme="primary-slim" style={{ width: 400 }}>
-                        <OctaneCardHeaderView
-                            headerText={localizeWithFallback('wiredchests.lock_info.title', 'About locking')}
-                            onCloseClick={() => setShowLockInfo(false)}
-                        />
-                        <OctaneCardContentView>
-                            <Column gap={2}>
-                                <Text small>{localizeWithFallback('wiredchests.lock_info.desc', '')}</Text>
-                                <ul className="octane-chest__rules">
-                                    {LOCK_INFO_RULES.map((key) => (
-                                        <li key={key}>
-                                            <Text small>{localizeWithFallback(key, '')}</Text>
-                                        </li>
-                                    ))}
-                                </ul>
-                                <Text bold className="octane-chest__title">{localizeWithFallback('wiredchests.capacity_info.title', 'About capacity')}</Text>
-                                <Text small>{localizeWithFallback('wiredchests.capacity_info.desc', '')}</Text>
-                                <ul className="octane-chest__rules">
-                                    {CAPACITY_INFO_RULES.map((key) => (
-                                        <li key={key}>
-                                            <Text small>{localizeWithFallback(key, '')}</Text>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </Column>
-                        </OctaneCardContentView>
-                    </OctaneCardView>
-                )}
+                {/* AIR lock_info_bubble: a bubble beside the info button that closes when it loses focus. */}
+                <Popover open={showLockInfo} onOpenChange={setShowLockInfo}>
+                    <PopoverContent align="center" anchor={lockInfoButtonRef} className="octane-chest__info-bubble" positionerClassName="octane-chest__info-bubble-positioner" side="right" sideOffset={8}>
+                        <Text bold className="octane-chest__title">{localizeWithFallback('wiredchests.lock_info.title', 'About locking')}</Text>
+                        <Column gap={2}>
+                        <Text small>{localizeWithFallback('wiredchests.lock_info.desc', '')}</Text>
+                        <ul className="octane-chest__rules">
+                            {LOCK_INFO_RULES.map((key) => (
+                                <li key={key}>
+                                    <Text small>{localizeWithFallback(key, '')}</Text>
+                                </li>
+                            ))}
+                        </ul>
+                        <Text bold className="octane-chest__title">{localizeWithFallback('wiredchests.capacity_info.title', 'About capacity')}</Text>
+                        <Text small>{localizeWithFallback('wiredchests.capacity_info.desc', '')}</Text>
+                        <ul className="octane-chest__rules">
+                            {CAPACITY_INFO_RULES.map((key) => (
+                                <li key={key}>
+                                    <Text small>{localizeWithFallback(key, '')}</Text>
+                                </li>
+                            ))}
+                        </ul>
+                    </Column>
+                    </PopoverContent>
+                </Popover>
 
                 {confirmWithdrawAll && (
                     <OctaneCardView className="octane-widget-chest-confirm" theme="primary-slim" style={{ width: 320 }}>

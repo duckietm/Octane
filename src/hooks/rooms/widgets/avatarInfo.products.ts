@@ -37,7 +37,8 @@ export const collectUseProductBubbles = (
     furniData: UseProductFurniData,
     ownerId: number,
     productObjectId: number,
-    units: readonly UseProductUnit[]
+    units: readonly UseProductUnit[],
+    inventoryStripId: number = -1
 ): UseProductItem[] | null => {
     const parts = furniData.customParams.split(' ');
     const part = parts.length ? parseInt(parts[0]) : -1;
@@ -61,8 +62,30 @@ export const collectUseProductBubbles = (
 
         if (furniData.specialType === FurniCategory.MONSTERPLANT_FERTILIZE && (userData.petLevel >= 7 || userData.canRevive)) continue;
 
-        bubbles.push(new UseProductItem(userData.roomIndex, RoomObjectCategory.UNIT, userData.name, productObjectId, roomObjectId, -1, replace));
+        bubbles.push(new UseProductItem(userData.roomIndex, RoomObjectCategory.UNIT, userData.name, productObjectId, roomObjectId, inventoryStripId, replace));
     }
 
     return bubbles;
 };
+
+/**
+ * Whether the product of a bubble lies in the inventory. AIR then keeps the furni's type id in
+ * `requestRoomObjectId` (there is no room object) and the inventory item's id in `requestInventoryStripId`.
+ */
+export const isUseProductFromInventory = (item: Pick<UseProductItem, 'requestInventoryStripId'> | null | undefined): boolean =>
+    !!item && item.requestInventoryStripId !== -1;
+
+/** The id the server is asked to use: the inventory item's, or the room object's. */
+export const useProductRequestId = (item: Pick<UseProductItem, 'requestInventoryStripId' | 'requestRoomObjectId'>): number =>
+    isUseProductFromInventory(item) ? item.requestInventoryStripId : item.requestRoomObjectId;
+
+/** The furni kinds AIR's inventory offers "Use" for in a private room: pet shampoo, parts, saddle and plant revival. */
+const INVENTORY_PET_PRODUCTS: readonly number[] = [
+    FurniCategory.PET_SHAMPOO,
+    FurniCategory.PET_CUSTOM_PART,
+    FurniCategory.PET_CUSTOM_PART_SHAMPOO,
+    FurniCategory.PET_SADDLE,
+    FurniCategory.MONSTERPLANT_REVIVAL
+];
+
+export const isInventoryPetProduct = (category: number): boolean => INVENTORY_PET_PRODUCTS.includes(category);

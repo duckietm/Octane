@@ -485,6 +485,7 @@ export const GroupForumView: FC<{}> = () =>
                     {mode === 'thread' && (
                         <GroupForumThreadView
                             forumData={forumData}
+                            getLastReadMessageIndex={getThreadLastReadMessageIndex}
                             groupId={effectiveGroupId}
                             initialPageIndex={threadStart.pageIndex}
                             initialThread={currentThread}
