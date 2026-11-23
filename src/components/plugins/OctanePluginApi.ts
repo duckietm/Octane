@@ -1,5 +1,15 @@
 import { FurnitureStackHeightComposer, GetRoomEngine, TextureUtils } from '@octane/renderer';
-import { CreateLinkEvent, GetRoomSession, PluginChannelListener, SendMessageComposer, VisitDesktop, sendPluginChannel, subscribePluginChannel } from '../../api';
+import {
+    CreateLinkEvent,
+    GetRoomSession,
+    PluginChannelListener,
+    PluginSlotMount,
+    registerPluginSlot,
+    SendMessageComposer,
+    VisitDesktop,
+    sendPluginChannel,
+    subscribePluginChannel
+} from '../../api';
 
 /**
  * Plugin descriptor registered by external plugin scripts.
@@ -60,6 +70,12 @@ export interface IOctanePluginApi {
     onChannel: (channel: string, listener: PluginChannelListener) => () => void;
     /** Answer the server plugin on a channel; false, sending nothing, for a bad channel name or a payload too long. */
     sendChannel: (channel: string, data: unknown) => boolean;
+    /**
+     * Draw inside one of the client's own windows. `mount` gets an empty element each time the window shows the slot
+     * and returns the function that cleans up when it hides it. Returns the function that takes the content out.
+     * Slots: `mod-tools.start-panel` (under the find-user row of the moderator start panel, 155 px wide).
+     */
+    registerSlot: (slot: string, mount: PluginSlotMount) => () => void;
 }
 
 // Internal plugin storage
@@ -68,7 +84,7 @@ const _listeners: Array<() => void> = [];
 const _windowCleanup = new Map<string, () => void>();
 // The windows each plugin opened through the API it received in onInit, closed when the plugin is removed.
 const _pluginWindows = new Map<string, Set<string>>();
-// The channel listeners each plugin added through that API, removed with it.
+// The channel listeners and slot contents each plugin added through that API, removed with it.
 const _pluginChannels = new Map<string, Set<() => void>>();
 
 // The API a plugin gets in onInit: the shared one, with the windows and channel listeners it opens recorded under its name.
@@ -92,6 +108,16 @@ function scopedApi(pluginName: string): IOctanePluginApi {
             return () => {
                 stop();
                 stops.delete(stop);
+            };
+        },
+        registerSlot(slot: string, mount: PluginSlotMount) {
+            const remove = pluginApi.registerSlot(slot, mount);
+            const stops = _pluginChannels.get(pluginName) ?? new Set<() => void>();
+            stops.add(remove);
+            _pluginChannels.set(pluginName, stops);
+            return () => {
+                remove();
+                stops.delete(remove);
             };
         }
     };
@@ -218,6 +244,10 @@ const pluginApi: IOctanePluginApi = {
 
     sendChannel(channel: string, data: unknown) {
         return sendPluginChannel(channel, data);
+    },
+
+    registerSlot(slot: string, mount: PluginSlotMount) {
+        return registerPluginSlot(slot, mount);
     },
 
     createWindow(id: string, title: string, width: number): HTMLDivElement | null {

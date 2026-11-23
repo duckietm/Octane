@@ -2,6 +2,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { publishPluginChannel } from '../../api/plugin-channel';
+import { getPluginSlotEntries } from '../../api/plugin-slots';
 import { getRegisteredPlugins, type IOctanePluginApi, pluginApi, subscribePlugins } from './OctanePluginApi';
 
 describe('plugin registration', () => {
@@ -130,5 +131,22 @@ describe('plugin registration', () => {
 
         expect(heard).not.toHaveBeenCalled();
         pluginApi.unregister('channel-stopper');
+    });
+
+    it('takes what a plugin drew in a slot out when the plugin is removed', () => {
+        pluginApi.register({
+            name: 'slot-owner',
+            label: 'Slot owner',
+            onOpen: () => undefined,
+            onInit: (api) => {
+                api.registerSlot('test.slot-owner', () => undefined);
+            }
+        });
+
+        expect(getPluginSlotEntries('test.slot-owner')).toHaveLength(1);
+
+        pluginApi.unregister('slot-owner');
+
+        expect(getPluginSlotEntries('test.slot-owner')).toHaveLength(0);
     });
 });

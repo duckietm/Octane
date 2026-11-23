@@ -63,3 +63,5 @@
 .native-start-panel__result.is-empty { cursor: default; }
 .native-start-panel__result:not(.is-empty):hover { outline: 1px solid #c8c8c8; outline-offset: -1px; }
 .native-start-panel__result > div { line-height: 0; }
+/* what external plugins draw under the find-user row (the mod-tools.start-panel slot): their own markup, in the panel's 11 px Ubuntu */
+.native-start-panel__plugins { position: absolute; display: flex; flex-direction: column; gap: 4px; color: #000; font: 400 11px/14px HabboAirUbuntu, UbuntuRegular, sans-serif; }

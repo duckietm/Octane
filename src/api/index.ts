@@ -25,6 +25,7 @@ export * from './octane';
 export * from './octane/room';
 export * from './octane/session';
 export * from './plugin-channel';
+export * from './plugin-slots';
 export * from './notification';
 export * from './nux';
 export * from './purse';

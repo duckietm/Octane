@@ -1,5 +1,5 @@
 import { HabboSearchResultData } from '@octane/renderer';
-import { FC, useMemo } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { LayoutAvatarImageView } from '../../../common';
 import { DraggableWindow } from '../../../common/draggable-window';
 import { NativeText } from '../../../common/native-text/NativeText';
@@ -15,6 +15,7 @@ import userIcon from '../../../assets/mod-tools/images/placeholder_avatar_small_
 import ticketIcon from '../../../assets/mod-tools/images/tools_file_icon.png';
 import { BaseButton } from '../../../common/BaseButton';
 import { localizeWithFallback } from '../../../api';
+import { PluginSlotView } from '../../plugins/PluginSlotView';
 
 const IMAGES: Record<string, string> = {
     roomtools_history_open_icon: roomToolIcon,
@@ -29,6 +30,10 @@ const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAA
 const SEARCH_ROW = 26;
 const SEARCH_TOP = 140;
 const RESULT_HEIGHT = 16;
+/** Where external plugins draw under the find-user row, and the gap kept below what they draw. */
+export const START_PANEL_PLUGIN_SLOT = 'mod-tools.start-panel';
+const PLUGIN_SLOT_TOP = SEARCH_TOP + 24;
+const PLUGIN_SLOT_GAP = 4;
 
 export interface StartPanelSelectedUser {
     userId: number;
@@ -75,7 +80,8 @@ const USER_CAPTION_WIDTH = 115;
 /**
  * AIR StartPanelCtrl (start_panel): room tool, room chatlog, user info and ticket browser regions, each greyed while it cannot be used. Kept from the
  * earlier mod tools and placed inside the frame: the selected user's head replaces the placeholder head (with a dot while the user is in the room and a
- * clear cross), the open issue count follows the ticket browser caption, and a row under the buttons finds a user by name.
+ * clear cross), the open issue count follows the ticket browser caption, and a row under the buttons finds a user by name. Under that row, external
+ * plugins may draw in the `mod-tools.start-panel` slot, and the frame grows by what they draw.
  */
 export const StartPanelView: FC<StartPanelProps> = (props) => {
     const {
@@ -84,6 +90,7 @@ export const StartPanelView: FC<StartPanelProps> = (props) => {
         onRoomTool, onChatlog, onUserInfo, onTicketQueue, onClose, x, y, onMove
     } = props;
     const node = useMemo(() => parseNativeLayout(startPanelXml), []);
+    const [pluginSlotHeight, setPluginSlotHeight] = useState(0);
     // The caption is drawn as wide as it is, and the row ends at the clear cross: a long name is cut with "..."
     // (the whole caption stays in the row's tooltip).
     const fittedUserCaption = useFittedNativeText(userCaption, 'il_button', USER_CAPTION_WIDTH);
@@ -107,7 +114,7 @@ export const StartPanelView: FC<StartPanelProps> = (props) => {
 
     return (
         <DraggableWindow handleSelector=".native-frame__titlebar" initialPosition={{ x, y }} onPositionChange={(position) => onMove(position.x, position.y)} unconstrainedPosition>
-            <NativeFrameView handlers={handlers} height={nativeNumber(node, 'height') + SEARCH_ROW} images={images} node={node} states={states} onClose={onClose}>
+            <NativeFrameView handlers={handlers} height={nativeNumber(node, 'height') + SEARCH_ROW + (pluginSlotHeight > 0 ? pluginSlotHeight + PLUGIN_SLOT_GAP : 0)} images={images} node={node} states={states} onClose={onClose}>
                 {showHead && (
                     <div className="native-start-panel__head" style={{ left: 5, top: userTop + 4 }}>
                         <LayoutAvatarImageView compactHead compactHeadPadding={0} compactHeadSize={20} direction={2} figure={resolveAvatarFigure(selectedUser.figure, selectedUser.gender)} gender={resolveAvatarGender(selectedUser.gender)} headOnly />
@@ -139,6 +146,7 @@ export const StartPanelView: FC<StartPanelProps> = (props) => {
                         </div>
                     )}
                 </div>
+                <PluginSlotView className="native-start-panel__plugins" slot={START_PANEL_PLUGIN_SLOT} style={{ left: 0, top: PLUGIN_SLOT_TOP, width: 155 }} onHeight={setPluginSlotHeight} />
             </NativeFrameView>
         </DraggableWindow>
     );
