@@ -1,10 +1,20 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const state = vi.hoisted(() => ({ sent: [] as unknown[], handlers: new Map<unknown, (event: unknown) => void>(), groups: [] as unknown[] }));
+const state = vi.hoisted(() => ({
+    sent: [] as unknown[],
+    handlers: new Map<unknown, (event: unknown) => void>(),
+    groups: [] as unknown[],
+    room: {} as unknown,
+    trading: false,
+    duckets: 0,
+    config: {} as Record<string, unknown>,
+    alerts: [] as string[]
+}));
 
 vi.mock('../../../../../../api', async (importOriginal) => ({
     ...(await importOriginal<typeof import('../../../../../../api')>()),
+    GetConfigurationValue: (key: string, fallback: unknown) => state.config[key] ?? fallback,
     LocalizeText: (key: string) => key,
     localizeWithFallback: (key: string) => key,
     SendMessageComposer: (composer: unknown) => state.sent.push(composer)
@@ -13,6 +23,10 @@ vi.mock('../../../../../../api', async (importOriginal) => ({
 vi.mock('../../../../../../hooks', async (importOriginal) => ({
     ...(await importOriginal<typeof import('../../../../../../hooks')>()),
     useInventoryFurni: () => ({ groupItems: state.groups }),
+    useInventoryTrade: () => ({ isTrading: state.trading }),
+    useNotification: () => ({ simpleAlert: (message: string) => state.alerts.push(message) }),
+    usePurse: () => ({ getCurrencyAmount: () => state.duckets }),
+    useRoom: () => ({ roomSession: state.room }),
     useMessageEvent: (type: unknown, handler: (event: unknown) => void) => state.handlers.set(type, handler)
 }));
 
@@ -25,9 +39,26 @@ const setStatus = (recyclerStatus: number) =>
     act(() => state.handlers.get(RecyclerStatusMessageEvent)?.({ getParser: () => ({ recyclerStatus, recyclerTimeoutSeconds: 0 }) }));
 
 describe('recycler page (AIR layout_recycler_xml + recyclerWidget_xml)', () => {
-    afterEach(cleanup);
+    afterEach(() => {
+        cleanup();
+        vi.useRealTimers();
+    });
+
+    // The machine runs at least 3 s and until the needle is on the right.
+    const runMachine = () => {
+        for (let tick = 0; tick < 4000 && screen.queryByRole('button', { name: 'catalog.recycler.button.abort' }); tick++)
+            act(() => {
+                vi.advanceTimersByTime(16);
+            });
+    };
 
     beforeEach(() => {
+        vi.useFakeTimers();
+        state.room = {};
+        state.trading = false;
+        state.duckets = 0;
+        state.config = { 'recycler.timeout_seconds': 0 };
+        state.alerts.length = 0;
         state.sent.length = 0;
         state.handlers.clear();
         state.groups = Array.from({ length: 9 }, (_, index) => group(100 + index, `furni${index}`));
@@ -49,6 +80,12 @@ describe('recycler page (AIR layout_recycler_xml + recyclerWidget_xml)', () => {
         expect(screen.queryByRole('dialog')).toBeNull();
 
         fireEvent.click(screen.getByRole('button', { name: 'catalog.recycler.button.recycle' }));
+
+        // AIR sends when the machine has run, not on the click.
+        expect(state.sent.some((composer) => composer instanceof RecycleItemsMessageComposer)).toBe(false);
+        expect(screen.getByRole('button', { name: 'catalog.recycler.button.abort' })).toBeInTheDocument();
+        runMachine();
+        expect(screen.queryByRole('button', { name: 'catalog.recycler.button.abort' })).toBeNull();
 
         const recycle = state.sent.find((composer) => composer instanceof RecycleItemsMessageComposer) as any;
 
@@ -90,6 +127,7 @@ describe('recycler page (AIR layout_recycler_xml + recyclerWidget_xml)', () => {
         fillAndRecycle();
 
         expect(screen.getByRole('status')).toHaveTextContent('recycler.info.processing');
+        runMachine();
 
         act(() =>
             state.handlers.get(RecyclerFinishedMessageEvent)?.({
@@ -112,8 +150,72 @@ describe('recycler page (AIR layout_recycler_xml + recyclerWidget_xml)', () => {
         expect(screen.getByRole('status')).toHaveTextContent('recycler.info.ready');
 
         fillAndRecycle();
+        runMachine();
         act(() => state.handlers.get(PurchaseErrorMessageEvent)?.({ getParser: () => ({ code: 0 }) }));
 
         expect(screen.getByRole('status')).toHaveTextContent('recycler.info.failed');
+    });
+
+    const sentRecycle = () => state.sent.some((composer) => composer instanceof RecycleItemsMessageComposer);
+
+    it('sends nothing when the run is aborted', () => {
+        render(<CatalogLayoutRecyclerView page={{} as any} hideNavigation={() => undefined} />);
+
+        setStatus(RecyclerStatusMessageEvent.SYSTEM_STATUS_ENABLED);
+        fillAndRecycle();
+        act(() => {
+            vi.advanceTimersByTime(1000);
+        });
+        fireEvent.click(screen.getByRole('button', { name: 'catalog.recycler.button.abort' }));
+        act(() => {
+            vi.advanceTimersByTime(60000);
+        });
+
+        expect(sentRecycle()).toBe(false);
+        expect(screen.getByRole('button', { name: 'catalog.recycler.button.recycle' })).toBeEnabled();
+    });
+
+    it('does not start outside a room, during a trade or without the duckets', () => {
+        state.room = null;
+
+        const { unmount } = render(<CatalogLayoutRecyclerView page={{} as any} hideNavigation={() => undefined} />);
+
+        setStatus(RecyclerStatusMessageEvent.SYSTEM_STATUS_ENABLED);
+        fillAndRecycle();
+        expect(screen.getByRole('button', { name: 'catalog.recycler.button.recycle' })).toBeDisabled();
+        unmount();
+
+        state.room = {};
+        state.trading = true;
+        render(<CatalogLayoutRecyclerView page={{} as any} hideNavigation={() => undefined} />);
+        setStatus(RecyclerStatusMessageEvent.SYSTEM_STATUS_ENABLED);
+        fillAndRecycle();
+        expect(state.alerts).toEqual(['recycler.alert.trading']);
+
+        cleanup();
+
+        state.trading = false;
+        state.config['recycler.ducket_cost'] = 50;
+        state.duckets = 49;
+        render(<CatalogLayoutRecyclerView page={{} as any} hideNavigation={() => undefined} />);
+        setStatus(RecyclerStatusMessageEvent.SYSTEM_STATUS_ENABLED);
+        fillAndRecycle();
+        expect(state.alerts).toEqual(['recycler.alert.trading', 'catalog.alert.notenough.activitypoints.title.0']);
+
+        runMachine();
+        expect(sentRecycle()).toBe(false);
+    });
+
+    it('waits recycler.timeout_seconds after a run', () => {
+        state.config['recycler.timeout_seconds'] = 10;
+        render(<CatalogLayoutRecyclerView page={{} as any} hideNavigation={() => undefined} />);
+
+        setStatus(RecyclerStatusMessageEvent.SYSTEM_STATUS_ENABLED);
+        fillAndRecycle();
+
+        runMachine();
+
+        expect(sentRecycle()).toBe(true);
+        expect(screen.getByRole('button', { name: 'catalog.recycler.button.wait' })).toBeDisabled();
     });
 });

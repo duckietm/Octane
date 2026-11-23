@@ -1,9 +1,10 @@
 import { InfiniteGrid } from '@layout/InfiniteGrid';
-import { GetRoomEngine, GetSessionDataManager, IRoomSession, RoomPreviewer, Vector3d } from '@octane/renderer';
+import { GetRoomEngine, GetSessionDataManager, IRoomSession, RoomEngineUseProductEvent, RoomPreviewer, Vector3d } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import {
     attemptItemPlacement,
+    DispatchMainEvent,
     DispatchUiEvent,
     FurniCategory,
     getGroupItemKey,
@@ -20,6 +21,7 @@ import { useInventoryFurni, useInventoryUnseenTracker, useMarketplaceConfigurati
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryCategoryLoadingView } from '../InventoryCategoryLoadingView';
+import { isInventoryPetProduct } from '../../../../hooks/rooms/widgets/avatarInfo.products';
 import { InventoryFurnitureItemView } from './InventoryFurnitureItemView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
@@ -256,6 +258,24 @@ export const InventoryFurnitureView: FC<{
                                 >
                                     {LocalizeText('inventory.furni.placetoroom')}
                                 </OctaneButton>
+                                {/* AIR FurniView use_btn: a pet product is used on a pet straight from the inventory, in a private room. */}
+                                {!!roomSession?.isPrivateRoom && isInventoryPetProduct(selectedItem.category) && (
+                                    <OctaneButton
+                                        disabled={!selectedItem.getUnlockedCount() || playTestRestricted}
+                                        className="octane-inventory-btn-use"
+                                        onClick={() => {
+                                            const item = selectedItem.getLastItem();
+
+                                            if (!item) return;
+
+                                            DispatchMainEvent(
+                                                new RoomEngineUseProductEvent(RoomEngineUseProductEvent.USE_PRODUCT_FROM_INVENTORY, roomSession.roomId, -1, -1, item.ref, item.type)
+                                            );
+                                        }}
+                                    >
+                                        {LocalizeText('inventory.furni.use')}
+                                    </OctaneButton>
+                                )}
                                 <div className="octane-inventory-preview-controls">
                                     <BaseButton type="button" onClick={() => roomPreviewer?.changeRoomObjectDirection()}>
                                         {localizeWithFallback('widget.furniture.button.rotate', 'Rotate')}

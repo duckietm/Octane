@@ -44,6 +44,7 @@ import { Hint } from '../../../common/Tooltip';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const MEMBERS_REQUEST_INTERVAL_MS = 550;
+const SEARCH_DELAY_MS = 1000;
 
 export const GroupMembersView: FC<{}> = (props) => {
     const [groupId, setGroupId] = useState<number>(-1);
@@ -51,7 +52,11 @@ export const GroupMembersView: FC<{}> = (props) => {
     const [membersData, setMembersData] = useState<GroupMembersParser>(null);
     const [pageId, setPageId] = useState<number>(-1);
     const [totalPages, setTotalPages] = useState<number>(0);
+    // searchText is what is typed; searchQuery what is asked for, 1 s after the last keystroke (AIR GuildMembersWindowCtrl Timer(1000, 1)).
+    const [searchText, setSearchText] = useState<string>('');
     const [searchQuery, setSearchQuery] = useState<string>('');
+    // The page typed in the footer; asked for on Enter or when the field is left (onPageInputDown / onPageInputClickAway).
+    const [pageDraft, setPageDraft] = useState<string>(null);
     const { showConfirm = null } = useNotification();
     const pendingActionsRef = useRef<Set<string>>(new Set());
     // The confirm reply only carries the user id, so remember who it was for and whether it was a kick or a block.
@@ -259,6 +264,21 @@ export const GroupMembersView: FC<{}> = (props) => {
 
     useEffect(() => refreshMembers(), [refreshMembers]);
 
+    useEffect(() => {
+        if (searchText === searchQuery) return;
+
+        const timeout = setTimeout(() => setSearchQuery(searchText), SEARCH_DELAY_MS);
+
+        return () => clearTimeout(timeout);
+    }, [searchText, searchQuery]);
+
+    const submitPageDraft = () => {
+        if (pageDraft === null) return;
+
+        setPageDraft(null);
+        setPageId(Math.min(Math.max(parseInt(pageDraft) || 1, 1), Math.max(1, totalPages)) - 1);
+    };
+
     useEffect(() => () => membersRequests.cancel(), [membersRequests]);
 
     useEffect(() => {
@@ -267,6 +287,7 @@ export const GroupMembersView: FC<{}> = (props) => {
         setMembersData(null);
         setTotalPages(0);
         setSearchQuery('');
+        setSearchText('');
         pendingRemovalRef.current = null;
     }, [groupId]);
 
@@ -289,8 +310,8 @@ export const GroupMembersView: FC<{}> = (props) => {
                                 className="octane-groups-input min-h-[calc(1.5em+.5rem+2px)] px-[.5rem] py-[.25rem] text-[.7875rem] rounded-[.2rem] w-full"
                                 placeholder={LocalizeText('group.members.searchinfo')}
                                 type="text"
-                                value={searchQuery}
-                                onChange={(event) => setSearchQuery(event.target.value)}
+                                value={searchText}
+                                onChange={(event) => setSearchText(event.target.value)}
                             />
                             <Select className="octane-groups-select form-select form-select-sm w-full" value={levelId} onChange={(event) => setLevelId(parseInt(event.target.value))}>
                                 <option value="0">{LocalizeText('group.members.search.all')}</option>
@@ -397,10 +418,18 @@ export const GroupMembersView: FC<{}> = (props) => {
                             <Text small className="octane-group-members-footer__label">
                                 {localizeWithFallback('group.members.members', `Members (${membersData.totalMembersCount})`, ['count'], [membersData.totalMembersCount.toString()])}
                             </Text>
-                            <NumberInput className="octane-group-members-footer__input" min={1} max={Math.max(1, totalPages)} value={membersData.pageIndex + 1} onChange={(event) => {
-                                    const value = Math.min(Math.max(parseInt(event.target.value) || 1, 1), Math.max(1, totalPages));
-                                    setPageId(value - 1);
-                                }} />
+                            <NumberInput
+                                className="octane-group-members-footer__input"
+                                min={1}
+                                max={Math.max(1, totalPages)}
+                                steppers={false}
+                                value={pageDraft ?? membersData.pageIndex + 1}
+                                onBlur={submitPageDraft}
+                                onChange={(event) => setPageDraft(event.target.value)}
+                                onKeyDown={(event) => {
+                                    if (event.key === 'Enter') submitPageDraft();
+                                }}
+                            />
                             <Text small className="octane-group-members-footer__total">
                                 / {Math.max(1, totalPages)}
                             </Text>

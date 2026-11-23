@@ -6242,6 +6242,21 @@
     height: 50px;
 }
 
+.octane-catalog-air-recycler__abort {
+    position: absolute;
+    top: 91px;
+    left: 30px;
+    height: 17px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #000000;
+    font-size: 10px;
+    line-height: 15px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .octane-catalog-air-recycler__pointer img {
     position: absolute;
     inset: 0;

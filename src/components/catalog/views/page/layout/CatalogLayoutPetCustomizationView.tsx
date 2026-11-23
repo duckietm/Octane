@@ -1,5 +1,4 @@
 import { FC, useEffect } from 'react';
-import { SanitizeHtml } from '../../../../../api';
 import { LayoutRoomPreviewerView } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogData } from '../../../../../hooks';
@@ -9,16 +8,17 @@ import { CatalogPurchaseSelectionPrompt } from '../widgets/CatalogPurchaseSelect
 import { CatalogPurchaseWidgetView } from '../widgets/CatalogPurchaseWidgetView';
 import { CatalogTotalPriceWidget } from '../widgets/CatalogTotalPriceWidget';
 import { CatalogLayoutProps } from './CatalogLayout.types';
-import { buildPetCustomizationPreviewFigure } from './petCustomization.helpers';
+import { buildPetCustomizationPreviewFigure, PET_CUSTOMIZATION_DEFAULT_FIGURE } from './petCustomization.helpers';
 
 export const CatalogLayoutPetCustomizationView: FC<CatalogLayoutProps> = ({ page }) => {
     const { currentOffer = null, roomPreviewer = null } = useCatalogData();
     const selectedOffer = currentOffer && page.offers.includes(currentOffer) ? currentOffer : null;
 
     useEffect(() => {
-        if (!selectedOffer?.product?.furnitureData || !roomPreviewer) return;
+        if (!roomPreviewer) return;
 
-        const figure = buildPetCustomizationPreviewFigure(selectedOffer.product.furnitureData);
+        const furnitureData = selectedOffer?.product?.furnitureData;
+        const figure = furnitureData ? buildPetCustomizationPreviewFigure(furnitureData) : PET_CUSTOMIZATION_DEFAULT_FIGURE;
 
         roomPreviewer.reset(false);
         roomPreviewer.updateRoomWallsAndFloorVisibility(false, false);
@@ -30,20 +30,15 @@ export const CatalogLayoutPetCustomizationView: FC<CatalogLayoutProps> = ({ page
         <NativeTextTree>
             <div className="octane-catalog-pet-customization-layout">
                 <div className="octane-catalog-pet-customization-preview">
-                    {selectedOffer ? (
+                    <LayoutRoomPreviewerView height={240} roomPreviewer={roomPreviewer} />
+                    {selectedOffer && (
                         <>
-                            <LayoutRoomPreviewerView height={240} roomPreviewer={roomPreviewer} />
                             <div className="octane-catalog-pet-customization-copy">
                                 <CatalogProductDetailsView offer={selectedOffer} />
                             </div>
                             <div className="octane-catalog-pet-customization-price">
                                 <CatalogTotalPriceWidget />
                             </div>
-                        </>
-                    ) : (
-                        <>
-                            {!!page.localization.getImage(1) && <img alt="" src={page.localization.getImage(1)} />}
-                            {!!page.localization.getText(0) && <div dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(0)) }} />}
                         </>
                     )}
                 </div>

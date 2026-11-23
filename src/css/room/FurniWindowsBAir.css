@@ -154,7 +154,7 @@
 }
 
 /* petpackage_new: header title u_headline_big at font_size 24 bold, the name input u_headline_medium
-   16 px bold #888888. The dark header band is not drawn here, so the title keeps its black colour. */
+   16 px bold #888888. The windows themselves are laid out in PetPackageWidget.css. */
 .octane-furni-petpackage .octane-card-content-shell {
     font-size: 12px;
 }

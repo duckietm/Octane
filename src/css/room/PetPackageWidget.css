@@ -1,0 +1,222 @@
+/* AIR's two "name your pet" windows (client 1.0.31): petpackage.xml and petpackage_new.xml. Every child sits where
+   its layout puts it, measured from the frame's content area. */
+.octane-pet-package .octane-pet-package__content {
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.octane-pet-package__compact,
+.octane-pet-package__large {
+    position: relative;
+}
+
+.octane-pet-package__compact > *,
+.octane-pet-package__large > * {
+    position: absolute;
+}
+
+.octane-pet-package .octane-pet-package__input {
+    box-sizing: border-box;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    outline: none;
+    background: #fff;
+}
+
+.octane-pet-package .octane-pet-package__cancel {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #333;
+    font-size: 12px;
+    line-height: 17px;
+    text-align: center;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+
+.octane-pet-package .octane-pet-package__pick {
+    box-sizing: border-box;
+    width: auto;
+    white-space: nowrap;
+}
+
+/* ---------- petpackage (280x160): the content border is 267x128. ---------- */
+.octane-pet-package__compact {
+    width: 267px;
+    height: 128px;
+}
+
+/* pet_img_bg_box 64x64 at 11,11 on 0xf0f0f0 with the 60x60 pet_image 2 px inside it. */
+.octane-pet-package__pet {
+    left: 11px;
+    top: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 64px;
+    height: 64px;
+    padding: 2px;
+    border: 1px solid #b6b6b6;
+    border-radius: 4px;
+    background: #f0f0f0;
+    overflow: hidden;
+}
+
+/* info_text 174x30 at 84,16: Ubuntu 12 px bold, wrapped. */
+.octane-pet-package .octane-pet-package__info {
+    left: 84px;
+    top: 16px;
+    width: 174px;
+    max-height: 30px;
+    overflow: hidden;
+    color: #000;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+}
+
+/* input_border 175x25 at 83,49; the input 160x17 at 7,4 inside it, Ubuntu 12 px bold. */
+.octane-pet-package__compact .octane-pet-package__input-border {
+    left: 83px;
+    top: 49px;
+    box-sizing: border-box;
+    width: 175px;
+    height: 25px;
+    border: 1px solid #8c8c8c;
+    border-radius: 3px;
+    background: #fff;
+}
+
+.octane-pet-package__compact .octane-pet-package__input {
+    position: absolute;
+    left: 6px;
+    top: 3px;
+    width: 160px;
+    height: 17px;
+    color: #000;
+    font-size: 12px !important;
+    font-weight: 700;
+    line-height: 17px;
+}
+
+/* cancel region 68x29 at 10,90 with its centred, underlined 12 px text 6 px down. */
+.octane-pet-package__compact .octane-pet-package__cancel {
+    left: 10px;
+    top: 96px;
+    width: 68px;
+}
+
+/* pick_name: a 28 px button_thick at y 91 that grows from 125 to 175 px with its caption, its right edge 9 px
+   from the border's. */
+.octane-pet-package__compact .octane-pet-package__pick {
+    top: 91px;
+    right: 9px;
+    min-width: 125px;
+    max-width: 175px;
+    height: 28px;
+}
+
+/* ---------- petpackage_new (475x250): margins 33 above and 3 below leave a 475x214 content area. ---------- */
+.octane-pet-package__large {
+    width: 475px;
+    height: 214px;
+}
+
+/* header background 473x100 at 1,0: a 0x376275 border around the 469x95 body in 0x0e3f52. */
+.octane-pet-package__header {
+    left: 1px;
+    top: 0;
+    box-sizing: border-box;
+    width: 473px;
+    height: 100px;
+    border-top: 2px solid #376275;
+    border-right: 2px solid #376275;
+    border-bottom: 3px solid #376275;
+    border-left: 2px solid #376275;
+    background: #0e3f52;
+}
+
+.octane-pet-package__header > * {
+    position: absolute;
+}
+
+/* The package box, 85x93 at 3,5, centred in its box and never stretched. */
+.octane-pet-package__box {
+    left: 1px;
+    top: 3px;
+    width: 85px;
+    height: 93px;
+    object-fit: none;
+    object-position: center;
+}
+
+/* petpackage.header.title at 95,11: u_headline_big at 24 px, white. */
+.octane-pet-package .octane-pet-package__title {
+    left: 93px;
+    top: 9px;
+    width: 280px;
+    color: #fff;
+    white-space: nowrap;
+}
+
+/* petpackage.header.description at 95,41, 354 px wide: white, wrapped, 2 px of leading. */
+.octane-pet-package .octane-pet-package__description {
+    left: 93px;
+    top: 39px;
+    width: 354px;
+    color: #fff;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+/* input_border 417x34 at 17,25 of the lower container (which starts at y 90); the input 380x17 at 7,6 in
+   u_headline_medium 0x888888, the small pen 17x18 at 393,8. */
+.octane-pet-package__large .octane-pet-package__input-border {
+    left: 17px;
+    top: 115px;
+    box-sizing: border-box;
+    width: 417px;
+    height: 34px;
+    border: 1px solid #8c8c8c;
+    border-radius: 3px;
+    background: #fff;
+}
+
+.octane-pet-package__large .octane-pet-package__input {
+    position: absolute;
+    left: 6px;
+    top: 5px;
+    width: 380px;
+    height: 22px;
+    color: #888;
+    line-height: 22px;
+}
+
+.octane-pet-package__pen {
+    position: absolute;
+    left: 392px;
+    top: 7px;
+    width: 17px;
+    height: 18px;
+    image-rendering: pixelated;
+}
+
+/* The button row starts at y 154 (90 + 64): the cancel text at 116,19 of it, the green pick_name button
+   195x33 at 239,10, at least 130 px wide. */
+.octane-pet-package__large .octane-pet-package__cancel {
+    left: 116px;
+    top: 173px;
+    width: 83px;
+    text-align: left;
+}
+
+.octane-pet-package__large .octane-pet-package__pick {
+    left: 239px;
+    top: 164px;
+    min-width: 130px;
+    width: 195px;
+    height: 33px;
+}

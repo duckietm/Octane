@@ -1,6 +1,6 @@
 import { RoomObjectCategory, RoomObjectType } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { FurniCategory, GetFurnitureDataForRoomObject, LocalizeText, UseProductItem } from '../../../../api';
+import { FurniCategory, GetUseProductFurniData, LocalizeText, UseProductItem } from '../../../../api';
 import { useRoom } from '../../../../hooks';
 import { ContextMenuHeaderView } from '../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../context-menu/ContextMenuListItemView';
@@ -47,7 +47,7 @@ export const AvatarInfoUseProductView: FC<AvatarInfoUseProductViewProps> = (prop
     useEffect(() => {
         if (!item) return;
 
-        const furniData = GetFurnitureDataForRoomObject(roomSession.roomId, item.requestRoomObjectId, RoomObjectCategory.FLOOR);
+        const furniData = GetUseProductFurniData(roomSession.roomId, item);
 
         if (!furniData) return;
 

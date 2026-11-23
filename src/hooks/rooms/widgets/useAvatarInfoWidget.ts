@@ -34,7 +34,7 @@ import { useFriends } from '../../friends';
 import { useWired } from '../../wired';
 import { useObjectDeselectedEvent, useObjectRollOutEvent, useObjectRollOverEvent, useObjectSelectedEvent } from '../engine';
 import { useRoom } from '../useRoom';
-import { collectUseProductBubbles } from './avatarInfo.products';
+import { collectUseProductBubbles, isUseProductFromInventory } from './avatarInfo.products';
 import { applyFavouriteGroupUpdate, applyUserBadgesUpdate, applyUserFigureUpdate } from './avatarInfo.reducers';
 
 // Time window after a directional / move-state user click during
@@ -257,6 +257,25 @@ const useAvatarInfoWidgetState = () => {
         if (useProductBubbles.length) setProductBubbles(useProductBubbles);
     });
 
+    // AIR ROSM_USE_PRODUCT_FROM_INVENTORY: the inventory's "Use" on a pet product offers the user's own pets it
+    // fits, as a product lying in the room does. The bubbles carry the furni type and the inventory item's id.
+    useOctaneEvent<RoomEngineUseProductEvent>(RoomEngineUseProductEvent.USE_PRODUCT_FROM_INVENTORY, (event) => {
+        const furniData = GetSessionDataManager().getFloorItemData(event.furnitureTypeId);
+
+        if (!furniData) return;
+
+        const units = GetRoomEngine()
+            .getRoomObjects(roomSession.roomId, RoomObjectCategory.UNIT)
+            .map((unit) => ({ roomObjectId: unit.id, userData: roomSession.userDataManager.getUserDataByIndex(unit.id) }));
+        const useProductBubbles = collectUseProductBubbles(furniData, GetSessionDataManager().userId, event.furnitureTypeId, units, event.inventoryStripId);
+
+        if (!useProductBubbles) return;
+
+        setConfirmingProduct(null);
+
+        if (useProductBubbles.length) setProductBubbles(useProductBubbles);
+    });
+
     useOctaneEvent<RoomEngineObjectEvent>(RoomEngineObjectEvent.REQUEST_MANIPULATION, (event) => {
         if (!CanManipulateFurniture(roomSession, event.objectId, event.category)) return;
 
@@ -352,11 +371,15 @@ const useAvatarInfoWidgetState = () => {
         } else if (event.category === RoomObjectCategory.FLOOR) {
             // The bubbles name the product furni in requestRoomObjectId: comparing their id never matched, so the
             // bubbles and the confirm stayed after the shampoo or the food was picked up.
-            if (productBubbles.some((bubble) => bubble.requestRoomObjectId === event.id)) {
-                setProductBubbles((prevValue) => prevValue.filter((bubble) => bubble.requestRoomObjectId !== event.id));
+            // A product from the inventory is no room object: its bubbles keep a furni type id there, which must not
+            // be taken for the furni that just left.
+            const isRemovedProduct = (bubble: UseProductItem) => !isUseProductFromInventory(bubble) && bubble.requestRoomObjectId === event.id;
+
+            if (productBubbles.some(isRemovedProduct)) {
+                setProductBubbles((prevValue) => prevValue.filter((bubble) => !isRemovedProduct(bubble)));
             }
 
-            if (confirmingProduct?.requestRoomObjectId === event.id) setConfirmingProduct(null);
+            if (confirmingProduct && isRemovedProduct(confirmingProduct)) setConfirmingProduct(null);
         }
 
         if (avatarInfo) {

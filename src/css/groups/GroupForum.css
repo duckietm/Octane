@@ -576,3 +576,12 @@
 .octane-forum.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button {
     right: 3px !important;
 }
+
+/* groupforum_forum_settings: an option the section above does not allow is disabled at blend 0.5, radio and label. */
+.octane-forum__option.is-locked > * {
+    opacity: 0.5;
+}
+
+.octane-forum__option.is-locked > button {
+    cursor: default;
+}
