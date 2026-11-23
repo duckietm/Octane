@@ -186,7 +186,8 @@
         {"key":"bot.name.max.length","comment":"Maximum rentable bot name length in characters.","value":15,"runtime":true},
         {"key":"pet.package.name.max.length","comment":"Maximum pet name length in the pet package window.","value":15,"runtime":true},
         {"key":"room.dragging.always_center","comment":"The room snaps back to the centre when a drag ends.","value":false,"runtime":true},
-        {"key":"infostand.place_more.enabled","comment":"\"Place more\" button on the infostand of furni the Builders Club sells, for players who may build with it.","value":false,"runtime":true}
+        {"key":"infostand.place_more.enabled","comment":"\"Place more\" button on the infostand of furni the Builders Club sells, for players who may build with it.","value":false,"runtime":true},
+        {"key":"monsterplants.composting.enabled","comment":"The room owner can compost a dead monster plant from its menu.","value":true,"runtime":true}
     ],
     "catalog": [
         {"title":"Catalog, purse and currencies","about":"Catalog pages and purchases, currencies and the purse, club, collectibles, custom badges and Builders Club."},
@@ -227,7 +228,9 @@
         {"key":"badge.display.excluded.badgeCodes","comment":"Badge codes hidden from the badge picker of the catalog badge display, e.g. [\"ADM\", \"MOD\"].","value":[],"runtime":true},
         {"key":"badge_rarity.uncommon","comment":"Treats uncommon badges as their own rarity tier with a glow; off counts them as common.","value":false,"runtime":true},
         {"key":"duckets.soft_limit","comment":"Duckets above which claiming earnings asks first, since the surplus is lost; 0: never asks.","value":0,"runtime":true},
-        {"key":"disclaimer.credit_spending.enabled","comment":"Purchases (catalog, club, camera) need a ticked credit spending disclaimer first.","value":false,"runtime":true}
+        {"key":"disclaimer.credit_spending.enabled","comment":"Purchases (catalog, club, camera) need a ticked credit spending disclaimer first.","value":false,"runtime":true},
+        {"key":"recycler.ducket_cost","comment":"Duckets a Furni-Matic run needs before it starts; 0: free. Keep it equal to the server setting recycler.ducket_cost, which is what charges them.","value":0,"runtime":true},
+        {"key":"recycler.timeout_seconds","comment":"Seconds the Furni-Matic start button waits after a run; the server enforces its own recycler.timeout_seconds.","value":10,"runtime":true}
     ],
     "chat": [
         {"title":"Chat and mentions","about":"Chat input and history, respect, and @mentions."},

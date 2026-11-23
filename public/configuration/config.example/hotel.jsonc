@@ -242,6 +242,9 @@
     // "Place more" button on the infostand of furni the Builders Club sells, for players who may build with it.
     "infostand.place_more.enabled": false,
 
+    // The room owner can compost a dead monster plant from its menu.
+    "monsterplants.composting.enabled": true,
+
 
     // ==== Catalog, purse and currencies ====
     // Catalog pages and purchases, currencies and the purse, club, collectibles, custom badges and Builders Club.
@@ -378,6 +381,12 @@
 
     // Purchases (catalog, club, camera) need a ticked credit spending disclaimer first.
     "disclaimer.credit_spending.enabled": false,
+
+    // Duckets a Furni-Matic run needs before it starts; 0: free. Keep it equal to the server setting recycler.ducket_cost, which is what charges them.
+    "recycler.ducket_cost": 0,
+
+    // Seconds the Furni-Matic start button waits after a run; the server enforces its own recycler.timeout_seconds.
+    "recycler.timeout_seconds": 10,
 
 
     // ==== Chat and mentions ====
