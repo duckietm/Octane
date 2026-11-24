@@ -75,7 +75,23 @@ import {
     OctaneCardView,
     Text
 } from '../../common';
-import { useInventoryTrade, useMessageEvent, useNotification, useObjectSelectedEvent, useRoom, useWiredObjectInspection, useWiredTools, useWiredVariableCatalog, useWiredVariableHolders, WIRED_VARIABLE_HOLDERS_POLL_MS } from '../../hooks';
+import {
+    permanentVariableItemId,
+    useInventoryTrade,
+    useMessageEvent,
+    useNotification,
+    useObjectSelectedEvent,
+    useRoom,
+    useWiredObjectInspection,
+    useWiredPermanentVariables,
+    useWiredTools,
+    useWiredVariableCatalog,
+    useWiredVariableHolders,
+    WIRED_PERMANENT_VARIABLE_CREATE,
+    WIRED_PERMANENT_VARIABLE_DELETE,
+    WIRED_PERMANENT_VARIABLE_SET,
+    WIRED_VARIABLE_HOLDERS_POLL_MS
+} from '../../hooks';
 import { isPersistedWiredVariable, WIRED_VARIABLE_TYPE_CREATED, WIRED_VARIABLE_TYPE_INTERNAL, wiredVariablePickerRows } from '../../api/wired/WiredVariableCatalog';
 import { WIRED_OFFICIAL_TARGET_FURNI, WIRED_OFFICIAL_TARGET_USER } from '../../api/wired/WiredVariableTargets';
 import { VARIABLES_TYPE_TARGET, wiredVariableAvailabilityLabel, wiredVariablePropertyRows, wiredVariableToDefinition } from './WiredVariableCatalog.helpers';
@@ -2088,8 +2104,39 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         () => new Map(furniVariableDefinitions.map((definition) => [definition.itemId, definition])),
         [furniVariableDefinitions]
     );
+    // A user holder who is not in the room is outside the room's variable snapshot: their permanent variables come
+    // from the official holder detail messages, which also carry the changes.
+    const absentHolderKey = useMemo(() => {
+        if (variablesType !== 'user' || !selectedManagedVariableEntry || !roomSession) return null;
+        if (findUserVariableHolderData(roomSession.userDataManager, selectedManagedVariableEntry.entityId)) return null;
+
+        return selectedManagedVariableEntry.entityId;
+    }, [variablesType, selectedManagedVariableEntry, roomSession]);
+    const absentHolder = useWiredPermanentVariables(absentHolderKey);
     const managedHolderVariableEntries = useMemo((): ManagedHolderVariableEntry[] => {
         if (!selectedManagedVariableEntry) return [];
+
+        if (absentHolderKey !== null) {
+            return (absentHolder.variables ?? [])
+                .map((variable): ManagedHolderVariableEntry | null => {
+                    const definition = userVariableDefinitionsById.get(permanentVariableItemId(variable.variableId));
+
+                    if (!definition) return null;
+
+                    return {
+                        variableItemId: definition.itemId,
+                        name: definition.name,
+                        hasValue: definition.hasValue,
+                        isReadOnly: !!definition.isReadOnly,
+                        value: variable.value,
+                        availability: getVariableAvailabilityLabel(definition.availability, 'user'),
+                        createdAt: Math.floor(variable.creationTime / 1000),
+                        updatedAt: Math.floor(variable.lastUpdateTime / 1000)
+                    };
+                })
+                .filter((entry): entry is ManagedHolderVariableEntry => !!entry)
+                .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }));
+        }
 
         switch (variablesType) {
             case 'user':
@@ -2154,6 +2201,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         }
     }, [
         selectedManagedVariableEntry,
+        absentHolderKey,
+        absentHolder.variables,
         variablesType,
         userVariableAssignments,
         userVariableDefinitionsById,
@@ -2165,7 +2214,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const selectedManagedHolderVariableEntry = useMemo(() => {
         if (!managedHolderVariableEntries.length) return null;
 
-        return managedHolderVariableEntries.find((entry) => entry.variableItemId === selectedManagedHolderVariableId) ?? managedHolderVariableEntries[0];
+        // AIR VariableManagementDetailView: the window opens with no row selected.
+        return managedHolderVariableEntries.find((entry) => entry.variableItemId === selectedManagedHolderVariableId) ?? null;
     }, [managedHolderVariableEntries, selectedManagedHolderVariableId]);
     const availableManagedHolderDefinitions = useMemo(() => {
         if (!selectedManagedVariableEntry || variablesType === 'global' || variablesType === 'context') return [];
@@ -2175,8 +2225,10 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         return definitions
             .filter((definition) => !assignedIds.has(definition.itemId) && !definition.isReadOnly && !isDerivedVariableItemId(definition.itemId))
+            // AIR variableFilter: a holder who is away can only be given a variable that is kept (permanent, shared).
+            .filter((definition) => absentHolderKey === null || definition.availability === 10 || definition.availability === 11)
             .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }));
-    }, [selectedManagedVariableEntry, variablesType, managedHolderVariableEntries, userVariableDefinitions, furniVariableDefinitions]);
+    }, [selectedManagedVariableEntry, variablesType, managedHolderVariableEntries, userVariableDefinitions, furniVariableDefinitions, absentHolderKey]);
     const selectedManagedGiveDefinition = useMemo(() => {
         if (!availableManagedHolderDefinitions.length) return null;
 
@@ -2278,8 +2330,9 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         !!selectedManagedHolderVariableEntry &&
         !selectedManagedHolderVariableEntry.isReadOnly &&
         !isDerivedVariableItemId(selectedManagedHolderVariableEntry.variableItemId);
-    const canGiveManagedHolderVariable =
-        canManageHolderVariables && variablesType !== 'global' && variablesType !== 'context' && !!availableManagedHolderDefinitions.length;
+    // AIR updateButtonsUI: Give variable follows the write permission alone; with nothing left to give, the bubble
+    // says so and its Create button stays off.
+    const canGiveManagedHolderVariable = canManageHolderVariables && variablesType !== 'global' && variablesType !== 'context';
     useEffect(() => {
         if (!selectedManagedVariableEntry) {
             setSelectedManagedHolderVariableId(0);
@@ -2300,13 +2353,12 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             return;
         }
 
+        // A row that is gone loses the selection; nothing is selected in its place.
+        if (!selectedManagedHolderVariableId) return;
         if (managedHolderVariableEntries.some((entry) => entry.variableItemId === selectedManagedHolderVariableId)) return;
 
-        const preferredItemId = Number(selectedVariableDefinition?.itemId ?? 0);
-        const preferredEntry = managedHolderVariableEntries.find((entry) => entry.variableItemId === preferredItemId);
-
-        setSelectedManagedHolderVariableId(preferredEntry?.variableItemId ?? managedHolderVariableEntries[0].variableItemId);
-    }, [managedHolderVariableEntries, selectedManagedHolderVariableId, selectedVariableDefinition?.itemId]);
+        setSelectedManagedHolderVariableId(0);
+    }, [managedHolderVariableEntries, selectedManagedHolderVariableId]);
     useEffect(() => {
         if (!availableManagedHolderDefinitions.length) {
             setManagedGiveVariableItemId(0);
@@ -2371,7 +2423,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         switch (variablesType) {
             case 'user':
-                updateUserVariableValue(selectedManagedVariableEntry.entityId, selectedManagedHolderVariableEntry.variableItemId, nextValue);
+                if (absentHolderKey !== null) absentHolder.change(selectedManagedHolderVariableEntry.variableItemId, nextValue, WIRED_PERMANENT_VARIABLE_SET);
+                else updateUserVariableValue(selectedManagedVariableEntry.entityId, selectedManagedHolderVariableEntry.variableItemId, nextValue);
                 break;
             case 'furni':
                 updateFurniVariableValue(selectedManagedVariableEntry.entityId, selectedManagedHolderVariableEntry.variableItemId, nextValue);
@@ -2388,6 +2441,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         roomSettings.canModify,
         editingManagedHolderValue,
         variablesType,
+        absentHolderKey,
+        absentHolder.change,
         updateUserVariableValue,
         updateFurniVariableValue,
         updateRoomVariableValue
@@ -2399,7 +2454,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         const parsedValue = Number(managedGiveValue.trim());
         const nextValue = clampWiredVariableValue(parsedValue);
 
-        if (variablesType === 'user') assignUserVariable(selectedManagedVariableEntry.entityId, selectedManagedGiveDefinition.itemId, nextValue);
+        if (absentHolderKey !== null) absentHolder.change(selectedManagedGiveDefinition.itemId, nextValue, WIRED_PERMANENT_VARIABLE_CREATE);
+        else if (variablesType === 'user') assignUserVariable(selectedManagedVariableEntry.entityId, selectedManagedGiveDefinition.itemId, nextValue);
         else assignFurniVariable(selectedManagedVariableEntry.entityId, selectedManagedGiveDefinition.itemId, nextValue);
 
         setSelectedManagedHolderVariableId(selectedManagedGiveDefinition.itemId);
@@ -2411,6 +2467,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         roomSettings.canModify,
         variablesType,
         managedGiveValue,
+        absentHolderKey,
+        absentHolder.change,
         assignUserVariable,
         assignFurniVariable
     ]);
@@ -2419,11 +2477,21 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             return;
         if (variablesType === 'global' || variablesType === 'context') return;
 
-        if (variablesType === 'user') removeUserVariable(selectedManagedVariableEntry.entityId, selectedManagedHolderVariableEntry.variableItemId);
+        if (absentHolderKey !== null) absentHolder.change(selectedManagedHolderVariableEntry.variableItemId, 0, WIRED_PERMANENT_VARIABLE_DELETE);
+        else if (variablesType === 'user') removeUserVariable(selectedManagedVariableEntry.entityId, selectedManagedHolderVariableEntry.variableItemId);
         else removeFurniVariable(selectedManagedVariableEntry.entityId, selectedManagedHolderVariableEntry.variableItemId);
 
         setEditingManagedHolderVariableId(0);
-    }, [selectedManagedVariableEntry, selectedManagedHolderVariableEntry, roomSettings.canModify, variablesType, removeUserVariable, removeFurniVariable]);
+    }, [
+        selectedManagedVariableEntry,
+        selectedManagedHolderVariableEntry,
+        roomSettings.canModify,
+        variablesType,
+        absentHolderKey,
+        absentHolder.change,
+        removeUserVariable,
+        removeFurniVariable
+    ]);
 
     const clearMonitorLogs = () => {
         if (isMonitorClearCoolingDown) return;
@@ -3407,7 +3475,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     <WiredVariableHolderPanelView
                         title={managedHolderPanelTitle}
                         warningText={managedHolderWarningText}
-                        onRefresh={() => requestUserVariables()}
+                        onRefresh={() => (absentHolderKey !== null ? absentHolder.refresh() : requestUserVariables())}
                         onClose={() => setSelectedManagedVariableEntry(null)}
                         preview={
                             <>
@@ -3418,6 +3486,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                         roomId={roomSession.roomId}
                                     />
                                 )}
+                                {absentHolderKey !== null && !!absentHolder.figure && <LayoutAvatarImageView direction={2} figure={absentHolder.figure} />}
                                 {variablesType === 'user' && managedHolderUserData && (
                                     <>
                                         {managedHolderUserData.type === RoomObjectType.PET ? (

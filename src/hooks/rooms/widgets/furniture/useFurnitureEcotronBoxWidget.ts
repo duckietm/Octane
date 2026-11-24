@@ -5,6 +5,9 @@ import { useOctaneEvent } from '../../../events';
 import { useFurniRemovedEvent } from '../../engine';
 
 /** Official `EcotronBoxFurniWidget._interfaceMapByFurniTypeName`: the furnimatic box has its own card. */
+/** The official product type of a chat style prize; the present-opened class id is then the style's id. */
+export const CHAT_STYLE_PRIZE_TYPE = 'chat_style';
+
 export const ECOTRONBOX_CARD = 'ecotronbox_card';
 export const ECOTRONBOX_CARD_FURNIMATIC = 'ecotronbox_card_furnimatic';
 
@@ -24,6 +27,7 @@ const useFurnitureEcotronBoxWidgetState = () => {
     const [isController, setIsController] = useState(false);
     const [prizeName, setPrizeName] = useState<string>(null);
     const [prizeImageUrl, setPrizeImageUrl] = useState<string>(null);
+    const [prizeChatStyleId, setPrizeChatStyleId] = useState(0);
     const openingRef = useRef(false);
 
     const onClose = () => {
@@ -33,6 +37,7 @@ const useFurnitureEcotronBoxWidgetState = () => {
         setIsController(false);
         setPrizeName(null);
         setPrizeImageUrl(null);
+        setPrizeChatStyleId(0);
     };
 
     const open = () => {
@@ -85,9 +90,13 @@ const useFurnitureEcotronBoxWidgetState = () => {
             imageUrl = GetRoomEngine().getFurnitureWallIconUrl(event.classId);
         }
 
+        // A chat style prize (product type chat_style, the class id its style): named from its product data.
+        const chatStyleId = event.itemType === CHAT_STYLE_PRIZE_TYPE ? event.classId : 0;
+
         setDate('');
-        setPrizeName(furniData?.name ?? '');
+        setPrizeName(chatStyleId ? (GetSessionDataManager().getProductData(`chat_bubble_${chatStyleId}`)?.name ?? '') : (furniData?.name ?? ''));
         setPrizeImageUrl(imageUrl);
+        setPrizeChatStyleId(chatStyleId);
     });
 
     useFurniRemovedEvent(objectId !== -1, (event) => {
@@ -105,6 +114,7 @@ const useFurnitureEcotronBoxWidgetState = () => {
         date,
         prizeName,
         prizeImageUrl,
+        prizeChatStyleId,
         canOpen: isController && prizeName === null,
         open,
         onClose

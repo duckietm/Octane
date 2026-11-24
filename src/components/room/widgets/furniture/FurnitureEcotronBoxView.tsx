@@ -13,7 +13,7 @@ import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
  * drags, like the official container.
  */
 export const FurnitureEcotronBoxView: FC = () => {
-    const { objectId = -1, card, date, prizeName, prizeImageUrl, canOpen, open, onClose } = useFurnitureEcotronBoxWidget();
+    const { objectId = -1, card, date, prizeName, prizeImageUrl, prizeChatStyleId = 0, canOpen, open, onClose } = useFurnitureEcotronBoxWidget();
 
     if (objectId === -1) return null;
 
@@ -31,7 +31,14 @@ export const FurnitureEcotronBoxView: FC = () => {
             <DraggableWindow handleSelector=".octane-ecotronbox-card" offsetLeft={50} offsetTop={50} windowPosition={DraggableWindowPosition.TOP_LEFT}>
                 <div className={`octane-ecotronbox-card octane-furni-ecotronbox${isFurnimatic ? ' is-furnimatic' : ''}`} style={{ backgroundImage: `url(${background})` }}>
                     <div className="octane-ecotronbox-date">{date}</div>
-                    <div className="octane-ecotronbox-preview">{prizeImageUrl && <img alt="" src={prizeImageUrl} />}</div>
+                    <div className="octane-ecotronbox-preview">
+                        {prizeImageUrl && <img alt="" src={prizeImageUrl} />}
+                        {prizeChatStyleId > 0 && (
+                            <span className="swf-chat-style-preview bubble-container">
+                                <span className={`chat-bubble bubble-${prizeChatStyleId}`} />
+                            </span>
+                        )}
+                    </div>
                     <div className="octane-ecotronbox-msg">{prizeName ?? title}</div>
                     {canOpen && (
                         <BaseButton className="octane-ecotronbox-open" onClick={open}>

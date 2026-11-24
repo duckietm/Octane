@@ -6177,12 +6177,16 @@
     line-height: 17px;
 }
 
+/* AIR recycler_recycle (params 131089: the button sizes itself to its caption): as wide as the text, so it grows
+   for the countdown caption. */
 .octane-catalog-air-recycler .octane-catalog-air-recycler__recycle {
     position: absolute;
     top: 41px;
     left: 19px;
-    width: 194px;
+    width: auto !important;
+    max-width: 194px;
     height: 30px;
+    white-space: nowrap;
 }
 
 .octane-catalog-air-recycler__frame {

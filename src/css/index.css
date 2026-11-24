@@ -2219,6 +2219,20 @@ body {
     font-size: 14px;
 }
 
+/* The chest's paged transaction log: AIR transaction_overview (880 wide), the table 852 x 234 on wired_menu_table_view. */
+.octane-chest-log { width: 880px; max-width: calc(100vw - 16px); }
+.octane-chest-log__body { display: flex; flex-direction: column; gap: 6px; color: #000; font-size: 12px; }
+.octane-chest-log__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-height: 42px; }
+.octane-chest-log__pairs { display: flex; flex-direction: column; gap: 5px; margin-right: auto; line-height: 17px; }
+.octane-chest-log__filter { display: flex; align-items: center; gap: 4px; }
+.octane-chest-log__table { height: 234px; }
+.octane-chest-log__details { padding: 0; border: 0; background: none; color: #0000ee; text-decoration: underline; cursor: pointer; }
+.octane-chest-log-details { width: 320px; }
+.octane-chest-log__detail { display: flex; flex-direction: column; gap: 5px; color: #000; font-size: 12px; line-height: 17px; }
+.octane-chest-log__items { display: flex; flex-wrap: wrap; gap: 6px; }
+.octane-chest-log__item { display: flex; align-items: center; gap: 3px; padding: 2px 4px; border: 1px solid #b0b0a8; border-radius: 3px; background: #fff; font-variant-numeric: tabular-nums; }
+.octane-chest-log__item img { max-width: 28px; max-height: 28px; object-fit: contain; }
+
 /* AIR Ubuntu chest settings: bordered groups and 7px section spacing. */
 .octane-chest-settings .octane-card-content-shell { max-height: calc(100vh / 2.4 + 60px); overflow-y: auto; }
 .octane-chest-settings__section { display: grid; gap: 5px; min-width: 0; margin: 0; padding: 7px; border: 1px solid #b0b0a8; border-radius: 3px; }

@@ -3,10 +3,8 @@ import {
     ChestCoinsEvent,
     ChestFurniChunkEvent,
     ChestFurniDeltaEvent,
-    ChestLogEvent,
     ChestOpenComposer,
     ChestOpenEvent,
-    ChestRequestLogComposer,
     ChestSaveNotificationsComposer,
     ChestSaveOptionsComposer,
     ChestSaveSettingsComposer,
@@ -62,6 +60,7 @@ import wiredIcon from '../../../../assets/images/wiredtools/wired_menu.png';
 import { Column, Flex, LayoutCurrencyIcon, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, PIXEL_ART_RENDERING, Text } from '../../../../common';
 import { useMessageEvent, usePurse } from '../../../../hooks';
 import { useWiredToolsState } from '../../../../hooks/wired-tools/useWiredToolsState';
+import { WiredChestTransactionLogView } from '../../../wired-tools/WiredChestTransactionLogView';
 import { ChestButton } from './ChestButton';
 import { ChestAppearanceFields, ChestSelect, ChestSettingsSection } from './ChestSettingsFields';
 import { ChestFurniGroup, chestFurniDisplayName, groupStoredFurni } from './chestFurniGrouping';
@@ -75,14 +74,6 @@ import { Hint } from '../../../../common/Tooltip';
 import { Popover, PopoverContent } from '../../../../common/FloatingPopover';
 import '../../../../css/room/FurniWindowsCAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-
-interface ChestLogRow {
-    type: string;
-    timestamp: number;
-    userName: string;
-    withdrawn: number;
-    deposited: number;
-}
 
 const CREDITS = -1;
 const NON_DIGITS = /\D/g;
@@ -177,7 +168,6 @@ export const FurnitureChestView: FC = () => {
 
     const [showUpgrade, setShowUpgrade] = useState(false);
     const [showLog, setShowLog] = useState(false);
-    const [logRows, setLogRows] = useState<ChestLogRow[]>([]);
     const [chosenUpgradeQty, setUpgradeQty] = useState(1);
     const [confirmWithdrawAll, setConfirmWithdrawAll] = useState(false);
     const [confirmLock, setConfirmLock] = useState<null | boolean>(null);
@@ -397,12 +387,6 @@ export const FurnitureChestView: FC = () => {
                 [localizeWithFallback(`wiredchests.upgrade.result.error.${ p.resultCode }`, '')],
             ),
         );
-    });
-
-    useMessageEvent<ChestLogEvent>(ChestLogEvent, (event) => {
-        const p = event.getParser();
-        setLogRows(p.rows.map((r) => ({ ...r })));
-        setShowLog(true);
     });
 
     // ChestSettingsUpdated (2159) arrives only for a successful save and closes the matching frame; a refused save
@@ -828,7 +812,7 @@ export const FurnitureChestView: FC = () => {
                                 </div>
                                 {/* AIR view_logs_btn: shown and enabled for whoever may read the chest. */}
                                 {layout.showLogs && (
-                                    <ChestButton wide footer disabled={!rights.canRead} onClick={() => SendMessageComposer(new ChestRequestLogComposer(itemId))}>
+                                    <ChestButton wide footer disabled={!rights.canRead} onClick={() => setShowLog(true)}>
                                         {LocalizeText('wiredchests.view_logs')}
                                     </ChestButton>
                                 )}
@@ -1020,56 +1004,8 @@ export const FurnitureChestView: FC = () => {
                     </OctaneCardView>
                 )}
 
-                {/* ===== LOG ===== */}
-                {showLog && (
-                    <OctaneCardView className="octane-widget-chest-log" theme="primary-slim" style={{ width: 520 }}>
-                        <OctaneCardHeaderView headerText={LocalizeText('wiredchests.logs.title')} onCloseClick={() => setShowLog(false)} />
-                        <OctaneCardContentView>
-                            <Column gap={1}>
-                                <Text small>{LocalizeText('wiredchests.logs.chest_id', ['id'], [String(itemId)])}</Text>
-                                <Flex gap={2} className="border-b pb-1">
-                                    <Text bold className="w-20">
-                                        {LocalizeText('wiredchests.logs.col.type')}
-                                    </Text>
-                                    <Text bold className="w-24">
-                                        {LocalizeText('wiredchests.logs.col.timestamp')}
-                                    </Text>
-                                    <Text bold className="grow!">
-                                        {LocalizeText('wiredchests.logs.col.username')}
-                                    </Text>
-                                    <Text bold className="w-16">
-                                        {LocalizeText('wiredchests.logs.col.withdraws')}
-                                    </Text>
-                                    <Text bold className="w-16">
-                                        {LocalizeText('wiredchests.logs.col.deposits')}
-                                    </Text>
-                                </Flex>
-                                {logRows.length === 0 && <Text small>{LocalizeText('wiredchests.logs.empty')}</Text>}
-                                {logRows.map((r, i) => (
-                                    <Flex key={i} gap={2}>
-                                        <Text small className="w-20">
-                                            {r.type === 'withdraw'
-                                                ? LocalizeText('wiredchests.logs.type.withdraw')
-                                                : LocalizeText('wiredchests.logs.type.deposit')}
-                                        </Text>
-                                        <Text small className="w-24">
-                                            {new Date(r.timestamp * 1000).toLocaleString()}
-                                        </Text>
-                                        <Text small className="grow!">
-                                            {r.userName}
-                                        </Text>
-                                        <Text small className="w-16">
-                                            {r.withdrawn || ''}
-                                        </Text>
-                                        <Text small className="w-16">
-                                            {r.deposited || ''}
-                                        </Text>
-                                    </Flex>
-                                ))}
-                            </Column>
-                        </OctaneCardContentView>
-                    </OctaneCardView>
-                )}
+                {/* ===== LOG (AIR WiredTransactionLogsView, opened by view_logs_btn): the chest's transactions, paged ===== */}
+                {showLog && <WiredChestTransactionLogView chestId={itemId} onClose={() => setShowLog(false)} />}
 
                 {/* ===== WIRED UPGRADE CONFIRM (AIR WiredChestWiredUpdateConfirmationView) ===== */}
                 {confirmWiredUpgrade && showSettings && (

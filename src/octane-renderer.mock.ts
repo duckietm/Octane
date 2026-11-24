@@ -1189,6 +1189,11 @@ export class MysteryBoxKeysUpdateEvent extends StubClass {
     public static MYSTERY_BOX_KEYS_UPDATE = 'mbke_update';
 }
 export class WiredMenuErrorEvent extends StubClass {}
+export class WiredUserPermanentVariablesListEvent extends StubClass {}
+export class WiredPermanentVariableResultEvent extends StubClass {}
+export class WiredPermanentVariablesRequestComposer extends RecordingComposer {}
+export class WiredPermanentVariableSetComposer extends RecordingComposer {}
+export class WiredVariableDeleteAllHoldersComposer extends RecordingComposer {}
 export class WiredMenuErrorParser extends StubClass {
     public static NOT_VARIABLE_OWNER = 7;
 }
@@ -1353,6 +1358,18 @@ export class RecycleItemsEntry {
     constructor(public readonly itemId: number) {}
 }
 export class RecycleItemsMessageComposer extends RecordingComposer {}
+// The wired chest transaction log (the chest window's log and the chests tab of the wired menu).
+export const CHEST_TRANSACTION_DEPOSIT = 0;
+export const CHEST_TRANSACTION_WITHDRAW = 1;
+export const CHEST_TRANSACTION_SOURCE_USER = 0;
+export const CHEST_TRANSACTION_SOURCE_WIRED = 1;
+export const CHEST_LOG_FILTER_ALL = 0;
+export const CHEST_LOG_FILTER_CURRENCY = 1;
+export const CHEST_LOG_FILTER_FURNI = 2;
+export class WiredChestRoomLogsComposer extends RecordingComposer {}
+export class WiredChestRoomLogsEvent extends MessageEvent {}
+export class WiredChestTransactionDetailsComposer extends RecordingComposer {}
+export class WiredChestTransactionDetailsEvent extends MessageEvent {}
 export class GetRecyclerPrizesMessageComposer extends RecordingComposer {}
 export class RecyclerPrizesMessageEvent extends MessageEvent {}
 export class RecyclerPrizeLevel extends StubClass {}

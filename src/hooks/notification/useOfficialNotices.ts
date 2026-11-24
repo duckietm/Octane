@@ -6,6 +6,7 @@ import {
     RoomMessageNotificationMessageEvent,
     WiredClickSettingsEvent,
     WiredMenuErrorEvent,
+    WiredPermanentVariableResultEvent,
     WiredMenuErrorParser
 } from '@octane/renderer';
 import { NotificationAlertType, NotificationBubbleType } from '../../api';
@@ -63,6 +64,16 @@ export const useOfficialNotices = (simpleAlert: SimpleAlert, showSingleBubble: S
 
         showSingleBubble(
             localizeWithFallback(`wiredmenu.error_message.${errorCode}`, 'Only the owner of this variable can perform this action.'),
+            NotificationBubbleType.INFO
+        );
+    });
+
+    // Official VariableManagementDetailController: a refused change of a holder's permanent variable is announced.
+    useMessageEvent<WiredPermanentVariableResultEvent>(WiredPermanentVariableResultEvent, (event) => {
+        if (event.getParser()?.success) return;
+
+        showSingleBubble(
+            localizeWithFallback('wiredmenu.variable_management_detail.notification.modification_failed', 'Variable modification failed'),
             NotificationBubbleType.INFO
         );
     });

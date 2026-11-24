@@ -65,6 +65,7 @@ export const WiredChestsTabView: FC<{}> = () => {
 
     // The detail window drives paging; while it is open the preview must not poll page 1 out from
     // under it. Held in a ref so the interval effect does not restart on every open/close.
+    const pendingPages = useRef(0);
     const detailsOpenRef = useRef(false);
     detailsOpenRef.current = detailsOpen;
 
@@ -73,6 +74,7 @@ export const WiredChestsTabView: FC<{}> = () => {
 
     const requestPage = useCallback(
         (nextPage: number, nextFilter: number, chestId = onlyChestId) => {
+            pendingPages.current++;
             SendMessageComposer(new WiredChestRoomLogsComposer(PAGE_SIZE, nextPage, nextFilter, chestId));
         },
         [onlyChestId],
@@ -94,8 +96,10 @@ export const WiredChestsTabView: FC<{}> = () => {
 
     useMessageEvent<WiredChestRoomLogsEvent>(WiredChestRoomLogsEvent, (event) => {
         const parser = event.getParser();
-        if (!parser) return;
+        // A chest window's own log asks for pages of this log too: a page nobody here asked for is that window's.
+        if (!parser || pendingPages.current <= 0) return;
 
+        pendingPages.current--;
         setRows(parser.rows);
         setPage(parser.page);
         setPageCount(parser.pageCount);

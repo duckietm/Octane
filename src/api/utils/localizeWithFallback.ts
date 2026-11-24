@@ -3,9 +3,16 @@ import { LocalizeText } from './LocalizeText';
 /**
  * Pure decision: the localization manager returns the key itself for a missing
  * translation, so treat "text equals the key" (or empty) as "no translation"
- * and use the fallback instead.
+ * and use the fallback instead. The same goes for a text that is still a bare `${key}` reference.
  */
-export const resolveLocalized = (localized: string, key: string, fallback: string): string => (localized && localized !== key ? localized : fallback);
+export const resolveLocalized = (localized: string, key: string, fallback: string): string =>
+    localized && localized !== key && !isUnresolvedReference(localized) ? localized : fallback;
+
+/**
+ * A text that is nothing but a reference to another key (`${widget.memenu.achievements}`) which the localization
+ * manager could not follow: a key that points at itself or at a key the hotel does not have. It is no translation.
+ */
+const isUnresolvedReference = (localized: string): boolean => /^\$\{[^{}]+\}$/.test(localized.trim());
 
 /** Fills `%name%` placeholders the way the localization manager does: case-insensitive, every occurrence. */
 export const fillPlaceholders = (text: string, parameters: string[] = null, replacements: string[] = null): string => {

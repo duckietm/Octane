@@ -51,7 +51,7 @@ import rewardGiftIcon from '../../assets/images/reward-track/reward-gift.png';
 import rewardGiftPremiumIcon from '../../assets/images/reward-track/reward-gift-premium.png';
 import taskListIcon from '../../assets/images/reward-track/task-list.png';
 import { GetRewardTrackTaskIconUrl } from '../../assets/images/reward-track/tasks';
-import { Button, DraggableWindowPosition, LayoutAvatarImageView, LayoutBadgeImageView, LayoutCurrencyIcon, LayoutFurniIconImageView, LayoutHabbiconImageView, Text } from '../../common';
+import { Button, DraggableWindowPosition, LayoutAvatarImageView, LayoutBadgeImageView, LayoutCurrencyIcon, LayoutFurniIconImageView, LayoutHabbiconImageView, LayoutPetImageView, Text } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { Hint } from '../../common/Tooltip';
@@ -83,6 +83,11 @@ const RewardIcon: FC<{ rewardTypeId: string; extraParams: string; productItemTyp
 
     // A Habbicon prize: its id is the product item type.
     if (type === 'habbicon') return <LayoutHabbiconImageView id={productItemTypeId} size={40} />;
+
+    // A bot or a pet prize (AIR ProductIconWidget product types 6 and 10): the server sends its figure.
+    if (type === 'bot' && extraParams) return <LayoutAvatarImageView className="octane-reward-track-prize-bot" direction={2} figure={extraParams} headOnly />;
+
+    if (type === 'pet' && extraParams) return <LayoutPetImageView className="octane-reward-track-prize-pet" direction={2} figure={extraParams} />;
 
     return <div className="octane-reward-track-prize-generic">{rewardTypeId}</div>;
 };

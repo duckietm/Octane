@@ -6,6 +6,7 @@ const state = vi.hoisted(() => ({ handlers: new Map<unknown, (event: unknown) =>
 vi.mock('../../../../../../api', async (importOriginal) => ({
     ...(await importOriginal<typeof import('../../../../../../api')>()),
     GetFurnitureData: () => null,
+    GetProductDataForLocalization: (code: string) => (code === 'chat_bubble_7' ? { name: 'Storm bubble' } : null),
     GetImageIconUrlForProduct: (_type: string, classId: number) => (classId === 30 ? null : `icon/${classId}.png`),
     LocalizeText: (key: string, _names?: string[], values?: string[]) => (values?.length ? `${key}:${values.join(',')}` : key),
     // The hotel's texts have the AIR levels 1-5, not level 6.
@@ -65,5 +66,28 @@ describe('recycler prizes page (AIR layout_recycler_prizes_xml)', () => {
         // The level tiles show the furni icons.
         expect(screen.getByRole('button', { name: 'Chair' }).querySelector('img')).toHaveAttribute('src', 'icon/10.png');
         expect(container.querySelector('.octane-catalog-air-prizes__teaser')).toBeNull();
+    });
+
+    it('shows a chat style prize as its bubble, named from the chat_bubble_<id> product data', () => {
+        const { container } = render(<CatalogLayoutRecyclerPrizesView page={null as any} hideNavigation={() => undefined} />);
+
+        act(() =>
+            state.handlers.get(RecyclerPrizesMessageEvent)?.({
+                getParser: () => ({
+                    levels: [{ levelId: 3, chance: 40, products: [{ name: '', productClassId: 7, productType: 'chat_style', count: 1 }] }]
+                })
+            })
+        );
+
+        const item = screen.getByRole('button', { name: 'Storm bubble' });
+
+        expect(item.querySelector('.chat-bubble.bubble-7')).not.toBeNull();
+        expect(item.querySelector('img')).toBeNull();
+
+        fireEvent.click(item);
+
+        expect(container.querySelector('.octane-catalog-air-prizes__preview .chat-bubble.bubble-7')).not.toBeNull();
+        expect(container.querySelector('.octane-catalog-air-prizes__name')?.textContent).toBe('Storm bubble');
+        expect(screen.queryByText('furni 7')).toBeNull();
     });
 });

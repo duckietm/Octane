@@ -160,7 +160,7 @@ export const GroupForumComposeView: FC<GroupForumComposeViewProps> = ({ compose,
             <div className="octane-forum__compose-bar" style={{ top: 145 }}>
                 <GroupText background={0x227aad} overrides={flatText(12, { color: 0xeeeeee })} text={LocalizeText('groupforum.compose.message')} x={1} y={1} />
                 <BaseButton className="octane-forum__help-link" type="button" onClick={() => CreateLinkEvent('habbopages/forums/formatting')}>
-                    <GroupText background={0x227aad} className="is-static" overrides={flatText(12, { color: 0xffffff, underline: true })} text={stripTags(LocalizeText('groupforum.compose.formatting_help'))} x={0} y={0} />
+                    <GroupText background={0x227aad} className="is-static" overrides={{ underline: true }} text={stripTags(LocalizeText('groupforum.compose.formatting_help'))} textStyle="id_link_regular" x={0} y={0} />
                 </BaseButton>
             </div>
             <GroupInput fontSize={12} height={200} inset={4} label={LocalizeText('groupforum.compose.message')} maxLength={4000} multiline plain value={message} width={444} x={0} y={165} onChange={(value) =>
@@ -169,7 +169,7 @@ export const GroupForumComposeView: FC<GroupForumComposeViewProps> = ({ compose,
             }} />
             <ForumButton label={LocalizeText('groupforum.compose.cancel')} width={120} x={25} y={378} onClick={onClose} />
             <ForumButton disabled={isPosting || !subjectOk || !messageOk || !canPostHere || cooldown > 0} label={LocalizeText('groupforum.compose.post')} tint="blue" width={120} x={295} y={378} onClick={post} />
-            {status && <GroupText background={FORUM_SURFACE} overrides={flatText(11)} text={status} width={424} wrap x={10} y={425} />}
+            {status && <GroupText background={FORUM_SURFACE} overrides={flatText(11)} text={status} width={424} wrap x={10} y={422} />}
         </ForumFrame>
     );
 };
