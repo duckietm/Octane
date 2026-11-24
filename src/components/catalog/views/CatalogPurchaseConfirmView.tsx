@@ -1,3 +1,4 @@
+import { IObjectData } from '@octane/renderer';
 import { FC, MutableRefObject, useEffect, useState } from 'react';
 import { GetConfigurationValue, IPurchasableOffer, LocalizeText, ProductTypeEnum } from '../../../api';
 import { localizeWithFallback } from '../../../api/utils/localizeWithFallback';
@@ -25,6 +26,11 @@ interface CatalogPurchaseConfirmViewProps {
     isSubmitting?: boolean;
     /** AIR PurchaseConfirmationDialog.ltdRaffleEnded: the server put this LTD purchase into a raffle. */
     isRaffling?: boolean;
+    /**
+     * AIR PurchaseConfirmationDialog.showOffer stuff data: the data the furni is drawn with, e.g. the badge and
+     * colours of the group picked for a group furni.
+     */
+    previewStuffData?: IObjectData;
     onConfirm: () => void;
     onCancel: () => void;
 }
@@ -55,7 +61,7 @@ const CatalogPurchaseRaffleText: FC = () => {
 };
 
 export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (props) => {
-    const { offer = null, quantity = 1, bundleDiscountRuleset = null, isGift = false, isSubmitting = false, isRaffling = false, onConfirm = null, onCancel = null } = props;
+    const { offer = null, quantity = 1, bundleDiscountRuleset = null, isGift = false, isSubmitting = false, isRaffling = false, previewStuffData = null, onConfirm = null, onCancel = null } = props;
     const spendingDisclaimerEnabled = GetConfigurationValue<boolean>('disclaimer.credit_spending.enabled', false) === true;
     const [spendingDisclaimerAccepted, setSpendingDisclaimerAccepted] = useState(!spendingDisclaimerEnabled);
 
@@ -97,6 +103,7 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                                 aria-label={offer.localizationName}
                                 direction={90}
                                 extraData={offer.product.extraParam}
+                                objectData={previewStuffData}
                                 productClassId={offer.product.productClassId}
                                 productType={offer.product.productType}
                                 role="img"

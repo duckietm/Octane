@@ -37,6 +37,21 @@ describe('reward track editor rules', () => {
         expect(validateRewardTrackPrizeInput({ ...prize, rewardType: 'gold' }, types).rewardType).toBeTruthy();
     });
 
+    it('ask a bot prize for its figure and a pet prize for its type, race and colour', () => {
+        const types = [ 'bot', 'pet' ];
+        const prize = { id: 'p1', requiredPoints: 20, productItemTypeId: 0, rewardType: 'bot', extraParams: '', rewardAmount: 1 };
+
+        expect(validateRewardTrackPrizeInput(prize, types).extraParams).toBeTruthy();
+        expect(validateRewardTrackPrizeInput({ ...prize, extraParams: 'bartender;name:Frank' }, types).extraParams).toBeTruthy();
+        expect(validateRewardTrackPrizeInput({ ...prize, extraParams: 'figure:hd-180-1' }, types)).toEqual({});
+        expect(validateRewardTrackPrizeInput({ ...prize, extraParams: 'bartender;name:Frank;figure:hd-180-1;gender:M' }, types)).toEqual({});
+
+        expect(validateRewardTrackPrizeInput({ ...prize, rewardType: 'pet', extraParams: 'horse' }, types).extraParams).toBeTruthy();
+        expect(validateRewardTrackPrizeInput({ ...prize, rewardType: 'pet', extraParams: '15 2 red' }, types).extraParams).toBeTruthy();
+        expect(validateRewardTrackPrizeInput({ ...prize, rewardType: 'pet', extraParams: '15' }, types)).toEqual({});
+        expect(validateRewardTrackPrizeInput({ ...prize, rewardType: 'pet', extraParams: '15 2 FFFFFF Shadowfax the Grey' }, types)).toEqual({});
+    });
+
     it('renumber only the entries a move touches', () => {
         const entries = [ { id: 'a', sortOrder: 1 }, { id: 'b', sortOrder: 2 }, { id: 'c', sortOrder: 3 } ];
 

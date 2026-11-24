@@ -229,6 +229,11 @@
     background: transparent;
 }
 
+/* AIR new_compose_message `message_text` has its own white background (0xffffffff), with or without text. */
+.octane-group-native__field.is-plain.is-multiline.is-empty {
+    background: #fff;
+}
+
 .octane-group-native__input {
     position: absolute;
     inset: 0;

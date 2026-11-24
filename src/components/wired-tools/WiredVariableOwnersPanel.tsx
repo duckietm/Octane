@@ -1,7 +1,7 @@
 import { IWiredVariableHolder } from '@octane/renderer';
 import { ReactNode } from 'react';
 import { localizeWithFallback } from '../../api';
-import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
+import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { WiredPageRequests } from '../../hooks/wired-tools/useWiredPageRequests';
 import { VariablesElementType } from './WiredCreatorTools.types';
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
@@ -149,10 +149,12 @@ export const WiredVariableOwnersPanel = (props: WiredVariableOwnersPanelProps) =
         }
     };
 
+    // AIR variables_management_overview (700 wide): the info box with Refresh beside it, the variable's name as a
+    // key / value line, the user type and sort menus on one line, the table (672 x 296) and the paging row.
     return (
         <NativeTextTree>
             <OctaneCardView
-                className="octane-wired-menu min-w-[860px] max-w-[860px] max-h-[620px]"
+                className="octane-wired-menu octane-wired-logs octane-wired-vars"
                 theme="primary-slim"
                 uniqueKey={uniqueKey}
                 windowPosition={DraggableWindowPosition.TOP_LEFT}
@@ -160,35 +162,29 @@ export const WiredVariableOwnersPanel = (props: WiredVariableOwnersPanelProps) =
                 offsetTop={offsetTop}
             >
                 <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.variable_management.title', 'Variable Management')} onCloseClick={onClose} />
-                <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
-                    <div className="rounded border border-[#c8c2b2] bg-white p-3 flex items-center justify-between gap-3">
-                        <div className="grow flex flex-col items-center text-center">
-                            <Text className="whitespace-pre-line">
-                                {(
-                                    infoText ??
-                                    localizeWithFallback(
-                                        'wiredmenu.variable_management.info',
-                                        'This is a tool to manage everyone and everything that holds this variable, in the room or not.'
-                                    )
-                                ).replace(/\\n/g, '\n')}
-                            </Text>
-                            <Text>
-                                <b>{localizeWithFallback('wiredmenu.variable_management.variable_name', 'Variable name:')}</b> {variableName}
-                            </Text>
+                <OctaneCardContentView className="octane-wired-logs__content" overflow="hidden">
+                    <div className="octane-wired-logs__top">
+                        <div className="octane-wired-logs__info">
+                            {(
+                                infoText ??
+                                localizeWithFallback(
+                                    'wiredmenu.variable_management.info',
+                                    'This is a tool to manage everyone and everything that holds this variable, in the room or not.'
+                                )
+                            ).replace(/\\n/g, '\n')}
                         </div>
                         <Button variant="secondary" onClick={() => requests.refresh()}>
                             {localizeWithFallback('wiredmenu.variable_management.refresh', 'Refresh')}
                         </Button>
                     </div>
-                    <div className="flex flex-wrap items-center gap-4 text-[12px]">
+                    <div className="octane-wired-vars__name">
+                        <b>{localizeWithFallback('wiredmenu.variable_management.variable_name', 'Variable name:')}</b> <span>{variableName}</span>
+                    </div>
+                    <div className="octane-wired-logs__filters">
                         {filters.map((filter) => (
-                            <label key={filter.id} className="flex items-center gap-2">
-                                <Text>{filter.label}</Text>
-                                <Select
-                                    className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                                    value={filter.value}
-                                    onChange={(event) => filter.onChange(event.target.value)}
-                                >
+                            <label key={filter.id} className="octane-wired-logs__field">
+                                <b>{filter.label}</b>
+                                <Select className="octane-wired-logs__menu" value={filter.value} onChange={(event) => filter.onChange(event.target.value)}>
                                     {filter.options.map((option) => (
                                         <option key={option.value} value={option.value}>
                                             {option.label}
@@ -211,7 +207,7 @@ export const WiredVariableOwnersPanel = (props: WiredVariableOwnersPanelProps) =
                         pagingTextKey="wiredmenu.variable_management.bottom_text"
                         emptyText={localizeWithFallback('wiredmenu.variable_management.empty', 'Nobody holds this variable with the current filters')}
                         scrollResetKey={scrollResetKey}
-                        bodyClassName="h-[360px]"
+                        bodyClassName="octane-wired-vars__table"
                     />
                 </OctaneCardContentView>
             </OctaneCardView>

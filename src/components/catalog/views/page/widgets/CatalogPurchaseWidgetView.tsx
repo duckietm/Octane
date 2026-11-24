@@ -573,6 +573,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
                         isSubmitting={purchaseState === CatalogPurchaseState.PURCHASE}
                         bundleDiscountRuleset={bundleDiscountRuleset}
                         offer={currentOffer}
+                        previewStuffData={purchaseOptions.previewStuffData}
                         quantity={purchaseOptions.quantity}
                         onCancel={() => {
                             // The raffle result still arrives later; this dialog just stops waiting for it.

@@ -115,6 +115,14 @@ const taskToInput = (trackId: string, task: RewardTrackAdminTask): RewardTrackAd
     levels: task.levels.map((level) => ({ ...level }))
 });
 
+/** An example of the extra parameters each reward type reads. */
+const PRIZE_EXTRA_PLACEHOLDERS: Record<string, string> = {
+    badge: 'ACH_Login1',
+    furni: 'club_sofa',
+    bot: 'generic;name:Frank;figure:hr-100.hd-180-1.ch-210-66.lg-270-82;gender:M;motto:Hi!',
+    pet: '15 2 FFFFFF Horse'
+};
+
 const emptyPrize = (trackId: string, rewardType: string, sortOrder: number): RewardTrackAdminPrizeInput => ({
     trackId,
     id: '',
@@ -872,14 +880,22 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                                     <NumberInput min={0} value={prizeForm.rewardAmount} onChange={(e) => setPrizeForm({ ...prizeForm, rewardAmount: toInt(e.target.value) })} />
                                                 </Field>
                                                 <Field
-                                                    label={prizeForm.rewardType === 'furni' ? text('prize.extra.furni', 'Furni name (items_base.item_name)') : text('prize.extra', 'Extra (badge code)')}
+                                                    label={
+                                                        prizeForm.rewardType === 'furni'
+                                                            ? text('prize.extra.furni', 'Furni name (items_base.item_name)')
+                                                            : prizeForm.rewardType === 'bot'
+                                                              ? text('prize.extra.bot', 'Bot (<ai type>;name:..;figure:..;gender:M;motto:..)')
+                                                              : prizeForm.rewardType === 'pet'
+                                                                ? text('prize.extra.pet', 'Pet (<type> <race> <colour> [name]; without a name the winner names it)')
+                                                                : text('prize.extra', 'Extra (badge code)')
+                                                    }
                                                     error={prizeErrors.extraParams}
                                                     span={2}
                                                 >
                                                     <input
                                                         value={prizeForm.extraParams}
                                                         maxLength={255}
-                                                        placeholder={prizeForm.rewardType === 'badge' ? 'ACH_Login1' : prizeForm.rewardType === 'furni' ? 'club_sofa' : ''}
+                                                        placeholder={PRIZE_EXTRA_PLACEHOLDERS[prizeForm.rewardType] ?? ''}
                                                         onChange={(e) => setPrizeForm({ ...prizeForm, extraParams: e.target.value })}
                                                     />
                                                 </Field>

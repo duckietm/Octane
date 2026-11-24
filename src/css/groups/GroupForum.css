@@ -436,10 +436,13 @@
     position: absolute;
 }
 
+/* AIR main_view: the status html sits at 3, 3 in its 300 px container and is centred in its own 300 px. */
 .octane-forum__status.is-list {
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    box-sizing: border-box;
+    padding: 3px 0 0 6px;
 }
 
 .octane-forum__status.is-list > .octane-group-native__text {

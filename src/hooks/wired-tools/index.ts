@@ -3,6 +3,7 @@ export * from './useWiredToolsActions';
 export * from './useWiredToolsState';
 export * from './useWiredToolsStore';
 export * from './useWiredPageRequests';
+export * from './useWiredPermanentVariables';
 export * from './useWiredObjectInspection';
 export * from './useWiredPlayTest';
 export * from './useWiredVariableCatalog';

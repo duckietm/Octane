@@ -92,5 +92,8 @@ export const splitPagingText = (text: string, totalEntries: number, lastPage: nu
 
     if (parts.length !== 2) return null;
 
-    return { start: parts[0].replace('%entries_count%', String(totalEntries)), end: parts[1].replace('%page_count%', String(lastPage)) };
+    // The chest transaction log names its count `%transaction_count%` (wiredchests.logs.bottom_text).
+    const start = parts[0].replace('%entries_count%', String(totalEntries)).replace('%transaction_count%', String(totalEntries));
+
+    return { start, end: parts[1].replace('%page_count%', String(lastPage)) };
 };
