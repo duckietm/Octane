@@ -195,13 +195,14 @@ export const InventoryFurnitureView: FC<{
                             }}
                         />
                         {selectedItem && (
-                            <div className="octane-inventory-furni-status">
+                            // AIR tradeable_info_region / recyclable_info_region: they only carry a tooltip, and a click on
+                            // them is theirs, so it does not pick the furni up as a click on the preview does.
+                            <div className="octane-inventory-furni-status" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
                                 <div
                                     className={`octane-inventory-furni-status-icon ${tradeableCount > 0 ? 'is-trade' : 'is-no-trade'}`}
                                     title={
-                                        tradeableCount > 0
-                                            ? LocalizeText('inventory.furni.trading.is_tradable', ['amount'], [String(tradeableCount)])
-                                            : LocalizeText('inventory.furni.trading.is_not_tradable')
+                                        // AIR FurniView: the tooltips of tradeable_info_region.
+                                        LocalizeText(tradeableCount > 0 ? 'inventory.furni.preview.tradeable_amount' : 'inventory.furni.preview.not_tradeable')
                                     }
                                 >
                                     {tradeableCount > 0 && <span className="octane-inventory-furni-status-count is-trade-count">{tradeableCount}</span>}
@@ -209,9 +210,7 @@ export const InventoryFurnitureView: FC<{
                                 <div
                                     className={`octane-inventory-furni-status-icon ${recyclableCount > 0 ? 'is-recycle' : 'is-no-recycle'}`}
                                     title={
-                                        recyclableCount > 0
-                                            ? LocalizeText('inventory.furni.recycling.is_recyclable', ['amount'], [String(recyclableCount)])
-                                            : LocalizeText('inventory.furni.recycling.is_not_recyclable')
+                                        LocalizeText(recyclableCount > 0 ? 'inventory.furni.preview.recyclable_amount' : 'inventory.furni.preview.not_recyclable')
                                     }
                                 >
                                     {recyclableCount > 0 && <span className="octane-inventory-furni-status-count is-recycle-count">{recyclableCount}</span>}

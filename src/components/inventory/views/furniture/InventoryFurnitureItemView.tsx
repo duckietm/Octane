@@ -4,6 +4,7 @@ import { attemptItemPlacement, getWiredChestOverlayColor, GroupItem } from '../.
 import { LayoutLimitedEditionStyledNumberView } from '../../../../common';
 import { classNames, InfiniteGrid } from '../../../../layout';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { useRecyclerSessionStore } from '../../../../state/recyclerSessionStore';
 
 export const InventoryFurnitureItemView: FC<{
     groupItem: GroupItem;
@@ -12,6 +13,7 @@ export const InventoryFurnitureItemView: FC<{
 }> = (props) => {
     const { groupItem = null, isActive = false, onSelect = null } = props;
     const [isMouseDown, setMouseDown] = useState(false);
+    const recyclerPlace = useRecyclerSessionStore((state) => state.place);
 
     const onMouseEvent = (event: MouseEvent) => {
         switch (event.type) {
@@ -28,12 +30,17 @@ export const InventoryFurnitureItemView: FC<{
                 attemptItemPlacement(groupItem);
                 return;
             case 'dblclick':
-                attemptItemPlacement(groupItem);
+                // AIR FurniModel.requestCurrentActionOnSelection: with the Furni-Matic open the furni goes to it.
+                if (recyclerPlace) recyclerPlace(groupItem);
+                else attemptItemPlacement(groupItem);
                 return;
         }
     };
 
     const count = groupItem.getUnlockedCount();
+    // AIR GroupItem.updateRecycleStatusVisual: while the Furni-Matic is open, a stack with a furni that can still go
+    // in it carries the recycle marker.
+    const showRecyclable = !!recyclerPlace && groupItem.items.some((item) => item.recyclable && !item.locked);
     // AIR GroupItem.updateItemImageVisual: a chest tile shows its contents count on a gold (coins) or brown (furni) plaque.
     // AIR GroupItem.updateItemImageVisual: a unique number wins, then a rarity plaque, then the chest plaque.
     const rarityLevel = groupItem.stuffData.uniqueNumber > 0 ? -1 : (groupItem.stuffData.rarityLevel ?? -1);
@@ -53,6 +60,7 @@ export const InventoryFurnitureItemView: FC<{
                 onMouseOut={onMouseEvent}
                 onMouseUp={onMouseEvent}
             >
+                {showRecyclable && <div aria-hidden className="octane-inventory-thumb-recyclable" />}
                 {chestColor && <div aria-hidden className={`octane-inventory-thumb-chest-background is-${ chestColor }`} />}
                 {groupItem.stuffData.uniqueNumber <= 0 && (
                     <div className="octane-inventory-thumb-image">
