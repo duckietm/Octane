@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getCatalogHeaderDescription, getCatalogTextElementName } from './catalogLocalization.helpers';
+import { getCatalogHeaderDescription, getCatalogHeaderTextKey, getCatalogTextElementName } from './catalogLocalization.helpers';
 
 const localization = (texts: string[]) => ({ getText: (index: number) => texts[index] ?? '' }) as any;
 
@@ -15,5 +15,10 @@ describe('standard catalog page localization mapping', () => {
         expect(getCatalogTextElementName(0, 'builders_club_frontpage')).toBe('ctlg_description');
         expect(getCatalogHeaderDescription('frontpage4', localization(['Front-page body']))).toBe('');
         expect(getCatalogHeaderDescription('trophies', localization(['Trophy body']))).toBe('');
+    });
+
+    it('lets the recycler write its own header text', () => {
+        expect(getCatalogHeaderTextKey('recycler')).toBe('recycler.info.ready');
+        expect(getCatalogHeaderTextKey('default_3x3')).toBeNull();
     });
 });

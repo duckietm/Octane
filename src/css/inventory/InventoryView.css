@@ -674,7 +674,9 @@
     line-height: 14px;
     font-weight: normal;
     color: #000;
-    text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff;
+    /* AIR GlowFilter(0xffffff, 1, 3, 3, 300): a solid white halo around the number. A filter, not a text-shadow: the
+       number is drawn as an AIR text raster, which a text-shadow does not reach, and it was black on the black stage. */
+    filter: drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff) drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff);
 }
 .octane-inventory-furni-status-count.is-trade-count { left: 33px; }
 .octane-inventory-furni-status-count.is-recycle-count { left: 18px; }
@@ -685,6 +687,19 @@
     display: none;
 }
 
+
+/* AIR inventory_thumb recyclable_container: inventory_thumb_icon_recycle, 16 x 16 at 2,3 of the tile. */
+.octane-inventory-window .octane-inventory-thumb-recyclable {
+    position: absolute;
+    top: 3px;
+    left: 2px;
+    z-index: 1;
+    width: 16px;
+    height: 16px;
+    background: url('../../assets/images/inventory/air/thumb-icon-recycle.png') no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
 
 /* AIR inventory_thumb + RarityItemGridOverlayWidget (rarity_item_overlay_griditem_xml, GroupItem.updateItemImageVisual):
    a seed tile with a MapStuffData "rarity" shows rarity_item_rarity_item_plaque (36x9 at 0,27 of the 36x36 overlay, the
