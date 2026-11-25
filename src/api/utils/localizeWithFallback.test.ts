@@ -9,6 +9,15 @@ import { fillPlaceholders, resolveLocalized } from './localizeWithFallback';
  * `purse.seasonal.currency.11` never reach the UI.
  */
 describe('resolveLocalized', () => {
+    it('treats a text that is still a bare ${key} reference as no translation', () => {
+        // A hotel text that points at itself, or at a key the hotel does not have.
+        expect(resolveLocalized('${widget.memenu.achievements}', 'widget.memenu.achievements', 'Achievements')).toBe('Achievements');
+        expect(resolveLocalized(' ${some.other.key} ', 'widget.memenu.achievements', 'Achievements')).toBe('Achievements');
+        // A real text that merely contains a reference or a dollar sign is kept.
+        expect(resolveLocalized('Costs ${price} today', 'k', 'fallback')).toBe('Costs ${price} today');
+        expect(resolveLocalized('$5', 'k', 'fallback')).toBe('$5');
+    });
+
     it('returns the localized text when it differs from the key', () => {
         expect(resolveLocalized('Pixels', 'purse.seasonal.currency.5', 'fallback')).toBe('Pixels');
     });

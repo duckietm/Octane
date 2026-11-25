@@ -246,6 +246,7 @@
     "chatcmd.client.shake": "هزّ الغرفة",
     "chatcmd.client.sign": "إظهار اللافتة",
     "chatcmd.client.togglefps": "تبديل عرض معدل الإطارات",
+    "chatcmd.client.directplanes": "Draw floors and walls directly (on/off)",
     "chatcmd.client.zoom": "تكبير/تصغير",
 
     // ------------------------------------------------------------------------

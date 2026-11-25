@@ -311,6 +311,15 @@ export const useChatInputActions = () => {
                         // Official setFpsCounterEnabled: the ping / fps / frame time readout. Typed again, it goes away.
                         useRoomStatsStore.getState().toggle();
                         return null;
+                    case ':directplanes': {
+                        // Flips room.planes.direct for this session, so a slow room can be measured both ways with the
+                        // readout of :showstats. The renderer keeps the baked planes where WebGL2 is not available.
+                        const engine = GetRoomEngine();
+
+                        engine.setPlaneRenderMode(!engine.planesDrawnDirect);
+                        useRoomStatsStore.getState().showPlaneMode(engine.planesDrawnDirect);
+                        return null;
+                    }
                     case ':togglefps': {
                         if (GetTicker().maxFPS > 0) GetTicker().maxFPS = 0;
                         else GetTicker().maxFPS = GetConfigurationValue<number>('system.fps.animation', 24);

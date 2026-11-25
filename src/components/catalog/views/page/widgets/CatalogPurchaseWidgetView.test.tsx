@@ -181,21 +181,21 @@ describe('catalog purchase widget', () => {
         expect(screen.getByRole('button', { name: 'Owned' })).toBeDisabled();
     });
 
-    it('keeps the buy label on the disabled button while the offer is unavailable', () => {
+    it('sells an offer without the multi-buy flag (have_offer = 0)', () => {
         setOffer(makeOffer({ haveOffer: false }));
 
         render(<CatalogPurchaseWidgetView />);
 
-        expect(screen.getByRole('button', { name: 'catalog.purchase_confirmation.buy' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'catalog.purchase_confirmation.buy' })).not.toBeDisabled();
         expect(screen.queryByText('catalog.alert.not_available')).not.toBeInTheDocument();
     });
 
-    it('keeps the rent label on the disabled button while a rent offer is unavailable', () => {
+    it('rents an offer without the multi-buy flag', () => {
         setOffer(makeOffer({ haveOffer: false, isRentOffer: true }));
 
         render(<CatalogPurchaseWidgetView />);
 
-        expect(screen.getByRole('button', { name: 'catalog.purchase_confirmation.rent' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'catalog.purchase_confirmation.rent' })).not.toBeDisabled();
     });
 
     it('shows the loading label while a lazy offer resolves', () => {

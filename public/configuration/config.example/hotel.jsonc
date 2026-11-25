@@ -108,6 +108,9 @@
     // Draws walls and floors straight from their tiles instead of baked textures (WebGL2 only).
     "room.planes.direct": false,
 
+    // In a crowd, talking and blinking avatars take turns redrawing and avatars off screen wait until they are back in view.
+    "room.avatar.redraw.budget": true,
+
     // Room colour changes (dimmer, backgrounds) apply at once instead of fading over 1.5 s.
     "room.color.skip.transition": false,
 
@@ -241,6 +244,9 @@
 
     // "Place more" button on the infostand of furni the Builders Club sells, for players who may build with it.
     "infostand.place_more.enabled": false,
+
+    // The room owner can compost a dead monster plant from its menu.
+    "monsterplants.composting.enabled": true,
 
 
     // ==== Catalog, purse and currencies ====
@@ -378,6 +384,12 @@
 
     // Purchases (catalog, club, camera) need a ticked credit spending disclaimer first.
     "disclaimer.credit_spending.enabled": false,
+
+    // Duckets a Furni-Matic run needs before it starts; 0: free. Keep it equal to the server setting recycler.ducket_cost, which is what charges them.
+    "recycler.ducket_cost": 0,
+
+    // Seconds the Furni-Matic start button waits after a run; the server enforces its own recycler.timeout_seconds.
+    "recycler.timeout_seconds": 10,
 
 
     // ==== Chat and mentions ====

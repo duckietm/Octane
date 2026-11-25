@@ -6,8 +6,14 @@ describe('catalog offer purchase eligibility', () => {
         expect(canPurchaseCatalogOffer({ isLazy: true, haveOffer: false } as any)).toBe(false);
     });
 
-    it('blocks offers explicitly disabled by the catalog', () => {
-        expect(canPurchaseCatalogOffer({ isLazy: false, haveOffer: false } as any)).toBe(false);
+    it('sells an offer without the multi-buy flag one at a time', () => {
+        // have_offer = 0 is common on bundles and pet eggs: the server sells them, only not several at once.
+        expect(canPurchaseCatalogOffer({ isLazy: false, haveOffer: false } as any)).toBe(true);
+    });
+
+    it('has nothing to sell without an offer', () => {
+        expect(canPurchaseCatalogOffer(null)).toBe(false);
+        expect(canPurchaseCatalogOffer(undefined)).toBe(false);
     });
 
     it('allows a resolved enabled offer', () => {

@@ -1,6 +1,6 @@
 import { GetRecyclerPrizesMessageComposer, RecyclerPrizeLevel, RecyclerPrizesMessageEvent } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { GetFurnitureData, GetImageIconUrlForProduct, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../../api';
+import { GetFurnitureData, GetImageIconUrlForProduct, GetProductDataForLocalization, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../../api';
 import { LayoutFurniImageView } from '../../../../../../common';
 import { BaseButton } from '../../../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
@@ -15,10 +15,29 @@ type RecyclerPrize = RecyclerPrizeLevel['products'][number];
 /** Used only when the hotel's texts lack recycler.prizes.category.N (level 6, mythic, is not an AIR level). */
 const CATEGORY_FALLBACK = ['Common', 'Uncommon', 'Rare', 'Very rare', 'Legendary', 'Mythic'];
 
-const prizeName = (prize: RecyclerPrize) => GetFurnitureData(prize.productClassId, prize.productType)?.name || prize.name;
+/** AIR ProductTypeEnum.PRODUCT_TYPE_CHAT_STYLE: the prize is a chat style, its class id the style's id. */
+const CHAT_STYLE_TYPE = 'chat_style';
+
+const isChatStyle = (prize: RecyclerPrize) => prize.productType === CHAT_STYLE_TYPE;
+
+/** AIR PrizeContainer.title: a furni's localized name, a chat style's from the product data `chat_bubble_<id>`. */
+const prizeName = (prize: RecyclerPrize) => {
+    if (isChatStyle(prize)) return GetProductDataForLocalization(`chat_bubble_${prize.productClassId}`)?.name || prize.name;
+
+    return GetFurnitureData(prize.productClassId, prize.productType)?.name || prize.name;
+};
+
+/** AIR PrizeGridItem draws the style's selector preview; here the same bubble the chat style picker shows. */
+const ChatStylePreview: FC<{ styleId: number }> = ({ styleId }) => (
+    <span className="swf-chat-style-preview bubble-container">
+        <span className={`chat-bubble bubble-${styleId}`} />
+    </span>
+);
 
 /** The furni's catalog icon (AIR's level item shows the product icon): a plain image, so it is never cut or rescaled. */
 const PrizeIcon: FC<{ prize: RecyclerPrize }> = ({ prize }) => {
+    if (isChatStyle(prize)) return <ChatStylePreview styleId={prize.productClassId} />;
+
     const iconUrl = GetImageIconUrlForProduct(prize.productType, prize.productClassId);
 
     if (!iconUrl) return <LayoutFurniImageView productClassId={prize.productClassId} productType={prize.productType} />;
@@ -72,7 +91,11 @@ export const CatalogLayoutRecyclerPrizesView: FC<CatalogLayoutProps> = ({ page }
                     {selected ? (
                         <>
                             <div className="octane-catalog-air-prizes__preview">
-                                <LayoutFurniImageView direction={2} productClassId={selected.productClassId} productType={selected.productType} scale={2} />
+                                {isChatStyle(selected) ? (
+                                    <ChatStylePreview styleId={selected.productClassId} />
+                                ) : (
+                                    <LayoutFurniImageView direction={2} productClassId={selected.productClassId} productType={selected.productType} scale={2} />
+                                )}
                             </div>
                             <div className="octane-catalog-air-prizes__name">{prizeName(selected)}</div>
                         </>

@@ -246,6 +246,7 @@
     "chatcmd.client.shake": "Raum wackeln lassen",
     "chatcmd.client.sign": "Schild zeigen",
     "chatcmd.client.togglefps": "FPS umschalten",
+    "chatcmd.client.directplanes": "Draw floors and walls directly (on/off)",
     "chatcmd.client.zoom": "Rein-/Rauszoomen",
 
     // ------------------------------------------------------------------------

@@ -1,0 +1,630 @@
+/* AIR wired_menu_table_view (table_view.xml) with the paging row of logs_overview / transaction_overview. */
+
+/* table_border (border style 0) around table_contents at 5,5. */
+.octane-wired-table {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 16px;
+    color: #000;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+/* The 5 px inset is a transparent border, not padding: rows are then clipped at the inset and never scroll over
+   the frame, and the title row can stick to the very top of what scrolls. */
+.octane-wired-table__border {
+    box-sizing: border-box;
+    min-height: 0;
+    padding: 0;
+    border: 5px solid transparent;
+    overflow-y: auto;
+    border-image: url('../../assets/images/habbo-skin/slices/border-white.png') 6 fill / 6px stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-wired-table__border table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    image-rendering: auto;
+}
+
+/* table_titlerow: 23 px, bold column names 4 px inside their column; the 1 px splitter (0x50 black) under it.
+   The cells stick, opaque and above the rows (whose labels are positioned, so they would paint over a title row
+   without its own layer); the splitter is a shadow, since a collapsed border does not travel with a sticky cell. */
+.octane-wired-table__border th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    height: 23px;
+    padding: 0 4px;
+    background: #ffffff;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.31);
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* table_row: 20 px, TableRowView colours 0xeaeaea (even) and 0xf9f9f9 (odd); element_text cut with "...". */
+.octane-wired-table__border td {
+    height: 20px;
+    padding: 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.octane-wired-table__border tbody tr:nth-child(odd) {
+    background: #eaeaea;
+}
+
+.octane-wired-table__border tbody tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+.octane-wired-table__border .is-right {
+    text-align: right;
+}
+
+/* empty_container: wiredmenu.table.empty centred in 0x333333. */
+.octane-wired-table__border tbody tr.is-empty {
+    background: transparent;
+}
+
+.octane-wired-table__border tr.is-empty td {
+    height: 100px;
+    color: #333333;
+    text-align: center;
+}
+
+/* pagination: two 50 x 30 container_buttons on each side, the page line centred between them. */
+.octane-wired-table__paging {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 30px;
+}
+
+.octane-wired-table__buttons {
+    display: flex;
+    gap: 13px;
+}
+
+.octane-wired-table__buttons.is-right {
+    gap: 10px;
+}
+
+.octane-wired-table__page-button {
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    width: 50px;
+    height: 30px;
+    margin: 0;
+    padding: 0;
+    border: 5px solid transparent;
+    border-radius: 0;
+    border-image: var(--habbo-skin-shiny-thick) 5 fill / 5px stretch;
+    background: transparent;
+    cursor: pointer;
+    image-rendering: pixelated;
+}
+
+.octane-wired-table__page-button:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-hover);
+}
+
+.octane-wired-table__page-button:active {
+    border-image-source: var(--habbo-skin-shiny-thick-pressed);
+}
+
+.octane-wired-table__page-button:disabled {
+    border-image-source: var(--habbo-skin-shiny-thick-disabled);
+    cursor: default;
+}
+
+/* The 10 x 10 arrow icons (icon styles 4 and 5, black); first / last carry two, 9 px apart. */
+.octane-wired-table__arrow {
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+}
+
+.octane-wired-table__arrow.is-left {
+    border-right: 7px solid #000;
+    margin-right: 2px;
+}
+
+.octane-wired-table__arrow.is-right {
+    border-left: 7px solid #000;
+    margin-left: 2px;
+}
+
+.octane-wired-table__page-button:disabled .octane-wired-table__arrow {
+    opacity: 0.4;
+}
+
+/* pagina_text_start / pagina_number_input / pagina_text_end: the texts at blend 0.7, the bordered field 21 px wide. */
+.octane-wired-table__page-line {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    white-space: nowrap;
+}
+
+.octane-wired-table__page-line > span {
+    opacity: 0.7;
+}
+
+.octane-wired-table__page-input {
+    box-sizing: border-box;
+    width: 28px;
+    height: 17px;
+    padding: 0 2px;
+    border: 1px solid #000;
+    border-radius: 0;
+    background: #fff;
+    color: #000;
+    font-size: 12px;
+    line-height: 15px;
+    text-align: center;
+}
+
+/* AIR logs_overview (700 wide): the room's wired log window. */
+.octane-wired-logs {
+    width: 700px;
+    min-width: 700px;
+    max-width: 700px;
+}
+
+.octane-wired-logs .octane-wired-logs__content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 7px 13px 14px;
+    color: #000;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.octane-wired-logs__top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: -5px;
+}
+
+/* The info box: border style 4, 580 x 38, the text centred on up to two lines. */
+.octane-wired-logs__info {
+    box-sizing: border-box;
+    flex: 0 1 580px;
+    min-width: 0;
+    width: 580px;
+    min-height: 38px;
+    padding: 0 6px;
+    border: 3px solid transparent;
+    border-image: url('../../assets/images/habbo-skin/slices/border-4.png') 6 fill / 6px stretch;
+    text-align: center;
+    white-space: pre-line;
+    line-height: 16px;
+}
+
+/* The caption is never broken inside a word: it keeps its line and the info box gives way. */
+.octane-wired-logs__auto-refresh {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 3px;
+    line-height: 14px;
+    white-space: nowrap;
+}
+
+/* filter_cont at x 15 (314 wide), log_source_cont at 349, log_level_cont at 534: bold keys, 25 px controls. */
+.octane-wired-logs__filters {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    height: 25px;
+    margin: 0 -1px 0 2px;
+}
+
+.octane-wired-logs__field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.octane-wired-logs__field.is-filter {
+    flex: 0 0 314px;
+}
+
+.octane-wired-logs__filter-input {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 25px;
+    padding: 0 6px;
+    border: 3px solid transparent;
+    border-image: url('../../assets/images/habbo-skin/slices/border-4.png') 6 fill / 6px stretch;
+    background: transparent;
+    color: #000;
+    font-size: 12px;
+    outline: none;
+}
+
+.octane-wired-logs .octane-wired-logs__menu {
+    width: 90px;
+    height: 25px;
+}
+
+.octane-wired-logs__table {
+    height: 316px;
+}
+
+/* AIR variables_management_overview (700 wide): shares the logs window's info box and menu line. The info box is
+   603 wide with Refresh (62 x 30) beside it, the variable's name sits on its own line and the menus start at the
+   left, 131 and 135 px wide. */
+.octane-wired-vars .octane-wired-logs__content {
+    gap: 8px;
+}
+
+.octane-wired-vars .octane-wired-logs__info {
+    flex: 1 1 auto;
+    width: auto;
+}
+
+.octane-wired-vars__name {
+    margin-left: 2px;
+    line-height: 17px;
+}
+
+.octane-wired-vars .octane-wired-logs__filters {
+    justify-content: flex-start;
+    gap: 15px;
+}
+
+.octane-wired-vars .octane-wired-logs__menu {
+    width: 133px;
+}
+
+.octane-wired-vars__table {
+    height: 296px;
+}
+
+/* AIR variables_management_detail (339 wide): "Manage User Variables". */
+.octane-wired-holder {
+    width: 339px;
+    min-width: 339px;
+    max-width: 339px;
+}
+
+.octane-wired-holder .octane-wired-holder__content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 7px 18px 14px;
+    color: #000;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+/* header: the info box 228 x 57, Refresh (62 x 30) 13 px beside it. */
+.octane-wired-holder__top {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.octane-wired-holder .octane-wired-holder__info {
+    flex: 0 0 228px;
+    width: 228px;
+    min-height: 57px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.octane-wired-holder__section {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+/* info_box: the preview (border style 2, 0xdadada, 94 x 94) and the text box (border style 10, 194 x 94). */
+.octane-wired-holder__holder {
+    display: flex;
+    gap: 15px;
+}
+
+.octane-wired-holder__preview {
+    box-sizing: border-box;
+    flex: 0 0 94px;
+    width: 94px;
+    height: 94px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid #b0b0a8;
+    border-radius: 4px;
+    background: #dadada;
+}
+
+.octane-wired-holder__lines {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 94px;
+    padding: 6px;
+    overflow: hidden;
+    border: 1px solid #000;
+    border-radius: 3px;
+    background: #fff;
+    line-height: 16px;
+}
+
+.octane-wired-holder__lines > div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* variable_values_table_container: 303 x 211. */
+.octane-wired-holder__table {
+    height: 211px;
+}
+
+.octane-wired-holder__table tbody tr {
+    cursor: pointer;
+}
+
+/* TableRowView: the selected row, 0xb8e2fc. */
+.octane-wired-table__border tbody tr.is-selected {
+    background: #b8e2fc;
+}
+
+.octane-wired-holder__value-column {
+    width: 96px;
+}
+
+.octane-wired-holder .octane-wired-holder__value-input {
+    box-sizing: border-box;
+    width: 86px;
+    height: 18px;
+    padding: 0 3px;
+    border: 1px solid #000;
+    background: #fff;
+    font-size: 12px;
+}
+
+/* delete_var_btn and add_var_btn: 145 x 25, 13 px apart. */
+.octane-wired-holder__buttons {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    gap: 13px;
+}
+
+.octane-wired-holder__buttons > button {
+    flex: 0 0 145px;
+    width: 145px;
+    height: 25px;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+}
+
+/* create_var_bubble: 186 wide, over the table above the Give variable button. */
+.octane-wired-holder__bubble {
+    position: absolute;
+    right: -5px;
+    bottom: calc(100% + 6px);
+    z-index: 10;
+    box-sizing: border-box;
+    width: 186px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px;
+    border: 1px solid #000;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.octane-wired-holder__bubble > button {
+    margin-top: 6px;
+    height: 25px;
+}
+
+.octane-wired-holder .octane-wired-holder__give-value {
+    width: 80px;
+    height: 22px;
+}
+
+/* AIR wired_menu_view, variable_overview_container (500 x 382): the Variables tab of the wired menu. */
+.octane-wired-variables {
+    box-sizing: border-box;
+    display: flex;
+    gap: 28px;
+    min-height: 382px;
+    padding: 18px 14px 14px;
+    color: #000;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.octane-wired-variables__left {
+    flex: 0 0 188px;
+    width: 188px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.octane-wired-variables__right {
+    flex: 1 1 256px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.octane-wired-variables__block {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-height: 0;
+}
+
+/* type_options: border style 3 in 0xdadada, 188 x 47, four 37 x 36 shiny buttons 47 px apart at 5,5. */
+.octane-wired-variables__types {
+    box-sizing: border-box;
+    display: flex;
+    gap: 10px;
+    height: 47px;
+    padding: 5px;
+    border-radius: 4px;
+    background: #dadada;
+}
+
+.octane-wired-variables__type {
+    box-sizing: border-box;
+    flex: 0 0 37px;
+    width: 37px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    border: 5px solid transparent;
+    border-radius: 0;
+    border-image: var(--habbo-skin-shiny) 5 fill / 5px stretch;
+    background: transparent;
+    cursor: pointer;
+    image-rendering: pixelated;
+}
+
+.octane-wired-variables__type:hover {
+    border-image-source: var(--habbo-skin-shiny-hover);
+}
+
+.octane-wired-variables__type.is-selected,
+.octane-wired-variables__type:active {
+    border-image-source: var(--habbo-skin-shiny-pressed);
+}
+
+.octane-wired-variables__type:disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+.octane-wired-variables__type img {
+    max-width: 27px;
+    max-height: 27px;
+}
+
+/* variable_list_container: the picker as the AIR table, 188 x 219, one column without a title row. */
+.octane-wired-variables__picker {
+    height: 219px;
+}
+
+.octane-wired-variables__picker tbody tr {
+    cursor: pointer;
+}
+
+/* button_row: Highlight and Manage 73 x 25, the red delete button 25 x 25, 8 px apart. */
+.octane-wired-variables__buttons {
+    display: flex;
+    gap: 8px;
+    min-height: 25px;
+}
+
+.octane-wired-variables__buttons > button:not(.octane-wired-variables__delete) {
+    flex: 1 1 73px;
+    min-width: 0;
+    height: 25px;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+    /* text_style button_shiny_regular: the regular cut at 12 px, so the captions fit their 73 px. */
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    white-space: nowrap;
+}
+
+/* Our own row under AIR's: each button at least as wide as its caption, the row shared between them; captions
+   that do not fit side by side (longer languages) go on a line each instead of being cut. */
+.octane-wired-variables__buttons.is-extra {
+    flex-wrap: wrap;
+}
+
+.octane-wired-variables__buttons.is-extra > button:not(.octane-wired-variables__delete) {
+    flex: 1 1 auto;
+    min-width: max-content;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
+.octane-wired-variables__delete {
+    box-sizing: border-box;
+    flex: 0 0 25px;
+    width: 25px;
+    height: 25px;
+    margin: 0 0 0 auto;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #000;
+    border-radius: 4px;
+    background: #e33934;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+    cursor: pointer;
+}
+
+.octane-wired-variables__delete:hover {
+    background: #ee4a45;
+}
+
+.octane-wired-variables__delete:disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+.octane-wired-variables__delete img {
+    image-rendering: pixelated;
+}
+
+/* variable_properties_table_container 256 x 188, variable_texts_table_container 256 x 115. */
+.octane-wired-variables__properties {
+    height: 188px;
+}
+
+.octane-wired-variables__texts {
+    height: 115px;
+}
+
+.octane-wired-variables__value-column {
+    width: 96px;
+}
+
+.octane-wired-variables__note {
+    padding: 4px 6px;
+    border: 1px solid #c8b98f;
+    border-radius: 3px;
+    background: #fff7df;
+    color: #6a5d33;
+    line-height: 15px;
+}

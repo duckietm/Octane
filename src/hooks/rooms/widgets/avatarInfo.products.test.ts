@@ -1,7 +1,7 @@
 import { RoomObjectCategory, RoomObjectType } from '@octane/renderer';
 import { describe, expect, it } from 'vitest';
 import { FurniCategory } from '../../../api/inventory/FurniCategory';
-import { collectUseProductBubbles, UseProductCandidate, UseProductUnit } from './avatarInfo.products';
+import { collectUseProductBubbles, isInventoryPetProduct, isUseProductFromInventory, UseProductCandidate, UseProductUnit, useProductRequestId } from './avatarInfo.products';
 
 const OWNER = 5;
 const PRODUCT_OBJECT = 900;
@@ -70,3 +70,35 @@ describe('collectUseProductBubbles', () => {
         expect(collect(0, [unit(11, pet())], '')).toEqual([]);
     });
 });
+
+describe('pet products used from the inventory (AIR ROSM_USE_PRODUCT_FROM_INVENTORY)', () => {
+    it('keeps the furni type and the inventory item in the bubble and asks the server with the item', () => {
+        const FURNI_TYPE = 4012;
+        const INVENTORY_ITEM = 77001;
+        const [bubble] = collectUseProductBubbles({ customParams: '1', specialType: FurniCategory.PET_SADDLE }, OWNER, FURNI_TYPE, [unit(11, pet())], INVENTORY_ITEM);
+
+        expect(bubble.requestRoomObjectId).toBe(FURNI_TYPE);
+        expect(bubble.requestInventoryStripId).toBe(INVENTORY_ITEM);
+        expect(isUseProductFromInventory(bubble)).toBe(true);
+        expect(useProductRequestId(bubble)).toBe(INVENTORY_ITEM);
+    });
+
+    it('asks the server with the room object for a product lying in the room', () => {
+        const [bubble] = collect(0, [unit(11, pet())]);
+
+        expect(isUseProductFromInventory(bubble)).toBe(false);
+        expect(useProductRequestId(bubble)).toBe(PRODUCT_OBJECT);
+        expect(isUseProductFromInventory(null)).toBe(false);
+    });
+
+    it('offers Use for the pet products AIR offers it for', () => {
+        for (const category of [FurniCategory.PET_SHAMPOO, FurniCategory.PET_CUSTOM_PART, FurniCategory.PET_CUSTOM_PART_SHAMPOO, FurniCategory.PET_SADDLE, FurniCategory.MONSTERPLANT_REVIVAL]) {
+            expect(isInventoryPetProduct(category)).toBe(true);
+        }
+
+        expect(isInventoryPetProduct(FurniCategory.MONSTERPLANT_SEED)).toBe(false);
+        expect(isInventoryPetProduct(FurniCategory.MONSTERPLANT_REBREED)).toBe(false);
+        expect(isInventoryPetProduct(1)).toBe(false);
+    });
+});
+

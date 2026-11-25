@@ -34,6 +34,7 @@ import {
 } from '../../../api';
 import { getStoredChatTextSize } from '../../../components/room/widgets/chat-input/chatTextSize';
 import { useChatHistory } from './../../chat-history';
+import { ChatBubblePacer, createChatBubblePacer } from './chatBubblePacer';
 import { useMessageEvent, useOctaneEvent } from '../../events';
 import { useUserDataSnapshot } from '../../session/useSessionSnapshots';
 import { useTranslation } from '../../translation';
@@ -54,6 +55,25 @@ const useChatWidgetState = () => {
     const { addChatEntry, updateChatEntry } = useChatHistory();
     const { settings, translateIncoming, consumeOutgoingTranslation } = useTranslation();
     const isDisposed = useRef(false);
+    // A crowd speaking in the same server tick is shown a few bubbles per frame (see chatBubblePacer).
+    const pacerRef = useRef<ChatBubblePacer<ChatBubbleMessage>>(null);
+
+    if (!pacerRef.current) {
+        pacerRef.current = createChatBubblePacer<ChatBubbleMessage>({
+            show: (lines) =>
+                setChatMessages((prevValue) => {
+                    const newValue = [...prevValue, ...lines];
+
+                    if (newValue.length > CHAT_MESSAGES_MAX) newValue.splice(0, newValue.length - CHAT_MESSAGES_MAX);
+
+                    return newValue;
+                }),
+            requestFrame: (callback) => window.requestAnimationFrame(callback),
+            cancelFrame: (handle) => window.cancelAnimationFrame(handle),
+            isHidden: () => document.hidden,
+            now: () => performance.now()
+        });
+    }
     // Reactive: re-renders if the session-data snapshot flips (e.g.
     // reconnect under a different user id). Safe to call here —
     // useChatWidget is not singleton-backed (see export below),
@@ -97,6 +117,11 @@ const useChatWidgetState = () => {
 
     const applyAsyncTranslation = useCallback(
         (bubbleId: number, chatEntryId: number, originalText: string, translatedText: string, detectedLanguage: string, targetLanguage: string) => {
+            // Not shown yet: the line itself takes the translation.
+            const waiting = pacerRef.current.find((chat) => chat.id === bubbleId);
+
+            if (waiting) applyTranslationToBubble(waiting, originalText, translatedText, detectedLanguage, targetLanguage);
+
             setChatMessages((prevValue) => {
                 const index = prevValue.findIndex((chat) => chat.id === bubbleId);
 
@@ -280,13 +305,7 @@ const useChatWidgetState = () => {
         chatMessage.nickIcon = event.nickIcon || '';
         chatMessage.displayOrder = event.displayOrder || 'icon-prefix-name';
 
-        setChatMessages((prevValue) => {
-            const newValue = [...prevValue, chatMessage];
-
-            if (newValue.length > CHAT_MESSAGES_MAX) newValue.shift();
-
-            return newValue;
-        });
+        pacerRef.current.push(chatMessage);
 
         // Pet, Bot and Rentable Bot chat is fire-and-forget ("UDP-style"):
         // the live bubble already rendered above, but we deliberately skip
@@ -330,6 +349,11 @@ const useChatWidgetState = () => {
             void imageRequest
                 .then((url) => {
                     if (!url || isDisposed.current) return;
+
+                    // Not shown yet: the line itself takes the face.
+                    const waiting = pacerRef.current.find((chat) => chat.id === bubbleId);
+
+                    if (waiting) waiting.imageUrl = url;
 
                     setChatMessages((prevValue) => {
                         const index = prevValue.findIndex((chat) => chat.id === bubbleId);
@@ -401,6 +425,7 @@ const useChatWidgetState = () => {
 
         return () => {
             isDisposed.current = true;
+            pacerRef.current?.clear();
         };
     }, []);
 

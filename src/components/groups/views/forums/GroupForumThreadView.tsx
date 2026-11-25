@@ -13,21 +13,17 @@ import {
 import { FC, useEffect, useRef, useState } from 'react';
 import { GetUserProfile, LocalizeText, ReportType, SendMessageComposer } from '../../../../api';
 import hideIcon from '../../../../assets/images/groups/native/forum_forum_hide.png';
-import replyIcon from '../../../../assets/images/groups/native/forum_reply.png';
 import reportIcon from '../../../../assets/images/groups/native/forum_forum_report.png';
 import unhideIcon from '../../../../assets/images/groups/native/forum_forum_unhide.png';
+import replyIcon from '../../../../assets/images/groups/native/forum_reply.png';
 import { ClassicScrollAreaView, LayoutAvatarImageView } from '../../../../common';
-import { useHelp, useMessageEvent } from '../../../../hooks';
-import { flatText, GroupText } from '../GroupNativeLayout';
-import { FORUM_PAGE_SIZE, FORUM_SURFACE, stripTags, ForumButton, forumAge, forumQuote, ForumPager } from './GroupForumLayout';
-import { forumPermissionText } from './GroupForumThreadListView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
-
-// Message states: 0 and 1 are visible, 10 is hidden by a group administrator, 20 deleted by Hotel staff.
-const MESSAGE_VISIBLE = 1;
-const MESSAGE_HIDDEN_BY_ADMIN = 10;
-const MESSAGE_DELETED_BY_STAFF = 20;
+import { useHelp, useMessageEvent } from '../../../../hooks';
+import { flatText, GroupText } from '../GroupNativeLayout';
+import { forumMessageLook, MESSAGE_DELETED_BY_STAFF, MESSAGE_HIDDEN_BY_ADMIN, MESSAGE_VISIBLE, newForumMessageIds } from './forumMessageLook';
+import { FORUM_PAGE_SIZE, FORUM_SURFACE, ForumButton, ForumPager, forumAge, forumQuote, stripTags } from './GroupForumLayout';
+import { forumPermissionText } from './GroupForumThreadListView';
 
 const ITEM_WIDTH = 515;
 
@@ -40,13 +36,28 @@ interface GroupForumThreadViewProps {
     initialPageIndex: number;
     scrollIndex: number;
     onBack: () => void;
+    /** GroupForumController.getThreadLastReadMessageIndex. */
+    getLastReadMessageIndex: (thread: GuildForumThread) => number;
     /** GroupForumController.updateUnreadMessageCounts(messageId, threadId, messageIndex). */
     onMessagesSeen: (messageId: number, threadId: number, messageIndex: number) => void;
     onReply: (subject: string, quote?: string) => void;
 }
 
-export const GroupForumThreadView: FC<GroupForumThreadViewProps> = ({ forumData, groupId, threadId, initialThread, initialPageIndex, scrollIndex, onBack, onMessagesSeen, onReply }) => {
+export const GroupForumThreadView: FC<GroupForumThreadViewProps> = ({
+    forumData,
+    groupId,
+    threadId,
+    initialThread,
+    initialPageIndex,
+    scrollIndex,
+    onBack,
+    getLastReadMessageIndex,
+    onMessagesSeen,
+    onReply
+}) => {
     const [messages, setMessages] = useState<MessageData[]>([]);
+    // MessageListView.update: the messages after the last one read are drawn as new.
+    const [newMessageIds, setNewMessageIds] = useState<ReadonlySet<number>>(() => new Set());
     const [thread, setThread] = useState<GuildForumThread>(initialThread);
     const [pageIndex, setPageIndex] = useState<number>(initialPageIndex);
     const viewportRef = useRef<HTMLDivElement>(null);
@@ -64,6 +75,8 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = ({ forumData,
 
         if (parser.groupId !== groupId || parser.threadId !== threadId || parser.startIndex !== pageIndex * FORUM_PAGE_SIZE) return;
 
+        // The list is drawn against what was read before this page counts as seen.
+        setNewMessageIds(newForumMessageIds(parser.messages, thread ? getLastReadMessageIndex(thread) : -1));
         setMessages(parser.messages);
 
         // updateUnreadMessageCounts: the newest message of the page counts as seen; the marker is sent when the forum is left (GroupForumController.markForumAsRead).
@@ -82,7 +95,13 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = ({ forumData,
 
         const page = Math.floor(parser.message.messageIndex / FORUM_PAGE_SIZE);
 
-        setThread((previous) => (previous ? Object.assign(Object.create(Object.getPrototypeOf(previous)), previous, { _totalMessages: Math.max(previous.totalMessages, parser.message.messageIndex + 1) }) : previous));
+        setThread((previous) =>
+            previous
+                ? Object.assign(Object.create(Object.getPrototypeOf(previous)), previous, {
+                      _totalMessages: Math.max(previous.totalMessages, parser.message.messageIndex + 1)
+                  })
+                : previous
+        );
 
         if (page !== pageIndex) setPageIndex(page);
         else SendMessageComposer(new GetMessagesMessageComposer(groupId, threadId, page * FORUM_PAGE_SIZE, FORUM_PAGE_SIZE));
@@ -94,6 +113,16 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = ({ forumData,
         if (parser.groupId !== groupId || parser.threadId !== threadId) return;
 
         setMessages((previous) => previous.map((message) => (message.messageId === parser.message.messageId ? parser.message : message)));
+        // MessageListView.updateElement: the refreshed message is drawn in its own state, no longer as new.
+        setNewMessageIds((previous) => {
+            if (!previous.has(parser.message.messageId)) return previous;
+
+            const next = new Set(previous);
+
+            next.delete(parser.message.messageId);
+
+            return next;
+        });
     });
 
     useMessageEvent<PostThreadMessageEvent>(PostThreadMessageEvent, (event) => {
@@ -130,15 +159,6 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = ({ forumData,
 
     const quoteOf = (message: MessageData) => forumQuote(message);
 
-    // MessageListView.handleButtonVisibility: moderators hide a message, show one hidden by an admin again, and only staff show one deleted by staff.
-    const hideActionOf = (message: MessageData): 'hide' | 'unhide' | null => {
-        if (!canModerate) return null;
-        if (message.state === MESSAGE_HIDDEN_BY_ADMIN) return 'unhide';
-        if (message.state === MESSAGE_DELETED_BY_STAFF) return isStaff ? 'unhide' : null;
-
-        return 'hide';
-    };
-
     // GroupForumController.deleteMessage hides with 10, or 20 for staff; unDeleteMessage sends 1.
     const moderate = (message: MessageData, action: 'hide' | 'unhide') => {
         const state = action === 'unhide' ? MESSAGE_VISIBLE : isStaff ? MESSAGE_DELETED_BY_STAFF : MESSAGE_HIDDEN_BY_ADMIN;
@@ -159,32 +179,59 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = ({ forumData,
 
     return (
         <>
-            <GroupText background={FORUM_SURFACE} height={25} overrides={flatText(16, { bold: true, color: 0xa6a6a2 })} text={subject} width={541} x={0} y={115} />
+            <GroupText
+                background={FORUM_SURFACE}
+                height={25}
+                overrides={flatText(16, { bold: true, color: 0xa6a6a2 })}
+                text={subject}
+                width={541}
+                x={0}
+                y={115}
+            />
             <div className="octane-forum__list">
-                <ClassicScrollAreaView className="octane-forum__scroll is-messages" contentClassName="octane-forum__scroll-content" minThumbSize={26} scrollStep={127} viewportRef={viewportRef}>
+                <ClassicScrollAreaView
+                    className="octane-forum__scroll is-messages"
+                    contentClassName="octane-forum__scroll-content"
+                    minThumbSize={26}
+                    scrollStep={127}
+                    viewportRef={viewportRef}
+                >
                     {messages.map((message) => {
-                        const isHiddenByAdmin = message.state === MESSAGE_HIDDEN_BY_ADMIN;
-                        const isDeleted = message.state === MESSAGE_DELETED_BY_STAFF;
-                        const panelColor = isDeleted ? 0xffdfd2 : isHiddenByAdmin ? 0xd7d7cf : 0xc6eff9;
-                        const textColor = isDeleted ? 0xffc6ba : isHiddenByAdmin ? 0xe9e9e0 : 0xffffff;
-                        // MessageListView.createListItem: a message deleted by staff reads as such for everyone but staff, any other hidden one for everyone but moderators.
-                        const isModerationMessage = (isDeleted && !isStaff) || (message.state > 1 && !canModerate);
+                        const look = forumMessageLook(message.state, newMessageIds.has(message.messageId), canModerate, isStaff);
+                        const isHiddenByAdmin = look.state === MESSAGE_HIDDEN_BY_ADMIN;
+                        const isDeleted = look.state === MESSAGE_DELETED_BY_STAFF;
+                        const { panelColor, textColor, isModerationMessage, hideAction } = look;
                         const getModerationMessage = (): string => {
-                            if (isHiddenByAdmin) return LocalizeText('groupforum.view.message_hidden_by_admin', ['ADMIN_NAME', 'admin_name'], [message.adminName, message.adminName]);
-                            if (isDeleted) return LocalizeText('groupforum.view.message_hidden_by_staff', ['ADMIN_NAME', 'admin_name'], [message.adminName, message.adminName]);
+                            if (isHiddenByAdmin)
+                                return LocalizeText(
+                                    'groupforum.view.message_hidden_by_admin',
+                                    ['ADMIN_NAME', 'admin_name'],
+                                    [message.adminName, message.adminName]
+                                );
+                            if (isDeleted)
+                                return LocalizeText(
+                                    'groupforum.view.message_hidden_by_staff',
+                                    ['ADMIN_NAME', 'admin_name'],
+                                    [message.adminName, message.adminName]
+                                );
 
                             return '';
                         };
                         const text = isModerationMessage ? getModerationMessage() : message.messageText;
                         const showText = !!text;
-                        const hideAction = hideActionOf(message);
                         const actions = (hideAction ? 1 : 0) + (canReport ? 1 : 0) + 1;
                         const actionsWidth = actions * 22;
 
                         return (
                             <div key={message.messageId} className="octane-forum__message">
                                 <div className="octane-forum__message-bar">
-                                    <GroupText background={0x227aad} overrides={flatText(12, { color: 0xeeeeee })} text={forumAge(message.creationTime)} x={0} y={4} />
+                                    <GroupText
+                                        background={0x227aad}
+                                        overrides={flatText(12, { color: 0xeeeeee })}
+                                        text={forumAge(message.creationTime)}
+                                        x={0}
+                                        y={4}
+                                    />
                                     <GroupText
                                         align="center"
                                         background={0x227aad}
@@ -197,35 +244,76 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = ({ forumData,
                                     <div className="octane-forum__message-actions" style={{ width: actionsWidth }}>
                                         {hideAction && (
                                             <BaseButton className="octane-forum__action is-hide" type="button" onClick={() => moderate(message, hideAction)}>
-                                                <img alt="" draggable={false} src={hideAction === 'unhide' ? unhideIcon : hideIcon} style={{ left: 4, top: 5 }} />
+                                                <img
+                                                    alt=""
+                                                    draggable={false}
+                                                    src={hideAction === 'unhide' ? unhideIcon : hideIcon}
+                                                    style={{ left: 4, top: 5 }}
+                                                />
                                             </BaseButton>
                                         )}
                                         {canReport && (
-                                            <BaseButton className="octane-forum__action is-report" type="button" onClick={() => report(ReportType.MESSAGE, { groupId, threadId, messageId: message.messageId })}>
+                                            <BaseButton
+                                                className="octane-forum__action is-report"
+                                                type="button"
+                                                onClick={() => report(ReportType.MESSAGE, { groupId, threadId, messageId: message.messageId })}
+                                            >
                                                 <img alt="" draggable={false} src={reportIcon} style={{ left: 2, top: 6 }} />
                                             </BaseButton>
                                         )}
-                                        <BaseButton className="octane-forum__action is-reply" disabled={!canReply} type="button" onClick={() => onReply(subject, quoteOf(message))}>
+                                        <BaseButton
+                                            className="octane-forum__action is-reply"
+                                            disabled={!canReply}
+                                            type="button"
+                                            onClick={() => onReply(subject, quoteOf(message))}
+                                        >
                                             <img alt="" draggable={false} src={replyIcon} style={{ left: 2, top: 6 }} />
                                         </BaseButton>
                                     </div>
                                 </div>
                                 <div className="octane-forum__message-body">
                                     <div className="octane-forum__message-author" style={{ background: '#' + panelColor.toString(16).padStart(6, '0') }}>
-                                        <GroupText background={panelColor} className="is-link" overrides={{ bold: true }} text={message.authorName} x={2} y={5} onClick={() => GetUserProfile(message.authorId)} />
                                         <GroupText
                                             background={panelColor}
-                                            text={LocalizeText('groupforum.view.thread_details1', ['TOTAL_MESSAGES', 'total_messages'], [String(message.authorPostCount), String(message.authorPostCount)])}
+                                            className="is-link"
+                                            overrides={{ bold: true }}
+                                            text={message.authorName}
+                                            x={2}
+                                            y={5}
+                                            onClick={() => GetUserProfile(message.authorId)}
+                                        />
+                                        <GroupText
+                                            background={panelColor}
+                                            text={LocalizeText(
+                                                'groupforum.view.thread_details1',
+                                                ['TOTAL_MESSAGES', 'total_messages'],
+                                                [String(message.authorPostCount), String(message.authorPostCount)]
+                                            )}
                                             x={2}
                                             y={23}
                                         />
-                                        <Hint content={message.authorName}><BaseButton aria-label={message.authorName} className="octane-forum__message-avatar" type="button" onClick={() => GetUserProfile(message.authorId)}>
-                                            <LayoutAvatarImageView direction={2} figure={message.authorFigure} />
-                                        </BaseButton></Hint>
+                                        <Hint content={message.authorName}>
+                                            <BaseButton
+                                                aria-label={message.authorName}
+                                                className="octane-forum__message-avatar"
+                                                type="button"
+                                                onClick={() => GetUserProfile(message.authorId)}
+                                            >
+                                                <LayoutAvatarImageView direction={2} figure={message.authorFigure} />
+                                            </BaseButton>
+                                        </Hint>
                                     </div>
                                     <div className="octane-forum__message-text" style={{ background: '#' + textColor.toString(16).padStart(6, '0') }}>
                                         {showText && (
-                                            <GroupText background={textColor} overrides={flatText(12)} text={text} width={ITEM_WIDTH - 130 - 12} wrap x={8} y={4} />
+                                            <GroupText
+                                                background={textColor}
+                                                overrides={flatText(12)}
+                                                text={text}
+                                                width={ITEM_WIDTH - 130 - 12}
+                                                wrap
+                                                x={8}
+                                                y={4}
+                                            />
                                         )}
                                     </div>
                                 </div>
@@ -236,7 +324,14 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = ({ forumData,
             </div>
             <div className="octane-forum__footer">
                 <ForumButton label={LocalizeText('groupforum.view.back')} width={95} x={10} onClick={onBack} />
-                <ForumButton disabled={!canReply} label={LocalizeText('groupforum.view.reply')} right={178} tint="blue" width={115} onClick={() => onReply(subject)} />
+                <ForumButton
+                    disabled={!canReply}
+                    label={LocalizeText('groupforum.view.reply')}
+                    right={178}
+                    tint="blue"
+                    width={115}
+                    onClick={() => onReply(subject)}
+                />
                 <ForumPager pageCount={pageCount} pageIndex={pageIndex} onPage={setPageIndex} />
             </div>
             {statusText && (

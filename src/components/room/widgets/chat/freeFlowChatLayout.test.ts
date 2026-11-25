@@ -1,5 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createLayoutBatcher, followFreeFlowAnchor, getChatViewerHeight, resolveFreeFlowLayout, resolveLineByLineLayout, resolveUntilSettled } from './freeFlowChatLayout';
+import {
+    createLayoutBatcher,
+    followFreeFlowAnchor,
+    getChatViewerHeight,
+    layoutPassesFor,
+    MAX_LAYOUT_PASSES_PER_FRAME,
+    resolveFreeFlowLayout,
+    resolveLineByLineLayout,
+    resolveUntilSettled
+} from './freeFlowChatLayout';
 
 describe('resolveFreeFlowLayout', () => {
     it('separates a shallow horizontal collision before stacking bubbles vertically', () => {
@@ -239,5 +248,47 @@ describe('createLayoutBatcher', () => {
         batcher.dispose();
         frames.runAll();
         expect(flush).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('layoutPassesFor', () => {
+    it('gives a quiet frame the extra pass it always had', () => {
+        expect(layoutPassesFor(0)).toBe(1);
+        expect(layoutPassesFor(1)).toBe(2);
+    });
+
+    it('does not run a pass per bubble when a crowd asks for room in one frame', () => {
+        expect(layoutPassesFor(12)).toBe(MAX_LAYOUT_PASSES_PER_FRAME);
+        expect(layoutPassesFor(200)).toBe(MAX_LAYOUT_PASSES_PER_FRAME);
+    });
+});
+
+describe('a full chat area', () => {
+    // 250 bubbles in rows of ten: the amount the chat area holds at most.
+    const crowd = Array.from({ length: 250 }, (_, index) => ({
+        id: index + 1,
+        left: (index % 10) * 60,
+        top: 400 - Math.floor(index / 10) * 12,
+        width: 110,
+        height: 24,
+        anchorX: (index % 10) * 60 + 55,
+        overflowTop: 0,
+        overflowBottom: 0
+    }));
+
+    it('still gives every bubble a place', () => {
+        const { positions } = resolveUntilSettled(crowd, resolveFreeFlowLayout, layoutPassesFor(12));
+
+        expect(positions).toHaveLength(250);
+        expect(positions.every((position) => Number.isFinite(position.left) && Number.isFinite(position.top))).toBe(true);
+    });
+
+    it('lays out the frame of a crowd well within a frame', () => {
+        const startedAt = performance.now();
+
+        resolveUntilSettled(crowd, resolveFreeFlowLayout, layoutPassesFor(12));
+
+        // A generous bound for a slow test machine; a pass per request took many times this.
+        expect(performance.now() - startedAt).toBeLessThan(250);
     });
 });

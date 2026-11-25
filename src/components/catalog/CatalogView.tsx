@@ -9,7 +9,7 @@ import { ToggleButton } from '../../common/ToggleButton';
 import { CatalogEffectsHost, useCatalogActions, useCatalogData, useCatalogUiState, useHasPermission, usePurse } from '../../hooks';
 import { CatalogStudioProvider } from './admin/studio/CatalogStudioProvider';
 import { CatalogAdminProvider, useCatalogAdmin } from './CatalogAdminContext';
-import { getCatalogHeaderDescription } from './catalogLocalization.helpers';
+import { getCatalogHeaderDescription, getCatalogHeaderTextKey } from './catalogLocalization.helpers';
 import { parseCatalogTabLabel, useCatalogWindowWidth } from './useCatalogWindowWidth';
 import { CatalogAdminManagerView } from './views/admin/CatalogAdminManagerView';
 import { CatalogAdminOfferEditView } from './views/admin/CatalogAdminOfferEditView';
@@ -55,6 +55,7 @@ const CatalogViewInner: FC<{}> = () => {
     const isMod = useHasPermission('acc_catalogfurni');
     // AIR's Builders Club warehouse has its own title and no tab row: its pages are listed on the left only.
     const isBuilder = currentType === CatalogType.BUILDER;
+    const headerTextKey = getCatalogHeaderTextKey(currentPage?.layoutCode);
     const adminToggle = <FaCog className={`text-[10px] ${adminMode ? 'animate-spin' : ''}`} style={adminMode ? { animationDuration: '3s' } : {}} />;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { purse = null } = usePurse();
@@ -292,7 +293,9 @@ const CatalogViewInner: FC<{}> = () => {
                                                           ['count', 'needle'],
                                                           [String(searchResult.offers.length), searchResult.searchValue]
                                                       )
-                                                    : getCatalogHeaderDescription(currentPage?.layoutCode, currentPage?.localization)
+                                                    : headerTextKey
+                                                      ? LocalizeText(headerTextKey)
+                                                      : getCatalogHeaderDescription(currentPage?.layoutCode, currentPage?.localization)
                                             )
                                         }}
                                     />

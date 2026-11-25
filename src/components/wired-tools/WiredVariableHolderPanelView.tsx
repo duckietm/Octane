@@ -1,8 +1,7 @@
 import { KeyboardEvent, ReactNode } from 'react';
-import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
+import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { Select } from '../../common/Select';
 import { NumberInput } from '../../common/NumberInput';
-import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { localizeWithFallback } from '../../api';
 
@@ -99,10 +98,13 @@ export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelView
     } = props;
     const selectedGiveOption = giveOptions.find((option) => option.id === giveSelectedId) ?? null;
 
+    // AIR variables_management_detail (339 wide): the info box with Refresh beside it, the holder's picture (94 x 94)
+    // next to its text box, the variables in the AIR table, and two 145 px buttons under it. A value is edited after
+    // a double click on it; Give variable opens the create bubble over the table.
     return (
         <NativeTextTree>
             <OctaneCardView
-                className="octane-wired-menu min-w-[430px] max-w-[430px] max-h-[620px]"
+                className="octane-wired-menu octane-wired-holder"
                 theme="primary-slim"
                 uniqueKey={uniqueKey}
                 windowPosition={DraggableWindowPosition.TOP_LEFT}
@@ -110,84 +112,60 @@ export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelView
                 offsetTop={offsetTop}
             >
                 <OctaneCardHeaderView headerText={title} onCloseClick={onClose} />
-                <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3 relative" overflow="hidden">
-                    <div className="rounded border border-[#c8c2b2] bg-white p-3 flex items-center justify-between gap-3">
-                        <div className="grow text-center">
-                            <Text>{warningText}</Text>
-                        </div>
+                <OctaneCardContentView className="octane-wired-holder__content" overflow="hidden">
+                    <div className="octane-wired-holder__top">
+                        <div className="octane-wired-logs__info octane-wired-holder__info">{warningText}</div>
                         <Button variant="secondary" onClick={onRefresh}>
-                            {localizeWithFallback('octane.wired_tools.refresh', 'Refresh')}
+                            {localizeWithFallback('wiredmenu.list_view.refresh', 'Refresh')}
                         </Button>
                     </div>
-                    <div className="flex flex-col gap-2">
-                        <Text bold>{localizeWithFallback('octane.wired_tools.holder_info', 'Holder info:')}</Text>
-                        <div className="flex gap-4">
-                            <div className="w-[140px] h-[110px] rounded border border-[#d8d2c3] bg-[#dedede] flex items-center justify-center overflow-hidden">
-                                {preview}
-                            </div>
-                            <div className="grow rounded border border-[#d8d2c3] bg-white p-3 flex flex-col gap-1 text-[12px]">
+                    <div className="octane-wired-holder__section">
+                        <b>{localizeWithFallback('wiredmenu.variable_management_detail.holder_info', 'Holder info:')}</b>
+                        <div className="octane-wired-holder__holder">
+                            <div className="octane-wired-holder__preview">{preview}</div>
+                            <div className="octane-wired-holder__lines">
                                 {infoLines.map((line, index) => (
-                                    <Text key={`${line}-${index}`}>{line}</Text>
+                                    <div key={`${line}-${index}`}>{line}</div>
                                 ))}
                             </div>
                         </div>
                     </div>
                     {status}
-                    <div className="flex flex-col gap-2 min-h-0 grow">
-                        <Text bold>{variablesTitle}</Text>
-                        <div className="grow rounded border border-[#d1ccbf] bg-white overflow-y-auto">
-                            <table className="w-full text-[12px]">
-                                <thead className="bg-[#efede5] sticky top-0">
+                    <div className="octane-wired-holder__section is-variables">
+                        <b>{variablesTitle}</b>
+                        <div className="octane-wired-table__border octane-wired-holder__table">
+                            <table>
+                                <thead>
                                     <tr>
-                                        <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.variable', 'Variable')}</th>
-                                        <th className="text-left px-2 py-1">{localizeWithFallback('octane.wired_tools.value', 'Value')}</th>
+                                        <th>{localizeWithFallback('octane.wired_tools.variable', 'Variable')}</th>
+                                        <th className="octane-wired-holder__value-column">{localizeWithFallback('octane.wired_tools.value', 'Value')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {!entries.length && (
-                                        <tr>
-                                            <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={2}>
-                                                {localizeWithFallback('octane.wired_tools.no_variables_currently_assigned', 'No variables currently assigned')}
-                                            </td>
+                                        <tr className="is-empty">
+                                            <td colSpan={2}>{localizeWithFallback('octane.wired_tools.no_variables_currently_assigned', 'No variables currently assigned')}</td>
                                         </tr>
                                     )}
-                                    {entries.map((entry, index) => {
+                                    {entries.map((entry) => {
                                         const isSelected = selectedId === entry.id;
                                         const isEditing = editingId === entry.id;
                                         const isEditable = canEdit && !entry.isReadOnly;
 
                                         return (
-                                            <tr
-                                                key={entry.id}
-                                                className={`${isSelected ? 'bg-[#d7dfea]' : index % 2 === 0 ? 'bg-white' : 'bg-[#f8f6f0]'} cursor-pointer hover:bg-[#e8eefc]`}
-                                                onClick={() => onSelect(entry.id)}
-                                            >
-                                                <td className="px-2 py-1">
-                                                    <div className="flex flex-col">
-                                                        <span>{entry.name}</span>
-                                                        <span className="text-[10px] text-[#8a8476]">{entry.availability}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-2 py-1">
-                                                    {!entry.hasValue && <span className="text-[#8a8476]">/</span>}
-                                                    {!!entry.hasValue && !isEditing && (
-                                                        <BaseButton
-                                                            className={`rounded px-1 py-[1px] ${isEditable ? 'text-[#1b57b2] underline underline-offset-2' : 'text-[#222]'}`}
-                                                            disabled={!isEditable}
-                                                            type="button"
-                                                            onClick={(event) => {
-                                                                event.stopPropagation();
-
-                                                                if (!isEditable) return;
-
-                                                                onBeginEdit(entry);
-                                                            }}
-                                                        >
-                                                            {entry.value ?? 0}
-                                                        </BaseButton>
-                                                    )}
+                                            <tr key={entry.id} aria-selected={isSelected} className={isSelected ? 'is-selected' : ''} onClick={() => onSelect(entry.id)}>
+                                                <td title={entry.availability ? `${entry.name} (${entry.availability})` : entry.name}>{entry.name}</td>
+                                                <td
+                                                    className="octane-wired-holder__value-column"
+                                                    onDoubleClick={() => {
+                                                        // AIR TableCellView: an editable cell turns into its field on a double click.
+                                                        if (entry.hasValue && isEditable && !isEditing) onBeginEdit(entry);
+                                                    }}
+                                                >
+                                                    {!entry.hasValue && '/'}
+                                                    {!!entry.hasValue && !isEditing && (entry.value ?? 0)}
                                                     {!!entry.hasValue && isEditing && (
-                                                        <NumberInput autoFocus className="w-[72px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={editingValue} onBlur={onEditBlur} onChange={(event) => onEditingValueChange(event.target.value)} onClick={(event) => event.stopPropagation()} onKeyDownCapture={onEditKeyDown} />
+                                                        <NumberInput autoFocus className="octane-wired-holder__value-input" steppers={false} value={editingValue} onBlur={onEditBlur} onChange={(event) => onEditingValueChange(event.target.value)} onClick={(event) => event.stopPropagation()} onKeyDownCapture={onEditKeyDown} />
                                                     )}
                                                 </td>
                                             </tr>
@@ -198,15 +176,11 @@ export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelView
                         </div>
                     </div>
                     {extraActions}
-                    <div className="relative flex items-center justify-between gap-3 pt-1">
+                    <div className="octane-wired-holder__buttons">
                         {isGiveOpen && (
-                            <div className="absolute right-0 bottom-full mb-2 w-[210px] rounded border border-[#8d887a] bg-[#efede5] p-3 shadow-[0_2px_8px_rgba(0,0,0,.25)] z-10 flex flex-col gap-2">
-                                <Text bold>{localizeWithFallback('octane.wired_tools.variable_2', 'Variable:')}</Text>
-                                <Select
-                                    className="rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px]"
-                                    value={selectedGiveOption?.id ?? ''}
-                                    onChange={(event) => onGiveSelect(event.target.value)}
-                                >
+                            <div className="octane-wired-holder__bubble">
+                                <b>{localizeWithFallback('wiredmenu.inspection.select_variable', 'Variable:')}</b>
+                                <Select value={selectedGiveOption?.id ?? ''} onChange={(event) => onGiveSelect(event.target.value)}>
                                     {!giveOptions.length && <option value="">{localizeWithFallback('octane.wired_tools.no_variables_available', 'No variables available')}</option>}
                                     {giveOptions.map((option) => (
                                         <option key={option.id} value={option.id}>
@@ -214,18 +188,18 @@ export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelView
                                         </option>
                                     ))}
                                 </Select>
-                                <Text bold>{localizeWithFallback('octane.wired_tools.value_2', 'Value:')}</Text>
-                                <NumberInput className="w-[96px] rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px] disabled:opacity-60" disabled={!selectedGiveOption?.hasValue} value={giveValue} onChange={(event) => onGiveValueChange(event.target.value)} />
-                                <Button disabled={!canGive} variant="secondary" onClick={onGive}>
-                                    {localizeWithFallback('octane.wired_tools.create', 'Create')}
+                                <b>{localizeWithFallback('wiredmenu.inspection.select_value', 'Value:')}</b>
+                                <NumberInput className="octane-wired-holder__give-value" disabled={!selectedGiveOption?.hasValue} steppers={false} value={giveValue} onChange={(event) => onGiveValueChange(event.target.value)} />
+                                <Button disabled={!canGive || !selectedGiveOption} variant="secondary" onClick={onGive}>
+                                    {localizeWithFallback('wiredmenu.inspection.create', 'Create')}
                                 </Button>
                             </div>
                         )}
                         <Button disabled={!canRemove} variant="secondary" onClick={onRemove}>
-                            {localizeWithFallback('octane.wired_tools.remove_variable', 'Remove variable')}
+                            {localizeWithFallback('wiredmenu.inspection.delete', 'Remove variable')}
                         </Button>
                         <Button disabled={!canGive} variant="secondary" onClick={onToggleGive}>
-                            {localizeWithFallback('octane.wired_tools.give_variable', 'Give variable')}
+                            {localizeWithFallback('wiredmenu.inspection.add', 'Give variable')}
                         </Button>
                     </div>
                 </OctaneCardContentView>

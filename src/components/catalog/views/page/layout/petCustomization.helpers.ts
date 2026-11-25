@@ -9,6 +9,9 @@ const parseNumberList = (value: string | undefined): number[] | null => {
     return values.length && values.every(Number.isInteger) ? values : null;
 };
 
+/** AIR PetPreviewCatalogWidget.init: a white horse (type 15, palette 2) stands in the preview until a product is picked. */
+export const PET_CUSTOMIZATION_DEFAULT_FIGURE = [15, 2, 0xffffff, 0].join(' ');
+
 export const buildPetCustomizationPreviewFigure = (furnitureData: IFurnitureData | null | undefined): string | null => {
     if (!furnitureData?.customParams?.length) return null;
 

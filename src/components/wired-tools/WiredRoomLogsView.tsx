@@ -1,7 +1,7 @@
 import { IWiredLogEntry, WiredLogPageEvent, WiredRoomLogsPageComposer } from '@octane/renderer';
 import { useEffect, useRef, useState } from 'react';
 import { localizeWithFallback, SendMessageComposer } from '../../api';
-import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
+import { DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { useMessageEvent } from '../../hooks';
 import { useWiredPageRequests } from '../../hooks/wired-tools/useWiredPageRequests';
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
@@ -171,10 +171,13 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
         }
     };
 
+    // AIR logs_overview (700 wide): the info box with Auto refresh beside it, then the filter field, the log source
+    // menu and the log level menu on one line, the table (672 x 316) and the paging row. AIR has no Refresh button:
+    // the page is asked for again by a filter, a page button or the auto refresh.
     return (
         <NativeTextTree>
             <OctaneCardView
-                className="octane-wired-menu min-w-[760px] max-w-[760px] max-h-[560px]"
+                className="octane-wired-menu octane-wired-logs"
                 theme="primary-slim"
                 uniqueKey="wired-room-logs"
                 windowPosition={DraggableWindowPosition.TOP_LEFT}
@@ -182,27 +185,24 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
                 offsetTop={40}
             >
                 <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.logs_overview.title', 'Wired room logs')} onCloseClick={onClose} />
-                <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
-                    <div className="rounded border border-[#c8c2b2] bg-white p-3 flex items-center justify-between gap-3">
-                        <Text className="whitespace-pre-line">
+                <OctaneCardContentView className="octane-wired-logs__content" overflow="hidden">
+                    <div className="octane-wired-logs__top">
+                        <div className="octane-wired-logs__info">
                             {localizeWithFallback(
                                 'wiredmenu.logs_overview.info',
                                 'Every line the wired engine wrote for this room, newest first. Filter by text, source or level.'
                             ).replace(/\\n/g, '\n')}
-                        </Text>
-                        <label className="flex items-center gap-1 text-[12px] whitespace-nowrap">
+                        </div>
+                        <label className="octane-wired-logs__auto-refresh">
                             <Checkbox checked={autoRefresh} onCheckedChange={(nextChecked) => setAutoRefresh(nextChecked)} />
-                            {localizeWithFallback('wiredmenu.logs_overview.auto_refresh', 'Auto refresh')}
+                            <span>{localizeWithFallback('wiredmenu.logs_overview.auto_refresh', 'Auto refresh')}</span>
                         </label>
-                        <Button variant="secondary" onClick={() => requests.refresh()}>
-                            {localizeWithFallback('wiredmenu.logs_overview.refresh', 'Refresh')}
-                        </Button>
                     </div>
-                    <div className="flex flex-wrap items-center gap-4 text-[12px]">
-                        <label className="flex items-center gap-2">
-                            <Text bold>{localizeWithFallback('wiredmenu.logs_overview.filter', 'Filter:')}</Text>
+                    <div className="octane-wired-logs__filters">
+                        <label className="octane-wired-logs__field is-filter">
+                            <b>{localizeWithFallback('wiredmenu.logs_overview.filter', 'Filter:')}</b>
                             <input
-                                className="w-[240px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
+                                className="octane-wired-logs__filter-input"
                                 type="text"
                                 maxLength={FILTER_MAX_CHARS}
                                 value={query}
@@ -215,10 +215,10 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
                                 }}
                             />
                         </label>
-                        <label className="flex items-center gap-2">
-                            <Text bold>{localizeWithFallback('wiredmenu.logs_overview.log_source', 'Log source:')}</Text>
+                        <label className="octane-wired-logs__field">
+                            <b>{localizeWithFallback('wiredmenu.logs_overview.log_source', 'Log source:')}</b>
                             <Select
-                                className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
+                                className="octane-wired-logs__menu"
                                 value={source}
                                 onChange={(event) => {
                                     const next = Number(event.target.value);
@@ -238,10 +238,10 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
                                 ))}
                             </Select>
                         </label>
-                        <label className="flex items-center gap-2">
-                            <Text bold>{localizeWithFallback('wiredmenu.logs_overview.log_level', 'Log level:')}</Text>
+                        <label className="octane-wired-logs__field">
+                            <b>{localizeWithFallback('wiredmenu.logs_overview.log_level', 'Log level:')}</b>
                             <Select
-                                className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
+                                className="octane-wired-logs__menu"
                                 value={level}
                                 onChange={(event) => {
                                     const next = Number(event.target.value);
@@ -274,7 +274,7 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
                         emptyText={localizeWithFallback('wiredmenu.logs_overview.empty', 'No log lines match the current filters')}
                         pagingTextKey="wiredmenu.logs_overview.bottom_text"
                         scrollResetKey={scrollKey}
-                        bodyClassName="h-[320px]"
+                        bodyClassName="octane-wired-logs__table"
                     />
                 </OctaneCardContentView>
             </OctaneCardView>

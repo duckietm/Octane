@@ -1,11 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../api', () => ({
-    LocalizeText: (key: string) => key,
+    // Only the long name has a detailed text in this hotel.
+    LocalizeText: (key: string, _names?: string[], values?: string[]) => (key === 'catalog.alert.petname.long.additionalInfo' ? `too long (max ${values?.[0]})` : key),
     SendMessageComposer: vi.fn()
 }));
 
-import { getPetPackageNameError } from './usePetPackageWidget';
+import { getPetPackageNameError } from './usePetPackageWidget.helpers';
 
 describe('getPetPackageNameError', () => {
     it('returns empty string for code 0 (no error)', () => {
@@ -27,5 +28,12 @@ describe('getPetPackageNameError', () => {
     it('falls back to the bobba label for unknown error codes (defensive default)', () => {
         expect(getPetPackageNameError(99)).toBe('catalog.alert.petname.bobba');
         expect(getPetPackageNameError(-1)).toBe('catalog.alert.petname.bobba');
+    });
+
+    it("uses the detailed text with the server's detail where the hotel has one", () => {
+        expect(getPetPackageNameError(1, '15')).toBe('too long (max 15)');
+        // No detailed text for this one: the plain text.
+        expect(getPetPackageNameError(3, '!?')).toBe('catalog.alert.petname.chars');
+        expect(getPetPackageNameError(1, '')).toBe('catalog.alert.petname.long');
     });
 });

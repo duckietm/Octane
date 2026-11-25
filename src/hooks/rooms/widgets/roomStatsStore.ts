@@ -2,13 +2,19 @@ import { createOctaneStore } from '../../../state/createOctaneStore';
 
 interface RoomStatsState {
     enabled: boolean;
+    /** How the room's floors and walls are drawn, shown under the readout once `:directplanes` was used; null before. */
+    planeMode: 'direct' | 'baked' | null;
     toggle: () => void;
+    /** Turns the readout on and names the plane mode under it. */
+    showPlaneMode: (direct: boolean) => void;
 }
 
 /** Whether the room statistics readout (`:showstats`) is on. */
 export const useRoomStatsStore = createOctaneStore<RoomStatsState>()((set) => ({
     enabled: false,
-    toggle: () => set((state) => ({ enabled: !state.enabled }))
+    planeMode: null,
+    toggle: () => set((state) => ({ enabled: !state.enabled })),
+    showPlaneMode: (direct) => set({ enabled: true, planeMode: direct ? 'direct' : 'baked' })
 }));
 
 export interface RoomStatsSample {

@@ -6153,28 +6153,40 @@
     overflow: hidden;
 }
 
-/* AIR shows the status in the catalog header; here it sits beside the button, clear of the machine. */
+/* AIR shows recycler.info.ready in the catalog header and nothing beside the button: the state of a run is only
+   announced to screen readers. */
 .octane-catalog-air-recycler__status {
     position: absolute;
-    top: 41px;
-    left: 220px;
-    box-sizing: border-box;
-    width: 130px;
-    height: 30px;
-    padding: 1px 4px;
+    width: 1px;
+    height: 1px;
     overflow: hidden;
-    border-radius: 3px;
-    background: rgba(255, 255, 255, 0.9);
-    font-size: 10px;
-    line-height: 13px;
+    clip-path: inset(50%);
+    white-space: nowrap;
 }
 
+/* recyclerWidget_xml: the ducket price at 19,7, the bold amount then the icon 2 px after it. */
+.octane-catalog-air-recycler__cost {
+    position: absolute;
+    top: 7px;
+    left: 19px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 30px;
+    font-weight: 700;
+    line-height: 17px;
+}
+
+/* AIR recycler_recycle (params 131089: the button sizes itself to its caption): as wide as the text, so it grows
+   for the countdown caption. */
 .octane-catalog-air-recycler .octane-catalog-air-recycler__recycle {
     position: absolute;
     top: 41px;
     left: 19px;
-    width: 194px;
+    width: auto !important;
+    max-width: 194px;
     height: 30px;
+    white-space: nowrap;
 }
 
 .octane-catalog-air-recycler__frame {
@@ -6219,6 +6231,17 @@
     cursor: pointer;
 }
 
+/* The furni held from the inventory, drawn at the pointer while it is over the catalog window (on the body). */
+.octane-catalog-air-recycler__held {
+    position: fixed;
+    z-index: 100000;
+    max-width: 34px;
+    max-height: 34px;
+    transform: translate(-50%, -50%);
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
 .octane-catalog-air-recycler__slot:disabled {
     cursor: default;
 }
@@ -6240,6 +6263,21 @@
     left: 37px;
     width: 50px;
     height: 50px;
+}
+
+.octane-catalog-air-recycler__abort {
+    position: absolute;
+    top: 91px;
+    left: 30px;
+    height: 17px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #000000;
+    font-size: 10px;
+    line-height: 15px;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 .octane-catalog-air-recycler__pointer img {

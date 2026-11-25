@@ -28,6 +28,22 @@ const SECTIONS: Section[] = [
     { labelKey: 'groupforum.permissions.moderate_label', y: 410, levels: [2, 3] }
 ];
 
+/**
+ * AIR ForumSettingsView.setSelectorState: the lowest level each section may take. Posting cannot be more open than
+ * reading, starting threads not more open than posting, and moderating is the administrators at least.
+ */
+export const forumPermissionMinimums = (levels: readonly number[]): number[] => [0, levels[0], levels[1], 2];
+
+/** Raises every level that is below its minimum, from reading down to moderating, as AIR does when a choice changes. */
+export const normalizeForumPermissions = (levels: readonly number[]): number[] => {
+    const read = Math.max(0, levels[0] ?? 0);
+    const postMessage = Math.max(read, levels[1] ?? 0);
+    const postThread = Math.max(postMessage, levels[2] ?? 0);
+    const moderate = Math.max(2, levels[3] ?? 0);
+
+    return [read, postMessage, postThread, moderate];
+};
+
 interface GroupForumSettingsViewProps {
     forumData: ExtendedForumData;
     groupId: number;
@@ -38,7 +54,10 @@ interface GroupForumSettingsViewProps {
 }
 
 export const GroupForumSettingsView: FC<GroupForumSettingsViewProps> = ({ forumData, groupId, readForumData, initialPosition, onClose }) => {
-    const [levels, setLevels] = useState<number[]>([forumData.readPermissions, forumData.postMessagePermissions, forumData.postThreadPermissions, forumData.moderatePermissions]);
+    const [levels, setLevels] = useState<number[]>(() =>
+        normalizeForumPermissions([forumData.readPermissions, forumData.postMessagePermissions, forumData.postThreadPermissions, forumData.moderatePermissions])
+    );
+    const minimums = forumPermissionMinimums(levels);
 
     // Two presses before the window closes still send one update.
     const saved = useRef<boolean>(false);
@@ -81,19 +100,26 @@ export const GroupForumSettingsView: FC<GroupForumSettingsViewProps> = ({ forumD
             {SECTIONS.map((section, sectionIndex) => (
                 <div key={section.labelKey} className="octane-forum__section" style={{ top: section.y }}>
                     <GroupText text={LocalizeText(section.labelKey)} x={0} y={0} />
-                    {section.levels.map((level, row) => (
-                        <div key={level}>
-                            <BaseButton
-                                aria-checked={levels[sectionIndex] === level}
-                                className={`octane-group-native__check is-radio${levels[sectionIndex] === level ? ' is-checked' : ''}`}
-                                role="radio"
-                                style={{ left: 20, top: 23 + row * 20 }}
-                                type="button"
-                                onClick={() => setLevels((previous) => previous.map((value, index) => (index === sectionIndex ? level : value)))}
-                            />
-                            <GroupText text={LocalizeText(OPTION_KEYS[level])} x={40} y={20 + row * 20} />
-                        </div>
-                    ))}
+                    {section.levels.map((level, row) => {
+                        // An option more open than the section above allows is greyed and cannot be picked.
+                        const locked = level < minimums[sectionIndex];
+
+                        return (
+                            <div key={level} className={locked ? 'octane-forum__option is-locked' : 'octane-forum__option'}>
+                                <BaseButton
+                                    aria-checked={levels[sectionIndex] === level}
+                                    aria-label={`${LocalizeText(section.labelKey)} ${LocalizeText(OPTION_KEYS[level])}`}
+                                    className={`octane-group-native__check is-radio${levels[sectionIndex] === level ? ' is-checked' : ''}`}
+                                    disabled={locked}
+                                    role="radio"
+                                    style={{ left: 20, top: 23 + row * 20 }}
+                                    type="button"
+                                    onClick={() => setLevels((previous) => normalizeForumPermissions(previous.map((value, index) => (index === sectionIndex ? level : value))))}
+                                />
+                                <GroupText text={LocalizeText(OPTION_KEYS[level])} x={40} y={20 + row * 20} />
+                            </div>
+                        );
+                    })}
                 </div>
             ))}
             <ForumButton label={LocalizeText('groupforum.settings.cancel')} width={120} x={25} y={478} onClick={onClose} />

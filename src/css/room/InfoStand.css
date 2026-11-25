@@ -121,6 +121,96 @@
   height: 28px;
 }
 
+/* The horse products use the plant seed geometry; the preview is a button holding the pet picture. */
+.octane-use-product-horse__preview,
+.octane-use-product-plant__preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* AIR use_product_widget_frame_monsterplant*: the 290 px wide plant product content. */
+.octane-use-product-plant {
+  width: min(292px, calc(100vw - 16px));
+  min-width: 0;
+  max-width: calc(100vw - 16px);
+}
+
+.octane-use-product-plant .octane-use-product-plant__content {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 11px 10px 10px;
+  overflow: hidden;
+  color: #000000;
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.octane-use-product-plant__columns {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  min-height: 184px;
+}
+
+.octane-use-product-plant__plant,
+.octane-use-product-plant__texts {
+  flex: 0 0 130px;
+  width: 130px;
+  min-width: 0;
+}
+
+.octane-use-product-plant__line {
+  width: 122px;
+  min-height: 17px;
+  margin-bottom: 1px;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.octane-use-product-plant__preview {
+  width: 122px;
+  height: 130px;
+  margin-bottom: 1px;
+  background: url('@/assets/images/room-widgets/avatar-info/preview-background.png') no-repeat center;
+}
+
+.octane-use-product-plant__texts {
+  padding-top: 18px;
+}
+
+.octane-use-product-plant__description,
+.octane-use-product-plant__info {
+  width: 130px;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.octane-use-product-plant__info {
+  margin-top: 11px;
+  font-style: italic;
+}
+
+.octane-use-product-plant__buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 21px;
+}
+
+.octane-use-product-plant .octane-use-product-plant__buttons > button {
+  flex: 0 0 130px;
+  width: 130px;
+  height: 30px;
+  padding-left: 2px !important;
+  padding-right: 2px !important;
+}
+
 /* AIR user_view: border style-1 black 190px, list x=10 y=10 w=170. */
 .octane-infostand {
   position: relative;

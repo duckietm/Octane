@@ -1,9 +1,10 @@
 import { InfiniteGrid } from '@layout/InfiniteGrid';
-import { GetRoomEngine, GetSessionDataManager, IRoomSession, RoomPreviewer, Vector3d } from '@octane/renderer';
+import { GetRoomEngine, GetSessionDataManager, IRoomSession, RoomEngineUseProductEvent, RoomPreviewer, Vector3d } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import {
     attemptItemPlacement,
+    DispatchMainEvent,
     DispatchUiEvent,
     FurniCategory,
     getGroupItemKey,
@@ -20,6 +21,7 @@ import { useInventoryFurni, useInventoryUnseenTracker, useMarketplaceConfigurati
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryCategoryLoadingView } from '../InventoryCategoryLoadingView';
+import { isInventoryPetProduct } from '../../../../hooks/rooms/widgets/avatarInfo.products';
 import { InventoryFurnitureItemView } from './InventoryFurnitureItemView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
@@ -193,13 +195,14 @@ export const InventoryFurnitureView: FC<{
                             }}
                         />
                         {selectedItem && (
-                            <div className="octane-inventory-furni-status">
+                            // AIR tradeable_info_region / recyclable_info_region: they only carry a tooltip, and a click on
+                            // them is theirs, so it does not pick the furni up as a click on the preview does.
+                            <div className="octane-inventory-furni-status" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
                                 <div
                                     className={`octane-inventory-furni-status-icon ${tradeableCount > 0 ? 'is-trade' : 'is-no-trade'}`}
                                     title={
-                                        tradeableCount > 0
-                                            ? LocalizeText('inventory.furni.trading.is_tradable', ['amount'], [String(tradeableCount)])
-                                            : LocalizeText('inventory.furni.trading.is_not_tradable')
+                                        // AIR FurniView: the tooltips of tradeable_info_region.
+                                        LocalizeText(tradeableCount > 0 ? 'inventory.furni.preview.tradeable_amount' : 'inventory.furni.preview.not_tradeable')
                                     }
                                 >
                                     {tradeableCount > 0 && <span className="octane-inventory-furni-status-count is-trade-count">{tradeableCount}</span>}
@@ -207,9 +210,7 @@ export const InventoryFurnitureView: FC<{
                                 <div
                                     className={`octane-inventory-furni-status-icon ${recyclableCount > 0 ? 'is-recycle' : 'is-no-recycle'}`}
                                     title={
-                                        recyclableCount > 0
-                                            ? LocalizeText('inventory.furni.recycling.is_recyclable', ['amount'], [String(recyclableCount)])
-                                            : LocalizeText('inventory.furni.recycling.is_not_recyclable')
+                                        LocalizeText(recyclableCount > 0 ? 'inventory.furni.preview.recyclable_amount' : 'inventory.furni.preview.not_recyclable')
                                     }
                                 >
                                     {recyclableCount > 0 && <span className="octane-inventory-furni-status-count is-recycle-count">{recyclableCount}</span>}
@@ -256,6 +257,24 @@ export const InventoryFurnitureView: FC<{
                                 >
                                     {LocalizeText('inventory.furni.placetoroom')}
                                 </OctaneButton>
+                                {/* AIR FurniView use_btn: a pet product is used on a pet straight from the inventory, in a private room. */}
+                                {!!roomSession?.isPrivateRoom && isInventoryPetProduct(selectedItem.category) && (
+                                    <OctaneButton
+                                        disabled={!selectedItem.getUnlockedCount() || playTestRestricted}
+                                        className="octane-inventory-btn-use"
+                                        onClick={() => {
+                                            const item = selectedItem.getLastItem();
+
+                                            if (!item) return;
+
+                                            DispatchMainEvent(
+                                                new RoomEngineUseProductEvent(RoomEngineUseProductEvent.USE_PRODUCT_FROM_INVENTORY, roomSession.roomId, -1, -1, item.ref, item.type)
+                                            );
+                                        }}
+                                    >
+                                        {LocalizeText('inventory.furni.use')}
+                                    </OctaneButton>
+                                )}
                                 <div className="octane-inventory-preview-controls">
                                     <BaseButton type="button" onClick={() => roomPreviewer?.changeRoomObjectDirection()}>
                                         {localizeWithFallback('widget.furniture.button.rotate', 'Rotate')}

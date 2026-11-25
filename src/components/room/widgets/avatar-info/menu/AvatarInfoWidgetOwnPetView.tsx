@@ -13,6 +13,7 @@ import { useNotification, useRoom, useSessionInfo, useWiredTools } from '../../.
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
+import { monsterPlantMenu } from './monsterPlantMenu';
 import { Checkbox } from '../../../../../common/Checkbox';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
@@ -128,6 +129,9 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
         });
     }, [avatarInfo]);
 
+    // Composting follows the hotel's setting like AIR; a hotel without the key keeps it on.
+    const plantMenu = monsterPlantMenu(avatarInfo, !!roomSession?.isRoomOwner, GetConfigurationValue<boolean>('monsterplants.composting.enabled', true) !== false);
+
     return (
         <NativeTextTree>
             <ContextMenuView
@@ -195,22 +199,22 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                     {mode === MODE_MONSTER_PLANT && (
                         <>
                             <ContextMenuListItemView onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>
-                            {avatarInfo.dead && (
+                            {plantMenu.revive && (
                                 <ContextMenuListItemView onClick={(event) => processAction('revive')}>
                                     {LocalizeText('infostand.button.revive')}
                                 </ContextMenuListItemView>
                             )}
-                            {roomSession.isRoomOwner && (
+                            {plantMenu.compost && (
                                 <ContextMenuListItemView onClick={(event) => processAction('compost')}>
                                     {LocalizeText('infostand.button.compost')}
                                 </ContextMenuListItemView>
                             )}
-                            {!avatarInfo.dead && avatarInfo.energy / avatarInfo.maximumEnergy < 0.98 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('treat')}>
+                            {plantMenu.treat && (
+                                <ContextMenuListItemView disabled={!plantMenu.treatEnabled} onClick={(event) => processAction('treat')}>
                                     {LocalizeText('infostand.button.pettreat')}
                                 </ContextMenuListItemView>
                             )}
-                            {!avatarInfo.dead && avatarInfo.level === avatarInfo.maximumLevel && avatarInfo.breedable && (
+                            {plantMenu.breeding && (
                                 <>
                                     <ContextMenuListItemView gap={1} onClick={(event) => processAction('toggle_breeding_permission')}>
                                         <Checkbox checked={avatarInfo.publiclyBreedable} readOnly={true} />

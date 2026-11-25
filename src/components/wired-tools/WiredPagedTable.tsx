@@ -40,8 +40,6 @@ export interface WiredPagedTableProps<T> {
     pagingTextKey?: string;
 }
 
-const PAGE_BUTTON_CLASS = 'min-w-[36px] rounded border border-[#b8b2a4] bg-white px-2 py-1 text-[12px] disabled:opacity-40';
-
 /**
  * A table over a pagination footer: first / previous / a page field / next / last, and the
  * "N found. Showing page [ ] of M" line. The caller says which page is shown and hands in the
@@ -74,15 +72,27 @@ export const WiredPagedTable = <T,>(props: WiredPagedTableProps<T>) => {
         requests.requestPage(clamped);
     };
 
+    const pageButton = (label: string, disabled: boolean, onClick: () => void, arrows: ('is-left' | 'is-right')[]) => (
+        <Hint content={label}>
+            <BaseButton aria-label={label} className="octane-wired-table__page-button" disabled={disabled} type="button" onClick={onClick}>
+                {arrows.map((direction, index) => (
+                    <i key={index} aria-hidden className={`octane-wired-table__arrow ${direction}`} />
+                ))}
+            </BaseButton>
+        </Hint>
+    );
+
+    // AIR wired_menu_table_view inside its window: the bordered table, then the paging row with two thick buttons on
+    // each side (first / previous, next / last) and the page line with its field centred between them.
     return (
         <NativeTextTree>
-            <div className="flex flex-col gap-2 min-h-0 grow">
-                <div ref={setBodyElement} className={`overflow-y-auto border border-[#d1ccbf] rounded bg-white ${bodyClassName}`} data-testid="wired-paged-table-body">
-                    <table className="w-full text-[12px] table-fixed">
-                        <thead className="bg-[#efede5] sticky top-0">
+            <div className="octane-wired-table">
+                <div ref={setBodyElement} className={`octane-wired-table__border ${bodyClassName}`} data-testid="wired-paged-table-body">
+                    <table>
+                        <thead>
                             <tr>
                                 {columns.map((column) => (
-                                    <th key={column.id} className={`px-2 py-1 ${column.align === 'right' ? 'text-right' : 'text-left'} ${column.className ?? ''}`}>
+                                    <th key={column.id} className={`${column.align === 'right' ? 'is-right' : ''} ${column.className ?? ''}`}>
                                         {column.title}
                                     </th>
                                 ))}
@@ -90,23 +100,17 @@ export const WiredPagedTable = <T,>(props: WiredPagedTableProps<T>) => {
                         </thead>
                         <tbody>
                             {!rows.length && (
-                                <tr>
-                                    <td className="px-2 py-3 text-center text-[#8b8678]" colSpan={columns.length}>
-                                        {emptyText}
-                                    </td>
+                                <tr className="is-empty">
+                                    <td colSpan={columns.length}>{emptyText}</td>
                                 </tr>
                             )}
-                            {rows.map((row, index) => (
-                                <tr key={getRowId(row)} className={index % 2 === 0 ? 'bg-white' : 'bg-[#f8f6f0]'}>
+                            {rows.map((row) => (
+                                <tr key={getRowId(row)}>
                                     {columns.map((column) => {
                                         const cell = getCell(row, column.id);
 
                                         return (
-                                            <td
-                                                key={column.id}
-                                                className={`px-2 py-1 truncate ${column.align === 'right' ? 'text-right' : ''} ${cell.className ?? ''}`}
-                                                title={cell.title}
-                                            >
+                                            <td key={column.id} className={`${column.align === 'right' ? 'is-right' : ''} ${cell.className ?? ''}`} title={cell.title}>
                                                 {cell.content}
                                             </td>
                                         );
@@ -116,24 +120,16 @@ export const WiredPagedTable = <T,>(props: WiredPagedTableProps<T>) => {
                         </tbody>
                     </table>
                 </div>
-                <div className="flex items-center justify-between gap-3">
-                    <div className="flex gap-2">
-                        <Hint content={localizeWithFallback('octane.wired_tools.first_page', 'First page')}>
-                            <BaseButton aria-label={localizeWithFallback('octane.wired_tools.first_page', 'First page')} className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" onClick={() => requests.requestFirstPage()}>
-                                &laquo;
-                            </BaseButton>
-                        </Hint>
-                        <Hint content={localizeWithFallback('octane.wired_tools.previous_page', 'Previous page')}>
-                            <BaseButton aria-label={localizeWithFallback('octane.wired_tools.previous_page', 'Previous page')} className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" onClick={() => requests.requestPreviousPage()}>
-                                &lsaquo;
-                            </BaseButton>
-                        </Hint>
+                <div className="octane-wired-table__paging">
+                    <div className="octane-wired-table__buttons">
+                        {pageButton(localizeWithFallback('octane.wired_tools.first_page', 'First page'), isFirst, () => requests.requestFirstPage(), ['is-left', 'is-left'])}
+                        {pageButton(localizeWithFallback('octane.wired_tools.previous_page', 'Previous page'), isFirst, () => requests.requestPreviousPage(), ['is-left'])}
                     </div>
-                    <div className="flex items-center gap-2 text-[12px] text-[#555]">
+                    <div className="octane-wired-table__page-line">
                         {pagingText && <span>{pagingText.start}</span>}
                         <input
                             aria-label={localizeWithFallback('octane.wired_tools.page', 'Page')}
-                            className="w-[42px] rounded border border-[#b8b2a4] bg-white px-1 py-[2px] text-center text-[12px]"
+                            className="octane-wired-table__page-input"
                             type="text"
                             inputMode="numeric"
                             value={pageInput}
@@ -148,17 +144,9 @@ export const WiredPagedTable = <T,>(props: WiredPagedTableProps<T>) => {
                         />
                         {pagingText && <span>{pagingText.end}</span>}
                     </div>
-                    <div className="flex gap-2">
-                        <Hint content={localizeWithFallback('octane.wired_tools.next_page', 'Next page')}>
-                            <BaseButton aria-label={localizeWithFallback('octane.wired_tools.next_page', 'Next page')} className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" onClick={() => requests.requestNextPage()}>
-                                &rsaquo;
-                            </BaseButton>
-                        </Hint>
-                        <Hint content={localizeWithFallback('octane.wired_tools.last_page', 'Last page')}>
-                            <BaseButton aria-label={localizeWithFallback('octane.wired_tools.last_page', 'Last page')} className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" onClick={() => requests.requestLastPage()}>
-                                &raquo;
-                            </BaseButton>
-                        </Hint>
+                    <div className="octane-wired-table__buttons is-right">
+                        {pageButton(localizeWithFallback('octane.wired_tools.next_page', 'Next page'), isLast, () => requests.requestNextPage(), ['is-right'])}
+                        {pageButton(localizeWithFallback('octane.wired_tools.last_page', 'Last page'), isLast, () => requests.requestLastPage(), ['is-right', 'is-right'])}
                     </div>
                 </div>
             </div>

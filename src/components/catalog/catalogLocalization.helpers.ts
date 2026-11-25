@@ -25,6 +25,12 @@ export const getCatalogTextElementName = (index: number, layoutCode: string): st
     return fields[index] ?? '';
 };
 
+/**
+ * Layouts whose widget writes the header description itself. AIR RecyclerCatalogWidget.updateUI puts
+ * `recycler.info.ready` there, whatever the page's own texts say.
+ */
+export const getCatalogHeaderTextKey = (layoutCode: string): string | null => (layoutCode === 'recycler' ? 'recycler.info.ready' : null);
+
 export const getCatalogHeaderDescription = (layoutCode: string, localization: IPageLocalization | null | undefined): string => {
     if (!localization || getCatalogTextElementName(0, layoutCode) !== 'catalog.header.description') return '';
 

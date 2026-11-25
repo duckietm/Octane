@@ -6,6 +6,7 @@ import {
     getWiredChestRights,
     isStarterChest,
     readWiredChestStuffData,
+    snapChestCapacityDraft,
     WIRED_CHEST_KIND_COINS,
     WIRED_CHEST_KIND_FURNI,
 } from './WiredChests';
@@ -83,5 +84,17 @@ describe('wired chest rights and layout (AIR WiredChestWrapperView)', () => {
             showSettings: true, showNotificationSettings: true, showCapacityOptions: true, showLockingOptions: false,
         });
         expect(getWiredChestLayout(true, true, WIRED_CHEST_KIND_FURNI)).toMatchObject({ showLockingOptions: true, depositKey: 'wiredchests.start_deposit' });
+    });
+
+    it('snaps a capacity typed above the maximum to the maximum (AIR onCapacityChange)', () => {
+        expect(snapChestCapacityDraft('250', 200)).toBe('200');
+        expect(snapChestCapacityDraft('200', 200)).toBe('200');
+        expect(snapChestCapacityDraft('7', 200)).toBe('7');
+        expect(snapChestCapacityDraft('', 200)).toBe('');
+    });
+
+    it('captions the deposit button the same for coin and furni chests', () => {
+        expect(getWiredChestLayout(true, false, WIRED_CHEST_KIND_FURNI).depositKey).toBe('wiredchests.start_deposit');
+        expect(getWiredChestLayout(true, false, WIRED_CHEST_KIND_COINS).depositKey).toBe('wiredchests.start_deposit');
     });
 });

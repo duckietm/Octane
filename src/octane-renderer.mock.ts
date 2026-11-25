@@ -502,6 +502,20 @@ export class FurnitureMultiStateComposer {
     ) {}
 }
 
+export class RoomEngineUseProductEvent {
+    static readonly USE_PRODUCT_FROM_ROOM = 'REUPE_USE_PRODUCT_FROM_ROOM';
+    static readonly USE_PRODUCT_FROM_INVENTORY = 'REUPE_USE_PRODUCT_FROM_INVENTORY';
+
+    constructor(
+        public readonly type: string,
+        public readonly roomId: number,
+        public readonly objectId: number,
+        public readonly category: number,
+        public readonly inventoryStripId: number = -1,
+        public readonly furnitureTypeId: number = -1
+    ) {}
+}
+
 export class RoomEngineObjectEvent extends StubClass {
     static readonly MOUSE_ENTER = 'REOE_MOUSE_ENTER';
     static readonly MOUSE_LEAVE = 'REOE_MOUSE_LEAVE';
@@ -1175,6 +1189,11 @@ export class MysteryBoxKeysUpdateEvent extends StubClass {
     public static MYSTERY_BOX_KEYS_UPDATE = 'mbke_update';
 }
 export class WiredMenuErrorEvent extends StubClass {}
+export class WiredUserPermanentVariablesListEvent extends StubClass {}
+export class WiredPermanentVariableResultEvent extends StubClass {}
+export class WiredPermanentVariablesRequestComposer extends RecordingComposer {}
+export class WiredPermanentVariableSetComposer extends RecordingComposer {}
+export class WiredVariableDeleteAllHoldersComposer extends RecordingComposer {}
 export class WiredMenuErrorParser extends StubClass {
     public static NOT_VARIABLE_OWNER = 7;
 }
@@ -1339,6 +1358,21 @@ export class RecycleItemsEntry {
     constructor(public readonly itemId: number) {}
 }
 export class RecycleItemsMessageComposer extends RecordingComposer {}
+// The wired chest transaction log (the chest window's log and the chests tab of the wired menu).
+export const CHEST_TRANSACTION_METHOD_MANUAL = 0;
+export const CHEST_TRANSACTION_METHOD_WIRED = 1;
+export const CHEST_TRANSACTION_METHOD_CONTRACT_PAYMENT = 2;
+export const CHEST_TRANSACTION_METHOD_CONTRACT_REWARD = 3;
+export const CHEST_TRANSACTION_METHOD_CONTRACT_TRADE = 4;
+export const CHEST_LOG_LIST_CHEST = 0;
+export const CHEST_LOG_LIST_ROOM = 1;
+export const CHEST_LOG_FILTER_ALL = 0;
+export const CHEST_LOG_FILTER_CURRENCY = 1;
+export const CHEST_LOG_FILTER_FURNI = 2;
+export class WiredChestRoomLogsComposer extends RecordingComposer {}
+export class WiredChestRoomLogsEvent extends MessageEvent {}
+export class WiredChestTransactionDetailsComposer extends RecordingComposer {}
+export class WiredChestTransactionDetailsEvent extends MessageEvent {}
 export class GetRecyclerPrizesMessageComposer extends RecordingComposer {}
 export class RecyclerPrizesMessageEvent extends MessageEvent {}
 export class RecyclerPrizeLevel extends StubClass {}

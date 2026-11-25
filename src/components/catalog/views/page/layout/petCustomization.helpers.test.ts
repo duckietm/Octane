@@ -1,7 +1,7 @@
 /* @vitest-environment jsdom */
 import { describe, expect, it } from 'vitest';
 import { FurniCategory } from '../../../../../api';
-import { buildPetCustomizationPreviewFigure } from './petCustomization.helpers';
+import { buildPetCustomizationPreviewFigure, PET_CUSTOMIZATION_DEFAULT_FIGURE } from './petCustomization.helpers';
 
 describe('standard pet customization catalog preview', () => {
     it('builds a complete default-pet figure for saddle custom parts', () => {
@@ -24,5 +24,9 @@ describe('standard pet customization catalog preview', () => {
 
     it('rejects malformed customization parameters instead of rendering a broken pet', () => {
         expect(buildPetCustomizationPreviewFigure({ specialType: FurniCategory.PET_SADDLE, customParams: '15 1,2' } as any)).toBeNull();
+    });
+
+    it('starts with a white horse', () => {
+        expect(PET_CUSTOMIZATION_DEFAULT_FIGURE).toBe('15 2 16777215 0');
     });
 });
