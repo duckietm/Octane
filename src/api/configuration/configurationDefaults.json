@@ -114,6 +114,7 @@
     "furni.rotation.bounce.height": 0.0625,
     "room.zoom.enabled": true,
     "room.planes.direct": false,
+    "room.avatar.redraw.budget": true,
     "room.color.skip.transition": false,
     "room.camera.follow_user": true,
     "room.camera.move.speed": 12,

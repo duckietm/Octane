@@ -16,6 +16,7 @@ const CLIENT_COMMANDS: { key: string; descriptionKey: string }[] = [
     { key: 'iddqd', descriptionKey: 'chatcmd.client.iddqd' },
     { key: 'screenshot', descriptionKey: 'chatcmd.client.screenshot' },
     { key: 'togglefps', descriptionKey: 'chatcmd.client.togglefps' },
+    { key: 'directplanes', descriptionKey: 'chatcmd.client.directplanes' },
     // Expressions
     { key: 'd', descriptionKey: 'chatcmd.client.laugh' },
     { key: 'kiss', descriptionKey: 'chatcmd.client.kiss' },

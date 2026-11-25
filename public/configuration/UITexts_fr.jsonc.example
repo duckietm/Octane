@@ -246,6 +246,7 @@
     "chatcmd.client.shake": "Secouer l'appart",
     "chatcmd.client.sign": "Afficher un panneau",
     "chatcmd.client.togglefps": "Afficher/Masquer les FPS",
+    "chatcmd.client.directplanes": "Draw floors and walls directly (on/off)",
     "chatcmd.client.zoom": "Zoom avant/arrière",
 
     // ------------------------------------------------------------------------

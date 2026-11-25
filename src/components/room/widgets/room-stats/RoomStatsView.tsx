@@ -14,6 +14,10 @@ const LAST_IN_FRAME = -1000;
 const RoomStatsReadout: FC = () => {
     const [text, setText] = useState('');
     const pingRef = useRef({ ms: -1, requestId: 0, sentAt: 0 });
+    // Not part of the official readout: only there after `:directplanes`, to tell the two measurements apart.
+    const planeMode = useRoomStatsStore((state) => state.planeMode);
+    const modes = planeMode ? `
+planes: ${planeMode}` : '';
 
     useMessageEvent<LatencyPingResponseEvent>(LatencyPingResponseEvent, (event) => {
         const ping = pingRef.current;
@@ -71,7 +75,7 @@ const RoomStatsReadout: FC = () => {
         };
     }, []);
 
-    return <div className="octane-room-stats">{text}</div>;
+    return <div className="octane-room-stats">{`${text}${modes}`}</div>;
 };
 
 /** The official room canvas statistics (`:showstats`): ping, frames per second and frame time, bottom right. */

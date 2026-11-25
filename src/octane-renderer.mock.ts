@@ -1359,10 +1359,13 @@ export class RecycleItemsEntry {
 }
 export class RecycleItemsMessageComposer extends RecordingComposer {}
 // The wired chest transaction log (the chest window's log and the chests tab of the wired menu).
-export const CHEST_TRANSACTION_DEPOSIT = 0;
-export const CHEST_TRANSACTION_WITHDRAW = 1;
-export const CHEST_TRANSACTION_SOURCE_USER = 0;
-export const CHEST_TRANSACTION_SOURCE_WIRED = 1;
+export const CHEST_TRANSACTION_METHOD_MANUAL = 0;
+export const CHEST_TRANSACTION_METHOD_WIRED = 1;
+export const CHEST_TRANSACTION_METHOD_CONTRACT_PAYMENT = 2;
+export const CHEST_TRANSACTION_METHOD_CONTRACT_REWARD = 3;
+export const CHEST_TRANSACTION_METHOD_CONTRACT_TRADE = 4;
+export const CHEST_LOG_LIST_CHEST = 0;
+export const CHEST_LOG_LIST_ROOM = 1;
 export const CHEST_LOG_FILTER_ALL = 0;
 export const CHEST_LOG_FILTER_CURRENCY = 1;
 export const CHEST_LOG_FILTER_FURNI = 2;

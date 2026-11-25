@@ -246,6 +246,7 @@
     "chatcmd.client.shake": "Sacudir la sala",
     "chatcmd.client.sign": "Mostrar cartel",
     "chatcmd.client.togglefps": "Alternar FPS",
+    "chatcmd.client.directplanes": "Draw floors and walls directly (on/off)",
     "chatcmd.client.zoom": "Acercar/alejar",
 
     // ------------------------------------------------------------------------

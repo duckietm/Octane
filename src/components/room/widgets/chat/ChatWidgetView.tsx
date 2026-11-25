@@ -7,7 +7,7 @@ import { CHAT_TEXT_SIZE_EVENT } from '../chat-input/chatTextSize';
 import { ChatWidgetMessageView } from './ChatWidgetMessageView';
 import { ChatWidgetWindowView } from './ChatWidgetWindowView';
 import { measureBubbleVisualOffsets } from './chatBubbleMetrics';
-import { createLayoutBatcher, getChatViewerHeight, resolveFreeFlowLayout, resolveLineByLineLayout, resolveUntilSettled } from './freeFlowChatLayout';
+import { createLayoutBatcher, getChatViewerHeight, layoutPassesFor, resolveFreeFlowLayout, resolveLineByLineLayout, resolveUntilSettled } from './freeFlowChatLayout';
 
 const CHAT_MOVE_UP_PIXELS = 19;
 const CHAT_REMOVE_TOP_MARGIN = -10;
@@ -43,10 +43,14 @@ export const ChatWidgetView: FC<{}> = (props) => {
         });
     }, [setChatMessages]);
 
-    // Reads only: every bubble's size in one go, so the browser lays the page out once.
-    const refreshChatMeasurements = useCallback(() => {
+    // Reads only: every bubble's size in one go, so the browser lays the page out once. A bubble measures itself
+    // when it appears and when it resizes, so a layout pass only measures the ones that have no size yet; measuring
+    // all 250 on every frame (their box, their computed style and their pointer) was most of a crowded frame.
+    // `all` is for a change that resizes every bubble at once (the window, the text size).
+    const refreshChatMeasurements = useCallback((all: boolean = false) => {
         chatMessagesRef.current.forEach((chat) => {
             if (!chat.elementRef) return;
+            if (!all && chat.width > 0 && chat.height > 0) return;
 
             const visualOffsets = measureBubbleVisualOffsets(chat.elementRef);
 
@@ -87,8 +91,8 @@ export const ChatWidgetView: FC<{}> = (props) => {
     }, []);
 
     const layoutPass = useCallback(
-        (passes: number = 1) => {
-            refreshChatMeasurements();
+        (passes: number = 1, measureAll: boolean = false) => {
+            refreshChatMeasurements(measureAll);
             resolveOverlappingChats(passes);
             removeHiddenChats();
         },
@@ -99,7 +103,7 @@ export const ChatWidgetView: FC<{}> = (props) => {
     // pass stands for the extra layout each new message used to get.
     const batcherRef = useRef<ReturnType<typeof createLayoutBatcher>>(null);
 
-    if (!batcherRef.current) batcherRef.current = createLayoutBatcher((pending) => layoutPass(pending + 1));
+    if (!batcherRef.current) batcherRef.current = createLayoutBatcher((pending) => layoutPass(layoutPassesFor(pending)));
 
     useEffect(() => () => batcherRef.current?.dispose(), []);
 
@@ -135,7 +139,7 @@ export const ChatWidgetView: FC<{}> = (props) => {
 
             window.requestAnimationFrame(() => {
                 batcherRef.current.flushNow();
-                layoutPass();
+                layoutPass(1, true);
             });
         };
 
@@ -186,7 +190,7 @@ export const ChatWidgetView: FC<{}> = (props) => {
             window.requestAnimationFrame(() => {
                 window.requestAnimationFrame(() => {
                     batcherRef.current.flushNow();
-                    layoutPass();
+                    layoutPass(1, true);
                 });
             });
         };

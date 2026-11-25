@@ -52,14 +52,22 @@ const refreshCollider = (bubble: LayoutBubble) => {
     bubble.colliderLeft = bubble.left - (bubble.colliderWidth - bubble.width) / 2;
 };
 
-const intersects = (first: LayoutBubble, second: LayoutBubble) => {
-    const overlapsHorizontally =
-        first.colliderLeft < second.colliderLeft + second.colliderWidth && first.colliderLeft + first.colliderWidth > second.colliderLeft;
-    const overlapsVertically =
-        first.colliderTop < second.colliderTop + second.colliderHeight && first.colliderTop + first.colliderHeight > second.colliderTop;
+// Rows first: in a full chat area most pairs of bubbles sit on different rows, and that settles it at once.
+const intersects = (first: LayoutBubble, second: LayoutBubble) =>
+    first.colliderTop < second.colliderTop + second.colliderHeight &&
+    first.colliderTop + first.colliderHeight > second.colliderTop &&
+    first.colliderLeft < second.colliderLeft + second.colliderWidth &&
+    first.colliderLeft + first.colliderWidth > second.colliderLeft;
 
-    return overlapsHorizontally && overlapsVertically;
-};
+/**
+ * Layout passes one frame may run. A pass already repeats until the bubbles stop moving (up to its own limit), so
+ * more passes only matter when that limit was hit; in a crowd, where a dozen bubbles ask for room in the same frame,
+ * a pass per request tested every pair of 250 bubbles hundreds of times a frame.
+ */
+export const MAX_LAYOUT_PASSES_PER_FRAME = 2;
+
+/** The passes for a frame in which `requests` bubbles asked for room: one more than the requests, up to the limit. */
+export const layoutPassesFor = (requests: number): number => Math.max(1, Math.min(requests + 1, MAX_LAYOUT_PASSES_PER_FRAME));
 
 export const resolveFreeFlowLayout = (bubbles: readonly FreeFlowLayoutBubble[]): FreeFlowLayoutPosition[] => {
     const resolved: LayoutBubble[] = bubbles.map((bubble) => {
@@ -70,15 +78,26 @@ export const resolveFreeFlowLayout = (bubbles: readonly FreeFlowLayoutBubble[]):
         return layoutBubble;
     });
 
+    // A pair that did not touch in the last round and of which neither bubble moved since cannot touch now, so
+    // from the second round on only pairs with a moved bubble are looked at. The order of the pairs is unchanged.
+    let movedBefore: boolean[] = null;
+
     for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
         let moved = false;
+        const movedNow: boolean[] = new Array(resolved.length).fill(false);
 
         for (let firstIndex = 0; firstIndex < resolved.length; firstIndex++) {
+            // Read per pair: an earlier pair of this round may have moved this bubble.
             for (let secondIndex = firstIndex + 1; secondIndex < resolved.length; secondIndex++) {
+                if (movedBefore && !movedBefore[firstIndex] && !movedBefore[secondIndex] && !movedNow[firstIndex] && !movedNow[secondIndex]) continue;
+
                 const first = resolved[firstIndex];
                 const second = resolved[secondIndex];
 
                 if (!intersects(first, second)) continue;
+
+                movedNow[firstIndex] = true;
+                movedNow[secondIndex] = true;
 
                 const left = first.left < second.left ? first : second;
                 const right = left === first ? second : first;
@@ -103,6 +122,8 @@ export const resolveFreeFlowLayout = (bubbles: readonly FreeFlowLayoutBubble[]):
         }
 
         if (!moved) break;
+
+        movedBefore = movedNow;
     }
 
     return resolved.map((bubble) => ({

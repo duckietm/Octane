@@ -1,5 +1,19 @@
 import type { ChatTextSize } from '../../../components/room/widgets/chat-input/chatTextSize';
 
+const pendingPlacements = new Set<ChatBubbleMessage>();
+
+const flushPlacements = (): void => {
+    const bubbles = [...pendingPlacements];
+
+    pendingPlacements.clear();
+
+    // The setters write the element's style; a bubble that left in the meantime has no element any more.
+    for (const bubble of bubbles) {
+        bubble.left = bubble.left;
+        bubble.top = bubble.top;
+    }
+};
+
 export class ChatBubbleMessage {
     public static BUBBLE_COUNTER: number = 0;
 
@@ -73,5 +87,19 @@ export class ChatBubbleMessage {
         this._left = value;
 
         if (this.elementRef) this.elementRef.style.left = this._left + 'px';
+    }
+
+    /**
+     * Moves the bubble, writing the position to its element together with every other bubble placed in the same
+     * turn. A crowd speaking at once mounts dozens of bubbles in one go, each measuring itself: written at once,
+     * every position made the next bubble's measurement lay the page out again.
+     */
+    public placeLater(left: number, top: number): void {
+        this._left = left;
+        this._top = top;
+
+        if (!pendingPlacements.size) queueMicrotask(flushPlacements);
+
+        pendingPlacements.add(this);
     }
 }
