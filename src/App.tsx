@@ -5,6 +5,7 @@ import {
     GetConfiguration,
     GetDesiredResolution,
     GetLocalizationManager,
+    GetRoomContentLoader,
     GetRoomEngine,
     GetRoomSessionManager,
     GetSessionDataManager,
@@ -374,6 +375,11 @@ export const App: FC<{}> = (props) => {
                 OctaneLogger.LOG_PACKETS = GetConfiguration().getValue<boolean>('system.log.packets', false);
 
                 startRenderer(width, height).catch((error) => OctaneLogger.error('[LoginScreen] Renderer warmup failed', error));
+
+                // The room libraries shipped with the renderer need neither the session data nor the room engine, so
+                // they load alongside the downloads below; the room engine step later waits for the same load.
+                // It logs a library that fails and never rejects.
+                void GetRoomContentLoader().preloadMandatoryLibraries();
 
                 const interpolate = (value: string) => GetConfiguration().interpolate(value);
                 const assetUrls = asStringArray(GetConfiguration().getValue<unknown>('preload.assets.urls')).map(interpolate);
