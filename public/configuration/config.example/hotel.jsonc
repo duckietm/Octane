@@ -108,6 +108,9 @@
     // Draws walls and floors straight from their tiles instead of baked textures (WebGL2 only).
     "room.planes.direct": false,
 
+    // In a crowd, talking and blinking avatars take turns redrawing and avatars off screen wait until they are back in view.
+    "room.avatar.redraw.budget": true,
+
     // Room colour changes (dimmer, backgrounds) apply at once instead of fading over 1.5 s.
     "room.color.skip.transition": false,
 

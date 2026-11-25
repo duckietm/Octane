@@ -17,4 +17,12 @@ describe('room statistics readout', () => {
         useRoomStatsStore.getState().toggle();
         expect(useRoomStatsStore.getState().enabled).toBe(false);
     });
+
+    it('names the plane mode and turns the readout on once :directplanes was used', () => {
+        expect(useRoomStatsStore.getState().planeMode).toBeNull();
+        useRoomStatsStore.getState().showPlaneMode(true);
+        expect(useRoomStatsStore.getState()).toMatchObject({ enabled: true, planeMode: 'direct' });
+        useRoomStatsStore.getState().showPlaneMode(false);
+        expect(useRoomStatsStore.getState()).toMatchObject({ enabled: true, planeMode: 'baked' });
+    });
 });

@@ -36,7 +36,6 @@ const ChatWidgetMessageViewBase: FC<ChatWidgetMessageViewProps> = ({
 }) => {
     const inHistory = layout === 'history';
     const [isVisible, setIsVisible] = useState(false);
-    const [isReady, setIsReady] = useState(false);
     const [chatTextSize, setChatTextSize] = useState<ChatTextSize>(() => chat?.textSize ?? getStoredChatTextSize());
     const elementRef = useRef<HTMLDivElement>(null);
     const makeRoomRef = useRef(makeRoom);
@@ -78,7 +77,7 @@ const ChatWidgetMessageViewBase: FC<ChatWidgetMessageViewProps> = ({
         if (!element) return;
 
         if (inHistory) {
-            setIsReady(true);
+            setIsVisible(true);
             return;
         }
 
@@ -93,21 +92,23 @@ const ChatWidgetMessageViewBase: FC<ChatWidgetMessageViewProps> = ({
         chat.visualOffsetBottom = visualOffsets.bottom;
         chat.elementRef = element;
 
-        let { left, top } = chat;
-
-        if (!left && !top) {
-            left = chat.location.x - width / 2;
-            top = element.parentElement.offsetHeight - height;
-
-            chat.left = left;
-            chat.top = top;
+        // Positions are written after every bubble of this commit has measured itself (placeLater), so a crowd
+        // speaking at once costs one layout, not one per bubble.
+        if (!chat.left && !chat.top) {
+            chat.placeLater(chat.location.x - width / 2, element.parentElement.offsetHeight - height);
         } else if (previousWidth && previousWidth !== width) {
-            chat.left += (previousWidth - width) / 2;
+            chat.placeLater(chat.left + (previousWidth - width) / 2, chat.top);
         }
 
-        setIsReady(true);
+        // Measured: the bubble asks for room and shows in the same pass. It used to take a pass of its own to
+        // become "ready" first, a third render of every bubble, which a crowd speaking at once paid for in one go.
+        if (!isVisible) {
+            if (makeRoom) makeRoom(chat);
+            setIsVisible(true);
+            return;
+        }
 
-        if (isVisible && (previousWidth !== width || previousHeight !== height) && makeRoom) makeRoom(chat);
+        if ((previousWidth !== width || previousHeight !== height) && makeRoom) makeRoom(chat);
     }, [
         chat,
         chat.formattedText,
@@ -172,13 +173,6 @@ const ChatWidgetMessageViewBase: FC<ChatWidgetMessageViewProps> = ({
             chat.elementRef = null;
         };
     }, [chat]);
-
-    useEffect(() => {
-        if (!isReady || !chat || isVisible) return;
-
-        if (makeRoom) makeRoom(chat);
-        setIsVisible(true);
-    }, [chat, isReady, isVisible, makeRoom]);
 
     const messageClassName = `message [overflow-wrap:anywhere] break-words${chat.type === 1 ? ' italic text-[#595959]' : ''}${chat.type === 2 ? ' font-bold' : ''}`;
 

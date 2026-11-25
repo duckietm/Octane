@@ -2,8 +2,8 @@ import {
     CHEST_LOG_FILTER_ALL,
     CHEST_LOG_FILTER_CURRENCY,
     CHEST_LOG_FILTER_FURNI,
-    CHEST_TRANSACTION_WITHDRAW,
-    FurnitureType,
+    CHEST_LOG_LIST_CHEST,
+    CHEST_LOG_LIST_ROOM,
     IWiredChestTransactionRow,
     WiredChestRoomLogsComposer,
     WiredChestRoomLogsEvent,
@@ -11,13 +11,15 @@ import {
     WiredChestTransactionDetailsEvent
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { localizeWithFallback, ProductImageUtility, SendMessageComposer } from '../../api';
+import { localizeWithFallback, SendMessageComposer } from '../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { Select } from '../../common/Select';
 import { useMessageEvent } from '../../hooks';
 import { useWiredPageRequests } from '../../hooks/wired-tools/useWiredPageRequests';
+import { WiredChestTransactionDetails, WiredChestTransactionDetailsView } from './WiredChestTransactionDetailsView';
+import { chestTransactionMethodText, lastChestLogPage, summarizeChestTransaction } from './WiredChestTransactions.helpers';
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
 import { NO_PAGE } from './WiredPaging.helpers';
 
@@ -31,16 +33,14 @@ const FILTERS = [
 ];
 
 /**
- * Whether a page of the log answers this window. The answer does not say which request it is for, and the chests tab
- * of the wired menu asks for pages of the same log: a page with a row of another chest is the tab's, not this one's.
+ * Whether a page of the log answers this window. The list says which log it is: one chest's (and which chest), or
+ * the room's. The chests tab of the wired menu and every open chest window ask for pages of the same message.
  */
-export const isChestLogPage = (rows: ReadonlyArray<Pick<IWiredChestTransactionRow, 'chestId'>>, chestId: number): boolean =>
-    rows.every((row) => row.chestId === chestId);
-
-const formatTimestamp = (seconds: number): string => (seconds > 0 ? new Date(seconds * 1000).toLocaleString() : '-');
+export const isChestLogPage = (list: { listType: number; listId: number }, chestId: number): boolean =>
+    chestId > 0 ? list.listType === CHEST_LOG_LIST_CHEST && list.listId === chestId : list.listType === CHEST_LOG_LIST_ROOM;
 
 interface WiredChestTransactionLogViewProps {
-    /** The chest whose transactions are listed. */
+    /** The chest whose transactions are listed; zero lists the whole room. */
     chestId: number;
     onClose: () => void;
 }
@@ -49,9 +49,10 @@ interface WiredChestTransactionLogViewProps {
 const REQUEST_RATELIMIT_MS = 520;
 
 /**
- * AIR WiredTransactionLogsView on transaction_overview (880 wide) for one chest, opened by the chest window's "View
- * logs" button: the list type and chest id as key / value lines, Refresh on the right, the AIR table with a Details
- * column and the paging row. The furni of a transaction open in their own window, as AIR's transaction_details.
+ * AIR WiredTransactionLogsView on transaction_overview (880 wide), for one chest (the chest window's "View logs"
+ * button) or for the room (the chests tab's "View detailed list"): the list type and its id as key / value lines,
+ * Refresh on the right, AIR's columns (type, timestamp, username, withdrawals, deposits, chests, details) and the
+ * paging row. A line is one transaction, however many chests it touched; "View" opens AIR's transaction_details.
  */
 export const WiredChestTransactionLogView: FC<WiredChestTransactionLogViewProps> = ({ chestId, onClose }) => {
     const [filter, setFilter] = useState(CHEST_LOG_FILTER_ALL);
@@ -59,11 +60,13 @@ export const WiredChestTransactionLogView: FC<WiredChestTransactionLogViewProps>
     const [page, setPage] = useState(NO_PAGE);
     const [pageCount, setPageCount] = useState(NO_PAGE);
     const [totalRows, setTotalRows] = useState(0);
-    const [detailRow, setDetailRow] = useState<IWiredChestTransactionRow | null>(null);
-    const [details, setDetails] = useState<Record<number, { spriteId: number; quantity: number }[]>>({});
+    const [listId, setListId] = useState(chestId);
+    const [details, setDetails] = useState<WiredChestTransactionDetails | null>(null);
     const [scrollResetKey, setScrollResetKey] = useState(0);
     // Pages asked for and not answered yet: an answer that comes while none is pending is someone else's.
     const pending = useRef(0);
+    // The transaction whose details this window asked for: the answer opens the details window.
+    const awaitedDetails = useRef(0);
 
     const sendRequest = useCallback(
         (nextPage: number, nextFilter: number) => {
@@ -84,59 +87,63 @@ export const WiredChestTransactionLogView: FC<WiredChestTransactionLogViewProps>
 
     // The first page on opening and after a change of filter.
     useEffect(() => {
-        setDetailRow(null);
+        setDetails(null);
         sendRequest(1, filter);
     }, [filter, sendRequest]);
 
     useMessageEvent<WiredChestRoomLogsEvent>(WiredChestRoomLogsEvent, (event) => {
         const parser = event.getParser();
 
-        if (!parser || pending.current <= 0 || !isChestLogPage(parser.rows, chestId)) return;
+        if (!parser || pending.current <= 0 || !isChestLogPage(parser, chestId)) return;
 
         pending.current--;
         setRows(parser.rows);
         setPage(parser.page);
-        setPageCount(Math.max(1, parser.pageCount));
-        setTotalRows(parser.totalRows);
+        setPageCount(lastChestLogPage(parser.total, parser.amount || CHEST_LOG_PAGE_SIZE));
+        setTotalRows(parser.total);
+        setListId(parser.listId);
         setScrollResetKey((value) => value + 1);
     });
 
     useMessageEvent<WiredChestTransactionDetailsEvent>(WiredChestTransactionDetailsEvent, (event) => {
         const parser = event.getParser();
 
-        if (parser) setDetails((previous) => ({ ...previous, [parser.transactionId]: parser.items }));
+        if (!parser?.transaction || parser.transactionId !== awaitedDetails.current) return;
+
+        awaitedDetails.current = 0;
+        setDetails({ transaction: parser.transaction, chestIds: parser.chestIds, withdrawn: parser.withdrawn, deposited: parser.deposited, incomplete: parser.incomplete });
     });
 
     const openDetail = (row: IWiredChestTransactionRow) => {
-        setDetailRow(row);
-
-        if (row.hasDetails && !details[row.transactionId]) SendMessageComposer(new WiredChestTransactionDetailsComposer(row.transactionId));
+        awaitedDetails.current = row.transactionId;
+        SendMessageComposer(new WiredChestTransactionDetailsComposer(row.transactionId));
     };
 
-    const typeText = (row: IWiredChestTransactionRow) =>
-        row.type === CHEST_TRANSACTION_WITHDRAW ? localizeWithFallback('wiredchests.logs.type.withdraw', 'Withdrawal') : localizeWithFallback('wiredchests.logs.type.deposit', 'Deposit');
-
+    // AIR's columns and their order (WiredTransactionLogsView.createTransactionTable).
     const columns: WiredTableColumn[] = [
-        { id: 'timestamp', title: localizeWithFallback('wiredchests.logs.col.timestamp', 'Timestamp'), className: 'w-[170px]' },
-        { id: 'type', title: localizeWithFallback('wiredchests.logs.col.type', 'Type'), className: 'w-[120px]' },
+        { id: 'type', title: localizeWithFallback('wiredchests.logs.col.type', 'Type'), className: 'w-[150px]' },
+        { id: 'timestamp', title: localizeWithFallback('wiredchests.logs.col.timestamp', 'Timestamp'), className: 'w-[140px]' },
         { id: 'username', title: localizeWithFallback('wiredchests.logs.col.username', 'Username') },
-        { id: 'withdraws', title: localizeWithFallback('wiredchests.logs.col.withdraws', 'Withdrawals'), className: 'w-[110px]', align: 'right' },
-        { id: 'deposits', title: localizeWithFallback('wiredchests.logs.col.deposits', 'Deposits'), className: 'w-[110px]', align: 'right' },
-        { id: 'details', title: localizeWithFallback('wiredchests.logs.col.details', 'Details'), className: 'w-[80px]', align: 'right' }
+        { id: 'withdraws', title: localizeWithFallback('wiredchests.logs.col.withdraws', 'Withdrawals'), className: 'w-[125px]' },
+        { id: 'deposits', title: localizeWithFallback('wiredchests.logs.col.deposits', 'Deposits'), className: 'w-[125px]' },
+        { id: 'chests', title: localizeWithFallback('wiredchests.logs.col.chests', 'Chests'), className: 'w-[95px]' },
+        { id: 'details', title: localizeWithFallback('wiredchests.logs.col.details', 'Details'), className: 'w-[80px]' }
     ];
 
     const getCell = (row: IWiredChestTransactionRow, columnId: string): WiredTableCell => {
         switch (columnId) {
-            case 'timestamp':
-                return { content: formatTimestamp(row.timestamp) };
             case 'type':
-                return { content: typeText(row) };
+                return { content: chestTransactionMethodText(row.method) };
+            case 'timestamp':
+                return { content: row.readableTimestamp || '-' };
             case 'username':
                 return { content: row.userName || '-', title: row.userName };
             case 'withdraws':
-                return { content: row.withdrawn || '-' };
+                return { content: summarizeChestTransaction(row.withdrawnFurni, row.withdrawnCoins) };
             case 'deposits':
-                return { content: row.deposited || '-' };
+                return { content: summarizeChestTransaction(row.depositedFurni, row.depositedCoins) };
+            case 'chests':
+                return { content: String(row.chestCount) };
             default:
                 // table_view element_link: the underlined link of the Details column.
                 return {
@@ -149,7 +156,7 @@ export const WiredChestTransactionLogView: FC<WiredChestTransactionLogViewProps>
         }
     };
 
-    const detailItems = detailRow ? details[detailRow.transactionId] : null;
+    const roomList = chestId <= 0;
 
     return (
         <NativeTextTree>
@@ -161,10 +168,12 @@ export const WiredChestTransactionLogView: FC<WiredChestTransactionLogViewProps>
                             <div className="octane-chest-log__header">
                                 <div className="octane-chest-log__pairs">
                                     <div>
-                                        <b>{localizeWithFallback('wiredchests.logs.list_type', 'List type:')}</b> <span>{localizeWithFallback('wiredchests.logs.type.0', 'Chest')}</span>
+                                        <b>{localizeWithFallback('wiredchests.logs.list_type', 'List type:')}</b>{' '}
+                                        <span>{roomList ? localizeWithFallback('wiredchests.logs.type.1', 'Room') : localizeWithFallback('wiredchests.logs.type.0', 'Chest')}</span>
                                     </div>
                                     <div>
-                                        <b>{localizeWithFallback('wiredchests.logs.chest_id', 'Chest id:')}</b> <span>{chestId}</span>
+                                        <b>{roomList ? localizeWithFallback('wiredchests.logs.room_id', 'Room id:') : localizeWithFallback('wiredchests.logs.chest_id', 'Chest id:')}</b>{' '}
+                                        <span>{listId > 0 ? listId : '-'}</span>
                                     </div>
                                 </div>
                                 <label className="octane-chest-log__filter">
@@ -198,38 +207,7 @@ export const WiredChestTransactionLogView: FC<WiredChestTransactionLogViewProps>
                         </div>
                     </OctaneCardContentView>
                 </OctaneCardView>
-                {detailRow && (
-                    <OctaneCardView className="octane-widget-chest-log octane-chest-log-details" theme="primary-slim" uniqueKey="chest-transaction-details">
-                        <OctaneCardHeaderView headerText={localizeWithFallback('wiredchests.log_details.title', 'Transaction details')} onCloseClick={() => setDetailRow(null)} />
-                        <OctaneCardContentView>
-                            <div className="octane-chest-log__detail">
-                                <div>
-                                    <b>{localizeWithFallback('wiredchests.log_details.timestamp', 'Timestamp:')}</b> <span>{formatTimestamp(detailRow.timestamp)}</span>
-                                </div>
-                                <div>
-                                    <b>{localizeWithFallback('wiredchests.log_details.type', 'Transaction method:')}</b> <span>{typeText(detailRow)}</span>
-                                </div>
-                                <div>
-                                    <b>{localizeWithFallback('wiredchests.log_details.username', 'Username:')}</b> <span>{detailRow.userName || '-'}</span>
-                                </div>
-                                <b>{localizeWithFallback('wiredchests.log_details.transactions', 'Transactions:')}</b>
-                                {(!detailRow.hasDetails || (detailItems && !detailItems.length)) && <div>{localizeWithFallback('wiredchests.log_details.transactions.none_placeholder', 'Nothing')}</div>}
-                                {detailRow.hasDetails && !detailItems && <div>...</div>}
-                                {!!detailItems?.length && (
-                                    <div className="octane-chest-log__items">
-                                        {detailItems.map((item) => (
-                                            <div key={item.spriteId} className="octane-chest-log__item">
-                                                {/* The server negates a wall item's sprite id: the two kinds have their own id ranges. */}
-                                                <img alt="" src={ProductImageUtility.getProductImageUrl(item.spriteId < 0 ? FurnitureType.WALL : FurnitureType.FLOOR, Math.abs(item.spriteId), '')} />
-                                                <span>x{item.quantity}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </OctaneCardContentView>
-                    </OctaneCardView>
-                )}
+                {details && <WiredChestTransactionDetailsView details={details} onClose={() => setDetails(null)} />}
             </>
         </NativeTextTree>
     );
