@@ -1,4 +1,4 @@
-import { CreateLinkEvent, DisconnectMessageComposer, GetCommunication } from '@octane/renderer';
+import { CreateLinkEvent, DisconnectMessageComposer, GetCommunication, LegacyExternalInterface } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     ClearRememberLogin,
@@ -9,6 +9,7 @@ import {
     GetRememberLogin,
     localizeWithFallback,
     OpenUrl,
+    PostHotelSessionLoggedOut,
     SendMessageComposer
 } from '../../api';
 import earningsIcon from '../../assets/images/purse-swf/icons/1747_icon_earnings_png$5e39e03f65fbbb9a85bedd0d577dc12d307477063.png';
@@ -18,6 +19,9 @@ import logoutIcon from '../../assets/images/purse-swf/icons/1936_logout_icon_png
 import settingsIcon from '../../assets/images/purse-swf/icons/2291_settings_icon_png$c9dcf215bb7a7e35a3f128c7c60151bc1008066621.png';
 import { Column } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
+import { loadNativeFont, measureNativeText } from '../../common/native-text/NativeFont';
+import { NativeText } from '../../common/native-text/NativeText';
+import { nativeTextStyles } from '../../common/native-text/NativeTextStyles';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { Hint } from '../../common/Tooltip';
 import { ClearStoredChatHistory, usePurse } from '../../hooks';
@@ -30,6 +34,33 @@ import { useVipQuestsPromo, VipQuestsPromoView } from './views/VipQuestsPromoVie
 
 /** How long logout waits for the server before going on: the local credentials are already gone. */
 const LOGOUT_TIMEOUT_MS = 3000;
+
+/** AIR purse_xml help label: a u_regular field floor(textWidth + 4) wide (measured in normal anti-aliasing), centred in the 50 px button. */
+const useHelpLabelWidth = (text: string): number | null => {
+    const [width, setWidth] = useState<number | null>(null);
+
+    useEffect(() => {
+        let disposed = false;
+        const style = nativeTextStyles.u_regular;
+
+        loadNativeFont(style)
+            .then(({ font }) => {
+                if (!disposed) setWidth(Math.floor(measureNativeText(font, text, { ...style, antiAliasType: 'normal' }) + 4));
+            })
+            .catch(() => {
+                if (!disposed) setWidth(null);
+            });
+
+        return () => {
+            disposed = true;
+        };
+    }, [text]);
+
+    return width;
+};
+
+/** The label's x inside the button's padding box: floor(50 / 2) - floor(width / 2), less the 3 px skin border outside it. */
+const helpLabelLeft = (fieldWidth: number | null): number => 22 - Math.floor((fieldWidth ?? 0) / 2);
 
 export const PurseView: FC<{}> = (props) => {
     const { purse = null, hcDisabled = false } = usePurse();
@@ -68,17 +99,20 @@ export const PurseView: FC<{}> = (props) => {
     // AIR PurseClubArea: without club days the "join" label shows purse.clubdays.zero.amount.text.
     const joinLabel = useMemo(() => localizeWithFallback('purse.clubdays.zero.amount.text', 'Get'), []);
 
-    // With HC, the time left: minutes under a day, else (periods x 31 + days) days.
+    // With HC (periods x 31 + days at least one), the time left: minutes under a day, else the days.
+    const clubDaysLeft = purse ? purse.clubPeriods * 31 + purse.clubDays : 0;
+    const hasClubTime = clubDaysLeft >= 1;
     const clubLabel = useMemo(() => {
-        if (!purse || purse.clubDays <= 0) return joinLabel;
+        if (!purse || clubDaysLeft < 1) return joinLabel;
         if (purse.minutesUntilExpiration > -1 && purse.minutesUntilExpiration < 60 * 24) {
             return FriendlyTime.shortFormat(purse.minutesUntilExpiration * 60);
         }
-        return FriendlyTime.shortFormat((purse.clubPeriods * 31 + purse.clubDays) * 86400);
-    }, [purse, joinLabel]);
+        return FriendlyTime.shortFormat(clubDaysLeft * 86400);
+    }, [purse, clubDaysLeft, joinLabel]);
 
     const earningsLabel = useMemo(() => localizeWithFallback('earnings.title', 'Earnings'), []);
     const helpLabel = useMemo(() => localizeWithFallback('toolbar.help', 'Help'), []);
+    const helpLabelWidth = useHelpLabelWidth(helpLabel);
     const logoutLabel = useMemo(() => localizeWithFallback('toolbar.logout', 'Log out'), []);
     const settingsLabel = useMemo(() => localizeWithFallback('widget.memenu.settings', 'Settings'), []);
     const clubTooltip = useMemo(() => localizeWithFallback('catalog.club.hc', 'Habbo Club'), []);
@@ -159,6 +193,16 @@ export const PurseView: FC<{}> = (props) => {
             /* best-effort — proceed with local logout regardless */
         }
 
+        // The website (inside a page: through the legacy interface; in its own tab: on the hotel-session channel) and the
+        // client's other tabs learn that the account logged out, as App does when the website posts it.
+        try {
+            LegacyExternalInterface.call('logout');
+        } catch {
+            /* best-effort — no embedding page */
+        }
+
+        PostHotelSessionLoggedOut();
+
         try {
             GetCommunication().connection.dispose();
         } catch {
@@ -235,7 +279,7 @@ export const PurseView: FC<{}> = (props) => {
                                         onClick={openClub}
                                     >
                                         <img src={hcIcon} alt="" className="octane-purse__btn-img" />
-                                        <span>{clubLabel}</span>
+                                        <span className={hasClubTime ? 'octane-purse__btn-days' : 'octane-purse__btn-join'}>{clubLabel}</span>
                                     </BaseButton>
                                 </Hint>
                             )}
@@ -246,7 +290,7 @@ export const PurseView: FC<{}> = (props) => {
                                     onClick={openEarnings}
                                 >
                                     <img src={earningsIcon} alt="" className="octane-purse__btn-img" />
-                                    <span>{earningsLabel}</span>
+                                    <span className="octane-purse__btn-earnings">{earningsLabel}</span>
                                     {earningsUnseen && <img src={earningsUnseenIcon} alt="" className="octane-purse__earnings-unseen" />}
                                 </BaseButton>
                             </Hint>
@@ -262,7 +306,9 @@ export const PurseView: FC<{}> = (props) => {
                                         CreateLinkEvent('help/show');
                                     }}
                                 >
-                                    <span>{helpLabel}</span>
+                                    <span className="octane-purse__help-label" style={{ left: helpLabelLeft(helpLabelWidth) }}>
+                                        <NativeText background={null} overrides={{ color: 0xffffff }} text={helpLabel} textStyle="u_regular" />
+                                    </span>
                                 </BaseButton>
                             </Hint>
                             <Hint content={logoutLabel}>

@@ -19,6 +19,8 @@ const MAX_USERNAME_LENGTH = 25;
 type FeedbackKind = 'error' | 'success';
 type Section = 'menu' | 'password' | 'email' | 'username';
 
+const isAccountSection = (value: string): value is Exclude<Section, 'menu'> => value === 'password' || value === 'email' || value === 'username';
+
 const passwordStrength = (value: string): { score: number; labelKey: string; color: string } =>
 {
     if(!value) return { score: 0, labelKey: '', color: 'bg-black/10' };
@@ -107,6 +109,10 @@ export const UserAccountSettingsView: FC<{}> = () =>
                 switch(parts[1])
                 {
                     case 'show':
+                        // user-account-settings/show/<password|email|username> opens straight on that form.
+                        resetForm();
+                        setFeedback(null);
+                        setSection(isAccountSection(parts[2]) ? parts[2] : 'menu');
                         setIsVisible(true);
                         return;
                     case 'hide':

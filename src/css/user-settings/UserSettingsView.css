@@ -378,6 +378,21 @@
     gap: 7px;
 }
 
+/* Built-in CMS account actions under the other settings: a titled group of menu buttons. */
+.air-settings-other__account {
+    display: flex;
+    min-width: 222px;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.air-settings-other__account-title {
+    font-weight: bold;
+}
+
 .air-settings-select-row {
     height: 24px;
     min-height: 24px;

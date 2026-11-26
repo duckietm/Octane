@@ -1,7 +1,8 @@
 import { FC } from 'react';
-import { LocalizeText, SanitizeHotelHtml } from '../../../../../api';
+import { LocalizeText, Offer, ProductTypeEnum, SanitizeHotelHtml } from '../../../../../api';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { getCatalogGridMetrics, useCatalogData, useCatalogDisplayPreferences } from '../../../../../hooks';
+import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';
 import { CatalogBadgeSelectorWidgetView } from '../widgets/CatalogBadgeSelectorWidgetView';
 import { CatalogFirstProductSelectorWidgetView } from '../widgets/CatalogFirstProductSelectorWidgetView';
 import { CatalogItemGridWidgetView } from '../widgets/CatalogItemGridWidgetView';
@@ -19,18 +20,24 @@ import { CatalogLayoutProps } from './CatalogLayout.types';
  * (105,245 255 x 175) and the purchase row (0,430). The layout also keeps a "select badge" label at 190,401, under
  * the badge grid: it shows only where no badge tile covers it. Its "select product" label lies under the item grid's
  * frame and is never seen, so it is not drawn.
+ *
+ * The product view is AIR's ProductViewCatalogWidget: a furni offer (a badge display) gets the room preview, but a
+ * badge offer has no room canvas: the badge itself is shown on the light panel and the texts turn black, as on every
+ * other page. A deal (bundle) gets no preview controls.
  */
 export const CatalogLayoutBadgeDisplayView: FC<CatalogLayoutProps> = (props) => {
     const { page = null } = props;
     const { currentOffer = null, roomPreviewer = null } = useCatalogData();
     const { density = 'standard', showTilePrices = true } = useCatalogDisplayPreferences();
     const gridMetrics = getCatalogGridMetrics(density);
+    const isBundleOffer = currentOffer?.pricingModel === Offer.PRICING_MODEL_BUNDLE;
+    const isBadgeOffer = !isBundleOffer && currentOffer?.product?.productType === ProductTypeEnum.BADGE;
 
     return (
         <NativeTextTree>
             <div className="octane-catalog-badge-display-layout">
                 <CatalogFirstProductSelectorWidgetView />
-                <section className={`octane-catalog-badge-preview ${currentOffer ? '' : 'is-empty'}`.trim()}>
+                <section className={`octane-catalog-badge-preview ${currentOffer ? '' : 'is-empty'} ${isBadgeOffer ? 'is-badge' : ''} ${isBundleOffer ? 'is-bundle' : ''}`.trim()}>
                     {!currentOffer && (
                         <div className="octane-catalog-badge-intro">
                             {!!page.localization.getImage(1) && <img alt="" src={page.localization.getImage(1)} />}
@@ -39,13 +46,21 @@ export const CatalogLayoutBadgeDisplayView: FC<CatalogLayoutProps> = (props) => 
                     )}
                     {currentOffer && (
                         <>
-                            <div className="octane-catalog-badge-product-render">
-                                <CatalogViewProductWidgetView height={240} />
-                            </div>
+                            {isBadgeOffer ? (
+                                <div className="octane-catalog-badge-product-badge" data-testid="catalog-badge-offer-image">
+                                    <CatalogAddOnBadgeWidgetView className="scale-200" />
+                                </div>
+                            ) : (
+                                <div className="octane-catalog-badge-product-render">
+                                    <CatalogViewProductWidgetView height={240} />
+                                </div>
+                            )}
                             <div className="octane-catalog-badge-product-copy octane-catalog-preview-details">
                                 <CatalogProductDetailsView offer={currentOffer} />
                             </div>
-                            <CatalogPreviewControls productType={currentOffer.product.productType} roomPreviewer={roomPreviewer} />
+                            {!isBadgeOffer && !isBundleOffer && (
+                                <CatalogPreviewControls productType={currentOffer.product.productType} roomPreviewer={roomPreviewer} />
+                            )}
                             <div className="octane-catalog-badge-limited">
                                 <CatalogLimitedItemWidgetView />
                             </div>

@@ -3,7 +3,7 @@ import { LocalizeShortNumber, localizeWithFallback } from '../../../api';
 import creditsIcon from '../../../assets/images/purse/air/credits.png';
 import diamondIcon from '../../../assets/images/purse/air/diamond.png';
 import ducketsIcon from '../../../assets/images/purse/air/duckets.png';
-import { LayoutCurrencyIcon, Text } from '../../../common';
+import { LayoutCurrencyIcon } from '../../../common';
 import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
 
@@ -30,8 +30,8 @@ const AIR_PURSE_TOOLTIPS: Record<number, { key: string; fallback: string }> = {
 
 /**
  * One AIR purse row (credit_count_button, ducket_count_button, diamond_count_button): the amount as a plain
- * number (`balance.toString()`, growing to the left of the 15 px icon), the currency name as its tooltip, and a
- * click that opens what the row is about.
+ * number (`balance.toString()`, growing to the left of the 15 px icon and clipped by the row), the currency name as its
+ * tooltip, and a click that opens what the row is about.
  */
 export const CurrencyView: FC<CurrencyViewProps> = (props) => {
     const { type = -1, amount = -1, short = false, onClick = null } = props;
@@ -50,9 +50,10 @@ export const CurrencyView: FC<CurrencyViewProps> = (props) => {
                 onClick?.();
             }}
         >
-            <Text textEnd variant="white" className="octane-purse-button__amount currency-text">
-                {displayAmount}
-            </Text>
+            {/* The count field grows to the left of x = 35 and the 52 px list row clips it: a long balance loses its leading digits. */}
+            <span className="octane-purse-button__clip">
+                <span className="octane-purse-button__amount currency-text">{displayAmount}</span>
+            </span>
             {airIcon ? <img src={airIcon} alt="" className="octane-purse-air-currency" /> : <LayoutCurrencyIcon type={type} />}
         </BaseButton>
     );
@@ -60,5 +61,5 @@ export const CurrencyView: FC<CurrencyViewProps> = (props) => {
     // A shortened amount shows the whole number in the tooltip too.
     const hint = short ? `${label} ${amount}`.trim() : label;
 
-    return hint ? <Hint content={hint}>{row}</Hint> : row;
+    return <div className={`octane-purse-currency octane-purse-currency--${type}`}>{hint ? <Hint content={hint}>{row}</Hint> : row}</div>;
 };

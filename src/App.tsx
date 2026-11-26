@@ -22,7 +22,7 @@ import {
     PrepareRenderer
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
-import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, getPendingPasswordResetToken, GetRememberLogin, GetUIVersion, isRememberedLogin, isRememberRejection, ListenForHotelSettings, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock, localizeWithFallback } from './api';
+import { clearAccessToken, ClearRememberLogin, ClearRememberLoginIfStill, createBootSteps, exchangeSsoTicketForAccessToken, getPendingPasswordResetToken, GetRememberLogin, GetUIVersion, HOTEL_SESSION_CHANNEL, HOTEL_SESSION_LOGGED_OUT, isRememberedLogin, isRememberRejection, ListenForHotelSettings, persistAccessTokenFromPayload, rememberRequestBody, renewAccessTokenIfDue, StoreRememberLoginFromPayload, withRememberLock, localizeWithFallback } from './api';
 import { Base } from './common';
 import { LoadingView } from './components/loading/LoadingView';
 import { LoginView } from './components/login/LoginView';
@@ -66,9 +66,6 @@ const asStringArray = (value: unknown): string[] => {
 };
 
 const hasRememberLogin = (): boolean => !!GetRememberLogin();
-
-/** The channel a hotel website can post its logout on, so a client in another tab forgets the account's chat history. */
-const HOTEL_SESSION_CHANNEL = 'hotel-session';
 
 export const App: FC<{}> = (props) => {
     const connectionState = useConnectionState();
@@ -326,11 +323,12 @@ export const App: FC<{}> = (props) => {
     useEffect(() => {
         if (typeof BroadcastChannel === 'undefined') return;
 
-        // A hotel website that posts { type: 'logged-out' } here when the account logs out in any tab.
+        // A hotel website (or another client tab, through the purse logout) posts { type: 'logged-out' } here when the account logs out,
+        // so this tab forgets the account's chat history.
         const channel = new BroadcastChannel(HOTEL_SESSION_CHANNEL);
 
         channel.onmessage = (event: MessageEvent<{ type?: string }>) => {
-            if (event.data?.type === 'logged-out') ClearStoredChatHistory();
+            if (event.data?.type === HOTEL_SESSION_LOGGED_OUT) ClearStoredChatHistory();
         };
 
         return () => channel.close();
