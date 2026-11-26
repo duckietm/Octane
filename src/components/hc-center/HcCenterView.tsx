@@ -10,7 +10,7 @@ import {
     ScrSendKickbackInfoMessageEvent
 } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { ClubStatus, FriendlyTime, GetClubBadge, GetConfigurationRecord, LocalizeText, SanitizeHtml, SendMessageComposer } from '../../api';
+import { ClubStatus, EscapeHtml, FriendlyTime, GetClubBadge, GetConfigurationRecord, LocalizeText, SanitizeHtml, SendMessageComposer } from '../../api';
 import benefitsBg from '../../assets/images/hc-center/benefits.png';
 import clockIcon from '../../assets/images/hc-center/clock.png';
 import hcLogo from '../../assets/images/hc-center/hc_logo.gif';
@@ -56,10 +56,10 @@ export const HcCenterView: FC<{}> = (props) => {
                 return LocalizeText(
                     `hccenter.status.${clubStatus}.info`,
                     ['timeleft', 'joindate', 'streakduration'],
-                    [getClubText(), kickbackData?.firstSubscriptionDate, FriendlyTime.shortFormat(kickbackData?.currentHcStreak * 86400)]
+                    [getClubText(), EscapeHtml(kickbackData?.firstSubscriptionDate), FriendlyTime.shortFormat(kickbackData?.currentHcStreak * 86400)]
                 );
             case ClubStatus.EXPIRED:
-                return LocalizeText(`hccenter.status.${clubStatus}.info`, ['joindate'], [kickbackData?.firstSubscriptionDate]);
+                return LocalizeText(`hccenter.status.${clubStatus}.info`, ['joindate'], [EscapeHtml(kickbackData?.firstSubscriptionDate)]);
             default:
                 return LocalizeText(`hccenter.status.${clubStatus}.info`);
         }

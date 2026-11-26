@@ -38,6 +38,7 @@ const FILTER_LABELS: Record<string, string> = {
     'inventory.furni.filter.type.credit_furni': 'Credit furni',
     'inventory.furni.filter.type.clothes': 'Clothes',
     'inventory.furni.filter.type.pet_food': 'Pet food',
+    'inventory.furni.filter.type.collectibles': 'Collectibles',
     'inventory.furni.filter.type.tradable': 'Tradable',
     'inventory.furni.filter.type.non_tradable': 'Non-tradable',
     'inventory.furni.filter.type.recyclable': 'Recyclable',

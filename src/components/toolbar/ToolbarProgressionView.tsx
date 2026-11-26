@@ -1,6 +1,6 @@
-import { CreateLinkEvent } from '@octane/renderer';
+import { CreateLinkEvent, RewardTrackData } from '@octane/renderer';
 import { Dispatch, FC, SetStateAction, useEffect, useRef } from 'react';
-import { GetConfigurationValue, localizeWithFallback } from '../../api';
+import { GetConfigurationValue, getRewardTrackClaimableCount, localizeWithFallback } from '../../api';
 import { Flex, LayoutItemCountView } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
@@ -23,14 +23,18 @@ const ProgressionItem: FC<{ name: string; iconClassName: string; label: string; 
 /**
  * ProgMenuController (prog_menu_view_xml): the progression icon's menu with daily tasks, quests,
  * achievements, leaderboards and the Introduction reward track (`reward_track/open/introduction`).
+ * Every other active track gets its own entry (ProgMenuController.onRewardTracks clones the introduction
+ * item, named by `widget.progmenu.rewardtrack.<id>`), and each track entry counts its own claimable prizes.
  */
 export const ToolbarProgressionView: FC<{
     unseenAchievementCount: number;
     unseenDailyTaskCount: number;
-    unseenRewardTrackCount: number;
+    rewardTracks: ReadonlyArray<Pick<RewardTrackData, 'id' | 'claimablePrizeCount'>>;
     setExpanded: Dispatch<SetStateAction<boolean>>;
-}> = ({ unseenAchievementCount = 0, unseenDailyTaskCount = 0, unseenRewardTrackCount = 0, setExpanded = null }) => {
+}> = ({ unseenAchievementCount = 0, unseenDailyTaskCount = 0, rewardTracks = [], setExpanded = null }) => {
     const elementRef = useRef<HTMLDivElement>(null);
+    const introductionCount = getRewardTrackClaimableCount(rewardTracks, 'introduction');
+    const extraTracks = rewardTracks.filter((track) => track.id !== 'introduction');
     // The official menu hides quests with toolbar.hide.quests and daily tasks with dailytasks.enabled.
     const showQuests = !GetConfigurationValue<boolean>('toolbar.hide.quests', false);
     const showDailyTasks = GetConfigurationValue<boolean>('dailytasks.enabled', true) !== false;
@@ -97,9 +101,19 @@ export const ToolbarProgressionView: FC<{
                     name="introduction"
                     iconClassName="icon-me-rewardtrack"
                     label={localizeWithFallback('widget.progmenu.introduction', 'Introduction')}
-                    count={unseenRewardTrackCount}
+                    count={introductionCount}
                     onClick={() => open('reward_track/open/introduction')}
                 />
+                {extraTracks.map((track) => (
+                    <ProgressionItem
+                        key={track.id}
+                        name={`rewardtrack-${track.id}`}
+                        iconClassName="icon-me-rewardtrack"
+                        label={localizeWithFallback(`widget.progmenu.rewardtrack.${track.id}`, track.id)}
+                        count={track.claimablePrizeCount}
+                        onClick={() => open(`reward_track/open/${track.id}`)}
+                    />
+                ))}
             </Flex>
         </NativeTextTree>
     );

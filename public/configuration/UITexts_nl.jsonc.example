@@ -228,6 +228,7 @@
     // chatcmd
     // ------------------------------------------------------------------------
     "chatcmd.client.chooser": "Gebruikerskiezer",
+    "chatcmd.client.directplanes": "Vloeren en muren direct tekenen (aan/uit)",
     "chatcmd.client.ejectall": "Alle meubels verwijderen",
     "chatcmd.client.flip": "Kamer omdraaien",
     "chatcmd.client.floor": "Vloereditor",
@@ -246,7 +247,6 @@
     "chatcmd.client.shake": "Kamer schudden",
     "chatcmd.client.sign": "Bordje tonen",
     "chatcmd.client.togglefps": "FPS aan/uit",
-    "chatcmd.client.directplanes": "Vloeren en muren direct tekenen (aan/uit)",
     "chatcmd.client.zoom": "In-/uitzoomen",
 
     // ------------------------------------------------------------------------

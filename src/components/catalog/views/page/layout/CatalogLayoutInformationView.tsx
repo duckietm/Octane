@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef } from 'react';
-import { localizeWithFallback, SanitizeHtml } from '../../../../../api';
+import { localizeWithFallback, SanitizeHotelHtml } from '../../../../../api';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
@@ -35,7 +35,7 @@ export const CatalogLayoutInformationView: FC<CatalogLayoutProps> = ({ page, hid
             )}
             <div className="octane-catalog-information-copy">
                 {texts.map((text, index) => (
-                    <section key={index} dangerouslySetInnerHTML={{ __html: SanitizeHtml(text) }} />
+                    <section key={index} dangerouslySetInnerHTML={{ __html: SanitizeHotelHtml(text) }} />
                 ))}
             </div>
         </article>

@@ -1795,6 +1795,26 @@
     opacity: 1 !important;
 }
 
+/* A badge offer has no room canvas (AIR ProductViewCatalogWidget): the badge sits centred on the light panel and
+   the texts turn black. */
+.octane-catalog-badge-preview.is-badge {
+    background: var(--catalog-standard-panel, #e9e9e1);
+}
+
+.octane-catalog-badge-product-badge {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-catalog-badge-preview.is-badge .octane-catalog-badge-product-copy .octane-catalog-product-details-name,
+.octane-catalog-badge-preview.is-badge .octane-catalog-badge-product-copy .octane-catalog-product-details-description {
+    color: #000 !important;
+}
+
 .octane-catalog-badge-preview .octane-catalog-preview-controls {
     top: 8px;
     right: 6px;

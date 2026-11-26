@@ -228,6 +228,7 @@
     // chatcmd
     // ------------------------------------------------------------------------
     "chatcmd.client.chooser": "Kullanıcı seçici",
+    "chatcmd.client.directplanes": "Draw floors and walls directly (on/off)",
     "chatcmd.client.ejectall": "Tüm mobileri çıkar",
     "chatcmd.client.flip": "Odayı ters çevir",
     "chatcmd.client.floor": "Zemin düzenleyici",
@@ -246,7 +247,6 @@
     "chatcmd.client.shake": "Odayı salla",
     "chatcmd.client.sign": "İşaret göster",
     "chatcmd.client.togglefps": "FPS'i aç/kapat",
-    "chatcmd.client.directplanes": "Draw floors and walls directly (on/off)",
     "chatcmd.client.zoom": "Yakınlaştır/uzaklaştır",
 
     // ------------------------------------------------------------------------

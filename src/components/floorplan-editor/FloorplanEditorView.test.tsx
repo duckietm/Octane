@@ -30,6 +30,7 @@ vi.mock('../../api', async (importOriginal) => {
 
 import {
     AddLinkEventTracker,
+    CreateLinkEvent,
     FloorHeightMapEvent,
     GetOccupiedTilesMessageComposer,
     GetRoomEntryTileMessageComposer,
@@ -73,6 +74,15 @@ describe('FloorplanEditorView container', () => {
         expect(AddLinkEventTracker).toHaveBeenCalledTimes(1);
         const tracker = (AddLinkEventTracker as ReturnType<typeof vi.fn>).mock.calls[0][0];
         expect(tracker.eventUrlPrefix).toBe('floor-editor/');
+    });
+
+    it('has a help button beside the close button that opens the Builders Club info page', () => {
+        openEditor();
+        const help = document.querySelector('.fp-header-help') as HTMLElement;
+
+        expect(help?.getAttribute('aria-label')).toBe('Help');
+        fireEvent.click(help);
+        expect(CreateLinkEvent).toHaveBeenCalledWith('habbopages/builders-club/info');
     });
 
     it('dispatches GetRoomEntryTileMessageComposer when editor becomes visible', () => {

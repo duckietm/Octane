@@ -5,7 +5,10 @@ import { CatalogLayoutBadgeDisplayView } from './CatalogLayoutBadgeDisplayView';
 
 vi.mock('../../../../../api', () => ({
     LocalizeText: (key: string) => key,
-    SanitizeHtml: (value: string) => value
+    Offer: { PRICING_MODEL_BUNDLE: 'pricing_model_bundle' },
+    ProductTypeEnum: { BADGE: 'b', FLOOR: 's' },
+    SanitizeHtml: (value: string) => value,
+    SanitizeHotelHtml: (value: string) => value
 }));
 
 vi.mock('../../../../../common', () => ({
@@ -24,6 +27,7 @@ vi.mock('../../../../../hooks', () => ({
     useCatalogDisplayPreferences: () => ({ density: 'standard', showTilePrices: true })
 }));
 
+vi.mock('../widgets/CatalogAddOnBadgeWidgetView', () => ({ CatalogAddOnBadgeWidgetView: () => <div data-testid="badge-image" /> }));
 vi.mock('../widgets/CatalogBadgeSelectorWidgetView', () => ({
     CatalogBadgeSelectorWidgetView: () => <div data-testid="badge-selector" />
 }));
@@ -106,5 +110,40 @@ describe('badge display catalog layout', () => {
         expect(screen.getByTestId('total-price').closest('.octane-catalog-preview-price')).toBeInTheDocument();
         expect(screen.getByTestId('total-price').closest('.octane-catalog-price-frame')).toBeInTheDocument();
         expect(screen.getByTestId('purchase')).toBeInTheDocument();
+    });
+});
+
+describe('CatalogLayoutBadgeDisplayView product view (AIR ProductViewCatalogWidget)', () => {
+    const offerOf = (productType: string, pricingModel = 'pricing_model_single') =>
+        ({ offerId: 1, pricingModel, localizationName: 'NL242', localizationDescription: '', product: { productType } }) as any;
+
+    it('shows a badge offer on the light panel without a room preview or controls', () => {
+        vi.mocked(useCatalogData).mockReturnValue({ currentOffer: offerOf('b'), roomPreviewer: null } as any);
+
+        const { container } = render(<CatalogLayoutBadgeDisplayView page={page} hideNavigation={() => undefined} />);
+
+        expect(screen.getByTestId('catalog-badge-offer-image')).toBeInTheDocument();
+        expect(screen.queryByTestId('product-preview')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('preview-controls')).not.toBeInTheDocument();
+        expect(container.querySelector('.octane-catalog-badge-preview')).toHaveClass('is-badge');
+    });
+
+    it('keeps the room preview and controls for a badge display furni', () => {
+        vi.mocked(useCatalogData).mockReturnValue({ currentOffer: offerOf('s'), roomPreviewer: null } as any);
+
+        render(<CatalogLayoutBadgeDisplayView page={page} hideNavigation={() => undefined} />);
+
+        expect(screen.getByTestId('product-preview')).toBeInTheDocument();
+        expect(screen.getByTestId('preview-controls')).toBeInTheDocument();
+        expect(screen.queryByTestId('catalog-badge-offer-image')).not.toBeInTheDocument();
+    });
+
+    it('gives a deal no preview controls', () => {
+        vi.mocked(useCatalogData).mockReturnValue({ currentOffer: offerOf('b', 'pricing_model_bundle'), roomPreviewer: null } as any);
+
+        render(<CatalogLayoutBadgeDisplayView page={page} hideNavigation={() => undefined} />);
+
+        expect(screen.getByTestId('product-preview')).toBeInTheDocument();
+        expect(screen.queryByTestId('preview-controls')).not.toBeInTheDocument();
     });
 });

@@ -146,10 +146,12 @@ const useInventoryFurniState = () => {
     useEffect(() => {
         if (!isVisible) return;
 
+        // Volt: leaving the furniture view clears the owned and the rented furni (the rentables tab is one of its sections).
         return () => {
-            if (resetCategory(UnseenItemCategory.FURNI)) {
-                updateGroupItems((prev) => clearUnseenFlags(prev));
-            }
+            const clearedOwned = resetCategory(UnseenItemCategory.FURNI);
+            const clearedRented = resetCategory(UnseenItemCategory.RENTABLE);
+
+            if (clearedOwned || clearedRented) updateGroupItems((prev) => clearUnseenFlags(prev));
         };
     }, [isVisible, resetCategory, updateGroupItems]);
 

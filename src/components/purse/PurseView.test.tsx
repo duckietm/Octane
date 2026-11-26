@@ -6,12 +6,15 @@ const mocks = vi.hoisted(() => ({
     openUrl: vi.fn(),
     clearRemember: vi.fn(),
     clearToken: vi.fn(),
-    config: {} as Record<string, unknown>
+    externalCalls: [] as unknown[][],
+    config: {} as Record<string, unknown>,
+    purse: null as Record<string, unknown> | null
 }));
 
 vi.mock('@octane/renderer', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@octane/renderer')>()),
-    CreateLinkEvent: (link: string) => mocks.links.push(link)
+    CreateLinkEvent: (link: string) => mocks.links.push(link),
+    LegacyExternalInterface: { available: false, call: (...args: unknown[]) => mocks.externalCalls.push(args) }
 }));
 
 vi.mock('../../api', async (importOriginal) => {
@@ -45,7 +48,7 @@ vi.mock('../../hooks', async (importOriginal) => {
         ...actual,
         usePurse: () => ({
             hcDisabled: false,
-            purse: {
+            purse: mocks.purse ?? {
                 activityPoints: new Map([
                     [0, 3692],
                     [5, 760]
@@ -70,11 +73,16 @@ describe('PurseView (AIR purse_xml / PurseAreaExtension)', () => {
         mocks.openUrl.mockClear();
         mocks.clearRemember.mockClear();
         mocks.clearToken.mockClear();
+        mocks.externalCalls.length = 0;
+        mocks.purse = null;
         vi.unstubAllGlobals();
     });
 
     it('forgets the local credentials on log out even when the server never answers', async () => {
-        vi.stubGlobal('fetch', vi.fn(() => new Promise(() => undefined)));
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() => new Promise(() => undefined))
+        );
         render(<PurseView />);
 
         fireEvent.click(screen.getByRole('button', { name: 'Log out' }));
@@ -83,6 +91,70 @@ describe('PurseView (AIR purse_xml / PurseAreaExtension)', () => {
             expect(mocks.clearRemember).toHaveBeenCalled();
             expect(mocks.clearToken).toHaveBeenCalled();
         });
+    });
+
+    it('tells the website and the other tabs on the hotel-session channel, as App hears it, and reloads', async () => {
+        const posted: { name: string; data: unknown }[] = [];
+
+        class FakeChannel {
+            constructor(public name: string) {}
+            postMessage(data: unknown) {
+                posted.push({ name: this.name, data });
+            }
+            close() {}
+        }
+
+        const reload = vi.fn();
+
+        vi.stubGlobal('BroadcastChannel', FakeChannel);
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() => Promise.resolve(new Response('{}')))
+        );
+        vi.spyOn(window, 'location', 'get').mockReturnValue({ ...window.location, reload } as Location);
+        render(<PurseView />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Log out' }));
+
+        await vi.waitFor(() => expect(reload).toHaveBeenCalled());
+
+        expect(posted).toEqual([{ name: 'hotel-session', data: { type: 'logged-out' } }]);
+        expect(mocks.externalCalls).toEqual([['logout']]);
+        expect(fetch).toHaveBeenCalledWith('/api/auth/logout', expect.objectContaining({ method: 'POST', credentials: 'include' }));
+        vi.restoreAllMocks();
+    });
+
+    it('puts each count in a clip box, so a long balance loses its leading digits rather than leaving the row', () => {
+        const { container } = render(<PurseView />);
+        const amount = container.querySelector('.currency--1 .octane-purse-button__amount');
+
+        expect(amount?.parentElement).toHaveClass('octane-purse-button__clip');
+        expect(amount?.closest('.octane-purse-currency')).toHaveClass('octane-purse-currency---1');
+        expect(container.querySelector('.octane-purse-currency--0')).not.toBeNull();
+    });
+
+    it('counts the club periods as 31 days each, so a member with whole months left never reads Get', () => {
+        mocks.purse = {
+            activityPoints: new Map([[0, 1]]),
+            clubDays: 0,
+            clubPeriods: 2,
+            clubLevel: 1,
+            credits: 5,
+            minutesUntilExpiration: -1
+        };
+        const { container } = render(<PurseView />);
+
+        expect(screen.queryByText('Get')).toBeNull();
+        expect(container.querySelector('.octane-purse__btn-days')).not.toBeNull();
+    });
+
+    it('centres the Help label on its field width in the 50 px button', () => {
+        const { container } = render(<PurseView />);
+        const label = container.querySelector<HTMLElement>('.octane-purse__help-label');
+
+        // jsdom loads no font: the width is unknown and the label starts at the button's centre, 22 px into the padding box.
+        expect(label).toHaveTextContent('Help');
+        expect(label?.style.left).toBe('22px');
     });
 
     it('shows each amount as the whole number, as AIR does', () => {

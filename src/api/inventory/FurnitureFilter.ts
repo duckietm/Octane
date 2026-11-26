@@ -1,4 +1,5 @@
 import { GetSessionDataManager, IFurnitureData } from '@octane/renderer';
+import { isMarketplaceCollectibleClass } from '../catalog/MarketplaceCollectibles';
 import { LocalizeText } from '../utils';
 import { FurniCategory } from './FurniCategory';
 import { GroupItem } from './GroupItem';
@@ -12,8 +13,23 @@ export const FURNI_MAIN_FILTER = {
 
 export type FurniMainFilter = (typeof FURNI_MAIN_FILTER)[keyof typeof FURNI_MAIN_FILTER];
 
+// Volt's lists: "collectibles" sits after pet food (floor) and paintings (wall).
 export const FURNI_TYPE_OPTIONS: Record<FurniMainFilter, string[]> = {
-    all: ['any', 'sittable', 'layable', 'tiles_or_rugs', 'ltd', 'wired', 'credit_furni', 'clothes', 'pet_food', 'tradable', 'non_tradable', 'recyclable'],
+    all: [
+        'any',
+        'sittable',
+        'layable',
+        'tiles_or_rugs',
+        'ltd',
+        'wired',
+        'credit_furni',
+        'clothes',
+        'pet_food',
+        'collectibles',
+        'tradable',
+        'non_tradable',
+        'recyclable'
+    ],
     floor_items: [
         'any',
         'sittable',
@@ -24,11 +40,12 @@ export const FURNI_TYPE_OPTIONS: Record<FurniMainFilter, string[]> = {
         'credit_furni',
         'clothes',
         'pet_food',
+        'collectibles',
         'tradable',
         'non_tradable',
         'recyclable'
     ],
-    wall_items: ['any', 'windows', 'dimmers', 'stickies', 'paintings', 'tradable', 'non_tradable', 'recyclable'],
+    wall_items: ['any', 'windows', 'dimmers', 'stickies', 'paintings', 'collectibles', 'tradable', 'non_tradable', 'recyclable'],
     room_layout: ['any', 'floors', 'wallpapers', 'landscape']
 };
 
@@ -88,6 +105,10 @@ const matchesTypeFilter = (item: GroupItem, typeId: string): boolean => {
             return item.category === FurniCategory.FIGURE_PURCHASABLE_SET;
         case 'pet_food':
             return className.startsWith('petfood') || furniLine === 'pet_food';
+        case 'collectibles':
+            // Volt keeps this option but matches nothing; here a collectible furni is what the server's
+            // Collectibles marketplace sells: an nft_* class (NftMarketplace, the product code is the class name).
+            return isMarketplaceCollectibleClass(className);
         case 'tradable':
             return data?.tradeable ?? !!last?.isTradable;
         case 'non_tradable':

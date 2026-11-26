@@ -1,6 +1,6 @@
 import { CreateLinkEvent } from '@octane/renderer';
 import { MouseEvent } from 'react';
-import { SanitizeHtml } from './SanitizeHtml';
+import { SanitizeHotelHtml } from './SanitizeHtml';
 
 /** Where an `event:` link waits after sanitising: a fragment link the sanitizer keeps. */
 const INTERNAL_LINK_PREFIX = '#octane-event:';
@@ -11,7 +11,7 @@ const INTERNAL_LINK_PREFIX = '#octane-event:';
  * fragment links; {@link handleInternalLinkClick} hands them back to the client's link events.
  */
 export const SanitizeHtmlWithInternalLinks = (html: string): string =>
-    SanitizeHtml((html ?? '').replace(/href\s*=\s*(["'])\s*event:/gi, (_match, quote: string) => `href=${quote}${INTERNAL_LINK_PREFIX}`));
+    SanitizeHotelHtml((html ?? '').replace(/href\s*=\s*(["'])\s*event:/gi, (_match, quote: string) => `href=${quote}${INTERNAL_LINK_PREFIX}`));
 
 /** The click handler for HTML from {@link SanitizeHtmlWithInternalLinks}: an internal link opens in the client. */
 export const handleInternalLinkClick = (event: MouseEvent<HTMLElement>): void => {

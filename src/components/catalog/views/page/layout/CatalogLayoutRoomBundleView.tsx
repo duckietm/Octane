@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { SanitizeHtml } from '../../../../../api';
+import { SanitizeHotelHtml } from '../../../../../api';
 import { Column, Flex, Grid, Text } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';
@@ -30,12 +30,12 @@ export const CatalogLayoutRoomBundleView: FC<CatalogLayoutProps> = (props) => {
                                 <Text
                                     aria-hidden
                                     className="octane-catalog-bundle-header-spacer"
-                                    dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(2)) }}
+                                    dangerouslySetInnerHTML={{ __html: SanitizeHotelHtml(page.localization.getText(2)) }}
                                 />
                                 <Text
                                     aria-hidden
                                     className="octane-catalog-bundle-header-spacer"
-                                    dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(2)) }}
+                                    dangerouslySetInnerHTML={{ __html: SanitizeHotelHtml(page.localization.getText(2)) }}
                                 />
                             </>
                         )}
@@ -55,10 +55,10 @@ export const CatalogLayoutRoomBundleView: FC<CatalogLayoutProps> = (props) => {
                             <Text
                                 aria-hidden
                                 className="octane-catalog-bundle-header-spacer"
-                                dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(2)) }}
+                                dangerouslySetInnerHTML={{ __html: SanitizeHotelHtml(page.localization.getText(2)) }}
                             />
                         )}
-                        {!!page.localization.getText(2) && <Text dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(2)) }} />}
+                        {!!page.localization.getText(2) && <Text dangerouslySetInnerHTML={{ __html: SanitizeHotelHtml(page.localization.getText(2)) }} />}
                         <Column className="octane-catalog-bundle-frame has-classic-scrollbar" overflow="hidden">
                             <CatalogBundleGridWidgetView fullWidth className="octane-catalog-layout-bundle-grid" columnCount={4} />
                         </Column>

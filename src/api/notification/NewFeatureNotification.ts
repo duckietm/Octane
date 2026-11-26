@@ -26,10 +26,12 @@ export type NewFeatureType = typeof NEW_FEATURE_TYPE_NORMAL | typeof NEW_FEATURE
 /** NewFeatureNotification.BG_COLOR_NORMAL. */
 export const NEW_FEATURE_BG_COLOR_NORMAL = '#686661';
 
-/** SingularNotificationController: the first check 2 s after start, then up to 3 retries 2 s apart. */
-export const NEW_FEATURE_FIRST_CHECK_DELAY_MS = 2000;
-export const NEW_FEATURE_CONDITION_RETRY_DELAY_MS = 2000;
-export const NEW_FEATURE_CONDITION_MAX_RETRIES = 3;
+/**
+ * SingularNotificationController looks at the active keys 2 s after the client starts and gives a key whose condition
+ * cannot be read yet 3 more tries, 2 s apart. That start delay passes during AIR's loading screen, so the bars are there
+ * when the hotel shows, and a key waits for its reward track at most 8 s in all.
+ */
+export const NEW_FEATURE_CONDITION_WAIT_MS = 2000 + 3 * 2000;
 export const NEW_FEATURE_CONDITION_REWARD_TRACK_INCOMPLETE = 'reward_track_incomplete';
 
 export enum NewFeatureConditionState {

@@ -10,6 +10,7 @@ import {
     decodeBase64,
     finiteNumber,
     flattenQuadratic,
+    quarterSampledLength,
     float32Bits,
     float32FromBits,
     floorToTwips,
@@ -144,5 +145,11 @@ describe('native text retained bitmap', () =>
         expect(Array.from(compositeRetainedToOpaque(retained, [ 255, 255, 255, 255 ]))).toMatchSnapshot('on white');
         expect(Array.from(compositeRetainedToOpaque(retained, [ 0, 0, 0, 255 ]))).toMatchSnapshot('on black');
         expect(attempt(() => compositeRetainedToOpaque(new Uint8Array(5), [ 0, 0, 0, 255 ]))).toMatchSnapshot('not rgba');
+    });
+});
+
+describe('quarterSampledLength (AIR underline)', () => {
+    it('covers the last pixel in quarter steps, by the samples whose centre lies inside the line', () => {
+        expect([ 10, 10.1, 10.125, 10.13, 10.4, 10.62, 10.7, 10.9 ].map(quarterSampledLength)).toEqual([ 10, 10, 10, 10.25, 10.5, 10.5, 10.75, 11 ]);
     });
 });

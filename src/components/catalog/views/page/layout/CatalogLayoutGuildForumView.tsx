@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { GetConfigurationValue, LocalizeText, SanitizeHtml } from '../../../../../api';
+import { GetConfigurationValue, LocalizeText, SanitizeHotelHtml } from '../../../../../api';
 import { Column, Flex, Grid } from '../../../../../common';
 import { LayoutImage } from '../../../../../common/layout/LayoutImage';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
@@ -36,7 +36,7 @@ export const CatalogLayouGuildForumView: FC<CatalogLayoutProps> = (props) => {
                     <Column overflow="hidden" size={8}>
                         <div
                             className="octane-catalog-forum-text grow! min-h-0 overflow-auto text-black"
-                            dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(1)) }}
+                            dangerouslySetInnerHTML={{ __html: SanitizeHotelHtml(page.localization.getText(1)) }}
                         />
                         {/* The forum selector keeps its "start a group" route visible before an article is picked; the
                             badge, price and purchase stay tied to the picked offer. */}

@@ -12,12 +12,20 @@ describe('purse text (grid_purse)', () => {
     });
 
     it('draws the amounts and the HC / earnings labels in u_bold 12', () => {
-        expect(css).toMatch(/\.allcurrencypurse \.text-white \{[^}]*font-size: 12px;[^}]*font-weight: 700;[^}]*text-shadow: 0 1px 0 rgba\(0, 0, 0, 0\.27\)/);
+        expect(css).toMatch(
+            /\.octane-purse-button \.currency-text \{[^}]*font-size: 12px;[^}]*font-weight: 700;[^}]*text-shadow: 0 1px 0 rgba\(0, 0, 0, 0\.27\)/
+        );
         expect(css).toMatch(/\.octane-purse__btn--earnings \{[^}]*color: #00c1c4;[^}]*font-size: 12px;[^}]*font-weight: 700;[^}]*text-shadow: none/);
     });
 
+    it('draws the Help label in white u_regular 12 without a shadow, as the help button field', () => {
+        expect(css).toMatch(/\.octane-purse__btn--settings \{[^}]*color: #ffffff;[^}]*font-size: 12px;[^}]*font-weight: 400;[^}]*text-shadow: none/);
+        expect(css).toMatch(/\.octane-purse__btn--help \.octane-purse__help-label \{[^}]*position: absolute;[^}]*top: -2px;/);
+    });
+
     it('draws the HC extend buy_now_button as the grey button_thick, 12 px bold black', () => {
-        expect(clubExtendCss).toMatch(/@layer base \{\s*\.octane-club-extend \.octane-club-extend-buy \{[^}]*border-image-source: var\(--habbo-skin-shiny-thick\) !important;[^}]*color: #000000 !important;[^}]*font-size: 12px !important;[^}]*font-weight: 700 !important;/);
+        expect(clubExtendCss).toMatch(
+            /@layer base \{\s*\.octane-club-extend \.octane-club-extend-buy \{[^}]*border-image-source: var\(--habbo-skin-shiny-thick\) !important;[^}]*color: #000000 !important;[^}]*font-size: 12px !important;[^}]*font-weight: 700 !important;/
+        );
     });
 });
-

@@ -12,7 +12,7 @@ import {
     RewardTracksMessageEvent,
     SecurityLevel
 } from '@octane/renderer';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { CopyToClipboard, getRewardTrackResultText, localizeWithFallback, NotificationAlertType, NotificationBubbleType, SendMessageComposer } from '../../api';
 import FREE_CLAIM_ICON from '../../assets/images/reward-track/free-track.png';
@@ -30,6 +30,12 @@ const useRewardTracksState = () => {
     const [tracksVersion, setTracksVersion] = useState(0);
     const [pendingPurchase, setPendingPurchase] = useState<string>(null);
     const { showSingleBubble = null, simpleAlert = null } = useNotification();
+    // The tracks as last rendered, for event handlers that must decide something before they update them.
+    const tracksRef = useRef<RewardTrackData[]>(tracks);
+
+    useEffect(() => {
+        tracksRef.current = tracks;
+    }, [tracks]);
 
     const requestTracks = useCallback(() => SendMessageComposer(new GetRewardTracksMessageComposer()), []);
 
@@ -92,34 +98,43 @@ const useRewardTracksState = () => {
 
     useMessageEvent<RewardTrackClaimResultMessageEvent>(RewardTrackClaimResultMessageEvent, (event) => {
         const parser = event.getParser();
+        // The bubble is shown here, outside the state updater: an updater runs while React renders, and
+        // showing a notification there updates another component during that render.
+        const track = tracksRef.current.find((existing) => existing.id === parser.trackId);
 
-        setTracks((prevValue) => {
-            const track = prevValue.find((existing) => existing.id === parser.trackId);
+        if (!track) return;
 
-            if (!track) return prevValue;
+        if (parser.resultCode === 0) {
+            const prize = track.getPrize(parser.rewardId);
 
-            if (parser.resultCode === 0) {
-                const prize = track.getPrize(parser.rewardId);
+            setTracks((prevValue) => {
+                const current = prevValue.find((existing) => existing.id === parser.trackId);
 
-                track.markPrizeClaimed(parser.rewardId);
+                if (!current) return prevValue;
 
-                if (showSingleBubble) {
-                    showSingleBubble(
-                        localizeWithFallback('reward_track.claim.notification.success', 'Reward claimed!'),
-                        NotificationBubbleType.INFO,
-                        prize && prize.premium ? PREMIUM_CLAIM_ICON : FREE_CLAIM_ICON,
-                        `reward_track/open/${track.id}`
-                    );
-                }
-            } else if (showSingleBubble) {
+                current.markPrizeClaimed(parser.rewardId);
+
+                return [...prevValue];
+            });
+
+            if (showSingleBubble) {
                 showSingleBubble(
-                    getRewardTrackResultText('reward_track.claim.notification.', parser.resultCode, 'The reward could not be claimed.'),
-                    NotificationBubbleType.INFO
+                    localizeWithFallback('reward_track.claim.notification.success', 'Reward claimed!'),
+                    NotificationBubbleType.INFO,
+                    prize && prize.premium ? PREMIUM_CLAIM_ICON : FREE_CLAIM_ICON,
+                    `reward_track/open/${track.id}`
                 );
             }
 
-            return [...prevValue];
-        });
+            return;
+        }
+
+        if (showSingleBubble) {
+            showSingleBubble(
+                getRewardTrackResultText('reward_track.claim.notification.', parser.resultCode, 'The reward could not be claimed.'),
+                NotificationBubbleType.INFO
+            );
+        }
     });
 
     useMessageEvent<RewardTrackProgressMessageEvent>(RewardTrackProgressMessageEvent, (event) => {

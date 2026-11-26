@@ -6,7 +6,8 @@ import { CatalogLayouGuildForumView } from './CatalogLayoutGuildForumView';
 vi.mock('../../../../../api', () => ({
     GetConfigurationValue: (key: string, fallback: unknown) => (key === 'image.library.url' ? 'https://cdn.example/c_images/' : fallback),
     LocalizeText: (key: string) => key,
-    SanitizeHtml: (value: string) => value
+    SanitizeHtml: (value: string) => value,
+    SanitizeHotelHtml: (value: string) => value
 }));
 
 vi.mock('../../../../../common', () => ({

@@ -1,7 +1,7 @@
 import { ColorConverter } from '@octane/renderer';
 import { FC, useMemo, useState } from 'react';
 import { FaFillDrip } from 'react-icons/fa';
-import { CatalogType, IPurchasableOffer, SanitizeHtml } from '../../../../../api';
+import { CatalogType, IPurchasableOffer, SanitizeHotelHtml } from '../../../../../api';
 import { AutoGrid, BaseButton, Button, Column, LayoutGridItem, Text } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogData, useCatalogUiState, useInventoryFurni } from '../../../../../hooks';
@@ -169,7 +169,7 @@ const CatalogLayoutColorGroupingGridView: FC<CatalogLayoutColorGroupViewProps> =
                 {!currentOffer && (
                     <Column center grow overflow="hidden">
                         {!!page.localization.getImage(1) && <img alt="" src={page.localization.getImage(1)} />}
-                        <Text center dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(0)) }} />
+                        <Text center dangerouslySetInnerHTML={{ __html: SanitizeHotelHtml(page.localization.getText(0)) }} />
                     </Column>
                 )}
                 {currentOffer && (

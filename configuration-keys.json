@@ -224,6 +224,7 @@
         {"key":"nft.minting.enabled","comment":"Shows the minting tab of the collectibles hub and loads mint tokens.","value":false,"runtime":true},
         {"key":"collectibles.transfer.enabled","comment":"Shows the transfer tab of the collectibles hub and loads the transfer fee.","value":false,"runtime":true},
         {"key":"nft.credit.converting.enabled","comment":"Lets emerald credit furni be redeemed; off: their exchange window never opens.","value":false,"example":true,"runtime":true},
+        {"key":"furni.cfc.redeemable","comment":"Shows the exchange window of CFC_ credit furni; keep it equal to the server setting hotel.furni.cfc.redeemable (0 there: set false).","value":true,"runtime":true},
         {"key":"badge.descriptions.enabled","comment":"Shows the name and description tooltip on badge images.","value":true,"runtime":true},
         {"key":"badge.display.excluded.badgeCodes","comment":"Badge codes hidden from the badge picker of the catalog badge display, e.g. [\"ADM\", \"MOD\"].","value":[],"runtime":true},
         {"key":"badge_rarity.uncommon","comment":"Treats uncommon badges as their own rarity tier with a glow; off counts them as common.","value":false,"runtime":true},

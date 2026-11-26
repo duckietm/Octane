@@ -5,8 +5,9 @@ import DOMPurify from 'dompurify';
 // alert could cover the whole client with `position:fixed;inset:0` - an overlay for phishing or tracking.
 const TEXT_STYLE_PROPERTIES = new Set(['color', 'background-color', 'font-weight', 'font-style', 'font-size', 'text-decoration', 'text-align']);
 
-// True while SanitizeHtml runs, so its stricter rules stay out of SanitizePageHtml, which shares the DOMPurify instance.
-let strictPass = false;
+// Which sanitiser is running, so each one's rules stay out of the others, which share the DOMPurify instance:
+// 'strict' for SanitizeHtml, 'hotel' for SanitizeHotelHtml.
+let textPass: 'strict' | 'hotel' | null = null;
 // True while SanitizePageHtml runs: help pages keep their layout styles, but not a position that takes them out of
 // their window (fixed or sticky), which could lay an overlay over the whole client.
 let pagePass = false;
@@ -28,7 +29,21 @@ export const pageStyle = (style: string): string =>
         })
         .join('; ');
 
-const textOnlyStyle = (style: string): string =>
+// A font size SanitizeHtml keeps: up to about three times the client's text. A bigger one let one alert word fill the screen.
+const FONT_SIZE_KEYWORDS = new Set(['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large', 'smaller', 'larger']);
+const FONT_SIZE_LIMITS: Record<string, number> = { px: 36, pt: 27, em: 3, rem: 3, '%': 300 };
+
+const isModestFontSize = (value: string): boolean => {
+    const size = value.trim().toLowerCase();
+
+    if (FONT_SIZE_KEYWORDS.has(size)) return true;
+
+    const match = /^(\d+(?:\.\d+)?)(px|pt|em|rem|%)$/.exec(size);
+
+    return !!match && Number(match[1]) <= FONT_SIZE_LIMITS[match[2]];
+};
+
+const textOnlyStyle = (style: string, limitFontSize = false): string =>
     style
         .split(';')
         .map((declaration) => declaration.trim())
@@ -40,7 +55,9 @@ const textOnlyStyle = (style: string): string =>
             const property = declaration.slice(0, colon).trim().toLowerCase();
             const value = declaration.slice(colon + 1).toLowerCase();
 
-            return TEXT_STYLE_PROPERTIES.has(property) && !value.includes('url(') && !value.includes('expression(');
+            if (!TEXT_STYLE_PROPERTIES.has(property) || value.includes('url(') || value.includes('expression(')) return false;
+
+            return !limitFontSize || property !== 'font-size' || isModestFontSize(value);
         })
         .join('; ');
 
@@ -85,7 +102,7 @@ const isAllowedImageSource = (src: string): boolean => {
 DOMPurify.addHook('afterSanitizeAttributes', (node) => {
     const element = node as Element;
 
-    if (strictPass) {
+    if (textPass) {
         // A link opens a new tab, never the page that holds the client: one with no target (or _top, _parent) used to
         // navigate the whole client away, and a look-alike page could then ask for the password.
         if (element.tagName === 'A' && (element.getAttribute('target') || element.getAttribute('href'))) element.setAttribute('target', '_blank');
@@ -95,7 +112,7 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
         const style = element.getAttribute('style');
 
         if (style !== null) {
-            const kept = textOnlyStyle(style);
+            const kept = textOnlyStyle(style, textPass === 'strict');
 
             if (kept.length) element.setAttribute('style', kept);
             else element.removeAttribute('style');
@@ -123,21 +140,46 @@ const HTML_ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '
 /** Escapes a plain text (a name a user chose) before it is put into a text that is then rendered as HTML. */
 export const EscapeHtml = (text: string): string => String(text ?? '').replace(/[&<>"']/g, (character) => HTML_ESCAPES[character]);
 
+// The two slashes matter: `https:path` and `https:/path` resolve against the client's own site.
+const WEB_LINK = /^https?:\/\//i;
+
 /**
- * Sanitises the small HTML of chat, alerts, notifications and catalog texts. Names of users, bots and pets are not
+ * Sanitises HTML that a player, staff member or the server can put words into: chat, alerts, notifications, wired
+ * texts and texts with server values. It keeps text formatting, colours and absolute http(s) links, which open in a
+ * new tab without a handle back to the client. Images, classes (the client's own utility classes could lay an overlay
+ * over the whole client), a huge font size and every other link are dropped. Names of users, bots and pets are not
  * HTML: render them as React text instead.
  */
 export const SanitizeHtml = (html: string): string => {
-    strictPass = true;
+    textPass = 'strict';
 
     try {
-        return DOMPurify.sanitize(html, {
+        return DOMPurify.sanitize(html ?? '', {
+            ALLOWED_TAGS: ['b', 'i', 'u', 'br', 'span', 'div', 'p', 'a', 'strong', 'em'],
+            ALLOWED_ATTR: ['href', 'style'],
+            ALLOWED_URI_REGEXP: WEB_LINK,
+            ALLOW_DATA_ATTR: false
+        });
+    } finally {
+        textPass = null;
+    }
+};
+
+/**
+ * Sanitises the hotel's own texts, such as catalog pages and collectibles, which may carry images from the hotel's
+ * own servers, classes and styled text. Never use it for a text that holds anything a player wrote or chose.
+ */
+export const SanitizeHotelHtml = (html: string): string => {
+    textPass = 'hotel';
+
+    try {
+        return DOMPurify.sanitize(html ?? '', {
             ALLOWED_TAGS: ['b', 'i', 'u', 'br', 'span', 'div', 'p', 'a', 'strong', 'em', 'img'],
             ALLOWED_ATTR: ['href', 'target', 'class', 'style', 'src', 'alt', 'rel'],
             ALLOW_DATA_ATTR: false
         });
     } finally {
-        strictPass = false;
+        textPass = null;
     }
 };
 

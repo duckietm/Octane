@@ -1,6 +1,7 @@
 import {
     AddLinkEventTracker,
     convertNumbersForSaving,
+    CreateLinkEvent,
     convertSettingToNumber,
     FloorHeightMapEvent,
     GetOccupiedTilesMessageComposer,
@@ -277,7 +278,18 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
                         classNames={['octane-floorplan-window']}
                         theme="primary-slim"
                     >
-                        <OctaneCardHeaderView headerText={externalSession?.title ?? LocalizeText('floor.plan.editor.title')} onCloseClick={closeEditor} />
+                        <OctaneCardHeaderView headerText={externalSession?.title ?? LocalizeText('floor.plan.editor.title')} onCloseClick={closeEditor}>
+                            {/* AIR's floor plan editor frame has a help button beside the close button: the Builders Club info page. */}
+                            <Hint content={localizeWithFallback('help.button.tooltip', 'Help')}>
+                                <BaseButton
+                                    aria-label={localizeWithFallback('help.button.tooltip', 'Help')}
+                                    className="fp-header-help"
+                                    type="button"
+                                    onClick={() => CreateLinkEvent('habbopages/builders-club/info')}
+                                    onMouseDown={(event) => event.stopPropagation()}
+                                />
+                            </Hint>
+                        </OctaneCardHeaderView>
                         <OctaneCardContentView overflow="hidden" className="flex flex-col">
                             <div className="fp-body">
                                 <div className="fp-banner">

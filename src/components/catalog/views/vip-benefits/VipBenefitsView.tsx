@@ -1,6 +1,6 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { flashFontTagsToSpans, GetConfigurationValue, localizeWithFallback, SanitizeHtml } from '../../../../api';
+import { flashFontTagsToSpans, GetConfigurationValue, localizeWithFallback, SanitizeHotelHtml } from '../../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
@@ -16,7 +16,7 @@ const FALLBACKS: Record<string, string> = {
 
 const text = (key: string): string => localizeWithFallback(key, FALLBACKS[key] ?? key);
 
-const html = (key: string): { __html: string } => ({ __html: SanitizeHtml(flashFontTagsToSpans(text(key))) });
+const html = (key: string): { __html: string } => ({ __html: SanitizeHotelHtml(flashFontTagsToSpans(text(key))) });
 
 /**
  * AIR vip_benefits (habbo-catalog-com, catalog/club/VipBenefitsWindow): the 457x450 "HC benefits" window
