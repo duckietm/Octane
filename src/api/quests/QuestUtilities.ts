@@ -219,6 +219,27 @@ export const getRewardTrackPrizeTooltip = (state: RewardTrackPrizeState): string
     }
 };
 
+/**
+ * The count a task row or level row shows next to its bar: the progress, clamped to the level's target,
+ * so a reached level reads "5 / 5" rather than the whole task progress ("66 / 5").
+ */
+export const getRewardTrackLevelProgress = (progressCount: number, requiredCount: number): number =>
+    Math.max(0, Math.min(progressCount, Math.max(0, requiredCount)));
+
+/** The part of a track the toolbar counts: the prizes the user can claim right now (ProgMenuController). */
+type RewardTrackClaimable = Pick<RewardTrackData, 'id' | 'claimablePrizeCount'>;
+
+/** The claimable prizes of one track; 0 for a track that is not in the list. */
+export const getRewardTrackClaimableCount = (tracks: ReadonlyArray<RewardTrackClaimable>, trackId: string): number =>
+    tracks.find((track) => track.id === trackId)?.claimablePrizeCount ?? 0;
+
+/**
+ * The track one toolbar entry opens when it does not name one: the first track with prizes to claim, so its badge
+ * leads to them, otherwise the first track. Its badge counts this track only.
+ */
+export const getRewardTrackMenuTarget = <T extends RewardTrackClaimable>(tracks: ReadonlyArray<T>): T | null =>
+    tracks.find((track) => track.claimablePrizeCount > 0) ?? tracks[0] ?? null;
+
 export interface RewardTrackTheme {
     dark: string;
     medium: string;

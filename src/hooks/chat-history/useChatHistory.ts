@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { ChatEntryType, ChatHistoryCurrentDate, GetConfigurationValue, IChatEntry, IRoomHistoryEntry, MessengerHistoryCurrentDate } from '../../api';
 import { useMessageEvent, useOctaneEvent } from '../events';
-import { discardLocalStorage, useLocalStorage } from '../useLocalStorage';
+import { discardAccountLocalStorage, useAccountLocalStorage } from '../useLocalStorage';
 
 const ROOM_HISTORY_MAX = 10;
 const MESSENGER_HISTORY_MAX = 1000;
@@ -11,13 +11,16 @@ const MESSENGER_HISTORY_MAX = 1000;
 let CHAT_HISTORY_COUNTER: number = 0;
 let MESSENGER_HISTORY_COUNTER: number = 0;
 
+// Stored per account (`key#<user id>`), so another account on the same browser never reads this one's chat.
+const CHAT_HISTORY_STORAGE_KEYS = ['chatHistory', 'roomHistory', 'messengerHistory', 'needsRoomInsert'];
+
 export const ClearStoredChatHistory = () => {
     CHAT_HISTORY_COUNTER = 0;
     MESSENGER_HISTORY_COUNTER = 0;
 
-    // Through the hook's own keys (per user id when one is set) and its live state: removing the bare keys missed the
-    // per-user ones, and the in-memory history was written back by the next pending write.
-    discardLocalStorage(['chatHistory', 'roomHistory', 'messengerHistory', 'needsRoomInsert']);
+    // Every account's stored history and the live state: the in-memory history was otherwise written back by the next
+    // pending write.
+    discardAccountLocalStorage(CHAT_HISTORY_STORAGE_KEYS);
 };
 
 /**
@@ -36,10 +39,10 @@ export const ClearStoredChatHistory = () => {
 const slimChatEntriesForStorage = (entries: IChatEntry[]): IChatEntry[] => entries.map((entry) => (entry.imageUrl ? { ...entry, imageUrl: undefined } : entry));
 
 const useChatHistoryState = () => {
-    const [chatHistory, setChatHistory] = useLocalStorage<IChatEntry[]>('chatHistory', [], { toStorage: slimChatEntriesForStorage });
-    const [roomHistory, setRoomHistory] = useLocalStorage<IRoomHistoryEntry[]>('roomHistory', []);
-    const [messengerHistory, setMessengerHistory] = useLocalStorage<IChatEntry[]>('messengerHistory', [], { toStorage: slimChatEntriesForStorage });
-    const [needsRoomInsert, setNeedsRoomInsert] = useLocalStorage('needsRoomInsert', false);
+    const [chatHistory, setChatHistory] = useAccountLocalStorage<IChatEntry[]>('chatHistory', [], { toStorage: slimChatEntriesForStorage });
+    const [roomHistory, setRoomHistory] = useAccountLocalStorage<IRoomHistoryEntry[]>('roomHistory', []);
+    const [messengerHistory, setMessengerHistory] = useAccountLocalStorage<IChatEntry[]>('messengerHistory', [], { toStorage: slimChatEntriesForStorage });
+    const [needsRoomInsert, setNeedsRoomInsert] = useAccountLocalStorage('needsRoomInsert', false);
 
     // Stored entries survive a reload; the module counter does not. New ids go above the restored range, so an
     // update (translation, avatar image) never lands on an older entry that has the same id.

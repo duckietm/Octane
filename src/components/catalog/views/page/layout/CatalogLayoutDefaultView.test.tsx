@@ -8,7 +8,8 @@ vi.mock('../../../../../api', () => ({
     GetConfigurationValue: vi.fn((key: string) => key === 'catalog.multiple.purchase.enabled'),
     LocalizeText: (key: string) => key,
     ProductTypeEnum: { BADGE: 'b', FLOOR: 's' },
-    SanitizeHtml: (value: string) => value
+    SanitizeHtml: (value: string) => value,
+    SanitizeHotelHtml: (value: string) => value
 }));
 
 vi.mock('../../../../../common', () => ({ Text: () => null }));

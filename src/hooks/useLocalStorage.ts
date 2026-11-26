@@ -1,6 +1,7 @@
 import { OctaneLogger } from '@octane/renderer';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { GetLocalStorage, SetLocalStorage } from '../api';
+import { useUserDataSnapshot } from './session/useSessionSnapshots';
 
 const userId = new URLSearchParams(window.location.search).get('userid') || 0;
 
@@ -23,6 +24,49 @@ export const discardLocalStorage = (keys: string[]): void => {
             /* storage blocked: nothing to remove */
         }
     }
+};
+
+// Account values are stored under `key#<user id>`. Older clients stored `key` or `key.<id from the URL>`, which every
+// account on one browser shared and a URL parameter could pick; the `#` keeps those apart.
+const toAccountStorageKey = (key: string, userId: number): string => `${key}#${userId}`;
+const accountResetKey = (key: string): string => `account:${key}`;
+
+/**
+ * Removes the stored values of these account keys for every account except `keepUserId` (0 keeps none), and the
+ * values older clients stored under the bare key or `key.<id>`.
+ */
+const removeAccountLocalStorage = (keys: string[], keepUserId = 0): void => {
+    try {
+        const storage = window.localStorage;
+        const isStale = (storageKey: string) =>
+            keys.some(
+                (key) =>
+                    storageKey === key ||
+                    storageKey.startsWith(`${key}.`) ||
+                    (storageKey.startsWith(`${key}#`) && storageKey !== toAccountStorageKey(key, keepUserId))
+            );
+        const stale: string[] = [];
+
+        for (let index = 0; index < storage.length; index++) {
+            const storageKey = storage.key(index);
+
+            if (storageKey && isStale(storageKey)) stale.push(storageKey);
+        }
+
+        for (const storageKey of stale) storage.removeItem(storageKey);
+    } catch {
+        /* storage blocked: nothing to remove */
+    }
+};
+
+/**
+ * Removes every account's stored values of these account keys and resets every live account hook on them to its
+ * initial value (a logout, a session that ended, a ban).
+ */
+export const discardAccountLocalStorage = (keys: string[]): void => {
+    for (const key of keys) liveResets.get(accountResetKey(key))?.forEach((reset) => reset());
+
+    removeAccountLocalStorage(keys);
 };
 
 const STORAGE_WRITE_DEBOUNCE_MS = 250;
@@ -66,34 +110,53 @@ interface UseLocalStorageOptions<T> {
     toStorage?: (value: T) => unknown;
 }
 
-const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocalStorageOptions<T> = {}): [T, Dispatch<SetStateAction<T>>] => {
-    key = storageKeyOf(key);
+const readStoredValue = <T>(storageKey: string | null, initialValue: T): T => {
+    if (!storageKey) return initialValue;
 
-    const [storedValue, setStoredValue] = useState<T>(() => {
-        try {
-            const item = typeof window !== 'undefined' ? GetLocalStorage<unknown>(key) : undefined;
+    try {
+        const item = typeof window !== 'undefined' ? GetLocalStorage<unknown>(storageKey) : undefined;
 
-            if (item === null || item === undefined) return initialValue;
+        if (item === null || item === undefined) return initialValue;
 
-            return matchesInitialShape(item, initialValue) ? item : initialValue;
-        } catch (error) {
-            return initialValue;
-        }
-    });
+        return matchesInitialShape(item, initialValue) ? item : initialValue;
+    } catch (error) {
+        return initialValue;
+    }
+};
+
+interface StoredState<T> {
+    storageKey: string | null;
+    value: T;
+}
+
+/**
+ * The stored state behind both hooks. `storageKey` null keeps the value in memory only. When the key changes (another
+ * account logs in), the value of the new key is read and a write still waiting for the old key is dropped.
+ */
+const useStoredState = <T>(storageKey: string | null, resetKey: string, initialValue: T, options: UseLocalStorageOptions<T>): [T, Dispatch<SetStateAction<T>>] => {
+    const [state, setState] = useState<StoredState<T>>(() => ({ storageKey, value: readStoredValue(storageKey, initialValue) }));
 
     // Event bursts and async callbacks can hold a setter from an earlier render. Every update is resolved
     // against the latest value, including updates React has not rendered yet, so none erases a newer one.
-    const storedValueRef = useRef(storedValue);
+    const stateRef = useRef(state);
     // Boxed so that null is a value like any other: an empty ref means no write is pending.
-    const pendingWriteRef = useRef<{ value: T } | null>(null);
+    const pendingWriteRef = useRef<StoredState<T> | null>(null);
     const writeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const optionsRef = useRef(options);
+    const storageKeyRef = useRef(storageKey);
+    const initialValueRef = useRef(initialValue);
 
-    // Keep the latest toStorage projection without re-running effects.
+    // Keep the latest toStorage projection and key without re-running effects.
     optionsRef.current = options;
+    storageKeyRef.current = storageKey;
 
-    const flushWrite = (value: T) => {
-        if (typeof window === 'undefined') return;
+    if (stateRef.current.storageKey !== storageKey) {
+        stateRef.current = { storageKey, value: readStoredValue(storageKey, initialValueRef.current) };
+        setState(stateRef.current);
+    }
+
+    const flushWrite = ({ storageKey: key, value }: StoredState<T>) => {
+        if (typeof window === 'undefined' || !key || key !== storageKeyRef.current) return;
 
         const project = optionsRef.current.toStorage;
         const projected = project ? project(value) : value;
@@ -128,14 +191,14 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
     // Debounce: high-frequency chat would otherwise trigger one full
     // JSON.stringify + setItem per message. We coalesce bursts into one
     // write per STORAGE_WRITE_DEBOUNCE_MS window with the latest value.
-    const scheduleWrite = (value: T) => {
-        pendingWriteRef.current = { value };
+    const scheduleWrite = (next: StoredState<T>) => {
+        pendingWriteRef.current = next;
         if (writeTimerRef.current) clearTimeout(writeTimerRef.current);
         writeTimerRef.current = setTimeout(() => {
             writeTimerRef.current = null;
             const pending = pendingWriteRef.current;
             pendingWriteRef.current = null;
-            if (pending) flushWrite(pending.value);
+            if (pending) flushWrite(pending);
         }, STORAGE_WRITE_DEBOUNCE_MS);
     };
 
@@ -148,7 +211,7 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
             if (writeTimerRef.current) clearTimeout(writeTimerRef.current);
             writeTimerRef.current = null;
             pendingWriteRef.current = null;
-            flushWrite(pending.value);
+            flushWrite(pending);
         };
 
         window.addEventListener('pagehide', flushOnLeave);
@@ -160,41 +223,62 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
         };
     }, []);
 
-    const initialValueRef = useRef(initialValue);
-
     useEffect(() => {
         const reset = () => {
             if (writeTimerRef.current) clearTimeout(writeTimerRef.current);
             writeTimerRef.current = null;
             pendingWriteRef.current = null;
-            storedValueRef.current = initialValueRef.current;
-            setStoredValue(initialValueRef.current);
+            stateRef.current = { storageKey: storageKeyRef.current, value: initialValueRef.current };
+            setState(stateRef.current);
         };
-        const resets = liveResets.get(key) ?? new Set<() => void>();
+        const resets = liveResets.get(resetKey) ?? new Set<() => void>();
 
         resets.add(reset);
-        liveResets.set(key, resets);
+        liveResets.set(resetKey, resets);
 
         return () => {
             resets.delete(reset);
-            if (!resets.size) liveResets.delete(key);
+            if (!resets.size) liveResets.delete(resetKey);
         };
-    }, [key]);
+    }, [resetKey]);
 
     const setValue: Dispatch<SetStateAction<T>> = (value) => {
         try {
-            const valueToStore = value instanceof Function ? value(storedValueRef.current) : value;
+            const key = storageKeyRef.current;
+            const current = stateRef.current.storageKey === key ? stateRef.current.value : readStoredValue(key, initialValueRef.current);
+            const next = { storageKey: key, value: value instanceof Function ? value(current) : value };
 
-            storedValueRef.current = valueToStore;
-            setStoredValue(valueToStore);
+            stateRef.current = next;
+            setState(next);
 
-            scheduleWrite(valueToStore);
+            if (key) scheduleWrite(next);
         } catch (error) {
             OctaneLogger.error(error);
         }
     };
 
-    return [storedValue, setValue];
+    return [state.value, setValue];
 };
 
-export const useLocalStorage = useLocalStorageState;
+/** A value shared by everyone who uses this browser, such as a window or catalog preference. */
+export const useLocalStorage = <T>(key: string, initialValue: T, options: UseLocalStorageOptions<T> = {}): [T, Dispatch<SetStateAction<T>>] => {
+    const storageKey = storageKeyOf(key);
+
+    return useStoredState(storageKey, storageKey, initialValue, options);
+};
+
+/**
+ * A value that belongs to the logged-in account, such as the chat history. It is stored under the session's user id:
+ * until the session knows that id it stays in memory only, and once it does, the values other accounts left in this
+ * browser (and those of older clients) are removed.
+ */
+export const useAccountLocalStorage = <T>(key: string, initialValue: T, options: UseLocalStorageOptions<T> = {}): [T, Dispatch<SetStateAction<T>>] => {
+    const { userId = 0 } = useUserDataSnapshot() ?? {};
+    const accountId = typeof userId === 'number' && userId > 0 ? userId : 0;
+
+    useEffect(() => {
+        if (accountId > 0) removeAccountLocalStorage([key], accountId);
+    }, [key, accountId]);
+
+    return useStoredState(accountId > 0 ? toAccountStorageKey(key, accountId) : null, accountResetKey(key), initialValue, options);
+};

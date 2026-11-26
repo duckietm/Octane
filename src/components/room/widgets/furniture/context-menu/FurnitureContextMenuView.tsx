@@ -163,8 +163,8 @@ export const FurnitureContextMenuView: FC<{}> = (props) => {
                         )}
                         {mode === GROUP_FURNITURE && groupData && (
                             <>
-                                <ContextMenuHeaderView className="cursor-pointer text-truncate" onClick={() => GetGroupInformation(groupData.guildId)}>
-                                    {groupData.guildName}
+                                <ContextMenuHeaderView className="cursor-pointer octane-context-menu-header--group" onClick={() => GetGroupInformation(groupData.guildId)}>
+                                    <span>{groupData.guildName}</span>
                                 </ContextMenuHeaderView>
                                 <div className="air-avatar-menu-buttons">
                                     {!isGroupMember && (

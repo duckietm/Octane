@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { LocalizeText, SanitizeHtml } from '../../../../../api';
+import { LocalizeText, SanitizeHotelHtml } from '../../../../../api';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { getCatalogGridMetrics, useCatalogData, useCatalogDisplayPreferences } from '../../../../../hooks';
 import { CatalogBadgeSelectorWidgetView } from '../widgets/CatalogBadgeSelectorWidgetView';
@@ -34,7 +34,7 @@ export const CatalogLayoutBadgeDisplayView: FC<CatalogLayoutProps> = (props) => 
                     {!currentOffer && (
                         <div className="octane-catalog-badge-intro">
                             {!!page.localization.getImage(1) && <img alt="" src={page.localization.getImage(1)} />}
-                            <span dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(0)) }} />
+                            <span dangerouslySetInnerHTML={{ __html: SanitizeHotelHtml(page.localization.getText(0)) }} />
                         </div>
                     )}
                     {currentOffer && (

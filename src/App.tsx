@@ -28,7 +28,7 @@ import { LoadingView } from './components/loading/LoadingView';
 import { LoginView } from './components/login/LoginView';
 import { MainView } from './components/MainView';
 import { ReconnectView } from './components/reconnect/ReconnectView';
-import { ClearStoredChatHistory, getConnectionFailureAction, shouldClearLoginAfterDisconnect, useConnectionState, useDevicePixelRatio, useMessageEvent, useOctaneEvent } from './hooks';
+import { ClearStoredChatHistory, getConnectionFailureAction, getDisconnectReasonKey, shouldClearLoginAfterDisconnect, useConnectionState, useDevicePixelRatio, useMessageEvent, useOctaneEvent } from './hooks';
 import { SharedHookRegistry } from './state/useSharedHook';
 
 OctaneVersion.UI_VERSION = GetUIVersion();
@@ -66,6 +66,9 @@ const asStringArray = (value: unknown): string[] => {
 };
 
 const hasRememberLogin = (): boolean => !!GetRememberLogin();
+
+/** The channel a hotel website can post its logout on, so a client in another tab forgets the account's chat history. */
+const HOTEL_SESSION_CHANNEL = 'hotel-session';
 
 export const App: FC<{}> = (props) => {
     const connectionState = useConnectionState();
@@ -310,6 +313,8 @@ export const App: FC<{}> = (props) => {
         if (action === 'kicked') {
             // ReconnectView shows the reason over the hotel; only a ban forgets the stored login.
             if (shouldClearLoginAfterDisconnect(connectionState.disconnectReason)) clearStoredCredentials();
+            // A logout (from another tab or the website) ends this account's session here too: its chat history goes.
+            else if (getDisconnectReasonKey(connectionState.disconnectReason) === 'logged_out') ClearStoredChatHistory();
         } else if (action === 'login') {
             console.warn('[App] Connection failed before authentication completed — falling back to login');
             fallbackToLogin();
@@ -317,6 +322,19 @@ export const App: FC<{}> = (props) => {
             showSessionExpired();
         }
     }, [connectionState.phase, connectionState.disconnectReason, clearStoredCredentials, fallbackToLogin, isReady, showSessionExpired]);
+
+    useEffect(() => {
+        if (typeof BroadcastChannel === 'undefined') return;
+
+        // A hotel website that posts { type: 'logged-out' } here when the account logs out in any tab.
+        const channel = new BroadcastChannel(HOTEL_SESSION_CHANNEL);
+
+        channel.onmessage = (event: MessageEvent<{ type?: string }>) => {
+            if (event.data?.type === 'logged-out') ClearStoredChatHistory();
+        };
+
+        return () => channel.close();
+    }, []);
 
     useMessageEvent<LoadGameUrlEvent>(LoadGameUrlEvent, (event) => {
         const parser = event.getParser();

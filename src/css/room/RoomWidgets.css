@@ -1175,6 +1175,18 @@
     color: #91c2ff;
 }
 
+/* guild_furni_menu: the group name is centred over the whole title row and a long one is cut 4px inside the bubble fill. */
+.octane-avatar-action-menu--own .octane-context-menu-header.octane-context-menu-header--group {
+    padding: 0;
+}
+
+.octane-avatar-action-menu--own .octane-context-menu-header--group > span {
+    max-width: 95px;
+    overflow: hidden;
+    text-align: left;
+    white-space: nowrap;
+}
+
 .air-avatar-menu-buttons {
     display: flex;
     width: 105px;

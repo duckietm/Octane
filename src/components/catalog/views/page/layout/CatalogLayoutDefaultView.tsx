@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { CatalogType, GetConfigurationValue, LocalizeText, ProductTypeEnum, SanitizeHtml } from '../../../../../api';
+import { CatalogType, GetConfigurationValue, LocalizeText, ProductTypeEnum, SanitizeHotelHtml } from '../../../../../api';
 import { findActiveCatalogNode, isCatalogHeadingPage } from '../../../../../api/catalog/CatalogCategoryIndex';
 import { LayoutChatStyleImageView, Text } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
@@ -85,7 +85,7 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = (props) => {
                             {!!page?.localization.getImage(1) && (
                                 <img alt="" className="w-[70px] h-[70px] object-contain rounded shrink-0" src={page.localization.getImage(1)} />
                             )}
-                            {hasTeaserText && <Text className="text-[11px]! text-muted" dangerouslySetInnerHTML={{ __html: SanitizeHtml(teaserText) }} />}
+                            {hasTeaserText && <Text className="text-[11px]! text-muted" dangerouslySetInnerHTML={{ __html: SanitizeHotelHtml(teaserText) }} />}
                         </div>
                     )}
                 </div>

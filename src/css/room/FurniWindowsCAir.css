@@ -17,8 +17,7 @@
 .octane-widget-crafting .octane-card-content-shell,
 [class*='octane-widget-chest'] .octane-card-content-shell,
 .octane-wired-chest-reward .octane-card-content-shell,
-.octane-furni-recolor .octane-card-content-shell,
-.octane-room-widget-area-hide .octane-card-content-shell {
+.octane-furni-recolor .octane-card-content-shell {
     font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
     font-size: 12px;
     line-height: 15px;
@@ -30,15 +29,13 @@
     .octane-widget-crafting .octane-card-content-shell :where(*):not(svg, svg *),
     [class*='octane-widget-chest'] .octane-card-content-shell :where(*):not(svg, svg *),
     .octane-wired-chest-reward .octane-card-content-shell :where(*):not(svg, svg *),
-    .octane-furni-recolor .octane-card-content-shell :where(*):not(svg, svg *),
-    .octane-room-widget-area-hide .octane-card-content-shell :where(*):not(svg, svg *) {
+    .octane-furni-recolor .octane-card-content-shell :where(*):not(svg, svg *) {
         font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
     }
 
     /* style 3 `button`: button_shiny_regular, 12 px. */
     .youtube-tv-widget .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger),
-    .octane-furni-recolor .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger),
-    .octane-room-widget-area-hide .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger) {
+    .octane-furni-recolor .octane-card-content-shell :where(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger) {
         font-size: 12px !important;
     }
 
@@ -186,14 +183,26 @@
     font-weight: 700;
 }
 
-/* ---- area_hide_ui: every text is u_small 10 px; the two titles bold, the info lines 0x999999. ---- */
-.octane-room-widget-area-hide .octane-card-content-shell {
-    font-size: 10px;
-    line-height: 13px;
+/* ---- area_hide_ui: a native style 3 frame (FurnitureAreaHideView); its texts are NativeText u_small. The border window
+   (3, 16, 275x250) is style 100 with background="true": a white fill under illumina_light_border_etched (3px caps, no centre). ---- */
+.furniture-area-hide__panel {
+    position: absolute;
+    left: 3px;
+    top: 16px;
+    width: 275px;
+    height: 250px;
+    background: #fff;
 }
 
-.octane-room-widget-area-hide .octane-card-content-shell .octane-area-hide__info {
-    color: #999999;
+.furniture-area-hide__panel::before {
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    border: 3px solid transparent;
+    border-image: url('../../assets/images/habbo-skin/slices/illumina-border-etched.png') 3 / 3px stretch;
+    content: '';
+    pointer-events: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
 }
 
 /* ---- boygirl: info text Volter 9 px, 0x0. ---- */

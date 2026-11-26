@@ -12,9 +12,23 @@ describe('reward track text (reward_track_main_xml, premium purchase confirmatio
 
     it('keeps the layout text sizes: title 18 bold, points 22 bold, task info name 17 bold, unclaimed count 11 bold', () => {
         expect(css).toMatch(/\.octane-reward-track-title \{[^}]*font-size: 18px;[^}]*font-weight: bold/);
-        expect(css).toMatch(/\.octane-reward-track-points-value \{[^}]*font-size: 22px;[^}]*font-weight: bold/);
+        expect(css).toMatch(/\.octane-reward-track-points-value > span \{[^}]*font-size: 22px;[^}]*font-weight: bold/);
         expect(css).toMatch(/\.octane-reward-track-task-info-name \{[^}]*font-size: 17px;[^}]*font-weight: bold/);
         expect(css).toMatch(/\.octane-reward-track-unclaimed \{[^}]*color: #fff;[^}]*font-size: 11px;[^}]*font-weight: bold/);
+    });
+
+    it('fixes the frame at 1103x722 with a 1097x683 content that never scrolls, the stage at (9, 8) like Volt', () => {
+        expect(css).toMatch(/\.draggable-window:has\(> \.octane-reward-track\) \{[^}]*width: 1103px;[^}]*height: 722px;/);
+        expect(css).toMatch(/\.octane-card-shell\.octane-reward-track \{[^}]*width: 1103px !important;[^}]*height: 722px !important;/);
+        expect(css).toMatch(
+            /\.octane-reward-track \.octane-reward-track-content\.octane-card-content-shell \{[^}]*width: 1097px;[^}]*height: 683px;[^}]*padding: 0 !important;[^}]*overflow: visible !important;/
+        );
+        expect(css).toMatch(/\.octane-reward-track-stage \{[^}]*position: absolute;[^}]*left: 9px;[^}]*top: 8px;[^}]*width: 1079px;[^}]*height: 667px;/);
+    });
+
+    it('wraps the tip inside its 265px field and cuts it there, so it never runs under Frank & Piccolo', () => {
+        expect(css).toMatch(/\.octane-reward-track-tip-text \{[^}]*width: 265px;[^}]*height: 30px;[^}]*padding: 0 2px;[^}]*overflow: hidden;[^}]*line-height: 13\.5px;/);
+        expect(css).toMatch(/\.octane-reward-track-tip-premium \.octane-reward-track-tip-text \{\s*width: 227px;/);
     });
 
     it('colours the premium confirmation texts like the layout', () => {

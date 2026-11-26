@@ -452,7 +452,7 @@ export function renderAdvancedRetainedPass(
             height,
             options.padding + 2 + offsetX,
             options.padding + metrics.baseline + 1 + offsetY,
-            font.swfFont.alignmentZones == null ? Math.floor(layout.rawTextWidth * 4) / 4 : Math.ceil(layout.rawTextWidth),
+            font.swfFont.alignmentZones == null ? Math.floor(layout.rawTextWidth * 4) / 4 : quarterSampledLength(layout.textWidth),
             lineColor
         );
     for (let placement of layout.placements) {
@@ -536,4 +536,10 @@ export function prepareNativeBundle(bundle: NativeBundle) {
             coverage: bundle.coverage == null ? null : { ...bundle.coverage }
         })
     };
+}
+
+// AIR draws the underline with four horizontal samples per pixel: the last pixel is covered by the samples whose centre lies inside the line.
+export function quarterSampledLength(length: number) {
+    const whole = Math.floor(length);
+    return whole + Math.max(0, Math.ceil((length - whole) * 4 - 0.5)) / 4;
 }

@@ -5,7 +5,8 @@ import { CatalogLayoutBadgeDisplayView } from './CatalogLayoutBadgeDisplayView';
 
 vi.mock('../../../../../api', () => ({
     LocalizeText: (key: string) => key,
-    SanitizeHtml: (value: string) => value
+    SanitizeHtml: (value: string) => value,
+    SanitizeHotelHtml: (value: string) => value
 }));
 
 vi.mock('../../../../../common', () => ({

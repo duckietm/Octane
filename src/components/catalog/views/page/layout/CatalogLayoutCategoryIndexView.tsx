@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { ICatalogNode, SanitizeHtml } from '../../../../../api';
+import { ICatalogNode, SanitizeHotelHtml } from '../../../../../api';
 import { catalogCategoryChildren } from '../../../../../api/catalog/CatalogCategoryIndex';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
@@ -25,7 +25,7 @@ export const CatalogLayoutCategoryIndexView: FC<CatalogLayoutCategoryIndexViewPr
     return (
         <NativeTextTree>
             <div className="octane-catalog-category-index">
-                {hasText && <div className="octane-catalog-category-index__text" dangerouslySetInnerHTML={{ __html: SanitizeHtml(text) }} />}
+                {hasText && <div className="octane-catalog-category-index__text" dangerouslySetInnerHTML={{ __html: SanitizeHotelHtml(text) }} />}
                 <div className="octane-catalog-category-index__list" role="list">
                     {children.map((child) => (
                         <BaseButton

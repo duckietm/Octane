@@ -13,6 +13,9 @@ import {
     getQuestImageName,
     getQuestProgressPercent,
     getQuestWaitSecondsLeft,
+    getRewardTrackClaimableCount,
+    getRewardTrackLevelProgress,
+    getRewardTrackMenuTarget,
     getRewardTrackPrizeState,
     isQuestRewardVisible,
     paginatePrizes,
@@ -85,6 +88,29 @@ describe('daily tasks', () => {
         expect(formatFriendlySeconds(59)).toBe('59s');
         expect(formatFriendlySeconds(3725)).toBe('1h 2m');
         expect(formatFriendlySeconds(90000)).toBe('1d 1h');
+    });
+});
+
+describe('reward track counts', () => {
+    it('clamps a level count to its target', () => {
+        expect(getRewardTrackLevelProgress(66, 5)).toBe(5);
+        expect(getRewardTrackLevelProgress(66, 100)).toBe(66);
+        expect(getRewardTrackLevelProgress(0, 5)).toBe(0);
+        expect(getRewardTrackLevelProgress(-1, 5)).toBe(0);
+    });
+
+    it('counts the claimable prizes of one track and picks the track a toolbar entry opens', () => {
+        const tracks = [
+            { id: 'introduction', claimablePrizeCount: 0 },
+            { id: 'habboween2026', claimablePrizeCount: 3 }
+        ];
+
+        expect(getRewardTrackClaimableCount(tracks, 'introduction')).toBe(0);
+        expect(getRewardTrackClaimableCount(tracks, 'habboween2026')).toBe(3);
+        expect(getRewardTrackClaimableCount(tracks, 'missing')).toBe(0);
+        expect(getRewardTrackMenuTarget(tracks)?.id).toBe('habboween2026');
+        expect(getRewardTrackMenuTarget([{ id: 'introduction', claimablePrizeCount: 0 }])?.id).toBe('introduction');
+        expect(getRewardTrackMenuTarget([])).toBeNull();
     });
 });
 

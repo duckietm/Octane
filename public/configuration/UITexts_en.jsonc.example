@@ -228,6 +228,7 @@
     // chatcmd
     // ------------------------------------------------------------------------
     "chatcmd.client.chooser": "User selector",
+    "chatcmd.client.directplanes": "Draw floors and walls directly (on/off)",
     "chatcmd.client.ejectall": "Eject all furni",
     "chatcmd.client.flip": "Flip the room",
     "chatcmd.client.floor": "Floor editor",
@@ -246,7 +247,6 @@
     "chatcmd.client.shake": "Shake the room",
     "chatcmd.client.sign": "Show sign",
     "chatcmd.client.togglefps": "Toggle FPS",
-    "chatcmd.client.directplanes": "Draw floors and walls directly (on/off)",
     "chatcmd.client.zoom": "Zoom in/out",
 
     // ------------------------------------------------------------------------

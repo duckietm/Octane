@@ -7,7 +7,7 @@ const vimeoCss = readFileSync(join(process.cwd(), 'src/css/room/VimeoDisplay.css
 
 describe('furni windows text (video_viewer, playlisteditor, craftingwidget, wired chests, boygirl, area_hide_ui)', () => {
     it('sets the Ubuntu windows in regular Ubuntu, also over the condensed face of their children', () => {
-        expect(css).toMatch(/\.octane-room-widget-area-hide \.octane-card-content-shell \{[^}]*HabboAirUbuntu/);
+        expect(css).toMatch(/\.octane-furni-recolor \.octane-card-content-shell \{[^}]*HabboAirUbuntu/);
         expect(css).toMatch(/@layer base \{[\s\S]*\[class\*='octane-widget-chest'\] \.octane-card-content-shell :where\(\*\):not\(svg, svg \*\)[\s\S]*HabboAirUbuntu, UbuntuRegular, sans-serif !important/);
         expect(vimeoCss).toMatch(/\.octane-vimeo-viewer-content :where\(\*\):not\(svg, svg \*\) \{[^}]*HabboAirUbuntu/);
     });
@@ -33,8 +33,9 @@ describe('furni windows text (video_viewer, playlisteditor, craftingwidget, wire
         expect(css).toMatch(/\.octane-chest__upgrade-error \{[^}]*color: #c42f3d;[^}]*font-weight: 700/);
     });
 
-    it('draws the area hide texts as u_small with grey info lines', () => {
-        expect(css).toMatch(/\.octane-room-widget-area-hide \.octane-card-content-shell \{\s*font-size: 10px/);
-        expect(css).toMatch(/\.octane-area-hide__info \{[^}]*color: #999999/);
+    it('draws the area hide border window as a white panel under the etched illumina border', () => {
+        expect(css).toMatch(/\.furniture-area-hide__panel \{[^}]*left: 3px;[^}]*top: 16px;[^}]*width: 275px;[^}]*height: 250px;[^}]*background: #fff/);
+        expect(css).toMatch(/\.furniture-area-hide__panel::before \{[^}]*illumina-border-etched\.png/);
+        expect(css).not.toMatch(/octane-room-widget-area-hide/);
     });
 });
