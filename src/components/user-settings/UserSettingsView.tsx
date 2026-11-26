@@ -17,7 +17,7 @@ import {
 } from '@octane/renderer';
 import { useUserChatPreferencesStore } from '@/state/userChatPreferences';
 import { FC, ReactNode, useEffect, useState } from 'react';
-import { DispatchMainEvent, DispatchUiEvent, localizeWithFallback, SendMessageComposer } from '../../api';
+import { DispatchMainEvent, DispatchUiEvent, getAccessToken, localizeWithFallback, SendMessageComposer } from '../../api';
 import { DraggableWindow } from '../../common';
 import {
     useCatalogDisplayPreferences,
@@ -246,6 +246,15 @@ export const UserSettingsView: FC<{}> = () => {
     const backLabel = localizeWithFallback('widget.memenu.back', localizeWithFallback('generic.back', 'Back'));
     const muteLabel = localizeWithFallback('widget.memenu.settings.volume.mute', 'Mute');
     const maximumLabel = localizeWithFallback('widget.memenu.settings.volume.maximum', 'Maximum volume');
+    // The account actions talk to the built-in CMS login API, which only works for a player who logged in
+    // through it (that login hands the client an access token); an SSO login from another website has none.
+    const hasBuiltInAccount = () => !!getAccessToken();
+
+    const openAccountSection = (accountSection: 'password' | 'email' | 'username') => {
+        CreateLinkEvent(`user-account-settings/show/${accountSection}`);
+        closeView();
+    };
+
     const openMenuSection = (nextSection: Exclude<SettingsSection, null>) => {
         setSection(nextSection);
         setReturnToMenu(true);
@@ -506,6 +515,20 @@ export const UserSettingsView: FC<{}> = () => {
                             <span>{localizeWithFallback('memenu.settings.other.keyboard.movement', 'Move with the arrow keys')}</span>
                         </label>
                     </div>
+                    {hasBuiltInAccount() && (
+                        <div className="air-settings-other__account" data-testid="other-settings-account">
+                            <span className="air-settings-other__account-title">{localizeWithFallback('usersettings.menu.section', 'Account')}</span>
+                            <BaseButton className="air-settings-button" onClick={() => openAccountSection('password')} type="button">
+                                {localizeWithFallback('usersettings.menu.password.title', 'Reset password')}
+                            </BaseButton>
+                            <BaseButton className="air-settings-button" onClick={() => openAccountSection('email')} type="button">
+                                {localizeWithFallback('usersettings.menu.email.title', 'Change email')}
+                            </BaseButton>
+                            <BaseButton className="air-settings-button" onClick={() => openAccountSection('username')} type="button">
+                                {localizeWithFallback('usersettings.menu.username.title', 'Change username')}
+                            </BaseButton>
+                        </div>
+                    )}
                 </AirSettingsFrame>
             </NativeTextTree>
         );

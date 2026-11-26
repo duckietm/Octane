@@ -1,7 +1,7 @@
 import { UnseenItemsEvent, UnseenResetCategoryComposer, UnseenResetItemsComposer } from '@octane/renderer';
 import { useCallback, useMemo, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { SendMessageComposer } from '../../api';
+import { getInventoryIconUnseenCount, SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';
 
 const sendResetCategoryMessage = (category: number) => SendMessageComposer(new UnseenResetCategoryComposer(category));
@@ -12,13 +12,9 @@ const useInventoryUnseenTrackerState = () => {
 
     const getCount = useCallback((category: number) => unseenItems.get(category)?.length || 0, [unseenItems]);
 
-    const getFullCount = useMemo(() => {
-        let count = 0;
-
-        for (const key of unseenItems.keys()) count += getCount(key);
-
-        return count;
-    }, [unseenItems, getCount]);
+    // Only what the inventory shows: the habbicon picker's unseen icons (category 8) used to show here too,
+    // a count on the inventory icon that nothing in the inventory marked or cleared.
+    const getFullCount = useMemo(() => getInventoryIconUnseenCount(getCount), [getCount]);
 
     const resetCategory = useCallback((category: number) => {
         let didReset = true;

@@ -45,6 +45,7 @@ vi.mock('../../../../../api', () => ({
     LocalizeText: (key: string, _names?: string[], values?: string[]) => `${key}${values?.length ? `:${values.join(',')}` : ''}`,
     OpenUrl: vi.fn(),
     SanitizeHtml: (value: string) => value,
+    SanitizeHotelHtml: (value: string) => value,
     SendMessageComposer: vi.fn(),
     ShowVipBenefits: vi.fn()
 }));

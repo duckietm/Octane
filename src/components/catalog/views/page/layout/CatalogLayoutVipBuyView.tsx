@@ -6,7 +6,7 @@ import {
     GetConfigurationValue,
     LocalizeText,
     OpenUrl,
-    SanitizeHtml,
+    SanitizeHotelHtml,
     SendMessageComposer,
     ShowVipBenefits
 } from '../../../../../api';
@@ -380,7 +380,7 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
                         ) : (
                             <div
                                 className="octane-club-center-link"
-                                dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('catalog.vip.buy.hccenter')) }}
+                                dangerouslySetInnerHTML={{ __html: SanitizeHotelHtml(LocalizeText('catalog.vip.buy.hccenter')) }}
                                 role="link"
                                 tabIndex={0}
                                 onClick={(event) => {

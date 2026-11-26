@@ -658,3 +658,27 @@
     margin: auto;
     image-rendering: var(--octane-pixel-art, pixelated);
 }
+
+/* The frame's help button (help_3, 19x20), left of the close button: it opens the Builders Club info page. */
+.octane-floorplan-window .octane-card-header-shell .fp-header-help {
+    position: absolute;
+    top: 50%;
+    right: 28px;
+    z-index: 2;
+    width: 19px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    background: url('@/assets/images/habbo-skin/slices/help-3-default.png') 0 0 / 19px 20px no-repeat;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    transform: translateY(-50%);
+}
+
+.octane-floorplan-window .octane-card-header-shell .fp-header-help:hover {
+    background-image: url('@/assets/images/habbo-skin/slices/help-3-hover.png');
+}
+
+.octane-floorplan-window .octane-card-header-shell .fp-header-help:active {
+    background-image: url('@/assets/images/habbo-skin/slices/help-3-pressed.png');
+}

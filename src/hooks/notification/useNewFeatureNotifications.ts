@@ -7,9 +7,7 @@ import {
     getActiveNewFeatureKeys,
     getNewFeatureConditionState,
     getNewFeaturePendingTimes,
-    NEW_FEATURE_CONDITION_MAX_RETRIES,
-    NEW_FEATURE_CONDITION_RETRY_DELAY_MS,
-    NEW_FEATURE_FIRST_CHECK_DELAY_MS,
+    NEW_FEATURE_CONDITION_WAIT_MS,
     NEW_FEATURE_TYPE_COUNTDOWN,
     NEW_FEATURE_TYPE_NORMAL,
     NEW_FEATURE_TYPE_PROMO,
@@ -44,9 +42,10 @@ export const readNewFeatureConfigurationProperty: NewFeaturePropertyReader = (ke
 };
 
 /**
- * SingularNotificationController.maybeShowNewFeatureNotification() + NewFeatureNotification: 2 s after the
- * client starts, every active key whose condition holds becomes a notification in the toolbar extension
- * area; a reward track condition is retried 3 times, 2 s apart, until the tracks are known. An expiry or
+ * SingularNotificationController.maybeShowNewFeatureNotification() + NewFeatureNotification: when the hotel
+ * shows, every active key whose condition holds becomes a notification in the toolbar extension area (AIR's
+ * 2 s start delay passes during its loading screen); a key waiting for its reward track is shown as soon as
+ * the track arrives, for up to 8 s. An expiry or
  * count-down time first asks the server how many seconds are left (GetSecondsUntil); an expired one is
  * dropped. "Cancel" removes it for this session only: AIR stores nothing.
  */
@@ -54,9 +53,16 @@ export const useNewFeatureNotifications = (property: NewFeaturePropertyReader = 
     const { tracks = [] } = useRewardTracks();
     const [entries, setEntries] = useState<NewFeatureNotificationEntry[]>([]);
     const tracksRef = useRef(tracks);
+    const pendingKeysRef = useRef<string[]>([]);
+    const checkPendingRef = useRef<(() => void) | null>(null);
 
     useLayoutEffect(() => {
         tracksRef.current = tracks;
+    }, [tracks]);
+
+    // The reward tracks arrived or changed: a key that waited for its track is decided now.
+    useEffect(() => {
+        checkPendingRef.current?.();
     }, [tracks]);
 
     useEffect(() => {
@@ -98,26 +104,32 @@ export const useNewFeatureNotifications = (property: NewFeaturePropertyReader = 
             if (pending.countdown) SendMessageComposer(new GetSecondsUntilMessageComposer(config.countDownTo));
         };
 
-        const check = (key: string, retry: number) => {
-            const state = getNewFeatureConditionState(property(`notifications.new_feature.condition.${key}`), tracksRef.current);
+        // Keys whose reward track is not known yet: checked again whenever the tracks change, until the wait is over.
+        const checkPending = () => {
+            const waiting: string[] = [];
 
-            if (state === NewFeatureConditionState.HIDDEN) return;
+            for (const key of pendingKeysRef.current) {
+                const state = getNewFeatureConditionState(property(`notifications.new_feature.condition.${key}`), tracksRef.current);
 
-            if (state === NewFeatureConditionState.UNAVAILABLE) {
-                if (retry < NEW_FEATURE_CONDITION_MAX_RETRIES) later(() => check(key, retry + 1), NEW_FEATURE_CONDITION_RETRY_DELAY_MS);
-
-                return;
+                if (state === NewFeatureConditionState.VISIBLE) create(key);
+                else if (state === NewFeatureConditionState.UNAVAILABLE) waiting.push(key);
             }
 
-            create(key);
+            pendingKeysRef.current = waiting;
         };
 
+        pendingKeysRef.current = getActiveNewFeatureKeys(property);
+        checkPendingRef.current = checkPending;
+        checkPending();
+
         later(() => {
-            for (const key of getActiveNewFeatureKeys(property)) check(key, 0);
-        }, NEW_FEATURE_FIRST_CHECK_DELAY_MS);
+            pendingKeysRef.current = [];
+        }, NEW_FEATURE_CONDITION_WAIT_MS);
 
         return () => {
             disposed = true;
+            pendingKeysRef.current = [];
+            checkPendingRef.current = null;
 
             for (const timer of timers) clearTimeout(timer);
 

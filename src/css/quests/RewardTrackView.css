@@ -8,25 +8,62 @@
  * with a 20% darker 1px stroke; --rt-panel sets the colour of each such panel.
  */
 
-.octane-reward-track {
+/*
+ * The frame is fixed at main_xml's 1103x722 (as Volt): the frame-3 shell keeps 36px on top and 3px on the
+ * other sides for itself, so the content is 1097x683 and the stage sits at (9, 8) in it, which puts the
+ * layout children at the FrameController margins (12, 44). The content must not scroll: a 24px side padding
+ * here used to leave 1073px for the 1079px stage, and the window grew a horizontal scrollbar.
+ */
+.draggable-window:has(> .octane-reward-track) {
     width: 1103px;
-    max-width: calc(100vw - 16px);
+    min-width: 1103px;
+    max-width: 1103px;
+    height: 722px;
+}
+
+.octane-card-shell.octane-reward-track {
+    box-sizing: border-box;
+    width: 1103px !important;
+    min-width: 1103px !important;
+    max-width: 1103px !important;
+    height: 722px !important;
+    min-height: 722px !important;
+    max-height: 722px !important;
+    color: #000;
     --rt-dark: #3576b9;
     --rt-medium: #cfe2f9;
     --rt-light: #ddebf9;
     --rt-active: #bdd6ef;
 }
 
-.octane-reward-track-content.octane-card-content-shell {
+.octane-reward-track .octane-reward-track-content.octane-card-content-shell {
     position: relative;
-    padding: 6px 12px 11px;
+    display: block;
+    width: 1097px;
+    height: 683px;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: transparent;
     color: #000;
     font-size: 12px;
 }
 
+.octane-reward-track-admin-host {
+    height: 100%;
+    overflow: auto;
+}
+
+.octane-reward-track-loading {
+    padding: 24px;
+}
+
 .octane-reward-track-stage {
-    position: relative;
-    flex: none;
+    position: absolute;
+    left: 9px;
+    top: 8px;
     width: 1079px;
     height: 667px;
 }
@@ -178,30 +215,45 @@
 
 .octane-reward-track-band-texts {
     position: absolute;
+    left: 0;
+    top: 0;
+    width: 100px;
+    height: 80px;
+}
+
+/* the band titles: 90px fields at (6, 57) / (6, 47), the premium info under it at y 61, texts blend 0.7 */
+.octane-reward-track-band-title,
+.octane-reward-track-band-desc {
+    position: absolute;
     left: 6px;
+    box-sizing: border-box;
     width: 90px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+    padding: 0 2px;
     opacity: 0.7;
-    line-height: 15px;
-}
-
-.octane-reward-track-band-free .octane-reward-track-band-texts {
-    top: 57px;
-}
-
-.octane-reward-track-band-premium .octane-reward-track-band-texts {
-    top: 47px;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .octane-reward-track-band-title {
+    height: 17px;
+    font-size: 12px;
     font-weight: bold;
+    line-height: 17px;
+}
+
+.octane-reward-track-band-free .octane-reward-track-band-title {
+    top: 57px;
+}
+
+.octane-reward-track-band-premium .octane-reward-track-band-title {
+    top: 47px;
 }
 
 .octane-reward-track-band-desc {
+    top: 61px;
+    height: 16px;
     font-size: 11px;
+    line-height: 16px;
 }
 
 /* track/loading_bar (194,94 602x13): grey track, green fill 4px past the progress, additive gloss */
@@ -315,8 +367,11 @@
 .octane-reward-track-indicator-points {
     left: 0;
     top: 136px;
+    box-sizing: border-box;
     width: 80px;
     height: 17px;
+    padding: 0 2px;
+    font-size: 12px;
     line-height: 17px;
     text-align: center;
 }
@@ -594,22 +649,30 @@
     height: 130px !important;
 }
 
-/* track_info itemlist (87+0, -1+26, 160 wide) */
+/* track_info itemlist (87, 25, 160x73) spacing 1: title, 2px spacer, description, instructions; on_resize_align_middle
+   keeps it centred when the title wraps. The texts wrap (2px TextField gutter), they are never cut with an ellipsis. */
 .octane-reward-track-info {
     left: 86px;
     top: 24px;
     width: 160px;
+    height: 73px;
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    justify-content: center;
+}
+
+.octane-reward-track-title,
+.octane-reward-track-desc,
+.octane-reward-track-instructions {
+    box-sizing: border-box;
+    padding: 2px;
+    overflow-wrap: break-word;
 }
 
 .octane-reward-track-title {
-    min-height: 24px;
-    margin-bottom: 3px;
     font-size: 18px;
     font-weight: bold;
-    line-height: 22px;
+    line-height: 20px;
 }
 
 /*
@@ -632,11 +695,16 @@
 .octane-reward-track-desc,
 .octane-reward-track-instructions {
     font-size: 11px;
-    line-height: 14px;
+    line-height: 12px;
+}
+
+.octane-reward-track-desc {
+    margin-top: 4px;
 }
 
 .octane-reward-track-instructions {
     width: 157px;
+    margin-top: 1px;
 }
 
 /* points_total_border (43,122 179x62, RECOLORABLE_MEDIUM) */
@@ -653,23 +721,37 @@
     position: absolute;
 }
 
+/* itemlist_horizontal centred on resize: point_large (y 2) and the 22px count (y -4), spacing 4 */
 .octane-reward-track-points-value {
     left: 0;
     right: 0;
-    top: 6px;
+    top: 10px;
+    height: 24px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     gap: 4px;
+}
+
+.octane-reward-track-points-value > img {
+    margin-top: 2px;
+}
+
+.octane-reward-track-points-value > span {
+    box-sizing: border-box;
+    height: 29px;
+    margin-top: -4px;
+    padding: 2px;
     font-size: 22px;
     font-weight: bold;
-    line-height: 28px;
+    line-height: 25px;
 }
 
 .octane-reward-track-points-label {
     left: 9px;
     top: 35px;
     width: 160px;
+    height: 18px;
     font-size: 13px;
     font-weight: bold;
     line-height: 18px;
@@ -685,15 +767,30 @@
     background: color-mix(in srgb, var(--rt-light) 85%, #000);
 }
 
-/* rewards collected (9,204): checkmark + rewards_collected_txt, etched */
+/* rewards collected (9,204 247x30), centred: checkmark (y 7) + rewards_collected_txt (y 6, one line), spacing 6 */
 .octane-reward-track-collected {
     left: 8px;
     top: 203px;
+    width: 247px;
     height: 30px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: center;
     gap: 6px;
     text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.octane-reward-track-collected > img {
+    margin-top: 7px;
+}
+
+.octane-reward-track-collected > span {
+    height: 17px;
+    margin-top: 6px;
+    padding: 0 2px;
+    font-size: 12px;
+    line-height: 17px;
+    white-space: nowrap;
 }
 
 /* ---------------------------------------------------------------- body */
@@ -727,6 +824,8 @@
 .octane-reward-track-tasks-title {
     left: 45px;
     top: 10px;
+    height: 19px;
+    padding: 0 2px;
     font-size: 14px;
     font-weight: bold;
     line-height: 19px;
@@ -735,7 +834,10 @@
 .octane-reward-track-tasks-progress {
     left: 45px;
     top: 30px;
+    height: 17px;
+    padding: 0 2px;
     color: #3c3c3c;
+    font-size: 12px;
     line-height: 17px;
 }
 
@@ -750,17 +852,18 @@
 .octane-reward-track-filter {
     width: 88px;
     height: 29px;
-    padding: 0 4px;
+    padding: 0 5px;
     box-sizing: border-box;
     border: 2px solid #b7b7b7;
     border-radius: 4px;
     background: #dddcdc;
     color: #444;
+    font-size: 12px;
     font-weight: bold;
+    line-height: 17px;
+    text-align: center;
     cursor: pointer;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .octane-reward-track-filter:hover {
@@ -776,23 +879,74 @@
     cursor: default;
 }
 
-/* tasks (14,94 422x259): 406x61 rows every 66px */
-.octane-reward-track-task-list {
+/* tasks: scrollable_itemlist_vertical style 100 (RewardTrackScrollList, 14,94 422x259): 406x61 rows every 66px,
+   the 9px scrollbar at the right edge, shown only while the rows do not fit. */
+.octane-reward-track-tasks > .octane-reward-track-task-list {
     left: 13px;
     top: 93px;
     width: 422px;
     height: 259px;
-    overflow-x: hidden;
-    overflow-y: auto;
 }
 
-.octane-reward-track-task-list > .octane-reward-track-task {
+.octane-reward-track-scroll-viewport {
+    width: 422px;
+    height: 259px;
+    overflow: hidden;
+}
+
+.octane-reward-track-task-list-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 406px;
+}
+
+.octane-reward-track-scrollbar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 9px;
+    height: 259px;
+}
+
+.octane-reward-track-scrollbar::before,
+.octane-reward-track-scrollbar-lift::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    border-style: solid;
+    border-color: transparent;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.octane-reward-track-scrollbar::before {
+    border-width: 2px 0;
+    border-image: url('../../assets/images/reward-track/scrollbar-track.png') 2 0 fill / 2px 0 stretch;
+}
+
+.octane-reward-track-scrollbar-lift {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 9px;
+    touch-action: none;
+}
+
+.octane-reward-track-scrollbar-lift::before {
+    border-width: 4px 0;
+    border-image: url('../../assets/images/reward-track/scrollbar-lift.png') 4 0 fill / 4px 0 stretch;
+}
+
+.octane-reward-track-task-list-content > .octane-reward-track-task {
     position: relative;
     display: block;
+    flex: 0 0 61px;
     width: 406px;
     height: 61px;
-    margin-bottom: 5px;
     padding: 0;
+    color: #000;
     text-align: left;
     cursor: pointer;
 }
@@ -827,7 +981,9 @@
 .octane-reward-track-task-name,
 .octane-reward-track-task-desc {
     left: 66px;
+    box-sizing: border-box;
     width: 202px;
+    padding: 0 2px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -835,12 +991,15 @@
 
 .octane-reward-track-task-name {
     top: 6px;
+    height: 17px;
+    font-size: 12px;
     font-weight: bold;
     line-height: 17px;
 }
 
 .octane-reward-track-task-desc {
     top: 22px;
+    height: 16px;
     font-size: 11px;
     line-height: 16px;
 }
@@ -853,22 +1012,25 @@
 .octane-reward-track-task-count {
     left: 279px;
     top: 37px;
+    height: 16px;
+    padding: 0 2px;
     font-size: 11px;
     line-height: 16px;
     white-space: nowrap;
 }
 
-/* the reward box (331,15 62x31, 0xf0f0f0) */
+/* the reward box (331,15 62x31, 0xf0f0f0) is right aligned on resize, so it is as wide as its content (54px for a one
+   digit count); its itemlist (8,4) holds the 14px count (y 2) and point_small (y 5), spacing 5 */
 .octane-reward-track-task > .octane-reward-track-task-reward {
     position: absolute;
     --rt-panel: #f0f0f0;
-    left: 330px;
+    left: auto;
+    right: 12px;
     top: 14px;
-    width: 62px;
     height: 31px;
+    padding: 0 9px 0 7px;
     display: flex;
     align-items: center;
-    justify-content: center;
 }
 
 .octane-reward-track-points-reward {
@@ -939,14 +1101,21 @@
     top: 6px;
 }
 
+/* reward_info_txt (57,9 265x30, 227 wide beside the premium button): wraps inside its field and is cut there, so it
+   never runs under Frank & Piccolo (329,7) or the button (323,9). */
 .octane-reward-track-tip-text {
     left: 56px;
     top: 8px;
+    box-sizing: border-box;
     width: 265px;
     height: 30px;
+    padding: 0 2px;
     display: flex;
     align-items: center;
-    line-height: 14px;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 13.5px;
+    overflow-wrap: break-word;
 }
 
 .octane-reward-track-tip-premium .octane-reward-track-tip-text {
@@ -1019,19 +1188,24 @@
 .octane-reward-track-task-info-name {
     left: 136px;
     top: 34px;
+    height: 22px;
+    padding: 0 2px;
     font-size: 17px;
     font-weight: bold;
     line-height: 22px;
+    white-space: nowrap;
 }
 
 .octane-reward-track-task-info-desc {
     left: 136px;
     top: 58px;
+    box-sizing: border-box;
     width: 469px;
     height: 63px;
+    padding: 2px;
     overflow: hidden;
     font-size: 13px;
-    line-height: 16px;
+    line-height: 14.5px;
 }
 
 /* task_levels (y 127): the rule (22,20 582x2) and the "Levels" title on it (37,7) */
@@ -1046,9 +1220,8 @@
 .octane-reward-track-levels-title {
     left: 36px;
     top: 133px;
-    min-width: 53px;
     height: 18px;
-    padding: 0 6px 0 3px;
+    padding: 0 8px 0 5px;
     box-sizing: border-box;
     background: #f0f0f0;
     color: #124b8b;
@@ -1090,7 +1263,11 @@
 .octane-reward-track-level-name {
     left: 17px;
     top: 13px;
+    box-sizing: border-box;
     width: 85px;
+    height: 17px;
+    padding: 0 2px;
+    font-size: 12px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1106,20 +1283,21 @@
 .octane-reward-track-level-count {
     left: 376px;
     top: 13px;
+    height: 16px;
+    padding: 0 2px;
     font-size: 11px;
     line-height: 16px;
     white-space: nowrap;
 }
 
-/* the level's end (470,7 94x30): checkmark + reward, right-aligned */
+/* the level's end, itemlist_horizontal (470,7 94x30) right aligned on resize: completed_icon + reward, spacing 10 */
 .octane-reward-track-level-end {
-    left: 469px;
+    left: auto;
+    right: 17px;
     top: 6px;
-    width: 94px;
     height: 30px;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
     gap: 10px;
 }
 
@@ -1157,6 +1335,8 @@
 .octane-reward-track-hint-title {
     left: 75px;
     top: 9px;
+    height: 18px;
+    padding: 0 2px;
     color: #124b8b;
     font-size: 13px;
     font-weight: bold;
@@ -1167,11 +1347,13 @@
 .octane-reward-track-hint-text {
     left: 75px;
     top: 28px;
+    box-sizing: border-box;
     width: 333px;
     height: 42px;
+    padding: 2px;
     overflow: hidden;
     font-size: 11px;
-    line-height: 14px;
+    line-height: 12.5px;
     text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.7);
 }
 

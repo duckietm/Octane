@@ -4,6 +4,17 @@ import { GetConfigurationValue, IsOwnerOfFurniture, SendMessageComposer } from '
 import { useOctaneEvent } from '../../../events';
 import { useFurniRemovedEvent } from '../../engine';
 
+/**
+ * Whether the exchange window stays shut for this furni. Habbo calls every CFC_ credit furni a "Non-redeemable item";
+ * a hotel that switches the server setting hotel.furni.cfc.redeemable off refuses to exchange them, and the client
+ * setting furni.cfc.redeemable (default true, as the server's) mirrors it.
+ */
+export const isCreditFurniExchangeHidden = (furniType: string, cfcRedeemable: unknown): boolean => {
+    const redeemable = !(cfcRedeemable === false || cfcRedeemable === 0 || cfcRedeemable === 'false' || cfcRedeemable === '0');
+
+    return !redeemable && (furniType ?? '').toUpperCase().startsWith('CFC_');
+};
+
 const useFurnitureExchangeWidgetState = () => {
     const [objectId, setObjectId] = useState(-1);
     const [category, setCategory] = useState(-1);
@@ -28,6 +39,8 @@ const useFurnitureExchangeWidgetState = () => {
         const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
 
         if (!roomObject || !IsOwnerOfFurniture(roomObject)) return;
+
+        if (isCreditFurniExchangeHidden(roomObject.type, GetConfigurationValue<unknown>('furni.cfc.redeemable', true))) return;
 
         const nft = roomObject.model.getValue<string>(RoomObjectVariable.FURNITURE_NFT_CREDIT) === 'true';
 

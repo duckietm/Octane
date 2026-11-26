@@ -118,7 +118,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const { getFullCount = 0 } = useInventoryUnseenTracker();
     const { getTotalUnseen = 0 } = useAchievements();
     const { unseenCount: unseenDailyTaskCount = 0 } = useDailyTasks();
-    const { unseenCount: unseenRewardTrackCount = 0 } = useRewardTracks();
+    const { tracks: rewardTracks = [], unseenCount: unseenRewardTrackCount = 0 } = useRewardTracks();
     // HabboToolbar.setUnseenItemCount("HTIE_ICON_PROGRESSION", unseenProgMenuCount): achievements + daily tasks + reward track rewards.
     const unreadForumsCount = useGroupForumUnreadStore((state) => state.unreadForumsCount);
     const unseenProgMenuCount = getTotalUnseen + unseenDailyTaskCount + unseenRewardTrackCount;
@@ -459,7 +459,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                                                 setExpanded={ setProgressionExpanded }
                                                 unseenAchievementCount={ getTotalUnseen }
                                                 unseenDailyTaskCount={ unseenDailyTaskCount }
-                                                unseenRewardTrackCount={ unseenRewardTrackCount } />
+                                                rewardTracks={ rewardTracks } />
                                         </motion.div> }
                                 </AnimatePresence>
                                 <ToolbarItemView

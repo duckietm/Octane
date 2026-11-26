@@ -39,7 +39,7 @@ interface Native3FrameProps {
     color?: number;
 }
 
-/** Frame style 3: the 9-slice frame_3 skin, a 19x20 close button at (width - 29, 8) and the content area at the frame margins (6, 25). */
+/** Frame style 3: the 9-slice frame_3 skin, a 19x20 close button at (width - 28, 8) and the content area at the frame margins (6, 25). */
 export const Native3Frame: FC<Native3FrameProps> = ({ width, height, title, onClose, children, color = FRAME3_COLOR }) => {
     const [closeState, setCloseState] = useState<'default' | 'hovering' | 'pressed'>('default');
 
@@ -53,7 +53,7 @@ export const Native3Frame: FC<Native3FrameProps> = ({ width, height, title, onCl
                 aria-label={localizeWithFallback('octane.mod_tools.close', 'Close')}
                 className="native3-close"
                 type="button"
-                style={rect(width - 29, 8, 19, 20)}
+                style={rect(width - 28, 8, 19, 20)}
                 onClick={onClose}
                 onPointerDown={() => setCloseState('pressed')}
                 onPointerEnter={() => setCloseState('hovering')}

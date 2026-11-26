@@ -228,6 +228,7 @@
     // chatcmd
     // ------------------------------------------------------------------------
     "chatcmd.client.chooser": "Sélecteur d'utilisateur",
+    "chatcmd.client.directplanes": "Draw floors and walls directly (on/off)",
     "chatcmd.client.ejectall": "Éjecter tous les mobis",
     "chatcmd.client.flip": "Retourner l'appart",
     "chatcmd.client.floor": "Éditeur de sol",
@@ -246,7 +247,6 @@
     "chatcmd.client.shake": "Secouer l'appart",
     "chatcmd.client.sign": "Afficher un panneau",
     "chatcmd.client.togglefps": "Afficher/Masquer les FPS",
-    "chatcmd.client.directplanes": "Draw floors and walls directly (on/off)",
     "chatcmd.client.zoom": "Zoom avant/arrière",
 
     // ------------------------------------------------------------------------

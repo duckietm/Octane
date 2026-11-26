@@ -1,6 +1,6 @@
 import { CreateLinkEvent, GetRoomEngine, GetSessionDataManager, RoomObjectCategory } from '@octane/renderer';
 import { Dispatch, FC, PropsWithChildren, SetStateAction, useEffect, useRef } from 'react';
-import { DispatchUiEvent, GetConfigurationValue, GetRoomSession, GetUserProfile, localizeWithFallback } from '../../api';
+import { DispatchUiEvent, GetConfigurationValue, GetRoomSession, GetUserProfile, getRewardTrackMenuTarget, localizeWithFallback } from '../../api';
 import { Flex, LayoutItemCountView } from '../../common';
 import { GuideToolEvent } from '../../events';
 import { useDailyTasks, useRewardTracks } from '../../hooks';
@@ -34,7 +34,10 @@ export const ToolbarMeView: FC<
     const { useGuideTool = false, unseenAchievementCount = 0, setMeExpanded = null, children = null, ...rest } = props;
     const elementRef = useRef<HTMLDivElement>(null);
     const { unseenCount: unseenDailyTaskCount = 0 } = useDailyTasks();
-    const { unseenCount: unseenRewardTrackCount = 0 } = useRewardTracks();
+    const { tracks: rewardTracks = [] } = useRewardTracks();
+    // The entry opens one track (the first with prizes to claim), so it counts that track's claimable prizes only:
+    // a total over every track left a badge that the opened track had nothing for.
+    const rewardTrack = getRewardTrackMenuTarget(rewardTracks);
     // GroupForumController.UNSEEN_FORUMS_COUNT: the reader's forums with unread messages.
     const unreadForumsCount = useGroupForumUnreadStore((state) => state.unreadForumsCount);
 
@@ -101,8 +104,8 @@ export const ToolbarMeView: FC<
                     name="rewardtrack"
                     iconClassName="icon-me-rewardtrack"
                     label={localizeWithFallback('toolbar.me.rewardtrack', localizeWithFallback('reward_track.title', 'Reward track'))}
-                    count={unseenRewardTrackCount}
-                    onClick={() => CreateLinkEvent('reward_track/toggle')}
+                    count={rewardTrack?.claimablePrizeCount ?? 0}
+                    onClick={() => CreateLinkEvent(rewardTrack ? `reward_track/toggle/${rewardTrack.id}` : 'reward_track/toggle')}
                 />
                 {GetConfigurationValue<boolean>('talent.track.enabled', true) && (
                     <MeMenuItem

@@ -7,7 +7,7 @@ import {
     getTargetedOfferPurchaseBlock,
     LocalizeText,
     localizeWithFallback,
-    SanitizeHtml,
+    SanitizeHotelHtml,
     SendMessageComposer
 } from '../../../../api';
 import { Button, Column, Flex, LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
@@ -77,7 +77,7 @@ export const OfferWindowView = (props: { offer: TargetedOfferData; secondsLeft: 
                         <Flex column className="w-75 text-black" gap={1}>
                             <Column fullHeight className="bg-warning p-2">
                                 <h4>{LocalizeText(offer.title)}</h4>
-                                <div dangerouslySetInnerHTML={{ __html: SanitizeHtml(offer.description) }} />
+                                <div dangerouslySetInnerHTML={{ __html: SanitizeHotelHtml(offer.description) }} />
                             </Column>
                             <Flex alignItems="center" alignSelf="center" gap={2} justifyContent="center">
                                 {offer.purchaseLimit > 1 && (

@@ -21,10 +21,12 @@ vi.mock('@octane/renderer', () => ({
 
 vi.mock('../../api', () => ({
     GetConfigurationValue: (key: string, fallback: unknown) => (mocks.config.has(key) ? mocks.config.get(key) : fallback),
+    getRewardTrackClaimableCount: (tracks: { id: string; claimablePrizeCount: number }[], trackId: string) =>
+        tracks.find((track) => track.id === trackId)?.claimablePrizeCount ?? 0,
     localizeWithFallback: (_key: string, fallback: string) => fallback
 }));
 
-const renderMenu = (counts: { achievements?: number; dailyTasks?: number; rewardTrack?: number } = {}) => {
+const renderMenu = (counts: { achievements?: number; dailyTasks?: number; tracks?: { id: string; claimablePrizeCount: number }[] } = {}) => {
     const setExpanded = vi.fn();
 
     render(
@@ -32,7 +34,7 @@ const renderMenu = (counts: { achievements?: number; dailyTasks?: number; reward
             setExpanded={setExpanded}
             unseenAchievementCount={counts.achievements ?? 0}
             unseenDailyTaskCount={counts.dailyTasks ?? 0}
-            unseenRewardTrackCount={counts.rewardTrack ?? 0}
+            rewardTracks={counts.tracks ?? []}
         />
     );
 
@@ -61,10 +63,21 @@ describe('ToolbarProgressionView (prog_menu_view)', () => {
         expect(setExpanded).toHaveBeenCalledWith(false);
     });
 
-    it('badges the Introduction entry with the claimable rewards', () => {
-        renderMenu({ rewardTrack: 3 });
+    it('badges the Introduction entry with the claimable rewards of the introduction track only', () => {
+        renderMenu({ tracks: [{ id: 'introduction', claimablePrizeCount: 0 }, { id: 'habboween2026', claimablePrizeCount: 3 }] });
 
-        expect(screen.getByRole('button', { name: 'Introduction' })).toHaveTextContent('3');
+        expect(screen.getByRole('button', { name: 'Introduction' }).querySelector('.octane-toolbar-count')).toBeNull();
+        expect(screen.getByRole('button', { name: 'habboween2026' })).toHaveTextContent('3');
+    });
+
+    it('gives every other track its own entry that opens it', () => {
+        const setExpanded = renderMenu({ tracks: [{ id: 'introduction', claimablePrizeCount: 2 }, { id: 'habboween2026', claimablePrizeCount: 0 }] });
+
+        expect(screen.getAllByRole('button').map((button) => button.getAttribute('data-name')).slice(-2)).toEqual(['introduction', 'rewardtrack-habboween2026']);
+        expect(screen.getByRole('button', { name: 'Introduction' })).toHaveTextContent('2');
+        fireEvent.click(screen.getByRole('button', { name: 'habboween2026' }));
+        expect(mocks.createLinkEvent).toHaveBeenCalledWith('reward_track/open/habboween2026');
+        expect(setExpanded).toHaveBeenCalledWith(false);
     });
 
     it('follows toolbar.hide.quests and dailytasks.enabled like the official menu', () => {

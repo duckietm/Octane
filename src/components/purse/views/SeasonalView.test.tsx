@@ -48,21 +48,48 @@ describe('SeasonalView (AIR SeasonalCurrencyIndicator)', () => {
     it('shows the zero text underlined at 0', () => {
         render(<SeasonalView type={101} amount={0} />);
 
-        expect(screen.getByText('Info')).toHaveClass('is-zero');
+        expect(screen.getByText('Info').closest('.seasonal-amount')).toHaveClass('is-zero');
     });
 
-    it('slides the change over the row and lands on the new balance', () => {
-        vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame', 'performance'] });
+    it('holds the old balance for the first half, then counts to the new one while the overlay crosses the row (40 ticks of 40 ms)', () => {
+        vi.useFakeTimers();
         const { rerender, container } = render(<SeasonalView type={101} amount={10} />);
 
         rerender(<SeasonalView type={101} amount={60} />);
-        expect(container.querySelector('.seasonal-change')).toHaveTextContent('+50');
+
+        const overlay = () => container.querySelector<HTMLElement>('.seasonal-change');
+
+        expect(overlay()).toHaveTextContent('+50');
+        expect(overlay()?.style.left).toBe('0px');
+        expect(screen.getByText('10')).toBeInTheDocument();
+
+        // 20 ticks: progress 0.5, the overlay at the middle of 192 - 33 and fully shown, the counter still on the old balance.
+        act(() => {
+            vi.advanceTimersByTime(20 * 40);
+        });
+
+        expect(overlay()?.style.left).toBe('80px');
+        expect(overlay()?.style.opacity).toBe('1');
+        expect(screen.getByText('10')).toBeInTheDocument();
+
+        // 30 ticks: progress 0.75, halfway through the count.
+        act(() => {
+            vi.advanceTimersByTime(10 * 40);
+        });
+
+        expect(screen.getByText('35')).toBeInTheDocument();
 
         act(() => {
-            vi.advanceTimersByTime(1100);
+            vi.advanceTimersByTime(10 * 40);
         });
 
         expect(screen.getByText('60')).toBeInTheDocument();
+        expect(overlay()).toBeNull();
+    });
+
+    it('starts no change for the first balance', () => {
+        const { container } = render(<SeasonalView type={101} amount={60} />);
+
         expect(container.querySelector('.seasonal-change')).toBeNull();
     });
 });

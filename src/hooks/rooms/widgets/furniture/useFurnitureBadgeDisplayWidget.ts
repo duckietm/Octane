@@ -41,8 +41,8 @@ const useFurnitureBadgeDisplayWidgetState = () => {
             setColor('1');
             setBadgeName(LocalizeBadgeName(stringStuff.getValue(1)));
             setBadgeDesc(LocalizeBadgeDescription(stringStuff.getValue(1)));
-            setDate(stringStuff.getValue(2));
-            setSenderName(stringStuff.getValue(3));
+            setDate(stringStuff.getValue(3));
+            setSenderName(stringStuff.getValue(2));
         }
     );
 

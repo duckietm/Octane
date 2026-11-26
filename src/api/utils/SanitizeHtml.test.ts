@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-import { SanitizeHtml, SanitizePageHtml } from './SanitizeHtml';
+import { SanitizeHotelHtml, SanitizeHtml, SanitizePageHtml } from './SanitizeHtml';
 
 /**
  * SanitizeHtml is the project's shared HTML sanitiser (DOMPurify with a fixed
@@ -23,11 +23,18 @@ describe('SanitizeHtml — neutralises dangerous markup', () => {
         expect(parse('<script>alert(1)</script>').querySelector('script')).toBeNull();
     });
 
-    it('strips inline event handlers (onerror) from allowed tags', () => {
+    it('removes images and their inline event handlers', () => {
         const div = parse('<img src=x onerror=alert(1)>');
-        const img = div.querySelector('img');
-        // img tag itself is allow-listed, but the handler must be gone
-        expect(img?.getAttribute('onerror')).toBeNull();
+
+        expect(div.querySelector('img')).toBeNull();
+        expect(div.innerHTML.toLowerCase()).not.toContain('onerror');
+    });
+
+    it('strips inline event handlers (onerror) from the images of hotel texts', () => {
+        const div = document.createElement('div');
+        div.innerHTML = SanitizeHotelHtml('<img src=x onerror=alert(1)>');
+
+        expect(div.querySelector('img')?.getAttribute('onerror')).toBeNull();
         expect(div.innerHTML.toLowerCase()).not.toContain('onerror');
     });
 
@@ -99,13 +106,40 @@ describe('SanitizeHtml — no overlays, no foreign images, no page takeover', ()
     });
 
     it('drops a style that only positions', () => {
-        expect(parse('<img src="/x.png" style="position:fixed;inset:0">').querySelector('img')?.hasAttribute('style')).toBe(false);
+        expect(parse('<span style="position:fixed;inset:0">x</span>').querySelector('span')?.hasAttribute('style')).toBe(false);
     });
 
-    it('keeps an image from the client origin and takes the source off one from elsewhere', () => {
-        expect(parse('<img src="/c_images/a.png">').querySelector('img')?.getAttribute('src')).toBe('/c_images/a.png');
-        expect(parse('<img src="https://tracker.example/p.gif">').querySelector('img')?.hasAttribute('src')).toBe(false);
-        expect(parse('<img src="//tracker.example/p.gif">').querySelector('img')?.hasAttribute('src')).toBe(false);
+    it('drops classes, so the client\'s own utility classes cannot lay an overlay over it', () => {
+        expect(parse('<div class="fixed inset-0 z-50">x</div>').querySelector('div')?.hasAttribute('class')).toBe(false);
+    });
+
+    it('keeps a modest font size and drops one that fills the screen', () => {
+        expect((parse('<span style="font-size:14px">a</span>').querySelector('span') as HTMLElement).style.fontSize).toBe('14px');
+        expect(parse('<span style="font-size:900px">a</span>').querySelector('span')?.hasAttribute('style')).toBe(false);
+        expect(parse('<span style="font-size:40em">a</span>').querySelector('span')?.hasAttribute('style')).toBe(false);
+        expect(parse('<span style="font-size:calc(100vh)">a</span>').querySelector('span')?.hasAttribute('style')).toBe(false);
+    });
+
+    it('keeps only absolute web links', () => {
+        const hrefs = ['https://example.com/a', 'http://example.com', 'https:example.com', '/relative', '#octane-event:catalog/open', 'mailto:a@b.c', 'event:navigator/goto/1'].map(
+            (href) => parse(`<a href="${href}">x</a>`).querySelector('a')?.getAttribute('href') ?? null
+        );
+
+        expect(hrefs).toEqual(['https://example.com/a', 'http://example.com', null, null, null, null, null]);
+    });
+
+    it('keeps an image from the client origin in a hotel text and takes the source off one from elsewhere', () => {
+        const hotel = (html: string) => {
+            const div = document.createElement('div');
+            div.innerHTML = SanitizeHotelHtml(html);
+            return div;
+        };
+
+        expect(hotel('<img src="/c_images/a.png" class="catalog-art">').querySelector('img')?.getAttribute('src')).toBe('/c_images/a.png');
+        expect(hotel('<img src="/c_images/a.png" class="catalog-art">').querySelector('img')?.getAttribute('class')).toBe('catalog-art');
+        expect(hotel('<img src="https://tracker.example/p.gif">').querySelector('img')?.hasAttribute('src')).toBe(false);
+        expect(hotel('<img src="//tracker.example/p.gif">').querySelector('img')?.hasAttribute('src')).toBe(false);
+        expect(hotel('<img src="/x.png" style="position:fixed;inset:0">').querySelector('img')?.hasAttribute('style')).toBe(false);
     });
 
     it('never lets a link replace the page that embeds the client', () => {

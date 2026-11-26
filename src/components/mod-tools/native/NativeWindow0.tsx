@@ -174,14 +174,24 @@ interface Native0ButtonProps {
     color?: number;
     onClick?: () => void;
     name?: string;
+    /** The button sizes itself to its label plus 10px on both sides, at most `width`, and keeps its left or right edge. */
+    fit?: 'left' | 'right';
+    /** Reports the fitted width, so a list can place the next window after it. */
+    onFit?: (width: number) => void;
 }
 
-export const Native0Button: FC<Native0ButtonProps> = ({ x, y, width, height, label, enabled = true, color, onClick, name }) => {
+export const Native0Button: FC<Native0ButtonProps> = ({ x: boxX, y, width: boxWidth, height, label, enabled = true, color, onClick, name, fit, onFit }) => {
     const [over, setOver] = useState(false);
     const [down, setDown] = useState(false);
     const state = !enabled ? 'disabled' : down ? 'pressed' : over ? 'hovering' : 'default';
     const labelRef = useRef<HTMLSpanElement>(null);
     const [labelOffset, setLabelOffset] = useState({ left: 0, top: 0 });
+    const [labelWidth, setLabelWidth] = useState(0);
+    const width = fit ? Math.min(boxWidth, labelWidth + 20) : boxWidth;
+    const x = fit === 'right' ? boxX + boxWidth - width : boxX;
+    const onFitRef = useRef(onFit);
+
+    onFitRef.current = onFit;
 
     // The label is centred on whole pixels (flex centring lands on half pixels and blurs the pixel glyphs): the native text field is 13px high and its first glyph row is 2px in, so a
     // 22px button sets its label one row lower than a 21px one; a label wider than the face minus 10px of padding on both sides
@@ -191,7 +201,13 @@ export const Native0Button: FC<Native0ButtonProps> = ({ x, y, width, height, lab
 
         if (!element) return;
 
-        const place = () => setLabelOffset({ left: element.offsetWidth > width - 20 ? 10 : Math.ceil((width - element.offsetWidth) / 2), top: Math.ceil((height - 13) / 2) + 2 });
+        const place = () => {
+            const fitted = fit ? Math.min(boxWidth, element.offsetWidth + 20) : boxWidth;
+
+            setLabelWidth(element.offsetWidth);
+            onFitRef.current?.(fitted);
+            setLabelOffset({ left: element.offsetWidth > fitted - 20 ? 10 : Math.ceil((fitted - element.offsetWidth) / 2), top: Math.ceil((height - 13) / 2) + 2 });
+        };
 
         place();
 
@@ -202,7 +218,7 @@ export const Native0Button: FC<Native0ButtonProps> = ({ x, y, width, height, lab
         observer.observe(element);
 
         return () => observer.disconnect();
-    }, [label, width, height]);
+    }, [label, boxWidth, height, fit]);
 
     return (
         <BaseButton type="button"

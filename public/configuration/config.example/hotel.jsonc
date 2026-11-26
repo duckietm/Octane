@@ -108,9 +108,6 @@
     // Draws walls and floors straight from their tiles instead of baked textures (WebGL2 only).
     "room.planes.direct": false,
 
-    // In a crowd, talking and blinking avatars take turns redrawing and avatars off screen wait until they are back in view.
-    "room.avatar.redraw.budget": true,
-
     // Room colour changes (dimmer, backgrounds) apply at once instead of fading over 1.5 s.
     "room.color.skip.transition": false,
 
@@ -369,6 +366,9 @@
 
     // Lets emerald credit furni be redeemed; off: their exchange window never opens.
     "nft.credit.converting.enabled": true,
+
+    // Shows the exchange window of CFC_ credit furni; keep it equal to the server setting hotel.furni.cfc.redeemable (0 there: set false).
+    "furni.cfc.redeemable": true,
 
     // Shows the name and description tooltip on badge images.
     "badge.descriptions.enabled": true,

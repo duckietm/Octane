@@ -399,4 +399,58 @@ describe('RewardTrackView', () => {
         fireEvent.click(screen.getByTestId('reward-track-admin-toggle'));
         expect(screen.getByTestId('admin')).toBeTruthy();
     });
+
+    it('shows a reached level as its target ("5 / 5"), not the whole task progress ("66 / 5")', () => {
+        const levels = [
+            { requiredCount: 5, pointsReward: 10, premium: false },
+            { requiredCount: 25, pointsReward: 20, premium: false },
+            { requiredCount: 100, pointsReward: 30, premium: false }
+        ];
+        const task = {
+            ...makeTask('chat', 'chat_with_someone', 66, 100),
+            levels,
+            activeLevel: levels[2],
+            activeLevelIndex: 2,
+            isComplete: false,
+            progressRatioFor: (level: { requiredCount: number }) => Math.min(1, 66 / level.requiredCount)
+        };
+
+        mocks.tracks = [{ ...makeTrack(60), tasks: [task] }];
+        const { container } = render(<RewardTrackView />);
+
+        openTrack();
+
+        expect([...container.querySelectorAll('.octane-reward-track-level-count')].map((node) => node.textContent)).toEqual([
+            '5 / 5',
+            '25 / 25',
+            '66 / 100'
+        ]);
+        expect(container.querySelector('.octane-reward-track-task-count').textContent).toBe('66 / 100');
+        expect(container.querySelectorAll('.octane-reward-track-level-check').length).toBe(2);
+    });
+
+    it('lays the tasks out in the AIR scroll list inside a fixed, non-resizable 1103x722 frame', () => {
+        mocks.tracks = [makeTrack(60)];
+        const { container } = render(<RewardTrackView />);
+
+        openTrack();
+
+        expect(container.querySelector('.octane-reward-track').classList.contains('resize-none')).toBe(true);
+        const list = container.querySelector('.octane-reward-track-task-list');
+
+        expect(list.querySelector('.octane-reward-track-scroll-viewport > .octane-reward-track-task-list-content')).toBeTruthy();
+        expect(list.querySelectorAll('.octane-reward-track-task').length).toBe(2);
+    });
+
+    it('toggles the track the Me menu names: opens it, then closes it', () => {
+        mocks.tracks = [makeTrack(60), { ...makeTrack(60), id: 'habboween2026' }];
+        const { container } = render(<RewardTrackView />);
+        const tracker = () => vi.mocked(AddLinkEventTracker).mock.calls.at(-1)[0] as { linkReceived: (url: string) => void };
+
+        act(() => tracker().linkReceived('reward_track/toggle/habboween2026'));
+        expect(container.querySelector('.octane-reward-track-title').textContent).toBe('habboween2026');
+
+        act(() => tracker().linkReceived('reward_track/toggle/habboween2026'));
+        expect(container.querySelector('.octane-reward-track')).toBeNull();
+    });
 });
