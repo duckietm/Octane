@@ -61,9 +61,12 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
+/* Its width is what the caption leaves, never its text's: sized by its text, a title shortened with "..." gave the purse beside it
+   room, grew, was laid out in full again and shortened again, so title and purse flickered (the Builders Club warehouse). */
 :root[data-handheld] .octane-handheld-sheet__title {
-    flex: 1 1 auto;
-    min-width: 0;
+    flex: 1 1 0;
+    /* Enough for a word or two; a narrow phone takes the rest from the purse beside it. */
+    min-width: 96px;
     overflow: hidden;
     color: var(--hh-on-dark);
     font-family: var(--hh-font-bold);

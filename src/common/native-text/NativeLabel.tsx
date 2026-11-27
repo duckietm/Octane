@@ -51,6 +51,10 @@ const ALIGN: Record<string, Measurement['align']> = { center: 'center', right: '
 // Width changes this small are a scrollbar coming or going, not a resized container.
 const SCROLLBAR_SLACK = 24;
 
+// A shortened label measured again this often within the window is chasing its own box (see the width watcher): it is left shortened.
+const CLIP_RESET_LIMIT = 3;
+const CLIP_RESET_WINDOW_MS = 1000;
+
 // Whether the environment lays elements out at all (jsdom does not: there nothing ever has a box).
 const hasLayout = () => document.documentElement.getClientRects().length > 0;
 
@@ -166,6 +170,11 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
     // The parent of a wrapped label can be sized by the label itself (a flex item, an inline-block): once the raster holds the wrapped
     // lines it keeps that width when the window around it widens (a window opening narrow, then laid out). The parent's container is
     // watched too, so the label is laid out again when the room it may take really changes.
+    // A shortened one-line label can move its own box: in a flex row whose items are sized by their content (a sheet title beside
+    // the purse) the shorter raster gives a neighbour room, the box changes width, the label is laid out again in full, overflows,
+    // is shortened again, and so on every frame. When the box keeps moving that fast, the shortened label stays as it is.
+    const clipResetsRef = useRef<number[]>([]);
+
     useLayoutEffect(() => {
         const parent = hostRef.current?.parentElement;
         const outer = parent?.parentElement;
@@ -178,6 +187,18 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
 
             if (!parentMoved && !outerMoved) return;
 
+            if (wrapWidth === undefined) {
+                const now = performance.now();
+                const recent = clipResetsRef.current.filter((time) => now - time < CLIP_RESET_WINDOW_MS);
+
+                if (recent.length >= CLIP_RESET_LIMIT) {
+                    clipResetsRef.current = recent;
+                    return;
+                }
+
+                clipResetsRef.current = [...recent, now];
+            }
+
             observer.disconnect();
             setResizeTick((tick) => tick + 1);
         });
@@ -187,7 +208,7 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
         if (outerWidth !== undefined && outer) observer.observe(outer);
 
         return () => observer.disconnect();
-    }, [watchedWidth, outerWidth]);
+    }, [watchedWidth, outerWidth, wrapWidth]);
 
     // A box that asks for dots is checked with the raster in it: one sized to its text (a tab, a title) grows with the raster and never
     // overflows; a fixed one (a dropdown value) does, and the label is then shortened to it. That needs the font's metrics: until it has

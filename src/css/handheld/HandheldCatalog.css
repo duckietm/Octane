@@ -12,7 +12,10 @@
 :root[data-handheld] .octane-handheld-shop__purse {
     display: flex;
     flex: 0 1 auto;
-    gap: var(--hh-space-1);
+    /* A coin that does not fit whole drops to a second line, which is cut off: never half a coin. */
+    flex-wrap: wrap;
+    gap: 0 var(--hh-space-1);
+    height: 24px;
     min-width: 0;
     overflow: hidden;
 }
