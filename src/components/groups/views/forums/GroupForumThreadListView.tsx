@@ -21,6 +21,8 @@ import { useHelp, useMessageEvent } from '../../../../hooks';
 import { flatText, GroupText } from '../GroupNativeLayout';
 import { FORUM_PAGE_SIZE, FORUM_SURFACE, stripTags, ForumButton, forumAge, ForumPager } from './GroupForumLayout';
 import { BaseButton } from '../../../../common/BaseButton';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldGroupForumThreadListView } from './HandheldGroupForumThreadListView';
 
 // Thread states: 1 visible, 10 hidden by a group administrator, 20 deleted by Hotel staff.
 export const THREAD_HIDDEN_BY_ADMIN = 10;
@@ -36,7 +38,7 @@ const threadColor = (state: number, rowIndex: number): number => {
 };
 
 /** ThreadListView.getModerationMessage. */
-const moderationMessage = (thread: GuildForumThread): string => {
+export const moderationMessage = (thread: GuildForumThread): string => {
     if (thread.state === THREAD_HIDDEN_BY_ADMIN) return LocalizeText('groupforum.view.thread_hidden_by_admin', ['ADMIN_NAME', 'admin_name'], [thread.adminName, thread.adminName]);
     if (thread.state === THREAD_DELETED_BY_STAFF) return LocalizeText('groupforum.view.thread_hidden_by_staff', ['ADMIN_NAME', 'admin_name'], [thread.adminName, thread.adminName]);
 
@@ -65,10 +67,12 @@ interface GroupForumThreadListViewProps {
     onNewThread: () => void;
     onOpenThread: (thread: GuildForumThread) => void;
     onPageChange: (pageIndex: number) => void;
+    /** Phone layout on its side: the thread shown beside the list. */
+    activeThreadId?: number;
 }
 
 
-export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = ({ forumData, groupId, pageIndex, reloadKey = 0, getLastReadMessageIndex, onLeave, onNewThread, onOpenThread, onPageChange }) => {
+export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = ({ forumData, groupId, pageIndex, reloadKey = 0, getLastReadMessageIndex, onLeave, onNewThread, onOpenThread, onPageChange, activeThreadId = 0 }) => {
     const [threads, setThreads] = useState<GuildForumThread[]>([]);
     const { report = null } = useHelp();
     const canModerate = forumData.canModerate;
@@ -117,7 +121,36 @@ export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = ({ fo
         SendMessageComposer(new ModerateThreadMessageComposer(groupId, thread.threadId, action === 'unhide' ? THREAD_VISIBLE : hiddenState));
     };
 
+    const toggleLock = (thread: GuildForumThread) => SendMessageComposer(new UpdateThreadMessageComposer(groupId, thread.threadId, !thread.isLocked, thread.isPinned));
+    const togglePin = (thread: GuildForumThread) => SendMessageComposer(new UpdateThreadMessageComposer(groupId, thread.threadId, thread.isLocked, !thread.isPinned));
+
     const statusKey = !canPostThread ? forumData.postThreadPermissionError : '';
+    const isHandheld = useIsHandheld();
+
+    // Phone layout: the same threads, rights and handlers as cards of the phone sheet (HandheldGroupForumView).
+    if (isHandheld)
+        return (
+            <HandheldGroupForumThreadListView
+                activeThreadId={activeThreadId}
+                canManage={canManage}
+                canPostThread={canPostThread}
+                canReport={canReport}
+                getLastReadMessageIndex={getLastReadMessageIndex}
+                hideActionOf={hideActionOf}
+                pageCount={pageCount}
+                pageIndex={pageIndex}
+                statusText={statusKey ? forumPermissionText(statusKey, 'operation_post_thread') : ''}
+                threads={threads}
+                onLeave={onLeave}
+                onModerate={moderate}
+                onNewThread={onNewThread}
+                onOpenThread={onOpenThread}
+                onPageChange={onPageChange}
+                onReport={(thread) => report(ReportType.THREAD, { groupId, threadId: thread.threadId })}
+                onToggleLock={toggleLock}
+                onTogglePin={togglePin}
+            />
+        );
 
     return (
         <>
@@ -156,7 +189,7 @@ export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = ({ fo
                                             disabled={!canManage}
                                             style={{ top: 0 }}
                                             type="button"
-                                            onClick={() => SendMessageComposer(new UpdateThreadMessageComposer(groupId, thread.threadId, !thread.isLocked, thread.isPinned))}
+                                            onClick={() => toggleLock(thread)}
                                         >
                                             <img alt="" draggable={false} src={thread.isLocked ? lockedIcon : unlockedIcon} style={{ left: 3, top: 1 }} />
                                         </BaseButton>
@@ -167,7 +200,7 @@ export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = ({ fo
                                             disabled={!canManage}
                                             style={{ top: canManage || thread.isLocked ? 20 : 0 }}
                                             type="button"
-                                            onClick={() => SendMessageComposer(new UpdateThreadMessageComposer(groupId, thread.threadId, thread.isLocked, !thread.isPinned))}
+                                            onClick={() => togglePin(thread)}
                                         >
                                             <img alt="" draggable={false} src={thread.isPinned ? pinnedIcon : unpinnedIcon} style={{ left: 3, top: 2 }} />
                                         </BaseButton>

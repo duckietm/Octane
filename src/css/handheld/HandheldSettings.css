@@ -1,0 +1,406 @@
+/*
+ * Phone settings (the Me menu's Settings entry), in the Octane handheld look (HandheldTokens.css) inside the shared
+ * frame (HandheldSheetFrame). UserSettingsView keeps its state and every row; on a phone its frame is a sheet: the
+ * menu is a list of rows, each section a page with a way back. The rows and controls are the desktop window's own
+ * (`air-settings-*`), drawn here as thumb-sized cards on the cream instead of 16 px lines on AIR's grey panel.
+ * Everything is scoped to :root[data-handheld], which only a phone-sized touch device gets.
+ */
+
+/* ---------------------------------------------------------------- page */
+
+:root[data-handheld] .octane-handheld-settings .octane-handheld-sheet__body {
+    padding: 0;
+}
+
+/* The way back out of a section, above its page. */
+:root[data-handheld] .octane-handheld-settings__bar {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    width: min(100%, 620px);
+    margin: 0 auto;
+    padding: var(--hh-space-3) var(--hh-space-3) 0;
+}
+
+:root[data-handheld] .octane-handheld-settings__back {
+    position: relative;
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 2px;
+    height: 36px;
+    padding: 0 var(--hh-space-3) 0 6px;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 20px;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+/* The pill is 36 px; the finger gets 44. */
+:root[data-handheld] .octane-handheld-settings__back::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+}
+
+:root[data-handheld] .octane-handheld-settings__back:active {
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-settings__back svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+/* The section itself scrolls; on a flat phone it keeps a readable width in the middle. */
+:root[data-handheld] .octane-handheld-settings__page {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    box-sizing: border-box;
+    gap: var(--hh-space-2);
+    width: min(100%, 620px);
+    min-height: 0;
+    margin: 0 auto;
+    padding: var(--hh-space-3) var(--hh-space-3) calc(var(--hh-space-4) + var(--octane-safe-bottom, 0px));
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-l);
+    line-height: 20px;
+}
+
+/* Every list of the desktop window is a column of cards here. */
+:root[data-handheld] .octane-handheld-settings :is(.air-settings-menu__items, .air-settings-chat__list, .air-settings-other__list, .air-settings-other__account, .air-settings-privacy__content, .air-settings-audio__rows, .air-settings-wordfilter) {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    align-items: stretch;
+    gap: var(--hh-space-2);
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+/* A row that leads somewhere: the menu's entries, the word filter, the account actions. */
+:root[data-handheld] .octane-handheld-settings .air-settings-button {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+    align-self: stretch;
+    width: 100%;
+    height: auto;
+    min-height: 48px;
+    padding: var(--hh-space-2) var(--hh-space-4);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-image-source: none;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    font: 400 var(--hh-size-l) / 20px var(--hh-font);
+    text-align: left;
+    white-space: normal;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-button:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-button:disabled {
+    opacity: 0.5;
+}
+
+/* The arrow of a row that opens something. */
+:root[data-handheld] .octane-handheld-settings .air-settings-button:not([type='submit'])::after {
+    content: '';
+    flex: none;
+    width: 8px;
+    height: 8px;
+    margin-right: 2px;
+    border-top: 2px solid var(--hh-air-border);
+    border-right: 2px solid var(--hh-air-border);
+    transform: rotate(45deg);
+}
+
+/* ---------------------------------------------------------------- check and select rows */
+
+:root[data-handheld] .octane-handheld-settings :is(.air-settings-check-row, .air-settings-select-row) {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-3);
+    width: 100%;
+    height: auto;
+    min-height: 48px;
+    margin: 0;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font: 400 var(--hh-size-l) / 20px var(--hh-font);
+}
+
+/* The whole text is read on a phone: it wraps instead of ending in dots. */
+:root[data-handheld] .octane-handheld-settings :is(.air-settings-check-row, .air-settings-select-row) > span {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: visible;
+    white-space: normal;
+}
+
+:root[data-handheld] .octane-handheld-settings :is(.air-settings-checkbox, .air-settings-radio) {
+    flex: none;
+    width: 24px !important;
+    min-width: 24px !important;
+    height: 24px !important;
+    min-height: 24px !important;
+    margin: 0 !important;
+    background-size: 100% 100% !important;
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-radio {
+    border: 1px solid var(--hh-air-box-line) !important;
+    background: var(--hh-air-white) !important;
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-radio[data-checked] {
+    background: radial-gradient(circle, var(--hh-air-blue-deep) 0 6px, var(--hh-air-white) 7px) !important;
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-select-row .octane-select-trigger {
+    flex: 0 1 46%;
+    box-sizing: border-box;
+    width: auto;
+    min-width: 120px;
+    height: 40px;
+    min-height: 40px;
+    padding: 0 var(--hh-space-2);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font: 400 var(--hh-size-l) / 38px var(--hh-font);
+}
+
+/* ---------------------------------------------------------------- texts */
+
+:root[data-handheld] .octane-handheld-settings :is(.air-settings-chat__info, .air-settings-audio__heading, .air-settings-privacy__content p) {
+    width: auto;
+    margin: 0;
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font: 400 var(--hh-size-m) / 18px var(--hh-font);
+    text-align: left;
+}
+
+:root[data-handheld] .octane-handheld-settings :is(.air-settings-privacy__content legend, .air-settings-other__account-title) {
+    margin: var(--hh-space-2) 0 0;
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-blue-header);
+    font: 700 var(--hh-size-m) / 18px var(--hh-font-bold);
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-privacy__content fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+/* ---------------------------------------------------------------- sound */
+
+/* One card per volume: its name, then mute, the slider and full volume in a row. */
+:root[data-handheld] .octane-handheld-settings .air-settings-volume-row {
+    display: grid;
+    box-sizing: border-box;
+    grid-template-columns: var(--hh-touch) minmax(0, 1fr) var(--hh-touch);
+    align-items: center;
+    gap: 0 var(--hh-space-2);
+    padding: var(--hh-space-2) var(--hh-space-2) var(--hh-space-1);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-volume-row__label {
+    grid-column: 1 / -1;
+    height: auto;
+    min-width: 0;
+    margin: 0;
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-text);
+    font: 700 var(--hh-size-m) / 18px var(--hh-font-bold);
+    white-space: normal;
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-volume-row__speaker {
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    margin: 0;
+    border-radius: var(--hh-radius-s);
+    background-position: center;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-volume-row__speaker:active {
+    background-color: var(--hh-air-box);
+}
+
+/* The white speakers are for AIR's dark panel; on the light card the coloured ones are drawn. */
+:root[data-handheld] .octane-handheld-settings .air-settings-volume-row__speaker--off {
+    background-image: url('../../assets/images/user-settings/air/sounds-off-color.png');
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-volume-row__speaker--on {
+    background-image: url('../../assets/images/user-settings/air/sounds-on-color.png');
+}
+
+/* The slider is ours here: a bar and a round knob a thumb can hold, not AIR's 12 px sprite. */
+:root[data-handheld] .octane-handheld-settings .air-settings-volume-row__slider {
+    position: relative;
+    width: auto;
+    height: var(--hh-touch);
+    margin: 0 16px;
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-volume-row__slider::before {
+    content: none;
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-volume-row__control {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-volume-row__control-area {
+    touch-action: none;
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-volume-row__track {
+    /* Base UI keeps the track in the flow (position: relative), so it is sized, not inset. */
+    inset: 18px auto auto;
+    height: 8px;
+    margin: 0 -16px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-box);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-volume-row__thumb {
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--hh-air-white);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-blue);
+    box-shadow: var(--hh-shadow-card);
+}
+
+/* ---------------------------------------------------------------- word filter */
+
+:root[data-handheld] .octane-handheld-settings .air-settings-wordfilter__add {
+    display: flex;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-wordfilter__add input {
+    flex: 1 1 auto;
+    box-sizing: border-box;
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font: 400 var(--hh-size-field) / 22px var(--hh-font);
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-wordfilter__add .air-settings-button {
+    flex: none;
+    justify-content: center;
+    width: auto;
+    min-width: 72px;
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-4);
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-wordfilter__error {
+    margin: 0;
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-red-deep);
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-wordfilter__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    background: none;
+    list-style: none;
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-wordfilter__list li {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-1) 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-wordfilter__empty {
+    color: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-handheld-settings .air-settings-wordfilter__remove {
+    flex: none;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    border-radius: var(--hh-radius-pill);
+    color: var(--hh-air-red-deep);
+    font: 700 22px / var(--hh-touch) var(--hh-font-bold);
+}

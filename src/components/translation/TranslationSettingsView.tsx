@@ -1,14 +1,14 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
-import { useTranslation } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
 import { Checkbox } from '../../common/Checkbox';
 import { Select } from '../../common/Select';
-import { BaseButton } from '../../common/BaseButton';
+import { useTranslation } from '../../hooks';
 import '../../css/translation/TranslationSettings.css';
-import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { localizeWithFallback } from '../../api';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
+import { HANDHELD_PAN_ONLY_SCALE } from '../../api/handheld/handheldWindowFit';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export const TranslationSettingsView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -63,7 +63,8 @@ export const TranslationSettingsView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+            <OctaneCardView
+                handheldScale={HANDHELD_PAN_ONLY_SCALE}
                 className="translation-settings-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                 theme="primary-slim"
                 uniqueKey="translation-settings"
@@ -75,7 +76,10 @@ export const TranslationSettingsView: FC<{}> = () => {
                         <Text>{localizeWithFallback('octane.translation.enable_automatic_translation', 'Enable automatic translation')}</Text>
                     </div>
                     <div className="rounded border border-black/10 bg-black/5 p-2 text-[11px] leading-4">
-                        {localizeWithFallback('octane.translation.when_enabled_chat_bubbles_always_show', 'When enabled, chat bubbles always show two lines:')} <strong>{localizeWithFallback('octane.translation.original', 'original:')}</strong> {localizeWithFallback('octane.translation.and', 'and')} <strong>{localizeWithFallback('octane.translation.translate', 'translate:')}</strong>.
+                        {localizeWithFallback('octane.translation.when_enabled_chat_bubbles_always_show', 'When enabled, chat bubbles always show two lines:')}{' '}
+                        <strong>{localizeWithFallback('octane.translation.original', 'original:')}</strong>{' '}
+                        {localizeWithFallback('octane.translation.and', 'and')}{' '}
+                        <strong>{localizeWithFallback('octane.translation.translate', 'translate:')}</strong>.
                     </div>
                     <div className="flex flex-col gap-2">
                         <Text bold>{localizeWithFallback('octane.translation.interface_texts', 'Interface texts')}</Text>
@@ -101,7 +105,14 @@ export const TranslationSettingsView: FC<{}> = () => {
                     <div className="flex flex-col gap-2">
                         <Text bold>{localizeWithFallback('octane.translation.incoming_messages', 'Incoming messages')}</Text>
                         <div className="flex flex-col gap-1">
-                            <Text>{localizeWithFallback('octane.translation.detected_language', 'Detected language (auto): %language%', ['language'], [getLanguageName(lastIncomingLanguage)])}</Text>
+                            <Text>
+                                {localizeWithFallback(
+                                    'octane.translation.detected_language',
+                                    'Detected language (auto): %language%',
+                                    ['language'],
+                                    [getLanguageName(lastIncomingLanguage)]
+                                )}
+                            </Text>
                             <label className="flex flex-col gap-1 text-[12px]">
                                 <span>{localizeWithFallback('octane.translation.translate_into', 'Translate into')}</span>
                                 <Select
@@ -122,7 +133,14 @@ export const TranslationSettingsView: FC<{}> = () => {
                     <div className="flex flex-col gap-2">
                         <Text bold>{localizeWithFallback('octane.translation.outgoing_messages', 'Outgoing messages')}</Text>
                         <div className="flex flex-col gap-1">
-                            <Text>{localizeWithFallback('octane.translation.detected_writing_language', 'Detected writing language (auto): %language%', ['language'], [getLanguageName(lastOutgoingLanguage)])}</Text>
+                            <Text>
+                                {localizeWithFallback(
+                                    'octane.translation.detected_writing_language',
+                                    'Detected writing language (auto): %language%',
+                                    ['language'],
+                                    [getLanguageName(lastOutgoingLanguage)]
+                                )}
+                            </Text>
                             <label className="flex flex-col gap-1 text-[12px]">
                                 <span>{localizeWithFallback('octane.translation.send_text_as', 'Send text as')}</span>
                                 <Select
@@ -141,12 +159,12 @@ export const TranslationSettingsView: FC<{}> = () => {
                         </div>
                     </div>
                     <div className="flex items-center justify-between text-[11px] text-black/60">
-                        <span>{languagesLoading ? localizeWithFallback('octane.translation.loading_languages', 'Loading languages...') : `${supportedLanguages.length} languages available`}</span>
-                        <BaseButton
-                            className="translation-settings-window__refresh"
-                            type="button"
-                            onClick={() => ensureSupportedLanguagesLoaded(true)}
-                        >
+                        <span>
+                            {languagesLoading
+                                ? localizeWithFallback('octane.translation.loading_languages', 'Loading languages...')
+                                : `${supportedLanguages.length} languages available`}
+                        </span>
+                        <BaseButton className="translation-settings-window__refresh" type="button" onClick={() => ensureSupportedLanguagesLoaded(true)}>
                             Refresh
                         </BaseButton>
                     </div>

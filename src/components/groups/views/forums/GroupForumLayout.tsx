@@ -6,6 +6,7 @@ import { DraggableWindowPosition, LayoutBadgeImageView, OctaneCardHeaderView, Oc
 import { flatText, GroupText, GroupWindowTitle } from '../GroupNativeLayout';
 import { BaseButton } from '../../../../common/BaseButton';
 import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
+import { FORUM_QUOTE_LINE } from './forumMessageLook';
 
 export const FORUM_PAGE_SIZE = 20;
 
@@ -19,8 +20,7 @@ export const FORUM_HEADER = 0x0e3f52;
 /** GroupForumView.getAsDaysHoursMinutes: FriendlyTime with the ".ago" texts and a threshold of 1, so a unit rolls over as soon as the next bigger one is exceeded ("90 seconds" is "2 minutes ago"). */
 export const forumAge = (seconds: number): string => FriendlyTime.format(seconds, '.ago', 1);
 
-// MessageListView: a line that starts with ">" (and the one space after it) is quoted text.
-const QUOTE_LINE = /^>(?: ?|$)/;
+const QUOTE_LINE = FORUM_QUOTE_LINE;
 
 /**
  * ComposeMessageView.addQuote, without the text that is already in the field: "<age> <author> wrote:", then every line of the message behind "> ",

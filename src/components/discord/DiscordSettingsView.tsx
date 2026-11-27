@@ -1,19 +1,14 @@
-import {
-    AddLinkEventTracker,
-    GetSessionDataManager,
-    ILinkEventTracker,
-    RemoveLinkEventTracker,
-} from '@octane/renderer';
+import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaDiscord } from 'react-icons/fa';
 import { GetConfigurationValue, LocalizeText, OpenUrl } from '../../api';
 import { LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
-import { DiscordPreferences, useDiscordSettings } from '../../hooks';
-import { Checkbox } from '../../common/Checkbox';
 import { BaseButton } from '../../common/BaseButton';
+import { Checkbox } from '../../common/Checkbox';
+import { DiscordPreferences, useDiscordSettings } from '../../hooks';
 import '../../css/discord/DiscordSettingsAirText.css';
+import { HANDHELD_PAN_ONLY_SCALE } from '../../api/handheld/handheldWindowFit';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 const localizeWithFallback = (key: string, fallback: string) => {
     const text = LocalizeText(key);
@@ -36,14 +31,15 @@ const CheckboxRow: FC<CheckboxRowProps> = ({ label, description, checked, disabl
                 (disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-[#5865F2]')
             }
         >
-            <Checkbox className="mt-1 h-4 w-4 shrink-0 accent-[#5865F2]" checked={checked} disabled={disabled} onCheckedChange={(nextChecked) => onChange(nextChecked)} />
+            <Checkbox
+                className="mt-1 h-4 w-4 shrink-0 accent-[#5865F2]"
+                checked={checked}
+                disabled={disabled}
+                onCheckedChange={(nextChecked) => onChange(nextChecked)}
+            />
             <div className="flex flex-col leading-tight">
                 <Text bold>{label}</Text>
-                {description && (
-                    <Text className="text-[11px] text-[#666666]">
-                        {description}
-                    </Text>
-                )}
+                {description && <Text className="text-[11px] text-[#666666]">{description}</Text>}
             </div>
         </label>
     </NativeTextTree>
@@ -166,7 +162,7 @@ export const DiscordSettingsView: FC = () => {
                         return;
                 }
             },
-            eventUrlPrefix: 'discord-settings/',
+            eventUrlPrefix: 'discord-settings/'
         };
 
         AddLinkEventTracker(linkTracker);
@@ -176,8 +172,7 @@ export const DiscordSettingsView: FC = () => {
 
     if (!isVisible) return null;
 
-    const setPref = (key: keyof DiscordPreferences) => (checked: boolean) =>
-        updatePreferences({ [key]: checked });
+    const setPref = (key: keyof DiscordPreferences) => (checked: boolean) => updatePreferences({ [key]: checked });
 
     // Cascade enable rules mirror the Flash DiscordSettingsView.updateUI():
     // the sub-options only make sense while the master toggle (and, for the
@@ -187,7 +182,12 @@ export const DiscordSettingsView: FC = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="discord-settings-window w-[390px]" theme="primary-slim" uniqueKey="discord-settings">
+            <OctaneCardView
+                handheldScale={HANDHELD_PAN_ONLY_SCALE}
+                className="discord-settings-window w-[390px]"
+                theme="primary-slim"
+                uniqueKey="discord-settings"
+            >
                 <OctaneCardHeaderView
                     headerText={localizeWithFallback('discord.settings.title', 'Impostazioni Discord')}
                     onCloseClick={() => setIsVisible(false)}
@@ -212,39 +212,27 @@ export const DiscordSettingsView: FC = () => {
 
                     <CheckboxRow
                         label={localizeWithFallback('discord.settings.show_habbo', 'Mostra Habbo su Discord')}
-                        description={localizeWithFallback(
-                            'discord.settings.show_habbo.desc',
-                            'Visualizza che stai giocando ad Habbo sul tuo profilo Discord',
-                        )}
+                        description={localizeWithFallback('discord.settings.show_habbo.desc', 'Visualizza che stai giocando ad Habbo sul tuo profilo Discord')}
                         checked={preferences.showHabbo}
                         onChange={setPref('showHabbo')}
                     />
                     <CheckboxRow
                         label={localizeWithFallback('discord.settings.share_activity', 'Condividi attività')}
-                        description={localizeWithFallback(
-                            'discord.settings.share_activity.desc',
-                            'Mostra in quale stanza ti trovi e cosa stai facendo',
-                        )}
+                        description={localizeWithFallback('discord.settings.share_activity.desc', 'Mostra in quale stanza ti trovi e cosa stai facendo')}
                         checked={preferences.shareActivity}
                         disabled={activityDisabled}
                         onChange={setPref('shareActivity')}
                     />
                     <CheckboxRow
                         label={localizeWithFallback('discord.settings.hide_hidden', 'Nascondi stanze nascoste')}
-                        description={localizeWithFallback(
-                            'discord.settings.hide_hidden.desc',
-                            'Non rivelare i dettagli quando sei in una stanza nascosta',
-                        )}
+                        description={localizeWithFallback('discord.settings.hide_hidden.desc', 'Non rivelare i dettagli quando sei in una stanza nascosta')}
                         checked={preferences.hideInHiddenRooms}
                         disabled={subOptionDisabled}
                         onChange={setPref('hideInHiddenRooms')}
                     />
                     <CheckboxRow
                         label={localizeWithFallback('discord.settings.allow_joining', 'Consenti di unirsi')}
-                        description={localizeWithFallback(
-                            'discord.settings.allow_joining.desc',
-                            'Aggiungi un pulsante "Visita stanza" alla tua presence',
-                        )}
+                        description={localizeWithFallback('discord.settings.allow_joining.desc', 'Aggiungi un pulsante "Visita stanza" alla tua presence')}
                         checked={preferences.allowJoining}
                         disabled={subOptionDisabled}
                         onChange={setPref('allowJoining')}
@@ -258,14 +246,8 @@ export const DiscordSettingsView: FC = () => {
                             label={localizeWithFallback('discord.settings.server.collectibles', 'Collectibles')}
                             configKey="collectibles.discord.link"
                         />
-                        <ServerLink
-                            label={localizeWithFallback('discord.settings.server.wired', 'Wired')}
-                            configKey="wired.discord.link"
-                        />
-                        <ServerLink
-                            label={localizeWithFallback('discord.settings.server.origins', 'Origins')}
-                            configKey="origins.discord.link"
-                        />
+                        <ServerLink label={localizeWithFallback('discord.settings.server.wired', 'Wired')} configKey="wired.discord.link" />
+                        <ServerLink label={localizeWithFallback('discord.settings.server.origins', 'Origins')} configKey="origins.discord.link" />
                     </div>
                 </OctaneCardContentView>
             </OctaneCardView>

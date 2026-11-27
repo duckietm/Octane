@@ -5,6 +5,8 @@ import { LayoutBadgeImageView } from '../../../../common';
 import { flatText, GroupText } from '../GroupNativeLayout';
 import { FORUM_HEADER, ForumButton, ForumFrame } from './GroupForumLayout';
 import { BaseButton } from '../../../../common/BaseButton';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldGroupForumSettingsView } from './HandheldGroupForumSettingsView';
 
 // Permission levels: 0 everybody, 1 group members, 2 group administrators, 3 the owner.
 const OPTION_KEYS = [
@@ -76,6 +78,24 @@ export const GroupForumSettingsView: FC<GroupForumSettingsViewProps> = ({ forumD
         SendMessageComposer(new UpdateForumSettingsMessageComposer(groupId, levels[0], levels[1], levels[2], levels[3]));
         onClose();
     };
+    const pick = (sectionIndex: number, level: number) => setLevels((previous) => normalizeForumPermissions(previous.map((value, index) => (index === sectionIndex ? level : value))));
+    const isHandheld = useIsHandheld();
+
+    // Phone layout: the same four choices, their rules and OK as a page of the phone sheet (HandheldGroupForumView).
+    if (isHandheld)
+        return (
+            <HandheldGroupForumSettingsView
+                levels={levels}
+                minimums={minimums}
+                sections={SECTIONS.map((section) => ({
+                    label: LocalizeText(section.labelKey),
+                    options: section.levels.map((level) => ({ level, label: LocalizeText(OPTION_KEYS[level]) }))
+                }))}
+                onCancel={onClose}
+                onPick={pick}
+                onSave={save}
+            />
+        );
 
     return (
         <ForumFrame
@@ -114,7 +134,7 @@ export const GroupForumSettingsView: FC<GroupForumSettingsViewProps> = ({ forumD
                                     role="radio"
                                     style={{ left: 20, top: 23 + row * 20 }}
                                     type="button"
-                                    onClick={() => setLevels((previous) => normalizeForumPermissions(previous.map((value, index) => (index === sectionIndex ? level : value))))}
+                                    onClick={() => pick(sectionIndex, level)}
                                 />
                                 <GroupText text={LocalizeText(OPTION_KEYS[level])} x={40} y={20 + row * 20} />
                             </div>

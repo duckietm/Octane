@@ -150,6 +150,10 @@ import './css/handheld/HandheldNavigator.css';
 import './css/handheld/HandheldSocial.css';
 import './css/handheld/HandheldProfile.css';
 import './css/handheld/HandheldRewardTrack.css';
+import './css/handheld/HandheldSettings.css';
+import './css/handheld/HandheldBadgeCreator.css';
+import './css/handheld/HandheldTalent.css';
+import './css/handheld/HandheldForum.css';
 import './css/handheld/HandheldProgress.css';
 import './css/handheld/HandheldFrames.css';
 import './css/handheld/HandheldRoomHud.css';
@@ -169,20 +173,20 @@ export const mountApp = (): void => {
     startHandheldWatcher();
 
     createRoot(document.getElementById('root')).render(
-    <StrictMode>
-        <QueryClientProvider client={queryClient}>
-            <ErrorBoundary
-                fallbackRender={({ error }) => (
-                    <LoadingView
-                        isError={true}
-                        message={`Something went wrong.\n${(error as Error)?.message ?? 'Unknown error'}`}
-                        homeUrl={window.location.origin + '/'}
-                    />
-                )}
-            >
-                <App />
-            </ErrorBoundary>
-        </QueryClientProvider>
-    </StrictMode>
-);
+        <StrictMode>
+            <QueryClientProvider client={queryClient}>
+                <ErrorBoundary
+                    fallbackRender={({ error }) => (
+                        <LoadingView
+                            isError={true}
+                            message={`Something went wrong.\n${(error as Error)?.message ?? 'Unknown error'}`}
+                            homeUrl={window.location.origin + '/'}
+                        />
+                    )}
+                >
+                    <App />
+                </ErrorBoundary>
+            </QueryClientProvider>
+        </StrictMode>
+    );
 };

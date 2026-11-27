@@ -1,5 +1,4 @@
 import { GetSessionDataManager } from '@octane/renderer';
-import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 import { FC, useState } from 'react';
 import {
     GetConfigurationValue,
@@ -22,6 +21,7 @@ import {
     TALENT_STATE_LOCKED,
     TALENT_TRACK_CITIZENSHIP
 } from '../../api';
+import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 import checkmarkIcon from '../../assets/images/reward-track/checkmark.png';
 import lockedRewardIcon from '../../assets/images/reward-track/locked-reward.png';
 import taskListIcon from '../../assets/images/reward-track/task-list.png';
@@ -32,8 +32,10 @@ import vipReward from '../../assets/images/talent/talent_vip_reward.png';
 import { AirModalDialog, LayoutAvatarImageView, LayoutBadgeImageView } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
 import { RewardTrackMiniBar } from '../quests/RewardTrackMiniBar';
 import { RewardTrackScrollList } from '../quests/RewardTrackScrollList';
+import { HandheldTalentTrackView } from './HandheldTalentTrackView';
 import { TalentImageView } from './TalentImageView';
 
 export const getTalentTaskTitle = (badgeCode: string): string => LocalizeBadgeName(badgeCode).toUpperCase();
@@ -171,7 +173,11 @@ const TalentRewardView: FC<{ trackName: string; level: ITalentLevel }> = ({ trac
 };
 
 /** The selected level in the detail panel: title, description, illustration, rewards and the task list. */
-const TalentLevelDetailView: FC<{ trackName: string; level: ITalentLevel; onSelectTask: (task: ITalentTask) => void }> = ({ trackName, level, onSelectTask }) => {
+const TalentLevelDetailView: FC<{ trackName: string; level: ITalentLevel; onSelectTask: (task: ITalentTask) => void }> = ({
+    trackName,
+    level,
+    onSelectTask
+}) => {
     const library = GetConfigurationValue<string>('image.library.url', '');
     const tasks = getTalentLevelTasks(level);
 
@@ -217,8 +223,14 @@ const TalentBeginDetailView: FC<{ trackName: string; citizenshipEnabled: boolean
                 </div>
                 <div className="octane-talent-begin__foot is-citizenship">
                     <img alt="" className="octane-talent-begin__emblem" draggable={false} src={citizenshipAccomplished} />
-                    <span className="octane-talent-begin__label">{localizeWithFallback(`talent.track.${trackName}.begin.citizenship`, 'BECOME A CITIZEN')}</span>
-                    <BaseButton className="octane-talent-button octane-talent-begin__button" type="button" onClick={() => onOpenTrack(TALENT_TRACK_CITIZENSHIP)}>
+                    <span className="octane-talent-begin__label">
+                        {localizeWithFallback(`talent.track.${trackName}.begin.citizenship`, 'BECOME A CITIZEN')}
+                    </span>
+                    <BaseButton
+                        className="octane-talent-button octane-talent-begin__button"
+                        type="button"
+                        onClick={() => onOpenTrack(TALENT_TRACK_CITIZENSHIP)}
+                    >
                         {localizeWithFallback('talent.track.citizenship.button', 'View the citizenship track')}
                     </BaseButton>
                 </div>
@@ -292,6 +304,10 @@ export const TalentTrackView: FC<TalentTrackViewProps> = ({ track, onClose, onSe
             : localizeWithFallback(`talent.track.${name}.begin.title`, '');
     const current = track.levels[currentLevel];
     const position = localizeWithFallback('talent.track.common.progress.position', 'You are here');
+    const isHandheld = useIsHandheld();
+
+    // Phone layout: the 800 x 580 frame cannot be read on a phone, so the track has a layout of its own there.
+    if (isHandheld) return <HandheldTalentTrackView track={track} onClose={onClose} onOpenTrack={onOpenTrack} onSelectTask={onSelectTask} />;
 
     return (
         <NativeTextTree>
@@ -319,7 +335,10 @@ export const TalentTrackView: FC<TalentTrackViewProps> = ({ track, onClose, onSe
                         </div>
                         <div className="octane-talent-progress">
                             <span className="octane-talent-progress__title">
-                                {localizeWithFallback(`talent.track.${name}.progress.title`, localizeWithFallback('talent.track.common.progress.title', 'YOUR PROGRESS'))}
+                                {localizeWithFallback(
+                                    `talent.track.${name}.progress.title`,
+                                    localizeWithFallback('talent.track.common.progress.title', 'YOUR PROGRESS')
+                                )}
                             </span>
                             <span className="octane-talent-progress__bar" data-testid="talent-progress-bar">
                                 <RewardTrackMiniBar ratio={progress} snapKey={name} width={PROGRESS_BAR_WIDTH} />
@@ -348,7 +367,12 @@ export const TalentTrackView: FC<TalentTrackViewProps> = ({ track, onClose, onSe
                         <div className="octane-talent-levels">
                             <img alt="" className="octane-talent-levels__icon" draggable={false} src={taskListIcon} />
                             <span className="octane-talent-levels__title">{localizeWithFallback('talent.track.common.levels.title', 'Levels')}</span>
-                            <RewardTrackScrollList key={name} className="octane-talent-level-list" contentClassName="octane-talent-level-list__content" height={LEVEL_LIST_HEIGHT}>
+                            <RewardTrackScrollList
+                                key={name}
+                                className="octane-talent-level-list"
+                                contentClassName="octane-talent-level-list__content"
+                                height={LEVEL_LIST_HEIGHT}
+                            >
                                 <TalentLevelRowView
                                     count=""
                                     name={beginTitle}

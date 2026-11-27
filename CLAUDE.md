@@ -569,6 +569,34 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
   speech forms are pages of the same shell. Add an action to the desktop menu or infostand and the drawer has it.
   The staff build tools are a page of their own (`infostand/HandheldBuildToolsView.tsx`): while they are on, the furni's drawer
   is replaced by a low panel of nothing but tile steps, turning and height (a corner card in landscape), so the furni stays in view.
+- Phone windows of the Me menu (the head on the dock; its popup is `ToolbarMeView` inside `HandheldToolbarView`). In the phone
+  frame (`HandheldSheetFrame`): settings (`UserSettingsView`: its `AirSettingsFrame` is a sheet on phones, the menu a list of rows,
+  every section a page with a way back; the rows are the desktop's `air-settings-*` ones, restyled by `HandheldSettings.css`, the
+  volume slider a bar with a round knob), the badge creator (`BadgeCreatorView`: the same editor stacked, canvas as wide as the
+  screen, a finger draws through the canvas' touch handlers, `HandheldBadgeCreator.css`) and the talent track
+  (`components/talent/HandheldTalentTrackView.tsx`, which `TalentTrackView` hands the track to: levels as a list, a level's rewards
+  and tasks as a page upright or beside the list on its side, `HandheldTalent.css`). Reflowed sheets in their AIR card: quests and
+  daily tasks (`HandheldProgress.css`). Fixed AIR frames drawn smaller or bigger as a whole (`HandheldFrames.css`): achievements,
+  the guide tool (282 px wide there, never below its real size and up to 1.35x, its chat a fixed height), collectibles, the group
+  forums and the talent level-up card; a frame whose own stylesheet squeezes it to the viewport gets `max-width: none` there, or
+  its right edge is cut off instead of the frame being scaled. Octane's own flow windows (account, translation, Discord settings)
+  stay at their real size with 16 px fields and finger-sized buttons (`HandheldWindows.css`). The shared `Button` sets padding,
+  text size and min-height with important utilities, so a phone rule sizes it with `height`. A field inside a scaled window is
+  `calc(16px / var(--octane-handheld-scale, 1))`. The header of the layout `OctaneCard` carries `.octane-card-close-hit` like the
+  common card header. `navigator/search/<tab>[/<text>]` opens that tab (`parseNavigatorSearchLink`).
+- Phone forums (`groupforum/toggle` from the Me menu, `groupforum/<group>` from group info), same look and frame
+  (`src/css/handheld/HandheldForum.css`). `GroupForumView` keeps every state, packet, link and right and, on a phone, hands its
+  five views to `groups/views/forums/HandheldGroupForumView.tsx` as the pages of one sheet instead of three windows: the lists
+  are the tabs (the desktop's quick links, unread forums counted on "mine"), a strip names the list or the open forum (badge to
+  the group, Settings for who may change them). Each desktop view (`GroupForumListView`, `...ThreadListView`, `...ThreadView`,
+  `...ComposeView`, `...SettingsView`) branches on `useIsHandheld()` after its hooks and hands its data and handlers to its
+  `HandheldGroupForum*View` twin, so a rule or packet changed there changes both. Upright one page at a time
+  (`handheldForumPanes`: settings over composer over thread over threads; a covered page stays mounted and hidden), on its side
+  two: threads | thread, or thread | composer / settings. Cards scroll with the pages under the last one (none for a single
+  page), the actions sit in a bar at the bottom; a thread row's lock / pin / hide / report open from its "..." button, a
+  message's quote / hide / report are named chips. `forumMessageLook` decides the look and the hide action as on the desktop;
+  `forumMessageBlocks` sets quoted (">") lines apart, and typed text is a `<pre>` so it stays browser text. The forum rules
+  in `HandheldFrames.css` (scaled desktop frame) are kept but no forum window reaches them on a phone any more.
 - Renderer-SDK mock for Vitest: `src/octane-renderer.mock.ts`
   (aliased over `@octane/renderer` via `vitest.config.mts`).
   Hosts the explicit `OctaneLogger` mock, the `mockEventDispatcher` /

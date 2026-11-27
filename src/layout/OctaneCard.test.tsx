@@ -69,3 +69,25 @@ describe('cards keep the window props off the DOM', () => {
         errors.mockRestore();
     });
 });
+
+// The 19 px close button of a card header is too small for a finger: it carries a larger target that only the phone layout shows.
+describe('card header close button', () => {
+    it('holds the finger-sized target of the phone layout', () => {
+        const onClose = vi.fn();
+
+        render(
+            <OctaneCard uniqueKey="close-card">
+                <OctaneCard.Header headerText="Title" onCloseClick={onClose} />
+            </OctaneCard>
+        );
+
+        const close = document.querySelector('.octane-card-close-button');
+        const hit = close?.querySelector('.octane-card-close-hit');
+
+        expect(hit).toBeTruthy();
+        expect(hit?.getAttribute('aria-hidden')).toBe('true');
+
+        (hit as HTMLElement).click();
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+});

@@ -55,6 +55,8 @@
 
 :root[data-handheld] .octane-quest-block-actions button,
 :root[data-handheld] .octane-quest-accept {
+    /* The shared Button sets its own min-height with an important utility; its height is ours. */
+    height: 40px;
     min-height: 40px;
 }
 
@@ -65,11 +67,14 @@
     padding: 0 4px;
 }
 
+/* The footer keeps its height (a wrapped text and the button under it), the list above it gives way. */
 :root[data-handheld] .octane-quests-hc-info {
+    flex: none;
     flex-wrap: wrap;
 }
 
 :root[data-handheld] .octane-quests-get-hc {
+    height: 40px;
     min-height: 40px;
 }
 
@@ -83,6 +88,7 @@
 }
 
 :root[data-handheld] .octane-quest-details-content button {
+    height: 40px;
     min-height: 40px;
 }
 
@@ -116,7 +122,12 @@
 
 :root[data-handheld] .octane-daily-task-claim,
 :root[data-handheld] .octane-daily-tasks-extra button {
+    height: 40px;
     min-height: 40px;
+}
+
+:root[data-handheld] .octane-daily-tasks-extra {
+    flex: none;
 }
 
 :root[data-handheld='portrait'] .octane-daily-task-claim {

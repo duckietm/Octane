@@ -131,3 +131,62 @@
 :root[data-handheld] .octane-room-settings :is(.octane-button, button.btn) {
     min-height: 36px;
 }
+
+/* ---------------------------------------------------------------- account, translation and Discord settings */
+
+/* Octane's own small windows (no pixel layout): they already follow the phone's width. Their fields are 16 px so mobile
+   Safari does not zoom into them, and their buttons, eye toggles and drop-downs are finger-sized. The account window sets
+   its text size with an important rule in the base layer (UserSettingsView.css), hence the same for its fields here. */
+@layer base {
+    :root[data-handheld] .user-account-settings__content input {
+        font-size: 16px !important;
+    }
+}
+
+:root[data-handheld] .user-account-settings__content input {
+    height: 44px;
+}
+
+/* The way back to the account menu. */
+:root[data-handheld] .user-account-settings__content button.rounded-full {
+    flex: none;
+    width: 40px;
+    height: 40px;
+}
+
+/* Show / hide password: the eye keeps its place at the field's end and takes the field's whole height. */
+:root[data-handheld] .user-account-settings__content .relative > button.absolute {
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+}
+
+:root[data-handheld] .user-account-settings__content :is(.habbo-btn-primary, .habbo-btn-secondary) {
+    height: 40px;
+}
+
+:root[data-handheld] .translation-settings-window .octane-select-trigger {
+    min-height: 40px;
+}
+
+:root[data-handheld] .translation-settings-window .translation-settings-window__refresh {
+    min-width: 80px;
+    height: 40px;
+}
+
+:root[data-handheld] .translation-settings-window .octane-checkbox {
+    position: relative;
+}
+
+:root[data-handheld] .translation-settings-window .octane-checkbox::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+}
+
+:root[data-handheld] .discord-settings-window .discord-settings-server-link {
+    min-height: 40px;
+}

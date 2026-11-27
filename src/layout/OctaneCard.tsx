@@ -1,9 +1,9 @@
-import { DetailedHTMLProps, HTMLAttributes, MouseEvent, PropsWithChildren, Ref, useRef, useImperativeHandle } from 'react';
+import { DetailedHTMLProps, HTMLAttributes, MouseEvent, PropsWithChildren, Ref, useImperativeHandle, useRef } from 'react';
 import { DraggableWindow, DraggableWindowPosition, DraggableWindowProps } from '../common';
+import { BaseButton } from '../common/BaseButton';
 import { CardResizeHandle } from '../common/card/CardResizeHandle';
 import { classNames } from './classNames';
 import { OctaneItemCountBadge } from './OctaneItemCountBadge';
-import { BaseButton } from '../common/BaseButton';
 
 type OctaneCardRootProps = PropsWithChildren<
     {
@@ -98,7 +98,10 @@ const OctaneCardHeader = ({ ref, headerText = '', onCloseClick = null, className
                     className="octane-card-close-button absolute flex items-center justify-center cursor-pointer"
                     onClick={onCloseClick}
                     onMouseDownCapture={onMouseDown}
-                />
+                >
+                    {/* A larger, invisible finger target; only the phone layout shows it. */}
+                    <span aria-hidden="true" className="octane-card-close-hit" />
+                </BaseButton>
             </div>
         </div>
     );

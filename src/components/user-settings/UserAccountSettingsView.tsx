@@ -5,7 +5,7 @@ import { ClearRememberLogin, clearAccessToken, GetConfigurationValue, getAccessT
 import { Button, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
+import { HANDHELD_PAN_ONLY_SCALE } from '../../api/handheld/handheldWindowFit';
 
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_PASSWORD_LENGTH = 128;
@@ -404,7 +404,7 @@ export const UserAccountSettingsView: FC<{}> = () =>
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="user-account-settings-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" theme="primary-slim" uniqueKey="user-account-settings">
+            <OctaneCardView handheldScale={HANDHELD_PAN_ONLY_SCALE} className="user-account-settings-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" theme="primary-slim" uniqueKey="user-account-settings">
                 <OctaneCardHeaderView headerText={ localizeWithFallback('usersettings.title', "User Settings") } onCloseClick={ close } />
 
                 <div className="user-account-settings__hero relative flex items-center gap-3 px-3 py-2 bg-[linear-gradient(180deg,#5ba4c4_0%,#418db0_100%)] text-white">

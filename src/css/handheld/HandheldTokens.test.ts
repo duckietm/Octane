@@ -19,11 +19,27 @@ const SHEETS = [
     'HandheldLooks.css',
     'HandheldProfile.css',
     'HandheldRewardTrack.css',
+    'HandheldSettings.css',
+    'HandheldBadgeCreator.css',
+    'HandheldTalent.css',
+    'HandheldForum.css',
     'HandheldDrawer.css'
 ];
 
 /** The sheets written wholly for the phone: every rule of theirs is scoped to it. */
-const PHONE_ONLY = ['HandheldSheet.css', 'HandheldCatalog.css', 'HandheldInventory.css', 'HandheldLooks.css', 'HandheldProfile.css', 'HandheldRewardTrack.css', 'HandheldDrawer.css'];
+const PHONE_ONLY = [
+    'HandheldSheet.css',
+    'HandheldCatalog.css',
+    'HandheldInventory.css',
+    'HandheldLooks.css',
+    'HandheldProfile.css',
+    'HandheldRewardTrack.css',
+    'HandheldSettings.css',
+    'HandheldBadgeCreator.css',
+    'HandheldTalent.css',
+    'HandheldForum.css',
+    'HandheldDrawer.css'
+];
 
 /** Custom properties a sheet sets itself, on one of its own elements. */
 const LOCAL = new Set(['--hh-level', '--hh-fill']);
@@ -83,10 +99,16 @@ describe('Octane handheld design tokens', () => {
         // Every token a sheet asks for exists...
         expect([...new Set(used)].filter((name) => !defined.has(name) && !LOCAL.has(name))).toEqual([]);
         // ...the sheet leans on them for its colours, radii, sizes and timings...
-        expect(used.length).toBeGreaterThan(sheet === 'HandheldSheet.css' ? 40 : 60); // the shared frame is a small sheet
-        for (const family of ['--hh-air-', '--hh-radius-', '--hh-space-', '--hh-size-', '--hh-fast']) expect(used.some((name) => name.startsWith(family)), family).toBe(true);
+        expect(used.length).toBeGreaterThan(['HandheldSheet.css', 'HandheldBadgeCreator.css'].includes(sheet) ? 40 : 60); // the shared frame and the badge creator are small sheets
+        for (const family of ['--hh-air-', '--hh-radius-', '--hh-space-', '--hh-size-', '--hh-fast'])
+            expect(
+                used.some((name) => name.startsWith(family)),
+                family
+            ).toBe(true);
         // ...and keeps no colour of its own in hex (white and black aside).
-        expect([...css.matchAll(/#[0-9a-f]{3,8}\b/gi)].map((match) => match[0].toLowerCase()).filter((hex) => !['#ffffff', '#000000'].includes(hex))).toEqual([]);
+        expect([...css.matchAll(/#[0-9a-f]{3,8}\b/gi)].map((match) => match[0].toLowerCase()).filter((hex) => !['#ffffff', '#000000'].includes(hex))).toEqual(
+            []
+        );
     });
 
     it.each(PHONE_ONLY)('%s only styles the phone layout, and hides no scrollbar', (sheet) => {

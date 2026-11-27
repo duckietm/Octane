@@ -1,0 +1,974 @@
+/*
+ * Phone group forums (the Me menu's Forum entry, and the forum of a group), in the Octane handheld look
+ * (HandheldTokens.css) inside the shared frame (HandheldSheetFrame). HandheldGroupForumView is the sheet: the three
+ * forum lists are its tabs, the forum on screen is named under them, and the list, the threads, a thread, the composer
+ * and the settings are its pages (one at a time upright, two beside each other on its side). Every page is a scrolled
+ * column of cards with its actions in a bar at the bottom. Everything is scoped to :root[data-handheld], which only a
+ * phone-sized touch device gets; the desktop keeps its three AIR windows.
+ */
+
+:root[data-handheld] .octane-handheld-forum .octane-handheld-sheet__body {
+    padding: 0;
+}
+
+:root[data-handheld] .octane-handheld-forum :where(button, textarea) {
+    margin: 0;
+    font-family: inherit;
+}
+
+:root[data-handheld] .octane-handheld-forum [hidden] {
+    display: none;
+}
+
+/* ---------------------------------------------------------------- drawn pictures */
+
+:root[data-handheld] .octane-handheld-forum__icon {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- what the sheet is about */
+
+/* The list on screen or the open forum: picture, name, a line about it, and the settings for who may change them. */
+:root[data-handheld] .octane-handheld-forum__heading {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: 60px;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-bottom: 1px solid var(--hh-air-box);
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-forum__heading-badge {
+    position: relative;
+    display: flex;
+    flex: 0 0 var(--hh-touch);
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-forum__heading-badge.is-picture {
+    cursor: default;
+}
+
+:root[data-handheld] .octane-handheld-forum__heading-badge:is(button):active {
+    background: var(--hh-air-track-active);
+}
+
+:root[data-handheld] .octane-handheld-forum__heading-badge img {
+    max-width: 36px;
+    max-height: 36px;
+}
+
+:root[data-handheld] .octane-handheld-forum__heading-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-forum__heading-title {
+    overflow: hidden;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-forum__heading-description {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+/* A flat phone has little height: the strip is one line, the picture smaller. */
+:root[data-handheld='landscape'] .octane-handheld-forum__heading {
+    min-height: 40px;
+    padding: 2px var(--hh-space-3);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__heading-badge {
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+}
+
+/* A group badge is 39 px: drawn a little smaller, it keeps its corners in the smaller box. */
+:root[data-handheld='landscape'] .octane-handheld-forum__heading-badge > * {
+    flex: none;
+    transform: scale(0.82);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__heading-text {
+    display: flex;
+    align-items: baseline;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__heading-title {
+    flex: none;
+    max-width: 50%;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__heading-description {
+    flex: 1 1 0;
+    min-width: 0;
+    -webkit-line-clamp: 1;
+}
+
+/* ---------------------------------------------------------------- pages */
+
+:root[data-handheld] .octane-handheld-forum__layout {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+:root[data-handheld] .octane-handheld-forum__pane {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* On its side: the thread list is the narrower column, what is read or written beside it the wider one. */
+:root[data-handheld] .octane-handheld-forum__layout[data-columns='2'] > .octane-handheld-forum__pane + .octane-handheld-forum__pane:not([hidden]) {
+    border-left: 1px solid var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-forum__layout[data-columns='2'] > .octane-handheld-forum__pane[data-pane='threads'] {
+    flex: 0 0 40%;
+}
+
+:root[data-handheld] .octane-handheld-forum__layout[data-columns='2'] > .octane-handheld-forum__pane[data-pane='thread'] ~ .octane-handheld-forum__pane {
+    flex: 0 0 46%;
+}
+
+:root[data-handheld] .octane-handheld-forum__page {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+/* What is scrolled: the cards and, under the last one, the pages. A link to one message scrolls it to that message. */
+:root[data-handheld] .octane-handheld-forum__scroll {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    box-sizing: border-box;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+    padding: var(--hh-space-3);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-forum__scroll > * {
+    flex: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__scroll {
+    padding: var(--hh-space-2) var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-forum__caption {
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-forum__title,
+:root[data-handheld] .octane-handheld-forum__subject {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-forum__empty {
+    padding: var(--hh-space-4) var(--hh-space-3);
+    border: 1px dashed var(--hh-air-border);
+    border-radius: var(--hh-radius-m);
+    color: var(--hh-air-text-muted);
+    text-align: center;
+}
+
+/* ---------------------------------------------------------------- forum and thread cards */
+
+:root[data-handheld] .octane-handheld-forum__rows {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--hh-space-2);
+}
+
+/* A flat phone showing one list alone has the width for two cards beside each other. */
+:root[data-handheld='landscape'] .octane-handheld-forum__layout[data-columns='1'] .octane-handheld-forum__rows {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+}
+
+:root[data-handheld] .octane-handheld-forum__row {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+/* Something new in it: a blue edge and a bold name. */
+:root[data-handheld] .octane-handheld-forum__row[data-unread='true'] {
+    border-color: var(--hh-air-track-blue);
+    box-shadow:
+        inset 4px 0 0 var(--hh-air-track-blue),
+        var(--hh-shadow-card);
+}
+
+/* The thread shown beside the list. */
+:root[data-handheld] .octane-handheld-forum__row[data-active='true'] {
+    border-color: var(--hh-air-select);
+    background: var(--hh-air-track-light);
+    box-shadow:
+        0 0 0 2px var(--hh-air-select),
+        var(--hh-shadow-card);
+}
+
+/* Hidden by an administrator: greyed. Removed by staff: a red line around it. */
+:root[data-handheld] .octane-handheld-forum__row[data-state='hidden'] {
+    background: var(--hh-air-box);
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-forum__row[data-state='deleted'] {
+    border-color: var(--hh-air-red);
+    background: var(--hh-air-track-free);
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-forum__row-badge {
+    display: flex;
+    flex: 0 0 56px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    min-height: 64px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-right: 1px solid var(--hh-air-box);
+    background: var(--hh-air-panel);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-forum__row-badge:active,
+:root[data-handheld] .octane-handheld-forum__row-main:active,
+:root[data-handheld] .octane-handheld-forum__row-more:active {
+    background: var(--hh-air-track-active);
+}
+
+:root[data-handheld] .octane-handheld-forum__row-main {
+    display: flex;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 64px;
+    padding: var(--hh-space-2) var(--hh-space-2) var(--hh-space-2) var(--hh-space-3);
+    border: 0;
+    background: none;
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-forum__row-main > .octane-handheld-forum__icon {
+    color: var(--hh-air-border);
+}
+
+:root[data-handheld] .octane-handheld-forum__row-text {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-forum__row-title {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-1);
+    min-width: 0;
+    overflow: hidden;
+    color: var(--hh-air-blue-header);
+    font-size: var(--hh-size-l);
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-forum__row-subject {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-forum__row[data-unread='true'] .octane-handheld-forum__row-title {
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-forum__row-title .octane-handheld-forum__icon {
+    color: var(--hh-air-blue-deep);
+}
+
+:root[data-handheld] .octane-handheld-forum__row-details,
+:root[data-handheld] .octane-handheld-forum__row-notice {
+    overflow: hidden;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-forum__row-notice {
+    color: var(--hh-air-red-deep);
+}
+
+:root[data-handheld] .octane-handheld-forum__row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--hh-space-3);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-forum__row[data-unread='true'] .octane-handheld-forum__count.is-unread {
+    color: var(--hh-air-track-blue);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+/* The row's own actions (lock, pin, hide, report) open from here. */
+:root[data-handheld] .octane-handheld-forum__row-more {
+    display: flex;
+    flex: 0 0 var(--hh-touch);
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    min-height: 64px;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid var(--hh-air-box);
+    background: none;
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-forum__row-more[aria-expanded='true'] {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-forum__row-more .octane-handheld-forum__icon {
+    stroke-width: 2.6px;
+}
+
+/* ---------------------------------------------------------------- named actions */
+
+:root[data-handheld] .octane-handheld-forum__actions {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-2) var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-forum__row > .octane-handheld-forum__actions {
+    flex: 1 0 100%;
+    border-top: 1px solid var(--hh-air-box);
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-forum__chip {
+    position: relative;
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 var(--hh-space-3) 0 10px;
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 20px;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+/* The pill is 36 px; the finger gets 44. */
+:root[data-handheld] .octane-handheld-forum__chip::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+}
+
+:root[data-handheld] .octane-handheld-forum__chip:active {
+    background: var(--hh-air-track-active);
+}
+
+:root[data-handheld] .octane-handheld-forum__chip.is-report {
+    color: var(--hh-air-red-deep);
+}
+
+:root[data-handheld] .octane-handheld-forum__chip:disabled,
+:root[data-handheld] .octane-handheld-forum__button:disabled,
+:root[data-handheld] .octane-handheld-forum__page-button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+/* A text link: the words are small, the finger gets a full row. */
+:root[data-handheld] .octane-handheld-forum__link {
+    display: inline-flex;
+    box-sizing: border-box;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 var(--hh-space-2);
+    border: 0;
+    border-radius: var(--hh-radius-s);
+    background: none;
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    text-decoration: underline;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-forum__link:active {
+    background: var(--hh-air-track-active);
+}
+
+:root[data-handheld] .octane-handheld-forum__hint {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    text-align: center;
+}
+
+/* ---------------------------------------------------------------- pages of a list */
+
+:root[data-handheld] .octane-handheld-forum__pages {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-1);
+    padding: var(--hh-space-1) 0;
+}
+
+:root[data-handheld] .octane-handheld-forum__page-button {
+    display: flex;
+    flex: 0 0 var(--hh-touch);
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-forum__page-button:active {
+    background: var(--hh-air-track-active);
+}
+
+:root[data-handheld] .octane-handheld-forum__page-count {
+    min-width: 64px;
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- the bar at the bottom */
+
+:root[data-handheld] .octane-handheld-forum__status {
+    flex: none;
+    padding: 6px var(--hh-space-3);
+    border-top: 1px solid var(--hh-air-box);
+    background: var(--hh-air-track-tip);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-forum__bar {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-top: 1px solid var(--hh-air-box);
+    background: var(--hh-air-panel);
+}
+
+/* The full-screen sheet already keeps clear of the home indicator (Handheld.css), so the bar adds nothing for it.
+   On its side the bar is lower: 36 px buttons whose hit area reaches over the bar's own padding. */
+:root[data-handheld='landscape'] .octane-handheld-forum__bar {
+    padding-top: var(--hh-space-1);
+    padding-bottom: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-forum__button {
+    display: flex;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-1);
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-forum__button:active {
+    background: var(--hh-air-track-active);
+}
+
+/* The one thing the page is for: the green button. */
+:root[data-handheld] .octane-handheld-forum__button.is-primary {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-forum__button.is-primary:active {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld] .octane-handheld-forum__button.is-primary:disabled {
+    box-shadow: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__button {
+    position: relative;
+    height: 36px;
+    overflow: visible;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__button::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+}
+
+/* ---------------------------------------------------------------- messages */
+
+:root[data-handheld] .octane-handheld-forum__message {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-width: 0;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+/* Not read yet: warm paper and a blue edge. Hidden: greyed. Removed by staff: a red line around it. */
+:root[data-handheld] .octane-handheld-forum__message[data-look='new'] {
+    border-color: var(--hh-air-track-blue);
+    background: var(--hh-air-track-free);
+    box-shadow:
+        inset 4px 0 0 var(--hh-air-track-blue),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-forum__message[data-look='hidden'] {
+    background: var(--hh-air-box);
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-forum__message[data-look='deleted'] {
+    border-color: var(--hh-air-red);
+    background: var(--hh-air-track-free);
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-forum__message-head {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-2) var(--hh-space-3) 0;
+}
+
+/* The author's head; it opens the profile, like the name beside it. */
+:root[data-handheld] .octane-handheld-forum__avatar {
+    position: relative;
+    flex: 0 0 var(--hh-touch);
+    box-sizing: border-box;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-track-light);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-forum__avatar:active {
+    background: var(--hh-air-track-active);
+}
+
+:root[data-handheld] .octane-handheld-forum__message-who {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-forum__author {
+    position: relative;
+    min-width: var(--hh-touch);
+    max-width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 22px;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+/* The name is one line of text; the finger gets the head's height around it. */
+:root[data-handheld] .octane-handheld-forum__author::after {
+    content: '';
+    position: absolute;
+    inset: -7px 0;
+}
+
+:root[data-handheld] .octane-handheld-forum__message-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--hh-space-2);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-forum__message-number {
+    flex: none;
+    align-self: flex-start;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-forum__notice {
+    margin: var(--hh-space-2) var(--hh-space-3) 0;
+    padding: 6px var(--hh-space-2);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-red-deep);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-forum__text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: var(--hh-space-2) var(--hh-space-3) 0;
+    font-size: var(--hh-size-l);
+    line-height: 21px;
+}
+
+:root[data-handheld] .octane-handheld-forum__lines,
+:root[data-handheld] .octane-handheld-forum__quote {
+    margin: 0;
+    overflow: visible;
+    font: inherit;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+/* What somebody else wrote: set in, on blue, behind a line. */
+:root[data-handheld] .octane-handheld-forum__quote {
+    padding: 6px var(--hh-space-2);
+    border-left: 3px solid var(--hh-air-blue);
+    border-radius: 0 var(--hh-radius-s) var(--hh-radius-s) 0;
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+/* ---------------------------------------------------------------- writing */
+
+:root[data-handheld] .octane-handheld-forum__label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+    min-height: 20px;
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+}
+
+/* The subject under its label; on a flat phone beside it, and the page's own title gives its line to the message. */
+:root[data-handheld] .octane-handheld-forum__field-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__field-group {
+    flex-direction: row;
+    align-items: center;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__field-group > .octane-handheld-forum__label {
+    flex: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__field-group > :is(.octane-handheld-forum__field, .octane-handheld-forum__reply-subject) {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__scroll.is-form > .octane-handheld-forum__title {
+    display: none;
+}
+
+/* 16 px, so mobile Safari does not zoom into the field. */
+:root[data-handheld] .octane-handheld-forum__field {
+    box-sizing: border-box;
+    width: 100%;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-s);
+    outline: 0;
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-field);
+    line-height: 22px;
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-forum__field:focus {
+    border-color: var(--hh-air-blue-deep);
+    box-shadow: 0 0 0 2px var(--hh-air-select);
+}
+
+:root[data-handheld] .octane-handheld-forum__scroll.is-form > .octane-handheld-forum__field.is-message {
+    flex: 1 0 168px;
+    height: auto;
+    padding: 10px var(--hh-space-3);
+    resize: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__scroll.is-form > .octane-handheld-forum__field.is-message {
+    flex-basis: 72px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+:root[data-handheld] .octane-handheld-forum__reply-subject {
+    padding: 10px var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+    font-size: var(--hh-size-l);
+    line-height: 20px;
+    overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------------- settings */
+
+:root[data-handheld] .octane-handheld-forum__sections {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__sections {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    align-items: start;
+}
+
+:root[data-handheld] .octane-handheld-forum__section {
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-forum__section-label {
+    padding: var(--hh-space-2) var(--hh-space-3);
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+}
+
+/* A choice: the whole row is the radio's (its hit area is stretched over it). */
+:root[data-handheld] .octane-handheld-forum__option {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    border-top: 1px solid var(--hh-air-box);
+    font-size: var(--hh-size-l);
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-forum__option:active {
+    background: var(--hh-air-track-light);
+}
+
+/* More open than the group above allows: greyed, not to be picked. */
+:root[data-handheld] .octane-handheld-forum__option[data-locked='true'] {
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-handheld-forum__radio {
+    position: static;
+    flex: none;
+    box-sizing: border-box;
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    border: 1px solid var(--hh-air-box-line);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-forum__radio[data-checked] {
+    border-color: var(--hh-air-blue-deep);
+    background: radial-gradient(circle, var(--hh-air-blue-deep) 0 6px, var(--hh-air-white) 7px);
+}
+
+:root[data-handheld] .octane-handheld-forum__radio::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+}
+
+:root[data-handheld] .octane-handheld-forum__option-label {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-forum__reply-subject {
+    padding: var(--hh-space-1) var(--hh-space-2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

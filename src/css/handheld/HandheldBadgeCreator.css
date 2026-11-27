@@ -1,0 +1,197 @@
+/*
+ * Phone badge creator (the Me menu's Badges entry), in the Octane handheld look (HandheldTokens.css) inside the shared
+ * frame (HandheldSheetFrame). BadgeCreatorView keeps its state and its editor; on a phone the editor is stacked: the
+ * canvas as wide as the screen, the tools, a palette of thumb-sized colours, the details and the badges made so far.
+ * On its side the canvas stands at the left and the rest scrolls beside it. A finger draws on the canvas, which
+ * therefore takes every touch for itself. The editor sets its desktop sizes inline, hence the !important sizes here.
+ * Everything is scoped to :root[data-handheld], which only a phone-sized touch device gets.
+ */
+
+:root[data-handheld] .octane-handheld-badges .octane-handheld-sheet__body {
+    padding: 0;
+}
+
+:root[data-handheld] .octane-handheld-badges__page {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    box-sizing: border-box;
+    gap: var(--hh-space-3);
+    min-height: 0;
+    padding: var(--hh-space-3) var(--hh-space-3) calc(var(--hh-space-4) + var(--octane-safe-bottom, 0px));
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-main {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-main > * {
+    min-width: 0 !important;
+}
+
+/* ---------------------------------------------------------------- canvas */
+
+/* A square as wide as the sheet; one cell is a fortieth of it, so are the grid lines. */
+:root[data-handheld] .octane-handheld-badges .badge-creator-canvas {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 480px;
+    height: auto !important;
+    margin: 0 auto;
+    aspect-ratio: 1;
+    border: 1px solid var(--hh-air-box-line) !important;
+    border-radius: var(--hh-radius-s);
+    background-size: 2.5% 2.5% !important;
+    box-shadow: var(--hh-shadow-card);
+    overflow: hidden;
+    touch-action: none;
+}
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-canvas canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ---------------------------------------------------------------- tools */
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-tools {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--hh-space-2);
+}
+
+/* The shared Button sets its padding and text size itself; its height is ours. */
+:root[data-handheld] .octane-handheld-badges__page button:not(.badge-creator-swatch) {
+    height: var(--hh-touch);
+    transition: filter var(--hh-fast) var(--hh-ease);
+}
+
+/* ---------------------------------------------------------------- palette */
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-palette {
+    grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    margin-top: var(--hh-space-2) !important;
+}
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-swatch {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 36px;
+    aspect-ratio: 1;
+    border: 1px solid var(--hh-air-box-line) !important;
+    border-radius: var(--hh-radius-s);
+}
+
+/* The colour in hand: a white gap and a dark ring around it. */
+:root[data-handheld] .octane-handheld-badges .badge-creator-swatch[data-selected] {
+    border-color: var(--hh-air-white) !important;
+    border-width: 2px !important;
+    box-shadow: 0 0 0 2px var(--hh-air-blue-header);
+}
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-custom {
+    gap: var(--hh-space-2) !important;
+    margin-top: var(--hh-space-3) !important;
+}
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-custom button {
+    flex: none;
+    width: var(--hh-touch) !important;
+    height: var(--hh-touch) !important;
+    border: 1px solid var(--hh-air-box-line) !important;
+    border-radius: var(--hh-radius-s);
+}
+
+/* ---------------------------------------------------------------- details */
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-side {
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-side input.form-control {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: var(--hh-touch);
+    margin-top: var(--hh-space-1);
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font: 400 var(--hh-size-field) / 22px var(--hh-font);
+}
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-actions {
+    display: flex;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-actions > button {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+/* ---------------------------------------------------------------- the badges made so far */
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-list {
+    flex: none;
+    gap: var(--hh-space-2);
+    margin-top: 0 !important;
+    padding-top: var(--hh-space-3);
+    border-top: 1px solid var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-list__row {
+    box-sizing: border-box;
+    min-height: 56px;
+    padding: var(--hh-space-2) !important;
+    border: 1px solid var(--hh-air-box) !important;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-badges .badge-creator-list__row > button {
+    flex: none;
+}
+
+/* ---------------------------------------------------------------- on its side */
+
+/* The canvas keeps the left, as tall as the sheet allows; the tools, palette, details and badges scroll at the right. */
+:root[data-handheld='landscape'] .octane-handheld-badges__page {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-content: start;
+    column-gap: var(--hh-space-4);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-badges :is(.badge-creator-main, .badge-creator-main > :first-child) {
+    display: contents;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-badges .badge-creator-canvas {
+    position: sticky;
+    top: 0;
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    align-self: start;
+    width: min(44vw, calc(100vh - 82px - var(--octane-safe-bottom, 0px))) !important;
+    margin: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-badges :is(.badge-creator-tools, .badge-creator-side, .badge-creator-list) {
+    grid-column: 2;
+    max-width: 420px;
+}

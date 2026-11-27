@@ -1,0 +1,427 @@
+/*
+ * Phone talent track (the Me menu's Talents entry), in the Octane handheld look (HandheldTokens.css) inside the shared
+ * frame (HandheldSheetFrame). HandheldTalentTrackView draws it: where the player stands and how far the track is, the
+ * levels as a list of cards, and a level's rewards and tasks as a page of the sheet (upright) or beside the list (on
+ * its side). Everything is scoped to :root[data-handheld], which only a phone-sized touch device gets.
+ */
+
+:root[data-handheld] .octane-handheld-talent .octane-handheld-sheet__body {
+    padding: 0;
+}
+
+:root[data-handheld] .octane-handheld-talent__layout {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* Both columns scroll on their own; upright only one of them is on screen. */
+:root[data-handheld] .octane-handheld-talent__list,
+:root[data-handheld] .octane-handheld-talent__detail {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    box-sizing: border-box;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+    padding: var(--hh-space-3) var(--hh-space-3) calc(var(--hh-space-4) + var(--octane-safe-bottom, 0px));
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-talent__list > *,
+:root[data-handheld] .octane-handheld-talent__detail > * {
+    flex: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-talent__list {
+    flex: 0 0 42%;
+    border-right: 1px solid var(--hh-air-box);
+}
+
+/* ---------------------------------------------------------------- summary */
+
+:root[data-handheld] .octane-handheld-talent__summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-track-light);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-talent__position {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-talent__collected {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-talent__heading {
+    margin-top: var(--hh-space-2);
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- bars */
+
+:root[data-handheld] .octane-handheld-talent__bar {
+    position: relative;
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 8px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-box);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+:root[data-handheld] .octane-handheld-talent__bar.is-track {
+    flex: none;
+    height: 12px;
+    background: var(--hh-air-white);
+}
+
+:root[data-handheld] .octane-handheld-talent__bar-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--hh-fill);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-count-yellow);
+    transition: width var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-talent [data-state='achieved'] .octane-handheld-talent__bar-fill {
+    background: var(--hh-air-count-green);
+}
+
+:root[data-handheld] .octane-handheld-talent__task-progress {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-talent__count {
+    flex: none;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-talent__state {
+    flex: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-talent__chevron {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: var(--hh-air-border);
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- levels */
+
+:root[data-handheld] .octane-handheld-talent__level {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    width: 100%;
+    min-height: 56px;
+    padding: var(--hh-space-2) var(--hh-space-2) var(--hh-space-2) var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-talent__level:active {
+    background: var(--hh-air-track-light);
+}
+
+/* The level the player is working on, and (on its side) the one shown beside the list. */
+:root[data-handheld] .octane-handheld-talent__level[data-state='current'] {
+    border-color: var(--hh-air-track-blue);
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-talent__level[data-active='true'] {
+    box-shadow:
+        0 0 0 2px var(--hh-air-select),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-talent__level[data-state='locked'] {
+    background: var(--hh-air-panel);
+    box-shadow: none;
+    color: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-handheld-talent__level-text {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-talent__level-name {
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+}
+
+/* ---------------------------------------------------------------- a level */
+
+:root[data-handheld] .octane-handheld-talent__back {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    align-self: flex-start;
+    gap: 2px;
+    height: 36px;
+    padding: 0 var(--hh-space-3) 0 6px;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 20px;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+/* The pill is 36 px; the finger gets 44. */
+:root[data-handheld] .octane-handheld-talent__back::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+}
+
+:root[data-handheld] .octane-handheld-talent__back:active {
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-talent__back .octane-handheld-talent__chevron {
+    stroke: currentColor;
+}
+
+:root[data-handheld] .octane-handheld-talent__title {
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-talent__description {
+    padding: 0 var(--hh-space-1);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-talent__rewards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-track-free);
+}
+
+:root[data-handheld] .octane-handheld-talent__rewards-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-talent__rewards-head strong {
+    color: var(--hh-air-green-deep);
+    font-family: var(--hh-font-bold);
+}
+
+:root[data-handheld] .octane-handheld-talent__reward-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-talent__reward {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 64px;
+    min-height: 56px;
+    padding: var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-talent__reward.is-perk {
+    flex: 1 1 100%;
+    align-items: flex-start;
+    text-align: left;
+}
+
+:root[data-handheld] .octane-handheld-talent__reward img {
+    max-width: 64px;
+    max-height: 64px;
+}
+
+/* ---------------------------------------------------------------- tasks */
+
+:root[data-handheld] .octane-handheld-talent__task {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-3);
+    width: 100%;
+    min-height: 64px;
+    padding: var(--hh-space-2) var(--hh-space-2) var(--hh-space-2) var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    text-align: left;
+}
+
+/* A task in progress opens its help. */
+:root[data-handheld] button.octane-handheld-talent__task {
+    border-color: var(--hh-air-track-blue);
+    box-shadow: var(--hh-shadow-card);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] button.octane-handheld-talent__task:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-talent__task[data-state='locked'] {
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-handheld-talent__task-badge {
+    display: flex;
+    flex: 0 0 44px;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+}
+
+:root[data-handheld] .octane-handheld-talent__task-text {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-talent__task-title {
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-talent__task-description {
+    font-size: var(--hh-size-m);
+    line-height: 17px;
+}
+
+/* ---------------------------------------------------------------- the start of a track */
+
+:root[data-handheld] .octane-handheld-talent__begin {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hh-space-3);
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-track-light);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-talent__begin > span:not(.octane-handheld-talent__begin-avatar) {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-talent__begin-avatar {
+    position: relative;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+}
+
+:root[data-handheld] .octane-handheld-talent__button {
+    flex: 1 0 100%;
+    box-sizing: border-box;
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-4);
+    border: 1px solid var(--hh-air-green-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    transition: filter var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-talent__button:active {
+    background: var(--hh-primary-pressed);
+}
