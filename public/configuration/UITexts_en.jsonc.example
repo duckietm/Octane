@@ -2082,8 +2082,6 @@
     "octane.handheld.info.actions": "Actions",
     "octane.handheld.info.close": "Close",
     "octane.handheld.info.title": "Info",
-    "octane.handheld.navigator.details": "Room details",
-    "octane.handheld.navigator.enter": "Go to room",
     "octane.handheld.placement.cancel": "Cancel",
     "octane.handheld.placement.hint": "Drag or tap to move it, then place it.",
     "octane.handheld.placement.place": "Place",

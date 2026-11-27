@@ -1,6 +1,7 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DESKTOP_LAYOUT } from '../../../../api/handheld/handheldLayout';
+import { useNavigatorRoomInfoPopupStore } from '../../../../hooks';
 import { useHandheldStore } from '../../../../state/handheldStore';
 
 const visits = vi.hoisted(() => ({ createRoomSession: vi.fn() }));
@@ -53,7 +54,10 @@ beforeEach(() => visits.createRoomSession.mockClear());
 
 afterEach(() => {
     cleanup();
-    act(() => useHandheldStore.setState({ layout: DESKTOP_LAYOUT }));
+    act(() => {
+        useHandheldStore.setState({ layout: DESKTOP_LAYOUT });
+        useNavigatorRoomInfoPopupStore.getState().hide();
+    });
 });
 
 describe('NavigatorSearchResultItemView', () => {
@@ -68,30 +72,29 @@ describe('NavigatorSearchResultItemView', () => {
         expect(visits.createRoomSession).toHaveBeenCalledWith(42);
     });
 
-    it('opens the room card on a tap on a phone and enters only from its button', () => {
+    it('is a card on a phone: a tap enters the room, the i button opens its info instead', () => {
         act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'portrait' } }));
         const { container } = render(<NavigatorSearchResultItemView thumbnail roomData={room} />);
 
         expect(container.querySelector('.octane-navigator-air__tile')).toBeNull();
-
-        const row = screen.getByRole('button', { name: 'Terrace' });
-
-        expect(row).toHaveAttribute('aria-expanded', 'false');
+        expect(container.querySelector('.octane-handheld-room__thumb')).not.toBeNull();
         expect(screen.getByText('tester')).toBeInTheDocument();
 
-        fireEvent.click(row);
+        fireEvent.click(screen.getByRole('button', { name: 'navigator.room.popup.room.info' }));
 
         expect(visits.createRoomSession).not.toHaveBeenCalled();
-        expect(row).toHaveAttribute('aria-expanded', 'true');
-        expect(screen.getByRole('region', { name: 'Room details' })).toHaveTextContent('A sunny terrace');
-        expect(screen.getByText('chill')).toBeInTheDocument();
+        expect(useNavigatorRoomInfoPopupStore.getState().room).toBe(room);
 
-        fireEvent.click(screen.getByRole('button', { name: 'Go to room' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Terrace' }));
 
         expect(visits.createRoomSession).toHaveBeenCalledWith(42);
+    });
 
-        fireEvent.click(row);
+    it('drops the picture in the compact list of a phone', () => {
+        act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'landscape' } }));
+        const { container } = render(<NavigatorSearchResultItemView roomData={room} />);
 
-        expect(screen.queryByRole('region', { name: 'Room details' })).toBeNull();
+        expect(container.querySelector('.octane-handheld-room.is-compact')).not.toBeNull();
+        expect(container.querySelector('.octane-handheld-room__thumb')).toBeNull();
     });
 });

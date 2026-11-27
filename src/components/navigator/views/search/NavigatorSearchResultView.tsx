@@ -38,9 +38,11 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
     // AIR BlockResultsView: without the thumbnail perk every block is rows, except under the official view.
     const officialView = topLevelContext?.code === 'official_view' || parentCode === 'official_view';
     const displayMode = thumbnailPerk ? chosenMode : officialView ? searchResult.mode : NavigatorSearchResultViewDisplayMode.LIST;
-    // Phone layout: rooms are always the tall touch rows, so the list / tiles switch is left out.
+    // Phone layout: a block shows room cards with their picture until the user picks the compact list for it.
     const isHandheld = useIsHandheld();
-    const canSwitchMode = thumbnailPerk && !isHandheld;
+    const pickedMode = useNavigatorUiStore((state) => state.resultViewModes[searchResult.code]);
+    const handheldCards = pickedMode === undefined || pickedMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS;
+    const canSwitchMode = thumbnailPerk;
 
     const getResultTitle = () => {
         const name = searchResult.code;
@@ -55,8 +57,9 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
     };
 
     const toggleDisplayMode = () => {
+        const showsList = isHandheld ? !handheldCards : displayMode === NavigatorSearchResultViewDisplayMode.LIST;
         const nextMode =
-            displayMode === NavigatorSearchResultViewDisplayMode.LIST
+            showsList
                 ? NavigatorSearchResultViewDisplayMode.THUMBNAILS
                 : NavigatorSearchResultViewDisplayMode.LIST;
 
@@ -77,12 +80,54 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
         else if (topLevelContext) store.setSearch(topLevelContext.code, '');
     };
 
-    const isTileMode = !isHandheld && displayMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS;
+    const isTileMode = displayMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS;
     const resultTitle = getResultTitle();
     const listViewLabel = localizeWithFallback('navigator.viewmode.list', 'Show rooms as a list');
     const tileViewLabel = localizeWithFallback('navigator.viewmode.tiles', 'Show rooms as tiles');
     const hideSave = parentCode === 'official_view' || searchResult.code === 'official_view';
     const eventTitle = isEventView(searchResult.code) || isEventView(parentCode);
+
+    if (isHandheld) {
+        const modeLabel = handheldCards ? listViewLabel : tileViewLabel;
+
+        return (
+            <NativeTextTree>
+                <Collapsible.Root
+                    render={<section />}
+                    className={`octane-handheld-nav__block${isExtended ? '' : ' is-collapsed'}`}
+                    open={isExtended}
+                    onOpenChange={() => useNavigatorUiStore.getState().setResultCollapsed(searchResult.code, isExtended)}
+                >
+                    <header className="octane-handheld-nav__block-head">
+                        <Collapsible.Trigger className="octane-handheld-nav__block-toggle" aria-label={resultTitle}>
+                            <img src={isExtended ? categoryCollapse : categoryExpand} alt="" />
+                            <span>{resultTitle}</span>
+                        </Collapsible.Trigger>
+                        {isExtended && (
+                            <BaseButton aria-label={modeLabel} className="octane-handheld-nav__block-tool" onClick={toggleDisplayMode}>
+                                <img src={handheldCards ? navViewRow : navViewThumbs} alt="" />
+                            </BaseButton>
+                        )}
+                        {searchResult.action === 1 && (
+                            <BaseButton aria-label={LocalizeText('navigator.more.rooms')} className="octane-handheld-nav__block-tool" onClick={showMore}>
+                                <img src={categoryShowMore} alt="" />
+                            </BaseButton>
+                        )}
+                        {searchResult.action > 1 && (
+                            <BaseButton aria-label={LocalizeText('navigator.back')} className="octane-handheld-nav__block-tool" onClick={showMore}>
+                                <img src={navViewMini} alt="" />
+                            </BaseButton>
+                        )}
+                    </header>
+                    <Collapsible.Panel className="octane-handheld-nav__cards">
+                        {searchResult.rooms.map((room, index) => (
+                            <NavigatorSearchResultItemView key={room.roomId || index} roomData={room} thumbnail={handheldCards} eventTitle={eventTitle} />
+                        ))}
+                    </Collapsible.Panel>
+                </Collapsible.Root>
+            </NativeTextTree>
+        );
+    }
 
     return (
         <NativeTextTree>

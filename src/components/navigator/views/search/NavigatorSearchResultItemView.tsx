@@ -74,8 +74,8 @@ export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProp
         useNavigatorRoomInfoPopupStore.getState().retargetIfVisible(roomData, thumbnail ? 'tile' : 'row', event.currentTarget.getBoundingClientRect());
     };
 
-    // Phone layout: every block is a list of tall rows that open the room's card on a tap, also where tiles were chosen.
-    if (isHandheld) return <HandheldNavigatorRoomRowView doorClassName={doorClass()} roomData={roomData} stripe={stripe} title={title} onVisit={visitRoom} />;
+    // Phone layout: a room is a card (with its picture, or compact without) that enters on a tap; the "i" opens its info.
+    if (isHandheld) return <HandheldNavigatorRoomRowView compact={!thumbnail} doorClassName={doorClass()} roomData={roomData} title={title} onVisit={visitRoom} />;
 
     if (thumbnail)
         return (

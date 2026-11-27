@@ -31,6 +31,8 @@ import {
     useOctaneEvent,
     requestRaidProtectionSettings
 } from '../../hooks';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldNavigatorView } from './views/HandheldNavigatorView';
 import { NavigatorDoorStateView } from './views/NavigatorDoorStateView';
 import { NavigatorRoomCreatorView } from './views/NavigatorRoomCreatorView';
 import { NavigatorRoomInfoView } from './views/NavigatorRoomInfoView';
@@ -72,6 +74,7 @@ export const NavigatorView: FC<{}> = () => {
     const tabsRef = useRef<HTMLDivElement>(null);
     const resizeRef = useRef<{ y: number; height: number; scale: number } | null>(null);
     const { askForward } = useNavigatorAskForward();
+    const isHandheld = useIsHandheld();
 
     useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.CREATED, () => {
         useNavigatorUiStore.getState().hide();
@@ -228,7 +231,7 @@ export const NavigatorView: FC<{}> = () => {
         sizeTabs();
 
         return () => observer.disconnect();
-    }, [isVisible, topLevelContexts]);
+    }, [isVisible, topLevelContexts, isHandheld]);
 
     useLayoutEffect(() => {
         const results = elementRef.current;
@@ -241,7 +244,7 @@ export const NavigatorView: FC<{}> = () => {
         updateScrollState();
 
         return () => observer.disconnect();
-    }, [isVisible, isCreatorOpen, searchResult]);
+    }, [isVisible, isCreatorOpen, searchResult, isHandheld]);
 
     const quickLinksLabel = localizeWithFallback('navigator.quick.links.title', 'Quick links');
     const navigatorLabel = localizeWithFallback('navigator.title', 'Navigator');
@@ -306,7 +309,23 @@ export const NavigatorView: FC<{}> = () => {
         <NativeTextTree>
             <>
                 {isVisible && (
-                    <DraggableWindow uniqueKey="navigator" handleSelector=".octane-navigator-air__caption">
+                    <DraggableWindow uniqueKey="navigator" handleSelector=".octane-navigator-air__caption" handheldSheet>
+                        {isHandheld ? (
+                            <HandheldNavigatorView
+                                activeTabCode={isCreatorOpen ? null : ((currentTabCode ? currentTabCode : topLevelContext?.code) ?? null)}
+                                isCreatorOpen={isCreatorOpen}
+                                isFetching={isFetching}
+                                liftedRooms={liftedRooms}
+                                resultsRef={elementRef}
+                                searchResult={searchResult}
+                                showPromote={showPromote}
+                                tabs={topLevelContexts}
+                                title={headerText}
+                                onCreateRoom={onCreateRoom}
+                                onPromoteRoom={onPromoteRoom}
+                                onRandomRoom={onRandomRoom}
+                            />
+                        ) : (
                         <div
                             ref={frameRef}
                             className={`octane-navigator-air max-w-[calc(100vw-16px)]${isOpenSavesSearches ? ' is-quick-links' : ''}`}
@@ -480,6 +499,7 @@ export const NavigatorView: FC<{}> = () => {
                                 }}
                             />
                         </div>
+                        )}
                     </DraggableWindow>
                 )}
                 <NavigatorRoomInfoPopupView />

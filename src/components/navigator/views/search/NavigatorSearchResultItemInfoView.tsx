@@ -8,10 +8,12 @@ import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 interface NavigatorSearchResultItemInfoViewProps {
     roomData: RoomDataParser;
     thumbnail?: boolean;
+    /** Phone layout: the large touch button of a room card; the info it opens stays until it is closed. */
+    handheld?: boolean;
 }
 
 export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfoViewProps> = (props) => {
-    const { roomData = null, thumbnail = false } = props;
+    const { roomData = null, thumbnail = false, handheld = false } = props;
     const elementRef = useRef<HTMLButtonElement>(null);
 
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -19,6 +21,8 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
         event.stopPropagation();
         if (!elementRef.current) return;
         useNavigatorRoomInfoPopupStore.getState().toggleFromInfo(roomData, elementRef.current.getBoundingClientRect());
+        // No pointer hovers a touch screen, so the info would fade away on its timer while it is being read.
+        if (handheld) useNavigatorRoomInfoPopupStore.getState().setHovered(true);
     };
 
     const handleMouseEnter = () => {
@@ -31,10 +35,10 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
             <BaseButton
                 type="button"
                 ref={elementRef}
-                className="octane-navigator-air__room-info"
+                className={handheld ? 'octane-handheld-room__info' : 'octane-navigator-air__room-info'}
                 aria-label={LocalizeText('navigator.room.popup.room.info')}
                 onClick={handleClick}
-                onMouseEnter={handleMouseEnter}
+                onMouseEnter={handheld ? undefined : handleMouseEnter}
             />
         </NativeTextTree>
     );

@@ -5,6 +5,7 @@ import refreshIcon from '../../../../assets/images/navigator/air/refresh-search.
 import searchCloseIcon from '../../../../assets/images/navigator/air/search-close.png';
 import searchPenIcon from '../../../../assets/images/navigator/air/search-pen.png';
 import { useNavigatorData, useNavigatorUiStore } from '../../../../hooks';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 import { NavigatorFilterChipsView } from './NavigatorFilterChipsView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
@@ -28,6 +29,7 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = (props) => {
     const currentFilter = useNavigatorUiStore((state) => state.currentFilter);
     const placeholder = LocalizeText('navigator.filter.input.placeholder');
     const hasQuery = inputText.length > 0;
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         if (!searchResult) return;
@@ -96,6 +98,41 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = (props) => {
     const clearSearch = () => {
         setInputText('');
     };
+
+    // Phone layout: one tall box, the filter chooser behind its magnifier, the pen (or clear) button at its end.
+    if (isHandheld) {
+        const filterName = SearchFilterOptions[searchFilterIndex]?.name;
+
+        return (
+            <NativeTextTree>
+                <form onSubmit={onSubmit} className="octane-handheld-nav__search">
+                    <NavigatorFilterChipsView handheld value={searchFilterIndex} onChange={setSearchFilterIndex} />
+                    <input
+                        aria-label={placeholder}
+                        autoCapitalize="none"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        className="octane-handheld-nav__search-input"
+                        enterKeyHint="search"
+                        name="q"
+                        placeholder={searchFilterIndex > 0 && filterName ? LocalizeText('navigator.filter.' + filterName) : placeholder}
+                        type="text"
+                        value={inputText}
+                        onChange={(event) => setInputText(event.target.value)}
+                        onKeyDown={onInputKeyDown}
+                    />
+                    <BaseButton
+                        type={hasQuery ? 'button' : 'submit'}
+                        className="octane-handheld-nav__search-action"
+                        aria-label={hasQuery ? LocalizeText('generic.clear') : placeholder}
+                        onClick={hasQuery ? clearSearch : undefined}
+                    >
+                        <img src={hasQuery ? searchCloseIcon : searchPenIcon} alt="" />
+                    </BaseButton>
+                </form>
+            </NativeTextTree>
+        );
+    }
 
     return (
         <NativeTextTree>
