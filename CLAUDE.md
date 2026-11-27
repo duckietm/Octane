@@ -567,6 +567,8 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
   `ContextMenuHeaderView` render their rows as drawer buttons (`icon` / `tone` props of a row are for the drawer only), and the
   pet / rentable-bot infostands portal their own buttons into the drawer's `actionsSlot`. Pet commands and the bot name / motto /
   speech forms are pages of the same shell. Add an action to the desktop menu or infostand and the drawer has it.
+  The staff build tools are a page of their own (`infostand/HandheldBuildToolsView.tsx`): while they are on, the furni's drawer
+  is replaced by a low panel of nothing but tile steps, turning and height (a corner card in landscape), so the furni stays in view.
 - Renderer-SDK mock for Vitest: `src/octane-renderer.mock.ts`
   (aliased over `@octane/renderer` via `vitest.config.mts`).
   Hosts the explicit `OctaneLogger` mock, the `mockEventDispatcher` /

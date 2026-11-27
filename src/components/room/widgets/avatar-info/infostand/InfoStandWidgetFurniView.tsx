@@ -74,6 +74,7 @@ import statStateIcon from '../../../../../assets/images/infostand/stat-state.png
 import statXIcon from '../../../../../assets/images/infostand/stat-x.png';
 import statYIcon from '../../../../../assets/images/infostand/stat-y.png';
 import chestLockedIcon from '../../../../../assets/images/groups/native/forum_forum_locked.png';
+import { HandheldBuildToolsView } from './HandheldBuildToolsView';
 import { HandheldFurniDrawerAction, HandheldFurniDrawerView } from './HandheldFurniDrawerView';
 import { ImagePositionEditorView } from './ImagePositionEditorView';
 import { BRANDING_NUMBER_RANGES, brandingSaveMap, customVariablesSaveMap, infostandCustomVariableLabel, infostandCustomVariables, infostandFurniOwnerText, infostandFurniPanelClass, parseBrandingOptions, parseFurniHeight, unsavedCustomVariables } from './infostandFurni.helpers';
@@ -1119,7 +1120,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                         )}
                         {showBuildtools && (
                             <>
-                                {dropdownOpen && (
+                                {dropdownOpen && !handheld && (
                                     <div className="octane-infostand-buildtools flex gap-[4px] w-full">
                                         <div className="flex-1 bg-[#3D5D63] rounded-[6px] border border-white p-[2px] flex flex-col gap-1">
                                             <Text small variant="white">
@@ -1387,7 +1388,6 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                     ? localizeWithFallback('infostand.button.buildtools.close', 'Close Buildtools')
                     : localizeWithFallback('infostand.button.buildtools.open', 'Open Buildtools'),
                 pressed: dropdownOpen,
-                opens: '.octane-infostand-buildtools',
                 run: () => setDropdownOpen(!dropdownOpen)
             },
             furniKeys.length > 0 &&
@@ -1407,6 +1407,24 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                     run: () => processButtonAction('save_custom_variables')
                 }
         ];
+
+        // Build tools up: only their controls, in a low panel, so the furni stays in view while it is moved.
+        if (showBuildtools && dropdownOpen) {
+            return (
+                <HandheldBuildToolsView
+                    height={furniLocationZ}
+                    picture={<LayoutRoomObjectImageView category={avatarInfo.category} objectId={avatarInfo.id} roomId={roomSession.roomId} />}
+                    title={avatarInfo.name}
+                    onBack={() => setDropdownOpen(false)}
+                    onClose={onClose}
+                    onHeightBlur={handleHeightBlur}
+                    onHeightChange={handleHeightChange}
+                    onHeightStep={adjustHeight}
+                    onMove={(deltaX, deltaY) => sendUpdate(deltaX, deltaY, furniLocationZ ?? 0, 0)}
+                    onRotate={(direction) => sendUpdate(0, 0, furniLocationZ ?? 0, direction)}
+                />
+            );
+        }
 
         return (
             <NativeTextTree>

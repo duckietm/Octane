@@ -77,7 +77,11 @@ const TEXTS: Record<string, string> = {
 };
 
 const localize = (key: string, parameters: string[] = [], values: string[] = []) => {
-    let text = TEXTS[key] ?? (/^pet\.command\./.test(key) ? ['Sit', 'Lie down', 'Follow', 'Beg', 'Play dead', 'Stay', 'Jump', 'Speak', 'Play', 'Silent'][Number(key.split('.')[2]) % 10] : key);
+    let text =
+        TEXTS[key] ??
+        (/^pet\.command\./.test(key)
+            ? ['Sit', 'Lie down', 'Follow', 'Beg', 'Play dead', 'Stay', 'Jump', 'Speak', 'Play', 'Silent'][Number(key.split('.')[2]) % 10]
+            : key);
 
     parameters.forEach((parameter, index) => (text = text.replace(`%${parameter}%`, values[index])));
 
@@ -182,7 +186,13 @@ vi.mock('@octane/renderer', async (importOriginal) => {
         AddLinkEventTracker: (tracker: { linkReceived: (url: string) => void }) => (mocks.linkTracker = tracker),
         RemoveLinkEventTracker: vi.fn(),
         RoomEnterEffect: { isRunning: () => false },
-        RoomObjectOperationType: { OBJECT_MOVE: 'OBJECT_MOVE', OBJECT_ROTATE_POSITIVE: 'OBJECT_ROTATE_POSITIVE', OBJECT_PICKUP: 'OBJECT_PICKUP', OBJECT_EJECT: 'OBJECT_EJECT', OBJECT_SAVE_STUFF_DATA: 'OBJECT_SAVE_STUFF_DATA' },
+        RoomObjectOperationType: {
+            OBJECT_MOVE: 'OBJECT_MOVE',
+            OBJECT_ROTATE_POSITIVE: 'OBJECT_ROTATE_POSITIVE',
+            OBJECT_PICKUP: 'OBJECT_PICKUP',
+            OBJECT_EJECT: 'OBJECT_EJECT',
+            OBJECT_SAVE_STUFF_DATA: 'OBJECT_SAVE_STUFF_DATA'
+        },
         RoomWidgetFurniInfoUsagePolicyEnum: { NOBODY: 0, CONTROLLER: 1, EVERYBODY: 2 },
         RoomObjectVariable: { FURNITURE_TYPE_ID: 'type_id', FURNITURE_DATA: 'data', FIGURE_CARRY_OBJECT: 'carry', FIGURE_EFFECT: 'effect' },
         PetType: { DOG: 0, CAT: 1, TERRIER: 2, BEAR: 3, PIG: 4, HORSE: 15, MONSTERPLANT: 16 },
@@ -253,7 +263,11 @@ vi.mock('../../../../common', async (importOriginal) => {
     };
 });
 
-vi.mock('./infostand/InfoStandBadgeSlotView', () => ({ InfoStandBadgeSlotView: ({ badgeCode }: { badgeCode?: string }) => <div className="relative h-[42px] w-[42px]">{badgeCode && <i className="ph-badge" />}</div> }));
+vi.mock('./infostand/InfoStandBadgeSlotView', () => ({
+    InfoStandBadgeSlotView: ({ badgeCode }: { badgeCode?: string }) => (
+        <div className="relative h-[42px] w-[42px]">{badgeCode && <i className="ph-badge" />}</div>
+    )
+}));
 
 vi.mock('../../../../hooks', () => ({
     useAvatarInfoWidget: () => ({
@@ -277,7 +291,12 @@ vi.mock('../../../../hooks', () => ({
     useRareValues: () => ({ getValue: () => null }),
     useRecolorableColorStore: Object.assign(() => null, { getState: () => ({ setColor: vi.fn() }) }),
     useWiredLabelStore: (selector: (state: unknown) => unknown) => selector({ labels: {}, openSettings: vi.fn() }),
-    useWiredTools: () => ({ openInspectionForFurni: mocks.openInspectionForFurni, openInspectionForUser: vi.fn(), showInspectButton: mocks.showInspect, roomSettings: { canModify: true } }),
+    useWiredTools: () => ({
+        openInspectionForFurni: mocks.openInspectionForFurni,
+        openInspectionForUser: vi.fn(),
+        showInspectButton: mocks.showInspect,
+        roomSettings: { canModify: true }
+    }),
     useRoom: () => ({ roomSession: mocks.roomSession }),
     useFriends: () => ({ canRequestFriend: () => mocks.canRequestFriend }),
     useHelp: () => ({ report: vi.fn() }),
@@ -285,7 +304,15 @@ vi.mock('../../../../hooks', () => ({
     useIsUserIgnored: () => false,
     useNotification: () => ({ showConfirm: vi.fn(), simpleAlert: vi.fn() }),
     usePurse: () => ({ getCurrencyAmount: () => 100 }),
-    useSessionInfo: () => ({ userRespectRemaining: 3, respectReplenishesLeft: 0, respectUser: mocks.respectUser, replenishRespect: vi.fn(), petRespectRemaining: 3, respectPet: mocks.respectPet, chatStyleId: 0 }),
+    useSessionInfo: () => ({
+        userRespectRemaining: 3,
+        respectReplenishesLeft: 0,
+        respectUser: mocks.respectUser,
+        replenishRespect: vi.fn(),
+        petRespectRemaining: 3,
+        respectPet: mocks.respectPet,
+        chatStyleId: 0
+    }),
     useAvatarEffects: () => ({ effects: [], activeEffectType: 0 }),
     useBackgroundTone: () => null,
     useInventoryBadges: () => ({ badgeCodes: [], activeBadgeCodes: [], requestBadges: vi.fn() }),
@@ -322,7 +349,16 @@ const peer = (changes: Partial<AvatarInfoUser> = {}) =>
         ...changes
     });
 
-const own = () => Object.assign(new AvatarInfoUser(AvatarInfoUser.OWN_USER), { name: 'Octavia', motto: 'Building the hotel, one tile at a time', webID: 1, roomIndex: 0, figure: 'hd-180-1', badges: ['ACH_1'], achievementScore: 640 });
+const own = () =>
+    Object.assign(new AvatarInfoUser(AvatarInfoUser.OWN_USER), {
+        name: 'Octavia',
+        motto: 'Building the hotel, one tile at a time',
+        webID: 1,
+        roomIndex: 0,
+        figure: 'hd-180-1',
+        badges: ['ACH_1'],
+        achievementScore: 640
+    });
 
 const pet = (changes: Partial<AvatarInfoPet> = {}) =>
     Object.assign(new AvatarInfoPet(AvatarInfoPet.PET_INFO), {
@@ -377,12 +413,18 @@ const select = (info: IAvatarInfo | null) => {
 };
 
 const drawer = () => screen.getByRole('region', { name: 'Selected in the room' });
-const actionNames = () => [...drawer().querySelectorAll('.octane-handheld-drawer__actions .octane-handheld-drawer__action')].map((button) => button.textContent);
+const actionNames = () =>
+    [...drawer().querySelectorAll('.octane-handheld-drawer__actions .octane-handheld-drawer__action')].map((button) => button.textContent);
 const tap = (name: string) => fireEvent.click(within(drawer()).getByRole('button', { name }));
 
 beforeEach(() => {
     // A phone: the primary pointer is a finger.
-    window.matchMedia = ((query: string) => ({ matches: true, media: query, addEventListener: vi.fn(), removeEventListener: vi.fn() })) as unknown as typeof window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+        matches: true,
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn()
+    })) as unknown as typeof window.matchMedia;
     mocks.handheld = true;
     mocks.canRequestFriend = true;
     mocks.showInspect = false;
@@ -455,7 +497,7 @@ describe('phone drawer: furni', () => {
         expect(mocks.avatarInfo).toBeNull();
     });
 
-    it('groups the wired and staff extras, and opens for the build tools', () => {
+    it('groups the wired and staff extras, and swaps to the build tools page', () => {
         mocks.showInspect = true;
         mocks.staff = true;
         select(furni({ isOwner: true, isAnyRoomController: true, roomControllerLevel: 5 }));
@@ -466,8 +508,19 @@ describe('phone drawer: furni', () => {
 
         tap('Open Buildtools');
 
-        expect(within(drawer()).getByRole('button', { name: 'Close Buildtools' })).toHaveAttribute('aria-pressed', 'true');
-        expect(drawer().querySelector('.octane-infostand-buildtools')).not.toBeNull();
+        // Only the build controls are left, as a page; Back brings the furni's drawer back.
+        const page = screen.getByRole('region', { name: 'Build tools' });
+
+        expect(page).toHaveAttribute('data-page');
+        expect(page.querySelector('.octane-handheld-build')).not.toBeNull();
+        expect(page.querySelectorAll('.octane-handheld-drawer__action')).toHaveLength(0);
+        expect(document.querySelector('.octane-infostand-buildtools')).toBeNull();
+        expect(screen.queryByRole('region', { name: 'Selected in the room' })).toBeNull();
+
+        fireEvent.click(within(page).getByRole('button', { name: 'Back' }));
+
+        expect(screen.queryByRole('region', { name: 'Build tools' })).toBeNull();
+        expect(actionNames()).toContain('Open Buildtools');
     });
 
     it('closes with the close button, and with a pull down on the peek; a pull up or a tap on the head opens it', () => {
@@ -628,12 +681,16 @@ describe('phone drawer: pets and bots', () => {
 
         const { PetTrainingPanelMessageEvent } = await import('@octane/renderer');
 
-        act(() => mocks.messageHandlers.get(PetTrainingPanelMessageEvent)({ getParser: () => ({ petId: 5, commands: [0, 1, 2, 3], enabledCommands: [0, 1] }) }));
+        act(() =>
+            mocks.messageHandlers.get(PetTrainingPanelMessageEvent)({ getParser: () => ({ petId: 5, commands: [0, 1, 2, 3], enabledCommands: [0, 1] }) })
+        );
 
         const page = screen.getByRole('region', { name: 'Pet commands' });
 
         expect(page).toHaveAttribute('data-page');
-        expect([...page.querySelectorAll('.octane-handheld-drawer__action')].map((button) => [button.textContent, button.getAttribute('aria-disabled')])).toEqual([
+        expect(
+            [...page.querySelectorAll('.octane-handheld-drawer__action')].map((button) => [button.textContent, button.getAttribute('aria-disabled')])
+        ).toEqual([
             ['Sit', null],
             ['Lie down', null],
             ['Follow', 'true'],
@@ -680,7 +737,12 @@ describe('phone drawer: pets and bots', () => {
 describe('desktop', () => {
     it('keeps the infostand and its buttons, and no drawer', () => {
         mocks.handheld = false;
-        window.matchMedia = ((query: string) => ({ matches: false, media: query, addEventListener: vi.fn(), removeEventListener: vi.fn() })) as unknown as typeof window.matchMedia;
+        window.matchMedia = ((query: string) => ({
+            matches: false,
+            media: query,
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn()
+        })) as unknown as typeof window.matchMedia;
         act(() => useHandheldStore.setState({ layout: { active: false, orientation: 'landscape' } }));
         select(furni({ isOwner: true, usagePolicy: 2, purchaseOfferId: 900 }));
 

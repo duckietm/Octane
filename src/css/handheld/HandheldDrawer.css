@@ -292,18 +292,6 @@
     line-height: 20px;
 }
 
-/* The build tools' arrows and steps are 24 px squares on the desktop: a finger gets 44. */
-:root[data-handheld] .octane-handheld-drawer__details .octane-infostand-buildtools {
-    flex-direction: column;
-    gap: var(--hh-space-2);
-}
-
-:root[data-handheld] .octane-handheld-drawer__details .octane-infostand-buildtools .cursor-pointer {
-    width: var(--hh-touch);
-    height: var(--hh-touch);
-    font-size: var(--hh-size-xl);
-}
-
 /* ---------------------------------------------------------------- actions */
 
 :root[data-handheld] .octane-handheld-drawer__actions {
@@ -711,4 +699,177 @@
 
 :root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-button--save:active {
     background: var(--hh-primary-pressed);
+}
+
+/* ---------------------------------------------------------------- build tools */
+
+/*
+ * The build tools page: nothing but the controls, three groups side by side (tile steps, turning, height) in a
+ * panel as low as they allow, so the furni being moved stays in view above it.
+ */
+:root[data-handheld] .octane-handheld-drawer:has(.octane-handheld-build) .octane-handheld-drawer__actions {
+    display: none;
+}
+
+:root[data-handheld] .octane-handheld-drawer:has(.octane-handheld-build) .octane-handheld-drawer__details {
+    flex: 0 0 auto;
+    padding: 0 var(--hh-space-3) var(--hh-space-3);
+    overflow: visible;
+    border-top: 0;
+}
+
+:root[data-handheld] .octane-handheld-build {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-build__group {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-build__label {
+    margin: 0;
+    overflow: hidden;
+    color: var(--hh-on-dark-muted);
+    font-size: var(--hh-size-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 14px;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-build__group[data-group='height'] {
+    flex: 1 1 140px;
+    max-width: 190px;
+}
+
+:root[data-handheld] .octane-handheld-build__pad {
+    display: grid;
+    grid-template-columns: repeat(2, var(--hh-touch));
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-build__turn {
+    display: grid;
+    grid-template-columns: var(--hh-touch);
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-build__steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(var(--hh-touch), 1fr));
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-build__key {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: auto;
+    min-width: var(--hh-touch);
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-1);
+    border: 1px solid var(--hh-hairline);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-well);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition:
+        filter var(--hh-fast) var(--hh-ease),
+        transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-build__key:active {
+    filter: brightness(1.25);
+    transform: scale(0.95);
+}
+
+:root[data-handheld] .octane-handheld-build__key > svg {
+    font-size: var(--hh-size-xl);
+    pointer-events: none;
+}
+
+/* The tile steps point where the furni goes on screen. */
+:root[data-handheld] .octane-handheld-build__key[data-move] {
+    border-color: var(--hh-air-blue-light);
+    background: var(--hh-air-blue);
+}
+
+:root[data-handheld] .octane-handheld-build__key[data-move='up-left'] > svg {
+    transform: rotate(-60deg);
+}
+
+:root[data-handheld] .octane-handheld-build__key[data-move='up-right'] > svg {
+    transform: rotate(60deg);
+}
+
+:root[data-handheld] .octane-handheld-build__key[data-move='down-left'] > svg {
+    transform: rotate(-120deg);
+}
+
+:root[data-handheld] .octane-handheld-build__key[data-move='down-right'] > svg {
+    transform: rotate(120deg);
+}
+
+:root[data-handheld] .octane-handheld-build__key[data-step='up'] {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+}
+
+:root[data-handheld] .octane-handheld-build__height-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+}
+
+/* The height itself, beside its label: as high as the label row of the other groups allows, typed at 16 px. */
+:root[data-handheld] .octane-handheld-drawer__details .octane-handheld-build__field {
+    flex: 0 1 76px;
+    width: 76px;
+    min-width: 0;
+    min-height: 0;
+    height: 30px;
+    text-align: center;
+}
+
+/* A narrow phone: the groups keep a finger per key and wrap the height under the other two. */
+@media (max-width: 359px) {
+    :root[data-handheld='portrait'] .octane-handheld-build {
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+}
+
+/* On its side the build tools are a card in the lower right corner, not the full-height panel: the room keeps its height. */
+:root[data-handheld='landscape'] .octane-handheld-drawer:has(.octane-handheld-build) {
+    top: auto;
+    right: calc(var(--hh-space-2) + var(--octane-safe-right, 0px));
+    bottom: calc(var(--hh-space-2) + var(--octane-safe-bottom, 0px));
+    padding: 0;
+    overflow: visible;
+    border-width: 1px;
+    border-radius: var(--hh-radius-l);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-drawer:has(.octane-handheld-build) .octane-handheld-drawer__head {
+    position: relative;
+    border-bottom: 0;
+    border-radius: var(--hh-radius-l) var(--hh-radius-l) 0 0;
+    background: none;
 }
