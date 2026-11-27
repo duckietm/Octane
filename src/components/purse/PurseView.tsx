@@ -25,10 +25,12 @@ import { nativeTextStyles } from '../../common/native-text/NativeTextStyles';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { Hint } from '../../common/Tooltip';
 import { ClearStoredChatHistory, usePurse } from '../../hooks';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
 import { useEarningsIndicatorStore } from '../../state/earningsIndicatorStore';
 import { ClubExtendView } from './views/ClubExtendView';
 import { ClubPromoView, isClubPromoVisible } from './views/ClubPromoView';
 import { CurrencyView } from './views/CurrencyView';
+import { HandheldPurseBalance, HandheldPurseView } from './views/HandheldPurseView';
 import { SeasonalView } from './views/SeasonalView';
 import { useVipQuestsPromo, VipQuestsPromoView } from './views/VipQuestsPromoView';
 
@@ -67,6 +69,7 @@ export const PurseView: FC<{}> = (props) => {
     const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
     const vipQuestsPromo = useVipQuestsPromo();
     const earningsUnseen = useEarningsIndicatorStore((state) => state.showing);
+    const isHandheld = useIsHandheld();
 
     // AIR SettingsExtension: one row per settings window, each closing the menu.
     const openSettingsLink = useCallback((link: string) => {
@@ -244,6 +247,45 @@ export const PurseView: FC<{}> = (props) => {
     // AIR ClubDiscountPromoExtension: the renewal offer while the membership runs out.
     // AIR: the quests box takes the club renewal bar's place.
     const showClubPromo = !vipQuestsPromo.visible && isClubPromoVisible(purse, hcDisabled);
+
+    // Phone layout: the balances in one chip, everything else behind its arrow (same data and actions as below).
+    if (isHandheld) {
+        const balances: HandheldPurseBalance[] = [{ type: -1, amount: purse.credits, onClick: openCredits }];
+
+        if (hasDuckets) balances.push({ type: 0, amount: purse.activityPoints.get(0) || 0, onClick: () => CreateLinkEvent('catalog/open/ducket_info') });
+        if (hasDiamonds) balances.push({ type: 5, amount: purse.activityPoints.get(5) || 0, onClick: () => CreateLinkEvent('catalog/open/loyalty_info') });
+
+        return (
+            <HandheldPurseView
+                balances={balances}
+                short={currencyDisplayNumberShort}
+                club={hcDisabled ? null : { label: hasClubTime ? `${clubTooltip}: ${clubLabel}` : `${clubLabel} ${clubTooltip}`, onClick: openClub }}
+                earnings={{ label: earningsLabel, unseen: earningsUnseen, onClick: openEarnings }}
+                help={{
+                    label: helpLabel,
+                    onClick: (event) => {
+                        event.stopPropagation();
+                        CreateLinkEvent('help/show');
+                    }
+                }}
+                logout={{ label: logoutLabel, onClick: handleLogout }}
+                settingsLabel={settingsLabel}
+                settingsRows={settingsMenuRows}
+                onSettingsLink={openSettingsLink}
+            >
+                {showClubPromo && <ClubPromoView purse={purse} />}
+                {vipQuestsPromo.visible && <VipQuestsPromoView onClose={vipQuestsPromo.close} />}
+                <ClubExtendView />
+                {otherCurrencies.length > 0 && (
+                    <div className="octane-purse__other">
+                        {otherCurrencies.map((type) => (
+                            <SeasonalView key={type} type={type} amount={purse.activityPoints.get(type) || 0} />
+                        ))}
+                    </div>
+                )}
+            </HandheldPurseView>
+        );
+    }
 
     return (
         <NativeTextTree>

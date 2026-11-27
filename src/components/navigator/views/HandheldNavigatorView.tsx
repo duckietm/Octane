@@ -30,8 +30,8 @@ export interface HandheldNavigatorViewProps {
 }
 
 /**
- * The navigator on a phone: one full sheet with a touch caption (help, close), the tabs, the search box,
- * the rooms and the two large buttons. One markup serves both orientations; the stylesheet stacks it in
+ * The navigator on a phone: one full sheet with our deep-blue header (navigator icon, title, help, close), the tabs as a
+ * row of pills, the search box, the rooms and the two large buttons (create room is the primary one). One markup serves both orientations; the stylesheet stacks it in
  * portrait and puts search and buttons in a column left of the rooms in landscape.
  */
 export const HandheldNavigatorView: FC<HandheldNavigatorViewProps> = (props) => {
@@ -42,17 +42,27 @@ export const HandheldNavigatorView: FC<HandheldNavigatorViewProps> = (props) => 
         <NativeTextTree>
             <div className="octane-handheld-nav">
                 <header className="octane-handheld-nav__caption">
+                    <span aria-hidden="true" className="octane-handheld-nav__mark octane-icon icon-rooms" />
                     <span className="octane-handheld-nav__title">{title}</span>
                     <BaseButton
                         aria-label={LocalizeText('generic.help')}
                         className="octane-handheld-nav__caption-button is-help"
                         onClick={() => CreateLinkEvent('habbopages/navigator')}
-                    />
+                    >
+                        <svg aria-hidden="true" viewBox="0 0 16 16">
+                            <path d="M5.4 6 C5.4 4.4 6.5 3.4 8 3.4 C9.5 3.4 10.6 4.4 10.6 5.8 C10.6 7.8 8 7.8 8 10" />
+                            <circle cx="8" cy="12.6" r="0.6" />
+                        </svg>
+                    </BaseButton>
                     <BaseButton
                         aria-label={LocalizeText('generic.close')}
                         className="octane-handheld-nav__caption-button is-close"
                         onClick={() => useNavigatorUiStore.getState().hide()}
-                    />
+                    >
+                        <svg aria-hidden="true" viewBox="0 0 16 16">
+                            <path d="M4 4 L12 12 M12 4 L4 12" />
+                        </svg>
+                    </BaseButton>
                 </header>
                 <TabBar className="octane-handheld-nav__tabs" value={activeTabCode}>
                     {(tabs ?? []).map((context) => (

@@ -29,9 +29,11 @@ export const ToolbarMeView: FC<
         useGuideTool: boolean;
         unseenAchievementCount: number;
         setMeExpanded: Dispatch<SetStateAction<boolean>>;
+        /** Opening the menu selects the player's own avatar in the room, as AIR does. The phone popup turns it off: there a selection opens the info sheet. */
+        selectOwnAvatar?: boolean;
     }>
 > = (props) => {
-    const { useGuideTool = false, unseenAchievementCount = 0, setMeExpanded = null, children = null, ...rest } = props;
+    const { useGuideTool = false, unseenAchievementCount = 0, setMeExpanded = null, selectOwnAvatar = true, children = null, ...rest } = props;
     const elementRef = useRef<HTMLDivElement>(null);
     const { unseenCount: unseenDailyTaskCount = 0 } = useDailyTasks();
     const { tracks: rewardTracks = [] } = useRewardTracks();
@@ -42,12 +44,14 @@ export const ToolbarMeView: FC<
     const unreadForumsCount = useGroupForumUnreadStore((state) => state.unreadForumsCount);
 
     useEffect(() => {
+        if (!selectOwnAvatar) return;
+
         const roomSession = GetRoomSession();
 
         if (!roomSession) return;
 
         GetRoomEngine().selectRoomObject(roomSession.roomId, roomSession.ownRoomIndex, RoomObjectCategory.UNIT);
-    }, []);
+    }, [selectOwnAvatar]);
 
     useEffect(() => {
         const onClick = (event: MouseEvent) => {

@@ -13,6 +13,7 @@ import {
 import { UseHabbiconIcon } from '../../../../assets/images/habbicons';
 import { LayoutHabbiconImageView, LayoutItemCountView, Popover, PopoverContent, PopoverTrigger } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Hint } from '../../../../common/Tooltip';
 
@@ -54,6 +55,7 @@ const measureSelectorHeight = (sections: SelectorSection[]) => {
 
 export const ChatInputHabbiconSelectorView: FC = () => {
     const catalog = useHabbiconCatalog();
+    const isHandheld = useIsHandheld();
     const [selectorVisible, setSelectorVisible] = useState(false);
     const [search, setSearch] = useState('');
 
@@ -121,7 +123,8 @@ export const ChatInputHabbiconSelectorView: FC = () => {
                     )}
                     {!selectorVisible && catalog.unseenCount > 0 && <span className="habbicon-unseen-count">{catalog.unseenCount}</span>}
                 </PopoverTrigger>
-                <PopoverContent align="start" avoidCollisions={false} className="habbicon-selector-popover" side="top" sideOffset={17}>
+                {/* On a phone the trigger sits near the right edge, so the window may shift to stay on screen. */}
+                <PopoverContent align="start" avoidCollisions={isHandheld} className="habbicon-selector-popover" side="top" sideOffset={17}>
                     <div className="habbicon-selector-window" style={{ height: windowHeight }}>
                         <div className="habbicon-selector-controls">
                             <div className="habbicon-selector-search">

@@ -1,5 +1,5 @@
 /*
- * Phone layout, stage 4: putting a room-working window aside, the purse's own buttons, and the windows that reflow (room settings,
+ * Phone layout, stage 4: putting a room-working window aside and the windows that reflow (room settings,
  * the floor plan import / export). The fixed-layout windows (wired boxes, furni windows, group and moderator frames, the camera) are
  * drawn smaller or bigger as a whole by DraggableWindow (`handheldScale` / `handheldMaxScale`) and need no rules of their own here.
  * Every selector is scoped to :root[data-handheld].
@@ -112,69 +112,6 @@
     color: #ffffff;
     font-size: 14px;
     font-weight: 700;
-}
-
-/* ---------------------------------------------------------------- purse buttons */
-
-/*
- * The purse's AIR buttons are 19 px tall (help, log out, settings) and 28 px (club, earnings), and the column is drawn at 85 % in
- * portrait. On a phone the purse grows downwards: the three small buttons leave their column for a row of thumb-sized buttons along
- * the purse's bottom, and the club and earnings buttons take the column's width.
- */
-:root[data-handheld] .octane-purse,
-:root[data-handheld] .octane-purse__chrome {
-    height: 128px;
-}
-
-:root[data-handheld] .octane-purse__body {
-    height: 129px;
-}
-
-:root[data-handheld] .octane-purse__divider {
-    display: none;
-}
-
-:root[data-handheld] .octane-purse__col--primary {
-    width: 159px;
-}
-
-:root[data-handheld] .octane-purse__btn--join,
-:root[data-handheld] .octane-purse__btn--earnings {
-    width: 159px;
-}
-
-/* The two stacked buttons share the 4 px gap between them as extra touch area. */
-:root[data-handheld] .octane-purse__btn--join::after,
-:root[data-handheld] .octane-purse__btn--earnings::after {
-    content: '';
-    position: absolute;
-    inset: -2px -4px;
-    z-index: 2;
-}
-
-:root[data-handheld] .octane-purse__col--actions {
-    top: 72px;
-    left: 7px;
-    width: 216px;
-    height: 48px;
-    flex-direction: row;
-    gap: 6px;
-}
-
-:root[data-handheld] .octane-purse__btn--help,
-:root[data-handheld] .octane-purse__btn--logout,
-:root[data-handheld] .octane-purse__btn--settings {
-    flex: 1 1 0;
-    width: auto;
-    height: 48px;
-    min-width: 0;
-}
-
-:root[data-handheld] .octane-purse__btn--help .octane-purse__help-label,
-:root[data-handheld] .octane-purse__btn--icon .octane-purse__btn-img {
-    top: 50%;
-    left: 50% !important;
-    transform: translate(-50%, -50%);
 }
 
 /* ---------------------------------------------------------------- reflowing windows */

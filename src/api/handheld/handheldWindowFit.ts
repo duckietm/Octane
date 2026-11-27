@@ -29,7 +29,7 @@ export interface HandheldWindowPlacement {
 /** Room left free around a dialog, so its edges are not hidden under rounded screen corners. */
 export const HANDHELD_WINDOW_MARGIN = 6;
 /** Space kept for the bottom toolbar when a window is placed. */
-export const HANDHELD_TOOLBAR_RESERVE = 52;
+export const HANDHELD_TOOLBAR_RESERVE = 60;
 
 /** The most a small window is ever enlarged. */
 const HANDHELD_MAX_ENLARGE = 2;

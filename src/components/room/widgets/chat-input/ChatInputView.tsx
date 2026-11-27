@@ -2,7 +2,6 @@ import { CreateLinkEvent, GetSessionDataManager, HabboClubLevelEnum, SecurityLev
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
-    ChatMessageTypeEnum,
     ChatStyleConfigEntry,
     GetClubMemberLevel,
     GetConfigurationValue,
@@ -16,15 +15,41 @@ import {
 import { Text } from '../../../../common';
 import { useHotelSettingsStore } from '../../../../state/hotelSettingsStore';
 import { BaseButton } from '../../../../common/BaseButton';
-import { useChatCommandSelector, useChatInputWidget, useChatMentions, useNuxChatReminder, usePurchasableChatStyles, useRoom, useSessionInfo, useUiEvent } from '../../../../hooks';
+import {
+    closeHandheldChatLine,
+    openHandheldWhisper,
+    useChatCommandSelector,
+    useChatDraft,
+    useChatInputWidget,
+    useChatMentions,
+    useHandheldChatMode,
+    useIsHandheld,
+    useNuxChatReminder,
+    usePurchasableChatStyles,
+    useRoom,
+    useRoomUserListSnapshot,
+    useSessionInfo,
+    useUiEvent
+} from '../../../../hooks';
+import { applyComposerMode, parseChatSubmission } from '../../../../hooks/rooms/widgets/chatInputSubmission';
+import type { HandheldChatMode } from '../../../../state/handheldChatComposerStore';
 import { ChatInputCommandSelectorView } from './ChatInputCommandSelectorView';
 import { ChatInputEmojiSelectorView } from './ChatInputEmojiSelectorView';
 import { ChatInputHabbiconSelectorView } from './ChatInputHabbiconSelectorView';
 import { ChatInputMentionSelectorView } from './ChatInputMentionSelectorView';
 import { ChatInputStyleSelectorView } from './ChatInputStyleSelectorView';
+import { HandheldChatComposerView } from './HandheldChatComposerView';
+
+/** RoomObjectType.USER: the entries of the room's unit list that are people. */
+const UNIT_TYPE_PERSON = 1;
 
 export const ChatInputView: FC<{}> = (props) => {
-    const [chatValue, setChatValue] = useState<string>('');
+    // The phone composer keeps its text in a store (it survives being closed); the desktop field keeps its own.
+    const [chatValue, setChatValue] = useChatDraft();
+    const isHandheld = useIsHandheld();
+    const { mode: composerMode, recipient: whisperRecipient, setMode: setComposerMode, setRecipient: setWhisperRecipient } = useHandheldChatMode();
+    const [recipientListOpen, setRecipientListOpen] = useState(false);
+    const roomUsers = useRoomUserListSnapshot();
     const [portalTarget, setPortalTarget] = useState<HTMLElement>(null);
     const { chatStyleId = 0, updateChatStyleId = null } = useSessionInfo();
     const ownedPurchasableStyleIds = usePurchasableChatStyles();
@@ -58,6 +83,12 @@ export const ChatInputView: FC<{}> = (props) => {
     const hotelSettings = useHotelSettingsStore((state) => state.settings);
     const maxChatLength = useMemo(() => resolveServerLength(hotelSettings, 'chatMaxLength', GetConfigurationValue<number>('chat.input.maxlength', 100)), [hotelSettings]);
 
+    const ownRoomIndex = roomSession?.ownRoomIndex ?? -1;
+    const whisperCandidates = useMemo(
+        () => (isHandheld ? roomUsers.filter((user) => user.type === UNIT_TYPE_PERSON && user.roomIndex !== ownRoomIndex && !!user.name).map((user) => user.name) : []),
+        [isHandheld, roomUsers, ownRoomIndex]
+    );
+
     const anotherInputHasFocus = useCallback(() => {
         const activeElement = document.activeElement;
 
@@ -88,36 +119,23 @@ export const ChatInputView: FC<{}> = (props) => {
         (value: string, shiftKey: boolean = false) => {
             if (!value || value === '') return;
 
-            let chatType = shiftKey ? ChatMessageTypeEnum.CHAT_SHOUT : ChatMessageTypeEnum.CHAT_DEFAULT;
-            let text = value;
+            let submission = parseChatSubmission(value, { whisper: chatModeIdWhisper, shout: chatModeIdShout, speak: chatModeIdSpeak }, shiftKey);
 
-            const parts = text.split(' ');
+            if (isHandheld) {
+                // The composer's segment decides how a line without a keyword goes out. A whisper with nobody to
+                // go to (never chosen, or no longer in the room) asks for a recipient first and keeps the text.
+                const recipientGone = whisperCandidates.length > 0 && !whisperCandidates.includes(whisperRecipient);
+                const moded = applyComposerMode(submission, composerMode, recipientGone ? '' : whisperRecipient);
 
-            let recipientName = '';
-            let append = '';
+                if (!moded) {
+                    setRecipientListOpen(true);
+                    return;
+                }
 
-            switch (parts[0]) {
-                case chatModeIdWhisper:
-                    chatType = ChatMessageTypeEnum.CHAT_WHISPER;
-                    recipientName = parts[1];
-                    append = chatModeIdWhisper + ' ' + recipientName + ' ';
-
-                    parts.shift();
-                    parts.shift();
-                    break;
-                case chatModeIdShout:
-                    chatType = ChatMessageTypeEnum.CHAT_SHOUT;
-
-                    parts.shift();
-                    break;
-                case chatModeIdSpeak:
-                    chatType = ChatMessageTypeEnum.CHAT_DEFAULT;
-
-                    parts.shift();
-                    break;
+                submission = moded;
             }
 
-            text = parts.join(' ');
+            const { text, chatType, recipientName, append } = submission;
 
             setIsTyping(false);
             setIsIdle(false);
@@ -133,7 +151,21 @@ export const ChatInputView: FC<{}> = (props) => {
 
             setChatValue(append);
         },
-        [chatModeIdWhisper, chatModeIdShout, chatModeIdSpeak, maxChatLength, chatStyleId, setIsTyping, setIsIdle, sendChat]
+        [
+            chatModeIdWhisper,
+            chatModeIdShout,
+            chatModeIdSpeak,
+            maxChatLength,
+            chatStyleId,
+            setIsTyping,
+            setIsIdle,
+            sendChat,
+            setChatValue,
+            isHandheld,
+            composerMode,
+            whisperRecipient,
+            whisperCandidates
+        ]
     );
 
     const updateChatInput = useCallback(
@@ -267,6 +299,13 @@ export const ChatInputView: FC<{}> = (props) => {
                 inputRef.current?.focus();
                 return;
             case RoomWidgetUpdateChatInputContentEvent.WHISPER: {
+                if (isHandheld) {
+                    // The phone composer whispers through its mode, so the draft stays free of keywords.
+                    setRecipientListOpen(false);
+                    openHandheldWhisper(event.userName);
+                    return;
+                }
+
                 setChatValue(`${chatModeIdWhisper} ${event.userName} `);
                 return;
             }
@@ -327,13 +366,8 @@ export const ChatInputView: FC<{}> = (props) => {
 
     if (!roomSession || roomSession.isSpectator || !portalTarget) return null;
 
-    return createPortal(
-        // justify-start, not between: the style trigger overlaps the bubble's pointed
-        // left cap via a negative margin. With justify-between, hiding an optional
-        // trailing button (habbicons disabled) redistributes the slack between the
-        // trigger and the bubble, exposing the cap and opening a gap.
-        <div className={`octane-chat-input-container swf-chat-input relative flex w-full items-center justify-start overflow-visible ${nuxReminder.wiggling ? 'is-nux-reminder' : ''}`}>
-            {nuxReminder.wiggling && <div className="octane-nux-chat-hint">{LocalizeText('widgets.chatinput.mode.remind.noobie')}</div>}
+    const suggestions = (
+        <>
             {commandSelectorVisible && (
                 <ChatInputCommandSelectorView
                     commands={filteredCommands}
@@ -353,6 +387,105 @@ export const ChatInputView: FC<{}> = (props) => {
                     onHover={mention.setSelectedIndex}
                 />
             )}
+        </>
+    );
+    const floodNotice = LocalizeText('chat.input.alert.flood', ['time'], [floodBlockedSeconds.toString()]);
+    const defaultPlaceholder = nuxReminder.reminding ? LocalizeText('widgets.chatinput.mode.remind.noobie') : LocalizeText('widgets.chatinput.default');
+
+    if (isHandheld) {
+        const chooseMode = (next: HandheldChatMode) => {
+            const wasWhisper = composerMode === 'whisper';
+
+            setComposerMode(next);
+
+            if (next !== 'whisper') {
+                setRecipientListOpen(false);
+                return;
+            }
+
+            // Tapping the chosen segment again opens the list to change who it goes to.
+            if (wasWhisper) {
+                setRecipientListOpen((open) => !open);
+                return;
+            }
+
+            // The avatar that is selected in the room comes first, then whoever was whispered to last.
+            if (selectedUsername.length && whisperCandidates.includes(selectedUsername)) {
+                setWhisperRecipient(selectedUsername);
+                return;
+            }
+
+            if (!whisperRecipient || (whisperCandidates.length > 0 && !whisperCandidates.includes(whisperRecipient))) setRecipientListOpen(true);
+        };
+
+        return createPortal(
+            <HandheldChatComposerView
+                mode={composerMode}
+                onModeChange={chooseMode}
+                recipient={whisperRecipient}
+                candidates={whisperCandidates}
+                recipientListOpen={recipientListOpen}
+                onRecipientListToggle={() => setRecipientListOpen((open) => !open)}
+                onRecipientChange={(name) => {
+                    setWhisperRecipient(name);
+                    setRecipientListOpen(false);
+                }}
+                canSend={!floodBlocked}
+                onSend={() => {
+                    sendChatValue(chatValue);
+                    inputRef.current?.focus();
+                }}
+                onClose={() => {
+                    setIsTyping(false);
+                    setRecipientListOpen(false);
+                    closeHandheldChatLine();
+                }}
+                styleSelector={<ChatInputStyleSelectorView chatStyleId={chatStyleId} chatStyleIds={chatStyleIds} selectChatStyleId={updateChatStyleId} />}
+                field={
+                    floodBlocked ? (
+                        <div className="octane-handheld-composer__flood" role="status">
+                            <span>{floodNotice}</span>
+                        </div>
+                    ) : (
+                        <input
+                            ref={inputRef}
+                            className="octane-handheld-composer__input"
+                            autoCapitalize="sentences"
+                            autoComplete="off"
+                            enterKeyHint="send"
+                            maxLength={maxChatLength}
+                            placeholder={
+                                composerMode === 'whisper' && whisperRecipient
+                                    ? localizeWithFallback('octane.handheld.chat.whisper_to', 'Whisper to %name%', ['name'], [whisperRecipient])
+                                    : defaultPlaceholder
+                            }
+                            type="text"
+                            value={chatValue}
+                            onChange={(event) => updateChatInput(event.target.value)}
+                            onFocus={() => nuxReminder.dismiss()}
+                        />
+                    )
+                }
+                pickers={
+                    <>
+                        <ChatInputHabbiconSelectorView />
+                        <ChatInputEmojiSelectorView addChatEmoji={addChatEmoji} />
+                    </>
+                }
+                suggestions={suggestions}
+            />,
+            portalTarget
+        );
+    }
+
+    return createPortal(
+        // justify-start, not between: the style trigger overlaps the bubble's pointed
+        // left cap via a negative margin. With justify-between, hiding an optional
+        // trailing button (habbicons disabled) redistributes the slack between the
+        // trigger and the bubble, exposing the cap and opening a gap.
+        <div className={`octane-chat-input-container swf-chat-input relative flex w-full items-center justify-start overflow-visible ${nuxReminder.wiggling ? 'is-nux-reminder' : ''}`}>
+            {nuxReminder.wiggling && <div className="octane-nux-chat-hint">{LocalizeText('widgets.chatinput.mode.remind.noobie')}</div>}
+            {suggestions}
             <ChatInputStyleSelectorView chatStyleId={chatStyleId} chatStyleIds={chatStyleIds} selectChatStyleId={updateChatStyleId} />
             {!floodBlocked && (
                 <div className="flex-1 items-center input-sizer swf-chat-input-sizer">
@@ -360,7 +493,7 @@ export const ChatInputView: FC<{}> = (props) => {
                         ref={inputRef}
                         className="swf-chat-input-field w-full border-none bg-transparent"
                         maxLength={maxChatLength}
-                        placeholder={nuxReminder.reminding ? LocalizeText('widgets.chatinput.mode.remind.noobie') : LocalizeText('widgets.chatinput.default')}
+                        placeholder={defaultPlaceholder}
                         type="text"
                         value={chatValue}
                         onChange={(event) => updateChatInput(event.target.value)}
@@ -372,7 +505,7 @@ export const ChatInputView: FC<{}> = (props) => {
             {floodBlocked && (
                 <div className="swf-chat-flood flex min-w-0 flex-1 items-center">
                     <Text variant="danger" className="w-full truncate whitespace-nowrap text-[0.8rem] font-bold leading-none">
-                        {LocalizeText('chat.input.alert.flood', ['time'], [floodBlockedSeconds.toString()])}
+                        {floodNotice}
                     </Text>
                 </div>
             )}

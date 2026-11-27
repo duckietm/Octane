@@ -140,6 +140,7 @@ import './css/room/VimeoDisplay.css';
 import './css/navigator/NavigatorView.css';
 import './css/navigator/RaidProtection.css';
 // After the window and toolbar styles, so the phone layout's rules win over the ones they adapt.
+import './css/handheld/HandheldTokens.css';
 import './css/handheld/Handheld.css';
 import './css/handheld/HandheldCatalog.css';
 import './css/handheld/HandheldInventory.css';
@@ -149,6 +150,8 @@ import './css/handheld/HandheldProfile.css';
 import './css/handheld/HandheldProgress.css';
 import './css/handheld/HandheldFrames.css';
 import './css/handheld/HandheldRoomHud.css';
+import './css/handheld/HandheldHud.css';
+import './css/handheld/HandheldChat.css';
 import './css/handheld/HandheldDialogs.css';
 import './css/handheld/HandheldWindows.css';
 import './css/handheld/HandheldFloorplan.css';

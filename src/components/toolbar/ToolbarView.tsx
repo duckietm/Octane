@@ -1,7 +1,7 @@
 import { AddLinkEventTracker, CreateLinkEvent, Dispose, DropBounce, EaseOut, FindNewFriendsMessageComposer, ILinkEventTracker, JumpBy, Motions, OctaneToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, RemoveLinkEventTracker, Wait, YouTubeRoomSettingsEvent } from '@octane/renderer';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { CSSProperties, FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { GetConfigurationValue, GetOptionalConfigurationValue, isBuildersClubEnabled, isHousekeepingEnabled, localizeWithFallback, MessengerIconState, OpenMessengerChat, SendMessageComposer, setYoutubeRoomEnabled, VisitDesktop } from '../../api';
+import { GetConfigurationValue, GetOptionalConfigurationValue, GetRoomSession, isBuildersClubEnabled, isHousekeepingEnabled, localizeWithFallback, MessengerIconState, OpenMessengerChat, SendMessageComposer, setYoutubeRoomEnabled, VisitDesktop } from '../../api';
 import collapseLeftImg from '../../assets/images/toolbar/air/collapse-left.png';
 import collapseRightImg from '../../assets/images/toolbar/air/collapse-right.png';
 import dividerImg from '../../assets/images/toolbar/air/divider.png';
@@ -9,8 +9,9 @@ import memenuBgImg from '../../assets/images/toolbar/air/memenu-bg.png';
 import memenuCircleImg from '../../assets/images/toolbar/air/memenu-circle.png';
 import { Flex, LayoutAvatarImageView, LayoutItemCountView } from '../../common';
 import { SoundboardRoomMessageEvent } from '../../events';
-import { useAchievements, useBuildHeight, useDailyTasks, useFriends, useHasPermission, useInventoryUnseenTracker, useIsHandheld, useMentionsSnapshot, useMessageEvent, useMessenger, useOctaneEvent, useOpenIssueCount, useRewardTracks, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
+import { useAchievements, useBuildHeight, useDailyTasks, useFriends, useHandheldChatLine, useHasPermission, useInventoryUnseenTracker, useIsHandheld, useMentionsSnapshot, useMessageEvent, useMessenger, useOctaneEvent, useOpenIssueCount, useRewardTracks, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
 import { BottomDockLayout, resolveBottomDockLayout } from './bottomDockLayout';
+import { HandheldToolbarExtra, HandheldToolbarView } from './HandheldToolbarView';
 import { ToolbarNavigatorItemView } from './ToolbarNavigatorItemView';
 import { ToolbarItemView } from './ToolbarItemView';
 import { ToolbarMeView } from './ToolbarMeView';
@@ -125,7 +126,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     // The Me icon also counts the forums with unread messages (shown on the Forums entry of the Me menu).
     const meMenuCount = unseenProgMenuCount + unreadForumsCount;
     const { requests = [] } = useFriends();
-    const { iconState = MessengerIconState.HIDDEN, acknowledgeIcon = null } = useMessenger();
+    const { iconState = MessengerIconState.HIDDEN, acknowledgeIcon = null, messageThreads = [] } = useMessenger();
 
     // AIR HabboFriendBarView.onOpenMessenger: toggle the messenger and stop the icon blinking.
     const openMessenger = () =>
@@ -152,11 +153,13 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     // The phone layout always uses the touch bar, also when the browser reports a mouse-like pointer.
     const isHandheld = useIsHandheld();
     const touchLayout = isTouchLayout || isHandheld;
-    const mobileOnlyClasses = touchLayout ? '' : 'hidden';
+    // The phone has its own dock (HandheldToolbarView); the touch bar and its side stack are for tablets.
+    const mobileOnlyClasses = (touchLayout && !isHandheld) ? '' : 'hidden';
     const desktopBlockClasses = touchLayout ? 'hidden' : 'block';
     const desktopFlexClasses = touchLayout ? 'hidden' : 'flex';
     const socialInSideStack = touchLayout;
-    const sideStackClasses = touchLayout ? '' : 'hidden';
+    const sideStackClasses = (touchLayout && !isHandheld) ? '' : 'hidden';
+    const handheldChatOpen = useHandheldChatLine(isInRoom);
     const storiesEnabled = useMemo(() => GetConfigurationValue<boolean>('toolbar.stories.enabled', false), []);
     const [ messengerNotifyFrame, setMessengerNotifyFrame ] = useState(0);
     const chatFrameStyle = useMemo<CSSProperties | undefined>(() =>
@@ -397,14 +400,68 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
         animationIconToToolbar('icon-inventory', event.image, event.x, event.y);
     });
 
+    // The phone's room chat button: only where the player can write (ChatInputView draws nothing for a spectator).
+    const hasRoomChat = isInRoom && !GetRoomSession()?.isSpectator;
+    const messengerUnreadCount = isHandheld ? messageThreads.reduce((total, thread) => total + (thread.unreadCount ?? 0), 0) : 0;
+
+    // Phone dock: the desktop entries it has no icon for go into the Me popup, in the desktop toolbar's order.
+    const handheldExtras: HandheldToolbarExtra[] = [];
+
+    if(isHandheld)
+    {
+        const addExtra = (shown: unknown, key: string, icon: string, fallback: string, onClick: () => void, count = 0) =>
+        {
+            if(shown) handheldExtras.push({ key, icon, label: localizeWithFallback(`octane.handheld.toolbar.${ key }`, fallback), count, onClick });
+        };
+
+        // In a room the dock's last cell is the room chat, so the messenger is listed here (first, with what is unread).
+        addExtra(hasRoomChat, 'messenger', (iconState === MessengerIconState.UNREAD) ? 'message is-unseen' : 'message', 'Messenger', openMessenger, messengerUnreadCount);
+        addExtra(isInRoom, 'hotel_view', 'habbo', 'Hotel view', () => VisitDesktop());
+        addExtra(!isInRoom, 'home', 'house', 'Home room', () => CreateLinkEvent('navigator/goto/home'));
+        addExtra(GetConfigurationValue('game.center.enabled'), 'games', 'game', 'Games', () => CreateLinkEvent('games/toggle'));
+        addExtra(!isInRoom && storiesEnabled, 'stories', 'stories', 'Stories', () => CreateLinkEvent('stories/toggle'));
+        addExtra(buildersClubEnabled, 'builders_club', 'buildersclub', 'Builders Club', () => CreateLinkEvent('catalog/toggle/builder'));
+        addExtra(isInRoom && showToolbarButton, 'wired', 'wired-tools', 'Wired tools', openMonitor);
+        addExtra(isInRoom, 'camera', 'camera', 'Camera', () => CreateLinkEvent('camera/toggle'));
+        addExtra(fortuneWheelEnabled, 'fortune_wheel', 'fortune-wheel', 'Fortune wheel', () => CreateLinkEvent('fortune-wheel/toggle'));
+        addExtra(isInRoom && youtubeEnabled, 'youtube', 'youtube', 'YouTube', openYouTubePlayer);
+        addExtra(isInRoom && soundboardEnabled, 'soundboard', 'soundboard', 'Soundboard', () => CreateLinkEvent('soundboard/toggle'));
+        addExtra(isInRoom && buildHeightAvailable, 'build_height', 'buildheight', 'Build height', toggleBuildHeight);
+        addExtra(isMod, 'mod_tools', 'modtools', 'Mod tools', () => CreateLinkEvent('mod-tools/show'), openTicketsCount);
+        addExtra(isHk && hkEnabled, 'housekeeping', 'housekeeping', 'Housekeeping', () => CreateLinkEvent('housekeeping/toggle'));
+        addExtra(true, 'find_friends', 'friendsearch', 'Find friends', () => SendMessageComposer(new FindNewFriendsMessageComposer()));
+        addExtra(mentionsEnabled, 'mentions', (mentionsUnread > 0) ? 'mentions-unread' : 'mentions', 'Mentions', () => CreateLinkEvent('mentions/toggle'), mentionsUnread);
+    }
+
+    const handheldExtraCount = handheldExtras.reduce((total, extra) => total + (extra.count ?? 0), 0);
+
     return (
         <NativeTextTree>
             <>
                 { youtubeEnabled && <YouTubePlayerView /> }
 
+                { isHandheld &&
+                    <HandheldToolbarView
+                        isInRoom={ isInRoom }
+                        hasRoomChat={ hasRoomChat }
+                        composerOpen={ handheldChatOpen }
+                        figure={ userFigure }
+                        inventoryCount={ getFullCount }
+                        meCount={ meMenuCount + handheldExtraCount }
+                        friendRequestCount={ requests.length }
+                        messengerUnreadCount={ messengerUnreadCount }
+                        messengerIconClass={ (iconState === MessengerIconState.UNREAD) ? ((messengerNotifyFrame === 1) ? 'is-notify-1' : 'is-notify-0') : '' }
+                        isMeOpen={ isMeExpanded }
+                        setMeOpen={ setMeExpanded }
+                        unseenAchievementCount={ getTotalUnseen }
+                        useGuideTool={ useGuideTool }
+                        extras={ handheldExtras }
+                        onMessenger={ openMessenger } /> }
+
                 { isInRoom &&
                     <div
                         data-chat-raised={ dockLayout.chatRaised ? 'true' : 'false' }
+                        data-handheld-chat={ handheldChatOpen ? 'open' : undefined }
                         style={ chatFrameStyle }
                         className={ `tb-frame absolute ${ chatFramePositionClass } left-1/2 -translate-x-1/2 z-[71] flex h-[38px] w-[466px] max-w-[95vw] items-center p-0 pointer-events-none` }>
                         <Flex
@@ -502,7 +559,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         <motion.div variants={ itemVariants } className="relative tb-slot tb-slot-tall tb-slot-memenu">
                             <img src={ memenuBgImg } alt="" className="tb-memenu-bg" />
                             <AnimatePresence>
-                                { isMeExpanded &&
+                                { (isMeExpanded && !isHandheld) &&
                                     <motion.div
                                         initial={ { opacity: 0, y: 6, scale: 0.97 } }
                                         animate={ { opacity: 1, y: 0, scale: 1 } }
@@ -631,7 +688,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         <motion.div variants={ itemVariants } className="relative tb-slot tb-slot-tall tb-slot-memenu shrink-0">
                             <img src={ memenuBgImg } alt="" className="tb-memenu-bg" />
                             <AnimatePresence>
-                                { isMeExpanded &&
+                                { (isMeExpanded && !isHandheld) &&
                                     <motion.div
                                         initial={ { opacity: 0, y: 6, scale: 0.97 } }
                                         animate={ { opacity: 1, y: 0, scale: 1 } }

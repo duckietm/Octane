@@ -137,7 +137,7 @@
 
 /* ---------------------------------------------------------------- tracker and timer */
 
-/* They sat right above the desktop toolbar; on a phone they sit above the chat line, inside the safe area. */
+/* They sat right above the desktop toolbar; on a phone they sit above the dock and the chat composer, inside the safe area. */
 :root[data-handheld] .octane-quest-tracker,
 :root[data-handheld] .octane-next-quest-timer {
     right: calc(6px + var(--octane-safe-right));

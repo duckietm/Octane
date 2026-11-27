@@ -209,3 +209,78 @@ describe('PurseView (AIR purse_xml / PurseAreaExtension)', () => {
         expect(rows.map((row) => row.textContent)).toEqual(['Sound settings', 'Discord settings', 'Chat settings', 'Other settings']);
     });
 });
+
+describe('PurseView in the phone layout', () => {
+    const phone = async (active: boolean) => {
+        const { act } = await import('@testing-library/react');
+        const { useHandheldStore } = await import('../../state/handheldStore');
+        const { useHandheldHudStore } = await import('../../state/handheldHudStore');
+
+        act(() => {
+            useHandheldStore.setState({ layout: { active, orientation: active ? 'portrait' : 'landscape' } });
+            useHandheldHudStore.setState({ sideOpen: false });
+        });
+    };
+
+    afterEach(async () => {
+        cleanup();
+        mocks.links.length = 0;
+        mocks.config = {};
+        mocks.openUrl.mockClear();
+        await phone(false);
+    });
+
+    it('shows the configured balances as one chip and nothing of the desktop purse', async () => {
+        await phone(true);
+
+        const { container } = render(<PurseView />);
+        const balances = Array.from(container.querySelectorAll('.octane-handheld-purse__balance'));
+
+        expect(balances.map((balance) => `${balance.getAttribute('data-currency')}=${balance.textContent}`)).toEqual(['-1=1,234,567', '0=3,692', '5=760']);
+        expect(container.querySelector('.octane-purse')).toBeNull();
+        expect(container.querySelector('.octane-handheld-purse__panel')).toBeNull();
+    });
+
+    it('leaves out a currency the hotel does not list in system.currency.types', async () => {
+        mocks.config['system.currency.types'] = [5];
+        await phone(true);
+
+        const { container } = render(<PurseView />);
+
+        expect(Array.from(container.querySelectorAll('.octane-handheld-purse__balance')).map((balance) => balance.getAttribute('data-currency'))).toEqual(['-1', '5']);
+    });
+
+    it('unfolds the desktop purse actions from the arrow, with the same links', async () => {
+        mocks.config['web.shop.relativeUrl'] = '/shop';
+        await phone(true);
+
+        const { container } = render(<PurseView />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Credits: 1234567' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Duckets: 3692' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Diamonds: 760' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Show more' }));
+        fireEvent.click(container.querySelector('[data-action="club"]'));
+        fireEvent.click(screen.getByRole('button', { name: 'Earnings' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Help' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+        fireEvent.click(screen.getByRole('menuitem', { name: 'Other settings' }));
+
+        expect(mocks.openUrl).toHaveBeenCalledWith('/shop');
+        expect(mocks.links).toEqual(['catalog/open/ducket_info', 'catalog/open/loyalty_info', 'habboUI/open/hccenter', 'habboUI/open/vault', 'help/show', 'user-settings/show/other']);
+        expect(screen.getByRole('button', { name: 'Log out' })).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Show less' }));
+
+        expect(container.querySelector('.octane-handheld-purse__panel')).toBeNull();
+    });
+
+    it('is the desktop purse again outside the phone layout', async () => {
+        await phone(false);
+
+        const { container } = render(<PurseView />);
+
+        expect(container.querySelector('.octane-purse')).not.toBeNull();
+        expect(container.querySelector('.octane-handheld-purse')).toBeNull();
+    });
+});

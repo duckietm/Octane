@@ -14,7 +14,7 @@
     --octane-safe-right: env(safe-area-inset-right, 0px);
     --octane-safe-bottom: env(safe-area-inset-bottom, 0px);
     --octane-safe-left: env(safe-area-inset-left, 0px);
-    --octane-handheld-toolbar: 52px;
+    --octane-handheld-toolbar: 60px;
     --octane-handheld-accent: #1e7295;
     --octane-handheld-panel: rgba(32, 31, 33, 0.94);
     --octane-handheld-line: rgba(255, 255, 255, 0.14);
@@ -99,35 +99,33 @@
 
 /* ---------------------------------------------------------------- toolbar and chat */
 
-:root[data-handheld] .tb-touch-bar {
-    width: calc(100vw - 12px - var(--octane-safe-left) - var(--octane-safe-right)) !important;
-    margin-bottom: calc(3px + var(--octane-safe-bottom)) !important;
-}
-
-:root[data-handheld] .tb-touch-bar .tb-bar-scroll {
-    gap: 10px;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-}
-
-:root[data-handheld] .tb-touch-side {
-    left: calc(4px + var(--octane-safe-left)) !important;
-}
-
+/* The room chat composer's frame: a band across the bottom edge (HandheldChat.css draws what is in it). */
 :root[data-handheld] .tb-frame {
-    bottom: calc(var(--octane-handheld-toolbar) + 8px + var(--octane-safe-bottom)) !important;
-    width: calc(100vw - 16px - var(--octane-safe-left) - var(--octane-safe-right)) !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
     max-width: none !important;
-    height: 44px !important;
+    height: auto !important;
+    translate: 0 !important;
 }
 
-/* With the keyboard open the toolbar steps aside and the chat line sits right on top of the keyboard. */
+/* With the keyboard open the toolbar steps aside and the composer sits right on top of the keyboard. */
 :root[data-handheld][data-handheld-keyboard] .tb-frame {
-    bottom: calc(var(--octane-keyboard-inset, 0px) + 6px) !important;
+    bottom: var(--octane-keyboard-inset, 0px) !important;
 }
 
-:root[data-handheld][data-handheld-keyboard] .tb-touch-bar,
-:root[data-handheld][data-handheld-keyboard] .tb-touch-side,
+/* The composer is away until it is asked for (the dock's chat button, HandheldHud.css): it stays mounted and can
+   take the focus, but is not seen and catches no finger. */
+:root[data-handheld] .tb-frame:not([data-handheld-chat]),
+:root[data-handheld] .tb-frame:not([data-handheld-chat]) * {
+    pointer-events: none !important;
+}
+
+:root[data-handheld] .tb-frame:not([data-handheld-chat]) {
+    opacity: 0;
+}
+
+:root[data-handheld][data-handheld-keyboard] .octane-handheld-dock,
 :root[data-handheld][data-handheld-keyboard] .octane-handheld-placement {
     visibility: hidden;
     pointer-events: none;

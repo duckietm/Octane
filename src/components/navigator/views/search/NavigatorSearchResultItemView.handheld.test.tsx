@@ -90,6 +90,17 @@ describe('NavigatorSearchResultItemView', () => {
         expect(visits.createRoomSession).toHaveBeenCalledWith(42);
     });
 
+    it('shows how full the room is on a phone: the level, the head count and the share of its places', () => {
+        act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'portrait' } }));
+        const { container } = render(<NavigatorSearchResultItemView thumbnail roomData={{ ...room, userCount: 20, maxUserCount: 25 } as any} />);
+        const meter = container.querySelector<HTMLElement>('.octane-handheld-room__meter');
+
+        expect(meter.getAttribute('data-level')).toBe('busy');
+        expect(meter.querySelector('.octane-handheld-room__meter-count').textContent).toBe('20');
+        expect(meter.querySelector<HTMLElement>('.octane-handheld-room__meter-bar').style.getPropertyValue('--hh-fill')).toBe('80%');
+        expect(container.querySelector('.octane-navigator-air__usercount')).toBeNull();
+    });
+
     it('drops the picture in the compact list of a phone', () => {
         act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'landscape' } }));
         const { container } = render(<NavigatorSearchResultItemView roomData={room} />);

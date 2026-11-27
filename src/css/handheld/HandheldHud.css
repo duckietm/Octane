@@ -1,0 +1,740 @@
+/*
+ * Phone HUD, in the Octane handheld look (HandheldTokens.css): what stays on screen over the hotel. A floating glass
+ * pill of icons at the bottom with one round button standing apart at its end (centred in portrait, in the bottom
+ * left corner in landscape), the room capsule at the top left, and the purse capsule at the top right with the
+ * handle that unfolds the rest of the right column. Scoped to :root[data-handheld] (set only on a phone-sized touch
+ * device by the handheld watcher), so the desktop toolbar, purse and room tools are left as they are. The dock and
+ * its 8 px margin are the --octane-handheld-toolbar strip that sheets keep clear.
+ */
+
+/* ---------------------------------------------------------------- dock */
+
+:root[data-handheld] .octane-handheld-dock {
+    position: absolute;
+    bottom: calc(8px + var(--octane-safe-bottom));
+    left: 50%;
+    z-index: 71;
+    transform: translateX(-50%);
+    font-family: var(--hh-font);
+    pointer-events: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-dock {
+    left: calc(8px + var(--octane-safe-left));
+    transform: none;
+}
+
+/* The open Me popup lies over the room chip's corner in landscape. */
+:root[data-handheld] .octane-handheld-dock[data-me-open] {
+    z-index: 73;
+}
+
+/* The row: the pill and, 8 px from it, the round button. */
+:root[data-handheld] .octane-handheld-dock__panel {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    height: 52px;
+}
+
+/* Glass: the room shows through, blurred; a light edge on top and a soft shadow lift it off the floor. */
+:root[data-handheld] .octane-handheld-dock__pill {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    height: 52px;
+    padding: 0 5px;
+    border: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-hud);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-float);
+    -webkit-backdrop-filter: var(--hh-blur);
+    backdrop-filter: var(--hh-blur);
+    pointer-events: auto;
+}
+
+/* Five 48 px cells and the round button make a 316 px dock; a narrower phone shares out what it has. */
+:root[data-handheld] .octane-handheld-dock__button {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: min(48px, calc((100vw - 88px - var(--octane-safe-left) - var(--octane-safe-right)) / 5));
+    height: 50px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: transparent;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+:root[data-handheld] .octane-handheld-dock__button .octane-icon {
+    flex: none;
+    pointer-events: none;
+}
+
+/* A press: the picture sinks a little. */
+:root[data-handheld] .octane-handheld-dock__button > :where(.octane-icon, .octane-handheld-dock__head, .octane-handheld-dock__chat-art) {
+    transition:
+        transform var(--hh-fast) var(--hh-ease),
+        filter var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-dock__button:active > :where(.octane-icon, .octane-handheld-dock__head, .octane-handheld-dock__chat-art) {
+    filter: brightness(0.8);
+    transform: translateY(1px);
+}
+
+:root[data-handheld] .octane-handheld-dock__button:focus-visible {
+    outline: var(--hh-focus-on-dark);
+    outline-offset: -2px;
+}
+
+/* The round button at the end of the dock: glass like the pill for the messenger... */
+:root[data-handheld] .octane-handheld-dock__button.is-lead {
+    box-sizing: border-box;
+    width: 52px;
+    height: 52px;
+    border: 1px solid var(--hh-air-outline);
+    background: var(--hh-air-hud);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-float);
+    -webkit-backdrop-filter: var(--hh-blur);
+    backdrop-filter: var(--hh-blur);
+}
+
+/* ...and the green for the room chat, the one primary action of a room. */
+:root[data-handheld] .octane-handheld-dock__button.is-lead[data-dock='chat'] {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow:
+        inset 0 1px 0 var(--hh-air-green-top),
+        var(--hh-shadow-primary);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+:root[data-handheld] .octane-handheld-dock__button.is-lead[data-dock='chat']:active {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld] .octane-handheld-dock__button.is-lead:focus-visible {
+    outline: 2px solid var(--hh-on-dark);
+    outline-offset: 2px;
+}
+
+/* The room chat picture: a white speech bubble with three green dots. */
+:root[data-handheld] .octane-handheld-dock__chat-art {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    margin-top: 2px;
+    fill: none;
+    filter: drop-shadow(0 1px 0 rgba(6, 60, 10, 0.5));
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-dock__chat-art .is-bubble {
+    fill: #ffffff;
+}
+
+:root[data-handheld] .octane-handheld-dock__chat-art .is-dots {
+    stroke: var(--hh-air-green-bottom);
+    stroke-width: 2.8px;
+    stroke-linecap: round;
+}
+
+:root[data-handheld] .octane-handheld-dock__button:active .octane-handheld-dock__chat-art {
+    filter: drop-shadow(0 1px 0 rgba(6, 60, 10, 0.5));
+}
+
+/* The player's head in a round frame with a blue ring. */
+:root[data-handheld] .octane-handheld-dock__head {
+    position: relative;
+    display: block;
+    flex: none;
+    box-sizing: border-box;
+    width: 44px;
+    height: 44px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    background:
+        linear-gradient(var(--hh-air-hud-700), var(--hh-air-hud-900)) padding-box,
+        linear-gradient(var(--hh-air-select-outer), var(--hh-air-blue)) border-box;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-dock__head .tb-memenu-avatar {
+    top: -2px;
+    left: -2px;
+}
+
+/* The Me menu is open: the ring lights up. */
+:root[data-handheld] .octane-handheld-dock__button[aria-expanded='true'] .octane-handheld-dock__head {
+    box-shadow: 0 0 0 3px rgba(99, 197, 233, 0.45);
+}
+
+/* Counts: red pills with white numbers and a dark outline. */
+:root[data-handheld] .octane-handheld-dock .octane-toolbar-count {
+    box-sizing: border-box;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-dismiss);
+    box-shadow: 0 0 0 1px var(--hh-air-outline);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xs);
+    font-weight: 700;
+    line-height: 16px;
+}
+
+@layer base {
+    /* LayoutItemCountView forces its border colour with an important utility; only an earlier-layer !important beats it. */
+    :root[data-handheld] .octane-handheld-dock .octane-toolbar-count {
+        border-color: var(--hh-air-red-deep) !important;
+    }
+}
+
+:root[data-handheld] .octane-handheld-dock__count {
+    top: 3px;
+    right: -2px;
+    z-index: 2;
+}
+
+:root[data-handheld] .octane-handheld-dock__button[data-dock='me'] .octane-handheld-dock__count {
+    top: 0;
+    right: -4px;
+}
+
+:root[data-handheld] .octane-handheld-dock__button.is-lead .octane-handheld-dock__count {
+    top: -3px;
+    right: -3px;
+}
+
+:root[data-handheld] .octane-handheld-dock__button .octane-toolbar-new-additions {
+    top: 2px;
+    right: -4px;
+    height: 18px;
+    border-color: var(--hh-air-outline);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-dismiss);
+}
+
+/* ---------------------------------------------------------------- me popup */
+
+:root[data-handheld] .octane-handheld-dock__me {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    box-sizing: border-box;
+    width: min(340px, calc(100vw - 16px - var(--octane-safe-left) - var(--octane-safe-right)));
+    max-height: calc(100vh - 84px - var(--octane-safe-top) - var(--octane-safe-bottom));
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transform: translateX(-50%);
+    border: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-hud-solid);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-float);
+    pointer-events: auto;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-dock__me {
+    left: 0;
+    width: min(560px, calc(100vw - 16px - var(--octane-safe-left) - var(--octane-safe-right)));
+    transform: none;
+}
+
+:root[data-handheld] .octane-handheld-dock__me .octane-toolbar-me {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: var(--hh-space-1);
+    width: auto;
+    max-width: none;
+    padding: var(--hh-space-2);
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-dock__me .octane-toolbar-me-item {
+    width: auto;
+    min-width: 0;
+    height: 64px;
+    padding-top: 7px;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-well);
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-dock__me .octane-toolbar-me-item:active {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .octane-handheld-dock__me .octane-toolbar-me-item:focus-visible {
+    outline: var(--hh-focus-on-dark);
+    outline-offset: -2px;
+}
+
+/* No pointer hovers on a phone, so the icons keep their colours. */
+:root[data-handheld] .octane-handheld-dock__me .octane-toolbar-me-item .octane-toolbar-me-icon {
+    filter: none;
+}
+
+:root[data-handheld] .octane-handheld-dock__me .octane-toolbar-me-label {
+    top: 43px;
+    width: 100%;
+    padding: 0 2px;
+    box-sizing: border-box;
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-xxs);
+    line-height: 14px;
+}
+
+:root[data-handheld] .octane-handheld-dock__me .octane-toolbar-me-item .octane-toolbar-count {
+    top: 4px;
+    right: 8px;
+}
+
+:root[data-handheld] .octane-handheld-dock__me-rule {
+    grid-column: 1 / -1;
+    height: 1px;
+    margin: var(--hh-space-1) var(--hh-space-2);
+    background: var(--hh-hairline);
+}
+
+/* A toolbar sprite (up to 45 px tall) drawn smaller in the 30 px art row of a menu cell. */
+:root[data-handheld] .octane-handheld-dock__extra-art {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 30px;
+}
+
+:root[data-handheld] .octane-handheld-dock__extra-art .octane-icon {
+    flex: none;
+    transform: scale(0.7);
+    image-rendering: auto;
+}
+
+/* ---------------------------------------------------------------- room capsule */
+
+:root[data-handheld] .octane-handheld-room-chip {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    box-sizing: border-box;
+    height: var(--hh-touch);
+    max-width: min(196px, calc(42vw - var(--octane-safe-left)));
+    margin: 0;
+    padding: 0 var(--hh-space-3) 0 5px;
+    border: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-hud);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-float);
+    -webkit-backdrop-filter: var(--hh-blur);
+    backdrop-filter: var(--hh-blur);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font);
+    text-align: left;
+    cursor: pointer;
+    pointer-events: auto;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-room-chip:active {
+    background: var(--hh-air-hud-solid);
+}
+
+/* Its menu is open: the capsule is solid and its edge takes the selection blue. */
+:root[data-handheld] .octane-handheld-room-chip[aria-expanded='true'] {
+    border-color: var(--hh-air-select);
+    background: var(--hh-air-hud-solid);
+}
+
+:root[data-handheld] .octane-handheld-room-chip:focus-visible {
+    outline: var(--hh-focus-on-dark);
+    outline-offset: 2px;
+}
+
+/* The house on a round well. */
+:root[data-handheld] .octane-handheld-room-chip__well {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--hh-well);
+}
+
+:root[data-handheld] .octane-handheld-room-chip__house {
+    flex: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-room-chip__text {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-room-chip__name {
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 16px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+:root[data-handheld] .octane-handheld-room-chip__facts {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-1);
+    height: 13px;
+}
+
+:root[data-handheld] .octane-handheld-room-chip__people {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    fill: var(--hh-on-dark-muted);
+}
+
+:root[data-handheld] .octane-handheld-room-chip__count {
+    margin-right: var(--hh-space-1);
+    color: var(--hh-on-dark-muted);
+    font-size: var(--hh-size-s);
+    line-height: 13px;
+}
+
+:root[data-handheld] .octane-handheld-room-chip__heart {
+    flex: none;
+    width: 12px;
+    height: 11px;
+    fill: var(--hh-on-dark-muted);
+}
+
+/* Still to be liked: an outline. Liked on this visit: red. */
+:root[data-handheld] .octane-handheld-room-chip__heart.is-open {
+    fill: none;
+    stroke: var(--hh-on-dark);
+    stroke-width: 1.3px;
+}
+
+:root[data-handheld] .octane-handheld-room-chip__heart.is-liked {
+    fill: var(--hh-air-count-red);
+}
+
+:root[data-handheld] .octane-handheld-room-chip__arrow {
+    flex: none;
+    width: 11px;
+    height: 7px;
+    fill: none;
+    stroke: var(--hh-on-dark-muted);
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-room-chip[aria-expanded='true'] .octane-handheld-room-chip__arrow {
+    transform: rotate(180deg);
+}
+
+/* The menu that hangs from the capsule wears the same dark glass. */
+:root[data-handheld] .octane-room-tools-container .octane-room-tools {
+    border: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-hud-solid);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-float);
+}
+
+/* ---------------------------------------------------------------- purse capsule and right column */
+
+/*
+ * The right column starts under the notch and stops above the toolbar strip; unfolded, it scrolls on its own when
+ * its widgets are taller than that. Its padding is the room the capsules' shadows need inside the scrolling box.
+ */
+:root[data-handheld] .octane-right-side {
+    top: var(--octane-safe-top);
+    right: var(--octane-safe-right);
+    box-sizing: border-box;
+    width: max-content;
+    max-width: calc(100vw - var(--octane-safe-left) - var(--octane-safe-right));
+    height: auto;
+    max-height: calc(100% - 8px - var(--octane-safe-top) - var(--octane-safe-bottom) - var(--octane-handheld-toolbar));
+    padding: 8px 4px 24px 24px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-purse {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    font-family: var(--hh-font-bold);
+}
+
+/*
+ * The balances in one row, a hairline between them; they wrap onto a second one only when the numbers are too long
+ * for the screen (so the corners are those of a 44 px capsule, not of a pill of any height).
+ */
+:root[data-handheld] .octane-handheld-purse__chip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    box-sizing: border-box;
+    min-height: var(--hh-touch);
+    max-width: calc(100vw - 14px - var(--octane-safe-left) - var(--octane-safe-right));
+    margin-right: 4px;
+    padding: 0 3px;
+    overflow: hidden;
+    border: 1px solid var(--hh-air-outline);
+    border-radius: 22px;
+    background: var(--hh-air-hud);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-float);
+    -webkit-backdrop-filter: var(--hh-blur);
+    backdrop-filter: var(--hh-blur);
+    pointer-events: auto;
+}
+
+/* In a room the room capsule has the other side of the top edge. */
+:root[data-handheld='portrait'] .octane-app-root:has(.octane-handheld-room-chip) .octane-handheld-purse__chip {
+    max-width: calc(58vw - 16px - var(--octane-safe-right));
+}
+
+:root[data-handheld] .octane-handheld-purse__balance {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 42px;
+    margin: 0;
+    padding: 0 var(--hh-space-2);
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: transparent;
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-purse__balance + .octane-handheld-purse__balance::before {
+    content: '';
+    position: absolute;
+    top: 13px;
+    bottom: 13px;
+    left: 0;
+    width: 1px;
+    background: var(--hh-hairline);
+}
+
+/* The capsule's border is part of what the finger gets. */
+:root[data-handheld] .octane-handheld-purse__balance::after {
+    content: '';
+    position: absolute;
+    inset: -1px 0;
+}
+
+:root[data-handheld] .octane-handheld-purse__balance:active {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .octane-handheld-purse :where(button):focus-visible {
+    outline: var(--hh-focus-on-dark);
+    outline-offset: -2px;
+}
+
+:root[data-handheld] .octane-handheld-purse__amount {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-purse__coin {
+    flex: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* The handle under the capsule: a short glass pill with a chevron. */
+:root[data-handheld] .octane-handheld-purse__toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 44px;
+    height: 24px;
+    margin: 0 4px 0 0;
+    padding: 0;
+    border: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-hud);
+    box-shadow: var(--hh-shadow-float);
+    -webkit-backdrop-filter: var(--hh-blur);
+    backdrop-filter: var(--hh-blur);
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+/* The drawn handle is small; the finger gets a taller target that stops short of the capsule above it. */
+:root[data-handheld] .octane-handheld-purse__toggle::after {
+    content: '';
+    position: absolute;
+    inset: -4px -6px -20px;
+}
+
+:root[data-handheld] .octane-handheld-purse__toggle:active,
+:root[data-handheld] .octane-handheld-purse__toggle[aria-expanded='true'] {
+    background: var(--hh-air-hud-solid);
+}
+
+:root[data-handheld] .octane-handheld-purse__toggle svg {
+    width: 11px;
+    height: 7px;
+    fill: none;
+    stroke: var(--hh-on-dark);
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-purse__toggle[aria-expanded='true'] svg {
+    transform: rotate(180deg);
+}
+
+:root[data-handheld] .octane-handheld-purse__panel {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    box-sizing: border-box;
+    width: 224px;
+    margin-right: 4px;
+    padding: var(--hh-space-2);
+    border: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-hud-solid);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-float);
+    pointer-events: auto;
+}
+
+:root[data-handheld] .octane-handheld-purse__action {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-2);
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-well);
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 15px;
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-purse__action:active,
+:root[data-handheld] .octane-handheld-purse__action[aria-expanded='true'] {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .octane-handheld-purse__action.is-wide {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    padding: 0 var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-purse__action img {
+    flex: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-purse__unseen {
+    margin-left: auto;
+}
+
+:root[data-handheld] .octane-handheld-purse__settings {
+    display: flex;
+    grid-column: 1 / -1;
+    flex-direction: column;
+    gap: 2px;
+}
+
+:root[data-handheld] .octane-handheld-purse__settings-row {
+    min-height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-3);
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: transparent;
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-s);
+    line-height: 15px;
+    text-align: left;
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-handheld-purse__settings-row:active {
+    background: var(--hh-well-pressed);
+}
+
+/* The desktop column's widgets keep their own 230 px look when unfolded. */
+:root[data-handheld] .octane-handheld-purse__more:not([hidden]),
+:root[data-handheld] .octane-handheld-side-widgets:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    width: 230px;
+    max-width: 100%;
+    margin-right: 3px;
+}
+
+:root[data-handheld] .octane-handheld-purse__more:empty {
+    display: none;
+}

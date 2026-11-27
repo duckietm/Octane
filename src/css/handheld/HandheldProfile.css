@@ -1,7 +1,7 @@
 /*
- * Phone user profile, profile customize (with the pose tab), the purse and the right side column. Scoped to
+ * Phone user profile and profile customize (with the pose tab). Scoped to
  * :root[data-handheld] (set only on a phone-sized touch device by the handheld watcher), so the desktop windows of
- * UserProfileView.css / PurseView.css are left as they are. The two profile windows open as sheets
+ * UserProfileView.css are left as they are. The two profile windows open as sheets
  * (DraggableWindow handheldSheet); inside them the content scrolls and the columns stack in portrait.
  */
 
@@ -162,47 +162,4 @@
 :root[data-handheld] .octane-profile-customize input:not([type='checkbox']):not([type='radio']),
 :root[data-handheld] .octane-profile-customize textarea {
     font-size: 16px;
-}
-
-/* ---------------------------------------------------------------- purse and right side column */
-
-/*
- * The right column (purse, notices, group info, offers, notifications) starts under the notch and stops above
- * the chat line and toolbar strip; it scrolls on its own when the widgets are taller than that, so it never
- * reaches down over the room tools and the chat.
- */
-:root[data-handheld] .octane-right-side {
-    top: var(--octane-safe-top);
-    right: calc(4px + var(--octane-safe-right));
-    width: min(230px, calc(100vw - 24px - var(--octane-safe-left) - var(--octane-safe-right)));
-    height: auto;
-    max-height: calc(100% - var(--octane-safe-top) - var(--octane-safe-bottom) - var(--octane-handheld-toolbar) - 64px);
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-}
-
-/* A narrow phone in portrait: the AIR column (purse box and widgets alike) is drawn at 85 %, so the room keeps more
-   of the top edge. Width and height are the column's own 230 px layout at that scale. */
-:root[data-handheld='portrait'] .octane-right-side {
-    width: 196px;
-}
-
-:root[data-handheld='portrait'] .octane-right-side > * {
-    width: 230px !important;
-    zoom: 0.85;
-}
-
-/* In landscape the screen is short: the column is held to the top half, the rest of the right edge stays room. */
-:root[data-handheld='landscape'] .octane-right-side {
-    max-height: calc(55% - var(--octane-safe-top));
-}
-
-:root[data-handheld] .octane-purse-menu {
-    min-width: 180px;
-}
-
-:root[data-handheld] .octane-purse-menu .octane-purse-menu__item {
-    min-height: 44px;
 }

@@ -177,9 +177,9 @@ describe('DraggableWindow in the phone layout', () => {
 
         const element = document.querySelector('.draggable-window') as HTMLElement;
 
-        // jsdom has no layout, so the window measures as the 340 x 462 default; 52 px are kept for the toolbar.
+        // jsdom has no layout, so the window measures as the 340 x 462 default; 60 px are kept for the toolbar.
         expect(element.getAttribute('data-handheld-window')).toBe('dialog');
-        expect(element.style.transform).toBe('translate3d(25px, 165px, 0)');
+        expect(element.style.transform).toBe('translate3d(25px, 161px, 0)');
     });
 
     it('turns a window wider than the phone into a sheet over the usable area', () => {
@@ -197,7 +197,7 @@ describe('DraggableWindow in the phone layout', () => {
         expect(element.getAttribute('data-handheld-window')).toBe('sheet');
         expect(element.style.transform).toBe('translate3d(0px, 0px, 0)');
         expect(element.style.width).toBe('390px');
-        expect(element.style.height).toBe('792px');
+        expect(element.style.height).toBe('784px');
     });
 
     it('does not drag on a phone', () => {
@@ -234,7 +234,7 @@ describe('DraggableWindow in the phone layout', () => {
 
         expect(element.getAttribute('data-handheld-window')).toBe('sheet');
         expect(element.style.width).toBe('390px');
-        expect(element.style.height).toBe('792px');
+        expect(element.style.height).toBe('784px');
     });
 
     it('draws a fixed-layout window smaller and centres it when it then fits', () => {
@@ -253,8 +253,8 @@ describe('DraggableWindow in the phone layout', () => {
         expect(element.style.getPropertyValue('--octane-handheld-scale')).toBe('0.771');
         expect(element.hasAttribute('data-handheld-pan')).toBe(false);
         expect(element.style.width).toBe('');
-        // 490 x 523 at 0.771 is 378 x 403, centred in the 390 x 792 area.
-        expect(element.style.transform).toBe('translate3d(6px, 195px, 0)');
+        // 490 x 523 at 0.771 is 378 x 403, centred in the 390 x 784 area.
+        expect(element.style.transform).toBe('translate3d(6px, 191px, 0)');
     });
 
     it('pans a fixed-layout window that is still too big at its smallest scale', () => {
@@ -273,7 +273,7 @@ describe('DraggableWindow in the phone layout', () => {
         expect(element.style.getPropertyValue('--octane-handheld-scale')).toBe('0.6');
         expect(element.hasAttribute('data-handheld-pan')).toBe(true);
         expect(element.style.width).toBe('390px');
-        expect(element.style.height).toBe('792px');
+        expect(element.style.height).toBe('784px');
     });
 
     it('ignores the phone props on desktop', () => {
@@ -310,7 +310,7 @@ describe('DraggableWindow in the phone layout', () => {
 
         act(() => useHandheldStore.setState({ keyboardInset: 0 }));
 
-        expect(element.style.height).toBe('792px');
+        expect(element.style.height).toBe('784px');
     });
 
     it('stays put when the keyboard opens for a field outside it', () => {
@@ -329,7 +329,7 @@ describe('DraggableWindow in the phone layout', () => {
         act(() => (document.querySelector('input') as HTMLInputElement).focus());
         act(() => useHandheldStore.setState({ keyboardInset: 336 }));
 
-        expect(element.style.height).toBe('792px');
+        expect(element.style.height).toBe('784px');
 
         act(() => useHandheldStore.setState({ keyboardInset: 0 }));
     });

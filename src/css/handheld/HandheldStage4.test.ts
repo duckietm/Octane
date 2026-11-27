@@ -56,10 +56,13 @@ describe('phone layout, stage 4 stylesheets', () => {
     });
 
     it('gives the purse actions thumb-sized buttons in a row', () => {
-        const css = read('src/css/handheld/HandheldWindows.css');
+        // The phone purse is its own view now (HandheldPurseView): club and earnings full width, then help, settings and log out.
+        const css = read('src/css/handheld/HandheldHud.css');
 
-        expect(css).toMatch(/\.octane-purse__col--actions \{[^}]*flex-direction: row/);
-        expect(css).toMatch(/\.octane-purse__btn--settings \{[^}]*height: 48px/);
+        expect(css).toMatch(/\.octane-handheld-purse__panel \{[^}]*grid-template-columns: repeat\(3, 1fr\)/);
+        expect(css).toMatch(/\.octane-handheld-purse__action \{[^}]*min-height: var\(--hh-touch\)/);
+        expect(read('src/css/handheld/HandheldTokens.css')).toContain('--hh-touch: 44px;');
+        expect(read('src/css/handheld/HandheldWindows.css')).not.toContain('.octane-purse__');
     });
 
     it('lets the fingers draw on the floor plan instead of scrolling the page', () => {

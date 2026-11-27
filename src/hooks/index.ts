@@ -13,6 +13,7 @@ export * from './friends';
 export * from './game-center';
 export * from './groups';
 export * from './handheld/useHandheldLayout';
+export * from './handheld/useHandheldChatLine';
 export * from './handheld/useHandheldFrameFit';
 export * from './help';
 export * from './hotel-view';
