@@ -1,0 +1,1096 @@
+/*
+ * Phone avatar editor ("Change Your Looks") in the Octane handheld look (HandheldTokens.css), inside the shared sheet
+ * frame (HandheldSheet.css): the categories are picture tabs on the blue, the wardrobe opens from the header. Upright
+ * the sheet stacks the avatar on its stage, the choices of the category, the part grid, the colours and the green
+ * save button; on a phone held on its side the grid, the colours and the avatar with the save button stand side by
+ * side. The shell carries none of the AIR window's classes, so AvatarEditorView.css does not reach it; the few shared
+ * parts (the part tile, the colour swatch) are restyled here. Scoped to :root[data-handheld].
+ */
+
+/* ---------------------------------------------------------------- header: the wardrobe button */
+
+:root[data-handheld] .octane-handheld-looks__wardrobe-toggle {
+    position: relative;
+    display: flex;
+    flex: 0 0 44px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    box-shadow: var(--hh-edge);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-looks__wardrobe-toggle::after {
+    content: "";
+    position: absolute;
+    inset: -4px 0;
+}
+
+:root[data-handheld] .octane-handheld-looks__wardrobe-toggle img {
+    width: 29px;
+    height: 21px;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-looks__wardrobe-toggle:active {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .octane-handheld-looks__wardrobe-toggle.is-open {
+    background: var(--hh-air-track-light);
+    box-shadow:
+        inset 0 1px 0 #ffffff,
+        0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-handheld] .octane-handheld-looks .octane-handheld-sheet__mark {
+    margin-right: 2px;
+}
+
+/* ---------------------------------------------------------------- the three areas */
+
+:root[data-handheld] .octane-handheld-looks__layout {
+    display: grid;
+    flex: 1 1 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+}
+
+/* On its side: the category on the left, the avatar with the save button under it on the right. */
+:root[data-handheld='landscape'] .octane-handheld-looks__layout {
+    grid-template-columns: minmax(0, 1fr) 172px;
+    grid-template-rows: minmax(0, 1fr) auto;
+}
+
+:root[data-handheld] .octane-handheld-looks__editor {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-looks__editor {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+}
+
+/* ---------------------------------------------------------------- the stage: avatar, rotate, the three tools */
+
+:root[data-handheld] .octane-handheld-looks__stage {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    align-items: stretch;
+    justify-content: center;
+    min-width: 0;
+    height: 152px;
+    padding: var(--hh-space-2);
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: linear-gradient(180deg, var(--hh-air-track-light) 0%, var(--hh-air-white) 100%);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-looks__stage {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: flex-start;
+    height: auto;
+    min-height: 0;
+}
+
+:root[data-handheld] .octane-handheld-looks__name {
+    position: absolute;
+    top: var(--hh-space-2);
+    left: var(--hh-space-3);
+    z-index: 2;
+    max-width: 36%;
+    overflow: hidden;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-looks__name {
+    max-width: 104px;
+}
+
+:root[data-handheld] .octane-handheld-looks__preview {
+    position: relative;
+    flex: 0 0 150px;
+    width: 150px;
+    min-height: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-looks__preview {
+    flex-basis: 112px;
+    width: 112px;
+}
+
+/* The avatar stands on a soft platform, feet near the card's lower edge. */
+:root[data-handheld] .octane-handheld-looks__figure {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 90px;
+    height: 130px;
+    transform: translateX(-50%);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-looks__figure {
+    left: 44px;
+}
+
+:root[data-handheld] .octane-handheld-looks__figure::before {
+    content: "";
+    position: absolute;
+    right: 8px;
+    bottom: 4px;
+    left: 8px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--hh-air-track-active);
+    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.12);
+}
+
+:root[data-handheld] .octane-handheld-looks__figure .avatar-image {
+    position: absolute;
+    bottom: 6px;
+    left: 0;
+    width: 90px;
+    height: 130px;
+    margin: 0;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-looks__effect-preview {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    width: 130px;
+    height: 150px;
+    transform: translateX(-50%);
+}
+
+/* Rotate: a round button at the avatar's foot, with our turn arrow. */
+:root[data-handheld] .octane-handheld-looks__rotate {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-looks__rotate {
+    right: auto;
+    left: 0;
+}
+
+:root[data-handheld] .octane-handheld-looks__rotate img {
+    width: 33px;
+    height: 22px;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-looks__rotate:active,
+:root[data-handheld] .octane-handheld-looks__tool:active {
+    background: var(--hh-air-track-light);
+}
+
+/* Reset, clear, randomise: three round quiet buttons down the card's right edge. */
+:root[data-handheld] .octane-handheld-looks__tools {
+    position: absolute;
+    top: 50%;
+    right: var(--hh-space-2);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    transform: translateY(-50%);
+}
+
+:root[data-handheld] .octane-handheld-looks__tool {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-size: var(--hh-size-l);
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-looks__tool svg {
+    width: 15px;
+    height: 15px;
+    pointer-events: none;
+}
+
+/* The collectible look that is chosen: its name in its collection's colour, on a dark pill under the name. */
+:root[data-handheld] .octane-handheld-looks__collectible-name {
+    position: absolute;
+    top: 30px;
+    left: var(--hh-space-3);
+    max-width: 40%;
+    padding: 2px var(--hh-space-2);
+    overflow: hidden;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-hud-700);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xs);
+    font-weight: 700;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- save */
+
+:root[data-handheld] .octane-handheld-looks__save {
+    box-sizing: border-box;
+    width: 100%;
+    height: 48px;
+    padding: 0 var(--hh-space-4);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-green-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-primary);
+    box-shadow:
+        inset 0 1px 0 var(--hh-air-green-top),
+        var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-looks__save:active {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-looks__save {
+    grid-column: 2;
+    grid-row: 2;
+    height: var(--hh-touch);
+}
+
+/* ---------------------------------------------------------------- a category: choices, parts, colours */
+
+:root[data-handheld] .octane-handheld-looks__model {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-looks__model {
+    flex-direction: row;
+}
+
+:root[data-handheld] .octane-handheld-looks__parts-column {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+}
+
+/* The choices above the grid: Boy / Girl, or the kinds of clothing in this category. Swiped when they do not fit. */
+:root[data-handheld] .octane-handheld-looks__chips {
+    display: flex;
+    flex: none;
+    gap: 6px;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-looks__chip {
+    display: flex;
+    flex: 1 0 56px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 56px;
+    max-width: 160px;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    overflow: hidden;
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+    white-space: nowrap;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-looks__chip > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+:root[data-handheld] .octane-handheld-looks__chip:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-looks__chip[aria-pressed='true'] {
+    border-color: var(--hh-air-select);
+    background: var(--hh-air-track-light);
+    box-shadow:
+        inset 0 0 0 1px var(--hh-air-select),
+        var(--hh-shadow-card);
+    color: var(--hh-air-blue-header);
+}
+
+:root[data-handheld] .octane-handheld-looks__chip .avatar-editor-icon {
+    flex: none;
+    height: 36px;
+    cursor: inherit;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-looks__chip .avatar-editor-icon img {
+    max-width: 47px;
+    max-height: 35px;
+}
+
+:root[data-handheld] .octane-handheld-looks__chip.is-gender .avatar-editor-icon img {
+    max-height: 30px;
+}
+
+/* The companion that is worn, with the button that takes it off. */
+:root[data-handheld] .octane-handheld-looks__equipped {
+    display: flex;
+    flex: 1 1 auto;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-1) 0 var(--hh-space-3);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-looks__equipped > img,
+:root[data-handheld] .octane-handheld-looks__equipped > .avatar-editor-icon {
+    flex: none;
+    max-width: 32px;
+    max-height: 32px;
+    object-fit: contain;
+}
+
+:root[data-handheld] .octane-handheld-looks__equipped > span {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-looks__equipped-remove {
+    position: relative;
+    display: flex;
+    flex: 0 0 36px;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-cream);
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-handheld-looks__equipped-remove::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+}
+
+:root[data-handheld] .octane-handheld-looks__equipped-remove img {
+    width: 22px;
+    height: 22px;
+}
+
+/* ---------------------------------------------------------------- the part grid */
+
+:root[data-handheld] .octane-handheld-looks__parts {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+:root[data-handheld] .octane-handheld-looks__parts > div {
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Five tiles across (the virtual rows of the shared grid, InfiniteGrid). */
+:root[data-handheld] .octane-handheld-looks__parts [data-index] {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    row-gap: 0;
+}
+
+:root[data-handheld] .octane-handheld-looks__part {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 60px;
+    margin: 0;
+    padding: 2px;
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    cursor: pointer;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-looks__part:active {
+    background: var(--hh-air-track-light);
+}
+
+/* The chosen part: the selection blue of our windows as a ring, on the light blue. */
+:root[data-handheld] .octane-handheld-looks__part.part-selected {
+    border-color: var(--hh-air-select);
+    background: var(--hh-air-track-light);
+    box-shadow:
+        inset 0 0 0 2px var(--hh-air-select),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-looks__part > img:not(.avatar-editor-part-hc) {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+:root[data-handheld] .octane-handheld-looks__part > .avatar-editor-face-thumbnail.is-disabled {
+    opacity: 0.45;
+}
+
+:root[data-handheld] .octane-handheld-looks__part .avatar-editor-icon {
+    pointer-events: none;
+}
+
+/* A part that needs the club, one that is tradable, one that has to be bought first: small marks in the corners. */
+:root[data-handheld] .octane-handheld-looks .avatar-editor-part-hc {
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 10px;
+    height: 9px;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-looks__part > .avatar-editor-sellable-icon {
+    top: 2px;
+    right: 2px;
+    width: 17px;
+    height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-looks__part.pet-sellable-locked {
+    opacity: 1;
+}
+
+:root[data-handheld] .octane-handheld-looks__part.pet-sellable-locked > img:not(.avatar-editor-part-hc) {
+    opacity: 0.45;
+}
+
+/* The price mark of a part that has to be bought: a small dark pill in the lower right corner. */
+:root[data-handheld] .octane-handheld-looks__part .pet-sellable-badge {
+    top: auto;
+    right: 2px;
+    bottom: 2px;
+    left: auto;
+    padding: 1px 3px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-hud);
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- colours */
+
+:root[data-handheld] .octane-handheld-looks__colours {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    min-width: 0;
+    min-height: 0;
+    padding: var(--hh-space-2);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-looks__colours {
+    flex: 0 0 200px;
+    width: 200px;
+}
+
+:root[data-handheld] .octane-handheld-looks__colours-head {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 28px;
+}
+
+:root[data-handheld] .octane-handheld-looks__colours-title {
+    overflow: hidden;
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Any colour at all, for club members: a small quiet pill. */
+:root[data-handheld] .octane-handheld-looks__advanced {
+    position: relative;
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-1);
+    height: 28px;
+    padding: 0 var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-size: var(--hh-size-xs);
+    line-height: 16px;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-looks__advanced::after {
+    content: "";
+    position: absolute;
+    inset: -9px 0;
+}
+
+:root[data-handheld] .octane-handheld-looks__advanced[aria-pressed='true'] {
+    border-color: var(--hh-air-select);
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-looks__palettes {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    min-width: 0;
+    min-height: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-looks__palettes {
+    gap: var(--hh-space-2);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-looks__palette {
+    flex: none;
+    min-width: 0;
+}
+
+/* Upright: two rows of swatches swiped sideways (one row each when the part takes several colours). */
+:root[data-handheld] .octane-handheld-looks__palette .avatar-editor-palette-grid {
+    grid-template-columns: none;
+    grid-template-rows: repeat(2, 40px);
+    grid-auto-columns: 40px;
+    grid-auto-flow: column;
+    grid-auto-rows: 40px;
+    gap: var(--hh-space-1);
+    height: auto;
+    padding: 2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-gutter: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-looks__colours:not([data-palettes='1']) .avatar-editor-palette-grid {
+    grid-template-rows: 40px;
+}
+
+/* On its side: the swatches fill the column and the whole column scrolls. */
+:root[data-handheld='landscape'] .octane-handheld-looks__palette .avatar-editor-palette-grid,
+:root[data-handheld='landscape'] .octane-handheld-looks__colours:not([data-palettes='1']) .avatar-editor-palette-grid {
+    grid-template-columns: repeat(4, 40px);
+    grid-template-rows: none;
+    grid-auto-flow: row;
+    overflow: visible;
+}
+
+:root[data-handheld] .octane-handheld-looks .avatar-editor-palette-item {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--hh-radius-s);
+}
+
+/* A swatch is 40 px with 4 px between: the finger gets the space around it too. */
+:root[data-handheld] .octane-handheld-looks .avatar-editor-palette-item::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+}
+
+:root[data-handheld] .octane-handheld-looks .avatar-editor-palette-color,
+:root[data-handheld] .octane-handheld-looks .avatar-editor-palette-frame {
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--hh-radius-s);
+}
+
+:root[data-handheld] .octane-handheld-looks .avatar-editor-palette-color {
+    background-image: none;
+    -webkit-mask: none;
+    mask: none;
+}
+
+:root[data-handheld] .octane-handheld-looks .avatar-editor-palette-frame {
+    border: 1px solid var(--hh-air-box-line);
+    background: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+:root[data-handheld] .octane-handheld-looks .avatar-editor-palette-item.is-selected .avatar-editor-palette-frame {
+    border: 2px solid var(--hh-air-white);
+    background: none;
+    box-shadow:
+        0 0 0 2px var(--hh-air-blue),
+        inset 0 0 0 1px var(--hh-air-outline);
+}
+
+:root[data-handheld] .octane-handheld-looks .avatar-editor-palette-hc {
+    top: auto;
+    right: 3px;
+    bottom: 3px;
+    left: auto;
+    padding: 2px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+}
+
+/* The free colour picker of the club. */
+:root[data-handheld] .octane-handheld-looks__palette > .flex {
+    height: 56px;
+    padding: 0;
+}
+
+/* ---------------------------------------------------------------- looks to pick whole: popular, collectibles */
+
+:root[data-handheld] .octane-handheld-looks__gallery,
+:root[data-handheld] .octane-handheld-looks__wardrobe {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+}
+
+:root[data-handheld] .octane-handheld-looks__gallery-head {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--hh-space-2);
+    min-width: 0;
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-looks__gallery-head b {
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-looks__gallery-head img {
+    align-self: center;
+    width: 15px;
+    height: 15px;
+}
+
+:root[data-handheld] .octane-handheld-looks__outfits,
+:root[data-handheld] .octane-handheld-looks__effects,
+:root[data-handheld] .octane-handheld-looks__slots {
+    display: grid;
+    flex: 1 1 0;
+    align-content: start;
+    gap: 6px;
+    min-height: 0;
+    padding: 2px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-looks__outfits {
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    grid-auto-rows: 96px;
+}
+
+:root[data-handheld] .octane-handheld-looks__outfit,
+:root[data-handheld] .octane-handheld-looks__effect {
+    position: relative;
+    box-sizing: border-box;
+    min-width: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-looks__outfit:active,
+:root[data-handheld] .octane-handheld-looks__effect:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-looks__outfit[aria-pressed='true'],
+:root[data-handheld] .octane-handheld-looks__effect[aria-pressed='true'] {
+    border-color: var(--hh-air-select);
+    box-shadow:
+        0 0 0 2px var(--hh-air-select),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-looks__effect[aria-pressed='true'] {
+    background: var(--hh-air-track-light);
+}
+
+/* The collectible that is worn: a small green dot in the corner. */
+:root[data-handheld] .octane-handheld-looks__outfit.is-worn::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-green-mid);
+    box-shadow: 0 0 0 2px var(--hh-air-white);
+}
+
+/* ---------------------------------------------------------------- effects */
+
+:root[data-handheld] .octane-handheld-looks__effects {
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    grid-auto-rows: 56px;
+}
+
+:root[data-handheld] .octane-handheld-looks__effect {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:root[data-handheld] .octane-handheld-looks__effect > img {
+    max-width: 40px;
+    max-height: 40px;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-looks__effect-amount {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    box-sizing: border-box;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 var(--hh-space-1);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-blue-deep);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xxs);
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-looks__effect-left {
+    position: absolute;
+    right: 5px;
+    bottom: 4px;
+    left: 5px;
+    height: 4px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-looks__effect-left > span,
+:root[data-handheld] .octane-handheld-looks__effect-time-bar {
+    display: block;
+    height: 100%;
+    background: var(--hh-air-green-mid);
+}
+
+/* Under the grid: the chosen effect's name and time left, and the way to the shop. */
+:root[data-handheld] .octane-handheld-looks__effect-bar {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 60px;
+    padding: var(--hh-space-2) var(--hh-space-2) var(--hh-space-2) var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-looks__effect-copy {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-looks__effect-copy b {
+    overflow: hidden;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-looks__effect-time {
+    position: relative;
+    height: 16px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-looks__effect-time span {
+    position: absolute;
+    inset: 0;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-xs);
+    line-height: 16px;
+    text-align: center;
+}
+
+/* A quiet button: the shop link, the wardrobe's two buttons. */
+:root[data-handheld] .octane-handheld-looks__quiet,
+:root[data-handheld] .octane-handheld-looks__slot-button {
+    flex: none;
+    box-sizing: border-box;
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-looks__quiet:active,
+:root[data-handheld] .octane-handheld-looks__slot-button:active {
+    background: var(--hh-air-track-light);
+}
+
+/* Nothing to show: no effects owned, no companions. */
+:root[data-handheld] .octane-handheld-looks__note {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-1);
+    min-height: 0;
+    padding: var(--hh-space-4);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-looks__note b {
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- wardrobe */
+
+:root[data-handheld] .octane-handheld-looks__slots {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-auto-rows: 112px;
+}
+
+/* A slot: the saved look on the left, "use" and "save" on the right. */
+:root[data-handheld] .octane-handheld-looks__slot {
+    display: grid;
+    box-sizing: border-box;
+    grid-template-columns: 56px minmax(0, 1fr);
+    grid-template-rows: 1fr 1fr;
+    gap: 0 var(--hh-space-2);
+    align-items: center;
+    min-width: 0;
+    padding: var(--hh-space-2);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-looks__slot.is-locked {
+    opacity: 0.55;
+}
+
+:root[data-handheld] .octane-handheld-looks__slot-figure {
+    position: relative;
+    display: flex;
+    grid-row: 1 / span 2;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    overflow: hidden;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-looks__slot-figure > img {
+    width: 17px;
+    height: 43px;
+    opacity: 0.6;
+}
+
+:root[data-handheld] .octane-handheld-looks__slot-button {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    padding: 0 var(--hh-space-2);
+    overflow: visible;
+}
+
+/* 40 px buttons 8 px apart: each gets the space around it. */
+:root[data-handheld] .octane-handheld-looks__slot-button::after {
+    content: "";
+    position: absolute;
+    inset: -3px 0;
+}
+
+:root[data-handheld] .octane-handheld-looks__slot-button.is-wear {
+    border-color: var(--hh-air-blue-deep);
+    background: var(--hh-air-blue);
+    box-shadow: var(--hh-edge), var(--hh-shadow-card);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-looks__slot-button.is-wear:active {
+    background: var(--hh-air-blue-deep);
+}
+
+:root[data-handheld] .octane-handheld-looks__slot-button:disabled {
+    box-shadow: none;
+    opacity: 0.45;
+}

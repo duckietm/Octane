@@ -73,7 +73,7 @@ describe('phone layout, stage 3 windows', () => {
         ['src/components/quests/DailyTasksView.tsx', 'handheldSheet'],
         ['src/components/quests/RewardTrackView.tsx', 'handheldScale={HANDHELD_MIN_FRAME_SCALE}'],
         ['src/components/talent/TalentTrackView.tsx', 'handheldScale={HANDHELD_MIN_FRAME_SCALE}'],
-        ['src/components/avatar-editor/AvatarEditorView.tsx', 'handheldScale={HANDHELD_TOUCH_FRAME_SCALE}'],
+        ['src/components/avatar-editor/AvatarEditorView.tsx', 'handheldSheet'],
         ['src/components/achievements/AchievementsView.tsx', 'handheldScale={HANDHELD_TOUCH_FRAME_SCALE}']
     ])('%s fits the phone with %s', (path, prop) => {
         expect(read(path)).toContain(prop);

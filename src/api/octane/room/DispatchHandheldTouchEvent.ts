@@ -13,7 +13,7 @@ import { pickSmallestContaining, RoomGestureIntent, RoomTouchGesture, toTouchPoi
 const CANVAS_ID = 1;
 const PICK_ORDER = [RoomObjectCategory.UNIT, RoomObjectCategory.FLOOR, RoomObjectCategory.WALL];
 
-/** Asks the avatar widget to show the action menu of the avatar a hold selected. */
+/** Asks the avatar widget to open the drawer of the avatar a hold selected, so all its actions show at once. */
 export const HANDHELD_AVATAR_ACTIONS_LINK = 'avatar-info/handheld-actions';
 
 const gesture = new RoomTouchGesture();

@@ -193,6 +193,20 @@
     font-weight: 700;
 }
 
+/* A tab that is a picture (the avatar editor's categories): as wide as a finger, never stretched. */
+:root[data-handheld] .octane-handheld-sheet__tab.has-image {
+    flex: 0 0 auto;
+    min-width: 56px;
+    padding: 0 var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-sheet__tab-image {
+    max-width: 41px;
+    max-height: 24px;
+    object-fit: contain;
+    pointer-events: none;
+}
+
 /* New things behind a tab: a small red count. */
 :root[data-handheld] .octane-handheld-sheet__tab-count {
     flex: none;

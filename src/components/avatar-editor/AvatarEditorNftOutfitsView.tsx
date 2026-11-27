@@ -3,6 +3,7 @@ import { localizeWithFallback } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { ToggleButton } from '../../common/ToggleButton';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
 import { formatNftOutfitLabel, getNftCollectionStyle, NftOutfit } from '../../hooks';
 
 interface AvatarEditorNftOutfitsViewProps {
@@ -38,6 +39,35 @@ const frameStyle = (outfit: NftOutfit): CSSProperties => {
 export const AvatarEditorNftOutfitsView: FC<AvatarEditorNftOutfitsViewProps> = (props) => {
     const { outfits = [], selectedOutfit = null, wornOutfit = null, onSelect = null } = props;
     const chooseText = localizeWithFallback('avatareditor.nfts.choose', 'Click to choose');
+    // Phone layout: the same looks as finger-sized cards (HandheldLooks.css).
+    const isHandheld = useIsHandheld();
+
+    if (isHandheld) {
+        return (
+            <NativeTextTree>
+                <div className="octane-handheld-looks__gallery">
+                    <div className="octane-handheld-looks__gallery-head">
+                        <b>{localizeWithFallback('avatareditor.nfts.title', 'Avatar Collectibles')}</b>
+                        <span>{chooseText}</span>
+                    </div>
+                    <div className="octane-handheld-looks__outfits">
+                        {outfits.map((outfit) => (
+                            <ToggleButton
+                                key={outfit.id}
+                                aria-label={formatNftOutfitLabel(collectionName(outfit), outfit)}
+                                className={`octane-handheld-looks__outfit is-collectible${wornOutfit?.id === outfit.id ? ' is-worn' : ''}`}
+                                pressed={selectedOutfit?.id === outfit.id}
+                                style={frameStyle(outfit)}
+                                onClick={() => onSelect?.(outfit)}
+                            >
+                                <LayoutAvatarImageView direction={4} figure={outfit.figure} gender={outfit.gender} fit small />
+                            </ToggleButton>
+                        ))}
+                    </div>
+                </div>
+            </NativeTextTree>
+        );
+    }
 
     return (
         <NativeTextTree>
@@ -67,12 +97,13 @@ export const AvatarEditorNftOutfitsView: FC<AvatarEditorNftOutfitsViewProps> = (
 /** AIR NftWardrobeParamView (`collectible_avatar_info`): "<collection> #<id>" in the collection's colour. */
 export const AvatarEditorNftOutfitInfoView: FC<{ outfit: NftOutfit | null }> = ({ outfit }) => {
     const style = outfit ? getNftCollectionStyle(outfit.contractKey) : null;
+    const isHandheld = useIsHandheld();
 
     if (!outfit || !style) return null;
 
     return (
         <NativeTextTree>
-            <div className="octane-avatar-editor-nft-info">
+            <div className={isHandheld ? 'octane-handheld-looks__collectible-name' : 'octane-avatar-editor-nft-info'}>
                 <span style={{ color: style.textColor }}>{formatNftOutfitLabel(collectionName(outfit), outfit)}</span>
             </div>
         </NativeTextTree>

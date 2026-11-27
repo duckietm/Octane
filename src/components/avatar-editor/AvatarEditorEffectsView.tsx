@@ -15,6 +15,8 @@ import { OwnedAvatarEffect, useAvatarEffects } from '../../hooks';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { ToggleButton } from '../../common/ToggleButton';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
 
 const isEffectRunning = (effect: OwnedAvatarEffect) => effect.isPermanent || effect.secondsLeft > 0;
 
@@ -31,11 +33,12 @@ const EffectTimeLeft: FC<{ effect: OwnedAvatarEffect }> = ({ effect }) => {
 
     const text = getAvatarEffectTimeLeftText(secondsLeft, effect.isPermanent);
     const progress = effect.isPermanent || effect.duration <= 0 ? 1 : Math.min(1, secondsLeft / effect.duration);
+    const isHandheld = useIsHandheld();
 
     return (
         <NativeTextTree>
-            <div className="octane-avatar-editor-effect-time">
-                <div className="octane-avatar-editor-effect-time-bar" style={{ width: `${progress * 100}%` }} />
+            <div className={isHandheld ? 'octane-handheld-looks__effect-time' : 'octane-avatar-editor-effect-time'}>
+                <div className={isHandheld ? 'octane-handheld-looks__effect-time-bar' : 'octane-avatar-editor-effect-time-bar'} style={{ width: `${progress * 100}%` }} />
                 <span>{text.parameter ? LocalizeText(text.key, [text.parameter], [text.value]) : LocalizeText(text.key)}</span>
             </div>
         </NativeTextTree>
@@ -56,6 +59,80 @@ export const AvatarEditorEffectsView: FC<{
     // AIR EffectsParamView opens this page; by default the Effects page under Clothing (a path, as Wired has an Effects page too).
     const shopPage = GetConfigurationValue<string>('avatareditor.effects.buy.button.catalog.page.name', EFFECTS_SHOP_PAGE) || EFFECTS_SHOP_PAGE;
     const selectedEffect = effects.find((effect) => effect.type === selectedType) ?? null;
+    // Phone layout: the same effects as finger-sized tiles, with the chosen one's details under them (HandheldLooks.css).
+    const isHandheld = useIsHandheld();
+
+    if (isHandheld) {
+        const effectName = (type: number) => localizeWithFallback(`fx_${type}`, `fx_${type}`);
+
+        return (
+            <NativeTextTree>
+                <div className="octane-handheld-looks__gallery">
+                    {!effects.length ? (
+                        <div className="octane-handheld-looks__note">
+                            <b>{LocalizeText('avatar.editor.content.title')}</b>
+                            <span>{LocalizeText('avatar.editor.content.notification')}</span>
+                        </div>
+                    ) : (
+                        <div className="octane-handheld-looks__effects">
+                            <ToggleButton
+                                aria-label={localizeWithFallback('octane.handheld.looks.no_effect', 'No effect')}
+                                className="octane-handheld-looks__effect"
+                                pressed={selectedType <= 0}
+                                onClick={() => onSelect(AVATAR_EDITOR_NO_EFFECT)}
+                            >
+                                <img alt="" src={removeSelectionSrc} draggable={false} />
+                            </ToggleButton>
+                            {effects.map((effect) => {
+                                const iconUrl = getAvatarEffectIconUrl(effect.type);
+
+                                return (
+                                    <ToggleButton
+                                        key={effect.type}
+                                        aria-label={effectName(effect.type)}
+                                        className="octane-handheld-looks__effect"
+                                        pressed={effect.type === selectedType}
+                                        onClick={() => onSelect(effect.type)}
+                                    >
+                                        {iconUrl && <img alt="" src={iconUrl} draggable={false} />}
+                                        {effect.inactiveCount > 1 && <span className="octane-handheld-looks__effect-amount">{effect.inactiveCount}</span>}
+                                        {isEffectRunning(effect) && (
+                                            <span className="octane-handheld-looks__effect-left">
+                                                <span
+                                                    style={{
+                                                        width: `${effect.isPermanent || effect.duration <= 0 ? 100 : Math.min(100, (effect.secondsLeft / effect.duration) * 100)}%`
+                                                    }}
+                                                />
+                                            </span>
+                                        )}
+                                    </ToggleButton>
+                                );
+                            })}
+                        </div>
+                    )}
+                    <div className="octane-handheld-looks__effect-bar">
+                        <div className="octane-handheld-looks__effect-copy">
+                            {selectedEffect && (
+                                <>
+                                    <b>{effectName(selectedEffect.type)}</b>
+                                    {isEffectRunning(selectedEffect) ? (
+                                        <EffectTimeLeft key={selectedEffect.type} effect={selectedEffect} />
+                                    ) : (
+                                        <span>{LocalizeText('avatareditor.save.to.activate')}</span>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                        {shopPage && (
+                            <BaseButton className="octane-handheld-looks__quiet" onClick={() => CreateLinkEvent(`catalog/open/${shopPage}`)}>
+                                {LocalizeText('avatareditor.effects.shop')}
+                            </BaseButton>
+                        )}
+                    </div>
+                </div>
+            </NativeTextTree>
+        );
+    }
 
     return (
         <NativeTextTree>

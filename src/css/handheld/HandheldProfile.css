@@ -1,165 +1,914 @@
 /*
- * Phone user profile and profile customize (with the pose tab). Scoped to
- * :root[data-handheld] (set only on a phone-sized touch device by the handheld watcher), so the desktop windows of
- * UserProfileView.css are left as they are. The two profile windows open as sheets
- * (DraggableWindow handheldSheet); inside them the content scrolls and the columns stack in portrait.
+ * Phone user profile and profile customiser in the Octane handheld look (HandheldTokens.css), inside the shared sheet
+ * frame (HandheldSheet.css). The profile keeps everything our profile window has: the banner is the top of the
+ * profile card, the avatar stands in its customised picture (background, stand, effect, border, pose) beside the
+ * identity, the user's own window background lies behind the cards and the accent colours the header. Upright the
+ * cards stack; on a phone held on its side the profile card and the three cells are left, the friends card right.
+ * The groups have their own tab. Neither shell carries the AIR window's class; the parts they share with the desktop
+ * (relationships, groups, the customiser's choices) are restyled here. Scoped to :root[data-handheld].
  */
 
-/* ---------------------------------------------------------------- profile */
+/* ---------------------------------------------------------------- the frame: accent and background */
 
-:root[data-handheld] .octane-extended-profile-window,
-:root[data-handheld] .octane-profile-customize {
-    width: 100% !important;
-    max-width: none !important;
-    height: 100% !important;
-    max-height: none !important;
+/* The accent of the profile being viewed colours the header, as it colours the title bar of the desktop window. */
+:root[data-handheld] .octane-handheld-profile.has-profile-accent,
+:root[data-handheld] .octane-handheld-customize.has-profile-accent {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--profile-accent) 80%, #ffffff) 0, var(--profile-accent) 100px);
 }
 
-/* The whole profile scrolls as one page instead of clipping the groups panel. */
-:root[data-handheld] .octane-extended-profile-window__content {
-    overflow-y: auto !important;
+:root[data-handheld] .octane-handheld-profile.has-light-accent .octane-handheld-sheet__title,
+:root[data-handheld] .octane-handheld-customize.has-light-accent .octane-handheld-sheet__title {
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-profile.has-light-accent .octane-handheld-sheet__tab:not(.is-active),
+:root[data-handheld] .octane-handheld-customize.has-light-accent .octane-handheld-sheet__tab:not(.is-active) {
+    background: rgba(0, 0, 0, 0.14);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-handheld-sheet__body,
+:root[data-handheld] .octane-handheld-customize .octane-handheld-sheet__body {
+    padding: 0;
+}
+
+/* The user's own window background, behind the cards (a picture they uploaded, their own gradient, a gallery card). */
+:root[data-handheld] .octane-handheld-profile__backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    background-color: var(--hh-air-cream);
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-profile__scroll,
+:root[data-handheld] .octane-handheld-customize__scroll {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+    padding: var(--hh-space-3);
+    overflow-x: hidden;
+    overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
 }
 
-:root[data-handheld] .octane-extended-profile-window__body--groups {
-    flex: 0 0 auto;
-    min-height: 260px;
-    overflow: visible;
+:root[data-handheld='landscape'] .octane-handheld-profile__scroll,
+:root[data-handheld='landscape'] .octane-handheld-customize__scroll {
+    padding: var(--hh-space-2) var(--hh-space-3);
 }
 
-:root[data-handheld] .octane-extended-profile-window__panel {
+/* ---------------------------------------------------------------- cards */
+
+:root[data-handheld] .octane-handheld-profile__columns {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-profile__columns {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+:root[data-handheld] .octane-handheld-profile__main {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-profile__main {
+    flex: 1 1 0;
+}
+
+:root[data-handheld] .octane-handheld-profile__card {
+    position: relative;
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-profile__card.is-friends {
+    flex: 1 1 0;
+}
+
+:root[data-handheld] .octane-handheld-profile__card.is-groups {
+    flex: none;
+}
+
+/* ---------------------------------------------------------------- the profile card: banner, picture, identity */
+
+:root[data-handheld] .octane-handheld-profile__card.is-hero {
+    overflow: hidden;
+}
+
+/* The banner is the card's top, edge to edge; the picture stands a little into it. */
+:root[data-handheld] .octane-handheld-profile__card.is-hero > .octane-extended-profile__banner {
+    flex: none;
+    height: 96px;
+    margin: calc(-1 * var(--hh-space-3)) calc(-1 * var(--hh-space-3)) 0;
+    border-bottom: 3px solid var(--profile-accent, var(--hh-air-box));
+}
+
+:root[data-handheld='landscape'] .octane-handheld-profile__card.is-hero > .octane-extended-profile__banner {
+    height: 72px;
+}
+
+:root[data-handheld] .octane-handheld-profile__card.is-hero > .octane-extended-profile__banner--custom {
+    background-position: center;
+    background-size: cover;
+}
+
+/* Customise: a round button on the banner's lower right corner. */
+:root[data-handheld] .octane-handheld-profile__customize {
+    position: absolute;
+    right: var(--hh-space-2);
+    bottom: var(--hh-space-2);
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-float);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-profile__customize:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-profile__customize img {
+    width: 17px;
+    height: 18px;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-profile__identity {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--hh-space-3);
+    min-width: 0;
+}
+
+/* The avatar in its customised picture, exactly as the desktop profile draws it (ProfileAvatarFrameView). */
+:root[data-handheld] .octane-handheld-profile__picture {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    margin: 3px;
+}
+
+:root[data-handheld] .octane-handheld-profile__card.has-banner .octane-handheld-profile__picture {
+    margin-top: -32px;
+    border-radius: var(--hh-radius-s);
+    box-shadow:
+        0 0 0 3px var(--hh-air-white),
+        var(--hh-shadow-float);
+}
+
+:root[data-handheld] .octane-handheld-profile__copy {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-profile__username {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-profile__motto {
+    margin: 0 0 var(--hh-space-1);
+    overflow: hidden;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+    font-style: italic;
+    line-height: 17px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-profile__meta {
+    margin: 0;
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-profile__meta b {
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-profile__status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 20px;
+    margin-top: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-profile__status .octane-icon {
+    flex: none;
+}
+
+:root[data-handheld] .octane-handheld-profile__status-text {
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* The five badges worn on the profile. */
+:root[data-handheld] .octane-handheld-profile__badges {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-handheld-profile__badge-slot {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: 48px;
+    padding: 0;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-profile__badge-slot .badge-image {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Change looks, change badges, customise; for somebody else: add as a friend, block. */
+:root[data-handheld] .octane-handheld-profile__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-profile__action {
+    display: flex;
+    flex: 1 1 40%;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-profile__action.is-wide {
+    flex-basis: 100%;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-profile__action.is-wide {
+    flex-basis: 40%;
+}
+
+:root[data-handheld] .octane-handheld-profile__action:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-profile__action.is-primary {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow:
+        inset 0 1px 0 var(--hh-air-green-top),
+        var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-profile__action.is-primary:active {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld] .octane-handheld-profile__action.is-block img {
+    flex: none;
+    width: 16px;
+    height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-profile__action.is-block.is-active {
+    border-color: var(--hh-air-red-deep);
+    color: var(--hh-air-red-deep);
+}
+
+/* ---------------------------------------------------------------- rooms, badges, level */
+
+:root[data-handheld] .octane-handheld-profile__cells {
+    display: grid;
+    flex: none;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-profile__cell {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 0;
+    min-height: 64px;
+    padding: 6px var(--hh-space-1);
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-profile__cell:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-profile__cell img {
+    flex: none;
+    max-height: 24px;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-profile__cell img.is-badge {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+:root[data-handheld] .octane-handheld-profile__cell-label {
+    max-width: 100%;
+    overflow: hidden;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-xs);
+    line-height: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-profile__cell-value {
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 16px;
+}
+
+/* ---------------------------------------------------------------- friends and relationships */
+
+:root[data-handheld] .octane-handheld-profile__friends-count {
+    margin: 0;
+    font-size: var(--hh-size-l);
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-profile__section-title {
+    margin: 0;
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-profile__note {
+    margin: 0;
+    padding: var(--hh-space-2) 0;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+}
+
+/* A relationship: its sign, then a pill with the friend's name (or "add friends") that is one whole button. */
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile__relationship {
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: var(--hh-space-2);
+    margin: 0;
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile__relationship-icon {
+    height: var(--hh-touch);
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile__relationship-box {
+    min-height: var(--hh-touch);
+    padding: 0;
+    border-color: var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile__relationship-name {
+    flex: 1 1 auto;
+    box-sizing: border-box;
+    max-width: none;
+    height: var(--hh-touch);
+    padding: 0 48px 0 var(--hh-space-4);
+    border: 0;
+    background: none;
+    color: var(--hh-air-blue-deep);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    text-align: left;
+    text-decoration: none;
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile__relationship-head {
+    right: var(--hh-space-2);
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile__relationship-subcopy {
+    margin: 2px 0 0 var(--hh-space-4);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-xs);
+}
+
+/* ---------------------------------------------------------------- blocked */
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile__blocked-overlay {
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    padding: var(--hh-space-4);
+    border-radius: var(--hh-radius-l) var(--hh-radius-l) 0 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-profile .octane-extended-profile__blocked-overlay {
+    flex-direction: row;
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile__blocked-text {
+    max-width: 100%;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-float);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile__blocked-text a {
+    display: inline-block;
+    min-height: 28px;
+    color: var(--hh-air-blue-deep);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-profile .octane-extended-profile__blocked-frank {
+    width: 111px;
+    height: 144px;
+}
+
+/* ---------------------------------------------------------------- groups tab */
+
+/* The user's groups as a row of badges swiped sideways, the chosen group's details under it. */
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
     height: auto;
-}
-
-:root[data-handheld='portrait'] .octane-extended-profile__top {
-    grid-template-columns: minmax(0, 1fr);
     min-height: 0;
 }
 
-:root[data-handheld='portrait'] .octane-extended-profile__separator {
-    display: none;
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-groups__count {
+    margin: 0;
+    font-size: var(--hh-size-m);
+    line-height: 18px;
 }
 
-:root[data-handheld] .octane-extended-profile__summary-button {
-    min-height: 44px;
-    padding: 0 6px;
-}
-
-:root[data-handheld] .octane-extended-profile__friend-button,
-:root[data-handheld] .octane-extended-profile__block-button,
-:root[data-handheld] .octane-extended-profile__link {
-    min-height: 36px;
-}
-
-:root[data-handheld] .octane-extended-profile__banner-edit {
-    min-width: 40px;
-    min-height: 40px;
-}
-
-:root[data-handheld] .octane-extended-profile-groups__list {
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-}
-
-/* ---------------------------------------------------------------- profile customize */
-
-:root[data-handheld] .octane-profile-customize .octane-card-tabs-shell {
-    flex: 0 0 auto;
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-groups__list {
+    display: flex;
+    flex: none;
+    gap: 6px;
+    padding: 2px;
     overflow-x: auto;
     overflow-y: hidden;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
 }
 
-:root[data-handheld] .octane-profile-customize .octane-card-tab-item {
-    flex: 0 0 auto;
-    min-height: 36px;
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-groups__item {
+    flex: 0 0 56px;
+    width: 56px;
+    min-height: 56px;
+    margin: 0;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-groups__item.active {
+    border-color: var(--hh-air-select);
+    background: var(--hh-air-track-light);
+    box-shadow: inset 0 0 0 1px var(--hh-air-select);
+}
+
+/* The favourite star of an own group: the finger gets more than its 16 px. */
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-groups__item > .octane-icon::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-groups__details {
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-group-info {
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: var(--hh-space-3);
+    min-height: 0;
+    padding: var(--hh-space-3);
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-group-info__badge-wrap {
+    width: 88px;
+    height: 88px;
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-group-info__member-link,
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-group-info__links > button {
+    min-height: var(--hh-touch);
+    border: 0;
+    background: none;
+    color: var(--hh-air-blue-deep);
+    font-size: var(--hh-size-m);
+    text-align: left;
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-group-info__member-link {
+    text-align: center;
+    text-decoration: underline;
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-group-info__links {
+    gap: 0;
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-group-info__description {
+    min-height: 0;
+    font-size: var(--hh-size-m);
+    line-height: 17px;
+}
+
+/* Join, leave, ask to join: the one button of a group (a shared Button, cut to a pill as in the customiser below). */
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-group-info__button {
+    align-self: stretch;
+    min-width: 0;
+    height: var(--hh-touch);
+    margin-top: var(--hh-space-2);
+    border: 0 !important;
+    border-image-source: none !important;
+    background: var(--hh-air-track-light) !important;
+    box-shadow: none !important;
+    clip-path: inset(0 round var(--hh-radius-pill));
+    color: var(--hh-air-blue-header) !important;
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+    text-shadow: none !important;
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile__hidden-notice {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+}
+
+/* No groups: the explanation as it is, and the way to the group rooms as a quiet pill. */
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-no-groups {
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-profile .octane-extended-profile-no-groups__view {
+    justify-content: center;
+    width: auto;
+    height: var(--hh-touch);
+    margin: var(--hh-space-2) 0 0;
+    padding: 0 var(--hh-space-4);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+/* ---------------------------------------------------------------- profile customiser */
+
+/* The banner as it looks now, then the tab's choices on one white card. */
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__preview {
+    flex: none;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-customize .octane-profile-customize__preview .octane-extended-profile__banner {
+    height: 64px;
+}
+
+:root[data-handheld] .octane-handheld-customize__panel {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__hint {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+    line-height: 17px;
+}
+
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__message {
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-radius: var(--hh-radius-s);
+    background: color-mix(in srgb, var(--hh-air-red) 12%, var(--hh-air-white));
+    color: var(--hh-air-red-deep);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__sections {
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__section {
+    gap: 6px;
+}
+
+/* Its buttons: pills a finger can hit, green for what saves, quiet for the rest, red for what removes. The shared
+   Button sets its AIR skin, square corners, padding and least height with !important utilities (which, living in a
+   cascade layer, outrank anything here): so the pill is cut with clip-path and the size given as a height. */
+:root[data-handheld] .octane-handheld-customize :is(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger) {
+    box-sizing: border-box;
+    gap: 6px;
+    min-width: 96px;
+    height: var(--hh-touch);
+    border: 0 !important;
+    border-image-source: none !important;
+    background: var(--hh-air-track-light) !important;
+    box-shadow: none !important;
+    clip-path: inset(0 round var(--hh-radius-pill));
+    color: var(--hh-air-blue-header) !important;
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+    text-shadow: none !important;
     touch-action: manipulation;
+    transition: opacity var(--hh-fast) var(--hh-ease);
 }
 
-:root[data-handheld] .octane-profile-customize .octane-card-content-shell {
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
+:root[data-handheld] .octane-handheld-customize .habbo-btn-secondary:active {
+    background: var(--hh-air-track-active) !important;
 }
 
-:root[data-handheld] .octane-profile-customize button {
+:root[data-handheld] .octane-handheld-customize .habbo-btn-primary {
+    background: var(--hh-primary) !important;
+    box-shadow: none !important;
+    color: var(--hh-on-primary) !important;
+}
+
+:root[data-handheld] .octane-handheld-customize .habbo-btn-primary:active {
+    background: var(--hh-primary-pressed) !important;
+}
+
+:root[data-handheld] .octane-handheld-customize .habbo-btn-danger {
+    background: var(--hh-dismiss) !important;
+    color: var(--hh-on-dark) !important;
+}
+
+:root[data-handheld] .octane-handheld-customize :is(.habbo-btn-primary, .habbo-btn-secondary, .habbo-btn-danger):disabled {
+    opacity: 0.5;
+}
+
+/* Background / stand / effect: three pills, the chosen one in the selection blue. */
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__segments {
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__segment {
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-2);
+    border-color: var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__segment.is-selected {
+    border-color: var(--hh-air-select);
+    background: var(--hh-air-track-light);
+    box-shadow: inset 0 0 0 1px var(--hh-air-select);
+    color: var(--hh-air-blue-header);
+}
+
+/* A choice: the picture itself with a thin edge, and the selection blue around the chosen one. */
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__option {
+    border-radius: var(--hh-radius-s);
+    box-shadow: 0 0 0 1px var(--hh-air-box);
     touch-action: manipulation;
+    transition: box-shadow var(--hh-fast) var(--hh-ease);
 }
 
-:root[data-handheld] .octane-profile-customize .octane-profile-customize__style-row {
-    flex-wrap: wrap;
-    gap: 8px;
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__option.is-selected {
+    box-shadow:
+        0 0 0 2px var(--hh-air-select),
+        0 0 0 4px var(--hh-air-track-active);
 }
 
-:root[data-handheld] .octane-profile-customize .octane-profile-customize__style-row > button {
-    min-height: 40px;
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__option:has(.octane-profile-customize__caption) {
+    background: var(--hh-air-panel);
 }
 
-/* Border and pose: the large picture above its controls in portrait, beside them in landscape. */
-:root[data-handheld='portrait'] .octane-profile-customize__border-layout,
-:root[data-handheld='portrait'] .octane-profile-customize__pose {
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__grid {
+    gap: var(--hh-space-2) !important;
+}
+
+/* The small square choices (angles, patterns, colour inputs) grow to a finger's size. */
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__angle,
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__pattern {
+    width: 40px;
+    height: 40px;
+    border-color: var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+}
+
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__angle {
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__angle.is-selected {
+    border-color: var(--hh-air-blue-deep);
+    background: var(--hh-air-blue);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__colour {
+    min-height: var(--hh-touch);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__colour input[type='color'] {
+    width: 48px;
+    height: 36px;
+    border-color: var(--hh-air-box-line);
+    border-radius: var(--hh-radius-s);
+}
+
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__style-row {
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__library-delete {
+    min-width: 28px;
+    min-height: 28px;
+}
+
+/* Border and pose: the large picture above its controls upright, beside them on the side. */
+:root[data-handheld='portrait'] .octane-handheld-customize .octane-profile-customize__border-layout,
+:root[data-handheld='portrait'] .octane-handheld-customize .octane-profile-customize__pose {
     flex-direction: column;
     align-items: center;
 }
 
-:root[data-handheld='portrait'] .octane-profile-customize__border-layout > .octane-profile-customize__sections,
-:root[data-handheld='portrait'] .octane-profile-customize__pose > .octane-profile-customize__sections {
+:root[data-handheld='portrait'] .octane-handheld-customize .octane-profile-customize__border-layout > .octane-profile-customize__sections,
+:root[data-handheld='portrait'] .octane-handheld-customize .octane-profile-customize__pose > .octane-profile-customize__sections {
     width: 100%;
 }
 
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__pose-value {
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+}
+
 /* The pose pad: four 44 px arrows in their cross, so a one-pixel nudge is one tap. */
-:root[data-handheld] .octane-profile-customize__pose-position {
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__pose-position {
     flex-wrap: wrap;
-    gap: 14px;
+    gap: var(--hh-space-4);
 }
 
-:root[data-handheld] .octane-profile-customize__pose-pad {
-    grid-template-columns: repeat(3, 44px);
-    grid-template-rows: repeat(3, 44px);
-    gap: 4px;
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__pose-pad {
+    grid-template-columns: repeat(3, var(--hh-touch));
+    grid-template-rows: repeat(3, var(--hh-touch));
+    gap: var(--hh-space-1);
 }
 
-:root[data-handheld] .octane-profile-customize__pose-arrow {
-    border-radius: 8px;
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__pose-arrow {
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-blue-deep);
     touch-action: manipulation;
 }
 
-:root[data-handheld] .octane-profile-customize__pose-arrow svg {
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__pose-arrow svg {
     width: 16px;
     height: 16px;
 }
 
-:root[data-handheld] .octane-profile-customize__pose-sliders {
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__pose-sliders {
     flex: 1 1 180px;
-    gap: 10px;
+    gap: var(--hh-space-2);
 }
 
-:root[data-handheld] .octane-profile-customize__pose-slider {
-    gap: 10px;
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__pose-slider {
+    gap: var(--hh-space-2);
 }
 
-:root[data-handheld] .octane-profile-customize__pose-slider > span:first-child {
+:root[data-handheld] .octane-handheld-customize .octane-profile-customize__pose-slider > span:first-child {
     flex: 0 0 76px;
 }
 
 /* The compact slider's 12 px thumb is too small for a finger: a 28 px thumb on a 40 px tall control. */
-:root[data-handheld] .octane-profile-customize .octane-slider.octane-slider--compact {
+:root[data-handheld] .octane-handheld-customize .octane-slider.octane-slider--compact {
     height: 40px;
     touch-action: none;
 }
 
-:root[data-handheld] .octane-profile-customize .octane-slider.octane-slider--compact .thumb {
+:root[data-handheld] .octane-handheld-customize .octane-slider.octane-slider--compact .thumb {
     width: 28px;
     height: 28px;
     line-height: 28px;
 }
 
-:root[data-handheld] .octane-profile-customize .octane-slider.octane-slider--compact .track {
+:root[data-handheld] .octane-handheld-customize .octane-slider.octane-slider--compact .track {
     height: 5px;
 }
 
-:root[data-handheld] .octane-profile-customize input:not([type='checkbox']):not([type='radio']),
-:root[data-handheld] .octane-profile-customize textarea {
-    font-size: 16px;
+/* Text fields at 16 px, so mobile Safari does not zoom into them. */
+:root[data-handheld] .octane-handheld-customize input:not([type='checkbox'], [type='radio'], [type='color'], [type='file']),
+:root[data-handheld] .octane-handheld-customize textarea {
+    font-size: var(--hh-size-field);
 }

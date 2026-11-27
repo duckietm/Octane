@@ -8,11 +8,21 @@ const strip = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, '');
 const tokens = strip(read('src/css/handheld/HandheldTokens.css'));
 const defined = new Set([...tokens.matchAll(/(--hh-[a-z0-9-]+):/g)].map((match) => match[1]));
 
-/** The phone modules that wear the Octane handheld look, and the frame the shop and the inventory share. */
-const SHEETS = ['HandheldNavigator.css', 'HandheldHud.css', 'HandheldChat.css', 'HandheldSheet.css', 'HandheldCatalog.css', 'HandheldInventory.css'];
+/** The phone modules that wear the Octane handheld look, the frame the shop, the inventory, the avatar editor and the profile share, and the drawer of whatever is selected in the room. */
+const SHEETS = [
+    'HandheldNavigator.css',
+    'HandheldHud.css',
+    'HandheldChat.css',
+    'HandheldSheet.css',
+    'HandheldCatalog.css',
+    'HandheldInventory.css',
+    'HandheldLooks.css',
+    'HandheldProfile.css',
+    'HandheldDrawer.css'
+];
 
 /** The sheets written wholly for the phone: every rule of theirs is scoped to it. */
-const PHONE_ONLY = ['HandheldSheet.css', 'HandheldCatalog.css', 'HandheldInventory.css'];
+const PHONE_ONLY = ['HandheldSheet.css', 'HandheldCatalog.css', 'HandheldInventory.css', 'HandheldLooks.css', 'HandheldProfile.css', 'HandheldDrawer.css'];
 
 /** Custom properties a sheet sets itself, on one of its own elements. */
 const LOCAL = new Set(['--hh-level', '--hh-fill']);

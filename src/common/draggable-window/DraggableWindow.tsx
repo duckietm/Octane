@@ -240,12 +240,17 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
             box = pan ? { width: area.width, height: area.height } : null;
             height = fit.height;
         } else {
-            const placement = handheldSheet ? { mode: 'sheet' as const, x: area.left, y: area.top } : placeHandheldWindow(natural.width, natural.height, area);
+            // A window that asks to be a sheet is a full screen of its own: it covers the whole viewport, the HUD and
+            // the toolbar included (its header has the way back); the CSS pads it by the safe-area insets.
+            const sheetArea = handheldSheet ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight } : area;
+            const placement = handheldSheet ? { mode: 'sheet' as const, x: 0, y: 0 } : placeHandheldWindow(natural.width, natural.height, area);
 
             mode = placement.mode;
             position = { x: placement.x, y: placement.y };
-            box = placement.mode === 'sheet' ? { width: area.width, height: area.height } : null;
+            box = placement.mode === 'sheet' ? { width: sheetArea.width, height: sheetArea.height } : null;
         }
+
+        const keyboardArea = handheldSheet && !scaledFit ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight } : area;
 
         // The on-screen keyboard opened for a field in this window: the window keeps clear of it.
         const keyboardInset = useHandheldStore.getState().keyboardInset;
@@ -254,7 +259,7 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
             const raised = fitAboveKeyboard(
                 { mode: box ? 'sheet' : 'dialog', x: position.x, y: position.y },
                 { width: box?.width ?? natural.width, height: box?.height ?? height },
-                area,
+                keyboardArea,
                 window.innerHeight,
                 keyboardInset
             );
@@ -497,6 +502,7 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
             className="absolute draggable-window"
             data-window-key={uniqueKey ?? undefined}
             data-handheld-window={handheldActive && handheldMode ? handheldMode : undefined}
+            data-handheld-fullscreen={handheldActive && handheldSheet && handheldMode === 'sheet' ? '' : undefined}
             data-handheld-pan={handheldActive && handheldFrame?.pan ? '' : undefined}
             data-handheld-peeked={peek.hidden ? '' : undefined}
             data-handheld-fixed={handheldActive && scaledFit ? '' : undefined}

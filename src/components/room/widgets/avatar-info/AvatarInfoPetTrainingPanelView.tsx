@@ -8,6 +8,8 @@ import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useMessageEvent, useRoom, useSessionInfo } from '../../../../hooks';
 import { Native3Button, Native3Frame } from '../../../mod-tools/native/NativeWindow3';
 import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
+import { HandheldDrawerAction, HandheldInfoDrawer } from '../../../../common/handheld/HandheldInfoDrawer';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 
 // The official pet_commands layout: a style-3 frame 195 wide coloured 0xff67a3bf, the pet in a 71x90 box at (5, 7) and its name at (76, 43) of the
 // client area, and the commands from (6, 103) as 84x22 style-3 buttons, two a row (x 0 and 86, a row every 25px). PetCommandTool sizes the
@@ -25,7 +27,8 @@ const CHROME_HEIGHT = 160;
 const DISABLED_MS = 1100;
 const DEFAULT_LOCATION = { x: 100, y: 70 };
 
-export const AvatarInfoPetTrainingPanelView: FC<{}> = (props) => {
+export const AvatarInfoPetTrainingPanelView: FC<{ /** Phone layout: back to the pet's drawer. */ onBack?: () => void }> = ({ onBack }) => {
+    const isHandheld = useIsHandheld();
     const [petData, setPetData] = useState<IRoomUserData>(null);
     const [petTrainInformation, setPetTrainInformation] = useState<PetTrainingMessageParser>(null);
     const [cooling, setCooling] = useState(false);
@@ -71,6 +74,34 @@ export const AvatarInfoPetTrainingPanelView: FC<{}> = (props) => {
     const rows = Math.ceil(commands.length / 2);
     const commandsHeight = rows > 0 ? (rows - 1) * ROW_STEP + BUTTON_HEIGHT : 0;
     const title = LocalizeText('widgets.pet.commands.title');
+
+    // Phone layout: the commands are a page of the drawer, a grid of finger-sized buttons that scrolls when there are many.
+    if (isHandheld) {
+        const close = () => setPetTrainInformation(null);
+
+        return (
+            <NativeTextTree>
+                <HandheldInfoDrawer
+                    actions={commands.map((command) => {
+                        const label = LocalizeText(`pet.command.${command}`);
+
+                        return (
+                            <HandheldDrawerAction key={command} disabled={cooling || !petTrainInformation.enabledCommands.includes(command)} onClick={() => processPetAction(petData.name, label)}>
+                                {label}
+                            </HandheldDrawerAction>
+                        );
+                    })}
+                    isPage={true}
+                    label={title}
+                    picture={<LayoutPetImageView direction={2} figure={petData.figure} headOnly={true} posture="std" />}
+                    subtitle={title}
+                    title={petData.name}
+                    onBack={onBack && (() => (close(), onBack()))}
+                    onClose={close}
+                />
+            </NativeTextTree>
+        );
+    }
 
     return (
         <NativeTextTree>

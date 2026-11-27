@@ -12,7 +12,7 @@ import {
     TradingOpenComposer
 } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaArrowLeft, FaBan, FaChevronLeft, FaChevronRight, FaCoins, FaCommentDots, FaDoorOpen, FaExchangeAlt, FaExclamationTriangle, FaFlag, FaHandHolding, FaHeart, FaHeartBroken, FaKey, FaMicrophone, FaMicrophoneSlash, FaSearch, FaShieldAlt, FaThumbsUp, FaTools, FaUserPlus, FaUserShield, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import {
     AMBASSADOR_MUTE_MINUTES,
     AvatarInfoUser,
@@ -339,7 +339,7 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                     {mode === MODE_NORMAL && (
                         <>
                             {canRequestFriend(avatarInfo.webID) && (
-                                <ContextMenuListItemView onClick={(event) => processAction('friend')}>
+                                <ContextMenuListItemView icon={<FaUserPlus />} onClick={(event) => processAction('friend')}>
                                     {LocalizeText('infostand.button.friend')}
                                 </ContextMenuListItemView>
                             )}
@@ -347,59 +347,59 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                                 <ContextMenuListItemView
                                     disabled={!!tradeBlockedKey}
                                     title={tradeBlockedKey ? LocalizeText(tradeBlockedKey) : undefined}
-                                    onClick={(event) => processAction('trade')}
+                                    icon={<FaExchangeAlt />} onClick={(event) => processAction('trade')}
                                 >
                                     {LocalizeText('infostand.button.trade')}
                                 </ContextMenuListItemView>
                             )}
-                            <ContextMenuListItemView onClick={(event) => processAction('whisper')}>{LocalizeText('infostand.button.whisper')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaCommentDots />} onClick={(event) => processAction('whisper')}>{LocalizeText('infostand.button.whisper')}</ContextMenuListItemView>
                             {userRespectRemaining > 0 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('respect')}>
+                                <ContextMenuListItemView icon={<FaThumbsUp />} onClick={(event) => processAction('respect')}>
                                     {LocalizeText('infostand.button.respect', ['count'], [userRespectRemaining.toString()])}
                                 </ContextMenuListItemView>
                             )}
                             {canReplenishRespect(userRespectRemaining, respectReplenishesLeft) && (
-                                <ContextMenuListItemView onClick={(event) => processAction('replenish_respect')}>
+                                <ContextMenuListItemView icon={<FaCoins />} onClick={(event) => processAction('replenish_respect')}>
                                     {LocalizeText('infostand.button.replenish_respect')}
                                 </ContextMenuListItemView>
                             )}
                             {!canRequestFriend(avatarInfo.webID) && (
-                                <ContextMenuListItemView onClick={(event) => processAction('relationship')}>
+                                <ContextMenuListItemView icon={<FaHeart />} onClick={(event) => processAction('relationship')}>
                                     {LocalizeText('infostand.link.relationship')}
                                     <FaChevronRight className="right fa-icon" />
                                 </ContextMenuListItemView>
                             )}
                             {!isIgnored && (
-                                <ContextMenuListItemView onClick={(event) => processAction('ignore')}>
+                                <ContextMenuListItemView icon={<FaVolumeMute />} onClick={(event) => processAction('ignore')}>
                                     {LocalizeText('infostand.button.ignore')}
                                 </ContextMenuListItemView>
                             )}
                             {isIgnored && (
-                                <ContextMenuListItemView onClick={(event) => processAction('unignore')}>
+                                <ContextMenuListItemView icon={<FaVolumeUp />} onClick={(event) => processAction('unignore')}>
                                     {LocalizeText('infostand.button.unignore')}
                                 </ContextMenuListItemView>
                             )}
-                            <ContextMenuListItemView onClick={(event) => processAction('report')}>{LocalizeText('infostand.button.report')}</ContextMenuListItemView>
-                            {showInspectButton && <ContextMenuListItemView onClick={(event) => processAction('inspect')}>{localizeWithFallback('octane.room.inspect', 'Inspect')}</ContextMenuListItemView>}
+                            <ContextMenuListItemView icon={<FaFlag />} onClick={(event) => processAction('report')}>{LocalizeText('infostand.button.report')}</ContextMenuListItemView>
+                            {showInspectButton && <ContextMenuListItemView icon={<FaSearch />} onClick={(event) => processAction('inspect')}>{localizeWithFallback('octane.room.inspect', 'Inspect')}</ContextMenuListItemView>}
                             {moderateMenuHasContent && (
-                                <ContextMenuListItemView onClick={(event) => processAction('moderate')}>
+                                <ContextMenuListItemView icon={<FaShieldAlt />} onClick={(event) => processAction('moderate')}>
                                     <FaChevronRight className="right fa-icon" />
                                     {LocalizeText('infostand.link.moderate')}
                                 </ContextMenuListItemView>
                             )}
                             {canOpenHousekeeping && (
-                                <ContextMenuListItemView onClick={(event) => processAction('housekeeping')}>
+                                <ContextMenuListItemView icon={<FaTools />} onClick={(event) => processAction('housekeeping')}>
                                     {LocalizeText('housekeeping.menu.open_user')}
                                 </ContextMenuListItemView>
                             )}
                             {avatarInfo.isAmbassador && (
-                                <ContextMenuListItemView onClick={(event) => processAction('ambassador')}>
+                                <ContextMenuListItemView icon={<FaUserShield />} onClick={(event) => processAction('ambassador')}>
                                     <FaChevronRight className="right fa-icon" />
                                     {LocalizeText('infostand.link.ambassador')}
                                 </ContextMenuListItemView>
                             )}
                             {canGiveHandItem && (
-                                <ContextMenuListItemView onClick={(event) => processAction('pass_hand_item')}>
+                                <ContextMenuListItemView icon={<FaHandHolding />} onClick={(event) => processAction('pass_hand_item')}>
                                     {LocalizeText('avatar.widget.pass_hand_item')}
                                 </ContextMenuListItemView>
                             )}
@@ -407,26 +407,26 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                     )}
                     {mode === MODE_MODERATE && (
                         <>
-                            <ContextMenuListItemView onClick={(event) => processAction('kick')}>{LocalizeText('infostand.button.kick')}</ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('mute')}>
+                            <ContextMenuListItemView icon={<FaDoorOpen />} tone="danger" onClick={(event) => processAction('kick')}>{LocalizeText('infostand.button.kick')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaMicrophoneSlash />} onClick={(event) => processAction('mute')}>
                                 <FaChevronRight className="right fa-icon" />
                                 {LocalizeText('infostand.button.mute')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('ban')}>
+                            <ContextMenuListItemView icon={<FaBan />} tone="danger" onClick={(event) => processAction('ban')}>
                                 <FaChevronRight className="right fa-icon" />
                                 {LocalizeText('infostand.button.ban')}
                             </ContextMenuListItemView>
                             {isShowGiveRights && (
-                                <ContextMenuListItemView onClick={(event) => processAction('give_rights')}>
+                                <ContextMenuListItemView icon={<FaKey />} onClick={(event) => processAction('give_rights')}>
                                     {LocalizeText('infostand.button.giverights')}
                                 </ContextMenuListItemView>
                             )}
                             {isShowRemoveRights && (
-                                <ContextMenuListItemView onClick={(event) => processAction('remove_rights')}>
+                                <ContextMenuListItemView icon={<FaKey />} tone="danger" onClick={(event) => processAction('remove_rights')}>
                                     {LocalizeText('infostand.button.removerights')}
                                 </ContextMenuListItemView>
                             )}
-                            <ContextMenuListItemView onClick={(event) => processAction('back')}>
+                            <ContextMenuListItemView icon={<FaArrowLeft />} onClick={(event) => processAction('back')}>
                                 <FaChevronLeft className="left fa-icon" />
                                 {LocalizeText('generic.back')}
                             </ContextMenuListItemView>
@@ -434,14 +434,14 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                     )}
                     {mode === MODE_MODERATE_BAN && (
                         <>
-                            <ContextMenuListItemView onClick={(event) => processAction('ban_hour')}>
+                            <ContextMenuListItemView icon={<FaBan />} tone="danger" onClick={(event) => processAction('ban_hour')}>
                                 {LocalizeText('infostand.button.ban_hour')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('ban_day')}>{LocalizeText('infostand.button.ban_day')}</ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('perm_ban')}>
+                            <ContextMenuListItemView icon={<FaBan />} tone="danger" onClick={(event) => processAction('ban_day')}>{LocalizeText('infostand.button.ban_day')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaBan />} tone="danger" onClick={(event) => processAction('perm_ban')}>
                                 {LocalizeText('infostand.button.perm_ban')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('back_moderate')}>
+                            <ContextMenuListItemView icon={<FaArrowLeft />} onClick={(event) => processAction('back_moderate')}>
                                 <FaChevronLeft className="left fa-icon" />
                                 {LocalizeText('generic.back')}
                             </ContextMenuListItemView>
@@ -449,16 +449,16 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                     )}
                     {mode === MODE_MODERATE_MUTE && (
                         <>
-                            <ContextMenuListItemView onClick={(event) => processAction('mute_2min')}>
+                            <ContextMenuListItemView icon={<FaMicrophoneSlash />} onClick={(event) => processAction('mute_2min')}>
                                 {LocalizeText('infostand.button.mute_2min')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('mute_5min')}>
+                            <ContextMenuListItemView icon={<FaMicrophoneSlash />} onClick={(event) => processAction('mute_5min')}>
                                 {LocalizeText('infostand.button.mute_5min')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('mute_10min')}>
+                            <ContextMenuListItemView icon={<FaMicrophoneSlash />} onClick={(event) => processAction('mute_10min')}>
                                 {LocalizeText('infostand.button.mute_10min')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('back_moderate')}>
+                            <ContextMenuListItemView icon={<FaArrowLeft />} onClick={(event) => processAction('back_moderate')}>
                                 <FaChevronLeft className="left fa-icon" />
                                 {LocalizeText('generic.back')}
                             </ContextMenuListItemView>
@@ -466,20 +466,20 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                     )}
                     {mode === MODE_AMBASSADOR && (
                         <>
-                            <ContextMenuListItemView onClick={(event) => processAction('ambassador_alert')}>
+                            <ContextMenuListItemView icon={<FaExclamationTriangle />} onClick={(event) => processAction('ambassador_alert')}>
                                 {LocalizeText('infostand.button.alert')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('ambassador_kick')}>
+                            <ContextMenuListItemView icon={<FaDoorOpen />} tone="danger" onClick={(event) => processAction('ambassador_kick')}>
                                 {LocalizeText('infostand.button.kick')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('ambassador_mute')}>
+                            <ContextMenuListItemView icon={<FaMicrophoneSlash />} onClick={(event) => processAction('ambassador_mute')}>
                                 {LocalizeText('infostand.button.mute')}
                                 <FaChevronRight className="right fa-icon" />
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('ambassador_unmute')}>
+                            <ContextMenuListItemView icon={<FaMicrophone />} onClick={(event) => processAction('ambassador_unmute')}>
                                 {LocalizeText('infostand.button.unmute')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('back')}>
+                            <ContextMenuListItemView icon={<FaArrowLeft />} onClick={(event) => processAction('back')}>
                                 <FaChevronLeft className="left fa-icon" />
                                 {LocalizeText('generic.back')}
                             </ContextMenuListItemView>
@@ -492,7 +492,7 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                                     {LocalizeText(getMuteLabelKey(minutes))}
                                 </ContextMenuListItemView>
                             ))}
-                            <ContextMenuListItemView onClick={(event) => processAction('back_ambassador')}>
+                            <ContextMenuListItemView icon={<FaArrowLeft />} onClick={(event) => processAction('back_ambassador')}>
                                 <FaChevronLeft className="left fa-icon" />
                                 {LocalizeText('generic.back')}
                             </ContextMenuListItemView>
@@ -511,10 +511,10 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                                     <div className="octane-friends-spritesheet icon-bobba cursor-pointer" />
                                 </ContextMenuListItemView>
                             </Flex>
-                            <ContextMenuListItemView onClick={(event) => processAction('rship_none')}>
+                            <ContextMenuListItemView icon={<FaHeartBroken />} onClick={(event) => processAction('rship_none')}>
                                 {LocalizeText('avatar.widget.clear_relationship')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('back')}>
+                            <ContextMenuListItemView icon={<FaArrowLeft />} onClick={(event) => processAction('back')}>
                                 <FaChevronLeft className="left fa-icon" />
                                 {LocalizeText('generic.back')}
                             </ContextMenuListItemView>

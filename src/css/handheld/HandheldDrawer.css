@@ -1,0 +1,714 @@
+/*
+ * Phone drawer of whatever is selected in the room (furni, wall item, pet, bot, another player, the player), in the
+ * Octane handheld look (HandheldTokens.css). It lies over the live room, so it wears the dark glass of the HUD and of
+ * the chat composer, not the cream of the full-screen sheets: the room stays readable around it and through it.
+ *   portrait   a floating glass card right over the toolbar strip, which stays in reach (shop, inventory, chat);
+ *              it peeks (head + one row of actions) until it is pulled or tapped open (details + every action)
+ *   landscape  a full-height panel at the right edge, always open; the room and the toolbar stay at the left
+ * The same shell carries the sub-pages (pet commands, bot name / motto / speech). Scoped to :root[data-handheld]
+ * (set only on a phone-sized touch device by the handheld watcher), so the desktop infostand stays as it is.
+ */
+
+/* ---------------------------------------------------------------- shell */
+
+:root[data-handheld] .octane-handheld-drawer {
+    position: fixed;
+    left: calc(var(--hh-space-2) + var(--octane-safe-left, 0px));
+    right: calc(var(--hh-space-2) + var(--octane-safe-right, 0px));
+    bottom: calc(var(--octane-handheld-toolbar) + var(--hh-space-1) + var(--octane-safe-bottom, 0px));
+    z-index: 85;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    /* Up to right under the top HUD when there is that much to show; most selections need far less. */
+    max-height: calc(100dvh - var(--octane-handheld-toolbar) - 76px);
+    border: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-hud);
+    box-shadow: var(--hh-shadow-float), var(--hh-edge);
+    -webkit-backdrop-filter: var(--hh-blur);
+    backdrop-filter: var(--hh-blur);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    pointer-events: auto;
+    transition: transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-drawer[data-pulling] {
+    transition-property: none;
+}
+
+/* The keyboard is up (a motto, a bot's name, a staff field): the toolbar stepped aside, the drawer sits on the keyboard. */
+:root[data-handheld][data-handheld-keyboard] .octane-handheld-drawer {
+    bottom: calc(var(--octane-keyboard-inset, 0px) + var(--hh-space-1));
+    max-height: calc(100dvh - var(--octane-keyboard-inset, 0px) - var(--octane-safe-top, 0px) - var(--hh-space-3));
+}
+
+:root[data-handheld='landscape'] .octane-handheld-drawer {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: min(348px, 44vw);
+    max-height: none;
+    padding: var(--octane-safe-top, 0px) var(--octane-safe-right, 0px) var(--octane-safe-bottom, 0px) 0;
+    border-width: 0 0 0 1px;
+    border-radius: var(--hh-radius-l) 0 0 var(--hh-radius-l);
+}
+
+:root[data-handheld='landscape'][data-handheld-keyboard] .octane-handheld-drawer {
+    bottom: var(--octane-keyboard-inset, 0px);
+    max-height: none;
+}
+
+/* A sub-page (pet commands, a bot form) is up: the drawer of the object behind it steps aside. */
+:root[data-handheld] .octane-handheld-drawer:not([data-page]):has(~ .octane-handheld-drawer[data-page]) {
+    display: none;
+}
+
+:root[data-handheld] .octane-handheld-drawer[data-page] {
+    z-index: 86;
+}
+
+:root[data-handheld] .octane-handheld-drawer :where(button, input, textarea):focus-visible {
+    outline: var(--hh-focus-on-dark);
+    outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- head */
+
+:root[data-handheld] .octane-handheld-drawer__head {
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    padding: var(--hh-space-3) var(--hh-space-3) var(--hh-space-2);
+    touch-action: none;
+}
+
+:root[data-handheld] .octane-handheld-drawer[data-kind='builders-club'] .octane-handheld-drawer__head,
+:root[data-handheld] .octane-handheld-drawer[data-kind='temporary'] .octane-handheld-drawer__head {
+    border-radius: var(--hh-radius-l) var(--hh-radius-l) 0 0;
+    box-shadow: inset 0 3px 0 var(--hh-air-count-yellow);
+}
+
+:root[data-handheld] .octane-handheld-drawer[data-kind='temporary'] .octane-handheld-drawer__head {
+    box-shadow: inset 0 3px 0 var(--hh-air-select);
+}
+
+/* The grip: a short bar on the upper edge; the whole head pulls. */
+:root[data-handheld] .octane-handheld-drawer__grip {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    width: 36px;
+    height: 4px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-on-dark-muted);
+    opacity: 0.7;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-drawer__picture {
+    position: relative;
+    display: flex;
+    flex: 0 0 52px;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-well);
+    box-shadow: inset 0 0 0 1px var(--hh-hairline);
+    pointer-events: none;
+}
+
+/* Whatever the picture is (a room object, a head, a pet), it is fitted into the well. */
+:root[data-handheld] .octane-handheld-drawer__picture > * {
+    flex: 0 0 auto;
+    max-width: none;
+}
+
+:root[data-handheld] .octane-handheld-drawer__picture > img,
+:root[data-handheld] .octane-handheld-drawer__picture > .octane-room-object-image {
+    max-width: 46px;
+    max-height: 46px;
+    object-fit: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+:root[data-handheld] .octane-handheld-drawer__titles {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-drawer__title {
+    margin: 0;
+    overflow: hidden;
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 19px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-drawer__subtitle {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    color: var(--hh-on-dark-muted);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-s);
+    font-weight: 400;
+    line-height: 15px;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+/* Fold, back and close: round, a finger wide. */
+:root[data-handheld] .octane-handheld-drawer__round {
+    display: flex;
+    flex: 0 0 var(--hh-touch);
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--hh-hairline);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-l);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-drawer__round:active {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .octane-handheld-drawer__close {
+    border-color: var(--hh-air-outline);
+    background: var(--hh-dismiss);
+    box-shadow: var(--hh-edge);
+}
+
+:root[data-handheld] .octane-handheld-drawer__close:active {
+    background: var(--hh-air-red-deep);
+}
+
+/* ---------------------------------------------------------------- details */
+
+:root[data-handheld] .octane-handheld-drawer__details {
+    flex: 1 1 auto;
+    box-sizing: border-box;
+    min-height: 0;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-top: 1px solid var(--hh-hairline);
+    font-family: var(--hh-font);
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-drawer__details[hidden] {
+    display: none;
+}
+
+/* The desktop infostands are fixed-width columns anchored to the room's corner; here they are the drawer's width. */
+:root[data-handheld] .octane-handheld-drawer__details > *,
+:root[data-handheld] .octane-handheld-drawer__details .octane-infostand {
+    position: relative;
+    inset: auto;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    pointer-events: auto;
+}
+
+:root[data-handheld] .octane-handheld-drawer__details > * {
+    align-items: stretch;
+    padding: 0;
+}
+
+/* The drawer's head already names the object and closes it; its actions are the drawer's buttons. */
+:root[data-handheld] .octane-handheld-drawer__details .octane-infostand__close {
+    display: none;
+}
+
+/* A pet's or bot's infostand is a dark panel of its own on the desktop; in the glass drawer it needs no second frame. */
+:root[data-handheld] .octane-handheld-drawer__details .octane-infostand:not(.profile-card-background) {
+    padding: 0;
+    border: 0;
+    border-image-source: none;
+    background: transparent;
+}
+
+:root[data-handheld] .octane-handheld-drawer__details .octane-infostand:not(.profile-card-background) .octane-infostand__header {
+    display: none;
+}
+
+/* The player's profile card keeps its own look (background, stand, overlay, border, pose) and its 190 px layout,
+   drawn larger and centred, so the picture reads and its badges and links are a finger wide. */
+:root[data-handheld] .octane-handheld-drawer__details .octane-infostand.profile-card-background {
+    width: 190px;
+    min-width: 190px;
+    max-width: 190px;
+    margin: 0 auto;
+    zoom: 1.3;
+}
+
+/* The cells of the furni stats copy their value: a finger high. */
+:root[data-handheld] .octane-handheld-drawer__details .octane-infostand-stat {
+    height: var(--hh-touch);
+}
+
+/* Fields of the infostand (motto, staff values, build height): 16 px, so mobile Safari does not zoom into them. */
+:root[data-handheld] .octane-handheld-drawer__details :where(input:not([type='checkbox']):not([type='radio']), textarea) {
+    box-sizing: border-box;
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-2);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+    line-height: 20px;
+}
+
+/* The build tools' arrows and steps are 24 px squares on the desktop: a finger gets 44. */
+:root[data-handheld] .octane-handheld-drawer__details .octane-infostand-buildtools {
+    flex-direction: column;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-drawer__details .octane-infostand-buildtools .cursor-pointer {
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    font-size: var(--hh-size-xl);
+}
+
+/* ---------------------------------------------------------------- actions */
+
+:root[data-handheld] .octane-handheld-drawer__actions {
+    display: grid;
+    flex: 0 0 auto;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--hh-space-2);
+    box-sizing: border-box;
+    max-height: 40dvh;
+    margin: 0;
+    padding: var(--hh-space-2) var(--hh-space-3) var(--hh-space-3);
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-top: 1px solid var(--hh-hairline);
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-drawer__actions:empty,
+:root[data-handheld] .octane-handheld-drawer__actions:not(:has(.octane-handheld-drawer__action)) {
+    display: none;
+}
+
+/* The peek shows one row: the first four buttons, whoever brought them (the infostand's slot, then the menu's rows). */
+:root[data-handheld] .octane-handheld-drawer[data-state='peek'] .octane-handheld-drawer__actions {
+    grid-template-rows: auto;
+    grid-auto-rows: 0;
+    row-gap: 0;
+    margin: 0 var(--hh-space-3) var(--hh-space-3);
+    padding: 0;
+    overflow: hidden;
+    border-top: 0;
+}
+
+:root[data-handheld] .octane-handheld-drawer[data-state='peek'] .octane-handheld-drawer__section {
+    display: none;
+}
+
+/* On its side the panel is short: it scrolls as one, the head stays, the actions come before the details. */
+:root[data-handheld='landscape'] .octane-handheld-drawer {
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-drawer__head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    border-bottom: 1px solid var(--hh-hairline);
+    background: var(--hh-air-hud-900);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-drawer__actions {
+    order: 1;
+    max-height: none;
+    overflow: visible;
+    border-top: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-drawer__details {
+    flex: 0 0 auto;
+    order: 2;
+    overflow: visible;
+}
+
+/* A form page keeps its fields on top. */
+:root[data-handheld='landscape'] .octane-handheld-drawer[data-page] .octane-handheld-drawer__details {
+    order: 0;
+    border-top: 0;
+}
+
+/* A page of nothing but actions (the pet commands) gives them all its room. */
+:root[data-handheld] .octane-handheld-drawer[data-page] .octane-handheld-drawer__actions {
+    flex: 1 1 auto;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    min-height: 0;
+    max-height: none;
+}
+
+/* The menu's own wrappers vanish: its rows are cells of the drawer's grid. */
+:root[data-handheld] .octane-handheld-drawer__slot,
+:root[data-handheld] .octane-handheld-drawer__menu,
+:root[data-handheld] .octane-handheld-drawer__menu .air-avatar-menu-buttons,
+:root[data-handheld] .octane-handheld-drawer__menu .menu-list-split-3 {
+    display: contents;
+}
+
+:root[data-handheld] .octane-handheld-drawer__section {
+    grid-column: 1 / -1;
+    margin: var(--hh-space-1) 0 0;
+    color: var(--hh-on-dark-muted);
+    font-size: var(--hh-size-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 14px;
+    text-transform: uppercase;
+}
+
+:root[data-handheld] .octane-handheld-drawer__section:first-child {
+    margin-top: 0;
+}
+
+:root[data-handheld] .octane-handheld-drawer__action {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    box-sizing: border-box;
+    width: auto;
+    min-width: 0;
+    height: auto;
+    min-height: 54px;
+    margin: 0;
+    padding: 6px var(--hh-space-1);
+    overflow: hidden;
+    border: 1px solid var(--hh-hairline);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-well);
+    box-shadow: none;
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xs);
+    font-weight: 700;
+    line-height: 13px;
+    text-align: center;
+    cursor: pointer;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-drawer__action:active {
+    background: var(--hh-well-pressed);
+    transform: scale(0.97);
+}
+
+:root[data-handheld] .octane-handheld-drawer__action-icon {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    height: 18px;
+    font-size: var(--hh-size-xl);
+    line-height: 1;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-drawer__action-label {
+    display: -webkit-box;
+    max-width: 100%;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    pointer-events: none;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+/* The bubble's sub-menu arrows: the drawer's buttons carry their own pictures. */
+:root[data-handheld] .octane-handheld-drawer__action-label > .fa-icon {
+    display: none;
+}
+
+:root[data-handheld] .octane-handheld-drawer__action-label > .octane-checkbox,
+:root[data-handheld] .octane-handheld-drawer__action-label > i {
+    display: inline-block;
+    margin-right: var(--hh-space-1);
+    vertical-align: middle;
+}
+
+/* The one main action: the green button. */
+:root[data-handheld] .octane-handheld-drawer__action[data-tone='primary'] {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary), var(--hh-edge);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-drawer__action[data-tone='primary']:active {
+    background: var(--hh-primary-pressed);
+}
+
+/* What takes something away (pick up, eject, kick, ban, delete): a red well, apart from the quiet ones. */
+:root[data-handheld] .octane-handheld-drawer__action[data-tone='danger'] {
+    border-color: var(--hh-air-red);
+    background: color-mix(in srgb, var(--hh-air-red) 38%, transparent);
+}
+
+:root[data-handheld] .octane-handheld-drawer__action[data-tone='danger']:active {
+    background: color-mix(in srgb, var(--hh-air-red) 62%, transparent);
+}
+
+:root[data-handheld] .octane-handheld-drawer__action[aria-pressed='true'] {
+    border-color: var(--hh-air-white);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-drawer__action[aria-disabled='true'] {
+    opacity: 0.45;
+    cursor: default;
+}
+
+/* The premium expressions of somebody without the club: the button stays, dimmed, and opens the club centre. */
+:root[data-handheld] .octane-handheld-drawer__action.air-avatar-menu-item--locked {
+    color: var(--hh-on-dark-muted);
+}
+
+/* The signs: six a row, each a finger wide. */
+:root[data-handheld] .octane-handheld-drawer__menu .air-avatar-menu-signs-grid {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+    flex: none;
+    width: auto;
+    min-width: 0;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+}
+
+/* The bubble pins the sign pictures and the club mark by pixel; in a button they sit in the label's flow. */
+:root[data-handheld] .octane-handheld-drawer__action .air-avatar-menu-sign-icon,
+:root[data-handheld] .octane-handheld-drawer__action .air-avatar-menu-vip {
+    position: static;
+    inset: auto;
+    display: inline-block;
+    margin: 0;
+    vertical-align: middle;
+}
+
+/* The bubble cuts its long labels to one line; a button has two. */
+:root[data-handheld] .octane-handheld-drawer__action .air-avatar-menu-extra-label {
+    display: inline;
+    max-width: none;
+    overflow: visible;
+    white-space: normal;
+}
+
+/* Inside the profile card (drawn at 1.3): the motto and the name are a finger high, the small icons get a wider touch. */
+:root[data-handheld] .octane-handheld-drawer__details .octane-infostand__motto-text,
+:root[data-handheld] .octane-handheld-drawer__details .octane-infostand__score-link,
+:root[data-handheld] .octane-handheld-drawer__details .octane-infostand__profile-link {
+    min-height: 34px;
+}
+
+:root[data-handheld] .octane-handheld-drawer__details .background-edit-icon {
+    overflow: visible;
+}
+
+:root[data-handheld] .octane-handheld-drawer__details .background-edit-icon::after {
+    content: '';
+    position: absolute;
+    inset: -9px -4px;
+}
+
+:root[data-handheld] .octane-handheld-drawer__details .motto-input {
+    min-height: 34px;
+    font-size: 13px;
+}
+
+:root[data-handheld] .octane-handheld-drawer__menu .air-avatar-menu-signs-grid .octane-handheld-drawer__action {
+    min-height: var(--hh-touch);
+    font-size: var(--hh-size-m);
+}
+
+/* What a bot says, and the answers it offers: the text across the grid, each answer a full row. */
+:root[data-handheld] .octane-handheld-drawer__menu .air-avatar-menu-dialogue {
+    grid-column: 1 / -1;
+    width: auto;
+    margin: 0;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-well);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-m);
+    line-height: 17px;
+}
+
+:root[data-handheld] .octane-handheld-drawer__action.air-avatar-menu-dialogue-option {
+    grid-column: 1 / -1;
+    min-height: var(--hh-touch);
+    font-size: var(--hh-size-m);
+}
+
+/* ---------------------------------------------------------------- sub-page forms (bot name, motto, speech) */
+
+:root[data-handheld] .octane-handheld-drawer__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-label {
+    width: auto;
+    height: auto;
+    overflow: visible;
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-m);
+    line-height: 17px;
+    white-space: normal;
+}
+
+/* The desktop form places these by pixel; on the page they are plain rows. */
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-input,
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-row .air-bot-skill-checkbox {
+    position: static;
+    inset: auto;
+}
+
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-input {
+    width: 100%;
+    height: var(--hh-touch);
+    text-align: left;
+}
+
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-chat-text {
+    height: 104px;
+    padding: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-3);
+    width: auto;
+    height: auto;
+    min-height: var(--hh-touch);
+    padding: 0;
+}
+
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-row > .air-bot-skill-label {
+    flex: 1 1 auto;
+    width: auto;
+}
+
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-row .air-bot-skill-checkbox {
+    flex: 0 0 auto;
+}
+
+/* The switch is 38 x 21: the row around it is the finger's target. */
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-row .air-bot-skill-checkbox::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+}
+
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-chat-delay {
+    flex: 0 0 76px;
+    width: 76px;
+    text-align: right;
+}
+
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-help-link {
+    width: auto;
+    height: auto;
+    min-height: var(--hh-touch);
+    color: var(--hh-air-select-outer);
+    font-size: var(--hh-size-m);
+    line-height: 17px;
+    text-align: left;
+}
+
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-buttons {
+    gap: var(--hh-space-2);
+    height: auto;
+    margin: var(--hh-space-1) 0 0;
+}
+
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-button {
+    flex: 1 1 0;
+    max-width: none;
+    height: 46px;
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-hairline);
+    border-image-source: none;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-button:active {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-button--save {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-drawer__form .air-bot-skill-button--save:active {
+    background: var(--hh-primary-pressed);
+}

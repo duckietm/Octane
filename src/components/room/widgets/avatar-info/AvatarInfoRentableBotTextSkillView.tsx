@@ -16,11 +16,13 @@ import { AvatarInfoBotSkillButtonsView, AvatarInfoBotSkillWindowView } from './A
 interface AvatarInfoRentableBotTextSkillViewProps {
     skillEvent: RoomWidgetUpdateRentableBotTextSkillEvent;
     onClose(): void;
+    /** Phone layout: back to the bot's drawer. */
+    onBack?: () => void;
 }
 
 /** name_configuration_xml; the motto skill (Octane only) reuses the same window. */
 export const AvatarInfoRentableBotTextSkillView: FC<AvatarInfoRentableBotTextSkillViewProps> = (props) => {
-    const { skillEvent = null, onClose = null } = props;
+    const { skillEvent = null, onClose = null, onBack } = props;
     const [text, setText] = useState<string>(skillEvent.text ?? '');
     const isMotto = skillEvent.skillType === BotSkillsEnum.CHANGE_BOT_MOTTO;
 
@@ -36,6 +38,8 @@ export const AvatarInfoRentableBotTextSkillView: FC<AvatarInfoRentableBotTextSki
                 category={skillEvent.category}
                 layout="name"
                 objectId={skillEvent.objectId}
+                onBack={onBack}
+                onClose={onClose}
                 title={
                     isMotto
                         ? localizeWithFallback('bot.skill.motto.configuration.title', localizeWithFallback('avatar.widget.change_bot_motto', 'Change motto'))

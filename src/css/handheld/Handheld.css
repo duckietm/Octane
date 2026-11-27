@@ -64,6 +64,15 @@
     resize: none;
 }
 
+/* A full-screen sheet covers the whole viewport; the notch and the home indicator get a strip in the header colour
+   instead of content. */
+:root[data-handheld] .draggable-window[data-handheld-window='sheet'][data-handheld-fullscreen] {
+    box-sizing: border-box;
+    padding: var(--octane-safe-top, 0px) var(--octane-safe-right, 0px) var(--octane-safe-bottom, 0px) var(--octane-safe-left, 0px);
+    /* Header blue behind the notch, sheet cream behind the home indicator. */
+    background: linear-gradient(180deg, var(--hh-air-blue-header-line, #376275) 0 50%, var(--hh-air-cream, #e9e9e1) 50% 100%);
+}
+
 :root[data-handheld] .draggable-window[data-handheld-window='scaled'] {
     width: max-content;
     min-width: 0;
@@ -195,120 +204,6 @@
 
 .octane-handheld-placement__button:active {
     transform: scale(0.94);
-}
-
-/* ---------------------------------------------------------------- infostand sheet */
-
-.octane-handheld-info-sheet {
-    position: fixed;
-    left: var(--octane-safe-left, 0px);
-    right: var(--octane-safe-right, 0px);
-    bottom: 0;
-    z-index: 85;
-    display: flex;
-    flex-direction: column;
-    max-height: min(62vh, 520px);
-    padding-bottom: var(--octane-safe-bottom, 0px);
-    border: 1px solid var(--octane-handheld-line);
-    border-bottom: 0;
-    border-radius: 14px 14px 0 0;
-    background: var(--octane-handheld-panel);
-    color: #fff;
-    pointer-events: auto;
-    transition: transform 160ms ease-out;
-    animation: octane-handheld-sheet-in 180ms ease-out;
-}
-
-.octane-handheld-info-sheet[data-pulling] {
-    transition: none;
-}
-
-:root[data-handheld='landscape'] .octane-handheld-info-sheet {
-    left: auto;
-    top: var(--octane-safe-top, 0px);
-    width: min(360px, 50vw);
-    max-height: none;
-    border-bottom: 1px solid var(--octane-handheld-line);
-    border-radius: 14px 0 0 14px;
-}
-
-.octane-handheld-info-sheet__grip {
-    display: flex;
-    justify-content: center;
-    padding: 8px 0 4px;
-    touch-action: none;
-}
-
-.octane-handheld-info-sheet__grip-bar {
-    width: 40px;
-    height: 4px;
-    border-radius: 2px;
-    background: rgba(255, 255, 255, 0.45);
-}
-
-.octane-handheld-info-sheet__bar {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
-    padding: 0 10px 6px;
-}
-
-.octane-handheld-info-sheet__actions {
-    min-height: 36px;
-    margin-right: auto;
-    padding: 0 16px;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 18px;
-    background: var(--octane-handheld-accent);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.octane-handheld-info-sheet__actions[aria-expanded='true'] {
-    background: #2b2a2c;
-}
-
-.octane-handheld-info-sheet__close {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
-    font-size: 18px;
-}
-
-.octane-handheld-info-sheet__body {
-    min-height: 0;
-    overflow: auto;
-    padding: 0 10px 10px;
-    overscroll-behavior: contain;
-}
-
-/* The desktop infostand is a fixed-width column; in the sheet it takes the sheet's width. */
-.octane-handheld-info-sheet__body > * {
-    width: 100% !important;
-    max-width: none !important;
-    pointer-events: auto;
-}
-
-@keyframes octane-handheld-sheet-in {
-    from {
-        transform: translateY(24px);
-        opacity: 0;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .octane-handheld-info-sheet {
-        animation: none;
-        transition: none;
-    }
 }
 
 /* ---------------------------------------------------------------- pixel text */

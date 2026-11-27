@@ -46,6 +46,9 @@ import {
     sendProfileCustomization,
     uploadProfileImage
 } from '../../api';
+import { DraggableWindow } from '../../common/draggable-window/DraggableWindow';
+import { HandheldSheetFrame } from '../../common/handheld/HandheldSheetFrame';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
 import { Button, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView, Text } from '../../common';
 import { Slider } from '../../common/Slider';
 import { ToggleButton } from '../../common/ToggleButton';
@@ -172,6 +175,7 @@ const loadImage = (url: string): Promise<HTMLImageElement> =>
 /** The own profile window's look: banner, background, picture, border and accent, from the hotel's lists or an uploaded picture. */
 export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfile, onClose, moveBannerRequest = 0 }) => {
     const [activeTab, setActiveTab] = useState<ProfileCustomizeTab>('banner');
+    const isHandheld = useIsHandheld();
     const [avatarPart, setAvatarPart] = useState<AvatarPart>('background');
     const [data, setData] = useState<ProfileCustomizationData | null>(null);
     const [options, setOptions] = useState<ProfileOptions | null>(null);
@@ -1007,6 +1011,63 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
     };
 
     const accentColor = getProfileAccentColor(userProfile.accentId ?? 0);
+
+    // Phone layout: the customiser is a sheet in the phone's own look, its tabs the frame's pills (HandheldProfile.css).
+    if (isHandheld) {
+        return (
+            <NativeTextTree>
+                <DraggableWindow handheldSheet uniqueKey="octane-profile-customize">
+                    <HandheldSheetFrame
+                        activeTab={editing ? null : shownTab}
+                        className={`octane-profile-customize octane-handheld-customize${accentColor ? ' has-profile-accent' : ''}${isLightProfileAccent(userProfile.accentId ?? 0) ? ' has-light-accent' : ''}`}
+                        icon="icon-me-profile"
+                        style={accentColor ? ({ '--profile-accent': accentColor } as CSSProperties) : undefined}
+                        tabs={editing ? [] : tabs.map((tab) => ({ id: tab, label: label(tab) }))}
+                        tabsLabel={localizeWithFallback('extendedprofile.customize.title', 'Customise profile')}
+                        title={localizeWithFallback('extendedprofile.customize.title', 'Customise profile')}
+                        onClose={onClose}
+                        onTab={(tab) => setActiveTab(tab as ProfileCustomizeTab)}
+                    >
+                        <div className="octane-handheld-customize__scroll">
+                            {canBanner && (
+                                <ProfileCustomizePreviewView
+                                    userProfile={userProfile}
+                                    banners={data?.banners ?? []}
+                                    onMoveBanner={hasBanner && !editing ? () => void moveBanner() : undefined}
+                                />
+                            )}
+                            {editing ? (
+                                <div className="octane-handheld-customize__panel">
+                                    <Text bold small>
+                                        {editing.kind === 'banner'
+                                            ? localizeWithFallback('extendedprofile.customize.upload.banner_title', 'Place your banner')
+                                            : localizeWithFallback('extendedprofile.customize.upload.background_title', 'Place your background')}
+                                    </Text>
+                                    <ProfileImageEditorView
+                                        kind={editing.kind}
+                                        image={editing.image}
+                                        pixelArt={editing.pixelArt}
+                                        animated={!!editing.gif}
+                                        busy={busy}
+                                        onCancel={() => setEditing(null)}
+                                        onSave={saveUpload}
+                                    />
+                                    {message && <p className="octane-profile-customize__message">{message}</p>}
+                                </div>
+                            ) : (
+                                <div className="octane-handheld-customize__panel">
+                                    <p className="octane-profile-customize__hint">{localizeWithFallback(TAB_HINTS[shownTab][0], TAB_HINTS[shownTab][1])}</p>
+                                    {message && <p className="octane-profile-customize__message">{message}</p>}
+                                    {renderTab()}
+                                </div>
+                            )}
+                        </div>
+                        <input ref={fileInput} accept={PROFILE_IMAGE_ACCEPT} className="hidden" type="file" onChange={onFile} />
+                    </HandheldSheetFrame>
+                </DraggableWindow>
+            </NativeTextTree>
+        );
+    }
 
     return (
         <NativeTextTree>

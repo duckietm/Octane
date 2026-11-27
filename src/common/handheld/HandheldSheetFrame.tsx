@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import { CSSProperties, FC, ReactNode } from 'react';
 import { LocalizeText } from '../../api/utils/LocalizeText';
 import { BaseButton } from '../BaseButton';
 import { TabBar, TabBarTab } from '../TabBar';
@@ -9,11 +9,15 @@ export interface HandheldSheetTab {
     label: string;
     /** Unseen things behind the tab; shown as a small count on it. */
     count?: number;
+    /** A picture shown instead of the label (the avatar editor's categories); the label then names the tab. */
+    image?: string;
 }
 
 export interface HandheldSheetFrameProps {
     /** Class of the module (for its own rules inside the frame). */
     className?: string;
+    /** Custom properties of the module on the frame (the accent colour of a profile). */
+    style?: CSSProperties;
     /** The toolbar icon of the module, e.g. "icon-catalog". */
     icon: string;
     title: string;
@@ -34,11 +38,11 @@ export interface HandheldSheetFrameProps {
  * cream sheet with rounded shoulders that holds the module's content. The shop and the inventory share it.
  */
 export const HandheldSheetFrame: FC<HandheldSheetFrameProps> = (props) => {
-    const { className = '', icon, title, onClose, headerExtra = null, tabs = null, activeTab = null, onTab, tabsLabel, children = null } = props;
+    const { className = '', style, icon, title, onClose, headerExtra = null, tabs = null, activeTab = null, onTab, tabsLabel, children = null } = props;
 
     return (
         <NativeTextTree>
-            <div className={`octane-handheld-sheet octane-scrollbar-native ${className}`.trim()}>
+            <div className={`octane-handheld-sheet octane-scrollbar-native ${className}`.trim()} style={style}>
                 <header className="octane-handheld-sheet__caption">
                     <span aria-hidden="true" className={`octane-handheld-sheet__mark octane-icon ${icon}`} />
                     <span className="octane-handheld-sheet__title">{title}</span>
@@ -54,11 +58,16 @@ export const HandheldSheetFrame: FC<HandheldSheetFrameProps> = (props) => {
                         {tabs.map((tab) => (
                             <TabBarTab
                                 key={tab.id}
-                                className={`octane-handheld-sheet__tab${tab.id === activeTab ? ' is-active' : ''}`}
+                                aria-label={tab.image ? tab.label : undefined}
+                                className={`octane-handheld-sheet__tab${tab.id === activeTab ? ' is-active' : ''}${tab.image ? ' has-image' : ''}`}
                                 value={tab.id}
                                 onClick={() => onTab?.(tab.id)}
                             >
-                                <span className="octane-handheld-sheet__tab-label">{tab.label}</span>
+                                {tab.image ? (
+                                    <img alt="" className="octane-handheld-sheet__tab-image" draggable={false} src={tab.image} />
+                                ) : (
+                                    <span className="octane-handheld-sheet__tab-label">{tab.label}</span>
+                                )}
                                 {!!tab.count && <span className="octane-handheld-sheet__tab-count">{tab.count}</span>}
                             </TabBarTab>
                         ))}

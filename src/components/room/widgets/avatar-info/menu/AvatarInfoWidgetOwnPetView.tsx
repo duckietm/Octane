@@ -8,6 +8,7 @@ import {
     RoomUnitGiveHandItemPetComposer
 } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
+import { FaBoxOpen, FaCookieBite, FaGraduationCap, FaHandHolding, FaHeart, FaHorse, FaPaw, FaRecycle, FaSearch, FaSeedling, FaShoppingCart, FaTimesCircle, FaWalking } from 'react-icons/fa';
 import { AvatarInfoPet, confirmCompostPlant, GetConfigurationValue, GetConfigurationRecord, GetOwnRoomObject, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../api';
 import { useNotification, useRoom, useSessionInfo, useWiredTools } from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
@@ -149,48 +150,48 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                     {mode === MODE_NORMAL && (
                         <>
                             {petRespectRemaining > 0 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('respect')}>
+                                <ContextMenuListItemView icon={<FaPaw />} onClick={(event) => processAction('respect')}>
                                     {LocalizeText('infostand.button.petrespect', ['count'], [petRespectRemaining.toString()])}
                                 </ContextMenuListItemView>
                             )}
-                            <ContextMenuListItemView onClick={(event) => processAction('train')}>{LocalizeText('infostand.button.train')}</ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaGraduationCap />} onClick={(event) => processAction('train')}>{LocalizeText('infostand.button.train')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaBoxOpen />} tone="danger" onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>
                             {avatarInfo.petType === PetType.HORSE && (
-                                <ContextMenuListItemView onClick={(event) => processAction('buy_saddle')}>
+                                <ContextMenuListItemView icon={<FaShoppingCart />} onClick={(event) => processAction('buy_saddle')}>
                                     {LocalizeText('infostand.button.buy_saddle')}
                                 </ContextMenuListItemView>
                             )}
                             {[PetType.BEAR, PetType.TERRIER, PetType.CAT, PetType.DOG, PetType.PIG].indexOf(avatarInfo.petType) > -1 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('breed')}>{LocalizeText('infostand.button.breed')}</ContextMenuListItemView>
+                                <ContextMenuListItemView icon={<FaHeart />} onClick={(event) => processAction('breed')}>{LocalizeText('infostand.button.breed')}</ContextMenuListItemView>
                             )}
                         </>
                     )}
                     {mode === MODE_SADDLED_UP && (
                         <>
-                            <ContextMenuListItemView onClick={(event) => processAction('mount')}>{LocalizeText('infostand.button.mount')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaHorse />} onClick={(event) => processAction('mount')}>{LocalizeText('infostand.button.mount')}</ContextMenuListItemView>
                             <ContextMenuListItemView gap={1} onClick={(event) => processAction('toggle_riding_permission')}>
                                 <Checkbox checked={!!avatarInfo.publiclyRideable} readOnly={true} />
                                 {LocalizeText('infostand.button.toggle_riding_permission')}
                             </ContextMenuListItemView>
                             {petRespectRemaining > 0 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('respect')}>
+                                <ContextMenuListItemView icon={<FaPaw />} onClick={(event) => processAction('respect')}>
                                     {LocalizeText('infostand.button.petrespect', ['count'], [petRespectRemaining.toString()])}
                                 </ContextMenuListItemView>
                             )}
-                            <ContextMenuListItemView onClick={(event) => processAction('train')}>{LocalizeText('infostand.button.train')}</ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('saddle_off')}>
+                            <ContextMenuListItemView icon={<FaGraduationCap />} onClick={(event) => processAction('train')}>{LocalizeText('infostand.button.train')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaBoxOpen />} tone="danger" onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaTimesCircle />} onClick={(event) => processAction('saddle_off')}>
                                 {LocalizeText('infostand.button.saddleoff')}
                             </ContextMenuListItemView>
                         </>
                     )}
                     {mode === MODE_RIDING && (
                         <>
-                            <ContextMenuListItemView onClick={(event) => processAction('dismount')}>
+                            <ContextMenuListItemView icon={<FaWalking />} onClick={(event) => processAction('dismount')}>
                                 {LocalizeText('infostand.button.dismount')}
                             </ContextMenuListItemView>
                             {petRespectRemaining > 0 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('respect')}>
+                                <ContextMenuListItemView icon={<FaPaw />} onClick={(event) => processAction('respect')}>
                                     {LocalizeText('infostand.button.petrespect', ['count'], [petRespectRemaining.toString()])}
                                 </ContextMenuListItemView>
                             )}
@@ -198,19 +199,19 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                     )}
                     {mode === MODE_MONSTER_PLANT && (
                         <>
-                            <ContextMenuListItemView onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaBoxOpen />} tone="danger" onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>
                             {plantMenu.revive && (
-                                <ContextMenuListItemView onClick={(event) => processAction('revive')}>
+                                <ContextMenuListItemView icon={<FaSeedling />} onClick={(event) => processAction('revive')}>
                                     {LocalizeText('infostand.button.revive')}
                                 </ContextMenuListItemView>
                             )}
                             {plantMenu.compost && (
-                                <ContextMenuListItemView onClick={(event) => processAction('compost')}>
+                                <ContextMenuListItemView icon={<FaRecycle />} tone="danger" onClick={(event) => processAction('compost')}>
                                     {LocalizeText('infostand.button.compost')}
                                 </ContextMenuListItemView>
                             )}
                             {plantMenu.treat && (
-                                <ContextMenuListItemView disabled={!plantMenu.treatEnabled} onClick={(event) => processAction('treat')}>
+                                <ContextMenuListItemView disabled={!plantMenu.treatEnabled} icon={<FaCookieBite />} onClick={(event) => processAction('treat')}>
                                     {LocalizeText('infostand.button.pettreat')}
                                 </ContextMenuListItemView>
                             )}
@@ -220,7 +221,7 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                                         <Checkbox checked={avatarInfo.publiclyBreedable} readOnly={true} />
                                         {LocalizeText('infostand.button.toggle_breeding_permission')}
                                     </ContextMenuListItemView>
-                                    <ContextMenuListItemView onClick={(event) => processAction('breed')}>
+                                    <ContextMenuListItemView icon={<FaHeart />} onClick={(event) => processAction('breed')}>
                                         {LocalizeText('infostand.button.breed')}
                                     </ContextMenuListItemView>
                                 </>
@@ -228,13 +229,13 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                         </>
                     )}
                     {canGiveHandItem && (
-                        <ContextMenuListItemView onClick={(event) => processAction('pass_hand_item')}>
+                        <ContextMenuListItemView icon={<FaHandHolding />} onClick={(event) => processAction('pass_hand_item')}>
                             {LocalizeText('infostand.button.pass_hand_item')}
                         </ContextMenuListItemView>
                     )}
                     {/* Official wired_inspect: the creator tools' inspection, for whoever may open it. */}
                     {showInspectButton && (
-                        <ContextMenuListItemView onClick={(event) => processAction('inspect')}>
+                        <ContextMenuListItemView icon={<FaSearch />} onClick={(event) => processAction('inspect')}>
                             {localizeWithFallback('octane.room.inspect', 'Inspect')}
                         </ContextMenuListItemView>
                     )}

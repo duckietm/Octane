@@ -222,7 +222,7 @@ describe('DraggableWindow in the phone layout', () => {
 
         expect(element.style.transform).toBe(before);
     });
-    it('keeps a sheet window a sheet even when it would fit as a dialog', () => {
+    it('makes a sheet window a full screen even when it would fit as a dialog', () => {
         goHandheld();
         render(
             <DraggableWindow handheldSheet>
@@ -234,7 +234,9 @@ describe('DraggableWindow in the phone layout', () => {
 
         expect(element.getAttribute('data-handheld-window')).toBe('sheet');
         expect(element.style.width).toBe('390px');
-        expect(element.style.height).toBe('784px');
+        expect(element.style.height).toBe('844px');
+        // A window that asks to be a sheet is a full screen: it covers the HUD and the toolbar strip too.
+        expect(element.hasAttribute('data-handheld-fullscreen')).toBe(true);
     });
 
     it('draws a fixed-layout window smaller and centres it when it then fits', () => {
@@ -310,7 +312,7 @@ describe('DraggableWindow in the phone layout', () => {
 
         act(() => useHandheldStore.setState({ keyboardInset: 0 }));
 
-        expect(element.style.height).toBe('784px');
+        expect(element.style.height).toBe('844px');
     });
 
     it('stays put when the keyboard opens for a field outside it', () => {
@@ -329,7 +331,7 @@ describe('DraggableWindow in the phone layout', () => {
         act(() => (document.querySelector('input') as HTMLInputElement).focus());
         act(() => useHandheldStore.setState({ keyboardInset: 336 }));
 
-        expect(element.style.height).toBe('784px');
+        expect(element.style.height).toBe('844px');
 
         act(() => useHandheldStore.setState({ keyboardInset: 0 }));
     });

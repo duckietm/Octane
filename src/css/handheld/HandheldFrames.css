@@ -1,35 +1,11 @@
 /*
- * Phone layout of the fixed-layout windows: the reward track (1103 x 722), the talent track (800 x 580), the avatar
- * editor (490 x 523) and the achievements (389 wide). Their AIR layouts are pixel coordinates, so on a phone they are
+ * Phone layout of the fixed-layout windows: the reward track (1103 x 722), the talent track (800 x 580) and the
+ * achievements (389 wide). Their AIR layouts are pixel coordinates, so on a phone they are
  * not reflowed but drawn smaller as a whole (DraggableWindow / AirModalDialog `handheldScale`, see fitHandheldFrame):
  * down to a readable minimum, and panned with a finger where they still do not fit. Scoped to :root[data-handheld];
  * the narrow-viewport fallbacks of their own stylesheets (which squeeze them and scroll inside) are switched off here,
  * since the whole frame is scaled instead.
  */
-
-/* ---------------------------------------------------------------- avatar editor */
-
-:root[data-handheld] .octane-avatar-editor {
-    width: 490px !important;
-    min-width: 490px;
-    max-width: 490px !important;
-    height: 523px !important;
-    min-height: 523px;
-    max-height: 523px !important;
-}
-
-:root[data-handheld] .octane-avatar-editor.is-wardrobe-open {
-    width: 669px !important;
-    min-width: 669px;
-    max-width: 669px !important;
-}
-
-:root[data-handheld] .octane-avatar-editor .octane-avatar-editor-content.octane-card-content-shell {
-    height: 490px !important;
-    max-height: 490px !important;
-    flex: 0 0 490px;
-    overflow: hidden !important;
-}
 
 /* ---------------------------------------------------------------- achievements */
 
