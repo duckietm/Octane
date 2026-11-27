@@ -5,7 +5,6 @@ import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../
 import { useHelp } from '../../../hooks';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 const SERVER_DATE = /^\w{3} (\w{3}) (\d{1,2}) (\d{2}:\d{2}:\d{2}) [A-Z]{2,5} (\d{4})$/;
 
@@ -51,7 +50,7 @@ export const SanctionSatusView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-help octane-sanction-info min-w-0 w-[min(450px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" theme="primary-slim">
+            <OctaneCardView className="octane-help octane-sanction-info min-w-0 w-[min(450px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" theme="primary-slim">
                 <OctaneCardHeaderView headerText={LocalizeText('help.sanction.info.title')} onCloseClick={() => setSanctionInfo(null)} />
                 <OctaneCardContentView className="text-black">
                     <div className="flex min-h-[170px] flex-col">

@@ -6,7 +6,6 @@ import { getPhotoCreator, useFurnitureExternalImageWidget, useHelp, useNotificat
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 // Official stories_image_widget: the photo in a 1px black outline on a translucent panel, browse arrows
 // either side, date and creator under it, and report / remove / close at the top right.
@@ -73,7 +72,7 @@ export const FurnitureExternalImageView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} uniqueKey="photo-viewer" handleSelector=".octane-photo-viewer__panel">
+            <DraggableWindow uniqueKey="photo-viewer" handleSelector=".octane-photo-viewer__panel">
                 <div className="octane-photo-viewer">
                     <div className="octane-photo-viewer__panel" />
                     <div className="octane-photo-viewer__photo">

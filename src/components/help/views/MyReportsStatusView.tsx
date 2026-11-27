@@ -5,7 +5,6 @@ import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../
 import { useMessageEvent } from '../../../hooks';
 import { OctaneButton } from '../../../layout';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 const formatTime = (time: number): string => (time > 0 ? new Date(time).toLocaleString() : '-');
 
@@ -37,7 +36,7 @@ export const MyReportsStatusView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+            <OctaneCardView
                 className="octane-help octane-my-reports min-w-0 w-[min(538px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                 theme="primary-slim"
                 uniqueKey="help-my-reports"

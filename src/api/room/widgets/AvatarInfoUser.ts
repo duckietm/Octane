@@ -26,10 +26,6 @@ export class AvatarInfoUser implements IAvatarInfo {
     public overlayId: number = 0;
     public cardBackgroundId: number = 0;
     public borderId: number = 0;
-    /** The avatar's pose in the profile picture: direction 0-7 and its offset in pixels. */
-    public avatarDirection: number = 2;
-    public avatarOffsetX: number = 0;
-    public avatarOffsetY: number = 0;
     public webID: number = 0;
     public xp: number = 0;
     public userType: number = -1;

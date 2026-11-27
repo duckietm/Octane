@@ -3,7 +3,6 @@ import { DraggableWindow } from '../../../common/draggable-window';
 import { NativeText } from '../../../common/native-text/NativeText';
 import { useModAlertStore } from '../../../hooks';
 import { Native3Frame, Native3ThickButton } from '../native/NativeWindow3';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 const BODY_COLOR = 0xe9e9e1;
 
@@ -33,7 +32,7 @@ export const NativeWindowAlert: FC<{ title: string; message: string; onClose: ()
     const height = 141 + (summaryHeight - 57);
 
     return (
-        <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} handleSelector=".native3-title" initialPosition={{ x: Math.round((window.innerWidth - width) / 2), y: Math.round((window.innerHeight - height) / 2) }}>
+        <DraggableWindow handleSelector=".native3-title" initialPosition={{ x: Math.round((window.innerWidth - width) / 2), y: Math.round((window.innerHeight - height) / 2) }}>
             <Native3Frame height={height} title={title} width={width} onClose={onClose}>
                 <div ref={summaryRef} style={{ position: 'absolute', left: 27, top: 14, width: 210 }}>
                     <NativeText background={BODY_COLOR} maxWidth={210} text={message} textStyle="u_regular" />

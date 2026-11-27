@@ -199,9 +199,6 @@ export class AvatarInfoUtilities {
         userInfo.overlayId = userData.overlay;
         userInfo.cardBackgroundId = userData.cardBackground ?? 0;
         userInfo.borderId = (userData as any).borderId ?? 0;
-        userInfo.avatarDirection = userData.avatarDirection ?? 2;
-        userInfo.avatarOffsetX = userData.avatarOffsetX ?? 0;
-        userInfo.avatarOffsetY = userData.avatarOffsetY ?? 0;
         userInfo.achievementScore = userData.activityPoints;
         userInfo.badgesRank = userData.badgesRank ?? -1;
         userInfo.webID = userData.webID;

@@ -4,7 +4,6 @@ import { Select } from '../../common/Select';
 import { NumberInput } from '../../common/NumberInput';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { localizeWithFallback } from '../../api';
-import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 export interface WiredHolderPanelEntry {
     id: string;
@@ -104,7 +103,7 @@ export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelView
     // a double click on it; Give variable opens the create bubble over the table.
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
+            <OctaneCardView
                 className="octane-wired-menu octane-wired-holder"
                 theme="primary-slim"
                 uniqueKey={uniqueKey}

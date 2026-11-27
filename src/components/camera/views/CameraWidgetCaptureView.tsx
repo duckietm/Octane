@@ -8,7 +8,6 @@ import { CameraCenteredText, CameraNativeText } from './CameraNativeText';
 import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
-import { HANDHELD_PAN_ONLY_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 export interface CameraWidgetCaptureViewProps {
     onClose: () => void;
@@ -234,7 +233,7 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
 
     return (
         <NativeTextTree>
-            <DraggableWindow handheldScale={HANDHELD_PAN_ONLY_SCALE} uniqueKey="camera-capture">
+            <DraggableWindow uniqueKey="camera-capture">
                 <Column center className="octane-camera-capture" gap={0}>
                     <div className="octane-camera-capture__body drag-handler">
                         <div className="octane-camera-capture__title">

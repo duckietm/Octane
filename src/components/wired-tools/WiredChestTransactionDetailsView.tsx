@@ -5,7 +5,6 @@ import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { chestTransactionMethodText } from './WiredChestTransactions.helpers';
-import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 export interface WiredChestTransactionDetails {
     transaction: IWiredChestTransactionRow;
@@ -54,7 +53,7 @@ export const WiredChestTransactionDetailsView: FC<WiredChestTransactionDetailsVi
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE} className="octane-widget-chest-log octane-chest-log-details" theme="primary-slim" uniqueKey="chest-transaction-details">
+            <OctaneCardView className="octane-widget-chest-log octane-chest-log-details" theme="primary-slim" uniqueKey="chest-transaction-details">
                 <OctaneCardHeaderView headerText={localizeWithFallback('wiredchests.log_details.title', 'Transaction details')} onCloseClick={onClose} />
                 <OctaneCardContentView>
                     <div className="octane-chest-log__detail">

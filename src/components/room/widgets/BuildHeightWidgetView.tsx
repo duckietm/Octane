@@ -7,7 +7,6 @@ import { NumberInput } from '../../../common/NumberInput';
 import '../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { formatBuildHeight, getBuildHeightMarks, roundBuildHeight } from './buildHeightScale';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 const STEP = 0.1;
 
@@ -33,7 +32,7 @@ export const BuildHeightWidgetView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-build-height-widget" theme="primary-slim" uniqueKey="build-height">
+            <OctaneCardView className="octane-build-height-widget" theme="primary-slim" uniqueKey="build-height">
                 <OctaneCardHeaderView headerText={LocalizeText('widget.buildheight.title')} onCloseClick={close} />
                 <OctaneCardContentView className="build-height-content">
                     <p className="build-height-description">{LocalizeText('widget.buildheight.description')}</p>

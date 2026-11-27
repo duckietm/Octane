@@ -29,12 +29,6 @@ import {
     PROFILE_IMAGE_MAX_SOURCE_BYTES,
     ProfileCustomizationChange,
     ProfileCustomizationData,
-    ProfileAvatarPose,
-    PROFILE_AVATAR_MAX_OFFSET,
-    clampProfileAvatarOffset,
-    profileAvatarPose,
-    rotateProfileAvatarDirection,
-    sameProfileAvatarPose,
     ProfileImageKind,
     ProfileImagePlacement,
     profileOptionState,
@@ -47,10 +41,9 @@ import {
     uploadProfileImage
 } from '../../api';
 import { Button, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView, Text } from '../../common';
-import { Slider } from '../../common/Slider';
 import { ToggleButton } from '../../common/ToggleButton';
 import { Hint } from '../../common/Tooltip';
-import { FaArrowDown, FaArrowLeft, FaArrowRight, FaArrowUp, FaLock, FaRedo, FaTimes, FaUndo } from 'react-icons/fa';
+import { FaLock, FaTimes } from 'react-icons/fa';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { ProfilePreviewView } from '../backgrounds/ProfilePreviewView';
@@ -58,14 +51,13 @@ import { ProfileAvatarFrameView } from './ProfileAvatarFrameView';
 import { ProfileCustomizePreviewView } from './ProfileCustomizePreviewView';
 import { ProfileImageEditorView } from './ProfileImageEditorView';
 
-const TABS = ['banner', 'card', 'avatar', 'pose', 'border', 'accent'] as const;
+const TABS = ['banner', 'card', 'avatar', 'border', 'accent'] as const;
 type ProfileCustomizeTab = (typeof TABS)[number];
 
 const TAB_LABELS: Record<ProfileCustomizeTab, [string, string]> = {
     banner: ['extendedprofile.customize.banner', 'Banner'],
     card: ['extendedprofile.customize.background', 'Background'],
     avatar: ['extendedprofile.customize.avatar', 'Picture'],
-    pose: ['extendedprofile.customize.pose', 'Pose'],
     border: ['extendedprofile.customize.border', 'Border'],
     accent: ['extendedprofile.customize.accent', 'Theme']
 };
@@ -77,10 +69,6 @@ const TAB_HINTS: Record<ProfileCustomizeTab, [string, string]> = {
         'The picture or shade behind the content of your profile window. Everyone who opens your profile sees it.'
     ],
     avatar: ['extendedprofile.customize.avatar.hint', 'What stands behind and around your character, in your profile and in the room infostand.'],
-    pose: [
-        'extendedprofile.customize.pose.hint',
-        'Turn your character and move it inside your picture. Everyone sees it in your profile and in the room infostand.'
-    ],
     border: [
         'extendedprofile.customize.border.hint',
         'The frame around your character: in your profile and in the infostand when someone clicks you in a room.'
@@ -145,12 +133,6 @@ const DEFAULT_STYLE: ProfileBackgroundStyle = { from: '#1e7cb8', to: '#0b2a40', 
 // The server drops a change that follows the previous one within half a second.
 const SEND_COOLDOWN_MS = 600;
 
-/** The pose tab's preview: the profile picture drawn twice as large, so a one-pixel nudge is seen. */
-const POSE_PREVIEW_SCALE = 2;
-
-/** One nudge of the avatar, in pixels of the picture. */
-const POSE_STEP = 1;
-
 interface ProfileCustomizeViewProps {
     userProfile: UserProfileParser;
     onClose: () => void;
@@ -191,14 +173,6 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
     const savedStyle = parseProfileBackgroundStyle(userProfile.backgroundStyle);
     const [styleDraft, setStyleDraft] = useState<ProfileBackgroundStyle>(() => savedStyle ?? DEFAULT_STYLE);
     const [accentDraft, setAccentDraft] = useState(() => getProfileAccentColor(userProfile.accentId ?? 0) ?? '#1e7cb8');
-    const savedPose = profileAvatarPose(userProfile);
-    // The pose being tried on: shown at once, sent with Save.
-    const [poseDraft, setPoseDraft] = useState<ProfileAvatarPose>(savedPose);
-
-    // A saved pose (this window's Save, or another client's) becomes the new starting point.
-    useEffect(() => {
-        setPoseDraft({ direction: savedPose.direction, offsetX: savedPose.offsetX, offsetY: savedPose.offsetY });
-    }, [savedPose.direction, savedPose.offsetX, savedPose.offsetY]);
     const canBanner = hasProfileFeature(userProfile, PROFILE_FEATURE_BANNER);
     const canUpload = hasProfileFeature(userProfile, PROFILE_FEATURE_UPLOAD);
     const canTheme = hasProfileFeature(userProfile, PROFILE_FEATURE_THEME);
@@ -734,9 +708,6 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                                         backgroundId={avatarPart === 'background' ? id : current.background}
                                         standId={avatarPart === 'stand' ? id : current.stand}
                                         overlayId={avatarPart === 'overlay' ? id : current.overlay}
-                                        direction={savedPose.direction}
-                                        offsetX={savedPose.offsetX}
-                                        offsetY={savedPose.offsetY}
                                         selected={id === current[avatarPart]}
                                         onClick={state.lock ? undefined : () => choose({ [avatarPart]: id }, current[avatarPart], null)}
                                     />
@@ -758,124 +729,6 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                             })}
                         </Grid>
                     </>
-                );
-            }
-            case 'pose': {
-                const nudge = (axis: 'offsetX' | 'offsetY', delta: number) =>
-                    setPoseDraft((draft) => ({ ...draft, [axis]: clampProfileAvatarOffset(draft[axis] + delta) }));
-                const setOffset = (axis: 'offsetX' | 'offsetY', value: number) =>
-                    setPoseDraft((draft) => ({ ...draft, [axis]: clampProfileAvatarOffset(Number(value)) }));
-                const turn = (steps: number) => setPoseDraft((draft) => ({ ...draft, direction: rotateProfileAvatarDirection(draft.direction, steps) }));
-                const text = (key: string, fallback: string) => localizeWithFallback(`extendedprofile.customize.pose.${key}`, fallback);
-                const arrow = (key: string, fallback: string, icon: ReactNode, disabled: boolean, onClick: () => void) => (
-                    <Hint content={text(key, fallback)}>
-                        <BaseButton
-                            aria-label={text(key, fallback)}
-                            className={`octane-profile-customize__pose-arrow octane-profile-customize__pose-arrow--${key}`}
-                            disabled={busy || disabled}
-                            onClick={onClick}
-                        >
-                            {icon}
-                        </BaseButton>
-                    </Hint>
-                );
-                const max = PROFILE_AVATAR_MAX_OFFSET;
-                const unchanged = sameProfileAvatarPose(poseDraft, savedPose);
-                const centred = poseDraft.offsetX === 0 && poseDraft.offsetY === 0;
-
-                return (
-                    <div className="octane-profile-customize__pose">
-                        <div className="octane-profile-customize__pose-preview" data-testid="profile-pose-preview">
-                            <ProfileAvatarFrameView
-                                figure={userProfile.figure}
-                                backgroundId={userProfile.backgroundId}
-                                standId={userProfile.standId}
-                                overlayId={userProfile.overlayId}
-                                borderId={userProfile.borderId ?? 0}
-                                direction={poseDraft.direction}
-                                offsetX={poseDraft.offsetX}
-                                offsetY={poseDraft.offsetY}
-                                scale={POSE_PREVIEW_SCALE}
-                            />
-                        </div>
-                        <div className="octane-profile-customize__sections">
-                            {section(
-                                text('direction', 'Direction'),
-                                <div className="octane-profile-customize__style-row">
-                                    <Button variant="secondary" disabled={busy} onClick={() => turn(1)}>
-                                        <FaUndo size={10} />
-                                        {text('turn_left', 'Turn left')}
-                                    </Button>
-                                    <span className="octane-profile-customize__pose-value" data-testid="profile-pose-direction">
-                                        {poseDraft.direction}
-                                    </span>
-                                    <Button variant="secondary" disabled={busy} onClick={() => turn(-1)}>
-                                        {text('turn_right', 'Turn right')}
-                                        <FaRedo size={10} />
-                                    </Button>
-                                </div>
-                            )}
-                            {section(
-                                text('position', 'Position'),
-                                <div className="octane-profile-customize__pose-position">
-                                    <div className="octane-profile-customize__pose-pad">
-                                        {arrow('up', 'Move up', <FaArrowUp size={10} />, poseDraft.offsetY <= -max, () => nudge('offsetY', -POSE_STEP))}
-                                        {arrow('left', 'Move left', <FaArrowLeft size={10} />, poseDraft.offsetX <= -max, () => nudge('offsetX', -POSE_STEP))}
-                                        {arrow('right', 'Move right', <FaArrowRight size={10} />, poseDraft.offsetX >= max, () => nudge('offsetX', POSE_STEP))}
-                                        {arrow('down', 'Move down', <FaArrowDown size={10} />, poseDraft.offsetY >= max, () => nudge('offsetY', POSE_STEP))}
-                                    </div>
-                                    <div className="octane-profile-customize__pose-sliders">
-                                        <div className="octane-profile-customize__pose-slider">
-                                            <span>{text('x', 'Left / right')}</span>
-                                            <Slider
-                                                disabledButton
-                                                className="octane-slider--compact grow"
-                                                min={-max}
-                                                max={max}
-                                                step={POSE_STEP}
-                                                value={poseDraft.offsetX}
-                                                thumbAriaLabel={text('x', 'Left / right')}
-                                                disabled={busy}
-                                                onChange={(value) => setOffset('offsetX', value)}
-                                            />
-                                            <span className="octane-profile-customize__pose-value" data-testid="profile-pose-x">
-                                                {poseDraft.offsetX}
-                                            </span>
-                                        </div>
-                                        <div className="octane-profile-customize__pose-slider">
-                                            <span>{text('y', 'Up / down')}</span>
-                                            <Slider
-                                                disabledButton
-                                                className="octane-slider--compact grow"
-                                                min={-max}
-                                                max={max}
-                                                step={POSE_STEP}
-                                                value={poseDraft.offsetY}
-                                                thumbAriaLabel={text('y', 'Up / down')}
-                                                disabled={busy}
-                                                onChange={(value) => setOffset('offsetY', value)}
-                                            />
-                                            <span className="octane-profile-customize__pose-value" data-testid="profile-pose-y">
-                                                {poseDraft.offsetY}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                            <div className="octane-profile-customize__style-row">
-                                <Button
-                                    variant="secondary"
-                                    disabled={busy || centred}
-                                    onClick={() => setPoseDraft((draft) => ({ ...draft, offsetX: 0, offsetY: 0 }))}
-                                >
-                                    {text('reset', 'Centre')}
-                                </Button>
-                                <Button variant="success" disabled={busy || unchanged} onClick={() => send({ pose: poseDraft })}>
-                                    {text('save', 'Save pose')}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
                 );
             }
             case 'border': {
@@ -915,9 +768,6 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
                                 standId={userProfile.standId}
                                 overlayId={userProfile.overlayId}
                                 borderId={hoverBorder ?? border}
-                                direction={savedPose.direction}
-                                offsetX={savedPose.offsetX}
-                                offsetY={savedPose.offsetY}
                             />
                         </div>
                         <div className="octane-profile-customize__sections">
@@ -1012,7 +862,6 @@ export const ProfileCustomizeView: FC<ProfileCustomizeViewProps> = ({ userProfil
         <NativeTextTree>
             <OctaneCardView
                 uniqueKey="octane-profile-customize"
-                handheldSheet
                 className={`octane-profile-customize w-[600px] h-[600px] max-w-[96vw] max-h-[90vh]${accentColor ? ' has-profile-accent' : ''}${isLightProfileAccent(userProfile.accentId ?? 0) ? ' has-light-accent' : ''}`}
                 style={accentColor ? ({ '--profile-accent': accentColor } as CSSProperties) : undefined}
             >

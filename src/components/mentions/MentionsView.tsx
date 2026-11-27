@@ -9,7 +9,6 @@ import { MentionRowView } from './MentionRowView';
 import { BaseButton } from '../../common/BaseButton';
 import { ToggleButton } from '../../common/ToggleButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 interface MentionsViewProps {
     onClose: () => void;
@@ -135,7 +134,7 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+            <OctaneCardView
                 className="mentions-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] has-classic-scrollbar"
                 theme="primary-slim"
                 uniqueKey="mentions"

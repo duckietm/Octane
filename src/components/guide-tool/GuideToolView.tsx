@@ -36,7 +36,6 @@ import { GuideToolUserPendingView } from './views/GuideToolUserPendingView';
 import { GuideToolUserSomethingWrogView } from './views/GuideToolUserSomethingWrogView';
 import { GuideToolUserThanksView } from './views/GuideToolUserThanksView';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 export const GuideToolView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -380,7 +379,7 @@ export const GuideToolView: FC<{}> = (props) => {
 
         return (
             <NativeTextTree>
-                <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="guide-tool-review" className="octane-guide-tool octane-guardian-review" theme="primary-slim">
+                <OctaneCardView uniqueKey="guide-tool-review" className="octane-guide-tool octane-guardian-review" theme="primary-slim">
                     <OctaneCardHeaderView headerText={guardianText(reviewHeader[review.state])} noCloseButton={!reviewClosable} onCloseClick={closeReview} />
                     <OctaneCardContentView className="text-black">
                         {review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_ACCEPT && (
@@ -423,7 +422,7 @@ export const GuideToolView: FC<{}> = (props) => {
         <NativeTextTree>
             <>
                 {isReporting && canReport && <GuideToolReportView onClose={() => setIsReporting(false)} />}
-                <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="guide-tool" className="octane-guide-tool" theme="primary-slim">
+                <OctaneCardView uniqueKey="guide-tool" className="octane-guide-tool" theme="primary-slim">
                     <OctaneCardHeaderView headerText={headerText} noCloseButton={noCloseButton} onCloseClick={(event) => processAction('close')} />
                     <OctaneCardContentView className="text-black">
                         {sessionState === GuideSessionState.GUIDE_TOOL_MENU && (

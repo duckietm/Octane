@@ -14,7 +14,6 @@ import headerReady from '../../../assets/images/groups/native/group_UI_ready.png
 import { OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { GroupAlert, GroupAlertContext, GroupNativeAlertView } from './GroupNativeAlertView';
 import { flatText, GROUP_HEADER_SURFACE, GroupText, GroupWindowTitle } from './GroupNativeLayout';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 // header_pic_bitmap_step_N, stretched into their 114x62 layout rectangle.
 const HEADER_IMAGES: Record<number, string> = { 1: headerIdentity, 2: headerBadge, 3: headerColors, 4: headerReady, 5: headerReady };
@@ -60,7 +59,7 @@ export const GroupManagementWindow: FC<GroupManagementWindowProps> = ({
 
     return (
         <GroupAlertContext.Provider value={setAlert}>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE}
+            <OctaneCardView
                 aria-label={LocalizeText('group.window.title')}
                 className="octane-group-native"
                 frameStyle={3}

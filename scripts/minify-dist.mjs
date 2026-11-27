@@ -1,5 +1,4 @@
 import { encodeBytes } from './asset-codec.mjs';
-import { buildDistIndexHtml } from './dist-index-html.mjs';
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { gzipSync } from 'zlib';
@@ -93,8 +92,6 @@ const contentSecurityPolicy = [
     "object-src 'none'",
     "base-uri 'self'"
 ].join('; ');
-const csp = (process.env.OCTANE_CSP === 'off') ? '' : contentSecurityPolicy;
+const cspMeta = (process.env.OCTANE_CSP === 'off') ? '' : `<meta http-equiv="Content-Security-Policy" content="${ contentSecurityPolicy }">`;
 
-writeFileSync(join(dist, 'index.html'), buildDistIndexHtml({ contentSecurityPolicy: csp, buildVersion }));
-
-if(!existsSync(join(dist, 'site.webmanifest'))) console.warn('minify-dist: site.webmanifest is missing from dist; "add to home screen" will not work.');
+writeFileSync(join(dist, 'index.html'), `<!DOCTYPE html><html><head><meta charset="utf-8">${ cspMeta }<meta name="viewport" content="width=device-width, initial-scale=1"><script async defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"></script></head><body><div id="root"></div><script src="configuration/bootstrap.js?v=${ buildVersion }"></script></body></html>`);

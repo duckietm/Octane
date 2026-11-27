@@ -13,7 +13,6 @@ import { Checkbox } from '../../common/Checkbox';
 import { BaseButton } from '../../common/BaseButton';
 import '../../css/discord/DiscordSettingsAirText.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 const localizeWithFallback = (key: string, fallback: string) => {
     const text = LocalizeText(key);
@@ -187,7 +186,7 @@ export const DiscordSettingsView: FC = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="discord-settings-window w-[390px]" theme="primary-slim" uniqueKey="discord-settings">
+            <OctaneCardView className="discord-settings-window w-[390px]" theme="primary-slim" uniqueKey="discord-settings">
                 <OctaneCardHeaderView
                     headerText={localizeWithFallback('discord.settings.title', 'Impostazioni Discord')}
                     onCloseClick={() => setIsVisible(false)}

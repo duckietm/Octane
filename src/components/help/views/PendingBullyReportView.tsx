@@ -4,7 +4,6 @@ import bullyIllustration from '../../../assets/images/guide-tool/chat-review/ill
 import { Button, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useHelp } from '../../../hooks';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 /**
  * AIR pending_bully_request (HelpController.showPendingTicket): the reporter already has a report
@@ -25,7 +24,7 @@ export const PendingBullyReportView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-guardian-pending" theme="primary-slim" uniqueKey="pending-bully-request">
+            <OctaneCardView className="octane-guardian-pending" theme="primary-slim" uniqueKey="pending-bully-request">
                 <OctaneCardHeaderView headerText={guardianText(`guide.pending.${kind}.title`)} onCloseClick={close} />
                 <OctaneCardContentView className="text-black">
                     <div className="octane-guardian-feedback__content">

@@ -7,7 +7,6 @@ import { ContextMenuHeaderView } from '../context-menu/ContextMenuHeaderView';
 import { ContextMenuListView } from '../context-menu/ContextMenuListView';
 import '../../../../css/room/FurniWindowsBAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 export const FurnitureHighScoreView: FC<{}> = (props) => {
     const { stuffDatas = null, getScoreType = null, getClearType = null, isConfigured = null, isTimeScore = null, formatScore = null } = useFurnitureHighScoreWidget();
@@ -22,7 +21,7 @@ export const FurnitureHighScoreView: FC<{}> = (props) => {
                     const timeScore = configured && isTimeScore(stuffData.scoreType);
 
                     return (
-                        <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} key={index} uniqueKey={`high-score-${objectId}`}>
+                        <DraggableWindow key={index} uniqueKey={`high-score-${objectId}`}>
                             <Column className="octane-widget-high-score octane-furni-highscore octane-context-menu bg-[#1e1f23] p-2 w-[280px] max-w-[280px] h-[320px]" gap={0}>
                                 <ContextMenuHeaderView classNames={['drag-handler cursor-move', 'octane-furni-highscore__caption']}>
                                     {configured

@@ -5,7 +5,6 @@ import stagePicture from '../../../../../assets/images/notifications/habbo_talen
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../../common';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../../api/handheld/handheldWindowFit';
 
 /** Why the talent show refused the respect: the user is not on the stage, or the room has too small an audience. */
 export type RespectFailedKind = 'stage' | 'audience';
@@ -36,7 +35,7 @@ export const respectFailedBody = (kind: RespectFailedKind, minAudience: string |
  */
 export const RespectFailedView: FC<{ kind: RespectFailedKind; onClose: () => void }> = ({ kind, onClose }) => (
     <NativeTextTree>
-        <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} classNames={['octane-respect-failed']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="respect-failed">
+        <OctaneCardView classNames={['octane-respect-failed']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="respect-failed">
             <OctaneCardHeaderView
                 headerText={localizeWithFallback('respect.giving.failed.title', FALLBACKS['respect.giving.failed.title'])}
                 onCloseClick={onClose}

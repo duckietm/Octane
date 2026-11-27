@@ -10,7 +10,6 @@ import { WiredLinkAction, WiredLinkColumn, WiredLinkTable } from './WiredLinkTab
 import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 /**
  * AIR WiredLinkConnectionsView (wired_link_connections_view_xml): the Links of one network in every room (room
@@ -71,7 +70,7 @@ const WiredLinkConnectionsWindow: FC<{ networkId: string }> = ({ networkId }) =>
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-wired-link-connections w-[660px]" theme="primary-slim" uniqueKey="wired-link-connections">
+            <OctaneCardView className="octane-wired-link-connections w-[660px]" theme="primary-slim" uniqueKey="wired-link-connections">
                 <OctaneCardHeaderView headerText={ localizeWithFallback('wiredlink.connections.title', `Connected rooms: ${ networkName }`, [ 'name' ], [ networkName ]) } onCloseClick={ closeConnections } />
                 <OctaneCardContentView gap={ 2 }>
                     <WiredLinkTable bodyClassName="h-[150px]" columns={ columns } emptyText={ loading ? '' : localizeWithFallback('wiredlink.empty.connections', '') } getCell={ getCell } getRowId={ connection => `${ connection.roomId }:${ connection.furniId }` } rows={ rows } />

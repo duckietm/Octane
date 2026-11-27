@@ -257,22 +257,6 @@ export const bindCatalogQueryClient = (client: QueryClient | null): void => {
 
 export const readCatalogIndex = (type: string): CatalogIndexData | undefined => boundClient?.getQueryData<CatalogIndexData>(catalogIndexKey(type));
 
-/**
- * The offer with this id on a catalog page that is already loaded (any of pageIds), or null. Search results build their
- * offers from the furni data, which knows nothing of limited editions; a loaded page has the server's offer.
- */
-export const readCachedCatalogOffer = (type: string, offerId: number, pageIds: number[]): IPurchasableOffer | null => {
-    if (!boundClient || offerId < 0) return null;
-
-    for (const pageId of pageIds) {
-        const offer = boundClient.getQueryData<CatalogPageData>(catalogPageKey(type, pageId))?.page?.offers?.find((entry) => entry.offerId === offerId);
-
-        if (offer) return offer;
-    }
-
-    return null;
-};
-
 export const invalidateCatalogIndex = (type: string): void => {
     boundClient?.invalidateQueries({ queryKey: catalogIndexKey(type) });
 };

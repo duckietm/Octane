@@ -254,7 +254,7 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldSheet
+            <OctaneCardView
                 className="octane-room-settings min-w-0 w-[min(341px,calc(100vw-16px))] h-[min(520px,calc(100vh-16px))] max-w-[calc(100vw-16px)]"
                 isResizable={false}
                 uniqueKey="octane-room-settings"

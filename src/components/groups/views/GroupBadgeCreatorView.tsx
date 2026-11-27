@@ -11,7 +11,6 @@ import { ClassicScrollAreaView, LayoutBadgeImageView } from '../../../common';
 import { useGroup } from '../../../hooks';
 import { GroupBox, GroupText } from './GroupNativeLayout';
 import { BaseButton } from '../../../common/BaseButton';
-import { pointerInElement } from '../../../api/handheld/handheldPointer';
 
 interface GroupBadgeCreatorViewProps {
     badgeParts: GroupBadgePart[];
@@ -49,10 +48,9 @@ export const GroupBadgeCreatorView: FC<GroupBadgeCreatorViewProps> = (props) => 
     };
 
     const selectPosition = (partIndex: number, event: PointerEvent<HTMLDivElement>) => {
-        // In the element's own pixels: on a phone the group window can be drawn smaller or bigger as a whole.
-        const point = pointerInElement(event.clientX, event.clientY, event.currentTarget);
-        const column = Math.min(2, Math.max(0, Math.floor((point.x - 1) / 14)));
-        const row = Math.min(2, Math.max(0, Math.floor((point.y - 1) / 14)));
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const column = Math.min(2, Math.max(0, Math.floor((event.clientX - bounds.left - 1) / 14)));
+        const row = Math.min(2, Math.max(0, Math.floor((event.clientY - bounds.top - 1) / 14)));
 
         setPartProperty(partIndex, 'position', row * 3 + column);
     };

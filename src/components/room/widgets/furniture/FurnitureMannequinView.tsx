@@ -7,7 +7,6 @@ import { OctaneInput } from '../../../../layout';
 import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/FurniWindowsAAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 const MODE_NONE: number = -1;
 const MODE_CONTROLLER: number = 0;
@@ -92,7 +91,7 @@ export const FurnitureMannequinView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-mannequin no-resize" theme="primary-slim">
+            <OctaneCardView className="octane-mannequin no-resize" theme="primary-slim">
                 <OctaneCardHeaderView headerText={LocalizeText('mannequin.widget.title')} onCloseClick={onClose} />
                 <OctaneCardContentView center>
                     <div className="flex w-full gap-2 overflow-hidden">

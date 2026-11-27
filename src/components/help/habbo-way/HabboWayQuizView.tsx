@@ -26,7 +26,6 @@ import { AirModalDialog, Radio } from '../../../common';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { HabboWayNavButtonView, LibraryImageView } from './HabboWayPagerView';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 interface HabboWayQuizViewProps {
     quiz: IQuizState;
@@ -98,7 +97,7 @@ export const HabboWayQuizView: FC<HabboWayQuizViewProps> = ({ quiz, selectAnswer
 
     return (
         <NativeTextTree>
-            <AirModalDialog handheldScale={HANDHELD_TOUCH_FRAME_SCALE} caption={caption} className="octane-habboway-quiz" width={499} onClose={closeQuiz}>
+            <AirModalDialog caption={caption} className="octane-habboway-quiz" width={499} onClose={closeQuiz}>
                 <div className="octane-habboway-quiz__indicator">
                     {showIndicator && <LibraryImageView src={images.indicator} />}
                     {showIndicator && <span>{indicator}</span>}

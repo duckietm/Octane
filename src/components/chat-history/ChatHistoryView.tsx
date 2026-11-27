@@ -2,7 +2,6 @@ import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLi
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { ChatEntryType, IChatEntry, LocalizeText, localizeWithFallback } from '../../api';
 import { useChatHistory, useIgnoredUsersSnapshot, useNotification } from '../../hooks';
-import { useHandheldKeyboardInset, useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
 import { ChatHistoryBubbleView } from './ChatHistoryBubbleView';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
@@ -22,8 +21,6 @@ export const ChatHistoryView: FC<{}> = (props) => {
     const { showConfirm = null } = useNotification();
     const elementRef = useRef<HTMLDivElement>(null);
     const prevChatLength = useRef<number>(0);
-    const isHandheld = useIsHandheld();
-    const keyboardInset = useHandheldKeyboardInset();
 
     const filteredChatHistory = useMemo(() => [...chatHistory], [chatHistory]);
 
@@ -37,16 +34,6 @@ export const ChatHistoryView: FC<{}> = (props) => {
             prevChatLength.current = filteredChatHistory.length;
         }
     }, [filteredChatHistory, isVisible]);
-
-    // Phone layout: the history ends above the chat line, which rises with the on-screen keyboard; the latest
-    // lines stay in view when the keyboard opens or closes.
-    useEffect(() => {
-        if (!isHandheld || !isVisible || !elementRef.current) return;
-
-        const element = elementRef.current;
-
-        element.scrollTo({ top: element.scrollHeight });
-    }, [isHandheld, isVisible, keyboardInset]);
 
     useEffect(() => {
         const linkTracker: ILinkEventTracker = {
@@ -121,12 +108,7 @@ export const ChatHistoryView: FC<{}> = (props) => {
                         ))}
                     </div>
                 </div>
-                <BaseButton
-                    className="octane-chat-history-handle"
-                    type="button"
-                    aria-label={isHandheld ? localizeWithFallback('octane.handheld.chat_history.close', 'Close chat history') : undefined}
-                    onClick={() => setIsVisible(false)}
-                />
+                <BaseButton className="octane-chat-history-handle" type="button" onClick={() => setIsVisible(false)} />
             </div>
         </NativeTextTree>
     );

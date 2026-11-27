@@ -15,7 +15,6 @@ import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 type ResolutionView =
     | { kind: 'picker'; stuffId: number; achievements: AchievementResolutionData[]; endsAt: number }
@@ -83,7 +82,7 @@ export const AchievementResolutionView: FC = () => {
     if (view.kind === 'completed') {
         return (
             <NativeTextTree>
-                <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-resolution" theme="primary-slim">
+                <OctaneCardView className="octane-resolution" theme="primary-slim">
                     <OctaneCardHeaderView headerText={localizeWithFallback('resolution.completed.title', 'New Year resolution')} onCloseClick={close} />
                     <OctaneCardContentView center gap={2}>
                         <LayoutBadgeImageView badgeCode={view.badgeCode} />
@@ -114,7 +113,7 @@ export const AchievementResolutionView: FC = () => {
 
         return (
             <NativeTextTree>
-                <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-resolution" theme="primary-slim">
+                <OctaneCardView className="octane-resolution" theme="primary-slim">
                     <OctaneCardHeaderView headerText={localizeWithFallback('resolution.progress.title', 'New Year resolution')} onCloseClick={close} />
                     <OctaneCardContentView gap={2}>
                         <div className="flex items-center gap-2">
@@ -165,7 +164,7 @@ export const AchievementResolutionView: FC = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-resolution octane-resolution--picker" theme="primary-slim">
+            <OctaneCardView className="octane-resolution octane-resolution--picker" theme="primary-slim">
                 <OctaneCardHeaderView headerText={localizeWithFallback('resolution.title', 'Set yourself a New Year resolution!')} onCloseClick={close} />
                 <OctaneCardContentView gap={2} overflow="hidden">
                     <Text small>{localizeWithFallback('resolution.header', 'Pick an achievement and see what level you need to reach.')}</Text>

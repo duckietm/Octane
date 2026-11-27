@@ -42,7 +42,6 @@ import { CatalogClubUpgradeButton } from './CatalogClubUpgradeButton';
 import { canPurchaseCatalogOffer } from './catalogPurchase.helpers';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
-import { HandheldCatalogPlaceButtonView } from './HandheldCatalogPlaceButtonView';
 
 interface CatalogPurchaseWidgetViewProps {
     disabled?: boolean;
@@ -83,7 +82,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
         setPurchaseOptions = null,
         setCatalogPlaceMultipleObjects = null
     } = useCatalogUiState();
-    const { requestOfferToMover = null, isDraggable = null, getBuilderFurniPlaceableStatus = null, getNodesByOfferId = null, resetPlacedOfferData = null } = useCatalogActions();
+    const { requestOfferToMover = null, getBuilderFurniPlaceableStatus = null, getNodesByOfferId = null, resetPlacedOfferData = null } = useCatalogActions();
     const { getCurrencyAmount = null } = usePurse();
 
     const setRaffling = useCallback((value: boolean) => {
@@ -542,7 +541,6 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
         <NativeTextTree>
             <>
                 {isClubLocked && <CatalogClubUpgradeButton />}
-                {!isClubLocked && !isBuildersClubOffer && <HandheldCatalogPlaceButtonView isDraggable={isDraggable} offer={currentOffer} onPlace={requestOfferToMover} />}
                 {!isClubLocked && !isBuildersClubOffer && !noGiftOption && !currentOffer.isRentOffer && (
                     <BaseButton
                         type="button"

@@ -3,7 +3,6 @@ import { LocalizeText, localizeWithFallback, NotificationAlertType } from '../..
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useNotification } from '../../../../hooks';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 interface FriendsRoomInviteViewProps {
     selectedFriendsIds: number[];
@@ -18,7 +17,7 @@ export const FriendsRoomInviteView: FC<FriendsRoomInviteViewProps> = (props) => 
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+            <OctaneCardView
                 className="octane-friends-room-invite min-w-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                 theme="primary-slim"
                 uniqueKey="octane-friends-room-invite"

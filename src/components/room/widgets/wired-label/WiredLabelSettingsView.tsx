@@ -7,7 +7,6 @@ import { wiredLabelCss } from './WiredLabelBubbleView';
 import { Checkbox } from '../../../../common/Checkbox';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 const COLOR_NAMES = [ 'blue', 'teal', 'green', 'gold', 'orange', 'red', 'purple', 'charcoal' ];
 const COLOR_FALLBACKS = [ 'Blue', 'Teal', 'Green', 'Gold', 'Orange', 'Red', 'Purple', 'Charcoal' ];
@@ -40,7 +39,7 @@ export const WiredLabelSettingsView: FC<WiredLabelSettingsViewProps> = ({ label,
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-wired-label-settings" theme="primary-slim">
+            <OctaneCardView className="octane-wired-label-settings" theme="primary-slim">
                 <OctaneCardHeaderView headerText={localizeWithFallback('widget.furniture_label.settings.title', 'Label settings')} onCloseClick={onClose} />
                 <OctaneCardContentView gap={2}>
                     <Text bold className="octane-wired-label-settings__heading">{localizeWithFallback('widget.furniture_label.settings.color', 'Label color')}</Text>

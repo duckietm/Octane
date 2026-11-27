@@ -4,7 +4,6 @@ import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Te
 import { ROOM_QUEUE_TARGET_SPECTATOR, useRoomQueueWidget } from '../../../../hooks';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 const positionKey = (target: number, isClubQueue: boolean): string => {
     const base = target === ROOM_QUEUE_TARGET_SPECTATOR ? 'room.queue.spectator.position' : 'room.queue.position';
@@ -32,7 +31,7 @@ export const RoomQueueWidgetView: FC = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-room-queue-widget" theme="primary-slim" uniqueKey="room-queue">
+            <OctaneCardView className="octane-room-queue-widget" theme="primary-slim" uniqueKey="room-queue">
                 <OctaneCardHeaderView headerText={localizeWithFallback('room.queue.title', 'Queue')} onCloseClick={leaveQueue} />
                 <OctaneCardContentView alignItems="center" gap={2}>
                     <Text bold center className="octane-room-queue-info">

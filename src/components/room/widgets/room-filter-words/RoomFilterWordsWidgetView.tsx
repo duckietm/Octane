@@ -7,7 +7,6 @@ import { classNames, OctaneInput } from '../../../../layout';
 import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 /** The longest word the server keeps (RoomWordFilterModifyEvent cuts anything longer). */
 export const MAX_WORD_LENGTH = 25;
@@ -52,7 +51,7 @@ export const RoomFilterWordsWidgetView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="room-filter-words"
+            <OctaneCardView uniqueKey="room-filter-words"
                 isResizable={false}
                 className="octane-room-filter-words min-w-0 w-[min(340px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                 theme="primary-slim"

@@ -2,7 +2,6 @@ import { FC, useState } from 'react';
 import { expandLocalizedText, localizeWithFallback } from '../../api';
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 export interface VariablesExplorerBulkDeleteViewProps {
     variableName: string;
@@ -25,7 +24,7 @@ export const VariablesExplorerBulkDeleteView: FC<VariablesExplorerBulkDeleteView
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
+            <OctaneCardView
                 className="min-w-[360px] max-w-[360px] octane-variables-explorer-window"
                 theme="primary-slim"
                 uniqueKey="variables-explorer-bulk-delete"

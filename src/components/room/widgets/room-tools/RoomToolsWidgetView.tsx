@@ -5,7 +5,6 @@ import { GetConfigurationValue, LocalizeText, SendMessageComposer, SetLocalStora
 import { Text } from '../../../../common';
 import { localizeWithFallback } from '../../../../api/utils/localizeWithFallback';
 import { useAchievements, useMessageEvent, useNavigatorData, useOctaneEvent, useRoom, useRoomEnterOnce } from '../../../../hooks';
-import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 import { classNames } from '../../../../layout';
 import { getRegisteredPlugins, IOctanePlugin, subscribePlugins } from '../../../plugins/OctanePluginApi';
 import { applyRoomZoom } from './roomZoom.helpers';
@@ -79,8 +78,6 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
     const [zoomScale, setZoomScale] = useState<number>(1);
     const [hasLikedRoom, setHasLikedRoom] = useState<boolean>(false);
     const [isToolsOpen, setIsToolsOpen] = useState<boolean>(false);
-    // Phone layout: the handle is the only way to the tools, so it says what it opens.
-    const isHandheld = useIsHandheld();
     const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
     const [roomHistory, setRoomHistory] = useState<RoomHistoryEntry[]>([]);
     const [plugins, setPlugins] = useState<IOctanePlugin[]>([]);
@@ -295,13 +292,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
     return (
         <NativeTextTree>
             <div className={classNames('octane-room-tools-container', !isToolsOpen && 'is-collapsed')}>
-                <BaseButton
-                    className="room-tools-collapse-toggle"
-                    type="button"
-                    aria-label={isHandheld ? localizeWithFallback('octane.handheld.room_tools.toggle', 'Room tools') : undefined}
-                    aria-expanded={isHandheld ? isToolsOpen : undefined}
-                    onClick={() => setIsToolsOpen((prevValue) => !prevValue)}
-                >
+                <BaseButton className="room-tools-collapse-toggle" type="button" onClick={() => setIsToolsOpen((prevValue) => !prevValue)}>
                     {isToolsOpen ? '‹' : '›'}
                 </BaseButton>
                 {isToolsOpen && (

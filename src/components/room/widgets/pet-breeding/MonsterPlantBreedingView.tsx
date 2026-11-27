@@ -32,7 +32,6 @@ import { ContextMenuListItemView } from "../context-menu/ContextMenuListItemView
 import { ContextMenuView } from "../context-menu/ContextMenuView";
 import '../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 // Official RoomWidgetPetBreedingEvent states.
 const STATE_OPEN = 0;
@@ -249,7 +248,7 @@ export const MonsterPlantBreedingView: FC = () => {
                     ))}
 
                 {confirm && confirmFirst && confirmSecond && (
-                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+                    <OctaneCardView
                         className="octane-monsterplant-breeding"
                         theme="primary-slim"
                     >
@@ -334,7 +333,7 @@ export const MonsterPlantBreedingView: FC = () => {
                 )}
 
                 {waiting && (
-                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+                    <OctaneCardView
                         className="octane-monsterplant-breeding"
                         theme="primary-slim"
                     >
@@ -367,7 +366,7 @@ export const MonsterPlantBreedingView: FC = () => {
                 )}
 
                 {cancelled && (
-                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+                    <OctaneCardView
                         className="octane-monsterplant-breeding"
                         theme="primary-slim"
                     >
@@ -389,7 +388,7 @@ export const MonsterPlantBreedingView: FC = () => {
                 )}
 
                 {result && (
-                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+                    <OctaneCardView
                         className="octane-monsterplant-breeding"
                         theme="primary-slim"
                     >

@@ -8,7 +8,6 @@ import {
     isProfileHiddenFromViewer,
     LocalizeText,
     localizeWithFallback,
-    profileAvatarPose,
     SanitizeHtml,
     SendMessageComposer
 } from '../../api';
@@ -39,7 +38,6 @@ interface UserContainerViewProps {
 export const UserContainerView: FC<UserContainerViewProps> = (props) => {
     const { userProfile = null, userBadges = [], userRelationships = null, onOpenRooms = null, onClose = null, isBlocked = false, onToggleBlock = null, onCustomize = null } = props;
     const borderId = userProfile.borderId ?? 0;
-    const avatarPose = profileAvatarPose(userProfile);
 
     const [requestSent, setRequestSent] = useState(userProfile.requestSent);
     const isOwnProfile = userProfile.id === GetSessionDataManager().userId;
@@ -102,9 +100,6 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                                 standId={userProfile.standId}
                                 overlayId={userProfile.overlayId}
                                 borderId={borderId}
-                                direction={avatarPose.direction}
-                                offsetX={avatarPose.offsetX}
-                                offsetY={avatarPose.offsetY}
                             />
                             <div className="octane-extended-profile__identity-copy">
                                 <UserIdentityView

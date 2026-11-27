@@ -4,8 +4,6 @@ import { AddLinkEventTracker, GetSessionDataManager } from '@octane/renderer';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChatEntryType, IChatEntry } from '../../api';
-import { DESKTOP_LAYOUT } from '../../api/handheld/handheldLayout';
-import { useHandheldStore } from '../../state/handheldStore';
 import { useChatHistory } from '../../hooks';
 import { canIgnoreFromHistory, ChatHistoryView } from './ChatHistoryView';
 
@@ -132,37 +130,5 @@ describe('ChatHistoryView ignore cross', () => {
         showConfirm.mock.calls[0][1]();
 
         expect(ignoreUser).toHaveBeenCalledWith(7);
-    });
-});
-
-describe('ChatHistoryView in the phone layout', () => {
-    beforeEach(() => {
-        vi.mocked(AddLinkEventTracker).mockClear();
-        HTMLElement.prototype.scrollTo = vi.fn();
-    });
-
-    afterEach(() => {
-        cleanup();
-        act(() => useHandheldStore.setState({ layout: DESKTOP_LAYOUT, keyboardInset: 0 }));
-    });
-
-    it('names its close handle and keeps the latest line in view when the keyboard opens', () => {
-        act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'portrait' } }));
-        renderVisibleHistory([roomInfoEntry({ name: 'Sala da pranzo' })]);
-
-        expect(screen.getByRole('button', { name: 'Close chat history' })).toBeInTheDocument();
-
-        const scrolls = vi.mocked(HTMLElement.prototype.scrollTo).mock.calls.length;
-
-        act(() => useHandheldStore.setState({ keyboardInset: 320 }));
-
-        expect(vi.mocked(HTMLElement.prototype.scrollTo).mock.calls.length).toBeGreaterThan(scrolls);
-    });
-
-    it('leaves the desktop handle without a label', () => {
-        renderVisibleHistory([roomInfoEntry({ name: 'Sala da pranzo' })]);
-
-        expect(screen.queryByRole('button', { name: 'Close chat history' })).not.toBeInTheDocument();
-        expect(document.querySelector('.octane-chat-history-handle')?.hasAttribute('aria-label')).toBe(false);
     });
 });

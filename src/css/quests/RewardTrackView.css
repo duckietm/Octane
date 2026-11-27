@@ -888,10 +888,9 @@
     height: 259px;
 }
 
-/* The viewport and the bar fill the list box the caller sizes (the task list here, the talent track's lists too). */
 .octane-reward-track-scroll-viewport {
-    width: 100%;
-    height: 100%;
+    width: 422px;
+    height: 259px;
     overflow: hidden;
 }
 
@@ -907,7 +906,7 @@
     top: 0;
     right: 0;
     width: 9px;
-    height: 100%;
+    height: 259px;
 }
 
 .octane-reward-track-scrollbar::before,

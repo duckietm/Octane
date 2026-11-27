@@ -9,8 +9,6 @@ import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { localizeWithFallback } from '../../../api';
-import { useHandheldStore } from '../../../state/handheldStore';
-import { movePinch, PinchAnchor, PinchPoint, startPinch, TOUCH_DRAW_DELAY_MS, TOUCH_DRAW_SLOP } from '../state/pinch';
 
 type Props = {
     state: FloorplanState;
@@ -185,126 +183,6 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
     const projection = usePointerToTile(svgRef, { width: visW, height: visH, x: viewX, y: viewY });
     const tool = useTool(state, dispatch, projection);
 
-    // Phone layout: one finger draws (after a moment, in case a second one joins), two fingers pinch to zoom and pan the plan.
-    const handheld = useHandheldStore((store) => store.layout.active);
-    const touchesRef = useRef(new Map<number, PinchPoint>());
-    const pinchRef = useRef<PinchAnchor | null>(null);
-    const pendingDrawRef = useRef<{ pointerId: number; x: number; y: number; timer: number } | null>(null);
-    const drawingRef = useRef<number | null>(null);
-    // After a pinch the finger left on the plan draws nothing until every finger is up.
-    const touchSpentRef = useRef(false);
-
-    const toolEvent = (pointerId: number, clientX: number, clientY: number) =>
-        ({ pointerId, clientX, clientY, currentTarget: svgRef.current, target: svgRef.current }) as unknown as ReactPointerEvent<Element>;
-
-    const viewPoint = (clientX: number, clientY: number): PinchPoint => {
-        const rect = scrollRef.current?.getBoundingClientRect();
-
-        return { x: clientX - (rect?.left ?? 0), y: clientY - (rect?.top ?? 0) };
-    };
-
-    const startPendingDraw = () => {
-        const pending = pendingDrawRef.current;
-
-        if (!pending) return;
-
-        window.clearTimeout(pending.timer);
-        pendingDrawRef.current = null;
-        drawingRef.current = pending.pointerId;
-        tool.onPointerDown(toolEvent(pending.pointerId, pending.x, pending.y));
-    };
-
-    const cancelPendingDraw = () => {
-        if (pendingDrawRef.current) window.clearTimeout(pendingDrawRef.current.timer);
-
-        pendingDrawRef.current = null;
-    };
-
-    useEffect(() => () => cancelPendingDraw(), []);
-
-    /** True when the touch was taken by the phone gestures (the drawing tool and the mouse pan must not see it). */
-    const touchDown = (e: ReactPointerEvent<SVGSVGElement>): boolean => {
-        if (!handheld || e.pointerType !== 'touch') return false;
-
-        const touches = touchesRef.current;
-
-        touches.set(e.pointerId, viewPoint(e.clientX, e.clientY));
-        e.preventDefault();
-
-        if (touches.size === 2) {
-            const [a, b] = [...touches.values()];
-
-            cancelPendingDraw();
-
-            if (drawingRef.current !== null) {
-                tool.onPointerUp(toolEvent(drawingRef.current, e.clientX, e.clientY));
-                drawingRef.current = null;
-            }
-
-            panStartRef.current = null;
-            setIsPanning(false);
-            touchSpentRef.current = true;
-            pinchRef.current = startPinch(a, b, zoom, { viewX, viewY, scale, width: viewport.w, height: viewport.h, flipped });
-
-            return true;
-        }
-
-        if (touches.size > 2 || touchSpentRef.current) return true;
-        // The pan tool keeps its one-finger pan.
-        if (panMode) return false;
-
-        pendingDrawRef.current = { pointerId: e.pointerId, x: e.clientX, y: e.clientY, timer: window.setTimeout(startPendingDraw, TOUCH_DRAW_DELAY_MS) };
-
-        return true;
-    };
-
-    const touchMove = (e: ReactPointerEvent<SVGSVGElement>): boolean => {
-        const touches = touchesRef.current;
-
-        if (!handheld || e.pointerType !== 'touch' || !touches.has(e.pointerId)) return false;
-
-        touches.set(e.pointerId, viewPoint(e.clientX, e.clientY));
-
-        const anchor = pinchRef.current;
-
-        if (anchor && touches.size >= 2) {
-            const [a, b] = [...touches.values()];
-            const next = movePinch(anchor, a, b, { width: viewport.w, height: viewport.h, flipped }, { min: ZOOM_MIN, max: ZOOM_MAX }, (z) => z * BASE_SCALE);
-
-            setZoom(next.zoom);
-            centerOn(next.centerX, next.centerY);
-
-            return true;
-        }
-
-        const pending = pendingDrawRef.current;
-
-        if (pending && pending.pointerId === e.pointerId && Math.hypot(e.clientX - pending.x, e.clientY - pending.y) > TOUCH_DRAW_SLOP) startPendingDraw();
-        if (drawingRef.current === e.pointerId) tool.onPointerMove(e);
-
-        return !panStartRef.current;
-    };
-
-    const touchUp = (e: ReactPointerEvent<SVGSVGElement>): boolean => {
-        const touches = touchesRef.current;
-
-        if (!handheld || e.pointerType !== 'touch' || !touches.has(e.pointerId)) return false;
-
-        touches.delete(e.pointerId);
-
-        if (touches.size < 2) pinchRef.current = null;
-        // A quick tap draws one tile.
-        if (pendingDrawRef.current?.pointerId === e.pointerId) startPendingDraw();
-        if (drawingRef.current === e.pointerId) {
-            tool.onPointerUp(e);
-            drawingRef.current = null;
-        }
-
-        if (!touches.size) touchSpentRef.current = false;
-
-        return !panStartRef.current;
-    };
-
     const rows = useMemo(
         () =>
             state.tiles.map((row, r) => {
@@ -404,7 +282,6 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
                             className={`fp-stage-svg select-none bg-black [shape-rendering:crispEdges] ${cursorClass}`}
                             onWheel={onWheel}
                             onPointerDown={(e) => {
-                                if (touchDown(e)) return;
                                 if (isPanGesture(e)) {
                                     e.preventDefault();
                                     panStartRef.current = { x: e.clientX, y: e.clientY, left: scrollRef.current?.scrollLeft ?? 0, top: scrollRef.current?.scrollTop ?? 0 };
@@ -414,17 +291,12 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
                                 tool.onPointerDown(e);
                             }}
                             onPointerMove={(e) => {
-                                if (touchMove(e)) return;
                                 if (panStartRef.current) return;
                                 tool.onPointerMove(e);
                             }}
                             onPointerUp={(e) => {
-                                if (touchUp(e)) return;
                                 if (panStartRef.current) return;
                                 tool.onPointerUp(e);
-                            }}
-                            onPointerCancel={(e) => {
-                                touchUp(e);
                             }}
                         >
                             {rows}

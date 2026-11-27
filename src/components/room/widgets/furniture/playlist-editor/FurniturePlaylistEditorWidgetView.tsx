@@ -6,7 +6,6 @@ import { DiskInventoryView } from './DiskInventoryView';
 import { SongPlaylistView } from './SongPlaylistView';
 import '../../../../../css/room/FurniWindowsCAir.css';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../../api/handheld/handheldWindowFit';
 
 export const FurniturePlaylistEditorWidgetView: FC<{}> = (props) => {
     const {
@@ -24,7 +23,7 @@ export const FurniturePlaylistEditorWidgetView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="playlist-editor" className="octane-playlist-editor-widget" theme="primary-slim">
+            <OctaneCardView uniqueKey="playlist-editor" className="octane-playlist-editor-widget" theme="primary-slim">
                 <OctaneCardHeaderView headerText={LocalizeText('playlist.editor.title')} onCloseClick={onClose} />
                 <OctaneCardContentView>
                     <div className="playlist-editor-layout flex flex-row gap-1 h-full min-h-0">

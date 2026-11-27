@@ -355,7 +355,6 @@
         {"key":"toolbar.fortunewheel.enabled","comment":"Shows the fortune wheel button on the toolbar and mounts the wheel.","value":true,"runtime":true},
         {"key":"toolbar.stories.enabled","comment":"Shows the stories button on the toolbar outside rooms.","value":false,"runtime":true},
         {"key":"toolbar.new_additions.notification.enabled","comment":"Shows the \"new\" label on the catalog button when there are new items.","value":true,"runtime":true},
-        {"key":"ui.handheld.enabled","comment":"Phone layout on phone-sized touch screens (sheets, room gestures, touch toolbar); false keeps the desktop layout everywhere. Test it with ?handheld=on|off|auto.","value":true,"runtime":true},
         {"key":"ui.native.text.enabled","comment":"Labels drawn with AIR's native text renderer; false uses browser text everywhere.","value":true,"runtime":true},
         {"key":"user.custom.filter.enabled","comment":"Shows the word filter row in the settings menu.","value":true,"runtime":true},
         {"key":"hotel_alert_animated","comment":"Short hotel and staff alerts show as a toast instead of a dialog.","value":false,"runtime":true},

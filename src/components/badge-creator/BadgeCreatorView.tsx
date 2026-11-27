@@ -17,7 +17,6 @@ import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
 import '../../css/badge-creator/BadgeCreatorView.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 const t = (key: string, fallback: string, params?: string[], replacements?: string[]): string => {
     try {
@@ -473,7 +472,7 @@ export const BadgeCreatorView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-badge-creator w-[760px] h-[680px]" isResizable={false} theme="primary-slim" uniqueKey="badge-creator">
+            <OctaneCardView className="octane-badge-creator w-[760px] h-[680px]" isResizable={false} theme="primary-slim" uniqueKey="badge-creator">
                 <OctaneCardHeaderView headerText={t('badgecreator.title', 'Badge Creator')} onCloseClick={() => setIsVisible(false)} />
                 <OctaneCardContentView className="octane-badge-creator__content text-black">
                     <Flex gap={2} className="badge-creator-main">

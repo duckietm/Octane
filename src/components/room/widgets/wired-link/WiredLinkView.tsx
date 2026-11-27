@@ -10,7 +10,6 @@ import { BaseButton } from '../../../../common/BaseButton';
 import { Checkbox } from '../../../../common/Checkbox';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 /**
  * AIR WiredLinkView (wired_link_view_xml): the Link's current network with "clear connection", the user's
@@ -68,7 +67,7 @@ export const WiredLinkView: FC<{}> = () =>
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-wired-link w-[620px]" theme="primary-slim" uniqueKey="wired-link">
+            <OctaneCardView className="octane-wired-link w-[620px]" theme="primary-slim" uniqueKey="wired-link">
                 <OctaneCardHeaderView headerText={ title } onCloseClick={ closeWiredLink } />
                 <OctaneCardContentView gap={ 2 }>
                     <div className="octane-wired-link__summary flex items-center justify-between rounded border border-[#b9cbd2] bg-[#dce8ec] px-2 py-1">

@@ -9,7 +9,7 @@ import memenuBgImg from '../../assets/images/toolbar/air/memenu-bg.png';
 import memenuCircleImg from '../../assets/images/toolbar/air/memenu-circle.png';
 import { Flex, LayoutAvatarImageView, LayoutItemCountView } from '../../common';
 import { SoundboardRoomMessageEvent } from '../../events';
-import { useAchievements, useBuildHeight, useDailyTasks, useFriends, useHasPermission, useInventoryUnseenTracker, useIsHandheld, useMentionsSnapshot, useMessageEvent, useMessenger, useOctaneEvent, useOpenIssueCount, useRewardTracks, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
+import { useAchievements, useBuildHeight, useDailyTasks, useFriends, useHasPermission, useInventoryUnseenTracker, useMentionsSnapshot, useMessageEvent, useMessenger, useOctaneEvent, useOpenIssueCount, useRewardTracks, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
 import { BottomDockLayout, resolveBottomDockLayout } from './bottomDockLayout';
 import { ToolbarNavigatorItemView } from './ToolbarNavigatorItemView';
 import { ToolbarItemView } from './ToolbarItemView';
@@ -149,9 +149,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const openIssueCount = useOpenIssueCount();
     const openTicketsCount = isMod ? openIssueCount : 0;
     const visibilityVariant = 'visible';
-    // The phone layout always uses the touch bar, also when the browser reports a mouse-like pointer.
-    const isHandheld = useIsHandheld();
-    const touchLayout = isTouchLayout || isHandheld;
+    const touchLayout = isTouchLayout;
     const mobileOnlyClasses = touchLayout ? '' : 'hidden';
     const desktopBlockClasses = touchLayout ? 'hidden' : 'block';
     const desktopFlexClasses = touchLayout ? 'hidden' : 'flex';
@@ -608,7 +606,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                     animate={ visibilityVariant }
                     variants={ mobileNavVariants }
                     transition={ NAV_TRANSITION }
-                    className={ `tb-touch-bar absolute left-1/2 bottom-0 z-[71] flex w-[95vw] -translate-x-1/2 items-center overflow-visible ${ mobileOnlyClasses } ${ isInRoom ? `octane-toolbar-mobile-hobba${ toolbarOpaqueClass } px-[6px] py-[4px] mb-[3px]` : '' }` }>
+                    className={ `absolute left-1/2 bottom-0 z-[71] flex w-[95vw] -translate-x-1/2 items-center overflow-visible ${ mobileOnlyClasses } ${ isInRoom ? `octane-toolbar-mobile-hobba${ toolbarOpaqueClass } px-[6px] py-[4px] mb-[3px]` : '' }` }>
                     <motion.div
                         variants={ containerVariants }
                         className="tb-bar-scroll flex h-full min-w-0 flex-1 items-center gap-2 overflow-x-auto overflow-y-visible px-1">
@@ -708,7 +706,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                     variants={ mobileNavVariants }
                     transition={ NAV_TRANSITION }
                     style={ staffStackBottom != null ? { top: 'auto', bottom: `${ staffStackBottom }px` } : undefined }
-                    className={ `tb-touch-side absolute left-1 z-[71] flex flex-col items-center gap-[2px] bg-[#55534e] px-[2px] py-[4px] ${ staffStackBottom == null ? 'top-1/2 -translate-y-1/2' : '' } ${ sideStackClasses }` }>
+                    className={ `absolute left-1 z-[71] flex flex-col items-center gap-[2px] bg-[#55534e] px-[2px] py-[4px] ${ staffStackBottom == null ? 'top-1/2 -translate-y-1/2' : '' } ${ sideStackClasses }` }>
                     { touchLayout && buildersClubEnabled &&
                         <motion.div variants={ itemVariants }>
                             <ToolbarItemView icon="buildersclub" onClick={ () => CreateLinkEvent('catalog/toggle/builder') } className="tb-icon" />

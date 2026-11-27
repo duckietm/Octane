@@ -68,10 +68,7 @@ export const OctaneCardHeaderView: FC<OctaneCardHeaderViewProps> = (props) => {
                     className="absolute flex items-center justify-center cursor-pointer right-2 octane-card-close-button"
                     onClick={onCloseClick}
                     onMouseDownCapture={onMouseDown}
-                >
-                    {/* A larger, invisible finger target; only the phone layout shows it. */}
-                    <span aria-hidden="true" className="octane-card-close-hit" />
-                </div>
+                ></div>
             </Flex>
         </Column>
     );

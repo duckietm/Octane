@@ -10,7 +10,6 @@ import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 const LIMIT_FURNI_PICKALL = 100;
 
@@ -135,7 +134,7 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className={classNames('octane-chooser', isUsers ? 'w-[290px] h-[357px]' : 'w-[413px] h-[354px]')} theme="primary-slim">
+            <OctaneCardView className={classNames('octane-chooser', isUsers ? 'w-[290px] h-[357px]' : 'w-[413px] h-[354px]')} theme="primary-slim">
                 <OctaneCardHeaderView headerText={title} onCloseClick={handleClose} />
                 <OctaneCardContentView overflow="hidden" gap={1}>
                     <div className="octane-chooser-bar">

@@ -4,7 +4,6 @@ import { AirModalDialog } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { TalentImageView } from './TalentImageView';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 interface CitizenshipPopupViewProps {
     onClose: () => void;
@@ -14,30 +13,28 @@ interface CitizenshipPopupViewProps {
 /**
  * Official CitizenshipPopupController (`citizenship_welcome`, 480x302): the welcome of a new user,
  * with the button that opens the citizenship track and the "look around first" link. No close box.
- * Drawn in the reward track's AIR frame; the subtitle leads the copy panel instead of sitting above the frame.
  */
 export const CitizenshipPopupView: FC<CitizenshipPopupViewProps> = ({ onClose, onOpenTrack }) => {
     const library = GetConfigurationValue<string>('image.library.url', '');
 
     return (
         <NativeTextTree>
-            <AirModalDialog handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+            <AirModalDialog
                 noCloseButton
                 caption={localizeWithFallback('citizenship.promo.popup.title', 'Hi there! Nice to meet you!')}
                 className="octane-citizenship-popup"
-                frameStyle={3}
+                subtitle={localizeWithFallback('citizenship.promo.popup.subtitle', 'WELCOME TO HABBO!')}
                 width={480}
                 onClose={onClose}
             >
                 <div className="octane-citizenship-popup__body">
                     <div className="octane-citizenship-popup__copy">
-                        <div className="octane-citizenship-popup__subtitle">{localizeWithFallback('citizenship.promo.popup.subtitle', 'WELCOME TO HABBO!')}</div>
                         <div className="octane-citizenship-popup__heading">{localizeWithFallback('citizenship.promo.popup.heading', 'You are entering a world of magic and wonder.')}</div>
-                        <div className="octane-citizenship-popup__text">{localizeWithFallback('citizenship.promo.popup.description.1', 'We want the hotel to be fun and safe for everyone.')}</div>
-                        <div className="octane-citizenship-popup__text">{localizeWithFallback('citizenship.promo.popup.description.2', 'It is fun, it is quick and there are prizes.')}</div>
+                        <div>{localizeWithFallback('citizenship.promo.popup.description.1', 'We want the hotel to be fun and safe for everyone.')}</div>
+                        <div>{localizeWithFallback('citizenship.promo.popup.description.2', 'It is fun, it is quick and there are prizes.')}</div>
                         <div className="octane-citizenship-popup__actions">
                             <BaseButton
-                                className="octane-talent-button"
+                                className="octane-habboway__action"
                                 type="button"
                                 onClick={() => {
                                     onClose();

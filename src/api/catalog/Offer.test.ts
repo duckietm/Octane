@@ -36,14 +36,3 @@ describe('Offer chat style products (AIR 13 PRODUCT_TYPE_CHAT_STYLE)', () => {
         expect(withFurni.chatStyleId).toBe('40');
     });
 });
-
-describe('Offer.clone', () => {
-    it('keeps the limited edition numbers of its products', () => {
-        const ltd = new Offer(7, 'steampunk_window', false, 25, 0, 0, true, 0, [new Product('i', 3001, '', 1, null, null, true, 50, 12)], false);
-        const copy = ltd.clone();
-
-        expect(copy.product.isUniqueLimitedItem).toBe(true);
-        expect(copy.product.uniqueLimitedItemSeriesSize).toBe(50);
-        expect(copy.product.uniqueLimitedItemsLeft).toBe(12);
-    });
-});

@@ -183,7 +183,6 @@ import { Select } from '../../common/Select';
 import { BaseButton } from '../../common/BaseButton';
 import { isDerivedVariableItemId } from '../wired/views/WiredVariablePickerData';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 const WIRED_FURNI_GRAVITY_MODEL_KEY = 'wired_furni_gravity';
 /** Our variable types as the official idtype (0 made with a box, 1 internal). */
@@ -3257,8 +3256,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                         ))}
                     </div>
                 )}
-                <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
-                    handheldPeek={{ label: localizeWithFallback('wiredmenu.title', 'Wired Creator Tools (:wired)') }}
+                <OctaneCardView
                     className="octane-wired-menu min-w-[520px] max-w-[520px]"
                     theme="primary-slim"
                     uniqueKey="wired-creator-tools"
@@ -3349,7 +3347,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     </OctaneCardContentView>
                 </OctaneCardView>
                 {isMonitorHistoryOpen && (
-                    <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
+                    <OctaneCardView
                         className="octane-wired-menu min-w-[760px] max-w-[760px] max-h-[520px]"
                         theme="primary-slim"
                         uniqueKey="wired-monitor-history"
@@ -3431,7 +3429,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     </OctaneCardView>
                 )}
                 {isMonitorInfoOpen && (
-                    <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
+                    <OctaneCardView
                         className="octane-wired-menu min-w-[560px] max-w-[560px] max-h-[520px]"
                         theme="primary-slim"
                         uniqueKey="wired-monitor-info"
@@ -3544,7 +3542,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     />
                 )}
                 {!!selectedMonitorErrorInfo && (
-                    <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
+                    <OctaneCardView
                         className="octane-wired-menu min-w-[470px] max-w-[470px] max-h-[500px]"
                         theme="primary-slim"
                         uniqueKey="wired-monitor-error-info"

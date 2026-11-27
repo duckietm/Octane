@@ -9,7 +9,6 @@ import { TabBar, TabBarTab } from '../../../../common/TabBar';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 export const HabbiconPrice: FC<{ priceCredits: number; priceActivityPoints: number; activityPointType: number }> = ({
     priceCredits,
@@ -85,7 +84,7 @@ export const HabbiconHubView: FC = () => {
                         <feColorMatrix type="matrix" values=".35 0 0 0 .35294 0 .35 0 0 .33333 0 0 .35 0 .31373 0 0 0 .65 0" />
                     </filter>
                 </svg>
-                <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+                <OctaneCardView
                     classNames={['habbicon-hub-window']}
                     frameStyle={3}
                     isResizable={false}

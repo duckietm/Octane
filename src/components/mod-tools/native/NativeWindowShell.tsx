@@ -2,7 +2,6 @@ import { FC, ReactNode, useCallback } from 'react';
 import { DraggableWindow } from '../../../common/draggable-window';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { ModWindowType, useModWindowTrackerStore } from '../../../hooks';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 interface NativeWindowShellProps {
     type: ModWindowType;
@@ -22,7 +21,7 @@ export const NativeWindowShell: FC<NativeWindowShellProps> = ({ type, windowKey,
 
     return (
         <NativeTextTree>
-            <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handleSelector=".native0-header" initialPosition={{ x, y }} onPositionChange={onPositionChange}>
+            <DraggableWindow handleSelector=".native0-header" initialPosition={{ x, y }} onPositionChange={onPositionChange}>
                 {children}
             </DraggableWindow>
         </NativeTextTree>

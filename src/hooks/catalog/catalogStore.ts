@@ -1,7 +1,6 @@
 import { CreateLinkEvent, FrontPageItem, GetRoomEngine, GetSessionDataManager, RoomObjectPlacementSource, RoomObjectVariable, RoomPreviewer } from '@octane/renderer';
 import {
     BuilderFurniPlaceableStatus,
-    CatalogPage,
     CatalogType,
     GetRoomSession,
     ICatalogNode,
@@ -87,12 +86,6 @@ export interface CatalogActions {
     selectCatalogOffer: (offer: IPurchasableOffer) => void;
     consumePendingOffer: (page: ICatalogPage) => void;
     setSearchResult: (result: SearchResult | null) => void;
-    /** HabboCatalog.performSearch: shows the results page and the filtered navigator, with no node active or open. */
-    beginCatalogSearch: (result: SearchResult, page: ICatalogPage) => void;
-    /** The server's offer for a search result (ProductOfferEvent) takes the result's place, so its tile shows it too. */
-    replaceSearchResultOffer: (offer: IPurchasableOffer) => void;
-    /** HabboCatalog.onClearSearch: drops the search; restorePage goes back to the page open before it. */
-    endCatalogSearch: (restorePage?: boolean) => void;
     setFrontPageItems: (items: FrontPageItem[]) => void;
     setNavigationHidden: (hidden: boolean) => void;
     setPurchaseOptions: (options: IPurchaseOptions | ((previous: IPurchaseOptions) => IPurchaseOptions)) => void;
@@ -351,9 +344,7 @@ export const useCatalogStore = createOctaneStore<CatalogStoreState>((set, get) =
         }
     },
 
-    // A page override (the search results) is a new page: AIR CatalogViewer.showSearchResults builds a fresh product view,
-    // so the offer selected on the page before it does not stay selected.
-    setCurrentPage: (page) => set({ pageOverride: page, currentOffer: null }),
+    setCurrentPage: (page) => set({ pageOverride: page }),
 
     setCurrentOffer: (offer) => set({ currentOffer: offer, purchaseOptions: offer ? { ...DEFAULT_PURCHASE_OPTIONS } : get().purchaseOptions }),
 
@@ -398,67 +389,6 @@ export const useCatalogStore = createOctaneStore<CatalogStoreState>((set, get) =
             set({ pageOverride: null });
             get().openPageById(previousPageId);
         }
-    },
-
-    beginCatalogSearch: (result, page) => {
-        // CatalogNavigator.filter: the search list starts with no row selected or expanded.
-        for (const node of get().activeNodes) {
-            node.deactivate();
-            node.close();
-        }
-
-        set({ activeNodes: [], searchResult: result, pageOverride: page, currentOffer: null });
-    },
-
-    replaceSearchResultOffer: (offer) => {
-        const { searchResult, pageOverride, currentType } = get();
-
-        if (!searchResult || !pageOverride || pageOverride.pageId !== -1) return;
-
-        const index = searchResult.offers.findIndex((entry) => entry.offerId === offer.offerId);
-
-        if (index === -1) return;
-
-        const offers = [...searchResult.offers];
-        const page = offer.page;
-
-        offers[index] = offer;
-
-        const resultsPage = new CatalogPage(
-            -1,
-            pageOverride.layoutCode,
-            pageOverride.localization,
-            offers,
-            pageOverride.acceptSeasonCurrencyAsCredits,
-            pageOverride.mode,
-            currentType
-        );
-
-        // The results page takes every offer over; the server's offer keeps the page that sells it, for the purchase.
-        if (page) offer.page = page;
-
-        set({ searchResult: new SearchResult(searchResult.searchValue, offers, searchResult.filteredNodes), pageOverride: resultsPage });
-    },
-
-    endCatalogSearch: (restorePage = true) => {
-        const { searchResult, pageOverride, previousPageId, activeNodes, isVisible } = get();
-        const showingSearchPage = !!pageOverride && pageOverride.pageId === -1;
-
-        if (!searchResult && !showingSearchPage) return;
-
-        set(showingSearchPage ? { searchResult: null, pageOverride: null, currentOffer: null } : { searchResult: null });
-
-        // A page opened from the results stays open; otherwise the page open before the search comes back.
-        if (!restorePage || (!showingSearchPage && activeNodes.length)) return;
-
-        if (previousPageId > 0) {
-            if (isVisible) get().openPageById(previousPageId);
-            else set({ pendingRequest: { kind: 'id', id: previousPageId } });
-
-            return;
-        }
-
-        if (isVisible) get().resolvePendingRequest();
     },
 
     setFrontPageItems: (items) => set({ frontPageItems: items }),

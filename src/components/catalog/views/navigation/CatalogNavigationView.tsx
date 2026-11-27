@@ -64,11 +64,11 @@ export const CatalogNavigationView: FC<CatalogNavigationViewProps> = (props) => 
                 contentClassName={`octane-catalog-navigation-list ${catalogType === CatalogType.BUILDER ? 'is-builders-club' : 'is-normal'}`}
                 role="tree"
             >
-                {/* CatalogNavigator.addSearchNodesToList: the filtered rows, sub-item templates from depth 3. */}
                 {searchResult &&
-                    searchResult.filteredNodes.map(({ node: n, depth }, index) => (
-                        <CatalogNavigationItemView key={getCatalogNodeKey(n, index)} child={depth > 2} node={n} runtime={runtime} searchDepth={depth} />
-                    ))}
+                    searchResult.filteredNodes.length > 0 &&
+                    searchResult.filteredNodes.map((n, index) => {
+                        return <CatalogNavigationItemView key={getCatalogNodeKey(n, index)} node={n} runtime={runtime} />;
+                    })}
                 {!searchResult && <CatalogNavigationSetView node={node} runtime={runtime} />}
             </ClassicScrollAreaView>
         </NativeTextTree>

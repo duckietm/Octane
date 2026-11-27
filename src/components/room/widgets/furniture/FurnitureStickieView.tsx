@@ -5,7 +5,6 @@ import { useFurnitureStickieWidget } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/FurniWindowsAAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 // Must match PostItColor on the gameserver — YELLOW is the server-side default.
 const STICKIE_COLORS = ['FF9C9C', 'FFC69C', 'FFFF33', '9CFF9C', '9CFFE8', '9CCEFF', 'C69CFF', 'FF9CFF'];
@@ -48,7 +47,7 @@ export const FurnitureStickieView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} handleSelector=".drag-handler" windowPosition={DraggableWindowPosition.TOP_LEFT}>
+            <DraggableWindow handleSelector=".drag-handler" windowPosition={DraggableWindowPosition.TOP_LEFT}>
                 <div
                     className={'octane-stickie ' + (isThemed ? 'octane-stickie-image stickie-' + getStickieTypeName(type) : 'stickie-plain')}
                     style={isThemed ? undefined : ({ '--stickie-color': getStickieColor(color) } as CSSProperties)}>

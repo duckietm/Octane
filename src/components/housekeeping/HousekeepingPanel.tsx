@@ -17,7 +17,6 @@ import { HousekeepingNavGroup, HousekeepingSidebar } from './views/shell/Houseke
 import { HousekeepingSoundboardTab } from './views/soundboard/HousekeepingSoundboardTab';
 import { HousekeepingSupportTab } from './views/support/HousekeepingSupportTab';
 import { HousekeepingUsersTab } from './views/users/HousekeepingUsersTab';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 export interface HousekeepingPanelProps {
     activeTab: HousekeepingTabId;
@@ -64,7 +63,7 @@ export const HousekeepingPanel: FC<HousekeepingPanelProps> = ({ activeTab, navGr
     return (
         <NativeTextTree>
             <WidgetErrorBoundary name="HousekeepingView">
-                <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+                <OctaneCardView
                     className={`octane-housekeeping w-[860px] h-[620px] max-h-[92vh] max-w-[96vw]`}
                     theme="primary-slim"
                     uniqueKey="housekeeping"

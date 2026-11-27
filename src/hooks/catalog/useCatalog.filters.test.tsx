@@ -78,13 +78,10 @@ describe('useCatalog filter contract', () => {
 
         expect(Object.keys(result.current).sort()).toEqual([
             'activateNode',
-            'beginCatalogSearch',
-            'endCatalogSearch',
             'getBuilderFurniPlaceableStatus',
             'getNodeById',
             'getNodeByName',
             'getNodesByOfferId',
-            'isDraggable',
             'openCatalogByType',
             'openPageById',
             'openPageByName',

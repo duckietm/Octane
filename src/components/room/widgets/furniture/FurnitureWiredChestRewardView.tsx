@@ -6,7 +6,6 @@ import { useRoom } from '../../../../hooks';
 import { IWiredRewardReceipt, useWiredRewardStore, WIRED_REWARD_MAX_OPEN } from '../../../../hooks/rooms/widgets/wiredRewardStore';
 import '../../../../css/room/FurniWindowsCAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 /** AIR RewardNotificationView: the frame is 276 px wide. */
 const REWARD_WIDTH = 276;
@@ -54,7 +53,7 @@ const RewardWindow: FC<{ receipt: IWiredRewardReceipt; index: number; onClose: (
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} theme="primary-slim" className="octane-wired-chest-reward" uniqueKey={ `wired-reward-${ receipt.id }` } offsetLeft={ offset } offsetTop={ offset } style={ { width: REWARD_WIDTH } }>
+            <OctaneCardView theme="primary-slim" className="octane-wired-chest-reward" uniqueKey={ `wired-reward-${ receipt.id }` } offsetLeft={ offset } offsetTop={ offset } style={ { width: REWARD_WIDTH } }>
                 <OctaneCardHeaderView headerText={ title } onCloseClick={ onClose } />
                 <OctaneCardContentView>
                     <Column gap={ 2 }>

@@ -5,7 +5,6 @@ import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Te
 import { OctaneInput } from '../../../../../layout';
 import '../../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../../api/handheld/handheldWindowFit';
 
 interface RoomPromoteEditWidgetViewProps {
     eventId: number;
@@ -32,7 +31,7 @@ export const RoomPromoteEditWidgetView: FC<RoomPromoteEditWidgetViewProps> = (pr
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="room-promote-edit"
+            <OctaneCardView uniqueKey="room-promote-edit"
                 className="octane-room-promote-edit min-w-0 w-[min(340px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                 theme="primary-slim"
             >

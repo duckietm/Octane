@@ -28,7 +28,6 @@ import { useMessageEvent, useNotification, usePurse } from '../../hooks';
 import { ducketsToClaim, exceedsDucketLimit, hasClaimableEarnings, useEarningsIndicatorStore } from '../../state/earningsIndicatorStore';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 const localizeWithFallback = (key: string, fallback: string) => {
     const text = LocalizeText(key);
@@ -265,7 +264,7 @@ export const VaultView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+            <OctaneCardView
                 className="octane-vault min-w-0 w-[min(430px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                 theme="primary-slim"
                 uniqueKey="vault"

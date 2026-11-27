@@ -34,7 +34,6 @@ import { NativeSkinView } from '../../../mod-tools/native/NativeSkinView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 /** wired_style_ubuntu: container colour 0xe9e9e1; trade rules on 0xdadada, nodes on 0xeeeeee. */
 const UBUNTU_BACKGROUND = 0xe9e9e1;
@@ -80,7 +79,7 @@ export const ContractFooter: FC<{ saveDisabled: boolean; onSave: () => void; onC
 
 /** AIR FramePreset in the Ubuntu wired style: 262px wide (420 for the element editor), not resizable. */
 export const ContractFrame: FC<PropsWithChildren<{ title: string; width: number; uniqueKey: string; offsetLeft?: number; className?: string; onClose: () => void }>> = ({ title, width, uniqueKey, offsetLeft = 0, className = '', onClose, children }) =>
-    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className={ `wired-contract ${ className }`.trim() } theme="primary-slim" frameStyle={ 3 } isResizable={ false } uniqueKey={ uniqueKey } offsetLeft={ offsetLeft } style={ { width, minWidth: width, maxWidth: width } }>
+    <OctaneCardView className={ `wired-contract ${ className }`.trim() } theme="primary-slim" frameStyle={ 3 } isResizable={ false } uniqueKey={ uniqueKey } offsetLeft={ offsetLeft } style={ { width, minWidth: width, maxWidth: width } }>
         <OctaneCardHeaderView headerText={ title } onCloseClick={ onClose } />
         <OctaneCardContentView>{ children }</OctaneCardContentView>
     </OctaneCardView>;

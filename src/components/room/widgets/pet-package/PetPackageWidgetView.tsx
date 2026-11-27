@@ -9,7 +9,6 @@ import '../../../../css/room/FurniWindowsBAir.css';
 import '../../../../css/room/PetPackageWidget.css';
 import { usePetPackageWidget } from '../../../../hooks';
 import { PetPackageFigure } from '../../../../hooks/rooms/widgets/usePetPackageWidget';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 /** The pet in the packages that do not say what they hold: the picture AIR gets from the package's figure. */
 const PET_PACKAGE_PREVIEW: Record<string, PetPackageFigure> = {
@@ -76,7 +75,7 @@ export const PetPackageWidgetView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+            <OctaneCardView
                 isResizable={false}
                 className={`octane-pet-package octane-furni-petpackage ${pet ? 'octane-pet-package--compact' : 'octane-pet-package--large'}`}
                 theme="primary-slim"

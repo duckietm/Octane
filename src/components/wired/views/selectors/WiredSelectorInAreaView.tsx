@@ -4,7 +4,6 @@ import { LocalizeText } from '../../../../api';
 import { Button, Text } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
-import { useHandheldRoomPickStore } from '../../../../state/handheldRoomPickStore';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 
 /**
@@ -21,8 +20,6 @@ export const WiredSelectorInAreaView: FC<{}> = () => {
     const [isActive, setIsActive] = useState(false);
     const [isSelecting, setIsSelecting] = useState(false);
     const { trigger = null, setIntParams } = useWired();
-    const startRoomPick = useHandheldRoomPickStore((state) => state.start);
-    const stopRoomPick = useHandheldRoomPickStore((state) => state.stop);
 
     const save = useCallback(() => {
         setIntParams([rootX, rootY, areaWidth, areaHeight]);
@@ -33,7 +30,6 @@ export const WiredSelectorInAreaView: FC<{}> = () => {
 
         const callback = (x: number, y: number, w: number, h: number) => {
             setIsSelecting(false);
-            stopRoomPick();
             setRootX(x);
             setRootY(y);
             setAreaWidth(w);
@@ -52,9 +48,8 @@ export const WiredSelectorInAreaView: FC<{}> = () => {
 
         return () => {
             GetRoomEngine().areaSelectionManager.deactivate();
-            stopRoomPick();
         };
-    }, [trigger, stopRoomPick]);
+    }, [trigger]);
 
     useEffect(() => {
         if (!trigger) return;
@@ -69,11 +64,6 @@ export const WiredSelectorInAreaView: FC<{}> = () => {
 
     const startSelecting = () => {
         setIsSelecting(true);
-        // On a phone the box steps aside while the area is dragged out in the room; the bar's button stops waiting for it.
-        startRoomPick(() => {
-            setIsSelecting(false);
-            stopRoomPick();
-        });
         GetRoomEngine().areaSelectionManager.startSelecting();
     };
 

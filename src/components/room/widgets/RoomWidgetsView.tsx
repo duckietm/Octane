@@ -24,7 +24,6 @@ import { UserChooserWidgetView } from './choosers/UserChooserWidgetView';
 import { DoorbellWidgetView } from './doorbell/DoorbellWidgetView';
 import { FriendRequestWidgetView } from './friend-request/FriendRequestWidgetView';
 import { FurnitureWidgetsView } from './furniture/FurnitureWidgetsView';
-import { HandheldPlacementBarView } from './handheld-placement/HandheldPlacementBarView';
 import { MonsterPlantBreedingView } from './pet-breeding/MonsterPlantBreedingView';
 import { PetBreedingView } from './pet-breeding/PetBreedingView';
 import { PetPackageWidgetView } from './pet-package/PetPackageWidgetView';
@@ -315,9 +314,6 @@ export const RoomWidgetsView: FC<{}> = (props) => {
                 </WidgetErrorBoundary>
                 <WidgetErrorBoundary name="FriendRequestWidget">
                     <FriendRequestWidgetView />
-                </WidgetErrorBoundary>
-                <WidgetErrorBoundary name="HandheldPlacementBar">
-                    <HandheldPlacementBarView />
                 </WidgetErrorBoundary>
             </WidgetErrorBoundary>
         </NativeTextTree>

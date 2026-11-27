@@ -16,7 +16,6 @@ import { Checkbox } from '../../common/Checkbox';
 import { Slider } from '../../common/Slider';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 const CONTROL_COMMAND_PREVIOUS_VIDEO = 0;
 const CONTROL_COMMAND_NEXT_VIDEO = 1;
@@ -260,7 +259,7 @@ export const YouTubePlayerView: FC<{}> = () => {
     );
 
     return (
-        <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="youtube-player" className={`youtube-player-modal ${isFullscreen ? '!fixed inset-0 w-full h-full z-[9999] rounded-none' : 'w-[550px]'}`}>
+        <OctaneCardView uniqueKey="youtube-player" className={`youtube-player-modal ${isFullscreen ? '!fixed inset-0 w-full h-full z-[9999] rounded-none' : 'w-[550px]'}`}>
             <OctaneCardHeaderView headerText={isRoomMode ? '📺 YouTube TV' : '▶ YouTube'} onCloseClick={() => setIsOpen(false)} />
             <OctaneCardContentView>
                 <div className="flex gap-1 mb-3 border-b border-gray-700 pb-2 flex-wrap">

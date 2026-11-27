@@ -15,7 +15,6 @@ import { Button, LayoutPetImageView, OctaneCardContentView, OctaneCardHeaderView
 import { useRoom } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 interface AvatarInfoUseProductConfirmViewProps {
     item: UseProductItem;
@@ -286,7 +285,7 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
     if (plantCopy) {
         return (
             <NativeTextTree>
-                <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-use-product-plant" isResizable={false}>
+                <OctaneCardView className="octane-use-product-plant" isResizable={false}>
                     <OctaneCardHeaderView headerText={LocalizeText(plantCopy.title, ['name'], [petData.name])} onCloseClick={onClose} />
                     <OctaneCardContentView className="octane-use-product-plant__content" overflow="hidden">
                         <div className="octane-use-product-plant__columns">
@@ -337,7 +336,7 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
     // thick Use button on one line. The same geometry as the plant seed window.
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-plant-seed-confirm octane-use-product-horse" isResizable={false}>
+            <OctaneCardView className="octane-plant-seed-confirm octane-use-product-horse" isResizable={false}>
                 <OctaneCardHeaderView headerText={LocalizeText('useproduct.widget.title', ['name'], [petData.name])} onCloseClick={onClose} />
                 <OctaneCardContentView className="octane-plant-seed-confirm__content" overflow="hidden">
                     <BaseButton type="button" className="octane-plant-seed-confirm__preview octane-use-product-horse__preview" onClick={selectRoomObject}>

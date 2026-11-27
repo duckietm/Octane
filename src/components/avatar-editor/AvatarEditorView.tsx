@@ -1,4 +1,3 @@
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 import {
     AddLinkEventTracker,
     AvatarEditorFigureCategory,
@@ -204,7 +203,6 @@ export const AvatarEditorView: FC<{}> = (props) => {
                 frameStyle={3}
                 isResizable={false}
                 uniqueKey="avatar-editor"
-                handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
             >
                 <OctaneCardHeaderView
                     headerText={LocalizeText(clothingChangeData ? 'widget.furni.clothingchange.editor.title' : 'avatareditor.title')}

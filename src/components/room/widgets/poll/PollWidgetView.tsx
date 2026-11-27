@@ -21,7 +21,6 @@ import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
 import { useNotification, usePollActions, useUiEvent } from '../../../../hooks';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 interface PollOffer {
     id: number;
@@ -181,7 +180,7 @@ export const PollWidgetView: FC = () => {
     if (offer) {
         return (
             <NativeTextTree>
-                <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-widget-poll octane-poll" theme="primary-slim">
+                <OctaneCardView className="octane-widget-poll octane-poll" theme="primary-slim">
                     <OctaneCardHeaderView headerText={localizeWithFallback('poll_offer_window', 'Poll')} onCloseClick={rejectOffer} />
                     <OctaneCardContentView gap={0} overflow="hidden">
                         <div className="octane-poll-header is-offer">
@@ -214,7 +213,7 @@ export const PollWidgetView: FC = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-widget-poll octane-poll" theme="primary-slim">
+            <OctaneCardView className="octane-widget-poll octane-poll" theme="primary-slim">
                 <OctaneCardHeaderView headerText={localizeWithFallback('poll_question_title', 'Poll')} onCloseClick={cancelContent} />
                 <OctaneCardContentView gap={0} overflow="hidden">
                     <div className="octane-poll-header">

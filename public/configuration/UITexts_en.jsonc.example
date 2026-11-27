@@ -1,5 +1,5 @@
 {
-    // UITexts - English (en). 3867 keys, in the same order in every UITexts_*.jsonc file:
+    // UITexts - English (en). 3859 keys, in the same order in every UITexts_*.jsonc file:
     // grouped by area, alphabetical inside each area. Keep placeholders (%...%, $(...), {0}, \n, HTML) as they are.
 
     // ------------------------------------------------------------------------
@@ -412,20 +412,6 @@
     "extendedprofile.customize.locked.hc": "Only for Habbo Club members.",
     "extendedprofile.customize.locked.rank": "Not available for your rank.",
     "extendedprofile.customize.none": "None",
-    "extendedprofile.customize.pose": "Pose",
-    "extendedprofile.customize.pose.direction": "Direction",
-    "extendedprofile.customize.pose.down": "Move down",
-    "extendedprofile.customize.pose.hint": "Turn your character and move it inside your picture. Everyone sees it in your profile and in the room infostand.",
-    "extendedprofile.customize.pose.left": "Move left",
-    "extendedprofile.customize.pose.position": "Position",
-    "extendedprofile.customize.pose.reset": "Centre",
-    "extendedprofile.customize.pose.right": "Move right",
-    "extendedprofile.customize.pose.save": "Save pose",
-    "extendedprofile.customize.pose.turn_left": "Turn left",
-    "extendedprofile.customize.pose.turn_right": "Turn right",
-    "extendedprofile.customize.pose.up": "Move up",
-    "extendedprofile.customize.pose.x": "Left / right",
-    "extendedprofile.customize.pose.y": "Up / down",
     "extendedprofile.customize.style": "Your own style",
     "extendedprofile.customize.style.angle": "Direction",
     "extendedprofile.customize.style.apply": "Apply style",
@@ -1250,7 +1236,6 @@
     "inventory.furni.filter.main.wall_items": "Wall items",
     "inventory.furni.filter.type.any": "Any type",
     "inventory.furni.filter.type.clothes": "Clothes",
-    "inventory.furni.filter.type.collectibles": "Collectibles",
     "inventory.furni.filter.type.credit_furni": "Credit furni",
     "inventory.furni.filter.type.dimmers": "Dimmers",
     "inventory.furni.filter.type.floors": "Floors",
@@ -2069,33 +2054,6 @@
     "octane.game_center.rematch_seconds": "Rematch (%seconds%)",
     "octane.game_center.scroll_down": "Scroll down",
     "octane.game_center.scroll_up": "Scroll up",
-
-    // ------------------------------------------------------------------------
-    // octane.handheld
-    // ------------------------------------------------------------------------
-    "octane.handheld.catalog.back": "Back to %name%",
-    "octane.handheld.catalog.overview": "All of %name%",
-    "octane.handheld.catalog.pages": "Catalogue pages",
-    "octane.handheld.catalog.place": "Place in room",
-    "octane.handheld.catalog.results": "Show %count% results",
-    "octane.handheld.chat_history.close": "Close chat history",
-    "octane.handheld.info.actions": "Actions",
-    "octane.handheld.info.close": "Close",
-    "octane.handheld.info.title": "Info",
-    "octane.handheld.navigator.details": "Room details",
-    "octane.handheld.navigator.enter": "Go to room",
-    "octane.handheld.placement.cancel": "Cancel",
-    "octane.handheld.placement.hint": "Drag or tap to move it, then place it.",
-    "octane.handheld.placement.place": "Place",
-    "octane.handheld.placement.rotate": "Rotate",
-    "octane.handheld.placement.title": "Placing an item",
-    "octane.handheld.room_tools.toggle": "Room tools",
-    "octane.handheld.window.peek": "Show the room",
-    "octane.handheld.window.peek_done": "Done",
-    "octane.handheld.window.peek_return": "Back to window",
-    "octane.handheld.window.pick_area": "Drag over the room to choose the area",
-    "octane.handheld.wired.pick_area": "Drag over the room to choose the area",
-    "octane.handheld.wired.picked": "Furni picked: %count% / %limit%",
 
     // ------------------------------------------------------------------------
     // octane.help
@@ -3213,13 +3171,6 @@
     "soundboard.silenced.count": "%count% muted",
     "soundboard.silenced.restore": "Unmute all",
     "soundboard.title": "Soundboard",
-
-    // ------------------------------------------------------------------------
-    // talent
-    // ------------------------------------------------------------------------
-    "talent.track.common.levels.progress": "%progress% / %total% levels completed",
-    "talent.track.common.levels.title": "Levels",
-    "talent.track.common.tasks.title": "Tasks",
 
     // ------------------------------------------------------------------------
     // toolbar

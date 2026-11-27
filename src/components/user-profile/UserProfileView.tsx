@@ -243,7 +243,6 @@ export const UserProfileView: FC<{}> = () => {
                     className={`octane-extended-profile-window w-[640px] h-[720px] max-w-[96vw] max-h-[92vh]${accentColor ? ' has-profile-accent' : ''}${isLightProfileAccent(userProfile.accentId ?? 0) ? ' has-light-accent' : ''}`}
                     style={accentStyle}
                     uniqueKey="octane-user-profile"
-                    handheldSheet
                 >
                     <OctaneCard.Header headerText={LocalizeText('extendedprofile.caption')} onCloseClick={onClose} />
                     <OctaneCard.Content

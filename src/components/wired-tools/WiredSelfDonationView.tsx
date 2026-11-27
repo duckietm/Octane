@@ -5,7 +5,6 @@ import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeade
 import { useMessageEvent, useNotification } from '../../hooks';
 import { NumberInput } from '../../common/NumberInput';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 /** The official tool's range; the server clamps to its own `hotel.selfdonation.max.amount`. */
 const DEFAULT_MAX_AMOUNT = 500;
@@ -85,7 +84,7 @@ export const WiredSelfDonationView = ({ onClose }: WiredSelfDonationViewProps) =
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
+            <OctaneCardView
                 className="octane-wired-menu min-w-[420px] max-w-[420px] max-h-[560px]"
                 theme="primary-slim"
                 uniqueKey="wired-self-donation"

@@ -1,5 +1,5 @@
 {
-    // UITexts - Italiano (it). 3867 keys, in the same order in every UITexts_*.jsonc file:
+    // UITexts - Italiano (it). 3859 keys, in the same order in every UITexts_*.jsonc file:
     // grouped by area, alphabetical inside each area. Keep placeholders (%...%, $(...), {0}, \n, HTML) as they are.
 
     // ------------------------------------------------------------------------
@@ -412,20 +412,6 @@
     "extendedprofile.customize.locked.hc": "Solo per i membri Habbo Club.",
     "extendedprofile.customize.locked.rank": "Non disponibile per il tuo rango.",
     "extendedprofile.customize.none": "Nessuno",
-    "extendedprofile.customize.pose": "Posa",
-    "extendedprofile.customize.pose.direction": "Direzione",
-    "extendedprofile.customize.pose.down": "Sposta giù",
-    "extendedprofile.customize.pose.hint": "Gira il tuo personaggio e spostalo nella tua immagine. Tutti lo vedono nel tuo profilo e nell'infostand della stanza.",
-    "extendedprofile.customize.pose.left": "Sposta a sinistra",
-    "extendedprofile.customize.pose.position": "Posizione",
-    "extendedprofile.customize.pose.reset": "Centra",
-    "extendedprofile.customize.pose.right": "Sposta a destra",
-    "extendedprofile.customize.pose.save": "Salva posa",
-    "extendedprofile.customize.pose.turn_left": "Gira a sinistra",
-    "extendedprofile.customize.pose.turn_right": "Gira a destra",
-    "extendedprofile.customize.pose.up": "Sposta su",
-    "extendedprofile.customize.pose.x": "Sinistra / destra",
-    "extendedprofile.customize.pose.y": "Su / giù",
     "extendedprofile.customize.style": "Il tuo stile",
     "extendedprofile.customize.style.angle": "Direzione",
     "extendedprofile.customize.style.apply": "Applica stile",
@@ -1250,7 +1236,6 @@
     "inventory.furni.filter.main.wall_items": "Furni da parete",
     "inventory.furni.filter.type.any": "Qualsiasi tipo",
     "inventory.furni.filter.type.clothes": "Vestiti",
-    "inventory.furni.filter.type.collectibles": "Collezionabili",
     "inventory.furni.filter.type.credit_furni": "Furni crediti",
     "inventory.furni.filter.type.dimmers": "Dimmer",
     "inventory.furni.filter.type.floors": "Pavimenti",
@@ -2069,33 +2054,6 @@
     "octane.game_center.rematch_seconds": "Rivincita (%seconds%)",
     "octane.game_center.scroll_down": "Scorri giù",
     "octane.game_center.scroll_up": "Scorri su",
-
-    // ------------------------------------------------------------------------
-    // octane.handheld
-    // ------------------------------------------------------------------------
-    "octane.handheld.catalog.back": "Torna a %name%",
-    "octane.handheld.catalog.overview": "Tutto %name%",
-    "octane.handheld.catalog.pages": "Pagine del catalogo",
-    "octane.handheld.catalog.place": "Posiziona nella stanza",
-    "octane.handheld.catalog.results": "Mostra %count% risultati",
-    "octane.handheld.chat_history.close": "Chiudi cronologia chat",
-    "octane.handheld.info.actions": "Azioni",
-    "octane.handheld.info.close": "Chiudi",
-    "octane.handheld.info.title": "Info",
-    "octane.handheld.navigator.details": "Dettagli stanza",
-    "octane.handheld.navigator.enter": "Vai alla stanza",
-    "octane.handheld.placement.cancel": "Annulla",
-    "octane.handheld.placement.hint": "Trascina o tocca per spostarlo, poi posizionalo.",
-    "octane.handheld.placement.place": "Posiziona",
-    "octane.handheld.placement.rotate": "Ruota",
-    "octane.handheld.placement.title": "Posizionamento oggetto",
-    "octane.handheld.room_tools.toggle": "Strumenti stanza",
-    "octane.handheld.window.peek": "Mostra la stanza",
-    "octane.handheld.window.peek_done": "Fatto",
-    "octane.handheld.window.peek_return": "Torna alla finestra",
-    "octane.handheld.window.pick_area": "Trascina sulla stanza per scegliere l'area",
-    "octane.handheld.wired.pick_area": "Trascina sulla stanza per scegliere l'area",
-    "octane.handheld.wired.picked": "Furni scelti: %count% / %limit%",
 
     // ------------------------------------------------------------------------
     // octane.help
@@ -3213,13 +3171,6 @@
     "soundboard.silenced.count": "%count% silenziati",
     "soundboard.silenced.restore": "Riattiva tutti",
     "soundboard.title": "Soundboard",
-
-    // ------------------------------------------------------------------------
-    // talent
-    // ------------------------------------------------------------------------
-    "talent.track.common.levels.progress": "%progress% / %total% livelli completati",
-    "talent.track.common.levels.title": "Livelli",
-    "talent.track.common.tasks.title": "Compiti",
 
     // ------------------------------------------------------------------------
     // toolbar

@@ -5,7 +5,6 @@ import { AirModalDialog } from '../../../common';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { HabboWayNavButtonView, HabboWayPageDotsView, LibraryImageView } from './HabboWayPagerView';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 interface SafetyBookletViewProps {
     page: number;
@@ -25,7 +24,7 @@ export const SafetyBookletView: FC<SafetyBookletViewProps> = ({ page, setPage, s
 
     return (
         <NativeTextTree>
-            <AirModalDialog handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+            <AirModalDialog
                 className="octane-habboway is-safety"
                 subtitle={localizeWithFallback('safety.booklet.frame.subtitle', 'SAFETY GUIDE')}
                 title={localizeWithFallback('safety.booklet.frame.title', 'Stay safe in Habbo')}

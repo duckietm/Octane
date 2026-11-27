@@ -16,7 +16,6 @@ import { SelectReportedChatsView } from './views/SelectReportedChatsView';
 import { SelectReportedUserView } from './views/SelectReportedUserView';
 import { SelectTopicView } from './views/SelectTopicView';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 export const HelpView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -97,7 +96,7 @@ export const HelpView: FC<{}> = (props) => {
         <NativeTextTree>
             <>
                 {isVisible && (
-                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="help"
+                    <OctaneCardView uniqueKey="help"
                         className={`octane-help min-w-0 ${isReporting ? 'w-[min(448px,calc(100vw-16px))]' : 'w-[min(420px,calc(100vw-16px))]'} max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]`}
                         theme="primary-slim"
                     >

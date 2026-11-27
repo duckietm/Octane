@@ -42,7 +42,6 @@ import { Select } from '../../common/Select';
 import { BaseButton } from '../../common/BaseButton';
 import '../../css/customize/CustomizeNickIconAirText.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 type CustomizeTab = 'icons' | 'prefix' | 'settings';
 type PrefixSubTab = 'library' | 'custom';
@@ -363,7 +362,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="customize-nick-icon-window w-[680px] max-w-[95vw]" theme="primary-slim" uniqueKey="customize-nick-icons">
+            <OctaneCardView className="customize-nick-icon-window w-[680px] max-w-[95vw]" theme="primary-slim" uniqueKey="customize-nick-icons">
                 <OctaneCardHeaderView headerText={localizeWithFallback('octane.customize.customize_bubble_identity', 'Customize Bubble Identity')} onCloseClick={() => setIsVisible(false)} />
                 <OctaneCardTabsView>
                     <OctaneCardTabsItemView isActive={activeTab === 'icons'} onClick={() => setActiveTab('icons')}>

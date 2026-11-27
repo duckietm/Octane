@@ -1,5 +1,4 @@
 export * from './AddAnimationTickerCallback';
-export * from './DispatchHandheldTouchEvent';
 export * from './DispatchMouseEvent';
 export * from './DispatchTouchEvent';
 export * from './GetOwnRoomObject';

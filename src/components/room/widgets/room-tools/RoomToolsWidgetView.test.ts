@@ -56,9 +56,4 @@ const css = readFileSync(join(process.cwd(), 'src/css/room/RoomWidgets.css'), 'u
         expect(css).toMatch(/&\.is-collapsed\s*\{[^}]*width:\s*158px;/s);
         expect(css).toMatch(/&\.is-collapsed\s+\.room-tools-collapse-toggle\s*\{[^}]*transform:\s*translateY\(-50%\);/s);
     });
-
-    it('names the collapse handle on phones only', () => {
-        expect(source).toContain("aria-label={isHandheld ? localizeWithFallback('octane.handheld.room_tools.toggle', 'Room tools') : undefined}");
-        expect(source).toContain('aria-expanded={isHandheld ? isToolsOpen : undefined}');
-    });
 });

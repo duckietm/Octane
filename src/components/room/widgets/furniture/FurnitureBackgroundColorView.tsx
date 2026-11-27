@@ -5,7 +5,6 @@ import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Sl
 import { useFurnitureBackgroundColorWidget } from '../../../../hooks';
 import '../../../../css/room/FurniWindowsAAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 export const FurnitureBackgroundColorView: FC<{}> = (props) => {
     const {
@@ -31,7 +30,7 @@ export const FurnitureBackgroundColorView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldPeek={{ label: LocalizeText('widget.backgroundcolour.title') }} handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-room-widget-background-color" theme="primary-slim">
+            <OctaneCardView className="octane-room-widget-background-color" theme="primary-slim">
                 <OctaneCardHeaderView headerText={LocalizeText('widget.backgroundcolour.title')} onCloseClick={onClose} />
                 <OctaneCardContentView classNames={['bgcolor-widget-content']} overflow="hidden">
                     <div className="bgcolor-widget-panel">

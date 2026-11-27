@@ -1,5 +1,5 @@
 {
-    // UITexts - Türkçe (tr). 3867 keys, in the same order in every UITexts_*.jsonc file:
+    // UITexts - Türkçe (tr). 3859 keys, in the same order in every UITexts_*.jsonc file:
     // grouped by area, alphabetical inside each area. Keep placeholders (%...%, $(...), {0}, \n, HTML) as they are.
 
     // ------------------------------------------------------------------------
@@ -412,20 +412,6 @@
     "extendedprofile.customize.locked.hc": "Yalnızca Habbo Club üyeleri için.",
     "extendedprofile.customize.locked.rank": "Rütben için kullanılamaz.",
     "extendedprofile.customize.none": "Yok",
-    "extendedprofile.customize.pose": "Duruş",
-    "extendedprofile.customize.pose.direction": "Yön",
-    "extendedprofile.customize.pose.down": "Aşağı taşı",
-    "extendedprofile.customize.pose.hint": "Karakterini döndür ve resminin içinde kaydır. Herkes bunu profilinde ve odadaki bilgi panelinde görür.",
-    "extendedprofile.customize.pose.left": "Sola taşı",
-    "extendedprofile.customize.pose.position": "Konum",
-    "extendedprofile.customize.pose.reset": "Ortala",
-    "extendedprofile.customize.pose.right": "Sağa taşı",
-    "extendedprofile.customize.pose.save": "Duruşu kaydet",
-    "extendedprofile.customize.pose.turn_left": "Sola döndür",
-    "extendedprofile.customize.pose.turn_right": "Sağa döndür",
-    "extendedprofile.customize.pose.up": "Yukarı taşı",
-    "extendedprofile.customize.pose.x": "Sol / sağ",
-    "extendedprofile.customize.pose.y": "Yukarı / aşağı",
     "extendedprofile.customize.style": "Kendi stilin",
     "extendedprofile.customize.style.angle": "Yön",
     "extendedprofile.customize.style.apply": "Stili uygula",
@@ -1250,7 +1236,6 @@
     "inventory.furni.filter.main.wall_items": "Duvar eşyaları",
     "inventory.furni.filter.type.any": "Herhangi bir tür",
     "inventory.furni.filter.type.clothes": "Kıyafetler",
-    "inventory.furni.filter.type.collectibles": "Koleksiyonluklar",
     "inventory.furni.filter.type.credit_furni": "Kredi mobileri",
     "inventory.furni.filter.type.dimmers": "Işık ayarlayıcılar",
     "inventory.furni.filter.type.floors": "Zeminler",
@@ -2069,33 +2054,6 @@
     "octane.game_center.rematch_seconds": "Rövanş (%seconds%)",
     "octane.game_center.scroll_down": "Aşağı kaydır",
     "octane.game_center.scroll_up": "Yukarı kaydır",
-
-    // ------------------------------------------------------------------------
-    // octane.handheld
-    // ------------------------------------------------------------------------
-    "octane.handheld.catalog.back": "%name% sayfasına dön",
-    "octane.handheld.catalog.overview": "Tüm %name%",
-    "octane.handheld.catalog.pages": "Katalog sayfaları",
-    "octane.handheld.catalog.place": "Odaya yerleştir",
-    "octane.handheld.catalog.results": "%count% sonucu göster",
-    "octane.handheld.chat_history.close": "Sohbet geçmişini kapat",
-    "octane.handheld.info.actions": "Eylemler",
-    "octane.handheld.info.close": "Kapat",
-    "octane.handheld.info.title": "Bilgi",
-    "octane.handheld.navigator.details": "Oda ayrıntıları",
-    "octane.handheld.navigator.enter": "Odaya git",
-    "octane.handheld.placement.cancel": "İptal",
-    "octane.handheld.placement.hint": "Taşımak için sürükle veya dokun, sonra yerleştir.",
-    "octane.handheld.placement.place": "Yerleştir",
-    "octane.handheld.placement.rotate": "Döndür",
-    "octane.handheld.placement.title": "Eşya yerleştiriliyor",
-    "octane.handheld.room_tools.toggle": "Oda araçları",
-    "octane.handheld.window.peek": "Odayı göster",
-    "octane.handheld.window.peek_done": "Tamam",
-    "octane.handheld.window.peek_return": "Pencereye dön",
-    "octane.handheld.window.pick_area": "Alanı seçmek için odada sürükle",
-    "octane.handheld.wired.pick_area": "Alanı seçmek için odada sürükle",
-    "octane.handheld.wired.picked": "Seçilen mobi: %count% / %limit%",
 
     // ------------------------------------------------------------------------
     // octane.help
@@ -3213,13 +3171,6 @@
     "soundboard.silenced.count": "%count% susturuldu",
     "soundboard.silenced.restore": "Tümünün sesini aç",
     "soundboard.title": "Soundboard",
-
-    // ------------------------------------------------------------------------
-    // talent
-    // ------------------------------------------------------------------------
-    "talent.track.common.levels.progress": "%progress% / %total% seviye tamamlandı",
-    "talent.track.common.levels.title": "Seviyeler",
-    "talent.track.common.tasks.title": "Görevler",
 
     // ------------------------------------------------------------------------
     // toolbar

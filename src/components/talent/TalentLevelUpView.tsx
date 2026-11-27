@@ -6,7 +6,6 @@ import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { ITalentLevelUp } from '../../hooks';
 import { TalentImageView } from './TalentImageView';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 interface TalentLevelUpViewProps {
     levelUp: ITalentLevelUp;
@@ -16,8 +15,7 @@ interface TalentLevelUpViewProps {
 
 /**
  * Official TalentLevelUpController (`level_up` layout, 430x362): the new level, its rewards joined
- * by "+", the button that opens the track and the level decoration beside the frame. Drawn in the reward
- * track's AIR frame, the level in a grey panel and the rewards on plates under a "Levels"-style heading.
+ * by "+", the button that opens the track and the level decoration beside the frame.
  */
 export const TalentLevelUpView: FC<TalentLevelUpViewProps> = ({ levelUp, onClose, onOpenTrack }) => {
     const library = GetConfigurationValue<string>('image.library.url', '');
@@ -45,17 +43,16 @@ export const TalentLevelUpView: FC<TalentLevelUpViewProps> = ({ levelUp, onClose
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-talent-levelup" frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="talent-level-up">
+            <OctaneCardView className="octane-talent-levelup" theme="primary-slim" uniqueKey="talent-level-up">
                 <OctaneCardHeaderView headerText={localizeWithFallback('talent.track.common.levelup.caption', 'A level up on the talent track!')} onCloseClick={onClose} />
-                <OctaneCardContentView className="octane-talent-levelup__content text-black" gap={1} overflow="visible">
+                <OctaneCardContentView className="text-black" gap={1}>
                     <div className="octane-talent-levelup__title">{localizeWithFallback('talent.track.common.levelup.title', 'Full of talent!')}</div>
                     <div className="octane-talent-levelup__message">{localizeWithFallback(`talent.track.${track}.levelup.message`, '')}</div>
                     <div className="octane-talent-levelup__box">
                         <div className="octane-talent-levelup__level">{localizeWithFallback(`talent.track.${track}.level.${level}.title`, '')}</div>
-                        <div className="octane-talent-levelup__description">{localizeWithFallback(`talent.track.${track}.level.${level}.description`, '')}</div>
+                        <div>{localizeWithFallback(`talent.track.${track}.level.${level}.description`, '')}</div>
                         {rewards.length > 0 && (
                             <div className="octane-talent-levelup__rewards">
-                                <span className="octane-talent-levelup__rule" />
                                 <div className="octane-talent-levelup__rewards-title">{localizeWithFallback('talent.track.common.levelup.rewards', 'THIS IS WHAT YOU GET:')}</div>
                                 <div className="octane-talent-levelup__reward-list">
                                     {rewards.map((reward, index) => (
@@ -69,7 +66,7 @@ export const TalentLevelUpView: FC<TalentLevelUpViewProps> = ({ levelUp, onClose
                         )}
                     </div>
                     <BaseButton
-                        className="octane-talent-button octane-talent-levelup__button"
+                        className="octane-habboway__action octane-talent-levelup__button"
                         type="button"
                         onClick={() => {
                             onClose();

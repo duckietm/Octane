@@ -4,8 +4,6 @@ import { CreateRoomSession, DoorStateType, TryVisitRoom } from '../../../../api'
 import { LayoutBadgeImageView, LayoutRoomThumbnailView } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useDoorState, useNavigatorRoomInfoPopupStore } from '../../../../hooks';
-import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
-import { HandheldNavigatorRoomRowView } from './HandheldNavigatorRoomRowView';
 import { NavigatorSearchResultItemInfoView } from './NavigatorSearchResultItemInfoView';
 import { NavigatorUserCountView } from './NavigatorUserCountView';
 
@@ -19,7 +17,6 @@ export interface NavigatorSearchResultItemViewProps {
 export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProps> = (props) => {
     const { roomData = null, thumbnail = false, eventTitle = false, stripe = false } = props;
     const { setSnapshot: setDoorData } = useDoorState();
-    const isHandheld = useIsHandheld();
     const title = eventTitle && roomData.roomAdName ? roomData.roomAdName : roomData.roomName;
 
     const doorClass = () => {
@@ -73,9 +70,6 @@ export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProp
     const retargetPopup = (event: MouseEvent<HTMLElement>) => {
         useNavigatorRoomInfoPopupStore.getState().retargetIfVisible(roomData, thumbnail ? 'tile' : 'row', event.currentTarget.getBoundingClientRect());
     };
-
-    // Phone layout: every block is a list of tall rows that open the room's card on a tap, also where tiles were chosen.
-    if (isHandheld) return <HandheldNavigatorRoomRowView doorClassName={doorClass()} roomData={roomData} stripe={stripe} title={title} onVisit={visitRoom} />;
 
     if (thumbnail)
         return (

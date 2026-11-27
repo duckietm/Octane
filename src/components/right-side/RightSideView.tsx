@@ -13,7 +13,7 @@ import { SoundboardFeedView } from '../soundboard/SoundboardFeedView';
 export const RightSideView: FC<{}> = (props) => {
     return (
         <NativeTextTree>
-            <div className="octane-right-side absolute top-0 right-1 z-10 w-[min(230px,calc(100vw-16px))] sm:w-[min(230px,calc(100vw-20px))] h-[calc(100%-55px)] pointer-events-none">
+            <div className="absolute top-0 right-1 z-10 w-[min(230px,calc(100vw-16px))] sm:w-[min(230px,calc(100vw-20px))] h-[calc(100%-55px)] pointer-events-none">
                 <Column gap={1} position="relative" alignItems="end" className="w-full">
                     <PurseView />
                     <PurseNoticesView />

@@ -16,7 +16,6 @@ import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useNotification, useNuxDialogs } from '../../hooks';
 import { LibraryImageView } from '../help/habbo-way/HabboWayPagerView';
 import { UiHelpBubblesView } from './UiHelpBubblesView';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 /** NuxGiftSelectionView.getProductName: the localization key, the product data or the furni name. */
 const getProductName = (product: INuxGiftProduct): string => {
@@ -58,7 +57,7 @@ export const NuxView: FC = () => {
                 <UiHelpBubblesView />
                 {oldUserOffer && (
                     // NuxOfferOldUserView (`nux_offer_old_user`, 456x220): no close box, skip or accept.
-                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-nux-offer is-old-user" theme="primary-slim" uniqueKey="nux-old-user">
+                    <OctaneCardView className="octane-nux-offer is-old-user" theme="primary-slim" uniqueKey="nux-old-user">
                         <OctaneCardHeaderView headerText={localizeWithFallback('notification.notification.nux.popup.title', 'Welcome to Habbo')} onCloseClick={rejectOldUserOffer} />
                         <OctaneCardContentView className="text-black" gap={2}>
                             <div className="octane-nux-offer__banner">
@@ -79,7 +78,7 @@ export const NuxView: FC = () => {
                 )}
                 {step && (
                     // NuxGiftSelectionView (`nux_gift_selection`, 487x287): one option per column, no close box.
-                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-nux-gifts" theme="primary-slim" uniqueKey="nux-gifts">
+                    <OctaneCardView className="octane-nux-gifts" theme="primary-slim" uniqueKey="nux-gifts">
                         <OctaneCardHeaderView
                             noCloseButton
                             className="octane-nux-gifts__header"
@@ -109,7 +108,7 @@ export const NuxView: FC = () => {
                 )}
                 {lobbyOffer && (
                     // NuxNoobRoomOfferView (`nux_noob_room_offer`, 382x222), placed at 20,20.
-                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-nux-offer is-lobby" offsetLeft={-30} offsetTop={-30} windowPosition={DraggableWindowPosition.TOP_LEFT} theme="primary-slim" uniqueKey="nux-lobby">
+                    <OctaneCardView className="octane-nux-offer is-lobby" offsetLeft={-30} offsetTop={-30} windowPosition={DraggableWindowPosition.TOP_LEFT} theme="primary-slim" uniqueKey="nux-lobby">
                         <OctaneCardHeaderView headerText={localizeWithFallback('notification.notification.nux.popup.title', 'Welcome to Habbo')} onCloseClick={hideLobbyOffer} />
                         <OctaneCardContentView className="text-black" gap={2}>
                             <LibraryImageView className="octane-nux-offer__lobby-image" src={`${library}nux/NUXroom_prompt.png`} />

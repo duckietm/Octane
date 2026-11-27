@@ -3,7 +3,6 @@ import { LocalizeText } from '../../../../../api';
 import { Button, Column, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useRoom } from '../../../../../hooks';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../../api/handheld/handheldWindowFit';
 
 interface EffectBoxConfirmViewProps {
     objectId: number;
@@ -22,7 +21,7 @@ export const EffectBoxConfirmView: FC<EffectBoxConfirmViewProps> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-use-product-confirmation">
+            <OctaneCardView className="octane-use-product-confirmation">
                 <OctaneCardHeaderView headerText={LocalizeText('effectbox.header.title')} onCloseClick={onClose} />
                 <OctaneCardContentView center>
                     <div className="flex gap-2">

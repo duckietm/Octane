@@ -5,7 +5,6 @@ import notificationIcon from '../../../assets/images/guide-tool/chat-review/noti
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useHelp } from '../../../hooks';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 /**
  * AIR chat_review_reporter_feedback (ChatReviewReporterFeedbackCtrl): what became of a bully
@@ -21,7 +20,7 @@ export const ChatReviewReporterFeedbackView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-guardian-feedback" theme="primary-slim" uniqueKey="chat-review-reporter-feedback">
+            <OctaneCardView className="octane-guardian-feedback" theme="primary-slim" uniqueKey="chat-review-reporter-feedback">
                 <OctaneCardHeaderView headerText={guardianText('guide.bully.request.reporter.title')} onCloseClick={close} />
                 <OctaneCardContentView className="text-black">
                     <div className="octane-guardian-feedback__content">

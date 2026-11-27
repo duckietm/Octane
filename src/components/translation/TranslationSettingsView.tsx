@@ -8,7 +8,6 @@ import { BaseButton } from '../../common/BaseButton';
 import '../../css/translation/TranslationSettings.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { localizeWithFallback } from '../../api';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 export const TranslationSettingsView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -63,7 +62,7 @@ export const TranslationSettingsView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+            <OctaneCardView
                 className="translation-settings-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                 theme="primary-slim"
                 uniqueKey="translation-settings"

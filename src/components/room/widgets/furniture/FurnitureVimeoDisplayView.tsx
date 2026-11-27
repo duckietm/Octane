@@ -4,7 +4,6 @@ import { OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useFurnitureVimeoWidget } from '../../../../hooks';
 import { sanitizeVimeoVideoIdInput, vimeoPlayerUrl } from '../../../../hooks/rooms/widgets/furniture/useFurnitureVimeoWidget.helpers';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 /**
  * The official Vimeo viewer (`vimeo_viewer_xml`, 451x356, caption "Vimeo Display"):
@@ -40,7 +39,7 @@ const VimeoViewer: FC<VimeoViewerProps> = ({ videoId, canEdit, onClose, onSave }
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} classNames={['octane-vimeo-viewer']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="vimeo-viewer">
+            <OctaneCardView classNames={['octane-vimeo-viewer']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="vimeo-viewer">
                 <OctaneCardHeaderView headerText={localizeWithFallback('widget.furni.vimeo_viewer.title', 'Vimeo Display')} onCloseClick={onClose} />
                 <div className="octane-vimeo-viewer-content">
                     <div className="octane-vimeo-viewer-background" data-testid="vimeo-video-background">

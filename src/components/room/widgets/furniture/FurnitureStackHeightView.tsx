@@ -8,7 +8,6 @@ import { NumberInput } from '../../../../common/NumberInput';
 import { Hint } from '../../../../common/Tooltip';
 import '../../../../css/room/FurniWindowsAAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 /**
  * Official `CustomStackHeightWidget` (`custom_stack_height_xml`): description, the move up / move down
@@ -39,7 +38,7 @@ export const FurnitureStackHeightView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-widget-custom-stack-height" theme="primary-slim">
+            <OctaneCardView className="octane-widget-custom-stack-height" theme="primary-slim">
                 <OctaneCardHeaderView headerText={LocalizeText(titleKey)} onCloseClick={onClose} />
                 <OctaneCardContentView justifyContent="between">
                     <Text>{LocalizeText(textKey)}</Text>

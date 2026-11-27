@@ -16,7 +16,6 @@ import { CameraWidgetEffectListView } from './effect-list';
 import { BaseButton } from '../../../../common/BaseButton';
 import { ToggleButton } from '../../../../common/ToggleButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 export interface CameraWidgetEditorViewProps {
     picture: CameraPicture;
@@ -246,7 +245,7 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="camera-editor" className="octane-camera-editor" frameStyle={3} isResizable={false} style={{ resize: 'none' }}>
+            <OctaneCardView uniqueKey="camera-editor" className="octane-camera-editor" frameStyle={3} isResizable={false} style={{ resize: 'none' }}>
                 <div className="octane-card-header-shell">
                     <span className="octane-card-title">
                         <CameraCenteredText

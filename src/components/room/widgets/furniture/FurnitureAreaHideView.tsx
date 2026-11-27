@@ -1,12 +1,11 @@
 import { CSSProperties, FC, useState } from 'react';
-import { LocalizeText, localizeWithFallback } from '../../../../api';
+import { LocalizeText } from '../../../../api';
 import { DraggableWindow } from '../../../../common/draggable-window';
 import { NativeText } from '../../../../common/native-text/NativeText';
 import { getAreaHideControlState, useFurnitureAreaHideWidget } from '../../../../hooks';
 import '../../../../css/room/FurniWindowsCAir.css';
 import { Native0Button, Native0Checkbox } from '../../../mod-tools/native/NativeWindow0';
 import { Native3Frame } from '../../../mod-tools/native/NativeWindow3';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 // AIR layout area_hide_ui: a 292x334 frame style 3 in 0x67a3bf with its content at the frame margins (6, 25).
 const WIDTH = 292;
@@ -70,7 +69,6 @@ export const FurnitureAreaHideView: FC<{}> = () => {
         selecting,
         selectionActive,
         startSelecting,
-        stopSelecting,
         clearSelection,
         toggleOnOff,
         onClose = null
@@ -82,14 +80,7 @@ export const FurnitureAreaHideView: FC<{}> = () => {
     const { optionsDisabled, selectDisabled, clearDisabled } = getAreaHideControlState(isOn, selecting, selectionActive);
 
     return (
-        <DraggableWindow
-            handheldPeek={{
-                label: LocalizeText('widget.areahide.title'),
-                hint: selecting ? localizeWithFallback('octane.handheld.window.pick_area', 'Drag over the room to choose the area') : undefined,
-                forced: selecting,
-                onReturn: stopSelecting
-            }}
-            handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} handleSelector=".native3-title" initialPosition={centred()} uniqueKey="area-hide">
+        <DraggableWindow handleSelector=".native3-title" initialPosition={centred()} uniqueKey="area-hide">
             <Native3Frame color={0x67a3bf} height={HEIGHT} title={LocalizeText('widget.areahide.title')} width={WIDTH} onClose={onClose}>
                 <div className="furniture-area-hide__panel" data-testid="area-hide-panel">
                     <AreaHideText bold dimmed={isOn} text={LocalizeText('widget.areahide.area_selection')} x={6} y={7} />

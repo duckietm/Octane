@@ -28,8 +28,7 @@ const ensureMobileViewport = () => {
         document.head.appendChild(viewport);
     }
 
-    // Kept in step with index.html: no zoom on a focused field, and the keyboard overlays the page instead of resizing it.
-    viewport.content = 'width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-visual';
+    viewport.content = 'width=device-width, initial-scale=1, viewport-fit=cover';
 };
 
 ensureMobileViewport();

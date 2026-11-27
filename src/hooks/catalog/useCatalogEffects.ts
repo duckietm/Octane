@@ -209,10 +209,7 @@ export const useCatalogEffects = (): void => {
 
         if (!data) return;
 
-        const { activeNodes, pageId: activePageId, searchResult } = useCatalogStore.getState();
-
-        // While searching no node is active on purpose; the search view reruns on the new tree.
-        if (searchResult) return;
+        const { activeNodes, pageId: activePageId } = useCatalogStore.getState();
 
         if (activePageId > -1 && (!activeNodes.length || activeNodes.at(-1).pageId !== activePageId || !isNodeInTree(activeNodes.at(-1) ?? null, data.rootNode))) {
             useCatalogStore.setState({ activeNodes: restoreCatalogActivePath(data.rootNode, activePageId) });
@@ -293,8 +290,6 @@ export const useCatalogEffects = (): void => {
         }
 
         state.selectCatalogOffer(offer);
-        // A search result tile is built from the furni data; the server's offer brings its limited edition numbers.
-        state.replaceSearchResultOffer(offer);
     });
 
     const showMakeOfferResult = (result: number) => {

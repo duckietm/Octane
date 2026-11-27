@@ -20,13 +20,12 @@ import {
     RoomWidgetUpdateRentableBotTextSkillEvent
 } from '../../../../api';
 import { Column, LayoutFurniIconImageView } from '../../../../common';
-import { useAvatarInfoWidget, useFurniPickupGuard, useIsHandheld, useOctaneEvent, useRoom, useUiEvent } from '../../../../hooks';
+import { useAvatarInfoWidget, useFurniPickupGuard, useOctaneEvent, useRoom, useUiEvent } from '../../../../hooks';
 import { AvatarInfoPetTrainingPanelView } from './AvatarInfoPetTrainingPanelView';
 import { AvatarInfoRentableBotChatView } from './AvatarInfoRentableBotChatView';
 import { AvatarInfoRentableBotTextSkillView } from './AvatarInfoRentableBotTextSkillView';
 import { AvatarInfoUseProductConfirmView } from './AvatarInfoUseProductConfirmView';
 import { AvatarInfoUseProductView } from './AvatarInfoUseProductView';
-import { HandheldInfoSheetView } from './infostand/HandheldInfoSheetView';
 import { InfoStandWidgetBotView } from './infostand/InfoStandWidgetBotView';
 import { InfoStandWidgetFurniView } from './infostand/InfoStandWidgetFurniView';
 import { InfoStandWidgetPetView } from './infostand/InfoStandWidgetPetView';
@@ -69,7 +68,6 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
         setIsDecorating = null
     } = useAvatarInfoWidget();
     const { roomSession = null } = useRoom();
-    const isHandheld = useIsHandheld();
 
     const updateAvatarClickControl = (updates: { suppressMenuUntil?: number; suppressRotateUntil?: number }) => {
         const globalScope = globalThis as any;
@@ -144,10 +142,6 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
                         return;
                     case 'block-rotate':
                         updateAvatarClickControl({ suppressRotateUntil: Date.now() + BLOCK_ROTATE_WINDOW_MS });
-                        return;
-                    // Phone layout: a long press on an avatar selected it and asks for its action menu.
-                    case 'handheld-actions':
-                        setMobileUserDetailsOpen(true);
                         return;
                 }
             },
@@ -227,8 +221,7 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
 
         switch (avatarInfo.type) {
             case AvatarInfoFurni.FURNI:
-                // The phone layout shows the full infostand in its sheet straight away.
-                if (isTouchLayout && !isHandheld && !isDecorating) {
+                if (isTouchLayout && !isDecorating) {
                     const info = avatarInfo as AvatarInfoFurni;
 
                     if (!mobileFurniDetailsOpen) {
@@ -255,9 +248,6 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
         }
     };
 
-    const hasAvatarActions =
-        !isGameMode && (avatarInfo?.type === AvatarInfoUser.OWN_USER || avatarInfo?.type === AvatarInfoUser.PEER) && !(avatarInfo as AvatarInfoUser).isSpectatorMode;
-
     return (
         <NativeTextTree>
             <>
@@ -270,16 +260,7 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
                     />
                 )}
                 {getMenuView()}
-                {avatarInfo && isHandheld && (
-                    <HandheldInfoSheetView
-                        actionsOpen={mobileUserDetailsOpen}
-                        onActions={hasAvatarActions ? () => setMobileUserDetailsOpen((open) => !open) : undefined}
-                        onClose={() => setAvatarInfo(null)}
-                    >
-                        {getInfostandView()}
-                    </HandheldInfoSheetView>
-                )}
-                {avatarInfo && !isHandheld && (
+                {avatarInfo && (
                     <Column alignItems="end" className="octane-infostand-area absolute right-[10px] bottom-[65px] pointer-events-none z-30 text-white">
                         {getInfostandView()}
                     </Column>

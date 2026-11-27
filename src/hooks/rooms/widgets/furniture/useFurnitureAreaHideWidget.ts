@@ -84,9 +84,6 @@ const useFurnitureAreaHideWidgetState = () => {
         GetRoomEngine().areaSelectionManager.startSelecting();
     };
 
-    /** Stops waiting for an area (the phone bar's button); the window comes back, the area stays as it was. */
-    const stopSelecting = () => setSelecting(false);
-
     const clearSelection = () => {
         if (isOn) return;
 
@@ -170,7 +167,6 @@ const useFurnitureAreaHideWidgetState = () => {
         selecting,
         selectionActive,
         startSelecting,
-        stopSelecting,
         clearSelection,
         toggleOnOff,
         onClose

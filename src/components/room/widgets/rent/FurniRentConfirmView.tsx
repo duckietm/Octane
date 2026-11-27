@@ -15,7 +15,6 @@ import { Button, Column, LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHe
 import { useMessageEvent, useNotification, usePurse, useRoom } from '../../../../hooks';
 import '../../../../css/room/FurniWindowsBAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 interface RentRequest {
     objectId: number;
@@ -106,7 +105,7 @@ export const FurniRentConfirmView: FC = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-widget-rent-confirm octane-furni-rent-confirm" theme="primary-slim">
+            <OctaneCardView className="octane-widget-rent-confirm octane-furni-rent-confirm" theme="primary-slim">
                 <OctaneCardHeaderView headerText={title} onCloseClick={() => setOffer(null)} />
                 <OctaneCardContentView gap={2}>
                     <Text bold className="octane-furni-rent-confirm__name">{offer.name}</Text>

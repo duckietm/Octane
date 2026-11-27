@@ -30,7 +30,6 @@ import { useInventoryBadges, useMessageEvent, usePurse, useSessionInfo } from '.
 import { BaseButton } from '../../common/BaseButton';
 import '../../css/hc-center/HcCenterView.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 export const HcCenterView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -162,7 +161,7 @@ export const HcCenterView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="hc-center" className="octane-hc-center-window min-w-0 w-[min(430px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] resize-none" theme="primary-slim">
+            <OctaneCardView uniqueKey="hc-center" className="octane-hc-center-window min-w-0 w-[min(430px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] resize-none" theme="primary-slim">
                 <OctaneCardHeaderView headerText={LocalizeText('generic.hccenter')} onCloseClick={() => setIsVisible(false)} />
                 <Flex className="bg-muted/50 p-3" position="relative">
                     <Column gap={2}>

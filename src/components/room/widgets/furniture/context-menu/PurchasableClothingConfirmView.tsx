@@ -11,7 +11,6 @@ import { BuildPurchasableClothingFigure, GetFurnitureDataForRoomObject, Localize
 import { Button, Column, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useRoom } from '../../../../../hooks';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../../api/handheld/handheldWindowFit';
 
 interface PurchasableClothingConfirmViewProps {
     objectId: number;
@@ -77,7 +76,7 @@ export const PurchasableClothingConfirmView: FC<PurchasableClothingConfirmViewPr
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-use-product-confirmation">
+            <OctaneCardView className="octane-use-product-confirmation">
                 <OctaneCardHeaderView headerText={LocalizeText('useproduct.widget.title.bind_clothing')} onCloseClick={onClose} />
                 <OctaneCardContentView center>
                     <div className="flex overflow-hidden gap-2">

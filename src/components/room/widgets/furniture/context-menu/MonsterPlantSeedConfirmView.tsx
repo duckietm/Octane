@@ -5,7 +5,6 @@ import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } f
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useRoom } from '../../../../../hooks';
-import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../../api/handheld/handheldWindowFit';
 
 interface MonsterPlantSeedConfirmViewProps {
     objectId: number;
@@ -59,7 +58,7 @@ export const MonsterPlantSeedConfirmView: FC<MonsterPlantSeedConfirmViewProps> =
     // two wrapped texts 200 wide at x 140, the underlined cancel link and the thick save button on one line.
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-plant-seed-confirm" isResizable={false}>
+            <OctaneCardView className="octane-plant-seed-confirm" isResizable={false}>
                 <OctaneCardHeaderView headerText={LocalizeText('useproduct.widget.title.plant_seed', ['name'], [furniData.name])} onCloseClick={onClose} />
                 <OctaneCardContentView className="octane-plant-seed-confirm__content" overflow="hidden">
                     <div className="octane-plant-seed-confirm__preview">

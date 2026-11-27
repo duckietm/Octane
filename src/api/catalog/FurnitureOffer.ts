@@ -10,14 +10,9 @@ export class FurnitureOffer implements IPurchasableOffer {
     private _furniData: IFurnitureData;
     private _page: ICatalogPage;
     private _product: IProduct;
-    private _offerId: number;
-    private _isRent: boolean;
 
-    // AIR FurnitureOffer: the offer the search found (HabboCatalog.createSearchResultOffer), rent only when that is what is sold.
-    constructor(furniData: IFurnitureData, offerId?: number, isRent?: boolean) {
+    constructor(furniData: IFurnitureData) {
         this._furniData = furniData;
-        this._isRent = isRent ?? (furniData.purchaseOfferId === -1 && furniData.rentOfferId > -1);
-        this._offerId = offerId ?? (this._isRent ? furniData.rentOfferId : furniData.purchaseOfferId);
         this._product = new Product(
             this._furniData.type,
             this._furniData.id,
@@ -29,11 +24,11 @@ export class FurnitureOffer implements IPurchasableOffer {
     }
 
     public activate(): void {
-        SendMessageComposer(new GetProductOfferComposer(this._offerId));
+        SendMessageComposer(new GetProductOfferComposer(this._furniData.rentOfferId > -1 ? this._furniData.rentOfferId : this._furniData.purchaseOfferId));
     }
 
     public get offerId(): number {
-        return this._offerId;
+        return this.isRentOffer ? this._furniData.rentOfferId : this._furniData.purchaseOfferId;
     }
 
     public get priceInActivityPoints(): number {
@@ -77,7 +72,7 @@ export class FurnitureOffer implements IPurchasableOffer {
     }
 
     public get isRentOffer(): boolean {
-        return this._isRent;
+        return this._furniData.rentOfferId > -1;
     }
 
     public get giftable(): boolean {
@@ -100,9 +95,8 @@ export class FurnitureOffer implements IPurchasableOffer {
         return this._furniData?.name ?? '';
     }
 
-    // AIR FurnitureDataParser passes an empty description (FurnitureDataParser.as:257), so search results show none.
     public get localizationDescription(): string {
-        return '';
+        return this._furniData?.description ?? '';
     }
 
     public get isLazy(): boolean {

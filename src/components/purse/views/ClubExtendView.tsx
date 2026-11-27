@@ -6,7 +6,6 @@ import { useMessageEvent, usePurse } from '../../../hooks';
 import { BaseButton } from '../../../common/BaseButton';
 import '../../../css/purse/ClubExtendView.css';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 const PriceRow: FC<{ label: string; credits: number; points: number; pointsType: number; bold?: boolean }> = ({ label, credits, points, pointsType, bold = false }) => (
     <NativeTextTree>
@@ -66,7 +65,7 @@ export const ClubExtendView: FC = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-club-extend" theme="primary-slim">
+            <OctaneCardView className="octane-club-extend" theme="primary-slim">
                 <OctaneCardHeaderView headerText={localizeWithFallback('catalog.club.extend.confirm.caption', 'Extend your HC subscription')} onCloseClick={() => setOffer(null)} />
                 <OctaneCardContentView gap={2}>
                     <Text bold>{localizeWithFallback('catalog.club.extend.confirm.title', 'Extend your HC subscription')}</Text>

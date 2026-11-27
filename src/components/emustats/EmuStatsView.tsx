@@ -14,7 +14,6 @@ import {
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 type EmuStatsSection = 'overview' | 'system' | 'wiredInsights' | 'users' | 'rooms' | 'wired';
 
@@ -574,7 +573,7 @@ export const EmuStatsView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-emustats-window w-[980px] h-[620px]" isResizable={false} theme="primary-slim" uniqueKey="emu-stats">
+            <OctaneCardView className="octane-emustats-window w-[980px] h-[620px]" isResizable={false} theme="primary-slim" uniqueKey="emu-stats">
                 <OctaneCardHeaderView headerText={localizeWithFallback('octane.emustats.emulator_stats', 'Emulator Stats')} onCloseClick={() => setIsVisible(false)} />
                 <OctaneCardContentView classNames={['octane-emustats-window__content']}>
                     <div className="octane-emustats">

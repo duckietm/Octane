@@ -1,121 +1,103 @@
-import { GetSessionDataManager, IFurnitureData } from '@octane/renderer';
+import { GetSessionDataManager } from '@octane/renderer';
 import { ChangeEvent, FC, KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import {
     CatalogPage,
+    FilterCatalogNode,
     FurnitureOffer,
-    GetProductDataForLocalization,
+    ICatalogNode,
+    ICatalogPage,
     IPurchasableOffer,
     LocalizeText,
     localizeWithFallback,
     PageLocalization,
     SearchResult
 } from '../../../../../api';
-import { BaseButton } from '../../../../../common/BaseButton';
-import { NativeText } from '../../../../../common/native-text/NativeText';
 import { useCatalogActions, useCatalogData, useCatalogUiState } from '../../../../../hooks';
-import { getNodesByOfferIdFromMap } from '../../../../../hooks/catalog/useCatalog.helpers';
-import { readCachedCatalogOffer, readCatalogIndex } from '../../../../../hooks/catalog/useCatalogQueries';
 import {
     CATALOG_SEARCH_DEBOUNCE_MS,
-    filterCatalogSearchNodes,
-    findCatalogSearchMatches,
+    findCatalogFurnitureMatches,
     isCatalogSearchEnterKey,
+    normalizeCatalogSearchText,
     shouldRunCatalogSearch
 } from './catalogSearch.helpers';
-
-/** HabboCatalog.ensureSearchEntries: a furni is found by its name and by its product data name. */
-const getSearchTerms = (furniture: IFurnitureData): string[] => [
-    furniture.name,
-    (GetProductDataForLocalization(furniture.fullName) ?? GetProductDataForLocalization(furniture.className))?.name
-];
+import { BaseButton } from '../../../../../common/BaseButton';
 
 export const CatalogSearchView: FC<{}> = () => {
-    const { rootNode = null, searchResult = null } = useCatalogData();
-    const { currentType = null } = useCatalogUiState();
-    const { beginCatalogSearch = null, endCatalogSearch = null } = useCatalogActions();
-    // The field shows the running search: closing the catalog (or placing a result in the room) and reopening it keeps both.
-    const [searchValue, setSearchValue] = useState(() => searchResult?.searchValue ?? '');
+    const [searchValue, setSearchValue] = useState('');
     const searchTimeout = useRef<ReturnType<typeof setTimeout>>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
-    const searchTypeRef = useRef(currentType);
-    const searchRootRef = useRef(rootNode);
-    const previousSearchResult = useRef(searchResult);
+    const { rootNode = null } = useCatalogData();
+    const { currentType = null, setSearchResult = null, setCurrentPage = null } = useCatalogUiState();
+    const { getNodesByOfferId = null } = useCatalogActions();
 
-    const cancelTimer = () => {
-        if (searchTimeout.current) clearTimeout(searchTimeout.current);
-
-        searchTimeout.current = null;
-    };
-
-    // HabboCatalog.performSearch (HabboCatalog.as:1901-1968): the results page, and the navigator filtered to the pages
-    // that sell a match or whose name holds the text.
     const runSearch = useCallback(
         (search: string) => {
-            if (!rootNode || !search.length) return;
+            if (!rootNode || !shouldRunCatalogSearch(search)) return;
 
             const furnitureDatas = GetSessionDataManager().getAllFurnitureData();
 
             if (!furnitureDatas || !furnitureDatas.length) return;
 
-            const index = readCatalogIndex(currentType);
-            const nodesByOfferId = (offerId: number) => getNodesByOfferIdFromMap(offerId, index?.offersToNodes, true);
-            const matches = findCatalogSearchMatches(furnitureDatas, search, currentType, nodesByOfferId, getSearchTerms);
-            // A page that is already loaded has the server's offer (limited edition numbers, prices); a clone keeps that
-            // page's offer as it is when the results page takes the clone over.
-            const offers: IPurchasableOffer[] = matches.offers.map((match) => {
-                const pageIds = (nodesByOfferId(match.offerId) ?? []).map((node) => node.pageId);
-                const cached = readCachedCatalogOffer(currentType, match.offerId, pageIds);
+            const { furniture: foundFurniture, furniLines: foundFurniLines } = findCatalogFurnitureMatches(
+                furnitureDatas,
+                search,
+                currentType,
+                undefined,
+                getNodesByOfferId ? (offerId) => !!getNodesByOfferId(offerId, true)?.length : null
+            );
 
-                return cached ? cached.clone() : new FurnitureOffer(match.furniture, match.offerId, match.isRent);
-            });
+            const offers: IPurchasableOffer[] = [];
 
-            beginCatalogSearch(
-                new SearchResult(search, offers, filterCatalogSearchNodes(search, matches.furniLines, matches.pageIds, rootNode)),
+            for (const furniture of foundFurniture) {
+                offers.push(new FurnitureOffer(furniture));
+            }
+
+            let nodes: ICatalogNode[] = [];
+
+            FilterCatalogNode(search, foundFurniLines, rootNode, nodes);
+
+            setSearchResult(
+                new SearchResult(
+                    search,
+                    offers,
+                    nodes.filter((node) => node.isVisible)
+                )
+            );
+            setCurrentPage(
                 new CatalogPage(
                     -1,
                     'default_3x3',
-                    new PageLocalization(
-                        ['catalog_header_roombuilder', 'credits_v3_teaser'],
-                        [LocalizeText('catalog.search.results', ['count', 'needle'], [String(offers.length), search])]
-                    ),
+                    new PageLocalization([], [LocalizeText('catalog.search.results', ['count', 'needle'], [String(offers.length), search])]),
                     offers,
                     false,
-                    1,
-                    currentType
+                    1
                 )
             );
         },
-        [beginCatalogSearch, currentType, rootNode]
+        [currentType, getNodesByOfferId, rootNode, setCurrentPage, setSearchResult]
     );
-
-    // HabboCatalog.onClearSearch: an empty field goes back to the page that was open before the search.
-    const endSearch = useCallback(() => endCatalogSearch?.(), [endCatalogSearch]);
 
     const scheduleSearch = useCallback(
         (value: string, immediate = false) => {
-            cancelTimer();
+            if (searchTimeout.current) clearTimeout(searchTimeout.current);
 
-            if (!value.length) {
-                endSearch();
+            const search = normalizeCatalogSearchText(value);
+
+            if (!shouldRunCatalogSearch(search)) {
+                setSearchResult(null);
 
                 return;
             }
 
             if (immediate) {
-                runSearch(value);
+                runSearch(search);
 
                 return;
             }
 
-            if (!shouldRunCatalogSearch(value)) return;
-
-            searchTimeout.current = setTimeout(() => {
-                searchTimeout.current = null;
-                runSearch(value);
-            }, CATALOG_SEARCH_DEBOUNCE_MS);
+            searchTimeout.current = setTimeout(() => runSearch(search), CATALOG_SEARCH_DEBOUNCE_MS);
         },
-        [endSearch, runSearch]
+        [runSearch, setSearchResult]
     );
 
     const onSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -133,72 +115,38 @@ export const CatalogSearchView: FC<{}> = () => {
     };
 
     const clearSearch = () => {
-        cancelTimer();
+        if (searchTimeout.current) clearTimeout(searchTimeout.current);
+
         setSearchValue('');
-        endSearch();
-        inputRef.current?.focus();
+        setSearchResult(null);
     };
 
-    // Another catalogue (NORMAL / BUILDERS_CLUB) starts without a search; a new tree (index loaded, publish) reruns the
-    // running one. Mounting again (the catalog reopened) keeps the search as it was.
     useEffect(() => {
-        const rootChanged = searchRootRef.current !== rootNode;
-
-        searchRootRef.current = rootNode;
-
-        if (searchTypeRef.current !== currentType) {
-            searchTypeRef.current = currentType;
-            cancelTimer();
-            setSearchValue('');
-
-            return;
-        }
-
-        if (rootChanged && searchValue) scheduleSearch(searchValue, !!searchResult);
+        if (searchValue) scheduleSearch(searchValue);
     }, [currentType, rootNode]);
 
-    // The search ended elsewhere (a tab, a catalog link, another catalogue): the field follows.
-    useEffect(() => {
-        const previous = previousSearchResult.current;
-
-        previousSearchResult.current = searchResult;
-
-        if (!previous || searchResult) return;
-
-        cancelTimer();
-        setSearchValue('');
-    }, [searchResult]);
-
-    useEffect(() => () => cancelTimer(), []);
-
-    const hasQuery = searchValue.length > 0;
+    useEffect(() => () => searchTimeout.current && clearTimeout(searchTimeout.current), []);
 
     return (
-        // AIR searchContainer: the search.helper text in the box and common_small_pen on the right, which turns into a
-        // clear button once something is typed.
+        // AIR searchContainer: the search.helper text (catalog.search, #666666) in the box and common_small_pen on the
+        // right, which turns into icons_close once something is typed.
         <div className="octane-catalog-search relative w-full">
-            {/* search.helper: ${catalog.search} in 0x666666 at blend 0.5 (0xb2b2b2 on the white field) until something is typed. */}
-            {!hasQuery && (
-                <NativeText
-                    nativeResolution
-                    background={0xffffff}
-                    className="octane-catalog-search-helper"
-                    overrides={{ color: 0xb2b2b2 }}
-                    text={LocalizeText('catalog.search')}
-                    textStyle="u_regular"
-                />
-            )}
             <input
-                ref={inputRef}
                 aria-label={LocalizeText('catalog.search')}
                 className="octane-catalog-search-input w-full"
+                placeholder={LocalizeText('catalog.search')}
                 type="text"
                 value={searchValue}
                 onChange={onSearchChange}
                 onKeyDown={onSearchKeyDown}
             />
-            {hasQuery ? (
-                <BaseButton aria-label={localizeWithFallback('generic.clear', 'Clear')} className="octane-catalog-search-clear" type="button" onClick={clearSearch}>
+            {searchValue && searchValue.length > 0 ? (
+                <BaseButton
+                    aria-label={localizeWithFallback('generic.clear', 'Clear')}
+                    type="button"
+                    className="octane-catalog-search-clear"
+                    onClick={clearSearch}
+                >
                     <FaTimes />
                 </BaseButton>
             ) : (

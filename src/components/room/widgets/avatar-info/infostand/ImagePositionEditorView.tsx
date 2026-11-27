@@ -6,8 +6,6 @@ import { Slider } from '../../../../../common/Slider';
 import { NumberInput } from '../../../../../common/NumberInput';
 import '../../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
-import { shownZoomOf, toLayoutOffset } from '../../../../../api/handheld/handheldPointer';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../../api/handheld/handheldWindowFit';
 
 const PAD_W = 230;
 const PAD_H = 150;
@@ -67,11 +65,8 @@ export const ImagePositionEditorView: FC<Props> = (props) => {
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
 
-        // In the pad's own pixels: on a phone the window can be drawn smaller or bigger as a whole.
-        const zoom = shownZoomOf(padRef.current);
-
-        setX(Math.round(toLayoutOffset(clientX - cx, zoom) * UNITS_PER_PX));
-        setY(Math.round(toLayoutOffset(clientY - cy, zoom) * UNITS_PER_PX));
+        setX(Math.round((clientX - cx) * UNITS_PER_PX));
+        setY(Math.round((clientY - cy) * UNITS_PER_PX));
     }, []);
 
     const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -106,7 +101,7 @@ export const ImagePositionEditorView: FC<Props> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="no-resize octane-image-position-editor" uniqueKey="image-position-editor" theme="primary-slim">
+            <OctaneCardView className="no-resize octane-image-position-editor" uniqueKey="image-position-editor" theme="primary-slim">
                 <OctaneCardHeaderView headerText={LocalizeText('image.position.editor.title')} onCloseClick={cancel} />
                 <OctaneCardContentView>
                     <div className="flex flex-col gap-2">

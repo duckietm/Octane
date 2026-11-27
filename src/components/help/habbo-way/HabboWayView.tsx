@@ -8,7 +8,6 @@ import { AirModalDialog } from '../../../common';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { HabboWayNavButtonView, HabboWayPageDotsView, LibraryImageView } from './HabboWayPagerView';
-import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 interface HabboWayViewProps {
     page: number;
@@ -27,7 +26,7 @@ export const HabboWayView: FC<HabboWayViewProps> = ({ page, setPage, startQuiz }
 
     return (
         <NativeTextTree>
-            <AirModalDialog handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
+            <AirModalDialog
                 className="octane-habboway"
                 subtitle={localizeWithFallback('habbo.way.frame.subtitle', 'WHAT IS RIGHT AND WRONG')}
                 title={localizeWithFallback('habbo.way.frame.title', 'The Habbo Way')}
