@@ -21,6 +21,14 @@ const OctaneCardRoot = ({
     dragStyle = {},
     offsetLeft = 0,
     offsetTop = 0,
+    initialPosition,
+    unconstrainedPosition,
+    onPositionChange,
+    // The phone props belong to the window, never to the card's element.
+    handheldSheet,
+    handheldScale,
+    handheldMaxScale,
+    handheldPeek,
     className = null,
     children,
     ...rest
@@ -34,9 +42,16 @@ const OctaneCardRoot = ({
         <DraggableWindow
             disableDrag={disableDrag}
             dragStyle={isWired ? dragStyle : { filter: 'drop-shadow(2.828px 2.828px 4px rgba(0, 0, 0, 0.349))', ...dragStyle }}
+            handheldMaxScale={handheldMaxScale}
+            handheldPeek={handheldPeek}
+            handheldScale={handheldScale}
+            handheldSheet={handheldSheet}
             handleSelector={handleSelector}
+            initialPosition={initialPosition}
             offsetLeft={offsetLeft}
             offsetTop={offsetTop}
+            onPositionChange={onPositionChange}
+            unconstrainedPosition={unconstrainedPosition}
             uniqueKey={uniqueKey}
             windowPosition={windowPosition}
         >

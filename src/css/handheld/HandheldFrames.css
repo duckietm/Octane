@@ -32,9 +32,10 @@
     overflow: hidden;
 }
 
-/* ---------------------------------------------------------------- reward track */
+/* ---------------------------------------------------------------- talent track lists */
 
-/* The list rows follow a finger dragged up and down (RewardTrackScrollList); a sideways drag pans the window. */
+/* The list rows follow a finger dragged up and down (RewardTrackScrollList, which the talent track draws its lists with);
+   a sideways drag pans the window. The reward track itself has its own phone layout (HandheldRewardTrack.css). */
 :root[data-handheld] .octane-reward-track-scroll-viewport {
     touch-action: pan-x;
 }

@@ -8,7 +8,7 @@ const strip = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, '');
 const tokens = strip(read('src/css/handheld/HandheldTokens.css'));
 const defined = new Set([...tokens.matchAll(/(--hh-[a-z0-9-]+):/g)].map((match) => match[1]));
 
-/** The phone modules that wear the Octane handheld look, the frame the shop, the inventory, the avatar editor and the profile share, and the drawer of whatever is selected in the room. */
+/** The phone modules that wear the Octane handheld look, the frame the shop, the inventory, the avatar editor, the profile and the reward track share, and the drawer of whatever is selected in the room. */
 const SHEETS = [
     'HandheldNavigator.css',
     'HandheldHud.css',
@@ -18,11 +18,12 @@ const SHEETS = [
     'HandheldInventory.css',
     'HandheldLooks.css',
     'HandheldProfile.css',
+    'HandheldRewardTrack.css',
     'HandheldDrawer.css'
 ];
 
 /** The sheets written wholly for the phone: every rule of theirs is scoped to it. */
-const PHONE_ONLY = ['HandheldSheet.css', 'HandheldCatalog.css', 'HandheldInventory.css', 'HandheldLooks.css', 'HandheldProfile.css', 'HandheldDrawer.css'];
+const PHONE_ONLY = ['HandheldSheet.css', 'HandheldCatalog.css', 'HandheldInventory.css', 'HandheldLooks.css', 'HandheldProfile.css', 'HandheldRewardTrack.css', 'HandheldDrawer.css'];
 
 /** Custom properties a sheet sets itself, on one of its own elements. */
 const LOCAL = new Set(['--hh-level', '--hh-fill']);
@@ -42,7 +43,11 @@ const AIR_SOURCES: [file: string, value: string, token: string][] = [
     ['src/css/catalog/CatalogView.css', '--catalog-standard-box-line: #757571', '--hh-air-box-line: #757571'],
     ['src/css/catalog/CatalogView.css', '--catalog-standard-text: #222222', '--hh-air-text: #222222'],
     ['src/css/quests/RewardTrackView.css', '--rt-dark: #3576b9', '--hh-air-track-blue: #3576b9'],
-    ['src/css/quests/RewardTrackView.css', '--rt-light: #ddebf9', '--hh-air-track-light: #ddebf9']
+    ['src/css/quests/RewardTrackView.css', '--rt-light: #ddebf9', '--hh-air-track-light: #ddebf9'],
+    ['src/css/quests/RewardTrackView.css', '--rt-band: #f9efe0', '--hh-air-track-free: #f9efe0'],
+    ['src/css/quests/RewardTrackView.css', '--rt-band: #f1def7', '--hh-air-track-premium: #f1def7'],
+    ['src/css/quests/RewardTrackView.css', '--rt-panel: #f5e1b9', '--hh-air-track-tip: #f5e1b9'],
+    ['src/css/quests/RewardTrackView.css', '--rt-button: #b265ce', '--hh-air-premium: #b265ce']
 ];
 
 describe('Octane handheld design tokens', () => {

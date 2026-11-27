@@ -103,7 +103,8 @@ const FRIENDLY_TIME_UNITS: { name: string; seconds: number; fallback: string }[]
  */
 export const getFriendlyTimeParts = (seconds: number, threshold: number = 3): { key: string; amount: number; fallback: string } => {
     for (const unit of FRIENDLY_TIME_UNITS) {
-        if (seconds > threshold * unit.seconds) return { key: `friendlytime.${unit.name}`, amount: Math.round(seconds / unit.seconds), fallback: unit.fallback };
+        if (seconds > threshold * unit.seconds)
+            return { key: `friendlytime.${unit.name}`, amount: Math.round(seconds / unit.seconds), fallback: unit.fallback };
     }
 
     return { key: 'friendlytime.seconds', amount: Math.round(seconds), fallback: '%amount% sec' };
@@ -341,7 +342,8 @@ export const paginatePrizeTiers = <T extends { premium: boolean; requiredPoints:
         const span = new Set(page);
 
         pageMilestones.push(page);
-        const ofPage = (tier: boolean) => prizes.filter((prize) => prize.premium === tier && span.has(prize.requiredPoints)).sort((a, b) => a.requiredPoints - b.requiredPoints);
+        const ofPage = (tier: boolean) =>
+            prizes.filter((prize) => prize.premium === tier && span.has(prize.requiredPoints)).sort((a, b) => a.requiredPoints - b.requiredPoints);
 
         free.push(ofPage(false));
         premium.push(ofPage(true));
@@ -351,6 +353,37 @@ export const paginatePrizeTiers = <T extends { premium: boolean; requiredPoints:
 };
 
 export const getPremiumBoostPercent = (taskPointsBoost: number): number => Math.round((taskPointsBoost - 1) * 100);
+
+/** What the premium pass of a track gives, as the lines of its purchase confirmation (in the official order). */
+export const getRewardTrackPremiumBenefits = (
+    track: Pick<RewardTrackData, 'taskPointsBoost' | 'hasPremiumPrizes' | 'instantPoints' | 'hasPremiumTasks' | 'hasPremiumLevels'>
+): string[] => {
+    const benefits: string[] = [];
+
+    if (track.taskPointsBoost > 1) {
+        benefits.push(
+            localizeWithFallback(
+                'reward_track.premium.confirm.benefit.boost',
+                '%percent%% more points from every task',
+                ['percent'],
+                [String(getPremiumBoostPercent(track.taskPointsBoost))]
+            )
+        );
+    }
+
+    if (track.hasPremiumPrizes) benefits.push(localizeWithFallback('reward_track.premium.confirm.benefit.rewards', 'Exclusive premium rewards'));
+
+    if (track.instantPoints > 0)
+        benefits.push(
+            localizeWithFallback('reward_track.premium.confirm.benefit.instant_points', '%points% points right away', ['points'], [String(track.instantPoints)])
+        );
+
+    if (track.hasPremiumTasks) benefits.push(localizeWithFallback('reward_track.premium.confirm.benefit.tasks', 'Extra premium tasks'));
+
+    if (track.hasPremiumLevels) benefits.push(localizeWithFallback('reward_track.premium.confirm.benefit.levels', 'Extra premium task levels'));
+
+    return benefits;
+};
 
 /** The official client localizes non-zero result codes as `<prefix><code>`. */
 export const getRewardTrackResultText = (prefix: string, resultCode: number, fallback: string): string => {
@@ -373,7 +406,9 @@ const LEGACY_DAILY_TASK_CURRENCIES: Record<string, number> = { credits: -1, duck
  * item type is the code), 1 and 11 a floor furni and 0 a wall furni (the item type is the class id). A server that
  * still sends the reward by name (product 0 with a word as the item type) is read the old way.
  */
-export const getDailyTaskRewardIcon = (reward: Pick<DailyTaskData['rewards'][number], 'productItemTypeId' | 'rewardTypeId' | 'extraParams'>): DailyTaskRewardIcon => {
+export const getDailyTaskRewardIcon = (
+    reward: Pick<DailyTaskData['rewards'][number], 'productItemTypeId' | 'rewardTypeId' | 'extraParams'>
+): DailyTaskRewardIcon => {
     const itemType = (reward?.rewardTypeId ?? '').trim();
     const numeric = /^-?\d+$/.test(itemType);
 

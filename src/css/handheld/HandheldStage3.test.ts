@@ -71,7 +71,7 @@ describe('phone layout, stage 3 windows', () => {
         ['src/components/user-profile/ProfileCustomizeView.tsx', 'handheldSheet'],
         ['src/components/quests/QuestsView.tsx', 'handheldSheet'],
         ['src/components/quests/DailyTasksView.tsx', 'handheldSheet'],
-        ['src/components/quests/RewardTrackView.tsx', 'handheldScale={HANDHELD_MIN_FRAME_SCALE}'],
+        ['src/components/quests/HandheldRewardTrackView.tsx', 'handheldSheet'],
         ['src/components/talent/TalentTrackView.tsx', 'handheldScale={HANDHELD_MIN_FRAME_SCALE}'],
         ['src/components/avatar-editor/AvatarEditorView.tsx', 'handheldSheet'],
         ['src/components/achievements/AchievementsView.tsx', 'handheldScale={HANDHELD_TOUCH_FRAME_SCALE}']

@@ -125,16 +125,6 @@
     min-width: 120px;
 }
 
-/* ---------------------------------------------------------------- reward track premium confirm */
-
-:root[data-handheld] .octane-reward-track-premium {
-    width: min(420px, calc(100vw - 24px)) !important;
-}
-
-:root[data-handheld] .octane-reward-track-premium-buttons button {
-    min-height: 44px;
-}
-
 /* ---------------------------------------------------------------- tracker and timer */
 
 /* They sat right above the desktop toolbar; on a phone they sit above the dock and the chat composer, inside the safe area. */

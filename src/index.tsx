@@ -149,6 +149,7 @@ import './css/handheld/HandheldLooks.css';
 import './css/handheld/HandheldNavigator.css';
 import './css/handheld/HandheldSocial.css';
 import './css/handheld/HandheldProfile.css';
+import './css/handheld/HandheldRewardTrack.css';
 import './css/handheld/HandheldProgress.css';
 import './css/handheld/HandheldFrames.css';
 import './css/handheld/HandheldRoomHud.css';

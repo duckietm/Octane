@@ -22,6 +22,11 @@
     --hh-air-track-medium: #cfe2f9;
     --hh-air-track-light: #ddebf9;
     --hh-air-track-active: #bdd6ef;
+    /* Reward-track bands and buttons (RewardTrackView.css --rt-band free and premium, --rt-panel tip, --rt-button premium). */
+    --hh-air-track-free: #f9efe0;
+    --hh-air-track-premium: #f1def7;
+    --hh-air-track-tip: #f5e1b9;
+    --hh-air-premium: #b265ce;
 
     /* AIR window cream, panels and box lines (CatalogView.css --catalog-standard-*). */
     --hh-air-cream: #e9e9e1;

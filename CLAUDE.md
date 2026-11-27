@@ -540,6 +540,33 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
   `InventoryView` renders the frame, every tab ends in `views/HandheldInventorySelectionView.tsx` (bar with the main action; the
   preview and the other actions open from it, always open in landscape). Neither shell carries the AIR window class, so the AIR
   rules scoped to `.octane-catalog-window` / `.octane-inventory-window` do not reach them.
+- Phone avatar editor and profile, same look and frame: `AvatarEditorView` renders `HandheldSheetFrame` with picture tabs
+  (`HandheldSheetTab.image`) and the wardrobe button in the header; each category view has a phone branch
+  (`HandheldLooksPartsView.tsx`: chips, 5-column part grid with the tile class `octane-handheld-looks__part`, palettes; wardrobe,
+  effects, popular looks, collectibles) styled by `HandheldLooks.css`. Upright: stage, category, colours, save; on its side:
+  grid | colours | avatar + save. Profile: `UserProfileView` renders the frame (tabs profile / groups, the accent on the header,
+  the user's window background as `.octane-handheld-profile__backdrop`), `UserContainerView` the cards (banner + framed picture
+  with pose as the hero, friends, three cells); `ProfileCustomizeView` is a frame too, its tabs the pills (`HandheldProfile.css`).
+  The shared `Button` carries `!important` utilities in a cascade layer, so phone sheets shape it with `height` + `clip-path`.
+- Phone reward track, same look and frame (`src/css/handheld/HandheldRewardTrack.css`): `RewardTrackView` keeps the state, the link
+  tracker and the actions and, on a phone, hands them to `src/components/quests/HandheldRewardTrackView.tsx` instead of drawing the
+  AIR window. Points in the header, tabs Rewards / Tasks, chips to switch between active tracks, a summary card; the road is a list
+  of stops read top to bottom (`src/api/quests/RewardTrackMilestones.ts`: free and premium prize of a threshold side by side, the
+  rail's fill per row as `--hh-fill`), with a sticky claim button; a task opens its levels and tip as a page of the sheet (upright)
+  or beside the list (on its side). Bars use `useRewardTrackProgressBar` in thousandths, so live progress animates as on the
+  desktop. The premium purchase is a card over the sheet; the staff editor keeps its desktop content in a scrolling container.
+  Cards (`OctaneCard`, `OctaneCardView`) consume every `DraggableWindow` prop and hand it on; none may reach the DOM
+  (`src/layout/OctaneCard.test.tsx`).
+- Phone drawer of whatever is selected in the room (furni, wall item, pet, bot, player), dark glass like the HUD and the chat
+  composer (`src/css/handheld/HandheldDrawer.css`): the shell is `src/common/handheld/HandheldInfoDrawer.tsx` (head with picture,
+  name, fold and close; details; action grid; a peek of head + one row of actions in portrait, pulled or tapped open; a full-height
+  panel at the right in landscape; `isPage` / `onBack` for sub-pages). `AvatarInfoWidgetView` renders it on phones:
+  `InfoStandWidgetFurniView` with its `handheld` prop hands its panel and every button to `infostand/HandheldFurniDrawerView.tsx`
+  (sections Item / Shop / Wired / Staff), units go through `infostand/HandheldUnitDrawerView.tsx`, whose actions are the very
+  context menus of the desktop: inside `HandheldDrawerContext`, `ContextMenuView` / `ContextMenuListItemView` /
+  `ContextMenuHeaderView` render their rows as drawer buttons (`icon` / `tone` props of a row are for the drawer only), and the
+  pet / rentable-bot infostands portal their own buttons into the drawer's `actionsSlot`. Pet commands and the bot name / motto /
+  speech forms are pages of the same shell. Add an action to the desktop menu or infostand and the drawer has it.
 - Renderer-SDK mock for Vitest: `src/octane-renderer.mock.ts`
   (aliased over `@octane/renderer` via `vitest.config.mts`).
   Hosts the explicit `OctaneLogger` mock, the `mockEventDispatcher` /
