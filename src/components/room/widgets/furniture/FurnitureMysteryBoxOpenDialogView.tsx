@@ -12,6 +12,7 @@ import { LayoutPrizeProductImageView } from '../../../../common/layout/LayoutPri
 import { useMessageEvent } from '../../../../hooks';
 import '../../../../css/room/FurniWindowsBAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 interface FurnitureMysteryBoxOpenDialogViewProps {
     ownerId: number;
@@ -60,7 +61,7 @@ export const FurnitureMysteryBoxOpenDialogView: FC<FurnitureMysteryBoxOpenDialog
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-mysterybox-dialog octane-furni-mysterybox" theme="primary-slim">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-mysterybox-dialog octane-furni-mysterybox" theme="primary-slim">
                 <OctaneCardHeaderView
                     headerText={
                         mode === ViewMode.WAITING ? LocalizeText(`mysterybox.dialog.${isOwner ? 'owner' : 'other'}.title`) : LocalizeText('mysterybox.reward.title')

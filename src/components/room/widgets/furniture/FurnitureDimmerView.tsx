@@ -13,6 +13,8 @@ import { Checkbox } from '../../../../common/Checkbox';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useFurnitureDimmerWidget, useOctaneEvent } from '../../../../hooks';
 import '../../../../css/room/FurniWindowsAAir.css';
+import { shownZoomOf, toLayoutOffset } from '../../../../api/handheld/handheldPointer';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 // AIR dimmer_ui: the brightness slider_movement_area is 206 wide and its 12 px slider_button moves over the 194 px between.
 const SLIDER_AREA_WIDTH = 206;
@@ -32,15 +34,17 @@ const DimmerSlider: FC<{ value: number; min: number; max: number; onChange: (val
     const dragRef = useRef<{ pointerId: number; offset: number } | null>(null);
 
     const valueAt = (clientX: number) => {
-        const area = areaRef.current?.getBoundingClientRect();
+        const element = areaRef.current;
+        const area = element?.getBoundingClientRect();
 
-        return area ? sliderValue(clientX - area.left - (dragRef.current?.offset ?? SLIDER_BUTTON_WIDTH / 2), min, max) : value;
+        // On a phone the window can be drawn smaller or bigger as a whole: the finger's offset is turned back into the slider's own pixels.
+        return area ? sliderValue(toLayoutOffset(clientX - area.left, shownZoomOf(element)) - (dragRef.current?.offset ?? SLIDER_BUTTON_WIDTH / 2), min, max) : value;
     };
 
     const onPointerDown = (event: PointerEvent<HTMLElement>) => {
         const button = event.currentTarget.getBoundingClientRect();
 
-        dragRef.current = { pointerId: event.pointerId, offset: event.clientX - button.left };
+        dragRef.current = { pointerId: event.pointerId, offset: toLayoutOffset(event.clientX - button.left, shownZoomOf(event.currentTarget)) };
         event.currentTarget.setPointerCapture(event.pointerId);
     };
 
@@ -135,7 +139,7 @@ export const FurnitureDimmerLayout: FC<FurnitureDimmerLayoutProps> = ({
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-room-widget-dimmer octane-dimmer">
+            <OctaneCardView handheldPeek={{ label: LocalizeText('widget.dimmer.title') }} handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-room-widget-dimmer octane-dimmer">
                 <OctaneCardHeaderView headerText={LocalizeText('widget.dimmer.title')} onCloseClick={onClose} />
                 {/* AIR hides the tabbed view while the dimmer is off; its room stays, so the window keeps its size. */}
                 <OctaneCardTabsView aria-hidden={!isOn} classNames={['octane-dimmer__tabs', ...(isOn ? [] : ['is-hidden'])]}>

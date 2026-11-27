@@ -4,13 +4,14 @@ import vipIcon from '../../../assets/images/groups/native/icon-vip-square.png';
 import { OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { flatText, GroupButton, GroupText, GroupWindowTitle } from './GroupNativeLayout';
 import { GroupRichText } from './GroupRichText';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 /**
  * The "Habbo Club required" window the groups manager opens when a join is refused because the user is in as many groups as a
  * user without Habbo Club may be (join failure reason 4): the explanation, a link to the Habbo Club centre and the join button.
  */
 export const GroupHcRequiredView: FC<{ onClose: () => void }> = ({ onClose }) => (
-    <OctaneCardView
+    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE}
         aria-label={LocalizeText('group.hcrequired.title')}
         className="octane-group-hc"
         frameStyle={3}

@@ -2,6 +2,7 @@ import { createContext, FC, useContext } from 'react';
 import { OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { GroupText, GroupWindowTitle } from './GroupNativeLayout';
 import { BaseButton } from '../../../common/BaseButton';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 export interface GroupAlert {
     title: string;
@@ -16,7 +17,7 @@ export const useGroupAlert = () => useContext(GroupAlertContext);
 // habbo_window_alert_xml: 278x141 frame, text (27,14 210x57) and a thick Ok in the 215px button list at (26,81),
 // both below the frame's 25px top margin and inside its 6px side margins.
 export const GroupNativeAlertView: FC<{ alert: GroupAlert; onClose: () => void }> = ({ alert, onClose }) => (
-    <OctaneCardView
+    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE}
         aria-label={alert.title}
         className="octane-group-alert"
         frameStyle={3}

@@ -13,6 +13,7 @@ export * from './GetRendererVersion';
 export * from './GetUIVersion';
 export * from './groups';
 export * from './guide-tool';
+export * from './handheld';
 export * from './habbicons';
 export * from './hc-center';
 export * from './help';

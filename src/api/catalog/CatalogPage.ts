@@ -1,3 +1,4 @@
+import { CatalogType } from './CatalogType';
 import { ICatalogPage } from './ICatalogPage';
 import { IPageLocalization } from './IPageLocalization';
 import { IPurchasableOffer } from './IPurchasableOffer';
@@ -11,6 +12,7 @@ export class CatalogPage implements ICatalogPage {
     private _offers: IPurchasableOffer[];
     private _acceptSeasonCurrencyAsCredits: boolean;
     private _mode: number;
+    private _catalogType: string;
 
     constructor(
         pageId: number,
@@ -18,7 +20,8 @@ export class CatalogPage implements ICatalogPage {
         localization: IPageLocalization,
         offers: IPurchasableOffer[],
         acceptSeasonCurrencyAsCredits: boolean,
-        mode: number = -1
+        mode: number = -1,
+        catalogType: string = CatalogType.NORMAL
     ) {
         this._pageId = pageId;
         this._layoutCode = layoutCode;
@@ -30,6 +33,8 @@ export class CatalogPage implements ICatalogPage {
 
         if (mode === -1) this._mode = CatalogPage.MODE_NORMAL;
         else this._mode = mode;
+
+        this._catalogType = catalogType;
     }
 
     public get pageId(): number {
@@ -54,5 +59,14 @@ export class CatalogPage implements ICatalogPage {
 
     public get mode(): number {
         return this._mode;
+    }
+
+    public get catalogType(): string {
+        return this._catalogType;
+    }
+
+    /** AIR CatalogPage.isBuilderPage: the page belongs to the BUILDERS_CLUB catalogue. */
+    public get isBuilderPage(): boolean {
+        return this._catalogType === CatalogType.BUILDER;
     }
 }

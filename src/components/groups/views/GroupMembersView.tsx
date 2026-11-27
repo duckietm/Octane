@@ -42,6 +42,7 @@ import { NumberInput } from '../../../common/NumberInput';
 import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 const MEMBERS_REQUEST_INTERVAL_MS = 550;
 const SEARCH_DELAY_MS = 1000;
@@ -295,7 +296,7 @@ export const GroupMembersView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView uniqueKey="group-members" className="octane-groups-window octane-group-members" theme="primary-slim" isResizable={false}>
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="group-members" className="octane-groups-window octane-group-members" theme="primary-slim" isResizable={false}>
                 <OctaneCardHeaderView
                     headerText={LocalizeText('group.members.title', ['groupName'], [membersData ? membersData.groupTitle : ''])}
                     onCloseClick={(event) => setGroupId(-1)}

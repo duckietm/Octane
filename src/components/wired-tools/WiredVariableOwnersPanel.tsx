@@ -8,6 +8,7 @@ import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedT
 import { Select } from '../../common/Select';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 /** The server's holder kinds (`entityType`). */
 export const HOLDER_TYPE_ROOM = 0;
@@ -153,7 +154,7 @@ export const WiredVariableOwnersPanel = (props: WiredVariableOwnersPanelProps) =
     // key / value line, the user type and sort menus on one line, the table (672 x 296) and the paging row.
     return (
         <NativeTextTree>
-            <OctaneCardView
+            <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
                 className="octane-wired-menu octane-wired-logs octane-wired-vars"
                 theme="primary-slim"
                 uniqueKey={uniqueKey}

@@ -4,11 +4,12 @@ import welcomeImage from '../../../assets/images/groups/native/group_welcome_inf
 import { OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { GroupButton, GroupWindowTitle } from './GroupNativeLayout';
 import { GroupRichText } from './GroupRichText';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 // group_created_window: 358x381 frame, html text (22,10 311x150), group_welcome_info (20,140), Ok button (115,304 131x29),
 // all below the 33px frame margin.
 export const GroupCreatedView: FC<{ onClose: () => void }> = ({ onClose }) => (
-    <OctaneCardView
+    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE}
         aria-label={LocalizeText('group.created.title')}
         className="octane-group-created"
         frameStyle={3}

@@ -1,6 +1,6 @@
 /* @vitest-environment jsdom */
 
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -60,7 +60,12 @@ vi.mock('./views/page/common/CatalogSearchView', () => ({ CatalogSearchView: () 
 vi.mock('./views/page/layout/marketplace/MarketplacePostOfferView', () => ({ MarketplacePostOfferView: () => null }));
 vi.mock('./views/vip-benefits/VipBenefitsView', () => ({ VipBenefitsView: () => null }));
 vi.mock('./views/page/layout/GetCatalogLayout', () => ({ GetCatalogLayout: () => null }));
+vi.mock('./views/handheld/HandheldCatalogBodyView', () => ({
+    HandheldCatalogBodyView: ({ rootTitle }: { rootTitle: string }) => <div data-testid="handheld-catalog">{rootTitle}</div>
+}));
 
+import { DESKTOP_LAYOUT } from '../../api/handheld/handheldLayout';
+import { useHandheldStore } from '../../state/handheldStore';
 import { CatalogView } from './CatalogView';
 
 afterEach(() => {
@@ -113,5 +118,32 @@ describe('CatalogView', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Admin' }));
 
         expect(state.setAdminMode).toHaveBeenCalledWith(true, expect.anything());
+    });
+
+    it('draws the desktop window when the phone layout is off', () => {
+        state.currentType = 'NORMAL';
+        state.isMod = false;
+        render(<CatalogView />);
+
+        expect(screen.queryByTestId('handheld-catalog')).toBeNull();
+        expect(document.querySelector('.octane-catalog-window.is-handheld')).toBeNull();
+        expect(document.querySelector('.octane-catalog-sidebar')).not.toBeNull();
+    });
+
+    it('swaps the tabs, tree and page for the one-screen phone catalogue on a phone', () => {
+        state.currentType = 'NORMAL';
+        state.isMod = false;
+        act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'portrait' } }));
+
+        try {
+            render(<CatalogView />);
+
+            expect(screen.getByTestId('handheld-catalog')).toHaveTextContent('catalog.title');
+            expect(document.querySelector('.octane-catalog-window.is-handheld')).not.toBeNull();
+            expect(document.querySelector('.octane-catalog-tabs-shell')).toBeNull();
+            expect(document.querySelector('.octane-catalog-sidebar')).toBeNull();
+        } finally {
+            act(() => useHandheldStore.setState({ layout: DESKTOP_LAYOUT }));
+        }
     });
 });

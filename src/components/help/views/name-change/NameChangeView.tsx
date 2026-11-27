@@ -7,6 +7,7 @@ import { useUiEvent } from '../../../../hooks';
 import { NameChangeConfirmationView } from './NameChangeConfirmationView';
 import { NameChangeInitView } from './NameChangeInitView';
 import { NameChangeInputView } from './NameChangeInputView';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 const INIT: string = 'INIT';
 const INPUT: string = 'INPUT';
@@ -53,7 +54,7 @@ export const NameChangeView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-change-username" theme="primary-slim">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-change-username" theme="primary-slim">
                 <OctaneCardHeaderView headerText={LocalizeText(titleKey)} onCloseClick={() => onAction('close')} />
                 <OctaneCardContentView className="text-black">
                     {layout === INIT && <NameChangeInitView onAction={onAction} />}

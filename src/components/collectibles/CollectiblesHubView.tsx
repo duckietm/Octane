@@ -13,6 +13,7 @@ import { CollectiblesRewardsTabView } from './CollectiblesRewardsTabView';
 import { CollectiblesShopTabView } from './CollectiblesShopTabView';
 import { CollectiblesTransferTabView } from './CollectiblesTransferTabView';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 /**
  * The official collectibles hub (`collectible_view_xml`, 500x600): the collector header with XP, high
@@ -32,7 +33,7 @@ export const CollectiblesHubView: FC = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView classNames={['octane-collectibles-hub']} frameStyle={3} isResizable={false} uniqueKey="collectibles-hub">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} classNames={['octane-collectibles-hub']} frameStyle={3} isResizable={false} uniqueKey="collectibles-hub">
                 <OctaneCardHeaderView headerText={localizeWithFallback('collectibles.title', 'Collectibles')} onCloseClick={() => closeHub?.()} />
                 <div className="octane-collectibles-hub-content" data-testid="collectibles-hub">
                     <div className="octane-collectibles-header">

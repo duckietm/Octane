@@ -10,6 +10,7 @@ vi.mock('../octane', () => ({
 }));
 vi.mock('@octane/renderer', () => ({
     KEEP_PROFILE_CUSTOMIZATION: -1,
+    KEEP_PROFILE_AVATAR_POSE: -1,
     RoomUnitBackgroundComposer: class {
         private readonly data: number[];
 
@@ -39,7 +40,14 @@ import {
     PROFILE_FEATURE_THEME,
     profileBackgroundStyleCss,
     resolveProfileBannerUrl,
-    sendProfileCustomization
+    sendProfileCustomization,
+    clampProfileAvatarOffset,
+    normalizeProfileAvatarDirection,
+    PROFILE_AVATAR_MAX_OFFSET,
+    profileAvatarOffsetStyle,
+    profileAvatarPose,
+    profileOverlayOffsetStyle,
+    rotateProfileAvatarDirection
 } from './profileCustomization';
 
 describe('parseProfileCustomizationData', () => {
@@ -98,7 +106,7 @@ describe('sendProfileCustomization', () => {
 
         sendProfileCustomization(profile as never, { banner: 2 });
 
-        expect(sent).toEqual([[1, 2, 3, 4, 5, 2, -1]]);
+        expect(sent).toEqual([[1, 2, 3, 4, 5, 2, -1, -1, 0, 0]]);
         expect(profileRequests).toEqual([9]);
     });
 
@@ -107,7 +115,16 @@ describe('sendProfileCustomization', () => {
 
         sendProfileCustomization(profile as never, { stand: 8 });
 
-        expect(sent).toEqual([[1, 8, 3, 4, 5, -1, -1]]);
+        expect(sent).toEqual([[1, 8, 3, 4, 5, -1, -1, -1, 0, 0]]);
+    });
+
+    it('sends the pose after the accent, with the server told to keep the rest', () => {
+        const profile = { id: 9, backgroundId: 1, standId: 2, overlayId: 3, cardBackgroundId: 4, borderId: 5, bannerId: 6, accentId: 7 };
+
+        sendProfileCustomization(profile as never, { pose: { direction: 5, offsetX: -3, offsetY: 40 } });
+
+        expect(sent).toEqual([[1, 2, 3, 4, 5, -1, -1, 5, -3, PROFILE_AVATAR_MAX_OFFSET]]);
+        expect(profileRequests).toEqual([9]);
     });
 });
 
@@ -151,5 +168,36 @@ describe('figureUnderOverlay', () => {
         expect(figureUnderOverlay(figure, 0)).toBe(figure);
         expect(figureUnderOverlay(figure, 5)).toBe(figure);
         expect(figureUnderOverlay(figure, null)).toBe(figure);
+    });
+});
+
+describe('profile avatar pose', () => {
+    it('keeps the avatar inside the 68 x 135 picture', () => {
+        expect(PROFILE_AVATAR_MAX_OFFSET).toBe(16);
+        expect(clampProfileAvatarOffset(17)).toBe(16);
+        expect(clampProfileAvatarOffset(-40)).toBe(-16);
+        expect(clampProfileAvatarOffset(3.6)).toBe(4);
+        expect(clampProfileAvatarOffset(Number.NaN)).toBe(0);
+    });
+
+    it('turns round the eight directions', () => {
+        expect(rotateProfileAvatarDirection(7, 1)).toBe(0);
+        expect(rotateProfileAvatarDirection(0, -1)).toBe(7);
+        expect(rotateProfileAvatarDirection(2, 3)).toBe(5);
+        expect(normalizeProfileAvatarDirection(9)).toBe(2);
+        expect(normalizeProfileAvatarDirection(undefined)).toBe(2);
+    });
+
+    it('reads the pose of a profile, today\'s look when the server sends none', () => {
+        expect(profileAvatarPose({})).toEqual({ direction: 2, offsetX: 0, offsetY: 0 });
+        expect(profileAvatarPose(null)).toEqual({ direction: 2, offsetX: 0, offsetY: 0 });
+        expect(profileAvatarPose({ avatarDirection: 6, avatarOffsetX: -20, avatarOffsetY: 5 })).toEqual({ direction: 6, offsetX: -16, offsetY: 5 });
+    });
+
+    it('moves the avatar with a translate that adds to its stand transform, and only the effects drawn on it', () => {
+        expect(profileAvatarOffsetStyle(0, 0)).toBeUndefined();
+        expect(profileAvatarOffsetStyle(3, -2)).toEqual({ translate: '3px -2px' });
+        expect(profileOverlayOffsetStyle(6, 3, -2)).toEqual({ translate: '3px -2px' });
+        expect(profileOverlayOffsetStyle(1, 3, -2)).toBeUndefined();
     });
 });

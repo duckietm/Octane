@@ -6,6 +6,7 @@ import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { rarityColor, toHexColor } from '../../hooks/collectibles/collectibles.helpers';
 import { getCollectibleProductName, useCollectibles } from '../../hooks/collectibles/useCollectibles';
 import { CollectibleProductImageView } from './CollectibleProductImageView';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 /**
  * `CollectiblesRewardBoxView` (`collectible_reward_xml`, 424x570): what the user's reward box held, on a
@@ -21,7 +22,7 @@ export const CollectiblesRewardBoxView: FC = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView classNames={['octane-collectibles-reward-box']} frameStyle={3} isResizable={false} uniqueKey="collectibles-reward-box">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} classNames={['octane-collectibles-reward-box']} frameStyle={3} isResizable={false} uniqueKey="collectibles-reward-box">
                 <OctaneCardHeaderView
                     headerText={localizeWithFallback('collectibles.reward_box.notif.title', 'Reward box opened!')}
                     onCloseClick={() => dismissReward?.()}

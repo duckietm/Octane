@@ -266,6 +266,7 @@ export const FriendsListView: FC<{}> = (props) => {
             <>
                 <DraggableWindow
                     uniqueKey="octane-friends"
+                    handheldSheet
                     handleSelector=".hfl-titlebar"
                     windowPosition={DraggableWindowPosition.TOP_LEFT}
                     offsetLeft={110}

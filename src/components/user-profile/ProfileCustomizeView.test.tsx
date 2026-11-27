@@ -92,3 +92,94 @@ describe('ProfileCustomizeView picture tab', () => {
         expect(document.querySelectorAll('.profile-preview')).toHaveLength(1);
     });
 });
+
+describe('ProfileCustomizeView pose tab', () => {
+    afterEach(() => {
+        cleanup();
+        sendProfileCustomization.mockClear();
+    });
+
+    const openPose = async (userProfile: object = profile) => {
+        render(<ProfileCustomizeView userProfile={userProfile as never} onClose={() => undefined} />);
+        fireEvent.click(screen.getByText('Pose'));
+
+        return screen.findByTestId('profile-pose-preview');
+    };
+
+    const avatarOf = (preview: HTMLElement) => preview.querySelector<HTMLElement>('.avatar-image');
+
+    it('comes right after the picture tab', () => {
+        render(<ProfileCustomizeView userProfile={profile as never} onClose={() => undefined} />);
+
+        const tabs = ['Banner', 'Background', 'Picture', 'Pose', 'Border', 'Theme'].map((name) => screen.getByText(name));
+
+        tabs.reduce((previous, tab) => {
+            expect(previous.compareDocumentPosition(tab) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+            return tab;
+        });
+    });
+
+    it('shows the whole picture with the saved pose, today\'s look by default', async () => {
+        const preview = await openPose({ ...profile, figure: 'hd-180-1.ch-210-66', backgroundId: 4, standId: 5, overlayId: 6 });
+
+        expect(preview.querySelector('.profile-background.background-4')).not.toBeNull();
+        expect(preview.querySelector('.profile-stand.stand-5')).not.toBeNull();
+        expect(preview.querySelector('.profile-overlay.overlay-6')).not.toBeNull();
+        expect(avatarOf(preview)?.style.translate ?? '').toBe('');
+        expect(screen.getByTestId('profile-pose-direction')).toHaveTextContent('2');
+        expect(screen.getByRole('button', { name: 'Save pose' })).toBeDisabled();
+    });
+
+    it('turns the avatar both ways round the eight directions', async () => {
+        await openPose({ ...profile, avatarDirection: 7 });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Turn left' }));
+        expect(screen.getByTestId('profile-pose-direction')).toHaveTextContent('0');
+
+        fireEvent.click(screen.getByRole('button', { name: 'Turn right' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Turn right' }));
+        expect(screen.getByTestId('profile-pose-direction')).toHaveTextContent('6');
+    });
+
+    it('nudges the avatar live, stops at the edge of the box and centres it again', async () => {
+        const preview = await openPose({ ...profile, avatarOffsetX: 15 });
+
+        expect(avatarOf(preview)?.style.translate).toBe('15px 0px');
+
+        fireEvent.click(screen.getByRole('button', { name: 'Move right' }));
+        expect(screen.getByTestId('profile-pose-x')).toHaveTextContent('16');
+        expect(screen.getByRole('button', { name: 'Move right' })).toBeDisabled();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Move up' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Move up' }));
+        expect(avatarOf(preview)?.style.translate).toBe('16px -2px');
+
+        fireEvent.click(screen.getByRole('button', { name: 'Centre' }));
+        expect(avatarOf(preview)?.style.translate ?? '').toBe('');
+        expect(screen.getByTestId('profile-pose-y')).toHaveTextContent('0');
+    });
+
+    it('saves the pose through the customisation message', async () => {
+        await openPose();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Turn left' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Move left' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Move down' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Save pose' }));
+
+        expect(sendProfileCustomization).toHaveBeenCalledWith(expect.objectContaining({ id: 9 }), { pose: { direction: 3, offsetX: -1, offsetY: 1 } });
+    });
+
+    it('draws the picker previews with the saved pose', async () => {
+        render(<ProfileCustomizeView userProfile={{ ...profile, avatarDirection: 4, avatarOffsetX: -5, avatarOffsetY: 3 } as never} onClose={() => undefined} />);
+
+        fireEvent.click(screen.getByText('Picture'));
+        await screen.findByRole('button', { name: 'Stand' });
+
+        const previews = document.querySelectorAll<HTMLElement>('.profile-preview .avatar-image');
+
+        expect(previews.length).toBeGreaterThan(0);
+        previews.forEach((avatar) => expect(avatar.style.translate).toBe('-5px 3px'));
+    });
+});

@@ -127,6 +127,16 @@ describe('applyUserFigureUpdate', () => {
         expect(next.borderId).toBe(6);
     });
 
+    it('carries the profile picture pose on a live update, today\'s look when the event has none', () => {
+        const state = buildAvatarInfoUser({ roomIndex: 3 });
+
+        const posed = applyUserFigureUpdate(state, { roomIndex: 3, avatarDirection: 6, avatarOffsetX: -4, avatarOffsetY: 7 } as any) as AvatarInfoUser;
+        const plain = applyUserFigureUpdate(posed, { roomIndex: 3 } as any) as AvatarInfoUser;
+
+        expect([posed.avatarDirection, posed.avatarOffsetX, posed.avatarOffsetY]).toEqual([6, -4, 7]);
+        expect([plain.avatarDirection, plain.avatarOffsetX, plain.avatarOffsetY]).toEqual([2, 0, 0]);
+    });
+
     it('defaults cardBackgroundId to 0 when the server omits it', () => {
         const state = buildAvatarInfoUser({ roomIndex: 3, cardBackgroundId: 7 });
         const event = {

@@ -14,6 +14,19 @@ import {
 import { createPortal } from 'react-dom';
 import { GetLocalStorage, SetLocalStorage, WindowSaveOptions } from '../../api';
 import { DraggableWindowPosition } from './DraggableWindowPosition';
+import { HandheldPeekOptions, resolveHandheldPeek } from '../../api/handheld/handheldPeek';
+import {
+    HANDHELD_WINDOW_MARGIN,
+    HandheldWindowMode,
+    fitAboveKeyboard,
+    fitHandheldFrame,
+    handheldUsableArea,
+    placeHandheldWindow,
+    readSafeInsets
+} from '../../api/handheld/handheldWindowFit';
+import { useHandheldStore } from '../../state/handheldStore';
+import { NativeTextTransformScale } from '../native-text/NativeTextTransformScale';
+import { HandheldPeekControls } from './HandheldPeekControls';
 
 const CURRENT_WINDOWS: HTMLElement[] = [];
 const POS_MEMORY: Map<Key, { x: number; y: number }> = new Map();
@@ -80,6 +93,20 @@ export interface DraggableWindowProps {
     unconstrainedPosition?: boolean;
     /** Told where the window was dropped after a drag (or where an explicit start position was moved to). */
     onPositionChange?: (position: { x: number; y: number }) => void;
+    /** Phone layout: always shown as a sheet over the usable area, even when the window would fit as a dialog. */
+    handheldSheet?: boolean;
+    /**
+     * Phone layout: the window has a fixed pixel layout that cannot reflow. It is drawn smaller as a whole to fit the
+     * screen, down to this scale (0..1); what still does not fit is panned inside the window.
+     */
+    handheldScale?: number;
+    /**
+     * Phone layout, with `handheldScale`: a small window may also be drawn bigger, up to this scale (above 1), so its pixel text and
+     * buttons are not desktop-sized on a phone.
+     */
+    handheldMaxScale?: number;
+    /** Phone layout: the window works on the room and can be put aside to reach it (see resolveHandheldPeek). */
+    handheldPeek?: HandheldPeekOptions;
     children?: ReactNode;
 }
 
@@ -95,7 +122,11 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
         offsetTop = 0,
         initialPosition,
         unconstrainedPosition = false,
-        onPositionChange
+        onPositionChange,
+        handheldSheet = false,
+        handheldScale,
+        handheldMaxScale,
+        handheldPeek
     } = props;
     const [delta, setDelta] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
     const [offset, setOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -106,6 +137,18 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
     const offsetRef = useRef({ x: 0, y: 0 });
     const deltaRef = useRef({ x: 0, y: 0 });
     const dragRef = useRef<{ pointerId: number; startX: number; startY: number; active: boolean } | null>(null);
+    // Phone layout: windows are not dragged but shown as a centred dialog or a sheet over the usable area.
+    const handheldActive = useHandheldStore((state) => state.layout.active);
+    const [handheldMode, setHandheldMode] = useState<HandheldWindowMode | null>(null);
+    const [handheldSheetSize, setHandheldSheetSize] = useState<{ width: number; height: number } | null>(null);
+    const [handheldFrame, setHandheldFrame] = useState<{ scale: number; pan: boolean } | null>(null);
+    const handheldKeyboardInset = useHandheldStore((state) => state.keyboardInset);
+    const naturalSizeRef = useRef<{ width: number; height: number } | null>(null);
+    const frameScaleRef = useRef(1);
+    const modeRef = useRef<HandheldWindowMode | null>(null);
+    const [peekHiddenByUser, setPeekHiddenByUser] = useState(false);
+    const peek = resolveHandheldPeek(handheldActive, handheldPeek, peekHiddenByUser);
+    const scaledFit = handheldScale !== undefined && handheldScale > 0 && !handheldSheet;
     const bringToTop = useCallback(() => {
         let zIndex = 400;
         for (const existingWindow of CURRENT_WINDOWS) {
@@ -156,6 +199,82 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
         return { x: clampedX, y: clampedY };
     }, [unconstrainedPosition]);
 
+    /** Places the window for the phone layout from the size it had before it was ever stretched into a sheet. */
+    const placeForHandheld = useCallback(() => {
+        const element = elementRef.current;
+
+        if (!element) return;
+
+        if (!naturalSizeRef.current) naturalSizeRef.current = { width: element.offsetWidth || 340, height: element.offsetHeight || 462 };
+
+        // A dialog is never stretched, so its size is its content's: it is measured again, for content that changed size since.
+        if (!scaledFit && !handheldSheet && modeRef.current === 'dialog' && element.offsetWidth > 0 && element.offsetHeight > 0) {
+            naturalSizeRef.current = { width: element.offsetWidth, height: element.offsetHeight };
+        }
+
+        // A scaled window is measured again each time: its content can change size (the avatar editor's wardrobe).
+        if (scaledFit) {
+            const rect = (element.firstElementChild as HTMLElement | null)?.getBoundingClientRect();
+
+            if (rect && rect.width > 0 && rect.height > 0) {
+                naturalSizeRef.current = { width: Math.round(rect.width / frameScaleRef.current), height: Math.round(rect.height / frameScaleRef.current) };
+            }
+        }
+
+        const natural = naturalSizeRef.current;
+        const area = handheldUsableArea(window.innerWidth, window.innerHeight, readSafeInsets(document));
+        let mode: HandheldWindowMode;
+        let position: { x: number; y: number };
+        let box: { width: number; height: number } | null = null;
+        let frame: { scale: number; pan: boolean } | null = null;
+        let height = natural.height;
+
+        if (scaledFit) {
+            const fit = fitHandheldFrame(natural.width, natural.height, area, handheldScale, HANDHELD_WINDOW_MARGIN, handheldMaxScale ?? 1);
+            const centred = placeHandheldWindow(fit.width, fit.height, area);
+            const pan = fit.panX || fit.panY || centred.mode === 'sheet';
+
+            mode = 'scaled';
+            frame = { scale: fit.scale, pan };
+            position = pan ? { x: area.left, y: area.top } : { x: centred.x, y: centred.y };
+            box = pan ? { width: area.width, height: area.height } : null;
+            height = fit.height;
+        } else {
+            const placement = handheldSheet ? { mode: 'sheet' as const, x: area.left, y: area.top } : placeHandheldWindow(natural.width, natural.height, area);
+
+            mode = placement.mode;
+            position = { x: placement.x, y: placement.y };
+            box = placement.mode === 'sheet' ? { width: area.width, height: area.height } : null;
+        }
+
+        // The on-screen keyboard opened for a field in this window: the window keeps clear of it.
+        const keyboardInset = useHandheldStore.getState().keyboardInset;
+
+        if (keyboardInset > 0 && element.contains(document.activeElement)) {
+            const raised = fitAboveKeyboard(
+                { mode: box ? 'sheet' : 'dialog', x: position.x, y: position.y },
+                { width: box?.width ?? natural.width, height: box?.height ?? height },
+                area,
+                window.innerHeight,
+                keyboardInset
+            );
+
+            position = { x: raised.x, y: raised.y };
+            if (box) box = { width: box.width, height: raised.height };
+        }
+
+        frameScaleRef.current = frame?.scale ?? 1;
+        modeRef.current = mode;
+        offsetRef.current = { x: position.x, y: position.y };
+        deltaRef.current = { x: 0, y: 0 };
+        setOffset({ x: position.x, y: position.y });
+        setDelta({ x: 0, y: 0 });
+        setHandheldMode(mode);
+        setHandheldSheetSize(box);
+        setHandheldFrame(frame);
+        setIsPositioned(true);
+    }, [scaledFit, handheldSheet, handheldScale, handheldMaxScale]);
+
     const initialX = initialPosition?.x;
     const initialY = initialPosition?.y;
     const hasInitialPosition = initialPosition !== undefined;
@@ -173,6 +292,20 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
     useLayoutEffect(() => {
         const element = elementRef.current as HTMLElement;
         if (!element) return;
+
+        if (handheldActive) {
+            placeForHandheld();
+            return;
+        }
+
+        if (handheldMode !== null) {
+            setHandheldMode(null);
+            setHandheldSheetSize(null);
+            setHandheldFrame(null);
+            frameScaleRef.current = 1;
+            modeRef.current = null;
+            setPeekHiddenByUser(false);
+        }
 
         if (!disableDrag) {
             const handle = element.querySelector(handleSelector);
@@ -206,11 +339,12 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
         setDelta({ x: 0, y: 0 });
         setIsPositioned(true);
         if (hasInitialPosition && (clampedPos.x !== initialX || clampedPos.y !== initialY)) onPositionChange?.(clampedPos);
-    }, [handleSelector, windowPosition, uniqueKey, disableDrag, offsetLeft, offsetTop, clampPosition, initialX, initialY, hasInitialPosition, onPositionChange]);
+        // handheldMode is only read to clear it when the phone layout ends; it is no dependency, so it never re-places the window.
+    }, [handleSelector, windowPosition, uniqueKey, disableDrag, offsetLeft, offsetTop, clampPosition, initialX, initialY, hasInitialPosition, onPositionChange, handheldActive, placeForHandheld]);
 
 
     useEffect(() => {
-        if (!dragHandler) return;
+        if (!dragHandler || handheldActive) return;
 
         const onPointerDown = (event: PointerEvent) => {
             if ((event.target as HTMLElement)?.closest?.('button, input, select, textarea, a')) return;
@@ -282,11 +416,16 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
             dragHandler.removeEventListener('pointerup', onPointerEnd);
             dragHandler.removeEventListener('pointercancel', onPointerEnd);
         };
-    }, [dragHandler, uniqueKey, clampPosition, hasInitialPosition, onPositionChange]);
+    }, [dragHandler, uniqueKey, clampPosition, hasInitialPosition, onPositionChange, handheldActive]);
 
     // A smaller browser window or another monitor must not leave a window out of reach.
     useEffect(() => {
         const keepInView = () => {
+            if (handheldActive) {
+                placeForHandheld();
+                return;
+            }
+
             if (dragRef.current?.active) return;
 
             const clampedPos = clampPosition(offsetRef.current.x, offsetRef.current.y);
@@ -300,10 +439,46 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
         window.addEventListener('resize', keepInView);
 
         return () => window.removeEventListener('resize', keepInView);
-    }, [clampPosition]);
+    }, [clampPosition, handheldActive, placeForHandheld]);
+
+    // The on-screen keyboard opening or closing moves a window that holds the focused field.
+    useEffect(() => {
+        if (!handheldActive) return;
+
+        const element = elementRef.current;
+
+        if (!element || (handheldKeyboardInset > 0 && !element.contains(document.activeElement))) return;
+
+        placeForHandheld();
+    }, [handheldActive, handheldKeyboardInset, placeForHandheld]);
+
+    // A scaled window or a dialog is fitted again when its content changes size (a sheet already fills the area).
+    useEffect(() => {
+        if (!handheldActive || handheldSheet || typeof ResizeObserver === 'undefined') return;
+
+        const content = elementRef.current?.firstElementChild;
+
+        if (!content) return;
+
+        let last = naturalSizeRef.current;
+        const observer = new ResizeObserver(() => {
+            const rect = content.getBoundingClientRect();
+            const width = Math.round(rect.width / frameScaleRef.current);
+            const height = Math.round(rect.height / frameScaleRef.current);
+
+            if (!rect.width || modeRef.current === 'sheet' || (last && Math.abs(last.width - width) <= 1 && Math.abs(last.height - height) <= 1)) return;
+
+            last = { width, height };
+            placeForHandheld();
+        });
+
+        observer.observe(content);
+
+        return () => observer.disconnect();
+    }, [handheldActive, handheldSheet, placeForHandheld]);
 
     useEffect(() => {
-        if (!uniqueKey || hasInitialPosition) return;
+        if (!uniqueKey || hasInitialPosition || handheldActive) return;
 
         const localStorage = GetLocalStorage<WindowSaveOptions>(`nitro.windows.${uniqueKey}`);
         if (!localStorage || !localStorage.offset) return;
@@ -314,15 +489,21 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
         setDelta({ x: 0, y: 0 });
         setOffset({ x: clampedPos.x, y: clampedPos.y });
         setIsPositioned(true);
-    }, [uniqueKey, clampPosition, hasInitialPosition]);
+    }, [uniqueKey, clampPosition, hasInitialPosition, handheldActive]);
 
     return createPortal(
         <div
             ref={elementRef}
             className="absolute draggable-window"
             data-window-key={uniqueKey ?? undefined}
+            data-handheld-window={handheldActive && handheldMode ? handheldMode : undefined}
+            data-handheld-pan={handheldActive && handheldFrame?.pan ? '' : undefined}
+            data-handheld-peeked={peek.hidden ? '' : undefined}
+            data-handheld-fixed={handheldActive && scaledFit ? '' : undefined}
             style={{
                 ...dragStyle,
+                ...(handheldActive && handheldSheetSize ? { width: `${handheldSheetSize.width}px`, height: `${handheldSheetSize.height}px` } : null),
+                ...(handheldActive && handheldFrame ? ({ '--octane-handheld-scale': String(handheldFrame.scale) } as CSSProperties) : null),
                 left: 0,
                 top: 0,
                 transform: `translate3d(${Math.round(offset.x + delta.x)}px, ${Math.round(offset.y + delta.y)}px, 0)`,
@@ -333,7 +514,14 @@ export const DraggableWindow: FC<DraggableWindowProps> = (props) => {
             onMouseDownCapture={onMouseDown}
             onTouchStartCapture={onTouchStart}
         >
-            {children}
+            {/* Labels in a window drawn smaller or bigger are rasterised at the size they are shown, not stretched. Always mounted, so a
+                change of scale never remounts the window's content. */}
+            <NativeTextTransformScale scale={handheldActive && handheldFrame ? handheldFrame.scale : 1} stage={elementRef}>
+                {children}
+            </NativeTextTransformScale>
+            {handheldPeek && (peek.canHide || peek.hidden) && (
+                <HandheldPeekControls options={handheldPeek} state={peek} onHide={() => setPeekHiddenByUser(true)} onShow={() => setPeekHiddenByUser(false)} />
+            )}
         </div>,
         document.getElementById('draggable-windows-container')
     );

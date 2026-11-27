@@ -7,7 +7,15 @@
          The full policy depends on the hotel's hosts and belongs in the web server's headers: see
          docs/secure-production-setup.md, "Content-Security-Policy". -->
     <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- maximum-scale stops the page zooming in when a text field gets focus on a phone; the room has its own pinch zoom.
+         resizes-visual keeps the layout when the on-screen keyboard opens (the chat is lifted above it instead). -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-visual" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>Octane</title>
     <!-- Connection hints for the two domains the loader hits first.
          dns-prefetch + preconnect halve the TLS round-trips on cold load. -->

@@ -4,6 +4,7 @@ import { DraggableWindow, DraggableWindowPosition } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Hint } from '../../../../common/Tooltip';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 export const BOT_SKILL_WINDOW_SIZES = {
     chatter: { width: 278, height: 369 },
@@ -47,7 +48,7 @@ export const AvatarInfoBotSkillWindowView: FC<AvatarInfoBotSkillWindowViewProps>
 
     return (
         <NativeTextTree>
-            <DraggableWindow handleSelector=".air-bot-skill-window-title" initialPosition={initialPosition} windowPosition={DraggableWindowPosition.NOTHING}>
+            <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handleSelector=".air-bot-skill-window-title" initialPosition={initialPosition} windowPosition={DraggableWindowPosition.NOTHING}>
                 <div className={`air-bot-skill-window air-bot-skill-window--${layout}`}>
                     <div className="air-bot-skill-window-title">
                         <span>{title}</span>

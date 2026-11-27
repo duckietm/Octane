@@ -37,6 +37,7 @@ import { Select } from '../../common/Select';
 import { useFriendOnlineNotificationStore } from '../../hooks/friends/friendOnlineNotificationStore';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 type SettingsSection = null | 'audio' | 'chat' | 'other' | 'privacy' | 'wordfilter';
 type VolumeAction = 'system_volume' | 'furni_volume' | 'trax_volume' | 'soundboard_volume';
@@ -51,7 +52,7 @@ interface AirSettingsFrameProps {
 
 const AirSettingsFrame: FC<AirSettingsFrameProps> = ({ backLabel, children, onBack, title, variant }) => (
     <NativeTextTree>
-        <DraggableWindow handleSelector=".air-settings-window__title" uniqueKey="user-settings">
+        <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handleSelector=".air-settings-window__title" uniqueKey="user-settings">
             <section
                 aria-label={title}
                 className={`user-settings-window air-settings-window air-settings-window--${variant} max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]`}

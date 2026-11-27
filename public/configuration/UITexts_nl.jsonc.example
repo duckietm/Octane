@@ -1,5 +1,5 @@
 {
-    // UITexts - Nederlands (nl). 3859 keys, in the same order in every UITexts_*.jsonc file:
+    // UITexts - Nederlands (nl). 3867 keys, in the same order in every UITexts_*.jsonc file:
     // grouped by area, alphabetical inside each area. Keep placeholders (%...%, $(...), {0}, \n, HTML) as they are.
 
     // ------------------------------------------------------------------------
@@ -412,6 +412,20 @@
     "extendedprofile.customize.locked.hc": "Alleen voor Habbo Club-leden.",
     "extendedprofile.customize.locked.rank": "Niet beschikbaar voor jouw rang.",
     "extendedprofile.customize.none": "Geen",
+    "extendedprofile.customize.pose": "Houding",
+    "extendedprofile.customize.pose.direction": "Richting",
+    "extendedprofile.customize.pose.down": "Omlaag",
+    "extendedprofile.customize.pose.hint": "Draai je figuur en verschuif hem binnen je afbeelding. Iedereen ziet het in je profiel en in de infostand van de kamer.",
+    "extendedprofile.customize.pose.left": "Naar links",
+    "extendedprofile.customize.pose.position": "Positie",
+    "extendedprofile.customize.pose.reset": "Centreren",
+    "extendedprofile.customize.pose.right": "Naar rechts",
+    "extendedprofile.customize.pose.save": "Houding opslaan",
+    "extendedprofile.customize.pose.turn_left": "Draai naar links",
+    "extendedprofile.customize.pose.turn_right": "Draai naar rechts",
+    "extendedprofile.customize.pose.up": "Omhoog",
+    "extendedprofile.customize.pose.x": "Links / rechts",
+    "extendedprofile.customize.pose.y": "Omhoog / omlaag",
     "extendedprofile.customize.style": "Je eigen stijl",
     "extendedprofile.customize.style.angle": "Richting",
     "extendedprofile.customize.style.apply": "Stijl toepassen",
@@ -1236,6 +1250,7 @@
     "inventory.furni.filter.main.wall_items": "Muurmeubi",
     "inventory.furni.filter.type.any": "Elk type",
     "inventory.furni.filter.type.clothes": "Kleding",
+    "inventory.furni.filter.type.collectibles": "Collectibles",
     "inventory.furni.filter.type.credit_furni": "Creditmeubi",
     "inventory.furni.filter.type.dimmers": "Dimmers",
     "inventory.furni.filter.type.floors": "Vloeren",
@@ -2054,6 +2069,33 @@
     "octane.game_center.rematch_seconds": "Revanche (%seconds%)",
     "octane.game_center.scroll_down": "Omlaag scrollen",
     "octane.game_center.scroll_up": "Omhoog scrollen",
+
+    // ------------------------------------------------------------------------
+    // octane.handheld
+    // ------------------------------------------------------------------------
+    "octane.handheld.catalog.back": "Terug naar %name%",
+    "octane.handheld.catalog.overview": "Alles uit %name%",
+    "octane.handheld.catalog.pages": "Catalogus pagina's",
+    "octane.handheld.catalog.place": "In kamer plaatsen",
+    "octane.handheld.catalog.results": "Toon %count% resultaten",
+    "octane.handheld.chat_history.close": "Chatgeschiedenis sluiten",
+    "octane.handheld.info.actions": "Acties",
+    "octane.handheld.info.close": "Sluiten",
+    "octane.handheld.info.title": "Info",
+    "octane.handheld.navigator.details": "Kamerdetails",
+    "octane.handheld.navigator.enter": "Naar kamer",
+    "octane.handheld.placement.cancel": "Annuleren",
+    "octane.handheld.placement.hint": "Sleep of tik om het te verplaatsen en plaats het dan.",
+    "octane.handheld.placement.place": "Plaatsen",
+    "octane.handheld.placement.rotate": "Draaien",
+    "octane.handheld.placement.title": "Item plaatsen",
+    "octane.handheld.room_tools.toggle": "Kamerhulpmiddelen",
+    "octane.handheld.window.peek": "Kamer tonen",
+    "octane.handheld.window.peek_done": "Klaar",
+    "octane.handheld.window.peek_return": "Terug naar venster",
+    "octane.handheld.window.pick_area": "Sleep over de kamer om het gebied te kiezen",
+    "octane.handheld.wired.pick_area": "Sleep over de kamer om het gebied te kiezen",
+    "octane.handheld.wired.picked": "Gekozen meubi: %count% / %limit%",
 
     // ------------------------------------------------------------------------
     // octane.help
@@ -3171,6 +3213,13 @@
     "soundboard.silenced.count": "%count% gedempt",
     "soundboard.silenced.restore": "Alles weer aanzetten",
     "soundboard.title": "Soundboard",
+
+    // ------------------------------------------------------------------------
+    // talent
+    // ------------------------------------------------------------------------
+    "talent.track.common.levels.progress": "%progress% / %total% niveaus voltooid",
+    "talent.track.common.levels.title": "Niveaus",
+    "talent.track.common.tasks.title": "Taken",
 
     // ------------------------------------------------------------------------
     // toolbar

@@ -1,0 +1,154 @@
+/*
+ * Phone quests, quest details, daily tasks and the small progression widgets (quest tracker, next quest timer).
+ * Scoped to :root[data-handheld] (set only on a phone-sized touch device by the handheld watcher), so QuestsView.css
+ * stays as it is on desktop. The quest list and daily tasks open as sheets (handheldSheet); their 470 / 402 px rows
+ * take the sheet's width, the quest and task columns stack in portrait and stay side by side in landscape.
+ * The reward track, talent track and achievements are fixed frames, scaled instead (HandheldFrames.css).
+ */
+
+/* ---------------------------------------------------------------- quests */
+
+:root[data-handheld] .octane-quests,
+:root[data-handheld] .octane-daily-tasks {
+    width: 100% !important;
+    max-width: none;
+}
+
+:root[data-handheld] :is(.octane-quests-content, .octane-daily-tasks-content) {
+    min-height: 0;
+    overflow: hidden;
+}
+
+:root[data-handheld] :is(.octane-quests-list, .octane-daily-tasks-list) {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-quest-entry {
+    width: 100%;
+}
+
+:root[data-handheld] .octane-quest-block {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+}
+
+/* Portrait: the campaign card is a strip above its quest, the quest picture beside the text. */
+:root[data-handheld='portrait'] .octane-quest-entry {
+    flex-direction: column;
+}
+
+:root[data-handheld='portrait'] .octane-quest-campaign {
+    width: 100%;
+    height: auto;
+    min-height: 64px;
+}
+
+:root[data-handheld] .octane-quest-block-actions {
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+:root[data-handheld] .octane-quest-block-actions button,
+:root[data-handheld] .octane-quest-accept {
+    min-height: 40px;
+}
+
+:root[data-handheld] .octane-quest-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 4px;
+}
+
+:root[data-handheld] .octane-quests-hc-info {
+    flex-wrap: wrap;
+}
+
+:root[data-handheld] .octane-quests-get-hc {
+    min-height: 40px;
+}
+
+:root[data-handheld] .octane-quest-details {
+    width: min(493px, calc(100vw - 24px)) !important;
+}
+
+:root[data-handheld] .octane-quest-details-content {
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+}
+
+:root[data-handheld] .octane-quest-details-content button {
+    min-height: 40px;
+}
+
+/* ---------------------------------------------------------------- daily tasks */
+
+:root[data-handheld] .octane-daily-task {
+    width: 100%;
+}
+
+:root[data-handheld] .octane-daily-task-left {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+}
+
+/* Portrait: the reward box goes under the task, its rewards and the claim button in one row. */
+:root[data-handheld='portrait'] .octane-daily-task {
+    flex-direction: column;
+}
+
+:root[data-handheld='portrait'] .octane-daily-task-right {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+}
+
+:root[data-handheld='portrait'] .octane-daily-task-reward-title {
+    flex: 1 0 100%;
+}
+
+:root[data-handheld] .octane-daily-task-claim,
+:root[data-handheld] .octane-daily-tasks-extra button {
+    min-height: 40px;
+}
+
+:root[data-handheld='portrait'] .octane-daily-task-claim {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 120px;
+}
+
+/* ---------------------------------------------------------------- reward track premium confirm */
+
+:root[data-handheld] .octane-reward-track-premium {
+    width: min(420px, calc(100vw - 24px)) !important;
+}
+
+:root[data-handheld] .octane-reward-track-premium-buttons button {
+    min-height: 44px;
+}
+
+/* ---------------------------------------------------------------- tracker and timer */
+
+/* They sat right above the desktop toolbar; on a phone they sit above the chat line, inside the safe area. */
+:root[data-handheld] .octane-quest-tracker,
+:root[data-handheld] .octane-next-quest-timer {
+    right: calc(6px + var(--octane-safe-right));
+    bottom: calc(var(--octane-handheld-toolbar) + 60px + var(--octane-safe-bottom));
+}
+
+:root[data-handheld] .octane-quest-tracker-moreinfo,
+:root[data-handheld] .octane-next-quest-timer-toggle {
+    min-height: 32px;
+}
+
+:root[data-handheld][data-handheld-keyboard] :is(.octane-quest-tracker, .octane-next-quest-timer) {
+    visibility: hidden;
+}

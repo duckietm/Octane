@@ -4,6 +4,7 @@ import { Button, Column, OctaneCardContentView, OctaneCardHeaderView, OctaneCard
 import { useFurnitureExchangeWidget } from '../../../../hooks';
 import '../../../../css/room/FurniWindowsBAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 export const FurnitureExchangeCreditView: FC<{}> = (props) => {
     const { objectId = -1, value = 0, isNft = false, onClose = null, redeem = null } = useFurnitureExchangeWidget();
@@ -12,7 +13,7 @@ export const FurnitureExchangeCreditView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-widget-exchange-credit octane-furni-exchange-credit" theme="primary-slim">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-widget-exchange-credit octane-furni-exchange-credit" theme="primary-slim">
                 <OctaneCardHeaderView headerText={LocalizeText('catalog.redeem.dialog.title')} onCloseClick={onClose} />
                 <OctaneCardContentView center>
                     <div className="flex gap-2 overflow-hidden">

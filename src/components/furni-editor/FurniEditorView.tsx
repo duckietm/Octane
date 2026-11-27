@@ -10,6 +10,7 @@ import { BaseButton } from '../../common/BaseButton';
 import '../../css/furni-editor/FurniEditorAirText.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { localizeWithFallback } from '../../api';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 const TAB_SEARCH = 0;
 const TAB_EDIT = 1;
@@ -144,7 +145,7 @@ export const FurniEditorView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView uniqueKey="furni-editor" className="octane-furni-editor w-[780px] h-[600px] min-w-[720px] min-h-[560px]">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="furni-editor" className="octane-furni-editor w-[780px] h-[600px] min-w-[720px] min-h-[560px]">
                 <OctaneCardHeaderView headerText={localizeWithFallback('octane.furni_editor.furni_editor', 'Furni Editor')} onCloseClick={handleClose} />
                 <OctaneCardTabsView>
                     <OctaneCardTabsItemView isActive={activeTab === TAB_SEARCH} onClick={() => setActiveTab(TAB_SEARCH)}>

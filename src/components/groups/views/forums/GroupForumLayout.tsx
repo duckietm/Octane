@@ -5,6 +5,7 @@ import { MessageData } from '@octane/renderer';
 import { DraggableWindowPosition, LayoutBadgeImageView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { flatText, GroupText, GroupWindowTitle } from '../GroupNativeLayout';
 import { BaseButton } from '../../../../common/BaseButton';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 export const FORUM_PAGE_SIZE = 20;
 
@@ -67,7 +68,7 @@ interface ForumFrameProps {
 
 /** A group forum window: frame 3 with the help and close buttons, its client origin 6px right of and 25px below the frame corner. */
 export const ForumFrame: FC<ForumFrameProps> = ({ uniqueKey, className, title, width, height, minWidth = width, minHeight = height, isResizable = false, initialPosition, onClose, onHelp, children }) => (
-    <OctaneCardView
+    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
         aria-label={title}
         className={`octane-forum ${className}`}
         frameStyle={3}

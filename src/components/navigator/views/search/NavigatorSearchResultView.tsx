@@ -10,6 +10,7 @@ import navViewRow from '../../../../assets/images/navigator/air/nav-view-row.png
 import navViewThumbs from '../../../../assets/images/navigator/air/nav-view-thumbs.png';
 import { LayoutSearchSavesView } from '../../../../common';
 import { useNavigatorData, useNavigatorUiStore, usePerkAllowed } from '../../../../hooks';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 import { NavigatorSearchResultItemView } from './NavigatorSearchResultItemView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
@@ -37,6 +38,9 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
     // AIR BlockResultsView: without the thumbnail perk every block is rows, except under the official view.
     const officialView = topLevelContext?.code === 'official_view' || parentCode === 'official_view';
     const displayMode = thumbnailPerk ? chosenMode : officialView ? searchResult.mode : NavigatorSearchResultViewDisplayMode.LIST;
+    // Phone layout: rooms are always the tall touch rows, so the list / tiles switch is left out.
+    const isHandheld = useIsHandheld();
+    const canSwitchMode = thumbnailPerk && !isHandheld;
 
     const getResultTitle = () => {
         const name = searchResult.code;
@@ -73,7 +77,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
         else if (topLevelContext) store.setSearch(topLevelContext.code, '');
     };
 
-    const isTileMode = displayMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS;
+    const isTileMode = !isHandheld && displayMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS;
     const resultTitle = getResultTitle();
     const listViewLabel = localizeWithFallback('navigator.viewmode.list', 'Show rooms as a list');
     const tileViewLabel = localizeWithFallback('navigator.viewmode.tiles', 'Show rooms as tiles');
@@ -94,7 +98,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                         <span>{resultTitle}</span>
                     </Collapsible.Trigger>
                     <div className="octane-navigator-air__category-controls">
-                        {isExtended && thumbnailPerk && displayMode === NavigatorSearchResultViewDisplayMode.LIST && (
+                        {isExtended && canSwitchMode && displayMode === NavigatorSearchResultViewDisplayMode.LIST && (
                             <Hint content={tileViewLabel}>
                                 <BaseButton
                                     type="button"
@@ -106,7 +110,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                                 </BaseButton>
                             </Hint>
                         )}
-                        {isExtended && thumbnailPerk && isTileMode && (
+                        {isExtended && canSwitchMode && isTileMode && (
                             <Hint content={listViewLabel}>
                                 <BaseButton
                                     type="button"

@@ -32,7 +32,7 @@ export const FloorplanImportExport: FC<Props> = ({ state, dispatch, onClose, onS
 
     return (
         <NativeTextTree>
-            <OctaneCardView uniqueKey="floorplan-import-export" theme="primary-slim" className="w-[630px] h-[475px]">
+            <OctaneCardView handheldSheet uniqueKey="floorplan-import-export" theme="primary-slim" className="w-[630px] h-[475px]">
                 <OctaneCardHeaderView headerText={LocalizeText('floor.plan.editor.import.export')} onCloseClick={onClose} />
                 <OctaneCardContentView className="flex flex-col gap-2">
                     <textarea className="form-control w-full flex-1 font-mono" value={raw} onChange={(e) => setRaw(e.target.value)} />

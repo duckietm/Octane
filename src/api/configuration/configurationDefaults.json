@@ -272,6 +272,7 @@
     "toolbar.fortunewheel.enabled": true,
     "toolbar.stories.enabled": false,
     "toolbar.new_additions.notification.enabled": true,
+    "ui.handheld.enabled": true,
     "ui.native.text.enabled": true,
     "user.custom.filter.enabled": true,
     "hotel_alert_animated": false,
