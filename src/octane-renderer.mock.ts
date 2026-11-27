@@ -458,6 +458,18 @@ export class RoomEngineAreaHideStateEvent extends StubClass {
 
 export class RoomAreaSelectionManager extends StubClass {
     static readonly HIGHLIGHT_DARKEN = 'highlight_darken';
+    static readonly NOT_ACTIVE = 0;
+    static readonly NOT_SELECTING_AREA = 1;
+    static readonly AWAITING_MOUSE_DOWN = 2;
+    static readonly SELECTING = 3;
+}
+
+// The operations of the selected room object the handheld room input checks (placing / moving an item).
+export class RoomObjectOperationType {
+    static readonly OBJECT_UNDEFINED = 'OBJECT_UNDEFINED';
+    static readonly OBJECT_MOVE = 'OBJECT_MOVE';
+    static readonly OBJECT_MOVE_TO = 'OBJECT_MOVE_TO';
+    static readonly OBJECT_PLACE = 'OBJECT_PLACE';
 }
 
 // Generic plugin channel: the message event and the action composer, which keeps what it sends.

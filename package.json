@@ -38,7 +38,7 @@
         "@fontsource/cherry-bomb-one": "^5.3.0",
         "@fontsource/pixelify-sans": "^5.3.0",
         "@fontsource/vampiro-one": "^5.3.0",
-        "@tanstack/react-query": "^5.108.1",
+        "@tanstack/react-query": "^5.107.1",
         "@tanstack/react-virtual": "^3.14.26",
         "dompurify": "^3.4.18",
         "emoji-mart": "^5.6.0",
@@ -63,13 +63,13 @@
         "@types/node": "^26.6.6",
         "@types/react": "^19.3.0",
         "@types/react-dom": "^19.3.0",
-        "@typescript-eslint/parser": "^8.73.0",
+        "@typescript-eslint/parser": "^8.72.2",
         "@vitejs/plugin-react": "^6.3.0",
         "babel-plugin-react-compiler": "^1.0.0",
         "eslint": "^10.15.0",
         "eslint-plugin-react-hooks": "^7.1.1",
         "jsdom": "^30.1.3",
-        "knip": "6.46.1",
+        "knip": "6.45.1",
         "postcss": "^8.5.33",
         "postcss-nested": "^9.0.0",
         "sirv": "^3.0.2",
@@ -77,6 +77,6 @@
         "typescript": "^6.0.3",
         "typescript7": "npm:typescript@^7.0.2",
         "vite": "^8.3.8",
-        "vitest": "^5.1.1"
+        "vitest": "^5.1.0"
     }
 }

@@ -126,7 +126,7 @@ export const QuestsView: FC<{}> = () => {
         <NativeTextTree>
             <>
                 {isVisible && (
-                    <OctaneCard className="octane-quests" uniqueKey="quests" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={-30}>
+                    <OctaneCard className="octane-quests" handheldSheet uniqueKey="quests" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={-30}>
                         <OctaneCard.Header headerText={localizeWithFallback('quests.list.caption', 'Quests')} onCloseClick={() => setIsVisible(false)} />
                         <OctaneCard.Content className="octane-quests-content">
                             <div className="octane-quests-list">

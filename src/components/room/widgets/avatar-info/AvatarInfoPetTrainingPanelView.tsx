@@ -7,6 +7,7 @@ import { NativeText } from '../../../../common/native-text/NativeText';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useMessageEvent, useRoom, useSessionInfo } from '../../../../hooks';
 import { Native3Button, Native3Frame } from '../../../mod-tools/native/NativeWindow3';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 // The official pet_commands layout: a style-3 frame 195 wide coloured 0xff67a3bf, the pet in a 71x90 box at (5, 7) and its name at (76, 43) of the
 // client area, and the commands from (6, 103) as 84x22 style-3 buttons, two a row (x 0 and 86, a row every 25px). PetCommandTool sizes the
@@ -73,7 +74,7 @@ export const AvatarInfoPetTrainingPanelView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <DraggableWindow handleSelector=".native3-title" initialPosition={DEFAULT_LOCATION}>
+            <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handleSelector=".native3-title" initialPosition={DEFAULT_LOCATION}>
                 <Native3Frame color={FRAME_COLOR} height={commandsHeight + CHROME_HEIGHT} title={title} width={WIDTH} onClose={() => setPetTrainInformation(null)}>
                     <div style={{ position: 'absolute', left: 5, top: 7, width: 71, height: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                         <LayoutPetImageView direction={2} figure={petData.figure} posture="std" />

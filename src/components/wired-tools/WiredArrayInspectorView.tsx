@@ -9,6 +9,7 @@ import { NO_PAGE } from './WiredPaging.helpers';
 import { NumberInput } from '../../common/NumberInput';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 export const WIRED_ARRAY_INSPECTOR_PAGE_SIZE = 25;
 const REQUEST_PAGE_RATELIMIT = 300;
@@ -155,7 +156,7 @@ export const WiredArrayInspectorView = (props: WiredArrayInspectorViewProps) => 
 
     return (
         <NativeTextTree>
-            <OctaneCardView
+            <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
                 className="octane-wired-menu min-w-[620px] max-w-[620px] max-h-[620px]"
                 theme="primary-slim"
                 uniqueKey="wired-array-inspector"

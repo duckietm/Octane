@@ -19,6 +19,7 @@ import { useFurnitureRecolorWidget } from '../../../../hooks';
 import { Select } from '../../../../common/Select';
 import '../../../../css/room/FurniWindowsCAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 const WHITE = 0xffffff;
 
@@ -97,7 +98,7 @@ export const FurnitureRecolorView: FC = () =>
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-furni-recolor" theme="primary-slim">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-furni-recolor" theme="primary-slim">
                 <OctaneCardHeaderView headerText={localizeWithFallback('furniture.recolor.title', 'Recolor furniture')} onCloseClick={close} />
                 <OctaneCardContentView gap={2}>
                     <Text bold small>

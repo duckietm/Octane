@@ -26,6 +26,7 @@ import { InventoryFurnitureItemView } from './InventoryFurnitureItemView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 
 const attemptPlaceMarketplaceOffer = (groupItem: GroupItem, collectible = false) => {
     const item = groupItem.getLastItem();
@@ -58,6 +59,9 @@ export const InventoryFurnitureView: FC<{
     const [isVisible, setIsVisible] = useState(false);
     const { groupItems = [], isLoaded = false, selectedItem = null, setSelectedItem = null, activate = null, deactivate = null } = useInventoryFurni();
     const tabItems = sectionGroupItems ?? groupItems;
+    // Phone layout: a finger on the preview looks at the furni (and may scroll past it); it does not pick it up as a
+    // mouse press does. The place button is the way into the room there.
+    const isHandheld = useIsHandheld();
     const { resetItems = null } = useInventoryUnseenTracker();
     const playTestRestricted = usePlayTestRestricted();
     const { data: marketplaceConfiguration = null } = useMarketplaceConfiguration();
@@ -182,7 +186,7 @@ export const InventoryFurnitureView: FC<{
                     <div
                         className="octane-inventory-furni-preview-stage"
                         onPointerDown={(event) => {
-                            if (event.button !== 0 || !roomSession || !selectedItem) return;
+                            if (isHandheld || event.button !== 0 || !roomSession || !selectedItem) return;
                             if ([FurniCategory.FLOOR, FurniCategory.WALL_PAPER, FurniCategory.LANDSCAPE].includes(selectedItem.category)) return;
                             attemptItemPlacement(selectedItem);
                         }}
@@ -191,7 +195,7 @@ export const InventoryFurnitureView: FC<{
                             fitParent
                             roomPreviewer={roomPreviewer}
                             onPreviewClick={() => {
-                                if (roomSession) attemptItemPlacement(selectedItem);
+                                if (roomSession && !isHandheld) attemptItemPlacement(selectedItem);
                             }}
                         />
                         {selectedItem && (

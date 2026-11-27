@@ -16,6 +16,7 @@ import { useHasPermission } from '../../hooks';
 import { CalendarItemView } from './CalendarItemView';
 import '../../css/campaign/CampaignCalendarView.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 interface CalendarViewProps {
     onClose(): void;
@@ -97,7 +98,7 @@ export const CalendarView: FC<CalendarViewProps> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView uniqueKey="campaign-calendar" className="octane-campaign-calendar" theme="primary-slim" style={{ width: spinnerWidth }}>
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="campaign-calendar" className="octane-campaign-calendar" theme="primary-slim" style={{ width: spinnerWidth }}>
                 <OctaneCardHeaderView
                     headerText={localizeWithFallback(`campaign.calendar.${campaignName}.title`, localizeWithFallback('campaign.calendar.title', 'Calendar'))}
                     onCloseClick={onClose}

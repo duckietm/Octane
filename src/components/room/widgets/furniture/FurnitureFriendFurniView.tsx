@@ -5,6 +5,7 @@ import { useFurnitureFriendFurniWidget } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/FurniWindowsBAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 const formatEngravingDate = (value: string) => {
     if (!value) return value;
@@ -39,7 +40,7 @@ export const FurnitureFriendFurniView: FC<{}> = (props) => {
 
         return (
             <NativeTextTree>
-                <OctaneCardView className="octane-engraving-lock octane-furni-lock-confirm" theme="primary-slim">
+                <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-engraving-lock octane-furni-lock-confirm" theme="primary-slim">
                     <OctaneCardHeaderView headerText={LocalizeText('friend.furniture.confirm.lock.caption')} onCloseClick={cancelLock ?? onClose} />
                     <OctaneCardContentView>
                         <h5 className="octane-furni-lock-confirm__subtitle text-black text-center font-bold mt-2 mb-2">{LocalizeText('friend.furniture.confirm.lock.subtitle')}</h5>
@@ -68,7 +69,7 @@ export const FurnitureFriendFurniView: FC<{}> = (props) => {
 
         return (
             <NativeTextTree>
-                <DraggableWindow handleSelector=".octane-engraving-lock-view">
+                <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} handleSelector=".octane-engraving-lock-view">
                     <div className={`octane-engraving-lock-view octane-furni-lovelock ${engravingTypeClass}`.trim()}>
                         <BaseButton type="button" className="engraving-lock-close" onClick={onClose} aria-label={localizeWithFallback('octane.room.close', 'Close')} />
                         <div className="engraving-lock-avatar engraving-lock-avatar--left">

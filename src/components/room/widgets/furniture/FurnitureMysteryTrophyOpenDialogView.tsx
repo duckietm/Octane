@@ -5,6 +5,7 @@ import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Te
 import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/FurniWindowsBAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 interface FurnitureMysteryTrophyOpenDialogViewProps {
     objectId: number;
@@ -24,7 +25,7 @@ export const FurnitureMysteryTrophyOpenDialogView: FC<FurnitureMysteryTrophyOpen
 
     return (
         <NativeTextTree>
-            <OctaneCardView
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE}
                 isResizable={false}
                 className="octane-mysterytrophy-dialog octane-furni-mysterytrophy min-w-0 w-[min(400px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                 theme="primary-slim"

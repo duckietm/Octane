@@ -16,6 +16,7 @@ import { BaseButton } from '../../../../common/BaseButton';
 import { canCraftMixerVerdict, countInMixer, CraftingMixerVerdict, MIXER_CAPACITY } from '../../../../hooks/rooms/widgets/furniture/furnitureCraftingMixer';
 import '../../../../css/room/FurniWindowsCAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 /** The official info texts of the free mixer, with English for a hotel whose texts lack them. */
 const MIXER_INFO: Record<CraftingMixerVerdict, [key: string, fallback: string]> = {
@@ -81,7 +82,7 @@ export const FurnitureCraftingView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-widget-crafting" theme="primary-slim">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-widget-crafting" theme="primary-slim">
                 <OctaneCardHeaderView headerText={LocalizeText('crafting.title')} onCloseClick={onClose} />
                 <OctaneCardContentView>
                     <div className="crafting-widget-layout flex grow! gap-2 overflow-hidden">

@@ -1,5 +1,5 @@
 {
-    // UITexts - Español (es). 3859 keys, in the same order in every UITexts_*.jsonc file:
+    // UITexts - Español (es). 3867 keys, in the same order in every UITexts_*.jsonc file:
     // grouped by area, alphabetical inside each area. Keep placeholders (%...%, $(...), {0}, \n, HTML) as they are.
 
     // ------------------------------------------------------------------------
@@ -412,6 +412,20 @@
     "extendedprofile.customize.locked.hc": "Solo para miembros de Habbo Club.",
     "extendedprofile.customize.locked.rank": "No disponible para tu rango.",
     "extendedprofile.customize.none": "Ninguno",
+    "extendedprofile.customize.pose": "Postura",
+    "extendedprofile.customize.pose.direction": "Dirección",
+    "extendedprofile.customize.pose.down": "Bajar",
+    "extendedprofile.customize.pose.hint": "Gira tu personaje y muévelo dentro de tu imagen. Todos lo ven en tu perfil y en el infostand de la sala.",
+    "extendedprofile.customize.pose.left": "Mover a la izquierda",
+    "extendedprofile.customize.pose.position": "Posición",
+    "extendedprofile.customize.pose.reset": "Centrar",
+    "extendedprofile.customize.pose.right": "Mover a la derecha",
+    "extendedprofile.customize.pose.save": "Guardar postura",
+    "extendedprofile.customize.pose.turn_left": "Girar a la izquierda",
+    "extendedprofile.customize.pose.turn_right": "Girar a la derecha",
+    "extendedprofile.customize.pose.up": "Subir",
+    "extendedprofile.customize.pose.x": "Izquierda / derecha",
+    "extendedprofile.customize.pose.y": "Arriba / abajo",
     "extendedprofile.customize.style": "Tu propio estilo",
     "extendedprofile.customize.style.angle": "Dirección",
     "extendedprofile.customize.style.apply": "Aplicar estilo",
@@ -1236,6 +1250,7 @@
     "inventory.furni.filter.main.wall_items": "Furni de pared",
     "inventory.furni.filter.type.any": "Cualquier tipo",
     "inventory.furni.filter.type.clothes": "Ropa",
+    "inventory.furni.filter.type.collectibles": "Coleccionables",
     "inventory.furni.filter.type.credit_furni": "Furni de créditos",
     "inventory.furni.filter.type.dimmers": "Reguladores de luz",
     "inventory.furni.filter.type.floors": "Suelos",
@@ -2054,6 +2069,33 @@
     "octane.game_center.rematch_seconds": "Revancha (%seconds%)",
     "octane.game_center.scroll_down": "Desplazar abajo",
     "octane.game_center.scroll_up": "Desplazar arriba",
+
+    // ------------------------------------------------------------------------
+    // octane.handheld
+    // ------------------------------------------------------------------------
+    "octane.handheld.catalog.back": "Volver a %name%",
+    "octane.handheld.catalog.overview": "Todo %name%",
+    "octane.handheld.catalog.pages": "Páginas del catálogo",
+    "octane.handheld.catalog.place": "Colocar en la sala",
+    "octane.handheld.catalog.results": "Ver %count% resultados",
+    "octane.handheld.chat_history.close": "Cerrar historial del chat",
+    "octane.handheld.info.actions": "Acciones",
+    "octane.handheld.info.close": "Cerrar",
+    "octane.handheld.info.title": "Info",
+    "octane.handheld.navigator.details": "Detalles de la sala",
+    "octane.handheld.navigator.enter": "Ir a la sala",
+    "octane.handheld.placement.cancel": "Cancelar",
+    "octane.handheld.placement.hint": "Arrastra o toca para moverlo y luego colócalo.",
+    "octane.handheld.placement.place": "Colocar",
+    "octane.handheld.placement.rotate": "Girar",
+    "octane.handheld.placement.title": "Colocando un objeto",
+    "octane.handheld.room_tools.toggle": "Herramientas de sala",
+    "octane.handheld.window.peek": "Ver la sala",
+    "octane.handheld.window.peek_done": "Listo",
+    "octane.handheld.window.peek_return": "Volver a la ventana",
+    "octane.handheld.window.pick_area": "Arrastra sobre la sala para elegir la zona",
+    "octane.handheld.wired.pick_area": "Arrastra sobre la sala para elegir la zona",
+    "octane.handheld.wired.picked": "Furnis elegidos: %count% / %limit%",
 
     // ------------------------------------------------------------------------
     // octane.help
@@ -3171,6 +3213,13 @@
     "soundboard.silenced.count": "%count% silenciados",
     "soundboard.silenced.restore": "Reactivar todos",
     "soundboard.title": "Mesa de sonidos",
+
+    // ------------------------------------------------------------------------
+    // talent
+    // ------------------------------------------------------------------------
+    "talent.track.common.levels.progress": "%progress% / %total% niveles completados",
+    "talent.track.common.levels.title": "Niveles",
+    "talent.track.common.tasks.title": "Tareas",
 
     // ------------------------------------------------------------------------
     // toolbar

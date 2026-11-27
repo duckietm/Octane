@@ -38,6 +38,7 @@ import { CameraSkinButton } from './CameraSkinButton';
 import { Checkbox } from '../../../common/Checkbox';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 export interface CameraWidgetCheckoutViewProps {
     base64Url: string;
@@ -375,7 +376,7 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-camera-checkout" frameStyle={3} isResizable={false} theme="primary-slim">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-camera-checkout" frameStyle={3} isResizable={false} theme="primary-slim">
                 <div className="octane-card-header-shell">
                     <span className="octane-card-title">
                         <CameraCenteredText background={0x484949} color={0xffffff} text={LocalizeText('camera.confirm_phase.title')} textStyle="u_frame_title" width={340} />

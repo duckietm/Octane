@@ -1,5 +1,5 @@
 {
-    // UITexts - العربية (ar). 3859 keys, in the same order in every UITexts_*.jsonc file:
+    // UITexts - العربية (ar). 3867 keys, in the same order in every UITexts_*.jsonc file:
     // grouped by area, alphabetical inside each area. Keep placeholders (%...%, $(...), {0}, \n, HTML) as they are.
 
     // ------------------------------------------------------------------------
@@ -412,6 +412,20 @@
     "extendedprofile.customize.locked.hc": "لأعضاء نادي هابو فقط.",
     "extendedprofile.customize.locked.rank": "غير متاح لرتبتك.",
     "extendedprofile.customize.none": "لا شيء",
+    "extendedprofile.customize.pose": "الوضعية",
+    "extendedprofile.customize.pose.direction": "الاتجاه",
+    "extendedprofile.customize.pose.down": "تحريك للأسفل",
+    "extendedprofile.customize.pose.hint": "أدر شخصيتك وحرّكها داخل صورتك. يراها الجميع في ملفك الشخصي وفي لوحة المعلومات في الغرفة.",
+    "extendedprofile.customize.pose.left": "تحريك لليسار",
+    "extendedprofile.customize.pose.position": "الموضع",
+    "extendedprofile.customize.pose.reset": "توسيط",
+    "extendedprofile.customize.pose.right": "تحريك لليمين",
+    "extendedprofile.customize.pose.save": "حفظ الوضعية",
+    "extendedprofile.customize.pose.turn_left": "استدارة لليسار",
+    "extendedprofile.customize.pose.turn_right": "استدارة لليمين",
+    "extendedprofile.customize.pose.up": "تحريك للأعلى",
+    "extendedprofile.customize.pose.x": "يسار / يمين",
+    "extendedprofile.customize.pose.y": "أعلى / أسفل",
     "extendedprofile.customize.style": "نمطك الخاص",
     "extendedprofile.customize.style.angle": "الاتجاه",
     "extendedprofile.customize.style.apply": "تطبيق النمط",
@@ -1236,6 +1250,7 @@
     "inventory.furni.filter.main.wall_items": "عناصر الجدار",
     "inventory.furni.filter.type.any": "أي نوع",
     "inventory.furni.filter.type.clothes": "الملابس",
+    "inventory.furni.filter.type.collectibles": "المقتنيات",
     "inventory.furni.filter.type.credit_furni": "أثاث الكريديت",
     "inventory.furni.filter.type.dimmers": "مخفّتات الإضاءة",
     "inventory.furni.filter.type.floors": "الأرضيات",
@@ -2054,6 +2069,33 @@
     "octane.game_center.rematch_seconds": "مباراة جديدة (%seconds%)",
     "octane.game_center.scroll_down": "التمرير لأسفل",
     "octane.game_center.scroll_up": "التمرير لأعلى",
+
+    // ------------------------------------------------------------------------
+    // octane.handheld
+    // ------------------------------------------------------------------------
+    "octane.handheld.catalog.back": "العودة إلى %name%",
+    "octane.handheld.catalog.overview": "كل %name%",
+    "octane.handheld.catalog.pages": "صفحات الكتالوج",
+    "octane.handheld.catalog.place": "ضع في الغرفة",
+    "octane.handheld.catalog.results": "عرض %count% نتيجة",
+    "octane.handheld.chat_history.close": "إغلاق سجل الدردشة",
+    "octane.handheld.info.actions": "إجراءات",
+    "octane.handheld.info.close": "إغلاق",
+    "octane.handheld.info.title": "معلومات",
+    "octane.handheld.navigator.details": "تفاصيل الغرفة",
+    "octane.handheld.navigator.enter": "اذهب إلى الغرفة",
+    "octane.handheld.placement.cancel": "إلغاء",
+    "octane.handheld.placement.hint": "اسحب أو انقر لتحريكه، ثم ضعه.",
+    "octane.handheld.placement.place": "ضع",
+    "octane.handheld.placement.rotate": "تدوير",
+    "octane.handheld.placement.title": "وضع عنصر",
+    "octane.handheld.room_tools.toggle": "أدوات الغرفة",
+    "octane.handheld.window.peek": "أظهر الغرفة",
+    "octane.handheld.window.peek_done": "تم",
+    "octane.handheld.window.peek_return": "العودة إلى النافذة",
+    "octane.handheld.window.pick_area": "اسحب فوق الغرفة لاختيار المنطقة",
+    "octane.handheld.wired.pick_area": "اسحب فوق الغرفة لاختيار المنطقة",
+    "octane.handheld.wired.picked": "الأثاث المختار: %count% / %limit%",
 
     // ------------------------------------------------------------------------
     // octane.help
@@ -3171,6 +3213,13 @@
     "soundboard.silenced.count": "%count% مكتوم",
     "soundboard.silenced.restore": "إلغاء كتم الكل",
     "soundboard.title": "لوحة الأصوات",
+
+    // ------------------------------------------------------------------------
+    // talent
+    // ------------------------------------------------------------------------
+    "talent.track.common.levels.progress": "%progress% / %total% مستويات مكتملة",
+    "talent.track.common.levels.title": "المستويات",
+    "talent.track.common.tasks.title": "المهام",
 
     // ------------------------------------------------------------------------
     // toolbar

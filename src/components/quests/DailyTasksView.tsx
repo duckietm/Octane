@@ -150,7 +150,7 @@ export const DailyTasksView: FC<{}> = () => {
     return (
         <NativeTextTree>
             <>
-                <OctaneCard className="octane-daily-tasks" uniqueKey="daily-tasks" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={-30}>
+                <OctaneCard className="octane-daily-tasks" handheldSheet uniqueKey="daily-tasks" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={-30}>
                     <OctaneCard.Header headerText={getDailyTasksWindowCaption(maxSecondsLeft)} onCloseClick={() => setIsVisible(false)} />
                     <OctaneCard.Content className="octane-daily-tasks-content">
                         {unclaimedTasks.length > 0 && (
@@ -188,6 +188,7 @@ export const DailyTasksView: FC<{}> = () => {
                     <OctaneCard
                         className="octane-daily-tasks octane-daily-tasks-unclaimed"
                         uniqueKey="daily-tasks-unclaimed"
+                        handheldSheet
                         windowPosition={DraggableWindowPosition.CENTER}
                     >
                         <OctaneCard.Header

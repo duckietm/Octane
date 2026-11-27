@@ -74,6 +74,7 @@ import { Hint } from '../../../../common/Tooltip';
 import { Popover, PopoverContent } from '../../../../common/FloatingPopover';
 import '../../../../css/room/FurniWindowsCAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 const CREDITS = -1;
 const NON_DIGITS = /\D/g;
@@ -547,7 +548,7 @@ export const FurnitureChestView: FC = () => {
         <NativeTextTree>
             <>
                 {/* ===== MAIN WINDOW ===== */}
-                <OctaneCardView className="octane-widget-chest" theme="primary-slim" style={{ width: 460 }}>
+                <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-widget-chest" theme="primary-slim" style={{ width: 460 }}>
                     <OctaneCardHeaderView headerText={chestName} onCloseClick={close} />
                     <OctaneCardContentView>
                         {stuff.locked && !isOwner && (
@@ -823,7 +824,7 @@ export const FurnitureChestView: FC = () => {
 
                 {/* ===== SETTINGS ===== */}
                 {showSettings && (
-                    <OctaneCardView className="octane-widget-chest-settings octane-chest-settings" theme="primary-slim" frameStyle={3} isResizable={false} style={{ width: 300 }}>
+                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-widget-chest-settings octane-chest-settings" theme="primary-slim" frameStyle={3} isResizable={false} style={{ width: 300 }}>
                         <OctaneCardHeaderView
                             headerText={LocalizeText('wiredchests.settings.title', ['chest_type'], [chestTypeLabel])}
                             onCloseClick={() => setShowSettings(false)}
@@ -878,7 +879,7 @@ export const FurnitureChestView: FC = () => {
 
                 {/* ===== NOTIFICATIONS ===== */}
                 {showNotifications && (
-                    <OctaneCardView className="octane-widget-chest-notifications octane-chest-settings" theme="primary-slim" frameStyle={3} isResizable={false} style={{ width: 350 }}>
+                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-widget-chest-notifications octane-chest-settings" theme="primary-slim" frameStyle={3} isResizable={false} style={{ width: 350 }}>
                         <OctaneCardHeaderView
                             headerText={LocalizeText('wiredchests.notification_settings.title', ['chest_type'], [chestTypeLabel])}
                             onCloseClick={() => setShowNotifications(false)}
@@ -932,7 +933,7 @@ export const FurnitureChestView: FC = () => {
 
                 {/* ===== UPGRADE ===== */}
                 {showUpgrade && (
-                    <OctaneCardView className="octane-widget-chest-upgrade" theme="primary-slim" style={{ width: 340 }}>
+                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-widget-chest-upgrade" theme="primary-slim" style={{ width: 340 }}>
                         <OctaneCardHeaderView headerText={LocalizeText('wiredchests.upgrade.title')} onCloseClick={() => setShowUpgrade(false)} />
                         <OctaneCardContentView>
                             <Column gap={2}>
@@ -1009,7 +1010,7 @@ export const FurnitureChestView: FC = () => {
 
                 {/* ===== WIRED UPGRADE CONFIRM (AIR WiredChestWiredUpdateConfirmationView) ===== */}
                 {confirmWiredUpgrade && showSettings && (
-                    <OctaneCardView className="octane-widget-chest-confirm" theme="primary-slim" style={{ width: 360 }}>
+                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-widget-chest-confirm" theme="primary-slim" style={{ width: 360 }}>
                         <OctaneCardHeaderView
                             headerText={localizeWithFallback('wiredchests.upgrade.title', 'Chest upgrade')}
                             onCloseClick={() => setConfirmWiredUpgrade(false)}
@@ -1055,7 +1056,7 @@ export const FurnitureChestView: FC = () => {
                 )}
 
                 {confirmLock !== null && (
-                    <OctaneCardView className="octane-widget-chest-confirm" theme="primary-slim" style={{ width: 340 }}>
+                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-widget-chest-confirm" theme="primary-slim" style={{ width: 340 }}>
                         <OctaneCardHeaderView
                             headerText={localizeWithFallback(
                                 confirmLock ? 'wiredchests.lock.confirm.title' : 'wiredchests.unlock.confirm.title',
@@ -1117,7 +1118,7 @@ export const FurnitureChestView: FC = () => {
                 </Popover>
 
                 {confirmWithdrawAll && (
-                    <OctaneCardView className="octane-widget-chest-confirm" theme="primary-slim" style={{ width: 320 }}>
+                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-widget-chest-confirm" theme="primary-slim" style={{ width: 320 }}>
                         <OctaneCardHeaderView headerText={LocalizeText('wiredchests.withdraw_all.confirm.title')} onCloseClick={() => setConfirmWithdrawAll(false)} />
                         <OctaneCardContentView>
                             <Column gap={2}>

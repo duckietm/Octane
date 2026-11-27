@@ -7,6 +7,7 @@ import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { Radio } from '../../common/Radio';
 import { useFirstLoginSetup } from '../../hooks/session/useFirstLoginSetup';
 import { useUserDataSnapshot } from '../../hooks/session/useSessionSnapshots';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 /**
  * The welcome window of an account that was made outside Octane's register screen: the look and starter room that
@@ -22,7 +23,7 @@ export const FirstLoginSetupView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-first-login" isResizable={false} uniqueKey="first-login-setup">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-first-login" isResizable={false} uniqueKey="first-login-setup">
                 <OctaneCardHeaderView headerText={localizeWithFallback('first_login.title', 'Welcome!')} onCloseClick={dismiss} />
                 <OctaneCardContentView className="octane-first-login__content" overflow="hidden">
                     <div className="octane-first-login__intro">

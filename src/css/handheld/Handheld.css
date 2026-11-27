@@ -1,0 +1,313 @@
+/*
+ * Phone layout. Every rule below the first one is scoped to :root[data-handheld], which the handheld
+ * watcher only sets on a phone-sized touch device (see src/api/handheld/handheldWatcher.ts), so the desktop
+ * layout never sees any of it. Later stages refine single windows on top of these generic rules.
+ */
+
+/* The larger close target of card windows exists on every layout but is only shown on phones. */
+.octane-card-close-hit {
+    display: none;
+}
+
+:root[data-handheld] {
+    --octane-safe-top: env(safe-area-inset-top, 0px);
+    --octane-safe-right: env(safe-area-inset-right, 0px);
+    --octane-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --octane-safe-left: env(safe-area-inset-left, 0px);
+    --octane-handheld-toolbar: 52px;
+    --octane-handheld-accent: #1e7295;
+    --octane-handheld-panel: rgba(32, 31, 33, 0.94);
+    --octane-handheld-line: rgba(255, 255, 255, 0.14);
+}
+
+:root[data-handheld] body {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+/* The room reads every finger itself (tap, drag, hold, pinch): the browser must not scroll or zoom it. */
+:root[data-handheld] .octane-app-root canvas {
+    touch-action: none;
+}
+
+:root[data-handheld] button,
+:root[data-handheld] .tb-icon {
+    touch-action: manipulation;
+}
+
+/* ---------------------------------------------------------------- windows */
+
+:root[data-handheld] .draggable-window[data-handheld-window] .drag-handler {
+    cursor: default;
+}
+
+:root[data-handheld] .draggable-window[data-handheld-window='sheet'] {
+    display: flex;
+    flex-direction: column;
+}
+
+/* A window bigger than the screen fills the usable area and scrolls inside, instead of hanging off it. */
+:root[data-handheld] .draggable-window[data-handheld-window='sheet'] > * {
+    flex: 1 1 auto;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    resize: none !important;
+}
+
+:root[data-handheld] .draggable-window[data-handheld-window] .octane-card-shell {
+    resize: none;
+}
+
+:root[data-handheld] .draggable-window[data-handheld-window='scaled'] {
+    width: max-content;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+}
+
+/* A fixed-layout window drawn smaller as a whole: its pixel layout stays, the scale comes from DraggableWindow. */
+:root[data-handheld] .draggable-window[data-handheld-window='scaled'] > * {
+    flex: none;
+    zoom: var(--octane-handheld-scale, 1);
+}
+
+/* Still bigger than the screen at its smallest readable scale: it fills the usable area and pans inside. */
+:root[data-handheld] .draggable-window[data-handheld-pan] {
+    display: flex;
+    overflow: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .draggable-window[data-handheld-pan] > * {
+    margin: auto;
+}
+
+:root[data-handheld] .octane-card-close-hit {
+    display: block;
+    position: absolute;
+    inset: -13px;
+}
+
+/* ---------------------------------------------------------------- toolbar and chat */
+
+:root[data-handheld] .tb-touch-bar {
+    width: calc(100vw - 12px - var(--octane-safe-left) - var(--octane-safe-right)) !important;
+    margin-bottom: calc(3px + var(--octane-safe-bottom)) !important;
+}
+
+:root[data-handheld] .tb-touch-bar .tb-bar-scroll {
+    gap: 10px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .tb-touch-side {
+    left: calc(4px + var(--octane-safe-left)) !important;
+}
+
+:root[data-handheld] .tb-frame {
+    bottom: calc(var(--octane-handheld-toolbar) + 8px + var(--octane-safe-bottom)) !important;
+    width: calc(100vw - 16px - var(--octane-safe-left) - var(--octane-safe-right)) !important;
+    max-width: none !important;
+    height: 44px !important;
+}
+
+/* With the keyboard open the toolbar steps aside and the chat line sits right on top of the keyboard. */
+:root[data-handheld][data-handheld-keyboard] .tb-frame {
+    bottom: calc(var(--octane-keyboard-inset, 0px) + 6px) !important;
+}
+
+:root[data-handheld][data-handheld-keyboard] .tb-touch-bar,
+:root[data-handheld][data-handheld-keyboard] .tb-touch-side,
+:root[data-handheld][data-handheld-keyboard] .octane-handheld-placement {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- furni placement */
+
+.octane-handheld-placement {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--octane-handheld-toolbar) + 60px + var(--octane-safe-bottom, 0px));
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    max-width: calc(100vw - 24px);
+    padding: 8px 12px 10px;
+    border: 1px solid var(--octane-handheld-line);
+    border-radius: 14px;
+    background: var(--octane-handheld-panel);
+    color: #fff;
+    transform: translateX(-50%);
+    pointer-events: auto;
+}
+
+.octane-handheld-placement__hint {
+    margin: 0;
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+}
+
+.octane-handheld-placement__actions {
+    display: flex;
+    gap: 18px;
+}
+
+.octane-handheld-placement__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+    background: #3b3a3c;
+    color: #fff;
+    font-size: 20px;
+}
+
+.octane-handheld-placement__button.is-place {
+    background: #3c8a2e;
+}
+
+.octane-handheld-placement__button.is-cancel {
+    background: #a8322b;
+}
+
+.octane-handheld-placement__button:active {
+    transform: scale(0.94);
+}
+
+/* ---------------------------------------------------------------- infostand sheet */
+
+.octane-handheld-info-sheet {
+    position: fixed;
+    left: var(--octane-safe-left, 0px);
+    right: var(--octane-safe-right, 0px);
+    bottom: 0;
+    z-index: 85;
+    display: flex;
+    flex-direction: column;
+    max-height: min(62vh, 520px);
+    padding-bottom: var(--octane-safe-bottom, 0px);
+    border: 1px solid var(--octane-handheld-line);
+    border-bottom: 0;
+    border-radius: 14px 14px 0 0;
+    background: var(--octane-handheld-panel);
+    color: #fff;
+    pointer-events: auto;
+    transition: transform 160ms ease-out;
+    animation: octane-handheld-sheet-in 180ms ease-out;
+}
+
+.octane-handheld-info-sheet[data-pulling] {
+    transition: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-info-sheet {
+    left: auto;
+    top: var(--octane-safe-top, 0px);
+    width: min(360px, 50vw);
+    max-height: none;
+    border-bottom: 1px solid var(--octane-handheld-line);
+    border-radius: 14px 0 0 14px;
+}
+
+.octane-handheld-info-sheet__grip {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 4px;
+    touch-action: none;
+}
+
+.octane-handheld-info-sheet__grip-bar {
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.45);
+}
+
+.octane-handheld-info-sheet__bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 0 10px 6px;
+}
+
+.octane-handheld-info-sheet__actions {
+    min-height: 36px;
+    margin-right: auto;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 18px;
+    background: var(--octane-handheld-accent);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.octane-handheld-info-sheet__actions[aria-expanded='true'] {
+    background: #2b2a2c;
+}
+
+.octane-handheld-info-sheet__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 18px;
+}
+
+.octane-handheld-info-sheet__body {
+    min-height: 0;
+    overflow: auto;
+    padding: 0 10px 10px;
+    overscroll-behavior: contain;
+}
+
+/* The desktop infostand is a fixed-width column; in the sheet it takes the sheet's width. */
+.octane-handheld-info-sheet__body > * {
+    width: 100% !important;
+    max-width: none !important;
+    pointer-events: auto;
+}
+
+@keyframes octane-handheld-sheet-in {
+    from {
+        transform: translateY(24px);
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .octane-handheld-info-sheet {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* ---------------------------------------------------------------- pixel text */
+
+/* A small Volter label in a window that reflows is drawn larger on a phone (NativeLabel, handheldVolterSize). */
+:root[data-handheld] octane-label[data-handheld-size] {
+    font-size: var(--octane-handheld-label-size) !important;
+}

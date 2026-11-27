@@ -7,6 +7,7 @@ import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { getClickedAnchor } from './getClickedAnchor';
 import { fetchHabboPage } from './fetchHabboPage';
 import { createLatestRequest } from './latestRequest';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 const NEW_LINE_REGEX = /\n\r|\n|\r/gm;
 /** Help pages shipped in the client's own public folder. */
@@ -121,7 +122,7 @@ export const OctanepediaView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView uniqueKey="octanepedia"
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="octanepedia"
                 className="octanepedia w-[450px] h-[400px] max-w-[90vw] max-h-[85vh]"
                 style={dimensions ? { width: dimensions.width, height: dimensions.height } : {}}
                 theme="primary-slim">

@@ -22,6 +22,7 @@ import { WiredChestTransactionDetails, WiredChestTransactionDetailsView } from '
 import { chestTransactionMethodText, lastChestLogPage, summarizeChestTransaction } from './WiredChestTransactions.helpers';
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
 import { NO_PAGE } from './WiredPaging.helpers';
+import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 /** Rows per page, the size the chests tab asks for too. */
 export const CHEST_LOG_PAGE_SIZE = 10;
@@ -161,7 +162,7 @@ export const WiredChestTransactionLogView: FC<WiredChestTransactionLogViewProps>
     return (
         <NativeTextTree>
             <>
-                <OctaneCardView className="octane-widget-chest-log octane-chest-log" theme="primary-slim" uniqueKey={`chest-transaction-log-${chestId}`}>
+                <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE} className="octane-widget-chest-log octane-chest-log" theme="primary-slim" uniqueKey={`chest-transaction-log-${chestId}`}>
                     <OctaneCardHeaderView headerText={localizeWithFallback('wiredchests.logs.title', 'Transaction log')} onCloseClick={onClose} />
                     <OctaneCardContentView>
                         <div className="octane-chest-log__body">

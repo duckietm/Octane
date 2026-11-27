@@ -1,0 +1,90 @@
+/*
+ * Phone layout of the fixed-layout windows: the reward track (1103 x 722), the talent track (800 x 580), the avatar
+ * editor (490 x 523) and the achievements (389 wide). Their AIR layouts are pixel coordinates, so on a phone they are
+ * not reflowed but drawn smaller as a whole (DraggableWindow / AirModalDialog `handheldScale`, see fitHandheldFrame):
+ * down to a readable minimum, and panned with a finger where they still do not fit. Scoped to :root[data-handheld];
+ * the narrow-viewport fallbacks of their own stylesheets (which squeeze them and scroll inside) are switched off here,
+ * since the whole frame is scaled instead.
+ */
+
+/* ---------------------------------------------------------------- avatar editor */
+
+:root[data-handheld] .octane-avatar-editor {
+    width: 490px !important;
+    min-width: 490px;
+    max-width: 490px !important;
+    height: 523px !important;
+    min-height: 523px;
+    max-height: 523px !important;
+}
+
+:root[data-handheld] .octane-avatar-editor.is-wardrobe-open {
+    width: 669px !important;
+    min-width: 669px;
+    max-width: 669px !important;
+}
+
+:root[data-handheld] .octane-avatar-editor .octane-avatar-editor-content.octane-card-content-shell {
+    height: 490px !important;
+    max-height: 490px !important;
+    flex: 0 0 490px;
+    overflow: hidden !important;
+}
+
+/* ---------------------------------------------------------------- achievements */
+
+:root[data-handheld] .octane-card-shell.octane-achievements-air,
+:root[data-handheld] .draggable-window:has(> .octane-achievements-air) {
+    width: 389px !important;
+    min-width: 389px !important;
+    max-width: 389px !important;
+}
+
+:root[data-handheld] .draggable-window[data-handheld-window='scaled']:has(> .octane-achievements-air) {
+    width: max-content !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+
+/* Panned, the window is the usable area's width (the inline size DraggableWindow gives it, which the narrow-screen
+   rule of AchievementsView.css would otherwise override with its !important width). */
+:root[data-handheld] .draggable-window[data-handheld-pan]:has(> .octane-achievements-air) {
+    width: calc(100vw - var(--octane-safe-left) - var(--octane-safe-right)) !important;
+}
+
+:root[data-handheld] .octane-achievements-air .air-achievements-content.octane-card-content-shell {
+    overflow: hidden;
+}
+
+/* ---------------------------------------------------------------- reward track */
+
+/* The list rows follow a finger dragged up and down (RewardTrackScrollList); a sideways drag pans the window. */
+:root[data-handheld] .octane-reward-track-scroll-viewport {
+    touch-action: pan-x;
+}
+
+/* The lift of the custom scrollbar is dragged on its own; the browser must not pan the window with it. */
+:root[data-handheld] .octane-reward-track-scrollbar-lift {
+    touch-action: none;
+}
+
+/* ---------------------------------------------------------------- talent track (an AIR modal dialog) */
+
+:root[data-handheld] .octane-air-modal[data-handheld-pan] {
+    /* Centred with auto margins instead, which fall back to the start edge when the frame is bigger than the screen. */
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-air-modal[data-handheld-pan] > .octane-air-modal__window {
+    margin: auto;
+}
+
+:root[data-handheld] .octane-air-modal__window[data-handheld-scaled] {
+    flex: none;
+    max-height: none;
+    zoom: var(--octane-handheld-scale, 1);
+}

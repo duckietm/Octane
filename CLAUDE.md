@@ -120,6 +120,8 @@ login/WebGL, so they're not usable for in-game verification.
   `TabBar`, `InlineDialog` (dialog mounted inline; `modal="trap-focus"` for the catalog confirms), `CollapsibleSection`, `Tooltip`,
   `ToggleButton` (every `aria-pressed` two-state button, incl. `InfiniteGrid.Item`), `ListSelect` (Base UI Select with the
   caller's own trigger/classes, for custom drop menus), `SuggestInput` (text input + Autocomplete list, replaces `<datalist>`),
+  `HierarchicalDropdown` (AIR's fly-out menu: a Base UI Menu whose branch rows open a column beside them; pick rows in tests
+  with `src/test-utils/chooseHierarchicalOption.ts`),
   `Slider` with `orientation="vertical"`. `Hint` (in `common/Tooltip.tsx`) gives an icon-only control a tooltip without a
   wrapper element: use it instead of a `title` attribute and keep an `aria-label`. A `div role="button"` is never right:
   use `BaseButton` / `ToggleButton` (unless the region contains its own button).

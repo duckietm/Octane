@@ -1,0 +1,208 @@
+/*
+ * Phone user profile, profile customize (with the pose tab), the purse and the right side column. Scoped to
+ * :root[data-handheld] (set only on a phone-sized touch device by the handheld watcher), so the desktop windows of
+ * UserProfileView.css / PurseView.css are left as they are. The two profile windows open as sheets
+ * (DraggableWindow handheldSheet); inside them the content scrolls and the columns stack in portrait.
+ */
+
+/* ---------------------------------------------------------------- profile */
+
+:root[data-handheld] .octane-extended-profile-window,
+:root[data-handheld] .octane-profile-customize {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    max-height: none !important;
+}
+
+/* The whole profile scrolls as one page instead of clipping the groups panel. */
+:root[data-handheld] .octane-extended-profile-window__content {
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-extended-profile-window__body--groups {
+    flex: 0 0 auto;
+    min-height: 260px;
+    overflow: visible;
+}
+
+:root[data-handheld] .octane-extended-profile-window__panel {
+    height: auto;
+}
+
+:root[data-handheld='portrait'] .octane-extended-profile__top {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+}
+
+:root[data-handheld='portrait'] .octane-extended-profile__separator {
+    display: none;
+}
+
+:root[data-handheld] .octane-extended-profile__summary-button {
+    min-height: 44px;
+    padding: 0 6px;
+}
+
+:root[data-handheld] .octane-extended-profile__friend-button,
+:root[data-handheld] .octane-extended-profile__block-button,
+:root[data-handheld] .octane-extended-profile__link {
+    min-height: 36px;
+}
+
+:root[data-handheld] .octane-extended-profile__banner-edit {
+    min-width: 40px;
+    min-height: 40px;
+}
+
+:root[data-handheld] .octane-extended-profile-groups__list {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ---------------------------------------------------------------- profile customize */
+
+:root[data-handheld] .octane-profile-customize .octane-card-tabs-shell {
+    flex: 0 0 auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-profile-customize .octane-card-tab-item {
+    flex: 0 0 auto;
+    min-height: 36px;
+    touch-action: manipulation;
+}
+
+:root[data-handheld] .octane-profile-customize .octane-card-content-shell {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-profile-customize button {
+    touch-action: manipulation;
+}
+
+:root[data-handheld] .octane-profile-customize .octane-profile-customize__style-row {
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+:root[data-handheld] .octane-profile-customize .octane-profile-customize__style-row > button {
+    min-height: 40px;
+}
+
+/* Border and pose: the large picture above its controls in portrait, beside them in landscape. */
+:root[data-handheld='portrait'] .octane-profile-customize__border-layout,
+:root[data-handheld='portrait'] .octane-profile-customize__pose {
+    flex-direction: column;
+    align-items: center;
+}
+
+:root[data-handheld='portrait'] .octane-profile-customize__border-layout > .octane-profile-customize__sections,
+:root[data-handheld='portrait'] .octane-profile-customize__pose > .octane-profile-customize__sections {
+    width: 100%;
+}
+
+/* The pose pad: four 44 px arrows in their cross, so a one-pixel nudge is one tap. */
+:root[data-handheld] .octane-profile-customize__pose-position {
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+:root[data-handheld] .octane-profile-customize__pose-pad {
+    grid-template-columns: repeat(3, 44px);
+    grid-template-rows: repeat(3, 44px);
+    gap: 4px;
+}
+
+:root[data-handheld] .octane-profile-customize__pose-arrow {
+    border-radius: 8px;
+    touch-action: manipulation;
+}
+
+:root[data-handheld] .octane-profile-customize__pose-arrow svg {
+    width: 16px;
+    height: 16px;
+}
+
+:root[data-handheld] .octane-profile-customize__pose-sliders {
+    flex: 1 1 180px;
+    gap: 10px;
+}
+
+:root[data-handheld] .octane-profile-customize__pose-slider {
+    gap: 10px;
+}
+
+:root[data-handheld] .octane-profile-customize__pose-slider > span:first-child {
+    flex: 0 0 76px;
+}
+
+/* The compact slider's 12 px thumb is too small for a finger: a 28 px thumb on a 40 px tall control. */
+:root[data-handheld] .octane-profile-customize .octane-slider.octane-slider--compact {
+    height: 40px;
+    touch-action: none;
+}
+
+:root[data-handheld] .octane-profile-customize .octane-slider.octane-slider--compact .thumb {
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+}
+
+:root[data-handheld] .octane-profile-customize .octane-slider.octane-slider--compact .track {
+    height: 5px;
+}
+
+:root[data-handheld] .octane-profile-customize input:not([type='checkbox']):not([type='radio']),
+:root[data-handheld] .octane-profile-customize textarea {
+    font-size: 16px;
+}
+
+/* ---------------------------------------------------------------- purse and right side column */
+
+/*
+ * The right column (purse, notices, group info, offers, notifications) starts under the notch and stops above
+ * the chat line and toolbar strip; it scrolls on its own when the widgets are taller than that, so it never
+ * reaches down over the room tools and the chat.
+ */
+:root[data-handheld] .octane-right-side {
+    top: var(--octane-safe-top);
+    right: calc(4px + var(--octane-safe-right));
+    width: min(230px, calc(100vw - 24px - var(--octane-safe-left) - var(--octane-safe-right)));
+    height: auto;
+    max-height: calc(100% - var(--octane-safe-top) - var(--octane-safe-bottom) - var(--octane-handheld-toolbar) - 64px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* A narrow phone in portrait: the AIR column (purse box and widgets alike) is drawn at 85 %, so the room keeps more
+   of the top edge. Width and height are the column's own 230 px layout at that scale. */
+:root[data-handheld='portrait'] .octane-right-side {
+    width: 196px;
+}
+
+:root[data-handheld='portrait'] .octane-right-side > * {
+    width: 230px !important;
+    zoom: 0.85;
+}
+
+/* In landscape the screen is short: the column is held to the top half, the rest of the right edge stays room. */
+:root[data-handheld='landscape'] .octane-right-side {
+    max-height: calc(55% - var(--octane-safe-top));
+}
+
+:root[data-handheld] .octane-purse-menu {
+    min-width: 180px;
+}
+
+:root[data-handheld] .octane-purse-menu .octane-purse-menu__item {
+    min-height: 44px;
+}

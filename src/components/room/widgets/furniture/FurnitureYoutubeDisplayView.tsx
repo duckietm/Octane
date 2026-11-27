@@ -6,6 +6,7 @@ import ReactPlayer from '../../../youtube/YoutubeReactPlayer';
 import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/FurniWindowsCAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 interface FurnitureYoutubeDisplayViewProps extends AutoGridProps {}
 
@@ -43,7 +44,7 @@ export const FurnitureYoutubeDisplayView: FC<{}> = (FurnitureYoutubeDisplayViewP
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="youtube-tv-widget">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="youtube-tv-widget">
                 <OctaneCardHeaderView headerText={LocalizeText('catalog.page.youtube_tvs')} onCloseClick={onClose} />
                 <OctaneCardContentView>
                     <div className="row size-full">

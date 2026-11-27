@@ -4,6 +4,8 @@ import { loadNativeFont, measureNativeText, peekNativeFont } from './NativeFont'
 import { NativeText } from './NativeText';
 import { isNativeTextEnabled } from './nativeTextEnabled';
 import { CssNativeFont, resolveCssNativeFont } from './resolveCssNativeFont';
+import { HANDHELD_FIXED_FRAME_SELECTOR, handheldVolterSize } from '../../api/handheld/handheldTextSize';
+import { isHandheldActive } from '../../state/handheldStore';
 
 // The host is a custom element: a window's generic `span` / `i` rules (colours, sizes) would otherwise land on it instead of
 // letting it inherit the text's own style.
@@ -74,13 +76,25 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
     const hostRef = useRef<HTMLElement>(null);
     const [measurement, setMeasurement] = useState<Measurement | null>(null);
     const [resizeTick, setResizeTick] = useState(0);
-    const key = `${text}\u0000${String(stateKey)}\u0000${resizeTick}`;
+    // Phone layout: the size a small Volter label is drawn at instead of its CSS one (see handheldVolterSize); 0 when it keeps it.
+    const [handheldSize, setHandheldSize] = useState<number | null>(null);
+    const key = `${text}\u0000${String(stateKey)}\u0000${resizeTick}\u0000${handheldSize}`;
     const current = measurement?.key === key ? measurement : null;
 
     useLayoutEffect(() => {
         const host = hostRef.current;
 
         if (!host || measurement?.key === key) return;
+
+        // Decided once, before the label is measured: the enlarged size is then set on the host, so the browser lays the text out at it too.
+        if (handheldSize === null && isHandheldActive()) {
+            const hostCss = getComputedStyle(host);
+            const enlarged = host.closest(HANDHELD_FIXED_FRAME_SELECTOR) ? null : handheldVolterSize(hostCss.fontFamily, parseFloat(hostCss.fontSize));
+
+            setHandheldSize(enlarged ?? 0);
+
+            return;
+        }
         if (!isNativeTextEnabled()) {
             setMeasurement({ key, font: null, lines: 1 });
 
@@ -138,7 +152,7 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
             ellipsisBox,
             align: lines > 1 ? ALIGN[css.textAlign] : undefined
         });
-    }, [key, measurement?.key]);
+    }, [key, measurement?.key, handheldSize]);
 
     // A wrapped label follows its container's width: when that really changes, the browser lays the text out again. Changes up to a
     // scrollbar's width are left alone: the raster's own height can show or hide a scrollbar, and measuring again on that would
@@ -226,9 +240,13 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
         return disconnect;
     }, [key, ellipsisStyle, ellipsisFont, currentClip]);
 
+    // The phone size goes through a custom property and a phone-only rule (Handheld.css): set inline it would clash with `font: inherit`.
+    const sizeStyle = handheldSize ? ({ '--octane-handheld-label-size': `${handheldSize}px` } as CSSProperties) : null;
+    const sizeFlag = handheldSize ? '' : undefined;
+
     if (!current?.font)
         return (
-            <octane-label ref={hostRef} style={INHERIT}>
+            <octane-label ref={hostRef} data-handheld-size={sizeFlag} style={sizeStyle ? { ...INHERIT, ...sizeStyle } : INHERIT}>
                 {text}
             </octane-label>
         );
@@ -243,11 +261,12 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
         display: 'inline-flex',
         alignItems: 'center',
         verticalAlign: 'top',
-        maxWidth: '100%'
+        maxWidth: '100%',
+        ...sizeStyle
     };
 
     return (
-        <octane-label ref={hostRef} className="octane-native-label" style={hostStyle}>
+        <octane-label ref={hostRef} className="octane-native-label" data-handheld-size={sizeFlag} style={hostStyle}>
             <NativeText
                 align={align}
                 background={null}

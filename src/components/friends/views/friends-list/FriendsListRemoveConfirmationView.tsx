@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { LocalizeText } from '../../../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 interface FriendsRemoveConfirmationViewProps {
     selectedFriendsIds: number[];
@@ -19,7 +20,7 @@ export const FriendsRemoveConfirmationView: FC<FriendsRemoveConfirmationViewProp
 
     return (
         <NativeTextTree>
-            <OctaneCardView
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
                 className="octane-friends-remove-confirmation min-w-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                 theme="primary-slim"
                 isResizable={false}

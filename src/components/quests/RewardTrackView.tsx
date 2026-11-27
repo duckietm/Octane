@@ -1,3 +1,4 @@
+import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 import {
     AddLinkEventTracker,
     CreateLinkEvent,
@@ -31,8 +32,7 @@ import {
     NotificationAlertType,
     REWARD_TRACK_BAR_WIDTH,
     RewardTrackTaskFilter,
-    resolveRewardTrackTheme,
-    rewardTrackColorToCss
+    resolveRewardTrackTheme
 } from '../../api';
 import availableIcon from '../../assets/images/reward-track/available-icon.png';
 import checkmarkIcon from '../../assets/images/reward-track/checkmark.png';
@@ -59,6 +59,7 @@ import { Hint } from '../../common/Tooltip';
 import { useHasPermission, useNotification, useRewardTrackProgressBar, useRewardTracks, useUserDataSnapshot } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { RewardTrackAdminView } from './RewardTrackAdminView';
+import { RewardTrackMiniBar } from './RewardTrackMiniBar';
 import { RewardTrackScrollList } from './RewardTrackScrollList';
 
 const CURRENCY_TYPES: Record<string, number> = { credits: -1, duckets: 0, diamonds: 5 };
@@ -104,25 +105,6 @@ const RewardTrackTaskGlyph: FC<{ actionType: string; large?: boolean }> = ({ act
         <NativeTextTree>
             <div className={large ? 'octane-reward-track-detail-glyph' : 'octane-reward-track-task-glyph'}>
                 {url && <img src={url} alt="" draggable={false} />}
-            </div>
-        </NativeTextTree>
-    );
-};
-
-/**
- * A loading_bar of the task rows and levels (RewardTrackTaskProgressBarView): grey track, orange fill that
- * turns green over 300 ms once full, with its gloss. The fill moves with AIR's accelerated mover.
- */
-const RewardTrackMiniBar: FC<{ ratio: number; width: number; snapKey: string; levelIndex?: number }> = ({ ratio, width, snapKey, levelIndex = -1 }) => {
-    const bar = useRewardTrackProgressBar({ ratio, maxWidth: width, animate: true, snapKey, task: true, levelIndex });
-
-    return (
-        <NativeTextTree>
-            <div className="octane-reward-track-mini-bar" style={{ width }} data-complete={ratio >= 1}>
-                <div className="octane-reward-track-mini-bar-progress" style={{ width: bar.width }}>
-                    <div className="octane-reward-track-mini-bar-fill" style={{ backgroundColor: rewardTrackColorToCss(bar.color) }} />
-                    <div className="octane-reward-track-mini-bar-gloss" />
-                </div>
             </div>
         </NativeTextTree>
     );
@@ -485,7 +467,13 @@ export const RewardTrackView: FC<{}> = () => {
     return (
         <NativeTextTree>
             <>
-                <OctaneCard className="octane-reward-track resize-none" uniqueKey="reward-track" windowPosition={DraggableWindowPosition.TOP_CENTER} style={themeStyle}>
+                <OctaneCard
+                    className="octane-reward-track resize-none"
+                    handheldScale={HANDHELD_MIN_FRAME_SCALE}
+                    uniqueKey="reward-track"
+                    windowPosition={DraggableWindowPosition.TOP_CENTER}
+                    style={themeStyle}
+                >
                     <OctaneCard.Header headerText={localizeWithFallback('reward_track.title', 'Reward Track')} onCloseClick={() => setTrackId(null)} />
                     <OctaneCard.Content className="octane-reward-track-content">
                         {isEditor && !editMode && track && (

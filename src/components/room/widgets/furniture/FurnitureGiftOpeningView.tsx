@@ -5,6 +5,7 @@ import { Button, Column, LayoutGiftTagView, LayoutImage, OctaneCardContentView, 
 import { useCatalogUiState, useFurniturePresentWidget, useInventoryFurni } from '../../../../hooks';
 import '../../../../css/room/FurniWindowsBAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 export const FurnitureGiftOpeningView: FC<{}> = (props) => {
     const {
@@ -43,7 +44,7 @@ export const FurnitureGiftOpeningView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-gift-opening octane-furni-gift-opening" theme="primary-slim">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-gift-opening octane-furni-gift-opening" theme="primary-slim">
                 <OctaneCardHeaderView
                     headerText={LocalizeText(
                         senderName ? 'widget.furni.present.window.title_from' : 'widget.furni.present.window.title',

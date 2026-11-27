@@ -9,6 +9,7 @@ import { calculateLastPage, NO_PAGE } from './WiredPaging.helpers';
 import { Checkbox } from '../../common/Checkbox';
 import { Select } from '../../common/Select';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 /** Rows per page, as the official log list shows them. */
 export const WIRED_ROOM_LOGS_PAGE_SIZE = 50;
@@ -176,7 +177,7 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
     // the page is asked for again by a filter, a page button or the auto refresh.
     return (
         <NativeTextTree>
-            <OctaneCardView
+            <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
                 className="octane-wired-menu octane-wired-logs"
                 theme="primary-slim"
                 uniqueKey="wired-room-logs"

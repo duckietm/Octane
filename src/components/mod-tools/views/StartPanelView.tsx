@@ -15,6 +15,7 @@ import userIcon from '../../../assets/mod-tools/images/placeholder_avatar_small_
 import ticketIcon from '../../../assets/mod-tools/images/tools_file_icon.png';
 import { BaseButton } from '../../../common/BaseButton';
 import { localizeWithFallback } from '../../../api';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 const IMAGES: Record<string, string> = {
     roomtools_history_open_icon: roomToolIcon,
@@ -106,7 +107,7 @@ export const StartPanelView: FC<StartPanelProps> = (props) => {
     const userTop = 10 + 60;
 
     return (
-        <DraggableWindow handleSelector=".native-frame__titlebar" initialPosition={{ x, y }} onPositionChange={(position) => onMove(position.x, position.y)} unconstrainedPosition>
+        <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handleSelector=".native-frame__titlebar" initialPosition={{ x, y }} onPositionChange={(position) => onMove(position.x, position.y)} unconstrainedPosition>
             <NativeFrameView handlers={handlers} height={nativeNumber(node, 'height') + SEARCH_ROW} images={images} node={node} states={states} onClose={onClose}>
                 {showHead && (
                     <div className="native-start-panel__head" style={{ left: 5, top: userTop + 4 }}>

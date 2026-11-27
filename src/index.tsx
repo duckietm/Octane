@@ -3,6 +3,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ErrorBoundary } from 'react-error-boundary';
 import { App } from './App';
+import { startHandheldWatcher } from './api/handheld/handheldWatcher';
 import { LoadingView } from './components/loading/LoadingView';
 
 const queryClient = new QueryClient({
@@ -138,12 +139,28 @@ import './css/collectibles/Collectibles.css';
 import './css/room/VimeoDisplay.css';
 import './css/navigator/NavigatorView.css';
 import './css/navigator/RaidProtection.css';
+// After the window and toolbar styles, so the phone layout's rules win over the ones they adapt.
+import './css/handheld/Handheld.css';
+import './css/handheld/HandheldCatalog.css';
+import './css/handheld/HandheldInventory.css';
+import './css/handheld/HandheldNavigator.css';
+import './css/handheld/HandheldSocial.css';
+import './css/handheld/HandheldProfile.css';
+import './css/handheld/HandheldProgress.css';
+import './css/handheld/HandheldFrames.css';
+import './css/handheld/HandheldRoomHud.css';
+import './css/handheld/HandheldDialogs.css';
+import './css/handheld/HandheldWindows.css';
+import './css/handheld/HandheldFloorplan.css';
 import './css/common/ClassicScrollbar.css';
 
 document.documentElement.classList.add('has-classic-scrollbar');
 
 // Mounted by bootstrap once the configuration is in; importing this module only loads the UI.
 export const mountApp = (): void => {
+    // The phone layout is decided before the first paint, so a phone never flashes the desktop layout.
+    startHandheldWatcher();
+
     createRoot(document.getElementById('root')).render(
     <StrictMode>
         <QueryClientProvider client={queryClient}>

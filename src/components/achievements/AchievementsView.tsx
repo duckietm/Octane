@@ -1,4 +1,5 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 import { FC, useEffect } from 'react';
 import { AchievementUtilities, LocalizeText } from '../../api';
 import { DraggableWindowPosition } from '../../common';
@@ -73,6 +74,7 @@ export const AchievementsView: FC = () => {
             <OctaneCard
                 className="octane-achievements-air octane-card-frame-3 octane-card-frame-teal"
                 uniqueKey="achievements"
+                handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
                 windowPosition={DraggableWindowPosition.TOP_CENTER}
                 offsetTop={-30}
                 data-view={selectedCategory ? 'category' : 'categories'}
