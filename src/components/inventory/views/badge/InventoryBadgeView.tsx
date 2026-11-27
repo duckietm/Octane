@@ -20,8 +20,11 @@ import {
 import { LayoutBadgeImageView } from '../../../../common';
 import { useInventoryBadges, useInventoryUnseenTracker, useNotification } from '../../../../hooks';
 import { OctaneButton } from '../../../../layout';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldInventoryAction, HandheldInventorySelectionView } from '../HandheldInventorySelectionView';
 import { InventoryBadgeItemView } from './InventoryBadgeItemView';
 import { BaseButton } from '../../../../common/BaseButton';
+import { ToggleButton } from '../../../../common/ToggleButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const ActiveBadgeSlot: FC<{
@@ -86,6 +89,7 @@ export const InventoryBadgeView: FC<{ filteredBadgeCodes?: string[] }> = (props)
     } = useInventoryBadges();
     const { isUnseen = null, removeUnseen = null } = useInventoryUnseenTracker();
     const { showConfirm = null } = useNotification();
+    const isHandheld = useIsHandheld();
     const [isDragOverInventory, setIsDragOverInventory] = useState(false);
     const [isDraggingFromActive, setIsDraggingFromActive] = useState(false);
     const maxSlots = useMemo(() => GetConfigurationValue<number>('user.badges.max.slots', 5), []);
@@ -207,6 +211,104 @@ export const InventoryBadgeView: FC<{ filteredBadgeCodes?: string[] }> = (props)
     const description = selectedBadgeCode ? LocalizeBadgeDescription(selectedBadgeCode) : '';
     const rarityLabel = rarityStat ? localizeWithFallback(`badge.rarity.${rarityStat.rarity}`, rarityStat.rarity) : '';
     const rarityText = rarityStat ? localizeWithFallback('badge.rarity.badge', `${rarityLabel} badge`, ['rarity'], [rarityLabel]) : '';
+
+    // Phone layout: the badges worn, the all / custom switch, the grid, and the chosen badge as a bar with "wear badge"
+    // (edit and delete behind "more"). A badge is put on with the button; dragging onto a slot stays a mouse thing.
+    if (isHandheld) {
+        const actions: HandheldInventoryAction[] = [];
+
+        if (selectedBadgeCode && isOwnCustomBadge(selectedBadgeCode)) {
+            actions.push({ key: 'edit', label: localizeWithFallback('octane.handheld.inventory.edit_badge', 'Edit badge'), onClick: handleEditCustom });
+        }
+
+        if (selectedBadgeCode && !isWearingBadge(selectedBadgeCode)) {
+            actions.push({
+                key: 'delete',
+                label: LocalizeText('generic.delete'),
+                danger: true,
+                onClick: isOwnCustomBadge(selectedBadgeCode) ? handleDeleteCustom : attemptDeleteBadge
+            });
+        }
+
+        const ownersText =
+            rarityStat && rarityStat.ownerCount > 0 && rarityStat.ownerCount < 1000
+                ? localizeWithFallback('badge.owner_count', `${rarityStat.ownerCount.toLocaleString()} owners`, ['count'], [rarityStat.ownerCount.toLocaleString()])
+                : '';
+        const hasDescription = !!description && description !== selectedBadgeCode;
+
+        return (
+            <NativeTextTree>
+                <div className="octane-handheld-inv__pane is-badges">
+                    <div className="octane-handheld-inv__wearing">
+                        <span className="octane-handheld-inv__wearing-title">{localizeWithFallback('inventory.badges.activebadges', 'Wearing')}</span>
+                        <div className="octane-handheld-inv__wearing-slots">
+                            {Array.from({ length: maxSlots }).map((_, index) => (
+                                <ActiveBadgeSlot
+                                    key={index}
+                                    badgeCode={activeBadgeCodes[index]}
+                                    isSelected={selectedBadgeCode === activeBadgeCodes[index] && !!activeBadgeCodes[index]}
+                                    slotIndex={index}
+                                    onDropBadge={handleDropOnSlot}
+                                    onDragStartFromSlot={handleDragStartFromSlot}
+                                    onSelectBadge={setSelectedBadgeCode}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="octane-handheld-inv__chips">
+                        <ToggleButton className="octane-handheld-inv__chip" pressed={customFilter === 'all'} onPressedChange={() => setCustomFilter('all')}>
+                            {`${localizeWithFallback('inventory.badges.tab.all', 'All')} (${baseCodes.length})`}
+                        </ToggleButton>
+                        <ToggleButton className="octane-handheld-inv__chip" pressed={customFilter === 'custom'} onPressedChange={() => setCustomFilter('custom')}>
+                            {`${localizeWithFallback('inventory.badges.tab.custom', 'Custom')} (${customCount})`}
+                        </ToggleButton>
+                        <BaseButton className="octane-handheld-inv__chip is-create" onClick={() => CreateLinkEvent('badge-creator/show')}>
+                            {localizeWithFallback('inventory.badges.create', 'Create badge')}
+                        </BaseButton>
+                    </div>
+                    <div className="octane-handheld-inv__gridbox">
+                        <div key={currentPage} className="octane-handheld-inv__grid">
+                            {inactiveCodes.slice(currentPage * 200, (currentPage + 1) * 200).map((code) => (
+                                <InventoryBadgeItemView key={code} badgeCode={code} />
+                            ))}
+                        </div>
+                        {pageCount > 1 && (
+                            <div className="octane-handheld-inv__pages">
+                                {Array.from({ length: pageCount }, (_, index) => (
+                                    <BaseButton key={index} aria-current={index === currentPage ? 'page' : undefined} onClick={() => setPage(index)}>
+                                        {index + 1}
+                                    </BaseButton>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    {selectedBadgeCode && (
+                        <HandheldInventorySelectionView
+                            actions={actions}
+                            meta={rarityText || (hasDescription ? description : '')}
+                            name={LocalizeBadgeName(selectedBadgeCode)}
+                            preview={
+                                <div className="octane-handheld-inv__badge-preview">
+                                    <LayoutBadgeImageView badgeCode={selectedBadgeCode} />
+                                    {hasDescription && <p>{description}</p>}
+                                    {ownersText && <p className="is-owners">{ownersText}</p>}
+                                </div>
+                            }
+                            primary={{
+                                key: 'wear',
+                                label: isWearingBadge(selectedBadgeCode)
+                                    ? localizeWithFallback('inventory.badges.clearbadge', 'Clear badge')
+                                    : localizeWithFallback('inventory.badges.wearbadge', 'Wear badge'),
+                                disabled: !isWearingBadge(selectedBadgeCode) && !canWearBadges(),
+                                onClick: () => toggleBadge(selectedBadgeCode)
+                            }}
+                            thumb={<LayoutBadgeImageView badgeCode={selectedBadgeCode} />}
+                        />
+                    )}
+                </div>
+            </NativeTextTree>
+        );
+    }
 
     return (
         <NativeTextTree>

@@ -1,8 +1,9 @@
 import { ICatalogNode } from '../catalog/ICatalogNode';
 
 /**
- * The phone catalogue shows one thing at a time: a list of pages (one level of the page tree) or a page.
- * These helpers decide what a row does and where "back" goes; the hook in hooks/catalog keeps the state.
+ * The phone catalogue: the top pages are the tabs, under them a list of pages (one level of the page tree) and the
+ * open page. Upright only the list or the page is on screen; on its side the list sits beside the page. These
+ * helpers decide what a row does and where "back" goes; the hook in hooks/catalog keeps the state.
  */
 export type HandheldCatalogStep = 'menu' | 'page';
 
@@ -19,18 +20,41 @@ export const catalogRowOpensList = (node: ICatalogNode | null | undefined): bool
 export const catalogListHasOverview = (listNode: ICatalogNode | null | undefined, root: ICatalogNode | null | undefined): boolean =>
     !!listNode && listNode !== root && !!listNode.parent && listNode.parent !== root && listNode.pageId > -1;
 
-/** The list one level up, or null at the top of the tree. */
-export const catalogListUpTarget = (listNode: ICatalogNode | null | undefined, root: ICatalogNode | null | undefined): ICatalogNode | null => {
+/** The list one level up, or null at the top: the root of the tree, or with tabs the list of a tab. */
+export const catalogListUpTarget = (listNode: ICatalogNode | null | undefined, root: ICatalogNode | null | undefined, tabs = false): ICatalogNode | null => {
     if (!listNode || !root || listNode === root) return null;
+    if (tabs && (listNode.parent ?? root) === root) return null;
 
     return listNode.parent ?? root;
 };
 
-/** The list a page is shown under: its folder, or the top of the tree for a top-level page. */
-export const catalogListOf = (pageNode: ICatalogNode | null | undefined, root: ICatalogNode | null | undefined): ICatalogNode | null => {
+/** The list a page is shown under: its folder. A top-level page is listed at the top of the tree, or with tabs under itself. */
+export const catalogListOf = (pageNode: ICatalogNode | null | undefined, root: ICatalogNode | null | undefined, tabs = false): ICatalogNode | null => {
     if (!pageNode) return root ?? null;
 
-    return pageNode.parent ?? root ?? null;
+    const parent = pageNode.parent ?? root ?? null;
+
+    return tabs && parent === root ? pageNode : parent;
+};
+
+/** The top-level page (the tab) a node sits under; the node itself when it is one. */
+export const catalogTabOf = (node: ICatalogNode | null | undefined, root: ICatalogNode | null | undefined): ICatalogNode | null => {
+    if (!node || node === root) return null;
+
+    let current = node;
+
+    while (current.parent && current.parent !== root) current = current.parent;
+
+    return current;
+};
+
+/** The rows of a list: the visible sub pages, or for a tab without any the tab's own page. */
+export const catalogListRows = (listNode: ICatalogNode | null | undefined, root: ICatalogNode | null | undefined): ICatalogNode[] => {
+    const rows = visibleCatalogChildren(listNode);
+
+    if (rows.length || !listNode || listNode === root || listNode.pageId < 0) return rows;
+
+    return [listNode];
 };
 
 /** Page names can carry a technical suffix ("(BC)", "(Hot)"); a pure number (a page id for staff) stays. */

@@ -4,17 +4,23 @@ import {
     catalogListOf,
     catalogListUpTarget,
     catalogRowOpensList,
+    catalogTabOf,
     HandheldCatalogStep,
-    resolveHandheldCatalogFollow
+    resolveHandheldCatalogFollow,
+    visibleCatalogChildren
 } from '../../api/handheld/handheldCatalogBrowse';
 import { useCatalogStore } from './catalogStore';
 
 export interface HandheldCatalogBrowser {
     step: HandheldCatalogStep;
-    /** The folder whose pages the list shows; the root of the tree at the top. */
+    /** The tab on screen (a top-level page); null without tabs. */
+    tabNode: ICatalogNode | null;
+    /** The folder whose pages the list shows: a tab or a folder under it; the root of the tree without tabs. */
     listNode: ICatalogNode | null;
-    /** The folder one level up (where the list's back button goes), null at the top. */
+    /** The folder one level up (where the list's back row goes), null at the top. */
     upNode: ICatalogNode | null;
+    /** A tab was tapped: its list of pages comes on screen (its page, for a tab without sub pages). */
+    openTab: (node: ICatalogNode) => void;
     /** A row was tapped: a folder opens its list, a page opens itself. */
     openRow: (node: ICatalogNode) => void;
     /** Opens the listed folder's own page. */
@@ -26,13 +32,13 @@ export interface HandheldCatalogBrowser {
 }
 
 /**
- * The state of the phone catalogue: which list of pages is shown and whether the list or the page is on
- * screen. It lives as long as the catalogue component, so closing and reopening the catalogue (for example
- * after placing an item from it) comes back to the same spot. A page opened from outside the catalogue (a
- * link, "buy more", a deep link while closed) is followed to; the first page the catalogue picks by itself
- * is not, so the catalogue starts at its list.
+ * The state of the phone catalogue: which tab and which list of pages are shown and, upright, whether the list or
+ * the page is on screen. It lives as long as the catalogue component, so closing and reopening the catalogue (for
+ * example after placing an item from it) comes back to the same spot. A page opened from outside the catalogue (a
+ * link, "buy more", a deep link while closed) is followed to; the first page the catalogue picks by itself is not,
+ * so the catalogue starts at its list. `tabs` is off for the Builders Club warehouse, whose tree has no tab row.
  */
-export const useHandheldCatalogBrowser = (rootNode: ICatalogNode | null): HandheldCatalogBrowser => {
+export const useHandheldCatalogBrowser = (rootNode: ICatalogNode | null, tabs = false): HandheldCatalogBrowser => {
     const isVisible = useCatalogStore((state) => state.isVisible);
     const activeNodes = useCatalogStore((state) => state.activeNodes);
     const searchResult = useCatalogStore((state) => state.searchResult);
@@ -83,9 +89,9 @@ export const useHandheldCatalogBrowser = (rootNode: ICatalogNode | null): Handhe
         if (follow !== 'follow') return;
 
         ignoreAutomaticRef.current = false;
-        setListNode(catalogListOf(leaf, rootNode));
+        setListNode(catalogListOf(leaf, rootNode, tabs));
         setStep('page');
-    }, [activeNodes, searchResult, rootNode]);
+    }, [activeNodes, searchResult, rootNode, tabs]);
 
     const activate = useCallback((node: ICatalogNode) => {
         ownActivationRef.current = true;
@@ -93,23 +99,45 @@ export const useHandheldCatalogBrowser = (rootNode: ICatalogNode | null): Handhe
         useCatalogStore.getState().activateNode(node);
     }, []);
 
+    const openTab = useCallback(
+        (node: ICatalogNode) => {
+            if (!node) return;
+
+            const store = useCatalogStore.getState();
+
+            // The tab ends the search and opens itself, not the page open before the search.
+            if (store.searchResult) store.endCatalogSearch(false);
+
+            // The tab's first page loads behind its list, so the page beside the list (on its side) is never another tab's.
+            if (catalogTabOf(store.activeNodes?.[store.activeNodes.length - 1] ?? null, rootNode) !== node) activate(node);
+
+            setListNode(node);
+            setStep(catalogRowOpensList(node) ? 'menu' : 'page');
+        },
+        [activate, rootNode]
+    );
+
     const openRow = useCallback(
         (node: ICatalogNode) => {
             if (!node) return;
 
-            if (catalogRowOpensList(node)) {
+            if (catalogRowOpensList(node) && node !== listNode) {
                 setListNode(node);
                 return;
             }
 
             activate(node);
-            setListNode(catalogListOf(node, rootNode));
+            setListNode(catalogListOf(node, rootNode, tabs));
             setStep('page');
         },
-        [activate, rootNode]
+        [activate, listNode, rootNode, tabs]
     );
 
-    const shownList = listNode ?? rootNode;
+    // Without a list chosen: the tab of the open page, or the first tab; the whole tree without tabs.
+    const activeLeaf = activeNodes?.length ? activeNodes[activeNodes.length - 1] : null;
+    const firstTab = tabs ? (catalogTabOf(activeLeaf, rootNode) ?? visibleCatalogChildren(rootNode)[0] ?? null) : null;
+    const shownList = listNode ?? firstTab ?? rootNode;
+    const tabNode = tabs ? catalogTabOf(shownList, rootNode) : null;
 
     const openListPage = useCallback(() => {
         if (!shownList || shownList === rootNode) return;
@@ -118,7 +146,7 @@ export const useHandheldCatalogBrowser = (rootNode: ICatalogNode | null): Handhe
         setStep('page');
     }, [activate, shownList, rootNode]);
 
-    const upNode = catalogListUpTarget(shownList, rootNode);
+    const upNode = catalogListUpTarget(shownList, rootNode, tabs);
 
     const goBack = useCallback(() => {
         if (step === 'page') {
@@ -131,5 +159,5 @@ export const useHandheldCatalogBrowser = (rootNode: ICatalogNode | null): Handhe
 
     const showPage = useCallback(() => setStep('page'), []);
 
-    return { step, listNode: shownList, upNode, openRow, openListPage, goBack, showPage };
+    return { step, tabNode, listNode: shownList, upNode, openTab, openRow, openListPage, goBack, showPage };
 };

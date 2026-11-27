@@ -140,16 +140,19 @@
     gap: 6px;
     height: 48px;
     padding: 0 var(--hh-space-3);
+    /* Long tab names (other languages) do not fit four across: the row then scrolls sideways, like the shop's. */
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
 }
 
 :root[data-handheld] .octane-handheld-nav__tab {
     position: relative;
-    flex: 1 1 0;
+    /* Share the row when the names fit, and never get narrower than the name. */
+    flex: 1 0 auto;
     box-sizing: border-box;
-    min-width: 0;
     height: 36px;
     padding: 0 var(--hh-space-2);
-    overflow: hidden;
     border: 0;
     border-radius: var(--hh-radius-pill);
     background: var(--hh-well);
@@ -158,7 +161,6 @@
     font-size: var(--hh-size-m);
     line-height: 36px;
     text-align: center;
-    text-overflow: ellipsis;
     white-space: nowrap;
     transition: background-color var(--hh-fast) var(--hh-ease);
 }
@@ -185,7 +187,6 @@
 }
 
 :root[data-handheld] .octane-handheld-nav__tab.is-active {
-    overflow: visible;
     background: var(--hh-air-track-light);
     box-shadow:
         inset 0 1px 0 #ffffff,

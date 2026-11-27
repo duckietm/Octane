@@ -27,7 +27,7 @@ export const HandheldCatalogPlaceButtonView: FC<HandheldCatalogPlaceButtonViewPr
 
     return (
         <NativeTextTree>
-            <BaseButton className="octane-handheld-catalog__place" onClick={() => onPlace(offer)}>
+            <BaseButton className="octane-handheld-shop__place" onClick={() => onPlace(offer)}>
                 <FaArrowsAlt aria-hidden="true" />
                 <span>{localizeWithFallback('octane.handheld.catalog.place', 'Place in room')}</span>
             </BaseButton>

@@ -61,9 +61,24 @@ describe('InventoryFurnitureView placement', () => {
         expect(placement.attemptItemPlacement).toHaveBeenCalledWith(chair);
     });
 
-    it('leaves the preview to look at on a phone and places through the button', () => {
+    it('shows the chosen furni as a bar on a phone and places it through the button', () => {
         act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'portrait' } }));
         renderView();
+
+        expect(screen.getByText('Chair')).toBeInTheDocument();
+        expect(screen.getByText('Not tradable · Not recyclable')).toBeInTheDocument();
+        expect(screen.queryByTestId('preview')).toBeNull();
+
+        fireEvent.click(screen.getByRole('button', { name: 'inventory.furni.placetoroom' }));
+
+        expect(placement.attemptItemPlacement).toHaveBeenCalledWith(chair);
+    });
+
+    it('opens the preview from the bar to look at, never to pick the furni up, with delete beside it', () => {
+        act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'portrait' } }));
+        renderView();
+
+        fireEvent.click(screen.getByRole('button', { name: 'More actions' }));
 
         const preview = screen.getByTestId('preview');
 
@@ -71,9 +86,15 @@ describe('InventoryFurnitureView placement', () => {
         fireEvent.click(preview);
 
         expect(placement.attemptItemPlacement).not.toHaveBeenCalled();
+        expect(screen.getByRole('button', { name: 'generic.delete' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'inventory.marketplace.sell' })).toBeNull();
+    });
 
-        fireEvent.click(screen.getByRole('button', { name: 'inventory.furni.placetoroom' }));
+    it('shows the preview beside the grid on a phone held on its side', () => {
+        act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'landscape' } }));
+        renderView();
 
-        expect(placement.attemptItemPlacement).toHaveBeenCalledWith(chair);
+        expect(screen.getByTestId('preview')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'inventory.furni.placetoroom' })).toBeInTheDocument();
     });
 });

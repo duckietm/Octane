@@ -3,8 +3,10 @@ import { ICatalogNode } from '../catalog/ICatalogNode';
 import {
     catalogListHasOverview,
     catalogListOf,
+    catalogListRows,
     catalogListUpTarget,
     catalogRowOpensList,
+    catalogTabOf,
     handheldCatalogLabel,
     resolveHandheldCatalogFollow,
     visibleCatalogChildren
@@ -67,5 +69,23 @@ describe('handheld catalogue browsing', () => {
         expect(resolveHandheldCatalogFollow({ ...base, ownActivation: true })).toBe('ignore');
         expect(resolveHandheldCatalogFollow({ ...base, searchJustEnded: true })).toBe('ignore');
         expect(resolveHandheldCatalogFollow({ ...base, ignoreAutomatic: true })).toBe('consume-automatic');
+    });
+
+    it('treats the top pages as tabs when asked to', () => {
+        // The list of a tab is the top: nothing above it to go back to.
+        expect(catalogListUpTarget(furni, root, true)).toBeNull();
+        expect(catalogListUpTarget(tables, root, true)).toBe(furni);
+        // A top-level page is listed under itself, any other page under its folder.
+        expect(catalogListOf(furni, root, true)).toBe(furni);
+        expect(catalogListOf(modern, root, true)).toBe(tables);
+        expect(catalogTabOf(modern, root)).toBe(furni);
+        expect(catalogTabOf(furni, root)).toBe(furni);
+        expect(catalogTabOf(root, root)).toBeNull();
+    });
+
+    it('lists a tab without sub pages as its own page', () => {
+        expect(catalogListRows(furni, root)).toEqual([chairs, tables]);
+        expect(catalogListRows(chairs, root)).toEqual([chairs]);
+        expect(catalogListRows(root, root)).toEqual([furni]);
     });
 });

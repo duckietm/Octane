@@ -2,7 +2,7 @@
 
 import { CreateLinkEvent, GetRoomEngine, MouseEventType, RoomObjectCategory, RoomObjectOperationType } from '@octane/renderer';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { CommitHandheldPlacement, DispatchHandheldTouchEvent, HANDHELD_AVATAR_ACTIONS_LINK } from './DispatchHandheldTouchEvent';
+import { CommitHandheldPlacement, DispatchHandheldTouchEvent, HANDHELD_AVATAR_ACTIONS_LINK, ShowHandheldPlacementPreview } from './DispatchHandheldTouchEvent';
 
 interface FakeEngine {
     activeRoomId: number;
@@ -83,6 +83,60 @@ describe('DispatchHandheldTouchEvent', () => {
 
         expect(CommitHandheldPlacement()).toBe(true);
         expect(engine.dispatchMouseEvent).toHaveBeenLastCalledWith(1, 120, 140, MouseEventType.MOUSE_CLICK, false, false, false, false);
+    });
+
+    // The room canvas reads one pointer move per drawn frame and ignores a move to the point of the event before it;
+    // the move of a tap shares both its frame and its point with the press and release, so it would never show.
+    it('walks the preview move in over the next animation frames', () => {
+        engine.operation = RoomObjectOperationType.OBJECT_PLACE;
+
+        fire('touchstart', [[120, 140]]);
+        fire('touchend', [], [[120, 140]]);
+
+        const before = sent().filter((type) => type === MouseEventType.MOUSE_MOVE).length;
+
+        vi.advanceTimersByTime(100);
+
+        const moves = engine.dispatchMouseEvent.mock.calls.filter((call) => call[3] === MouseEventType.MOUSE_MOVE).map((call) => [call[1], call[2]]);
+
+        // Walked in from beside the point, so no step repeats the position of the event before it.
+        expect(moves.length).toBe(before + 3);
+        expect(moves.slice(-3)).toEqual([[122, 140], [121, 140], [120, 140]]);
+    });
+
+    it('shows a new placement in the middle of the room before any touch, and places it there', () => {
+        engine.operation = RoomObjectOperationType.OBJECT_PLACE;
+
+        ShowHandheldPlacementPreview();
+        vi.advanceTimersByTime(100);
+
+        const x = Math.round(window.innerWidth / 2);
+        const y = Math.round(window.innerHeight * 0.45);
+
+        expect(engine.dispatchMouseEvent).toHaveBeenLastCalledWith(1, x, y, MouseEventType.MOUSE_MOVE, false, false, false, false);
+
+        expect(CommitHandheldPlacement()).toBe(true);
+        expect(engine.dispatchMouseEvent).toHaveBeenLastCalledWith(1, x, y, MouseEventType.MOUSE_CLICK, false, false, false, false);
+    });
+
+    it('shows no preview when nothing is being placed', () => {
+        ShowHandheldPlacementPreview();
+        vi.advanceTimersByTime(100);
+
+        expect(engine.dispatchMouseEvent).not.toHaveBeenCalled();
+    });
+
+    it('lets the engine place the preview directly, and keeps placing when the preview is not on a valid spot', () => {
+        engine.operation = RoomObjectOperationType.OBJECT_PLACE;
+
+        const commit = vi.fn().mockReturnValueOnce(false).mockReturnValueOnce(true);
+
+        (engine as unknown as { commitActiveObjectPlacement: () => boolean }).commitActiveObjectPlacement = commit;
+
+        expect(CommitHandheldPlacement()).toBe(false);
+        expect(CommitHandheldPlacement()).toBe(true);
+        expect(commit).toHaveBeenCalledTimes(2);
+        expect(sent()).not.toContain(MouseEventType.MOUSE_CLICK);
     });
 
     it('does not commit when nothing is being placed', () => {

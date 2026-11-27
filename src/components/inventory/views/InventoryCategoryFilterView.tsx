@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { FURNI_MAIN_FILTER, FURNI_TYPE_OPTIONS, FurniMainFilter, furniMainFilterKey, furniTypeFilterKey, LocalizeText, localizeWithFallback } from '../../../api';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
 
 export const BADGE_MAIN_ALL = 'all';
 export const BADGE_MAIN_NORMAL = 'normal';
@@ -76,6 +77,8 @@ export const InventoryCategoryFilterView: FC<InventoryCategoryFilterViewProps> =
         onTypeFilterChange = null
     } = props;
 
+    // Phone layout: the field carries its hint as a placeholder (the AIR bar draws a magnifying glass instead).
+    const isHandheld = useIsHandheld();
     const isBadges = currentTab === TAB_BADGES;
     const isFurniture = currentTab === TAB_FURNITURE || currentTab === 'inventory.collectibles' || currentTab === 'inventory.rentables';
     const typeOptions = isFurniture ? FURNI_TYPE_OPTIONS[(mainFilter as FurniMainFilter) || FURNI_MAIN_FILTER.ALL] || FURNI_TYPE_OPTIONS.all : [];
@@ -86,6 +89,7 @@ export const InventoryCategoryFilterView: FC<InventoryCategoryFilterViewProps> =
                 <div className="octane-inventory-filter-search">
                     <input
                         className="octane-inventory-filter-input"
+                        placeholder={isHandheld ? localizeOr('generic.search', 'Search') : undefined}
                         aria-label={localizeOr('catalog.search', localizeWithFallback('octane.inventory.search_inventory', 'Search inventory'))}
                         onKeyDown={(event) => {
                             if (event.key === 'Enter') onSearchApply?.(searchValue);

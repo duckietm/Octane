@@ -1,6 +1,8 @@
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useCatalogData, useCatalogDisplayPreferences, useCatalogUiState } from '../../../../../hooks';
+import { DESKTOP_LAYOUT } from '../../../../../api/handheld/handheldLayout';
+import { useHandheldStore } from '../../../../../state/handheldStore';
 import { CatalogLayoutDefaultView } from './CatalogLayoutDefaultView';
 
 vi.mock('../../../../../api', () => ({
@@ -28,6 +30,7 @@ vi.mock('../../../../../hooks', () => ({
 vi.mock('../../../CatalogAdminContext', () => ({ useCatalogAdmin: () => ({ adminMode: admin.mode }) }));
 vi.mock('../../catalog-icon/CatalogIconView', () => ({ CatalogIconView: () => null }));
 
+vi.mock('./HandheldCatalogLayoutDefaultView', () => ({ HandheldCatalogLayoutDefaultView: () => <div data-testid="handheld-layout" /> }));
 vi.mock('../../catalog-header/CatalogHeaderView', () => ({ CatalogHeaderView: () => null }));
 vi.mock('../widgets/CatalogAddOnBadgeWidgetView', () => ({ CatalogAddOnBadgeWidgetView: () => null }));
 vi.mock('../widgets/CatalogItemGridWidgetView', () => ({ CatalogItemGridWidgetView: () => null }));
@@ -67,6 +70,25 @@ describe('default catalog layout', () => {
         expect(preview.style.width).toBe('100%');
         expect(preview.style.minWidth).toBe('0px');
         expect(preview.style.flexGrow).toBe('1');
+    });
+
+    it('keeps the AIR layout on the desktop and hands a phone its own grid and product panel', () => {
+        const desktop = render(<CatalogLayoutDefaultView hideNavigation={() => undefined} page={page as any} />);
+
+        expect(desktop.container.querySelector('.octane-catalog-default-layout')).not.toBeNull();
+        expect(desktop.queryByTestId('handheld-layout')).toBeNull();
+        cleanup();
+
+        useHandheldStore.setState({ layout: { active: true, orientation: 'portrait' } });
+
+        try {
+            const phone = render(<CatalogLayoutDefaultView hideNavigation={() => undefined} page={page as any} />);
+
+            expect(phone.getByTestId('handheld-layout')).toBeInTheDocument();
+            expect(phone.container.querySelector('.octane-catalog-default-layout')).toBeNull();
+        } finally {
+            useHandheldStore.setState({ layout: DESKTOP_LAYOUT });
+        }
     });
 
     describe('a heading page', () => {

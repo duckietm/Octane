@@ -189,14 +189,19 @@
     background: transparent !important;
 }
 
-/* The catalogue tab strip scrolls sideways on phones (swiped, like AIR's tab_context it has no bar). */
+/* The catalogue tab strip scrolls sideways on phones (swiped, like AIR's tab_context it has no bar); so do the rows
+   of pill tabs of a phone sheet (HandheldSheet.css) and of the phone navigator (HandheldNavigator.css). */
 .has-classic-scrollbar .octane-classic-scroll-area-viewport,
+.has-classic-scrollbar .octane-handheld-sheet .octane-handheld-sheet__tabs,
+.octane-handheld-nav .octane-handheld-nav__tabs,
 .has-classic-scrollbar .octane-avatar-editor .octane-avatar-editor-subcategories,
 .has-classic-scrollbar .octane-catalog-window .octane-catalog-tabs-shell {
     scrollbar-width: none !important;
 }
 
 .has-classic-scrollbar .octane-classic-scroll-area-viewport::-webkit-scrollbar,
+.has-classic-scrollbar .octane-handheld-sheet .octane-handheld-sheet__tabs::-webkit-scrollbar,
+.octane-handheld-nav .octane-handheld-nav__tabs::-webkit-scrollbar,
 .has-classic-scrollbar .octane-avatar-editor .octane-avatar-editor-subcategories::-webkit-scrollbar,
 .has-classic-scrollbar .octane-catalog-window .octane-catalog-tabs-shell::-webkit-scrollbar {
     display: none !important;

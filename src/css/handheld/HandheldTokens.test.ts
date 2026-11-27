@@ -8,8 +8,11 @@ const strip = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, '');
 const tokens = strip(read('src/css/handheld/HandheldTokens.css'));
 const defined = new Set([...tokens.matchAll(/(--hh-[a-z0-9-]+):/g)].map((match) => match[1]));
 
-/** The three phone modules that wear the Octane handheld look. */
-const SHEETS = ['HandheldNavigator.css', 'HandheldHud.css', 'HandheldChat.css'];
+/** The phone modules that wear the Octane handheld look, and the frame the shop and the inventory share. */
+const SHEETS = ['HandheldNavigator.css', 'HandheldHud.css', 'HandheldChat.css', 'HandheldSheet.css', 'HandheldCatalog.css', 'HandheldInventory.css'];
+
+/** The sheets written wholly for the phone: every rule of theirs is scoped to it. */
+const PHONE_ONLY = ['HandheldSheet.css', 'HandheldCatalog.css', 'HandheldInventory.css'];
 
 /** Custom properties a sheet sets itself, on one of its own elements. */
 const LOCAL = new Set(['--hh-level', '--hh-fill']);
@@ -65,10 +68,19 @@ describe('Octane handheld design tokens', () => {
         // Every token a sheet asks for exists...
         expect([...new Set(used)].filter((name) => !defined.has(name) && !LOCAL.has(name))).toEqual([]);
         // ...the sheet leans on them for its colours, radii, sizes and timings...
-        expect(used.length).toBeGreaterThan(60);
+        expect(used.length).toBeGreaterThan(sheet === 'HandheldSheet.css' ? 40 : 60); // the shared frame is a small sheet
         for (const family of ['--hh-air-', '--hh-radius-', '--hh-space-', '--hh-size-', '--hh-fast']) expect(used.some((name) => name.startsWith(family)), family).toBe(true);
         // ...and keeps no colour of its own in hex (white and black aside).
         expect([...css.matchAll(/#[0-9a-f]{3,8}\b/gi)].map((match) => match[0].toLowerCase()).filter((hex) => !['#ffffff', '#000000'].includes(hex))).toEqual([]);
+    });
+
+    it.each(PHONE_ONLY)('%s only styles the phone layout, and hides no scrollbar', (sheet) => {
+        const css = strip(read(`src/css/handheld/${sheet}`));
+        const selectors = [...css.matchAll(/([^{}]+)\{[^{}]*\}/g)].flatMap((match) => match[1].split(/,(?![^()]*\))/)).map((selector) => selector.trim());
+
+        expect(selectors.length).toBeGreaterThan(20);
+        expect(selectors.filter((selector) => !selector.startsWith(':root[data-handheld'))).toEqual([]);
+        expect(css).not.toMatch(/scrollbar-width|::-webkit-scrollbar/);
     });
 
     it.each(SHEETS)('%s keeps its motion on the shared short timing', (sheet) => {

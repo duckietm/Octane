@@ -4,6 +4,7 @@ import { FaBars, FaCog } from 'react-icons/fa';
 import { CatalogType, GetConfigurationValue, isBuildersClubEnabled, LocalizeShortNumber, LocalizeText, localizeWithFallback, SanitizeHtml } from '../../api';
 import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
+import { DraggableWindow } from '../../common/draggable-window/DraggableWindow';
 import { CssNativeText } from '../../common/native-text/CssNativeText';
 import { ToggleButton } from '../../common/ToggleButton';
 import { CatalogEffectsHost, useCatalogActions, useCatalogData, useCatalogUiState, useHasPermission, usePurse } from '../../hooks';
@@ -19,7 +20,7 @@ import { CatalogLoadingStateView } from './views/CatalogLoadingStateView';
 import { CatalogBuildersClubStatusView } from './views/catalog-header/CatalogBuildersClubStatusView';
 import { CatalogIconView } from './views/catalog-icon/CatalogIconView';
 import { CatalogGiftView } from './views/gift/CatalogGiftView';
-import { HandheldCatalogBodyView } from './views/handheld/HandheldCatalogBodyView';
+import { HandheldCatalogView } from './views/handheld/HandheldCatalogView';
 import { CatalogBreadcrumbView } from './views/navigation/CatalogBreadcrumbView';
 import { CatalogNavigationView } from './views/navigation/CatalogNavigationView';
 import { CatalogSearchView } from './views/page/common/CatalogSearchView';
@@ -184,25 +185,22 @@ const CatalogViewInner: FC<{}> = () => {
     return (
         <>
             {isVisible && isHandheld && (
-                <OctaneCardView classNames={['octane-catalog-window', 'is-handheld']} isResizable={false} uniqueKey="catalog">
-                    <OctaneCardHeaderView
-                        className={isBuilder ? 'builders-club-card-header' : ''}
-                        headerText={isBusy ? LocalizeText('generic.loading') || 'Loading...' : catalogTitle}
-                        onCloseClick={() => setIsVisible(false)}
-                    />
-                    <OctaneCardContentView classNames={['octane-catalog-content-shell', 'is-handheld']}>
-                        <HandheldCatalogBodyView
-                            activeNodes={activeNodes}
-                            currentPage={currentPage}
-                            isBusy={isBusy}
-                            renderPage={() => GetCatalogLayout(currentPage, hideNavigation)}
-                            rootNode={rootNode}
-                            rootTitle={catalogTitle}
-                            searchResult={searchResult}
-                        />
-                    </OctaneCardContentView>
-                    {(isBusy || catalogLoadError) && <CatalogLoadingStateView error={catalogLoadError} onRetry={retryCurrentPage} />}
-                </OctaneCardView>
+                <DraggableWindow handheldSheet uniqueKey="catalog">
+                    <HandheldCatalogView
+                        activeNodes={activeNodes}
+                        adminMode={adminMode}
+                        currentPage={currentPage}
+                        isBusy={isBusy}
+                        renderPage={() => GetCatalogLayout(currentPage, hideNavigation)}
+                        rootNode={rootNode}
+                        searchResult={searchResult}
+                        title={isBusy ? LocalizeText('generic.loading') || 'Loading...' : catalogTitle}
+                        useTabs={!isBuilder}
+                        onClose={() => setIsVisible(false)}
+                    >
+                        {(isBusy || catalogLoadError) && <CatalogLoadingStateView error={catalogLoadError} onRetry={retryCurrentPage} />}
+                    </HandheldCatalogView>
+                </DraggableWindow>
             )}
             {isVisible && !isHandheld && (
                 <OctaneCardView

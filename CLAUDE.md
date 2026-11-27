@@ -532,6 +532,14 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
   max-width), styles read from the bubble CSS; markup (links, mentions, colour tags), emoji, name prefixes/icons and translations
   stay browser text. `NativeTextRasterCache` reuses finished rasters (16 MB LRU). Rasters (Ubuntu and Volter) are drawn at the device pixel ratio itself (`getNativeTextRasterScale`; on a fractional ratio such as Windows 125 % at the nearest whole font size, halves down: Volter 9 px as 11 px) and shown `pixelated`, so they are never resampled; only the letter-spaced canvas path keeps the next whole scale. A one-line label in a `text-overflow: ellipsis` box that its drawn raster overflows is shortened with "..." (`fitNativeText`); boxes sized to their text are left alone. Never wrap a `.map` callback's keyed element (the key
   must stay on the returned element): the outer view's tree already covers it.
+- Phone ("handheld") shop and inventory, in the Octane handheld look (`src/css/handheld/HandheldTokens.css`): both sit in the
+  shared `src/common/handheld/HandheldSheetFrame.tsx` (deep-blue header, scrolling pill tabs, cream sheet; `HandheldSheet.css`).
+  Shop: `src/components/catalog/views/handheld/HandheldCatalogView.tsx` (tabs, page list, page; `useHandheldCatalogBrowser`),
+  the default page is `views/page/layout/HandheldCatalogLayoutDefaultView.tsx` (own tile grid + bottom product panel that reuses
+  the stepper / purchase widgets); every other layout keeps its AIR content inside a `.octane-catalog-window` wrapper. Inventory:
+  `InventoryView` renders the frame, every tab ends in `views/HandheldInventorySelectionView.tsx` (bar with the main action; the
+  preview and the other actions open from it, always open in landscape). Neither shell carries the AIR window class, so the AIR
+  rules scoped to `.octane-catalog-window` / `.octane-inventory-window` do not reach them.
 - Renderer-SDK mock for Vitest: `src/octane-renderer.mock.ts`
   (aliased over `@octane/renderer` via `vitest.config.mts`).
   Hosts the explicit `OctaneLogger` mock, the `mockEventDispatcher` /

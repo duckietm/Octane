@@ -14,6 +14,7 @@ import {
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NativeText } from '../../../../../common/native-text/NativeText';
 import { useCatalogActions, useCatalogData, useCatalogUiState } from '../../../../../hooks';
+import { useIsHandheld } from '../../../../../hooks/handheld/useHandheldLayout';
 import { getNodesByOfferIdFromMap } from '../../../../../hooks/catalog/useCatalog.helpers';
 import { readCachedCatalogOffer, readCatalogIndex } from '../../../../../hooks/catalog/useCatalogQueries';
 import {
@@ -36,6 +37,8 @@ export const CatalogSearchView: FC<{}> = () => {
     const { beginCatalogSearch = null, endCatalogSearch = null } = useCatalogActions();
     // The field shows the running search: closing the catalog (or placing a result in the room) and reopening it keeps both.
     const [searchValue, setSearchValue] = useState(() => searchResult?.searchValue ?? '');
+    // Phone layout: the field carries its hint as a plain placeholder in the phone's own type, not as AIR's drawn helper text.
+    const isHandheld = useIsHandheld();
     const searchTimeout = useRef<ReturnType<typeof setTimeout>>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const searchTypeRef = useRef(currentType);
@@ -178,7 +181,7 @@ export const CatalogSearchView: FC<{}> = () => {
         // clear button once something is typed.
         <div className="octane-catalog-search relative w-full">
             {/* search.helper: ${catalog.search} in 0x666666 at blend 0.5 (0xb2b2b2 on the white field) until something is typed. */}
-            {!hasQuery && (
+            {!hasQuery && !isHandheld && (
                 <NativeText
                     nativeResolution
                     background={0xffffff}
@@ -192,6 +195,7 @@ export const CatalogSearchView: FC<{}> = () => {
                 ref={inputRef}
                 aria-label={LocalizeText('catalog.search')}
                 className="octane-catalog-search-input w-full"
+                placeholder={isHandheld ? LocalizeText('catalog.search') : undefined}
                 type="text"
                 value={searchValue}
                 onChange={onSearchChange}

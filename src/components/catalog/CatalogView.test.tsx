@@ -60,8 +60,12 @@ vi.mock('./views/page/common/CatalogSearchView', () => ({ CatalogSearchView: () 
 vi.mock('./views/page/layout/marketplace/MarketplacePostOfferView', () => ({ MarketplacePostOfferView: () => null }));
 vi.mock('./views/vip-benefits/VipBenefitsView', () => ({ VipBenefitsView: () => null }));
 vi.mock('./views/page/layout/GetCatalogLayout', () => ({ GetCatalogLayout: () => null }));
-vi.mock('./views/handheld/HandheldCatalogBodyView', () => ({
-    HandheldCatalogBodyView: ({ rootTitle }: { rootTitle: string }) => <div data-testid="handheld-catalog">{rootTitle}</div>
+vi.mock('./views/handheld/HandheldCatalogView', () => ({
+    HandheldCatalogView: ({ title, useTabs }: { title: string; useTabs: boolean }) => (
+        <div data-testid="handheld-catalog" data-tabs={String(useTabs)}>
+            {title}
+        </div>
+    )
 }));
 
 import { DESKTOP_LAYOUT } from '../../api/handheld/handheldLayout';
@@ -126,11 +130,11 @@ describe('CatalogView', () => {
         render(<CatalogView />);
 
         expect(screen.queryByTestId('handheld-catalog')).toBeNull();
-        expect(document.querySelector('.octane-catalog-window.is-handheld')).toBeNull();
+        expect(document.querySelector('.octane-catalog-window')).not.toBeNull();
         expect(document.querySelector('.octane-catalog-sidebar')).not.toBeNull();
     });
 
-    it('swaps the tabs, tree and page for the one-screen phone catalogue on a phone', () => {
+    it('swaps the AIR window for the phone shop on a phone', () => {
         state.currentType = 'NORMAL';
         state.isMod = false;
         act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'portrait' } }));
@@ -139,7 +143,9 @@ describe('CatalogView', () => {
             render(<CatalogView />);
 
             expect(screen.getByTestId('handheld-catalog')).toHaveTextContent('catalog.title');
-            expect(document.querySelector('.octane-catalog-window.is-handheld')).not.toBeNull();
+            expect(screen.getByTestId('handheld-catalog')).toHaveAttribute('data-tabs', 'true');
+            // The phone shop is its own sheet: no AIR window, tab strip or tree around it.
+            expect(document.querySelector('.octane-catalog-window')).toBeNull();
             expect(document.querySelector('.octane-catalog-tabs-shell')).toBeNull();
             expect(document.querySelector('.octane-catalog-sidebar')).toBeNull();
         } finally {

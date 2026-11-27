@@ -142,6 +142,7 @@ import './css/navigator/RaidProtection.css';
 // After the window and toolbar styles, so the phone layout's rules win over the ones they adapt.
 import './css/handheld/HandheldTokens.css';
 import './css/handheld/Handheld.css';
+import './css/handheld/HandheldSheet.css';
 import './css/handheld/HandheldCatalog.css';
 import './css/handheld/HandheldInventory.css';
 import './css/handheld/HandheldNavigator.css';

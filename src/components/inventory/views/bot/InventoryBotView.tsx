@@ -7,6 +7,8 @@ import { useInventoryBots, useInventoryUnseenTracker, usePlayTestRestricted } fr
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryCategoryLoadingView } from '../InventoryCategoryLoadingView';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldInventorySelectionView } from '../HandheldInventorySelectionView';
 import { InventoryBotImageView } from './InventoryBotImageView';
 import { InventoryBotItemView } from './InventoryBotItemView';
 
@@ -19,6 +21,7 @@ export const InventoryBotView: FC<{
     const { botItems = [], isLoaded = false, selectedBot = null, activate = null, deactivate = null } = useInventoryBots();
     const { isUnseen = null, removeUnseen = null } = useInventoryUnseenTracker();
     const playTestRestricted = usePlayTestRestricted();
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         if (!selectedBot || !isUnseen(UnseenItemCategory.BOT, selectedBot.botData.id)) return;
@@ -40,6 +43,37 @@ export const InventoryBotView: FC<{
         if (!isLoaded) return <InventoryCategoryLoadingView />;
 
         return <InventoryCategoryEmptyView desc={LocalizeText('inventory.empty.bots.desc')} title={LocalizeText('inventory.empty.bots.title')} />;
+    }
+
+    // Phone layout: the grid, and the chosen bot as a bar with "place in room"; its picture opens the larger one.
+    if (isHandheld) {
+        return (
+            <NativeTextTree>
+                <div className="octane-handheld-inv__pane is-bots">
+                    <div className="octane-handheld-inv__gridbox">
+                        <div className="octane-handheld-inv__grid">
+                            {botItems.map((item) => (
+                                <InventoryBotItemView key={item.botData.id} botItem={item} />
+                            ))}
+                        </div>
+                    </div>
+                    {selectedBot && (
+                        <HandheldInventorySelectionView
+                            meta={selectedBot.botData.motto}
+                            name={selectedBot.botData.name}
+                            preview={<InventoryBotImageView figure={selectedBot.botData.figure} gender={selectedBot.botData.gender} preview />}
+                            primary={{
+                                key: 'place',
+                                label: LocalizeText('inventory.bot.placetoroom'),
+                                disabled: !roomSession?.isRoomOwner || playTestRestricted,
+                                onClick: () => attemptBotPlacement(selectedBot)
+                            }}
+                            thumb={<InventoryBotImageView figure={selectedBot.botData.figure} gender={selectedBot.botData.gender} />}
+                        />
+                    )}
+                </div>
+            </NativeTextTree>
+        );
     }
 
     return (

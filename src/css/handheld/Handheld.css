@@ -161,7 +161,8 @@
 
 .octane-handheld-placement__actions {
     display: flex;
-    gap: 18px;
+    align-items: center;
+    gap: 14px;
 }
 
 .octane-handheld-placement__button {
@@ -181,8 +182,15 @@
     background: #3c8a2e;
 }
 
-.octane-handheld-placement__button.is-cancel {
-    background: #a8322b;
+/* "Done" is a text pill: it ends the placing, which is the normal way out once enough items stand. */
+.octane-handheld-placement__button.is-done {
+    width: auto;
+    min-width: 72px;
+    padding: 0 18px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .octane-handheld-placement__button:active {

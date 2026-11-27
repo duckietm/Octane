@@ -21,6 +21,56 @@ let holdTimer: ReturnType<typeof setTimeout> | null = null;
 
 const send = (type: string, x: number, y: number) => GetRoomEngine().dispatchMouseEvent(CANVAS_ID, x, y, type, false, false, false, false);
 
+/** Where the preview of the item being placed was last put; the place button drops it there. */
+let previewPoint: { x: number; y: number } | null = null;
+let previewFrames = 0;
+let previewFrameRequest: number | null = null;
+
+const PREVIEW_MOVE_FRAMES = 3;
+
+/**
+ * Puts the placement preview under a point. The room canvas drops a pointer move in three cases a tap or a first
+ * touch always hits: it reads at most one move per drawn frame, it ignores a move to the very point of the event
+ * before it (the press and release of the tap), and it reports the first move over a surface as "pointer entered"
+ * instead of a move. So the move is walked in over the next animation frames from two pixels beside the point:
+ * each step is a new position in a new frame, and the last one is the point itself.
+ */
+const movePlacementPreview = (x: number, y: number) => {
+    previewPoint = { x, y };
+    previewFrames = PREVIEW_MOVE_FRAMES;
+
+    // A drag already moves every frame, so this one usually gets through; the steps below cover the tap.
+    send(MouseEventType.MOUSE_MOVE, x, y);
+
+    if (typeof requestAnimationFrame !== 'function') return;
+
+    // A new point restarts the walk, so a request that never ran (a hidden tab) cannot block the next one.
+    if (previewFrameRequest !== null) cancelAnimationFrame(previewFrameRequest);
+
+    const step = () => {
+        previewFrameRequest = null;
+
+        if (!previewPoint || previewFrames <= 0 || !isRoomObjectPlacementActive()) return;
+
+        previewFrames--;
+        send(MouseEventType.MOUSE_MOVE, previewPoint.x + previewFrames, previewPoint.y);
+
+        if (previewFrames > 0) previewFrameRequest = requestAnimationFrame(step);
+    };
+
+    previewFrameRequest = requestAnimationFrame(step);
+};
+
+/**
+ * A placement just started and no finger has pointed anywhere yet: the item is shown in the middle of the visible
+ * room, so there is something to see and to drag before the first touch.
+ */
+export const ShowHandheldPlacementPreview = (): void => {
+    if (!isRoomObjectPlacementActive() || typeof window === 'undefined') return;
+
+    movePlacementPreview(Math.round(window.innerWidth / 2), Math.round(window.innerHeight * 0.45));
+};
+
 /** An item from the inventory or catalogue is being placed, or a placed one is being moved. */
 export const isRoomObjectPlacementActive = (): boolean => {
     const engine = GetRoomEngine();
@@ -79,6 +129,11 @@ const perform = (intent: RoomGestureIntent) => {
             send(MouseEventType.MOUSE_DOWN, intent.x, intent.y);
             return;
         case 'drag':
+            if (isRoomObjectPlacementActive()) {
+                movePlacementPreview(intent.x, intent.y);
+                return;
+            }
+
             send(MouseEventType.MOUSE_MOVE, intent.x, intent.y);
             return;
         case 'release':
@@ -89,7 +144,7 @@ const perform = (intent: RoomGestureIntent) => {
             return;
         case 'tap':
             if (isRoomObjectPlacementActive()) {
-                send(MouseEventType.MOUSE_MOVE, intent.x, intent.y);
+                movePlacementPreview(intent.x, intent.y);
                 return;
             }
 
@@ -162,12 +217,30 @@ export const DispatchHandheldTouchEvent = (event: TouchEvent): void => {
     else if (event.type === 'touchstart') scheduleHold();
 };
 
-/** Drops the item being placed or moved where its preview is: a click on the last point the finger touched. */
+/**
+ * Drops the item being placed or moved where its preview stands. The engine places it directly: a simulated click
+ * at the preview is not reliable (it is hit-tested again, and a miss cancels the whole placement). False when
+ * nothing is being placed or the preview is not on a valid spot; the placement then stays active.
+ */
 export const CommitHandheldPlacement = (): boolean => {
     if (!isRoomObjectPlacementActive()) return false;
 
-    const { x, y } = gesture.lastPoint;
+    const engine = GetRoomEngine();
 
+    if (typeof engine.commitActiveObjectPlacement === 'function') {
+        if (!engine.commitActiveObjectPlacement()) return false;
+
+        previewPoint = null;
+        previewFrames = 0;
+
+        return true;
+    }
+
+    // An older renderer without the direct call: the click a mouse would make at the preview.
+    const { x, y } = previewPoint ?? gesture.lastPoint;
+
+    previewPoint = null;
+    previewFrames = 0;
     send(MouseEventType.MOUSE_CLICK, x, y);
 
     return true;

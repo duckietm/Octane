@@ -1,7 +1,7 @@
 import { CreateLinkEvent, GetRoomEngine } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { FaCheck, FaSyncAlt, FaTimes } from 'react-icons/fa';
-import { cancelRoomObjectPlacement, CommitHandheldPlacement, getPlacingItemId, isRoomObjectPlacementActive, localizeWithFallback } from '../../../../api';
+import { FaCheck, FaSyncAlt } from 'react-icons/fa';
+import { cancelRoomObjectPlacement, CommitHandheldPlacement, getPlacingItemId, isRoomObjectPlacementActive, localizeWithFallback, ShowHandheldPlacementPreview } from '../../../../api';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useIsHandheld, useRoom } from '../../../../hooks';
@@ -31,7 +31,7 @@ const cancelPlacement = () => {
 
 /**
  * Phone layout: while an item is being placed or moved, a bar above the toolbar says what to do and gives
- * the three choices a finger needs (place, rotate, cancel). A tap in the room only moves the preview there,
+ * the three choices a finger needs (done, rotate, place). A tap in the room only moves the preview there,
  * so an item is never dropped by accident.
  */
 export const HandheldPlacementBarView: FC<{}> = () => {
@@ -54,6 +54,11 @@ export const HandheldPlacementBarView: FC<{}> = () => {
         return () => window.clearInterval(interval);
     }, [isHandheld, roomSession]);
 
+    // A placement that just started shows its item at once, in the middle of the room, before any touch.
+    useEffect(() => {
+        if (isHandheld && isPlacing) ShowHandheldPlacementPreview();
+    }, [isHandheld, isPlacing]);
+
     if (!isHandheld || !isPlacing) return null;
 
     const place = () => {
@@ -67,15 +72,16 @@ export const HandheldPlacementBarView: FC<{}> = () => {
 
     const placeLabel = localizeWithFallback('octane.handheld.placement.place', 'Place');
     const rotateLabel = localizeWithFallback('octane.handheld.placement.rotate', 'Rotate');
-    const cancelLabel = localizeWithFallback('octane.handheld.placement.cancel', 'Cancel');
+    const doneLabel = localizeWithFallback('octane.handheld.placement.done', 'Done');
 
     return (
         <NativeTextTree>
             <div className="octane-handheld-placement" role="toolbar" aria-label={localizeWithFallback('octane.handheld.placement.title', 'Placing an item')}>
                 <p className="octane-handheld-placement__hint">{localizeWithFallback('octane.handheld.placement.hint', 'Drag or tap to move it, then place it.')}</p>
                 <div className="octane-handheld-placement__actions">
-                    <BaseButton aria-label={cancelLabel} className="octane-handheld-placement__button is-cancel" onClick={cancel}>
-                        <FaTimes aria-hidden="true" />
+                    {/* Placing goes on while more of the same item are left, so leaving it reads as "done", not as an error. */}
+                    <BaseButton className="octane-handheld-placement__button is-done" onClick={cancel}>
+                        {doneLabel}
                     </BaseButton>
                     <BaseButton aria-label={rotateLabel} className="octane-handheld-placement__button is-rotate" onClick={() => GetRoomEngine().rotateActiveObjectPreview(true)}>
                         <FaSyncAlt aria-hidden="true" />
