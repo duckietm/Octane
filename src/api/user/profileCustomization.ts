@@ -77,8 +77,6 @@ export const PROFILE_AVATAR_DEFAULT_DIRECTION = 2;
  */
 export const PROFILE_AVATAR_MAX_OFFSET = 16;
 
-export const DEFAULT_PROFILE_AVATAR_POSE: ProfileAvatarPose = { direction: PROFILE_AVATAR_DEFAULT_DIRECTION, offsetX: 0, offsetY: 0 };
-
 /** Effects drawn on the avatar itself (the costumes and the one before them), which move with it as its stand does. */
 export const PROFILE_AVATAR_BOUND_OVERLAYS: ReadonlyArray<number> = [5, 6, 7, 8];
 
