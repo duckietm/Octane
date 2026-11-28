@@ -1,5 +1,5 @@
 import { AddLinkEventTracker, GetSoundManager, ILinkEventTracker, ITraxEditorSong, RemoveLinkEventTracker, SoundManagerEvent } from '@octane/renderer';
-import { FC, MouseEvent, PointerEvent, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, MouseEvent, PointerEvent, ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { GetDiskColor, localizeWithFallback } from '../../api';
 import { GetTraxCartridgeUrl } from '../../assets/images/trax';
 import { Button, Column, Flex, LayoutCurrencyIcon, Text } from '../../common';
@@ -11,6 +11,8 @@ import { BaseButton } from '../../common/BaseButton';
 import { ToggleButton } from '../../common/ToggleButton';
 import { Hint } from '../../common/Tooltip';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HANDHELD_TRAX_CELL_WIDTH, HandheldTraxEditorView } from './HandheldTraxEditorView';
 
 const CELL_WIDTH = 22;
 const CARTRIDGES_PER_PAGE = 8;
@@ -80,6 +82,10 @@ export const TraxEditorView: FC<{}> = () =>
     const { showConfirm = null } = useNotification();
 
     const canAfford = costAmount <= 0 || getCurrencyAmount(costCurrency) >= costAmount;
+    const isHandheld = useIsHandheld();
+    // The phone timeline has finger-sized cells; the playhead and the taps on a track read the width from here.
+    const cellWidth = isHandheld ? HANDHELD_TRAX_CELL_WIDTH : CELL_WIDTH;
+    const cellWidthRef = useRef(cellWidth);
 
     const isPlayingRef = useRef(false);
     const playheadRef = useRef<HTMLDivElement | null>(null);
@@ -87,19 +93,24 @@ export const TraxEditorView: FC<{}> = () =>
     const playheadUnitRef = useRef(0);
     const previewTokenRef = useRef(0);
 
+    useLayoutEffect(() =>
+    {
+        cellWidthRef.current = cellWidth;
+    }, [cellWidth]);
+
     const movePlayhead = useCallback((unit: number) =>
     {
         playheadUnitRef.current = unit;
         setPlayheadUnit(unit);
 
-        if (playheadRef.current) playheadRef.current.style.left = `${unit * CELL_WIDTH}px`;
+        if (playheadRef.current) playheadRef.current.style.left = `${unit * cellWidthRef.current}px`;
     }, []);
 
     const stopPlayhead = useCallback(() =>
     {
         cancelAnimationFrame(playheadRafRef.current);
 
-        if (playheadRef.current) playheadRef.current.style.left = `${playheadUnitRef.current * CELL_WIDTH}px`;
+        if (playheadRef.current) playheadRef.current.style.left = `${playheadUnitRef.current * cellWidthRef.current}px`;
     }, []);
 
     const startPlayhead = useCallback((startUnit: number, totalUnits: number) =>
@@ -111,7 +122,7 @@ export const TraxEditorView: FC<{}> = () =>
             const units = startUnit + ((performance.now() - startedAt) / 2000);
             const node = playheadRef.current;
 
-            if (node) node.style.left = `${Math.min(units, totalUnits) * CELL_WIDTH}px`;
+            if (node) node.style.left = `${Math.min(units, totalUnits) * cellWidthRef.current}px`;
 
             if (units < totalUnits) playheadRafRef.current = requestAnimationFrame(step);
         };
@@ -324,7 +335,7 @@ export const TraxEditorView: FC<{}> = () =>
         (event: MouseEvent<HTMLDivElement>, channel: number) =>
         {
             const rect = event.currentTarget.getBoundingClientRect();
-            const unit = Math.floor((event.clientX - rect.left) / CELL_WIDTH);
+            const unit = Math.floor((event.clientX - rect.left) / cellWidthRef.current);
 
             if (unit < 0 || unit >= songLength) return;
 
@@ -337,7 +348,7 @@ export const TraxEditorView: FC<{}> = () =>
         (event: MouseEvent<HTMLDivElement>, channel: number) =>
         {
             const rect = event.currentTarget.getBoundingClientRect();
-            const unit = Math.floor((event.clientX - rect.left) / CELL_WIDTH);
+            const unit = Math.floor((event.clientX - rect.left) / cellWidthRef.current);
 
             if (unit < 0 || unit >= songLength)
             {
@@ -394,7 +405,7 @@ export const TraxEditorView: FC<{}> = () =>
         (event: PointerEvent<HTMLDivElement>) =>
         {
             const rect = event.currentTarget.getBoundingClientRect();
-            const unit = Math.min(songLength - 1, Math.max(0, Math.floor((event.clientX - rect.left) / CELL_WIDTH)));
+            const unit = Math.min(songLength - 1, Math.max(0, Math.floor((event.clientX - rect.left) / cellWidthRef.current)));
 
             movePlayhead(unit);
         },
@@ -478,9 +489,74 @@ export const TraxEditorView: FC<{}> = () =>
         buy(localizeWithFallback('trax.editor.new.song.name', 'My new song'));
     }, [buy]);
 
+    const shortenSong = useCallback(() =>
+    {
+        const nextLength = Math.max(TRAX_MIN_UNITS, songLength - 4);
+
+        setSongLength(nextLength);
+        setChannels((prev) => prev.map((placements) => placements.filter((p) => p.position + p.length <= nextLength)));
+        if (playheadUnitRef.current >= nextLength) movePlayhead(nextLength - 1);
+        setIsDirty(true);
+    }, [songLength, movePlayhead]);
+
+    const lengthenSong = useCallback(() =>
+    {
+        setSongLength((prev) => Math.min(TRAX_MAX_UNITS, prev + 4));
+        setIsDirty(true);
+    }, []);
+
+    const renameSong = useCallback((name: string) =>
+    {
+        setSongName(name);
+        setIsDirty(true);
+    }, []);
+
     if (!isVisible) return null;
 
     const emptySlots = Math.max(0, maxSongs - songs.length);
+
+    if (isHandheld)
+        return (
+            <HandheldTraxEditorView
+                activeSlot={activeSlot}
+                canBuy={canAfford && pendingAction !== 'buy'}
+                channels={channels}
+                costAmount={costAmount}
+                costCurrency={costCurrency}
+                editingSongId={editingSongId}
+                emptySlots={emptySlots}
+                errorText={lastError ? localizeWithFallback(...(ERROR_TEXTS[lastError] ?? ERROR_TEXTS[4])) : ''}
+                isDirty={isDirty}
+                isPlaying={isPlaying}
+                loaded={loaded}
+                playheadRef={playheadRef}
+                playheadUnit={playheadUnit}
+                scrub={{ onPointerDown: scrubPointerDown, onPointerMove: scrubPointerMove, onPointerUp: scrubPointerUp, onPointerCancel: scrubPointerUp }}
+                slotSamples={slotSamples}
+                slotSets={slotSets}
+                songLength={songLength}
+                songName={songName}
+                songs={songs}
+                onActiveSlot={setActiveSlot}
+                onBuy={buyNewSong}
+                onChannelClick={onChannelClick}
+                onClear={clearSong}
+                onClose={hideEditor}
+                onDelete={deleteCurrentSong}
+                onLengthen={lengthenSong}
+                onLoadCartridge={loadCartridge}
+                onOpenSong={openSong}
+                onRemovePlacement={removePlacement}
+                onRename={renameSong}
+                onRewind={rewindPlayhead}
+                onSave={saveCurrentSong}
+                onSelectSample={selectSample}
+                onShift={shiftSong}
+                onShorten={shortenSong}
+                onStop={stopPreview}
+                onTogglePlay={togglePreview}
+            />
+        );
     const rackCartridges = TraxSoundSets.slice(rackPage * CARTRIDGES_PER_PAGE, (rackPage + 1) * CARTRIDGES_PER_PAGE);
     return (
         <NativeTextTree>
@@ -695,11 +771,7 @@ export const TraxEditorView: FC<{}> = () =>
                                                     boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.45)',
                                                     textShadow: '0 1px 1px rgba(0, 0, 0, 0.6)'
                                                 }}
-                                                onChange={(event) =>
-                                                {
-                                                    setSongName(event.target.value);
-                                                    setIsDirty(true);
-                                                }}
+                                                onChange={(event) => renameSong(event.target.value)}
                                             />
                                         </div>
                                         <MachineButton accent="#c2493f" title={localizeWithFallback('trax.editor.delete', 'Delete')} onClick={deleteCurrentSong}>
@@ -842,25 +914,13 @@ export const TraxEditorView: FC<{}> = () =>
                                         <Text small style={{ color: 'rgba(255, 255, 255, 0.8)' }}>{localizeWithFallback('trax.editor.length', 'Length')}: {formatStamp(songLength * 2)}</Text>
                                         <MachineButton
                                             disabled={songLength <= TRAX_MIN_UNITS}
-                                            onClick={() =>
-                                            {
-                                                const nextLength = Math.max(TRAX_MIN_UNITS, songLength - 4);
-
-                                                setSongLength(nextLength);
-                                                setChannels((prev) => prev.map((placements) => placements.filter((p) => p.position + p.length <= nextLength)));
-                                                if (playheadUnitRef.current >= nextLength) movePlayhead(nextLength - 1);
-                                                setIsDirty(true);
-                                            }}
+                                            onClick={shortenSong}
                                         >
                                             −
                                         </MachineButton>
                                         <MachineButton
                                             disabled={songLength >= TRAX_MAX_UNITS}
-                                            onClick={() =>
-                                            {
-                                                setSongLength((prev) => Math.min(TRAX_MAX_UNITS, prev + 4));
-                                                setIsDirty(true);
-                                            }}
+                                            onClick={lengthenSong}
                                         >
                                             +
                                         </MachineButton>

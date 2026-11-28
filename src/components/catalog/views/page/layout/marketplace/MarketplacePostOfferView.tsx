@@ -55,6 +55,8 @@ import {
     useNotification,
     useUiEvent
 } from '../../../../../../hooks';
+import { useIsHandheld } from '../../../../../../hooks/handheld/useHandheldLayout';
+import { HandheldMarketplacePostOfferView } from '../../../handheld/HandheldShopSheetViews';
 import { MarketplaceBuyTokensView, MarketplaceNoCreditsView } from './MarketplaceTokenDialogsView';
 
 let isPostingMarketplaceOffer = false;
@@ -136,6 +138,7 @@ export const MarketplacePostOfferView: FC<{}> = () => {
     );
     const nftStats = useNftMarketplaceItemStats(item && isNft ? productCode : null);
     const stats = isNft ? nftStats : furniStats;
+    const isHandheld = useIsHandheld();
 
     // The furni marketplace's check: can this user make an offer (trade pass, tokens)?
     const startFurniOffer = (offerItem: FurnitureItem, offerItems: FurnitureItem[]) => {
@@ -377,12 +380,66 @@ export const MarketplacePostOfferView: FC<{}> = () => {
         );
     };
 
+    const statText = (key: string, price: number, days: string = null) =>
+        days === null ? text(key, ['price'], [String(price)]) : text(key, ['days', 'price'], [days, String(price)]);
+
     const statLine = (name: string, key: string, price: number, days: string = null) =>
         isMarketplacePriceStatVisible(price) && (
             <span className={`octane-marketplace-post-offer-stat is-${name}`} data-testid={`marketplace-post-offer-${name}`}>
-                {days === null ? text(key, ['price'], [String(price)]) : text(key, ['days', 'price'], [days, String(price)])}
+                {statText(key, price, days)}
             </span>
         );
+
+    const finalText = priceCheck.valid
+        ? `${text('sell.in.marketplace.revenue.label')}: ${revenue}`
+        : isNft
+          ? collectiblesMarketplaceText('shop.marketplace.invalid.price.emeralds', ['minPrice', 'maxPrice'], [String(minimumPrice), String(maximumPrice)])
+          : text('shop.marketplace.invalid.price', ['minPrice', 'maxPrice'], [String(minimumPrice), String(maximumPrice)]);
+
+    const picture = (
+        <LayoutFurniImageView
+            direction={90}
+            extraData={item.isWallItem ? (item.stuffData?.getLegacyString() ?? '') : String(item.extra)}
+            productClassId={item.type}
+            productType={item.isWallItem ? ProductTypeEnum.WALL : ProductTypeEnum.FLOOR}
+        />
+    );
+
+    if (isHandheld) {
+        const statRows = stats
+            ? [
+                  { name: 'average', price: stats.averagePrice, text: statText('inventory.marketplace.make_offer.average_price', stats.averagePrice, averageDays) },
+                  { name: 'lowest', price: stats.lowestCurrentPrice, text: statText('inventory.marketplace.make_offer.lowest_price', stats.lowestCurrentPrice) },
+                  { name: 'suggested', price: stats.suggestedPrice, text: statText('inventory.marketplace.make_offer.suggested_price', stats.suggestedPrice) }
+              ].filter((row) => isMarketplacePriceStatVisible(row.price))
+            : [];
+
+        return (
+            <HandheldMarketplacePostOfferView
+                amount={
+                    isNft
+                        ? null
+                        : { label: text('sellinmarketplace.amount', ['max_amount'], [String(maxAmount)]), value: amountText, max: maxAmount, onChange: onAmountChange }
+                }
+                cancelLabel={text('inventory.marketplace.make_offer.cancel')}
+                copyLabel={showCopySuggested ? text('inventory.marketplace.make_offer.copy_suggested_price') : null}
+                expiration={text('inventory.marketplace.make_offer.expiration_info_days', ['days'], [expirationDays])}
+                finalText={finalText}
+                isNft={isNft}
+                name={furniName}
+                picture={picture}
+                postLabel={text('inventory.marketplace.make_offer.post')}
+                price={{ label: text('inventory.marketplace.make_offer.price_request'), value: priceText, valid: priceCheck.valid, onChange: onPriceChange }}
+                rarity={(item.stuffData?.rarityLevel ?? -1) >= 0 ? <LayoutRarityLevelView level={item.stuffData.rarityLevel} /> : null}
+                stats={statRows.map(({ name, text: line }) => ({ name, text: line }))}
+                title={text('inventory.marketplace.make_offer.title')}
+                unique={uniqueNumber > 0 ? <LayoutLimitedEditionCompactPlateView uniqueNumber={uniqueNumber} uniqueSeries={item.stuffData.uniqueSeries} /> : null}
+                onClose={close}
+                onCopySuggested={copySuggestedPrice}
+                onPost={postOffer}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>
@@ -395,14 +452,7 @@ export const MarketplacePostOfferView: FC<{}> = () => {
             >
                 <OctaneCardHeaderView headerText={text('inventory.marketplace.make_offer.title')} onCloseClick={close} />
                 <OctaneCardContentView classNames={['octane-marketplace-post-offer-content']} overflow="hidden">
-                    <div className="octane-marketplace-post-offer-image">
-                        <LayoutFurniImageView
-                            direction={90}
-                            extraData={item.isWallItem ? (item.stuffData?.getLegacyString() ?? '') : String(item.extra)}
-                            productClassId={item.type}
-                            productType={item.isWallItem ? ProductTypeEnum.WALL : ProductTypeEnum.FLOOR}
-                        />
-                    </div>
+                    <div className="octane-marketplace-post-offer-image">{picture}</div>
                     {uniqueNumber > 0 && (
                         <LayoutLimitedEditionCompactPlateView
                             className="octane-marketplace-post-offer-unique"
@@ -459,17 +509,7 @@ export const MarketplacePostOfferView: FC<{}> = () => {
                             </BaseButton>
                         )}
                         <div className="octane-marketplace-post-offer-final" data-testid="marketplace-post-offer-final" role="status">
-                            <span>
-                                {priceCheck.valid
-                                    ? `${text('sell.in.marketplace.revenue.label')}: ${revenue}`
-                                    : isNft
-                                      ? collectiblesMarketplaceText(
-                                            'shop.marketplace.invalid.price.emeralds',
-                                            ['minPrice', 'maxPrice'],
-                                            [String(minimumPrice), String(maximumPrice)]
-                                        )
-                                      : text('shop.marketplace.invalid.price', ['minPrice', 'maxPrice'], [String(minimumPrice), String(maximumPrice)])}
-                            </span>
+                            <span>{finalText}</span>
                         </div>
                         <div className="octane-marketplace-post-offer-buttons">
                             <BaseButton className="octane-marketplace-post-offer-button is-post" disabled={!priceCheck.valid} onClick={postOffer}>

@@ -6,6 +6,8 @@ import { useRareValues } from '../../hooks';
 import { OctaneCard, OctaneInput } from '../../layout';
 import '../../css/rare-values/RareValuesAirText.css';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldRareValuesView } from './HandheldRareValuesView';
 
 const PAGE_SIZE = 50;
 
@@ -23,6 +25,7 @@ export const RareValuesView: FC<{}> = () => {
     const { values = null, loaded = false } = useRareValues();
     const scrollRef = useRef<HTMLDivElement>(null);
     const sentinelRef = useRef<HTMLDivElement>(null);
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         const linkTracker: ILinkEventTracker = {
@@ -116,6 +119,21 @@ export const RareValuesView: FC<{}> = () => {
 
     const visibleRows = filtered.slice(0, visibleCount);
     const hasMore = visibleCount < filtered.length;
+
+    if (isHandheld)
+        return (
+            <HandheldRareValuesView
+                hasMore={hasMore}
+                loaded={loaded}
+                rows={visibleRows}
+                scrollRef={scrollRef}
+                searchValue={searchValue}
+                sentinelRef={sentinelRef}
+                total={filtered.length}
+                onClose={() => setIsVisible(false)}
+                onSearch={setSearchValue}
+            />
+        );
 
     return (
         <NativeTextTree>

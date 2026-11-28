@@ -6,6 +6,8 @@ import { Checkbox } from '../../../../../common/Checkbox';
 import { InlineDialog } from '../../../../../common/InlineDialog';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../../../hooks/handheld/useHandheldLayout';
+import { HandheldClubPurchaseConfirmView } from '../../handheld/HandheldShopConfirmViews';
 
 interface CatalogClubPurchaseConfirmViewProps {
     offer: ClubOfferData;
@@ -20,10 +22,27 @@ export const CatalogClubPurchaseConfirmView: FC<CatalogClubPurchaseConfirmViewPr
     const disclaimerEnabled = useMemo(() => GetConfigurationValue<boolean>('disclaimer.credit_spending.enabled', false), []);
     const [disclaimerAccepted, setDisclaimerAccepted] = useState(!disclaimerEnabled);
     const showCredits = offer.priceCredits > 0 || offer.priceActivityPoints <= 0;
+    const isHandheld = useIsHandheld();
 
     useEffect(() => setDisclaimerAccepted(!disclaimerEnabled), [disclaimerEnabled, offer.offerId]);
 
     const title = LocalizeText('catalog.club.buy.confirm');
+
+    if (isHandheld)
+        return (
+            <HandheldClubPurchaseConfirmView
+                disclaimer={disclaimerEnabled ? { accepted: disclaimerAccepted, onChange: setDisclaimerAccepted } : null}
+                price={[
+                    ...(showCredits ? [{ amount: offer.priceCredits, type: -1 }] : []),
+                    ...(offer.priceActivityPoints > 0 ? [{ amount: offer.priceActivityPoints, type: offer.priceActivityPointsType }] : [])
+                ]}
+                productText={productText}
+                title={title}
+                validUntilText={validUntilText}
+                onCancel={onCancel}
+                onConfirm={onConfirm}
+            />
+        );
 
     return (
         <NativeTextTree>

@@ -2,6 +2,7 @@ import { FC, useEffect, useRef } from 'react';
 import { localizeWithFallback } from '../../../../api';
 import { LayoutAvatarImageView } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 import { MentionSuggestion } from '../../../../hooks/rooms/widgets/useChatMentions.helpers';
 
 interface ChatInputMentionSelectorViewProps {
@@ -19,6 +20,8 @@ interface ChatInputMentionSelectorViewProps {
 export const ChatInputMentionSelectorView: FC<ChatInputMentionSelectorViewProps> = (props) => {
     const { suggestions = [], selectedIndex = 0, onSelect = null, onHover = null } = props;
     const listRef = useRef<HTMLDivElement>(null);
+    // On a phone the same list is a glass panel above the composer and the keyboard, with 44 px rows (HandheldInventoryDialogs.css).
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         if (!listRef.current) return;
@@ -32,7 +35,7 @@ export const ChatInputMentionSelectorView: FC<ChatInputMentionSelectorViewProps>
 
     return (
         <NativeTextTree>
-            <div className="chat-input-mention-popover">
+            <div className={isHandheld ? 'chat-input-mention-popover is-handheld' : 'chat-input-mention-popover'}>
                 <div className="chat-input-mention-popover-header">
                     <span className="chat-input-mention-popover-header-dot" aria-hidden />
                     <span>{localizeWithFallback('mentions.selector.title', '@ Mention')}</span>

@@ -685,7 +685,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView classNames={['octane-catalog-admin-manager']} uniqueKey="catalog-admin-manager">
+            <OctaneCardView handheldSheet classNames={['octane-catalog-admin-manager']} uniqueKey="catalog-admin-manager">
                 <OctaneCardHeaderView headerText={localizeWithFallback('octane.catalog.catalog_admin_editor', 'Catalog Admin Editor')} onCloseClick={() => catalogAdmin.setAdminMode(false)} />
                 <OctaneCardContentView classNames={['octane-catalog-admin-manager-body']}>
                     <div aria-live="polite" className={`octane-catalog-admin-command-bar is-${commandState.phase}`}>

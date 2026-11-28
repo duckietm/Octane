@@ -148,6 +148,7 @@
         {"key":"room.zoom.enabled","comment":"Room zoom scales the canvas; off: zoom buttons rescale the room geometry instead.","value":true,"runtime":true},
         {"key":"room.planes.direct","comment":"Draws walls and floors straight from their tiles instead of baked textures (WebGL2 only).","value":false,"runtime":true},
         {"key":"room.color.skip.transition","comment":"Room colour changes (dimmer, backgrounds) apply at once instead of fading over 1.5 s.","value":false,"runtime":true},
+        {"key":"room.avatar.redraw.budget","comment":"In a crowd, the mouth and eye frames of avatars that stand still take turns instead of slowing the frame down; off: every avatar redraws at once, as before.","value":true,"runtime":true},
         {"key":"pet.types","comment":"Pet type names, by type id; used only when pets.json is missing or empty.","value":[]},
         {"key":"room.camera.follow_user","comment":"The room camera follows the own avatar when it walks off view.","value":true,"runtime":true},
         {"key":"room.camera.move.speed","comment":"Divisor of the camera glide speed; higher is slower and smoother.","value":12,"runtime":true},

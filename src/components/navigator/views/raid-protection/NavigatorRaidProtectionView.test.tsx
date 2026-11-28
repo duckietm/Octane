@@ -2,6 +2,9 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { IRaidProtectionSettings } from '../../../../api/navigator/RaidProtection';
 import { useRaidProtectionStore } from '../../../../hooks/navigator/raidProtectionStore';
+import { DESKTOP_LAYOUT } from '../../../../api/handheld/handheldLayout';
+import { useHandheldStore } from '../../../../state/handheldStore';
+import { selectOption } from '../../../../test-utils/selectOption';
 
 const sendSave = vi.fn((..._args: unknown[]) => true);
 const showConfirm = vi.fn();
@@ -110,5 +113,52 @@ describe('raid protection window (AIR raid_protection_settings_xml)', () =>
         render(<NavigatorRaidProtectionView />);
 
         expect(screen.getByRole('status').querySelector('.is-active')).not.toBeNull();
+    });
+
+    describe('on a phone', () =>
+    {
+        beforeEach(() => act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'portrait' } })));
+
+        afterEach(() => act(() => useHandheldStore.setState({ layout: DESKTOP_LAYOUT })));
+
+        it('is a sheet whose choices follow the same rules', () =>
+        {
+            open(settings({ enabled: true, actionType: 0, guardEnabled: false }));
+            render(<NavigatorRaidProtectionView />);
+
+            expect(screen.getByTestId('handheld-raid-protection')).toBeInTheDocument();
+
+            const [ sensitivity, action, ban, guardDuration ] = screen.getAllByRole('combobox');
+
+            expect(sensitivity).not.toHaveAttribute('data-disabled');
+            expect(action).not.toHaveAttribute('data-disabled');
+            expect(ban).toHaveAttribute('data-disabled');
+            expect(guardDuration).toHaveAttribute('data-disabled');
+        });
+
+        it('asks before switching protection on and saves the chosen values with the confirmation', () =>
+        {
+            open(settings());
+            render(<NavigatorRaidProtectionView />);
+
+            fireEvent.click(screen.getByRole('checkbox', { name: 'Turn on raid protection' }));
+            selectOption(screen.getAllByRole('combobox')[1], 'Temporary ban');
+            fireEvent.click(screen.getByRole('button', { name: /save|opslaan/i }));
+
+            expect(sendSave).not.toHaveBeenCalled();
+            act(() => showConfirm.mock.calls[0][1]());
+            expect(sendSave).toHaveBeenCalledWith(expect.objectContaining({ roomId: 5, enabled: true, actionType: 1 }), true);
+        });
+
+        it('closes from Cancel without saving', () =>
+        {
+            open(settings({ enabled: true }));
+            render(<NavigatorRaidProtectionView />);
+
+            fireEvent.click(screen.getByRole('button', { name: /cancel|annuleren/i }));
+
+            expect(sendSave).not.toHaveBeenCalled();
+            expect(screen.queryByTestId('handheld-raid-protection')).toBeNull();
+        });
     });
 });

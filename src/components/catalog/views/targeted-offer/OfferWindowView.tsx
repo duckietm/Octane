@@ -14,11 +14,14 @@ import { Button, Column, Flex, LayoutCurrencyIcon, OctaneCardContentView, Octane
 import { usePurse } from '../../../../hooks';
 import { NumberInput } from '../../../../common/NumberInput';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldOfferWindowView } from '../handheld/HandheldShopSheetViews';
 
 export const OfferWindowView = (props: { offer: TargetedOfferData; secondsLeft: number | null; onMinimize: () => void }) => {
     const { offer = null, secondsLeft = null, onMinimize = null } = props;
 
     const { getCurrencyAmount } = usePurse();
+    const isHandheld = useIsHandheld();
 
     const [chosenAmount, setAmount] = useState<number>(1);
     // Held inside 1..purchaseLimit: an emptied field (NaN) or a value past the limit was sent as typed.
@@ -63,6 +66,36 @@ export const OfferWindowView = (props: { offer: TargetedOfferData; secondsLeft: 
 
     if (!offer) return;
 
+    const warning =
+        purchaseBlock === 'credits'
+            ? localizeWithFallback('catalog.alert.notenough.credits.description', 'You do not have enough credits for this offer.')
+            : purchaseBlock === 'points'
+              ? localizeWithFallback('catalog.alert.notenough.activitypoints.description', 'You do not have enough points for this offer.')
+              : null;
+
+    if (isHandheld)
+        return (
+            <HandheldOfferWindowView
+                buyDisabled={buying || purchaseBlock !== null}
+                buyLabel={LocalizeText('targeted.offer.button.buy')}
+                descriptionHtml={{ __html: SanitizeHotelHtml(offer.description) }}
+                imageUrl={GetConfigurationValue('image.library.url') + offer.imageUrl}
+                price={[
+                    ...(offer.priceInCredits > 0 ? [{ amount: offer.priceInCredits * amount, type: -1 }] : []),
+                    ...(offer.priceInActivityPoints > 0 ? [{ amount: offer.priceInActivityPoints * amount, type: offer.activityPointType }] : [])
+                ]}
+                priceLabel={LocalizeText('targeted.offer.price.label')}
+                quantity={
+                    offer.purchaseLimit > 1 ? { label: LocalizeText('catalog.bundlewidget.quantity'), value: amount, max: offer.purchaseLimit, onChange: setAmount } : null
+                }
+                timeLeft={secondsLeft !== null ? LocalizeText('targeted.offer.timeleft', ['timeleft'], [FriendlyTime.format(secondsLeft)]) : null}
+                title={LocalizeText(offer.title)}
+                warning={warning}
+                onBuy={buyOffer}
+                onMinimize={() => onMinimize()}
+            />
+        );
+
     return (
         <NativeTextTree>
             <OctaneCardView className="octane-targeted-offer" theme="primary-slim" uniqueKey="targeted-offer">
@@ -90,11 +123,9 @@ export const OfferWindowView = (props: { offer: TargetedOfferData; secondsLeft: 
                                     {LocalizeText('targeted.offer.button.buy')}
                                 </Button>
                             </Flex>
-                            {(purchaseBlock === 'credits' || purchaseBlock === 'points') && (
+                            {warning && (
                                 <Text center small variant="danger">
-                                    {purchaseBlock === 'credits'
-                                        ? localizeWithFallback('catalog.alert.notenough.credits.description', 'You do not have enough credits for this offer.')
-                                        : localizeWithFallback('catalog.alert.notenough.activitypoints.description', 'You do not have enough points for this offer.')}
+                                    {warning}
                                 </Text>
                             )}
                         </Flex>

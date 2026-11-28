@@ -3,6 +3,8 @@ import { FC, useEffect, useState } from 'react';
 import { flashFontTagsToSpans, GetConfigurationValue, localizeWithFallback, SanitizeHotelHtml } from '../../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldVipBenefitsView } from '../handheld/HandheldShopSheetViews';
 
 /** English fallbacks for the AIR texts, used only when the external texts lack the key. */
 const FALLBACKS: Record<string, string> = {
@@ -25,6 +27,7 @@ const html = (key: string): { __html: string } => ({ __html: SanitizeHotelHtml(f
  */
 export const VipBenefitsView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         const linkTracker: ILinkEventTracker = {
@@ -56,6 +59,19 @@ export const VipBenefitsView: FC<{}> = () => {
     if (!isVisible) return null;
 
     const imageLibrary = GetConfigurationValue<string>('image.library.url', '');
+
+    if (isHandheld)
+        return (
+            <HandheldVipBenefitsView
+                caption={text('vip.benefits.caption')}
+                descriptionHtml={html('vip.benefits.description')}
+                detailsHtml={html('vip.benefits.details')}
+                headerImage={`${imageLibrary}directVipBuy/hc_benefits_header.png`}
+                teaserImage={`${imageLibrary}directVipBuy/hc_benefits_teaser.png`}
+                title={text('vip.benefits.title')}
+                onClose={() => setIsVisible(false)}
+            />
+        );
 
     return (
         <NativeTextTree>

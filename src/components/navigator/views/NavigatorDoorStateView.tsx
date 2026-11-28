@@ -3,7 +3,9 @@ import { CreateRoomSession, DoorStateType, GoToDesktop, LocalizeText } from '../
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../common';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useDoorState } from '../../../hooks';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
 import { OctaneInput } from '../../../layout';
+import { HandheldDoorMode, HandheldDoorStateView } from './HandheldDoorStateView';
 
 const VISIBLE_STATES = [
     DoorStateType.START_DOORBELL,
@@ -17,6 +19,7 @@ const DOORBELL_STATES = [DoorStateType.START_DOORBELL, DoorStateType.STATE_WAITI
 export const NavigatorDoorStateView: FC<{}> = (props) => {
     const [password, setPassword] = useState('');
     const { snapshot, setSnapshot, reset } = useDoorState();
+    const isHandheld = useIsHandheld();
 
     const onClose = () => {
         if (snapshot.state === DoorStateType.STATE_WAITING) GoToDesktop();
@@ -44,6 +47,31 @@ export const NavigatorDoorStateView: FC<{}> = (props) => {
     if (VISIBLE_STATES.indexOf(snapshot.state) === -1) return null;
 
     const isDoorbell = DOORBELL_STATES.indexOf(snapshot.state) >= 0;
+
+    if (isHandheld) {
+        const mode: HandheldDoorMode =
+            snapshot.state === DoorStateType.START_DOORBELL
+                ? 'doorbell'
+                : snapshot.state === DoorStateType.STATE_WAITING
+                  ? 'waiting'
+                  : snapshot.state === DoorStateType.STATE_NO_ANSWER
+                    ? 'no-answer'
+                    : snapshot.state === DoorStateType.STATE_WRONG_PASSWORD
+                      ? 'wrong-password'
+                      : 'password';
+
+        return (
+            <HandheldDoorStateView
+                mode={mode}
+                password={password}
+                roomName={snapshot.roomInfo?.roomName ?? ''}
+                onClose={onClose}
+                onPassword={setPassword}
+                onRing={ring}
+                onTry={tryEntering}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

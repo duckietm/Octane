@@ -1,0 +1,2528 @@
+/*
+ * Phone room extras in the Octane handheld look (HandheldTokens.css): the soundboard (a sheet docked over the room, its
+ * feed as glass capsules in the right column), the trax machine, the rare values, the seasonal calendar and raid
+ * protection as sheets (HandheldSheetFrame), and the door (doorbell / password), the room link and a finished quest
+ * as centred cards (HandheldCenterCard). Upright everything reads top to bottom; on its side the sheets use the width.
+ * Scoped to :root[data-handheld] (set only on a phone-sized touch device), so the desktop windows stay as they are.
+ */
+
+/* ---------------------------------------------------------------- shared parts of the sheets */
+
+:root[data-handheld] .octane-handheld-rx :where(button, input) {
+    font-family: inherit;
+}
+
+:root[data-handheld] .octane-handheld-rx :where(button) {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root[data-handheld] .octane-handheld-rx__scroll {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    min-width: 0;
+    min-height: 0;
+    margin: 0 calc(var(--hh-space-3) * -1);
+    padding: 2px var(--hh-space-3) var(--hh-space-3);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-rx__section-title,
+:root[data-handheld] .octane-handheld-rx__card-title {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-rx__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    box-sizing: border-box;
+    min-width: 0;
+    padding: var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-rx__text,
+:root[data-handheld] .octane-handheld-rx__hint,
+:root[data-handheld] .octane-handheld-rx__empty,
+:root[data-handheld] .octane-handheld-rx__error {
+    margin: 0;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 19px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-rx__hint {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 17px;
+}
+
+:root[data-handheld] :is(.octane-handheld-rx__text, .octane-handheld-rx__hint).is-centred {
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-rx__text.is-error,
+:root[data-handheld] .octane-handheld-rx__error {
+    color: var(--hh-air-red);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-rx__empty {
+    padding: var(--hh-space-4) 0;
+    color: var(--hh-air-text-muted);
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-rx__meta {
+    display: flex;
+    flex: none;
+    justify-content: space-between;
+    padding: var(--hh-space-2) var(--hh-space-1) 0;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-rx__more {
+    padding: var(--hh-space-3) 0;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    text-align: center;
+}
+
+/* The search: a 16 px pill with a drawn magnifier. */
+:root[data-handheld] .octane-handheld-rx__toolbar {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+}
+
+:root[data-handheld] .octane-handheld-rx__search-icon {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    box-sizing: border-box;
+    width: 14px;
+    height: 14px;
+    margin-top: -8px;
+    border: 2px solid var(--hh-air-box-line);
+    border-radius: var(--hh-radius-pill);
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-rx__search-icon::after {
+    content: "";
+    position: absolute;
+    right: -5px;
+    bottom: -4px;
+    width: 6px;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--hh-air-box-line);
+    transform: rotate(45deg);
+}
+
+:root[data-handheld] .octane-handheld-rx__input,
+:root[data-handheld] .octane-handheld-rx-card .octane-handheld-rx__input {
+    flex: 1 1 auto;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+    line-height: 20px;
+    outline: 0;
+    transition: border-color var(--hh-fast) var(--hh-ease);
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+:root[data-handheld] .octane-handheld-rx__input.is-search {
+    padding-left: 40px;
+    border-color: var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+}
+
+:root[data-handheld] .octane-handheld-rx__input::placeholder {
+    color: var(--hh-air-box-line);
+    opacity: 1;
+}
+
+:root[data-handheld] .octane-handheld-rx__input:focus {
+    border-color: var(--hh-air-blue);
+}
+
+:root[data-handheld] .octane-handheld-rx__input::-webkit-search-cancel-button {
+    display: none;
+}
+
+/* Chips: 36 px pills, the finger gets 44; a row of them scrolls sideways. */
+:root[data-handheld] .octane-handheld-rx__chips {
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+    margin: 0 calc(var(--hh-space-3) * -1);
+    padding: var(--hh-space-2) var(--hh-space-3);
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-rx__chip {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    margin: 0;
+    padding: 0 var(--hh-space-4);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    line-height: 20px;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx__chip::after {
+    content: "";
+    position: absolute;
+    inset: -4px 0;
+}
+
+:root[data-handheld] .octane-handheld-rx__chip:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-rx__chip[data-pressed] {
+    border-color: var(--hh-air-blue-deep);
+    background: var(--hh-air-blue-deep);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-rx__chip.is-tool {
+    padding: 0 var(--hh-space-3);
+    color: var(--hh-air-blue-deep);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-rx__chip.is-danger {
+    color: var(--hh-air-red);
+}
+
+/* Buttons: 44 px pills; the one way on is green. */
+:root[data-handheld] .octane-handheld-rx__button {
+    display: inline-flex;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-4);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        filter var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx__button:active {
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-rx__button.is-primary {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-rx__button.is-primary:active {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld] .octane-handheld-rx__button:disabled {
+    box-shadow: none;
+    cursor: default;
+    filter: grayscale(0.6);
+    opacity: 0.45;
+}
+
+:root[data-handheld] .octane-handheld-rx__link {
+    position: relative;
+    margin: 0;
+    padding: 0 var(--hh-space-1);
+    border: 0;
+    background: none;
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 20px;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rx__link::after {
+    content: "";
+    position: absolute;
+    inset: -12px -4px;
+}
+
+/* The bar at the bottom of a sheet: the actions, above the safe area. */
+:root[data-handheld] .octane-handheld-rx__bar {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hh-space-2);
+    margin: 0 calc(var(--hh-space-3) * -1) calc(var(--hh-space-2) * -1);
+    padding: var(--hh-space-2) var(--hh-space-3) calc(var(--hh-space-2) + var(--octane-safe-bottom, 0px));
+    border-top: 1px solid var(--hh-air-box);
+    background: var(--hh-air-panel);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+}
+
+:root[data-handheld] .octane-handheld-rx__bar-actions {
+    display: flex;
+    flex: 1 1 100%;
+    gap: var(--hh-space-2);
+}
+
+/* A page of a sheet: Back and its title. */
+:root[data-handheld] .octane-handheld-rx__page-head {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rx__page-title {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rx__back {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 2px;
+    height: 36px;
+    margin: 0;
+    padding: 0 var(--hh-space-3) 0 6px;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 20px;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx__back::after {
+    content: "";
+    position: absolute;
+    inset: -4px 0;
+}
+
+:root[data-handheld] .octane-handheld-rx__back:active {
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-rx__chevron {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+/* The drop-downs (Select): white 44 px fields with a drawn chevron. */
+:root[data-handheld] .octane-select-trigger.octane-handheld-rx__select {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    height: var(--hh-touch);
+    min-height: var(--hh-touch);
+    padding: 0 36px 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+    line-height: 20px;
+    text-align: left;
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-select-trigger.octane-handheld-rx__select::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    box-sizing: border-box;
+    width: 8px;
+    height: 8px;
+    margin-top: -6px;
+    border: solid var(--hh-air-blue);
+    border-width: 0 2.5px 2.5px 0;
+    border-radius: 1px;
+    background: none;
+    pointer-events: none;
+    transform: rotate(45deg);
+}
+
+:root[data-handheld] .octane-select-trigger.octane-handheld-rx__select[data-disabled] {
+    background: var(--hh-air-panel);
+    cursor: default;
+    opacity: 0.55;
+}
+
+:root[data-handheld] .octane-handheld-rx__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-handheld-rx__field-label {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-rx :where(button, input, [role="slider"]):focus-visible,
+:root[data-handheld] .octane-handheld-rx-card :where(button, input):focus-visible {
+    outline: var(--hh-focus-on-paper);
+    outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- centred cards (door, room link, finished quest) */
+
+:root[data-handheld] .octane-handheld-rx-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    padding: max(var(--hh-space-4), var(--octane-safe-top, 0px)) calc(var(--hh-space-4) + var(--octane-safe-right, 0px))
+        calc(var(--octane-handheld-toolbar) + var(--hh-space-3) + var(--octane-safe-bottom, 0px)) calc(var(--hh-space-4) + var(--octane-safe-left, 0px));
+    background: var(--hh-air-outline);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+}
+
+/* On its side there is little height: the card may use the strip of the toolbar too. */
+:root[data-handheld='landscape'] .octane-handheld-rx-scrim {
+    padding-top: max(var(--hh-space-2), var(--octane-safe-top, 0px));
+    padding-bottom: max(var(--hh-space-2), var(--octane-safe-bottom, 0px));
+}
+
+/* The keyboard is up (the password): the card sits on it. */
+:root[data-handheld][data-handheld-keyboard] .octane-handheld-rx-scrim {
+    padding-bottom: calc(var(--octane-keyboard-inset, 0px) + var(--hh-space-2));
+}
+
+:root[data-handheld] .octane-handheld-rx-card {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: min(100%, 360px);
+    max-height: 100%;
+    overflow: hidden;
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-cream);
+    box-shadow: var(--hh-shadow-float);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-card {
+    width: min(100%, 440px);
+}
+
+:root[data-handheld] .octane-handheld-rx-card img {
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-rx-card__head {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    height: 52px;
+    padding: 0 var(--hh-space-2) 0 var(--hh-space-4);
+    background: linear-gradient(180deg, var(--hh-air-blue-header-line) 0%, var(--hh-air-blue-header) 100%);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-card__head {
+    height: 46px;
+}
+
+:root[data-handheld] .octane-handheld-rx-card__icon {
+    flex: none;
+    margin-left: -4px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+:root[data-handheld] .octane-handheld-rx-card__title {
+    flex: 1 1 0;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rx-card__close {
+    position: relative;
+    display: flex;
+    flex: 0 0 36px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-dismiss);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px var(--hh-air-outline);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-card__close::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+}
+
+:root[data-handheld] .octane-handheld-rx-card__close svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-rx-card__body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    min-height: 0;
+    padding: var(--hh-space-4);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-card__body {
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-3) var(--hh-space-4);
+}
+
+:root[data-handheld] .octane-handheld-rx-card__actions {
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+    padding: 0 var(--hh-space-4) var(--hh-space-4);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-card__actions {
+    padding-bottom: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-rx-card__actions .octane-handheld-rx__button {
+    font-size: var(--hh-size-m);
+}
+
+/* The door: the room's name, the text, the dots while the bell rings, the password. */
+:root[data-handheld] .octane-handheld-rx-door__room {
+    overflow: hidden;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rx-door__dots {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    padding: var(--hh-space-1) 0;
+}
+
+:root[data-handheld] .octane-handheld-rx-door__dots i {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-blue);
+    /* pulseGlow lives in index.css: a phone sheet keeps no keyframes of its own. */
+    animation: pulseGlow 1.2s ease-in-out infinite;
+}
+
+:root[data-handheld] .octane-handheld-rx-door__dots i:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+:root[data-handheld] .octane-handheld-rx-door__dots i:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+
+/* The room link: picture and texts, the link field and its copy button. */
+:root[data-handheld] .octane-handheld-rx-link__hero {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-rx-link__thumb {
+    flex: none;
+    width: 88px;
+    height: 88px;
+    border-radius: var(--hh-radius-s);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-rx-link__texts {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rx-link__headline {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-rx-link__field {
+    display: flex;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rx-link__copy {
+    display: flex;
+    flex: 0 0 var(--hh-touch);
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--hh-air-blue-deep);
+    border-radius: var(--hh-radius-pill);
+    background: linear-gradient(180deg, var(--hh-air-blue-light) 0%, var(--hh-air-blue) 50%, var(--hh-air-blue-deep) 100%);
+    box-shadow: var(--hh-edge), var(--hh-shadow-card);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    font-size: var(--hh-size-l);
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-link__copy.is-copied {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+}
+
+/* A finished quest: the badge, the caption, the text and the reward chip. */
+:root[data-handheld] .octane-handheld-rx-quest__hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-rx-quest__icon {
+    flex: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-quest__hero {
+    flex-direction: row;
+    justify-content: center;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-quest__icon {
+    width: 84px;
+    height: 72px;
+    background-size: contain;
+}
+
+:root[data-handheld] .octane-handheld-rx-quest__caption {
+    color: var(--hh-air-green-deep);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-rx-quest__reward {
+    display: flex;
+    align-items: center;
+    align-self: center;
+    gap: var(--hh-space-2);
+    min-height: 36px;
+    padding: 0 var(--hh-space-4) 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-track-free);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- soundboard */
+
+/* A sheet over the room, not a full screen: upright above the toolbar strip, on its side at the right edge. */
+:root[data-handheld] .octane-handheld-rx-dock {
+    position: fixed;
+    right: 0;
+    bottom: calc(var(--octane-handheld-toolbar) + var(--octane-safe-bottom, 0px));
+    left: 0;
+    z-index: 84;
+    display: flex;
+    height: min(64dvh, 560px);
+    max-height: calc(100dvh - var(--octane-handheld-toolbar) - var(--octane-safe-top, 0px) - var(--hh-space-4));
+    overflow: hidden;
+    border-radius: var(--hh-radius-l) var(--hh-radius-l) 0 0;
+    box-shadow: var(--hh-shadow-float);
+    pointer-events: auto;
+    transition: height var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-dock {
+    top: 0;
+    bottom: 0;
+    left: auto;
+    width: min(460px, 56vw);
+    height: auto;
+    max-height: none;
+    border-radius: var(--hh-radius-l) 0 0 var(--hh-radius-l);
+}
+
+:root[data-handheld][data-handheld-keyboard] .octane-handheld-rx-dock {
+    bottom: var(--octane-keyboard-inset, 0px);
+    max-height: calc(100dvh - var(--octane-keyboard-inset, 0px) - var(--octane-safe-top, 0px));
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-dock .octane-handheld-sheet {
+    padding-right: var(--octane-safe-right, 0px);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb .octane-handheld-sheet__body {
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb [data-tone="blue"],
+:root[data-handheld] .octane-handheld-rx-sb[data-tone="blue"] {
+    --rx-tone: var(--hh-air-blue);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb [data-tone="green"] {
+    --rx-tone: var(--hh-air-green-mid);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb [data-tone="gold"] {
+    --rx-tone: var(--hh-air-count-yellow);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb [data-tone="purple"] {
+    --rx-tone: var(--hh-air-premium);
+}
+
+/* The cooldown: a thin bar that empties while the pads rest. */
+:root[data-handheld] .octane-handheld-rx-sb__cooldown {
+    flex: none;
+    height: 4px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-box);
+    opacity: 0.4;
+    transition: opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__cooldown[data-cooling] {
+    opacity: 1;
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__cooldown-track,
+:root[data-handheld] .octane-handheld-rx-sb__cooldown-fill {
+    height: 100%;
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__cooldown-fill {
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-blue);
+    transition: width var(--hh-fast) linear;
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__scroll {
+    padding-top: var(--hh-space-2);
+}
+
+/* The shelf: the favourites (or the last sounds) as named pills in one row. */
+:root[data-handheld] .octane-handheld-rx-sb__shelf {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__shelf-label {
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 16px;
+    text-transform: uppercase;
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__shelf-row {
+    display: flex;
+    gap: var(--hh-space-2);
+    margin: 0 calc(var(--hh-space-3) * -1);
+    padding: 2px var(--hh-space-3) var(--hh-space-1);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__shelf-pill {
+    display: inline-flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    max-width: 168px;
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-3) 0 6px;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__shelf-pill:active,
+:root[data-handheld] .octane-handheld-rx-sb__pad-play:active {
+    transform: scale(0.96);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__shelf-pill[data-playing] {
+    border-color: var(--rx-tone);
+    box-shadow: 0 0 0 2px var(--rx-tone);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__shelf-dot,
+:root[data-handheld] .octane-handheld-rx-sb__pad-icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--rx-tone);
+    box-shadow: var(--hh-edge);
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-l);
+    line-height: 1;
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__shelf-name {
+    min-width: 0;
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* The pads: finger-sized tiles in the tone of the sound. */
+:root[data-handheld] .octane-handheld-rx-sb__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__pad {
+    position: relative;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__pad-play {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    min-height: 88px;
+    margin: 0;
+    padding: var(--hh-space-3) var(--hh-space-2) var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-top: 4px solid var(--rx-tone);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__pad[data-playing] .octane-handheld-rx-sb__pad-play {
+    border-color: var(--rx-tone);
+    background: var(--hh-air-track-light);
+    box-shadow:
+        0 0 0 2px var(--rx-tone),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__pad-play[aria-disabled="true"],
+:root[data-handheld] .octane-handheld-rx-sb__shelf-pill[aria-disabled="true"] {
+    cursor: default;
+    filter: grayscale(0.7);
+    opacity: 0.5;
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__pad-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--hh-radius-s);
+}
+
+/* On its side the height is short: no shelf (its chips "Favourites" / "Recent" hold the same sounds), lower pads. */
+:root[data-handheld='landscape'] .octane-handheld-rx-sb__shelf {
+    display: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-sb__pad-play {
+    min-height: 72px;
+    padding-top: var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-sb__pad-icon {
+    width: 28px;
+    height: 28px;
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__pad-name {
+    display: -webkit-box;
+    width: 100%;
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+/* The star in the pad's corner: drawn small, 40 px for the finger. */
+:root[data-handheld] .octane-handheld-rx-sb__star {
+    position: absolute;
+    top: 6px;
+    right: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: transparent;
+    color: var(--hh-air-box);
+    cursor: pointer;
+    transition: color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__star::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__star svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4px;
+    stroke-linejoin: round;
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__star[data-pressed] {
+    color: var(--hh-air-count-yellow);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__star[data-pressed] svg {
+    fill: currentColor;
+}
+
+:root[data-handheld] .octane-handheld-rx-sb__note {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-rx-sb .soundboard-bars i {
+    background: var(--hh-on-dark);
+}
+
+/* The feed in the right column: the AIR notification bubble of the column (its skin is NotificationCenterView.css'),
+   wider for a name and a sound on one line, at a readable size, with a 44 px silence button. */
+:root[data-handheld] .octane-right-side .soundboard-feed {
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-right-side .soundboard-feed .soundboard-feed__item {
+    box-sizing: border-box;
+    width: auto;
+    max-width: min(300px, calc(100vw - 72px));
+    min-height: var(--hh-touch);
+    gap: var(--hh-space-2);
+    transition: opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-right-side .soundboard-feed :is(.soundboard-feed__user, .soundboard-feed__sound) {
+    font-size: var(--hh-size-m);
+    line-height: 17px;
+}
+
+:root[data-handheld] .octane-right-side .soundboard-feed .soundboard-feed__user {
+    font-family: var(--hh-font-bold);
+}
+
+:root[data-handheld] .octane-right-side .soundboard-feed .soundboard-feed__icon {
+    width: 16px;
+    height: 16px;
+    color: var(--hh-air-select);
+}
+
+:root[data-handheld] .octane-right-side .soundboard-feed .soundboard-feed__silence {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    min-height: 36px;
+    padding: 0;
+    font-size: var(--hh-size-l);
+    opacity: 1;
+}
+
+:root[data-handheld] .octane-right-side .soundboard-feed .soundboard-feed__silence::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+}
+
+:root[data-handheld] .octane-right-side .soundboard-feed .soundboard-feed__timer {
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-select);
+}
+
+/* ---------------------------------------------------------------- rare values */
+
+:root[data-handheld] .octane-handheld-rx-rares__list {
+    display: grid;
+    gap: var(--hh-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-rares__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:root[data-handheld] .octane-handheld-rx-rares__card {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-width: 0;
+    min-height: 68px;
+    padding: var(--hh-space-2) var(--hh-space-3) var(--hh-space-2) var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-rx-rares__picture {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-rx-rares__image {
+    width: 44px;
+    height: 44px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-rx-rares__name {
+    display: -webkit-box;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 17px;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+:root[data-handheld] .octane-handheld-rx-rares__value {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-1);
+    height: 32px;
+    padding: 0 var(--hh-space-2) 0 var(--hh-space-3);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-deep);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- raid protection */
+
+:root[data-handheld] .octane-handheld-rx-raid__advice {
+    flex: none;
+    margin: 0;
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-track-tip);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 19px;
+}
+
+:root[data-handheld] .octane-handheld-rx-raid__cards {
+    display: grid;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-raid__cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+}
+
+:root[data-handheld] .octane-handheld-rx-raid .octane-handheld-rx__card {
+    gap: var(--hh-space-3);
+    padding-top: var(--hh-space-1);
+}
+
+/* The switch row: the whole row is the checkbox' label; the box is drawn as a switch. */
+:root[data-handheld] .octane-handheld-rx-raid__toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-height: 52px;
+    margin: 0 calc(var(--hh-space-3) * -1);
+    padding: 0 var(--hh-space-3);
+    border-bottom: 1px solid var(--hh-air-box);
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-handheld-rx-raid__toggle-text {
+    flex: 1 1 0;
+    min-width: 0;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-rx-raid__toggle .octane-checkbox {
+    position: relative;
+    flex: 0 0 48px;
+    box-sizing: border-box;
+    width: 48px;
+    min-width: 48px;
+    height: 28px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-box);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-raid__toggle .octane-checkbox::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-raid__toggle .octane-checkbox[data-checked] {
+    background: var(--hh-air-green-mid);
+}
+
+:root[data-handheld] .octane-handheld-rx-raid__toggle .octane-checkbox[data-checked]::after {
+    transform: translateX(20px);
+}
+
+:root[data-handheld] .octane-handheld-rx-raid__choice {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-raid__choice[data-disabled] {
+    opacity: 0.6;
+}
+
+:root[data-handheld] .octane-handheld-rx-raid__choice-label {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-rx-raid__status {
+    display: flex;
+    flex: 1 1 100%;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-rx-raid__status-dot {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-count-green);
+}
+
+:root[data-handheld] .octane-handheld-rx-raid__status[data-active] {
+    color: var(--hh-air-red);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-rx-raid__status[data-active] .octane-handheld-rx-raid__status-dot {
+    background: var(--hh-air-red);
+    animation: pulseGlowRed 1.2s ease-in-out infinite;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-raid .octane-handheld-rx__bar {
+    flex-wrap: nowrap;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-raid__status {
+    flex: 1 1 auto;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-raid .octane-handheld-rx__bar-actions {
+    flex: 0 0 300px;
+}
+
+/* ---------------------------------------------------------------- seasonal calendar */
+
+:root[data-handheld] .octane-handheld-rx-seasonal__layout {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-height: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-seasonal__layout[data-page="days"] {
+    flex-direction: row;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-seasonal__main {
+    margin-right: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-seasonal__side {
+    flex: 0 0 min(320px, 42%);
+    margin-left: 0;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__days {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day {
+    position: relative;
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: 112px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 2px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    text-align: left;
+    transition:
+        transform var(--hh-fast) var(--hh-ease),
+        box-shadow var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] button.octane-handheld-rx-seasonal__day {
+    cursor: pointer;
+}
+
+:root[data-handheld] button.octane-handheld-rx-seasonal__day:active {
+    transform: scale(0.97);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day-art {
+    position: absolute;
+    inset: 0 0 26px;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--hh-air-track-light) 0%, var(--hh-air-track-medium) 100%);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day-number {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-hud-solid);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 24px;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day-state {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-1);
+    height: 26px;
+    background: var(--hh-air-box);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day-state img {
+    max-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day[data-look="open"] {
+    border-color: var(--hh-air-green-mid);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day[data-look="open"] .octane-handheld-rx-seasonal__day-state {
+    background: var(--hh-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day[data-look="done"] .octane-handheld-rx-seasonal__day-state {
+    background: var(--hh-air-count-empty);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day[data-look="missed"] .octane-handheld-rx-seasonal__day-art {
+    filter: grayscale(1);
+    opacity: 0.55;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day[data-look="missed"] .octane-handheld-rx-seasonal__day-state {
+    color: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day[data-look="coming"] {
+    border-style: dashed;
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day[data-look="coming"] .octane-handheld-rx-seasonal__day-art {
+    opacity: 0.35;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day[data-look="coming"] .octane-handheld-rx-seasonal__day-state {
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text-muted);
+}
+
+/* Today: a ring that glows, as the desktop's indicator flashes (pulseGlow is index.css'). */
+:root[data-handheld] .octane-handheld-rx-seasonal__day[data-today] {
+    outline: 3px solid var(--hh-air-select);
+    outline-offset: 0;
+    animation: pulseGlow 1.6s ease-in-out infinite;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__day[data-selected] {
+    outline: 3px solid var(--hh-air-blue-deep);
+    animation: none;
+}
+
+
+:root[data-handheld] .octane-handheld-rx-seasonal__extras {
+    display: grid;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__promo {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    align-items: center;
+    gap: var(--hh-space-2) var(--hh-space-3);
+    background: linear-gradient(180deg, var(--hh-air-track-light) 0%, var(--hh-air-white) 70%);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__promo > .octane-handheld-rx__button {
+    grid-column: 1 / -1;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__promo-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__promo-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__promo-name {
+    overflow: hidden;
+    font-size: var(--hh-size-m);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__promo-balance {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__teaser {
+    align-items: center;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__rares {
+    display: flex;
+    gap: var(--hh-space-3);
+    justify-content: center;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__rare {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+    cursor: pointer;
+    transition: transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__rare:disabled {
+    cursor: default;
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__rare[data-locked] {
+    background: var(--hh-air-count-empty);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__rare img {
+    max-width: 48px;
+    max-height: 48px;
+}
+
+/* A padlock drawn in the locked tile. */
+:root[data-handheld] .octane-handheld-rx-seasonal__lock {
+    position: relative;
+    width: 18px;
+    height: 14px;
+    margin-top: 8px;
+    border-radius: 3px;
+    background: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__lock::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    left: 3px;
+    box-sizing: border-box;
+    width: 12px;
+    height: 12px;
+    border: 3px solid var(--hh-air-text-muted);
+    border-bottom: 0;
+    border-radius: 6px 6px 0 0;
+}
+
+/* The day's quest: the desktop entry, on cards. */
+:root[data-handheld] .octane-handheld-rx-seasonal__details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__details .octane-quest-entry {
+    flex-direction: column;
+    width: 100%;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__details .octane-quest-campaign {
+    width: 100%;
+    height: auto;
+    min-height: 64px;
+    box-sizing: border-box;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-blue-header);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__details .octane-quest-campaign-header {
+    border-radius: var(--hh-radius-s) var(--hh-radius-s) 0 0;
+    background: var(--hh-air-blue-deep);
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__details .octane-quest-block {
+    box-sizing: border-box;
+    width: auto;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__details .octane-quest-block-header {
+    height: 32px;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-header);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__details .octane-quest-entry[data-accepted="true"] :is(.octane-quest-campaign, .octane-quest-campaign-header) {
+    background: var(--hh-air-count-yellow);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__details .octane-quest-entry[data-accepted="true"] .octane-quest-block-header {
+    background: var(--hh-air-track-tip);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-rx-seasonal__details :is(.octane-quest-accept, .octane-quest-block-actions button) {
+    height: var(--hh-touch);
+    min-height: var(--hh-touch);
+}
+
+/* The campaign room: a full-width pill under the quest. */
+:root[data-handheld] .octane-handheld-rx-seasonal__details > .octane-quest-link {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-4);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-blue-deep);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+/* ---------------------------------------------------------------- trax machine */
+
+:root[data-handheld] .octane-handheld-rx-trax {
+    --rx-screen: var(--hh-air-hud-900);
+}
+
+/* The songs. */
+:root[data-handheld] .octane-handheld-rx-trax__songs {
+    display: grid;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__songs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__song,
+:root[data-handheld] .octane-handheld-rx-trax__buy,
+:root[data-handheld] .octane-handheld-rx-trax__empty-slot {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-3);
+    width: 100%;
+    min-width: 0;
+    min-height: 64px;
+    margin: 0;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__song:active,
+:root[data-handheld] .octane-handheld-rx-trax__buy:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__song[data-open] {
+    border-color: var(--hh-air-blue-deep);
+    box-shadow:
+        0 0 0 2px var(--hh-air-select),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__disk {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--hh-radius-pill);
+    background: radial-gradient(circle at center, var(--hh-air-hud-900) 0 5px, var(--hh-air-white) 5px 7px, var(--trax-disk, var(--hh-air-box)) 7px 100%);
+    box-shadow:
+        inset 0 1px 2px rgba(255, 255, 255, 0.5),
+        0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__disk.is-empty {
+    border: 2px dashed var(--hh-air-box);
+    background: none;
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__song-text {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__song-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__song-length {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__song .octane-handheld-rx__chevron {
+    color: var(--hh-air-border);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__buy {
+    border: 1px dashed var(--hh-air-green-mid);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-green-deep);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__buy:disabled {
+    cursor: default;
+    filter: grayscale(0.8);
+    opacity: 0.5;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__buy-plus {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__price {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-1);
+    height: 32px;
+    padding: 0 var(--hh-space-2) 0 var(--hh-space-3);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__empty-slot {
+    border-style: dashed;
+    background: transparent;
+    box-shadow: none;
+    color: var(--hh-air-text-muted);
+    cursor: default;
+    font-size: var(--hh-size-m);
+}
+
+/* Drawn glyphs of the machine's buttons. */
+:root[data-handheld] .octane-handheld-rx-trax__glyph {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__glyph.is-filled {
+    fill: currentColor;
+    stroke-width: 1px;
+}
+
+/* The editor: upright a scrolling stack over the transport bar; on its side sounds | timeline. */
+:root[data-handheld] .octane-handheld-rx-trax__editor {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-height: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__editor {
+    display: grid;
+    grid-template-columns: minmax(240px, 34%) minmax(0, 1fr);
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__left {
+    margin-right: 0;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__top {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__top > .octane-handheld-rx-trax__head {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* On its side the tools are their icons (their names stay their labels). */
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__tools {
+    flex-wrap: nowrap;
+    padding: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__tool-text {
+    display: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__tools .octane-handheld-rx__chip {
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__tools .octane-handheld-rx__chip::after {
+    content: none;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__head {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__icon-button {
+    display: flex;
+    flex: 0 0 var(--hh-touch);
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__icon-button.is-save {
+    border-color: var(--hh-air-blue-deep);
+    background: linear-gradient(180deg, var(--hh-air-blue-light) 0%, var(--hh-air-blue) 50%, var(--hh-air-blue-deep) 100%);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__icon-button.is-delete {
+    color: var(--hh-air-red);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__icon-button:disabled {
+    box-shadow: none;
+    cursor: default;
+    filter: grayscale(1);
+    opacity: 0.4;
+}
+
+/* The sounds: the four tracks, the set of the chosen one and its nine pads. */
+:root[data-handheld] .octane-handheld-rx-trax__sounds {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__tracks {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__tracks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__track {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-1);
+    min-width: 0;
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0 6px;
+    border: 1px solid var(--hh-air-box);
+    border-bottom: 4px solid var(--trax-track);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__track[data-pressed] {
+    border-color: var(--trax-track);
+    background: var(--hh-air-track-light);
+    box-shadow: 0 0 0 1px var(--trax-track);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__track-number {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--trax-track);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__track-title {
+    min-width: 0;
+    overflow: hidden;
+    font-size: var(--hh-size-s);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld='portrait'] .octane-handheld-rx-trax__track .octane-handheld-rx-trax__cartridge {
+    display: none;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__cartridge {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__cartridge.is-small {
+    width: 20px;
+    height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__cartridge.is-block {
+    box-sizing: border-box;
+    width: 24px;
+    border: 1px solid var(--hh-air-box-line);
+    border-radius: 3px;
+    background: var(--trax-set);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__cartridge.is-block.is-small {
+    width: 14px;
+    height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__set-button {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    width: 100%;
+    min-height: 48px;
+    margin: 0;
+    padding: 0 var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__set-button:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__set-button-text {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__set-title {
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 17px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__set-artist {
+    overflow: hidden;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__set-button .octane-handheld-rx__chevron {
+    color: var(--hh-air-border);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__samples {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__samples {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__sample {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0;
+    border: 1px solid rgba(0, 0, 0, 0.35);
+    border-radius: var(--hh-radius-s);
+    background: var(--trax-track);
+    box-shadow: var(--hh-edge);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    transition:
+        box-shadow var(--hh-fast) var(--hh-ease),
+        transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__sample:active {
+    transform: scale(0.95);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__sample[data-pressed] {
+    box-shadow:
+        0 0 0 2px var(--hh-air-white),
+        0 0 0 4px var(--hh-air-blue-deep);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__sample-number {
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 17px;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__sample-length {
+    font-size: var(--hh-size-s);
+    line-height: 14px;
+}
+
+/* The sets: every cartridge as a tile. */
+:root[data-handheld] .octane-handheld-rx-trax__sets {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__set {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--hh-space-1);
+    min-width: 0;
+    min-height: 104px;
+    margin: 0;
+    padding: var(--hh-space-2) 6px;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    text-align: center;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__set .octane-handheld-rx-trax__cartridge {
+    width: 40px;
+    height: 40px;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__set .octane-handheld-rx-trax__set-title {
+    display: -webkit-box;
+    width: 100%;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__set .octane-handheld-rx-trax__set-artist {
+    width: 100%;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__set[data-pressed] {
+    border-color: var(--hh-air-select);
+    background: var(--hh-air-track-light);
+    box-shadow:
+        0 0 0 2px var(--hh-air-select),
+        var(--hh-shadow-card);
+}
+
+/* The tools over the timeline. */
+:root[data-handheld] .octane-handheld-rx-trax__tools {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-1) 0;
+}
+
+/* The timeline: a dark screen that scrolls sideways inside its box; cells of 36 px. */
+:root[data-handheld] .octane-handheld-rx-trax__timeline {
+    flex: none;
+    box-sizing: border-box;
+    max-width: 100%;
+    padding: var(--hh-space-2);
+    overflow-x: auto;
+    overflow-y: hidden;
+    border: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-m);
+    background: var(--rx-screen);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__lane {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__playhead {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 3;
+    width: 3px;
+    margin-left: -1px;
+    border-radius: 2px;
+    background: var(--hh-air-white);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__playhead::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -5px;
+    border-top: 10px solid var(--hh-air-white);
+    border-right: 6.5px solid transparent;
+    border-left: 6.5px solid transparent;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__ruler {
+    position: relative;
+    height: 36px;
+    border-radius: var(--hh-radius-s);
+    background-color: var(--hh-well);
+    background-image: repeating-linear-gradient(
+        to right,
+        transparent 0,
+        transparent calc(var(--trax-cell) * 5 - 1px),
+        var(--hh-hairline) calc(var(--trax-cell) * 5 - 1px),
+        var(--hh-hairline) calc(var(--trax-cell) * 5)
+    );
+    cursor: col-resize;
+    touch-action: none;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__stamp {
+    position: absolute;
+    top: 10px;
+    margin-left: -14px;
+    color: var(--hh-on-dark-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__channel {
+    position: relative;
+    flex: none;
+    height: var(--hh-touch);
+    border-radius: var(--hh-radius-s);
+    background-color: var(--hh-air-hud-700);
+    background-image: repeating-linear-gradient(
+        to right,
+        transparent 0,
+        transparent calc(var(--trax-cell) - 1px),
+        var(--hh-hairline) calc(var(--trax-cell) - 1px),
+        var(--hh-hairline) var(--trax-cell)
+    );
+    box-shadow: inset 4px 0 0 var(--trax-track);
+    cursor: crosshair;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__channel[data-active] {
+    background-color: var(--hh-air-hud-line);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__ruler {
+    height: 36px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__channel {
+    height: 36px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__timeline {
+    padding: 6px;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__block {
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    z-index: 1;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.45);
+    border-radius: var(--hh-radius-s);
+    background: var(--trax-track);
+    box-shadow: var(--hh-edge);
+    color: var(--hh-air-hud-900);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    transition: opacity var(--hh-fast) var(--hh-ease);
+}
+
+/* Erasing: the blocks show they go on a tap. */
+:root[data-handheld] .octane-handheld-rx-trax__timeline[data-erasing] .octane-handheld-rx-trax__channel {
+    cursor: default;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__timeline[data-erasing] .octane-handheld-rx-trax__block {
+    border: 2px dashed var(--hh-air-white);
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__timeline[data-erasing] {
+    border-color: var(--hh-air-red);
+    box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.5),
+        0 0 0 2px var(--hh-air-red);
+}
+
+/* The transport bar. */
+:root[data-handheld] .octane-handheld-rx-trax__transport {
+    flex-wrap: nowrap;
+    gap: 6px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__transport {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__key {
+    position: relative;
+    display: flex;
+    flex: 0 0 var(--hh-touch);
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__key:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__key.is-play {
+    flex-basis: 52px;
+    width: 52px;
+    height: 52px;
+    margin: -4px 0;
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rx-trax__key.is-play {
+    flex-basis: 48px;
+    width: 48px;
+    height: 48px;
+    margin: 0;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__key.is-play[data-playing] {
+    border-color: var(--hh-air-blue-deep);
+    background: linear-gradient(180deg, var(--hh-air-blue-light) 0%, var(--hh-air-blue) 50%, var(--hh-air-blue-deep) 100%);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__key.is-erase[data-pressed] {
+    border-color: var(--hh-air-red-deep);
+    background: var(--hh-dismiss);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__key:disabled {
+    box-shadow: none;
+    cursor: default;
+    opacity: 0.4;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__key.is-small {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__key.is-small::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__length {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__length-value {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 44px;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-rx-trax__length-label {
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-s);
+    font-weight: 400;
+    line-height: 14px;
+}
+
+/* ---------------------------------------------------------------- less motion */
+
+@media (prefers-reduced-motion: reduce) {
+    :root[data-handheld] .octane-handheld-rx-door__dots i,
+    :root[data-handheld] .octane-handheld-rx-seasonal__day[data-today],
+    :root[data-handheld] .octane-handheld-rx-raid__status[data-active] .octane-handheld-rx-raid__status-dot {
+        animation: none;
+    }
+}

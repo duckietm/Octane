@@ -6,6 +6,8 @@ import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { ToggleButton } from '../../../common/ToggleButton';
 import { carouselElementLayout, claimButtonFor, SpecialItem, spotlightBlendFor } from '../../../hooks/catalog/specialItemsDisplay.helpers';
 import { useSpecialItemsDisplay } from '../../../hooks/catalog/useSpecialItemsDisplay';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldSpecialItemsDisplayView } from './HandheldSpecialItemsDisplayView';
 
 /** `getLocalization(key, "")`: a missing text is empty, never the raw key. */
 const text = (key: string, parameters: string[] = null, replacements: string[] = null): string => localizeWithFallback(key, '', parameters, replacements);
@@ -22,6 +24,7 @@ const itemDescription = (setKey: string, item: SpecialItem): string => text(`spe
  */
 export const SpecialItemsDisplayView: FC = () => {
     const { isVisible = false, setKey = '', items = [], claimState, rotation, close, navigateTo, next, previous, claim } = useSpecialItemsDisplay();
+    const isHandheld = useIsHandheld();
 
     if (!isVisible || !items.length) return null;
 
@@ -31,6 +34,64 @@ export const SpecialItemsDisplayView: FC = () => {
     const spotlightBlend = spotlightBlendFor(plaqueBlend);
     const claimButton = claimButtonFor(claimState);
     const title = localizeWithFallback('special_items.title', '%set_name%', ['set_name'], [text(`special_items.${setKey}.title`)]);
+
+    const viewer = (
+        <div className="octane-special-items-viewer">
+            <div className="octane-special-items-platform" />
+            <div className="octane-special-items-spotlight-base" style={{ opacity: spotlightBlend }} />
+            <div className="octane-special-items-rotation">
+                {items.map((item) => {
+                    const layout = carouselElementLayout(item.index, rotation.carousel.position, count);
+
+                    return (
+                        <div
+                            key={item.index}
+                            className="octane-special-items-product"
+                            data-testid="special-items-product"
+                            style={{ left: layout.x, top: layout.y, opacity: layout.blend, zIndex: Math.round(layout.depth * 100) }}
+                        >
+                            <LayoutFurniImageView direction={2} productClassId={item.classId} productType={ProductTypeEnum.FLOOR} />
+                        </div>
+                    );
+                })}
+            </div>
+            <div className="octane-special-items-spotlight" style={{ opacity: spotlightBlend }} />
+        </div>
+    );
+
+    if (isHandheld)
+        return (
+            <HandheldSpecialItemsDisplayView
+                claim={
+                    claimButton.visible
+                        ? {
+                              info: localizeWithFallback('special_items.claim_info', 'View all items to get a free reward:'),
+                              label:
+                                  claimButton.captionKey === 'special_items.claimed'
+                                      ? localizeWithFallback('special_items.claimed', 'Claimed')
+                                      : localizeWithFallback('special_items.claim', 'Claim'),
+                              enabled: claimButton.enabled,
+                              onClaim: claim
+                          }
+                        : null
+                }
+                item={{
+                    name: itemName(setKey, shownItem),
+                    description: itemDescription(setKey, shownItem),
+                    icon: <LayoutFurniIconImageView productClassId={shownItem.classId} productType={ProductTypeEnum.FLOOR} />,
+                    blend: plaqueBlend
+                }}
+                pages={items.map((item) => ({ index: item.index, name: itemName(setKey, item), selected: item.index === rotation.carousel.target }))}
+                setDescription={text(`special_items.${setKey}.header.desc`)}
+                setTitle={text(`special_items.${setKey}.header.title`)}
+                stage={viewer}
+                title={title}
+                onClose={close}
+                onNext={next}
+                onPage={navigateTo}
+                onPrevious={previous}
+            />
+        );
 
     return (
         <NativeTextTree>
@@ -45,27 +106,7 @@ export const SpecialItemsDisplayView: FC = () => {
                         </div>
                     </div>
                     <div className="octane-special-items-center">
-                        <div className="octane-special-items-viewer">
-                            <div className="octane-special-items-platform" />
-                            <div className="octane-special-items-spotlight-base" style={{ opacity: spotlightBlend }} />
-                            <div className="octane-special-items-rotation">
-                                {items.map((item) => {
-                                    const layout = carouselElementLayout(item.index, rotation.carousel.position, count);
-
-                                    return (
-                                        <div
-                                            key={item.index}
-                                            className="octane-special-items-product"
-                                            data-testid="special-items-product"
-                                            style={{ left: layout.x, top: layout.y, opacity: layout.blend, zIndex: Math.round(layout.depth * 100) }}
-                                        >
-                                            <LayoutFurniImageView direction={2} productClassId={item.classId} productType={ProductTypeEnum.FLOOR} />
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                            <div className="octane-special-items-spotlight" style={{ opacity: spotlightBlend }} />
-                        </div>
+                        {viewer}
                         <BaseButton
                             aria-label={localizeWithFallback('generic.previous', 'Previous')}
                             className="octane-special-items-nav is-previous"
