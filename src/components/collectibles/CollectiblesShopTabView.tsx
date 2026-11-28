@@ -10,6 +10,11 @@ import emeraldIcon from '../../assets/images/collectibles/pursearea_tiny_emerald
 import { CollectibleProductImageView } from './CollectibleProductImageView';
 import { CollectiblesLoadingView } from './CollectiblesLoadingView';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldCollectiblesShopView } from './HandheldCollectiblesShopView';
+
+/** An offer still has mints left (or no limit). */
+const isAvailable = (offer: CollectibleShopOfferData): boolean => offer.mintLimit === -1 || offer.mintedCount < offer.mintLimit;
 
 /** `ShopTab`: the shop's categories, the offers of the picked one, and the picked offer's preview and price. */
 export const CollectiblesShopTabView: FC = () => {
@@ -20,6 +25,7 @@ export const CollectiblesShopTabView: FC = () => {
     const groups = useMemo(() => groupShopOffers(shopOffers ?? []), [shopOffers]);
     const group = groups.find((entry) => entry.categoryKey === categoryKey) ?? groups[0] ?? null;
     const offer: CollectibleShopOfferData = group?.offers.find((entry) => entry.productCode === selectedCode) ?? group?.offers[0] ?? null;
+    const isHandheld = useIsHandheld();
 
     if (shopOffers === null) return <CollectiblesLoadingView />;
 
@@ -53,6 +59,24 @@ export const CollectiblesShopTabView: FC = () => {
             localizeWithFallback('catalog.purchase_confirmation.title', 'Confirm purchase')
         );
     };
+
+    if (isHandheld) {
+        return (
+            <HandheldCollectiblesShopView
+                categoryKey={group?.categoryKey ?? null}
+                groups={groups}
+                isAvailable={isAvailable}
+                offer={offer}
+                purchasePending={purchasePending}
+                onBuy={buy}
+                onCategory={(key) => {
+                    setCategoryKey(key);
+                    setSelectedCode(null);
+                }}
+                onSelect={setSelectedCode}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>
@@ -114,7 +138,7 @@ export const CollectiblesShopTabView: FC = () => {
                                         {offer.emeraldPrice}
                                         <img alt="" draggable={false} src={emeraldIcon} />
                                     </span>
-                                    <BaseButton className="octane-collectibles-button is-green" disabled={!(offer.mintLimit === -1 || offer.mintedCount < offer.mintLimit) || purchasePending} onClick={buy}>
+                                    <BaseButton className="octane-collectibles-button is-green" disabled={!isAvailable(offer) || purchasePending} onClick={buy}>
                                         {localizeWithFallback('generic.buy', 'Buy')}
                                     </BaseButton>
                                 </div>

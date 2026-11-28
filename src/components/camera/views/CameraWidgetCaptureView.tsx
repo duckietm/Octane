@@ -9,6 +9,8 @@ import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { HANDHELD_PAN_ONLY_SCALE } from '../../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldCameraCaptureView } from './HandheldCameraCaptureView';
 
 export interface CameraWidgetCaptureViewProps {
     onClose: () => void;
@@ -33,6 +35,8 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
     } = useCamera();
     const { simpleAlert = null } = useNotification();
     const { roomBackgroundColor = 0 } = useRoom();
+    // On a phone the same viewfinder, shutter and roll are laid out by HandheldCameraCaptureView.
+    const isHandheld = useIsHandheld();
     const elementRef = useRef<HTMLCanvasElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const flashRef = useRef<HTMLDivElement>(null);
@@ -123,7 +127,8 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
             video.classList.remove('octane-camera-viewfinder__stream--ready');
             stream?.getTracks().forEach((track) => track.stop());
         };
-    }, [selectedPicture]);
+        // The phone layout mounts its own viewfinder: the stream follows it when the layout changes.
+    }, [selectedPicture, isHandheld]);
 
     useEffect(() => {
         const capturedSlot = pendingCapturedSlotRef.current;
@@ -232,6 +237,38 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
     const activeSlotIndex = selectedPictureIndex > -1 ? selectedPictureIndex : activePictureSlotIndex;
     const hasPictures = cameraRoll.some((picture) => !!picture);
 
+    const selectSlot = (index: number) => {
+        if (isTakingPictureRef.current) return;
+
+        setActivePictureSlotIndex(index);
+        setSelectedPictureIndex(cameraRoll[index] ? index : -1);
+    };
+
+    const deleteSelectedPicture = () => {
+        if (!isTakingPictureRef.current) onDelete();
+    };
+
+    if (isHandheld) {
+        return (
+            <HandheldCameraCaptureView
+                activeSlotIndex={activeSlotIndex}
+                cameraRoll={cameraRoll}
+                canvasRef={elementRef}
+                flashRef={flashRef}
+                rollLimit={CAMERA_ROLL_LIMIT}
+                selectedPicture={selectedPicture}
+                selectedPictureIndex={selectedPictureIndex}
+                videoRef={videoRef}
+                onClose={onClose}
+                onDelete={deleteSelectedPicture}
+                onEdit={onEdit}
+                onHelp={() => CreateLinkEvent('habbopages/camera')}
+                onShutter={takePicture}
+                onSlot={selectSlot}
+            />
+        );
+    }
+
     return (
         <NativeTextTree>
             <DraggableWindow handheldScale={HANDHELD_PAN_ONLY_SCALE} uniqueKey="camera-capture">
@@ -300,12 +337,7 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
                                         type="button"
                                         className="octane-camera-roll__slot-button"
                                         aria-label={picture ? LocalizeText('camera.editor.button.tooltip') : LocalizeText('camera.take.photo.button.tooltip')}
-                                        onClick={() => {
-                                            if (isTakingPictureRef.current) return;
-
-                                            setActivePictureSlotIndex(index);
-                                            setSelectedPictureIndex(picture ? index : -1);
-                                        }}
+                                        onClick={() => selectSlot(index)}
                                     >
                                         {picture && <img alt="" src={picture.imageUrl} />}
                                     </BaseButton>
@@ -315,9 +347,7 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
                                                 type="button"
                                                 className="octane-camera-roll__delete"
                                                 aria-label={LocalizeText('camera.delete.button.text')}
-                                                onClick={() => {
-                                                    if (!isTakingPictureRef.current) onDelete();
-                                                }}
+                                                onClick={deleteSelectedPicture}
                                             />
                                         </Hint>
                                     )}

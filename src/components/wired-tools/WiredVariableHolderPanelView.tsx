@@ -5,6 +5,8 @@ import { NumberInput } from '../../common/NumberInput';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { localizeWithFallback } from '../../api';
 import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldWiredHolderPanel } from './handheld/HandheldWiredHolderPanel';
 
 export interface WiredHolderPanelEntry {
     id: string;
@@ -39,6 +41,8 @@ export interface WiredVariableHolderPanelViewProps {
     onEditingValueChange: (value: string) => void;
     onEditBlur: () => void;
     onEditKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
+    /** Phone layout: saves the value being edited (the desktop field saves on Enter). */
+    onCommitEdit?: () => void;
     isGiveOpen: boolean;
     onToggleGive: () => void;
     giveOptions: WiredHolderPanelGiveOption[];
@@ -62,6 +66,11 @@ export interface WiredVariableHolderPanelViewProps {
  * inline value editing, and remove / give. Pure view; the caller owns the data and the writes.
  */
 export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelViewProps) => {
+    const isHandheld = useIsHandheld();
+
+    // A phone shows the holder as a page of the sheet, with the same data and writes.
+    if (isHandheld) return <HandheldWiredHolderPanel {...props} />;
+
     const {
         title,
         warningText,

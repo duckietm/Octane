@@ -23,7 +23,11 @@ const SHEETS = [
     'HandheldBadgeCreator.css',
     'HandheldTalent.css',
     'HandheldForum.css',
-    'HandheldDrawer.css'
+    'HandheldDrawer.css',
+    'HandheldCamera.css',
+    'HandheldHotelView.css',
+    'HandheldCollectibles.css',
+    'HandheldWiredTools.css'
 ];
 
 /** The sheets written wholly for the phone: every rule of theirs is scoped to it. */
@@ -38,7 +42,11 @@ const PHONE_ONLY = [
     'HandheldBadgeCreator.css',
     'HandheldTalent.css',
     'HandheldForum.css',
-    'HandheldDrawer.css'
+    'HandheldDrawer.css',
+    'HandheldCamera.css',
+    'HandheldHotelView.css',
+    'HandheldCollectibles.css',
+    'HandheldWiredTools.css'
 ];
 
 /** Custom properties a sheet sets itself, on one of its own elements. */

@@ -21,6 +21,8 @@ import { Hint } from '../../common/Tooltip';
 import { NativeTextTransformScale } from '../../common/native-text/NativeTextTransformScale';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { WidgetErrorBoundary } from '../../common/error-boundary/WidgetErrorBoundary';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldHotelView } from './HandheldHotelView';
 import { HotelViewDragonAdoptionButton } from './widgets/HotelViewDragonAdoptionButton';
 import { HotelViewLiveSlotView } from './widgets/HotelViewLiveSlotView';
 
@@ -236,6 +238,7 @@ export const HotelView: FC = () => {
     const [now, setNow] = useState(Date.now());
     const imageLibraryUrl = GetConfigurationValue<string>('image.library.url', '');
     const assetUrl = GetConfigurationValue<string>('asset.url', '');
+    const isHandheld = useIsHandheld();
 
     useMessageEvent<HotelViewLandingEvent>(HotelViewLandingEvent, (event) => {
         const parser = event.getParser();
@@ -272,7 +275,8 @@ export const HotelView: FC = () => {
         updateScale();
 
         return () => observer.disconnect();
-    }, []);
+        // The phone draws no stage (HandheldHotelView): the stage's box only exists again once the phone layout ends.
+    }, [isHandheld]);
 
     useEffect(() => {
         const timeout = window.setTimeout(() => setTextScale(scale), TEXT_SCALE_SETTLE_MS);
@@ -551,6 +555,150 @@ export const HotelView: FC = () => {
         setSceneDragPosition(null);
     };
 
+    const openSlotEditor = (slot: IHotelViewLandingSlot) => {
+        setEditingSlot(slot);
+        setCountdownInput(toEditableCountdownValue(parseSlotConfig(slot.configJson).endsAt));
+    };
+
+    const closeSlotEditor = () => {
+        setEditingSlot(null);
+        setCountdownInput('');
+    };
+
+    // What a slot shows: the live widget of its type, or the texts and buttons the staff gave it. The same on both layouts.
+    const renderSlotContent = (slot: IHotelViewLandingSlot) => {
+        const config = parseSlotConfig(slot.configJson);
+        const isCountdown = slot.type === 'nextlimitedrarecountdown' || slot.type === 'expiringcatalogpage' || slot.type === 'expiringcatalogpagesmall';
+        const seconds = isCountdown ? getSecondsRemaining(config.endsAt, now) : null;
+        const isLtdPending = slot.type === 'nextlimitedrarecountdown' && seconds !== null && seconds > 0;
+        const isExpired = (slot.type === 'expiringcatalogpage' || slot.type === 'expiringcatalogpagesmall') && seconds === 0;
+        const voteOptions = config.voteOptions || [];
+        const voteTotal = voteOptions.reduce((total, option) => total + (config.voteCounts?.[String(option.id)] || 0), 0);
+        const countdown = seconds === null ? null : getCountdownParts(seconds);
+
+        const staticContent = <>
+            {slot.title && <h2>{slot.title}</h2>}
+            {slot.body && <p>{slot.body}</p>}
+            {slot.type === 'bonus' && <div className="hotelview-progress"><span style={{ width: `${Math.min(100, Math.max(0, slot.progress))}%` }} /></div>}
+            {slot.type === 'communitygoal' && <div className="hotelview-progress hotelview-community-progress" aria-label={`${voteTotal} votes`}>{voteOptions.slice(0, 2).map((option, index) => <span key={option.id} className={`hotelview-community-progress-option-${index + 1}`} style={{ width: `${voteTotal ? ((config.voteCounts?.[String(option.id)] || 0) / voteTotal) * 100 : 0}%` }} />)}</div>}
+            {seconds !== null && (slot.type === 'nextlimitedrarecountdown'
+                ? <strong className="hotelview-countdown hotelview-ltd-countdown">{seconds ? <><span className="hotelview-ltd-countdown-values">{countdown?.days.toString().padStart(2, '0')}:{countdown?.hours.toString().padStart(2, '0')}:{countdown?.minutes.toString().padStart(2, '0')}:{countdown?.seconds.toString().padStart(2, '0')}</span><small>{localizeWithFallback('octane.hotel_view.days_hours_minutes_seconds', 'Days Hours Minutes Seconds')}</small></> : localizeWithFallback('octane.hotel_view.available_now', 'Available now')}</strong>
+                : <strong className="hotelview-countdown">{isExpired ? 'Expired' : (seconds ? formatCountdown(seconds) : localizeWithFallback('octane.hotel_view.available_now', 'Available now'))}</strong>)}
+            {slot.progressLabel && <strong>{slot.progressLabel}</strong>}
+            {slot.type === 'communitygoal'
+                ? <div className="hotelview-vote-options">{voteOptions.map((option) => <BaseButton key={option.id} className={config.userVote === option.id ? 'hotelview-vote-selected' : ''} type="button" disabled={config.userVote !== undefined} onClick={() => SendMessageComposer(new HotelViewLandingVoteComposer(slot.id, option.id))}>{option.label} <span>{config.voteCounts?.[String(option.id)] || 0}</span></BaseButton>)}</div>
+                : <>{slot.buttonText && <BaseButton type="button" disabled={isLtdPending || isExpired} onClick={() => handleSlotClick(getCatalogLink(slot))}>{isLtdPending ? localizeWithFallback('octane.hotel_view.coming_soon', 'Coming soon') : slot.buttonText}</BaseButton>}{config.secondaryButtonText && <BaseButton type="button" onClick={() => handleSlotClick(config.secondaryLink || '')}>{config.secondaryButtonText}</BaseButton>}</>}
+        </>;
+
+        return <HotelViewLiveSlotView slot={slot} config={config} fallback={staticContent} onLink={handleSlotClick} />;
+    };
+
+    // The slot and scene editors (staff): a window on the stage on the desktop, a sheet on a phone. `className` is the form's.
+    const renderSlotEditor = (className: string) => editingSlot && (
+        <form className={className} onSubmit={saveSlot}>
+            <header>{localizeWithFallback('octane.hotel_view.edit_slot_id', 'Edit slot %id%', ['id'], [String(editingSlot.id)])}</header>
+            <div className={`hotelview-editor-preview hotelview-editor-slot-preview${editingSlot.enabled ? '' : ' hotelview-slot-disabled'}`}>
+                <span className="hotelview-editor-preview-label">{localizeWithFallback('octane.hotel_view.preview', 'Preview')}</span>
+                {editingSlot.imageUrl && <img src={resolveImageUrl(editingSlot.imageUrl, imageLibraryUrl, assetUrl)} alt="" />}
+                <div>
+                    {editingSlot.title && <strong>{editingSlot.title}</strong>}
+                    {editingSlot.body && <p>{editingSlot.body}</p>}
+                    {editingSlot.type === 'communitygoal'
+                        ? <div className="hotelview-editor-preview-votes">{(parseSlotConfig(editingSlot.configJson).voteOptions || []).slice(0, 2).map((option) => <BaseButton key={option.id} type="button">{option.label || `Vote ${option.id}`}</BaseButton>)}</div>
+                        : editingSlot.buttonText && <BaseButton type="button">{editingSlot.buttonText}</BaseButton>}
+                </div>
+                {!editingSlot.enabled && <em>{localizeWithFallback('octane.hotel_view.disabled_slot', 'Disabled slot')}</em>}
+            </div>
+            <label className="hotelview-editor-toggle"><Checkbox checked={editingSlot.enabled} onCheckedChange={(nextChecked) => setEditingSlot({ ...editingSlot, enabled: nextChecked })} /><span>Enabled: {editingSlot.enabled ? 'Yes' : 'No'}</span></label>
+            <label>{localizeWithFallback('octane.hotel_view.widget_type', 'Widget type')}<Select value={editingSlot.type} onChange={(event) => selectSlotWidgetType(event.target.value as IHotelViewLandingSlot['type'])}>{SLOT_WIDGET_TYPES.map((widget) => <option key={widget.value} value={widget.value}>{widget.label}</option>)}</Select></label>
+            <label>{localizeWithFallback('octane.hotel_view.title', 'Title')}<input value={editingSlot.title} onChange={(event) => setEditingSlot({ ...editingSlot, title: event.target.value })} /></label>
+            <label>{localizeWithFallback('octane.hotel_view.body', 'Body')}<textarea value={editingSlot.body} onChange={(event) => setEditingSlot({ ...editingSlot, body: event.target.value })} /></label>
+            <label>{localizeWithFallback('octane.hotel_view.image_url', 'Image URL')}<input value={editingSlot.imageUrl} onChange={(event) => setEditingSlot({ ...editingSlot, imageUrl: event.target.value })} /></label>
+            <label>{localizeWithFallback('octane.hotel_view.button', 'Button')}<input value={editingSlot.buttonText} onChange={(event) => setEditingSlot({ ...editingSlot, buttonText: event.target.value })} /></label>
+            <label>{localizeWithFallback('octane.hotel_view.button_action', 'Button action')}<Select value={getSelectedAction(editingSlot.link)} onChange={(event) => setEditingSlot({ ...editingSlot, link: event.target.value === CUSTOM_ACTION ? '' : event.target.value })}><option value={CUSTOM_ACTION}>{localizeWithFallback('octane.hotel_view.custom_link', 'Custom link')}</option>{HOTEL_VIEW_ACTIONS.map((action) => <option key={action.value} value={action.value}>{action.label}</option>)}</Select></label>
+            <label>{localizeWithFallback('octane.hotel_view.custom_link', 'Custom link')}<input value={editingSlot.link} placeholder="navigator/goto/123" onChange={(event) => setEditingSlot({ ...editingSlot, link: event.target.value })} /></label>
+            {['catalogpromo', 'catalogpromosmall', 'expiringcatalogpage', 'expiringcatalogpagesmall', 'nextlimitedrarecountdown'].includes(editingSlot.type) && <label>{localizeWithFallback('octane.hotel_view.catalog_page_name_id', 'Catalog page name / ID')}<input value={parseSlotConfig(editingSlot.configJson).catalogPage || ''} placeholder="limited_rares" onChange={(event) => updateEditingConfig((config) => ({ ...config, catalogPage: event.target.value }))} /></label>}
+            {(editingSlot.type === 'expiringcatalogpage' || editingSlot.type === 'expiringcatalogpagesmall') && <label>{localizeWithFallback('octane.hotel_view.featured_catalog_slot', 'Featured catalog slot')}<NumberInput min="1" value={parseSlotConfig(editingSlot.configJson).featuredSlot || ''} placeholder={localizeWithFallback('octane.hotel_view.optional', 'Optional')} onChange={(event) => updateEditingConfig((config) => ({ ...config, featuredSlot: Number(event.target.value) || undefined }))} /></label>}
+            {editingSlot.type !== 'communitygoal' && <><label>{localizeWithFallback('octane.hotel_view.progress', 'Progress')}<NumberInput min="0" max="100" value={editingSlot.progress} onChange={(event) => setEditingSlot({ ...editingSlot, progress: Number(event.target.value) })} /></label><label>{localizeWithFallback('octane.hotel_view.progress_label', 'Progress label')}<input value={editingSlot.progressLabel} onChange={(event) => setEditingSlot({ ...editingSlot, progressLabel: event.target.value })} /></label></>}
+            {editingSlot.type === 'nextlimitedrarecountdown' && <label className="hotelview-editor-toggle"><Checkbox checked={parseSlotConfig(editingSlot.configJson).useServerLTD !== false} onCheckedChange={(nextChecked) => updateEditingConfig((config) => ({ ...config, useServerLTD: nextChecked }))} /><span>Use emulator LTD configuration: {parseSlotConfig(editingSlot.configJson).useServerLTD !== false ? 'Yes' : 'No'}</span></label>}
+            {editingSlot.type === 'bonus' && <label className="hotelview-editor-toggle"><Checkbox checked={parseSlotConfig(editingSlot.configJson).useServerBonusRare !== false} onCheckedChange={(nextChecked) => updateEditingConfig((config) => ({ ...config, useServerBonusRare: nextChecked }))} /><span>Live bonus rare from the emulator: {parseSlotConfig(editingSlot.configJson).useServerBonusRare !== false ? 'Yes' : 'No'}</span></label>}
+            {editingSlot.type === 'communitygoal' && <label className="hotelview-editor-toggle"><Checkbox checked={parseSlotConfig(editingSlot.configJson).useServerGoal === true} onCheckedChange={(nextChecked) => updateEditingConfig((config) => ({ ...config, useServerGoal: nextChecked }))} /><span>Show the emulator community goal meter instead of these votes: {parseSlotConfig(editingSlot.configJson).useServerGoal === true ? 'Yes' : 'No'}</span></label>}
+            {editingSlot.type === 'dailyquest' && <label className="hotelview-editor-toggle"><Checkbox checked={parseSlotConfig(editingSlot.configJson).useServerQuest !== false} onCheckedChange={(nextChecked) => updateEditingConfig((config) => ({ ...config, useServerQuest: nextChecked }))} /><span>Live daily quest from the emulator: {parseSlotConfig(editingSlot.configJson).useServerQuest !== false ? 'Yes' : 'No'}</span></label>}
+            {editingSlot.type === 'achievementcompetition_hall_of_fame' && <label>{localizeWithFallback('octane.hotel_view.competition_goal_code', 'Competition goal code')}<input value={parseSlotConfig(editingSlot.configJson).goalCode || ''} placeholder={localizeWithFallback('octane.hotel_view.empty_the_active_community_goal', 'Empty = the active community goal')} onChange={(event) => updateEditingConfig((config) => ({ ...config, goalCode: event.target.value }))} /></label>}
+            {editingSlot.type === 'concurrentusersgoal' && <label>{localizeWithFallback('octane.hotel_view.reward_badge_code', 'Reward badge code')}<input value={parseSlotConfig(editingSlot.configJson).badgeCode || ''} placeholder="ConcurrentUsersReward" onChange={(event) => updateEditingConfig((config) => ({ ...config, badgeCode: event.target.value }))} /></label>}
+            {(editingSlot.type === 'nextlimitedrarecountdown' || editingSlot.type === 'expiringcatalogpage' || editingSlot.type === 'expiringcatalogpagesmall') && <label>{localizeWithFallback('octane.hotel_view.countdown_ends', 'Countdown ends')}<input className="hotelview-countdown-editor-input" value={countdownInput} placeholder="DD/MM/YYYY HH:mm" onChange={(event) => {
+                setCountdownInput(event.target.value);
+
+                if (editingSlot.type === 'nextlimitedrarecountdown' && event.target.value.trim()) updateEditingConfig((config) => ({ ...config, useServerLTD: false }));
+            }} /></label>}
+            {editingSlot.type === 'communitygoal' && <>
+                <div className="hotelview-vote-rewards">
+                <fieldset className="hotelview-vote-reward-panel"><legend>{localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1')}</legend>
+                    <label>{localizeWithFallback('octane.hotel_view.label', 'Label')}<input value={parseSlotConfig(editingSlot.configJson).voteOptions?.[0]?.label || ''} onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [{ ...(config.voteOptions?.[0] || { id: 1 }), label: event.target.value }, config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }] }))} /></label>
+                    <label>{localizeWithFallback('octane.hotel_view.badge_code', 'Badge code')}<input value={parseSlotConfig(editingSlot.configJson).voteOptions?.[0]?.badgeCode || ''} placeholder="badge_code" onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [{ ...(config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }), badgeCode: event.target.value }, config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }] }))} /></label>
+                    <label>{localizeWithFallback('octane.hotel_view.furni_item_id', 'Furni item ID')}<NumberInput min="1" value={parseSlotConfig(editingSlot.configJson).voteOptions?.[0]?.furniId || ''} placeholder={localizeWithFallback('octane.hotel_view.optional', 'Optional')} onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [{ ...(config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }), furniId: event.target.value ? Number(event.target.value) : undefined }, config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }] }))} /></label>
+                    <label>{localizeWithFallback('octane.hotel_view.currency_type', 'Currency type')}<NumberInput min="0" value={parseSlotConfig(editingSlot.configJson).voteOptions?.[0]?.currencyType ?? ''} placeholder="0 = pixels" onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [{ ...(config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }), currencyType: event.target.value === '' ? undefined : Number(event.target.value) }, config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }] }))} /></label>
+                    <label>{localizeWithFallback('octane.hotel_view.currency_quantity', 'Currency quantity')}<NumberInput min="1" value={parseSlotConfig(editingSlot.configJson).voteOptions?.[0]?.currencyAmount || ''} placeholder={localizeWithFallback('octane.hotel_view.optional', 'Optional')} onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [{ ...(config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }), currencyAmount: event.target.value ? Number(event.target.value) : undefined }, config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }] }))} /></label>
+                </fieldset>
+                <fieldset className="hotelview-vote-reward-panel"><legend>{localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2')}</legend>
+                    <label>{localizeWithFallback('octane.hotel_view.label', 'Label')}<input value={parseSlotConfig(editingSlot.configJson).voteOptions?.[1]?.label || ''} onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }, { ...(config.voteOptions?.[1] || { id: 2 }), label: event.target.value }] }))} /></label>
+                    <label>{localizeWithFallback('octane.hotel_view.badge_code', 'Badge code')}<input value={parseSlotConfig(editingSlot.configJson).voteOptions?.[1]?.badgeCode || ''} placeholder="badge_code" onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }, { ...(config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }), badgeCode: event.target.value }] }))} /></label>
+                    <label>{localizeWithFallback('octane.hotel_view.furni_item_id', 'Furni item ID')}<NumberInput min="1" value={parseSlotConfig(editingSlot.configJson).voteOptions?.[1]?.furniId || ''} placeholder={localizeWithFallback('octane.hotel_view.optional', 'Optional')} onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }, { ...(config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }), furniId: event.target.value ? Number(event.target.value) : undefined }] }))} /></label>
+                    <label>{localizeWithFallback('octane.hotel_view.currency_type', 'Currency type')}<NumberInput min="0" value={parseSlotConfig(editingSlot.configJson).voteOptions?.[1]?.currencyType ?? ''} placeholder="0 = pixels" onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }, { ...(config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }), currencyType: event.target.value === '' ? undefined : Number(event.target.value) }] }))} /></label>
+                    <label>{localizeWithFallback('octane.hotel_view.currency_quantity', 'Currency quantity')}<NumberInput min="1" value={parseSlotConfig(editingSlot.configJson).voteOptions?.[1]?.currencyAmount || ''} placeholder={localizeWithFallback('octane.hotel_view.optional', 'Optional')} onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }, { ...(config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }), currencyAmount: event.target.value ? Number(event.target.value) : undefined }] }))} /></label>
+                </fieldset>
+                </div>
+                <BaseButton className="hotelview-reset-votes" type="button" onClick={() => resetCommunityGoalVotes(editingSlot.id)}>{localizeWithFallback('octane.hotel_view.reset_all_community_votes', 'Reset all community votes')}</BaseButton>
+            </>}
+            {editingSlot.type !== 'communitygoal' && <>
+                <label>{localizeWithFallback('octane.hotel_view.secondary_button', 'Secondary button')}<input value={parseSlotConfig(editingSlot.configJson).secondaryButtonText || ''} onChange={(event) => updateEditingConfig((config) => ({ ...config, secondaryButtonText: event.target.value }))} /></label>
+                <label>{localizeWithFallback('octane.hotel_view.secondary_action', 'Secondary action')}<Select value={getSelectedAction(parseSlotConfig(editingSlot.configJson).secondaryLink || '')} onChange={(event) => updateEditingConfig((config) => ({ ...config, secondaryLink: event.target.value === CUSTOM_ACTION ? '' : event.target.value }))}><option value={CUSTOM_ACTION}>{localizeWithFallback('octane.hotel_view.custom_link', 'Custom link')}</option>{HOTEL_VIEW_ACTIONS.map((action) => <option key={action.value} value={action.value}>{action.label}</option>)}</Select></label>
+                <label>{localizeWithFallback('octane.hotel_view.secondary_custom_link', 'Secondary custom link')}<input value={parseSlotConfig(editingSlot.configJson).secondaryLink || ''} onChange={(event) => updateEditingConfig((config) => ({ ...config, secondaryLink: event.target.value }))} /></label>
+            </>}
+            <footer><BaseButton type="button" onClick={closeSlotEditor}>{localizeWithFallback('octane.hotel_view.cancel', 'Cancel')}</BaseButton><BaseButton type="submit">{localizeWithFallback('octane.hotel_view.save', 'Save')}</BaseButton></footer>
+        </form>
+    );
+
+    const renderSceneEditor = (className: string) => editingScene && (
+        <form className={className} onSubmit={saveScene}>
+            <header>{localizeWithFallback('octane.hotel_view.edit_hotelview_images', 'Edit HotelView images')}</header>
+            <div className="hotelview-editor-preview hotelview-editor-scene-preview">
+                <span className="hotelview-editor-preview-label">{localizeWithFallback('octane.hotel_view.background_preview', 'Background preview')}</span>
+                <div className="hotelview-editor-scene-canvas" style={{ backgroundImage: editingScene.backgroundUrl ? `url(${resolveImageUrl(editingScene.backgroundUrl, imageLibraryUrl, assetUrl)})` : undefined }}>
+                    {editingScene.leftUrl && <img className="hotelview-editor-scene-left" src={resolveImageUrl(editingScene.leftUrl, imageLibraryUrl, assetUrl)} alt="" />}
+                    {editingScene.drapeUrl && <img className="hotelview-editor-scene-drape" src={resolveImageUrl(editingScene.drapeUrl, imageLibraryUrl, assetUrl)} alt="" />}
+                    {editingScene.rightUrl && <img className="hotelview-editor-scene-right" src={resolveImageUrl(editingScene.rightUrl, imageLibraryUrl, assetUrl)} alt="" />}
+                </div>
+            </div>
+            <label>{localizeWithFallback('octane.hotel_view.background_url', 'Background URL')}<input value={editingScene.backgroundUrl} onChange={(event) => setEditingScene({ ...editingScene, backgroundUrl: event.target.value })} /></label>
+            <label>{localizeWithFallback('octane.hotel_view.drape_url', 'Drape URL')}<input value={editingScene.drapeUrl} onChange={(event) => setEditingScene({ ...editingScene, drapeUrl: event.target.value })} /></label>
+            <label>{localizeWithFallback('octane.hotel_view.left_image_url', 'Left image URL')}<input value={editingScene.leftUrl} onChange={(event) => setEditingScene({ ...editingScene, leftUrl: event.target.value })} /></label>
+            <label>{localizeWithFallback('octane.hotel_view.right_image_url', 'Right image URL')}<input value={editingScene.rightUrl} onChange={(event) => setEditingScene({ ...editingScene, rightUrl: event.target.value })} /></label>
+            <label className="hotelview-editor-toggle"><Checkbox checked={editingScene.hallOfFameEnabled} onCheckedChange={(nextChecked) => setEditingScene({ ...editingScene, hallOfFameEnabled: nextChecked })} /><span>Hall of Fame: {editingScene.hallOfFameEnabled ? 'Enabled' : 'Disabled'}</span></label>
+            {editingScene.hallOfFameEnabled && <>
+                <label>{localizeWithFallback('octane.hotel_view.hall_of_fame_ranking', 'Hall of Fame ranking')}<Select value={editingScene.hallOfFameMode} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameMode: event.target.value })}><option value="latest_registered">{localizeWithFallback('octane.hotel_view.latest_registered_users', 'Latest registered users')}</option><option value="online_time">{localizeWithFallback('octane.hotel_view.most_online_time', 'Most online time')}</option><option value="achievement_score">{localizeWithFallback('octane.hotel_view.highest_achievement_score', 'Highest achievement score')}</option><option value="currency">{localizeWithFallback('octane.hotel_view.highest_currency_balance', 'Highest currency balance')}</option></Select></label>
+                {editingScene.hallOfFameMode === 'currency' && <label>{localizeWithFallback('octane.hotel_view.currency_type', 'Currency type')}<NumberInput min="0" value={editingScene.hallOfFameCurrencyType} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameCurrencyType: Math.max(0, Number(event.target.value) || 0) })} /></label>}
+            </>}
+            {/* The avatar is placed by dragging it on the view; this puts it back where it stands by default (on Save). */}
+            <div className="hotelview-editor-avatar-reset">
+                <span>
+                    {editingScene.leftX < 0 || editingScene.leftY < 0
+                        ? localizeWithFallback('octane.hotel_view.avatar_position_default', 'Avatar position: default')
+                        : localizeWithFallback('octane.hotel_view.avatar_position_custom', 'Avatar position: custom')}
+                </span>
+                <BaseButton
+                    type="button"
+                    data-testid="hotelview-avatar-reset"
+                    disabled={editingScene.leftX < 0 || editingScene.leftY < 0}
+                    onClick={() => setEditingScene({ ...editingScene, leftX: -1, leftY: -1 })}
+                >
+                    {localizeWithFallback('octane.hotel_view.reset_avatar_position', 'Reset avatar position')}
+                </BaseButton>
+            </div>
+            <footer><BaseButton type="button" onClick={() => setEditingScene(null)}>{localizeWithFallback('octane.hotel_view.cancel', 'Cancel')}</BaseButton><BaseButton type="submit">{localizeWithFallback('octane.hotel_view.save', 'Save')}</BaseButton></footer>
+        </form>
+    );
+
     // The player's avatar. An admin gets a handle on it and drags it to where it should stand; until one does, it
     // stands where the stylesheet puts it.
     const renderSceneAvatar = (className: string) => (
@@ -573,6 +721,42 @@ export const HotelView: FC = () => {
             )}
         </div>
     );
+
+    if (isHandheld) {
+        // The phone draws the same scene and slots as a home screen of its own (HandheldHotelView): the art as a picture at the
+        // top (on its side: at the left), the slots as a list of cards. Placing things by dragging is the desktop stage's.
+        const visibleSlots = landingData.slots.filter((slot) => slot.enabled || landingData.canEdit);
+        const art = (url: string) => (url ? resolveImageUrl(url, imageLibraryUrl, assetUrl) : '');
+
+        return (
+            <HandheldHotelView
+                scene={{ backgroundUrl: art(scene.backgroundUrl), leftUrl: art(scene.leftUrl), rightUrl: art(scene.rightUrl), drapeUrl: art(scene.drapeUrl) }}
+                figure={GetSessionDataManager().figure}
+                gender={GetSessionDataManager().gender}
+                cards={visibleSlots.map((slot) => ({
+                    id: slot.id,
+                    type: slot.type,
+                    enabled: slot.enabled,
+                    imageUrl: slot.imageUrl ? art(slot.imageUrl) : slot.type === 'nextlimitedrarecountdown' ? LTD_COUNTDOWN_ICON : '',
+                    content: slot.enabled ? renderSlotContent(slot) : null
+                }))}
+                hallOfFameUsers={scene.hallOfFameEnabled ? scene.hallOfFameUsers : []}
+                canEdit={landingData.canEdit}
+                onEditSlot={(slotId) => {
+                    const slot = landingData.slots.find((value) => value.id === slotId);
+
+                    if (slot) openSlotEditor(slot);
+                }}
+                onEditScene={() => setEditingScene(scene)}
+                editor={editingSlot ? renderSlotEditor('octane-handheld-hotel-editor') : editingScene ? renderSceneEditor('octane-handheld-hotel-editor is-scene') : null}
+                editorTitle={editingSlot
+                    ? localizeWithFallback('octane.hotel_view.edit_slot_id', 'Edit slot %id%', ['id'], [String(editingSlot.id)])
+                    : localizeWithFallback('octane.hotel_view.edit_hotelview_images', 'Edit HotelView images')}
+                onCloseEditor={() => (editingSlot ? closeSlotEditor() : setEditingScene(null))}
+                extras={<WidgetErrorBoundary name="HotelViewDragonAdoptionButton"><HotelViewDragonAdoptionButton /></WidgetErrorBoundary>}
+            />
+        );
+    }
 
     return (
         // AIR fills the landing view behind the see-through toolbar; the scene keeps its old box, 55 px up.
@@ -602,39 +786,14 @@ export const HotelView: FC = () => {
                                         {slot.imageUrl && <img className="hotelview-slot-image" src={resolveImageUrl(slot.imageUrl, imageLibraryUrl, assetUrl)} alt="" />}
                                         {!slot.imageUrl && slot.type === 'nextlimitedrarecountdown' && <img className="hotelview-slot-image hotelview-ltd-countdown-icon" src={LTD_COUNTDOWN_ICON} alt="" />}
                                         <div className="hotelview-slot-copy">
-                                            {(() => {
-                                                const config = parseSlotConfig(slot.configJson);
-                                                const isCountdown = slot.type === 'nextlimitedrarecountdown' || slot.type === 'expiringcatalogpage' || slot.type === 'expiringcatalogpagesmall';
-                                                const seconds = isCountdown ? getSecondsRemaining(config.endsAt, now) : null;
-                                                const isLtdPending = slot.type === 'nextlimitedrarecountdown' && seconds !== null && seconds > 0;
-                                                const isExpired = (slot.type === 'expiringcatalogpage' || slot.type === 'expiringcatalogpagesmall') && seconds === 0;
-                                                const voteOptions = config.voteOptions || [];
-                                                const voteTotal = voteOptions.reduce((total, option) => total + (config.voteCounts?.[String(option.id)] || 0), 0);
-                                                const countdown = seconds === null ? null : getCountdownParts(seconds);
-
-                                                const staticContent = <>
-                                            {slot.title && <h2>{slot.title}</h2>}
-                                            {slot.body && <p>{slot.body}</p>}
-                                            {slot.type === 'bonus' && <div className="hotelview-progress"><span style={{ width: `${Math.min(100, Math.max(0, slot.progress))}%` }} /></div>}
-                                            {slot.type === 'communitygoal' && <div className="hotelview-progress hotelview-community-progress" aria-label={`${voteTotal} votes`}>{voteOptions.slice(0, 2).map((option, index) => <span key={option.id} className={`hotelview-community-progress-option-${index + 1}`} style={{ width: `${voteTotal ? ((config.voteCounts?.[String(option.id)] || 0) / voteTotal) * 100 : 0}%` }} />)}</div>}
-                                            {seconds !== null && (slot.type === 'nextlimitedrarecountdown'
-                                                ? <strong className="hotelview-countdown hotelview-ltd-countdown">{seconds ? <><span className="hotelview-ltd-countdown-values">{countdown?.days.toString().padStart(2, '0')}:{countdown?.hours.toString().padStart(2, '0')}:{countdown?.minutes.toString().padStart(2, '0')}:{countdown?.seconds.toString().padStart(2, '0')}</span><small>{localizeWithFallback('octane.hotel_view.days_hours_minutes_seconds', 'Days Hours Minutes Seconds')}</small></> : localizeWithFallback('octane.hotel_view.available_now', 'Available now')}</strong>
-                                                : <strong className="hotelview-countdown">{isExpired ? 'Expired' : (seconds ? formatCountdown(seconds) : localizeWithFallback('octane.hotel_view.available_now', 'Available now'))}</strong>)}
-                                            {slot.progressLabel && <strong>{slot.progressLabel}</strong>}
-                                            {slot.type === 'communitygoal'
-                                                ? <div className="hotelview-vote-options">{voteOptions.map((option) => <BaseButton key={option.id} className={config.userVote === option.id ? 'hotelview-vote-selected' : ''} type="button" disabled={config.userVote !== undefined} onClick={() => SendMessageComposer(new HotelViewLandingVoteComposer(slot.id, option.id))}>{option.label} <span>{config.voteCounts?.[String(option.id)] || 0}</span></BaseButton>)}</div>
-                                                : <>{slot.buttonText && <BaseButton type="button" disabled={isLtdPending || isExpired} onClick={() => handleSlotClick(getCatalogLink(slot))}>{isLtdPending ? localizeWithFallback('octane.hotel_view.coming_soon', 'Coming soon') : slot.buttonText}</BaseButton>}{config.secondaryButtonText && <BaseButton type="button" onClick={() => handleSlotClick(config.secondaryLink || '')}>{config.secondaryButtonText}</BaseButton>}</>}
-                                                </>;
-
-                                                return <HotelViewLiveSlotView slot={slot} config={config} fallback={staticContent} onLink={handleSlotClick} />;
-                                            })()}
+                                            {renderSlotContent(slot)}
                                         </div>
                                     </>}
                                     {!slot.enabled && <span>{localizeWithFallback('octane.hotel_view.disabled_slot', 'Disabled slot')}</span>}
                                     {landingData.canEdit && <Hint content={localizeWithFallback('octane.hotel_view.drag_to_move', 'Drag to move')}>
                                         <BaseButton type="button" className="hotelview-slot-drag-handle" onPointerDown={(event) => startSlotDrag(event, slot)} onPointerMove={moveSlotDrag} onPointerUp={finishSlotDrag} onPointerCancel={finishSlotDrag} aria-label={localizeWithFallback('octane.hotel_view.move_slot_id', 'Move slot %id%', ['id'], [String(slot.id)])}>↕</BaseButton>
                                     </Hint>}
-                                    {landingData.canEdit && <BaseButton type="button" className="hotelview-slot-edit" onClick={() => { setEditingSlot(slot); setCountdownInput(toEditableCountdownValue(parseSlotConfig(slot.configJson).endsAt)); }} aria-label={localizeWithFallback('octane.hotel_view.edit_slot_id', 'Edit slot %id%', ['id'], [String(slot.id)])}>✎</BaseButton>}
+                                    {landingData.canEdit && <BaseButton type="button" className="hotelview-slot-edit" onClick={() => openSlotEditor(slot)} aria-label={localizeWithFallback('octane.hotel_view.edit_slot_id', 'Edit slot %id%', ['id'], [String(slot.id)])}>✎</BaseButton>}
                                 </section>
                             ))}
                         </main>
@@ -654,109 +813,8 @@ export const HotelView: FC = () => {
                                 <BaseButton aria-label={localizeWithFallback('octane.hotel_view.drag_hall_of_fame', 'Drag Hall of Fame')} type="button" className="hotelview-hall-of-fame-drag-handle" onPointerDown={(event) => startSceneDrag(event, 'hallOfFame')} onPointerMove={moveSceneDrag} onPointerUp={finishSceneDrag} onPointerCancel={finishSceneDrag}>↕</BaseButton>
                             </Hint>}
                         </div>}
-                        {editingSlot && (
-                            <form className="hotelview-editor" onSubmit={saveSlot}>
-                                <header>{localizeWithFallback('octane.hotel_view.edit_slot_id', 'Edit slot %id%', ['id'], [String(editingSlot.id)])}</header>
-                                <div className={`hotelview-editor-preview hotelview-editor-slot-preview${editingSlot.enabled ? '' : ' hotelview-slot-disabled'}`}>
-                                    <span className="hotelview-editor-preview-label">{localizeWithFallback('octane.hotel_view.preview', 'Preview')}</span>
-                                    {editingSlot.imageUrl && <img src={resolveImageUrl(editingSlot.imageUrl, imageLibraryUrl, assetUrl)} alt="" />}
-                                    <div>
-                                        {editingSlot.title && <strong>{editingSlot.title}</strong>}
-                                        {editingSlot.body && <p>{editingSlot.body}</p>}
-                                        {editingSlot.type === 'communitygoal'
-                                            ? <div className="hotelview-editor-preview-votes">{(parseSlotConfig(editingSlot.configJson).voteOptions || []).slice(0, 2).map((option) => <BaseButton key={option.id} type="button">{option.label || `Vote ${option.id}`}</BaseButton>)}</div>
-                                            : editingSlot.buttonText && <BaseButton type="button">{editingSlot.buttonText}</BaseButton>}
-                                    </div>
-                                    {!editingSlot.enabled && <em>{localizeWithFallback('octane.hotel_view.disabled_slot', 'Disabled slot')}</em>}
-                                </div>
-                                <label className="hotelview-editor-toggle"><Checkbox checked={editingSlot.enabled} onCheckedChange={(nextChecked) => setEditingSlot({ ...editingSlot, enabled: nextChecked })} /><span>Enabled: {editingSlot.enabled ? 'Yes' : 'No'}</span></label>
-                                <label>{localizeWithFallback('octane.hotel_view.widget_type', 'Widget type')}<Select value={editingSlot.type} onChange={(event) => selectSlotWidgetType(event.target.value as IHotelViewLandingSlot['type'])}>{SLOT_WIDGET_TYPES.map((widget) => <option key={widget.value} value={widget.value}>{widget.label}</option>)}</Select></label>
-                                <label>{localizeWithFallback('octane.hotel_view.title', 'Title')}<input value={editingSlot.title} onChange={(event) => setEditingSlot({ ...editingSlot, title: event.target.value })} /></label>
-                                <label>{localizeWithFallback('octane.hotel_view.body', 'Body')}<textarea value={editingSlot.body} onChange={(event) => setEditingSlot({ ...editingSlot, body: event.target.value })} /></label>
-                                <label>{localizeWithFallback('octane.hotel_view.image_url', 'Image URL')}<input value={editingSlot.imageUrl} onChange={(event) => setEditingSlot({ ...editingSlot, imageUrl: event.target.value })} /></label>
-                                <label>{localizeWithFallback('octane.hotel_view.button', 'Button')}<input value={editingSlot.buttonText} onChange={(event) => setEditingSlot({ ...editingSlot, buttonText: event.target.value })} /></label>
-                                <label>{localizeWithFallback('octane.hotel_view.button_action', 'Button action')}<Select value={getSelectedAction(editingSlot.link)} onChange={(event) => setEditingSlot({ ...editingSlot, link: event.target.value === CUSTOM_ACTION ? '' : event.target.value })}><option value={CUSTOM_ACTION}>{localizeWithFallback('octane.hotel_view.custom_link', 'Custom link')}</option>{HOTEL_VIEW_ACTIONS.map((action) => <option key={action.value} value={action.value}>{action.label}</option>)}</Select></label>
-                                <label>{localizeWithFallback('octane.hotel_view.custom_link', 'Custom link')}<input value={editingSlot.link} placeholder="navigator/goto/123" onChange={(event) => setEditingSlot({ ...editingSlot, link: event.target.value })} /></label>
-                                {['catalogpromo', 'catalogpromosmall', 'expiringcatalogpage', 'expiringcatalogpagesmall', 'nextlimitedrarecountdown'].includes(editingSlot.type) && <label>{localizeWithFallback('octane.hotel_view.catalog_page_name_id', 'Catalog page name / ID')}<input value={parseSlotConfig(editingSlot.configJson).catalogPage || ''} placeholder="limited_rares" onChange={(event) => updateEditingConfig((config) => ({ ...config, catalogPage: event.target.value }))} /></label>}
-                                {(editingSlot.type === 'expiringcatalogpage' || editingSlot.type === 'expiringcatalogpagesmall') && <label>{localizeWithFallback('octane.hotel_view.featured_catalog_slot', 'Featured catalog slot')}<NumberInput min="1" value={parseSlotConfig(editingSlot.configJson).featuredSlot || ''} placeholder={localizeWithFallback('octane.hotel_view.optional', 'Optional')} onChange={(event) => updateEditingConfig((config) => ({ ...config, featuredSlot: Number(event.target.value) || undefined }))} /></label>}
-                                {editingSlot.type !== 'communitygoal' && <><label>{localizeWithFallback('octane.hotel_view.progress', 'Progress')}<NumberInput min="0" max="100" value={editingSlot.progress} onChange={(event) => setEditingSlot({ ...editingSlot, progress: Number(event.target.value) })} /></label><label>{localizeWithFallback('octane.hotel_view.progress_label', 'Progress label')}<input value={editingSlot.progressLabel} onChange={(event) => setEditingSlot({ ...editingSlot, progressLabel: event.target.value })} /></label></>}
-                                {editingSlot.type === 'nextlimitedrarecountdown' && <label className="hotelview-editor-toggle"><Checkbox checked={parseSlotConfig(editingSlot.configJson).useServerLTD !== false} onCheckedChange={(nextChecked) => updateEditingConfig((config) => ({ ...config, useServerLTD: nextChecked }))} /><span>Use emulator LTD configuration: {parseSlotConfig(editingSlot.configJson).useServerLTD !== false ? 'Yes' : 'No'}</span></label>}
-                                {editingSlot.type === 'bonus' && <label className="hotelview-editor-toggle"><Checkbox checked={parseSlotConfig(editingSlot.configJson).useServerBonusRare !== false} onCheckedChange={(nextChecked) => updateEditingConfig((config) => ({ ...config, useServerBonusRare: nextChecked }))} /><span>Live bonus rare from the emulator: {parseSlotConfig(editingSlot.configJson).useServerBonusRare !== false ? 'Yes' : 'No'}</span></label>}
-                                {editingSlot.type === 'communitygoal' && <label className="hotelview-editor-toggle"><Checkbox checked={parseSlotConfig(editingSlot.configJson).useServerGoal === true} onCheckedChange={(nextChecked) => updateEditingConfig((config) => ({ ...config, useServerGoal: nextChecked }))} /><span>Show the emulator community goal meter instead of these votes: {parseSlotConfig(editingSlot.configJson).useServerGoal === true ? 'Yes' : 'No'}</span></label>}
-                                {editingSlot.type === 'dailyquest' && <label className="hotelview-editor-toggle"><Checkbox checked={parseSlotConfig(editingSlot.configJson).useServerQuest !== false} onCheckedChange={(nextChecked) => updateEditingConfig((config) => ({ ...config, useServerQuest: nextChecked }))} /><span>Live daily quest from the emulator: {parseSlotConfig(editingSlot.configJson).useServerQuest !== false ? 'Yes' : 'No'}</span></label>}
-                                {editingSlot.type === 'achievementcompetition_hall_of_fame' && <label>{localizeWithFallback('octane.hotel_view.competition_goal_code', 'Competition goal code')}<input value={parseSlotConfig(editingSlot.configJson).goalCode || ''} placeholder={localizeWithFallback('octane.hotel_view.empty_the_active_community_goal', 'Empty = the active community goal')} onChange={(event) => updateEditingConfig((config) => ({ ...config, goalCode: event.target.value }))} /></label>}
-                                {editingSlot.type === 'concurrentusersgoal' && <label>{localizeWithFallback('octane.hotel_view.reward_badge_code', 'Reward badge code')}<input value={parseSlotConfig(editingSlot.configJson).badgeCode || ''} placeholder="ConcurrentUsersReward" onChange={(event) => updateEditingConfig((config) => ({ ...config, badgeCode: event.target.value }))} /></label>}
-                                {(editingSlot.type === 'nextlimitedrarecountdown' || editingSlot.type === 'expiringcatalogpage' || editingSlot.type === 'expiringcatalogpagesmall') && <label>{localizeWithFallback('octane.hotel_view.countdown_ends', 'Countdown ends')}<input className="hotelview-countdown-editor-input" value={countdownInput} placeholder="DD/MM/YYYY HH:mm" onChange={(event) => {
-                                    setCountdownInput(event.target.value);
-
-                                    if (editingSlot.type === 'nextlimitedrarecountdown' && event.target.value.trim()) updateEditingConfig((config) => ({ ...config, useServerLTD: false }));
-                                }} /></label>}
-                                {editingSlot.type === 'communitygoal' && <>
-                                    <div className="hotelview-vote-rewards">
-                                    <fieldset className="hotelview-vote-reward-panel"><legend>{localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1')}</legend>
-                                        <label>{localizeWithFallback('octane.hotel_view.label', 'Label')}<input value={parseSlotConfig(editingSlot.configJson).voteOptions?.[0]?.label || ''} onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [{ ...(config.voteOptions?.[0] || { id: 1 }), label: event.target.value }, config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }] }))} /></label>
-                                        <label>{localizeWithFallback('octane.hotel_view.badge_code', 'Badge code')}<input value={parseSlotConfig(editingSlot.configJson).voteOptions?.[0]?.badgeCode || ''} placeholder="badge_code" onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [{ ...(config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }), badgeCode: event.target.value }, config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }] }))} /></label>
-                                        <label>{localizeWithFallback('octane.hotel_view.furni_item_id', 'Furni item ID')}<NumberInput min="1" value={parseSlotConfig(editingSlot.configJson).voteOptions?.[0]?.furniId || ''} placeholder={localizeWithFallback('octane.hotel_view.optional', 'Optional')} onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [{ ...(config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }), furniId: event.target.value ? Number(event.target.value) : undefined }, config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }] }))} /></label>
-                                        <label>{localizeWithFallback('octane.hotel_view.currency_type', 'Currency type')}<NumberInput min="0" value={parseSlotConfig(editingSlot.configJson).voteOptions?.[0]?.currencyType ?? ''} placeholder="0 = pixels" onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [{ ...(config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }), currencyType: event.target.value === '' ? undefined : Number(event.target.value) }, config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }] }))} /></label>
-                                        <label>{localizeWithFallback('octane.hotel_view.currency_quantity', 'Currency quantity')}<NumberInput min="1" value={parseSlotConfig(editingSlot.configJson).voteOptions?.[0]?.currencyAmount || ''} placeholder={localizeWithFallback('octane.hotel_view.optional', 'Optional')} onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [{ ...(config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }), currencyAmount: event.target.value ? Number(event.target.value) : undefined }, config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }] }))} /></label>
-                                    </fieldset>
-                                    <fieldset className="hotelview-vote-reward-panel"><legend>{localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2')}</legend>
-                                        <label>{localizeWithFallback('octane.hotel_view.label', 'Label')}<input value={parseSlotConfig(editingSlot.configJson).voteOptions?.[1]?.label || ''} onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }, { ...(config.voteOptions?.[1] || { id: 2 }), label: event.target.value }] }))} /></label>
-                                        <label>{localizeWithFallback('octane.hotel_view.badge_code', 'Badge code')}<input value={parseSlotConfig(editingSlot.configJson).voteOptions?.[1]?.badgeCode || ''} placeholder="badge_code" onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }, { ...(config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }), badgeCode: event.target.value }] }))} /></label>
-                                        <label>{localizeWithFallback('octane.hotel_view.furni_item_id', 'Furni item ID')}<NumberInput min="1" value={parseSlotConfig(editingSlot.configJson).voteOptions?.[1]?.furniId || ''} placeholder={localizeWithFallback('octane.hotel_view.optional', 'Optional')} onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }, { ...(config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }), furniId: event.target.value ? Number(event.target.value) : undefined }] }))} /></label>
-                                        <label>{localizeWithFallback('octane.hotel_view.currency_type', 'Currency type')}<NumberInput min="0" value={parseSlotConfig(editingSlot.configJson).voteOptions?.[1]?.currencyType ?? ''} placeholder="0 = pixels" onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }, { ...(config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }), currencyType: event.target.value === '' ? undefined : Number(event.target.value) }] }))} /></label>
-                                        <label>{localizeWithFallback('octane.hotel_view.currency_quantity', 'Currency quantity')}<NumberInput min="1" value={parseSlotConfig(editingSlot.configJson).voteOptions?.[1]?.currencyAmount || ''} placeholder={localizeWithFallback('octane.hotel_view.optional', 'Optional')} onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [config.voteOptions?.[0] || { id: 1, label: localizeWithFallback('octane.hotel_view.vote_option_1', 'Vote option 1') }, { ...(config.voteOptions?.[1] || { id: 2, label: localizeWithFallback('octane.hotel_view.vote_option_2', 'Vote option 2') }), currencyAmount: event.target.value ? Number(event.target.value) : undefined }] }))} /></label>
-                                    </fieldset>
-                                    </div>
-                                    <BaseButton className="hotelview-reset-votes" type="button" onClick={() => resetCommunityGoalVotes(editingSlot.id)}>{localizeWithFallback('octane.hotel_view.reset_all_community_votes', 'Reset all community votes')}</BaseButton>
-                                </>}
-                                {editingSlot.type !== 'communitygoal' && <>
-                                    <label>{localizeWithFallback('octane.hotel_view.secondary_button', 'Secondary button')}<input value={parseSlotConfig(editingSlot.configJson).secondaryButtonText || ''} onChange={(event) => updateEditingConfig((config) => ({ ...config, secondaryButtonText: event.target.value }))} /></label>
-                                    <label>{localizeWithFallback('octane.hotel_view.secondary_action', 'Secondary action')}<Select value={getSelectedAction(parseSlotConfig(editingSlot.configJson).secondaryLink || '')} onChange={(event) => updateEditingConfig((config) => ({ ...config, secondaryLink: event.target.value === CUSTOM_ACTION ? '' : event.target.value }))}><option value={CUSTOM_ACTION}>{localizeWithFallback('octane.hotel_view.custom_link', 'Custom link')}</option>{HOTEL_VIEW_ACTIONS.map((action) => <option key={action.value} value={action.value}>{action.label}</option>)}</Select></label>
-                                    <label>{localizeWithFallback('octane.hotel_view.secondary_custom_link', 'Secondary custom link')}<input value={parseSlotConfig(editingSlot.configJson).secondaryLink || ''} onChange={(event) => updateEditingConfig((config) => ({ ...config, secondaryLink: event.target.value }))} /></label>
-                                </>}
-                                <footer><BaseButton type="button" onClick={() => { setEditingSlot(null); setCountdownInput(''); }}>{localizeWithFallback('octane.hotel_view.cancel', 'Cancel')}</BaseButton><BaseButton type="submit">{localizeWithFallback('octane.hotel_view.save', 'Save')}</BaseButton></footer>
-                            </form>
-                        )}
-                        {editingScene && (
-                            <form className="hotelview-editor hotelview-scene-editor" onSubmit={saveScene}>
-                                <header>{localizeWithFallback('octane.hotel_view.edit_hotelview_images', 'Edit HotelView images')}</header>
-                                <div className="hotelview-editor-preview hotelview-editor-scene-preview">
-                                    <span className="hotelview-editor-preview-label">{localizeWithFallback('octane.hotel_view.background_preview', 'Background preview')}</span>
-                                    <div className="hotelview-editor-scene-canvas" style={{ backgroundImage: editingScene.backgroundUrl ? `url(${resolveImageUrl(editingScene.backgroundUrl, imageLibraryUrl, assetUrl)})` : undefined }}>
-                                        {editingScene.leftUrl && <img className="hotelview-editor-scene-left" src={resolveImageUrl(editingScene.leftUrl, imageLibraryUrl, assetUrl)} alt="" />}
-                                        {editingScene.drapeUrl && <img className="hotelview-editor-scene-drape" src={resolveImageUrl(editingScene.drapeUrl, imageLibraryUrl, assetUrl)} alt="" />}
-                                        {editingScene.rightUrl && <img className="hotelview-editor-scene-right" src={resolveImageUrl(editingScene.rightUrl, imageLibraryUrl, assetUrl)} alt="" />}
-                                    </div>
-                                </div>
-                                <label>{localizeWithFallback('octane.hotel_view.background_url', 'Background URL')}<input value={editingScene.backgroundUrl} onChange={(event) => setEditingScene({ ...editingScene, backgroundUrl: event.target.value })} /></label>
-                                <label>{localizeWithFallback('octane.hotel_view.drape_url', 'Drape URL')}<input value={editingScene.drapeUrl} onChange={(event) => setEditingScene({ ...editingScene, drapeUrl: event.target.value })} /></label>
-                                <label>{localizeWithFallback('octane.hotel_view.left_image_url', 'Left image URL')}<input value={editingScene.leftUrl} onChange={(event) => setEditingScene({ ...editingScene, leftUrl: event.target.value })} /></label>
-                                <label>{localizeWithFallback('octane.hotel_view.right_image_url', 'Right image URL')}<input value={editingScene.rightUrl} onChange={(event) => setEditingScene({ ...editingScene, rightUrl: event.target.value })} /></label>
-                                <label className="hotelview-editor-toggle"><Checkbox checked={editingScene.hallOfFameEnabled} onCheckedChange={(nextChecked) => setEditingScene({ ...editingScene, hallOfFameEnabled: nextChecked })} /><span>Hall of Fame: {editingScene.hallOfFameEnabled ? 'Enabled' : 'Disabled'}</span></label>
-                                {editingScene.hallOfFameEnabled && <>
-                                    <label>{localizeWithFallback('octane.hotel_view.hall_of_fame_ranking', 'Hall of Fame ranking')}<Select value={editingScene.hallOfFameMode} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameMode: event.target.value })}><option value="latest_registered">{localizeWithFallback('octane.hotel_view.latest_registered_users', 'Latest registered users')}</option><option value="online_time">{localizeWithFallback('octane.hotel_view.most_online_time', 'Most online time')}</option><option value="achievement_score">{localizeWithFallback('octane.hotel_view.highest_achievement_score', 'Highest achievement score')}</option><option value="currency">{localizeWithFallback('octane.hotel_view.highest_currency_balance', 'Highest currency balance')}</option></Select></label>
-                                    {editingScene.hallOfFameMode === 'currency' && <label>{localizeWithFallback('octane.hotel_view.currency_type', 'Currency type')}<NumberInput min="0" value={editingScene.hallOfFameCurrencyType} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameCurrencyType: Math.max(0, Number(event.target.value) || 0) })} /></label>}
-                                </>}
-                                {/* The avatar is placed by dragging it on the view; this puts it back where it stands by default (on Save). */}
-                                <div className="hotelview-editor-avatar-reset">
-                                    <span>
-                                        {editingScene.leftX < 0 || editingScene.leftY < 0
-                                            ? localizeWithFallback('octane.hotel_view.avatar_position_default', 'Avatar position: default')
-                                            : localizeWithFallback('octane.hotel_view.avatar_position_custom', 'Avatar position: custom')}
-                                    </span>
-                                    <BaseButton
-                                        type="button"
-                                        data-testid="hotelview-avatar-reset"
-                                        disabled={editingScene.leftX < 0 || editingScene.leftY < 0}
-                                        onClick={() => setEditingScene({ ...editingScene, leftX: -1, leftY: -1 })}
-                                    >
-                                        {localizeWithFallback('octane.hotel_view.reset_avatar_position', 'Reset avatar position')}
-                                    </BaseButton>
-                                </div>
-                                <footer><BaseButton type="button" onClick={() => setEditingScene(null)}>{localizeWithFallback('octane.hotel_view.cancel', 'Cancel')}</BaseButton><BaseButton type="submit">{localizeWithFallback('octane.hotel_view.save', 'Save')}</BaseButton></footer>
-                            </form>
-                        )}
+                        {editingSlot && renderSlotEditor('hotelview-editor')}
+                        {editingScene && renderSceneEditor('hotelview-editor hotelview-scene-editor')}
                         </NativeTextTransformScale>
                     </div>
                 </div>

@@ -6,6 +6,8 @@ import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { chestTransactionMethodText } from './WiredChestTransactions.helpers';
 import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldWiredButton, HandheldWiredCard, HandheldWiredPage, HandheldWiredPair } from './handheld/HandheldWiredParts';
 
 export interface WiredChestTransactionDetails {
     transaction: IWiredChestTransactionRow;
@@ -51,6 +53,60 @@ const TransactionSide: FC<{ title: string; coins: number; furniCount: number; it
 export const WiredChestTransactionDetailsView: FC<WiredChestTransactionDetailsViewProps> = ({ details, onClose }) => {
     const [extraInfoOpen, setExtraInfoOpen] = useState(false);
     const { transaction, chestIds, withdrawn, deposited, incomplete } = details;
+    const isHandheld = useIsHandheld();
+
+    // Phone: a page beside the log on its side (over it upright), the lines as a card, each side of the transaction as a card of its own.
+    if (isHandheld)
+        return (
+            <HandheldWiredPage side title={localizeWithFallback('wiredchests.log_details.title', 'Transaction details')} uniqueKey="chest-transaction-details" onClose={onClose}>
+                <HandheldWiredCard>
+                    <HandheldWiredPair label={localizeWithFallback('wiredchests.log_details.type', 'Transaction method:')} value={chestTransactionMethodText(transaction.method)} />
+                    <HandheldWiredPair label={localizeWithFallback('wiredchests.log_details.timestamp', 'Timestamp:')} value={transaction.readableTimestamp || '-'} />
+                    <HandheldWiredPair label={localizeWithFallback('wiredchests.log_details.room_id', 'Room id:')} value={transaction.roomId} />
+                    <HandheldWiredPair label={localizeWithFallback('wiredchests.log_details.chest_ids', 'Chest id(s):')} value={chestIds.join(', ') || '-'} />
+                    <HandheldWiredPair label={localizeWithFallback('wiredchests.log_details.username', 'Username:')} value={transaction.userName || '-'} />
+                    <HandheldWiredPair label={localizeWithFallback('wiredchests.log_details.extra', 'Extra:')} value={transaction.definitionInfo || '-'} />
+                    <HandheldWiredButton pressed={extraInfoOpen} testId="wired-chest-extra" onClick={() => setExtraInfoOpen((open) => !open)}>
+                        {localizeWithFallback('wiredchests.log_details.extra.title', 'Extra information')}
+                    </HandheldWiredButton>
+                    {extraInfoOpen && (
+                        <div className="octane-handheld-wired__note">
+                            <div>{localizeWithFallback('wiredchests.log_details.extra.desc.1', 'This can hold additional information relevant to the wired transaction.')}</div>
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: localizeWithFallback(
+                                        'wiredchests.log_details.extra.desc.2',
+                                        '<b>1. </b>For <b>WIRED</b> transactions: the furni id of the wired action and the amount of items / currency.'
+                                    )
+                                }}
+                            />
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: localizeWithFallback('wiredchests.log_details.extra.desc.3', '<b>2. </b>For <b>CONTRACT</b> transactions: the contract id and the multiplier used.')
+                                }}
+                            />
+                        </div>
+                    )}
+                </HandheldWiredCard>
+                <div className="octane-handheld-wired__heading">{localizeWithFallback('wiredchests.log_details.transactions', 'Transactions:')}</div>
+                <div className="octane-handheld-wired__sides">
+                    <TransactionSide
+                        coins={transaction.withdrawnCoins}
+                        furniCount={transaction.withdrawnFurni}
+                        incomplete={incomplete}
+                        items={withdrawn}
+                        title={localizeWithFallback('wiredchests.log_details.transactions.withdrawn', 'Withdrawals')}
+                    />
+                    <TransactionSide
+                        coins={transaction.depositedCoins}
+                        furniCount={transaction.depositedFurni}
+                        incomplete={incomplete}
+                        items={deposited}
+                        title={localizeWithFallback('wiredchests.log_details.transactions.deposit', 'Deposits')}
+                    />
+                </div>
+            </HandheldWiredPage>
+        );
 
     return (
         <NativeTextTree>

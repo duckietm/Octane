@@ -6,6 +6,9 @@ import { useMessageEvent, useNotification } from '../../hooks';
 import { NumberInput } from '../../common/NumberInput';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { ToggleButton } from '../../common/ToggleButton';
+import { HandheldWiredButton, HandheldWiredCard, HandheldWiredEmpty, HandheldWiredField, HandheldWiredPage } from './handheld/HandheldWiredParts';
 
 /** The official tool's range; the server clamps to its own `hotel.selfdonation.max.amount`. */
 const DEFAULT_MAX_AMOUNT = 500;
@@ -60,6 +63,7 @@ export const WiredSelfDonationView = ({ onClose }: WiredSelfDonationViewProps) =
     const [selected, setSelected] = useState<SelfDonationCandidate | null>(null);
     const allFurniture = useMemo(() => GetSessionDataManager().getAllFurnitureData() ?? [], []);
     const results = useMemo(() => searchFurnitureTypes(allFurniture, query), [allFurniture, query]);
+    const isHandheld = useIsHandheld();
 
     useMessageEvent<SelfDonationResultMessageEvent>(SelfDonationResultMessageEvent, (event) => {
         const code = event.getParser()?.resultCode;
@@ -82,6 +86,72 @@ export const WiredSelfDonationView = ({ onClose }: WiredSelfDonationViewProps) =
 
         SendMessageComposer(new SelfDonationMessageComposer(selected.isWallItem, selected.id, '', clampedAmount));
     };
+
+    // Phone: a page of the sheet; the search results are rows to tap, Donate sits in the bar under them.
+    if (isHandheld)
+        return (
+            <HandheldWiredPage
+                aside={
+                    <HandheldWiredCard>
+                        <HandheldWiredField label={`${localizeWithFallback('selfdonation.amount', 'Amount')} (${localizeWithFallback('selfdonation.amount.range', '1 to %max%', ['max'], [String(maxAmount)])})`}>
+                            <NumberInput
+                                aria-label={localizeWithFallback('octane.wired_tools.amount', 'Amount')}
+                                max={maxAmount}
+                                min={1}
+                                value={amount}
+                                onBlur={() => setAmount(clampedAmount)}
+                                onChange={(event) => setAmount(Number.parseInt(event.target.value, 10) || 1)}
+                            />
+                        </HandheldWiredField>
+                        <HandheldWiredField label={localizeWithFallback('selfdonation.search', 'Furni')}>
+                            <input
+                                aria-label={localizeWithFallback('octane.wired_tools.search_furni', 'Search furni')}
+                                className="octane-handheld-wired__input"
+                                placeholder={localizeWithFallback('selfdonation.search.placeholder', 'Name or classname')}
+                                type="search"
+                                value={query}
+                                onChange={(event) => setQuery(event.target.value)}
+                            />
+                        </HandheldWiredField>
+                    </HandheldWiredCard>
+                }
+                title={localizeWithFallback('selfdonation.title', 'Sandbox donation tool')}
+                uniqueKey="wired-self-donation"
+                onClose={onClose}
+            >
+                <div className="octane-handheld-wired__rows" data-testid="self-donation-results">
+                    {!results.length && <HandheldWiredEmpty>{localizeWithFallback('selfdonation.empty', 'No furni matches the search')}</HandheldWiredEmpty>}
+                    {results.map((candidate) => {
+                        const isSelected = selected?.id === candidate.id && selected?.isWallItem === candidate.isWallItem;
+
+                        return (
+                            <ToggleButton
+                                key={`${candidate.isWallItem ? 'w' : 'f'}-${candidate.id}`}
+                                className={`octane-handheld-wired__row${isSelected ? ' is-selected' : ''}`}
+                                pressed={isSelected}
+                                onClick={() => setSelected(candidate)}
+                            >
+                                <span className="octane-handheld-wired__row-key">
+                                    {candidate.name}
+                                    <span className="octane-handheld-wired__row-note">{candidate.className}</span>
+                                </span>
+                                <span className="octane-handheld-wired__row-value">{candidate.isWallItem ? 'Wall' : 'Floor'}</span>
+                            </ToggleButton>
+                        );
+                    })}
+                </div>
+                <div className="octane-handheld-wired__bar is-sticky">
+                    <span className="octane-handheld-wired__muted">
+                        {selected
+                            ? localizeWithFallback('selfdonation.selected', 'Selected: %name%', ['name'], [selected.name])
+                            : localizeWithFallback('selfdonation.none_selected', 'Pick a furni from the list')}
+                    </span>
+                    <HandheldWiredButton disabled={!selected} testId="self-donation-donate" tone="primary" onClick={donate}>
+                        {localizeWithFallback('selfdonation.donate', 'Donate')}
+                    </HandheldWiredButton>
+                </div>
+            </HandheldWiredPage>
+        );
 
     return (
         <NativeTextTree>

@@ -20,6 +20,8 @@ import checkmarkIcon from '../../assets/images/collectibles/icon_checkmark_small
 import { CollectibleProductImageView } from './CollectibleProductImageView';
 import { CollectiblesLoadingView } from './CollectiblesLoadingView';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldCollectiblesCollectionsView, HandheldCollectiblesCollectionView } from './HandheldCollectiblesCollectionsView';
 
 const html = (key: string, fallback: string, parameters: string[], replacements: string[]) =>
     SanitizeHtml(localizeWithFallback(key, fallback, parameters, replacements));
@@ -28,8 +30,9 @@ const collectionTitle = (collection: CollectibleCollectionData) =>
     localizeWithFallback(`collectibles.set.${collection.collectionId}`, collection.collectionName || collection.collectionId);
 
 /** `CollectionView`: one set, its preview area (reward, bonus or the picked product) and its products. */
-const CollectionDetailView: FC<{ collection: CollectibleCollectionData }> = ({ collection }) => {
+const CollectionDetailView: FC<{ collection: CollectibleCollectionData; onBack?: (() => void) | null }> = ({ collection, onBack = null }) => {
     const { pendingClaims = {}, claimCollection = null } = useCollectibles();
+    const isHandheld = useIsHandheld();
     const [selected, setSelected] = useState<CollectibleProductData>(null);
     const [now, setNow] = useState(() => Date.now());
     const owned = collectionOwnedCount(collection);
@@ -49,6 +52,26 @@ const CollectionDetailView: FC<{ collection: CollectibleCollectionData }> = ({ c
     }, [timer?.visible, timer?.expired]);
 
     const complete = owned === total && total > 0;
+    const toggleItem = (item: CollectibleProductData) => setSelected((current) => (current?.productCode === item.productCode ? null : item));
+    const claim = () => claimCollection?.(collection.collectionId, preview.kind === 'bonus');
+
+    if (isHandheld) {
+        return (
+            <HandheldCollectiblesCollectionView
+                collection={collection}
+                complete={complete}
+                owned={owned}
+                preview={preview}
+                selectedItem={selectedItem}
+                timer={timer}
+                title={collectionTitle(collection)}
+                total={total}
+                onBack={onBack}
+                onClaim={claim}
+                onToggleItem={toggleItem}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>
@@ -126,10 +149,7 @@ const CollectionDetailView: FC<{ collection: CollectibleCollectionData }> = ({ c
                                 )}
                             </div>
                             {preview.claimable && (
-                                <BaseButton
-                                    className="octane-collectibles-button is-green octane-collectibles-claim-button"
-                                    onClick={() => claimCollection?.(collection.collectionId, preview.kind === 'bonus')}
-                                >
+                                <BaseButton className="octane-collectibles-button is-green octane-collectibles-claim-button" onClick={claim}>
                                     {localizeWithFallback('collectibles.claim', 'Claim reward')}
                                 </BaseButton>
                             )}
@@ -167,7 +187,7 @@ const CollectionDetailView: FC<{ collection: CollectibleCollectionData }> = ({ c
                             aria-label={getCollectibleProductName(item)}
                             className={`octane-collectibles-item${selectedItem?.productCode === item.productCode ? ' is-selected' : ''}${item.amount > 0 ? ' is-owned' : ''}`}
                             pressed={selectedItem?.productCode === item.productCode}
-                            onClick={() => setSelected((current) => (current?.productCode === item.productCode ? null : item))}
+                            onClick={() => toggleItem(item)}
                         >
                             <CollectibleProductImageView icon product={item} />
                             <span className="octane-collectibles-item-amount">{`x${item.amount}`}</span>
@@ -194,8 +214,26 @@ export const CollectiblesCollectionsTabView: FC = () => {
         return comparison.length ? sorted.filter((collection) => collectionTitle(collection).toLowerCase().includes(comparison)) : sorted;
     }, [sorted, search]);
     const selected = sorted.find((collection) => collection.collectionId === selectedId) ?? sorted[0] ?? null;
+    const isHandheld = useIsHandheld();
 
     if (collections === null) return <CollectiblesLoadingView />;
+
+    if (isHandheld) {
+        return (
+            <HandheldCollectiblesCollectionsView
+                renderDetail={(onBack) => (selected ? <CollectionDetailView collection={selected} onBack={onBack} /> : null)}
+                search={search}
+                selectedId={selected?.collectionId ?? null}
+                shown={shown}
+                sortMode={sortMode}
+                title={collectionTitle}
+                total={sorted.length}
+                onSearch={setSearch}
+                onSelect={setSelectedId}
+                onSort={setSortMode}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

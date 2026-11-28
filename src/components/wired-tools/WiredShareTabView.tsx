@@ -28,6 +28,8 @@ import { useMessageEvent, useNotification, useRoom, useWiredTools } from '../../
 import { Checkbox } from '../../common/Checkbox';
 import { Radio } from '../../common/Radio';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldWiredShareTab } from './handheld/HandheldWiredRoomTabs';
 
 const furniName = (type: string): string => GetSessionDataManager()?.getFloorItemDataByName?.(type)?.name || type;
 
@@ -55,6 +57,7 @@ export const WiredShareTabView: FC<{}> = () => {
     const [importBusy, setImportBusy] = useState(false);
     const [report, setReport] = useState<IWiredSetupImportReport | null>(null);
     const fileInput = useRef<HTMLInputElement>(null);
+    const isHandheld = useIsHandheld();
 
     useMessageEvent<WiredSetupExportResultEvent>(WiredSetupExportResultEvent, (event) => {
         const parser = event.getParser();
@@ -143,6 +146,65 @@ export const WiredShareTabView: FC<{}> = () => {
     const counts = report ? [ String(report.configured), String(report.placed), String(report.missing), String(report.refused) ] : [];
     const countKeys = [ 'configured', 'placed', 'missing', 'refused' ];
     const codeIsValid = isWiredShareCode(importCode);
+
+    if (isHandheld) {
+        const reportOk = !!report && report.status === WIRED_SHARE_STATUS_OK;
+
+        return (
+            <HandheldWiredShareTab
+                anchorAvatar={anchorMode === WIRED_SHARE_ANCHOR_AVATAR}
+                canImport={canModify && !importBusy && codeIsValid && reportOk && !report.confirmed}
+                canModify={canModify}
+                canPreview={canModify && !importBusy && codeIsValid}
+                copied={copied}
+                describeEntry={(entry) => ({ box: furniName(entry.type), status: wiredImportEntryText(entry.status), reason: entry.reason ? wiredImportReasonText(entry.reason) : '' })}
+                exportBusy={exportBusy}
+                exportCode={exportCode}
+                exportCount={exportCount}
+                exportErrorText={exportError !== WIRED_SHARE_STATUS_OK ? wiredShareErrorText(exportError) : null}
+                fileInput={fileInput}
+                importCode={importCode}
+                maxCodeLength={WIRED_SHARE_MAX_CODE_LENGTH * 2}
+                placeFromInventory={placeFromInventory}
+                report={report}
+                reportErrorText={report && !reportOk ? wiredShareErrorText(report.status) : null}
+                reportSummary={
+                    !reportOk
+                        ? ''
+                        : report.confirmed
+                          ? localizeWithFallback(
+                                'wiredmenu.share.import.done',
+                                'Import done: %configured% configured, %placed% placed, %missing% missing, %refused% failed.',
+                                countKeys,
+                                counts
+                            )
+                          : localizeWithFallback('wiredmenu.share.import.summary', '%configured% to configure, %placed% to place, %missing% missing, %refused% not possible.', countKeys, counts)
+                }
+                onAnchorAvatar={() => {
+                    setAnchorMode(WIRED_SHARE_ANCHOR_AVATAR);
+                    setReport(null);
+                }}
+                onAnchorOriginal={() => {
+                    setAnchorMode(WIRED_SHARE_ANCHOR_ORIGINAL);
+                    setReport(null);
+                }}
+                onCopy={copyCode}
+                onDownload={downloadCode}
+                onExport={requestExport}
+                onImport={confirmImport}
+                onImportCodeChange={(code) => {
+                    setImportCode(code);
+                    setReport(null);
+                }}
+                onLoadFile={loadFile}
+                onPlaceFromInventoryChange={(nextChecked) => {
+                    setPlaceFromInventory(nextChecked);
+                    setReport(null);
+                }}
+                onPreview={() => sendImport(false)}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

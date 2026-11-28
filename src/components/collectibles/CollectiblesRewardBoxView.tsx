@@ -7,6 +7,8 @@ import { rarityColor, toHexColor } from '../../hooks/collectibles/collectibles.h
 import { getCollectibleProductName, useCollectibles } from '../../hooks/collectibles/useCollectibles';
 import { CollectibleProductImageView } from './CollectibleProductImageView';
 import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldCollectiblesRewardBoxView } from './HandheldCollectiblesRewardBoxView';
 
 /**
  * `CollectiblesRewardBoxView` (`collectible_reward_xml`, 424x570): what the user's reward box held, on a
@@ -15,10 +17,15 @@ import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit
 export const CollectiblesRewardBoxView: FC = () => {
     const { rewardQueue = [], dismissReward = null } = useCollectibles();
     const reward = rewardQueue[0] ?? null;
+    const isHandheld = useIsHandheld();
 
     if (!reward) return null;
 
     const color = toHexColor(rarityColor(reward.rarity));
+
+    if (isHandheld) {
+        return <HandheldCollectiblesRewardBoxView color={color} reward={reward} waiting={rewardQueue.length - 1} onDismiss={() => dismissReward?.()} />;
+    }
 
     return (
         <NativeTextTree>

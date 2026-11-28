@@ -7,6 +7,8 @@ import { useNotification } from '../../hooks/notification';
 import silverIcon from '../../assets/images/collectibles/pursearea_mid_silver_icon.png';
 import { CollectiblesLoadingView } from './CollectiblesLoadingView';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldCollectiblesTransferView } from './HandheldCollectiblesTransferView';
 
 /**
  * `TransferNftsTab`. The official tab moves every collectible of the collector wallet to an external
@@ -17,6 +19,7 @@ export const CollectiblesTransferTabView: FC = () => {
     const { transferFee = null, silver = 0, collectorWallet = '', transferPending = false, transfer = null } = useCollectibles();
     const { showConfirm = null } = useNotification();
     const [recipient, setRecipient] = useState('');
+    const isHandheld = useIsHandheld();
 
     if (transferFee === null) return <CollectiblesLoadingView />;
 
@@ -37,6 +40,18 @@ export const CollectiblesTransferTabView: FC = () => {
             localizeWithFallback('collectibles.transfer', 'Transfer')
         );
     };
+
+    if (isHandheld) {
+        return (
+            <HandheldCollectiblesTransferView
+                canTransfer={enabled}
+                fee={transferFee}
+                recipient={recipient}
+                onRecipient={setRecipient}
+                onTransfer={onTransfer}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

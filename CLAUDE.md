@@ -597,6 +597,23 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
   message's quote / hide / report are named chips. `forumMessageLook` decides the look and the hide action as on the desktop;
   `forumMessageBlocks` sets quoted (">") lines apart, and typed text is a `<pre>` so it stays browser text. The forum rules
   in `HandheldFrames.css` (scaled desktop frame) are kept but no forum window reaches them on a phone any more.
+- Phone wired creator tools (`src/css/handheld/HandheldWiredTools.css`): `WiredCreatorToolsView` hands its tab props to
+  `wired-tools/handheld/HandheldWiredToolsView` (sheet, tabs as pills; "Pick in room" and the eye put it aside behind the peek bar
+  until the room selection changes). The extra windows branch on `useIsHandheld()` into `HandheldWiredPage` (Back; `side` puts a
+  detail page at the right on its side; `aside` puts the filters in their own column), and `WiredPagedTable` renders
+  `HandheldWiredPagedList` (cards and a pager; a column's `handheld` is `'title' | 'meta' | 'action' | 'hidden'`).
+- Phone collectibles (`src/css/handheld/HandheldCollectibles.css`): `CollectiblesHubView` and every tab view branch on
+  `useIsHandheld()` after their hooks and hand data + handlers to `components/collectibles/HandheldCollectibles*View.tsx` twins
+  (level and balances in the header, tabs as pills, tiles that open as a page or beside the list, the main action in a bottom
+  bar); the reward box is a centred card (`HandheldCollectiblesRewardBoxView`).
+- Phone camera (`src/css/handheld/HandheldCamera.css`): `CameraWidgetCaptureView` / `CameraWidgetEditorView` /
+  `CameraWidgetCheckoutView` hand their state to `HandheldCamera*View` twins. The viewfinder is a full-screen layer whose only
+  clear part is the unscaled 320 px viewfinder on whole pixels (the capture area is read from its place on screen); a finger
+  inside it pans the room. Editor and checkout are frame sheets; "Clear all" is the editor's `clear_effects` action.
+- Phone hotel view (`src/css/handheld/HandheldHotelView.css`): `HotelView` hands the scene, the slot content
+  (`renderSlotContent`) and its editor forms to `hotel-view/HandheldHotelView.tsx`: the art as a picture across the top with the
+  slots as glass cards scrolling over it (on its side scene left, cards right), a green home-room button, staff pencils opening
+  the editors as a sheet. Drag-placing slots stays desktop-only.
 - Renderer-SDK mock for Vitest: `src/octane-renderer.mock.ts`
   (aliased over `@octane/renderer` via `vitest.config.mts`).
   Hosts the explicit `OctaneLogger` mock, the `mockEventDispatcher` /

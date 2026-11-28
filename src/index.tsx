@@ -163,6 +163,10 @@ import './css/handheld/HandheldDrawer.css';
 import './css/handheld/HandheldDialogs.css';
 import './css/handheld/HandheldWindows.css';
 import './css/handheld/HandheldFloorplan.css';
+import './css/handheld/HandheldCamera.css';
+import './css/handheld/HandheldHotelView.css';
+import './css/handheld/HandheldCollectibles.css';
+import './css/handheld/HandheldWiredTools.css';
 import './css/common/ClassicScrollbar.css';
 
 document.documentElement.classList.add('has-classic-scrollbar');
