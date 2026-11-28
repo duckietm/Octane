@@ -9,6 +9,8 @@ import { AvatarEditorAdvancedColorView, AvatarEditorPaletteSetView } from './pal
 import { BaseButton } from '../../common/BaseButton';
 import { ToggleButton } from '../../common/ToggleButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldLooksPartsView } from './HandheldLooksPartsView';
 
 export const AvatarEditorPetView: FC<{
     categories: IAvatarEditorCategory[];
@@ -26,6 +28,8 @@ export const AvatarEditorPetView: FC<{
         selectEditorColor = null
     } = useAvatarEditor();
     const hasHC = GetClubMemberLevel() > 0;
+    // Phone layout: the worn companion as a strip over the phone's part grid (HandheldLooksPartsView).
+    const isHandheld = useIsHandheld();
 
     const petCategory = categories.length ? categories[0] : null;
     const selectedPetSetId = selectedParts?.['pt'] ?? null;
@@ -78,7 +82,35 @@ export const AvatarEditorPetView: FC<{
     }, [selectEditorPart]);
 
     if (!petCategory || !petCategory.partItems || !petCategory.partItems.length) {
-        return <div className="octane-avatar-editor-empty-state">{localizeWithFallback('octane.avatar_editor.no_companion_pets_available', 'No companion pets available.')}</div>;
+        return <div className={isHandheld ? 'octane-handheld-looks__note' : 'octane-avatar-editor-empty-state'}>{localizeWithFallback('octane.avatar_editor.no_companion_pets_available', 'No companion pets available.')}</div>;
+    }
+
+    if (isHandheld) {
+        return (
+            <HandheldLooksPartsView
+                category={petCategory}
+                chips={
+                    <div className="octane-handheld-looks__equipped">
+                        {selectedPartItem && slotThumbUrl ? <img src={slotThumbUrl} alt="" draggable={false} /> : <AvatarEditorIcon icon="pt" />}
+                        <span>
+                            {selectedPartItem
+                                ? localizeWithFallback('octane.avatar_editor.companion_equipped', 'Companion equipped')
+                                : localizeWithFallback('octane.avatar_editor.no_companion_selected', 'No companion selected')}
+                        </span>
+                        {selectedPartItem && (
+                            <BaseButton
+                                aria-label={localizeWithFallback('octane.avatar_editor.remove_companion', 'Remove companion')}
+                                className="octane-handheld-looks__equipped-remove"
+                                onClick={removePet}
+                            >
+                                <AvatarEditorIcon icon="clear" />
+                            </BaseButton>
+                        )}
+                    </div>
+                }
+                showColours={hasColors}
+            />
+        );
     }
 
     return (

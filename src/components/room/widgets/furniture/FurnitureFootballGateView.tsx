@@ -5,6 +5,7 @@ import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Te
 import { useFurnitureFootballGateWidget } from '../../../../hooks';
 import '../../../../css/room/FurniWindowsCAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 export const FurnitureFootballGateView: FC<{}> = (props) => {
     const { objectId = -1, setObjectId = null, onClose = null } = useFurnitureFootballGateWidget();
@@ -18,7 +19,7 @@ export const FurnitureFootballGateView: FC<{}> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-football-gate w-[300px]" theme="primary-slim" uniqueKey="football-gate">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-football-gate w-[300px]" theme="primary-slim" uniqueKey="football-gate">
                 <OctaneCardHeaderView headerText={LocalizeText('widget.furni.clothingchange.gender.title')} onCloseClick={onClose} />
                 <OctaneCardContentView>
                     <div className="flex justify-center w-full">

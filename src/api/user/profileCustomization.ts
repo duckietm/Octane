@@ -1,4 +1,5 @@
-import { KEEP_PROFILE_CUSTOMIZATION, RoomUnitBackgroundComposer, UserProfileParser } from '@octane/renderer';
+import { KEEP_PROFILE_AVATAR_POSE, KEEP_PROFILE_CUSTOMIZATION, RoomUnitBackgroundComposer, UserProfileParser } from '@octane/renderer';
+import type { CSSProperties } from 'react';
 import { configFileUrl } from '../../secure-assets';
 import { parseCssColors, toneOf } from '../utils/backgroundTone';
 import { GetConfigurationValue, GetOptionalConfigurationValue, SendMessageComposer } from '../octane';
@@ -58,6 +59,65 @@ export const figureUnderOverlay = (figure: string, overlayId: number | null | un
               .filter((part) => !CLOTHING_PARTS.test(part))
               .join('.')
         : figure;
+
+/** How the avatar stands in the profile picture: the direction it faces (0-7) and its offset in the box, in pixels. */
+export interface ProfileAvatarPose {
+    direction: number;
+    offsetX: number;
+    offsetY: number;
+}
+
+/** The direction the avatar faced before it could be turned: today's look, and what an older server means. */
+export const PROFILE_AVATAR_DEFAULT_DIRECTION = 2;
+
+/**
+ * How far the avatar may be moved each way, in pixels (the server clamps to the same). The picture is 68 x 135 and the
+ * avatar's body about 34 px wide in its middle, so 16 px to either side keeps it in the box; its feet are on row 116
+ * and its head near row 28 (higher on a stand), so 16 px up or down keeps it in too.
+ */
+export const PROFILE_AVATAR_MAX_OFFSET = 16;
+
+export const DEFAULT_PROFILE_AVATAR_POSE: ProfileAvatarPose = { direction: PROFILE_AVATAR_DEFAULT_DIRECTION, offsetX: 0, offsetY: 0 };
+
+/** Effects drawn on the avatar itself (the costumes and the one before them), which move with it as its stand does. */
+export const PROFILE_AVATAR_BOUND_OVERLAYS: ReadonlyArray<number> = [5, 6, 7, 8];
+
+export const clampProfileAvatarOffset = (value: number): number =>
+    Number.isFinite(value) ? Math.max(-PROFILE_AVATAR_MAX_OFFSET, Math.min(PROFILE_AVATAR_MAX_OFFSET, Math.round(value))) : 0;
+
+/** One of the eight directions; anything else faces the default way. */
+export const normalizeProfileAvatarDirection = (direction: number | null | undefined): number =>
+    Number.isInteger(direction) && direction >= 0 && direction <= 7 ? direction : PROFILE_AVATAR_DEFAULT_DIRECTION;
+
+/** Turns the avatar by `steps` eighths (negative turns the other way), wrapping round 0-7. */
+export const rotateProfileAvatarDirection = (direction: number, steps: number): number => (((normalizeProfileAvatarDirection(direction) + steps) % 8) + 8) % 8;
+
+/** A pose made safe to draw, from what the server sent (missing fields are today's look). */
+export const profileAvatarPose = (
+    source: Partial<Record<'avatarDirection' | 'avatarOffsetX' | 'avatarOffsetY', number | null>> | null | undefined
+): ProfileAvatarPose => ({
+    direction: normalizeProfileAvatarDirection(source?.avatarDirection),
+    offsetX: clampProfileAvatarOffset(source?.avatarOffsetX ?? 0),
+    offsetY: clampProfileAvatarOffset(source?.avatarOffsetY ?? 0)
+});
+
+export const sameProfileAvatarPose = (a: ProfileAvatarPose, b: ProfileAvatarPose): boolean =>
+    a.direction === b.direction && a.offsetX === b.offsetX && a.offsetY === b.offsetY;
+
+/**
+ * Moves the avatar in the picture. CSS `translate` adds to the `transform` that puts its feet on the stand, so both
+ * apply; no style at all for today's place.
+ */
+export const profileAvatarOffsetStyle = (offsetX = 0, offsetY = 0): CSSProperties | undefined => {
+    const x = clampProfileAvatarOffset(offsetX);
+    const y = clampProfileAvatarOffset(offsetY);
+
+    return x || y ? { translate: `${x}px ${y}px` } : undefined;
+};
+
+/** The offset style for an effect: only those drawn on the avatar move with it. */
+export const profileOverlayOffsetStyle = (overlayId: number | null | undefined, offsetX = 0, offsetY = 0): CSSProperties | undefined =>
+    overlayId && PROFILE_AVATAR_BOUND_OVERLAYS.includes(overlayId) ? profileAvatarOffsetStyle(offsetX, offsetY) : undefined;
 
 /** An accent of the user's own colour: this bit over the colour as 0xRRGGBB (the server checks the same bit). */
 export const PROFILE_CUSTOM_ACCENT = 0x1000000;
@@ -223,11 +283,14 @@ export const findProfileBannerUrl = (banners: ReadonlyArray<ProfileBannerEntry>,
     return entry ? resolveProfileBannerUrl(entry.image) : '';
 };
 
-export type ProfileCustomizationChange = Partial<Record<'background' | 'stand' | 'overlay' | 'card' | 'border' | 'banner' | 'accent', number>>;
+export type ProfileCustomizationChange = Partial<Record<'background' | 'stand' | 'overlay' | 'card' | 'border' | 'banner' | 'accent', number>> & {
+    /** The avatar's pose in the picture; without it the server keeps the saved one. */
+    pose?: ProfileAvatarPose;
+};
 
 /**
  * Saves one change of the own profile window. The infostand values travel in the same message, so
- * they are sent as they are now; banner and accent are left to the server unless they change. The
+ * they are sent as they are now; banner, accent and the avatar's pose are left to the server unless they change. The
  * profile is asked for again to show the result.
  */
 export const sendProfileCustomization = (profile: UserProfileParser, change: ProfileCustomizationChange): void => {
@@ -239,7 +302,10 @@ export const sendProfileCustomization = (profile: UserProfileParser, change: Pro
             change.card ?? profile.cardBackgroundId ?? 0,
             change.border ?? profile.borderId ?? 0,
             change.banner ?? KEEP_PROFILE_CUSTOMIZATION,
-            change.accent ?? KEEP_PROFILE_CUSTOMIZATION
+            change.accent ?? KEEP_PROFILE_CUSTOMIZATION,
+            change.pose ? normalizeProfileAvatarDirection(change.pose.direction) : KEEP_PROFILE_AVATAR_POSE,
+            change.pose ? clampProfileAvatarOffset(change.pose.offsetX) : 0,
+            change.pose ? clampProfileAvatarOffset(change.pose.offsetY) : 0
         )
     );
     GetUserProfile(profile.id);

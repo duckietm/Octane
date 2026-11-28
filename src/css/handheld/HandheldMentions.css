@@ -1,0 +1,478 @@
+/*
+ * Phone mentions (the toolbar's @ button), in the Octane handheld look (HandheldTokens.css) inside the shared frame
+ * (HandheldSheetFrame). HandheldMentionsView draws it: the filters as the sheet's tabs, a search field, the mentions as
+ * cards under their day, refresh and "mark all as read" in a bar at the bottom. On its side the cards sit two a row.
+ * Everything is scoped to :root[data-handheld], which only a phone-sized touch device gets.
+ */
+
+:root[data-handheld] .octane-handheld-mentions .octane-handheld-sheet__body {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+/* ---------------------------------------------------------------- search */
+
+:root[data-handheld] .octane-handheld-mentions__search {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    margin: var(--hh-space-3) var(--hh-space-3) 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-mentions__search {
+    margin-top: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-mentions__search-icon {
+    position: absolute;
+    left: var(--hh-space-3);
+    width: 14px;
+    height: 14px;
+    color: var(--hh-air-text-muted);
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-sheet input.octane-handheld-mentions__search-field {
+    flex: 1 1 auto;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-touch) 0 36px;
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+    line-height: 20px;
+    outline: none;
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-mentions__search-field:focus {
+    border-color: var(--hh-air-blue-deep);
+}
+
+:root[data-handheld] .octane-handheld-mentions__search-field::-webkit-search-cancel-button {
+    display: none;
+}
+
+:root[data-handheld] .octane-handheld-mentions__search-clear {
+    position: absolute;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: none;
+    color: var(--hh-air-text-muted);
+    cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- list */
+
+:root[data-handheld] .octane-handheld-mentions__list {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    box-sizing: border-box;
+    gap: var(--hh-space-2);
+    min-height: 0;
+    padding: var(--hh-space-3);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-mentions__list > * {
+    flex: none;
+}
+
+:root[data-handheld] .octane-handheld-mentions__group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-mentions__group-label {
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-mentions__cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-mentions__cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+}
+
+/* ---------------------------------------------------------------- a mention */
+
+:root[data-handheld] .octane-handheld-mentions__card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+/* Unread: the blue edge of AIR's selection along the left, and the name in the deep window blue. */
+:root[data-handheld] .octane-handheld-mentions__card[data-unread] {
+    border-color: var(--hh-air-blue-light);
+    box-shadow:
+        inset 4px 0 0 var(--hh-air-select),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-mentions__card-main {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    align-items: flex-start;
+    gap: var(--hh-space-3);
+    width: 100%;
+    min-height: 64px;
+    padding: var(--hh-space-3) var(--hh-space-3) var(--hh-space-2) var(--hh-space-3);
+    border: 0;
+    background: none;
+    color: var(--hh-air-text);
+    cursor: pointer;
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-mentions__card-main:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-mentions__avatar {
+    position: relative;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-mentions__card-body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-mentions__card-head {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    padding-right: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-mentions__name {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-mentions__card[data-unread] .octane-handheld-mentions__name {
+    color: var(--hh-air-blue-deep);
+}
+
+:root[data-handheld] .octane-handheld-mentions__chip {
+    flex: none;
+    padding: 0 6px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-deep);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-mentions__chip[data-kind='room'] {
+    background: var(--hh-air-track-tip);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-mentions__time {
+    flex: none;
+    margin-left: auto;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-mentions__room {
+    overflow: hidden;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Three lines until the card is tapped, then all of it. */
+:root[data-handheld] .octane-handheld-mentions__message {
+    display: -webkit-box;
+    margin-top: 2px;
+    overflow: hidden;
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+:root[data-handheld] .octane-handheld-mentions__card[data-expanded] .octane-handheld-mentions__message {
+    display: block;
+    -webkit-line-clamp: none;
+}
+
+:root[data-handheld] .octane-handheld-mentions__message .mention-tag {
+    color: var(--hh-air-blue-deep);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-mentions__message .mention-tag--self {
+    padding: 0 2px;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-track-tip);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-mentions__dot {
+    position: absolute;
+    top: var(--hh-space-2);
+    right: var(--hh-space-2);
+    width: 8px;
+    height: 8px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-select);
+}
+
+:root[data-handheld] .octane-handheld-mentions__card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--hh-space-2);
+    padding: 0 var(--hh-space-2) var(--hh-space-2) 64px;
+}
+
+:root[data-handheld] .octane-handheld-mentions__goto,
+:root[data-handheld] .octane-handheld-mentions__remove {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-1);
+    height: var(--hh-touch);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-mentions__goto {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 200px;
+    padding: 0 var(--hh-space-4);
+    overflow: hidden;
+}
+
+:root[data-handheld] .octane-handheld-mentions__remove {
+    flex: 0 0 var(--hh-touch);
+    width: var(--hh-touch);
+    padding: 0;
+    color: var(--hh-air-red);
+}
+
+:root[data-handheld] .octane-handheld-mentions__goto:active,
+:root[data-handheld] .octane-handheld-mentions__remove:active {
+    background: var(--hh-air-track-active);
+}
+
+/* ---------------------------------------------------------------- empty and more */
+
+:root[data-handheld] .octane-handheld-mentions__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--hh-space-3);
+    padding: var(--hh-space-4) var(--hh-space-3);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-mentions__empty-glyph {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-mentions__empty-glyph::before {
+    content: '@';
+    display: block;
+    color: var(--hh-air-white);
+    font-family: var(--hh-font-bold);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 46px;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-mentions__more {
+    align-self: center;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-4);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-mentions__more:disabled {
+    opacity: 0.6;
+}
+
+/* ---------------------------------------------------------------- the bar at the bottom */
+
+:root[data-handheld] .octane-handheld-mentions__bar {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-top: 1px solid var(--hh-air-box);
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-mentions__bar {
+    padding-top: var(--hh-space-1);
+    padding-bottom: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-mentions__button {
+    display: flex;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-mentions__empty .octane-handheld-mentions__button {
+    flex: none;
+}
+
+:root[data-handheld] .octane-handheld-mentions__button:active {
+    background: var(--hh-air-track-active);
+}
+
+:root[data-handheld] .octane-handheld-mentions__button:disabled {
+    opacity: 0.6;
+}
+
+:root[data-handheld] .octane-handheld-mentions__button.is-primary {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-mentions__button.is-primary:active {
+    background: var(--hh-primary-pressed);
+}
+
+/* ---------------------------------------------------------------- on its side */
+
+/* The search and the actions make a column at the left, so the cards get the whole height at the right. */
+:root[data-handheld='landscape'] .octane-handheld-mentions .octane-handheld-sheet__body {
+    display: grid;
+    grid-template-columns: minmax(200px, 30%) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-mentions__search {
+    grid-column: 1;
+    grid-row: 1;
+    margin: var(--hh-space-3) 0 0 var(--hh-space-3);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-mentions__list {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-mentions__bar {
+    grid-column: 1;
+    grid-row: 2;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: var(--hh-space-3) 0 var(--hh-space-3) var(--hh-space-3);
+    border-top: 0;
+    background: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-mentions__bar .octane-handheld-mentions__button {
+    flex: none;
+}

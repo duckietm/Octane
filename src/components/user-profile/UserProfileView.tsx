@@ -16,6 +16,7 @@ import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import {
     applyUserAccent,
     CreateLinkEvent,
+    findProfileBanner,
     getProfileAccentColor,
     GetRoomSession,
     GetUserProfile,
@@ -41,6 +42,9 @@ import { useProfileCustomizeStore } from '../../state/profileCustomizeStore';
 import { useBackgroundTone, useIsUserBlocked, useMessageEvent, useNotification, useOctaneEvent } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { BaseButton } from '../../common/BaseButton';
+import { DraggableWindow } from '../../common/draggable-window/DraggableWindow';
+import { HandheldSheetFrame } from '../../common/handheld/HandheldSheetFrame';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
 import { Hint } from '../../common/Tooltip';
 import { GroupsContainerView } from './GroupsContainerView';
 import { ProfileBannerMoveButton } from './ProfileBannerMoveButton';
@@ -61,6 +65,9 @@ export const UserProfileView: FC<{}> = () => {
     // Opened from the infostand's edit button: the customiser alone, without the profile window behind it.
     const [customizeOnly, setCustomizeOnly] = useState(false);
     const shownProfileId = useRef(0);
+    // Phone layout: the profile is a sheet in the phone's own look (HandheldSheetFrame), with the groups on a tab.
+    const isHandheld = useIsHandheld();
+    const [handheldTab, setHandheldTab] = useState<'profile' | 'groups'>('profile');
     const contentRef = useRef<HTMLDivElement>(null);
     // The window body's own colour, under a background picture that does not cover it all.
     const backgroundKey = userProfile
@@ -173,6 +180,7 @@ export const UserProfileView: FC<{}> = () => {
             setUserBadges([]);
             setUserRelationships(null);
             setIsCustomizing(false);
+            setHandheldTab('profile');
         }
 
         // Asked for by the infostand's edit button: the customiser opens by itself, unless the profile is already shown.
@@ -235,6 +243,101 @@ export const UserProfileView: FC<{}> = () => {
     const accentColor = getProfileAccentColor(userProfile.accentId ?? 0);
     const accentStyle = accentColor ? ({ '--profile-accent': accentColor } as CSSProperties) : undefined;
     const customizeLabel = localizeWithFallback('extendedprofile.customize.title', 'Customise profile');
+    const customizeView = isOwnProfile && isCustomizing && (
+        <ProfileCustomizeView userProfile={userProfile} moveBannerRequest={moveBannerRequest} onClose={() => (customizeOnly ? onClose() : setIsCustomizing(false))} />
+    );
+    const groupsContent = isProfileHiddenFromViewer(userProfile, GetSessionDataManager().userId) ? (
+        <p className="octane-extended-profile__hidden-notice">{localizeWithFallback('profile.full_profile_hidden', 'The full profile of this user is hidden')}</p>
+    ) : (
+        <GroupsContainerView fullWidth groups={userProfile.groups} itsMe={userProfile.id === GetSessionDataManager().userId} onLeaveGroup={onLeaveGroup} />
+    );
+    const blockedOverlay = isBlocked && (
+        // Official blocked_container: the drama text, whose "event:profile/unblock" link
+        // opens the unblock confirm (it carries no href, so it is never followed as a
+        // page), and Frank's stop sign.
+        <div className="octane-extended-profile__blocked-overlay">
+            <div
+                className="octane-extended-profile__blocked-text"
+                dangerouslySetInnerHTML={{
+                    __html: SanitizeHtml(
+                        localizeWithFallback('extendedprofile.blocked', 'You are blocking this user. <a href="event:profile/unblock">Unblock</a>')
+                            .split(' href="event:profile/unblock"')
+                            .join('')
+                    )
+                }}
+                onClick={(event) => {
+                    if (!(event.target as HTMLElement).closest('a')) return;
+
+                    event.preventDefault();
+                    toggleBlock();
+                }}
+            />
+            <img className="octane-extended-profile__blocked-frank" src={frankStop} alt="" draggable={false} />
+        </div>
+    );
+
+    if (isHandheld) {
+        // The owner always gets the strip (empty until a banner is picked), so the customise button has its place.
+        const hasBanner = showBanner && (isOwnProfile || !!userProfile.bannerImage || !!findProfileBanner(banners, userProfile.bannerId ?? 0));
+
+        return (
+            <NativeTextTree>
+                {!customizeOnly && (
+                    <DraggableWindow handheldSheet uniqueKey="octane-user-profile">
+                        <HandheldSheetFrame
+                            activeTab={handheldTab}
+                            className={`octane-handheld-profile${accentColor ? ' has-profile-accent' : ''}${isLightProfileAccent(userProfile.accentId ?? 0) ? ' has-light-accent' : ''}`}
+                            icon="icon-me-profile"
+                            style={accentStyle}
+                            tabs={[
+                                { id: 'profile', label: LocalizeText('extendedprofile.caption') },
+                                { id: 'groups', label: localizeWithFallback('octane.handheld.profile.groups', 'Groups') }
+                            ]}
+                            tabsLabel={LocalizeText('extendedprofile.caption')}
+                            title={LocalizeText('extendedprofile.caption')}
+                            onClose={onClose}
+                            onTab={(tab) => setHandheldTab(tab === 'groups' ? 'groups' : 'profile')}
+                        >
+                            {/* The user's own window background (uploaded picture, own style or a gallery card), behind the cards. */}
+                            <div ref={contentRef} aria-hidden="true" className={`octane-handheld-profile__backdrop ${cardBackgroundClass}`} data-testid="profile-backdrop" style={contentStyle}>
+                                {ownStyle && ownStyle.pattern > 0 && (
+                                    <span className={`octane-extended-profile__style-pattern profile-card-background card-background-${ownStyle.pattern}`} />
+                                )}
+                            </div>
+                            <div className="octane-handheld-profile__scroll">
+                                {handheldTab === 'profile' && (
+                                    <UserContainerView
+                                        banner={
+                                            hasBanner && (
+                                                <ProfileBannerView userProfile={userProfile} banners={banners} placeholder>
+                                                    {isOwnProfile && (
+                                                        <BaseButton aria-label={customizeLabel} className="octane-handheld-profile__customize" onClick={() => setIsCustomizing(true)}>
+                                                            <img src={pencilIcon} alt="" draggable={false} />
+                                                        </BaseButton>
+                                                    )}
+                                                </ProfileBannerView>
+                                            )
+                                        }
+                                        userBadges={userBadges}
+                                        userProfile={userProfile}
+                                        userRelationships={userRelationships}
+                                        isBlocked={isBlocked}
+                                        onToggleBlock={toggleBlock}
+                                        onOpenRooms={onOpenRooms}
+                                        onClose={onClose}
+                                        onCustomize={() => setIsCustomizing(true)}
+                                    />
+                                )}
+                                {handheldTab === 'groups' && <section className="octane-handheld-profile__card is-groups">{groupsContent}</section>}
+                            </div>
+                            {blockedOverlay}
+                        </HandheldSheetFrame>
+                    </DraggableWindow>
+                )}
+                {customizeView}
+            </NativeTextTree>
+        );
+    }
 
     return (
         <NativeTextTree>
@@ -243,6 +346,7 @@ export const UserProfileView: FC<{}> = () => {
                     className={`octane-extended-profile-window w-[640px] h-[720px] max-w-[96vw] max-h-[92vh]${accentColor ? ' has-profile-accent' : ''}${isLightProfileAccent(userProfile.accentId ?? 0) ? ' has-light-accent' : ''}`}
                     style={accentStyle}
                     uniqueKey="octane-user-profile"
+                    handheldSheet
                 >
                     <OctaneCard.Header headerText={LocalizeText('extendedprofile.caption')} onCloseClick={onClose} />
                     <OctaneCard.Content
@@ -256,33 +360,7 @@ export const UserProfileView: FC<{}> = () => {
                                 className={`octane-extended-profile__style-pattern profile-card-background card-background-${ownStyle.pattern}`}
                             />
                         )}
-                        {isBlocked && (
-                            // Official blocked_container: the drama text, whose "event:profile/unblock" link
-                            // opens the unblock confirm (it carries no href, so it is never followed as a
-                            // page), and Frank's stop sign.
-                            <div className="octane-extended-profile__blocked-overlay">
-                                <div
-                                    className="octane-extended-profile__blocked-text"
-                                    dangerouslySetInnerHTML={{
-                                        __html: SanitizeHtml(
-                                            localizeWithFallback(
-                                                'extendedprofile.blocked',
-                                                'You are blocking this user. <a href="event:profile/unblock">Unblock</a>'
-                                            )
-                                                .split(' href="event:profile/unblock"')
-                                                .join('')
-                                        )
-                                    }}
-                                    onClick={(event) => {
-                                        if (!(event.target as HTMLElement).closest('a')) return;
-
-                                        event.preventDefault();
-                                        toggleBlock();
-                                    }}
-                                />
-                                <img className="octane-extended-profile__blocked-frank" src={frankStop} alt="" draggable={false} />
-                            </div>
-                        )}
+                        {blockedOverlay}
                         {showBanner && (
                             <ProfileBannerView userProfile={userProfile} banners={banners}>
                                 {isOwnProfile && isCustomizing && <ProfileBannerMoveButton onMove={() => setMoveBannerRequest((value) => value + 1)} />}
@@ -315,30 +393,13 @@ export const UserProfileView: FC<{}> = () => {
                         </div>
                         <div className="octane-extended-profile-window__body octane-extended-profile-window__body--groups flex-1 overflow-hidden px-[10px] pb-[10px] pt-[6px]">
                             <div className="octane-extended-profile-window__panel h-full p-2">
-                                {isProfileHiddenFromViewer(userProfile, GetSessionDataManager().userId) ? (
-                                    <p className="octane-extended-profile__hidden-notice">
-                                        {localizeWithFallback('profile.full_profile_hidden', 'The full profile of this user is hidden')}
-                                    </p>
-                                ) : (
-                                    <GroupsContainerView
-                                        fullWidth
-                                        groups={userProfile.groups}
-                                        itsMe={userProfile.id === GetSessionDataManager().userId}
-                                        onLeaveGroup={onLeaveGroup}
-                                    />
-                                )}
+                                {groupsContent}
                             </div>
                         </div>
                     </OctaneCard.Content>
                 </OctaneCard>
             )}
-            {isOwnProfile && isCustomizing && (
-                <ProfileCustomizeView
-                    userProfile={userProfile}
-                    moveBannerRequest={moveBannerRequest}
-                    onClose={() => (customizeOnly ? onClose() : setIsCustomizing(false))}
-                />
-            )}
+            {customizeView}
         </NativeTextTree>
     );
 };

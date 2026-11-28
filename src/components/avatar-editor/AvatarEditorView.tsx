@@ -31,9 +31,12 @@ import { AvatarEditorNftOutfitInfoView, AvatarEditorNftOutfitsView } from './Ava
 import { AvatarEditorPetView } from './AvatarEditorPetView';
 import { AvatarEditorWardrobeView } from './AvatarEditorWardrobeView';
 import { BaseButton } from '../../common/BaseButton';
+import { DraggableWindow } from '../../common/draggable-window/DraggableWindow';
+import { HandheldSheetFrame } from '../../common/handheld/HandheldSheetFrame';
 import { ToggleButton } from '../../common/ToggleButton';
 import { Hint } from '../../common/Tooltip';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
 
 const MAIN_TAB_ICONS: Record<string, string> = {
     [AvatarEditorFigureCategory.GENERIC]: mainGenericSrc,
@@ -61,9 +64,26 @@ const MAIN_TAB_ORDER: string[] = [
     AvatarEditorFigureCategory.PETS
 ];
 
+/** What each main tab is called on the phone, where it is a picture (text key and English fallback). */
+const MAIN_TAB_NAMES: Record<string, [key: string, fallback: string]> = {
+    [AvatarEditorFigureCategory.GENERIC]: ['octane.handheld.looks.tab.body', 'Body'],
+    [AvatarEditorFigureCategory.HEAD]: ['octane.handheld.looks.tab.head', 'Head'],
+    [AvatarEditorFigureCategory.TORSO]: ['octane.handheld.looks.tab.top', 'Tops'],
+    [AvatarEditorFigureCategory.LEGS]: ['octane.handheld.looks.tab.bottom', 'Bottoms'],
+    [AvatarEditorFigureCategory.MISC]: ['octane.handheld.looks.tab.extras', 'Extras'],
+    [AvatarEditorFigureCategory.HOTLOOKS]: ['octane.handheld.looks.tab.popular', 'Popular looks'],
+    [AVATAR_EDITOR_EFFECTS_TAB]: ['octane.handheld.looks.tab.effects', 'Effects'],
+    [AvatarEditorFigureCategory.NFT]: ['octane.handheld.looks.tab.collectibles', 'Collectibles'],
+    [AvatarEditorFigureCategory.PETS]: ['octane.handheld.looks.tab.companions', 'Companions']
+};
+
 export const AvatarEditorView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isWardrobeOpen, setIsWardrobeOpen] = useState(false);
+    // Phone layout: the editor is a sheet in the phone's own look (HandheldSheetFrame) instead of the AIR window; the
+    // wardrobe takes the place of the part grid there, so it starts closed and is opened from the header.
+    const isHandheld = useIsHandheld();
+    const [isHandheldWardrobeOpen, setIsHandheldWardrobeOpen] = useState(false);
     // Effect picked in the effects tab; null until the user picks one.
     const [effectSelection, setEffectSelection] = useState<number>(null);
     const { activeEffectType = 0, activateEffect = null } = useAvatarEffects();
@@ -186,15 +206,111 @@ export const AvatarEditorView: FC<{}> = (props) => {
         if (!isVisible) {
             setClothingChangeData(null);
             setIsWardrobeOpen(false);
+            setIsHandheldWardrobeOpen(false);
             setEffectSelection(null);
         }
     }, [isVisible, setEditorVisibility, setClothingChangeData]);
 
     useEffect(() => {
-        if (!canUseWardrobe) setIsWardrobeOpen(false);
+        if (!canUseWardrobe) {
+            setIsWardrobeOpen(false);
+            setIsHandheldWardrobeOpen(false);
+        }
     }, [canUseWardrobe]);
 
     if (!isVisible) return null;
+
+    const title = LocalizeText(clothingChangeData ? 'widget.furni.clothingchange.editor.title' : 'avatareditor.title');
+    const categoryContent = (
+        <>
+            {activeModelKey.length > 0 && !isPetsOpen && !isNftOpen && !isEffectsOpen && !isHotLooksOpen && avatarModels[activeModelKey] && (
+                <AvatarEditorModelView categories={avatarModels[activeModelKey]} name={activeModelKey} />
+            )}
+            {isPetsOpen && <AvatarEditorPetView categories={avatarModels[activeModelKey]} />}
+            {isNftOpen && (
+                <AvatarEditorNftOutfitsView
+                    outfits={nftWardrobe.outfits}
+                    selectedOutfit={nftWardrobe.selectedOutfit}
+                    wornOutfit={nftWardrobe.wornOutfit}
+                    onSelect={nftWardrobe.selectOutfit}
+                />
+            )}
+            {isHotLooksOpen && (
+                <AvatarEditorHotLooksView
+                    hotLooks={hotLooks[gender === AvatarFigurePartType.FEMALE ? 'F' : 'M']}
+                    onSelect={(look) => loadAvatarData(look.figure, look.gender)}
+                />
+            )}
+            {isEffectsOpen && <AvatarEditorEffectsView selectedType={effectSelection ?? (activeEffectType > 0 ? activeEffectType : -1)} onSelect={setEffectSelection} />}
+        </>
+    );
+    const secondaryActions: [action: string, label: string, icon: typeof FaRedo][] = [
+        [AvatarEditorAction.ACTION_RESET, localizeWithFallback('octane.avatar_editor.reset_avatar', 'Reset avatar'), FaRedo],
+        [AvatarEditorAction.ACTION_CLEAR, localizeWithFallback('octane.avatar_editor.clear_avatar', 'Clear avatar'), FaTrash],
+        [AvatarEditorAction.ACTION_RANDOMIZE, localizeWithFallback('octane.avatar_editor.randomize_avatar', 'Randomize avatar'), FaDice]
+    ];
+
+    if (isHandheld) {
+        const showWardrobe = isHandheldWardrobeOpen && canUseWardrobe;
+        const wardrobeLabel = LocalizeText('avatareditor.wardrobe.title');
+
+        return (
+            <NativeTextTree>
+                <DraggableWindow handheldSheet uniqueKey="avatar-editor">
+                    <HandheldSheetFrame
+                        activeTab={showWardrobe ? null : activeModelKey}
+                        className={`octane-handheld-looks${showWardrobe ? ' is-wardrobe-open' : ''}`}
+                        headerExtra={
+                            canUseWardrobe && (
+                                <ToggleButton
+                                    aria-label={wardrobeLabel}
+                                    className={`octane-handheld-looks__wardrobe-toggle${showWardrobe ? ' is-open' : ''}`}
+                                    pressed={showWardrobe}
+                                    onClick={() => setIsHandheldWardrobeOpen((open) => !open)}
+                                >
+                                    <img alt="" draggable={false} src={wardrobeHangerSrc} />
+                                </ToggleButton>
+                            )
+                        }
+                        icon="icon-me-clothing"
+                        tabs={orderedModelKeys.map((modelKey) => ({
+                            id: modelKey,
+                            image: MAIN_TAB_ICONS[modelKey],
+                            label: MAIN_TAB_NAMES[modelKey] ? localizeWithFallback(...MAIN_TAB_NAMES[modelKey]) : modelKey
+                        }))}
+                        tabsLabel={localizeWithFallback('octane.handheld.looks.tabs', 'Clothing categories')}
+                        title={title}
+                        onClose={() => setIsVisible(false)}
+                        onTab={(modelKey) => {
+                            setIsHandheldWardrobeOpen(false);
+                            selectMainTab(modelKey);
+                        }}
+                    >
+                        <div className="octane-handheld-looks__layout">
+                            <section className="octane-handheld-looks__stage" aria-label={GetSessionDataManager().userName}>
+                                <span className="octane-handheld-looks__name">{GetSessionDataManager().userName}</span>
+                                <AvatarEditorFigurePreviewView effectType={effectSelection ?? 0} />
+                                {isNftOpen && <AvatarEditorNftOutfitInfoView outfit={nftWardrobe.selectedOutfit} />}
+                                {!clothingChangeData && !isNftOpen && (
+                                    <div className="octane-handheld-looks__tools">
+                                        {secondaryActions.map(([action, label, Icon]) => (
+                                            <BaseButton key={action} aria-label={label} className="octane-handheld-looks__tool" onClick={() => processAction(action)}>
+                                                <Icon aria-hidden="true" />
+                                            </BaseButton>
+                                        ))}
+                                    </div>
+                                )}
+                            </section>
+                            <div className="octane-handheld-looks__editor">{showWardrobe ? <AvatarEditorWardrobeView /> : categoryContent}</div>
+                            <BaseButton className="octane-handheld-looks__save" onClick={() => processAction(AvatarEditorAction.ACTION_SAVE)}>
+                                {LocalizeText('avatareditor.save')}
+                            </BaseButton>
+                        </div>
+                    </HandheldSheetFrame>
+                </DraggableWindow>
+            </NativeTextTree>
+        );
+    }
 
     return (
         <NativeTextTree>
@@ -205,7 +321,7 @@ export const AvatarEditorView: FC<{}> = (props) => {
                 uniqueKey="avatar-editor"
             >
                 <OctaneCardHeaderView
-                    headerText={LocalizeText(clothingChangeData ? 'widget.furni.clothingchange.editor.title' : 'avatareditor.title')}
+                    headerText={title}
                     onCloseClick={(event) => setIsVisible(false)}
                 />
                 <OctaneCardContentView className="octane-avatar-editor-content">
@@ -238,27 +354,7 @@ export const AvatarEditorView: FC<{}> = (props) => {
                             </ToggleButton>
                         )}
                         <div className="octane-avatar-editor-main">
-                            {activeModelKey.length > 0 && !isPetsOpen && !isNftOpen && !isEffectsOpen && !isHotLooksOpen && avatarModels[activeModelKey] && (
-                                <AvatarEditorModelView categories={avatarModels[activeModelKey]} name={activeModelKey} />
-                            )}
-                            {isPetsOpen && <AvatarEditorPetView categories={avatarModels[activeModelKey]} />}
-                            {isNftOpen && (
-                                <AvatarEditorNftOutfitsView
-                                    outfits={nftWardrobe.outfits}
-                                    selectedOutfit={nftWardrobe.selectedOutfit}
-                                    wornOutfit={nftWardrobe.wornOutfit}
-                                    onSelect={nftWardrobe.selectOutfit}
-                                />
-                            )}
-                            {isHotLooksOpen && (
-                                <AvatarEditorHotLooksView
-                                    hotLooks={hotLooks[gender === AvatarFigurePartType.FEMALE ? 'F' : 'M']}
-                                    onSelect={(look) => loadAvatarData(look.figure, look.gender)}
-                                />
-                            )}
-                            {isEffectsOpen && (
-                                <AvatarEditorEffectsView selectedType={effectSelection ?? (activeEffectType > 0 ? activeEffectType : -1)} onSelect={setEffectSelection} />
-                            )}
+                            {categoryContent}
                             <AvatarEditorFigurePreviewView effectType={effectSelection ?? 0} />
                             {isNftOpen && <AvatarEditorNftOutfitInfoView outfit={nftWardrobe.selectedOutfit} />}
                             {!clothingChangeData && !isNftOpen && (

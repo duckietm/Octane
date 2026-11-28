@@ -1,6 +1,6 @@
 /* @vitest-environment jsdom */
 
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -60,7 +60,16 @@ vi.mock('./views/page/common/CatalogSearchView', () => ({ CatalogSearchView: () 
 vi.mock('./views/page/layout/marketplace/MarketplacePostOfferView', () => ({ MarketplacePostOfferView: () => null }));
 vi.mock('./views/vip-benefits/VipBenefitsView', () => ({ VipBenefitsView: () => null }));
 vi.mock('./views/page/layout/GetCatalogLayout', () => ({ GetCatalogLayout: () => null }));
+vi.mock('./views/handheld/HandheldCatalogView', () => ({
+    HandheldCatalogView: ({ title, useTabs }: { title: string; useTabs: boolean }) => (
+        <div data-testid="handheld-catalog" data-tabs={String(useTabs)}>
+            {title}
+        </div>
+    )
+}));
 
+import { DESKTOP_LAYOUT } from '../../api/handheld/handheldLayout';
+import { useHandheldStore } from '../../state/handheldStore';
 import { CatalogView } from './CatalogView';
 
 afterEach(() => {
@@ -113,5 +122,34 @@ describe('CatalogView', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Admin' }));
 
         expect(state.setAdminMode).toHaveBeenCalledWith(true, expect.anything());
+    });
+
+    it('draws the desktop window when the phone layout is off', () => {
+        state.currentType = 'NORMAL';
+        state.isMod = false;
+        render(<CatalogView />);
+
+        expect(screen.queryByTestId('handheld-catalog')).toBeNull();
+        expect(document.querySelector('.octane-catalog-window')).not.toBeNull();
+        expect(document.querySelector('.octane-catalog-sidebar')).not.toBeNull();
+    });
+
+    it('swaps the AIR window for the phone shop on a phone', () => {
+        state.currentType = 'NORMAL';
+        state.isMod = false;
+        act(() => useHandheldStore.setState({ layout: { active: true, orientation: 'portrait' } }));
+
+        try {
+            render(<CatalogView />);
+
+            expect(screen.getByTestId('handheld-catalog')).toHaveTextContent('catalog.title');
+            expect(screen.getByTestId('handheld-catalog')).toHaveAttribute('data-tabs', 'true');
+            // The phone shop is its own sheet: no AIR window, tab strip or tree around it.
+            expect(document.querySelector('.octane-catalog-window')).toBeNull();
+            expect(document.querySelector('.octane-catalog-tabs-shell')).toBeNull();
+            expect(document.querySelector('.octane-catalog-sidebar')).toBeNull();
+        } finally {
+            act(() => useHandheldStore.setState({ layout: DESKTOP_LAYOUT }));
+        }
     });
 });

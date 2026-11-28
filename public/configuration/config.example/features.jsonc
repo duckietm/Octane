@@ -26,6 +26,9 @@
     // Shows the "new" label on the catalog button when there are new items.
     "toolbar.new_additions.notification.enabled": true,
 
+    // Phone layout on phone-sized touch screens (sheets, room gestures, touch toolbar); false keeps the desktop layout everywhere. Test it with ?handheld=on|off|auto.
+    "ui.handheld.enabled": true,
+
     // Labels drawn with AIR's native text renderer; false uses browser text everywhere.
     "ui.native.text.enabled": true,
 

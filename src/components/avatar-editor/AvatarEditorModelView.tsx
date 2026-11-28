@@ -9,6 +9,24 @@ import { AvatarEditorAdvancedColorView, AvatarEditorPaletteSetView } from './pal
 import { BaseButton } from '../../common/BaseButton';
 import { ToggleButton } from '../../common/ToggleButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldLooksPartsView } from './HandheldLooksPartsView';
+
+/** What the sub-category pictures stand for (the phone names them for a screen reader); English fallbacks. */
+const HANDHELD_PART_NAMES: Record<string, string> = {
+    ca: 'Accessories',
+    cc: 'Jackets',
+    ch: 'Shirts',
+    cp: 'Prints',
+    ea: 'Eyewear',
+    fa: 'Face accessories',
+    ha: 'Hats',
+    he: 'Hair accessories',
+    hr: 'Hair',
+    lg: 'Trousers',
+    sh: 'Shoes',
+    wa: 'Belts'
+};
 
 export const AvatarEditorModelView: FC<{
     name: string;
@@ -58,7 +76,47 @@ export const AvatarEditorModelView: FC<{
         selectSet(resolvedSetType);
     }, [activeSetType, resolvedSetType, selectSet, selectedColorParts]);
 
+    // Phone layout: the same choices as finger-sized chips over the phone's part grid (HandheldLooksPartsView).
+    const isHandheld = useIsHandheld();
+
     if (!activeCategory) return null;
+
+    if (isHandheld) {
+        const isGeneric = name === AvatarEditorFigureCategory.GENERIC;
+        const genders: [value: string, icon: string, label: string][] = [
+            [AvatarFigurePartType.MALE, 'male', LocalizeText('avatareditor.generic.boy')],
+            [AvatarFigurePartType.FEMALE, 'female', LocalizeText('avatareditor.generic.girl')]
+        ];
+
+        return (
+            <HandheldLooksPartsView
+                category={activeCategory}
+                chips={
+                    isGeneric
+                        ? genders.map(([value, icon, label]) => (
+                              <ToggleButton key={value} className="octane-handheld-looks__chip is-gender" pressed={gender === value} onClick={() => setGender(value)}>
+                                  <AvatarEditorIcon icon={icon} selected={gender === value} />
+                                  <span>{label}</span>
+                              </ToggleButton>
+                          ))
+                        : categories.length > 1
+                          ? categories.map((category) => (
+                                <ToggleButton
+                                    key={category.setType}
+                                    aria-label={localizeWithFallback(`octane.handheld.looks.part.${category.setType}`, HANDHELD_PART_NAMES[category.setType] ?? category.setType)}
+                                    className="octane-handheld-looks__chip"
+                                    pressed={resolvedSetType === category.setType}
+                                    onClick={() => selectSet(category.setType)}
+                                >
+                                    <AvatarEditorIcon icon={category.setType} selected={resolvedSetType === category.setType} />
+                                </ToggleButton>
+                            ))
+                          : null
+                }
+                chipsLabel={isGeneric ? localizeWithFallback('octane.handheld.looks.gender', 'Gender') : localizeWithFallback('octane.handheld.looks.parts', 'Clothing types')}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

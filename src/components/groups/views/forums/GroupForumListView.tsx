@@ -5,6 +5,8 @@ import { ClassicScrollAreaView, LayoutBadgeImageView } from '../../../../common'
 import { flatText, GroupText } from '../GroupNativeLayout';
 import { FORUM_PAGE_SIZE, FORUM_SURFACE, stripTags, ForumButton, forumAge, ForumPager } from './GroupForumLayout';
 import { BaseButton } from '../../../../common/BaseButton';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldGroupForumListView } from './HandheldGroupForumListView';
 
 const ROW_WIDTH = 532;
 
@@ -35,6 +37,23 @@ export const GroupForumListView: FC<GroupForumListViewProps> = ({ list, onMarkAs
     const before = linkMatch ? stripTags(linkMatch[1]) : stripTags(status);
     const linkText = linkMatch ? linkMatch[2] : '';
     const after = linkMatch ? stripTags(linkMatch[3]) : '';
+    const isHandheld = useIsHandheld();
+
+    // Phone layout: the same list, handlers and pages as cards of the phone sheet (HandheldGroupForumView).
+    if (isHandheld)
+        return (
+            <HandheldGroupForumListView
+                hint={{ before, link: linkText, after }}
+                list={list}
+                pageCount={pageCount}
+                pageIndex={pageIndex}
+                onHint={() => CreateLinkEvent('catalog/open/guild_forum')}
+                onMarkAsRead={onMarkAsRead}
+                onOpenForum={onOpenForum}
+                onOpenGroup={(groupId) => GetGroupInformation(groupId)}
+                onPage={onPage}
+            />
+        );
 
     return (
         <>

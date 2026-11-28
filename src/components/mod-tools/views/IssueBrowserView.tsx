@@ -7,6 +7,8 @@ import { findNativeNode, nativeCaption, nativeFollow, nativeNumber, NativeNode, 
 import { Native0Border, Native0Button, Native0Frame, Native0Rows, Native0Scrollbar, Native0Tab, Native0Text } from '../native/NativeWindow0';
 import { NativeWindowShell } from '../native/NativeWindowShell';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModIssueBrowserView } from '../handheld/HandheldModTicketsView';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SHADE = 0xb2e6fa;
@@ -55,6 +57,7 @@ export const IssueBrowserView: FC<IssueBrowserProps> = ({ x, y, width, height, c
     };
     // the lists are re-read when the manager changes (version) and on its 15 second tick
     useIssueManagerStore((state) => state.version);
+    const isHandheld = useIsHandheld();
 
     const context0 = rectOf(findNativeNode(root, 'tab_context'));
     const protoRect0 = rectOf(findNativeNode(root, 'open_issues_prototype'));
@@ -107,6 +110,46 @@ export const IssueBrowserView: FC<IssueBrowserProps> = ({ x, y, width, height, c
 
     const rowColors = bundles.map((_, index) => (index % 2 === 0 ? SHADE : 0xffffff));
     const label = (node: NativeNode) => nativeCaption(node);
+
+    // phone: the same tabs, bundles and buttons as cards on a page of the sheet
+    if (isHandheld) {
+        const headerText = (pattern: RegExp, fallback: string) => header.children.map(label).find((caption) => pattern.test(caption)) ?? fallback;
+
+        return (
+            <HandheldModIssueBrowserView
+                autoPickLabel={label(autoPick)}
+                columns={{ score: headerText(/score/i, 'Score'), player: headerText(/player/i, 'Player'), open: headerText(/^open$/i, 'Open'), msgs: headerText(/msgs/i, 'Msgs'), picker: headerText(/picker/i, 'Picker') }}
+                handleLabel={tab === 'my' ? label(buttonOf('handle_button')) : ''}
+                items={bundles.map((bundle) => ({
+                    id: bundle.id,
+                    priority: bundle.priority,
+                    category: categoryOf(bundle),
+                    source: sourceOf(bundle),
+                    target: bundle.primary?.issue.reportedUserId ? (bundle.primary.issue.reportedUserName ?? '') : '',
+                    targetIsUser: !!bundle.primary?.issue.reportedUserId,
+                    time: bundle.openTime(),
+                    messages: bundle.messageCount,
+                    picker: bundle.pickerName
+                }))}
+                pickLabel={tab === 'open' ? label(buttonOf('pick_button')) : ''}
+                releaseAllLabel={tab === 'my' && releaseAllNode ? label(releaseAllNode) : ''}
+                releaseLabel={tab === 'my' ? label(buttonOf('release_button')) : ''}
+                tab={tab}
+                tabs={TABS.map((entry) => ({ tab: entry.tab, label: label(findNativeNode(root, entry.name)) }))}
+                title={nativeCaption(root)}
+                onClose={onClose}
+                onHandle={(bundleId) => context.openHandler(bundleId)}
+                onPick={(bundleId) => guardedPick(`bundle:${bundleId}`, () => pickBundle(bundleId, 'pick button', context))}
+                onPickNext={() => guardedPick('next', () => pickNext('issue browser pick next', context))}
+                onRelease={(bundleId) => releaseBundle(bundleId, context)}
+                onReleaseAll={() => releaseAll(context)}
+                onTab={(next) => {
+                    setTab(next);
+                    setOffset(0);
+                }}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

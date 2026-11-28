@@ -2,6 +2,9 @@ import { FC, useLayoutEffect, useRef, useState } from 'react';
 import { DraggableWindow } from '../../../common/draggable-window';
 import { NativeText } from '../../../common/native-text/NativeText';
 import { Native3Frame, Native3ThickButton } from '../native/NativeWindow3';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModConfirmView } from '../handheld/HandheldModSanctionViews';
 
 const BODY_COLOR = 0xe9e9e1;
 const WIDTH = 278;
@@ -22,6 +25,7 @@ interface ModConfirmViewProps {
 export const ModConfirmView: FC<ModConfirmViewProps> = ({ title, message, confirmLabel, cancelLabel, onConfirm, onCancel }) => {
     const summaryRef = useRef<HTMLDivElement>(null);
     const [summaryHeight, setSummaryHeight] = useState(57);
+    const isHandheld = useIsHandheld();
 
     useLayoutEffect(() => {
         const element = summaryRef.current;
@@ -39,11 +43,14 @@ export const ModConfirmView: FC<ModConfirmViewProps> = ({ title, message, confir
         return () => observer.disconnect();
     }, [message]);
 
+    // phone: a card over the sheet with the same two choices
+    if (isHandheld) return <HandheldModConfirmView cancelLabel={cancelLabel} confirmLabel={confirmLabel} message={message} title={title} onCancel={onCancel} onConfirm={onConfirm} />;
+
     const height = 141 + (summaryHeight - 57);
     const buttonY = 81 + (summaryHeight - 57);
 
     return (
-        <DraggableWindow handleSelector=".native3-title" initialPosition={{ x: Math.round((window.innerWidth - WIDTH) / 2), y: Math.round((window.innerHeight - height) / 2) }}>
+        <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} handleSelector=".native3-title" initialPosition={{ x: Math.round((window.innerWidth - WIDTH) / 2), y: Math.round((window.innerHeight - height) / 2) }}>
             <Native3Frame height={height} title={title} width={WIDTH} onClose={onCancel}>
                 <div ref={summaryRef} style={{ position: 'absolute', left: 27, top: 14, width: 210 }}>
                     <NativeText background={BODY_COLOR} maxWidth={210} text={message} textStyle="u_regular" />

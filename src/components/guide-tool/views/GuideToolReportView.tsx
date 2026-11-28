@@ -1,6 +1,7 @@
 import { GuideSessionReportMessageComposer } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { localizeWithFallback, SendMessageComposer } from '../../../api';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_PAN_ONLY_SCALE } from '../../../api/handheld/handheldWindowFit';
 import { BaseButton, Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../common';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
@@ -30,6 +31,8 @@ export const GuideToolReportView: FC<GuideToolReportViewProps> = ({ onClose }) =
     return (
         <NativeTextTree>
             <OctaneCardView
+                handheldScale={HANDHELD_PAN_ONLY_SCALE}
+                handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE}
                 className="octane-guide-tool octane-guide-report min-w-0 w-[min(282px,calc(100vw-16px))]"
                 theme="primary-slim"
                 uniqueKey="guide-tool-report"

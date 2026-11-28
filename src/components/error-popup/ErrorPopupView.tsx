@@ -7,6 +7,7 @@ import { BaseButton } from '../../common/BaseButton';
 import { Checkbox } from '../../common/Checkbox';
 import { InlineDialog } from '../../common/InlineDialog';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 /**
  * The official error window (ErrorPopupCtrl, error_popup): an error of the client that nothing caught is shown with
@@ -60,7 +61,7 @@ export const ErrorPopupView: FC = () => {
             <InlineDialog
                 aria-label={title}
                 render={({ ref, ...popupProps }) => (
-                    <OctaneCardView {...popupProps} innerRef={ref as MutableRefObject<HTMLDivElement>} classNames={['octane-error-popup']} frameStyle={3} isResizable={false} theme="primary-slim" />
+                    <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} {...popupProps} innerRef={ref as MutableRefObject<HTMLDivElement>} classNames={['octane-error-popup']} frameStyle={3} isResizable={false} theme="primary-slim" />
                 )}
                 onClose={close}
             >

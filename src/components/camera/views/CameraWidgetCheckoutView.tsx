@@ -38,6 +38,9 @@ import { CameraSkinButton } from './CameraSkinButton';
 import { Checkbox } from '../../../common/Checkbox';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldCameraCheckoutView } from './HandheldCameraCheckoutView';
 
 export interface CameraWidgetCheckoutViewProps {
     base64Url: string;
@@ -84,6 +87,8 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
     const productImageRef = useRef<HTMLImageElement>(null);
     const { getCurrencyAmount = null } = usePurse();
     const { showConfirm = null, simpleAlert = null } = useNotification();
+    // On a phone the same state and actions are shown by HandheldCameraCheckoutView.
+    const isHandheld = useIsHandheld();
 
     const publishDisabled = useMemo(
         // camera.publish.disabled is the older, inverted name of camera.photo.publishing.enabled.
@@ -369,13 +374,53 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
     const publishButtonDisabled = isWaiting || !isImageLoaded || publishCooldown > 0;
     const competitionDisabled = isWaiting || !isImageLoaded || ['submitted', 'limit', 'error'].includes(competitionState);
     const costLabel = LocalizeText('catalog.purchase.confirmation.dialog.cost');
+    const cancelLabel = LocalizeText(isWaiting || picturesBought > 0 || wasPicturePublished ? 'generic.close' : 'catalog.purchase_confirmation.cancel');
+    const onImageLoad = () => {
+        setIsImageLoaded(true);
+        setHasRenderingFailed(false);
+        setStatusLocalization('camera.confirm_phase.info');
+    };
+
+    if (isHandheld) {
+        return (
+            <HandheldCameraCheckoutView
+                buyDisabled={buyDisabled}
+                cancelLabel={cancelLabel}
+                competitionDisabled={competitionDisabled}
+                competitionEnabled={competitionEnabled}
+                competitionHeader={LocalizeText(
+                    competitionState === 'submitted' ? 'camera.competition.submitted.info' : competitionState === 'limit' ? 'camera.competition.limit.info' : 'camera.competition.header'
+                )}
+                disclaimerAccepted={disclaimerAccepted}
+                hasRenderingFailed={hasRenderingFailed}
+                imageContainerRef={productImageContainerRef}
+                imageRef={productImageRef}
+                isImageLoaded={isImageLoaded}
+                pictureUrl={pictureUrl}
+                picturesBought={picturesBought}
+                price={price}
+                publishButtonDisabled={publishButtonDisabled}
+                publishEnabled={!publishDisabled}
+                publishedPhotoUrl={publishedPhotoUrl}
+                spendingDisclaimerEnabled={spendingDisclaimerEnabled}
+                status={statusLocalization ? LocalizeText(statusLocalization) : ''}
+                wasPicturePublished={wasPicturePublished}
+                onAction={processAction}
+                onDisclaimer={(accepted) => setDisclaimerAccepted(accepted)}
+                onImageError={reportRenderingFailure}
+                onImageLoad={onImageLoad}
+                onOpenInventory={() => CreateLinkEvent('inventory/show/furni')}
+            />
+        );
+    }
+
     const renderButton = (key: string, className: string, label: string, disabled: boolean, variant: 'green' | 'gray', onClick: () => void) => (
         <CameraSkinButton key={key} className={className} disabled={disabled} label={label} variant={variant} onClick={onClick} />
     );
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-camera-checkout" frameStyle={3} isResizable={false} theme="primary-slim">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-camera-checkout" frameStyle={3} isResizable={false} theme="primary-slim">
                 <div className="octane-card-header-shell">
                     <span className="octane-card-title">
                         <CameraCenteredText background={0x484949} color={0xffffff} text={LocalizeText('camera.confirm_phase.title')} textStyle="u_frame_title" width={340} />
@@ -395,11 +440,7 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
                                 alt=""
                                 src={pictureUrl}
                                 style={{ visibility: isImageLoaded ? 'visible' : 'hidden' }}
-                                onLoad={() => {
-                                    setIsImageLoaded(true);
-                                    setHasRenderingFailed(false);
-                                    setStatusLocalization('camera.confirm_phase.info');
-                                }}
+                                onLoad={onImageLoad}
                                 onError={reportRenderingFailure}
                             />
                         )}
@@ -519,7 +560,7 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
                         {renderButton(
                             'cancel',
                             'is-cancel-button',
-                            LocalizeText(isWaiting || picturesBought > 0 || wasPicturePublished ? 'generic.close' : 'catalog.purchase_confirmation.cancel'),
+                            cancelLabel,
                             false,
                             'gray',
                             () => processAction('cancel')

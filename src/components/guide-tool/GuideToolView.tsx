@@ -18,8 +18,19 @@ import {
     RemoveLinkEventTracker
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { GetConfigurationValue, guardianText, GuideSessionState, GuideToolMessage, GuideToolMessageGroup, isSafeExternalUrl, LocalizeText, SendMessageComposer } from '../../api';
+import {
+    GetConfigurationValue,
+    GuideSessionState,
+    GuideToolMessage,
+    GuideToolMessageGroup,
+    guardianText,
+    isSafeExternalUrl,
+    LocalizeText,
+    SendMessageComposer
+} from '../../api';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_PAN_ONLY_SCALE } from '../../api/handheld/handheldWindowFit';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { GuideToolEvent } from '../../events';
 import { useGuardianChatReview, useMessageEvent, useNotification, useUiEvent } from '../../hooks';
 import { GuardianChatReviewAcceptView } from './views/GuardianChatReviewAcceptView';
@@ -35,7 +46,6 @@ import { GuideToolUserNoHelpersView } from './views/GuideToolUserNoHelpersView';
 import { GuideToolUserPendingView } from './views/GuideToolUserPendingView';
 import { GuideToolUserSomethingWrogView } from './views/GuideToolUserSomethingWrogView';
 import { GuideToolUserThanksView } from './views/GuideToolUserThanksView';
-import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export const GuideToolView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -379,7 +389,13 @@ export const GuideToolView: FC<{}> = (props) => {
 
         return (
             <NativeTextTree>
-                <OctaneCardView uniqueKey="guide-tool-review" className="octane-guide-tool octane-guardian-review" theme="primary-slim">
+                <OctaneCardView
+                    handheldScale={HANDHELD_PAN_ONLY_SCALE}
+                    handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE}
+                    uniqueKey="guide-tool-review"
+                    className="octane-guide-tool octane-guardian-review"
+                    theme="primary-slim"
+                >
                     <OctaneCardHeaderView headerText={guardianText(reviewHeader[review.state])} noCloseButton={!reviewClosable} onCloseClick={closeReview} />
                     <OctaneCardContentView className="text-black">
                         {review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_ACCEPT && (
@@ -390,7 +406,8 @@ export const GuideToolView: FC<{}> = (props) => {
                                 onSkip={skipReview}
                             />
                         )}
-                        {(review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_VOTERS || review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_VOTE) && (
+                        {(review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_VOTERS ||
+                            review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_VOTE) && (
                             <GuardianChatReviewVoteView
                                 countdownId={review.countdownId}
                                 countdownSeconds={review.countdownSeconds}
@@ -400,7 +417,8 @@ export const GuideToolView: FC<{}> = (props) => {
                                 onVote={voteReview}
                             />
                         )}
-                        {(review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_RESULTS || review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_RESULTS) && (
+                        {(review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_RESULTS ||
+                            review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_RESULTS) && (
                             <GuardianChatReviewResultsView
                                 final={review.state === GuideSessionState.GUARDIAN_CHAT_REVIEW_RESULTS}
                                 ownVote={review.ownVote}
@@ -422,7 +440,13 @@ export const GuideToolView: FC<{}> = (props) => {
         <NativeTextTree>
             <>
                 {isReporting && canReport && <GuideToolReportView onClose={() => setIsReporting(false)} />}
-                <OctaneCardView uniqueKey="guide-tool" className="octane-guide-tool" theme="primary-slim">
+                <OctaneCardView
+                    handheldScale={HANDHELD_PAN_ONLY_SCALE}
+                    handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE}
+                    uniqueKey="guide-tool"
+                    className="octane-guide-tool"
+                    theme="primary-slim"
+                >
                     <OctaneCardHeaderView headerText={headerText} noCloseButton={noCloseButton} onCloseClick={(event) => processAction('close')} />
                     <OctaneCardContentView className="text-black">
                         {sessionState === GuideSessionState.GUIDE_TOOL_MENU && (

@@ -1,7 +1,7 @@
 /* @vitest-environment jsdom */
 import { QueryClient } from '@tanstack/react-query';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { CatalogNode, CatalogPage, CatalogType, PageLocalization, ProductTypeEnum, SearchResult } from '../../api';
+import { CatalogNode, CatalogPage, CatalogType, Offer, PageLocalization, Product, ProductTypeEnum, SearchResult } from '../../api';
 import { INITIAL_CATALOG_UI_STATE, useCatalogStore } from './catalogStore';
 import { bindCatalogQueryClient, catalogIndexKey, catalogPageKey } from './useCatalogQueries';
 
@@ -193,6 +193,111 @@ describe('catalogStore page override and search', () => {
 
         expect(useCatalogStore.getState().pageOverride).toBeNull();
         expect(useCatalogStore.getState().activeNodes.at(-1)).toBe(tables);
+    });
+
+    it('setCurrentPage drops the offer selected on the page before it', () => {
+        useCatalogStore.setState({ currentOffer: { offerId: 9 } as any });
+
+        useCatalogStore.getState().setCurrentPage(syntheticPage());
+
+        expect(useCatalogStore.getState().currentOffer).toBeNull();
+    });
+
+    it('beginCatalogSearch shows the results with no node active or open', () => {
+        const { root, furni, chairs } = buildIndex();
+        client.setQueryData(catalogIndexKey(CatalogType.NORMAL), { rootNode: root, offersToNodes: new Map() });
+        useCatalogStore.setState({ isVisible: true });
+        useCatalogStore.getState().activateNode(chairs);
+
+        const page = syntheticPage();
+        const result = new SearchResult('cha', [], [{ node: chairs, depth: 3 }]);
+
+        useCatalogStore.getState().beginCatalogSearch(result, page);
+
+        const state = useCatalogStore.getState();
+        expect(state.activeNodes).toEqual([]);
+        expect(state.searchResult).toBe(result);
+        expect(state.pageOverride).toBe(page);
+        expect(state.previousPageId).toBe(2);
+        expect([furni.isActive, furni.isOpen, chairs.isActive, chairs.isOpen]).toEqual([false, false, false, false]);
+    });
+
+    it('replaceSearchResultOffer puts the server offer on the results tile and keeps its own page', () => {
+        const plain = new Offer(7, 'window', false, 25, 0, 0, true, 0, [new Product('i', 3001, '', 1, null, null)], false);
+        const other = new Offer(8, 'other', false, 5, 0, 0, true, 0, [new Product('i', 3002, '', 1, null, null)], false);
+        const page = new CatalogPage(-1, 'default_3x3', new PageLocalization([], []), [plain, other], false, 1);
+
+        useCatalogStore.getState().beginCatalogSearch(new SearchResult('win', [plain, other], []), page);
+
+        const server = new Offer(7, 'window', false, 25, 0, 0, true, 0, [new Product('i', 3001, '', 1, null, null, true, 50, 12)], false);
+        const sellingPage = new CatalogPage(12, 'default_3x3', new PageLocalization([], []), [server], false, 1);
+
+        useCatalogStore.getState().replaceSearchResultOffer(server);
+
+        const state = useCatalogStore.getState();
+        expect(state.searchResult.offers).toEqual([server, other]);
+        expect(state.pageOverride.offers.map((offer) => offer.offerId)).toEqual([7, 8]);
+        expect(state.pageOverride.offers[0].product.uniqueLimitedItemSeriesSize).toBe(50);
+        expect(server.page).toBe(sellingPage);
+    });
+
+    it('replaceSearchResultOffer leaves a normal page alone', () => {
+        const page = new CatalogPage(5, 'default_3x3', new PageLocalization([], []), [], false, 1);
+
+        useCatalogStore.setState({ searchResult: null, pageOverride: page });
+        useCatalogStore.getState().replaceSearchResultOffer(new Offer(7, 'window', false, 25, 0, 0, true, 0, [new Product('i', 3001, '', 1, null, null)], false));
+
+        expect(useCatalogStore.getState().pageOverride).toBe(page);
+    });
+
+    it('endCatalogSearch goes back to the page open before the search', () => {
+        const { root, chairs } = buildIndex();
+        client.setQueryData(catalogIndexKey(CatalogType.NORMAL), { rootNode: root, offersToNodes: new Map() });
+        useCatalogStore.setState({ isVisible: true });
+        useCatalogStore.getState().activateNode(chairs);
+        useCatalogStore.getState().beginCatalogSearch(new SearchResult('x', [], []), syntheticPage());
+
+        useCatalogStore.getState().endCatalogSearch();
+
+        const state = useCatalogStore.getState();
+        expect(state.searchResult).toBeNull();
+        expect(state.pageOverride).toBeNull();
+        expect(state.activeNodes.at(-1)).toBe(chairs);
+        expect(chairs.isActive).toBe(true);
+    });
+
+    it('endCatalogSearch keeps a page opened from the results open, without toggling it', () => {
+        const { root, furni, chairs, tables } = buildIndex();
+        client.setQueryData(catalogIndexKey(CatalogType.NORMAL), { rootNode: root, offersToNodes: new Map() });
+        useCatalogStore.setState({ isVisible: true });
+        useCatalogStore.getState().activateNode(chairs);
+        useCatalogStore.getState().beginCatalogSearch(new SearchResult('x', [], []), syntheticPage());
+        useCatalogStore.getState().activateNode(tables);
+
+        useCatalogStore.getState().endCatalogSearch();
+
+        expect(useCatalogStore.getState().activeNodes).toEqual([furni, tables]);
+        expect(useCatalogStore.getState().pageId).toBe(3);
+        expect(tables.isOpen).toBe(true);
+    });
+
+    it('endCatalogSearch while the catalog is closed queues the previous page instead of reopening the window', () => {
+        useCatalogStore.setState({ isVisible: false, previousPageId: 3, pageOverride: syntheticPage(), searchResult: new SearchResult('x', [], []) });
+
+        useCatalogStore.getState().endCatalogSearch();
+
+        expect(useCatalogStore.getState().isVisible).toBe(false);
+        expect(useCatalogStore.getState().pendingRequest).toEqual({ kind: 'id', id: 3 });
+    });
+
+    it('endCatalogSearch(false) only drops the search, for a tab that opens itself', () => {
+        useCatalogStore.setState({ isVisible: true, previousPageId: 3, pageOverride: syntheticPage(), searchResult: new SearchResult('x', [], []) });
+
+        useCatalogStore.getState().endCatalogSearch(false);
+
+        expect(useCatalogStore.getState().searchResult).toBeNull();
+        expect(useCatalogStore.getState().pageOverride).toBeNull();
+        expect(useCatalogStore.getState().activeNodes).toEqual([]);
     });
 
     it('setCurrentOffer resets the purchase options', () => {

@@ -22,10 +22,12 @@ import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryCategoryLoadingView } from '../InventoryCategoryLoadingView';
 import { isInventoryPetProduct } from '../../../../hooks/rooms/widgets/avatarInfo.products';
+import { HandheldInventoryAction, HandheldInventorySelectionView } from '../HandheldInventorySelectionView';
 import { InventoryFurnitureItemView } from './InventoryFurnitureItemView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 
 const attemptPlaceMarketplaceOffer = (groupItem: GroupItem, collectible = false) => {
     const item = groupItem.getLastItem();
@@ -58,6 +60,9 @@ export const InventoryFurnitureView: FC<{
     const [isVisible, setIsVisible] = useState(false);
     const { groupItems = [], isLoaded = false, selectedItem = null, setSelectedItem = null, activate = null, deactivate = null } = useInventoryFurni();
     const tabItems = sectionGroupItems ?? groupItems;
+    // Phone layout: a finger on the preview looks at the furni (and may scroll past it); it does not pick it up as a
+    // mouse press does. The place button is the way into the room there.
+    const isHandheld = useIsHandheld();
     const { resetItems = null } = useInventoryUnseenTracker();
     const playTestRestricted = usePlayTestRestricted();
     const { data: marketplaceConfiguration = null } = useMarketplaceConfiguration();
@@ -154,6 +159,110 @@ export const InventoryFurnitureView: FC<{
         return <InventoryCategoryEmptyView desc={LocalizeText('inventory.empty.desc')} title={LocalizeText('inventory.empty.title')} />;
     }
 
+    const useSelectedProduct = () => {
+        const item = selectedItem?.getLastItem();
+
+        if (!item || !roomSession) return;
+
+        DispatchMainEvent(new RoomEngineUseProductEvent(RoomEngineUseProductEvent.USE_PRODUCT_FROM_INVENTORY, roomSession.roomId, -1, -1, item.ref, item.type));
+    };
+
+    // Phone layout: the grid, and under it (beside it on a phone held on its side) the chosen furni as a bar with
+    // "place in room"; its preview and the other actions (use, sell, delete) open from the bar.
+    if (isHandheld) {
+        const pageItems = filteredGroupItems.slice(currentPage * 200, (currentPage + 1) * 200);
+        const actions: HandheldInventoryAction[] = [];
+
+        if (selectedItem) {
+            if (!!roomSession?.isPrivateRoom && isInventoryPetProduct(selectedItem.category)) {
+                actions.push({
+                    key: 'use',
+                    label: LocalizeText('inventory.furni.use'),
+                    disabled: !selectedItem.getUnlockedCount() || playTestRestricted,
+                    onClick: useSelectedProduct
+                });
+            }
+
+            if (selectedItem.isSellable || selectedCollectible) {
+                actions.push({ key: 'sell', label: LocalizeText('inventory.marketplace.sell'), onClick: () => attemptPlaceMarketplaceOffer(selectedItem, selectedCollectible) });
+            }
+
+            actions.push({ key: 'delete', label: LocalizeText('generic.delete'), danger: true, onClick: () => attemptDeleteItem(selectedItem) });
+        }
+
+        return (
+            <NativeTextTree>
+                <div className="octane-handheld-inv__pane is-furni">
+                    <div className="octane-handheld-inv__gridbox">
+                        <InfiniteGrid<GroupItem>
+                            squareItems
+                            columnCount={6}
+                            columnGap={6}
+                            itemKey={getGroupItemKey}
+                            itemRender={(item) => <InventoryFurnitureItemView groupItem={item} isActive={item === selectedItem} onSelect={setSelectedItem} />}
+                            items={pageItems}
+                        />
+                        {pageCount > 1 && (
+                            <div className="octane-handheld-inv__pages">
+                                {Array.from({ length: pageCount }, (_, index) => (
+                                    <BaseButton key={index} aria-current={index === currentPage ? 'page' : undefined} onClick={() => setPage(index)}>
+                                        {index + 1}
+                                    </BaseButton>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    {selectedItem && (
+                        <HandheldInventorySelectionView
+                            actions={actions}
+                            meta={`${
+                                tradeableCount > 0
+                                    ? localizeWithFallback('octane.handheld.inventory.tradable', '%count% tradable', ['count'], [String(tradeableCount)])
+                                    : localizeWithFallback('octane.handheld.inventory.not_tradable', 'Not tradable')
+                            } · ${
+                                recyclableCount > 0
+                                    ? localizeWithFallback('octane.handheld.inventory.recyclable', '%count% recyclable', ['count'], [String(recyclableCount)])
+                                    : localizeWithFallback('octane.handheld.inventory.not_recyclable', 'Not recyclable')
+                            }`}
+                            name={selectedItem.name}
+                            preview={
+                                <>
+                                    <LayoutRoomPreviewerView fitParent roomPreviewer={roomPreviewer} />
+                                    <div className="octane-handheld-inv__preview-tools">
+                                        <BaseButton onClick={() => roomPreviewer?.changeRoomObjectDirection()}>
+                                            {localizeWithFallback('widget.furniture.button.rotate', 'Rotate')}
+                                        </BaseButton>
+                                        <BaseButton onClick={() => roomPreviewer?.changeRoomObjectState()}>
+                                            {localizeWithFallback('widget.furniture.button.use', 'Use')}
+                                        </BaseButton>
+                                    </div>
+                                    {selectedItem.stuffData.isUnique && (
+                                        <LayoutLimitedEditionCompactPlateView
+                                            className="octane-handheld-inv__plate"
+                                            position="absolute"
+                                            uniqueNumber={selectedItem.stuffData.uniqueNumber}
+                                            uniqueSeries={selectedItem.stuffData.uniqueSeries}
+                                        />
+                                    )}
+                                    {selectedItem.stuffData.rarityLevel > -1 && (
+                                        <LayoutRarityLevelView className="octane-handheld-inv__plate" level={selectedItem.stuffData.rarityLevel} position="absolute" />
+                                    )}
+                                </>
+                            }
+                            primary={{
+                                key: 'place',
+                                label: LocalizeText('inventory.furni.placetoroom'),
+                                disabled: !roomSession || !selectedItem.getUnlockedCount() || playTestRestricted,
+                                onClick: () => attemptItemPlacement(selectedItem)
+                            }}
+                            thumb={selectedItem.iconUrl ? <img alt="" draggable={false} src={selectedItem.iconUrl} /> : null}
+                        />
+                    )}
+                </div>
+            </NativeTextTree>
+        );
+    }
+
     return (
         <NativeTextTree>
             <div className="octane-inventory-furni">
@@ -182,7 +291,7 @@ export const InventoryFurnitureView: FC<{
                     <div
                         className="octane-inventory-furni-preview-stage"
                         onPointerDown={(event) => {
-                            if (event.button !== 0 || !roomSession || !selectedItem) return;
+                            if (isHandheld || event.button !== 0 || !roomSession || !selectedItem) return;
                             if ([FurniCategory.FLOOR, FurniCategory.WALL_PAPER, FurniCategory.LANDSCAPE].includes(selectedItem.category)) return;
                             attemptItemPlacement(selectedItem);
                         }}
@@ -191,7 +300,7 @@ export const InventoryFurnitureView: FC<{
                             fitParent
                             roomPreviewer={roomPreviewer}
                             onPreviewClick={() => {
-                                if (roomSession) attemptItemPlacement(selectedItem);
+                                if (roomSession && !isHandheld) attemptItemPlacement(selectedItem);
                             }}
                         />
                         {selectedItem && (

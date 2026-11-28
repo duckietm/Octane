@@ -21,6 +21,8 @@ import { Native0Button, Native0Dropmenu, Native0Frame, Native0Input, Native0Text
 import { NativeWindowShell } from '../native/NativeWindowShell';
 import { ModConfirmView } from './ModConfirmView';
 import { tradeLockSeconds } from './tradeLockSeconds';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModActionView } from '../handheld/HandheldModSanctionViews';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const FRAME_COLOR = 0x418db0;
@@ -107,6 +109,7 @@ export const ModActionView: FC<ModActionProps> = ({ userId, userName, settings, 
     const sentRef = useRef(false);
     const templates = settings?.messageTemplates ?? [];
     const applied = sanctionLog?.[userId] ?? [];
+    const isHandheld = useIsHandheld();
 
     // the default sanction for this user arrives as "<name>[ (avatar) ]<length> & <trade lock> & <machine ban>"
     useMessageEvent<CfhSanctionMessageEvent>(CfhSanctionMessageEvent, (event) => {
@@ -235,6 +238,78 @@ export const ModActionView: FC<ModActionProps> = ({ userId, userName, settings, 
     };
 
     const custom = rectOf(customButton);
+    const confirmation = pending && (
+        <ModConfirmView
+            cancelLabel={LocalizeText('generic.cancel')}
+            confirmLabel={localizeWithFallback('modtools.native.confirm.apply', 'Apply')}
+            message={localizeWithFallback('modtools.native.confirm.body', `${pending.name}: ${userName}`, ['sanction', 'username'], [pending.name, userName])}
+            title={localizeWithFallback('modtools.native.confirm.title', 'Confirm')}
+            onCancel={() => setPending(null)}
+            onConfirm={() => {
+                const sanction = pending;
+
+                setPending(null);
+                send(sanction);
+            }}
+        />
+    );
+
+    // phone: the same choices and sends on a page of the sheet; the confirmation is the phone card ModConfirmView draws there
+    if (isHandheld) {
+        // the field labels of the layout ("CFH topic:", "Sanction type:")
+        const labelText = (pattern: RegExp, fallback: string) => {
+            const walk = (node: NativeNode): string | null => {
+                if (node.tag === 'text' && pattern.test(nativeCaption(node))) return nativeCaption(node);
+
+                for (const child of node.children) {
+                    const found = walk(child);
+
+                    if (found) return found;
+                }
+
+                return null;
+            };
+
+            return walk(root) ?? fallback;
+        };
+
+        return (
+            <>
+                <HandheldModActionView
+                    applied={applied.map((entry, index) => ({ key: `${entry.at}:${index}`, text: `${formatSanctionTime(entry.at)}  ${entry.label}` }))}
+                    appliedTitle={localizeWithFallback('modtools.native.applied', 'Applied this session:')}
+                    customLabel={nativeCaption(customButton)}
+                    defaultEnabled={topicIndex >= 0}
+                    defaultLabel={nativeCaption(defaultButton)}
+                    defaultText={defaultLabel}
+                    infoText={nativeCaption(findNativeNode(root, 'message_info'))}
+                    message={message}
+                    sanctionCaption={nativeCaption(findNativeNode(root, 'sanction_type'))}
+                    sanctionIndex={sanctionIndex}
+                    sanctionLabel={labelText(/^sanction type/i, 'Sanction type:')}
+                    sanctions={SANCTIONS.map((sanction) => sanction.name)}
+                    templateCaption={localizeWithFallback('octane.mod_tools.select_from_message_templates', 'Select from message templates')}
+                    templates={templates}
+                    title={localizeWithFallback('octane.mod_tools.mod_action_on_user_name', 'Mod action on: %user_name%', ['user_name'], [String(userName)])}
+                    topicCaption={nativeCaption(findNativeNode(root, 'cfh_topics'))}
+                    topicIndex={topicIndex}
+                    topicLabel={labelText(/^cfh topic/i, 'CFH topic:')}
+                    topics={topicNames}
+                    onClose={onClose}
+                    onCustom={onCustom}
+                    onDefault={onDefault}
+                    onMessage={setMessage}
+                    onSanction={setSanctionIndex}
+                    onTemplate={(index) => {
+                        setMessage(templates[index]);
+                        setInputActive(true);
+                    }}
+                    onTopic={selectTopic}
+                />
+                {confirmation}
+            </>
+        );
+    }
 
     return (
         <>
@@ -295,21 +370,7 @@ export const ModActionView: FC<ModActionProps> = ({ userId, userName, settings, 
                 />
             </Native0Frame>
         </NativeWindowShell>
-            {pending && (
-                <ModConfirmView
-                    cancelLabel={LocalizeText('generic.cancel')}
-                    confirmLabel={localizeWithFallback('modtools.native.confirm.apply', 'Apply')}
-                    message={localizeWithFallback('modtools.native.confirm.body', `${pending.name}: ${userName}`, ['sanction', 'username'], [pending.name, userName])}
-                    title={localizeWithFallback('modtools.native.confirm.title', 'Confirm')}
-                    onCancel={() => setPending(null)}
-                    onConfirm={() => {
-                        const sanction = pending;
-
-                        setPending(null);
-                        send(sanction);
-                    }}
-                />
-            )}
+            {confirmation}
         </>
     );
 };

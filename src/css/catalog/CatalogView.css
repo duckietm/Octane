@@ -1206,7 +1206,7 @@
 }
 
 .octane-catalog-navigation-node.is-child .octane-catalog-navigation-item {
-    padding-left: 15px;
+    padding-left: calc(15px + var(--octane-catalog-navigation-indent, 0px));
     color: #52819a;
     font-style: italic;
 }
@@ -1283,6 +1283,14 @@
 
 .octane-catalog-navigation-caret.is-open {
     background-image: url("../../assets/images/catalog/navigation/arrow_down.png");
+}
+
+/* search.helper's text field at the input's text position; it gives way once something is typed. */
+.octane-catalog-search .octane-catalog-search-helper {
+    position: absolute !important;
+    top: 4px;
+    left: 5px;
+    pointer-events: none;
 }
 
 /* searchContainer (184 x 24): white box, the helper/input at (4, 3), common_small_pen at (160, 2). */

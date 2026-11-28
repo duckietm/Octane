@@ -5,6 +5,7 @@ import { OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { useMessageEvent } from '../../../hooks';
 import { GroupInformationNativeView } from './GroupInformationNativeView';
 import { GroupWindowTitle } from './GroupNativeLayout';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 export const GroupInformationStandaloneView: FC<{}> = (props) => {
     const [groupInformation, setGroupInformation] = useState<GroupInformationParser>(null);
@@ -23,7 +24,7 @@ export const GroupInformationStandaloneView: FC<{}> = (props) => {
     if (!groupInformation) return null;
 
     return (
-        <OctaneCardView
+        <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE}
             aria-label={LocalizeText('group.window.title')}
             className="octane-group-info"
             frameStyle={3}

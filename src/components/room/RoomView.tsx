@@ -1,7 +1,8 @@
 import { CreateLinkEvent, GetEventDispatcher, GetRenderer, GetRoomEngine, RoomObjectMouseEvent, RoomObjectTileMouseEvent, RoomSession } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC, useEffect, useRef } from 'react';
-import { DispatchMouseEvent, DispatchTouchEvent } from '../../api';
+import { DispatchHandheldTouchEvent, DispatchMouseEvent, DispatchTouchEvent } from '../../api';
+import { isHandheldActive } from '../../state/handheldStore';
 import { useRoom, useRoomKeyboardMovement } from '../../hooks';
 import { classNames } from '../../layout';
 import { RoomSpectatorView } from './spectator/RoomSpectatorView';
@@ -33,10 +34,13 @@ export const RoomView: FC<{}> = (props) => {
         canvas.onmousedown = (event) => DispatchMouseEvent(event);
         canvas.onmouseup = (event) => DispatchMouseEvent(event);
 
-        canvas.ontouchstart = (event) => DispatchTouchEvent(event);
-        canvas.ontouchmove = (event) => DispatchTouchEvent(event);
-        canvas.ontouchend = (event) => DispatchTouchEvent(event);
-        canvas.ontouchcancel = (event) => DispatchTouchEvent(event);
+        // The phone layout reads the fingers as gestures (tap, drag to pan, hold, pinch); elsewhere touch stays as it was.
+        const onTouch = (event: TouchEvent) => (isHandheldActive() ? DispatchHandheldTouchEvent(event) : DispatchTouchEvent(event));
+
+        canvas.ontouchstart = onTouch;
+        canvas.ontouchmove = onTouch;
+        canvas.ontouchend = onTouch;
+        canvas.ontouchcancel = onTouch;
 
         let touchStartX = 0;
         let touchStartY = 0;

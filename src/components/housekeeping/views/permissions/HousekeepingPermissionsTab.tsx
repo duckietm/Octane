@@ -11,6 +11,7 @@ import {
     readHousekeepingPermissionMatrix
 } from '../../../../api';
 import { useHousekeeping, useHousekeepingConfirm } from '../../../../hooks';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 import { HOUSEKEEPING_INPUT_CLASS, HousekeepingButton, HousekeepingEmptyState, HousekeepingPill, HousekeepingSection } from '../common/HousekeepingParts';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
@@ -30,6 +31,7 @@ export const HousekeepingPermissionsTab: FC = () => {
     const [reload, setReload] = useState(0);
     const [search, setSearch] = useState('');
     const [onlyMixed, setOnlyMixed] = useState(false);
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         const controller = new AbortController();
@@ -119,7 +121,52 @@ export const HousekeepingPermissionsTab: FC = () => {
                 {!error && !matrix && isLoading && <HousekeepingEmptyState>{LocalizeText('generic.loading')}</HousekeepingEmptyState>}
                 {!error && matrix && rows.length === 0 && <HousekeepingEmptyState>{LocalizeText('housekeeping.permissions.empty')}</HousekeepingEmptyState>}
 
-                {!error && matrix && rows.length > 0 && (
+                {!error && matrix && rows.length > 0 && isHandheld && (
+                    <div className="octane-handheld-hk__cards" data-testid="hk-permission-cards">
+                        {rows.map((row) => (
+                            <div key={row.key} className="octane-handheld-hk__card is-static" data-testid="hk-permission-card">
+                                <span className="octane-handheld-hk__card-title">{row.key}</span>
+                                {row.comment && <span className="octane-handheld-hk__card-body">{row.comment}</span>}
+                                <div className="octane-handheld-hk__ranks">
+                                    {matrix.ranks.map((rank, rankIndex) => {
+                                        const value = row.values[rankIndex] ?? 0;
+                                        const disabled = !rank.editable || isActionPending;
+                                        const label = `${row.key} · ${rank.name || `#${rank.id}`}`;
+
+                                        return (
+                                            <label key={rank.id} className="octane-handheld-hk__rank" data-own={rank.own} data-locked={!rank.editable}>
+                                                <span className="octane-handheld-hk__rank-name">
+                                                    {!rank.editable && <FaLock size={10} />}
+                                                    {rank.own && <FaExclamationTriangle className="text-amber-600" size={10} />}
+                                                    <span>{rank.name || `#${rank.id}`}</span>
+                                                </span>
+                                                {row.max <= 1 ? (
+                                                    <Checkbox aria-label={label} checked={value > 0} disabled={disabled} onCheckedChange={(nextChecked) => change(row.key, rank, rankIndex, value, nextChecked ? 1 : 0)} />
+                                                ) : (
+                                                    <Select
+                                                        aria-label={label}
+                                                        className="octane-handheld-hk__rank-select"
+                                                        disabled={disabled}
+                                                        value={value}
+                                                        onChange={(event) => change(row.key, rank, rankIndex, value, Number(event.target.value))}
+                                                    >
+                                                        {Array.from({ length: row.max + 1 }, (_, option) => (
+                                                            <option key={option} value={option}>
+                                                                {option}
+                                                            </option>
+                                                        ))}
+                                                    </Select>
+                                                )}
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {!error && matrix && rows.length > 0 && !isHandheld && (
                     <div className="max-h-[420px] overflow-auto rounded border border-zinc-200 bg-white">
                         <table className="w-full border-collapse text-[11px]">
                             <thead className="sticky top-0 z-[1] bg-zinc-100">

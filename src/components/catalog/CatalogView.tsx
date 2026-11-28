@@ -4,9 +4,11 @@ import { FaBars, FaCog } from 'react-icons/fa';
 import { CatalogType, GetConfigurationValue, isBuildersClubEnabled, LocalizeShortNumber, LocalizeText, localizeWithFallback, SanitizeHtml } from '../../api';
 import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
+import { DraggableWindow } from '../../common/draggable-window/DraggableWindow';
 import { CssNativeText } from '../../common/native-text/CssNativeText';
 import { ToggleButton } from '../../common/ToggleButton';
 import { CatalogEffectsHost, useCatalogActions, useCatalogData, useCatalogUiState, useHasPermission, usePurse } from '../../hooks';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
 import { CatalogStudioProvider } from './admin/studio/CatalogStudioProvider';
 import { CatalogAdminProvider, useCatalogAdmin } from './CatalogAdminContext';
 import { getCatalogHeaderDescription, getCatalogHeaderTextKey } from './catalogLocalization.helpers';
@@ -18,6 +20,7 @@ import { CatalogLoadingStateView } from './views/CatalogLoadingStateView';
 import { CatalogBuildersClubStatusView } from './views/catalog-header/CatalogBuildersClubStatusView';
 import { CatalogIconView } from './views/catalog-icon/CatalogIconView';
 import { CatalogGiftView } from './views/gift/CatalogGiftView';
+import { HandheldCatalogView } from './views/handheld/HandheldCatalogView';
 import { CatalogBreadcrumbView } from './views/navigation/CatalogBreadcrumbView';
 import { CatalogNavigationView } from './views/navigation/CatalogNavigationView';
 import { CatalogSearchView } from './views/page/common/CatalogSearchView';
@@ -33,7 +36,7 @@ const CatalogViewInner: FC<{}> = () => {
         navigationHidden = false,
         setNavigationHidden = null,
         activeNodes = [],
-        setSearchResult = null,
+        pageId: openPageId = -1,
         currentType = CatalogType.NORMAL
     } = useCatalogUiState();
     const {
@@ -41,6 +44,8 @@ const CatalogViewInner: FC<{}> = () => {
         openPageByName = null,
         openPageByOfferId = null,
         activateNode = null,
+        endCatalogSearch = null,
+        getNodeById = null,
         openCatalogByType = null,
         toggleCatalogByType = null,
         retryCurrentPage = null
@@ -53,14 +58,27 @@ const CatalogViewInner: FC<{}> = () => {
     const hideNavigation = useCallback(() => setNavigationHidden?.(true), [setNavigationHidden]);
 
     const isMod = useHasPermission('acc_catalogfurni');
+    // Phone layout: the catalogue is one screen at a time (list of pages, then the page) instead of tabs and a tree.
+    const isHandheld = useIsHandheld();
     // AIR's Builders Club warehouse has its own title and no tab row: its pages are listed on the left only.
     const isBuilder = currentType === CatalogType.BUILDER;
     const headerTextKey = getCatalogHeaderTextKey(currentPage?.layoutCode);
+    const catalogTitle = isBuilder ? localizeWithFallback('builder.catalog.title', 'The Builders Club Warehouse') : LocalizeText('catalog.title');
     const adminToggle = <FaCog className={`text-[10px] ${adminMode ? 'animate-spin' : ''}`} style={adminMode ? { animationDuration: '3s' } : {}} />;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { purse = null } = usePurse();
     const displayedCurrencies = GetConfigurationValue<number[]>('system.currency.types', []);
     const activeCatalogNode = activeNodes?.[activeNodes.length - 1] ?? null;
+    // A search leaves no node active (CatalogNavigator.filter); the tab of the page still open stays selected in the strip.
+    const searchTab = useMemo(() => {
+        if (!searchResult || activeNodes?.length || !rootNode || openPageId <= -1) return null;
+
+        let node = getNodeById?.(openPageId, rootNode) ?? null;
+
+        while (node?.parent && node.parent !== rootNode) node = node.parent;
+
+        return node;
+    }, [searchResult, activeNodes, rootNode, openPageId, getNodeById]);
     const buildersClubEnabled = isBuildersClubEnabled();
     // Strip technical suffixes like "(BC)" or "(Hot)" but keep the
     // pageId hint the gameserver appends when the viewer has
@@ -166,7 +184,25 @@ const CatalogViewInner: FC<{}> = () => {
 
     return (
         <>
-            {isVisible && (
+            {isVisible && isHandheld && (
+                <DraggableWindow handheldSheet uniqueKey="catalog">
+                    <HandheldCatalogView
+                        activeNodes={activeNodes}
+                        adminMode={adminMode}
+                        currentPage={currentPage}
+                        isBusy={isBusy}
+                        renderPage={() => GetCatalogLayout(currentPage, hideNavigation)}
+                        rootNode={rootNode}
+                        searchResult={searchResult}
+                        title={isBusy ? LocalizeText('generic.loading') || 'Loading...' : catalogTitle}
+                        useTabs={!isBuilder}
+                        onClose={() => setIsVisible(false)}
+                    >
+                        {(isBusy || catalogLoadError) && <CatalogLoadingStateView error={catalogLoadError} onRetry={retryCurrentPage} />}
+                    </HandheldCatalogView>
+                </DraggableWindow>
+            )}
+            {isVisible && !isHandheld && (
                 <OctaneCardView
                     classNames={['octane-catalog-window']}
                     dragStyle={catalogWindowStyle}
@@ -227,10 +263,11 @@ const CatalogViewInner: FC<{}> = () => {
                                     return (
                                         <OctaneCardTabsItemView
                                             key={`${child.pageId}-${child.pageName}-${index}`}
-                                            isActive={child.isActive}
+                                            isActive={child.isActive || child === searchTab}
                                             title={child.localization}
                                             onClick={() => {
-                                                if (searchResult) setSearchResult(null);
+                                                // The tab ends the search and opens itself, not the page open before the search.
+                                                if (searchResult) endCatalogSearch(false);
 
                                                 activateNode(child);
                                             }}
@@ -311,7 +348,7 @@ const CatalogViewInner: FC<{}> = () => {
                                         <CatalogSearchView />
                                     </div>
                                     <div className="octane-catalog-navigation-shell">
-                                        {activeNodes && activeNodes.length > 0 && <CatalogNavigationView node={activeNodes[0]} catalogType={currentType} />}
+                                        {(searchResult || activeNodes?.length > 0) && <CatalogNavigationView node={activeNodes?.[0] ?? null} catalogType={currentType} />}
                                     </div>
                                 </div>
                             )}

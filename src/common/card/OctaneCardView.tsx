@@ -33,6 +33,13 @@ export const OctaneCardView: FC<OctaneCardViewProps> = (props) => {
         dragStyle,
         offsetLeft,
         offsetTop,
+        handheldSheet,
+        handheldScale,
+        handheldMaxScale,
+        handheldPeek,
+        initialPosition,
+        unconstrainedPosition,
+        onPositionChange,
         ...rest
     } = props;
     const elementRef = useRef<HTMLDivElement>(null);
@@ -58,10 +65,17 @@ export const OctaneCardView: FC<OctaneCardViewProps> = (props) => {
         <OctaneCardContextProvider value={{ theme }}>
             <DraggableWindow
                 disableDrag={disableDrag}
+                handheldMaxScale={handheldMaxScale}
+                handheldPeek={handheldPeek}
+                handheldScale={handheldScale}
+                handheldSheet={handheldSheet}
                 dragStyle={resolvedFrameStyle === 3 ? { filter: 'drop-shadow(2.828px 2.828px 4px rgba(0, 0, 0, 0.349))', ...dragStyle } : dragStyle}
                 handleSelector={handleSelector}
+                initialPosition={initialPosition}
                 offsetLeft={offsetLeft}
                 offsetTop={offsetTop}
+                onPositionChange={onPositionChange}
+                unconstrainedPosition={unconstrainedPosition}
                 uniqueKey={uniqueKey}
                 windowPosition={windowPosition}
             >

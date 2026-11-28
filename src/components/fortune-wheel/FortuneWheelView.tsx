@@ -8,12 +8,11 @@ import { FortuneWheelSettingsView } from './FortuneWheelSettingsView';
 import { WheelWinReveal } from './WheelWinReveal';
 import { renderPrizeIcon } from './wheelPrizeIcon';
 import { getWinCurrencyType, getWinLabel } from './wheelPrizeLabel';
-import { getSliceColorIndexes, WHEEL_SLICE_COLORS } from './wheelSliceColors';
+import { getSliceColorIndexes, sliceColor } from './wheelSliceColors';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useHandheldLayout } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldFortuneWheelView } from './HandheldFortuneWheelView';
 
-// Habbo's bright slice palette, each colour overridable by a runtime theme
-// through --wheel-slice-<n> (the fallback values keep the stock look).
-const sliceColor = (index: number) => `var(--wheel-slice-${index + 1}, ${WHEEL_SLICE_COLORS[index]})`;
 const WHEEL_SIZE = 360;
 const DISC_INSET = 22;
 const DISC_RADIUS = WHEEL_SIZE / 2 - DISC_INSET;
@@ -21,6 +20,8 @@ const ICON_RADIUS = 104;
 const BULB_COUNT = 16;
 const BULB_RADIUS = WHEEL_SIZE / 2 - DISC_INSET / 2;
 const FULL_TURNS = 5;
+// On a phone the wheel may be drawn a little bigger than its real size when the screen has the room.
+const HANDHELD_MAX_WHEEL_SCALE = 1.25;
 
 // Spin motion (wind-back → fast spin past target → settle back).
 const WINDBACK_DEG = 14;
@@ -37,6 +38,7 @@ export const FortuneWheelView: FC<{}> = () => {
     const { freeSpins, extraSpins, spinCost, spinCostType, prizes, recentWins, pendingPrizeId, isSpinning, isRequestPending, open, spin, buySpin, finishSpin } =
         useFortuneWheel();
     const canManage = useHasPermission('acc_wheeladmin');
+    const { active: isHandheld, orientation } = useHandheldLayout();
 
     const [rotation, setRotation] = useState(0);
     const [phase, setPhase] = useState<SpinPhase>('idle');
@@ -95,14 +97,25 @@ export const FortuneWheelView: FC<{}> = () => {
         const host = wheelHostRef.current;
         if (!host || typeof ResizeObserver === 'undefined') return;
 
+        // On a phone held on its side the wheel's column is as high as the sheet: the wheel fits its height too.
+        const fitHeight = isHandheld && orientation === 'landscape';
         const observer = new ResizeObserver((entries) => {
             const width = entries[0]?.contentRect.width ?? WHEEL_SIZE;
-            setWheelScale(Math.min(1, width / WHEEL_SIZE));
+            const height = entries[0]?.contentRect.height ?? WHEEL_SIZE;
+
+            if (!isHandheld) {
+                setWheelScale(Math.min(1, width / WHEEL_SIZE));
+                return;
+            }
+
+            const fit = Math.min(HANDHELD_MAX_WHEEL_SCALE, width / WHEEL_SIZE, fitHeight ? height / WHEEL_SIZE : Number.POSITIVE_INFINITY);
+
+            if (fit > 0) setWheelScale(fit);
         });
         observer.observe(host);
 
         return () => observer.disconnect();
-    }, [isVisible]);
+    }, [isVisible, isHandheld, orientation]);
 
     // Drive the spin animation when the server reports the winning slice.
     useEffect(() => {
@@ -222,6 +235,90 @@ export const FortuneWheelView: FC<{}> = () => {
     const canSpin = freeSpins + extraSpins > 0 && !isSpinning && !isRequestPending && prizes.length > 0;
     const isTurning = phase !== 'idle';
 
+    // The wheel itself, on the desktop card and on the phone sheet alike: the same slice math, spin and landing.
+    const stage = (
+        <div
+            className={`wheel-stage ${isTurning ? 'is-turning' : ''}`}
+            style={{ width: WHEEL_SIZE, height: WHEEL_SIZE, transform: `translateX(-50%) scale(${wheelScale})` }}
+        >
+            <div className="wheel-rim" />
+            {Array.from({ length: BULB_COUNT }, (_, i) => {
+                const angle = (i * 360) / BULB_COUNT;
+
+                return (
+                    <span
+                        key={`bulb-${i}`}
+                        className={`wheel-bulb ${i % 2 ? 'is-alt' : ''}`}
+                        style={{ transform: `rotate(${angle}deg) translateY(-${BULB_RADIUS}px)` }}
+                    />
+                );
+            })}
+            {/* A turned square box grows past its circle and would scroll the window: the still frame clips it. */}
+            <div className="wheel-disc-frame" style={{ inset: DISC_INSET }}>
+                <div
+                    className="wheel-disc"
+                    style={{ background, transform: `rotate(${rotation}deg)`, transition: wheelTransition }}
+                    onTransitionEnd={handleTransitionEnd}
+                >
+                    {prizes.map((_, i) => (
+                        <div
+                            key={`divider-${i}`}
+                            className="wheel-divider"
+                            style={{ height: DISC_RADIUS, transform: `translateX(-1px) rotate(${i * sliceAngle}deg)` }}
+                        />
+                    ))}
+                    {prizes.map((prize, i) => {
+                        const centerAngle = (i + 0.5) * sliceAngle;
+
+                        return (
+                            <div
+                                key={prize.id}
+                                className="wheel-slice-anchor"
+                                style={{ transform: `rotate(${centerAngle}deg) translateY(-${ICON_RADIUS}px) rotate(-${centerAngle}deg)` }}
+                            >
+                                {/* Turned back by the wheel's own angle, on the same curve, so the prizes stay upright while it spins. */}
+                                <div className="wheel-slice-plate" style={{ transform: `translate(-50%, -50%) rotate(${-rotation}deg)`, transition: wheelTransition }}>
+                                    {renderPrizeIcon(prize)}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+            <div className="wheel-hub" />
+            <svg className="wheel-pointer" width="32" height="38" viewBox="0 0 32 38" aria-hidden="true">
+                <path d="M3 3 H29 V13 L16 35 L3 13 Z" />
+                <path className="wheel-pointer-shine" d="M7 7 H25 V11 H7 Z" />
+            </svg>
+        </div>
+    );
+
+    if (isHandheld) {
+        return (
+            <HandheldFortuneWheelView
+                canManage={canManage}
+                canSpin={canSpin}
+                extraSpins={shownSpins.extra}
+                freeSpins={shownSpins.free}
+                isRequestPending={isRequestPending}
+                isTurning={isTurning}
+                prizes={prizes}
+                recentWins={recentWins}
+                reveal={revealPrize && <WheelWinReveal handheld prize={revealPrize} onDismiss={() => setRevealPrize(null)} />}
+                settings={canManage && isSettingsOpen ? <FortuneWheelSettingsView onClose={() => setIsSettingsOpen(false)} /> : null}
+                spinCost={spinCost}
+                spinCostType={spinCostType}
+                stage={stage}
+                wheelHostRef={wheelHostRef}
+                wheelSize={WHEEL_SIZE * wheelScale}
+                onBuySpin={() => buySpin()}
+                onClose={() => setIsVisible(false)}
+                onOpenSettings={() => setIsSettingsOpen(true)}
+                onSpin={() => spin()}
+            />
+        );
+    }
+
     return (
         <NativeTextTree>
             <OctaneCard className="wheel-card w-[684px] max-w-[96vw]" uniqueKey="fortune-wheel">
@@ -230,60 +327,7 @@ export const FortuneWheelView: FC<{}> = () => {
                     <div className="relative">
                         <div className="wheel-layout">
                             <div ref={wheelHostRef} className="wheel-stage-host" style={{ height: WHEEL_SIZE * wheelScale }}>
-                                <div
-                                    className={`wheel-stage ${isTurning ? 'is-turning' : ''}`}
-                                    style={{ width: WHEEL_SIZE, height: WHEEL_SIZE, transform: `translateX(-50%) scale(${wheelScale})` }}
-                                >
-                                    <div className="wheel-rim" />
-                                    {Array.from({ length: BULB_COUNT }, (_, i) => {
-                                        const angle = (i * 360) / BULB_COUNT;
-
-                                        return (
-                                            <span
-                                                key={`bulb-${i}`}
-                                                className={`wheel-bulb ${i % 2 ? 'is-alt' : ''}`}
-                                                style={{ transform: `rotate(${angle}deg) translateY(-${BULB_RADIUS}px)` }}
-                                            />
-                                        );
-                                    })}
-                                    {/* A turned square box grows past its circle and would scroll the window: the still frame clips it. */}
-                                    <div className="wheel-disc-frame" style={{ inset: DISC_INSET }}>
-                                        <div
-                                            className="wheel-disc"
-                                            style={{ background, transform: `rotate(${rotation}deg)`, transition: wheelTransition }}
-                                            onTransitionEnd={handleTransitionEnd}
-                                        >
-                                            {prizes.map((_, i) => (
-                                                <div
-                                                    key={`divider-${i}`}
-                                                    className="wheel-divider"
-                                                    style={{ height: DISC_RADIUS, transform: `translateX(-1px) rotate(${i * sliceAngle}deg)` }}
-                                                />
-                                            ))}
-                                            {prizes.map((prize, i) => {
-                                                const centerAngle = (i + 0.5) * sliceAngle;
-
-                                                return (
-                                                    <div
-                                                        key={prize.id}
-                                                        className="wheel-slice-anchor"
-                                                        style={{ transform: `rotate(${centerAngle}deg) translateY(-${ICON_RADIUS}px) rotate(-${centerAngle}deg)` }}
-                                                    >
-                                                        {/* Turned back by the wheel's own angle, on the same curve, so the prizes stay upright while it spins. */}
-                                                        <div className="wheel-slice-plate" style={{ transform: `translate(-50%, -50%) rotate(${-rotation}deg)`, transition: wheelTransition }}>
-                                                            {renderPrizeIcon(prize)}
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                    <div className="wheel-hub" />
-                                    <svg className="wheel-pointer" width="32" height="38" viewBox="0 0 32 38" aria-hidden="true">
-                                        <path d="M3 3 H29 V13 L16 35 L3 13 Z" />
-                                        <path className="wheel-pointer-shine" d="M7 7 H25 V11 H7 Z" />
-                                    </svg>
-                                </div>
+                                {stage}
                             </div>
                             <div className="wheel-side">
                                 <div className="wheel-panel wheel-spins">

@@ -9,6 +9,7 @@ import {
     RoomUnitDropHandItemComposer
 } from '@octane/renderer';
 import { Dispatch, FC, SetStateAction, useState } from 'react';
+import { FaArrowLeft, FaBed, FaChair, FaHandHolding, FaHandPaper, FaHandsHelping, FaIdBadge, FaKissWinkHeart, FaLaughBeam, FaMale, FaMusic, FaPaintRoller, FaPen, FaSearch, FaSignLanguage, FaSmile, FaStop, FaTrophy, FaTshirt } from 'react-icons/fa';
 import {
     AvatarInfoUser,
     DispatchUiEvent,
@@ -234,63 +235,63 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                     {mode === MODE_NORMAL && (
                         <>
                             {avatarInfo.allowNameChange && (
-                                <ContextMenuListItemView classNames={['air-avatar-menu-item--link']} onClick={() => processAction('change_name')}>
+                                <ContextMenuListItemView classNames={['air-avatar-menu-item--link']} icon={<FaPen />} onClick={() => processAction('change_name')}>
                                     {LocalizeText('widget.avatar.change_name')}
                                 </ContextMenuListItemView>
                             )}
                             {isShowDecorate() && (
-                                <ContextMenuListItemView onClick={() => processAction('decorate')}>
+                                <ContextMenuListItemView icon={<FaPaintRoller />} onClick={() => processAction('decorate')}>
                                     {LocalizeText('widget.avatar.decorate')}
                                 </ContextMenuListItemView>
                             )}
-                            <ContextMenuListItemView classNames={['air-avatar-menu-item--link']} onClick={() => processAction('change_looks')}>
+                            <ContextMenuListItemView classNames={['air-avatar-menu-item--link']} icon={<FaTshirt />} onClick={() => processAction('change_looks')}>
                                 {LocalizeText('widget.memenu.myclothes')}
                             </ContextMenuListItemView>
                             {expressionsMenuEnabled ? (
-                                <ContextMenuListItemView onClick={() => processAction('expressions')}>
+                                <ContextMenuListItemView icon={<FaSmile />} onClick={() => processAction('expressions')}>
                                     {LocalizeText('infostand.link.expressions')}
                                 </ContextMenuListItemView>
                             ) : (
-                                <ContextMenuListItemView onClick={() => processAction('wave')}>{LocalizeText('widget.memenu.wave')}</ContextMenuListItemView>
+                                <ContextMenuListItemView icon={<FaHandPaper />} onClick={() => processAction('wave')}>{LocalizeText('widget.memenu.wave')}</ContextMenuListItemView>
                             )}
                             {hasClub && !isRidingHorse && (
-                                <ContextMenuListItemView disabled={hasActiveEffect} onClick={() => processAction('dance_menu')}>
+                                <ContextMenuListItemView disabled={hasActiveEffect} icon={<FaMusic />} onClick={() => processAction('dance_menu')}>
                                     {LocalizeText('widget.memenu.dance')}
                                 </ContextMenuListItemView>
                             )}
                             {!isDancing && !hasClub && !isRidingHorse && (
-                                <ContextMenuListItemView disabled={hasActiveEffect} onClick={() => processAction('dance')}>
+                                <ContextMenuListItemView disabled={hasActiveEffect} icon={<FaMusic />} onClick={() => processAction('dance')}>
                                     {LocalizeText('widget.memenu.dance')}
                                 </ContextMenuListItemView>
                             )}
                             {isDancing && !hasClub && !isRidingHorse && (
-                                <ContextMenuListItemView onClick={() => processAction('dance_stop')}>
+                                <ContextMenuListItemView icon={<FaStop />} onClick={() => processAction('dance_stop')}>
                                     {LocalizeText('widget.memenu.dance.stop')}
                                 </ContextMenuListItemView>
                             )}
                             {signsEnabled && (
-                                <ContextMenuListItemView onClick={() => processAction('signs')}>
+                                <ContextMenuListItemView icon={<FaSignLanguage />} onClick={() => processAction('signs')}>
                                     {LocalizeText('infostand.show.signs')}
                                 </ContextMenuListItemView>
                             )}
                             {avatarInfo.carryItem > 0 && avatarInfo.carryItem < 999999 && handItemDropEnabled && !isHandItemBlocked && (
-                                <ContextMenuListItemView onClick={() => processAction('drop_carry_item')}>
+                                <ContextMenuListItemView icon={<FaHandHolding />} onClick={() => processAction('drop_carry_item')}>
                                     {LocalizeText('avatar.widget.drop_hand_item')}
                                 </ContextMenuListItemView>
                             )}
                             {showInspectButton && (
-                                <ContextMenuListItemView onClick={() => processAction('inspect')}>
+                                <ContextMenuListItemView icon={<FaSearch />} onClick={() => processAction('inspect')}>
                                     {LocalizeText('infostand.button.wired_inspect')}
                                 </ContextMenuListItemView>
                             )}
 
                             {/* Polaris-only actions are appended after the official AIR rows. */}
-                            <ContextMenuListItemView onClick={() => processAction('customize_nick')}>
+                            <ContextMenuListItemView icon={<FaIdBadge />} onClick={() => processAction('customize_nick')}>
                                 <span className="air-avatar-menu-extra-label">
                                     {localizeWithFallback('widget.memenu.customize_nick', 'Custom nickname')}
                                 </span>
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={() => processAction('badge_leaderboard')}>
+                            <ContextMenuListItemView icon={<FaTrophy />} onClick={() => processAction('badge_leaderboard')}>
                                 <span className="air-avatar-menu-extra-label">
                                     {localizeWithFallback('badge_leaderboard.title.total_badges', 'Badge leaderboard')}
                                 </span>
@@ -299,22 +300,22 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                     )}
                     {mode === MODE_CLUB_DANCES && (
                         <>
-                            <ContextMenuListItemView disabled={!isDancing} onClick={() => processAction('dance_stop')}>
+                            <ContextMenuListItemView disabled={!isDancing} icon={<FaStop />} onClick={() => processAction('dance_stop')}>
                                 {LocalizeText('widget.memenu.dance.stop')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={() => processAction('dance_1')}>{LocalizeText('widget.memenu.dance1')}</ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={() => processAction('dance_2')}>{LocalizeText('widget.memenu.dance2')}</ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={() => processAction('dance_3')}>{LocalizeText('widget.memenu.dance3')}</ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={() => processAction('dance_4')}>{LocalizeText('widget.memenu.dance4')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaMusic />} onClick={() => processAction('dance_1')}>{LocalizeText('widget.memenu.dance1')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaMusic />} onClick={() => processAction('dance_2')}>{LocalizeText('widget.memenu.dance2')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaMusic />} onClick={() => processAction('dance_3')}>{LocalizeText('widget.memenu.dance3')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaMusic />} onClick={() => processAction('dance_4')}>{LocalizeText('widget.memenu.dance4')}</ContextMenuListItemView>
                             <ContextMenuListItemView
                                 classNames={premiumExpressionClassNames}
                                 disabled={hasVip && !canUsePremiumExpression}
-                                onClick={() => processAction('dance_sixseven')}
+                                icon={<FaMusic />} onClick={() => processAction('dance_sixseven')}
                             >
                                 {!hasVip && <i className="air-avatar-menu-vip" aria-hidden="true" />}
                                 {localizeWithFallback('widget.memenu.dance.sixseven', 'Six Seven')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={() => processAction('back')}>
+                            <ContextMenuListItemView icon={<FaArrowLeft />} onClick={() => processAction('back')}>
                                 {LocalizeText('generic.back')}
                             </ContextMenuListItemView>
                         </>
@@ -322,18 +323,18 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                     {mode === MODE_EXPRESSIONS && (
                         <>
                             {sittingEnabled && !isSwimming && !isRidingHorse && ownPosture === AvatarAction.POSTURE_STAND && (
-                                <ContextMenuListItemView onClick={() => processAction('sit')}>{LocalizeText('widget.memenu.sit')}</ContextMenuListItemView>
+                                <ContextMenuListItemView icon={<FaChair />} onClick={() => processAction('sit')}>{LocalizeText('widget.memenu.sit')}</ContextMenuListItemView>
                             )}
                             {sittingEnabled && !isSwimming && !isRidingHorse && GetCanStandUp() && (
-                                <ContextMenuListItemView onClick={() => processAction('stand')}>{LocalizeText('widget.memenu.stand')}</ContextMenuListItemView>
+                                <ContextMenuListItemView icon={<FaMale />} onClick={() => processAction('stand')}>{LocalizeText('widget.memenu.stand')}</ContextMenuListItemView>
                             )}
-                            <ContextMenuListItemView disabled={isSwimming} onClick={() => processAction('wave')}>
+                            <ContextMenuListItemView disabled={isSwimming} icon={<FaHandPaper />} onClick={() => processAction('wave')}>
                                 {LocalizeText('widget.memenu.wave')}
                             </ContextMenuListItemView>
                             <ContextMenuListItemView
                                 classNames={premiumExpressionClassNames}
                                 disabled={hasVip && !canUsePremiumExpression}
-                                onClick={() => processAction('blow')}
+                                icon={<FaKissWinkHeart />} onClick={() => processAction('blow')}
                             >
                                 {!hasVip && <i className="air-avatar-menu-vip" aria-hidden="true" />}
                                 {LocalizeText('widget.memenu.blow')}
@@ -342,7 +343,7 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                                 <ContextMenuListItemView
                                     classNames={premiumExpressionClassNames}
                                     disabled={hasVip && !canUsePremiumExpression}
-                                    onClick={() => processAction('expression_67')}
+                                    icon={<FaHandsHelping />} onClick={() => processAction('expression_67')}
                                 >
                                     {!hasVip && <i className="air-avatar-menu-vip" aria-hidden="true" />}
                                     {LocalizeText('widget.memenu.expression_67')}
@@ -351,13 +352,13 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                             <ContextMenuListItemView
                                 classNames={premiumExpressionClassNames}
                                 disabled={hasVip && !canUsePremiumExpression}
-                                onClick={() => processAction('laugh')}
+                                icon={<FaLaughBeam />} onClick={() => processAction('laugh')}
                             >
                                 {!hasVip && <i className="air-avatar-menu-vip" aria-hidden="true" />}
                                 {LocalizeText('widget.memenu.laugh')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={() => processAction('idle')}>{LocalizeText('widget.memenu.idle')}</ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={() => processAction('back')}>
+                            <ContextMenuListItemView icon={<FaBed />} onClick={() => processAction('idle')}>{LocalizeText('widget.memenu.idle')}</ContextMenuListItemView>
+                            <ContextMenuListItemView icon={<FaArrowLeft />} onClick={() => processAction('back')}>
                                 {LocalizeText('generic.back')}
                             </ContextMenuListItemView>
                         </>
@@ -376,7 +377,7 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                                     </ContextMenuListItemView>
                                 ))}
                             </div>
-                            <ContextMenuListItemView onClick={() => processAction('back')}>
+                            <ContextMenuListItemView icon={<FaArrowLeft />} onClick={() => processAction('back')}>
                                 {LocalizeText('generic.back')}
                             </ContextMenuListItemView>
                         </>

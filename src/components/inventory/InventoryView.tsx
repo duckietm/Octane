@@ -27,6 +27,8 @@ import {
     UnseenItemCategory
 } from '../../api';
 import { OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
+import { DraggableWindow } from '../../common/draggable-window/DraggableWindow';
+import { HandheldSheetFrame } from '../../common/handheld/HandheldSheetFrame';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import {
     useInventoryBadges,
@@ -38,6 +40,7 @@ import {
     useWiredTrading
 } from '../../hooks';
 import { isCollectiblesEnabled } from '../../hooks/collectibles/useCollectibles';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
 import { InventoryBadgeView } from './views/badge/InventoryBadgeView';
 import { InventoryBotView } from './views/bot/InventoryBotView';
 import { InventoryCollectiblesView } from './views/collectibles/InventoryCollectiblesView';
@@ -138,6 +141,8 @@ export const InventoryView: FC<{}> = () => {
     const { getCount = null } = useInventoryUnseenTracker();
     const { groupItems = [], setSelectedItem = null } = useInventoryFurni();
     const { badgeCodes = [], setSelectedBadgeCode = null } = useInventoryBadges();
+    // Phone layout: the inventory is a sheet in the phone's own look (HandheldSheetFrame) instead of the AIR window.
+    const isHandheld = useIsHandheld();
     // The link tracker below is registered once: it reads the latest inventory through this ref.
     const linkTargetsRef = useRef({ groupItems, badgeCodes, setSelectedItem, setSelectedBadgeCode });
     linkTargetsRef.current = { groupItems, badgeCodes, setSelectedItem, setSelectedBadgeCode };
@@ -318,6 +323,85 @@ export const InventoryView: FC<{}> = () => {
         </OctaneCardTabsView>
     );
 
+    const filterBar = showFilter && (
+        <InventoryCategoryFilterView
+            currentTab={currentTab}
+            mainFilter={mainFilter}
+            typeFilter={typeFilter}
+            searchValue={searchValue}
+            onMainFilterChange={(value) => {
+                setMainFilter(value);
+                setAppliedSearch(searchValue);
+            }}
+            onTypeFilterChange={(value) => {
+                setTypeFilter(value);
+                setAppliedSearch(searchValue);
+            }}
+            onSearchChange={setSearchValue}
+            onSearchApply={setAppliedSearch}
+        />
+    );
+    const tabContent = (
+        <>
+            {section && (
+                <InventoryFurnitureView filteredGroupItems={filteredGroupItems} roomPreviewer={roomPreviewer} roomSession={roomSession} sectionGroupItems={sectionGroupItems} />
+            )}
+            {showsCollectibles && <InventoryCollectiblesView />}
+            {currentTab === TAB_PETS && <InventoryPetView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
+            {currentTab === TAB_BADGES && <InventoryBadgeView filteredBadgeCodes={filteredBadgeCodes} />}
+            {currentTab === TAB_BOTS && <InventoryBotView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
+            {currentTab === TAB_PREFIXES && <InventoryPrefixView />}
+        </>
+    );
+
+    if (isHandheld) {
+        const wiredOnly = !isTrading && isWiredTrading;
+
+        return (
+            <NativeTextTree>
+                <>
+                    <DraggableWindow handheldSheet uniqueKey="inventory">
+                        <HandheldSheetFrame
+                            activeTab={currentTab}
+                            className="octane-handheld-inv"
+                            icon="icon-inventory"
+                            tabs={wiredOnly ? [] : TABS.map((name) => ({ id: name, label: tabLabel(name), count: getTabUnseenCount(name, getCount) }))}
+                            tabsLabel={LocalizeText('inventory.title')}
+                            title={LocalizeText('inventory.title')}
+                            onClose={onClose}
+                            onTab={setCurrentTab}
+                        >
+                            {browsing && (
+                                <>
+                                    {filterBar}
+                                    <div className="octane-handheld-inv__content">{tabContent}</div>
+                                </>
+                            )}
+                            {/* A trade keeps its AIR content (and the AIR inventory's rules) inside the sheet. */}
+                            {showTrade && (
+                                <div className="octane-inventory-window octane-handheld-inv__air is-trading">
+                                    <div className="octane-inventory-body is-trade">
+                                        <InventoryTradeView cancelTrade={onClose} />
+                                    </div>
+                                </div>
+                            )}
+                            {tradeMinimized && <InventoryTradeMinimizedView onCancel={onClose} onContinue={() => setCurrentTab(TAB_FURNITURE)} />}
+                            {wiredOnly && (
+                                <div className="octane-inventory-window octane-handheld-inv__air is-wired-trading">
+                                    <div className="octane-inventory-body is-trade">
+                                        <InventoryWiredTradeView />
+                                    </div>
+                                </div>
+                            )}
+                        </HandheldSheetFrame>
+                    </DraggableWindow>
+                    <InventoryFurnitureDeleteView />
+                    <InventoryTradeNameScamWarningView />
+                </>
+            </NativeTextTree>
+        );
+    }
+
     return (
         <NativeTextTree>
             <>
@@ -332,38 +416,9 @@ export const InventoryView: FC<{}> = () => {
                         <>
                             {tabs}
                             <div className="octane-inventory-body">
-                                {showFilter && (
-                                    <InventoryCategoryFilterView
-                                        currentTab={currentTab}
-                                        mainFilter={mainFilter}
-                                        typeFilter={typeFilter}
-                                        searchValue={searchValue}
-                                        onMainFilterChange={(value) => {
-                                            setMainFilter(value);
-                                            setAppliedSearch(searchValue);
-                                        }}
-                                        onTypeFilterChange={(value) => {
-                                            setTypeFilter(value);
-                                            setAppliedSearch(searchValue);
-                                        }}
-                                        onSearchChange={setSearchValue}
-                                        onSearchApply={setAppliedSearch}
-                                    />
-                                )}
+                                {filterBar}
                                 <div className={`octane-inventory-content ${section ? 'is-furniture' : ''}`}>
-                                    {section && (
-                                        <InventoryFurnitureView
-                                            filteredGroupItems={filteredGroupItems}
-                                            roomPreviewer={roomPreviewer}
-                                            roomSession={roomSession}
-                                            sectionGroupItems={sectionGroupItems}
-                                        />
-                                    )}
-                                    {showsCollectibles && <InventoryCollectiblesView />}
-                                    {currentTab === TAB_PETS && <InventoryPetView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
-                                    {currentTab === TAB_BADGES && <InventoryBadgeView filteredBadgeCodes={filteredBadgeCodes} />}
-                                    {currentTab === TAB_BOTS && <InventoryBotView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
-                                    {currentTab === TAB_PREFIXES && <InventoryPrefixView />}
+                                    {tabContent}
                                 </div>
                             </div>
                         </>

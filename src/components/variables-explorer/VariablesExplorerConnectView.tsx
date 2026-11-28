@@ -17,6 +17,7 @@ import { VariablesExplorerPrefill } from '../../state/variablesExplorer';
 import { Checkbox } from '../../common/Checkbox';
 import { Select } from '../../common/Select';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 export interface VariablesExplorerConnectViewProps {
     prefill: VariablesExplorerPrefill | null;
@@ -84,7 +85,7 @@ export const VariablesExplorerConnectView: FC<VariablesExplorerConnectViewProps>
 
     return (
         <NativeTextTree>
-            <OctaneCardView
+            <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
                 className="min-w-[380px] max-w-[380px] octane-variables-explorer-window"
                 theme="primary-slim"
                 uniqueKey="variables-explorer"

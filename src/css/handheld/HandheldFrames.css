@@ -1,0 +1,169 @@
+/*
+ * Phone layout of the fixed-layout windows: the reward track (1103 x 722), the talent track (800 x 580) and the
+ * achievements (389 wide). Their AIR layouts are pixel coordinates, so on a phone they are
+ * not reflowed but drawn smaller as a whole (DraggableWindow / AirModalDialog `handheldScale`, see fitHandheldFrame):
+ * down to a readable minimum, and panned with a finger where they still do not fit. Scoped to :root[data-handheld];
+ * the narrow-viewport fallbacks of their own stylesheets (which squeeze them and scroll inside) are switched off here,
+ * since the whole frame is scaled instead.
+ */
+
+/* ---------------------------------------------------------------- achievements */
+
+:root[data-handheld] .octane-card-shell.octane-achievements-air,
+:root[data-handheld] .draggable-window:has(> .octane-achievements-air) {
+    width: 389px !important;
+    min-width: 389px !important;
+    max-width: 389px !important;
+}
+
+:root[data-handheld] .draggable-window[data-handheld-window='scaled']:has(> .octane-achievements-air) {
+    width: max-content !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+
+/* Panned, the window is the usable area's width (the inline size DraggableWindow gives it, which the narrow-screen
+   rule of AchievementsView.css would otherwise override with its !important width). */
+:root[data-handheld] .draggable-window[data-handheld-pan]:has(> .octane-achievements-air) {
+    width: calc(100vw - var(--octane-safe-left) - var(--octane-safe-right)) !important;
+}
+
+:root[data-handheld] .octane-achievements-air .air-achievements-content.octane-card-content-shell {
+    overflow: hidden;
+}
+
+/* ---------------------------------------------------------------- talent track lists */
+
+/* The list rows follow a finger dragged up and down (RewardTrackScrollList, which the talent track draws its lists with);
+   a sideways drag pans the window. The reward track itself has its own phone layout (HandheldRewardTrack.css). */
+:root[data-handheld] .octane-reward-track-scroll-viewport {
+    touch-action: pan-x;
+}
+
+/* The lift of the custom scrollbar is dragged on its own; the browser must not pan the window with it. */
+:root[data-handheld] .octane-reward-track-scrollbar-lift {
+    touch-action: none;
+}
+
+/* ---------------------------------------------------------------- talent track (an AIR modal dialog) */
+
+:root[data-handheld] .octane-air-modal[data-handheld-pan] {
+    /* Centred with auto margins instead, which fall back to the start edge when the frame is bigger than the screen. */
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-air-modal[data-handheld-pan] > .octane-air-modal__window {
+    margin: auto;
+}
+
+:root[data-handheld] .octane-air-modal__window[data-handheld-scaled] {
+    flex: none;
+    max-height: none;
+    zoom: var(--octane-handheld-scale, 1);
+}
+
+/* ---------------------------------------------------------------- guide tool */
+
+/* The helper windows have no width of their own (they follow their text), which a phone would stretch across the
+   screen and then draw smaller. Here they are AIR's 282 px, so DraggableWindow can draw them bigger (handheldMaxScale)
+   until they fill the phone's width; the chat of a running session keeps a fixed height and scrolls inside. */
+:root[data-handheld] .draggable-window > .octane-guide-tool {
+    width: 282px !important;
+    max-width: none !important;
+    /* Taller than a flat phone: the whole window is panned, instead of a second scroll inside it. */
+    max-height: none !important;
+}
+
+:root[data-handheld] .octane-guide-tool .chat-messages {
+    flex: none;
+    height: 190px;
+}
+
+:root[data-handheld] .octane-guide-tool .chat-messages > * {
+    flex: 1 1 auto;
+    min-height: 0;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-guide-tool textarea.request-message {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 64px;
+}
+
+/* The underlined links (cancel, skip, "I cannot decide") and the three ticket boxes get a finger's height around them. */
+:root[data-handheld] .octane-guide-tool .octane-card-content-shell :is(.octane-guardian-link, button.underline) {
+    min-height: 30px;
+}
+
+:root[data-handheld] .octane-guide-tool .octane-checkbox {
+    position: relative;
+}
+
+:root[data-handheld] .octane-guide-tool .octane-checkbox::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+}
+
+/* A field is 16 px on screen whatever the window is scaled to, so mobile Safari does not zoom into it. The guide tool
+   sets its field size with an important rule in the base layer (GuideTool.css), hence the same here. */
+@layer base {
+    :root[data-handheld] .octane-guide-tool .octane-card-content-shell :where(input, textarea) {
+        font-size: calc(16px / var(--octane-handheld-scale, 1)) !important;
+    }
+}
+
+/* ---------------------------------------------------------------- collectibles */
+
+/* The hub (500 x 600) and the reward box (424 x 570) are pixel layouts too: on a narrow screen their own stylesheet
+   squeezes the frame to the viewport, which cuts the level, the balances and the last tabs off. A phone keeps the
+   frame whole and DraggableWindow draws it smaller; what is still taller than a flat phone is panned. */
+:root[data-handheld] .draggable-window > :is(.octane-collectibles-hub, .octane-collectibles-reward-box) {
+    max-width: none !important;
+    max-height: none !important;
+}
+
+:root[data-handheld] :is(.octane-collectibles-hub-content, .octane-collectibles-reward-box-content) {
+    max-height: none;
+}
+
+/* ---------------------------------------------------------------- group forums */
+
+/* The forum windows are pixel layouts of 550 / 455 / 350 px. Squeezed to the screen's width their rows lose the
+   message counts and the links at the right edge, so a phone keeps the frame whole: DraggableWindow draws it smaller
+   and what is still wider or taller than the screen is panned. */
+:root[data-handheld] .draggable-window > .octane-forum {
+    max-width: none !important;
+    max-height: none !important;
+}
+
+/* Fields are 16 px on screen whatever the window is scaled to, so mobile Safari does not zoom into them (the field
+   carries its AIR text size inline, hence the important size). */
+:root[data-handheld] .octane-forum :is(input, textarea).octane-group-native__input {
+    font-size: calc(16px / var(--octane-handheld-scale, 1)) !important;
+}
+
+/* ---------------------------------------------------------------- talent dialogs */
+
+/* The level-up card is 430 px of fixed layout: kept whole and drawn smaller, instead of squeezed to the screen with its
+   reward plates hanging out. The talent track itself has its own phone layout (HandheldTalent.css). */
+:root[data-handheld] .draggable-window > .octane-talent-levelup {
+    width: 430px !important;
+    max-width: none !important;
+    max-height: none !important;
+}
+
+:root[data-handheld] :is(.octane-talent-dialog, .octane-talent-levelup) .octane-talent-button {
+    min-height: 40px;
+}
+
+:root[data-handheld] .octane-talent-dialog__decline {
+    min-height: 36px;
+}

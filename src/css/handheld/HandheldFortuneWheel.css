@@ -1,0 +1,780 @@
+/*
+ * The wheel of fortune on a phone (HandheldFortuneWheelView, HandheldFortuneWheelSettingsView), in the Octane handheld
+ * look (HandheldTokens.css) inside the shared sheet (HandheldSheet.css). Upright: the wheel as wide as the screen, the
+ * green Spin button and the spins left under it, buying a spin, the prizes as cards and the recent winners, all in one
+ * scrolling page. On its side: the wheel at the left as high as the sheet, the rest scrolling at the right. The wheel
+ * itself keeps its own look (FortuneWheelView.css) and is only scaled. The win is a card in the middle of the sheet; the
+ * staff settings are a page with Back and a bar with Cancel / Save. Everything is scoped to :root[data-handheld].
+ */
+
+/* ---------------------------------------------------------------- frame */
+
+/* The body is not the containing block of the pages: the covered wheel page and the win card are laid over the whole
+   sheet (the win card dims the header too). */
+:root[data-handheld] .octane-handheld-wheel .octane-handheld-sheet__body {
+    position: static;
+    padding: 0;
+}
+
+:root[data-handheld] .octane-handheld-wheel .octane-handheld-sheet__mark {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+}
+
+:root[data-handheld] .octane-handheld-wheel__page {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 0;
+}
+
+:root[data-handheld] .octane-handheld-wheel__page.is-wheel {
+    gap: var(--hh-space-3);
+    padding: var(--hh-space-2) var(--hh-space-3) var(--hh-space-4);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Under the settings page the wheel stays drawn (hidden, not removed), so a spin that runs ends and lands. */
+:root[data-handheld] .octane-handheld-wheel__page.is-wheel[data-covered='true'] {
+    position: absolute;
+    inset: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- the wheel */
+
+/* The box FortuneWheelView measures: its width (and on its side its height) decides the wheel's scale. */
+:root[data-handheld] .octane-handheld-wheel__stage {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    /* Room for the pointer, which stands a little above the rim. */
+    padding-top: var(--hh-space-3);
+    background: radial-gradient(closest-side, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.35) 70%, rgba(255, 255, 255, 0) 100%);
+}
+
+:root[data-handheld] .octane-handheld-wheel__stage-box {
+    position: relative;
+    flex: none;
+}
+
+/* ---------------------------------------------------------------- spin and spins */
+
+:root[data-handheld] .octane-handheld-wheel__side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-wheel__spin {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 56px;
+    padding: 0 var(--hh-space-4);
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-primary);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        0 0 0 1px var(--hh-air-green-border),
+        var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+    transition:
+        transform var(--hh-fast) var(--hh-ease),
+        opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-wheel__spin:active:not(:disabled) {
+    background: var(--hh-primary-pressed);
+    transform: translateY(1px);
+}
+
+:root[data-handheld] .octane-handheld-wheel__spin:disabled {
+    background: var(--hh-air-box);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    color: var(--hh-air-text-muted);
+    cursor: default;
+    text-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-wheel__spins {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-wheel__count {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+    min-height: var(--hh-touch);
+    padding: var(--hh-space-1) var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-wheel__count-label {
+    min-width: 0;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 15px;
+}
+
+:root[data-handheld] .octane-handheld-wheel__count-value {
+    flex: none;
+    min-width: 28px;
+    padding: 0 var(--hh-space-2);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 28px;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-wheel__note {
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    text-align: center;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+:root[data-handheld] .octane-handheld-wheel__actions {
+    display: flex;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-wheel__button {
+    display: flex;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-4);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-blue-header);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-wheel__button:active:not(:disabled) {
+    background: var(--hh-air-track-active);
+}
+
+:root[data-handheld] .octane-handheld-wheel__button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+:root[data-handheld] .octane-handheld-wheel__button.is-buy {
+    flex-grow: 2;
+    justify-content: space-between;
+}
+
+:root[data-handheld] .octane-handheld-wheel__button.is-settings {
+    flex: 0 1 auto;
+}
+
+/* The price: a pill with the currency icon. */
+:root[data-handheld] .octane-handheld-wheel__cost {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-1);
+    height: 28px;
+    padding: 0 var(--hh-space-2) 0 var(--hh-space-3);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-cream);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-wheel__button.is-save {
+    border: 0;
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-wheel__button.is-save:active:not(:disabled) {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld] .octane-handheld-wheel__button.is-save:disabled {
+    background: var(--hh-air-box);
+    box-shadow: none;
+    color: var(--hh-air-text-muted);
+    opacity: 1;
+}
+
+/* ---------------------------------------------------------------- prizes and winners */
+
+:root[data-handheld] .octane-handheld-wheel__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-wheel__heading {
+    padding: var(--hh-space-1) var(--hh-space-1) 0;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-wheel__prizes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--hh-space-2);
+}
+
+/* A prize card wears its slice's colour (--wheel-prize-slice) on its left edge and round its picture. */
+:root[data-handheld] .octane-handheld-wheel__prize {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 60px;
+    padding: var(--hh-space-1) var(--hh-space-3) var(--hh-space-1) var(--hh-space-2);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow:
+        inset 5px 0 0 var(--wheel-prize-slice),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-wheel__prize[data-tier='rare'] {
+    background: linear-gradient(180deg, var(--hh-air-white) 0%, var(--hh-air-track-tip) 100%);
+}
+
+:root[data-handheld] .octane-handheld-wheel__prize-icon {
+    display: flex;
+    flex: 0 0 48px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-left: var(--hh-space-1);
+    overflow: hidden;
+    border: 3px solid var(--wheel-prize-slice);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+}
+
+:root[data-handheld] .octane-handheld-wheel__prize-label {
+    display: -webkit-box;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 16px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+:root[data-handheld] .octane-handheld-wheel__prize[data-tier='rare'] .octane-handheld-wheel__prize-label {
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-wheel__prize[data-tier='none'] .octane-handheld-wheel__prize-label {
+    color: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-handheld-wheel__winners {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-wheel__winner {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-height: 56px;
+    padding: var(--hh-space-1) var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-wheel__winner + .octane-handheld-wheel__winner {
+    border-top: 1px solid var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-wheel__winner-head {
+    display: flex;
+    flex: 0 0 40px;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-wheel__winner-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-wheel__winner-name {
+    overflow: hidden;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 17px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-wheel__winner-prize {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-1);
+    min-width: 0;
+    color: var(--hh-air-green-deep);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-wheel__winner-prize > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-wheel__empty {
+    padding: var(--hh-space-4) var(--hh-space-3);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+    text-align: center;
+}
+
+/* ---------------------------------------------------------------- the win */
+
+:root[data-handheld] .octane-handheld-wheel .wheel-win-reveal.is-handheld {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    gap: var(--hh-space-3);
+    padding: var(--hh-space-4);
+    background: rgba(14, 63, 82, 0.62);
+}
+
+:root[data-handheld] .octane-handheld-wheel .wheel-win-reveal.is-handheld.is-rare {
+    background: rgba(14, 63, 82, 0.78);
+}
+
+:root[data-handheld] .octane-handheld-wheel .wheel-win-reveal.is-handheld .wheel-win-card {
+    flex-direction: column;
+    box-sizing: border-box;
+    width: min(300px, 100%);
+    min-height: 0;
+    gap: var(--hh-space-3);
+    padding: var(--hh-space-4);
+    border: 0;
+    border-image-source: none;
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-panel);
+    box-shadow: var(--hh-shadow-float);
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-wheel .wheel-win-reveal.is-handheld .wheel-win-card.is-rare {
+    box-shadow:
+        0 0 0 3px var(--hh-air-count-yellow),
+        var(--hh-shadow-float);
+}
+
+:root[data-handheld] .octane-handheld-wheel .wheel-win-reveal.is-handheld .wheel-win-icon {
+    width: 96px;
+    height: 96px;
+}
+
+:root[data-handheld] .octane-handheld-wheel .wheel-win-reveal.is-handheld .wheel-win-card.is-quiet .wheel-win-icon {
+    width: 72px;
+    height: 72px;
+}
+
+:root[data-handheld] .octane-handheld-wheel .wheel-win-reveal.is-handheld .wheel-win-copy {
+    flex: none;
+    width: 100%;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-wheel .wheel-win-reveal.is-handheld .wheel-win-title {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    line-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-wheel .wheel-win-reveal.is-handheld .wheel-win-prize {
+    margin-top: var(--hh-space-1);
+    color: var(--hh-air-green-deep);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    line-height: 22px;
+    white-space: normal;
+}
+
+:root[data-handheld] .octane-handheld-wheel .wheel-win-reveal.is-handheld .wheel-win-jackpot {
+    font-size: var(--hh-size-xl);
+}
+
+:root[data-handheld] .octane-handheld-wheel__reveal-ok {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 48px;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    transition: transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-wheel__reveal-ok:active {
+    background: var(--hh-primary-pressed);
+    transform: translateY(1px);
+}
+
+/* ---------------------------------------------------------------- staff settings */
+
+:root[data-handheld] .octane-handheld-wheel__page.is-settings {
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-height: 0;
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__head {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-2) var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-wheel__back {
+    display: inline-flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-1);
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-4) 0 var(--hh-space-2);
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-wheel__back:active {
+    background: var(--hh-air-track-active);
+}
+
+:root[data-handheld] :is(.octane-handheld-wheel__back, .octane-handheld-wheel-settings__remove) svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__title {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__list {
+    display: grid;
+    flex: 1 1 0;
+    align-content: start;
+    gap: var(--hh-space-3);
+    min-height: 0;
+    padding: var(--hh-space-1) var(--hh-space-3) var(--hh-space-4);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-wheel-settings__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__card {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--hh-space-2) var(--hh-space-3);
+    min-width: 0;
+    padding: var(--hh-space-2) var(--hh-space-3) var(--hh-space-3);
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__card-head {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__card-title {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__remove {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-dismiss);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    transition: transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__remove:active {
+    transform: scale(0.94);
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__field.is-wide {
+    grid-column: 1 / -1;
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__label {
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+}
+
+/* Fields: 44 px and 16 px text, so the phone does not zoom into them. */
+:root[data-handheld] .octane-handheld-wheel-settings .octane-handheld-wheel-settings__input {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: none;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+    line-height: 20px;
+    text-align: left;
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings .octane-handheld-wheel-settings__input:focus {
+    border-color: var(--hh-air-blue-deep);
+    outline: none;
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings .octane-handheld-wheel-settings__input:disabled {
+    background: var(--hh-air-cream);
+    color: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-select-trigger.octane-handheld-wheel-settings__input {
+    padding-right: 36px;
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-select-trigger.octane-handheld-wheel-settings__input::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    box-sizing: border-box;
+    width: 8px;
+    height: 8px;
+    margin-top: -6px;
+    border: solid var(--hh-air-blue);
+    border-width: 0 2.5px 2.5px 0;
+    border-radius: 1px;
+    pointer-events: none;
+    transform: rotate(45deg);
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__add {
+    display: flex;
+    grid-column: 1 / -1;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    height: var(--hh-touch);
+    border: 2px dashed var(--hh-air-blue-light);
+    border-radius: var(--hh-radius-m);
+    background: transparent;
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__add:active:not(:disabled) {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__add:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__bar {
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-2) var(--hh-space-3) var(--hh-space-3);
+    border-top: 1px solid var(--hh-air-box);
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-wheel-settings__bar .octane-handheld-wheel__button {
+    height: 48px;
+}
+
+/* ---------------------------------------------------------------- on its side */
+
+/* The wheel at the left, as high as the sheet; the button, the spins, the prizes and the winners scroll at the right. */
+:root[data-handheld='landscape'] .octane-handheld-wheel__page.is-wheel {
+    display: grid;
+    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+    gap: var(--hh-space-4);
+    padding: 0 0 0 var(--hh-space-3);
+    overflow: hidden;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-wheel__stage {
+    height: 100%;
+    min-height: 0;
+    padding-bottom: var(--hh-space-2);
+    overflow: hidden;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-wheel__side {
+    min-height: 0;
+    padding: var(--hh-space-3) var(--hh-space-3) var(--hh-space-4) 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ---------------------------------------------------------------- the prize pictures */
+
+/* The amounts on the plates are drawn a little bigger than on the desktop, so they still read when the wheel is scaled
+   down to a narrow phone. */
+:root[data-handheld] .octane-handheld-wheel .is-small .wheel-prize-amount {
+    font-size: var(--hh-size-l);
+}
+
+:root[data-handheld] .octane-handheld-wheel .is-large .wheel-prize-amount {
+    font-size: var(--hh-size-xl);
+}

@@ -5,6 +5,7 @@ import hcSmallSrc from '../../../assets/images/avatareditor/air/hc-small.png';
 import { LayoutCurrencyIcon } from '../../../common';
 import { useAvatarEditor } from '../../../hooks';
 import { useOctaneEvent } from '../../../hooks/events';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
 import { InfiniteGrid } from '../../../layout';
 import { AvatarEditorIcon } from '../AvatarEditorIcon';
 
@@ -22,6 +23,8 @@ export const AvatarEditorFigureSetItemView: FC<
     const [loadingState, setLoadingState] = useState<{ partKey: string; isLoading: boolean }>(null);
     const { selectedColorParts = null, getFigureStringWithFace = null } = useAvatarEditor();
     const selectedColors = selectedColorParts?.[setType] ?? null;
+    // Phone layout: the tile has its own class, so the AIR tile's rules (and their !important) do not reach it.
+    const isHandheld = useIsHandheld();
 
     const clubLevel = partItem.partSet?.clubLevel ?? 0;
     const isHC = !GetConfigurationValue<boolean>('hc.disabled', false) && clubLevel > 0;
@@ -109,7 +112,7 @@ export const AvatarEditorFigureSetItemView: FC<
     return (
         <InfiniteGrid.Item
             itemActive={isSelected}
-            className={`avatar-parts mx-auto${isHead ? ' is-head' : ''}${showLoading ? ' is-loading' : ''}${isSelected ? ' part-selected' : ''}${!partItem.isClear && isSellableNotOwned ? ' pet-sellable-locked' : ''}`}
+            className={`${isHandheld ? 'octane-handheld-looks__part' : 'avatar-parts mx-auto'}${isHead ? ' is-head' : ''}${showLoading ? ' is-loading' : ''}${isSelected ? ' part-selected' : ''}${!partItem.isClear && isSellableNotOwned ? ' pet-sellable-locked' : ''}`}
             {...rest}
         >
             {!partItem.isClear && assetUrl && (

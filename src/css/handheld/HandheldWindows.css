@@ -1,0 +1,192 @@
+/*
+ * Phone layout, stage 4: putting a room-working window aside and the windows that reflow (room settings,
+ * the floor plan import / export). The fixed-layout windows (wired boxes, furni windows, group and moderator frames, the camera) are
+ * drawn smaller or bigger as a whole by DraggableWindow (`handheldScale` / `handheldMaxScale`) and need no rules of their own here.
+ * Every selector is scoped to :root[data-handheld].
+ */
+
+/* ---------------------------------------------------------------- a window put aside */
+
+/* Hidden but still mounted, so its settings and picks are kept while the room is used. */
+:root[data-handheld] .draggable-window[data-handheld-peeked] {
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* The "show the room" button in the window's top-left corner. It is drawn at the screen's size, whatever the window is scaled to,
+   and is no part of the window's own layout (the sheet and scaled rules size every other child). */
+:root[data-handheld] .draggable-window[data-handheld-window] > .octane-handheld-peek-button {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    z-index: 30;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0;
+    padding: 0;
+    zoom: 1;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: var(--octane-handheld-accent);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+}
+
+/* The larger touch target around it. */
+:root[data-handheld] .draggable-window[data-handheld-window] > .octane-handheld-peek-button::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+}
+
+/* A downward chevron over a bar: the window goes down, the room comes up. */
+:root[data-handheld] .octane-handheld-peek-button__icon {
+    position: relative;
+    display: block;
+    width: 12px;
+    height: 12px;
+    margin-top: -4px;
+    border-right: 3px solid #ffffff;
+    border-bottom: 3px solid #ffffff;
+    transform: rotate(45deg);
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-peek-bar {
+    position: fixed;
+    top: calc(var(--octane-safe-top) + 6px);
+    left: 50%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+    max-width: calc(100vw - 16px - var(--octane-safe-left) - var(--octane-safe-right));
+    min-height: 48px;
+    padding: 4px 4px 4px 14px;
+    transform: translateX(-50%);
+    border: 1px solid var(--octane-handheld-line);
+    border-radius: 24px;
+    background: var(--octane-handheld-panel);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+}
+
+:root[data-handheld] .octane-handheld-peek-bar__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-peek-bar__label {
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+:root[data-handheld] .octane-handheld-peek-bar__hint {
+    font-size: 12px;
+    line-height: 16px;
+    opacity: 0.85;
+}
+
+:root[data-handheld] .octane-handheld-peek-bar__button {
+    flex: none;
+    min-width: 44px;
+    min-height: 40px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 20px;
+    background: var(--octane-handheld-accent);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- reflowing windows */
+
+/* Room settings fills the sheet instead of its 341 x 520 desktop box. */
+:root[data-handheld] .draggable-window[data-handheld-window='sheet'] > .octane-room-settings {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+:root[data-handheld] .octane-room-settings :is(input:not([type='checkbox']):not([type='radio']), textarea),
+:root[data-handheld] .draggable-window[data-window-key='floorplan-import-export'] textarea {
+    font-size: 16px;
+}
+
+:root[data-handheld] .octane-room-settings .octane-card-tab-item,
+:root[data-handheld] .octane-room-settings :is(.octane-button, button.btn) {
+    min-height: 36px;
+}
+
+/* ---------------------------------------------------------------- account, translation and Discord settings */
+
+/* Octane's own small windows (no pixel layout): they already follow the phone's width. Their fields are 16 px so mobile
+   Safari does not zoom into them, and their buttons, eye toggles and drop-downs are finger-sized. The account window sets
+   its text size with an important rule in the base layer (UserSettingsView.css), hence the same for its fields here. */
+@layer base {
+    :root[data-handheld] .user-account-settings__content input {
+        font-size: 16px !important;
+    }
+}
+
+:root[data-handheld] .user-account-settings__content input {
+    height: 44px;
+}
+
+/* The way back to the account menu. */
+:root[data-handheld] .user-account-settings__content button.rounded-full {
+    flex: none;
+    width: 40px;
+    height: 40px;
+}
+
+/* Show / hide password: the eye keeps its place at the field's end and takes the field's whole height. */
+:root[data-handheld] .user-account-settings__content .relative > button.absolute {
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+}
+
+:root[data-handheld] .user-account-settings__content :is(.habbo-btn-primary, .habbo-btn-secondary) {
+    height: 40px;
+}
+
+:root[data-handheld] .translation-settings-window .octane-select-trigger {
+    min-height: 40px;
+}
+
+:root[data-handheld] .translation-settings-window .translation-settings-window__refresh {
+    min-width: 80px;
+    height: 40px;
+}
+
+:root[data-handheld] .translation-settings-window .octane-checkbox {
+    position: relative;
+}
+
+:root[data-handheld] .translation-settings-window .octane-checkbox::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+}
+
+:root[data-handheld] .discord-settings-window .discord-settings-server-link {
+    min-height: 40px;
+}

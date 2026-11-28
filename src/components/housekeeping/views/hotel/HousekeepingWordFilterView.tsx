@@ -2,6 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { FaFilter, FaPlus, FaSearch, FaSync, FaTrash } from 'react-icons/fa';
 import { HOUSEKEEPING_WORDFILTER_REPLACEMENT_MAX, HousekeepingApi, housekeepingFailureKey, IHousekeepingList, LocalizeText } from '../../../../api';
 import { useHousekeeping, useHousekeepingConfirm } from '../../../../hooks';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 import { HOUSEKEEPING_INPUT_CLASS, HousekeepingButton, HousekeepingEmptyState, HousekeepingPill, HousekeepingSection } from '../common/HousekeepingParts';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
@@ -20,6 +21,7 @@ export const HousekeepingWordFilterView: FC = () => {
     const [search, setSearch] = useState('');
     const [word, setWord] = useState('');
     const [replacement, setReplacement] = useState('');
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         const controller = new AbortController();
@@ -132,7 +134,49 @@ export const HousekeepingWordFilterView: FC = () => {
                 {!error && !list && isLoading && <HousekeepingEmptyState>{LocalizeText('generic.loading')}</HousekeepingEmptyState>}
                 {!error && list && rows.length === 0 && <HousekeepingEmptyState>{LocalizeText('housekeeping.hotel.wordfilter.empty')}</HousekeepingEmptyState>}
 
-                {!error && rows.length > 0 && (
+                {!error && rows.length > 0 && isHandheld && (
+                    <div className="octane-handheld-hk__cards" data-testid="hk-wordfilter-cards">
+                        {rows.map((row) => {
+                            const entry = cell(row, 'word');
+                            const flags = ['hide', 'report', 'prefix'].filter((flag) => cell(row, flag) === '1');
+                            const mute = parseInt(cell(row, 'mute')) || 0;
+
+                            return (
+                                <div key={entry} className="octane-handheld-hk__card is-static is-row">
+                                    <span className="octane-handheld-hk__card-main">
+                                        <span className="octane-handheld-hk__card-title">{entry}</span>
+                                        <span className="octane-handheld-hk__card-body">{`${LocalizeText('housekeeping.hotel.wordfilter.column.replacement')}: ${cell(row, 'replacement') || '-'}`}</span>
+                                        {(flags.length > 0 || mute > 0) && (
+                                            <span className="octane-handheld-hk__chips">
+                                                {flags.map((flag) => (
+                                                    <HousekeepingPill key={flag} tone="warning">
+                                                        {LocalizeText(`housekeeping.hotel.wordfilter.flag.${flag}`)}
+                                                    </HousekeepingPill>
+                                                ))}
+                                                {mute > 0 && (
+                                                    <HousekeepingPill tone="danger">
+                                                        {LocalizeText('housekeeping.hotel.wordfilter.flag.mute', ['minutes'], [String(mute)])}
+                                                    </HousekeepingPill>
+                                                )}
+                                            </span>
+                                        )}
+                                    </span>
+                                    <BaseButton
+                                        aria-label={`${LocalizeText('housekeeping.hotel.wordfilter.remove')} ${entry}`}
+                                        className="octane-handheld-hk__icon-button is-danger"
+                                        disabled={isActionPending}
+                                        type="button"
+                                        onClick={() => remove(entry)}
+                                    >
+                                        <FaTrash size={14} />
+                                    </BaseButton>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+
+                {!error && rows.length > 0 && !isHandheld && (
                     <div className="max-h-[260px] overflow-auto rounded border border-zinc-200 bg-white">
                         <table className="w-full border-collapse text-[11px]">
                             <thead className="sticky top-0 bg-zinc-100">

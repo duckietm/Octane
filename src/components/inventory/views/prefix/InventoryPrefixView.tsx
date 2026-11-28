@@ -5,6 +5,8 @@ import { GetNickIconUrl } from '../../../../assets/images/user_custom/nick_icons
 import { ClassicScrollAreaView } from '../../../../common/scroll-area/ClassicScrollAreaView';
 import { useInventoryNickIcons, useInventoryPrefixes, useNotification } from '../../../../hooks';
 import { OctaneButton } from '../../../../layout';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldInventorySelectionView } from '../HandheldInventorySelectionView';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryCategoryLoadingView } from '../InventoryCategoryLoadingView';
 import { TabBar, TabBarTab } from '../../../../common/TabBar';
@@ -76,6 +78,7 @@ export const InventoryPrefixView: FC<{}> = () => {
         deactivate: deactivateNickIcons = null
     } = useInventoryNickIcons();
     const { showConfirm = null } = useNotification();
+    const isHandheld = useIsHandheld();
     const selectedIconUrl = useMemo(() => (selectedNickIcon ? GetNickIconUrl(selectedNickIcon.iconKey) : ''), [selectedNickIcon]);
 
     const attemptDeletePrefix = () => {
@@ -143,6 +146,38 @@ export const InventoryPrefixView: FC<{}> = () => {
                             desc={localizeWithFallback('inventory.empty.prefixes.desc', 'Prefixes you buy show up here.')}
                             title={localizeWithFallback('inventory.empty.prefixes.title', 'You have no prefixes')}
                         />
+                    ) : isHandheld ? (
+                        <div className="octane-handheld-inv__pane is-prefixes">
+                            <div className="octane-handheld-inv__gridbox">
+                                <div className="octane-handheld-inv__grid is-wide">
+                                    {prefixes.map((prefix: IPrefixItem) => (
+                                        <BaseButton
+                                            key={prefix.id}
+                                            className={cellClass(selectedPrefix?.id === prefix.id, !!prefix.active)}
+                                            onClick={() => setSelectedPrefix(prefix)}
+                                        >
+                                            <PrefixPreview color={prefix.color} effect={prefix.effect} font={prefix.font} icon={prefix.icon} text={prefix.text} />
+                                        </BaseButton>
+                                    ))}
+                                </div>
+                            </div>
+                            {selectedPrefix && (
+                                <HandheldInventorySelectionView
+                                    actions={[{ key: 'delete', label: deleteLabel, danger: true, disabled: !!selectedPrefix.active, onClick: attemptDeletePrefix }]}
+                                    meta={selectedPrefix.active ? activeLabel : ''}
+                                    name={`{${selectedPrefix.text}}`}
+                                    preview={
+                                        <PrefixPreview className="is-large" color={selectedPrefix.color} effect={selectedPrefix.effect} font={selectedPrefix.font} icon={selectedPrefix.icon} text={selectedPrefix.text} />
+                                    }
+                                    primary={{
+                                        key: 'activate',
+                                        label: selectedPrefix.active ? deactivateLabel : activateLabel,
+                                        onClick: () => (selectedPrefix.active ? deactivatePrefix() : activatePrefix(selectedPrefix.id))
+                                    }}
+                                    thumb={<span className="octane-handheld-inv__thumb-glyph">{selectedPrefix.icon || '{ }'}</span>}
+                                />
+                            )}
+                        </div>
                     ) : (
                         <div className="octane-inventory-animals is-prefixes">
                             <div className="octane-inventory-animal-grid">
@@ -208,6 +243,34 @@ export const InventoryPrefixView: FC<{}> = () => {
                             onAction={() => CreateLinkEvent('customize/show')}
                             title={localizeWithFallback('inventory.empty.nickicons.title', 'You have no icons')}
                         />
+                    ) : isHandheld ? (
+                        <div className="octane-handheld-inv__pane is-prefixes">
+                            <div className="octane-handheld-inv__gridbox">
+                                <div className="octane-handheld-inv__grid">
+                                    {nickIcons.map((icon) => (
+                                        <BaseButton
+                                            key={icon.id}
+                                            className={cellClass(selectedNickIcon?.id === icon.id, !!icon.active)}
+                                            onClick={() => setSelectedNickIcon(icon)}
+                                        >
+                                            {GetNickIconUrl(icon.iconKey) && <img alt={icon.displayName || icon.iconKey} className="octane-inventory-identity-icon" src={GetNickIconUrl(icon.iconKey)} />}
+                                        </BaseButton>
+                                    ))}
+                                </div>
+                            </div>
+                            {selectedNickIcon && (
+                                <HandheldInventorySelectionView
+                                    meta={selectedNickIcon.active ? activeLabel : ''}
+                                    name={selectedNickIcon.displayName || selectedNickIcon.iconKey}
+                                    primary={{
+                                        key: 'activate',
+                                        label: selectedNickIcon.active ? deactivateLabel : activateLabel,
+                                        onClick: () => (selectedNickIcon.active ? deactivateNickIcon() : activateNickIcon(selectedNickIcon.id))
+                                    }}
+                                    thumb={selectedIconUrl ? <img alt="" className="octane-inventory-identity-icon" src={selectedIconUrl} /> : null}
+                                />
+                            )}
+                        </div>
                     ) : (
                         <div className="octane-inventory-animals is-prefixes">
                             <div className="octane-inventory-animal-grid">

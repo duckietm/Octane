@@ -7,6 +7,7 @@ import { LayoutAvatarImageView } from '../../common';
 import { useAvatarEditor } from '../../hooks';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
 
 const SLOTS_PER_COL = 7;
 const HC_SLOT_LIMIT = 5;
@@ -71,6 +72,48 @@ export const AvatarEditorWardrobeView: FC<{}> = () => {
         },
         [gender, getFigureString, setSavedFigures, slots]
     );
+
+    // Phone layout: every slot is a card with its look and two labelled buttons (HandheldLooks.css).
+    const isHandheld = useIsHandheld();
+
+    if (isHandheld) {
+        const saveLabel = LocalizeText('avatareditor.wardrobe.save');
+        const wearLabel = LocalizeText('widget.generic_usable.button.use');
+
+        return (
+            <NativeTextTree>
+                <section className="octane-handheld-looks__wardrobe" aria-label={LocalizeText('avatareditor.wardrobe.title')}>
+                    <div className="octane-handheld-looks__gallery-head">
+                        <b>{LocalizeText('avatareditor.wardrobe.title')}</b>
+                        <img src={hcIconSrc} alt="" draggable={false} />
+                    </div>
+                    <div className="octane-handheld-looks__slots">
+                        {slots.map(([figureContainer, slotGender], index) => {
+                            const enabled = isWardrobeSlotEnabled(index + 1);
+
+                            return (
+                                <div key={index} className={`octane-handheld-looks__slot${enabled ? '' : ' is-locked'}`}>
+                                    <div className="octane-handheld-looks__slot-figure">
+                                        {figureContainer ? (
+                                            <LayoutAvatarImageView direction={4} figure={figureContainer.getFigureString()} gender={slotGender} fit small />
+                                        ) : (
+                                            <img src={emptySlotSrc} alt="" draggable={false} />
+                                        )}
+                                    </div>
+                                    <BaseButton className="octane-handheld-looks__slot-button is-wear" disabled={!enabled || !figureContainer} onClick={() => wearFigureAtIndex(index)}>
+                                        {wearLabel}
+                                    </BaseButton>
+                                    <BaseButton className="octane-handheld-looks__slot-button" disabled={!enabled} onClick={() => saveFigureAtWardrobeIndex(index)}>
+                                        {saveLabel}
+                                    </BaseButton>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </section>
+            </NativeTextTree>
+        );
+    }
 
     return (
         <NativeTextTree>

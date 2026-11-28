@@ -24,6 +24,8 @@ import { flatText, GroupText } from '../GroupNativeLayout';
 import { forumMessageLook, MESSAGE_DELETED_BY_STAFF, MESSAGE_HIDDEN_BY_ADMIN, MESSAGE_VISIBLE, newForumMessageIds } from './forumMessageLook';
 import { FORUM_PAGE_SIZE, FORUM_SURFACE, ForumButton, ForumPager, forumAge, forumQuote, stripTags } from './GroupForumLayout';
 import { forumPermissionText } from './GroupForumThreadListView';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldGroupForumThreadView } from './HandheldGroupForumThreadView';
 
 const ITEM_WIDTH = 515;
 
@@ -146,7 +148,7 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = ({
 
         pendingScroll.current = 0;
 
-        const target = viewport.querySelectorAll<HTMLElement>('.octane-forum__message')[index];
+        const target = viewport.querySelectorAll<HTMLElement>('.octane-forum__message, [data-forum-message]')[index];
 
         if (target) viewport.scrollTop = target.offsetTop;
     }, [messages]);
@@ -176,6 +178,34 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = ({
         return isLocked && forumData?.moderatePermissionError ? forumPermissionText(forumData.moderatePermissionError, 'operation_post_in_locked') : '';
     };
     const statusText = getStatusText();
+    const isHandheld = useIsHandheld();
+
+    // Phone layout: the same messages, rights and handlers as cards of the phone sheet (HandheldGroupForumView).
+    if (isHandheld)
+        return (
+            <HandheldGroupForumThreadView
+                canModerate={canModerate}
+                canReply={canReply}
+                canReport={canReport}
+                isLocked={!!thread?.isLocked}
+                isPinned={!!thread?.isPinned}
+                isStaff={isStaff}
+                messages={messages}
+                newMessageIds={newMessageIds}
+                pageCount={pageCount}
+                pageIndex={pageIndex}
+                statusText={stripTags(statusText)}
+                subject={subject}
+                viewportRef={viewportRef}
+                onBack={onBack}
+                onModerate={moderate}
+                onPage={setPageIndex}
+                onProfile={(userId) => GetUserProfile(userId)}
+                onQuote={(message) => onReply(subject, quoteOf(message))}
+                onReply={() => onReply(subject)}
+                onReport={(message) => report(ReportType.MESSAGE, { groupId, threadId, messageId: message.messageId })}
+            />
+        );
 
     return (
         <>

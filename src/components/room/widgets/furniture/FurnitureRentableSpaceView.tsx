@@ -4,6 +4,7 @@ import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Te
 import { RENTABLE_SPACE_ERROR_TEXTS, useFurnitureRentableSpaceWidget } from '../../../../hooks';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 const errorText = (code: number) => {
     const entry = RENTABLE_SPACE_ERROR_TEXTS.get(code);
@@ -30,7 +31,7 @@ export const FurnitureRentableSpaceView: FC<{}> = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-widget-rentablespace" theme="primary-slim" uniqueKey="rentablespace">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} className="octane-widget-rentablespace" theme="primary-slim" uniqueKey="rentablespace">
                 <OctaneCardHeaderView headerText={localizeWithFallback('rentablespace.widget.title', 'For rent')} onCloseClick={onClose} />
                 <OctaneCardContentView>
                     {errorCode > 0 && (

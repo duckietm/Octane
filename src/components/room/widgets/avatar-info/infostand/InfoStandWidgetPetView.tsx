@@ -1,7 +1,10 @@
 import { CreateLinkEvent, GetRoomEngine, PetRespectComposer, PetType, RoomObjectCategory, RoomObjectOperationType } from '@octane/renderer';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, ReactNode, useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { FaArrowsAlt, FaBoxOpen, FaCookieBite, FaGraduationCap, FaPaw, FaRecycle, FaShoppingBasket, FaSyncAlt } from 'react-icons/fa';
 import { confirmCompostPlant, ConvertSeconds, GetConfigurationRecord, IsAnyRoomController, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button, Column, Flex, LayoutCounterTimeView, LayoutPetImageView, LayoutRarityLevelView, Text, UserProfileIconView } from '../../../../../common';
+import { HandheldDrawerAction, useHandheldDrawer } from '../../../../../common/handheld/HandheldInfoDrawer';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useNotification, useRoom, useSessionInfo } from '../../../../../hooks';
 import { InfoStandHeaderView } from './InfoStandHeaderView';
@@ -35,6 +38,23 @@ interface AvatarInfoPet {
     isOwner?: boolean;
     roomIndex?: number;
 }
+
+/** Phone drawer: the picture of each infostand button. */
+const BUTTON_ICONS: Record<string, ReactNode> = {
+    move: <FaArrowsAlt />,
+    rotate: <FaSyncAlt />,
+    buyfood: <FaShoppingBasket />,
+    train: <FaGraduationCap />,
+    treat: <FaCookieBite />,
+    compost: <FaRecycle />,
+    pick_up: <FaBoxOpen />,
+    respect: <FaPaw />
+};
+
+/** The pet menu already offers these, so the phone drawer (which shows that menu as buttons) takes them from there. */
+const MENU_ACTIONS = ['respect', 'treat', 'compost'];
+/** The menu of a pet that is being ridden leaves these out; any other pet's menu has them. */
+const MENU_ACTIONS_UNLESS_RIDDEN = ['train', 'pick_up'];
 
 interface InfoStandWidgetPetViewProps {
     avatarInfo: AvatarInfoPet;
@@ -196,6 +216,7 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = ({ avatar
     const [remainingTimeToLive, setRemainingTimeToLive] = useState(0);
     const { roomSession = null } = useRoom();
     const { showConfirm = null } = useNotification();
+    const drawer = useHandheldDrawer();
     const { petRespectRemaining = 0, respectPet = null } = useSessionInfo();
 
     useEffect(() => {
@@ -308,6 +329,8 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = ({ avatar
         }
     ];
 
+    const inDrawerMenu = (action: string) => MENU_ACTIONS.includes(action) || (MENU_ACTIONS_UNLESS_RIDDEN.includes(action) && !(avatarInfo as { rider?: boolean }).rider);
+
     if (!avatarInfo) return <Text variant="white">{LocalizeText('generic.loading')}</Text>;
 
     return (
@@ -332,16 +355,36 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = ({ avatar
                         </div>
                     </Column>
                 </Column>
-                <Flex gap={1} justifyContent="end">
-                    {buttons.map(
-                        (button) =>
-                            button.condition && (
-                                <Button key={button.action} variant="dark" onClick={() => processButtonAction(button.action)}>
+                {!drawer && (
+                    <Flex gap={1} justifyContent="end">
+                        {buttons.map(
+                            (button) =>
+                                button.condition && (
+                                    <Button key={button.action} variant="dark" onClick={() => processButtonAction(button.action)}>
+                                        {button.label}
+                                    </Button>
+                                )
+                        )}
+                    </Flex>
+                )}
+                {/* Phone drawer: the same buttons go to the head of its action grid, minus the ones its menu rows already are. */}
+                {drawer?.actionsSlot &&
+                    createPortal(
+                        buttons
+                            .filter((button) => button.condition && !inDrawerMenu(button.action))
+                            .map((button) => (
+                                <HandheldDrawerAction
+                                    key={button.action}
+                                    data-action={button.action}
+                                    icon={BUTTON_ICONS[button.action]}
+                                    tone={button.action === 'pick_up' || button.action === 'compost' ? 'danger' : undefined}
+                                    onClick={() => processButtonAction(button.action)}
+                                >
                                     {button.label}
-                                </Button>
-                            )
+                                </HandheldDrawerAction>
+                            )),
+                        drawer.actionsSlot
                     )}
-                </Flex>
             </Column>
         </NativeTextTree>
     );

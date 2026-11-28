@@ -1,0 +1,237 @@
+/*
+ * Phone build height (the toolbar's build height button), in the look of the phone build tools: the drawer shell
+ * (HandheldInfoDrawer, HandheldDrawer.css) as a low dark-glass panel over the toolbar strip, a card in the lower right
+ * corner on its side, so the room where the furni goes stays in view. HandheldBuildHeightView draws it and reuses the
+ * build tools' keys (`octane-handheld-build__key`); the panel itself carries `octane-handheld-build`, so the drawer
+ * rules for the build tools (no action grid, the corner card on its side) apply to it too. Scoped to :root[data-handheld].
+ */
+
+/* One column: the stepper row, the walking-underneath row, the two actions. */
+:root[data-handheld] .octane-handheld-build.octane-handheld-build-height {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: var(--hh-space-2);
+}
+
+/* The drawer's subtitle (what the tool does) stays on one line. */
+:root[data-handheld] .octane-handheld-drawer:has(.octane-handheld-build-height) .octane-handheld-drawer__subtitle {
+    overflow: hidden;
+    color: var(--hh-on-dark-muted);
+    font-size: var(--hh-size-s);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* The toolbar's icon, centred in the picture well. */
+:root[data-handheld] .octane-handheld-drawer:has(.octane-handheld-build-height) .octane-handheld-drawer__picture .octane-icon {
+    flex: none;
+    background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* ---------------------------------------------------------------- stepper */
+
+/* Down steps, the height, up steps: the height in the middle of the thumbs' reach. */
+:root[data-handheld] .octane-handheld-build-height__stepper {
+    display: grid;
+    grid-template-columns: var(--hh-touch) var(--hh-touch) minmax(64px, 1fr) var(--hh-touch) var(--hh-touch);
+    align-items: center;
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-build-height__stepper .octane-handheld-build__key {
+    font-size: var(--hh-size-l);
+}
+
+:root[data-handheld] .octane-handheld-build-height__stepper .octane-handheld-build__key:disabled {
+    opacity: 0.4;
+    cursor: default;
+    filter: none;
+    transform: none;
+}
+
+:root[data-handheld] .octane-handheld-build-height__stepper .octane-number-input {
+    min-width: 0;
+}
+
+/* The height, typed at 16 px so the phone does not zoom into it. */
+:root[data-handheld] .octane-handheld-drawer .octane-handheld-build-height__field,
+:root[data-handheld] .octane-handheld-drawer .octane-handheld-build-height__stepper input {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-1);
+    border: 1px solid var(--hh-hairline);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-hud-900);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-field);
+    font-weight: 700;
+    text-align: center;
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-drawer .octane-handheld-build-height__stepper input:focus {
+    border-color: var(--hh-air-select);
+    outline: none;
+}
+
+/* ---------------------------------------------------------------- walking underneath */
+
+:root[data-handheld] .octane-handheld-build-height__row {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-height: var(--hh-touch);
+    padding: var(--hh-space-1) var(--hh-space-3);
+    border: 1px solid var(--hh-hairline);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-well);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    line-height: 17px;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-build-height__row:active {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .octane-handheld-build-height__row[data-locked] {
+    cursor: default;
+}
+
+:root[data-handheld] .octane-handheld-build-height__row[data-locked] .octane-checkbox {
+    opacity: 0.5;
+}
+
+:root[data-handheld] .octane-handheld-build-height__row .octane-checkbox {
+    flex: none;
+}
+
+:root[data-handheld] .octane-handheld-build-height__row-text {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-build-height__hint {
+    color: var(--hh-on-dark-muted);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-s);
+    line-height: 15px;
+}
+
+/* ---------------------------------------------------------------- actions */
+
+:root[data-handheld] .octane-handheld-build-height__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-build-height__action {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-2);
+    overflow: hidden;
+    border: 1px solid var(--hh-hairline);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    touch-action: manipulation;
+    transition: filter var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-build-height__action:active {
+    filter: brightness(1.25);
+}
+
+:root[data-handheld] .octane-handheld-build-height__action:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+/* Turning the tool off is the red of what dismisses. */
+:root[data-handheld] .octane-handheld-build-height__action.is-off {
+    border-color: var(--hh-air-red-deep);
+    background: var(--hh-dismiss);
+}
+
+/* Pressed: the up steps take the pressed green, turning off the deep red. */
+:root[data-handheld] .octane-handheld-build-height__stepper .octane-handheld-build__key[data-step='up']:active {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld] .octane-handheld-build-height__action.is-off:active {
+    background: var(--hh-air-red-deep);
+    filter: none;
+}
+
+/* Walking underneath switched on: the row wears the selection blue. */
+:root[data-handheld] .octane-handheld-build-height__row:has(.octane-checkbox[data-checked]) {
+    border-color: var(--hh-air-select);
+    background: var(--hh-well-pressed);
+    box-shadow: inset 3px 0 0 var(--hh-air-select);
+}
+
+/* Keyboard focus reads on the dark glass. */
+:root[data-handheld] .octane-handheld-build-height__row:focus-within,
+:root[data-handheld] .octane-handheld-build-height__action:focus-visible {
+    outline: var(--hh-focus-on-dark);
+    outline-offset: 2px;
+}
+
+/* The field's wrapper takes the field's corners, type size and colour. */
+:root[data-handheld] .octane-handheld-build-height__stepper .octane-number-input {
+    border-radius: var(--hh-radius-s);
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-field);
+}
+
+/* On its side the panel's rows sit a little closer, so the card stays clear of the top bar. */
+:root[data-handheld='landscape'] .octane-handheld-build.octane-handheld-build-height {
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-build-height__actions {
+    gap: var(--hh-space-1);
+    margin-top: var(--hh-space-1);
+}
+
+/* ---------------------------------------------------------------- beside another drawer */
+
+/* On its side a card in the lower right corner, as wide as the stepper needs. */
+:root[data-handheld='landscape'] .octane-handheld-drawer:has(.octane-handheld-build-height) {
+    width: min(340px, 44vw);
+}
+
+/* Something in the room is selected as well (its drawer, or the build tools of a furni): upright, the build height moves
+   up under the top bar; on its side, to the left of that drawer. Both stay in reach. */
+:root[data-handheld='portrait']:has(.octane-handheld-drawer:not(.octane-handheld-build-height-drawer)) .octane-handheld-build-height-drawer {
+    top: calc(var(--octane-safe-top, 0px) + 64px);
+    bottom: auto;
+}
+
+:root[data-handheld='landscape']:has(.octane-handheld-drawer:not(.octane-handheld-build-height-drawer)) .octane-handheld-build-height-drawer {
+    right: calc(min(348px, 44vw) + var(--hh-space-3) + var(--octane-safe-right, 0px));
+}

@@ -5,6 +5,7 @@ import { Column } from '../Column';
 import { DraggableWindow } from '../draggable-window';
 import { Flex } from '../Flex';
 import { Text } from '../Text';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 interface LayoutTrophyViewProps {
     color: string;
@@ -19,7 +20,7 @@ export const LayoutTrophyView: FC<LayoutTrophyViewProps> = (props) => {
     const { color = '', message = '', date = '', senderName = '', customTitle = null, onCloseClick = null } = props;
 
     return (
-        <DraggableWindow handleSelector=".drag-handler">
+        <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} handleSelector=".drag-handler">
             <Column alignItems="center" className={`octane-layout-trophy trophy-${color}`} gap={0}>
                 <Flex center fullWidth className="trophy-header drag-handler" position="relative">
                     <Base pointer className="trophy-close" position="absolute" onClick={onCloseClick} />

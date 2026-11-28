@@ -4,6 +4,9 @@ import { DraggableWindow, DraggableWindowPosition } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Hint } from '../../../../common/Tooltip';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
+import { HandheldInfoDrawer } from '../../../../common/handheld/HandheldInfoDrawer';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 
 export const BOT_SKILL_WINDOW_SIZES = {
     chatter: { width: 278, height: 369 },
@@ -18,6 +21,9 @@ interface AvatarInfoBotSkillWindowViewProps {
     category: number;
     title: string;
     children?: ReactNode;
+    /** Phone layout: the form is a sub-page of the drawer; these are its close and back buttons. */
+    onClose?: () => void;
+    onBack?: () => void;
 }
 
 interface AvatarInfoBotSkillButtonsViewProps {
@@ -37,7 +43,8 @@ const getBotBounds = (objectId: number, category: number) => {
 
 /** The bubble window of chatter_configuration_xml / name_configuration_xml, opened where the bot menu was. */
 export const AvatarInfoBotSkillWindowView: FC<AvatarInfoBotSkillWindowViewProps> = (props) => {
-    const { layout, objectId, category, title, children = null } = props;
+    const { layout, objectId, category, title, children = null, onClose = null, onBack } = props;
+    const isHandheld = useIsHandheld();
     const { width, height } = BOT_SKILL_WINDOW_SIZES[layout];
 
     const initialPosition = useMemo(
@@ -45,9 +52,18 @@ export const AvatarInfoBotSkillWindowView: FC<AvatarInfoBotSkillWindowViewProps>
         [objectId, category, width, height]
     );
 
+    // Phone layout: the form is a page of the drawer (16 px fields, over the keyboard) instead of a bubble by the bot.
+    if (isHandheld && onClose) {
+        return (
+            <NativeTextTree>
+                <HandheldInfoDrawer details={<div className={`octane-handheld-drawer__form octane-handheld-drawer__form--${layout}`}>{children}</div>} isPage={true} label={title} title={title} onBack={onBack} onClose={onClose} />
+            </NativeTextTree>
+        );
+    }
+
     return (
         <NativeTextTree>
-            <DraggableWindow handleSelector=".air-bot-skill-window-title" initialPosition={initialPosition} windowPosition={DraggableWindowPosition.NOTHING}>
+            <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handleSelector=".air-bot-skill-window-title" initialPosition={initialPosition} windowPosition={DraggableWindowPosition.NOTHING}>
                 <div className={`air-bot-skill-window air-bot-skill-window--${layout}`}>
                     <div className="air-bot-skill-window-title">
                         <span>{title}</span>

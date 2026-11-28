@@ -3,6 +3,9 @@ import { DraggableWindow } from '../../../common/draggable-window';
 import { NativeText } from '../../../common/native-text/NativeText';
 import { useModAlertStore } from '../../../hooks';
 import { Native3Frame, Native3ThickButton } from '../native/NativeWindow3';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModAlertView } from '../handheld/HandheldModSanctionViews';
 
 const BODY_COLOR = 0xe9e9e1;
 
@@ -32,7 +35,7 @@ export const NativeWindowAlert: FC<{ title: string; message: string; onClose: ()
     const height = 141 + (summaryHeight - 57);
 
     return (
-        <DraggableWindow handleSelector=".native3-title" initialPosition={{ x: Math.round((window.innerWidth - width) / 2), y: Math.round((window.innerHeight - height) / 2) }}>
+        <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} handleSelector=".native3-title" initialPosition={{ x: Math.round((window.innerWidth - width) / 2), y: Math.round((window.innerHeight - height) / 2) }}>
             <Native3Frame height={height} title={title} width={width} onClose={onClose}>
                 <div ref={summaryRef} style={{ position: 'absolute', left: 27, top: 14, width: 210 }}>
                     <NativeText background={BODY_COLOR} maxWidth={210} text={message} textStyle="u_regular" />
@@ -46,6 +49,18 @@ export const NativeWindowAlert: FC<{ title: string; message: string; onClose: ()
 export const NativeAlertView: FC<{}> = () => {
     const alerts = useModAlertStore((state) => state.alerts);
     const close = useModAlertStore((state) => state.close);
+    const isHandheld = useIsHandheld();
+
+    // phone: each alert is a card over the sheet with its Ok
+    if (isHandheld) {
+        return (
+            <>
+                {alerts.map((alert) => (
+                    <HandheldModAlertView key={alert.id} message={alert.message} title={alert.title} onClose={() => close(alert.id)} />
+                ))}
+            </>
+        );
+    }
 
     return (
         <>

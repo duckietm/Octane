@@ -15,6 +15,8 @@ import tokenLarge from '../../assets/images/collectibles/minting_token_large.png
 import tokenSmall from '../../assets/images/collectibles/minting_token_small.png';
 import { CollectiblesLoadingView } from './CollectiblesLoadingView';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldCollectiblesMintView } from './HandheldCollectiblesMintView';
 
 const furniName = (mintable: CollectibleMintableData): string => {
     const data = mintable.itemType === 'i' ? GetSessionDataManager().getWallItemData(mintable.itemTypeId) : GetSessionDataManager().getFloorItemData(mintable.itemTypeId);
@@ -72,6 +74,7 @@ export const CollectiblesMintTabView: FC = () => {
 
         return ids;
     }, [groupItems]);
+    const isHandheld = useIsHandheld();
 
     if (mintables === null || mintTokens === null) return <CollectiblesLoadingView />;
 
@@ -110,6 +113,31 @@ export const CollectiblesMintTabView: FC = () => {
             localizeWithFallback('shop.minting.confirm.title', 'Confirm you want to collect')
         );
     };
+
+    const canBuyTokens = !!offer && offer.silverPrice <= silver && !purchasePending;
+
+    if (isHandheld) {
+        return (
+            <HandheldCollectiblesMintView
+                canBuyTokens={canBuyTokens}
+                canCollect={enabled}
+                furniName={furniName}
+                mintables={mintables}
+                offerIndex={offerIndex}
+                ownedCount={(mintable) => idsOf(mintable).length}
+                selected={selected}
+                timeFraction={timeFraction}
+                timeLeft={timeLeft}
+                tokenOffer={offer}
+                tokenOffers={mintTokenOffers}
+                tokens={mintTokens}
+                onBuyTokens={() => buyMintTokens?.(offer)}
+                onCollect={onCollect}
+                onOfferIndex={setOfferIndex}
+                onSelect={setSelectedId}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>
@@ -216,11 +244,7 @@ export const CollectiblesMintTabView: FC = () => {
                                 {offer?.silverPrice ?? 0}
                                 <img alt="" draggable={false} src={silverIcon} />
                             </span>
-                            <BaseButton
-                                className="octane-collectibles-button is-blue"
-                                disabled={!offer || offer.silverPrice > silver || purchasePending}
-                                onClick={() => buyMintTokens?.(offer)}
-                            >
+                            <BaseButton className="octane-collectibles-button is-blue" disabled={!canBuyTokens} onClick={() => buyMintTokens?.(offer)}>
                                 {localizeWithFallback('generic.buy', 'Buy')}
                             </BaseButton>
                         </div>

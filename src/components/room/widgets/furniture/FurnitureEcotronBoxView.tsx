@@ -5,6 +5,7 @@ import { BaseButton } from '../../../../common/BaseButton';
 import { ECOTRONBOX_CARD_FURNIMATIC, useFurnitureEcotronBoxWidget } from '../../../../hooks';
 import '../../../../css/room/FurniWindowsBAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 /**
  * Official `ecotronbox_card` / `ecotronbox_card_furnimatic` (257 x 114): the gift-card background from
@@ -28,7 +29,7 @@ export const FurnitureEcotronBoxView: FC = () => {
 
     return (
         <NativeTextTree>
-            <DraggableWindow handleSelector=".octane-ecotronbox-card" offsetLeft={50} offsetTop={50} windowPosition={DraggableWindowPosition.TOP_LEFT}>
+            <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} handleSelector=".octane-ecotronbox-card" offsetLeft={50} offsetTop={50} windowPosition={DraggableWindowPosition.TOP_LEFT}>
                 <div className={`octane-ecotronbox-card octane-furni-ecotronbox${isFurnimatic ? ' is-furnimatic' : ''}`} style={{ backgroundImage: `url(${background})` }}>
                     <div className="octane-ecotronbox-date">{date}</div>
                     <div className="octane-ecotronbox-preview">

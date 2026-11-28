@@ -1,0 +1,1101 @@
+/*
+ * Phone inventory, in the Octane handheld look (HandheldTokens.css) inside the shared sheet frame
+ * (HandheldSheet.css). Everything is scoped to :root[data-handheld] (set only on a phone-sized touch device by the
+ * handheld watcher), so the AIR window of InventoryView.css stays as it is everywhere else. Every tab is laid out
+ * the same way: its filters, a grid of tiles that scrolls, and under it what is chosen as a bar with the main action
+ * (HandheldInventorySelectionView). On a phone held on its side the bar becomes a column right of the grid, with
+ * the larger preview and the other actions always open. A trade keeps its AIR content inside the sheet.
+ */
+
+/* ---------------------------------------------------------------- layout */
+
+:root[data-handheld] .octane-handheld-inv .octane-handheld-sheet__body {
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-inv__content,
+:root[data-handheld] .octane-handheld-inv__pane,
+:root[data-handheld] .octane-handheld-inv .octane-inventory-identity {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    width: auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* On its side the sheet is one grid: filters and tiles on the left, the chosen item in a column on the right. The
+   wrappers between the sheet and those parts step aside. */
+:root[data-handheld='landscape'] .octane-handheld-inv .octane-handheld-sheet__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 244px;
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+    gap: 0 var(--hh-space-3);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv__content,
+:root[data-handheld='landscape'] .octane-handheld-inv__pane,
+:root[data-handheld='landscape'] .octane-handheld-inv .octane-inventory-identity {
+    display: contents;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv .octane-handheld-sheet__body > *,
+:root[data-handheld='landscape'] .octane-handheld-inv__content > *,
+:root[data-handheld='landscape'] .octane-handheld-inv .octane-inventory-identity > * {
+    grid-column: 1;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv :where(.octane-inventory-filter-bar, .octane-inventory-collectibles-options, .octane-handheld-inv__wearing, .octane-inventory-identity-tabs) {
+    grid-row: 1;
+    margin-bottom: var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv .octane-handheld-inv__chips {
+    grid-row: 2;
+    margin-bottom: var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv .octane-handheld-inv__gridbox {
+    grid-column: 1;
+    grid-row: 4;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv .octane-handheld-inv__selection {
+    grid-column: 2;
+    grid-row: 1 / -1;
+}
+
+/* ---------------------------------------------------------------- filters */
+
+:root[data-handheld] .octane-handheld-inv :where(.octane-inventory-filter-bar, .octane-inventory-collectibles-options) {
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+/* The search field: a white pill with a drawn magnifying glass. */
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-search,
+:root[data-handheld] .octane-handheld-inv .octane-inventory-collectibles-options > .octane-inventory-filter-input {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    align-items: center;
+    min-width: 0;
+    height: var(--hh-touch);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    transition:
+        border-color var(--hh-fast) var(--hh-ease),
+        box-shadow var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-search {
+    padding-left: 36px;
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-search:focus-within,
+:root[data-handheld] .octane-handheld-inv .octane-inventory-collectibles-options > .octane-inventory-filter-input:focus {
+    border-color: var(--hh-air-blue-deep);
+    box-shadow:
+        0 0 0 3px rgba(46, 111, 138, 0.22),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-search::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    box-sizing: border-box;
+    width: 13px;
+    height: 13px;
+    margin-top: -8px;
+    border: 2.5px solid var(--hh-air-blue);
+    border-radius: 50%;
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-search::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 24px;
+    width: 6px;
+    height: 2.5px;
+    margin-top: 3px;
+    border-radius: 2px;
+    background: var(--hh-air-blue);
+    transform: rotate(45deg);
+    transform-origin: left center;
+}
+
+/* 16 px: mobile Safari zooms the page into any field with smaller text. The placeholder keeps the small size. */
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-input {
+    flex: 1 1 auto;
+    box-sizing: border-box;
+    width: 0;
+    min-width: 0;
+    height: 100%;
+    padding: 0 var(--hh-space-1);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+    line-height: 20px;
+    outline: 0;
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-collectibles-options > .octane-inventory-filter-input {
+    padding: 0 var(--hh-space-4);
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-input::placeholder {
+    color: var(--hh-air-box-line);
+    font-size: 14px;
+    opacity: 1;
+}
+
+/* Clear: a round well at the end of the field, with a drawn cross. */
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-clear {
+    position: relative;
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    margin-right: 5px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-cream);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-clear::before,
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-clear::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 2px;
+    margin: -1px 0 0 -6px;
+    border-radius: 2px;
+    background: var(--hh-air-text-muted);
+    transform: rotate(45deg);
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-clear::after {
+    transform: rotate(-45deg);
+}
+
+/* The two selects: white pills with a drawn chevron. */
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-choice,
+:root[data-handheld] .octane-handheld-inv .octane-inventory-collectibles-filter {
+    position: relative;
+    display: block;
+    flex: 0 1 108px;
+    min-width: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv .octane-inventory-filter-choice,
+:root[data-handheld='landscape'] .octane-handheld-inv .octane-inventory-collectibles-filter {
+    flex-basis: 132px;
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-select,
+:root[data-handheld] .octane-handheld-inv .octane-inventory-collectibles-filter {
+    box-sizing: border-box;
+    width: 100%;
+    height: var(--hh-touch);
+    padding: 0 28px 0 14px;
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-m);
+    line-height: 20px;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-select:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-select:disabled {
+    opacity: 0.5;
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-filter-choice::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    box-sizing: border-box;
+    width: 8px;
+    height: 8px;
+    margin-top: -6px;
+    border: solid var(--hh-air-blue);
+    border-width: 0 2.5px 2.5px 0;
+    border-radius: 1px;
+    pointer-events: none;
+    transform: rotate(45deg);
+}
+
+/* The list a select opens: a white card of rows a finger can hit. */
+:root[data-handheld] .octane-inventory-filter-menu {
+    box-sizing: border-box;
+    min-width: 168px;
+    max-height: 60vh;
+    padding: var(--hh-space-1);
+    overflow-y: auto;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-float);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: 14px !important;
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-inventory-filter-menu::before {
+    content: none;
+}
+
+:root[data-handheld] .octane-inventory-filter-option {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    border-radius: var(--hh-radius-s);
+    background: transparent;
+    font-family: var(--hh-font);
+    font-size: 14px !important;
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-inventory-filter-option[data-highlighted] {
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-inventory-filter-option[data-selected],
+:root[data-handheld] .octane-inventory-filter-option[aria-selected='true'] {
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-header);
+}
+
+/* ---------------------------------------------------------------- grid of tiles */
+
+:root[data-handheld] .octane-handheld-inv__gridbox {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    min-width: 0;
+    min-height: 0;
+}
+
+/* The furni grid brings its own scrolling box (InfiniteGrid); the other tabs' grids scroll themselves. */
+:root[data-handheld] .octane-handheld-inv__gridbox > :first-child {
+    flex: 1 1 0;
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 3px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Six tiles across a phone held upright (393 px), each about 56 px: a full finger. */
+:root[data-handheld] .octane-handheld-inv__gridbox .grid,
+:root[data-handheld] .octane-handheld-inv__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)) !important;
+    grid-auto-rows: auto;
+    align-content: start;
+    gap: 6px !important;
+}
+
+:root[data-handheld] .octane-handheld-inv__grid.is-wide {
+    grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)) !important;
+}
+
+:root[data-handheld] .octane-handheld-inv :where(.octane-inventory-thumb, .octane-inventory-identity-cell, .octane-collectibles-item) {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    min-width: 0;
+    aspect-ratio: 1;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    cursor: pointer;
+    isolation: isolate;
+    opacity: 1;
+    touch-action: manipulation;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        box-shadow var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-inv__grid.is-wide > .octane-inventory-identity-cell {
+    height: 52px;
+    aspect-ratio: auto;
+}
+
+/* The AIR tile bitmaps (background, outline) are not used on the phone's tiles. */
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb::before,
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb::after,
+:root[data-handheld] .octane-handheld-inv .octane-inventory-identity-cell::after {
+    content: none;
+}
+
+:root[data-handheld] .octane-handheld-inv :where(.octane-inventory-thumb, .octane-inventory-identity-cell, .octane-collectibles-item):active {
+    background: var(--hh-air-track-light);
+}
+
+/* The chosen tile: the selection blue of our windows as a ring, on the light blue. */
+:root[data-handheld] .octane-handheld-inv :where(.octane-inventory-thumb, .octane-inventory-identity-cell, .octane-collectibles-item).is-selected {
+    border-color: var(--hh-air-select);
+    background: var(--hh-air-track-light);
+    box-shadow:
+        0 0 0 2px var(--hh-air-select),
+        var(--hh-shadow-card);
+}
+
+/* Something new: a warm edge. What is in use (a prefix, an icon): a green one. */
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb.is-unseen:not(.is-selected) {
+    border-color: var(--hh-air-count-yellow);
+    box-shadow:
+        0 0 0 2px var(--hh-air-count-yellow),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-identity-cell.is-active:not(.is-selected) {
+    border-color: var(--hh-air-count-green);
+    box-shadow:
+        inset 0 0 0 1px var(--hh-air-count-green),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb.opacity-50 > .octane-inventory-thumb-image {
+    opacity: 0.45;
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb img,
+:root[data-handheld] .octane-handheld-inv .octane-collectibles-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-animal-thumb-image {
+    position: static;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* How many of it: a small blue count in the corner. */
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb > .bg-red-700,
+:root[data-handheld] .octane-handheld-inv .octane-collectibles-item-amount {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    bottom: auto;
+    left: auto;
+    z-index: 2;
+    box-sizing: border-box;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 var(--hh-space-1);
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-blue-deep);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xxs);
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    pointer-events: none;
+}
+
+/* The AIR marks of a tile (recycle, rarity plaque, chest plaque) keep their bitmaps, centred on the larger tile. */
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb-recyclable {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    z-index: 1;
+    width: 16px;
+    height: 16px;
+    background: url('../../assets/images/inventory/air/thumb-icon-recycle.png') no-repeat;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb-rarity {
+    position: absolute;
+    top: calc(50% + 9px);
+    left: calc(50% - 18px);
+    z-index: 1;
+    width: 36px;
+    height: 9px;
+    background: url('../../assets/images/inventory/rarity/rarity_item_plaque.png') no-repeat;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb-rarity-count,
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb-chest-count {
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    display: flex;
+    justify-content: center;
+    width: 24px;
+    height: 5px;
+    line-height: 0;
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb-chest-background,
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb-chest {
+    position: absolute;
+    top: calc(50% - 18px);
+    left: calc(50% - 18px);
+    width: 36px;
+    height: 36px;
+    background-repeat: no-repeat;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb-chest-background.is-brown {
+    background-image: url('../../assets/images/inventory/chest/chest_overlay_brown_background.png');
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb-chest-background.is-gold {
+    background-image: url('../../assets/images/inventory/chest/chest_overlay_gold_background.png');
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb-chest {
+    z-index: 1;
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb-chest.is-brown {
+    background-image: url('../../assets/images/inventory/chest/chest_overlay_brown_plaque.png');
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb-chest.is-gold {
+    background-image: url('../../assets/images/inventory/chest/chest_overlay_gold_plaque.png');
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-thumb-chest-count {
+    top: 28px;
+}
+
+/* Pages of a long tab: small pills under the grid. */
+:root[data-handheld] .octane-handheld-inv__pages {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    gap: var(--hh-space-1);
+    overflow-x: auto;
+}
+
+:root[data-handheld] .octane-handheld-inv__pages button {
+    position: relative;
+    flex: none;
+    box-sizing: border-box;
+    min-width: 36px;
+    height: 28px;
+    padding: 0 var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-inv__pages button::after {
+    content: "";
+    position: absolute;
+    inset: -9px -3px;
+}
+
+:root[data-handheld] .octane-handheld-inv__pages button[aria-current='page'] {
+    border-color: var(--hh-air-blue-deep);
+    background: var(--hh-air-blue);
+    color: var(--hh-on-dark);
+}
+
+/* ---------------------------------------------------------------- what is chosen */
+
+:root[data-handheld] .octane-handheld-inv__selection {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-inv__bar {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    padding: var(--hh-space-2);
+}
+
+/* Its picture: a tap opens the larger preview. */
+:root[data-handheld] .octane-handheld-inv__thumb {
+    position: relative;
+    display: flex;
+    flex: 0 0 48px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-cream);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-inv__thumb:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-inv__thumb :where(img, canvas) {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-inv__thumb-glyph {
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-inv__text {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-inv__name,
+:root[data-handheld] .octane-handheld-inv__meta {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-inv__name {
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-inv__meta {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+/* Upright the line beside the button may take two rows ("4 tradable · 4 recyclable"). */
+:root[data-handheld='portrait'] .octane-handheld-inv__meta {
+    display: -webkit-box;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+/* "More": opens the drawer with the preview and the other actions. */
+:root[data-handheld] .octane-handheld-inv__more {
+    position: relative;
+    display: flex;
+    flex: 0 0 36px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-inv__more::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+}
+
+:root[data-handheld] .octane-handheld-inv__more:active {
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-inv__more svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+    transition: transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-inv__more[aria-pressed='true'] svg {
+    transform: rotate(180deg);
+}
+
+/* The main action: the green button. */
+:root[data-handheld] .octane-handheld-inv__primary {
+    flex: 0 1 auto;
+    box-sizing: border-box;
+    min-width: 96px;
+    max-width: 52%;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-4);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-green-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-primary);
+    box-shadow:
+        inset 0 1px 0 var(--hh-air-green-top),
+        var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-inv__primary:active {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld] .octane-handheld-inv__primary:disabled,
+:root[data-handheld] .octane-handheld-inv__action:disabled {
+    box-shadow: none;
+    opacity: 0.5;
+}
+
+/* The drawer: the larger preview and the other actions. */
+:root[data-handheld] .octane-handheld-inv__drawer {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    padding: var(--hh-space-2) var(--hh-space-2) 0;
+}
+
+:root[data-handheld] .octane-handheld-inv__preview {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    height: 148px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-cream);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-inv__preview > :first-child:not(img, span, p, .octane-handheld-inv__badge-preview) {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+}
+
+:root[data-handheld] .octane-handheld-inv__preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Rotate / use: small white pills in the preview's corner. */
+:root[data-handheld] .octane-handheld-inv__preview-tools {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 3;
+    display: flex;
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-handheld-inv__preview-tools button {
+    position: relative;
+    box-sizing: border-box;
+    height: 32px;
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-inv__preview-tools button::after {
+    content: "";
+    position: absolute;
+    inset: -7px -3px;
+}
+
+:root[data-handheld] .octane-handheld-inv__preview-tools button:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-inv__plate {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 2;
+}
+
+:root[data-handheld] .octane-handheld-inv__badge-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--hh-space-1);
+    max-width: 100%;
+    padding: var(--hh-space-2);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-inv__badge-preview p {
+    margin: 0;
+}
+
+:root[data-handheld] .octane-handheld-inv__actions {
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+/* The other actions: quiet pills; one that deletes is in the red of our close buttons. */
+:root[data-handheld] .octane-handheld-inv__action {
+    flex: 1 1 0;
+    box-sizing: border-box;
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-inv__action:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-inv__action.is-danger {
+    color: var(--hh-air-red-deep);
+}
+
+/* On its side: one column. The preview on top takes what height is left, then the name, the other actions and the
+   main action across the column; the bar's picture and "more" are not needed. */
+:root[data-handheld='landscape'] .octane-handheld-inv__selection {
+    gap: 6px;
+    padding: var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv__drawer,
+:root[data-handheld='landscape'] .octane-handheld-inv__bar {
+    display: contents;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv__thumb,
+:root[data-handheld='landscape'] .octane-handheld-inv__more {
+    display: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv__preview {
+    order: 1;
+    flex: 1 1 0;
+    height: auto;
+    min-height: 40px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv__text {
+    order: 2;
+    flex: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv__actions {
+    order: 3;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv__action {
+    height: 36px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-inv__primary {
+    order: 4;
+    flex: none;
+    width: 100%;
+    max-width: none;
+    height: 40px;
+}
+
+/* ---------------------------------------------------------------- badges: worn, and all / custom */
+
+:root[data-handheld] .octane-handheld-inv__wearing {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    padding: 6px var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-inv__wearing-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-inv__wearing-slots {
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-badge-slot {
+    box-sizing: border-box;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    aspect-ratio: auto;
+}
+
+:root[data-handheld] .octane-handheld-inv .octane-inventory-badge-slot.is-empty {
+    border: 1px dashed var(--hh-air-border);
+    border-radius: var(--hh-radius-s);
+    background: transparent;
+}
+
+:root[data-handheld] .octane-handheld-inv__chips,
+:root[data-handheld] .octane-handheld-inv .octane-inventory-identity-tabs {
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+    width: auto;
+    height: auto;
+    min-width: 0;
+    margin-top: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+:root[data-handheld] .octane-handheld-inv__chip,
+:root[data-handheld] .octane-handheld-inv .octane-inventory-identity-tab {
+    position: relative;
+    flex: 0 1 auto;
+    box-sizing: border-box;
+    min-width: 0;
+    height: 36px;
+    padding: 0 var(--hh-space-3);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-m);
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-inv__chip::after,
+:root[data-handheld] .octane-handheld-inv .octane-inventory-identity-tab::after {
+    content: "";
+    position: absolute;
+    inset: -5px 0;
+}
+
+:root[data-handheld] .octane-handheld-inv__chip[aria-pressed='true'],
+:root[data-handheld] .octane-handheld-inv .octane-inventory-identity-tab.is-active {
+    border-color: var(--hh-air-select);
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-inv__chip.is-create {
+    margin-left: auto;
+    color: var(--hh-air-blue-deep);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- empty and loading tabs */
+
+:root[data-handheld] .octane-handheld-inv :where(.octane-inventory-empty, .octane-inventory-collectibles-state) {
+    position: relative;
+    inset: auto;
+    width: auto;
+    height: auto;
+    margin: auto;
+    padding: var(--hh-space-4);
+    color: var(--hh-air-text-muted);
+    text-align: center;
+}
+
+/* ---------------------------------------------------------------- trade */
+
+/* A trade keeps its AIR content: the wrapper carries the AIR inventory's class for that content's rules, its window
+   size is undone here, and the two AIR columns (own inventory, both offers) are stacked in a scrolling card. */
+:root[data-handheld] .octane-inventory-window.octane-handheld-inv__air {
+    display: block;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: var(--hh-space-1) !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-cream);
+    box-shadow: var(--hh-shadow-card);
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-inv__air .octane-inventory-body.is-trade {
+    height: auto;
+    padding: var(--hh-space-1);
+    overflow: visible;
+}
+
+:root[data-handheld] .octane-inventory-body.is-trade > .grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: none !important;
+    height: auto !important;
+    gap: 10px;
+}
+
+:root[data-handheld] .octane-inventory-body.is-trade > .grid > * {
+    grid-column: 1 / -1 !important;
+    min-height: 0;
+}
+
+:root[data-handheld] .octane-inventory-body.is-trade .octane-trade-button {
+    min-height: 40px;
+    font-size: 13px !important;
+}
+
+:root[data-handheld] .octane-inventory-body.is-trade :where(input, .octane-number-input) {
+    min-height: 36px;
+    font-size: 16px !important;
+}
+
+:root[data-handheld] .octane-trade-minimized {
+    width: calc(100vw - 12px) !important;
+}

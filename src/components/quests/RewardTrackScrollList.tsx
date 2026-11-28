@@ -1,4 +1,5 @@
-import { FC, PointerEvent as ReactPointerEvent, ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { FC, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent, ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { isHandheldActive } from '../../state/handheldStore';
 
 // scrollable_itemlist_vertical style 100, ported from the launcher scrollbar controller (class Lq) and measured on the native reward track:
 // - the scroll position is a normalized offset in [0, 1] that every input adds to as a float; the list moves to trunc(offset * range),
@@ -18,6 +19,21 @@ interface RewardTrackScrollListProps {
 
 const clamp = (value: number) => Math.max(0, Math.min(1, value));
 
+/** Phone layout: a finger moved this far is a swipe through the list, and the tap that ends it is not a click. */
+export const REWARD_TRACK_SWIPE_SLOP = 8;
+
+/**
+ * Phone layout: the window can be drawn smaller (CSS zoom); pointer moves are in screen px, the list in its own px.
+ * Always 1 outside the phone layout.
+ */
+const drawnScale = (element: HTMLElement | null): number => {
+    if (!element || !isHandheldActive() || !element.offsetHeight) return 1;
+
+    const ratio = element.getBoundingClientRect().height / element.offsetHeight;
+
+    return Number.isFinite(ratio) && ratio > 0 ? ratio : 1;
+};
+
 export const RewardTrackScrollList: FC<RewardTrackScrollListProps> = ({ className, contentClassName, height, children }) =>
 {
     const rootRef = useRef<HTMLDivElement>(null);
@@ -25,6 +41,8 @@ export const RewardTrackScrollList: FC<RewardTrackScrollListProps> = ({ classNam
     const contentRef = useRef<HTMLDivElement>(null);
     const offsetRef = useRef(0);
     const dragRef = useRef<{ pointerId: number; startY: number | null; startOffset: number } | null>(null);
+    const swipeRef = useRef<{ pointerId: number; startY: number; startOffset: number; scale: number; moved: boolean } | null>(null);
+    const swallowClickRef = useRef(false);
     const [offset, setOffsetState] = useState(0);
     const [contentHeight, setContentHeight] = useState(0);
 
@@ -123,7 +141,46 @@ export const RewardTrackScrollList: FC<RewardTrackScrollListProps> = ({ classNam
             return;
         }
 
-        setOffset(drag.startOffset + (event.clientY - drag.startY) / travel);
+        setOffset(drag.startOffset + (event.clientY - drag.startY) / (travel * drawnScale(rootRef.current)));
+    };
+
+    // Phone layout: the list follows a finger dragged over the rows (there is no wheel on a phone).
+    const onViewportPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+        swallowClickRef.current = false;
+
+        if (event.pointerType !== 'touch' || !overflow || !isHandheldActive()) return;
+
+        swipeRef.current = { pointerId: event.pointerId, startY: event.clientY, startOffset: offsetRef.current, scale: drawnScale(rootRef.current), moved: false };
+    };
+
+    const onViewportPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+        const swipe = swipeRef.current;
+
+        if (!swipe || swipe.pointerId !== event.pointerId || range <= 0) return;
+
+        const moved = event.clientY - swipe.startY;
+
+        if (!swipe.moved && Math.abs(moved) < REWARD_TRACK_SWIPE_SLOP) return;
+
+        swipe.moved = true;
+        setOffset(swipe.startOffset - moved / swipe.scale / range);
+    };
+
+    const onViewportPointerEnd = (event: ReactPointerEvent<HTMLDivElement>) => {
+        const swipe = swipeRef.current;
+
+        if (!swipe || swipe.pointerId !== event.pointerId) return;
+
+        swallowClickRef.current = swipe.moved;
+        swipeRef.current = null;
+    };
+
+    const onViewportClickCapture = (event: ReactMouseEvent<HTMLDivElement>) => {
+        if (!swallowClickRef.current) return;
+
+        swallowClickRef.current = false;
+        event.preventDefault();
+        event.stopPropagation();
     };
 
     const onLiftPointerUp = (event: ReactPointerEvent<HTMLDivElement>) =>
@@ -137,7 +194,15 @@ export const RewardTrackScrollList: FC<RewardTrackScrollListProps> = ({ classNam
 
     return (
         <div ref={rootRef} className={className}>
-            <div ref={viewportRef} className="octane-reward-track-scroll-viewport">
+            <div
+                ref={viewportRef}
+                className="octane-reward-track-scroll-viewport"
+                onClickCapture={onViewportClickCapture}
+                onPointerCancel={onViewportPointerEnd}
+                onPointerDown={onViewportPointerDown}
+                onPointerMove={onViewportPointerMove}
+                onPointerUp={onViewportPointerEnd}
+            >
                 <div ref={contentRef} className={contentClassName}>
                     {children}
                 </div>

@@ -1,0 +1,1485 @@
+/*
+ * The reward track on a phone (HandheldRewardTrackView), in the Octane handheld look (HandheldTokens.css) and the shared
+ * frame (HandheldSheet.css): the points in the header, a summary card, the prize road as stops read top to bottom with
+ * the free and the premium prize side by side and the progress rail down the left, and the tasks as cards whose details
+ * are a page of the sheet. Upright everything is one scrolling column; on its side there are two columns
+ * (summary | road, tasks | details). The track's own colours (--rt-*) come from its theme, set on the frame.
+ * Everything is scoped to :root[data-handheld], which only a phone-sized touch device gets.
+ */
+
+/* ---------------------------------------------------------------- header: points and the staff gear */
+
+:root[data-handheld] .octane-handheld-rt__purse {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-1);
+    height: 24px;
+    padding: 0 var(--hh-space-2) 0 6px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xs);
+    font-weight: 700;
+    line-height: 24px;
+}
+
+:root[data-handheld] .octane-handheld-rt__gear svg {
+    fill: currentColor;
+    stroke: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__gear:active {
+    background: var(--hh-well-pressed);
+}
+
+/* ---------------------------------------------------------------- layout */
+
+/* Upright: one column that scrolls as a whole, edge to edge of the sheet; the lane heads and the task filters stay at
+   its top, the claim button at its bottom. */
+:root[data-handheld] .octane-handheld-rt__layout {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+    margin: calc(-1 * var(--hh-space-3)) calc(-1 * var(--hh-space-3)) calc(-1 * var(--hh-space-2));
+    padding: var(--hh-space-3) var(--hh-space-3) var(--hh-space-2);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: var(--hh-radius-l) var(--hh-radius-l) 0 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-rt__side {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rt__main {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* On its side: two columns that scroll on their own. */
+:root[data-handheld='landscape'] .octane-handheld-rt__layout {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    gap: var(--hh-space-2) var(--hh-space-3);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__layout[data-tab='tasks'] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__side {
+    grid-area: 1 / 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__layout[data-tab='tasks'] .octane-handheld-rt__side {
+    display: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__main {
+    grid-area: 1 / 2 / span 2;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__main.is-tasks {
+    grid-area: 1 / 1 / span 2;
+}
+
+:root[data-handheld] .octane-handheld-rt__loading,
+:root[data-handheld] .octane-handheld-rt__empty {
+    margin: 0;
+    padding: var(--hh-space-4);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+    text-align: center;
+}
+
+/* ---------------------------------------------------------------- several tracks: a row of chips */
+
+:root[data-handheld] .octane-handheld-rt__tracks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-handheld-rt__track {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 0;
+    max-width: 100%;
+    height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    line-height: 20px;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+/* The chip is 36 px; the finger gets 44. */
+:root[data-handheld] .octane-handheld-rt__track::after,
+:root[data-handheld] .octane-handheld-rt__filter::after,
+:root[data-handheld] .octane-handheld-rt__back::after {
+    content: "";
+    position: absolute;
+    inset: -5px 0;
+}
+
+:root[data-handheld] .octane-handheld-rt__track:active {
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-rt__track[data-active='true'] {
+    border-color: var(--rt-dark, var(--hh-air-track-blue));
+    background: var(--rt-dark, var(--hh-air-track-blue));
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-rt__track-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Something to claim: a small red count (on a chip, on the claim button). */
+:root[data-handheld] .octane-handheld-rt__badge {
+    flex: none;
+    box-sizing: border-box;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-red);
+    box-shadow: 0 0 0 1px var(--hh-air-outline);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xxs);
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+}
+
+/* ---------------------------------------------------------------- summary card */
+
+:root[data-handheld] .octane-handheld-rt__summary,
+:root[data-handheld] .octane-handheld-rt__card {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-rt__identity {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--hh-space-3);
+    min-width: 0;
+}
+
+/* The player's head (the toolbar's cropped face), on the track's light colour. */
+:root[data-handheld] .octane-handheld-rt__head {
+    position: relative;
+    display: flex;
+    flex: 0 0 48px;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: var(--rt-light, var(--hh-air-track-light));
+    box-shadow: inset 0 0 0 1px var(--rt-active, var(--hh-air-track-active));
+}
+
+:root[data-handheld] .octane-handheld-rt__head > * {
+    flex: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__titles {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rt__name {
+    max-width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+/* Staff: the name copies the id; it gets a finger's height. */
+:root[data-handheld] .octane-handheld-rt__name.is-copy {
+    min-height: var(--hh-touch);
+    cursor: copy;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+}
+
+:root[data-handheld] .octane-handheld-rt__desc {
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-rt__info {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-xs);
+    line-height: 15px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-rt__stats {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rt__stat {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    min-height: 40px;
+    padding: var(--hh-space-1) var(--hh-space-2);
+    border-radius: var(--hh-radius-s);
+    background: var(--rt-light, var(--hh-air-track-light));
+}
+
+:root[data-handheld] .octane-handheld-rt__stat img {
+    flex: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__stat-value {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-1);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-rt__stat-label {
+    min-width: 0;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-xs);
+    line-height: 14px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-rt__next {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-rt__next-label {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-xs);
+    line-height: 14px;
+}
+
+/* ---------------------------------------------------------------- bars */
+
+/* A progress bar: the fill is moved (and coloured orange to green) by the stepper the desktop bars use. */
+:root[data-handheld] .octane-handheld-rt__bar {
+    position: relative;
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 8px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-box);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.14);
+}
+
+:root[data-handheld] .octane-handheld-rt__bar-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--rt-dark, var(--hh-air-track-blue));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+:root[data-handheld] .octane-handheld-rt__next .octane-handheld-rt__bar {
+    flex: none;
+    height: 10px;
+}
+
+/* A points value with the small points icon. */
+:root[data-handheld] .octane-handheld-rt__points {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 3px;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rt__count {
+    flex: none;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-xs);
+    line-height: 14px;
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- the road: lane heads */
+
+:root[data-handheld] .octane-handheld-rt__lanes,
+:root[data-handheld] .octane-handheld-rt__stop {
+    display: grid;
+    grid-template-columns: 62px minmax(0, 1fr);
+    column-gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rt__main[data-premium='true'] .octane-handheld-rt__lanes,
+:root[data-handheld] .octane-handheld-rt__main[data-premium='true'] .octane-handheld-rt__stop {
+    grid-template-columns: 62px minmax(0, 1fr) minmax(0, 1fr);
+}
+
+/* The lane heads stay on top while the stops scroll under them. */
+:root[data-handheld] .octane-handheld-rt__lanes {
+    position: sticky;
+    z-index: 2;
+    top: calc(-1 * var(--hh-space-3));
+    margin: 0 calc(-1 * var(--hh-space-3));
+    padding: var(--hh-space-1) var(--hh-space-3) 6px;
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__lanes {
+    top: 0;
+    margin: 0;
+    padding: 0 0 6px;
+}
+
+:root[data-handheld] .octane-handheld-rt__lane {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-track-free);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 16px;
+    text-align: left;
+}
+
+:root[data-handheld] .octane-handheld-rt__lane.is-free {
+    grid-column: 2;
+}
+
+:root[data-handheld] .octane-handheld-rt__lane.is-premium {
+    background: var(--hh-air-track-premium);
+}
+
+:root[data-handheld] .octane-handheld-rt__lane > img {
+    flex: none;
+    width: auto;
+    height: 24px;
+    image-rendering: auto;
+}
+
+:root[data-handheld] .octane-handheld-rt__lane > .octane-handheld-rt__lane-check {
+    height: auto;
+    margin-left: auto;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-rt__lane > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Without the pass the premium head is the way to it. */
+:root[data-handheld] .octane-handheld-rt__lane.is-upgrade {
+    border-color: var(--hh-air-premium);
+    box-shadow: var(--hh-shadow-card);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rt__lane.is-upgrade:active {
+    background: var(--hh-air-white);
+}
+
+:root[data-handheld] .octane-handheld-rt__lane-copy {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+}
+
+:root[data-handheld] .octane-handheld-rt__lane-copy > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rt__upgrade {
+    color: var(--hh-air-premium);
+    font-size: var(--hh-size-xs);
+    line-height: 14px;
+}
+
+/* ---------------------------------------------------------------- the road: stops */
+
+:root[data-handheld] .octane-handheld-rt__road {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__stop {
+    position: relative;
+    padding: var(--hh-space-1) 0;
+    scroll-margin: 60px 0 72px;
+}
+
+/* The rail: a grey line down the row with the threshold on it, filled from the top as far as the points have come. */
+:root[data-handheld] .octane-handheld-rt__rail {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-rt__rail::before,
+:root[data-handheld] .octane-handheld-rt__rail::after {
+    content: "";
+    position: absolute;
+    top: calc(-1 * var(--hh-space-1));
+    left: calc(50% - 3px);
+    width: 6px;
+}
+
+:root[data-handheld] .octane-handheld-rt__rail::before {
+    bottom: calc(-1 * var(--hh-space-1));
+    background: var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-rt__rail::after {
+    height: calc((100% + 2 * var(--hh-space-1)) * var(--hh-fill, 0));
+    background: var(--hh-air-count-green);
+}
+
+:root[data-handheld] .octane-handheld-rt__stop:first-child .octane-handheld-rt__rail::before {
+    border-radius: var(--hh-radius-pill) var(--hh-radius-pill) 0 0;
+}
+
+/* The last stop is the end of the rail. */
+:root[data-handheld] .octane-handheld-rt__stop:last-child .octane-handheld-rt__rail::before {
+    bottom: 50%;
+}
+
+:root[data-handheld] .octane-handheld-rt__stop:last-child .octane-handheld-rt__rail::after {
+    max-height: calc(50% + var(--hh-space-1));
+}
+
+/* The threshold: the points a stop asks for; green once they are there. */
+:root[data-handheld] .octane-handheld-rt__threshold {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 46px;
+    max-width: 100%;
+    height: 26px;
+    padding: 0 6px;
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xs);
+    font-weight: 700;
+    line-height: 24px;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rt__threshold img {
+    flex: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__stop[data-reached='true'] .octane-handheld-rt__threshold {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-air-count-green);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-rt__stop[data-current='true'] .octane-handheld-rt__threshold {
+    box-shadow:
+        0 0 0 2px var(--hh-air-white),
+        0 0 0 4px var(--hh-air-select);
+}
+
+:root[data-handheld] .octane-handheld-rt__cell {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    min-height: 68px;
+}
+
+/* A stop without a prize in this lane keeps its place, as a faint slot. */
+:root[data-handheld] .octane-handheld-rt__cell:empty {
+    border: 1px dashed var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+}
+
+/* ---------------------------------------------------------------- the road: prizes */
+
+:root[data-handheld] .octane-handheld-rt__prize {
+    position: relative;
+    display: flex;
+    flex: 1 0 auto;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    width: 100%;
+    min-width: 0;
+    min-height: 68px;
+    padding: 5px;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-track-free);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rt__prize[data-premium='true'] {
+    background: var(--hh-air-track-premium);
+}
+
+:root[data-handheld] button.octane-handheld-rt__prize {
+    cursor: pointer;
+}
+
+:root[data-handheld] button.octane-handheld-rt__prize:active {
+    background: var(--hh-air-white);
+}
+
+/* The plate the product stands on. */
+:root[data-handheld] .octane-handheld-rt__plate {
+    position: relative;
+    display: flex;
+    flex: 0 0 52px;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+    pointer-events: none;
+}
+
+/* The claimed check and the premium lock sit on the plate's corner, so the word beside it has the room. */
+:root[data-handheld] .octane-handheld-rt__plate > .octane-handheld-rt__mark {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    z-index: 1;
+    max-width: none;
+    max-height: none;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
+/* The product pictures were placed by coordinates in the desktop window; here they sit in the middle of the plate. */
+:root[data-handheld] .octane-handheld-rt__plate > :not(.octane-handheld-rt__quantity, .octane-handheld-rt__mark) {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    flex: none;
+    max-width: 48px;
+    max-height: 48px;
+    margin: 0;
+    transform: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__quantity {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    box-sizing: border-box;
+    min-width: 20px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-blue-header);
+    box-shadow: 0 0 0 1px var(--hh-air-white);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xxs);
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-rt__prize-state {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: var(--hh-space-1);
+    min-width: 0;
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__prize-state span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+/* Ready to claim: a green edge and the green "Claim" pill. */
+:root[data-handheld] .octane-handheld-rt__prize[data-state='claimable'] {
+    border-color: var(--hh-air-green-mid);
+    box-shadow:
+        0 0 0 1px var(--hh-air-green-mid),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-rt__prize[data-state='claimable'] .octane-handheld-rt__prize-state span {
+    flex: 0 1 auto;
+    padding: 6px 10px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-primary);
+    box-shadow:
+        inset 0 1px 0 var(--hh-air-green-top),
+        var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+/* Claimed: flat, with the green check. */
+:root[data-handheld] .octane-handheld-rt__prize[data-state='claimed'] {
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__prize[data-state='claimed'] .octane-handheld-rt__prize-state {
+    color: var(--hh-air-green-deep);
+}
+
+/* Not enough points yet: flat and faded. */
+:root[data-handheld] .octane-handheld-rt__prize[data-state='not_enough_points'] {
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__prize[data-state='not_enough_points'] .octane-handheld-rt__plate {
+    opacity: 0.55;
+}
+
+/* Behind the pass: the lock, in the premium colour. */
+:root[data-handheld] .octane-handheld-rt__prize[data-state='premium_locked'] {
+    border-color: var(--hh-air-premium);
+}
+
+:root[data-handheld] .octane-handheld-rt__prize[data-state='premium_locked'] .octane-handheld-rt__prize-state {
+    color: var(--hh-air-premium);
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+:root[data-handheld] .octane-handheld-rt__button {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-4);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rt__button:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-rt__button.is-primary {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow:
+        inset 0 1px 0 var(--hh-air-green-top),
+        var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-rt__button.is-primary:active {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld] .octane-handheld-rt__button.is-premium {
+    flex: none;
+    border-color: var(--hh-air-premium);
+    background: var(--hh-air-premium);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        var(--hh-shadow-card);
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-rt__button.is-premium:active {
+    opacity: 0.85;
+}
+
+:root[data-handheld] .octane-handheld-rt__button:disabled {
+    box-shadow: none;
+    opacity: 0.5;
+}
+
+/* The claim button stays at the bottom of the road while something waits to be claimed. */
+:root[data-handheld] .octane-handheld-rt__actions {
+    position: sticky;
+    z-index: 2;
+    bottom: calc(-1 * var(--hh-space-2));
+    display: flex;
+    flex: none;
+    margin: auto calc(-1 * var(--hh-space-3)) calc(-1 * var(--hh-space-2));
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-top: 1px solid var(--hh-air-box);
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__actions {
+    position: static;
+    grid-area: 2 / 1;
+    margin: 0;
+    padding: 0;
+    border-top: 0;
+}
+
+/* ---------------------------------------------------------------- tasks */
+
+/* The count and the filters stay on top while the cards scroll under them. */
+:root[data-handheld] .octane-handheld-rt__tasks-head {
+    position: sticky;
+    z-index: 2;
+    top: calc(-1 * var(--hh-space-3));
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0 calc(-1 * var(--hh-space-3));
+    padding: var(--hh-space-1) var(--hh-space-3) var(--hh-space-2);
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__tasks-head {
+    top: 0;
+    margin: 0;
+    padding: 0 0 var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-rt__tasks-count {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-rt__tasks-count img {
+    flex: none;
+    height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-rt__filters {
+    display: flex;
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-handheld-rt__filter {
+    position: relative;
+    flex: 1 1 0;
+    box-sizing: border-box;
+    min-width: 0;
+    height: 36px;
+    padding: 0 var(--hh-space-2);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rt__filter:active {
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-rt__filter[data-active='true'] {
+    border-color: var(--hh-air-blue-header);
+    background: var(--hh-air-blue-header);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+/* The tip strip: the gift, the words, Frank and Piccolo (or the way to the pass). */
+:root[data-handheld] .octane-handheld-rt__tip {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: 52px;
+    margin-bottom: var(--hh-space-2);
+    padding: 6px var(--hh-space-2);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-track-tip);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-rt__tip.is-premium {
+    background: var(--hh-air-track-premium);
+}
+
+:root[data-handheld] .octane-handheld-rt__tip img {
+    flex: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__tip-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-rt__task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-handheld-rt__task {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    width: 100%;
+    min-width: 0;
+    min-height: 68px;
+    padding: var(--hh-space-2) var(--hh-space-1) var(--hh-space-2) var(--hh-space-2);
+    border: 1px solid transparent;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rt__task:active {
+    background: var(--hh-air-track-light);
+}
+
+/* On its side the details stand beside the list, so the list shows which task they belong to. */
+:root[data-handheld='landscape'] .octane-handheld-rt__task[data-selected='true'] {
+    border-color: var(--hh-air-select);
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-rt__glyph {
+    display: flex;
+    flex: 0 0 44px;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--hh-radius-s);
+    background: var(--rt-light, var(--hh-air-track-light));
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__glyph img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+:root[data-handheld] .octane-handheld-rt__glyph.is-large {
+    flex-basis: 64px;
+    width: 64px;
+    height: 64px;
+    border-radius: var(--hh-radius-m);
+}
+
+:root[data-handheld] .octane-handheld-rt__task-copy {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__task-name {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 17px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-rt__task-desc {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-xs);
+    line-height: 14px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-rt__task-desc:empty {
+    display: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__task-progress {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    margin-top: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-rt__task-end {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--hh-space-1);
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__chevron {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: var(--hh-air-border);
+    stroke-width: 2.2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+/* Nothing opens on its side: the details are already there. */
+:root[data-handheld='landscape'] .octane-handheld-rt__task > .octane-handheld-rt__chevron {
+    display: none;
+}
+
+/* ---------------------------------------------------------------- task details */
+
+/* Upright: a page over the sheet, with Back; the list under it keeps its place. */
+:root[data-handheld] .octane-handheld-rt__detail {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+    padding: var(--hh-space-3) var(--hh-space-3) 0;
+    border-radius: var(--hh-radius-l) var(--hh-radius-l) 0 0;
+    background: var(--hh-air-cream);
+}
+
+/* On its side: the right column. */
+:root[data-handheld='landscape'] .octane-handheld-rt__detail {
+    position: static;
+    grid-area: 1 / 2 / span 2;
+    padding: 0;
+    border-radius: 0;
+}
+
+:root[data-handheld] .octane-handheld-rt__detail-bar {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__detail-bar {
+    display: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__back {
+    position: relative;
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 2px;
+    height: 36px;
+    padding: 0 var(--hh-space-3) 0 6px;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 20px;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-rt__back:active {
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-rt__back .octane-handheld-rt__chevron {
+    stroke: currentColor;
+}
+
+:root[data-handheld] .octane-handheld-rt__detail-scroll {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-height: 0;
+    padding-bottom: var(--hh-space-2);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-rt__card.is-task {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-rt__heading {
+    margin: 0;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-rt__levels {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* A level: its name, the bar, the count (never past the level's target), the check once done, the points. */
+:root[data-handheld] .octane-handheld-rt__level {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr) 58px 17px 44px;
+    align-items: center;
+    column-gap: var(--hh-space-2);
+    min-height: 36px;
+    padding: 0 var(--hh-space-2);
+    border-radius: var(--hh-radius-s);
+}
+
+:root[data-handheld] .octane-handheld-rt__level[data-active='true'] {
+    background: var(--rt-light, var(--hh-air-track-light));
+}
+
+:root[data-handheld] .octane-handheld-rt__level .octane-handheld-rt__count {
+    text-align: right;
+}
+
+:root[data-handheld] .octane-handheld-rt__level-name {
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-rt__level-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:root[data-handheld] .octane-handheld-rt__level .octane-handheld-rt__points {
+    justify-self: end;
+}
+
+/* Frank's tip, with the button that leads to where the task is done. */
+:root[data-handheld] .octane-handheld-rt__hint {
+    display: flex;
+    flex: none;
+    align-items: flex-end;
+    gap: var(--hh-space-3);
+    padding: var(--hh-space-3) var(--hh-space-3) 0;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-track-light);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-rt__hint-frank {
+    flex: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__hint-copy {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-self: center;
+    gap: var(--hh-space-1);
+    min-width: 0;
+    padding-bottom: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-rt__hint-title {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-rt__hint-text {
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-rt__hint .octane-handheld-rt__button {
+    flex: none;
+    margin-top: var(--hh-space-1);
+}
+
+/* ---------------------------------------------------------------- the premium pass purchase */
+
+:root[data-handheld] .octane-handheld-rt__scrim {
+    position: absolute;
+    z-index: 5;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--hh-space-3);
+    background: var(--hh-air-outline);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__scrim {
+    align-items: center;
+}
+
+:root[data-handheld] .octane-handheld-rt__confirm > * {
+    flex: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__confirm {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    width: 100%;
+    max-width: 420px;
+    max-height: 100%;
+    padding: var(--hh-space-4);
+    overflow-y: auto;
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-panel);
+    box-shadow: var(--hh-shadow-float);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-rt__confirm-head {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-3);
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-track-premium);
+}
+
+:root[data-handheld] .octane-handheld-rt__confirm-head img {
+    flex: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__confirm-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-rt__confirm-titles strong {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-rt__confirm-desc {
+    margin: 0;
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-rt__benefits {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+:root[data-handheld] .octane-handheld-rt__benefits li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--hh-space-2);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-rt__benefits img {
+    flex: none;
+    margin-top: 1px;
+}
+
+:root[data-handheld] .octane-handheld-rt__cost {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hh-space-2) var(--hh-space-3);
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-rt__cost-label {
+    margin-right: auto;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-rt__price {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--hh-space-1);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+}
+
+/* Cancel and buy stay in reach when the card has to scroll (a phone on its side). */
+:root[data-handheld] .octane-handheld-rt__confirm-buttons {
+    position: sticky;
+    bottom: calc(-1 * var(--hh-space-4));
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+    margin: 0 calc(-1 * var(--hh-space-4)) calc(-1 * var(--hh-space-4));
+    padding: var(--hh-space-2) var(--hh-space-4) var(--hh-space-4);
+    background: var(--hh-air-panel);
+}
+
+/* On its side the card is wide and low: what the pass gives stands beside what it is and costs. */
+:root[data-handheld='landscape'] .octane-handheld-rt__scrim {
+    padding: var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__confirm {
+    display: grid;
+    grid-template-areas:
+        "head benefits"
+        "desc benefits"
+        "cost buttons";
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--hh-space-4);
+    align-items: center;
+    max-width: 640px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__confirm-head {
+    grid-area: head;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__confirm-desc {
+    grid-area: desc;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__benefits {
+    grid-area: benefits;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__cost {
+    grid-area: cost;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-rt__confirm-buttons {
+    position: static;
+    grid-area: buttons;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------------------------------------------------------------- staff editor */
+
+/* The editor keeps its desktop content; here it scrolls both ways inside the sheet, with 16 px fields so mobile Safari
+   does not zoom into them. */
+:root[data-handheld] .octane-handheld-rt__admin {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-rt__admin :where(input, textarea, select),
+:root[data-handheld] .octane-reward-track-admin-modal :where(input, textarea, select) {
+    font-size: var(--hh-size-field);
+}
+
+:root[data-handheld] .octane-handheld-rt__admin :where(button),
+:root[data-handheld] .octane-reward-track-admin-modal :where(button) {
+    min-height: 32px;
+}
+
+/* Upright the track list stands above the open track instead of beside it, and the form fields go two abreast. */
+:root[data-handheld='portrait'] .octane-handheld-rt__admin .octane-reward-track-admin-body {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+:root[data-handheld='portrait'] .octane-handheld-rt__admin .octane-reward-track-admin-grid,
+:root[data-handheld='portrait'] .octane-reward-track-admin-modal .octane-reward-track-admin-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* A panel's table is wider than a phone: it is swiped sideways inside its panel. */
+:root[data-handheld] .octane-handheld-rt__admin .octane-reward-track-admin-panel {
+    min-width: 0;
+    overflow-x: auto;
+}
+
+:root[data-handheld] .octane-handheld-rt__admin .octane-reward-track-admin-toolbar,
+:root[data-handheld] .octane-handheld-rt__admin .octane-reward-track-admin-panel-head {
+    flex-wrap: wrap;
+}
+
+/* The editor's forms open as a window of their own: no wider than the phone, scrolling inside. */
+:root[data-handheld] .octane-reward-track-admin-modal {
+    width: auto !important;
+    max-width: calc(100vw - 16px - var(--octane-safe-left, 0px) - var(--octane-safe-right, 0px));
+    max-height: calc(100dvh - 16px - var(--octane-safe-top, 0px) - var(--octane-safe-bottom, 0px));
+}
+
+:root[data-handheld] .octane-reward-track-admin-modal-body {
+    overflow: auto;
+}

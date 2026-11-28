@@ -1,0 +1,177 @@
+/*
+ * Phone room tools and chat history. Scoped to :root[data-handheld] (set only on a phone-sized touch device by the
+ * handheld watcher), so RoomWidgets.css / ChatHistoryView.css stay as they are on desktop. The tools open from the
+ * room chip at the top left; the chat history lives at the room's left edge, keeps clear of the toolbar strip and
+ * the chat composer (HandheldChat.css) and follows the composer up when the on-screen keyboard opens.
+ */
+
+/* ---------------------------------------------------------------- room tools */
+
+/* The tools hang from the room chip at the top left (HandheldHud.css draws the chip): a menu under it. */
+:root[data-handheld] .octane-room-tools-container,
+:root[data-handheld] .octane-room-tools-container.is-collapsed {
+    top: calc(8px + var(--octane-safe-top));
+    bottom: auto;
+    left: calc(8px + var(--octane-safe-left));
+    z-index: 72;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: auto;
+    height: auto;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-room-tools-container .octane-room-tools {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 208px;
+    min-height: 0;
+    max-height: calc(100vh - 130px - var(--octane-safe-top) - var(--octane-safe-bottom));
+    gap: 2px;
+    padding: 8px 10px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 8px;
+    background: rgba(47, 46, 41, 0.96);
+    pointer-events: auto;
+}
+
+:root[data-handheld] .octane-room-tools-container .room-tools-zoom-row {
+    height: 44px;
+    padding-bottom: 2px;
+    font-size: 12px;
+}
+
+/* The 18 x 19 zoom bitmaps stay as drawn, centred in finger-sized buttons. */
+:root[data-handheld] .octane-room-tools-container .room-tools-zoom-button {
+    width: 40px;
+    height: 40px;
+    margin-left: 0;
+    background-position: center;
+}
+
+:root[data-handheld] .octane-room-tools-container .room-tool-row {
+    height: 40px;
+    font-size: 12px;
+    line-height: 40px;
+}
+
+:root[data-handheld] .octane-room-tools-container .room-history-controls {
+    height: 44px;
+    gap: 8px;
+}
+
+:root[data-handheld] .octane-room-tools-container .room-history-controls > * {
+    min-width: 40px;
+    min-height: 40px;
+}
+
+/* The visited rooms open beside the menu. */
+:root[data-handheld] .octane-room-tools-container .octane-room-tools-history {
+    top: 50px;
+    bottom: auto;
+    left: 212px;
+    pointer-events: auto;
+}
+
+:root[data-handheld] .octane-room-tools-container .octane-room-history {
+    width: min(220px, calc(100vw - 236px - var(--octane-safe-left) - var(--octane-safe-right)));
+    min-width: 140px;
+    max-height: calc(100vh - 130px - var(--octane-safe-top) - var(--octane-safe-bottom));
+    overscroll-behavior: contain;
+}
+
+:root[data-handheld] .octane-room-tools-container .octane-room-history .room-history-item {
+    min-height: 40px;
+    text-align: left;
+}
+
+/* The entry card (owner and tags; the chip already has the name) drops in under the chip. */
+:root[data-handheld] .octane-room-tools-container .octane-room-tools-info.octane-room-tools-info--enter,
+:root[data-handheld] .octane-room-tools-container.is-collapsed .octane-room-tools-info.octane-room-tools-info--enter {
+    top: 50px;
+    bottom: auto;
+    left: 0;
+    min-width: 0;
+    max-width: calc(100vw - 16px - var(--octane-safe-left) - var(--octane-safe-right));
+}
+
+/* The open menu takes that place. */
+:root[data-handheld] .octane-room-tools-container:not(.is-collapsed) .octane-room-tools-info.octane-room-tools-info--enter {
+    display: none;
+}
+
+:root[data-handheld] .octane-room-tools-container .octane-room-tools-info__tag {
+    min-height: 32px;
+}
+
+/* With the keyboard open the chat composer takes the bottom; the chip and its menu step aside like the toolbar does. */
+:root[data-handheld][data-handheld-keyboard] .octane-room-tools-container {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- chat history */
+
+:root[data-handheld] .octane-chat-history {
+    top: var(--octane-safe-top);
+    bottom: calc(var(--octane-handheld-toolbar) + 60px + var(--octane-safe-bottom));
+    left: var(--octane-safe-left);
+    width: calc(100vw - 8px - var(--octane-safe-left) - var(--octane-safe-right));
+    max-width: 480px;
+}
+
+/* The keyboard opened (for the chat composer): the history ends right above the composer on top of the keyboard. */
+:root[data-handheld][data-handheld-keyboard] .octane-chat-history {
+    bottom: calc(var(--octane-keyboard-inset, 0px) + 104px);
+}
+
+:root[data-handheld] .octane-chat-history-tray-bar {
+    width: 12px;
+}
+
+:root[data-handheld] .octane-chat-history-content {
+    inset: 0 44px 0 12px;
+}
+
+:root[data-handheld] .octane-chat-history-scroll {
+    padding: 10px 6px 14px;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-chat-history-time {
+    flex-basis: 44px;
+    font-size: 11px;
+}
+
+/* No hover on a phone: the ignore cross is always shown, in a finger-sized target. */
+:root[data-handheld] .octane-chat-history-ignore {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    margin-left: 2px;
+    opacity: 0.85;
+}
+
+:root[data-handheld] .octane-chat-history-ignore::before,
+:root[data-handheld] .octane-chat-history-ignore::after {
+    top: 16px;
+    left: 11px;
+}
+
+:root[data-handheld] .octane-chat-history-handle {
+    bottom: 50%;
+    width: 44px;
+    height: 72px;
+    transform: translateY(50%);
+    border-radius: 0 10px 10px 0;
+    touch-action: manipulation;
+}
+
+:root[data-handheld] .octane-chat-history-handle::before {
+    left: 18px;
+    top: 30px;
+}

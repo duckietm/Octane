@@ -5,6 +5,8 @@ import { clampInputPage, DEFAULT_PAGING_TEXT, NO_PAGE, parseInputPage, restrictP
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldWiredPagedList } from './handheld/HandheldWiredPagedList';
 
 export interface WiredTableColumn {
     id: string;
@@ -12,6 +14,8 @@ export interface WiredTableColumn {
     /** Tailwind width class of the header cell, e.g. `w-[120px]`; the last column takes the rest. */
     className?: string;
     align?: 'left' | 'right';
+    /** Phone layout (HandheldWiredPagedList): the card's heading, a part of its one small line, an action at its foot, or left out. Default: a line. */
+    handheld?: 'title' | 'meta' | 'action' | 'hidden';
 }
 
 export interface WiredTableCell {
@@ -49,6 +53,7 @@ export const WiredPagedTable = <T,>(props: WiredPagedTableProps<T>) => {
     const { columns, rows, getRowId, getCell, currentPage, totalEntries, lastPage, requests, emptyText, scrollResetKey = 0, bodyClassName = 'max-h-[300px]', pagingTextKey = '' } = props;
     const [pageInput, setPageInput] = useState(currentPage === NO_PAGE ? '1' : String(currentPage));
     const [bodyElement, setBodyElement] = useState<HTMLDivElement | null>(null);
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         setPageInput(currentPage === NO_PAGE ? '1' : String(currentPage));
@@ -57,6 +62,9 @@ export const WiredPagedTable = <T,>(props: WiredPagedTableProps<T>) => {
     useEffect(() => {
         if (bodyElement) bodyElement.scrollTop = 0;
     }, [scrollResetKey, bodyElement]);
+
+    // A phone shows the rows as cards over a finger-sized pager, fed by the same rows, cells and requests.
+    if (isHandheld) return <HandheldWiredPagedList {...props} />;
 
     const isFirst = currentPage !== NO_PAGE && currentPage <= 1;
     const isLast = currentPage !== NO_PAGE && lastPage !== NO_PAGE && currentPage >= lastPage;

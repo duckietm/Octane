@@ -1,0 +1,1322 @@
+/*
+ * The mod tools on a phone (ModToolsView -> HandheldModToolsView): one sheet in the Octane handheld look instead of the
+ * desktop's start panel and its windows. The tabs are the start page and every open tool; upright one page fills the
+ * sheet, on its side the start page stays on the left and the tool in front on the right. Every tool page has a head
+ * (Back, name, close), content that scrolls and its actions in a bar at the bottom. Scoped to :root[data-handheld].
+ */
+
+/* ---------------------------------------------------------------- frame */
+
+:root[data-handheld] .octane-handheld-modtools .octane-handheld-sheet__body {
+    padding: 0;
+}
+
+/* An open tool on a tab: named after its subject (a user, a room, a ticket), cut short when long. */
+:root[data-handheld] .octane-handheld-modtools .octane-handheld-sheet__tab {
+    flex: 0 0 auto;
+    max-width: 168px;
+}
+
+:root[data-handheld] .octane-handheld-modtools .octane-handheld-sheet__tab-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+:root[data-handheld] .octane-handheld-modtools__layout {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-modtools__layout {
+    gap: var(--hh-space-2);
+    padding: 0 var(--hh-space-2) 0 0;
+}
+
+:root[data-handheld] .octane-handheld-modtools :is(.octane-handheld-modtools__start-column, .octane-handheld-modtools__pages, .octane-handheld-modtools__page)[hidden],
+:root[data-handheld] .octane-handheld-modtools [hidden] {
+    display: none;
+}
+
+:root[data-handheld] .octane-handheld-modtools__start-column {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+    padding: var(--hh-space-3);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-modtools__start-column {
+    flex: 0 0 292px;
+    padding: var(--hh-space-2) var(--hh-space-2) var(--hh-space-3) var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-modtools__pages {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* On its side the tool in front is a panel of its own beside the start page. */
+:root[data-handheld='landscape'] .octane-handheld-modtools__pages {
+    margin: var(--hh-space-2) 0 0;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m) var(--hh-radius-m) 0 0;
+    background: var(--hh-air-panel);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-modtools__pages > .octane-handheld-modtools__note {
+    margin: auto;
+}
+
+/* ---------------------------------------------------------------- page */
+
+:root[data-handheld] .octane-handheld-modtools__page {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+:root[data-handheld] .octane-handheld-modtools__page-head {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: 52px;
+    padding: var(--hh-space-1) var(--hh-space-2) var(--hh-space-1) var(--hh-space-2);
+    border-bottom: 1px solid var(--hh-air-box);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-modtools__page-head {
+    min-height: 46px;
+    padding-left: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-modtools__back {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 2px;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-3) 0 var(--hh-space-1);
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__back:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-modtools__page-name {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-modtools__page-title {
+    overflow: hidden;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-modtools__page-subtitle {
+    overflow: hidden;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] :is(.octane-handheld-modtools__page-close, .octane-handheld-modtools__icon-button) {
+    position: relative;
+    display: flex;
+    flex: 0 0 36px;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin: 0 var(--hh-space-1);
+    padding: 0;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text-muted);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+/* The circle is 36 px; the finger gets 44. */
+:root[data-handheld] :is(.octane-handheld-modtools__page-close, .octane-handheld-modtools__icon-button)::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+}
+
+:root[data-handheld] :is(.octane-handheld-modtools__page-close, .octane-handheld-modtools__icon-button):active {
+    background: var(--hh-air-box);
+}
+
+:root[data-handheld] :is(.octane-handheld-modtools__chevron, .octane-handheld-modtools__cross) {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-modtools__page-body {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-height: 0;
+    padding: var(--hh-space-3);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-modtools__page-body > * {
+    flex: none;
+}
+
+/* The page's actions: a bar at the bottom, clear of the phone's home bar. */
+:root[data-handheld] .octane-handheld-modtools__bar {
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-2) var(--hh-space-3) max(var(--hh-space-2), env(safe-area-inset-bottom));
+    border-top: 1px solid var(--hh-air-box);
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-modtools__bar > .octane-handheld-modtools__button {
+    flex: 1 1 0;
+}
+
+/* ---------------------------------------------------------------- shared parts */
+
+:root[data-handheld] .octane-handheld-modtools__card {
+    box-sizing: border-box;
+    padding: var(--hh-space-1) var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-modtools__heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-1) 2px 0;
+    color: var(--hh-air-blue-deep);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__heading-hint {
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font);
+    font-weight: 400;
+}
+
+:root[data-handheld] .octane-handheld-modtools__note {
+    margin: 0;
+    padding: var(--hh-space-3);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-modtools__tag {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    height: 20px;
+    padding: 0 var(--hh-space-2);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-header);
+    font-size: var(--hh-size-s);
+    line-height: 20px;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-modtools__dot {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-count-empty);
+    box-shadow: 0 0 0 2px var(--hh-air-white);
+}
+
+:root[data-handheld] .octane-handheld-modtools__dot.is-present {
+    background: var(--hh-air-count-green);
+}
+
+:root[data-handheld] .octane-handheld-modtools__count {
+    flex: none;
+    box-sizing: border-box;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-red);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 22px;
+    text-align: center;
+}
+
+/* Buttons: finger high, the green one for what moves on, red for what closes or sanctions. */
+:root[data-handheld] .octane-handheld-modtools__button {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: var(--hh-touch);
+    padding: var(--hh-space-1) var(--hh-space-2);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__button:active {
+    background: var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-modtools__button[data-tone='primary'] {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow: var(--hh-edge);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-modtools__button[data-tone='primary']:active {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld] .octane-handheld-modtools__button[data-tone='danger'] {
+    border-color: var(--hh-air-red-deep);
+    background: var(--hh-dismiss);
+    box-shadow: var(--hh-edge);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-modtools__button:disabled {
+    cursor: default;
+    opacity: 0.45;
+}
+
+:root[data-handheld] .octane-handheld-modtools__button-label {
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-modtools__button-hint {
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-s);
+    font-weight: 400;
+    line-height: 14px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-modtools__chip {
+    position: relative;
+    flex: none;
+    height: 30px;
+    padding: 0 var(--hh-space-3);
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-header);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__chip::after {
+    content: "";
+    position: absolute;
+    inset: -4px -2px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__chip:active {
+    background: var(--hh-air-track-light);
+}
+
+/* Facts: the name, the value, an optional link. */
+:root[data-handheld] .octane-handheld-modtools__facts {
+    margin: 0;
+}
+
+:root[data-handheld] .octane-handheld-modtools__fact {
+    display: grid;
+    grid-template-columns: minmax(96px, 38%) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: 36px;
+    border-bottom: 1px solid var(--hh-air-box);
+    font-size: var(--hh-size-m);
+    line-height: 17px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__fact:last-child {
+    border-bottom: 0;
+}
+
+:root[data-handheld] .octane-handheld-modtools__fact dt {
+    color: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-handheld-modtools__fact dd {
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-modtools__fact[data-tone='alert'] dd {
+    color: var(--hh-air-red);
+}
+
+:root[data-handheld] .octane-handheld-modtools__fact-link {
+    position: relative;
+    height: 32px;
+    padding: 0 var(--hh-space-3);
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-header);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__fact-link::after {
+    content: "";
+    position: absolute;
+    inset: -2px 0;
+}
+
+:root[data-handheld] .octane-handheld-modtools__fact-link:active {
+    background: var(--hh-air-track-active);
+}
+
+/* Fields: 16 px so the phone does not zoom in. */
+:root[data-handheld] .octane-handheld-modtools__field {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__field:focus {
+    border-color: var(--hh-air-blue-deep);
+    outline: none;
+}
+
+:root[data-handheld] .octane-handheld-modtools__field.is-area {
+    min-height: 96px;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    line-height: 21px;
+    resize: vertical;
+}
+
+:root[data-handheld] .octane-handheld-modtools__field.is-tall {
+    min-height: 160px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__select.octane-select-trigger,
+:root[data-handheld] .octane-handheld-modtools .octane-handheld-modtools__select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-s);
+    background-color: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+/* A box or a round and its words: the whole row is the label. */
+:root[data-handheld] .octane-handheld-modtools__check,
+:root[data-handheld] .octane-handheld-modtools__radio-row {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-height: var(--hh-touch);
+    border-bottom: 1px solid var(--hh-air-box);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    line-height: 17px;
+}
+
+:root[data-handheld] :is(.octane-handheld-modtools__check, .octane-handheld-modtools__radio-row):last-child {
+    border-bottom: 0;
+}
+
+:root[data-handheld] .octane-handheld-modtools__check[data-disabled='true'] {
+    opacity: 0.45;
+}
+
+:root[data-handheld] .octane-handheld-modtools__check.is-compact {
+    min-height: 36px;
+    border-bottom: 0;
+    font-size: var(--hh-size-s);
+    line-height: 15px;
+}
+
+:root[data-handheld] .octane-handheld-modtools :is(.octane-checkbox, .octane-radio) {
+    flex: none;
+}
+
+/* The pixel radio of the AIR skin, drawn twice as big for a finger. */
+:root[data-handheld] .octane-handheld-modtools .octane-radio {
+    width: 22px;
+    min-width: 22px;
+    height: 24px;
+    background-size: 22px 24px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__proposed {
+    margin: 0;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-track-tip);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+/* Pills inside a page (the ticket lists, the parts of a ticket). */
+:root[data-handheld] .octane-handheld-modtools__segments {
+    display: flex;
+    gap: 6px;
+    padding: 2px 0 var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-modtools__segment {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    height: 36px;
+    padding: 0 var(--hh-space-2);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text-muted);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    line-height: 34px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__segment[data-pressed] {
+    border-color: var(--hh-air-blue-header);
+    background: var(--hh-air-blue-header);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-modtools__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+}
+
+/* ---------------------------------------------------------------- start page */
+
+:root[data-handheld] .octane-handheld-modtools__start {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-modtools__selected {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-1);
+    min-height: 64px;
+    padding: var(--hh-space-1) var(--hh-space-1) var(--hh-space-1) var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-modtools__selected-user {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-width: 0;
+    min-height: 56px;
+    padding: 0 var(--hh-space-1);
+    border: 0;
+    border-radius: var(--hh-radius-s);
+    background: transparent;
+    color: var(--hh-air-text);
+    cursor: pointer;
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__selected-user:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-modtools__head {
+    position: relative;
+    display: flex;
+    flex: 0 0 44px;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-modtools__head > .octane-handheld-modtools__dot {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__selected-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-modtools__selected-name {
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-modtools__selected-where,
+:root[data-handheld] .octane-handheld-modtools__room-line {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__room-line {
+    padding: 0 2px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__selected-empty {
+    flex: 1 1 0;
+    padding: var(--hh-space-2);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__search {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-modtools__results {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-modtools__result {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    border: 0;
+    border-bottom: 1px solid var(--hh-air-box);
+    background: transparent;
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__result:last-child {
+    border-bottom: 0;
+}
+
+:root[data-handheld] .octane-handheld-modtools__result:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-modtools__result-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-modtools__tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-modtools__tile {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 64px;
+    padding: var(--hh-space-2) var(--hh-space-2) var(--hh-space-2) var(--hh-space-2);
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-blue-header);
+    cursor: pointer;
+    text-align: left;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__tile:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-modtools__tile:disabled {
+    background: var(--hh-air-panel);
+    box-shadow: none;
+    color: var(--hh-air-text-muted);
+    cursor: default;
+}
+
+:root[data-handheld] .octane-handheld-modtools__tile:disabled .octane-handheld-modtools__tile-icon img {
+    opacity: 0.45;
+}
+
+:root[data-handheld] .octane-handheld-modtools__tile-icon {
+    display: flex;
+    flex: 0 0 36px;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-modtools__tile-text {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-modtools__tile-label {
+    overflow-wrap: anywhere;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 17px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__tile-hint {
+    font-size: var(--hh-size-s);
+    line-height: 15px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__tile .octane-handheld-modtools__chevron {
+    color: var(--hh-air-blue-light);
+}
+
+/* ---------------------------------------------------------------- user info */
+
+:root[data-handheld] .octane-handheld-modtools__user {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-modtools__user-head {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: 48px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__user-name {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- room tool */
+
+:root[data-handheld] .octane-handheld-modtools__room {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    padding: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-modtools__room-name {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-modtools__room-desc {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-modtools__room-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hh-space-1);
+}
+
+/* ---------------------------------------------------------------- tickets */
+
+:root[data-handheld] .octane-handheld-modtools__ticket {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-modtools__ticket-main {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-modtools__ticket-icon {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__ticket-text {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-modtools__ticket-title {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 19px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-modtools__ticket-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hh-space-1) var(--hh-space-3);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__ticket-actions {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-modtools__issue {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: 56px;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border: 2px solid transparent;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__issue[data-selected='true'] {
+    border-color: var(--hh-air-select);
+}
+
+:root[data-handheld] .octane-handheld-modtools__issue .octane-handheld-modtools__chevron {
+    color: var(--hh-air-blue-light);
+}
+
+:root[data-handheld] .octane-handheld-modtools__messages {
+    padding: 0;
+    overflow: hidden;
+}
+
+:root[data-handheld] .octane-handheld-modtools__message {
+    margin: 0;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-bottom: 1px solid var(--hh-air-box);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-modtools__message:nth-child(odd) {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-modtools__message:last-child {
+    border-bottom: 0;
+}
+
+/* The ticket's bar: "open the next issue", then the five ways to finish, three a row upright, all five on its side. */
+:root[data-handheld] .octane-handheld-modtools__close-bar {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-modtools__close-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-modtools__close-actions {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+:root[data-handheld] .octane-handheld-modtools__close-actions .octane-handheld-modtools__button {
+    padding: 2px var(--hh-space-1);
+    font-size: var(--hh-size-s);
+    line-height: 15px;
+}
+
+/* On its side the bar keeps "next issue" and the buttons on one line. */
+:root[data-handheld='landscape'] .octane-handheld-modtools__close-bar {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-modtools__close-bar > .octane-handheld-modtools__check {
+    flex: 0 0 112px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-modtools__close-actions {
+    flex: 1 1 0;
+}
+
+/* ---------------------------------------------------------------- chatlog */
+
+:root[data-handheld] .octane-handheld-modtools__find {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-modtools__find-count {
+    flex: none;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-modtools__chatlog {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-modtools__record {
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-modtools__record-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: var(--hh-touch);
+    padding: var(--hh-space-1) var(--hh-space-3);
+    background: var(--hh-air-blue);
+}
+
+:root[data-handheld] .octane-handheld-modtools__record-title {
+    flex: 1 1 140px;
+    min-width: 0;
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 17px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-modtools__line {
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-top: 1px solid var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-modtools__line[data-mark='0'] {
+    background: var(--hh-air-track-tip);
+}
+
+:root[data-handheld] .octane-handheld-modtools__line[data-mark='1'] {
+    background: var(--hh-air-track-medium);
+}
+
+:root[data-handheld] .octane-handheld-modtools__line-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-modtools__line-user {
+    position: relative;
+    min-width: var(--hh-touch);
+    max-width: 75%;
+    min-height: 36px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    text-align: left;
+    text-decoration: underline;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__line-user.is-plain {
+    display: inline-flex;
+    align-items: center;
+    color: var(--hh-air-text);
+    text-decoration: none;
+}
+
+:root[data-handheld] .octane-handheld-modtools__line-time {
+    flex: none;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-modtools__line-text {
+    margin: 2px 0 0;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+:root[data-handheld] .octane-handheld-modtools__line-text.is-bold {
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- visits, records, classification */
+
+:root[data-handheld] .octane-handheld-modtools__visit {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-height: 56px;
+    padding: var(--hh-space-1) var(--hh-space-2) var(--hh-space-1) var(--hh-space-3);
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__visit.is-user {
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-handheld-modtools__visit.is-user:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-modtools__visit-time {
+    flex: none;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-modtools__visit-room {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: var(--hh-touch);
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: var(--hh-touch);
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-modtools__visit > .octane-handheld-modtools__button {
+    flex: 0 0 88px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__applied {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__applied-title {
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- confirmations and alerts */
+
+/* A card over the sheet (and over the room, for an alert that comes while the sheet is put away). */
+:root[data-handheld] .octane-handheld-modtools__overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--hh-space-4);
+    background: var(--hh-air-outline);
+    font-family: var(--hh-font);
+}
+
+:root[data-handheld] .octane-handheld-modtools__dialog {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    width: 100%;
+    max-width: 340px;
+    max-height: 100%;
+    padding: var(--hh-space-4);
+    overflow-y: auto;
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-cream);
+    box-shadow: var(--hh-shadow-float);
+    color: var(--hh-air-text);
+    transition: opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__dialog-title {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-modtools__dialog-text {
+    margin: 0;
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+:root[data-handheld] .octane-handheld-modtools__dialog-actions {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: var(--hh-space-2);
+}
+
+/* Focus rings on the cream. */
+:root[data-handheld] :is(.octane-handheld-modtools, .octane-handheld-modtools__overlay) :where(button, textarea, input):focus-visible {
+    outline: var(--hh-focus-on-paper);
+    outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- open tools on the start page */
+
+:root[data-handheld] .octane-handheld-modtools__open-list {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-modtools__open {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-1);
+    padding-right: var(--hh-space-1);
+    border-bottom: 1px solid var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-modtools__open:last-child {
+    border-bottom: 0;
+}
+
+:root[data-handheld] .octane-handheld-modtools__open-name {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-2) 0 var(--hh-space-3);
+    border: 0;
+    background: transparent;
+    color: var(--hh-air-blue-header);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-modtools__open-name > span {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-modtools__open-name:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-modtools__open-name .octane-handheld-modtools__chevron {
+    color: var(--hh-air-blue-light);
+}

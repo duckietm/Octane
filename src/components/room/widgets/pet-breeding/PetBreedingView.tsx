@@ -13,6 +13,7 @@ import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Te
 import { useOctaneEvent, useRoom } from '../../../../hooks';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 interface BreedingRequest {
     nestId: number;
@@ -86,7 +87,7 @@ export const PetBreedingView: FC = () => {
     if (success) {
         return (
             <NativeTextTree>
-                <OctaneCardView className="octane-pet-breeding" theme="primary-slim">
+                <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-pet-breeding" theme="primary-slim">
                     <OctaneCardHeaderView headerText={localizeWithFallback('breedpets.nestbreeding.success.header', 'Breeding over')} onCloseClick={() => setSuccess(null)} />
                     <OctaneCardContentView center gap={2}>
                         <Text>{localizeWithFallback('breedpets.nestbreeding.success.title', 'You are now a proud owner of...')}</Text>
@@ -106,7 +107,7 @@ export const PetBreedingView: FC = () => {
 
         return (
             <NativeTextTree>
-                <OctaneCardView className="octane-pet-breeding" theme="primary-slim">
+                <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-pet-breeding" theme="primary-slim">
                     <OctaneCardHeaderView headerText={localizeWithFallback('breedpets.confirmation.alert.title', 'Error!')} onCloseClick={() => setError('')} />
                     <OctaneCardContentView center gap={2}>
                         <Text center>{error}</Text>
@@ -141,7 +142,7 @@ export const PetBreedingView: FC = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-pet-breeding" theme="primary-slim">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-pet-breeding" theme="primary-slim">
                 <OctaneCardHeaderView headerText={localizeWithFallback('breedpets.confirmation.widget.title', 'Breeding Pets')} onCloseClick={cancel} />
                 <OctaneCardContentView gap={2} overflow="auto">
                     <Text small>{localizeWithFallback('breedpets.confirmation.widget.request', 'Do you want to breed these pets?')}</Text>

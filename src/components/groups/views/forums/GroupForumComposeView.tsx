@@ -7,9 +7,14 @@ import { flatText, GroupInput, GroupText } from '../GroupNativeLayout';
 import { FORUM_HEADER, FORUM_SURFACE, ForumButton, ForumFrame, stripTags } from './GroupForumLayout';
 import { forumPermissionText } from './GroupForumThreadListView';
 import { BaseButton } from '../../../../common/BaseButton';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldGroupForumComposeView } from './HandheldGroupForumComposeView';
 
 // ComposeMessageView.validateInputs: a subject or a message of 10 characters or fewer is refused, and a post follows the last one by at least 30 seconds.
 const MIN_LENGTH = 10;
+// The longest subject and message the fields take.
+const SUBJECT_MAX_LENGTH = 120;
+const MESSAGE_MAX_LENGTH = 4000;
 const POST_COOLDOWN = 30000;
 
 // GroupForumController.lastPostTime: shared by every composer of the session; it starts 30 seconds in the past.
@@ -124,6 +129,32 @@ export const GroupForumComposeView: FC<GroupForumComposeViewProps> = ({ compose,
         return isHintShown ? LocalizeText('groupforum.compose.reply_hint') : '';
     };
     const status = getStatus();
+    const isHandheld = useIsHandheld();
+
+    // Phone layout: the same fields, rules and Post as a page of the phone sheet (HandheldGroupForumView).
+    if (isHandheld)
+        return (
+            <HandheldGroupForumComposeView
+                canPost={!(isPosting || !subjectOk || !messageOk || !canPostHere || cooldown > 0)}
+                message={message}
+                messageMaxLength={MESSAGE_MAX_LENGTH}
+                replySubject={isReply ? compose.subject : null}
+                status={status}
+                subject={subject}
+                subjectMaxLength={SUBJECT_MAX_LENGTH}
+                onCancel={onClose}
+                onFormattingHelp={() => CreateLinkEvent('habbopages/forums/formatting')}
+                onMessage={(value) => {
+                    setMessage(value);
+                    setIsHintShown(false);
+                }}
+                onPost={post}
+                onSubject={(value) => {
+                    setSubject(value);
+                    setIsHintShown(false);
+                }}
+            />
+        );
 
     return (
         <ForumFrame
@@ -152,7 +183,7 @@ export const GroupForumComposeView: FC<GroupForumComposeViewProps> = ({ compose,
             {isReply ? (
                 <GroupText background={0xffffff} overrides={flatText(16)} text={compose.subject} x={0} y={117} />
             ) : (
-                <GroupInput fontSize={16} height={22} inset={2} label={LocalizeText('groupforum.compose.subject')} maxLength={120} plain value={subject} width={444} x={0} y={117} onChange={(value) =>
+                <GroupInput fontSize={16} height={22} inset={2} label={LocalizeText('groupforum.compose.subject')} maxLength={SUBJECT_MAX_LENGTH} plain value={subject} width={444} x={0} y={117} onChange={(value) =>
                 {
                     setSubject(value); setIsHintShown(false);
                 }} />
@@ -163,7 +194,7 @@ export const GroupForumComposeView: FC<GroupForumComposeViewProps> = ({ compose,
                     <GroupText background={0x227aad} className="is-static" overrides={{ underline: true }} text={stripTags(LocalizeText('groupforum.compose.formatting_help'))} textStyle="id_link_regular" x={0} y={0} />
                 </BaseButton>
             </div>
-            <GroupInput fontSize={12} height={200} inset={4} label={LocalizeText('groupforum.compose.message')} maxLength={4000} multiline plain value={message} width={444} x={0} y={165} onChange={(value) =>
+            <GroupInput fontSize={12} height={200} inset={4} label={LocalizeText('groupforum.compose.message')} maxLength={MESSAGE_MAX_LENGTH} multiline plain value={message} width={444} x={0} y={165} onChange={(value) =>
             {
                 setMessage(value); setIsHintShown(false);
             }} />

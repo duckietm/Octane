@@ -4,6 +4,7 @@ import { localizeWithFallback, ShowVipBenefits } from '../../../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../../common';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../../../api/handheld/handheldWindowFit';
 
 /** Which furni sent the user here: AIR's TYPE_VIPHOPPER uses `viphopper.*` texts, the HC gate `gate.*`. */
 export type VipRequiredKind = 'viphopper' | 'gate';
@@ -28,7 +29,7 @@ const text = (key: string): string => localizeWithFallback(key, FALLBACKS[key] ?
  */
 export const VipRequiredView: FC<{ kind: VipRequiredKind; onClose: () => void }> = ({ kind, onClose }) => (
     <NativeTextTree>
-        <OctaneCardView classNames={['octane-vip-required']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="vip-required">
+        <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE} classNames={['octane-vip-required']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="vip-required">
             <OctaneCardHeaderView headerText={text('viprequired.header')} onCloseClick={onClose} />
             <OctaneCardContentView classNames={['octane-vip-required-content']} overflow="hidden">
                 <span className="octane-vip-required-title">{text(`${kind}.viprequired.title`)}</span>

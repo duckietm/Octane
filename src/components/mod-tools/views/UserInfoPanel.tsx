@@ -14,6 +14,9 @@ import { findNativeNode, nativeCaption, nativeNumber, NativeNode, parseNativeLay
 import { Native0Border, Native0Button, Native0Text } from '../native/NativeWindow0';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { USER_RECORD_KIND, UserRecordKind } from './UserRecordsView';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModFact } from '../handheld/HandheldModPage';
+import { HandheldModUserInfoPanel } from '../handheld/HandheldModUserInfoView';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SHADE = 0xa2d6ea;
@@ -37,12 +40,15 @@ export interface UserInfoPanelProps {
     onOpenRoomVisits: () => void;
     /** Opens the in-client records window of this user for one kind (cautions, bans, banned accounts, trade locks). */
     onOpenRecords: (kind: UserRecordKind, userName: string) => void;
+    /** Phone: the panel is the whole page (the user info window) and names it after the user. */
+    handheldPageTitle?: boolean;
 }
 
 // Classic v75 UserInfoCtrl (og): the user_info border with its fields and buttons. It is the content of the user info window (X5) and of the caller / reported panels of the issue handler: GetModeratorUserInfo(userId) goes out when the window opens, the fields stay hidden behind "Loading..."
 // until the answer for this user arrives; the sanction counts show a "view" link when they are above zero, which opens the records window of that kind. Kept from the earlier user info: "Online" also says when the
 // user is in the moderator's room, and the free space under the buttons holds a refresh button.
-export const UserInfoPanel: FC<UserInfoPanelProps> = ({ userId, settings, onOpenChatlog, onOpenSendMessage, onOpenModAction, onOpenRoomVisits, onOpenRecords }) => {
+export const UserInfoPanel: FC<UserInfoPanelProps> = ({ userId, settings, onOpenChatlog, onOpenSendMessage, onOpenModAction, onOpenRoomVisits, onOpenRecords, handheldPageTitle = false }) => {
+    const isHandheld = useIsHandheld();
     const frame = useMemo(() => parseNativeLayout(userInfoXml), []);
     const fields = useMemo(() => findNativeNode(frame, 'fields'), [frame]);
     const buttons = useMemo(() => findNativeNode(frame, 'buttons'), [frame]);
@@ -102,6 +108,60 @@ export const UserInfoPanel: FC<UserInfoPanelProps> = ({ userId, settings, onOpen
             {linkName && value > 0 && <Native0Text background={linkBackground} bold text="view" underline width={30} height={13} x={at(linkName).x} y={at(linkName).y} onClick={onLink} />}
         </>
     );
+
+    if (isHandheld) {
+        // the same fields, buttons and rules as the panel below, as rows and finger-sized buttons; the labels are the panel's own
+        const labelOf = (name: string, fallback: string) => {
+            const y = at(name).y;
+            const label = fields.children.find((node) => node.tag === 'text' && !node.attrs.name && nativeNumber(node, 'y') === y && nativeNumber(node, 'x') === 0);
+
+            return label ? text(label) : fallback;
+        };
+        const viewLabel = caption('view_caution_count_txt');
+        const view = (count: number, kind: UserRecordKind) => (data && count > 0 ? { label: viewLabel, onClick: () => onOpenRecords(kind, data.userName) } : undefined);
+        const facts: HandheldModFact[] = data
+            ? [
+                  { label: labelOf('name_txt', 'Name'), value: data.userName },
+                  { label: labelOf('cfh_count_txt', 'CFHs'), value: `${data.cfhCount}` },
+                  { label: labelOf('abusive_cfh_count_txt', 'Abusive CFHs'), value: `${data.abusiveCfhCount}` },
+                  { label: labelOf('caution_count_txt', 'Cautions'), value: `${data.cautionCount}`, action: view(data.cautionCount, USER_RECORD_KIND.cautions) },
+                  { label: labelOf('ban_count_txt', 'Bans'), value: `${data.banCount}`, action: view(data.banCount, USER_RECORD_KIND.bans) },
+                  { label: labelOf('last_sanction_time_txt', 'Last sanction'), value: data.lastSanctionTime || '-', tone: sanctionColor ? 'alert' : undefined },
+                  { label: labelOf('trading_lock_count_txt', 'Trade locks'), value: `${data.tradingLockCount}`, action: view(data.tradingLockCount, USER_RECORD_KIND.tradeLocks) },
+                  { label: labelOf('trading_lock_expiry_txt', 'Lock Expires'), value: data.tradingExpiryDate || caption('trading_lock_expiry_txt') },
+                  { label: labelOf('last_login_txt', 'Last Login'), value: formatTime(data.minutesSinceLastLogin * 60) },
+                  { label: labelOf('online_txt', 'Online'), value: roomUser ? localizeWithFallback('octane.mod_tools.yes_in_room', 'Yes (in room)') : data.online ? 'Yes' : 'No' },
+                  { label: labelOf('last_purchase_txt', 'Purchase'), value: data.lastPurchaseDate || 'No purchases' },
+                  { label: localizeWithFallback('octane.handheld.mod_tools.email', 'Email'), value: data.primaryEmailAddress || 'No email found' },
+                  { label: labelOf('id_bans_txt', 'Banned Accs.'), value: `${data.identityRelatedBanCount}`, action: view(data.identityRelatedBanCount, USER_RECORD_KIND.bannedAccounts) },
+                  { label: labelOf('registered_txt', 'Registered'), value: formatTime(data.registrationAgeInMinutes * 60) },
+                  { label: localizeWithFallback('octane.handheld.mod_tools.classification', 'Class'), value: data.userClassification || '-' }
+              ]
+            : [];
+        const label = (name: string) => text(findNativeNode(buttons, name));
+
+        return (
+            <HandheldModUserInfoPanel
+                actions={
+                    data
+                        ? [
+                              { id: 'chatlog', label: label('chatlog_but'), enabled: settings.chatlogsPermission, onClick: onOpenChatlog },
+                              { id: 'message', label: label('message_but'), enabled: canMessage, onClick: () => onOpenSendMessage(data.userName) },
+                              { id: 'modaction', label: label('modaction_but'), enabled: canModAction, tone: 'danger', onClick: () => onOpenModAction(data.userName) },
+                              { id: 'roomvisits', label: label('roomvisits_but'), enabled: true, onClick: onOpenRoomVisits },
+                              { id: 'habboinfo', label: label('habboinfotool_but'), enabled: !!habboInfoToolUrl || canOpenHousekeepingUser, onClick: openHabboInfo },
+                              { id: 'refresh', label: localizeWithFallback('modtools.native.refresh', 'Refresh'), enabled: true, onClick: refresh }
+                          ]
+                        : []
+                }
+                facts={facts}
+                loadingText={nativeCaption(findNativeNode(frame, 'loading_txt'))}
+                name={data?.userName ?? null}
+                pageTitle={handheldPageTitle}
+                present={!!roomUser}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

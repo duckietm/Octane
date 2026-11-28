@@ -5,10 +5,13 @@ import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } f
 import { requestMentions, requestMoreMentions, useMentionActions, useMentionsSnapshot } from '../../hooks';
 import { setMentionsPanelOpen } from '../../hooks/mentions/mentionsStore';
 import { useUserDataSnapshot } from '../../hooks/session/useSessionSnapshots';
+import { HandheldMentionsView } from './HandheldMentionsView';
 import { MentionRowView } from './MentionRowView';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
 import { BaseButton } from '../../common/BaseButton';
 import { ToggleButton } from '../../common/ToggleButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 interface MentionsViewProps {
     onClose: () => void;
@@ -62,6 +65,7 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
     const { open, goto, remove, markAll } = useMentionActions();
     const [filter, setFilter] = useState<MentionFilter>('all');
     const [query, setQuery] = useState('');
+    const isHandheld = useIsHandheld();
 
     // While the panel is open a new mention lands in the list, so it needs no toast.
     useEffect(() => {
@@ -97,6 +101,44 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
         setFilter('all');
         setQuery('');
     };
+
+    if (isHandheld) {
+        const empty = hasAny
+            ? null
+            : isLoading && mentions.length === 0
+              ? 'loading'
+              : status === 'error' && mentions.length === 0
+                ? 'error'
+                : mentions.length > 0 && isFiltering
+                  ? 'noresults'
+                  : 'empty';
+
+        return (
+            <HandheldMentionsView
+                empty={empty}
+                filter={filter}
+                filters={FILTERS.map(({ key, label }) => ({ key, label: LocalizeText(label) }))}
+                groups={groups.map((group) => ({ ...group, label: LocalizeText(GROUP_LABEL[group.key]) }))}
+                hasMore={hasMore}
+                isLoading={isLoading}
+                loadingMore={loadingMore}
+                ownUsername={ownUsername}
+                query={query}
+                title={title}
+                unreadCount={unreadCount}
+                onClearFilters={clearFilters}
+                onClose={onClose}
+                onFilter={(key) => setFilter(key as MentionFilter)}
+                onGoto={goto}
+                onLoadMore={requestMoreMentions}
+                onMarkAll={markAll}
+                onOpen={open}
+                onQuery={setQuery}
+                onRefresh={requestMentions}
+                onRemove={remove}
+            />
+        );
+    }
 
     const renderEmpty = () => {
         if (isLoading && mentions.length === 0) {
@@ -134,7 +176,7 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
                 className="mentions-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] has-classic-scrollbar"
                 theme="primary-slim"
                 uniqueKey="mentions"

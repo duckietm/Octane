@@ -259,7 +259,20 @@ export class Offer implements IPurchasableOffer {
         for (const product of this._products) {
             const furnitureData = GetFurnitureData(product.productClassId, product.productType);
 
-            products.push(new Product(product.productType, product.productClassId, product.extraParam, product.productCount, productData, furnitureData));
+            // A clone keeps the limited edition numbers, so an LTD offer still shows its plaque and tile.
+            products.push(
+                new Product(
+                    product.productType,
+                    product.productClassId,
+                    product.extraParam,
+                    product.productCount,
+                    productData,
+                    furnitureData,
+                    product.isUniqueLimitedItem,
+                    product.uniqueLimitedItemSeriesSize,
+                    product.uniqueLimitedItemsLeft
+                )
+            );
         }
 
         const offer = new Offer(

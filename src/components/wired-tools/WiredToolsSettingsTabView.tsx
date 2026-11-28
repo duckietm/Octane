@@ -16,6 +16,8 @@ import { Checkbox } from '../../common/Checkbox';
 import { Select } from '../../common/Select';
 import { buildTimezoneOptions } from '../../api/wired/WiredTimezones';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldWiredCheckRow, HandheldWiredSettingsTab } from './handheld/HandheldWiredRoomTabs';
 
 const WIRED_ACCESS_EVERYONE = 1;
 const WIRED_ACCESS_USERS_WITH_RIGHTS = 2;
@@ -93,6 +95,7 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
         [selectedTimeZone, serverTimeZone]
     );
     const showSelfDonation = !!onOpenSelfDonation && GetConfigurationValue<boolean>('wired.selfdonation.enabled', false);
+    const isHandheld = useIsHandheld();
 
     const updateInspectMask = (bit: number) => {
         if (!canManageSettings) return;
@@ -155,6 +158,68 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
             </label>
         );
     };
+
+    if (isHandheld) {
+        // The phone tab shows the same boxes, with the same implied and disabled rules and the same saves.
+        const accessRows = (options: RoomAccessOption[], mask: number, impliedMask: number, onToggle: (bit: number) => void): HandheldWiredCheckRow[] =>
+            options.map((option) => {
+                const isImplied = (impliedMask & option.bit) !== 0;
+
+                return {
+                    label: option.label,
+                    checked: isImplied || (mask & option.bit) !== 0,
+                    disabled: isImplied || !roomSettings.isLoaded || !canManageSettings,
+                    onChange: () => onToggle(option.bit)
+                };
+            });
+
+        return (
+            <HandheldWiredSettingsTab
+                canReload={canChangeRoomState}
+                canRollBack={canRollBackRoomState}
+                inspectRows={accessRows(inspectOptions, roomSettings.inspectMask, implied.inspect, updateInspectMask)}
+                modifyRows={accessRows(modifyOptions, roomSettings.modifyMask, implied.modify, updateModifyMask)}
+                preferenceRows={[
+                    {
+                        label: localizeWithFallback('wiredmenu.settings.preferences.toolbar', 'Show wired menu in toolbar'),
+                        checked: accountPreferences.showToolbarButton,
+                        onChange: (nextChecked) => updateAccountPreferences({ showToolbarButton: nextChecked })
+                    },
+                    {
+                        label: localizeWithFallback('wiredmenu.settings.preferences.inspect_button', 'Furni/user inspect button'),
+                        checked: accountPreferences.showInspectButton,
+                        onChange: (nextChecked) => updateAccountPreferences({ showInspectButton: nextChecked })
+                    },
+                    {
+                        label: localizeWithFallback('wiredmenu.settings.preferences.playtest', 'Enable playtesting mode'),
+                        checked: accountPreferences.playTestMode,
+                        onChange: (nextChecked) => setPlayTestMode(nextChecked)
+                    },
+                    {
+                        label: localizeWithFallback('wiredmenu.settings.preferences.show_all_errors', 'Show all system notifications'),
+                        checked: accountPreferences.showSystemNotifications,
+                        onChange: (nextChecked) => updateAccountPreferences({ showSystemNotifications: nextChecked })
+                    }
+                ]}
+                timezone={selectedTimeZone}
+                timezoneDisabled={!roomSettings.isLoaded || !canManageSettings}
+                timezoneOptions={timezoneOptions.map((zone) => ({ value: zone, label: zone === serverTimeZone ? `${zone} (hotel)` : zone }))}
+                wiredStyle={accountPreferences.wiredStyle}
+                wiredStyleOptions={[WIRED_STYLE_DEFAULT, ...WIRED_STYLE_OPTIONS].map((style) => ({
+                    value: style,
+                    label:
+                        style === WIRED_STYLE_DEFAULT
+                            ? localizeWithFallback('wiredmenu.settings.preferences.wired_style.default', 'Default (%name%)', ['name'], [wiredStyleTitle('illumina')])
+                            : wiredStyleTitle(style)
+                }))}
+                onOpenSelfDonation={showSelfDonation ? onOpenSelfDonation : null}
+                onReload={reloadRoomState}
+                onRollBack={rollbackRoomState}
+                onTimezoneChange={saveRoomTimezone}
+                onWiredStyleChange={(style) => updateAccountPreferences({ wiredStyle: normalizeWiredStyle(style) })}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

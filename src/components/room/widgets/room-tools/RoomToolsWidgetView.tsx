@@ -4,9 +4,11 @@ import { FC, useEffect, useEffectEvent, useRef, useState } from 'react';
 import { GetConfigurationValue, LocalizeText, SendMessageComposer, SetLocalStorage, TryVisitRoom } from '../../../../api';
 import { Text } from '../../../../common';
 import { localizeWithFallback } from '../../../../api/utils/localizeWithFallback';
-import { useAchievements, useMessageEvent, useNavigatorData, useOctaneEvent, useRoom, useRoomEnterOnce } from '../../../../hooks';
+import { useAchievements, useMessageEvent, useNavigatorData, useOctaneEvent, useRoom, useRoomEnterOnce, useRoomUserListSnapshot } from '../../../../hooks';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
 import { classNames } from '../../../../layout';
 import { getRegisteredPlugins, IOctanePlugin, subscribePlugins } from '../../../plugins/OctanePluginApi';
+import { HandheldRoomChipView } from './HandheldRoomChipView';
 import { applyRoomZoom } from './roomZoom.helpers';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
@@ -78,6 +80,9 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
     const [zoomScale, setZoomScale] = useState<number>(1);
     const [hasLikedRoom, setHasLikedRoom] = useState<boolean>(false);
     const [isToolsOpen, setIsToolsOpen] = useState<boolean>(false);
+    // Phone layout: the handle is the room chip at the top left (name, people in the room, like), and it says what it opens.
+    const isHandheld = useIsHandheld();
+    const roomUsers = useRoomUserListSnapshot();
     const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
     const [roomHistory, setRoomHistory] = useState<RoomHistoryEntry[]>([]);
     const [plugins, setPlugins] = useState<IOctanePlugin[]>([]);
@@ -292,8 +297,26 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
     return (
         <NativeTextTree>
             <div className={classNames('octane-room-tools-container', !isToolsOpen && 'is-collapsed')}>
-                <BaseButton className="room-tools-collapse-toggle" type="button" onClick={() => setIsToolsOpen((prevValue) => !prevValue)}>
-                    {isToolsOpen ? '‹' : '›'}
+                <BaseButton
+                    className={isHandheld ? 'octane-handheld-room-chip' : 'room-tools-collapse-toggle'}
+                    type="button"
+                    aria-label={isHandheld ? localizeWithFallback('octane.handheld.room_tools.toggle', 'Room tools') : undefined}
+                    aria-expanded={isHandheld ? isToolsOpen : undefined}
+                    onClick={() => setIsToolsOpen((prevValue) => !prevValue)}
+                >
+                    {isHandheld ? (
+                        <HandheldRoomChipView
+                            roomName={navigatorData?.enteredGuestRoom?.roomName ?? ''}
+                            users={roomUsers}
+                            fallbackUserCount={navigatorData?.enteredGuestRoom?.userCount ?? 0}
+                            canLike={!!navigatorData?.canRate && !hasLikedRoom}
+                            liked={hasLikedRoom}
+                        />
+                    ) : isToolsOpen ? (
+                        '‹'
+                    ) : (
+                        '›'
+                    )}
                 </BaseButton>
                 {isToolsOpen && (
                     <div className="octane-room-tools">

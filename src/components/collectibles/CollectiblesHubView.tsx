@@ -13,13 +13,26 @@ import { CollectiblesRewardsTabView } from './CollectiblesRewardsTabView';
 import { CollectiblesShopTabView } from './CollectiblesShopTabView';
 import { CollectiblesTransferTabView } from './CollectiblesTransferTabView';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldCollectiblesHubView } from './HandheldCollectiblesHubView';
 
 /**
  * The official collectibles hub (`collectible_view_xml`, 500x600): the collector header with XP, high
  * score, level and the silver and emerald balances, the tab bar, and one container per tab.
  */
 export const CollectiblesHubView: FC = () => {
-    const { isVisible = false, currentTab = 'rewards', setCurrentTab = null, closeHub = null, score, emeralds = 0, silver = 0 } = useCollectibles();
+    const {
+        isVisible = false,
+        currentTab = 'rewards',
+        setCurrentTab = null,
+        closeHub = null,
+        score,
+        emeralds = 0,
+        silver = 0,
+        rewardClaims = null
+    } = useCollectibles();
+    const isHandheld = useIsHandheld();
     const tabs = visibleCollectiblesTabs((key) => GetConfigurationValue<boolean>(key, false) === true);
 
     useEffect(() => {
@@ -29,10 +42,39 @@ export const CollectiblesHubView: FC = () => {
     if (!isVisible) return null;
 
     const levelColor = toHexColor(collectorLevelColor(score?.level ?? 0));
+    // Each tab view branches on the phone itself, so the same tabs fill both frames.
+    const content = (
+        <>
+            {currentTab === 'rewards' && <CollectiblesRewardsTabView />}
+            {currentTab === 'collections' && <CollectiblesCollectionsTabView />}
+            {currentTab === 'shop' && <CollectiblesShopTabView />}
+            {currentTab === 'minting' && <CollectiblesMintTabView />}
+            {currentTab === 'transfer' && <CollectiblesTransferTabView />}
+            {currentTab === 'info' && <CollectiblesInfoTabView />}
+        </>
+    );
+
+    if (isHandheld) {
+        return (
+            <HandheldCollectiblesHubView
+                claimable={rewardClaims?.length ?? 0}
+                currentTab={currentTab}
+                emeralds={emeralds}
+                level={score?.level ?? 0}
+                levelColor={levelColor}
+                silver={silver}
+                tabs={tabs}
+                onClose={() => closeHub?.()}
+                onTab={(tab) => setCurrentTab?.(tab)}
+            >
+                {content}
+            </HandheldCollectiblesHubView>
+        );
+    }
 
     return (
         <NativeTextTree>
-            <OctaneCardView classNames={['octane-collectibles-hub']} frameStyle={3} isResizable={false} uniqueKey="collectibles-hub">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} classNames={['octane-collectibles-hub']} frameStyle={3} isResizable={false} uniqueKey="collectibles-hub">
                 <OctaneCardHeaderView headerText={localizeWithFallback('collectibles.title', 'Collectibles')} onCloseClick={() => closeHub?.()} />
                 <div className="octane-collectibles-hub-content" data-testid="collectibles-hub">
                     <div className="octane-collectibles-header">
@@ -77,14 +119,7 @@ export const CollectiblesHubView: FC = () => {
                             </ToggleButton>
                         ))}
                     </div>
-                    <div className="octane-collectibles-tab-content">
-                        {currentTab === 'rewards' && <CollectiblesRewardsTabView />}
-                        {currentTab === 'collections' && <CollectiblesCollectionsTabView />}
-                        {currentTab === 'shop' && <CollectiblesShopTabView />}
-                        {currentTab === 'minting' && <CollectiblesMintTabView />}
-                        {currentTab === 'transfer' && <CollectiblesTransferTabView />}
-                        {currentTab === 'info' && <CollectiblesInfoTabView />}
-                    </div>
+                    <div className="octane-collectibles-tab-content">{content}</div>
                 </div>
             </OctaneCardView>
         </NativeTextTree>

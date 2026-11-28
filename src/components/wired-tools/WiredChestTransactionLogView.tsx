@@ -22,6 +22,9 @@ import { WiredChestTransactionDetails, WiredChestTransactionDetailsView } from '
 import { chestTransactionMethodText, lastChestLogPage, summarizeChestTransaction } from './WiredChestTransactions.helpers';
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
 import { NO_PAGE } from './WiredPaging.helpers';
+import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldWiredButton, HandheldWiredCard, HandheldWiredField, HandheldWiredPage, HandheldWiredPair } from './handheld/HandheldWiredParts';
 
 /** Rows per page, the size the chests tab asks for too. */
 export const CHEST_LOG_PAGE_SIZE = 10;
@@ -67,6 +70,7 @@ export const WiredChestTransactionLogView: FC<WiredChestTransactionLogViewProps>
     const pending = useRef(0);
     // The transaction whose details this window asked for: the answer opens the details window.
     const awaitedDetails = useRef(0);
+    const isHandheld = useIsHandheld();
 
     const sendRequest = useCallback(
         (nextPage: number, nextFilter: number) => {
@@ -121,13 +125,13 @@ export const WiredChestTransactionLogView: FC<WiredChestTransactionLogViewProps>
 
     // AIR's columns and their order (WiredTransactionLogsView.createTransactionTable).
     const columns: WiredTableColumn[] = [
-        { id: 'type', title: localizeWithFallback('wiredchests.logs.col.type', 'Type'), className: 'w-[150px]' },
-        { id: 'timestamp', title: localizeWithFallback('wiredchests.logs.col.timestamp', 'Timestamp'), className: 'w-[140px]' },
-        { id: 'username', title: localizeWithFallback('wiredchests.logs.col.username', 'Username') },
+        { id: 'type', title: localizeWithFallback('wiredchests.logs.col.type', 'Type'), className: 'w-[150px]', handheld: 'title' },
+        { id: 'timestamp', title: localizeWithFallback('wiredchests.logs.col.timestamp', 'Timestamp'), className: 'w-[140px]', handheld: 'meta' },
+        { id: 'username', title: localizeWithFallback('wiredchests.logs.col.username', 'Username'), handheld: 'meta' },
         { id: 'withdraws', title: localizeWithFallback('wiredchests.logs.col.withdraws', 'Withdrawals'), className: 'w-[125px]' },
         { id: 'deposits', title: localizeWithFallback('wiredchests.logs.col.deposits', 'Deposits'), className: 'w-[125px]' },
         { id: 'chests', title: localizeWithFallback('wiredchests.logs.col.chests', 'Chests'), className: 'w-[95px]' },
-        { id: 'details', title: localizeWithFallback('wiredchests.logs.col.details', 'Details'), className: 'w-[80px]' }
+        { id: 'details', title: localizeWithFallback('wiredchests.logs.col.details', 'Details'), className: 'w-[80px]', handheld: 'action' }
     ];
 
     const getCell = (row: IWiredChestTransactionRow, columnId: string): WiredTableCell => {
@@ -146,6 +150,15 @@ export const WiredChestTransactionLogView: FC<WiredChestTransactionLogViewProps>
                 return { content: String(row.chestCount) };
             default:
                 // table_view element_link: the underlined link of the Details column.
+                if (isHandheld)
+                    return {
+                        content: (
+                            <HandheldWiredButton testId="wired-chest-log-view" onClick={() => openDetail(row)}>
+                                {localizeWithFallback('wiredchests.logs.details_text', 'View')}
+                            </HandheldWiredButton>
+                        )
+                    };
+
                 return {
                     content: (
                         <BaseButton className="octane-chest-log__details" type="button" onClick={() => openDetail(row)}>
@@ -158,10 +171,64 @@ export const WiredChestTransactionLogView: FC<WiredChestTransactionLogViewProps>
 
     const roomList = chestId <= 0;
 
+    const filterOptions = FILTERS.map((option) => (
+        <option key={option.value} value={option.value}>
+            {localizeWithFallback(option.key, option.fallback)}
+        </option>
+    ));
+
+    // Phone: a page of the sheet (a chest's window opens it from the room, the chests tab for the room's log); the
+    // transactions as cards, and a transaction's details as a page of their own (beside the log on its side).
+    if (isHandheld)
+        return (
+            <>
+                <HandheldWiredPage
+                    actions={
+                        <HandheldWiredButton onClick={() => requests.refresh()}>{localizeWithFallback('wiredchests.logs.refresh', 'Refresh')}</HandheldWiredButton>
+                    }
+                    title={localizeWithFallback('wiredchests.logs.title', 'Transaction log')}
+                    uniqueKey={`chest-transaction-log-${chestId}`}
+                    onClose={onClose}
+                    aside={
+                        <HandheldWiredCard>
+                            <HandheldWiredPair
+                                label={localizeWithFallback('wiredchests.logs.list_type', 'List type:')}
+                                value={roomList ? localizeWithFallback('wiredchests.logs.type.1', 'Room') : localizeWithFallback('wiredchests.logs.type.0', 'Chest')}
+                            />
+                            <HandheldWiredPair
+                                label={roomList ? localizeWithFallback('wiredchests.logs.room_id', 'Room id:') : localizeWithFallback('wiredchests.logs.chest_id', 'Chest id:')}
+                                value={listId > 0 ? listId : '-'}
+                            />
+                            <HandheldWiredField label={localizeWithFallback('wiredchests.logs.item_type_filter', 'Filter item type:')}>
+                                <Select value={filter} onChange={(event) => setFilter(parseInt(event.target.value, 10))}>
+                                    {filterOptions}
+                                </Select>
+                            </HandheldWiredField>
+                        </HandheldWiredCard>
+                    }
+                >
+                    <WiredPagedTable
+                        columns={columns}
+                        currentPage={page}
+                        emptyText={localizeWithFallback('wiredchests.logs.empty', 'No transactions yet.')}
+                        getCell={getCell}
+                        getRowId={(row) => String(row.transactionId)}
+                        lastPage={pageCount}
+                        pagingTextKey="wiredchests.logs.bottom_text"
+                        requests={requests}
+                        rows={rows}
+                        scrollResetKey={scrollResetKey}
+                        totalEntries={totalRows}
+                    />
+                </HandheldWiredPage>
+                {details && <WiredChestTransactionDetailsView details={details} onClose={() => setDetails(null)} />}
+            </>
+        );
+
     return (
         <NativeTextTree>
             <>
-                <OctaneCardView className="octane-widget-chest-log octane-chest-log" theme="primary-slim" uniqueKey={`chest-transaction-log-${chestId}`}>
+                <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE} className="octane-widget-chest-log octane-chest-log" theme="primary-slim" uniqueKey={`chest-transaction-log-${chestId}`}>
                     <OctaneCardHeaderView headerText={localizeWithFallback('wiredchests.logs.title', 'Transaction log')} onCloseClick={onClose} />
                     <OctaneCardContentView>
                         <div className="octane-chest-log__body">

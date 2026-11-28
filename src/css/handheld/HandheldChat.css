@@ -1,0 +1,454 @@
+/*
+ * Phone room chat composer, in the Octane handheld look (HandheldTokens.css): a glass sheet with rounded shoulders
+ * across the bottom edge, with the send mode on top (say, shout, whisper as one segmented pill; the round close
+ * button at the right) and the field under it (chat style, text, habbicons and emoji, and the green send button).
+ * Scoped to :root[data-handheld] (set only on a phone-sized touch device by the handheld watcher), so the desktop
+ * chat input in RoomWidgets.css stays as it is. Handheld.css places the sheet's frame (.tb-frame) at the bottom edge
+ * or on top of the on-screen keyboard and keeps it away until the dock's chat button asks for it.
+ */
+
+/* ---------------------------------------------------------------- sheet */
+
+:root[data-handheld] .octane-handheld-composer {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px calc(12px + var(--octane-safe-right)) calc(8px + var(--octane-safe-bottom)) calc(12px + var(--octane-safe-left));
+    border-top: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-l) var(--hh-radius-l) 0 0;
+    background: var(--hh-air-hud);
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.28);
+    -webkit-backdrop-filter: var(--hh-blur);
+    backdrop-filter: var(--hh-blur);
+    font-family: var(--hh-font-bold);
+    pointer-events: auto;
+}
+
+/* The keyboard covers the home indicator's strip, so the sheet needs no room for it. */
+:root[data-handheld][data-handheld-keyboard] .octane-handheld-composer {
+    padding-bottom: 8px;
+}
+
+/* Both rows share one column: the whole width in portrait, a centred 510 px in landscape. */
+:root[data-handheld] .octane-handheld-composer__column {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    width: 100%;
+    max-width: 510px;
+    margin: 0 auto;
+}
+
+:root[data-handheld] .octane-handheld-composer :where(button):focus-visible {
+    outline: var(--hh-focus-on-dark);
+    outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- mode row */
+
+:root[data-handheld] .octane-handheld-composer__top {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    height: 36px;
+}
+
+/* One segmented pill: a dark track, the chosen mode a white pill inside it. */
+:root[data-handheld] .octane-handheld-composer__modes {
+    display: flex;
+    flex: 0 1 252px;
+    box-sizing: border-box;
+    gap: 2px;
+    min-width: 0;
+    height: 36px;
+    padding: 3px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    box-shadow: inset 0 0 0 1px var(--hh-hairline);
+}
+
+:root[data-handheld] .octane-handheld-composer__mode {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0 var(--hh-space-1);
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: transparent;
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 16px;
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+/* The segments are 30 px; the finger gets 44. */
+:root[data-handheld] .octane-handheld-composer__mode::after {
+    content: '';
+    position: absolute;
+    inset: -7px 0;
+}
+
+:root[data-handheld] .octane-handheld-composer__mode span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    pointer-events: none;
+}
+
+/* A whisper has nobody to go to yet: its label is held back until somebody is chosen. */
+:root[data-handheld] .octane-handheld-composer__mode[data-needs-recipient] {
+    color: var(--hh-on-dark-muted);
+}
+
+:root[data-handheld] .octane-handheld-composer__mode:active {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .octane-handheld-composer__mode[aria-pressed='true'] {
+    background: var(--hh-air-white);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    color: var(--hh-air-text);
+}
+
+/* Who the whisper goes to; a tap opens the list of the room's players. */
+:root[data-handheld] .octane-handheld-composer__recipient {
+    position: relative;
+    display: flex;
+    flex: 0 1 auto;
+    align-items: center;
+    gap: 6px;
+    box-sizing: border-box;
+    min-width: 0;
+    height: 32px;
+    margin: 0;
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-hairline);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 15px;
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-handheld-composer__recipient::after,
+:root[data-handheld] .octane-handheld-composer__close::after {
+    content: '';
+    position: absolute;
+    inset: -7px -4px;
+}
+
+:root[data-handheld] .octane-handheld-composer__recipient[aria-expanded='true'] {
+    border-color: var(--hh-air-select);
+    background: rgba(99, 197, 233, 0.22);
+}
+
+:root[data-handheld] .octane-handheld-composer__recipient-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+:root[data-handheld] .octane-handheld-composer__recipient svg {
+    flex: none;
+    width: 8px;
+    height: 5px;
+    fill: var(--hh-on-dark);
+}
+
+/* Close: the red round button with a thin cross, as in the navigator's header. */
+:root[data-handheld] .octane-handheld-composer__close {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 36px;
+    height: 36px;
+    margin: 0 0 0 auto;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-dismiss);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px var(--hh-air-outline);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-composer__close:active {
+    background: var(--hh-air-red-deep);
+}
+
+:root[data-handheld] .octane-handheld-composer__close svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: var(--hh-on-dark);
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+}
+
+/* ---------------------------------------------------------------- field row */
+
+:root[data-handheld] .octane-handheld-composer__pill {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    height: var(--hh-touch);
+    padding: 0 4px 0 6px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow:
+        0 0 0 1px var(--hh-air-outline),
+        0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: box-shadow var(--hh-fast) var(--hh-ease);
+}
+
+/* Writing: the field wears the selection blue. */
+:root[data-handheld] .octane-handheld-composer__pill:focus-within {
+    box-shadow:
+        0 0 0 2px var(--hh-air-select),
+        0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* The chat style chooser: our style picture alone, in a finger-sized cell. */
+:root[data-handheld] .octane-handheld-composer__pill .swf-chat-style-trigger {
+    position: relative;
+    flex: none;
+    justify-content: center;
+    width: 36px;
+    height: 100%;
+}
+
+:root[data-handheld] .octane-handheld-composer__pill .swf-chat-style-arrow {
+    display: none;
+}
+
+:root[data-handheld] .octane-handheld-composer__pill .swf-chat-style-icon {
+    flex: none;
+    width: 17px;
+    height: 19px;
+    background: url('@/assets/images/chat-input-swf/chat_styles.png') center / auto no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* 16 px, so mobile Safari does not zoom the page when the field takes the focus. */
+:root[data-handheld] .octane-handheld-composer__input {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0 var(--hh-space-1);
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+    line-height: 20px;
+    appearance: none;
+}
+
+:root[data-handheld] .octane-handheld-composer__input::placeholder {
+    color: var(--hh-air-box-line);
+    opacity: 1;
+}
+
+:root[data-handheld] .octane-handheld-composer__flood {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    min-width: 0;
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-red);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-composer__flood span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+:root[data-handheld] .octane-handheld-composer__pill .habbicon-chat-trigger,
+:root[data-handheld] .octane-handheld-composer__pill .swf-chat-emoji-trigger {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-handheld-composer__pill .habbicon-chat-trigger img {
+    max-width: 22px;
+    max-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-composer__pill .habbicon-unseen-count {
+    top: -2px;
+    left: 17px;
+}
+
+:root[data-handheld] .octane-handheld-composer__pill .swf-chat-emoji-trigger {
+    font-size: 18px;
+    line-height: 1;
+}
+
+/* Send: the green, the one primary button of the composer. */
+:root[data-handheld] .octane-handheld-composer__send {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: 68px;
+    height: 36px;
+    margin: 0 0 0 var(--hh-space-1);
+    padding: 0 var(--hh-space-4);
+    border: 1px solid var(--hh-air-green-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-primary);
+    box-shadow: inset 0 1px 0 var(--hh-air-green-top);
+    color: var(--hh-on-primary);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 16px;
+    cursor: pointer;
+}
+
+/* The whole height of the field answers the thumb. */
+:root[data-handheld] .octane-handheld-composer__send::after {
+    content: '';
+    position: absolute;
+    inset: -5px -5px -5px -2px;
+}
+
+:root[data-handheld] .octane-handheld-composer__send:active {
+    background: var(--hh-primary-pressed);
+}
+
+:root[data-handheld] .octane-handheld-composer__send[disabled] {
+    border-color: var(--hh-air-border);
+    background: var(--hh-air-box);
+    box-shadow: none;
+    color: var(--hh-air-box-line);
+}
+
+/* ---------------------------------------------------------------- lists above the composer */
+
+/* Command and mention suggestions and the whisper list stand on the band, as wide as the composer's column. */
+:root[data-handheld] .octane-handheld-composer .chat-input-command-popover.octane-card-shell.octane-card-frame-3,
+:root[data-handheld] .octane-handheld-composer .chat-input-mention-popover {
+    bottom: calc(100% + 8px);
+    margin-bottom: 4px;
+}
+
+:root[data-handheld] .octane-handheld-composer .chat-input-command-popover-list,
+:root[data-handheld] .octane-handheld-composer .chat-input-mention-popover-list {
+    max-height: min(220px, calc(100vh - var(--octane-keyboard-inset, 0px) - 190px));
+}
+
+:root[data-handheld] .octane-handheld-composer__recipients {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 14px);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: min(248px, 100%);
+    padding: var(--hh-space-2);
+    border: 1px solid var(--hh-hairline);
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-hud-solid);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-float);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-composer__recipients-title {
+    padding: 2px var(--hh-space-2) 6px;
+    color: var(--hh-on-dark-muted);
+    font-size: var(--hh-size-xs);
+    font-weight: 700;
+    line-height: 14px;
+}
+
+:root[data-handheld] .octane-handheld-composer__recipients-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: min(216px, calc(100vh - var(--octane-keyboard-inset, 0px) - 190px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+:root[data-handheld] .octane-handheld-composer__recipients-item {
+    display: flex;
+    flex: none;
+    align-items: center;
+    min-height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-3);
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: transparent;
+    color: var(--hh-on-dark);
+    font-size: 14px;
+    line-height: 18px;
+    text-align: left;
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-handheld-composer__recipients-item span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+:root[data-handheld] .octane-handheld-composer__recipients-item:active {
+    background: var(--hh-well-pressed);
+}
+
+/* The chosen player: the selection blue's tint and a bar of it at the row's start. */
+:root[data-handheld] .octane-handheld-composer__recipients-item[aria-selected='true'] {
+    background: rgba(99, 197, 233, 0.22);
+    box-shadow: inset 3px 0 0 var(--hh-air-select);
+    color: var(--hh-air-select-outer);
+}
+
+:root[data-handheld] .octane-handheld-composer__recipients-empty {
+    padding: var(--hh-space-2);
+    font-size: var(--hh-size-m);
+    line-height: 17px;
+}
+
+/* The emoji picker keeps to what is left of the screen above the composer and the keyboard. */
+:root[data-handheld] .swf-chat-emoji-popover em-emoji-picker {
+    max-height: calc(100vh - var(--octane-keyboard-inset, 0px) - 124px - var(--octane-safe-top) - var(--octane-safe-bottom));
+    min-height: 0;
+}

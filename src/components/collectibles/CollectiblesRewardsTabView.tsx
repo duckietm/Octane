@@ -6,12 +6,17 @@ import { formatCollectibleDate } from '../../hooks/collectibles/collectibles.hel
 import { getCollectibleProductName, useCollectibles } from '../../hooks/collectibles/useCollectibles';
 import { CollectibleProductImageView } from './CollectibleProductImageView';
 import { CollectiblesLoadingView } from './CollectiblesLoadingView';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldCollectiblesRewardsView } from './HandheldCollectiblesRewardsView';
 
 /** `RewardClaimsTab`: the level rewards waiting to be claimed and the claim all button. */
 export const CollectiblesRewardsTabView: FC = () => {
-    const { rewardClaims = null, claimAllPending = false, claimAllRewards = null } = useCollectibles();
+    const { rewardClaims = null, claimAllPending = false, claimAllRewards = null, score = null } = useCollectibles();
+    const isHandheld = useIsHandheld();
 
     if (rewardClaims === null || claimAllPending) return <CollectiblesLoadingView />;
+
+    if (isHandheld) return <HandheldCollectiblesRewardsView claims={rewardClaims} score={score} onClaimAll={() => claimAllRewards?.()} />;
 
     return (
         <NativeTextTree>

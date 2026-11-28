@@ -16,6 +16,8 @@ import { NativeWindowShell } from '../native/NativeWindowShell';
 import { findNativeNode, nativeCaption, nativeNumber, NativeNode, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Border, Native0Button, Native0Checkbox, Native0Dropmenu, Native0Frame, Native0Input, Native0Text } from '../native/NativeWindow0';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModRoomToolView } from '../handheld/HandheldModRoomToolView';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SPACING = 5;
@@ -59,6 +61,7 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
     const [changeName, setChangeName] = useState(false);
 
     const resizeWindow = useModWindowTrackerStore((state) => state.resize);
+    const isHandheld = useIsHandheld();
     const requestedRef = useRef(false);
     // "Edit in HK" is the classic link to the hotel's external room admin. Without a `roomadmin.url`
     // the button used to do nothing at all, silently; the in-client housekeeping room page is the
@@ -180,6 +183,67 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
 
         onClose();
     };
+
+    // phone: the same room, checks, message and sends as a page of the mod tools sheet
+    if (isHandheld) {
+        const focusMessage = () => {
+            if (isPlaceholder) {
+                setMessage('');
+                setIsPlaceholder(false);
+            }
+
+            setInputActive(true);
+        };
+
+        return (
+            <HandheldModRoomToolView
+                canAct={!!data && eligible}
+                chatlogEnabled={settings.chatlogsPermission}
+                checks={[
+                    { id: 'kick', label: nativeCaption(act.children[3]), checked: kick, enabled: settings.roomKickPermission, onToggle: () => setKick((value) => !value) },
+                    { id: 'lock', label: nativeCaption(act.children[4]), checked: lock, enabled: true, onToggle: () => setLock((value) => !value) },
+                    { id: 'name', label: nativeCaption(act.children[5]), checked: changeName, enabled: true, onToggle: () => setChangeName((value) => !value) }
+                ]}
+                editEnabled={!!roomAdminUrl || canOpenHousekeepingRoom}
+                message={isPlaceholder ? '' : message}
+                placeholder={placeholder}
+                room={
+                    data
+                        ? {
+                              exists,
+                              name: data.room.name,
+                              desc: hasDesc ? data.room.desc : '',
+                              tags,
+                              ownerName: data.ownerName,
+                              userCount: data.userCount,
+                              ownerInRoom: data.ownerInRoom
+                          }
+                        : null
+                }
+                roomId={roomId}
+                selectedTemplate={selectedTemplate}
+                templateCaption={menuCaption}
+                templates={templates}
+                title={nativeCaption(root)}
+                onCaution={() => send(true)}
+                onChatlog={() => data && onOpenChatlog(data.flatId)}
+                onClose={onClose}
+                onEdit={() => data && openRoomAdmin(data.flatId)}
+                onEnter={() => data && TryVisitRoom(data.flatId)}
+                onMessage={setMessage}
+                onMessageFocus={focusMessage}
+                onOwner={() => data && onOpenUserInfo(data.ownerId)}
+                onRefresh={refresh}
+                onSendMessage={() => send(false)}
+                onTemplate={(index) => {
+                    setSelectedTemplate(index);
+                    setMessage(templates[index]);
+                    setIsPlaceholder(false);
+                    setInputActive(true);
+                }}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

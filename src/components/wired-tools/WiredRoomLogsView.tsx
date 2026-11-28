@@ -9,6 +9,9 @@ import { calculateLastPage, NO_PAGE } from './WiredPaging.helpers';
 import { Checkbox } from '../../common/Checkbox';
 import { Select } from '../../common/Select';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldWiredButton, HandheldWiredCard, HandheldWiredField, HandheldWiredPage } from './handheld/HandheldWiredParts';
 
 /** Rows per page, as the official log list shows them. */
 export const WIRED_ROOM_LOGS_PAGE_SIZE = 50;
@@ -67,6 +70,7 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
     const nextFilters = useRef<{ logSourceFilter: number; logLevelFilter: number; query: string } | null>(null);
     const silentRequest = useRef(false);
     const pageRequestedSilently = useRef(false);
+    const isHandheld = useIsHandheld();
 
     useMessageEvent<WiredLogPageEvent>(WiredLogPageEvent, (event) => {
         const parser = event.getParser();
@@ -150,10 +154,10 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
     }, [autoRefresh, refreshEpoch]);
 
     const columns: WiredTableColumn[] = [
-        { id: 'timestamp', title: localizeWithFallback('wiredmenu.logs_overview.col.timestamp', 'Timestamp'), className: 'w-[150px]' },
-        { id: 'source', title: localizeWithFallback('wiredmenu.logs_overview.col.source', 'Source'), className: 'w-[150px]' },
-        { id: 'level', title: localizeWithFallback('wiredmenu.logs_overview.col.level', 'Level'), className: 'w-[80px]' },
-        { id: 'message', title: localizeWithFallback('wiredmenu.logs_overview.col.message', 'Message') }
+        { id: 'timestamp', title: localizeWithFallback('wiredmenu.logs_overview.col.timestamp', 'Timestamp'), className: 'w-[150px]', handheld: 'meta' },
+        { id: 'source', title: localizeWithFallback('wiredmenu.logs_overview.col.source', 'Source'), className: 'w-[150px]', handheld: 'meta' },
+        { id: 'level', title: localizeWithFallback('wiredmenu.logs_overview.col.level', 'Level'), className: 'w-[80px]', handheld: 'meta' },
+        { id: 'message', title: localizeWithFallback('wiredmenu.logs_overview.col.message', 'Message'), handheld: 'title' }
     ];
 
     const getCell = (entry: IWiredLogEntry, columnId: string): WiredTableCell => {
@@ -171,12 +175,123 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
         }
     };
 
+    const changeSource = (next: number) => {
+        // AIR refuses the menu selection while the limiter holds requests back.
+        if (!requests.canRequestNewPage(false)) return;
+
+        setSource(next);
+        updateFilters({ source: next });
+    };
+
+    const changeLevel = (next: number) => {
+        if (!requests.canRequestNewPage(false)) return;
+
+        setLevel(next);
+        updateFilters({ level: next });
+    };
+
+    const sourceOptions = [
+        <option key="all" value={-1}>
+            {localizeWithFallback('wiredmenu.logs_overview.log_source.all', 'All')}
+        </option>,
+        ...WIRED_LOG_SOURCES.map((name, index) => (
+            <option key={name} value={index}>
+                {wiredLogSourceLabel(index)}
+            </option>
+        ))
+    ];
+    const levelOptions = [
+        <option key="all" value={-1}>
+            {localizeWithFallback('wiredmenu.logs_overview.log_level.all', 'All')}
+        </option>,
+        ...WIRED_LOG_LEVELS.map((name, index) => (
+            <option key={name} value={index}>
+                {wiredLogLevelLabel(index)}
+            </option>
+        ))
+    ];
+    const table = (
+        <WiredPagedTable
+            columns={columns}
+            rows={page?.entries ?? []}
+            getRowId={(entry) => String(entry.id)}
+            getCell={getCell}
+            currentPage={currentPage}
+            totalEntries={page?.totalEntries ?? 0}
+            lastPage={lastPage}
+            requests={requests}
+            emptyText={localizeWithFallback('wiredmenu.logs_overview.empty', 'No log lines match the current filters')}
+            pagingTextKey="wiredmenu.logs_overview.bottom_text"
+            scrollResetKey={scrollKey}
+            bodyClassName="octane-wired-logs__table"
+        />
+    );
+
+    // Phone: a page of the sheet; the filters in a card over the lines as cards, each coloured by its level.
+    if (isHandheld)
+        return (
+            <HandheldWiredPage
+                aside={
+                    <HandheldWiredCard>
+                        <p className="octane-handheld-wired__text">
+                            {localizeWithFallback(
+                                'wiredmenu.logs_overview.info',
+                                'Every line the wired engine wrote for this room, newest first. Filter by text, source or level.'
+                            ).replace(/\\n/g, '\n')}
+                        </p>
+                        <HandheldWiredField label={localizeWithFallback('wiredmenu.logs_overview.filter', 'Filter:')}>
+                            <div className="octane-handheld-wired__inline">
+                                <input
+                                    className="octane-handheld-wired__input"
+                                    enterKeyHint="search"
+                                    maxLength={FILTER_MAX_CHARS}
+                                    type="search"
+                                    value={query}
+                                    onChange={(event) => setQuery(event.target.value)}
+                                    onKeyDown={(event) => {
+                                        if (event.key !== 'Enter') return;
+
+                                        event.preventDefault();
+                                        updateFilters();
+                                    }}
+                                />
+                                <HandheldWiredButton testId="wired-logs-search" onClick={() => updateFilters()}>
+                                    {localizeWithFallback('generic.search', 'Search')}
+                                </HandheldWiredButton>
+                            </div>
+                        </HandheldWiredField>
+                        <div className="octane-handheld-wired__field-row">
+                            <HandheldWiredField label={localizeWithFallback('wiredmenu.logs_overview.log_source', 'Log source:')}>
+                                <Select value={source} onChange={(event) => changeSource(Number(event.target.value))}>
+                                    {sourceOptions}
+                                </Select>
+                            </HandheldWiredField>
+                            <HandheldWiredField label={localizeWithFallback('wiredmenu.logs_overview.log_level', 'Log level:')}>
+                                <Select value={level} onChange={(event) => changeLevel(Number(event.target.value))}>
+                                    {levelOptions}
+                                </Select>
+                            </HandheldWiredField>
+                        </div>
+                        <label className="octane-handheld-wired__check is-row">
+                            <Checkbox checked={autoRefresh} onCheckedChange={(nextChecked) => setAutoRefresh(nextChecked)} />
+                            <span>{localizeWithFallback('wiredmenu.logs_overview.auto_refresh', 'Auto refresh')}</span>
+                        </label>
+                    </HandheldWiredCard>
+                }
+                title={localizeWithFallback('wiredmenu.logs_overview.title', 'Wired room logs')}
+                uniqueKey="wired-room-logs"
+                onClose={onClose}
+            >
+                {table}
+            </HandheldWiredPage>
+        );
+
     // AIR logs_overview (700 wide): the info box with Auto refresh beside it, then the filter field, the log source
     // menu and the log level menu on one line, the table (672 x 316) and the paging row. AIR has no Refresh button:
     // the page is asked for again by a filter, a page button or the auto refresh.
     return (
         <NativeTextTree>
-            <OctaneCardView
+            <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
                 className="octane-wired-menu octane-wired-logs"
                 theme="primary-slim"
                 uniqueKey="wired-room-logs"

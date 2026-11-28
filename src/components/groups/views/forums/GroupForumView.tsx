@@ -31,6 +31,8 @@ import { GroupForumSettingsView } from './GroupForumSettingsView';
 import { GroupForumThreadListView } from './GroupForumThreadListView';
 import { GroupForumThreadView } from './GroupForumThreadView';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { useHandheldLayout } from '../../../../hooks/handheld/useHandheldLayout';
+import { HANDHELD_FORUM_LISTS, HandheldGroupForumView } from './HandheldGroupForumView';
 
 type ForumMode = 'threads' | 'thread' | 'list';
 type ForumCompose = { kind: 'thread' } | { kind: 'reply'; threadId: number; subject: string; quote?: string; quoteSeq: number };
@@ -99,6 +101,7 @@ export const GroupForumView: FC<{}> = () =>
     const requestedListCode = useRef<number>(-1);
     const forumsListRef = useRef<GroupForumsListData>(null);
     const isVisibleRef = useRef<boolean>(false);
+    const handheld = useHandheldLayout();
 
     const showForumsList = useCallback((list: GroupForumsListData) =>
     {
@@ -427,6 +430,90 @@ export const GroupForumView: FC<{}> = () =>
     const isList = mode === 'list' && !!forumsList;
     // Only forum data of the requested group is kept (see the ForumDataMessageEvent handler), so every write goes to that group.
     const effectiveGroupId = groupId;
+
+    // Phone layout: the same views with the same state and handlers, as the pages of one sheet instead of three windows.
+    // On its side the thread list stays beside the open thread, so a thread picked there replaces the one shown (its key).
+    if (handheld.active)
+    {
+        const isSideBySide = handheld.orientation === 'landscape';
+        const openSettings = () => setIsSettingsOpen(true);
+        const getHeading = () =>
+        {
+            if (isList) return { title: LocalizeText(`groupforum.view.forums_header.${forumsList.listCode}`), description: LocalizeText(`groupforum.view.forums_description.${forumsList.listCode}`), icon: LIST_ICONS[forumsList.listCode] };
+            if (!forumData) return null;
+
+            return {
+                title: forumData.name,
+                description: forumData.description,
+                badge: forumData.icon ?? '',
+                onOpen: () => effectiveGroupId > 0 && GetGroupInformation(effectiveGroupId),
+                onSettings: forumData.canChangeSettings ? openSettings : undefined
+            };
+        };
+
+        return (
+            <HandheldGroupForumView
+                activeList={isList ? (HANDHELD_FORUM_LISTS.find((name) => LIST_CODES[name] === forumsList.listCode) ?? null) : null}
+                compose={compose && forumData && (
+                    <GroupForumComposeView
+                        compose={compose}
+                        forumData={forumData}
+                        groupId={effectiveGroupId}
+                        initialPosition={{ x: 0, y: 0 }}
+                        readForumData={() => forumRef.current}
+                        onClose={() => setCompose(null)}
+                        onThreadCreated={onThreadCreated}
+                    />
+                )}
+                heading={getHeading()}
+                list={isList && (
+                    <GroupForumListView
+                        list={forumsList}
+                        onMarkAsRead={markForumsAsRead}
+                        onOpenForum={(id) => openForum(id, true)}
+                        onPage={(pageIndex) => openForumsList(forumsList.listCode, pageIndex * FORUM_PAGE_SIZE)}
+                    />
+                )}
+                orientation={handheld.orientation}
+                settings={isSettingsOpen && forumData && (
+                    <GroupForumSettingsView forumData={forumData} groupId={effectiveGroupId} initialPosition={{ x: 0, y: 0 }} readForumData={() => forumRef.current} onClose={() => setIsSettingsOpen(false)} />
+                )}
+                thread={mode === 'thread' && (
+                    <GroupForumThreadView
+                        key={threadId}
+                        forumData={forumData}
+                        getLastReadMessageIndex={getThreadLastReadMessageIndex}
+                        groupId={effectiveGroupId}
+                        initialPageIndex={threadStart.pageIndex}
+                        initialThread={currentThread}
+                        scrollIndex={threadStart.scrollIndex}
+                        threadId={threadId}
+                        onBack={backToThreads}
+                        onMessagesSeen={onMessagesSeen}
+                        onReply={(subject, quote) => setCompose((previous) => ({ kind: 'reply', threadId, subject, quote, quoteSeq: previous && previous.kind === 'reply' && previous.threadId === threadId ? previous.quoteSeq + 1 : 0 }))}
+                    />
+                )}
+                threads={(mode === 'threads' || (mode === 'thread' && isSideBySide)) && forumData && (
+                    <GroupForumThreadListView
+                        activeThreadId={mode === 'thread' ? threadId : 0}
+                        forumData={forumData}
+                        getLastReadMessageIndex={getThreadLastReadMessageIndex}
+                        groupId={effectiveGroupId}
+                        pageIndex={threadsPage}
+                        reloadKey={threadsReload}
+                        onLeave={leaveThreads}
+                        onNewThread={() => setCompose({ kind: 'thread' })}
+                        onOpenThread={openThreadAtFirstUnread}
+                        onPageChange={setThreadsPage}
+                    />
+                )}
+                unreadForumsCount={unreadForumsCount}
+                onClose={closeForum}
+                onHelp={() => CreateLinkEvent('habbopages/forums')}
+                onOpenList={(name) => openForumsList(LIST_CODES[name] ?? MY_FORUMS)}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

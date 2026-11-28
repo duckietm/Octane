@@ -4,6 +4,7 @@ import { OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useEpicPopup } from '../../../../hooks/friends/useEpicPopup';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 /**
  * AIR `HabboEpicPopupView` / `epic_popup_frame_xml` (215x275 frame, centred): the server's image in a 200x200
@@ -17,7 +18,7 @@ export const EpicPopupView: FC = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView key={imageUrl} classNames={['octane-epic-popup']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="epic-popup">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} key={imageUrl} classNames={['octane-epic-popup']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="epic-popup">
                 <OctaneCardHeaderView headerText="" onCloseClick={close} />
                 <div className="octane-epic-popup-content" data-testid="epic-popup">
                     <div className="octane-epic-popup-image">

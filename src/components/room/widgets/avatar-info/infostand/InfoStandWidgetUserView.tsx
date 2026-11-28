@@ -21,6 +21,9 @@ import {
     GetUserProfile,
     LocalizeText,
     localizeWithFallback,
+    profileAvatarOffsetStyle,
+    profileAvatarPose,
+    profileOverlayOffsetStyle,
     resolveServerLength,
     SendMessageComposer
 } from '../../../../../api';
@@ -90,6 +93,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     // A light card background needs dark text: the infostand's own text is white on its black frame.
     const infostandTone = useBackgroundTone(infostandRef, cardBackgroundId ? `card-${cardBackgroundId}` : '', { r: 61, g: 61, b: 61 });
     const infostandBorderClass = borderId ? `border-${borderId}` : '';
+    const avatarPose = profileAvatarPose(avatarInfo);
     const handleProfileClick = useCallback(() => {
         GetUserProfile(avatarInfo.webID);
     }, [avatarInfo.webID]);
@@ -166,6 +170,9 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
             newValue.overlayId = event.overlayId;
             newValue.cardBackgroundId = event.cardBackgroundId ?? 0;
             newValue.borderId = event.borderId ?? 0;
+            newValue.avatarDirection = event.avatarDirection ?? 2;
+            newValue.avatarOffsetX = event.avatarOffsetX ?? 0;
+            newValue.avatarOffsetY = event.avatarOffsetY ?? 0;
             return newValue;
         });
     });
@@ -263,8 +270,16 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                     <div className="octane-infostand__figure-row">
                         <BaseButton type="button" className={`octane-infostand__avatar-well profile-background ${infostandBackgroundClass}`} onClick={handleProfileClick}>
                             <Base position="absolute" className={`profile-stand ${infostandStandClass}`} />
-                            <LayoutAvatarImageView direction={2} figure={figureUnderOverlay(avatarInfo.figure, overlayId)} />
-                            <Base position="absolute" className={`profile-overlay ${infostandOverlayClass}`} />
+                            <LayoutAvatarImageView
+                                direction={avatarPose.direction}
+                                figure={figureUnderOverlay(avatarInfo.figure, overlayId)}
+                                style={profileAvatarOffsetStyle(avatarPose.offsetX, avatarPose.offsetY)}
+                            />
+                            <Base
+                                position="absolute"
+                                className={`profile-overlay ${infostandOverlayClass}`}
+                                style={profileOverlayOffsetStyle(overlayId, avatarPose.offsetX, avatarPose.offsetY)}
+                            />
                         </BaseButton>
                         {avatarInfo.type === AvatarInfoUser.OWN_USER && (
                             <Base component={BaseButton} type="button"

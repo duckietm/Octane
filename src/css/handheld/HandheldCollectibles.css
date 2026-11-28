@@ -1,0 +1,1358 @@
+/*
+ * Phone collectibles hub (the Me menu's Collectibles entry, `collectibles/open`) and the opened reward box, in the
+ * Octane handheld look (HandheldTokens.css) inside the shared frame (HandheldSheetFrame). The level badge and both
+ * balances sit in the header, the hub's tabs are the pills; products, relics and sets are finger-sized tiles, and what
+ * is picked opens as a page with a way back (upright) or stands beside the list (on its side), its main action in a
+ * bar at the foot. The reward box is a card in the middle of the screen. Everything is scoped to :root[data-handheld],
+ * which only a phone-sized touch device gets.
+ */
+
+:root[data-handheld] .octane-handheld-collectibles .octane-handheld-sheet__body {
+    padding: 0;
+}
+
+/* A narrow phone gives the header's room to the balances: the cabinet icon goes, the title keeps its words. */
+@media (max-width: 380px) {
+    :root[data-handheld] .octane-handheld-collectibles .octane-handheld-sheet__mark {
+        display: none;
+    }
+}
+
+:root[data-handheld] .octane-handheld-collectibles__content {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+/* ---------------------------------------------------------------- header: level and balances */
+
+:root[data-handheld] .octane-handheld-collectibles__purse {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__level {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-level, var(--hh-air-blue));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px var(--hh-air-outline);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 28px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__coin {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 2px;
+    height: 28px;
+    padding: 0 2px 0 var(--hh-space-2);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 28px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__coin img {
+    width: 24px;
+    height: 24px;
+}
+
+/* ---------------------------------------------------------------- pages and panes */
+
+:root[data-handheld] .octane-handheld-collectibles__panes {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+:root[data-handheld] :is(.octane-handheld-collectibles__pane, .octane-handheld-collectibles__page) {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* On its side: the list in a column left of what is picked. */
+:root[data-handheld='landscape'] .octane-handheld-collectibles__pane.is-list {
+    flex: 0 0 44%;
+    border-right: 1px solid var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__scroll {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    box-sizing: border-box;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+    padding: var(--hh-space-3) var(--hh-space-3) var(--hh-space-4);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__scroll > * {
+    flex: none;
+}
+
+/* The page's main action, at its foot above the safe area. */
+:root[data-handheld] .octane-handheld-collectibles__actions {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-3);
+    padding: var(--hh-space-2) var(--hh-space-3) calc(var(--hh-space-2) + var(--octane-safe-bottom, 0px));
+    border-top: 1px solid var(--hh-air-box);
+    background: var(--hh-air-panel);
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.06);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__actions > .octane-handheld-collectibles__button {
+    flex: 1 1 auto;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__heading {
+    margin-top: var(--hh-space-1);
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__title {
+    min-width: 0;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__text {
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__text.is-muted {
+    color: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__text b {
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] :is(.octane-handheld-collectibles__empty, .octane-handheld-collectibles .octane-collectibles-empty) {
+    padding: var(--hh-space-4) var(--hh-space-4);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__card {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__card.is-bonus {
+    gap: var(--hh-space-1);
+    background: var(--hh-air-track-free);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__card-label {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__card-name {
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__note {
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-header);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__note.is-warning {
+    background: var(--hh-air-track-tip);
+    color: var(--hh-air-text);
+}
+
+/* The tab's loading box, centred on the sheet. */
+:root[data-handheld] .octane-handheld-collectibles .octane-collectibles-loading-box {
+    border-color: var(--hh-air-box);
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+/* ---------------------------------------------------------------- buttons, back, price, chevron */
+
+:root[data-handheld] .octane-handheld-collectibles__button,
+:root[data-handheld] .octane-handheld-collectibles-box .octane-handheld-collectibles__button {
+    box-sizing: border-box;
+    min-width: 96px;
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-4);
+    border: 1px solid var(--hh-air-blue-deep);
+    border-radius: var(--hh-radius-pill);
+    background: linear-gradient(180deg, var(--hh-air-blue-light) 0%, var(--hh-air-blue) 50%, var(--hh-air-blue-deep) 100%);
+    box-shadow: var(--hh-edge), var(--hh-shadow-card);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    white-space: nowrap;
+    touch-action: manipulation;
+    transition: filter var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__button:active {
+    filter: brightness(0.92);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__button.is-primary {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__button.is-primary:active {
+    background: var(--hh-primary-pressed);
+    filter: none;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__button:disabled {
+    box-shadow: none;
+    cursor: default;
+    filter: grayscale(0.6);
+    opacity: 0.45;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__back {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    align-self: flex-start;
+    gap: 2px;
+    height: 36px;
+    padding: 0 var(--hh-space-3) 0 6px;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 20px;
+}
+
+/* The pill is 36 px; the finger gets 44. */
+:root[data-handheld] .octane-handheld-collectibles__back::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__back:active {
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__chevron {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: var(--hh-air-border);
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__back .octane-handheld-collectibles__chevron {
+    stroke: currentColor;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__price {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-1);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__price.is-large {
+    font-size: var(--hh-size-xl);
+    line-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__price img {
+    flex: none;
+    max-height: 24px;
+}
+
+/* ---------------------------------------------------------------- bars and timers */
+
+:root[data-handheld] .octane-handheld-collectibles__bar {
+    position: relative;
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 8px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-box);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__bar-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--hh-fill);
+    border-radius: var(--hh-radius-pill);
+    background: var(--collectibles-bar, var(--hh-air-count-green));
+    transition: width var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__timer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__timer.is-card {
+    gap: 6px;
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__timer .octane-handheld-collectibles__bar {
+    flex: none;
+    --collectibles-bar: var(--hh-air-count-yellow);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__timer[data-expired='true'] .octane-handheld-collectibles__bar {
+    --collectibles-bar: var(--hh-air-count-red);
+}
+
+/* ---------------------------------------------------------------- the stage: what is picked, on the turning star */
+
+:root[data-handheld] .octane-handheld-collectibles__stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 200px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: linear-gradient(180deg, var(--hh-air-blue-header-line) 0%, var(--hh-air-blue-header) 100%);
+    box-shadow: var(--hh-shadow-card);
+    isolation: isolate;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-collectibles__stage {
+    height: 120px;
+}
+
+/* A low screen: the action bar is a little lower too. */
+:root[data-handheld='landscape'] .octane-handheld-collectibles__actions {
+    padding-top: 6px;
+    padding-bottom: calc(6px + var(--octane-safe-bottom, 0px));
+}
+
+:root[data-handheld] .octane-handheld-collectibles__star {
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 300px;
+    margin: -150px 0 0 -150px;
+    background: url("@/assets/images/collectibles/bg_star_300x300.png") no-repeat center;
+    opacity: 0.35;
+    pointer-events: none;
+    /* The turn of the desktop hub's star (Collectibles.css). */
+    animation: octane-collectibles-turn 18s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root[data-handheld] .octane-handheld-collectibles__star {
+        animation: none;
+    }
+}
+
+:root[data-handheld] .octane-handheld-collectibles__stage-image {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    padding: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__stage-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__stage-name {
+    flex: none;
+    padding: 6px var(--hh-space-3);
+    overflow: hidden;
+    background: var(--hh-air-hud);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--hh-space-2);
+    margin: 0;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__scroll > .octane-handheld-collectibles__facts {
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__facts > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__facts dt {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__facts dd {
+    margin: 0;
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__row {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-3);
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__row img {
+    flex: none;
+}
+
+/* ---------------------------------------------------------------- tiles (products, relics, the items of a set) */
+
+:root[data-handheld] .octane-handheld-collectibles__tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: var(--hh-space-2);
+    padding: 2px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__tiles.is-wide {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+}
+
+:root[data-handheld] .octane-handheld-collectibles__tile {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-1);
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 1;
+    padding: var(--hh-space-1);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    touch-action: manipulation;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        box-shadow var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__tiles.is-wide > .octane-handheld-collectibles__tile {
+    aspect-ratio: auto;
+    min-height: 112px;
+    padding: var(--hh-space-2) 6px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__tile:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__tile[data-pressed] {
+    border-color: var(--hh-air-select);
+    background: var(--hh-air-track-light);
+    box-shadow:
+        0 0 0 2px var(--hh-air-select),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__tile[data-soldout='true'] {
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__tile[data-soldout='true'] .octane-handheld-collectibles__tile-image {
+    opacity: 0.45;
+}
+
+/* Nothing left to mint: a tag on the tile. */
+:root[data-handheld] .octane-handheld-collectibles__tag {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    padding: 0 6px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-red);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 18px;
+    pointer-events: none;
+}
+
+/* An item of a set not collected yet: faded, as on the desktop shelf. */
+:root[data-handheld] .octane-handheld-collectibles__tile[data-owned='false'] .octane-handheld-collectibles__tile-image {
+    opacity: 0.4;
+    filter: grayscale(1);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__tile-image {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__tiles.is-wide .octane-handheld-collectibles__tile-image {
+    flex: 0 0 56px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__tile-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__tile-name {
+    width: 100%;
+    overflow: hidden;
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__badge {
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    padding: 0 5px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-hud);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__check {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- chips, fields, selects */
+
+:root[data-handheld] .octane-handheld-collectibles__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__chip {
+    position: relative;
+    box-sizing: border-box;
+    height: 36px;
+    padding: 0 var(--hh-space-4);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    line-height: 20px;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__chip::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__chip[data-pressed] {
+    border-color: var(--hh-air-blue-deep);
+    background: var(--hh-air-blue-deep);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__toolbar {
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-3) var(--hh-space-3) 0;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__input {
+    flex: 1 1 auto;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-4);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+    line-height: 20px;
+    outline: 0;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__input::placeholder {
+    color: var(--hh-air-box-line);
+    opacity: 1;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__input:focus-visible {
+    outline: var(--hh-focus-on-paper);
+    outline-offset: 1px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__input::-webkit-search-cancel-button {
+    display: none;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__field-label {
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+}
+
+/* The selects: white pills with a drawn chevron. */
+:root[data-handheld] .octane-select-trigger.octane-handheld-collectibles__select {
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    align-items: center;
+    min-width: 104px;
+    height: var(--hh-touch);
+    padding: 0 32px 0 var(--hh-space-4);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-l);
+    line-height: 20px;
+    text-align: left;
+}
+
+:root[data-handheld] .octane-select-trigger.octane-handheld-collectibles__select::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    box-sizing: border-box;
+    width: 8px;
+    height: 8px;
+    margin-top: -6px;
+    border: solid var(--hh-air-blue);
+    border-width: 0 2.5px 2.5px 0;
+    border-radius: 1px;
+    background: none;
+    pointer-events: none;
+    transform: rotate(45deg);
+}
+
+/* ---------------------------------------------------------------- rewards */
+
+:root[data-handheld] .octane-handheld-collectibles__collector {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-3);
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-track-light);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__collector-level {
+    display: flex;
+    flex: 0 0 72px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 72px;
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-level, var(--hh-air-blue));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px var(--hh-air-outline);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__collector-number {
+    font-family: var(--hh-font-bold);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 32px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__collector-caption {
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__collector-scores {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    margin: 0;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__collector-scores dt {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__collector-scores dd {
+    margin: 0;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__claim {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-height: 64px;
+    padding: var(--hh-space-2) var(--hh-space-3) var(--hh-space-2) var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__claim-text {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__claim-text b {
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__claim-name {
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__amount {
+    flex: none;
+    padding: 0 var(--hh-space-2);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 24px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__thumb {
+    display: flex;
+    flex: 0 0 48px;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    overflow: hidden;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__thumb img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* On its side: the collector card in a column left of the rewards. */
+:root[data-handheld='landscape'] .octane-handheld-collectibles__page.is-rewards > .octane-handheld-collectibles__scroll {
+    display: grid;
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    align-content: start;
+    align-items: start;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-collectibles__page.is-rewards .octane-handheld-collectibles__collector {
+    position: sticky;
+    top: 0;
+}
+
+/* ---------------------------------------------------------------- collections */
+
+:root[data-handheld] .octane-handheld-collectibles__sets {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--hh-space-2);
+    padding: 2px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__set {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    width: 100%;
+    min-width: 0;
+    min-height: 68px;
+    padding: var(--hh-space-2) 6px var(--hh-space-2) var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-left: 4px solid var(--collectibles-progress, var(--hh-air-box));
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    text-align: left;
+    touch-action: manipulation;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__set .octane-handheld-collectibles__thumb {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__set:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__set[data-pressed] {
+    background: var(--hh-air-track-light);
+    box-shadow:
+        0 0 0 2px var(--hh-air-select),
+        var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__set-text {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__set-name {
+    display: -webkit-box;
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 17px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__set-progress {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__count {
+    flex: none;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__set-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+    padding: 0 var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__pill {
+    flex: none;
+    padding: 0 10px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--collectibles-progress, var(--hh-air-blue));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 26px;
+}
+
+/* ---------------------------------------------------------------- minting */
+
+:root[data-handheld] .octane-handheld-collectibles__stamps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__stamps-balance {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__stamps-balance img {
+    flex: none;
+    width: 48px;
+    height: 40px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__stamps-text {
+    display: flex;
+    flex-direction: column;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__stamps-text strong {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 26px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__stamps-buy {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hh-space-2) var(--hh-space-3);
+    padding-top: var(--hh-space-2);
+    border-top: 1px solid var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__stamps-label {
+    flex: 1 0 100%;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__stamps-buy .octane-handheld-collectibles__select {
+    flex: 1 1 88px;
+    min-width: 88px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__stamps-buy .octane-handheld-collectibles__button {
+    flex: 0 0 auto;
+}
+
+/* ---------------------------------------------------------------- transfer and info */
+
+:root[data-handheld] .octane-handheld-collectibles__card.is-transfer,
+:root[data-handheld] .octane-handheld-collectibles__card.is-info {
+    align-items: center;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__safe {
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 400 / 180;
+    background: url("@/assets/images/collectibles/collectables_transfer_safe.png") no-repeat center / contain;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__cabinet {
+    width: 130px;
+    height: 128px;
+    background: url("@/assets/images/collectibles/collectables_cabinet_element.png") no-repeat center;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-collectibles__fee {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+}
+
+:root[data-handheld] .octane-handheld-collectibles__fee-label {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+/* On its side: what it does left, the name field right. */
+:root[data-handheld='landscape'] .octane-handheld-collectibles__page.is-transfer > .octane-handheld-collectibles__scroll {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-content: start;
+    align-items: start;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-collectibles__safe {
+    max-width: 220px;
+}
+
+/* ---------------------------------------------------------------- the opened reward box */
+
+:root[data-handheld] .octane-handheld-collectibles-box {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    width: min(360px, calc(100vw - 24px - var(--octane-safe-left, 0px) - var(--octane-safe-right, 0px)));
+    overflow: hidden;
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-panel);
+    box-shadow: var(--hh-shadow-float);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box img {
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__head {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-2);
+    height: 52px;
+    padding: 0 var(--hh-space-2) 0 var(--hh-space-4);
+    background: linear-gradient(180deg, var(--hh-air-blue-header-line) 0%, var(--hh-air-blue-header) 100%);
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__title {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__close {
+    position: relative;
+    display: flex;
+    flex: 0 0 36px;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-dismiss);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px var(--hh-air-outline);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__close::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__close svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__prize {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    overflow: hidden;
+    background: var(--collectibles-rarity, var(--hh-air-blue));
+    isolation: isolate;
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__prize .octane-handheld-collectibles__star {
+    opacity: 0.75;
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    max-height: 100%;
+    padding: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__image img {
+    max-width: 100%;
+    max-height: 176px;
+    object-fit: contain;
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: var(--hh-space-3) var(--hh-space-4) calc(var(--hh-space-4) + var(--octane-safe-bottom, 0px));
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__contains {
+    color: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__name {
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__rarity {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 var(--hh-space-3);
+    border-radius: var(--hh-radius-pill);
+    background: var(--collectibles-rarity, var(--hh-air-blue));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-s);
+    line-height: 26px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__rarity strong {
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box__info {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-collectibles-box .octane-handheld-collectibles__button {
+    align-self: stretch;
+    margin-top: var(--hh-space-1);
+}
+
+/* On its side the card is wide and low: the prize left of what it is. */
+:root[data-handheld='landscape'] .octane-handheld-collectibles-box {
+    display: grid;
+    grid-template-areas:
+        "head head"
+        "prize body";
+    grid-template-columns: 220px minmax(0, 1fr);
+    width: min(560px, calc(100vw - 24px - var(--octane-safe-left, 0px) - var(--octane-safe-right, 0px)));
+}
+
+:root[data-handheld='landscape'] .octane-handheld-collectibles-box__head {
+    grid-area: head;
+    height: 46px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-collectibles-box__prize {
+    grid-area: prize;
+    height: auto;
+    min-height: 220px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-collectibles-box__body {
+    grid-area: body;
+    justify-content: center;
+}
+
+/* On its side the list column is low: the relics come first, the stamps and what relics are under them. */
+:root[data-handheld='landscape'] .octane-handheld-collectibles__panes.is-mint .octane-handheld-collectibles__pane.is-list .octane-handheld-collectibles__tiles {
+    order: -1;
+}
+
+/* A tile with a name carries its count in the top corner. */
+:root[data-handheld] .octane-handheld-collectibles__tiles.is-wide .octane-handheld-collectibles__badge {
+    top: 4px;
+    bottom: auto;
+}

@@ -9,6 +9,9 @@ import { NO_PAGE } from './WiredPaging.helpers';
 import { NumberInput } from '../../common/NumberInput';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldWiredButton, HandheldWiredCard, HandheldWiredField, HandheldWiredPage, HandheldWiredPair } from './handheld/HandheldWiredParts';
 
 export const WIRED_ARRAY_INSPECTOR_PAGE_SIZE = 25;
 const REQUEST_PAGE_RATELIMIT = 300;
@@ -27,6 +30,7 @@ export const WiredArrayInspectorView = (props: WiredArrayInspectorViewProps) => 
     const [ownerInput, setOwnerInput] = useState('0');
     const [editing, setEditing] = useState<{ fieldId: number; index: number; value: string } | null>(null);
     const [scrollKey, setScrollKey] = useState(0);
+    const isHandheld = useIsHandheld();
 
     useMessageEvent<WiredArrayInspectionDataEvent>(WiredArrayInspectionDataEvent, (event) => {
         const parsed = event.getParser()?.data ?? null;
@@ -98,7 +102,7 @@ export const WiredArrayInspectorView = (props: WiredArrayInspectorViewProps) => 
     };
 
     const columns: WiredTableColumn[] = [
-        { id: 'index', title: localizeWithFallback('wiredmenu.arrays.col.index', 'Index'), className: 'w-[70px]' },
+        { id: 'index', title: localizeWithFallback('wiredmenu.arrays.col.index', 'Index'), className: 'w-[70px]', handheld: 'title' },
         ...fields.map((field) => ({
             id: `field-${field.id}`,
             title: field.name || localizeWithFallback('wiredmenu.arrays.col.value', 'Value')
@@ -118,7 +122,8 @@ export const WiredArrayInspectorView = (props: WiredArrayInspectorViewProps) => 
                 content: (
                     <input
                         autoFocus
-                        className="w-[90px] rounded border border-[#b8b2a4] bg-white px-1 text-[12px]"
+                        aria-label={localizeWithFallback('wiredmenu.arrays.col.value', 'Value')}
+                        className={isHandheld ? 'octane-handheld-wired__input' : 'w-[90px] rounded border border-[#b8b2a4] bg-white px-1 text-[12px]'}
                         value={editing.value}
                         onBlur={commitEdit}
                         onChange={(event) => setEditing({ ...editing, value: event.target.value })}
@@ -136,7 +141,7 @@ export const WiredArrayInspectorView = (props: WiredArrayInspectorViewProps) => 
             className: 'tabular-nums',
             content: (
                 <BaseButton
-                    className="text-[#1b57b2] underline underline-offset-2"
+                    className={isHandheld ? 'octane-handheld-wired__value-link' : 'text-[#1b57b2] underline underline-offset-2'}
                     type="button"
                     onClick={() => setEditing({ fieldId, index: entry.index, value: raw })}
                 >
@@ -153,9 +158,67 @@ export const WiredArrayInspectorView = (props: WiredArrayInspectorViewProps) => 
               .replace('%total%', String(data.totalIndexes))
         : '';
 
+    const loadOwner = () => {
+        const parsed = parseInt(ownerInput.trim(), 10);
+
+        setOwnerId(Number.isFinite(parsed) ? parsed : 0);
+    };
+
+    // Phone: a page of the sheet; the owner field gets a Load button, as a phone has no Enter to rely on.
+    if (isHandheld)
+        return (
+            <HandheldWiredPage
+                actions={
+                    <HandheldWiredButton onClick={() => requests.refresh()}>{localizeWithFallback('wiredmenu.variable_management.refresh', 'Refresh')}</HandheldWiredButton>
+                }
+                title={localizeWithFallback('wiredmenu.arrays.title', 'Array contents')}
+                uniqueKey="wired-array-inspector"
+                onClose={onClose}
+                aside={
+                    <HandheldWiredCard>
+                        <HandheldWiredPair label={localizeWithFallback('wiredmenu.variable_management.variable_name', 'Variable name:')} value={variableName} valueClassName="is-strong" />
+                        {!!data && <p className="octane-handheld-wired__text">{summary}</p>}
+                        <HandheldWiredField label={localizeWithFallback('wiredmenu.arrays.owner', 'Owner id')}>
+                            <div className="octane-handheld-wired__inline">
+                                <NumberInput
+                                    value={ownerInput}
+                                    onChange={(event) => setOwnerInput(event.target.value)}
+                                    onKeyDown={(event) => {
+                                        if (event.key === 'Enter') loadOwner();
+                                    }}
+                                />
+                                <HandheldWiredButton testId="wired-array-load" onClick={loadOwner}>
+                                    {localizeWithFallback('octane.handheld.wired_tools.load', 'Load')}
+                                </HandheldWiredButton>
+                            </div>
+                        </HandheldWiredField>
+                        <p className="octane-handheld-wired__muted">{localizeWithFallback('wiredmenu.arrays.owner.hint', 'Room arrays ignore this. Press Enter to load.')}</p>
+                        {!!data && !data.hasArray && (
+                            <p className="octane-handheld-wired__text">
+                                {localizeWithFallback('wiredmenu.arrays.not_array', 'That variable is not an array, or this owner has no value for it yet.')}
+                            </p>
+                        )}
+                    </HandheldWiredCard>
+                }
+            >
+                <WiredPagedTable
+                    columns={columns}
+                    rows={data?.entries ?? []}
+                    getRowId={(entry) => String(entry.index)}
+                    getCell={getCell}
+                    currentPage={currentPage}
+                    totalEntries={data?.totalIndexes ?? 0}
+                    lastPage={lastPage}
+                    requests={requests}
+                    emptyText={localizeWithFallback('wiredmenu.arrays.empty', 'This array holds nothing yet')}
+                    scrollResetKey={scrollKey}
+                />
+            </HandheldWiredPage>
+        );
+
     return (
         <NativeTextTree>
-            <OctaneCardView
+            <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
                 className="octane-wired-menu min-w-[620px] max-w-[620px] max-h-[620px]"
                 theme="primary-slim"
                 uniqueKey="wired-array-inspector"

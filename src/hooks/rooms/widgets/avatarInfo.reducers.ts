@@ -57,6 +57,9 @@ export const applyUserFigureUpdate = (state: IAvatarInfo | null, event: RoomSess
     next.overlayId = event.overlayId;
     next.cardBackgroundId = event.cardBackgroundId ?? 0;
     next.borderId = event.borderId ?? 0;
+    next.avatarDirection = event.avatarDirection ?? 2;
+    next.avatarOffsetX = event.avatarOffsetX ?? 0;
+    next.avatarOffsetY = event.avatarOffsetY ?? 0;
 
     return next;
 };

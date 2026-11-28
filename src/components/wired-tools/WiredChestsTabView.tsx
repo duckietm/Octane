@@ -17,6 +17,8 @@ import { Select } from '../../common/Select';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldWiredChestsTab } from './handheld/HandheldWiredRoomTabs';
 import { WiredChestTransactionLogView } from './WiredChestTransactionLogView';
 import { chestTransactionMethodText, summarizeChestTransaction } from './WiredChestTransactions.helpers';
 
@@ -131,6 +133,34 @@ export const WiredChestsTabView: FC<{}> = () => {
     }, [filter, requestPage]);
 
     const previewRows = useMemo(() => (page === 1 ? rows : []), [page, rows]);
+    const isHandheld = useIsHandheld();
+
+    if (isHandheld)
+        return (
+            <>
+                <HandheldWiredChestsTab
+                    canManageAll={canManageAll}
+                    canManageOwn={canManageOwn}
+                    describeRow={(row) => ({
+                        method: chestTransactionMethodText(row.method),
+                        withdrawn: summarizeChestTransaction(row.withdrawnFurni, row.withdrawnCoins),
+                        deposited: summarizeChestTransaction(row.depositedFurni, row.depositedCoins)
+                    })}
+                    filter={filter}
+                    filterOptions={FILTERS.map((option) => ({ value: String(option.value), label: localizeWithFallback(option.key, option.fallback) }))}
+                    loaded={loaded}
+                    lockBusy={lockBusy}
+                    rows={previewRows}
+                    totalRows={totalRows}
+                    onFilterChange={setFilter}
+                    onLockAll={lockEveryChest}
+                    onLockOwn={() => sendLock(true, false)}
+                    onUnlockOwn={() => sendLock(false, false)}
+                    onViewDetails={() => setDetailsOpen(true)}
+                />
+                {detailsOpen && <WiredChestTransactionLogView chestId={0} onClose={closeDetails} />}
+            </>
+        );
 
     const renderPreviewBody = () => {
         if (!loaded) return null;

@@ -16,6 +16,9 @@ import { CameraWidgetEffectListView } from './effect-list';
 import { BaseButton } from '../../../../common/BaseButton';
 import { ToggleButton } from '../../../../common/ToggleButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldCameraEditorView } from './HandheldCameraEditorView';
 
 export interface CameraWidgetEditorViewProps {
     picture: CameraPicture;
@@ -49,6 +52,7 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
     const [currentPictureUrl, setCurrentPictureUrl] = useState<string>(picture?.imageUrl ?? '');
     const requestIdRef = useRef<number>(0);
     const stableTexture = picture?.texture ?? null;
+    const isHandheld = useIsHandheld();
 
     const colorMatrixEffects = useMemo(() => availableEffects.filter((effect) => effect.colorMatrix), [availableEffects]);
     const compositeEffects = useMemo(() => availableEffects.filter((effect) => effect.texture), [availableEffects]);
@@ -131,6 +135,14 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
                     if (selectedEffectName === effectName) setSelectedEffectName(null);
                     return;
                 }
+                // The phone editor's "Clear all": every effect off the picture at once.
+                case 'clear_effects':
+                    if (!selectedEffects.length) return;
+
+                    setIsRendering(true);
+                    setSelectedEffects([]);
+                    setSelectedEffectName(null);
+                    return;
                 case 'download': {
                     if (!currentPictureUrl) return;
 
@@ -243,9 +255,31 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
         };
     }, []);
 
+    if (isHandheld) {
+        return (
+            <HandheldCameraEditorView
+                currentEffect={currentEffect}
+                currentTab={currentTab}
+                effects={visibleEffects}
+                isRendering={isRendering}
+                isZoomed={isZoomed}
+                myLevel={myLevel}
+                pictureUrl={currentPictureUrl}
+                processAction={processAction}
+                selectedEffectName={selectedEffectName}
+                selectedEffects={selectedEffects}
+                tabs={TABS}
+                thumbnails={effectsThumbnails}
+                onDeselect={() => setSelectedEffectName(null)}
+                onHelp={() => CreateLinkEvent('habbopages/camera')}
+                onStrength={(value) => setSelectedEffectAlpha(value / 100)}
+            />
+        );
+    }
+
     return (
         <NativeTextTree>
-            <OctaneCardView uniqueKey="camera-editor" className="octane-camera-editor" frameStyle={3} isResizable={false} style={{ resize: 'none' }}>
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} uniqueKey="camera-editor" className="octane-camera-editor" frameStyle={3} isResizable={false} style={{ resize: 'none' }}>
                 <div className="octane-card-header-shell">
                     <span className="octane-card-title">
                         <CameraCenteredText

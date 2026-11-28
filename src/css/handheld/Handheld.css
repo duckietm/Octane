@@ -1,0 +1,220 @@
+/*
+ * Phone layout. Every rule below the first one is scoped to :root[data-handheld], which the handheld
+ * watcher only sets on a phone-sized touch device (see src/api/handheld/handheldWatcher.ts), so the desktop
+ * layout never sees any of it. Later stages refine single windows on top of these generic rules.
+ */
+
+/* The larger close target of card windows exists on every layout but is only shown on phones. */
+.octane-card-close-hit {
+    display: none;
+}
+
+:root[data-handheld] {
+    --octane-safe-top: env(safe-area-inset-top, 0px);
+    --octane-safe-right: env(safe-area-inset-right, 0px);
+    --octane-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --octane-safe-left: env(safe-area-inset-left, 0px);
+    --octane-handheld-toolbar: 60px;
+    --octane-handheld-accent: #1e7295;
+    --octane-handheld-panel: rgba(32, 31, 33, 0.94);
+    --octane-handheld-line: rgba(255, 255, 255, 0.14);
+}
+
+:root[data-handheld] body {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+/* The room reads every finger itself (tap, drag, hold, pinch): the browser must not scroll or zoom it. */
+:root[data-handheld] .octane-app-root canvas {
+    touch-action: none;
+}
+
+:root[data-handheld] button,
+:root[data-handheld] .tb-icon {
+    touch-action: manipulation;
+}
+
+/* ---------------------------------------------------------------- windows */
+
+:root[data-handheld] .draggable-window[data-handheld-window] .drag-handler {
+    cursor: default;
+}
+
+:root[data-handheld] .draggable-window[data-handheld-window='sheet'] {
+    display: flex;
+    flex-direction: column;
+}
+
+/* A window bigger than the screen fills the usable area and scrolls inside, instead of hanging off it. */
+:root[data-handheld] .draggable-window[data-handheld-window='sheet'] > * {
+    flex: 1 1 auto;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    resize: none !important;
+}
+
+:root[data-handheld] .draggable-window[data-handheld-window] .octane-card-shell {
+    resize: none;
+}
+
+/* A full-screen sheet covers the whole viewport; the notch and the home indicator get a strip in the header colour
+   instead of content. */
+:root[data-handheld] .draggable-window[data-handheld-window='sheet'][data-handheld-fullscreen] {
+    box-sizing: border-box;
+    padding: var(--octane-safe-top, 0px) var(--octane-safe-right, 0px) var(--octane-safe-bottom, 0px) var(--octane-safe-left, 0px);
+    /* Header blue behind the notch, sheet cream behind the home indicator. */
+    background: linear-gradient(180deg, var(--hh-air-blue-header-line, #376275) 0 50%, var(--hh-air-cream, #e9e9e1) 50% 100%);
+}
+
+:root[data-handheld] .draggable-window[data-handheld-window='scaled'] {
+    width: max-content;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+}
+
+/* A fixed-layout window drawn smaller as a whole: its pixel layout stays, the scale comes from DraggableWindow. */
+:root[data-handheld] .draggable-window[data-handheld-window='scaled'] > * {
+    flex: none;
+    zoom: var(--octane-handheld-scale, 1);
+}
+
+/* Still bigger than the screen at its smallest readable scale: it fills the usable area and pans inside. */
+:root[data-handheld] .draggable-window[data-handheld-pan] {
+    display: flex;
+    overflow: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .draggable-window[data-handheld-pan] > * {
+    margin: auto;
+}
+
+:root[data-handheld] .octane-card-close-hit {
+    display: block;
+    position: absolute;
+    inset: -13px;
+}
+
+/* ---------------------------------------------------------------- toolbar and chat */
+
+/* The room chat composer's frame: a band across the bottom edge (HandheldChat.css draws what is in it). */
+:root[data-handheld] .tb-frame {
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    translate: 0 !important;
+}
+
+/* With the keyboard open the toolbar steps aside and the composer sits right on top of the keyboard. */
+:root[data-handheld][data-handheld-keyboard] .tb-frame {
+    bottom: var(--octane-keyboard-inset, 0px) !important;
+}
+
+/* The composer is away until it is asked for (the dock's chat button, HandheldHud.css): it stays mounted and can
+   take the focus, but is not seen and catches no finger. */
+:root[data-handheld] .tb-frame:not([data-handheld-chat]),
+:root[data-handheld] .tb-frame:not([data-handheld-chat]) * {
+    pointer-events: none !important;
+}
+
+:root[data-handheld] .tb-frame:not([data-handheld-chat]) {
+    opacity: 0;
+}
+
+:root[data-handheld][data-handheld-keyboard] .octane-handheld-dock,
+:root[data-handheld][data-handheld-keyboard] .octane-handheld-placement {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- furni placement */
+
+.octane-handheld-placement {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--octane-handheld-toolbar) + 60px + var(--octane-safe-bottom, 0px));
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    max-width: calc(100vw - 24px);
+    padding: 8px 12px 10px;
+    border: 1px solid var(--octane-handheld-line);
+    border-radius: 14px;
+    background: var(--octane-handheld-panel);
+    color: #fff;
+    transform: translateX(-50%);
+    pointer-events: auto;
+}
+
+.octane-handheld-placement__hint {
+    margin: 0;
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+}
+
+.octane-handheld-placement__actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.octane-handheld-placement__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+    background: #3b3a3c;
+    color: #fff;
+    font-size: 20px;
+}
+
+.octane-handheld-placement__button.is-place {
+    background: #3c8a2e;
+}
+
+/* "Done" is a text pill: it ends the placing, which is the normal way out once enough items stand. */
+.octane-handheld-placement__button.is-done {
+    width: auto;
+    min-width: 72px;
+    padding: 0 18px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.octane-handheld-placement__button:active {
+    transform: scale(0.94);
+}
+
+/* ---------------------------------------------------------------- pixel text */
+
+/* A small Volter label in a window that reflows is drawn larger on a phone (NativeLabel, handheldVolterSize). */
+:root[data-handheld] octane-label[data-handheld-size] {
+    font-size: var(--octane-handheld-label-size) !important;
+}
+
+/* The loading screen: the hotel logo (280 px) covers half a phone's width over the splash, so a phone shows the splash,
+   the message and the bar without it. */
+:root[data-handheld] .octane-loading__logo {
+    display: none;
+}

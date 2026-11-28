@@ -7,6 +7,8 @@ import { NativeWindowShell } from '../native/NativeWindowShell';
 import { findNativeNode, nativeCaption, nativeNumber, NativeNode, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Button, Native0Dropmenu, Native0Frame, Native0Input, Native0Text } from '../native/NativeWindow0';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModSendMessageView } from '../handheld/HandheldModSanctionViews';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 /** `$pe._rfaec9bccb2e7a4`: the topic id the free message carries. */
@@ -37,6 +39,7 @@ export const SendMessageView: FC<SendMessageProps> = ({ userId, userName, settin
 
     // the window is disposed by its first send: a second click before it is gone must not send again
     const sentRef = useRef(false);
+    const isHandheld = useIsHandheld();
 
     const onSend = () => {
         if (sentRef.current) return;
@@ -51,6 +54,39 @@ export const SendMessageView: FC<SendMessageProps> = ({ userId, userName, settin
         SendMessageComposer(new ModMessageMessageComposer(userId, message, SEND_MESSAGE_TOPIC));
         onClose();
     };
+
+    // phone: the same field, templates and send on a page of the sheet
+    if (isHandheld) {
+        return (
+            <HandheldModSendMessageView
+                countText={isHint ? '' : localizeWithFallback('modtools.native.chars', `${message.trim().length} characters`, ['count'], [`${message.trim().length}`])}
+                message={isHint ? '' : message}
+                placeholder={nativeCaption(input)}
+                selectedTemplate={selectedTemplate}
+                sendLabel={nativeCaption(send)}
+                templateCaption={nativeCaption(findNativeNode(root, 'msgTemplatesSelect'))}
+                templates={templates}
+                title={localizeWithFallback('octane.mod_tools.msg_to_user_name', 'Msg To: %user_name%', ['user_name'], [String(userName)])}
+                onClose={onClose}
+                onFocus={() => {
+                    if (isHint) {
+                        setMessage('');
+                        setIsHint(false);
+                    }
+
+                    setInputActive(true);
+                }}
+                onMessage={setMessage}
+                onSend={onSend}
+                onTemplate={(index) => {
+                    setSelectedTemplate(index);
+                    setMessage(templates[index]);
+                    setIsHint(false);
+                    setInputActive(true);
+                }}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

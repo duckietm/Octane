@@ -9,23 +9,25 @@ import {
     RoomEnterEffect,
     RoomSessionDanceEvent
 } from '@octane/renderer';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import {
     AvatarInfoFurni,
     AvatarInfoPet,
     AvatarInfoRentableBot,
     AvatarInfoUser,
     GetConfigurationValue,
+    IAvatarInfo,
     RoomWidgetUpdateRentableBotChatEvent,
     RoomWidgetUpdateRentableBotTextSkillEvent
 } from '../../../../api';
 import { Column, LayoutFurniIconImageView } from '../../../../common';
-import { useAvatarInfoWidget, useFurniPickupGuard, useOctaneEvent, useRoom, useUiEvent } from '../../../../hooks';
+import { useAvatarInfoWidget, useFurniPickupGuard, useIsHandheld, useOctaneEvent, useRoom, useUiEvent } from '../../../../hooks';
 import { AvatarInfoPetTrainingPanelView } from './AvatarInfoPetTrainingPanelView';
 import { AvatarInfoRentableBotChatView } from './AvatarInfoRentableBotChatView';
 import { AvatarInfoRentableBotTextSkillView } from './AvatarInfoRentableBotTextSkillView';
 import { AvatarInfoUseProductConfirmView } from './AvatarInfoUseProductConfirmView';
 import { AvatarInfoUseProductView } from './AvatarInfoUseProductView';
+import { HandheldUnitDrawerView } from './infostand/HandheldUnitDrawerView';
 import { InfoStandWidgetBotView } from './infostand/InfoStandWidgetBotView';
 import { InfoStandWidgetFurniView } from './infostand/InfoStandWidgetFurniView';
 import { InfoStandWidgetPetView } from './infostand/InfoStandWidgetPetView';
@@ -51,6 +53,10 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
     const [isTouchLayout, setIsTouchLayout] = useState(false);
     const [mobileFurniDetailsOpen, setMobileFurniDetailsOpen] = useState(false);
     const [mobileUserDetailsOpen, setMobileUserDetailsOpen] = useState(false);
+    // Phone drawer: peeking (false) or open (true). It survives a swap to another object and folds again once nothing is selected.
+    const [drawerExpanded, setDrawerExpanded] = useState(false);
+    // Phone drawer: the pet or bot whose sub-page (commands, name, speech) is open, so its back button can return to it.
+    const subPageOriginRef = useRef<IAvatarInfo>(null);
     const [rentableBotChatEvent, setRentableBotChatEvent] = useState<RoomWidgetUpdateRentableBotChatEvent>(null);
     const [rentableBotTextSkillEvent, setRentableBotTextSkillEvent] = useState<RoomWidgetUpdateRentableBotTextSkillEvent>(null);
     const {
@@ -68,6 +74,7 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
         setIsDecorating = null
     } = useAvatarInfoWidget();
     const { roomSession = null } = useRoom();
+    const isHandheld = useIsHandheld();
 
     const updateAvatarClickControl = (updates: { suppressMenuUntil?: number; suppressRotateUntil?: number }) => {
         const globalScope = globalThis as any;
@@ -143,6 +150,11 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
                     case 'block-rotate':
                         updateAvatarClickControl({ suppressRotateUntil: Date.now() + BLOCK_ROTATE_WINDOW_MS });
                         return;
+                    // Phone layout: a long press on an avatar selected it and asks for its action menu.
+                    case 'handheld-actions':
+                        setMobileUserDetailsOpen(true);
+                        setDrawerExpanded(true);
+                        return;
                 }
             },
             eventUrlPrefix: 'avatar-info/'
@@ -161,12 +173,19 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
         if (avatarInfo?.type !== AvatarInfoUser.OWN_USER && avatarInfo?.type !== AvatarInfoUser.PEER) {
             setMobileUserDetailsOpen(false);
         }
+
+        if (!avatarInfo) setDrawerExpanded(false);
+        else if (avatarInfo.type === AvatarInfoPet.PET_INFO || avatarInfo.type === AvatarInfoRentableBot.RENTABLE_BOT) subPageOriginRef.current = avatarInfo;
     }, [avatarInfo]);
 
-    const getMenuView = () => {
+    /** The menu of the selected avatar: the bubble over it on the desktop, the action buttons of the drawer on a phone. */
+    const getMenuView = (forDrawer: boolean = false) => {
         if (!roomSession || isGameMode) return null;
 
-        if (activeNameBubble) return <AvatarInfoWidgetNameView nameInfo={activeNameBubble} onClose={() => setActiveNameBubble(null)} />;
+        if (activeNameBubble && !forDrawer) return <AvatarInfoWidgetNameView nameInfo={activeNameBubble} onClose={() => setActiveNameBubble(null)} />;
+
+        // On a phone the drawer shows the menu; only the name bubble floats over the room.
+        if (isHandheld && !forDrawer) return null;
 
         if (avatarInfo) {
             switch (avatarInfo.type) {
@@ -177,14 +196,14 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
                 case AvatarInfoUser.PEER: {
                     const info = avatarInfo as AvatarInfoUser;
 
-                    if (isTouchLayout && !mobileUserDetailsOpen) return null;
+                    if (isTouchLayout && !mobileUserDetailsOpen && !forDrawer) return null;
 
                     if (GetConfigurationValue('user.tags.enabled')) GetSessionDataManager().getUserTags(info.roomIndex);
 
                     if (info.isSpectatorMode) return null;
 
                     if (info.isOwnUser) {
-                        if (RoomEnterEffect.isRunning()) return <AvatarInfoNewUserHelpView avatarInfo={info} onClose={() => setAvatarInfo(null)} />;
+                        if (RoomEnterEffect.isRunning()) return forDrawer ? null : <AvatarInfoNewUserHelpView avatarInfo={info} onClose={() => setAvatarInfo(null)} />;
 
                         return (
                             <NativeTextTree>
@@ -221,7 +240,8 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
 
         switch (avatarInfo.type) {
             case AvatarInfoFurni.FURNI:
-                if (isTouchLayout && !isDecorating) {
+                // The phone layout shows the full infostand in its sheet straight away.
+                if (isTouchLayout && !isHandheld && !isDecorating) {
                     const info = avatarInfo as AvatarInfoFurni;
 
                     if (!mobileFurniDetailsOpen) {
@@ -248,6 +268,32 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
         }
     };
 
+    const closeDrawer = () => setAvatarInfo(null);
+
+    /** Phone layout: one drawer for whatever is selected. A furni's infostand builds its own drawer content. */
+    const getHandheldDrawer = () => {
+        if (avatarInfo.type === AvatarInfoFurni.FURNI)
+            return <InfoStandWidgetFurniView avatarInfo={avatarInfo as AvatarInfoFurni} handheld={{ expanded: drawerExpanded, onExpandedChange: setDrawerExpanded }} onClose={closeDrawer} />;
+
+        return (
+            <HandheldUnitDrawerView
+                avatarInfo={avatarInfo}
+                details={getInfostandView()}
+                expanded={drawerExpanded}
+                menu={getMenuView(true)}
+                onClose={closeDrawer}
+                onExpandedChange={setDrawerExpanded}
+            />
+        );
+    };
+
+    /** Phone layout: the back button of a pet's or bot's sub-page shows that pet or bot again. */
+    const backToOrigin = isHandheld
+        ? () => {
+              if (subPageOriginRef.current) setAvatarInfo(subPageOriginRef.current);
+          }
+        : undefined;
+
     return (
         <NativeTextTree>
             <>
@@ -260,7 +306,8 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
                     />
                 )}
                 {getMenuView()}
-                {avatarInfo && (
+                {avatarInfo && isHandheld && getHandheldDrawer()}
+                {avatarInfo && !isHandheld && (
                     <Column alignItems="end" className="octane-infostand-area absolute right-[10px] bottom-[65px] pointer-events-none z-30 text-white">
                         {getInfostandView()}
                     </Column>
@@ -281,16 +328,23 @@ export const AvatarInfoWidgetView: FC<{}> = (props) => {
                             />
                         );
                     })}
-                {rentableBotChatEvent && <AvatarInfoRentableBotChatView chatEvent={rentableBotChatEvent} onClose={() => setRentableBotChatEvent(null)} />}
+                {rentableBotChatEvent && (
+                    <AvatarInfoRentableBotChatView
+                        chatEvent={rentableBotChatEvent}
+                        onBack={backToOrigin && (() => (setRentableBotChatEvent(null), backToOrigin()))}
+                        onClose={() => setRentableBotChatEvent(null)}
+                    />
+                )}
                 {rentableBotTextSkillEvent && (
                     <AvatarInfoRentableBotTextSkillView
                         key={`${rentableBotTextSkillEvent.botId}:${rentableBotTextSkillEvent.skillType}:${rentableBotTextSkillEvent.text}`}
                         skillEvent={rentableBotTextSkillEvent}
+                        onBack={backToOrigin && (() => (setRentableBotTextSkillEvent(null), backToOrigin()))}
                         onClose={() => setRentableBotTextSkillEvent(null)}
                     />
                 )}
                 {confirmingProduct && <AvatarInfoUseProductConfirmView item={confirmingProduct} onClose={() => updateConfirmingProduct(null)} />}
-                <AvatarInfoPetTrainingPanelView />
+                <AvatarInfoPetTrainingPanelView onBack={backToOrigin} />
             </>
         </NativeTextTree>
     );

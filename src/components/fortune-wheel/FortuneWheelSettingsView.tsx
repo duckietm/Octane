@@ -8,8 +8,10 @@ import { Select } from '../../common/Select';
 import { NumberInput } from '../../common/NumberInput';
 import { Hint } from '../../common/Tooltip';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldFortuneWheelSettingsView } from './HandheldFortuneWheelSettingsView';
 
-interface EditRow {
+export interface EditRow {
     id: number;
     category: string;
     num: number;
@@ -17,7 +19,7 @@ interface EditRow {
     label: string;
 }
 
-interface CategoryDef {
+export interface CategoryDef {
     key: string;
     labelKey: string;
 }
@@ -30,6 +32,9 @@ const CATEGORIES: CategoryDef[] = [
     { key: 'spins', labelKey: 'rarevalues.editor.cat.spin' },
     { key: 'nothing', labelKey: 'rarevalues.editor.cat.nothing' }
 ];
+
+/** The most prizes a wheel can hold; Add stops there. */
+const MAX_PRIZES = 64;
 
 const prizeToCategory = (prize: IWheelAdminPrize): string => {
     switch (prize.type) {
@@ -76,6 +81,7 @@ interface FortuneWheelSettingsViewProps {
 export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ onClose }) => {
     const { adminPrizes = [], loadAdminPrizes = null, saveAdminPrizes = null } = useFortuneWheel();
     const [editRows, setEditRows] = useState<EditRow[]>([]);
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         if (loadAdminPrizes) loadAdminPrizes();
@@ -105,6 +111,23 @@ export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ on
             const tempId = Math.min(0, ...prev.map((row) => row.id)) - 1;
             return [...prev, { id: tempId, category: 'item', num: 0, weight: 1, label: '' }];
         });
+
+    const save = () => saveAdminPrizes?.(editRows.map(rowToEdit));
+
+    if (isHandheld) {
+        return (
+            <HandheldFortuneWheelSettingsView
+                categories={CATEGORIES}
+                maxRows={MAX_PRIZES}
+                rows={editRows}
+                onAdd={addRow}
+                onBack={onClose}
+                onRemove={removeRow}
+                onSave={save}
+                onUpdate={updateRow}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>
@@ -154,10 +177,10 @@ export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ on
                                 </Text>
                             )}
                         </Column>
-                        <Button variant="secondary" disabled={editRows.length >= 64} onClick={addRow}>
+                        <Button variant="secondary" disabled={editRows.length >= MAX_PRIZES} onClick={addRow}>
                             {LocalizeText('rarevalues.editor.add')}
                         </Button>
-                        <Button variant="primary" disabled={!editRows.length} onClick={() => saveAdminPrizes?.(editRows.map(rowToEdit))}>
+                        <Button variant="primary" disabled={!editRows.length} onClick={save}>
                             {LocalizeText('rarevalues.editor.save')}
                         </Button>
                     </Column>

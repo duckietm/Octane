@@ -25,6 +25,7 @@ import { VariablesExplorerHolderView } from './VariablesExplorerHolderView';
 import { VariablesExplorerHoldersView } from './VariablesExplorerHoldersView';
 import { Select } from '../../common/Select';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 export interface VariablesExplorerMainViewProps {
     connection: ExplorerConnection;
@@ -106,7 +107,7 @@ export const VariablesExplorerMainView: FC<VariablesExplorerMainViewProps> = ({ 
     return (
         <NativeTextTree>
             <>
-                <OctaneCardView
+                <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
                     className="min-w-[560px] max-w-[560px] octane-variables-explorer-window"
                     theme="primary-slim"
                     uniqueKey="variables-explorer"

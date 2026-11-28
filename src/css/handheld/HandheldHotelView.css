@@ -1,0 +1,1104 @@
+/*
+ * Phone hotel view (the home screen out of a room), in the Octane handheld look (HandheldTokens.css). HotelView hands
+ * its scene and slots to HandheldHotelView, which draws:
+ *   portrait   the scene as a picture across the top (the art filling it, cropped around its middle, so it is never
+ *              letterboxed or tiny), the player standing in it, and the slots as dark glass cards that scroll up
+ *              over it; the list starts under the purse and stops above the dock
+ *   landscape  the scene filling the left, the cards a column at the right, from under the purse to the bottom
+ *              (the dock is at the bottom left there, over the art)
+ * The live widgets keep their own markup; here they are reflowed into the card width and get finger-sized buttons.
+ * The staff editors are a sheet (HandheldSheetFrame) holding HotelView's own form. Scoped to :root[data-handheld]
+ * (set only on a phone-sized touch device by the handheld watcher), so the desktop stage is left as it is.
+ */
+
+/* ---------------------------------------------------------------- shell */
+
+:root[data-handheld] .octane-handheld-hotel {
+    /* The picture's height upright, the top of the list (under the purse capsule and its handle), the column on its side. */
+    --octane-hotel-hero: clamp(300px, 52vh, 480px);
+    --octane-hotel-top: calc(var(--octane-safe-top, 0px) + 92px);
+    --octane-hotel-column: min(360px, 46vw);
+    /* Where the art is cropped around (x): the middle; a hotel whose art stands elsewhere can set it on the root. */
+    --octane-hotel-focus-x: 50%;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: var(--hh-air-blue-header);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-hotel :where(h2, p, ul) {
+    margin: 0;
+    padding: 0;
+}
+
+:root[data-handheld] .octane-handheld-hotel img {
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-hotel :where(button):focus-visible {
+    outline: var(--hh-focus-on-dark);
+    outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- scene */
+
+:root[data-handheld] .octane-handheld-hotel__scene {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    /* Its own layer: the art and the fade stack inside it, all under the list. */
+    z-index: 0;
+    height: var(--octane-hotel-hero);
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--hh-air-select) 0%, var(--hh-air-blue) 100%);
+    pointer-events: none;
+}
+
+/* The art fills the picture: as wide as it must be for the height (or the other way round), cropped at the sides around
+   the focus and standing on its ground line. */
+:root[data-handheld] .octane-handheld-hotel__backdrop {
+    position: absolute;
+    inset: 0;
+    background-position: var(--octane-hotel-focus-x) 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* The bottom of the picture runs into the colour under the list. */
+:root[data-handheld] .octane-handheld-hotel__scene::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 4;
+    height: 72px;
+    background: linear-gradient(180deg, transparent 0%, var(--hh-air-blue-header) 100%);
+}
+
+:root[data-handheld] .octane-handheld-hotel__art {
+    position: absolute;
+    display: block;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+:root[data-handheld] .octane-handheld-hotel__art.is-left {
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    max-width: 48%;
+    max-height: 72%;
+    object-position: left bottom;
+}
+
+:root[data-handheld] .octane-handheld-hotel__art.is-right {
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    max-width: 48%;
+    max-height: 72%;
+    object-position: right bottom;
+}
+
+:root[data-handheld] .octane-handheld-hotel__art.is-drape {
+    top: 0;
+    left: 0;
+    z-index: 1;
+    max-width: 44%;
+    max-height: 44%;
+    object-position: left top;
+}
+
+/* The player, standing in the scene at the left, above where the list begins. */
+:root[data-handheld] .octane-handheld-hotel__avatar {
+    position: absolute;
+    bottom: 48px;
+    left: calc(var(--hh-space-4) + var(--octane-safe-left, 0px));
+    z-index: 3;
+    width: 90px;
+    height: 130px;
+}
+
+:root[data-handheld] .octane-handheld-hotel__figure {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* On its side: the scene is the left of the screen, the full height. */
+:root[data-handheld='landscape'] .octane-handheld-hotel__scene {
+    right: calc(var(--octane-hotel-column) + var(--octane-safe-right, 0px));
+    bottom: 0;
+    height: auto;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-hotel__scene::after {
+    top: 0;
+    left: auto;
+    width: 48px;
+    height: auto;
+    background: linear-gradient(90deg, transparent 0%, var(--hh-air-blue-header) 100%);
+}
+
+/* The dock lies along the bottom left there: the player stands above it. */
+:root[data-handheld='landscape'] .octane-handheld-hotel__avatar {
+    bottom: calc(var(--octane-handheld-toolbar) + var(--hh-space-2) + var(--octane-safe-bottom, 0px));
+    left: calc(var(--hh-space-4) + var(--hh-space-2) + var(--octane-safe-left, 0px));
+}
+
+/* ---------------------------------------------------------------- list */
+
+/*
+ * The list starts under the purse and stops above the dock; upright its first card is pushed down to the bottom of the
+ * picture, so the scene is seen first and the cards scroll up over it. Its top edge fades, so a card leaves softly.
+ */
+:root[data-handheld] .octane-handheld-hotel__feed {
+    position: absolute;
+    top: var(--octane-hotel-top);
+    right: 0;
+    bottom: calc(var(--octane-handheld-toolbar) + var(--octane-safe-bottom, 0px));
+    left: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    box-sizing: border-box;
+    padding: max(var(--hh-space-3), calc(var(--octane-hotel-hero) - var(--octane-hotel-top) - 40px)) calc(var(--hh-space-3) + var(--octane-safe-right, 0px))
+        var(--hh-space-3) calc(var(--hh-space-3) + var(--octane-safe-left, 0px));
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, black var(--hh-space-3));
+    mask-image: linear-gradient(180deg, transparent 0, black var(--hh-space-3));
+}
+
+:root[data-handheld] .octane-handheld-hotel__feed > * {
+    flex: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-hotel__feed {
+    bottom: calc(var(--hh-space-2) + var(--octane-safe-bottom, 0px));
+    left: auto;
+    width: calc(var(--octane-hotel-column) + var(--octane-safe-right, 0px));
+    padding-top: var(--hh-space-3);
+    padding-left: var(--hh-space-2);
+}
+
+/* ---------------------------------------------------------------- actions */
+
+:root[data-handheld] .octane-handheld-hotel__actions {
+    display: flex;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+/* The one primary thing on the home screen: the green capsule to the player's home room (or to a new room). */
+:root[data-handheld] .octane-handheld-hotel__home {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-4) 0 var(--hh-space-2);
+    border: 1px solid var(--hh-air-green-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-primary);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-hotel__home:active {
+    background: var(--hh-primary-pressed);
+    transform: scale(0.98);
+}
+
+:root[data-handheld] .octane-handheld-hotel__home .octane-icon {
+    flex: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-hotel__home-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* The staff's pencil: on the actions row for the scene, at a card's top right for its slot. */
+:root[data-handheld] .octane-handheld-hotel__edit {
+    display: grid;
+    flex: none;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0;
+    place-items: center;
+    border: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-hud);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-float);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    -webkit-backdrop-filter: var(--hh-blur);
+    backdrop-filter: var(--hh-blur);
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-hotel__edit:active {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .octane-handheld-hotel__card > .octane-handheld-hotel__edit {
+    position: absolute;
+    top: var(--hh-space-2);
+    right: var(--hh-space-2);
+    background: var(--hh-well);
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-hotel__pencil {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linejoin: round;
+    stroke-width: 1.6px;
+}
+
+/* ---------------------------------------------------------------- cards */
+
+:root[data-handheld] .octane-handheld-hotel__card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--hh-space-3);
+    box-sizing: border-box;
+    min-width: 0;
+    padding: var(--hh-space-3);
+    border: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-l);
+    /* Solid glass: the art behind is busy, the text on the card must not fight it. */
+    background: var(--hh-air-hud-solid);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-float);
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-hotel__card[data-has-image] {
+    grid-template-columns: 64px minmax(0, 1fr);
+}
+
+/* The staff's pencil keeps the top right corner to itself. */
+:root[data-handheld] .octane-handheld-hotel__card:has(> .octane-handheld-hotel__edit) {
+    padding-right: calc(var(--hh-touch) + var(--hh-space-3));
+}
+
+:root[data-handheld] .octane-handheld-hotel__card[data-disabled] {
+    min-height: 60px;
+    align-content: center;
+    border-style: dashed;
+    border-color: var(--hh-hairline);
+    background: var(--hh-air-outline);
+}
+
+:root[data-handheld] .octane-handheld-hotel__disabled {
+    color: var(--hh-on-dark-muted);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-hotel__card-image {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-well);
+    object-fit: contain;
+}
+
+:root[data-handheld] .octane-handheld-hotel__card-copy {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* Type: the title, the text under it, a figure in bold. Low specificity, so the white panels of a widget keep theirs. */
+:root[data-handheld] .octane-handheld-hotel__card-copy :where(h2) {
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-hotel__card-copy :where(p) {
+    margin-top: var(--hh-space-1);
+    color: var(--hh-on-dark-muted);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-hotel__card-copy :where(strong) {
+    display: block;
+    margin-top: var(--hh-space-2);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+}
+
+/* A small caps line above a widget's title. */
+:root[data-handheld] .octane-handheld-hotel .hotelview-widget-title {
+    display: block;
+    margin-bottom: var(--hh-space-1);
+    color: var(--hh-air-select);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    letter-spacing: 0.4px;
+    line-height: 16px;
+    text-shadow: none;
+    text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------- card buttons */
+
+/* Every action of a slot is a 44 px button across the card: the first green, the ones after it quieter. */
+:root[data-handheld] .octane-handheld-hotel__card-copy button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-2);
+    box-sizing: border-box;
+    width: 100%;
+    min-height: var(--hh-touch);
+    height: auto;
+    margin: var(--hh-space-3) 0 0;
+    padding: var(--hh-space-1) var(--hh-space-4);
+    border: 1px solid var(--hh-air-green-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-primary);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: none;
+    cursor: pointer;
+    transition: transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-hotel__card-copy button:active {
+    background: var(--hh-primary-pressed);
+    transform: scale(0.98);
+}
+
+:root[data-handheld] .octane-handheld-hotel__card-copy button + button,
+:root[data-handheld] .octane-handheld-hotel__card-copy button.hotelview-widget-link {
+    margin-top: var(--hh-space-2);
+    border-color: var(--hh-hairline);
+    background: var(--hh-well);
+    box-shadow: var(--hh-edge);
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-hotel__card-copy button + button:active,
+:root[data-handheld] .octane-handheld-hotel__card-copy button.hotelview-widget-link:active {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .octane-handheld-hotel__card-copy button:disabled {
+    filter: grayscale(1);
+    opacity: 0.55;
+    cursor: default;
+    transform: none;
+}
+
+/* ---------------------------------------------------------------- slot pieces */
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-progress {
+    box-sizing: border-box;
+    height: 14px;
+    margin-top: var(--hh-space-2);
+    padding: 2px;
+    border: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-hud-900);
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-progress span {
+    border-radius: var(--hh-radius-pill);
+    background: linear-gradient(180deg, var(--hh-air-select-outer) 0%, var(--hh-air-select) 100%);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-community-progress {
+    padding: 0;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-community-progress span {
+    border-radius: 0;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-community-progress .hotelview-community-progress-option-2 {
+    background: linear-gradient(180deg, var(--hh-air-count-yellow) 0%, var(--hh-air-premium) 100%);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-countdown {
+    margin-top: var(--hh-space-2);
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-xl) !important;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+    text-align: left;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-ltd-countdown-values {
+    display: block;
+    font-size: 22px;
+    line-height: 26px;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-ltd-countdown small {
+    display: block;
+    color: var(--hh-on-dark-muted);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-s);
+    letter-spacing: 0;
+}
+
+/* The votes of a community goal slot: one 44 px row each, its count at the right; the chosen one in the selection blue. */
+:root[data-handheld] .octane-handheld-hotel .hotelview-vote-options {
+    display: grid;
+    gap: var(--hh-space-2);
+    margin-top: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-vote-options button {
+    position: relative;
+    justify-content: flex-start;
+    margin: 0;
+    padding-right: calc(var(--hh-space-4) + 40px);
+    border-color: var(--hh-hairline);
+    background: var(--hh-well);
+    box-shadow: var(--hh-edge);
+    color: var(--hh-on-dark);
+    text-align: left;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-vote-options button span {
+    position: absolute;
+    right: var(--hh-space-4);
+    color: var(--hh-on-dark-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-vote-options button.hotelview-vote-selected:disabled {
+    border-color: var(--hh-air-select);
+    background: var(--hh-well-pressed);
+    filter: none;
+    opacity: 1;
+}
+
+/* ---------------------------------------------------------------- live widgets */
+
+/* News: the header with one dot per article (each dot a 36 px target), the picture above the text. */
+:root[data-handheld] .octane-handheld-hotel .hotelview-promo-article-header {
+    color: var(--hh-air-select);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    text-shadow: none;
+    text-transform: uppercase;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-promo-article-navigation {
+    gap: 0;
+    margin-right: calc(var(--hh-space-2) * -1);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-promo-article-navigation button.hotelview-promo-article-disk {
+    position: relative;
+    width: 36px;
+    min-height: 36px;
+    height: 36px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: transparent;
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-promo-article-disk::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--hh-on-dark-muted);
+    border-radius: var(--hh-radius-pill);
+    background: transparent;
+    transform: translate(-50%, -50%);
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-promo-article-disk-on::before {
+    border-color: var(--hh-on-dark);
+    background: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-promo-article-body {
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    margin-top: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-promo-article-image {
+    align-self: center;
+    max-width: 100%;
+    max-height: 160px;
+    border-radius: var(--hh-radius-m);
+    object-fit: contain;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-hotel .hotelview-promo-article-image {
+    max-height: 112px;
+}
+
+/* Bonus rare: the bar is tall enough for its 12 px status. */
+:root[data-handheld] .octane-handheld-hotel .hotelview-bonus-rare {
+    align-items: flex-start;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-bonus-rare-progress {
+    height: 22px;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-bonus-rare-progress span {
+    background: linear-gradient(180deg, var(--hh-air-count-yellow) 0%, var(--hh-air-premium) 140%);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-bonus-rare-progress em {
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-style: normal;
+    line-height: 20px;
+}
+
+/* Community goal: the texts, then the meter under them, in the middle. */
+:root[data-handheld] .octane-handheld-hotel .hotelview-community-goal {
+    flex-direction: column;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-community-goal-meter {
+    flex: none;
+    align-self: center;
+    width: 136px;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-community-goal-status {
+    position: absolute;
+    top: 92px;
+    right: 0;
+    left: 0;
+    margin: 0;
+    font-size: var(--hh-size-s);
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-community-goal-votes {
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-community-goal-votes button {
+    margin-top: var(--hh-space-3);
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    color: var(--hh-on-primary);
+}
+
+/* Users online goal. */
+:root[data-handheld] .octane-handheld-hotel .hotelview-concurrent-users-reward {
+    gap: var(--hh-space-2);
+    margin-top: var(--hh-space-2);
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-m);
+    text-shadow: none;
+}
+
+/* Daily quest: the easy | hard switch as two small capsules. */
+:root[data-handheld] .octane-handheld-hotel .hotelview-daily-quest-difficulty {
+    align-items: center;
+    gap: var(--hh-space-1);
+    color: var(--hh-on-dark-muted);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-daily-quest-difficulty > span {
+    display: none;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-daily-quest-difficulty button,
+:root[data-handheld] .octane-handheld-hotel .hotelview-daily-quest-difficulty button + button {
+    width: auto;
+    min-height: 36px;
+    height: 36px;
+    margin: 0;
+    padding: 0 var(--hh-space-3);
+    border-color: var(--hh-hairline);
+    background: var(--hh-well);
+    box-shadow: none;
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-daily-quest-difficulty button.hotelview-daily-quest-selected:disabled {
+    border-color: var(--hh-air-select);
+    background: var(--hh-well-pressed);
+    filter: none;
+    opacity: 1;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-daily-quest-body {
+    gap: var(--hh-space-3);
+    margin-top: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-daily-quest-current {
+    color: var(--hh-on-dark);
+}
+
+/*
+ * Competition hall of fame: the ten players wrap in rows instead of one 360 px line; the card above them names the one
+ * last touched (a tap opens the profile, as on the desktop). The go-to-room key under a head is a 36 px target.
+ */
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-hof,
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-prizes {
+    width: auto;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-hof-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--hh-space-1);
+    height: auto;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-hof-popup {
+    position: static;
+    flex: 0 0 100%;
+    width: auto;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-hof-popup::after {
+    content: none;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-hof-popup-body {
+    height: auto;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-well);
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-hof-popup-body :is(strong, span) {
+    display: block;
+    margin: 0;
+    color: var(--hh-on-dark);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-hof-entry {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 52px;
+    height: 112px;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-hof-entry button.hotelview-competition-hof-avatar {
+    position: relative;
+    display: block;
+    width: 52px;
+    height: 112px;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: transparent;
+    box-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-hof-avatar .avatar-image {
+    left: 0;
+    width: 52px;
+    height: 112px;
+    background-position: 50% 100%;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-hof-entry button.hotelview-competition-hof-room-link {
+    position: absolute;
+    top: 72px;
+    left: 8px;
+    z-index: 2;
+    width: 36px;
+    min-height: 36px;
+    height: 36px;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-hud-solid);
+    box-shadow: none;
+}
+
+/* Competition prizes: the white reward box keeps its dark text. */
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-prizes-box {
+    grid-template-columns: 56px minmax(0, 1fr);
+    margin-top: var(--hh-space-2);
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-prizes-box :is(strong, p, span) {
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-competition-earned-prize {
+    align-items: flex-start;
+    gap: var(--hh-space-2);
+    margin-bottom: var(--hh-space-3);
+}
+
+/* The free cursed dragon: a card of its own at the top of the list. */
+:root[data-handheld] .octane-handheld-hotel .hotelview-dragon-adoption {
+    position: static;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    min-height: 56px;
+    margin: 0;
+    padding: var(--hh-space-2) var(--hh-space-3) var(--hh-space-2) var(--hh-space-2);
+    border: 1px solid var(--hh-air-outline);
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-hud);
+    box-shadow:
+        var(--hh-edge),
+        var(--hh-shadow-float);
+    -webkit-backdrop-filter: var(--hh-blur);
+    backdrop-filter: var(--hh-blur);
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-dragon-adoption:active {
+    background: var(--hh-air-hud-solid);
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-dragon-adoption__title {
+    color: var(--hh-air-select-outer);
+    font-size: var(--hh-size-l);
+    line-height: 20px;
+    white-space: normal;
+}
+
+:root[data-handheld] .octane-handheld-hotel .hotelview-dragon-adoption__info {
+    color: var(--hh-on-dark-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    white-space: normal;
+}
+
+/* ---------------------------------------------------------------- hall of fame of the scene */
+
+:root[data-handheld] .octane-handheld-hotel__fame {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+    gap: var(--hh-space-2);
+    margin-top: var(--hh-space-3);
+    list-style: none;
+}
+
+:root[data-handheld] .octane-handheld-hotel__fame-user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    padding-bottom: var(--hh-space-2);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-well);
+}
+
+:root[data-handheld] .octane-handheld-hotel__fame-avatar {
+    flex: none;
+    width: 64px;
+    height: 96px;
+    background-position: 50% 0;
+}
+
+:root[data-handheld] .octane-handheld-hotel__fame-name {
+    max-width: 100%;
+    padding: 0 var(--hh-space-1);
+    box-sizing: border-box;
+    overflow: hidden;
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- staff editors (a sheet) */
+
+/* HotelView's own form, scrolling inside the sheet; the sheet's header names it, so the form's own header goes. */
+:root[data-handheld] .octane-handheld-hotel-editor {
+    display: grid;
+    flex: 1 1 auto;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: var(--hh-space-3);
+    min-height: 0;
+    margin: calc(var(--hh-space-3) * -1) calc(var(--hh-space-3) * -1) calc(var(--hh-space-2) * -1);
+    padding: var(--hh-space-3) var(--hh-space-3) 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-hotel-editor {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor > header {
+    display: none;
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor > :is(.hotelview-editor-preview, .hotelview-editor-toggle, .hotelview-vote-rewards, .hotelview-reset-votes, .hotelview-editor-avatar-reset, footer) {
+    grid-column: 1 / -1;
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor label {
+    display: grid;
+    gap: var(--hh-space-1);
+    min-width: 0;
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+}
+
+/* Fields: 44 px and 16 px text, so the phone does not zoom into them. */
+:root[data-handheld] .octane-handheld-hotel-editor :is(input:not([type='checkbox']), textarea, .octane-select-trigger, .octane-number-input) {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: none;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-field);
+    font-weight: 400;
+    transition: border-color var(--hh-fast) var(--hh-ease);
+}
+
+/* (Specific enough to beat the field rule above, whose :is() carries an attribute.) */
+:root[data-handheld] .octane-handheld-hotel-editor label textarea:not([hidden]) {
+    min-height: 96px;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    resize: vertical;
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor :is(input, textarea):focus {
+    border-color: var(--hh-air-blue-deep);
+    outline: none;
+}
+
+/* A switch row: the whole 44 px row is the label of its box. */
+:root[data-handheld] .octane-handheld-hotel-editor .hotelview-editor-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    cursor: pointer;
+}
+
+/* The preview of the slot or of the scene, as a picture at the top. */
+:root[data-handheld] .octane-handheld-hotel-editor .hotelview-editor-preview {
+    border: 0;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-track-light);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor .hotelview-editor-preview-label {
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-blue-header);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor .hotelview-editor-slot-preview {
+    padding-top: 30px;
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor .hotelview-editor-slot-preview :is(strong, p) {
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor .hotelview-editor-slot-preview button {
+    min-height: 28px;
+    border-radius: var(--hh-radius-pill);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor .hotelview-editor-scene-preview {
+    height: 160px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-hotel-editor .hotelview-editor-scene-preview {
+    height: 112px;
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor .hotelview-vote-rewards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-hotel-editor .hotelview-vote-rewards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor .hotelview-vote-reward-panel {
+    display: grid;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    margin: 0;
+    padding: var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor .hotelview-vote-reward-panel legend {
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-blue-deep);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor .hotelview-editor-avatar-reset {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+    font-size: var(--hh-size-m);
+}
+
+/* Buttons of the form: 44 px; Save is the green one, the reset of the votes the red one. */
+:root[data-handheld] .octane-handheld-hotel-editor :is(.hotelview-reset-votes, .hotelview-editor-avatar-reset button, footer button) {
+    min-width: 96px;
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-4);
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor :is(.hotelview-reset-votes, .hotelview-editor-avatar-reset button, footer button):active {
+    transform: scale(0.98);
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor :is(.hotelview-editor-avatar-reset button):disabled {
+    opacity: 0.5;
+    cursor: default;
+    transform: none;
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor button.hotelview-reset-votes {
+    border-color: var(--hh-air-red-deep);
+    background: var(--hh-dismiss);
+    color: var(--hh-on-primary);
+}
+
+/* The footer stays at the bottom of the sheet while the form scrolls under it. */
+:root[data-handheld] .octane-handheld-hotel-editor > footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--hh-space-2);
+    margin: 0 calc(var(--hh-space-3) * -1);
+    padding: var(--hh-space-2) var(--hh-space-3) calc(var(--hh-space-2) + var(--octane-safe-bottom, 0px));
+    border-top: 1px solid var(--hh-air-box);
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor > footer button {
+    flex: 1 1 0;
+}
+
+:root[data-handheld] .octane-handheld-hotel-editor > footer button[type='submit'] {
+    border-color: var(--hh-air-green-border);
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}

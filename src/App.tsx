@@ -29,6 +29,7 @@ import { LoginView } from './components/login/LoginView';
 import { MainView } from './components/MainView';
 import { ReconnectView } from './components/reconnect/ReconnectView';
 import { ClearStoredChatHistory, getConnectionFailureAction, getDisconnectReasonKey, shouldClearLoginAfterDisconnect, useConnectionState, useDevicePixelRatio, useMessageEvent, useOctaneEvent } from './hooks';
+import { isHandheldActive, useHandheldStore } from './state/handheldStore';
 import { SharedHookRegistry } from './state/useSharedHook';
 
 OctaneVersion.UI_VERSION = GetUIVersion();
@@ -36,7 +37,10 @@ OctaneVersion.UI_VERSION = GetUIVersion();
 const getViewportDimensions = () => {
     const viewport = window.visualViewport;
     const width = Math.max(1, Math.floor(viewport?.width ?? window.innerWidth));
-    const height = Math.max(1, Math.floor(viewport?.height ?? window.innerHeight));
+    // Phone layout: the on-screen keyboard must not shrink the hotel (the room would resize on every focus);
+    // the chat is lifted above the keyboard by the handheld stylesheet instead.
+    const keyboardOpen = isHandheldActive() && useHandheldStore.getState().keyboardInset > 0;
+    const height = Math.max(1, Math.floor(keyboardOpen ? window.innerHeight : (viewport?.height ?? window.innerHeight)));
 
     return { width, height };
 };

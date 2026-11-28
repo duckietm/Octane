@@ -121,7 +121,7 @@ export const HousekeepingRoomSettingsForm: FC<HousekeepingRoomSettingsFormProps>
                         <input className={HOUSEKEEPING_INPUT_CLASS} value={draft.tags} onChange={(event) => update('tags', event.target.value)} />
                     </HousekeepingField>
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="hk-form-actions flex items-center gap-1.5">
                     {error !== HousekeepingErrorKey.NONE && isDirty && (
                         <span className="text-[10px] font-semibold text-rose-600">{LocalizeText(`housekeeping.validation.${error}`)}</span>
                     )}

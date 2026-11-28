@@ -1,4 +1,4 @@
-import { FC, KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { CSSProperties, FC, KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { FaArrowsAlt, FaPlus, FaTrash } from 'react-icons/fa';
 import { ICatalogNode, LocalizeText } from '../../../../api';
 import { CssNativeText } from '../../../../common/native-text/CssNativeText';
@@ -11,10 +11,12 @@ export interface CatalogNavigationItemViewProps {
     node: ICatalogNode;
     runtime: CatalogNavigationRuntime;
     child?: boolean;
+    /** Set while searching: the row is drawn at this depth and lists no children (the filter lists them itself). */
+    searchDepth?: number;
 }
 
 export const CatalogNavigationItemView: FC<CatalogNavigationItemViewProps> = (props) => {
-    const { node = null, runtime, child = false } = props;
+    const { node = null, runtime, child = false, searchDepth = null } = props;
     const { activateNode, adminMode, createSubpage, deletePage, reorderPage } = runtime;
     const [isDragOver, setIsDragOver] = useState(false);
     const dragRef = useRef<HTMLDivElement>(null);
@@ -91,8 +93,14 @@ export const CatalogNavigationItemView: FC<CatalogNavigationItemViewProps> = (pr
         [activateNode, node]
     );
 
+    // CatalogNodeRenderable.createWindow: below depth 3 the icon and title move 6px right per level.
+    const depthIndent = searchDepth !== null ? Math.max(0, searchDepth - 3) * 6 : 0;
+
     return (
-        <div className={`octane-catalog-navigation-node ${child ? 'is-child' : ''}`}>
+        <div
+            className={`octane-catalog-navigation-node ${child ? 'is-child' : ''}`}
+            style={depthIndent ? ({ '--octane-catalog-navigation-indent': `${depthIndent}px` } as CSSProperties) : undefined}
+        >
             <div
                 ref={dragRef}
                 className={`octane-catalog-navigation-item group/nav ${node.isActive ? 'is-active' : ''} ${node.isBranch ? 'is-branch' : 'is-leaf'} ${node.isOpen ? 'is-open' : ''} ${isDragOver ? 'is-drag-over' : ''}`}
@@ -143,7 +151,7 @@ export const CatalogNavigationItemView: FC<CatalogNavigationItemViewProps> = (pr
                 )}
                 {node.isBranch && <span aria-hidden="true" className={`octane-catalog-navigation-caret${node.isOpen ? ' is-open' : ''}`} />}
             </div>
-            {node.isOpen && node.isBranch && <CatalogNavigationSetView child={true} node={node} runtime={runtime} />}
+            {searchDepth === null && node.isOpen && node.isBranch && <CatalogNavigationSetView child={true} node={node} runtime={runtime} />}
         </div>
     );
 };

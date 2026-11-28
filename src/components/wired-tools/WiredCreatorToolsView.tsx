@@ -183,11 +183,21 @@ import { Select } from '../../common/Select';
 import { BaseButton } from '../../common/BaseButton';
 import { isDerivedVariableItemId } from '../wired/views/WiredVariablePickerData';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_MIN_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldWiredInspectionTab } from './handheld/HandheldWiredInspectionTab';
+import { HandheldWiredMonitorTab } from './handheld/HandheldWiredMonitorTab';
+import { HandheldWiredToolsView } from './handheld/HandheldWiredToolsView';
+import { HandheldWiredVariablesTab } from './handheld/HandheldWiredVariablesTab';
+import type { WiredInspectionTabViewProps } from './WiredInspectionTabView';
+import type { WiredMonitorTabViewProps } from './WiredMonitorTabView';
+import type { WiredVariablesTabViewProps } from './WiredVariablesTabView';
 
 const WIRED_FURNI_GRAVITY_MODEL_KEY = 'wired_furni_gravity';
 /** Our variable types as the official idtype (0 made with a box, 1 internal). */
 export const WiredCreatorToolsView: FC<{}> = () => {
     const openVariablesExplorer = useVariablesExplorerStore((s) => s.open);
+    const isHandheld = useIsHandheld();
     const isVisible = useWiredCreatorToolsUiStore((s) => s.isVisible);
     const setIsVisible = useWiredCreatorToolsUiStore((s) => s.setIsVisible);
     const activeTab = useWiredCreatorToolsUiStore((s) => s.activeTab);
@@ -3229,6 +3239,254 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
     if (!isVisible) return null;
 
+    const monitorTabProps: WiredMonitorTabViewProps = {
+        monitorStats,
+        monitorLogs,
+        monitorHistoryRows,
+        onOpenMonitorInfo: () => setIsMonitorInfoOpen(true),
+        onOpenMonitorHistory: () => setIsMonitorHistoryOpen(true),
+        onOpenRoomLogs: () => setIsRoomLogsOpen(true),
+        isClearCoolingDown: isMonitorClearCoolingDown,
+        canClearLogs: !!roomSettings.canModify,
+        onClearMonitorLogs: clearMonitorLogs,
+        onOpenMonitorLogDetails: openMonitorLogDetails
+    };
+    const inspectionTabProps: WiredInspectionTabViewProps = {
+        selectedFurni,
+        selectedUser,
+        roomId: roomSession?.roomId ?? null,
+        previewRevision: furniInternalRevision,
+        previewPlaceholder,
+        keepSelected,
+        onKeepSelectedChange: setKeepSelected,
+        displayedVariables,
+        selectedInspectionVariableKey,
+        onSelectInspectionVariable: (variable) => {
+                                    setSelectedInspectionVariableKeys((prev) => ({ ...prev, [inspectionType]: variable.key }));
+                                    beginVariableEdit(variable);
+                                },
+        onCancelVariableEdit: cancelVariableEdit,
+        onVariableInputKeyDown,
+        onBeginVariableEdit: (variable) => {
+                                    setSelectedInspectionVariableKeys((prev) => ({ ...prev, [inspectionType]: variable.key }));
+                                    beginVariableEdit(variable);
+                                },
+        selectedInspectionGiveDefinition,
+        onSelectGiveVariable: setInspectionGiveVariableItemId,
+        availableInspectionDefinitions,
+        inspectionGiveValue,
+        onInspectionGiveValueChange: setInspectionGiveValue,
+        canGiveInspectionVariable,
+        onGiveInspectionVariable: () => giveInspectionVariable(),
+        canRemoveInspectionVariable,
+        onRemoveInspectionVariable: () => removeInspectionVariable(),
+        canHighlightWireds: canHighlightConfiguredWireds,
+        isHighlightingWireds: isHighlightingConfiguredWireds && canHighlightConfiguredWireds,
+        onToggleHighlightWireds: () => setIsHighlightingConfiguredWireds((value) => !value)
+    };
+    const variablesTabProps: WiredVariablesTabViewProps = {
+        variablePickerDefinitions,
+        selectedVariableDefinition,
+        onPickVariable: (key) => setSelectedVariableKeys((prev) => ({ ...prev, [variablesType]: key })),
+        canVariableHighlight,
+        variableManageCanOpen,
+        canVariableClear,
+        onClearVariable: confirmClearVariable,
+        onOpenManagePanel: () => {
+                                    requestUserVariables();
+                                    setSelectedManagedVariableEntry(null);
+                                    setIsVariableManageOpen(true);
+                                },
+        arrayInspectorCanOpen: !!selectedVariableDefinition?.itemId,
+        onOpenArrayInspector: () => setIsArrayInspectorOpen(true),
+        selectedVariableProperties,
+        selectedVariableTextValues,
+        onOpenWebApiExplorer: () => openVariablesExplorer({ roomId: roomSession?.roomId })
+    };
+    // The windows the tools open over themselves; on a phone each of them is a page of its own (HandheldWiredPage).
+    const roomWindows = (
+        <>
+            {isVariableManageOpen && !!selectedVariableDefinition?.itemId && variablesType !== 'context' && (
+                <WiredVariableOwnersView
+                    variableId={selectedVariableDefinition.variableId}
+                    variableName={selectedVariableDefinition.key}
+                    variablesType={variablesType}
+                    hasValue={!!selectedVariableDefinition.hasValue}
+                    describeHolder={describeVariableHolder}
+                    onManage={setSelectedManagedVariableEntry}
+                    onClose={() => setIsVariableManageOpen(false)}
+                />
+            )}
+            {isArrayInspectorOpen && !!selectedVariableDefinition?.itemId && (
+                <WiredArrayInspectorView
+                    definitionItemId={selectedVariableDefinition.itemId}
+                    variableName={selectedVariableDefinition.key}
+                    variableType={wiredArrayVariableTypeOf(variablesType)}
+                    onClose={() => setIsArrayInspectorOpen(false)}
+                />
+            )}
+            {isRoomLogsOpen && <WiredRoomLogsView onClose={() => setIsRoomLogsOpen(false)} />}
+            {isSelfDonationOpen && <WiredSelfDonationView onClose={() => setIsSelfDonationOpen(false)} />}
+            {!!selectedManagedVariableEntry && !!selectedVariableDefinition && (
+                <WiredVariableHolderPanelView
+                    title={managedHolderPanelTitle}
+                    warningText={managedHolderWarningText}
+                    onRefresh={() => (absentHolderKey !== null ? absentHolder.refresh() : requestUserVariables())}
+                    onClose={() => setSelectedManagedVariableEntry(null)}
+                    preview={
+                        <>
+                            {variablesType === 'furni' && roomSession && (
+                                <LayoutRoomObjectImageView
+                                    category={managedHolderFurniCategory}
+                                    objectId={selectedManagedVariableEntry.entityId}
+                                    roomId={roomSession.roomId}
+                                />
+                            )}
+                            {absentHolderKey !== null && !!absentHolder.figure && <LayoutAvatarImageView direction={2} figure={absentHolder.figure} />}
+                            {variablesType === 'user' && managedHolderUserData && (
+                                <>
+                                    {managedHolderUserData.type === RoomObjectType.PET ? (
+                                        <LayoutPetImageView direction={2} figure={managedHolderUserData.figure} />
+                                    ) : (
+                                        <LayoutAvatarImageView direction={2} figure={managedHolderUserData.figure} />
+                                    )}
+                                </>
+                            )}
+                            {variablesType === 'global' && (
+                                <img alt={localizeWithFallback('octane.wired_tools.global_placeholder', 'Global placeholder')} className="max-w-full max-h-full object-contain p-3" src={wiredGlobalPlaceholderImage} />
+                            )}
+                        </>
+                    }
+                    infoLines={managedHolderInfoLines}
+                    variablesTitle={variablesType === 'global' ? localizeWithFallback('octane.wired_tools.room_variables', 'Room variables:') : localizeWithFallback('octane.wired_tools.assigned_variables', 'Assigned variables:')}
+                    entries={managedHolderVariableEntries.map((entry) => ({
+                        id: String(entry.variableItemId),
+                        name: entry.name,
+                        availability: entry.availability,
+                        hasValue: entry.hasValue,
+                        value: entry.value,
+                        isReadOnly: entry.isReadOnly
+                    }))}
+                    selectedId={selectedManagedHolderVariableEntry ? String(selectedManagedHolderVariableEntry.variableItemId) : null}
+                    onSelect={(id) => setSelectedManagedHolderVariableId(Number(id))}
+                    canEdit={roomSettings.canModify}
+                    editingId={editingManagedHolderVariableId ? String(editingManagedHolderVariableId) : null}
+                    editingValue={editingManagedHolderValue}
+                    onBeginEdit={(entry) => {
+                        setSelectedManagedHolderVariableId(Number(entry.id));
+                        setEditingManagedHolderVariableId(Number(entry.id));
+                        setEditingManagedHolderValue(String(entry.value ?? 0));
+                    }}
+                    onEditingValueChange={setEditingManagedHolderValue}
+                    onEditBlur={() => setEditingManagedHolderVariableId(0)}
+                    onEditKeyDown={onManagedHolderValueInputKeyDown}
+                    onCommitEdit={commitManagedHolderValueEdit}
+                    isGiveOpen={isManagedGiveOpen}
+                    onToggleGive={() => setIsManagedGiveOpen((value) => !value)}
+                    giveOptions={availableManagedHolderDefinitions.map((definition) => ({
+                        id: String(definition.itemId),
+                        name: definition.name,
+                        hasValue: !!definition.hasValue
+                    }))}
+                    giveSelectedId={selectedManagedGiveDefinition ? String(selectedManagedGiveDefinition.itemId) : ''}
+                    onGiveSelect={(id) => setManagedGiveVariableItemId(Number(id))}
+                    giveValue={managedGiveValue}
+                    onGiveValueChange={setManagedGiveValue}
+                    canGive={canGiveManagedHolderVariable}
+                    onGive={() => giveManagedHolderVariable()}
+                    canRemove={canRemoveManagedHolderVariable}
+                    onRemove={() => removeManagedHolderVariable()}
+                />
+            )}
+        </>
+    );
+    const title = localizeWithFallback('wiredmenu.title', 'Wired Creator Tools (:wired)');
+
+    // A phone gets the tools as a sheet of its own (HandheldWiredToolsView): the same tabs, data and handlers, with
+    // the monitor's extra windows as pages of the sheet and every other window as a page over it.
+    if (isHandheld)
+        return (
+            <NativeTextTree>
+                <>
+                    {isVariableHighlightActive && !!variableHighlightOverlays.length && (
+                        <div className="pointer-events-none absolute left-0 top-0 z-30">
+                            {variableHighlightOverlays.map((overlay) => (
+                                <div
+                                    key={overlay.key}
+                                    className="pointer-events-none absolute"
+                                    style={{
+                                        left: overlay.x,
+                                        top: overlay.y,
+                                        transform: 'translateX(-50%)'
+                                    }}
+                                >
+                                    {overlay.hasValue && (
+                                        <div className="absolute left-1/2 top-[-30px] -translate-x-1/2">
+                                            <div className="relative min-w-[24px] rounded-[8px] bg-[#86aebccc] px-[8px] py-[4px] text-center text-[12px] font-bold leading-none text-white shadow-[inset_0_0_0_1px_rgba(176,211,225,.7)]">
+                                                {overlay.value ?? 0}
+                                                <span className="absolute left-1/2 bottom-[-7px] z-10 h-0 w-0 -translate-x-1/2 border-x-[6px] border-t-[7px] border-x-transparent border-t-[#86aebccc]" />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    <HandheldWiredToolsView
+                        activeTab={activeTab}
+                        pickedKey={`${inspectionType}:${selectedFurni?.objectId ?? ''}:${selectedFurni?.category ?? ''}:${selectedUser?.roomIndex ?? ''}`}
+                        pickHint={
+                            inspectionType === 'user'
+                                ? localizeWithFallback('octane.handheld.wired_tools.pick_user', 'Tap a user in the room')
+                                : localizeWithFallback('octane.handheld.wired_tools.pick_furni', 'Tap a furni in the room')
+                        }
+                        tabs={TABS.map((tab) => ({ id: tab.key, label: localizeWithFallback(wiredMenuTabKey(tab.key), tab.label) }))}
+                        title={title}
+                        onClose={() => setIsVisible(false)}
+                        onTab={(id) => setActiveTab(id as WiredToolsTab)}
+                    >
+                        {({ startPicking }) => (
+                            <>
+                                {activeTab === 'monitor' && (
+                                    <HandheldWiredMonitorTab
+                                        {...monitorTabProps}
+                                        errorDetails={selectedMonitorLogDetails}
+                                        errorInfo={selectedMonitorErrorInfo}
+                                        errorSource={selectedMonitorDetailSource}
+                                        formatSource={formatMonitorSource}
+                                        historyRows={filteredMonitorHistoryRows}
+                                        infoSections={monitorInfoSections}
+                                        isHistoryOpen={isMonitorHistoryOpen}
+                                        isInfoOpen={isMonitorInfoOpen}
+                                        severityFilter={monitorHistorySeverityFilter}
+                                        typeFilter={monitorHistoryTypeFilter}
+                                        typeOptions={monitorHistoryTypeOptions}
+                                        onCloseError={() => {
+                                            setSelectedMonitorErrorType(null);
+                                            setSelectedMonitorLogDetails(null);
+                                        }}
+                                        onCloseHistory={() => setIsMonitorHistoryOpen(false)}
+                                        onCloseInfo={() => setIsMonitorInfoOpen(false)}
+                                        onOpenHistoryDetails={openMonitorLogDetails}
+                                        onSeverityFilterChange={setMonitorHistorySeverityFilter}
+                                        onTypeFilterChange={setMonitorHistoryTypeFilter}
+                                    />
+                                )}
+                                {activeTab === 'inspection' && (
+                                    <HandheldWiredInspectionTab {...inspectionTabProps} onCommitVariableEdit={commitVariableEdit} onStartPicking={startPicking} />
+                                )}
+                                {activeTab === 'variables' && <HandheldWiredVariablesTab {...variablesTabProps} />}
+                                {activeTab === 'settings' && <WiredToolsSettingsTabView onOpenSelfDonation={() => setIsSelfDonationOpen(true)} />}
+                                {activeTab === 'chests' && <WiredChestsTabView />}
+                                {activeTab === 'share' && <WiredShareTabView />}
+                            </>
+                        )}
+                    </HandheldWiredToolsView>
+                    {roomWindows}
+                </>
+            </NativeTextTree>
+        );
+
     return (
         <NativeTextTree>
             <>
@@ -3256,7 +3514,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                         ))}
                     </div>
                 )}
-                <OctaneCardView
+                <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
+                    handheldPeek={{ label: localizeWithFallback('wiredmenu.title', 'Wired Creator Tools (:wired)') }}
                     className="octane-wired-menu min-w-[520px] max-w-[520px]"
                     theme="primary-slim"
                     uniqueKey="wired-creator-tools"
@@ -3272,74 +3531,13 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     </OctaneCardTabsView>
                     <OctaneCardContentView className="text-black bg-[#e9e6d9]" gap={3}>
                         {activeTab === 'monitor' && (
-                            <WiredMonitorTabView
-                                monitorStats={monitorStats}
-                                monitorLogs={monitorLogs}
-                                monitorHistoryRows={monitorHistoryRows}
-                                onOpenMonitorInfo={() => setIsMonitorInfoOpen(true)}
-                                onOpenMonitorHistory={() => setIsMonitorHistoryOpen(true)}
-                                onOpenRoomLogs={() => setIsRoomLogsOpen(true)}
-                                isClearCoolingDown={isMonitorClearCoolingDown}
-                                canClearLogs={!!roomSettings.canModify}
-                                onClearMonitorLogs={clearMonitorLogs}
-                                onOpenMonitorLogDetails={openMonitorLogDetails}
-                            />
+                            <WiredMonitorTabView {...monitorTabProps} />
                         )}
                         {activeTab === 'inspection' && (
-                            <WiredInspectionTabView
-                                selectedFurni={selectedFurni}
-                                selectedUser={selectedUser}
-                                roomId={roomSession?.roomId ?? null}
-                                previewRevision={furniInternalRevision}
-                                previewPlaceholder={previewPlaceholder}
-                                keepSelected={keepSelected}
-                                onKeepSelectedChange={setKeepSelected}
-                                displayedVariables={displayedVariables}
-                                selectedInspectionVariableKey={selectedInspectionVariableKey}
-                                onSelectInspectionVariable={(variable) => {
-                                    setSelectedInspectionVariableKeys((prev) => ({ ...prev, [inspectionType]: variable.key }));
-                                    beginVariableEdit(variable);
-                                }}
-                                onCancelVariableEdit={cancelVariableEdit}
-                                onVariableInputKeyDown={onVariableInputKeyDown}
-                                onBeginVariableEdit={(variable) => {
-                                    setSelectedInspectionVariableKeys((prev) => ({ ...prev, [inspectionType]: variable.key }));
-                                    beginVariableEdit(variable);
-                                }}
-                                selectedInspectionGiveDefinition={selectedInspectionGiveDefinition}
-                                onSelectGiveVariable={setInspectionGiveVariableItemId}
-                                availableInspectionDefinitions={availableInspectionDefinitions}
-                                inspectionGiveValue={inspectionGiveValue}
-                                onInspectionGiveValueChange={setInspectionGiveValue}
-                                canGiveInspectionVariable={canGiveInspectionVariable}
-                                onGiveInspectionVariable={() => giveInspectionVariable()}
-                                canRemoveInspectionVariable={canRemoveInspectionVariable}
-                                onRemoveInspectionVariable={() => removeInspectionVariable()}
-                                canHighlightWireds={canHighlightConfiguredWireds}
-                                isHighlightingWireds={isHighlightingConfiguredWireds && canHighlightConfiguredWireds}
-                                onToggleHighlightWireds={() => setIsHighlightingConfiguredWireds((value) => !value)}
-                            />
+                            <WiredInspectionTabView {...inspectionTabProps} />
                         )}
                         {activeTab === 'variables' && (
-                            <WiredVariablesTabView
-                                variablePickerDefinitions={variablePickerDefinitions}
-                                selectedVariableDefinition={selectedVariableDefinition}
-                                onPickVariable={(key) => setSelectedVariableKeys((prev) => ({ ...prev, [variablesType]: key }))}
-                                canVariableHighlight={canVariableHighlight}
-                                variableManageCanOpen={variableManageCanOpen}
-                                canVariableClear={canVariableClear}
-                                onClearVariable={confirmClearVariable}
-                                onOpenManagePanel={() => {
-                                    requestUserVariables();
-                                    setSelectedManagedVariableEntry(null);
-                                    setIsVariableManageOpen(true);
-                                }}
-                                arrayInspectorCanOpen={!!selectedVariableDefinition?.itemId}
-                                onOpenArrayInspector={() => setIsArrayInspectorOpen(true)}
-                                selectedVariableProperties={selectedVariableProperties}
-                                selectedVariableTextValues={selectedVariableTextValues}
-                                onOpenWebApiExplorer={() => openVariablesExplorer({ roomId: roomSession?.roomId })}
-                            />
+                            <WiredVariablesTabView {...variablesTabProps} />
                         )}
                         {activeTab === 'settings' && <WiredToolsSettingsTabView onOpenSelfDonation={() => setIsSelfDonationOpen(true)} />}
                         {activeTab === 'chests' && <WiredChestsTabView />}
@@ -3347,7 +3545,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     </OctaneCardContentView>
                 </OctaneCardView>
                 {isMonitorHistoryOpen && (
-                    <OctaneCardView
+                    <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
                         className="octane-wired-menu min-w-[760px] max-w-[760px] max-h-[520px]"
                         theme="primary-slim"
                         uniqueKey="wired-monitor-history"
@@ -3429,7 +3627,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     </OctaneCardView>
                 )}
                 {isMonitorInfoOpen && (
-                    <OctaneCardView
+                    <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
                         className="octane-wired-menu min-w-[560px] max-w-[560px] max-h-[520px]"
                         theme="primary-slim"
                         uniqueKey="wired-monitor-info"
@@ -3450,99 +3648,9 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                         </OctaneCardContentView>
                     </OctaneCardView>
                 )}
-                {isVariableManageOpen && !!selectedVariableDefinition?.itemId && variablesType !== 'context' && (
-                    <WiredVariableOwnersView
-                        variableId={selectedVariableDefinition.variableId}
-                        variableName={selectedVariableDefinition.key}
-                        variablesType={variablesType}
-                        hasValue={!!selectedVariableDefinition.hasValue}
-                        describeHolder={describeVariableHolder}
-                        onManage={setSelectedManagedVariableEntry}
-                        onClose={() => setIsVariableManageOpen(false)}
-                    />
-                )}
-                {isArrayInspectorOpen && !!selectedVariableDefinition?.itemId && (
-                    <WiredArrayInspectorView
-                        definitionItemId={selectedVariableDefinition.itemId}
-                        variableName={selectedVariableDefinition.key}
-                        variableType={wiredArrayVariableTypeOf(variablesType)}
-                        onClose={() => setIsArrayInspectorOpen(false)}
-                    />
-                )}
-                {isRoomLogsOpen && <WiredRoomLogsView onClose={() => setIsRoomLogsOpen(false)} />}
-                {isSelfDonationOpen && <WiredSelfDonationView onClose={() => setIsSelfDonationOpen(false)} />}
-                {!!selectedManagedVariableEntry && !!selectedVariableDefinition && (
-                    <WiredVariableHolderPanelView
-                        title={managedHolderPanelTitle}
-                        warningText={managedHolderWarningText}
-                        onRefresh={() => (absentHolderKey !== null ? absentHolder.refresh() : requestUserVariables())}
-                        onClose={() => setSelectedManagedVariableEntry(null)}
-                        preview={
-                            <>
-                                {variablesType === 'furni' && roomSession && (
-                                    <LayoutRoomObjectImageView
-                                        category={managedHolderFurniCategory}
-                                        objectId={selectedManagedVariableEntry.entityId}
-                                        roomId={roomSession.roomId}
-                                    />
-                                )}
-                                {absentHolderKey !== null && !!absentHolder.figure && <LayoutAvatarImageView direction={2} figure={absentHolder.figure} />}
-                                {variablesType === 'user' && managedHolderUserData && (
-                                    <>
-                                        {managedHolderUserData.type === RoomObjectType.PET ? (
-                                            <LayoutPetImageView direction={2} figure={managedHolderUserData.figure} />
-                                        ) : (
-                                            <LayoutAvatarImageView direction={2} figure={managedHolderUserData.figure} />
-                                        )}
-                                    </>
-                                )}
-                                {variablesType === 'global' && (
-                                    <img alt={localizeWithFallback('octane.wired_tools.global_placeholder', 'Global placeholder')} className="max-w-full max-h-full object-contain p-3" src={wiredGlobalPlaceholderImage} />
-                                )}
-                            </>
-                        }
-                        infoLines={managedHolderInfoLines}
-                        variablesTitle={variablesType === 'global' ? localizeWithFallback('octane.wired_tools.room_variables', 'Room variables:') : localizeWithFallback('octane.wired_tools.assigned_variables', 'Assigned variables:')}
-                        entries={managedHolderVariableEntries.map((entry) => ({
-                            id: String(entry.variableItemId),
-                            name: entry.name,
-                            availability: entry.availability,
-                            hasValue: entry.hasValue,
-                            value: entry.value,
-                            isReadOnly: entry.isReadOnly
-                        }))}
-                        selectedId={selectedManagedHolderVariableEntry ? String(selectedManagedHolderVariableEntry.variableItemId) : null}
-                        onSelect={(id) => setSelectedManagedHolderVariableId(Number(id))}
-                        canEdit={roomSettings.canModify}
-                        editingId={editingManagedHolderVariableId ? String(editingManagedHolderVariableId) : null}
-                        editingValue={editingManagedHolderValue}
-                        onBeginEdit={(entry) => {
-                            setSelectedManagedHolderVariableId(Number(entry.id));
-                            setEditingManagedHolderVariableId(Number(entry.id));
-                            setEditingManagedHolderValue(String(entry.value ?? 0));
-                        }}
-                        onEditingValueChange={setEditingManagedHolderValue}
-                        onEditBlur={() => setEditingManagedHolderVariableId(0)}
-                        onEditKeyDown={onManagedHolderValueInputKeyDown}
-                        isGiveOpen={isManagedGiveOpen}
-                        onToggleGive={() => setIsManagedGiveOpen((value) => !value)}
-                        giveOptions={availableManagedHolderDefinitions.map((definition) => ({
-                            id: String(definition.itemId),
-                            name: definition.name,
-                            hasValue: !!definition.hasValue
-                        }))}
-                        giveSelectedId={selectedManagedGiveDefinition ? String(selectedManagedGiveDefinition.itemId) : ''}
-                        onGiveSelect={(id) => setManagedGiveVariableItemId(Number(id))}
-                        giveValue={managedGiveValue}
-                        onGiveValueChange={setManagedGiveValue}
-                        canGive={canGiveManagedHolderVariable}
-                        onGive={() => giveManagedHolderVariable()}
-                        canRemove={canRemoveManagedHolderVariable}
-                        onRemove={() => removeManagedHolderVariable()}
-                    />
-                )}
+                {roomWindows}
                 {!!selectedMonitorErrorInfo && (
-                    <OctaneCardView
+                    <OctaneCardView handheldScale={HANDHELD_MIN_FRAME_SCALE}
                         className="octane-wired-menu min-w-[470px] max-w-[470px] max-h-[500px]"
                         theme="primary-slim"
                         uniqueKey="wired-monitor-error-info"

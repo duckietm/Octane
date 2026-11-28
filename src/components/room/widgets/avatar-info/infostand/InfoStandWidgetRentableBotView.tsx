@@ -1,7 +1,10 @@
 import { BotRemoveComposer, GetRoomEngine, RoomObjectCategory, RoomObjectOperationType } from '@octane/renderer';
 import { FC, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { FaArrowsAlt, FaSyncAlt } from 'react-icons/fa';
 import { AvatarInfoRentableBot, BotSkillsEnum, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button, Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserProfileIconView } from '../../../../../common';
+import { HandheldDrawerAction, useHandheldDrawer } from '../../../../../common/handheld/HandheldInfoDrawer';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useRoom } from '../../../../../hooks';
 import { InfoStandHeaderView } from './InfoStandHeaderView';
@@ -24,6 +27,7 @@ export const InfoStandWidgetRentableBotView: FC<InfoStandWidgetRentableBotViewPr
     }, [avatarInfo]);
 
     const { roomSession = null } = useRoom();
+    const drawer = useHandheldDrawer();
 
     // Official InfoStandRentableBotView: an owned bot is moved and turned like furni by whoever has rights in the
     // room, owns the bot or controls any room, and never in play-test mode.
@@ -88,7 +92,29 @@ export const InfoStandWidgetRentableBotView: FC<InfoStandWidgetRentableBotViewPr
                         </div>
                     </div>
                 </div>
-                {(canArrange || canPickup) && (
+                {/* Phone drawer: move and rotate go to the head of its action grid (moving hands the room to the player, so the
+                    drawer closes); picking the bot up is a row of its menu there. */}
+                {drawer?.actionsSlot &&
+                    canArrange &&
+                    createPortal(
+                        <>
+                            <HandheldDrawerAction
+                                data-action="move"
+                                icon={<FaArrowsAlt />}
+                                onClick={() => {
+                                    arrangeBot(RoomObjectOperationType.OBJECT_MOVE);
+                                    onClose();
+                                }}
+                            >
+                                {LocalizeText('infostand.button.move')}
+                            </HandheldDrawerAction>
+                            <HandheldDrawerAction data-action="rotate" icon={<FaSyncAlt />} onClick={() => arrangeBot(RoomObjectOperationType.OBJECT_ROTATE_POSITIVE)}>
+                                {LocalizeText('infostand.button.rotate')}
+                            </HandheldDrawerAction>
+                        </>,
+                        drawer.actionsSlot
+                    )}
+                {!drawer && (canArrange || canPickup) && (
                     <div className="flex justify-end gap-1">
                         {canArrange && (
                             <>

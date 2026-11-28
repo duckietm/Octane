@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { forumMessageLook, newForumMessageIds } from './forumMessageLook';
+import { forumMessageBlocks, forumMessageLook, newForumMessageIds } from './forumMessageLook';
 
 describe('forumMessageLook', () => {
     it('draws a read visible message white', () => {
@@ -51,5 +51,21 @@ describe('newForumMessageIds', () => {
         expect([...newForumMessageIds(messages, 20)]).toEqual([8, 9]);
         expect([...newForumMessageIds(messages, 22)]).toEqual([]);
         expect([...newForumMessageIds(messages, -1)]).toEqual([7, 8, 9]);
+    });
+});
+
+describe('forumMessageBlocks', () => {
+    it('keeps the lines in their order and sets runs of quoted lines apart, without their marker or the blank lines around them', () => {
+        expect(forumMessageBlocks('2 hours ago Alba wrote:\r> first\r>\r>second\r>\r\rMy answer\rsecond line\r')).toEqual([
+            { quote: false, lines: ['2 hours ago Alba wrote:'] },
+            { quote: true, lines: ['first', '', 'second'] },
+            { quote: false, lines: ['My answer', 'second line'] }
+        ]);
+    });
+
+    it('reads every kind of line break and treats nothing else as markup', () => {
+        expect(forumMessageBlocks('a\nb\r\nc <b>bold</b> 1 > 0')).toEqual([{ quote: false, lines: ['a', 'b', 'c <b>bold</b> 1 > 0'] }]);
+        expect(forumMessageBlocks('')).toEqual([]);
+        expect(forumMessageBlocks('\n \n')).toEqual([]);
     });
 });

@@ -1,0 +1,1064 @@
+/*
+ * The camera on a phone, in the Octane handheld look (HandheldTokens.css). Three screens:
+ *
+ * - The viewfinder (HandheldCameraCaptureView): a full-screen layer over the room. Its only clear part is the 320 x 320
+ *   viewfinder, never scaled, because the shutter captures what lies under it on screen; the rest is dimmed glass that
+ *   keeps the touches, while a finger dragged inside the viewfinder reaches the room so the shot is framed by moving the
+ *   room. Title, help and close on top, the roll and the round shutter at the bottom; on its side the roll is a column at
+ *   the left and the buttons a column at the right.
+ * - The editor (HandheldCameraEditorView) and the checkout (HandheldCameraCheckoutView): sheets of the shared phone frame
+ *   (HandheldSheet.css). The picture on top (on its side: at the left), the rest below (at the right), the main action in a
+ *   bar at the bottom.
+ *
+ * Every rule is scoped to :root[data-handheld], which only a phone-sized touch device gets.
+ */
+
+/* ================================================================ viewfinder */
+
+/* The window of the viewfinder covers the screen but draws nothing itself and lets the touches through; the layer inside
+   decides where they go (the full-screen sheet rule would paint the header blue and the cream behind the notch). */
+:root[data-handheld] .draggable-window[data-handheld-window='sheet']:has(> .octane-handheld-camera) {
+    padding: 0;
+    background: none;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-camera {
+    --octane-camera-shade: color-mix(in srgb, var(--hh-air-hud-900) 55%, transparent);
+    --octane-camera-glass: var(--hh-air-hud);
+    position: relative;
+    display: grid;
+    box-sizing: border-box;
+    grid-template-areas:
+        'top'
+        'stage'
+        'roll'
+        'actions';
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-m);
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-camera :where(button) {
+    margin: 0;
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+:root[data-handheld] .octane-handheld-camera :where(button):focus-visible {
+    outline: var(--hh-focus-on-dark);
+    outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- top */
+
+:root[data-handheld] .octane-handheld-camera__top {
+    display: flex;
+    grid-area: top;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: calc(52px + var(--octane-safe-top, 0px));
+    padding: var(--octane-safe-top, 0px) calc(var(--hh-space-2) + var(--octane-safe-right, 0px)) 0 calc(var(--hh-space-4) + var(--octane-safe-left, 0px));
+    background: var(--octane-camera-glass);
+    box-shadow: inset 0 -1px 0 var(--hh-hairline);
+    pointer-events: auto;
+    -webkit-backdrop-filter: var(--hh-blur);
+    backdrop-filter: var(--hh-blur);
+}
+
+:root[data-handheld] .octane-handheld-camera__mark {
+    flex: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-camera__title {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Help and close: 36 px rounds, the finger gets 44 px around each. */
+:root[data-handheld] .octane-handheld-camera__round {
+    position: relative;
+    display: flex;
+    flex: 0 0 36px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    box-shadow: var(--hh-edge);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-camera__round::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+}
+
+:root[data-handheld] .octane-handheld-camera__round:active {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .octane-handheld-camera__round.is-close {
+    background: var(--hh-dismiss);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px var(--hh-air-outline);
+}
+
+:root[data-handheld] .octane-handheld-camera__round svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- stage: shades around the viewfinder */
+
+:root[data-handheld] .octane-handheld-camera__stage {
+    display: grid;
+    grid-area: stage;
+    grid-template-columns: minmax(0, 1fr) 320px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) 320px minmax(0, 1fr);
+    /* On whole pixels where the browser can round: the capture frame is read from this place and rounded to whole pixels. */
+    grid-template-columns: max(0px, round(down, (100% - 320px) / 2, 1px)) 320px minmax(0, 1fr);
+    grid-template-rows: max(0px, round(down, (100% - 320px) / 2, 1px)) 320px minmax(0, 1fr);
+    min-width: 0;
+    min-height: 0;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-camera__shade {
+    background: var(--octane-camera-shade);
+    pointer-events: auto;
+    touch-action: none;
+}
+
+:root[data-handheld] .octane-handheld-camera__shade.is-top {
+    grid-area: 1 / 1 / 2 / 4;
+}
+
+:root[data-handheld] .octane-handheld-camera__shade.is-left {
+    grid-area: 2 / 1 / 3 / 2;
+}
+
+:root[data-handheld] .octane-handheld-camera__shade.is-right {
+    grid-area: 2 / 3 / 3 / 4;
+}
+
+:root[data-handheld] .octane-handheld-camera__shade.is-bottom {
+    grid-area: 3 / 1 / 4 / 4;
+}
+
+/* The viewfinder: exactly 320 CSS px, so its place on screen is the frame the room is captured from. */
+:root[data-handheld] .octane-handheld-camera__frame {
+    position: relative;
+    grid-area: 2 / 2 / 3 / 3;
+    width: 320px;
+    height: 320px;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-camera .octane-camera-viewfinder {
+    position: absolute;
+    inset: 0;
+    width: 320px;
+    height: 320px;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-camera.is-previewing .octane-camera-viewfinder {
+    background: var(--hh-air-hud-900);
+}
+
+/* Corner marks a little outside the frame, so not one pixel of the picture is covered. */
+:root[data-handheld] .octane-handheld-camera__corners {
+    position: absolute;
+    inset: -4px;
+    background:
+        linear-gradient(var(--hh-on-dark), var(--hh-on-dark)) left top / 24px 3px no-repeat,
+        linear-gradient(var(--hh-on-dark), var(--hh-on-dark)) left top / 3px 24px no-repeat,
+        linear-gradient(var(--hh-on-dark), var(--hh-on-dark)) right top / 24px 3px no-repeat,
+        linear-gradient(var(--hh-on-dark), var(--hh-on-dark)) right top / 3px 24px no-repeat,
+        linear-gradient(var(--hh-on-dark), var(--hh-on-dark)) left bottom / 24px 3px no-repeat,
+        linear-gradient(var(--hh-on-dark), var(--hh-on-dark)) left bottom / 3px 24px no-repeat,
+        linear-gradient(var(--hh-on-dark), var(--hh-on-dark)) right bottom / 24px 3px no-repeat,
+        linear-gradient(var(--hh-on-dark), var(--hh-on-dark)) right bottom / 3px 24px no-repeat;
+    filter: drop-shadow(0 0 1px var(--hh-air-outline));
+    pointer-events: none;
+}
+
+/* The shutter flash (its animation is the desktop's) fills the viewfinder. */
+:root[data-handheld] .octane-handheld-camera .octane-camera-capture__flash {
+    inset: 0;
+    width: auto;
+    height: auto;
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- roll */
+
+:root[data-handheld] .octane-handheld-camera__roll {
+    display: flex;
+    grid-area: roll;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-3) calc(var(--hh-space-3) + var(--octane-safe-right, 0px)) var(--hh-space-1) calc(var(--hh-space-3) + var(--octane-safe-left, 0px));
+    background: var(--octane-camera-glass);
+    pointer-events: auto;
+    -webkit-backdrop-filter: var(--hh-blur);
+    backdrop-filter: var(--hh-blur);
+}
+
+:root[data-handheld] .octane-handheld-camera__slot {
+    position: relative;
+    display: flex;
+    flex: 0 0 52px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    overflow: hidden;
+    border: 2px solid var(--hh-hairline);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-well);
+    cursor: pointer;
+    transition:
+        border-color var(--hh-fast) var(--hh-ease),
+        transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-camera__slot.is-free {
+    border-style: dashed;
+    background: transparent;
+}
+
+:root[data-handheld] .octane-handheld-camera__slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+/* Where the next picture goes (or the one being looked at): the selection blue. */
+:root[data-handheld] .octane-handheld-camera__slot.is-active {
+    border-color: var(--hh-air-select);
+    border-style: solid;
+}
+
+:root[data-handheld] .octane-handheld-camera__slot[data-pressed] {
+    box-shadow: 0 0 0 2px var(--hh-air-select-outer);
+    transform: translateY(-2px);
+}
+
+:root[data-handheld] .octane-handheld-camera__slot:active {
+    transform: scale(0.95);
+}
+
+/* ---------------------------------------------------------------- actions */
+
+:root[data-handheld] .octane-handheld-camera__actions {
+    display: grid;
+    grid-area: actions;
+    box-sizing: border-box;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--hh-space-3);
+    padding: var(--hh-space-2) calc(var(--hh-space-4) + var(--octane-safe-right, 0px)) calc(var(--hh-space-3) + var(--octane-safe-bottom, 0px)) calc(var(--hh-space-4) + var(--octane-safe-left, 0px));
+    background: var(--octane-camera-glass);
+    pointer-events: auto;
+    -webkit-backdrop-filter: var(--hh-blur);
+    backdrop-filter: var(--hh-blur);
+}
+
+:root[data-handheld] .octane-handheld-camera__side {
+    display: flex;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-camera__side.is-start {
+    justify-content: flex-start;
+}
+
+:root[data-handheld] .octane-handheld-camera__side.is-end {
+    justify-content: flex-end;
+}
+
+/* The shutter: a white ring round a white core, the size of a thumb. */
+:root[data-handheld] .octane-handheld-camera__shutter {
+    display: flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    padding: 0;
+    border: 4px solid var(--hh-on-dark);
+    border-radius: var(--hh-radius-pill);
+    background: transparent;
+    box-shadow:
+        0 0 0 1px var(--hh-air-outline),
+        var(--hh-shadow-float);
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-handheld-camera__shutter-core {
+    width: 58px;
+    height: 58px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-on-dark);
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12);
+    pointer-events: none;
+    transition:
+        transform var(--hh-fast) var(--hh-ease),
+        background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-camera__shutter:active .octane-handheld-camera__shutter-core {
+    transform: scale(0.88);
+}
+
+/* Looking at a picture of the roll: the shutter goes back to the live viewfinder, so its core is the selection blue. */
+:root[data-handheld] .octane-handheld-camera.is-previewing .octane-handheld-camera__shutter-core {
+    background: var(--hh-air-select);
+}
+
+:root[data-handheld] .octane-handheld-camera__pill {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-4);
+    overflow: hidden;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    color: var(--hh-on-primary);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: filter var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-camera__pill.is-edit {
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+}
+
+:root[data-handheld] .octane-handheld-camera__pill.is-delete {
+    background: var(--hh-dismiss);
+    box-shadow: 0 0 0 1px var(--hh-air-outline);
+}
+
+:root[data-handheld] .octane-handheld-camera__pill:active {
+    filter: brightness(0.88);
+}
+
+/* ---------------------------------------------------------------- viewfinder on its side */
+
+/* The roll a column at the left, the viewfinder in the middle, title and buttons a column at the right. */
+:root[data-handheld='landscape'] .octane-handheld-camera {
+    grid-template-areas:
+        'roll stage top'
+        'roll stage actions';
+    grid-template-columns: auto minmax(0, 1fr) calc(148px + var(--octane-safe-right, 0px));
+    grid-template-rows: auto minmax(0, 1fr);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-camera__top {
+    justify-content: flex-end;
+    min-height: 52px;
+    padding: calc(var(--hh-space-2) + var(--octane-safe-top, 0px)) calc(var(--hh-space-2) + var(--octane-safe-right, 0px)) var(--hh-space-2) var(--hh-space-2);
+    box-shadow: none;
+}
+
+/* The column is narrow: the toolbar icon and the round buttons are enough to say what this is. */
+:root[data-handheld='landscape'] .octane-handheld-camera__title {
+    display: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-camera__mark {
+    margin-right: auto;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-camera__roll {
+    flex-direction: column;
+    padding: var(--hh-space-3) var(--hh-space-3) var(--hh-space-3) calc(var(--hh-space-3) + var(--octane-safe-left, 0px));
+}
+
+:root[data-handheld='landscape'] .octane-handheld-camera__actions {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
+    justify-items: center;
+    padding: var(--hh-space-2) calc(var(--hh-space-3) + var(--octane-safe-right, 0px)) calc(var(--hh-space-3) + var(--octane-safe-bottom, 0px)) var(--hh-space-3);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-camera__side {
+    width: 100%;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-camera__side.is-start {
+    align-self: end;
+    order: 3;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-camera__side.is-end {
+    align-self: start;
+    order: 1;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-camera__shutter {
+    order: 2;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-camera__side .octane-handheld-camera__pill {
+    width: 100%;
+}
+
+/* ================================================================ editor */
+
+:root[data-handheld] .octane-handheld-camera-editor__help {
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__layout {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+}
+
+/* The picture: square, as large as the sheet allows while the tools, two rows of effects and the bar stay on screen. */
+:root[data-handheld] .octane-handheld-camera-editor__picture {
+    position: relative;
+    flex: none;
+    align-self: center;
+    box-sizing: border-box;
+    width: min(100%, max(200px, calc(100dvh - 430px)));
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-hud-900);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__picture img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    transition: opacity var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__picture[aria-busy='true'] img {
+    opacity: 0.7;
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__controls {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__tools {
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+}
+
+/* Chips on the cream: zoom (a toggle), save, clear, take off. */
+:root[data-handheld] .octane-handheld-camera-editor__chip {
+    flex: 1 1 0;
+    box-sizing: border-box;
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    overflow: hidden;
+    border: 1px solid var(--hh-air-border);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__chip:active {
+    background: var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__chip[data-pressed] {
+    border-color: var(--hh-air-blue-deep);
+    background: var(--hh-air-select);
+    color: var(--hh-air-blue-header);
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__chip:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__chip.is-remove {
+    flex: none;
+    grid-area: remove;
+    align-self: center;
+}
+
+/* The selected effect: its name and strength, the slider, and the way to take it off again. */
+:root[data-handheld] .octane-handheld-camera-editor__effect {
+    display: grid;
+    flex: none;
+    box-sizing: border-box;
+    grid-template-areas:
+        'name remove'
+        'slider remove';
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: var(--hh-space-3);
+    min-height: 64px;
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__effect.is-empty {
+    display: flex;
+    align-items: center;
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__effect-name {
+    grid-area: name;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__hint {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+/* A bar and a round knob a thumb can hold, as in the phone settings. */
+:root[data-handheld] .octane-handheld-camera-editor__slider {
+    position: relative;
+    grid-area: slider;
+    height: 32px;
+    touch-action: none;
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__slider .octane-slider-bare-control {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__slider .octane-slider-bare-track {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    border-radius: var(--hh-radius-pill);
+    background: linear-gradient(90deg, var(--hh-air-blue) 0 var(--hh-fill, 0%), var(--hh-air-box) var(--hh-fill, 0%) 100%);
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__slider .octane-slider-bare-thumb {
+    width: 26px;
+    height: 26px;
+    border: 2px solid var(--hh-air-blue-deep);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    transition: box-shadow var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__slider .octane-slider-bare-thumb::after {
+    content: "";
+    position: absolute;
+    inset: -9px;
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__slider .octane-slider-bare-thumb:has(:focus-visible) {
+    outline: var(--hh-focus-on-paper);
+    outline-offset: 2px;
+}
+
+/* The effects: a grid of finger-sized tiles that scrolls; the active ones carry a tick, the selected one the blue ring. */
+:root[data-handheld] .octane-handheld-camera-editor__grid {
+    display: grid;
+    flex: 1 1 0;
+    grid-auto-rows: 64px;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    align-content: start;
+    gap: var(--hh-space-2);
+    min-height: 64px;
+    padding: 2px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__tile {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    overflow: hidden;
+    border: 2px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-hud-900);
+    cursor: pointer;
+    transition:
+        border-color var(--hh-fast) var(--hh-ease),
+        transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__tile:active {
+    transform: scale(0.95);
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__tile[data-pressed] {
+    border-color: var(--hh-air-green-mid);
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__tile.is-selected {
+    border-color: var(--hh-air-select);
+    box-shadow: 0 0 0 2px var(--hh-air-blue-deep);
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__tile.is-locked {
+    border-style: dashed;
+    background: var(--hh-air-box);
+    cursor: default;
+}
+
+/* A locked effect shows the level it needs, under a drawn padlock. */
+:root[data-handheld] .octane-handheld-camera-editor__level {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__level::before {
+    content: "";
+    width: 12px;
+    height: 10px;
+    border: 2px solid currentColor;
+    border-bottom-width: 7px;
+    border-radius: 6px 6px 2px 2px;
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__tick {
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-primary);
+    box-shadow: 0 0 0 1px var(--hh-air-outline);
+}
+
+:root[data-handheld] .octane-handheld-camera-editor__tick::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    width: 4px;
+    height: 7px;
+    border: solid var(--hh-on-primary);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* ---------------------------------------------------------------- bottom bars (editor and checkout) */
+
+:root[data-handheld] :is(.octane-handheld-camera-editor__bar, .octane-handheld-camera-checkout__bar) {
+    display: flex;
+    flex: none;
+    gap: var(--hh-space-2);
+    padding-top: var(--hh-space-1);
+}
+
+:root[data-handheld] :is(.octane-handheld-camera-editor__button, .octane-handheld-camera-checkout__button) {
+    flex: 1 1 0;
+    box-sizing: border-box;
+    min-width: 0;
+    height: var(--hh-touch);
+    padding: 0 var(--hh-space-4);
+    overflow: hidden;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: filter var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] :is(.octane-handheld-camera-editor__button, .octane-handheld-camera-checkout__button).is-primary {
+    background: var(--hh-primary);
+    box-shadow: var(--hh-shadow-primary);
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] :is(.octane-handheld-camera-editor__button, .octane-handheld-camera-checkout__button).is-cancel {
+    border: 1px solid var(--hh-air-border);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+}
+
+:root[data-handheld] :is(.octane-handheld-camera-editor__button, .octane-handheld-camera-checkout__button):active {
+    filter: brightness(0.9);
+}
+
+:root[data-handheld] :is(.octane-handheld-camera-editor__button, .octane-handheld-camera-checkout__button):disabled {
+    box-shadow: none;
+    cursor: default;
+    filter: grayscale(0.6);
+    opacity: 0.55;
+}
+
+/* ---------------------------------------------------------------- editor on its side */
+
+/* The picture at the left as high as the sheet, everything else beside it. */
+:root[data-handheld='landscape'] .octane-handheld-camera-editor__layout {
+    flex-direction: row;
+    gap: var(--hh-space-3);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-camera-editor__picture {
+    align-self: flex-start;
+    width: auto;
+    height: 100%;
+    max-height: 320px;
+}
+
+/* ================================================================ checkout */
+
+:root[data-handheld] .octane-handheld-camera-checkout__layout {
+    display: grid;
+    flex: 1 1 0;
+    grid-template-areas:
+        'cards'
+        'bar';
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__picture-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__picture {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 240px);
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 4px solid var(--hh-air-white);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-box);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__picture img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__picture.is-failed {
+    border-style: dashed;
+    border-color: var(--hh-air-border);
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__loading {
+    color: var(--hh-air-text-muted);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__status {
+    margin: 0;
+    color: var(--hh-air-blue-deep);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 17px;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__cards {
+    display: flex;
+    grid-area: cards;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    min-width: 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Upright: the picture and the status on top, the cards scrolling under them, the bar at the bottom. */
+:root[data-handheld='portrait'] .octane-handheld-camera-checkout__layout {
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+        'picture'
+        'cards'
+        'bar';
+}
+
+:root[data-handheld='portrait'] .octane-handheld-camera-checkout__picture-column {
+    grid-area: picture;
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__card {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+    box-shadow: var(--hh-shadow-card);
+}
+
+/* A card's own button spans the card (the shared button rule shares a row's width, which a column has none of). */
+:root[data-handheld] .octane-handheld-camera-checkout__card .octane-handheld-camera-checkout__button {
+    flex: none;
+    width: 100%;
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__card.is-competition {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__card.is-published {
+    background: var(--hh-air-track-free);
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__card-title {
+    margin: 0;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 19px;
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__card-text {
+    margin: 0;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hh-space-2);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__amount {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--hh-space-1);
+    height: 28px;
+    padding: 0 var(--hh-space-2);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    box-shadow: inset 0 0 0 1px var(--hh-air-box);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__amount-icon {
+    flex: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__bought {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__bought-count {
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+/* The links (to the inventory, to the published picture): text on a 44 px target. */
+:root[data-handheld] .octane-handheld-camera-checkout__link {
+    display: inline-flex;
+    box-sizing: border-box;
+    align-items: center;
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-2);
+    border: 0;
+    background: none;
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    text-decoration: underline;
+    transition: color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__link:active {
+    color: var(--hh-air-blue-header);
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__link.is-published-link {
+    align-self: flex-start;
+    margin-left: calc(-1 * var(--hh-space-2));
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__note {
+    flex: none;
+    margin: 0;
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__spending {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--hh-space-3);
+    min-height: var(--hh-touch);
+    padding: var(--hh-space-1) var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-panel);
+    cursor: pointer;
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__spending-text {
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-camera-checkout__bar {
+    grid-area: bar;
+}
+
+/* ---------------------------------------------------------------- checkout on its side */
+
+/* The picture and the status at the left, the cards scrolling at the right, the bar under the cards. */
+:root[data-handheld='landscape'] .octane-handheld-camera-checkout__layout {
+    grid-template-areas:
+        'picture cards'
+        'picture bar';
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: var(--hh-space-3);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-camera-checkout__picture-column {
+    grid-area: picture;
+    width: 220px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-camera-checkout__picture {
+    width: 100%;
+}

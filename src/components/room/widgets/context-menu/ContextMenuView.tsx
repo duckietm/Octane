@@ -3,6 +3,7 @@ import { CSSProperties, FC, useCallback, useEffect, useLayoutEffect, useMemo, us
 import { AddAnimationTickerCallback, FixedSizeStack, GetRoomObjectBounds, GetRoomObjectScreenLocation, GetRoomSession } from '../../../../api';
 import { BaseProps } from '../../../../common';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { useHandheldDrawer } from '../../../../common/handheld/HandheldInfoDrawer';
 import { ContextMenuCaretView } from './ContextMenuCaretView';
 
 interface ContextMenuViewProps extends BaseProps<HTMLDivElement> {
@@ -27,7 +28,20 @@ const FADE_DELAY = 5000;
 const FADE_LENGTH = 75;
 const SPACE_AROUND_EDGES = 10;
 
-export const ContextMenuView: FC<ContextMenuViewProps> = ({
+/**
+ * The bubble over a room object. Inside the phone drawer the same menu is laid out as the drawer's action
+ * buttons instead: no bubble, no position to follow, the rows straight in the drawer's grid.
+ */
+export const ContextMenuView: FC<ContextMenuViewProps> = (props) =>
+{
+    const drawer = useHandheldDrawer();
+
+    if (drawer) return <div className="octane-handheld-drawer__menu">{props.children}</div>;
+
+    return <ContextMenuBubbleView {...props} />;
+};
+
+const ContextMenuBubbleView: FC<ContextMenuViewProps> = ({
     objectId = -1,
     category = -1,
     userType = -1,

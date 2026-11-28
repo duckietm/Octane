@@ -9,12 +9,14 @@ import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 interface AvatarInfoRentableBotChatViewProps {
     chatEvent: RoomWidgetUpdateRentableBotChatEvent;
     onClose(): void;
+    /** Phone layout: back to the bot's drawer. */
+    onBack?: () => void;
 }
 
 const CHAT_TEXT_MAX_CHARS = 1000;
 
 export const AvatarInfoRentableBotChatView: FC<AvatarInfoRentableBotChatViewProps> = (props) => {
-    const { chatEvent = null, onClose = null } = props;
+    const { chatEvent = null, onClose = null, onBack } = props;
 
     const [newText, setNewText] = useState<string>(chatEvent.chat === '${bot.skill.chatter.configuration.text.placeholder}' ? '' : chatEvent.chat);
     const [automaticChat, setAutomaticChat] = useState<boolean>(chatEvent.automaticChat);
@@ -39,6 +41,8 @@ export const AvatarInfoRentableBotChatView: FC<AvatarInfoRentableBotChatViewProp
                 category={chatEvent.category}
                 layout="chatter"
                 objectId={chatEvent.objectId}
+                onBack={onBack}
+                onClose={onClose}
                 title={LocalizeText('bot.skill.chatter.configuration.title')}
             >
                 <div className="air-bot-skill-label">{LocalizeText('bot.skill.chatter.configuration.chat.text')}</div>

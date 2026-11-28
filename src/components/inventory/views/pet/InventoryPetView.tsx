@@ -9,6 +9,8 @@ import { useInventoryPets, useInventoryUnseenTracker, useNotification, usePlayTe
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryCategoryLoadingView } from '../InventoryCategoryLoadingView';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldInventorySelectionView } from '../HandheldInventorySelectionView';
 import { InventoryPetImageView } from './InventoryPetImageView';
 import { InventoryPetItemView } from './InventoryPetItemView';
 import { BaseButton } from '../../../../common/BaseButton';
@@ -24,6 +26,7 @@ export const InventoryPetView: FC<{
     const { isUnseen = null, removeUnseen = null } = useInventoryUnseenTracker();
     const { showConfirm = null } = useNotification();
     const playTestRestricted = usePlayTestRestricted();
+    const isHandheld = useIsHandheld();
 
     const [searchInput, setSearchInput] = useState('');
     const [search, setSearch] = useState('');
@@ -98,74 +101,117 @@ export const InventoryPetView: FC<{
         return <InventoryCategoryEmptyView desc={LocalizeText('inventory.empty.pets.desc')} title={LocalizeText('inventory.empty.pets.title')} />;
     }
 
+    const filterBar = (
+        <div className="octane-inventory-filter-bar">
+            <div className="octane-inventory-filter-search">
+                <input
+                    placeholder={isHandheld ? LocalizeText('generic.search') : undefined}
+                    className="octane-inventory-filter-input"
+                    aria-label={LocalizeText('generic.search')}
+                    value={searchInput}
+                    onChange={(event) => setSearchInput(event.target.value)}
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter') setSearch(searchInput.toLowerCase());
+                        if (event.key === 'Escape') {
+                            setSearchInput('');
+                            setSearch('');
+                        }
+                    }}
+                />
+                {searchInput && (
+                    <BaseButton
+                        type="button"
+                        className="octane-inventory-filter-clear"
+                        aria-label={LocalizeText('generic.clear')}
+                        onClick={() => {
+                            setSearchInput('');
+                            setSearch('');
+                        }}
+                    />
+                )}
+            </div>
+            <InventoryFilterSelect
+                aria-label={localizeWithFallback('octane.inventory.pet_type', 'Pet type')}
+                value={activeType}
+                onChange={(value) => {
+                    setTypeFilter(Number(value));
+                    setSearch(searchInput.toLowerCase());
+                }}
+            >
+                <option value={-1}>
+                    {LocalizeText('inventory.pets.filter.type.all') === 'inventory.pets.filter.type.all'
+                        ? localizeWithFallback('octane.inventory.all_types', 'All types')
+                        : LocalizeText('inventory.pets.filter.type.all')}
+                </option>
+                {availableTypes.map((type) => (
+                    <option key={type} value={type}>
+                        {LocalizeText(`pet.type.${type}`)}
+                    </option>
+                ))}
+            </InventoryFilterSelect>
+            <InventoryFilterSelect
+                aria-label={localizeWithFallback('octane.inventory.pet_rarity', 'Pet rarity')}
+                disabled={!rarityFilterEnabled}
+                value={activeRarity}
+                onChange={(value) => setRarityFilter(Number(value))}
+            >
+                <option value={-1}>
+                    {LocalizeText('inventory.pets.filter.rarity.all') === 'inventory.pets.filter.rarity.all'
+                        ? localizeWithFallback('octane.inventory.all_rarities', 'All rarities')
+                        : LocalizeText('inventory.pets.filter.rarity.all')}
+                </option>
+                {rarityFilterEnabled &&
+                    availableRarities.map((rarity) => (
+                        <option key={rarity} value={rarity}>
+                            {rarity}
+                        </option>
+                    ))}
+            </InventoryFilterSelect>
+        </div>
+    );
+
+    // Phone layout: the filters, the grid, and the chosen pet as a bar with "place in room" (delete behind "more").
+    if (isHandheld) {
+        return (
+            <NativeTextTree>
+                <div className="octane-handheld-inv__pane is-pets">
+                    {filterBar}
+                    <div className="octane-handheld-inv__gridbox">
+                        <div className="octane-handheld-inv__grid">
+                            {visiblePets.map((item) => (
+                                <InventoryPetItemView key={item.petData.id} petItem={item} />
+                            ))}
+                        </div>
+                    </div>
+                    {selectedPet && (
+                        <HandheldInventorySelectionView
+                            actions={[{ key: 'delete', label: LocalizeText('generic.delete'), danger: true, onClick: attemptDeletePet }]}
+                            meta={LocalizeText(`pet.type.${selectedPet.petData.typeId}`)}
+                            name={selectedPet.petData.name}
+                            preview={
+                                <>
+                                    <InventoryPetImageView pet={selectedPet.petData} preview />
+                                    {selectedPet.petData.rarityLevel >= 0 && <LayoutRarityLevelView className="octane-handheld-inv__plate" level={selectedPet.petData.rarityLevel} />}
+                                </>
+                            }
+                            primary={{
+                                key: 'place',
+                                label: LocalizeText('inventory.pets.placetoroom'),
+                                disabled: !(roomSession?.isRoomOwner || roomSession?.allowPets) || playTestRestricted,
+                                onClick: () => attemptPetPlacement(selectedPet)
+                            }}
+                            thumb={<InventoryPetImageView pet={selectedPet.petData} />}
+                        />
+                    )}
+                </div>
+            </NativeTextTree>
+        );
+    }
+
     return (
         <NativeTextTree>
             <div className="octane-inventory-animals is-pets">
-                <div className="octane-inventory-filter-bar">
-                    <div className="octane-inventory-filter-search">
-                        <input
-                            className="octane-inventory-filter-input"
-                            aria-label={LocalizeText('generic.search')}
-                            value={searchInput}
-                            onChange={(event) => setSearchInput(event.target.value)}
-                            onKeyDown={(event) => {
-                                if (event.key === 'Enter') setSearch(searchInput.toLowerCase());
-                                if (event.key === 'Escape') {
-                                    setSearchInput('');
-                                    setSearch('');
-                                }
-                            }}
-                        />
-                        {searchInput && (
-                            <BaseButton
-                                type="button"
-                                className="octane-inventory-filter-clear"
-                                aria-label={LocalizeText('generic.clear')}
-                                onClick={() => {
-                                    setSearchInput('');
-                                    setSearch('');
-                                }}
-                            />
-                        )}
-                    </div>
-                    <InventoryFilterSelect
-                        aria-label={localizeWithFallback('octane.inventory.pet_type', 'Pet type')}
-                        value={activeType}
-                        onChange={(value) => {
-                            setTypeFilter(Number(value));
-                            setSearch(searchInput.toLowerCase());
-                        }}
-                    >
-                        <option value={-1}>
-                            {LocalizeText('inventory.pets.filter.type.all') === 'inventory.pets.filter.type.all'
-                                ? localizeWithFallback('octane.inventory.all_types', 'All types')
-                                : LocalizeText('inventory.pets.filter.type.all')}
-                        </option>
-                        {availableTypes.map((type) => (
-                            <option key={type} value={type}>
-                                {LocalizeText(`pet.type.${type}`)}
-                            </option>
-                        ))}
-                    </InventoryFilterSelect>
-                    <InventoryFilterSelect
-                        aria-label={localizeWithFallback('octane.inventory.pet_rarity', 'Pet rarity')}
-                        disabled={!rarityFilterEnabled}
-                        value={activeRarity}
-                        onChange={(value) => setRarityFilter(Number(value))}
-                    >
-                        <option value={-1}>
-                            {LocalizeText('inventory.pets.filter.rarity.all') === 'inventory.pets.filter.rarity.all'
-                                ? localizeWithFallback('octane.inventory.all_rarities', 'All rarities')
-                                : LocalizeText('inventory.pets.filter.rarity.all')}
-                        </option>
-                        {rarityFilterEnabled &&
-                            availableRarities.map((rarity) => (
-                                <option key={rarity} value={rarity}>
-                                    {rarity}
-                                </option>
-                            ))}
-                    </InventoryFilterSelect>
-                </div>
+                {filterBar}
                 <div className="octane-inventory-animal-grid">
                     <ClassicScrollAreaView className="size-full">
                         <div className="octane-inventory-animal-cells">

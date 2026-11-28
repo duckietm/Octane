@@ -1,0 +1,924 @@
+/*
+ * Phone Housekeeping (the staff panel), in the Octane handheld look (HandheldTokens.css) inside the shared frame
+ * (HandheldSheetFrame). HandheldHousekeepingView draws the shell: the global search and the sections as a start list
+ * of finger-sized rows, each section a page with Back (upright) or beside the list (on its side). The pages are the
+ * desktop's own section views; this sheet gives their building blocks (sections, fields, buttons, segmented choices,
+ * fact grids, popovers, the typed danger confirmation) the phone's sizes and colours, and styles the phone-only card
+ * lists of the server lists, the permission matrix and the word filter. Everything is scoped to :root[data-handheld],
+ * which only a phone-sized touch device gets; the status colours of pills and banners stay the panel's own.
+ */
+
+:root[data-handheld] .octane-handheld-hk .octane-handheld-sheet__body {
+    padding: 0;
+}
+
+:root[data-handheld] .octane-handheld-hk__root {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-hk__status {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+}
+
+/* The status line and the password reveal run as wide as the sheet, under its rounded shoulders. */
+:root[data-handheld] .octane-handheld-hk__status > * {
+    padding-right: var(--hh-space-3);
+    padding-left: var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-hk__status [role='status'] {
+    min-height: var(--hh-touch);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-hk__status [role='status'] button {
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    margin-right: calc(var(--hh-space-2) * -1);
+}
+
+:root[data-handheld] .octane-handheld-hk__status input {
+    height: var(--hh-touch);
+    font-size: var(--hh-size-field);
+}
+
+:root[data-handheld] .octane-handheld-hk__status [role='status'] > div > input {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-hk__status [role='status'] > div > button:not([aria-label]) {
+    flex: none;
+    width: auto;
+    height: var(--hh-touch);
+    margin: 0;
+    padding: 0 var(--hh-space-3);
+}
+
+:root[data-handheld] .octane-handheld-hk__layout {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* Both columns scroll on their own; upright only one of them is on screen. */
+:root[data-handheld] .octane-handheld-hk__menu,
+:root[data-handheld] .octane-handheld-hk__page {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    box-sizing: border-box;
+    gap: var(--hh-space-3);
+    min-width: 0;
+    min-height: 0;
+    padding: var(--hh-space-3) var(--hh-space-3) calc(var(--hh-space-4) + var(--octane-safe-bottom, 0px));
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-hk__menu > *,
+:root[data-handheld] .octane-handheld-hk__page > * {
+    flex: none;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-hk__menu {
+    flex: 0 0 272px;
+    gap: var(--hh-space-2);
+    padding-top: var(--hh-space-2);
+    border-right: 1px solid var(--hh-air-box);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-hk__page {
+    padding-top: var(--hh-space-2);
+}
+
+/* ---------------------------------------------------------------- start list */
+
+:root[data-handheld] .octane-handheld-hk__search {
+    padding: var(--hh-space-2);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-hk__search > .relative > div:has(input) {
+    box-sizing: border-box;
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    border-color: var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+}
+
+:root[data-handheld] .octane-handheld-hk__search input {
+    min-height: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: var(--hh-size-field);
+}
+
+/* The search's list hangs under the box, as wide as the card. */
+:root[data-handheld] .octane-handheld-hk__root .octane-hk-popover[role='listbox'],
+:root[data-handheld] .octane-handheld-hk__search .octane-hk-popover {
+    width: calc(100vw - 2 * var(--hh-space-4));
+    max-width: 360px;
+    border-radius: var(--hh-radius-m);
+}
+
+:root[data-handheld] .octane-handheld-hk__search .octane-hk-popover [role='option'] {
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-3);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-hk__group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-hk__heading {
+    padding: 0 var(--hh-space-1);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 18px;
+}
+
+/* The rows of a group sit in one white card, parted by hairlines. */
+:root[data-handheld] .octane-handheld-hk__rows {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-hk__row {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    width: 100%;
+    min-height: 56px;
+    padding: var(--hh-space-1) var(--hh-space-3) var(--hh-space-1) var(--hh-space-2);
+    border: 0;
+    border-top: 1px solid var(--hh-air-box);
+    background: transparent;
+    color: var(--hh-air-text);
+    cursor: pointer;
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-hk__row:first-child {
+    border-top: 0;
+}
+
+:root[data-handheld] .octane-handheld-hk__row:active {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-hk__row[data-active='true'] {
+    background: var(--hh-air-track-active);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-hk__row {
+    min-height: var(--hh-touch);
+}
+
+/* The hotel icons are pixel art in their own sizes; each keeps it, centred in a slot as wide as the widest. */
+:root[data-handheld] .octane-handheld-hk__row-icon {
+    display: flex;
+    flex: 0 0 44px;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+:root[data-handheld] .octane-handheld-hk__row-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-hk__count {
+    flex: none;
+    min-width: 22px;
+    padding: 0 var(--hh-space-2);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-blue);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-s);
+    font-weight: 700;
+    line-height: 22px;
+    text-align: center;
+}
+
+:root[data-handheld] .octane-handheld-hk__chevron {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: var(--hh-air-border);
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- a page */
+
+:root[data-handheld] .octane-handheld-hk__page-head {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-2);
+    min-height: var(--hh-touch);
+}
+
+:root[data-handheld] .octane-handheld-hk__page-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-hk__back {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    align-self: flex-start;
+    gap: 2px;
+    height: 36px;
+    padding: 0 var(--hh-space-3) 0 6px;
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+    cursor: pointer;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    font-weight: 700;
+    line-height: 20px;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-hk__page-head .octane-handheld-hk__back {
+    align-self: center;
+}
+
+/* The pill is 36 px; the finger gets 44. */
+:root[data-handheld] .octane-handheld-hk__back::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+}
+
+:root[data-handheld] .octane-handheld-hk__back:active {
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld] .octane-handheld-hk__back .octane-handheld-hk__chevron {
+    stroke: currentColor;
+}
+
+:root[data-handheld] .octane-handheld-hk__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-3);
+    min-width: 0;
+}
+
+/* ---------------------------------------------------------------- the desktop blocks, phone-sized */
+
+/* Section frames become cards. */
+:root[data-handheld] .octane-handheld-hk__content section {
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-3);
+    border-radius: var(--hh-radius-m);
+    box-shadow: var(--hh-shadow-card);
+}
+
+:root[data-handheld] .octane-handheld-hk__content section > header {
+    flex-wrap: wrap;
+    min-height: 36px;
+}
+
+:root[data-handheld] .octane-handheld-hk__root .hk-air-heading {
+    color: var(--hh-air-blue-header) !important;
+}
+
+/* Rows of buttons wrap instead of running off the screen; a field in such a row keeps a usable width. */
+:root[data-handheld] .octane-handheld-hk__content .flex:not(.flex-col):has(> .hk-btn) {
+    flex-wrap: wrap;
+}
+
+:root[data-handheld] .octane-handheld-hk__content .flex:not(.flex-col):has(> .hk-btn) > :is(.grow, input) {
+    flex: 1 1 160px;
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-hk__content :where(.truncate) {
+    min-width: 0;
+}
+
+/* Two or more columns of fields and facts: two on a phone held upright, one for a field beside a wide one. */
+:root[data-handheld='portrait'] .octane-handheld-hk__content :is(.grid-cols-3, .grid-cols-4) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:root[data-handheld='portrait'] .octane-handheld-hk__content :is(.grid-cols-\[180px_1fr\], .grid-cols-\[110px_1fr\]) {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+/* Fields beside their button (currencies, timed sanctions) and side-by-side cards take one line each upright. */
+:root[data-handheld='portrait'] .octane-handheld-hk__content .grid:has(> * > label .octane-number-input),
+:root[data-handheld='portrait'] .octane-handheld-hk__content .grid-cols-2:has(> section) {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+:root[data-handheld] .octane-handheld-hk__content .grid > .flex:has(> label .octane-number-input) > .hk-btn {
+    flex: 1 1 auto;
+}
+
+/* Forms of labelled fields: one field per line upright, each as wide as the line. */
+:root[data-handheld='portrait'] .octane-handheld-hk__content .grid-cols-2:has(> label :is(input, textarea, .octane-select-trigger)) {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+:root[data-handheld] .octane-handheld-hk__content .grid > label .octane-select-trigger {
+    width: 100%;
+}
+
+/* A full-width cell stays one column wide when the grid has only one, so no column is added for it. */
+:root[data-handheld] .octane-handheld-hk__content .grid > .col-span-2 {
+    grid-column: 1 / -1;
+}
+
+/* The timed sanctions: number and button on one line each. */
+:root[data-handheld='portrait'] .octane-handheld-hk__content section > .grid-cols-2:has(.octane-number-input) {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+:root[data-handheld] .octane-handheld-hk__content .grid > .flex.items-center:has(.octane-number-input) {
+    flex-wrap: nowrap;
+}
+
+/* The currencies of a user card stay three across. */
+:root[data-handheld] .octane-handheld-hk__content .mt-1\.5.grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* A field beside its options (permission search, word filter) takes the line's width. */
+:root[data-handheld] .octane-handheld-hk__content .flex:not(.flex-col):has(> input) {
+    flex-wrap: wrap;
+}
+
+:root[data-handheld] .octane-handheld-hk__content .flex:not(.flex-col):has(> input) > input {
+    flex: 1 1 160px;
+    width: auto;
+    min-width: 0;
+}
+
+/* A search box: the desktop's bordered box around a bare field; the box is the finger-sized part. */
+:root[data-handheld] .octane-handheld-hk__content div:has(> input.bg-transparent, > .octane-number-input input.bg-transparent) {
+    box-sizing: border-box;
+    min-height: var(--hh-touch);
+    border-radius: var(--hh-radius-s);
+}
+
+:root[data-handheld] .octane-handheld-hk__content input.bg-transparent {
+    min-height: 40px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* Fields: 16 px so the phone does not zoom, a finger high. */
+:root[data-handheld] .octane-handheld-hk__root :is(input:not([type='checkbox'], [type='radio'], [type='range'], [aria-hidden='true']), textarea) {
+    box-sizing: border-box;
+    min-height: var(--hh-touch);
+    border-radius: var(--hh-radius-s);
+    font-size: var(--hh-size-field) !important;
+}
+
+:root[data-handheld] .octane-handheld-hk__root textarea {
+    min-height: 88px !important;
+    padding-top: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-hk__root .octane-number-input {
+    box-sizing: border-box;
+    min-width: 72px;
+    min-height: var(--hh-touch);
+    border-radius: var(--hh-radius-s);
+    font-size: var(--hh-size-field) !important;
+}
+
+:root[data-handheld] .octane-handheld-hk__root .octane-number-input input {
+    min-height: 0;
+}
+
+:root[data-handheld] .octane-handheld-hk__root .octane-select-trigger {
+    box-sizing: border-box;
+    min-height: var(--hh-touch);
+    border-radius: var(--hh-radius-s);
+    font-size: var(--hh-size-field);
+}
+
+:root[data-handheld] .octane-handheld-hk__root label:has(> .octane-checkbox) {
+    min-height: var(--hh-touch);
+}
+
+:root[data-handheld] .octane-handheld-hk__root .octane-checkbox {
+    width: 22px;
+    height: 22px;
+}
+
+/* Hints, counters and table cells come up to the phone's 12 px floor. */
+@layer base {
+    :root[data-handheld] .octane-handheld-hk__root :where(.text-\[9px\], .text-\[10px\], .text-\[11px\]):not(svg, svg *) {
+        font-size: var(--hh-size-s) !important;
+    }
+
+    :root[data-handheld] .octane-handheld-hk__root .hk-air-heading {
+        font-size: var(--hh-size-l) !important;
+        line-height: 20px !important;
+    }
+}
+
+/* Buttons: a finger high, rounded, the green for what saves or gives, the red for what punishes. */
+:root[data-handheld] .octane-handheld-hk__root .hk-btn {
+    box-sizing: border-box;
+    min-height: var(--hh-touch);
+    height: auto;
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-box) !important;
+    border-image-source: none !important;
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-white) !important;
+    box-shadow: var(--hh-shadow-card) !important;
+    color: var(--hh-air-text);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-m);
+    white-space: normal;
+    text-align: center;
+    transition:
+        background-color var(--hh-fast) var(--hh-ease),
+        transform var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-hk__root .hk-btn--sm {
+    min-width: var(--hh-touch);
+    min-height: 36px;
+    padding: 0 var(--hh-space-2);
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-hk__root .hk-btn:active:not(:disabled) {
+    background: var(--hh-air-cream) !important;
+    transform: translateY(1px);
+}
+
+:root[data-handheld] .octane-handheld-hk__root :is(.hk-btn--success, .hk-btn--primary):not(:disabled) {
+    border-color: var(--hh-air-green-border) !important;
+    background: var(--hh-primary) !important;
+    box-shadow: var(--hh-shadow-primary) !important;
+    color: var(--hh-on-primary);
+}
+
+:root[data-handheld] .octane-handheld-hk__root :is(.hk-btn--success, .hk-btn--primary):active:not(:disabled) {
+    background: var(--hh-primary-pressed) !important;
+}
+
+:root[data-handheld] .octane-handheld-hk__root .hk-btn--warning:not(:disabled) {
+    border-color: var(--hh-air-count-yellow) !important;
+    background: var(--hh-air-track-tip) !important;
+}
+
+:root[data-handheld] .octane-handheld-hk__root .hk-btn--danger:not(:disabled) {
+    border-color: var(--hh-air-red-deep) !important;
+    background: var(--hh-dismiss) !important;
+    color: var(--hh-on-dark);
+    text-shadow: none;
+}
+
+:root[data-handheld] .octane-handheld-hk__root .hk-btn:disabled {
+    background: var(--hh-air-panel) !important;
+    box-shadow: none !important;
+    color: var(--hh-air-text-muted);
+}
+
+/* A label inside a button the desktop paints white on its grey skin reads on the phone's light buttons too. */
+:root[data-handheld] .octane-handheld-hk__root .hk-btn .text-white {
+    color: inherit;
+}
+
+:root[data-handheld] .octane-handheld-hk__root .octane-handheld-hk__wide {
+    width: 100%;
+}
+
+/* Small icon-only buttons of the desktop rows (open user, clear, remove) get a finger-sized box. */
+:root[data-handheld] .octane-handheld-hk__content button:not(.hk-btn, .octane-handheld-hk__card, .octane-handheld-hk__back, .hk-segmented__item, .octane-select-trigger, .octane-checkbox, [role='spinbutton'] button, .octane-number-input button) {
+    min-width: 36px;
+    min-height: 36px;
+}
+
+/* Sub-pages and list choices: pills that wrap onto a second line. */
+:root[data-handheld] .octane-handheld-hk__root .hk-segmented {
+    flex-wrap: wrap;
+    gap: var(--hh-space-1);
+    padding: 0;
+    border: 0 !important;
+    background: transparent !important;
+}
+
+:root[data-handheld] .octane-handheld-hk__root .hk-segmented__item {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    height: 36px;
+    padding: 0 var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-white);
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-hk__root .hk-segmented__item.is-active {
+    border-color: var(--hh-air-blue-deep);
+    background: var(--hh-air-blue-deep) !important;
+    color: var(--hh-on-dark);
+}
+
+:root[data-handheld] .octane-handheld-hk__root .hk-segmented__count {
+    font-size: var(--hh-size-s);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-hk__root .hk-segmented__item.is-active .hk-segmented__count {
+    background: var(--hh-air-white);
+    color: var(--hh-air-blue-deep);
+}
+
+:root[data-handheld] .octane-handheld-hk__root .hk-segmented--compact .hk-segmented__item {
+    height: 36px;
+    font-size: var(--hh-size-s);
+}
+
+/* Lists the desktop caps at a few hundred pixels scroll with the page instead. */
+:root[data-handheld] .octane-handheld-hk__content :is(.max-h-\[260px\], .max-h-\[300px\], .max-h-\[360px\], .max-h-\[420px\]) {
+    max-height: none;
+}
+
+/* Popovers over the page (user suggestions) as wide as the page. */
+:root[data-handheld] .octane-handheld-hk__content .octane-hk-popover > * {
+    min-height: var(--hh-touch);
+}
+
+/* The audit rows and the dashboard's recent lines wrap onto a second line. */
+:root[data-handheld] .octane-handheld-hk__content li > div:first-child,
+:root[data-handheld] .octane-handheld-hk__content li {
+    flex-wrap: wrap;
+    row-gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-hk__content li {
+    padding-top: var(--hh-space-2);
+    padding-bottom: var(--hh-space-2);
+}
+
+/* The soundboard rows: name and facts over the actions. */
+:root[data-handheld] .octane-handheld-hk__content [data-testid^='soundboard-catalog-row-'] {
+    grid-template-columns: minmax(0, 1fr);
+    border-radius: var(--hh-radius-m);
+}
+
+:root[data-handheld] .octane-handheld-hk__content [data-testid^='soundboard-catalog-row-'] > div:last-child {
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-hk__content [data-testid^='soundboard-catalog-row-'] button {
+    min-width: var(--hh-touch);
+    min-height: var(--hh-touch);
+    font-size: var(--hh-size-m);
+}
+
+/* Edit forms keep their Save / Reset as a bar at the foot of the screen while the form is in view. */
+:root[data-handheld] .octane-handheld-hk__content .hk-form-actions {
+    position: sticky;
+    bottom: calc(var(--hh-space-3) * -1);
+    z-index: 2;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--hh-space-2);
+    padding: var(--hh-space-2);
+    border-top: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+}
+
+/* In a section card the bar runs to the card's edges. */
+:root[data-handheld] .octane-handheld-hk__content section > .hk-form-actions {
+    margin: 0 calc(var(--hh-space-3) * -1) calc(var(--hh-space-3) * -1);
+    padding: var(--hh-space-2) var(--hh-space-3);
+    border-radius: 0 0 var(--hh-radius-m) var(--hh-radius-m);
+}
+
+:root[data-handheld] .octane-handheld-hk__content .hk-form-actions > button {
+    flex: 1 1 120px;
+    min-height: var(--hh-touch);
+}
+
+/* ---------------------------------------------------------------- card lists */
+
+:root[data-handheld] .octane-handheld-hk__cards,
+:root[data-handheld] .octane-handheld-hk__detail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-hk__card {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--hh-space-1);
+    width: 100%;
+    min-height: 56px;
+    padding: var(--hh-space-2) 36px var(--hh-space-2) var(--hh-space-3);
+    border: 1px solid var(--hh-air-box);
+    border-radius: var(--hh-radius-m);
+    background: var(--hh-air-white);
+    box-shadow: var(--hh-shadow-card);
+    color: var(--hh-air-text);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+    text-align: left;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-hk__card:active:not(.is-static) {
+    background: var(--hh-air-track-light);
+}
+
+:root[data-handheld] .octane-handheld-hk__card.is-static,
+:root[data-handheld] .octane-handheld-hk__card.is-detail {
+    padding-right: var(--hh-space-3);
+    cursor: default;
+}
+
+:root[data-handheld] .octane-handheld-hk__card.is-row {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--hh-space-2);
+    padding-right: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-hk__card-main {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--hh-space-1);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-hk__card-head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--hh-space-2);
+    min-width: 0;
+}
+
+:root[data-handheld] .octane-handheld-hk__card-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+    font-weight: 700;
+    line-height: 20px;
+    overflow-wrap: anywhere;
+}
+
+:root[data-handheld] .octane-handheld-hk__card-time {
+    flex: none;
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-hk__card-body {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--hh-air-text);
+    font-size: var(--hh-size-m);
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+:root[data-handheld] .octane-handheld-hk__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hh-space-1);
+}
+
+:root[data-handheld] .octane-handheld-hk__chip {
+    padding: 0 var(--hh-space-2);
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-track-light);
+    color: var(--hh-air-blue-header);
+    font-size: var(--hh-size-s);
+    line-height: 20px;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-hk__chevron.is-card {
+    position: absolute;
+    top: 50%;
+    right: var(--hh-space-3);
+    margin-top: -8px;
+}
+
+/* A row as its own page: every column as a label over its value. */
+:root[data-handheld] .octane-handheld-hk__pair {
+    display: flex;
+    flex-direction: column;
+    padding: var(--hh-space-1) 0;
+    border-top: 1px solid var(--hh-air-box);
+}
+
+:root[data-handheld] .octane-handheld-hk__pair:first-child {
+    border-top: 0;
+}
+
+:root[data-handheld] .octane-handheld-hk__pair-label {
+    color: var(--hh-air-text-muted);
+    font-size: var(--hh-size-s);
+    line-height: 16px;
+}
+
+:root[data-handheld] .octane-handheld-hk__pair-value {
+    font-size: var(--hh-size-m);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* The ranks of a permission, two across: the rank's name and its box or level. */
+:root[data-handheld] .octane-handheld-hk__ranks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--hh-space-1) var(--hh-space-2);
+    margin-top: var(--hh-space-1);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-hk__ranks {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+:root[data-handheld] .octane-handheld-hk__rank {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hh-space-2);
+    min-height: var(--hh-touch);
+    padding: 0 var(--hh-space-2);
+    border-radius: var(--hh-radius-s);
+    background: var(--hh-air-panel);
+}
+
+:root[data-handheld] .octane-handheld-hk__rank[data-own='true'] {
+    background: var(--hh-air-track-tip);
+}
+
+:root[data-handheld] .octane-handheld-hk__rank[data-locked='true'] {
+    color: var(--hh-air-text-muted);
+}
+
+:root[data-handheld] .octane-handheld-hk__rank-name {
+    display: flex;
+    align-items: center;
+    gap: var(--hh-space-1);
+    min-width: 0;
+    overflow: hidden;
+    font-size: var(--hh-size-m);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-hk__rank .octane-select-trigger {
+    min-width: 64px;
+    min-height: 36px;
+}
+
+:root[data-handheld] .octane-handheld-hk__icon-button {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--hh-touch);
+    height: var(--hh-touch);
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: transparent;
+    color: var(--hh-air-text-muted);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-hk__icon-button.is-danger {
+    color: var(--hh-air-red);
+}
+
+:root[data-handheld] .octane-handheld-hk__icon-button:active {
+    background: var(--hh-air-cream);
+}
+
+/* ---------------------------------------------------------------- the typed danger confirmation */
+
+/* A centred card over the whole sheet. */
+:root[data-handheld] .octane-handheld-hk__root [aria-modal='true'] {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--hh-space-4);
+    background: var(--hh-air-outline);
+}
+
+:root[data-handheld] .octane-handheld-hk__root [aria-modal='true'] > .octane-hk-popover {
+    box-sizing: border-box;
+    gap: var(--hh-space-3);
+    width: 100%;
+    max-width: 360px;
+    padding: var(--hh-space-4);
+    border: 0;
+    border-radius: var(--hh-radius-l);
+    background: var(--hh-air-white) !important;
+    box-shadow: var(--hh-shadow-float) !important;
+    font-size: var(--hh-size-m);
+}
+
+:root[data-handheld] .octane-handheld-hk__root [aria-modal='true'] > .octane-hk-popover > div:first-child {
+    color: var(--hh-air-red);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-l);
+}
+
+:root[data-handheld] .octane-handheld-hk__root [aria-modal='true'] p {
+    font-size: var(--hh-size-m);
+    line-height: 18px;
+}
+
+:root[data-handheld] .octane-handheld-hk__root [aria-modal='true'] label {
+    font-size: var(--hh-size-s);
+}
+
+:root[data-handheld] .octane-handheld-hk__root [aria-modal='true'] .justify-end {
+    flex-wrap: nowrap;
+}
+
+:root[data-handheld] .octane-handheld-hk__root [aria-modal='true'] .justify-end > button {
+    flex: 1 1 0;
+}

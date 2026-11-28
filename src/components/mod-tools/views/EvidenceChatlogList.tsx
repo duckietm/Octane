@@ -61,7 +61,7 @@ interface HeaderOptions {
  * an IM session has no buttons, a forum thread or message opens its forum, a selfie opens its picture and a photo its moderation page (when one is configured), both
  * with the room tool of the room they were taken in. The forum "Delete" button is left out: this server's thread delete erases the thread instead of hiding it.
  */
-const headerOf = (record: ChatRecordData, options: HeaderOptions): { label: string; action: HeaderButton | null; action2: HeaderButton | null } => {
+export const headerOf = (record: ChatRecordData, options: HeaderOptions): { label: string; action: HeaderButton | null; action2: HeaderButton | null } => {
     const roomTool = record.roomId > 0 ? { label: localizeWithFallback('octane.mod_tools.room_tool', 'Room tool'), onClick: () => options.onOpenRoomTool(record.roomId) } : null;
     const context = record.context;
 

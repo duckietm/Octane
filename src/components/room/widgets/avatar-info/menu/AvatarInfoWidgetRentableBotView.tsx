@@ -11,6 +11,7 @@ import {
     RoomObjectType
 } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
+import { FaBoxOpen, FaCocktail, FaCommentDots, FaGlassCheers, FaMusic, FaPen, FaQuoteRight, FaSearch, FaSyncAlt, FaTshirt, FaWalking } from 'react-icons/fa';
 import {
     AvatarInfoRentableBot,
     BotSkillsEnum,
@@ -207,56 +208,56 @@ export const AvatarInfoWidgetRentableBotView: FC<AvatarInfoWidgetRentableBotView
                     {canControl && (
                         <>
                             {avatarInfo.botSkills.indexOf(BotSkillsEnum.DONATE_TO_ALL) >= 0 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('donate_to_all')}>
+                                <ContextMenuListItemView icon={<FaGlassCheers />} onClick={(event) => processAction('donate_to_all')}>
                                     {localizeWithFallback('avatar.widget.donate_to_all', 'Serve everyone')}
                                 </ContextMenuListItemView>
                             )}
                             {avatarInfo.botSkills.indexOf(BotSkillsEnum.DONATE_TO_USER) >= 0 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('donate_to_user')}>
+                                <ContextMenuListItemView icon={<FaCocktail />} onClick={(event) => processAction('donate_to_user')}>
                                     {localizeWithFallback('avatar.widget.donate_to_user', 'Serve me')}
                                 </ContextMenuListItemView>
                             )}
                             {avatarInfo.botSkills.indexOf(BotSkillsEnum.CHANGE_BOT_NAME) >= 0 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('change_bot_name')}>
+                                <ContextMenuListItemView icon={<FaPen />} onClick={(event) => processAction('change_bot_name')}>
                                     {LocalizeText('avatar.widget.change_bot_name')}
                                 </ContextMenuListItemView>
                             )}
                             {avatarInfo.botSkills.indexOf(BotSkillsEnum.CHANGE_BOT_MOTTO) >= 0 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('change_bot_motto')}>
+                                <ContextMenuListItemView icon={<FaQuoteRight />} onClick={(event) => processAction('change_bot_motto')}>
                                     {localizeWithFallback('avatar.widget.change_bot_motto', 'Change motto')}
                                 </ContextMenuListItemView>
                             )}
                             {avatarInfo.botSkills.indexOf(BotSkillsEnum.DRESS_UP) >= 0 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('dress_up')}>
+                                <ContextMenuListItemView icon={<FaTshirt />} onClick={(event) => processAction('dress_up')}>
                                     {LocalizeText('avatar.widget.dress_up')}
                                 </ContextMenuListItemView>
                             )}
                             {avatarInfo.botSkills.indexOf(BotSkillsEnum.RANDOM_WALK) >= 0 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('random_walk')}>
+                                <ContextMenuListItemView icon={<FaWalking />} onClick={(event) => processAction('random_walk')}>
                                     {LocalizeText('avatar.widget.random_walk')}
                                 </ContextMenuListItemView>
                             )}
                             {avatarInfo.botSkills.indexOf(BotSkillsEnum.SETUP_CHAT) >= 0 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('setup_chat')}>
+                                <ContextMenuListItemView icon={<FaCommentDots />} onClick={(event) => processAction('setup_chat')}>
                                     {LocalizeText('avatar.widget.setup_chat')}
                                 </ContextMenuListItemView>
                             )}
                             {avatarInfo.botSkills.indexOf(BotSkillsEnum.DANCE) >= 0 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('dance')}>{LocalizeText('avatar.widget.dance')}</ContextMenuListItemView>
+                                <ContextMenuListItemView icon={<FaMusic />} onClick={(event) => processAction('dance')}>{LocalizeText('avatar.widget.dance')}</ContextMenuListItemView>
                             )}
                             {avatarInfo.botSkills.indexOf(BotSkillsEnum.ROTATE) >= 0 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('rotate')}>
+                                <ContextMenuListItemView icon={<FaSyncAlt />} onClick={(event) => processAction('rotate')}>
                                     {LocalizeText('tooltip.roombuilding.rotate')}
                                 </ContextMenuListItemView>
                             )}
                             {avatarInfo.botSkills.indexOf(BotSkillsEnum.NO_PICK_UP) === -1 && (
-                                <ContextMenuListItemView onClick={(event) => processAction('pick')}>{LocalizeText('avatar.widget.pick_up')}</ContextMenuListItemView>
+                                <ContextMenuListItemView icon={<FaBoxOpen />} tone="danger" onClick={(event) => processAction('pick')}>{LocalizeText('avatar.widget.pick_up')}</ContextMenuListItemView>
                             )}
                         </>
                     )}
                     {/* Official wired_inspect: the creator tools' inspection, for whoever may open it. */}
                     {showInspectButton && (
-                        <ContextMenuListItemView onClick={(event) => processAction('inspect')}>
+                        <ContextMenuListItemView icon={<FaSearch />} onClick={(event) => processAction('inspect')}>
                             {localizeWithFallback('octane.room.inspect', 'Inspect')}
                         </ContextMenuListItemView>
                     )}

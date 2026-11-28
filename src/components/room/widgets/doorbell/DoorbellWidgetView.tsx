@@ -6,6 +6,7 @@ import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 /* Official doorbell: the information in red, then a list of 20 px rows, each with the name and two
    icon buttons, a green check to let the visitor in and a red cross to turn them away. */
@@ -26,7 +27,7 @@ export const DoorbellWidgetView: FC = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView className="octane-widget-doorbell" theme="primary-slim">
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE} className="octane-widget-doorbell" theme="primary-slim">
                 <OctaneCardHeaderView headerText={localizeWithFallback('widgets.doorbell.title', LocalizeText('navigator.doorbell.title'))} onCloseClick={() => setDismissedUsers(users)} />
                 <OctaneCardContentView gap={2} overflow="hidden">
                     <div className="octane-doorbell-info">{localizeWithFallback('widgets.doorbell.info', 'These visitors are waiting at the door.')}</div>

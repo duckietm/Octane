@@ -36,6 +36,7 @@ import {
 import { Column, DraggableWindow, DraggableWindowPosition, Flex, LayoutAvatarImageView, ListSelect, Text } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 
 type LeaderboardPage =
     | { key: 'totalBadges'; board: BadgeLeaderboardBoard; frame: string; emblem: string; title: () => string; info: () => string; option: () => string }
@@ -250,7 +251,7 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
     return (
         <NativeTextTree>
             <div className="octane-badge-leaderboard fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
-                <DraggableWindow
+                <DraggableWindow handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
                     uniqueKey="badge-leaderboard"
                     handleSelector=".octane-badge-leaderboard__drag-handle"
                     windowPosition={DraggableWindowPosition.CENTER}

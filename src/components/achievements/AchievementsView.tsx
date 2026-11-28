@@ -1,6 +1,7 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../api/handheld/handheldWindowFit';
 import { FC, useEffect } from 'react';
-import { AchievementUtilities, LocalizeText } from '../../api';
+import { AchievementUtilities, getVisibleAchievementCategories, LocalizeText } from '../../api';
 import { DraggableWindowPosition } from '../../common';
 import { useAchievements } from '../../hooks';
 import { OctaneCard } from '../../layout';
@@ -9,6 +10,8 @@ import { AirAchievementProgressBar } from './AirAchievementProgressBar';
 import { AchievementsCategoryListView } from './category-list';
 import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../hooks/handheld/useHandheldLayout';
+import { HandheldAchievementsView } from './HandheldAchievementsView';
 
 export const AchievementsView: FC = () => {
     const {
@@ -22,8 +25,12 @@ export const AchievementsView: FC = () => {
         achievementScore = 0,
         getProgress = 0,
         getMaxProgress = 0,
-        selectedCategory = null
+        selectedCategory = null,
+        visibleAchievements = [],
+        selectedAchievement = null,
+        setSelectedAchievementId = null
     } = useAchievements();
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         const linkTracker: ILinkEventTracker = {
@@ -68,11 +75,29 @@ export const AchievementsView: FC = () => {
 
     if (!isVisible || !isLoaded) return null;
 
+    if (isHandheld) {
+        return (
+            <HandheldAchievementsView
+                achievements={visibleAchievements}
+                categories={getVisibleAchievementCategories(achievementCategories)}
+                maxProgress={getMaxProgress}
+                progress={getProgress}
+                score={achievementScore}
+                selectedAchievement={selectedAchievement}
+                selectedCategory={selectedCategory}
+                onClose={close}
+                onSelectAchievement={setSelectedAchievementId}
+                onSelectCategory={setSelectedCategoryCode}
+            />
+        );
+    }
+
     return (
         <NativeTextTree>
             <OctaneCard
                 className="octane-achievements-air octane-card-frame-3 octane-card-frame-teal"
                 uniqueKey="achievements"
+                handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
                 windowPosition={DraggableWindowPosition.TOP_CENTER}
                 offsetTop={-30}
                 data-view={selectedCategory ? 'category' : 'categories'}

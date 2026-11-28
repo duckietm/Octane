@@ -13,6 +13,8 @@ import {
 } from '../../../../hooks/collectibles/collectibles.helpers';
 import { getCollectibleProductName, useCollectibles } from '../../../../hooks/collectibles/useCollectibles';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../../hooks/handheld/useHandheldLayout';
+import { HandheldInventorySelectionView } from '../HandheldInventorySelectionView';
 import { InventoryCategoryLoadingView } from '../InventoryCategoryLoadingView';
 
 const nameOf = (group: CollectibleGroup) => getCollectibleProductName(group.product);
@@ -32,6 +34,7 @@ export const InventoryCollectiblesView: FC = () => {
     const [filterIndex, setFilterIndex] = useState(0);
     const [search, setSearch] = useState('');
     const [selectedCode, setSelectedCode] = useState<string>(null);
+    const isHandheld = useIsHandheld();
 
     useEffect(() => {
         requestInventory?.();
@@ -55,11 +58,12 @@ export const InventoryCollectiblesView: FC = () => {
 
     return (
         <NativeTextTree>
-            <div className="octane-inventory-collectibles" data-testid="inventory-collectibles">
+            <div className={isHandheld ? 'octane-handheld-inv__pane is-collectibles' : 'octane-inventory-collectibles'} data-testid="inventory-collectibles">
                 <div className="octane-inventory-collectibles-options">
                     <input
                         aria-label={localizeWithFallback('generic.search', 'Search')}
                         className="octane-inventory-filter-input"
+                        placeholder={isHandheld ? localizeWithFallback('generic.search', 'Search') : undefined}
                         value={search}
                         onChange={(event) => setSearch(event.target.value)}
                     />
@@ -77,6 +81,34 @@ export const InventoryCollectiblesView: FC = () => {
                         ))}
                     </Select>
                 </div>
+                {isHandheld ? (
+                    <>
+                        <div className="octane-handheld-inv__gridbox">
+                            <div className="octane-handheld-inv__grid">
+                                {shown.map((group) => (
+                                    <ToggleButton
+                                        key={group.productCode}
+                                        aria-label={nameOf(group)}
+                                        className={`octane-collectibles-item${selected?.productCode === group.productCode ? ' is-selected' : ''}`}
+                                        pressed={selected?.productCode === group.productCode}
+                                        onClick={() => setSelectedCode(group.productCode)}
+                                    >
+                                        <CollectibleProductImageView icon product={group.product} />
+                                        {group.assetIds.length > 1 && <span className="octane-collectibles-item-amount">{group.assetIds.length}</span>}
+                                    </ToggleButton>
+                                ))}
+                            </div>
+                        </div>
+                        {selected && (
+                            <HandheldInventorySelectionView
+                                meta={`${localizeWithFallback('collectibles.item.type', 'Type')}: ${typeLabel(selected.product.productTypeId)}`}
+                                name={nameOf(selected)}
+                                preview={<CollectibleProductImageView product={selected.product} />}
+                                thumb={<CollectibleProductImageView icon product={selected.product} />}
+                            />
+                        )}
+                    </>
+                ) : (
                 <div className="octane-inventory-collectibles-body">
                     <div className="octane-inventory-collectibles-grid">
                         {shown.map((group) => (
@@ -106,6 +138,7 @@ export const InventoryCollectiblesView: FC = () => {
                         </div>
                     )}
                 </div>
+                )}
             </div>
         </NativeTextTree>
     );

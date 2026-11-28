@@ -1,0 +1,127 @@
+/*
+ * Octane handheld design tokens. One palette, one set of radii, depths, type sizes and timings for every phone
+ * screen: the navigator, the room HUD and the chat composer read all their looks from here, and later phone screens
+ * should too. The colours are the AIR client's, exactly as the rest of our client already uses them (each token names
+ * where its value lives); the shapes built from them (pills, capsules, soft depth) are ours. Scoped to
+ * :root[data-handheld] (set only on a phone-sized touch device by the handheld watcher), so the desktop never sees
+ * a token.
+ */
+
+:root[data-handheld] {
+    /* AIR window blues (HabboTheme.css --habbo-blue*, CatalogView.css --catalog-standard-blue*). */
+    --hh-air-blue: #418db0;
+    --hh-air-blue-light: #67a3bf;
+    --hh-air-blue-deep: #2e6f8a;
+    --hh-air-blue-header: #0e3f52;
+    --hh-air-blue-header-line: #376275;
+    /* AIR selection blue (--habbo-select, --habbo-select-outer). */
+    --hh-air-select: #63c5e9;
+    --hh-air-select-outer: #82d1ed;
+    /* Reward-track blues (RewardTrackView.css --rt-dark, --rt-medium, --rt-light, --rt-active). */
+    --hh-air-track-blue: #3576b9;
+    --hh-air-track-medium: #cfe2f9;
+    --hh-air-track-light: #ddebf9;
+    --hh-air-track-active: #bdd6ef;
+    /* Reward-track bands and buttons (RewardTrackView.css --rt-band free and premium, --rt-panel tip, --rt-button premium). */
+    --hh-air-track-free: #f9efe0;
+    --hh-air-track-premium: #f1def7;
+    --hh-air-track-tip: #f5e1b9;
+    --hh-air-premium: #b265ce;
+
+    /* AIR window cream, panels and box lines (CatalogView.css --catalog-standard-*). */
+    --hh-air-cream: #e9e9e1;
+    --hh-air-panel: #f7f7f2;
+    --hh-air-white: #ffffff;
+    --hh-air-box: #d2d1cb;
+    --hh-air-box-line: #757571;
+    --hh-air-border: #9d9d96;
+    --hh-air-text: #222222;
+    --hh-air-text-muted: #666666;
+
+    /* AIR green buy button (HabboTheme.css --habbo-buy-*, --habbo-success). */
+    --hh-air-green-top: #3dcc45;
+    --hh-air-green-mid: #1aa022;
+    --hh-air-green-bottom: #128818;
+    --hh-air-green-deep: #00800b;
+    --hh-air-green-border: #0a5a10;
+
+    /* AIR red close button (--habbo-close, --habbo-close-hover). */
+    --hh-air-red: #b9322a;
+    --hh-air-red-deep: #921911;
+
+    /* AIR navigator head-count colours (NavigatorUserCountColor.ts). */
+    --hh-air-count-green: #63b162;
+    --hh-air-count-yellow: #ffb11b;
+    --hh-air-count-red: #c2332c;
+    --hh-air-count-empty: #cbcac1;
+
+    /* The dark see-through greys AIR lays over the room, and its black outline (--habbo-toolbar and our HUD panels). */
+    --hh-air-hud: rgba(47, 46, 41, 0.8);
+    --hh-air-hud-solid: rgba(47, 46, 41, 0.96);
+    --hh-air-hud-900: #24231f;
+    --hh-air-hud-700: #3c3a34;
+    --hh-air-hud-line: #555555;
+    --hh-air-outline: rgba(0, 0, 0, 0.6);
+
+    /* What sits on the dark surfaces. */
+    --hh-on-dark: #ffffff;
+    --hh-on-dark-muted: #c9c7bd;
+    --hh-hairline: rgba(255, 255, 255, 0.14);
+    --hh-well: rgba(255, 255, 255, 0.12);
+    --hh-well-pressed: rgba(255, 255, 255, 0.24);
+
+    /* The one primary thing on a screen: the green button, shaded from its lower half so white text reads on it. */
+    --hh-primary: linear-gradient(180deg, var(--hh-air-green-mid) 0%, var(--hh-air-green-bottom) 46%, var(--hh-air-green-deep) 100%);
+    --hh-primary-pressed: linear-gradient(180deg, var(--hh-air-green-bottom) 0%, var(--hh-air-green-deep) 100%);
+    --hh-on-primary: #ffffff;
+    /* What dismisses: the red button. */
+    --hh-dismiss: linear-gradient(180deg, var(--hh-air-red) 0%, var(--hh-air-red-deep) 100%);
+
+    /* Radii. */
+    --hh-radius-s: 8px;
+    --hh-radius-m: 12px;
+    --hh-radius-l: 16px;
+    --hh-radius-pill: 999px;
+
+    /* Spacing: a 4 px grid. */
+    --hh-space-1: 4px;
+    --hh-space-2: 8px;
+    --hh-space-3: 12px;
+    --hh-space-4: 16px;
+
+    /* The least a finger needs. */
+    --hh-touch: 44px;
+
+    /* Depth: a thin light edge on top plus a soft shadow under, instead of flat boxes. */
+    --hh-edge: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    --hh-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.06);
+    --hh-shadow-float: 0 6px 18px rgba(0, 0, 0, 0.34), 0 1px 3px rgba(0, 0, 0, 0.3);
+    --hh-shadow-primary: 0 3px 10px rgba(10, 90, 16, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --hh-blur: blur(12px) saturate(1.2);
+
+    /* Type: AIR's Ubuntu at the sizes our windows use (16 px for fields, so mobile Safari does not zoom into them). */
+    --hh-font: HabboAirUbuntu, UbuntuRegular, Ubuntu, sans-serif;
+    --hh-font-bold: HabboAirUbuntu, UbuntuBold, Ubuntu, sans-serif;
+    --hh-size-xxs: 10px;
+    --hh-size-xs: 11px;
+    --hh-size-s: 12px;
+    --hh-size-m: 13px;
+    --hh-size-l: 15px;
+    --hh-size-xl: 17px;
+    --hh-size-field: 16px;
+
+    /* Motion: short. */
+    --hh-fast: 120ms;
+    --hh-ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+    /* Focus rings: the selection blue on dark, the deep window blue on cream. */
+    --hh-focus-on-dark: 2px solid var(--hh-air-select);
+    --hh-focus-on-paper: 2px solid var(--hh-air-blue-deep);
+}
+
+/* Somebody who asked for less motion gets none of ours. */
+@media (prefers-reduced-motion: reduce) {
+    :root[data-handheld] {
+        --hh-fast: 0ms;
+    }
+}

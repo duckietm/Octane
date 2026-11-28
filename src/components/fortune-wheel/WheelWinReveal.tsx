@@ -1,6 +1,7 @@
 import { IWheelPrize } from '@octane/renderer';
 import { FC, useEffect } from 'react';
-import { LocalizeText } from '../../api';
+import { LocalizeText, localizeWithFallback } from '../../api';
+import { BaseButton } from '../../common/BaseButton';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { renderPrizeIcon } from './wheelPrizeIcon';
 import { getWheelPrizeLabel } from './wheelPrizeLabel';
@@ -10,6 +11,8 @@ import { WHEEL_SLICE_COLORS } from './wheelSliceColors';
 interface WheelWinRevealProps {
     prize: IWheelPrize;
     onDismiss: () => void;
+    /** Phone layout: the card sits in the middle of the sheet and carries its own OK button. */
+    handheld?: boolean;
 }
 
 const CONFETTI_COUNT = 40;
@@ -29,8 +32,22 @@ const CONFETTI = Array.from({ length: CONFETTI_COUNT }, (_, i) => ({
 // How long each tier lingers before auto-dismissing (ms).
 const AUTO_DISMISS = { none: 2000, common: 2400, rare: 4000 } as const;
 
-export const WheelWinReveal: FC<WheelWinRevealProps> = ({ prize, onDismiss }) => {
+export const WheelWinReveal: FC<WheelWinRevealProps> = ({ prize, onDismiss, handheld = false }) => {
     const tier = getPrizeTier(prize);
+    const phone = handheld ? ' is-handheld' : '';
+    // A finger needs something to aim at; tapping anywhere still closes the card, as with the mouse.
+    const okButton = handheld && (
+        <BaseButton
+            className="octane-handheld-wheel__reveal-ok"
+            data-testid="wheel-win-ok"
+            onClick={(event) => {
+                event.stopPropagation();
+                onDismiss();
+            }}
+        >
+            {localizeWithFallback('generic.ok', 'OK')}
+        </BaseButton>
+    );
 
     useEffect(() => {
         const timer = window.setTimeout(onDismiss, AUTO_DISMISS[tier]);
@@ -41,12 +58,15 @@ export const WheelWinReveal: FC<WheelWinRevealProps> = ({ prize, onDismiss }) =>
     if (tier === 'none') {
         return (
             <NativeTextTree>
-                <div className="wheel-win-reveal is-quiet absolute inset-0 z-40" onClick={onDismiss}>
+                <div className={`wheel-win-reveal is-quiet absolute inset-0 z-40${phone}`} onClick={onDismiss}>
                     <div className="wheel-win-card is-quiet">
                         <div className="wheel-win-icon">{renderPrizeIcon(prize, true)}</div>
                         <div className="wheel-win-copy">
-                            <div className="wheel-win-title">{LocalizeText('wheel.win.nothing')}</div>
+                            <div className="wheel-win-title">
+                                {handheld ? localizeWithFallback('wheel.win.nothing', 'No luck this time') : LocalizeText('wheel.win.nothing')}
+                            </div>
                         </div>
+                        {okButton}
                     </div>
                 </div>
             </NativeTextTree>
@@ -58,7 +78,7 @@ export const WheelWinReveal: FC<WheelWinRevealProps> = ({ prize, onDismiss }) =>
 
     return (
         <NativeTextTree>
-            <div className={`wheel-win-reveal absolute inset-0 z-40 ${isRare ? 'is-rare' : ''}`} onClick={onDismiss}>
+            <div className={`wheel-win-reveal absolute inset-0 z-40 ${isRare ? 'is-rare' : ''}${phone}`} onClick={onDismiss}>
                 {isRare &&
                     CONFETTI.map((piece, i) => (
                         <span
@@ -75,15 +95,22 @@ export const WheelWinReveal: FC<WheelWinRevealProps> = ({ prize, onDismiss }) =>
                         />
                     ))}
 
-                {isRare && <div className="wheel-win-jackpot">{LocalizeText('wheel.win.jackpot')}</div>}
+                {isRare && (
+                    <div className="wheel-win-jackpot">
+                        {handheld ? localizeWithFallback('wheel.win.jackpot', 'Jackpot!') : LocalizeText('wheel.win.jackpot')}
+                    </div>
+                )}
 
                 <div className={`wheel-win-card ${isRare ? 'is-rare' : ''}`}>
                     <div className="wheel-win-icon">{renderPrizeIcon(prize, true)}</div>
 
                     <div className="wheel-win-copy">
-                        <div className="wheel-win-title">{LocalizeText('wheel.win.title')}</div>
+                        <div className="wheel-win-title">
+                            {handheld ? localizeWithFallback('wheel.win.title', 'You won!') : LocalizeText('wheel.win.title')}
+                        </div>
                         {!!label && <div className="wheel-win-prize">{label}</div>}
                     </div>
+                    {okButton}
                 </div>
             </div>
         </NativeTextTree>

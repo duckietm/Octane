@@ -209,7 +209,7 @@ export const HousekeepingSoundboardTab: FC = () => {
                                 .join(' · ')}
                         </div>
                     )}
-                    <div className="col-span-2 flex flex-wrap justify-end gap-1.5">
+                    <div className="hk-form-actions col-span-2 flex flex-wrap justify-end gap-1.5">
                         <BaseButton
                             type="button"
                             disabled={draftLocked}

@@ -48,6 +48,8 @@ import { WiredFurniSelectorView } from './WiredFurniSelectorView';
 import { finalizeWiredVariablePickers } from './WiredVariablePickerHistory';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { useHandheldRoomPickStore } from '../../../state/handheldRoomPickStore';
+import { HANDHELD_ENLARGE_FRAME_SCALE, HANDHELD_TOUCH_FRAME_SCALE } from '../../../api/handheld/handheldWindowFit';
 
 export interface WiredBaseViewProps {
     wiredType: string;
@@ -146,6 +148,8 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
         setPasteIntoMode = null
     } = useWired();
     const { roomSettings, accountPreferences } = useWiredTools();
+    const roomPicking = useHandheldRoomPickStore((state) => state.picking);
+    const endRoomPick = useHandheldRoomPickStore((state) => state.end);
     const { showSingleBubble = null, showConfirm = null, simpleAlert = null } = useNotification();
     // Official determineActiveWiredStyle(): the proto furni force their own look, the rest wear the user's pick.
     const wiredStyle = resolveWiredStyle(accountPreferences?.wiredStyle, furniClassName);
@@ -405,9 +409,23 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
     resolvedCardStyle.maxWidth = WIRED_CARD_WIDTH;
     resolvedCardStyle.resize = 'none';
 
+    // Phone layout: the box can step aside so furni are picked in the room; it does so itself while an area is dragged out.
+    const pickLimit = trigger?.maximumItemSelectionCount ?? 0;
+    const handheldPeek = {
+        label: (wiredName ? splitWiredName(wiredName).title : '') || LocalizeText('wiredfurni.title'),
+        hint: roomPicking
+            ? localizeWithFallback('octane.handheld.wired.pick_area', 'Drag over the room to choose the area')
+            : requiresFurni > WiredFurniType.STUFF_SELECTION_OPTION_NONE && pickLimit > 0
+              ? localizeWithFallback('octane.handheld.wired.picked', 'Furni picked: %count% / %limit%', ['count', 'limit'], [String(furniIds?.length ?? 0), String(pickLimit)])
+              : undefined,
+        forced: roomPicking,
+        onReturn: endRoomPick ?? undefined
+    };
+
     return (
         <NativeTextTree>
             <OctaneCardView
+                handheldPeek={handheldPeek} handheldScale={HANDHELD_TOUCH_FRAME_SCALE} handheldMaxScale={HANDHELD_ENLARGE_FRAME_SCALE}
                 className={`octane-wired ${wiredStyleClassName(wiredStyle)} ${allowScrolling ? 'octane-wired--scrolling' : ''} max-h-[calc(100vh-16px)]`}
                 theme="primary-slim"
                 uniqueKey="octane-wired"

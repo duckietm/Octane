@@ -1,0 +1,260 @@
+/*
+ * The frame every phone screen after the navigator shares (HandheldSheetFrame), in the Octane handheld look
+ * (HandheldTokens.css): the deep-blue header with the module's icon, its title and the round close button, a row of
+ * pill tabs that scrolls sideways when there are many, and the cream sheet with rounded shoulders. The sizes are the
+ * navigator's (HandheldNavigator.css), so the shop and the inventory read as the same app. Everything is scoped to
+ * :root[data-handheld], which only a phone-sized touch device gets.
+ */
+
+:root[data-handheld] .octane-handheld-sheet {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--hh-air-blue-header-line) 0, var(--hh-air-blue-header) 100px);
+    color: var(--hh-air-text);
+    font-family: var(--hh-font);
+    font-size: var(--hh-size-m);
+    line-height: 17px;
+}
+
+:root[data-handheld] .octane-handheld-sheet :where(button, input) {
+    margin: 0;
+    appearance: none;
+    font-family: inherit;
+    -webkit-appearance: none;
+}
+
+:root[data-handheld] .octane-handheld-sheet img {
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* ---------------------------------------------------------------- header */
+
+:root[data-handheld] .octane-handheld-sheet__caption {
+    display: flex;
+    flex: 0 0 52px;
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--hh-space-2);
+    height: 52px;
+    padding: 0 var(--hh-space-2) 0 var(--hh-space-4);
+}
+
+/* A flat phone has little height: the header and the tab row are each a little lower. */
+:root[data-handheld='landscape'] .octane-handheld-sheet__caption {
+    flex-basis: 46px;
+    height: 46px;
+}
+
+/* The module's icon, as on the toolbar. */
+:root[data-handheld] .octane-handheld-sheet__mark {
+    flex: none;
+    margin-left: -4px;
+    background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* Its width is what the caption leaves, never its text's: sized by its text, a title shortened with "..." gave the purse beside it
+   room, grew, was laid out in full again and shortened again, so title and purse flickered (the Builders Club warehouse). */
+:root[data-handheld] .octane-handheld-sheet__title {
+    flex: 1 1 0;
+    /* Enough for a word or two; a narrow phone takes the rest from the purse beside it. */
+    min-width: 96px;
+    overflow: hidden;
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xl);
+    font-weight: 700;
+    line-height: 22px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Close: a round red button with a drawn cross; the finger gets the whole 44 px around it. */
+:root[data-handheld] .octane-handheld-sheet__caption-button {
+    position: relative;
+    display: flex;
+    flex: 0 0 36px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    box-shadow: var(--hh-edge);
+    color: var(--hh-on-dark);
+    cursor: pointer;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld] .octane-handheld-sheet__caption-button::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+}
+
+:root[data-handheld] .octane-handheld-sheet__caption-button svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+:root[data-handheld] .octane-handheld-sheet__caption-button.is-close {
+    background: var(--hh-dismiss);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px var(--hh-air-outline);
+}
+
+:root[data-handheld] .octane-handheld-sheet__caption-button.is-close:active {
+    background: var(--hh-air-red-deep);
+}
+
+/* ---------------------------------------------------------------- tabs */
+
+/* One row of pills on the blue; the one on screen is the light one. A few share the width, many scroll sideways
+   (swiped; the row shows no bar, see ClassicScrollbar.css). */
+:root[data-handheld] .octane-handheld-sheet__tabs {
+    display: flex;
+    flex: 0 0 48px;
+    box-sizing: border-box;
+    align-items: flex-start;
+    gap: 6px;
+    height: 48px;
+    padding: 0 var(--hh-space-3);
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+:root[data-handheld] .octane-handheld-sheet__tab {
+    position: relative;
+    display: flex;
+    flex: 1 0 auto;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 72px;
+    height: 36px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-well);
+    color: var(--hh-on-dark-muted);
+    cursor: pointer;
+    font-size: var(--hh-size-m);
+    line-height: 36px;
+    white-space: nowrap;
+    transition: background-color var(--hh-fast) var(--hh-ease);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-sheet__tabs {
+    flex-basis: 42px;
+    height: 42px;
+}
+
+:root[data-handheld='landscape'] .octane-handheld-sheet__tab {
+    height: 32px;
+    line-height: 32px;
+}
+
+/* The pill is 36 px; the finger gets the strip's whole height. */
+:root[data-handheld] .octane-handheld-sheet__tab::after {
+    content: "";
+    position: absolute;
+    inset: -6px 0;
+}
+
+:root[data-handheld] .octane-handheld-sheet__tab:active {
+    background: var(--hh-well-pressed);
+}
+
+:root[data-handheld] .octane-handheld-sheet__tab.is-active {
+    background: var(--hh-air-track-light);
+    box-shadow:
+        inset 0 1px 0 #ffffff,
+        0 1px 3px rgba(0, 0, 0, 0.35);
+    color: var(--hh-air-blue-header);
+    font-family: var(--hh-font-bold);
+    font-weight: 700;
+}
+
+/* A tab that is a picture (the avatar editor's categories): as wide as a finger, never stretched. */
+:root[data-handheld] .octane-handheld-sheet__tab.has-image {
+    flex: 0 0 auto;
+    min-width: 56px;
+    padding: 0 var(--hh-space-2);
+}
+
+:root[data-handheld] .octane-handheld-sheet__tab-image {
+    max-width: 41px;
+    max-height: 24px;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+/* New things behind a tab: a small red count. */
+:root[data-handheld] .octane-handheld-sheet__tab-count {
+    flex: none;
+    box-sizing: border-box;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: var(--hh-radius-pill);
+    background: var(--hh-air-red);
+    box-shadow: 0 0 0 1px var(--hh-air-outline);
+    color: var(--hh-on-dark);
+    font-family: var(--hh-font-bold);
+    font-size: var(--hh-size-xxs);
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+}
+
+/* ---------------------------------------------------------------- body */
+
+/* The cream sheet, with rounded shoulders over the blue. */
+:root[data-handheld] .octane-handheld-sheet__body {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 0;
+    padding: var(--hh-space-3) var(--hh-space-3) var(--hh-space-2);
+    overflow: hidden;
+    border-radius: var(--hh-radius-l) var(--hh-radius-l) 0 0;
+    background: var(--hh-air-cream);
+}
+
+:root[data-handheld='landscape'] .octane-handheld-sheet__body {
+    padding-top: var(--hh-space-2);
+}
+
+/* Focus rings: deep blue on the cream, the selection blue on the header. */
+:root[data-handheld] .octane-handheld-sheet :where(button, [role='option']):focus-visible {
+    outline: var(--hh-focus-on-paper);
+    outline-offset: 2px;
+}
+
+:root[data-handheld] .octane-handheld-sheet :where(.octane-handheld-sheet__caption-button, .octane-handheld-sheet__tab):focus-visible {
+    outline: var(--hh-focus-on-dark);
+}

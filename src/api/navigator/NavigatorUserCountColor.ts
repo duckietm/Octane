@@ -18,3 +18,19 @@ export const getNavigatorUserCountColor = (userCount: number, maxUserCount: numb
 
     return NAVIGATOR_USERCOUNT_EMPTY;
 };
+
+/** How full a room is, in the same four steps as the colours above. */
+export type NavigatorUserCountLevel = 'empty' | 'open' | 'busy' | 'full';
+
+export const getNavigatorUserCountLevel = (userCount: number, maxUserCount: number): NavigatorUserCountLevel => {
+    switch (getNavigatorUserCountColor(userCount, maxUserCount)) {
+        case NAVIGATOR_USERCOUNT_RED:
+            return 'full';
+        case NAVIGATOR_USERCOUNT_YELLOW:
+            return 'busy';
+        case NAVIGATOR_USERCOUNT_GREEN:
+            return 'open';
+        default:
+            return 'empty';
+    }
+};

@@ -4,6 +4,8 @@ import { loadNativeFont, measureNativeText, peekNativeFont } from './NativeFont'
 import { NativeText } from './NativeText';
 import { isNativeTextEnabled } from './nativeTextEnabled';
 import { CssNativeFont, resolveCssNativeFont } from './resolveCssNativeFont';
+import { HANDHELD_FIXED_FRAME_SELECTOR, handheldVolterSize } from '../../api/handheld/handheldTextSize';
+import { isHandheldActive } from '../../state/handheldStore';
 
 // The host is a custom element: a window's generic `span` / `i` rules (colours, sizes) would otherwise land on it instead of
 // letting it inherit the text's own style.
@@ -49,6 +51,10 @@ const ALIGN: Record<string, Measurement['align']> = { center: 'center', right: '
 // Width changes this small are a scrollbar coming or going, not a resized container.
 const SCROLLBAR_SLACK = 24;
 
+// A shortened label measured again this often within the window is chasing its own box (see the width watcher): it is left shortened.
+const CLIP_RESET_LIMIT = 3;
+const CLIP_RESET_WINDOW_MS = 1000;
+
 // Whether the environment lays elements out at all (jsdom does not: there nothing ever has a box).
 const hasLayout = () => document.documentElement.getClientRects().length > 0;
 
@@ -74,13 +80,25 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
     const hostRef = useRef<HTMLElement>(null);
     const [measurement, setMeasurement] = useState<Measurement | null>(null);
     const [resizeTick, setResizeTick] = useState(0);
-    const key = `${text}\u0000${String(stateKey)}\u0000${resizeTick}`;
+    // Phone layout: the size a small Volter label is drawn at instead of its CSS one (see handheldVolterSize); 0 when it keeps it.
+    const [handheldSize, setHandheldSize] = useState<number | null>(null);
+    const key = `${text}\u0000${String(stateKey)}\u0000${resizeTick}\u0000${handheldSize}`;
     const current = measurement?.key === key ? measurement : null;
 
     useLayoutEffect(() => {
         const host = hostRef.current;
 
         if (!host || measurement?.key === key) return;
+
+        // Decided once, before the label is measured: the enlarged size is then set on the host, so the browser lays the text out at it too.
+        if (handheldSize === null && isHandheldActive()) {
+            const hostCss = getComputedStyle(host);
+            const enlarged = host.closest(HANDHELD_FIXED_FRAME_SELECTOR) ? null : handheldVolterSize(hostCss.fontFamily, parseFloat(hostCss.fontSize));
+
+            setHandheldSize(enlarged ?? 0);
+
+            return;
+        }
         if (!isNativeTextEnabled()) {
             setMeasurement({ key, font: null, lines: 1 });
 
@@ -138,7 +156,7 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
             ellipsisBox,
             align: lines > 1 ? ALIGN[css.textAlign] : undefined
         });
-    }, [key, measurement?.key]);
+    }, [key, measurement?.key, handheldSize]);
 
     // A wrapped label follows its container's width: when that really changes, the browser lays the text out again. Changes up to a
     // scrollbar's width are left alone: the raster's own height can show or hide a scrollbar, and measuring again on that would
@@ -152,6 +170,11 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
     // The parent of a wrapped label can be sized by the label itself (a flex item, an inline-block): once the raster holds the wrapped
     // lines it keeps that width when the window around it widens (a window opening narrow, then laid out). The parent's container is
     // watched too, so the label is laid out again when the room it may take really changes.
+    // A shortened one-line label can move its own box: in a flex row whose items are sized by their content (a sheet title beside
+    // the purse) the shorter raster gives a neighbour room, the box changes width, the label is laid out again in full, overflows,
+    // is shortened again, and so on every frame. When the box keeps moving that fast, the shortened label stays as it is.
+    const clipResetsRef = useRef<number[]>([]);
+
     useLayoutEffect(() => {
         const parent = hostRef.current?.parentElement;
         const outer = parent?.parentElement;
@@ -164,6 +187,18 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
 
             if (!parentMoved && !outerMoved) return;
 
+            if (wrapWidth === undefined) {
+                const now = performance.now();
+                const recent = clipResetsRef.current.filter((time) => now - time < CLIP_RESET_WINDOW_MS);
+
+                if (recent.length >= CLIP_RESET_LIMIT) {
+                    clipResetsRef.current = recent;
+                    return;
+                }
+
+                clipResetsRef.current = [...recent, now];
+            }
+
             observer.disconnect();
             setResizeTick((tick) => tick + 1);
         });
@@ -173,7 +208,7 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
         if (outerWidth !== undefined && outer) observer.observe(outer);
 
         return () => observer.disconnect();
-    }, [watchedWidth, outerWidth]);
+    }, [watchedWidth, outerWidth, wrapWidth]);
 
     // A box that asks for dots is checked with the raster in it: one sized to its text (a tab, a title) grows with the raster and never
     // overflows; a fixed one (a dropdown value) does, and the label is then shortened to it. That needs the font's metrics: until it has
@@ -226,9 +261,13 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
         return disconnect;
     }, [key, ellipsisStyle, ellipsisFont, currentClip]);
 
+    // The phone size goes through a custom property and a phone-only rule (Handheld.css): set inline it would clash with `font: inherit`.
+    const sizeStyle = handheldSize ? ({ '--octane-handheld-label-size': `${handheldSize}px` } as CSSProperties) : null;
+    const sizeFlag = handheldSize ? '' : undefined;
+
     if (!current?.font)
         return (
-            <octane-label ref={hostRef} style={INHERIT}>
+            <octane-label ref={hostRef} data-handheld-size={sizeFlag} style={sizeStyle ? { ...INHERIT, ...sizeStyle } : INHERIT}>
                 {text}
             </octane-label>
         );
@@ -243,11 +282,12 @@ const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
         display: 'inline-flex',
         alignItems: 'center',
         verticalAlign: 'top',
-        maxWidth: '100%'
+        maxWidth: '100%',
+        ...sizeStyle
     };
 
     return (
-        <octane-label ref={hostRef} className="octane-native-label" style={hostStyle}>
+        <octane-label ref={hostRef} className="octane-native-label" data-handheld-size={sizeFlag} style={hostStyle}>
             <NativeText
                 align={align}
                 background={null}

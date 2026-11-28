@@ -5,6 +5,7 @@ import { usePurse } from '../../../../hooks/purse/usePurse';
 import { HabbiconPrice } from './HabbiconHubView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { HANDHELD_TOUCH_FRAME_SCALE } from '../../../../api/handheld/handheldWindowFit';
 
 export const HabbiconPurchaseView: FC = () => {
     const catalog = useHabbiconCatalog();
@@ -37,7 +38,7 @@ export const HabbiconPurchaseView: FC = () => {
 
     return (
         <NativeTextTree>
-            <OctaneCardView
+            <OctaneCardView handheldScale={HANDHELD_TOUCH_FRAME_SCALE}
                 classNames={['habbicon-purchase-window']}
                 frameStyle={3}
                 isResizable={false}

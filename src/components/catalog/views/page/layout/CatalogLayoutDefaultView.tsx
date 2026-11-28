@@ -4,6 +4,7 @@ import { findActiveCatalogNode, isCatalogHeadingPage } from '../../../../../api/
 import { LayoutChatStyleImageView, Text } from '../../../../../common';
 import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { getCatalogGridMetrics, useCatalogActions, useCatalogData, useCatalogDisplayPreferences, useCatalogUiState } from '../../../../../hooks';
+import { useIsHandheld } from '../../../../../hooks/handheld/useHandheldLayout';
 import { useCatalogAdmin } from '../../../CatalogAdminContext';
 import { CatalogHeaderView } from '../../catalog-header/CatalogHeaderView';
 import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';
@@ -19,6 +20,7 @@ import { CatalogTotalPriceWidget } from '../widgets/CatalogTotalPriceWidget';
 import { CatalogViewProductWidgetView } from '../widgets/CatalogViewProductWidgetView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 import { CatalogLayoutCategoryIndexView } from './CatalogLayoutCategoryIndexView';
+import { HandheldCatalogLayoutDefaultView } from './HandheldCatalogLayoutDefaultView';
 
 export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = (props) => {
     const { page = null } = props;
@@ -28,6 +30,7 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = (props) => {
     const adminMode = useCatalogAdmin()?.adminMode ?? false;
     const { density = 'standard', showTilePrices = true } = useCatalogDisplayPreferences();
     const gridMetrics = getCatalogGridMetrics(density);
+    const isHandheld = useIsHandheld();
 
     const teaserText = page?.localization.getText(0) ?? '';
     const hasTeaserText = !!teaserText.replace(/<[^>]*>/g, '').trim();
@@ -43,6 +46,9 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = (props) => {
     if (!adminMode && page && isCatalogHeadingPage(page.offers?.length ?? 0, headingNode)) {
         return <CatalogLayoutCategoryIndexView node={headingNode} text={teaserText} onOpen={(node) => activateNode?.(node)} />;
     }
+
+    // Phone layout: the grid with the product panel under it (beside it on a phone held on its side), in the phone's own look.
+    if (isHandheld) return <HandheldCatalogLayoutDefaultView {...props} />;
 
     return (
         <NativeTextTree>

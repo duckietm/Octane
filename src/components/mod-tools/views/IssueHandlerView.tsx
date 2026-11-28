@@ -12,6 +12,9 @@ import { UserInfoPanel } from './UserInfoPanel';
 import { UserRecordKind } from './UserRecordsView';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { useIsHandheld } from '../../../hooks/handheld/useHandheldLayout';
+import { HandheldModPage, HandheldModNote } from '../handheld/HandheldModPage';
+import { HandheldModIssueHandlerView } from '../handheld/HandheldModTicketsView';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SHADE = 0xa2d6ea;
@@ -108,6 +111,16 @@ export const IssueHandlerView: FC<IssueHandlerProps> = ({
     const evidenceIssue = issues.find((tracked) => tracked.issue.issueId === evidenceIssueId) ?? primary;
     const evidence = useEvidence('cfh', evidenceIssue?.issue.issueId ?? 0);
     const { issueSanctions = {} } = useModTools();
+    const isHandheld = useIsHandheld();
+
+    // phone: a ticket that is gone (closed or released elsewhere) keeps its page until it is closed, saying so
+    if (isHandheld && (!bundle || !current)) {
+        return (
+            <HandheldModPage title={nativeCaption(root)} onClose={onClose}>
+                <HandheldModNote text={localizeWithFallback('octane.handheld.mod_tools.ticket_gone', 'This ticket is no longer yours to handle.')} />
+            </HandheldModPage>
+        );
+    }
 
     if (!bundle || !current) return null;
 
@@ -217,6 +230,74 @@ export const IssueHandlerView: FC<IssueHandlerProps> = ({
         onOpenRecords: (kind: UserRecordKind, userName: string) => onOpenRecords(userId, kind, userName),
         onOpenSendMessage: (userName: string) => onOpenSendMessage(userId, userName)
     });
+
+    // phone: the bundle, its messages, the evidence chatlog and both users as parts of one page, the closing actions in its bar
+    if (isHandheld) {
+        const buttonCaption = (name: string) => nativeCaption(buttonNode(name));
+
+        return (
+            <HandheldModIssueHandlerView
+                autoNext={autoNext}
+                autoNextLabel={nativeCaption(buttonNode('handle_next_text'))}
+                callerPanel={<UserInfoPanel key={callerId} settings={settings} userId={callerId} {...panelHandlers(callerId)} />}
+                closeActions={[
+                    { id: 'useless', label: buttonCaption('close_useless'), tone: 'danger', onClick: () => closeAs(CLOSE_USELESS) },
+                    { id: 'abusive', label: localizeWithFallback('modtools.native.close_abusive', 'Close as abusive'), tone: 'danger', onClick: () => closeAs(CLOSE_ABUSIVE) },
+                    {
+                        id: 'release',
+                        label: buttonCaption('release'),
+                        tone: 'plain',
+                        onClick: () => {
+                            if (finishedRef.current) return;
+
+                            releaseBundle(bundle.id, context);
+                            finish();
+                        }
+                    },
+                    { id: 'sanction', label: buttonCaption('close_sanction'), tone: 'plain', onClick: closeWithDefaultSanction },
+                    { id: 'resolved', label: buttonCaption('close_resolved'), tone: 'primary', onClick: () => closeAs(CLOSE_RESOLVED) }
+                ]}
+                evidence={evidence}
+                issues={issues.map((tracked) => ({
+                    id: tracked.issue.issueId,
+                    reporter: tracked.issue.reporterUserName ?? '',
+                    category: categoryOf(tracked.issue.reportedCategoryId),
+                    source: sourceOf(tracked),
+                    time: issueOpenTime(tracked),
+                    primary: tracked.issue.issueId === primary?.issue.issueId && issues.length > 1,
+                    selected: tracked.issue.issueId === current.issue.issueId
+                }))}
+                messages={messageRows.map((row) => row.text)}
+                proposedText={proposedText}
+                reportedPanel={reportedShown ? <UserInfoPanel key={bundle.reportedUserId} settings={settings} userId={bundle.reportedUserId} {...panelHandlers(bundle.reportedUserId)} /> : null}
+                sectionLabels={{
+                    caller: localizeWithFallback('octane.mod_tools.caller_user_info', 'Caller User Info'),
+                    messages: localizeWithFallback('octane.mod_tools.messages', 'Messages'),
+                    reported: localizeWithFallback('octane.mod_tools.reported_user_info', 'Reported User Info')
+                }}
+                subtitle={`${categoryOf(categoryId)} · ${issueOpenTime(primary ?? current)}`}
+                tabTitle={reportedShown && primary?.issue.reportedUserName ? `${categoryOf(categoryId)}: ${primary.issue.reportedUserName}` : categoryOf(categoryId)}
+                title={nativeCaption(root)}
+                topicCaption={nativeCaption(findNativeNode(root, 'cfh_topics'))}
+                topicDisabled={categoryId === CATEGORY_NO_TOPIC}
+                topicIndex={topicIndex}
+                topics={topicNames}
+                onAutoNext={() => setAutoNext((value) => !value)}
+                onClose={() => onClose()}
+                onEnterRoom={onEnterRoom}
+                onOpenRoomTool={onOpenRoomTool}
+                onOpenUserInfo={(userId) => onOpenUserInfo(userId, chatRect)}
+                onSelectIssue={(issueId) => {
+                    const tracked = issues.find((entry) => entry.issue.issueId === issueId);
+
+                    setSelectedIssueId(issueId);
+
+                    if (tracked && tracked.issue.reporterUserId !== 0) setEvidenceIssueId(issueId);
+                }}
+                onTopic={setChosenTopic}
+            />
+        );
+    }
 
     return (
         <NativeTextTree>

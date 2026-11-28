@@ -15,8 +15,14 @@ import { BaseButton } from '../../../../common/BaseButton';
 import { TabBar, TabBarTab } from '../../../../common/TabBar';
 import { Hint } from '../../../../common/Tooltip';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
+import { fittingTabCount } from '../../../../api/handheld/handheldTabStrip';
+import { useHandheldStore } from '../../../../state/handheldStore';
 
 const MESSENGER_VISIBLE_AVATARS = 7;
+/** Phone layout: a friend head tab (46 px, see HandheldSocial.css), the two scroll arrows (32 px each) and the most heads shown. */
+const HANDHELD_AVATAR_TAB_WIDTH = 46;
+const HANDHELD_AVATAR_ARROWS_WIDTH = 64;
+const HANDHELD_MAX_VISIBLE_AVATARS = 16;
 /** How long the window keeps its place for an older history page that was asked for. */
 const OLDER_PAGE_WAIT_MS = 5000;
 
@@ -27,6 +33,13 @@ export const FriendsMessengerView: FC<{}> = (props) => {
     const [isHabbiconPickerVisible, setIsHabbiconPickerVisible] = useState(false);
     const habbiconCatalog = useHabbiconCatalog();
     const [avatarStartIndex, setAvatarStartIndex] = useState(0);
+    const handheld = useHandheldStore((state) => state.layout.active);
+    const [navigationWidth, setNavigationWidth] = useState(0);
+    const navigationRef = useRef<HTMLDivElement>(null);
+    // On a phone the strip is the screen's width: as many heads as fit there, not the desktop window's seven.
+    const visibleAvatars = handheld
+        ? fittingTabCount(navigationWidth - HANDHELD_AVATAR_ARROWS_WIDTH, HANDHELD_AVATAR_TAB_WIDTH, HANDHELD_MAX_VISIBLE_AVATARS)
+        : MESSENGER_VISIBLE_AVATARS;
     const {
         visibleThreads = [],
         activeThread = null,
@@ -258,7 +271,7 @@ export const FriendsMessengerView: FC<{}> = (props) => {
     }, [isVisible, activeThread, lastThreadId, visibleThreads, setActiveThreadId]);
 
     useEffect(() => {
-        const maximumStart = Math.max(0, visibleThreads.length - MESSENGER_VISIBLE_AVATARS);
+        const maximumStart = Math.max(0, visibleThreads.length - visibleAvatars);
         const activeIndex = activeThread ? visibleThreads.findIndex((thread) => thread.threadId === activeThread.threadId) : -1;
 
         setAvatarStartIndex((current) => {
@@ -266,27 +279,45 @@ export const FriendsMessengerView: FC<{}> = (props) => {
 
             if (activeIndex < 0) return clamped;
             if (activeIndex < clamped) return activeIndex;
-            if (activeIndex >= clamped + MESSENGER_VISIBLE_AVATARS) return Math.min(activeIndex - MESSENGER_VISIBLE_AVATARS + 1, maximumStart);
+            if (activeIndex >= clamped + visibleAvatars) return Math.min(activeIndex - visibleAvatars + 1, maximumStart);
 
             return clamped;
         });
-    }, [activeThread, visibleThreads]);
+    }, [activeThread, visibleThreads, visibleAvatars]);
 
-    const maximumAvatarStart = Math.max(0, visibleThreads.length - MESSENGER_VISIBLE_AVATARS);
-    const displayedThreads = visibleThreads.slice(avatarStartIndex, avatarStartIndex + MESSENGER_VISIBLE_AVATARS);
+    const maximumAvatarStart = Math.max(0, visibleThreads.length - visibleAvatars);
+    const displayedThreads = visibleThreads.slice(avatarStartIndex, avatarStartIndex + visibleAvatars);
     const scrollAvatars = (direction: -1 | 1) => setAvatarStartIndex((current) => Math.max(0, Math.min(maximumAvatarStart, current + direction)));
+
+    useLayoutEffect(() => {
+        const element = navigationRef.current;
+
+        if (!handheld || !isVisible || !element) return;
+
+        const measure = () => setNavigationWidth(element.clientWidth);
+
+        measure();
+
+        if (typeof ResizeObserver === 'undefined') return;
+
+        const observer = new ResizeObserver(measure);
+
+        observer.observe(element);
+
+        return () => observer.disconnect();
+    }, [handheld, isVisible]);
 
     if (!isVisible) return null;
 
     return (
         <NativeTextTree>
             <>
-            <DraggableWindow uniqueKey="messenger" handleSelector=".messenger-drag" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={8}>
+            <DraggableWindow uniqueKey="messenger" handheldSheet handleSelector=".messenger-drag" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={8}>
                 <div className="messenger-window">
                     <div className="messenger-drag" />
                     <BaseButton className="messenger-minimize" onClick={() => setIsVisible(false)} />
                     <div className="messenger-open-title">{LocalizeText('messenger.window.title', ['OPEN_CHAT_COUNT'], [visibleThreads.length.toString()])}</div>
-                    <div className="messenger-avatar-navigation">
+                    <div ref={navigationRef} className="messenger-avatar-navigation">
                         <BaseButton
                             type="button"
                             className="messenger-avatar-scroll left"
